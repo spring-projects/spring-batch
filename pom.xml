@@ -28,12 +28,12 @@
 		</license>
 	</licenses>
 
-	<!--modules>
-		<module>docs</module>
+	<modules>
+		<!--module>docs</module-->
 		<module>infrastructure</module>
-		<module>integration</module>
-		<module>container-scratch</module>
-	</modules-->
+		<!--module>integration</module>
+		<module>container-scratch</module-->
+	</modules>
 
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
