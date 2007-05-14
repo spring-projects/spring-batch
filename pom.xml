@@ -1,224 +1,299 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.springframework.batch</groupId>
-  <artifactId>spring-batch</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>Spring Batch</name>
-  <description>
+<project
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.springframework.batch</groupId>
+    <artifactId>spring-batch</artifactId>
+    <packaging>pom</packaging>
+    <name>Spring Batch</name>
+    <version>1.0-SNAPSHOT</version>
+    <description>
         Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track
         their execution, or simply as an optimisation for repetitive processing in a transactional environment. Spring
         Batch is part of the Spring Portfolio.
     </description>
-  <url>http://www.springframework.org/spring-batch</url>
-  <issueManagement>
-    <system>JIRA</system>
-    <url>http://opensource2.atlassian.com/projects/spring/browse/BATCH</url>
-  </issueManagement>
-  <ciManagement>
-    <system>bamboo</system>
-    <url>http://build.springframework.org:8085/bamboo/</url>
-  </ciManagement>
-  <distributionManagement>
-    <downloadUrl>http://www.springframework.org/spring-batch</downloadUrl>
-    <repository>
-      <id>local</id>
-      <url>file:///Users/nebhale/Documents/springframework/repos/repo</url>
-    </repository>
-    <snapshotRepository>
-      <id>aws-s3</id>
-      <name>Amazon S3</name>
-      <url>s3://maven.springframework.org</url>
-    </snapshotRepository>
-    <site>
-      <id>static.springframework.org</id>
-      <url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-batch/site</url>
-    </site>
-  </distributionManagement>
-  <inceptionYear>2005</inceptionYear>
-  <developers>
-    <developer>
-      <id>dsyer</id>
-      <name>Dave Syer</name>
-      <email>dsyer@interface21.com</email>
-    </developer>
-  </developers>
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <scm>
-    <connection>scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+    <url>http://www.springframework.org/spring-batch</url>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://opensource2.atlassian.com/projects/spring/browse/BATCH</url>
+    </issueManagement>
+    <ciManagement>
+        <system>Bamboo</system>
+        <url>http://build.springframework.org:8085/bamboo/browse/BATCH</url>
+    </ciManagement>
+    <inceptionYear>2007</inceptionYear>
+    <mailingLists>
+        <mailingList>
+            <name>spring-batch-announce</name>
+            <subscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</subscribe>
+            <unsubscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</unsubscribe>
+            <post>spring-batch-announce@lists.interface21.com</post>
+            <archive>http://lists.interface21.com/archives/spring-batch-announce/</archive>
+        </mailingList>
+    </mailingLists>
+    <developers>
+        <developer>
+            <id>dsyer</id>
+            <name>Dave Syer</name>
+            <email>dsyer@interface21.com</email>
+            <organization>Interface21</organization>
+            <organizationUrl>http://www.interface21.com</organizationUrl>
+            <roles>
+                <role>Lead</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>
+            scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
         </connection>
-    <developerConnection>scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+        <developerConnection>
+            scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
         </developerConnection>
-    <url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk</url>
-  </scm>
-  <modules>
-<!--module>docs</module-->
-    <module>infrastructure</module>
-<!--module>integration</module>
-        <module>container-scratch</module-->
-  </modules>
-  <properties>
-    <maven.test.failure.ignore>true</maven.test.failure.ignore>
-  </properties>
-  <repositories>
-    <repository>
-      <id>apache</id>
-      <url>http://people.apache.org/maven-snapshot-repository</url>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>spring-ext</id>
-      <url>https://svn.sourceforge.net/svnroot/springframework/repos/repo-ext</url>
-    </pluginRepository>
-  </pluginRepositories>
-  <build>
-    <extensions>
-      <extension>
-        <groupId>org.springframework.aws</groupId>
-        <artifactId>spring-aws-maven</artifactId>
-        <version>1.0.3</version>
-      </extension>
-    </extensions>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.3</version>
-        <configuration>
-<!--forkMode>pertest</forkMode-->
-          <includes>
-            <include>**/*Tests.java</include>
-          </includes>
-          <excludes>
-            <exclude>**/Abstract*.java</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>junitreport</id>
-            <phase>site</phase>
-            <configuration>
-              <tasks>
-                <echo>Creating JUnit reports</echo>
-                <mkdir dir="target/surefire-reports"/>
-                <junitreport todir="target/surefire-reports">
-                  <fileset dir="target/surefire-reports">
-                    <include name="TEST-*.xml"/>
-                  </fileset>
-                  <report todir="target/site/junit-reports"/>
-                </junitreport>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>cleandata</id>
-            <phase>pre-site</phase>
-            <configuration>
-              <tasks>
-                <echo>Removing test data</echo>
-                <delete failonerror="false">
-                  <fileset dir="amqstore"/>
-                  <fileset dir="activemq-data"/>
-                  <fileset dir="derby-home"/>
-                </delete>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant-junit</artifactId>
-            <version>1.6.5</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <plugin>
-        <artifactId>maven-clean-plugin</artifactId>
-        <configuration>
-          <filesets>
-            <fileset>
-              <directory>${basedir}</directory>
-              <includes>
-                <include>activemq-data</include>
-                <include>derby-home</include>
-                <include>amqstore</include>
-                <include>.clover</include>
-                <include>surefire*</include>
-              </includes>
-              <followSymlinks>false</followSymlinks>
-            </fileset>
-          </filesets>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  <reporting>
-    <excludeDefaults>true</excludeDefaults>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>com.interface21.maven</groupId>
-        <artifactId>maven-external-report-plugin</artifactId>
-        <version>1.0</version>
-        <configuration>
-          <name>JUnit Report</name>
-          <description>JUnit test results for this project</description>
-          <base>junit-reports</base>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jdepend-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <links>
-            <link>http://java.sun.com/j2ee/1.4/docs/api</link>
-            <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-            <link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
-            <link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
-            <link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
-            <link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
-            <link>http://jakarta.apache.org/commons/logging/api/</link>
-            <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
-            <link>http://www.junit.org/junit/javadoc/</link>
-            <link>http://logging.apache.org/log4j/docs/api/</link>
-            <link>http://jakarta.apache.org/regexp/apidocs/</link>
-            <link>http://jakarta.apache.org/velocity/api/</link>
-          </links>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
+        <url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk</url>
+    </scm>
+    <organization>
+        <name>Spring Framework</name>
+        <url>http://www.springframework.org</url>
+    </organization>
+    <build>
+        <extensions>
+            <extension>
+                <groupId>org.springframework.aws</groupId>
+                <artifactId>spring-aws-maven</artifactId>
+                <version>1.1.1</version>
+            </extension>
+        </extensions>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <forkMode>once</forkMode>
+                    <includes>
+                        <include>**/*Tests.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/Abstract*.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>junitreport</id>
+                        <phase>site</phase>
+                        <configuration>
+                            <tasks>
+                                <echo>Creating JUnit reports</echo>
+                                <mkdir dir="target/surefire-reports"/>
+                                <junitreport todir="target/surefire-reports">
+                                    <fileset dir="target/surefire-reports">
+                                        <include name="TEST-*.xml"/>
+                                    </fileset>
+                                    <report todir="target/site/junit-reports"/>
+                                </junitreport>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>cleandata</id>
+                        <phase>pre-site</phase>
+                        <configuration>
+                            <tasks>
+                                <echo>Removing test data</echo>
+                                <delete failonerror="false">
+                                    <fileset dir="amqstore"/>
+                                    <fileset dir="activemq-data"/>
+                                    <fileset dir="derby-home"/>
+                                </delete>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>ant</groupId>
+                        <artifactId>ant-junit</artifactId>
+                        <version>1.6.5</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>${basedir}</directory>
+                            <includes>
+                                <include>activemq-data</include>
+                                <include>derby-home</include>
+                                <include>amqstore</include>
+                                <include>.clover</include>
+                                <include>surefire*</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <modules>
+        <!--<module>docs</module>-->
+        <module>infrastructure</module>
+        <!--<module>integration</module>-->
+        <!--<module>container-scratch</module>-->
+    </modules>
+    <repositories>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>spring-release</id>
+            <name>Spring Release Repository</name>
+            <url>s3://maven.springframework.org/release</url>
+        </repository>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>spring-milestone</id>
+            <name>Spring Milestone Repository</name>
+            <url>s3://maven.springframework.org/milestone</url>
+        </repository>
+        <repository>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>spring-snapshot</id>
+            <name>Spring Snapshot Repository</name>
+            <url>s3://maven.springframework.org/snapshot</url>
+        </repository>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>spring-external</id>
+            <name>Spring External Repository</name>
+            <url>s3://maven.springframework.org/external</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-external</id>
+            <name>Spring External Repository</name>
+            <url>s3://maven.springframework.org/external</url>
+        </pluginRepository>
+    </pluginRepositories>
+    <reporting>
+        <excludeDefaults>true</excludeDefaults>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.interface21.maven</groupId>
+                <artifactId>maven-external-report-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <name>JUnit Report</name>
+                    <description>JUnit test results for this project</description>
+                    <base>junit-reports</base>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jdepend-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <links>
+                        <link>http://java.sun.com/j2ee/1.4/docs/api</link>
+                        <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+                        <link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
+                        <link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
+                        <link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
+                        <link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
+                        <link>http://jakarta.apache.org/commons/logging/api/</link>
+                        <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
+                        <link>http://www.junit.org/junit/javadoc/</link>
+                        <link>http://logging.apache.org/log4j/docs/api/</link>
+                        <link>http://jakarta.apache.org/regexp/apidocs/</link>
+                        <link>http://jakarta.apache.org/velocity/api/</link>
+                    </links>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+    <distributionManagement>
+        <downloadUrl>http://www.springframework.org/spring-batch</downloadUrl>
+        <repository>
+            <id>spring-milestone</id>
+            <name>Spring Milestone Repository</name>
+            <url>s3://maven.springframework.org/milestone</url>
+        </repository>
+        <snapshotRepository>
+            <id>spring-snapshot</id>
+            <name>Spring Snapshot Repository</name>
+            <url>s3://maven.springframework.org/snapshot</url>
+        </snapshotRepository>
+        <site>
+            <id>static.springframework.org</id>
+            <url>
+                scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-batch/site
+            </url>
+        </site>
+    </distributionManagement>
+    <!--<properties>-->
+    <!--<maven.test.failure.ignore>true</maven.test.failure.ignore>-->
+    <!--</properties>-->
+    <!--<repositories>-->
+    <!--<repository>-->
+    <!--<id>apache</id>-->
+    <!--<url>http://people.apache.org/maven-snapshot-repository</url>-->
+    <!--</repository>-->
+    <!--</repositories>-->
 </project>
