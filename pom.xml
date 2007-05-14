@@ -183,7 +183,7 @@
             </snapshots>
             <id>spring-release</id>
             <name>Spring Release Repository</name>
-            <url>s3://maven.springframework.org/release</url>
+            <url>http://maven.springframework.org.s3.amazonaws.com/release</url>
         </repository>
         <repository>
             <releases>
@@ -194,7 +194,7 @@
             </snapshots>
             <id>spring-milestone</id>
             <name>Spring Milestone Repository</name>
-            <url>s3://maven.springframework.org/milestone</url>
+            <url>http://maven.springframework.org.s3.amazonaws.com/milestone</url>
         </repository>
         <repository>
             <releases>
@@ -205,7 +205,7 @@
             </snapshots>
             <id>spring-snapshot</id>
             <name>Spring Snapshot Repository</name>
-            <url>s3://maven.springframework.org/snapshot</url>
+            <url>http://maven.springframework.org.s3.amazonaws.com/snapshot</url>
         </repository>
         <repository>
             <releases>
@@ -216,14 +216,29 @@
             </snapshots>
             <id>spring-external</id>
             <name>Spring External Repository</name>
-            <url>s3://maven.springframework.org/external</url>
+            <url>http://maven.springframework.org.s3.amazonaws.com/external</url>
         </repository>
     </repositories>
     <pluginRepositories>
+		<pluginRepository>
+            <id>spring-release</id>
+            <name>Spring Release Repository</name>
+            <url>http://maven.springframework.org.s3.amazonaws.com/release</url>
+		</pluginRepository>
+		<pluginRepository>
+            <id>spring-milestone</id>
+            <name>Spring Milestone Repository</name>
+            <url>http://maven.springframework.org.s3.amazonaws.com/milestone</url>
+		</pluginRepository>
+		<pluginRepository>
+            <id>spring-snapshot</id>
+            <name>Spring Snapshot Repository</name>
+            <url>http://maven.springframework.org.s3.amazonaws.com/snapshot</url>
+		</pluginRepository>
         <pluginRepository>
             <id>spring-external</id>
             <name>Spring External Repository</name>
-            <url>s3://maven.springframework.org/external</url>
+            <url>http://maven.springframework.org.s3.amazonaws.com/external</url>
         </pluginRepository>
     </pluginRepositories>
     <reporting>
