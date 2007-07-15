@@ -173,6 +173,13 @@
 		<!--<module>integration</module>-->
 		<!--<module>container-scratch</module>-->
 	</modules>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-external</id>
+			<name>Spring External Repository</name>
+			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext</url>
+		</pluginRepository>
+	</pluginRepositories>
 	<reporting>
 		<excludeDefaults>true</excludeDefaults>
 		<plugins>
