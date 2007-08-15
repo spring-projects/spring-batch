@@ -54,6 +54,8 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	 */
 
 	protected void setUp() throws Exception {
+		System.err.println("***for Ben, System.getProperty(\"java.io.tmpdir\"): "+rootDir);
+		System.err.println("***for Ben, File.createTempFile(\"foo\", \".bar\"): "+File.createTempFile("foo", ".bar"));
 		assertNotNull(rootDir);
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.YEAR, 2007);
