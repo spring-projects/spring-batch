@@ -39,24 +39,21 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	 */
 	private BatchResourceFactoryBean resourceFactory = new BatchResourceFactoryBean();
 
-	private String rootDir = System.getProperty("java.io.tmpdir");
+	private String rootDir = getRootDir();
 	
 	private char pathsep = File.separatorChar;
 	
 	private String PATTERN_STRING = "%BATCH_ROOT%"+pathsep+"%JOB_NAME%-%SCHEDULE_DATE%-%JOB_RUN%-%STREAM_NAME%";
 
-	private String EXPECTED_ABSOLUTE_PATH = rootDir+"testJob-20070730-0-testStream";
+	private String EXPECTED_ABSOLUTE_PATH = rootDir+pathsep+"testJob-20070730-0-testStream";
 
-	private String NULL_JOB_NAME_PATH = rootDir+"%JOB_NAME%-20070730-0-testStream";
+	private String NULL_JOB_NAME_PATH = rootDir+pathsep+"%JOB_NAME%-20070730-0-testStream";
 
 	/**
 	 * mock step context
 	 */
 
 	protected void setUp() throws Exception {
-		System.err.println("***for Ben, System.getProperty(\"java.io.tmpdir\"): "+rootDir);
-		System.err.println("***for Ben, File.createTempFile(\"foo\", \".bar\"): "+File.createTempFile("foo", ".bar"));
-		assertNotNull(rootDir);
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.YEAR, 2007);
 		calendar.set(Calendar.MONTH, Calendar.JULY);
@@ -74,6 +71,15 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		resourceFactory.afterPropertiesSet();
 	}
 
+	private String getRootDir() {
+		String rootDir = System.getProperty("java.io.tmpdir");
+		assertNotNull(rootDir);
+		if (rootDir!=null && rootDir.endsWith(File.separator)) {
+			rootDir = rootDir.substring(0, rootDir.lastIndexOf(File.separator));
+		}
+		return rootDir;
+	}
+
 	/**
 	 * regular use with valid context and pattern provided
 	 */
@@ -83,6 +89,8 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 		String returnedPath = resource.getFile().getAbsolutePath();
 
+		System.err.println(EXPECTED_ABSOLUTE_PATH);
+		System.err.println(returnedPath);
 		assertEquals(EXPECTED_ABSOLUTE_PATH, returnedPath);
 	}
 

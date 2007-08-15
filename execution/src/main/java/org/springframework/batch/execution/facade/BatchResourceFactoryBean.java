@@ -16,6 +16,8 @@
 
 package org.springframework.batch.execution.facade;
 
+import java.io.File;
+
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.context.ResourceLoaderAware;
@@ -151,6 +153,9 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 
 	public void setRootDirectory(String rootDirectory) {
 		this.rootDirectory = rootDirectory;
+		if (rootDirectory!=null && rootDirectory.endsWith(File.separator)) {
+			this.rootDirectory = rootDirectory.substring(0, rootDirectory.lastIndexOf(File.separator));
+		}
 	}
 
 	public void setStepName(String stepName) {
