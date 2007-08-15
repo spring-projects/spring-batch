@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:po="http://adsj.accenture.com/purchaseorders"
+    targetNamespace="http://adsj.accenture.com/purchaseorders"
+    elementFormDefault="qualified">
+    <xs:element name="purchase-orders">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="order" type="po:order" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>            
+    </xs:element>
+    <xs:complexType name="order">
+        <xs:sequence>
+            <xs:element name="customer" type="po:customer"/>
+            <xs:element name="date" type="xs:string"/>
+            <xs:element name="lineItems" type="po:lineItems"/>
+            <xs:element name="shipper" type="po:shipper" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="customer">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="address" type="xs:string"/>
+            <xs:element name="age" type="xs:int"/>
+            <xs:element name="moo" type="xs:int" default="100"/>
+            <xs:element name="poo" type="xs:int" default="200"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="lineItems">
+    	<xs:sequence>
+    		<xs:element name="lineItem" type="po:lineItem" minOccurs="0" maxOccurs="unbounded"/>
+    	</xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="lineItem">
+        <xs:sequence>
+            <xs:element name="description" type="xs:string"/>
+            <xs:element name="perUnitOunces" type="xs:decimal"/>
+            <xs:element name="price" type="xs:decimal"/>
+            <xs:element name="quantity" type="xs:integer"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="shipper">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="perOunceRate" type="xs:decimal"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

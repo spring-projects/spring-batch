@@ -1,0 +1,176 @@
+                                    ------
+                                    Batch: Sequential Steps Use Case
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    January 2007
+
+Use Case: Sequential Processing of Dependent Steps
+
+* Goal
+
+  Compose a batch operation from a sequence of dependent steps.
+  Define and implement the operation only once, and allow restart
+  after failure without having to change configuration, and without
+  having to repeat steps that were successful.
+
+  A sub-goal is to allow the progress of a batch through the steps to
+  be traced accurately for reporting and auditing purposes.  This
+  requires the steps to be uniquely identified.
+
+* Scope
+
+  * Simple linear sequence of steps.  Slightly more complicated
+  requirements can be handled by putting independent steps in a
+  sequence (no need for splits and joins).
+
+* Preconditions
+
+  * A non-trivial sequence is defined: 
+
+    * more than one step:
+
+    * the effects of each step can be measured.
+
+  * The sequence can be interrupted or artificially terminated in the
+    second or subsequent step.
+
+* Success
+
+  * A non-trivial sequence executes successfully.  The progress and
+  success of each step can be verified by the tester.
+
+  * The same sequence is forced to fail on second step in such a way
+  that the first step result is not suspected of being in error,
+  e.g. by interrupting it.  When it is restarted the first step is not
+  repeated, and the sequence is successful.
+
+  * The same sequence is forced to fail on second step in such a way
+  that the first step result is obviously in error, even though it
+  completed normally.  When the batch is restarted the first step <is>
+  repeated, and the sequence is successful.
+
+* Description
+
+  The vanilla successful case proceeds as follows:
+
+    [[1]] Container logs the start of a step, uniquely indentifying
+    the initial conditions.
+
+    [[1]] Container stores internal state so that initial conditions
+    can be re-created in the event of a restart.
+
+    [[1]] Step execution proceeds as per one of the other use cases
+    (e.g. {{{file-to-database.html}Copy File to Database}}), including
+    transactional behaviour.
+
+    [[1]] Client instructs Container to store internal state needed by
+    further steps (e.g. cached reference data).
+
+    [[1]] Container logs successful completion of step, and stores 
+
+    [[1]] Repeat for next and subsequent steps.  Internal state is
+    passed from one state to the next.
+
+* Variations
+
+** Internal Failure of Step
+
+  If a step fails internally, e.g. because of resource becoming
+  temporarily unavailable, the sequence can be restarted without
+  repeating the previous steps.
+
+    [[1]] Operator fixes resource problem (e.g. starts web service).
+
+    [[1]] Operator restarts batch with no configuration or input data
+    changes.
+
+    [[1]] Container resumes batch from the last commit point of the
+    failed step.
+
+    [[1]] Sequence completes normally.
+
+  The process above could be carried out by the container entirely (no
+  need for operator intervention) if a retry policy is in effect.
+
+** Failure of Step Owing to Bad Initial State
+
+  If a step fails because it receives bad data from an earlier step,
+  the Container cannot recover without intervention.
+
+    [[1]] Operator attempts to restart without doing anything to fix
+    the problem.
+
+    [[1]] Container detects bad initial state immediately and fails
+    fast.
+
+  If the original problem can be located and fixed (e.g. input data
+  for earlier step is revised):
+
+    [[1]] Operator restarts batch signalling to container which step
+    to begin with.
+
+    [[1]] Container locates initial state for the first step to be
+    executed.
+
+    [[1]] Container starts execution from the beginning of the desired
+    state.  This time the input data are different, so the sequence
+    can complete normally.
+
+* Implementation
+
+  * The need to save state for subsequent steps leads to the
+  introduction of a batch context concept.  And the need for
+  initialising restarts leads to the context being serializable,
+  either natively or by some pluggable strategy (this is covered in
+  the {{{restart.html}Restart after Failure}} use case).
+
+  Unfortunately, the need for {{{parallel.html}parallel processing}}
+  and automatic {{{restart.html}restart}} also makes it practically
+  impossible for steps to handle the context at the level of a single
+  thread of execution, where the client needs to implement business
+  logic.  If a step is executing in parallel, then each node needs to
+  be able to restart independently, but the context needs to be a
+  single object that can be passed on to the next step (unless all the
+  steps are parallelised with the same multiplicity, which might not
+  be efficient in general).
+
+  Thus batch context must be defined and managed by the template or
+  execution handler.
+
+  * The requirement for steps might have implications for the
+  implementer of the batch operation (the client).  Obviously a client
+  defines the sequence of steps according to the business requirement,
+  but ideally we would like him to be unaware of the reporting and
+  restart infrastructure.  Maybe an array of callbacks works (the
+  callback interface is irrelevant, except that it accepts a context
+  object as an argument):
+
++---
+batchTemplate.iterate(new RepeatCallback[] { 
+
+    new RepeatCallback() {
+        public boolean doInIteration(RepeatContext context) {
+            // do stuff for step one
+        };
+    },
+
+    new RepeatCallback() {
+        public boolean doInIteration(RepeatContext context) {
+            // do stuff for step two - the context
+            // is the same...
+        };
+    }
+
+});
++---
+
+  Notice that there is no need for the context to be set explicitly
+  before executing the callback.  The context is handled internally to
+  the batch template using an analogue of the
+  <<<TransactionSynchronizationManager>>>.
+
+  * If we prefer that clients never need to know about batch
+  templates, then the code above needs to be automated.  This would be
+  where an additional domain layer might come into play
+  (c.f. <<<Step>>>).

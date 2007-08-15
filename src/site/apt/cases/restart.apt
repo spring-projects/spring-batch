@@ -1,0 +1,86 @@
+                                    ------
+                                    Restart Use Case
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    January 2007
+
+Use Case: Manual Restart After Failure
+
+* Goal
+
+  Restart a failed or interrupted batch and have it pick up where it
+  left off (within limits of transaction boundaries) to save time and
+  resources.  A key goal is that the management of the batch process
+  (locating a job and its input and results, starting, scheduling,
+  restarting) should be as easy as possible for a non-developer, like
+  an application support team with some business back up.  
+
+* Scope
+
+  Any batch should be able to restart gracefully, even if (depending
+  on chosen container or client implementation) it might have to go
+  right back to the beginning.
+
+* Preconditions
+
+  * It is possible to identify exception conditions under which a
+  restart will be able to carry on processing a batch from where it
+  left off.
+
+  * There exists a presistent storage mechanism for the initial
+    conditions.
+
+* Success
+
+  * Force a batch to fail, and then fix the problem and restart.  See
+    successful completion with no duplicate results.
+
+* Description
+
+  [[1]] A batch operation encounters an exception which forces the
+  process to stop processing.
+
+  [[1]] Container catches exception and classifies it.
+
+  [[1]] Container logs event with enough information to identify the
+  location of the job and the nature of the problem.
+
+  [[1]] Container saves initial condition from last commit point, to
+  enable restart to start from the last known good operation.
+
+  [[1]] Operator fixes problem (e.g. makes missing resource available,
+  edits input file).
+
+  [[1]] Operator restarts batch.
+
+  [[1]] Container loads initial conditions and continues processing.
+
+* Variations
+
+  * Some restarts might lend themsleves to being handled automatically
+    - see the use case {{{retry.html}Automatic Retry}}.
+
+* Implementation
+
+  * The saving of initial conditions needs to be strategised.  In some
+  cases saving a native serialization to a file will suffice.  In
+  others a database might be used, or some custom serialization
+  (persist / rehydrate).
+
+  * The initial condition is naturally under control of the
+  <<<DataProvider>>>.  The client need not know about the persistence
+  and rehydration.  In fact explicit persistence and rehydration might
+  be overkill - just relying on the transaction semantics might be
+  adequate in a lot of cases.  The <<<DataProvider>>> would have to be
+  aware of the transactions, which we assume are normally demarcated
+  in the <<<ExecutionHandler>>>.  Since the point at which persistence
+  is needed is tied to transaction commits, there may have to be some
+  transaction synchronization.
+
+  * The persistence of initial conditions is a cross cutting concern.
+  It may lend itself (along with the application of an execution
+  handler generally) to being implemented as an aspect.  Compare the
+  <<<TransactionTemplate>>>, where the most common usage is via an
+  interceptor, but occasionally the template is used directly by
+  client code.

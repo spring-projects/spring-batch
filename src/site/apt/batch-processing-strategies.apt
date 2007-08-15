@@ -1,0 +1,196 @@
+                                    ------
+                                    Batch Processing Strategy
+                                    ------
+                                    Scott Wintermute, Wayne Lund
+                                    ------
+                                    May 2007
+
+Batch Processing Strategies
+
+  To help design and implement batch systems, basic batch application building blocks and patterns should be provided to the designers and programmers in form of sample structure charts and code shells. When starting to design a batch job, the business logic should be decomposed into a series of steps which can be implemented using the following standard building blocks:
+
+   * <<Conversion Applications:>> For each type of file supplied by or generated to an external system, a conversion application will need to be created to convert the transaction records supplied into a standard format required for processing. This type of batch application can partly or entirely consist of translation utility modules (see Basic Batch Services).
+
+   * <<Validation Applications:>> Validation applications ensure that all input/output records are correct and consistent. Validation is typically based on file headers and trailers, checksums and validation algorithms as well as record level cross-checks.
+
+   * <<Extract Applications:>> An application that reads a set of records from a database or input file, selects records based on predefined rules, and writes the records to an output file.
+
+   * <<Extract/Update Applications:>> An application that reads records from a database or an input file, and makes changes to a database or an output file driven by the data found in each input record.
+
+   * <<Processing and Updating Applications:>> An application that performs processing on input transactions from an extract or a validation application. The processing will usually involve reading a database to obtain data required for processing, potentially updating the database and creating records for output processing.
+
+   * <<Output/Format Applications:>> Applications reading an input file, restructures data from this record according to a standard format, and produces an output file for printing or transmission to another program or system.
+   
+  Additionally a basic application shell should be provided for business logic that cannot be built using the previously mentioned building blocks.
+
+  In addition to the main building blocks, each application may use one or more of standard utility steps, such as:
+
+   * Sort - A Program that reads an input file and produces an output file where records have been re-sequenced according to a sort key field in the records. Sorts are usually performed by standard system utilities.
+
+   * Split - A program that reads a single input file, and writes each record to one of several output files based on a field value. Splits can be tailored or performed by parameter-driven standard system utilities.
+
+   * Merge - A program that reads records from multiple input files and produces one output file with combined data from the input files. Merges can be tailored or performed by parameter-driven standard system utilities.
+
+  Batch applications can additionally be categorized by their input source:
+
+    * Database-driven applications are driven by rows or values retrieved from the database.  
+
+    * File-driven applications are driven by records or values retrieved from a file.
+    
+    * Message-driven applications are driven by messages retrieved from a message queue.  
+
+  The foundation of any batch system is the processing strategy. Factors affecting the selection of the strategy include: estimated batch system volume, concurrency with on-line or with another batch systems, available batch windows (and with more enterprises wanting to be up and running 24x7, this leaves no obvious batch windows).
+
+  Typical processing options for batch are:
+
+    * Normal processing in a batch window during off-line
+
+    * Concurrent batch / on-line processing
+
+    * Parallel processing of many different batch runs or jobs at the same time
+
+    * Partitioning (i.e. processing of many instances of the same job at the same time)
+
+    * A combination of these
+
+  The order in the list above reflects the implementation complexity, processing in a batch window being the easiest and partitioning the most complex to implement.
+
+  Some or all of these options may be supported by a commercial scheduler.
+
+  In the following section these processing options are discussed in more detail. It is important to notice that the commit and locking strategy adopted by batch processes will be dependent on the type of processing performed, and as a rule of thumb and the on-line locking strategy should also use the same principles. Therefore, the batch architecture cannot be simply an afterthought when designing an overall architecture.
+
+  The locking strategy can use only normal database locks, or an additional custom locking service can be implemented in the architecture. The locking service would track database locking (for example by storing the necessary information in a dedicated db-table) and give or deny permissions to the application programs requesting a db operation. Retry logic could also be implemented by this architecture to avoid aborting a batch job in case of a lock situation.
+
+ <<1. Normal processing in a batch window>>
+  For simple batch processes running in a separate batch window, where the data being updated is not required by on-line users or other batch processes, concurrency is not an issue and a single commit can be done at the end of the batch run.
+
+  In most cases a more robust approach is more appropriate. A thing to keep in mind is that batch systems have a tendency to grow as time goes by, both in terms of complexity and the data volumes they will handle. If no locking strategy is in place and the system still relies on a single commit point, modifying the batch programs can be painful. Therefore, even with the simplest batch systems, consider the need for commit logic for restart-recovery options as well as the information concerning the more complex cases below.
+
+ <<2. Concurrent batch / on-line processing>>
+  Batch applications processing data that can simultaneously be updated by on-line users, should not lock any data (either in the database or in files) which could be required by on-line users for more than a few seconds. Also updates should be committed to the database at the end of every few transaction. This minimizes the portion of data that is unavailable to other processes and the elapsed time the data is unavailable.
+
+  Another option to minimize physical locking is to have a logical row-level locking implemented using either an Optimistic Locking Pattern or a Pessimistic Locking Pattern.
+
+   * Optimistic locking assumes a low likelihood of record contention. It typically means inserting a timestamp column in each database table used concurrently by both batch and on-line processing. When an application fetches a row for processing, it also fetches the timestamp. As the application then tries to update the processed row, the update uses the original timestamp in the WHERE clause. If the timestamp matches, the data and the timestamp will be updated successfully. If the timestamp does not match, this indicates that another application has updated the same row between the fetch and the update attempt and therefore the update cannot be performed.
+
+   * Pessimistic locking is any locking strategy that assumes there is a high likelihood of record contention and therefore either a physical or logical lock needs to be obtained at retrieval time. One type of pessimistic logical locking uses a dedicated lock-column in the database table. When an application retrieves the row for update, it sets a flag in the lock column. With the flag in place, other applications attempting to retrieve the same row will logically fail. When the application that set the flag updates the row, it also clears the flag, enabling the row to be retrieved by other applications. Please note, that the integrity of data must be maintained also between the initial fetch and the setting of the flag, for example by using db locks (e.g., SELECT FOR UPDATE). Note also that this method suffers from the same downside as physical locking except that it is somewhat easier to manage building a time-out mechanism that will get the lock released if the user goes to lunch while the record is locked.
+
+  These patterns are not necessarily suitable for batch processing, but they might be used for concurrent batch and on-line processing (e.g. in cases where the database doesn't support row-level locking). As a general rule, optimistic locking is more suitable for on-line applications, while pessimistic locking is more suitable for batch applications. Whenever logical locking is used, the same scheme must be used for all applications accessing data entities protected by logical locks.
+
+  Note that both of these solutions only address locking a single record. Often we may need to lock a logically related group of records. With physical locks, you have to manage these very carefully in order to avoid potential deadlocks. With logical locks, it is usually best to build a logical lock manager that understands the logical record groups you want to protect and can ensure that locks are coherent and non-deadlocking. This logical lock manager usually uses its own tables for lock management, contention reporting, time-out mechanism, etc.
+
+ <<3. Parallel Processing>>
+   Parallel processing allows multiple batch runs / jobs to run in parallel to minimize the total elapsed batch processing time. This is not a problem as long as the jobs are not sharing the same files, db-tables or index spaces. If they do, this service should be implemented using partitioned data. Another option is to build an architecture module for maintaining interdependencies using a control table. A control table should contain a row for each shared resource and whether it is in use by an application or not. The batch architecture or the application in a parallel job would then retrieve information from that table to determine if it can get access to the resource it needs or not.
+
+   If the data access is not a problem, parallel processing can be implemented through the use of additional threads to process in parallel.  In the mainframe environment, parallel job classes have traditionally been used, in order to ensure adequate CPU time for all the processes. Regardless, the solution has to be robust enough to ensure time slices for all the running processes.
+
+   Other key issues in parallel processing include load balancing and the availability of general system resources such as files, database buffer pools etc. Also note that the control table itself can easily become a critical resource.
+
+  <<4. Partitioning>>
+   Using partitioning allows multiple versions of large batch applications to run concurrently. The purpose of this is to reduce the elapsed time required to process long batch jobs. Processes which can be successfully partitioned are those where the input file can be split and/or the main database tables partitioned to allow the application to run against different sets of data.
+
+   In addition, processes which are partitioned must be designed to only process their assigned data set. A partitioning architecture has to be closely tied to the database design and the database partitioning strategy. Please note, that the database partitioning doesn't necessarily mean physical partitioning of the database, although in most cases this is advisable. The following picture illustrates the partitioning approach:
+   
+[images/partitioned.png]
+
+
+   The architecture should be flexible enough to allow dynamic configuration of the number of partitions. Both automatic and user controlled configuration should be considered. Automatic configuration may be based on parameters such as the input file size and/or the number of input records.
+
+  <<4.1 Partitioning Approaches>>
+   The following lists some of the possible partitioning approaches. Selecting a partitioning approach has to be done on a case-by-case basis.
+
+   <1. Fixed and Even Break-Up of Record Set>
+
+    This involves breaking the input record set into an even number of portions (e.g. 10, where each portion will have exactly 1/10th of the entire record set). Each portion is then processed by one instance of the batch/extract application.
+
+    In order to use this approach, preprocessing will be required to split the recordset up. The result of this split will be a lower and upper bound placement number which can be used as input to the batch/extract application in order to restrict its processing to its portion alone.
+
+    Preprocessing could be a large overhead as it has to calculate and determine the bounds of each portion of the record set.
+
+   <2. Breakup by a Key Column>
+
+    This involves breaking up the input record set by a key column such as a location code, and assigning data from each key to a batch instance. In order to achieve this, column values can either be
+
+   <3.  Assigned to a batch instance via a partitioning table (see below for details).>
+
+   <4.  Assigned to a batch instance by a portion of the value (e.g. values 0000-0999, 1000 - 1999, etc.)>
+
+   Under option 1, addition of new values will mean a manual reconfiguration of the batch/extract to ensure that the new value is added to a particular instance.
+
+   Under option 2, this will ensure that all values are covered via an instance of the batch job. However, the number of values processed by one instance is dependent on the distribution of column values (i.e. there may be a large number of locations in the 0000-0999 range, and few in the 1000-1999 range). Under this option, the data range should be designed with partitioning in mind.
+
+   Under both options, the optimal even distribution of records to batch instances cannot be realized. There is no dynamic configuration of the number of batch instances used.
+
+  <5.  Breakup by Views>
+
+   This approach is basically breakup by a key column, but on the database level. It involves breaking up the recordset into views. These views will be used by each instance of the batch application during its processing. The breakup will be done by grouping the data.
+
+   With this option, each instance of a batch application will have to be configured to hit a particular view (instead of the master table). Also, with the addition of new data values, this new group of data will have to be included into a view. There is no dynamic configuration capability, as a change in the number of instances will result in a change to the views.
+
+  <6. Addition of a Processing Indicator>
+
+   This involves the addition of a new column to the input table, which acts as an indicator. As a preprocessing step, all indicators would be marked to non-processed. During the record fetch stage of the batch application, records are read on the condition that that record is marked non-processed, and once they are read (with lock), they are marked processing. When that record is completed, the indicator is updated to either complete or error. Many instances of a batch application can be started without a change, as the additional column ensures that a record is only processed once.
+
+   With this option, I/O on the table increases dynamically. In the case of an updating batch application, this impact is reduced, as a write will have to occur anyway.
+
+  <7. Extract Table to a Flat File>
+
+   This involves the extraction of the table into a file. This file can then be split into multiple segments and used as input to the batch instances.
+
+   With this option, the additional overhead of extracting the table into a file, and splitting it, may cancel out the effect of multi-partitioning. Dynamic configuration can be achieved via changing the file splitting script.
+
+  <8.  Use of a Hashing Column>
+
+   This scheme involves the addition of a hash column (key/index) to the database tables used to retrieve the driver record. This hash column will have an indicator to determine which instance of the batch application will process this particular row. For example, if there are three batch instances to be started, then an indicator of 'A' will mark that row for processing by instance 1, an indicator of 'B' will mark that row for processing by instance 2, etc.
+
+   The procedure used to retrieve the records would then have an additional WHERE clause to select all rows marked by a particular indicator. The inserts in this table would involve the addition of the marker field, which would be defaulted to one of the instances (e.g. 'A').
+
+   A simple batch application would be used to update the indicators such as to redistribute the load between the different instances. When a sufficiently large number of new rows have been added, this batch can be run (anytime, except in the batch window) to redistribute the new rows to other instances.
+
+   Additional instances of the batch application only require the running of the batch application as above to redistribute the indicators to cater for a new number of instances.
+
+
+ <<4.2 Database and Application design Principles>>
+   
+   An architecture that supports multi-partitioned applications which run against partitioned database tables using the key column approach, should include a central partition repository for storing partition parameters. This provides flexibility and ensures maintainability. The repository will generally consist of a single table known as the partition table.
+   
+   Information stored in the partition table will be static and in general should be maintained by the DBA. The table should consist of one row of information for each partition of a multi-partitioned application. The table should have columns for:  Program ID Code, Partition Number (Logical ID of the partition), Low Value of the db key column for this partition, High Value of the db key column for this partition.
+   
+   On program start-up the program id and partition number should be passed to the application from the architecture (Control Processing Tasklet). These variables are used to read the partition table, to determine what range of data the application is to process (if a key column approach is used). In addition the partition number must be used throughout the processing to:
+
+   * Add to the output files/database updates in order for the merge process to work properly
+   
+   * Report normal processing to the batch log and any errors that occur during execution to the architecture error handler
+
+ <<4.3  Minimizing Deadlocks>>
+  When applications run in parallel or partitioned, contention in database resources and deadlocks may occur. It is critical that the database design team eliminates potential contention situations as far as possible as part of the database design.
+
+  Also ensure that the database index tables are designed with deadlock prevention and performance in mind.
+
+  Deadlocks or hot spots often occur in administration or architecture tables such as log tables, control tables, and lock tables. The implications of these should be taken into account as well. A realistic stress test is crucial for identifying the possible bottlenecks in the architecture.
+
+  To minimize the impact of conflicts on data, the architecture should provide services such as wait-and-retry intervals when attaching to a database or when encountering a deadlock. This means a built-in mechanism to react to certain database return codes and instead of issuing an immediate error handling, waiting a predetermined amount of time and retrying the database operation.
+
+ <<4.4  Parameter Passing and Validation>>
+
+  The partition architecture should be relatively transparent to application developers. The architecture should perform all tasks associated with running the application in a partitioned mode including:
+
+   * Retrieve partition parameters before application start-up
+
+   * Validate partition parameters before application start-up
+
+   * Pass parameters to application at start-up
+
+  The validation should include checks to ensure that:
+
+   * the application has sufficient partitions to cover the whole data range
+
+   * there are no gaps between partitions
+
+  If the database is partitioned, some additional validation may be necessary to ensure that a single partition does not span database partitions.
+
+  Also the architecture should take into consideration the consolidation of partitions. Key questions include:
+
+  * Must all the partitions be finished before going into the next job step?
+ 
+  * What happens if one of the partitions aborts?

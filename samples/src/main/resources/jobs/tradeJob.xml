@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       		http://www.springframework.org/schema/aop
+ 			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	<import resource="../simple-container-definition.xml" />
+
+	<import resource="tradeJobIo.xml" />
+	<!--import resource="tradeJobAop.xml" /-->
+
+	<bean class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
+		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry" />
+	</bean>
+
+	<bean id="jobConfiguration" parent="simpleJob">
+		<property name="name" value="tradeJob" />
+		<property name="steps">
+			<list>
+				<bean id="step1" parent="simpleStep">
+					<constructor-arg>
+						<bean class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+							<property name="itemProvider">
+								<bean
+									class="org.springframework.batch.execution.tasklet.support.DefaultFlatFileItemProvider">
+									<property name="source" ref="fileInputTemplate" />
+									<property name="mapper">
+										<bean class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
+									</property>
+									<property name="validator" ref="tradeValidator" />
+								</bean>
+							</property>
+							<property name="itemProcessor">
+								<bean class="org.springframework.batch.sample.module.process.TradeProcessor"
+									p:writer-ref="tradeDao" />
+							</property>
+						</bean>
+					</constructor-arg>
+				</bean>
+				<bean id="step2" parent="simpleStep">
+					<constructor-arg>
+						<bean class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+							<property name="itemProvider">
+								<bean
+									class="org.springframework.batch.execution.tasklet.support.InputSourceItemProvider">
+									<property name="inputSource">
+										<bean class="org.springframework.batch.io.sql.SqlCursorInputSource">
+											<constructor-arg>
+												<ref bean="dataSource" />
+											</constructor-arg>
+											<property name="sql"
+												value="SELECT id, quantity, price, customer from TRADE" />
+											<property name="mapper">
+												<bean class="org.springframework.batch.sample.mapping.TradeRowMapper" />
+											</property>
+										</bean>
+									</property>
+								</bean>
+							</property>
+							<property name="itemProcessor">
+								<bean class="org.springframework.batch.sample.module.process.CustomerUpdateProcessor"
+									p:dao-ref="customerDao" />
+							</property>
+						</bean>
+					</constructor-arg>
+				</bean>
+				<bean id="step3" parent="simpleStep">
+					<constructor-arg>
+						<bean class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+							<property name="itemProvider">
+								<bean
+									class="org.springframework.batch.execution.tasklet.support.InputSourceItemProvider">
+									<property name="inputSource">
+										<bean class="org.springframework.batch.io.sql.SqlCursorInputSource">
+											<constructor-arg>
+												<ref bean="dataSource" />
+											</constructor-arg>
+											<property name="sql" value="SELECT id, name, credit FROM customer " />
+											<property name="mapper">
+												<bean
+													class="org.springframework.batch.sample.mapping.CustomerCreditRowMapper" />
+											</property>
+										</bean>
+									</property>
+								</bean>
+							</property>
+							<property name="itemProcessor">
+								<bean
+									class="org.springframework.batch.sample.module.process.CustomerCreditUpdateProcessor"
+									p:writer-ref="customerReportOutputSource" />
+							</property>
+						</bean>
+					</constructor-arg>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="fileLocator" class="org.springframework.core.io.ClassPathResource">
+		<constructor-arg type="java.lang.String"
+			value="data/tradeJob/input/20070122.teststream.ImportTradeDataStep.txt" />
+	</bean>
+
+	<bean id="customerFileLocator" class="org.springframework.core.io.FileSystemResource">
+		<constructor-arg type="java.lang.String" value="20070122.testStream.CustomerReportStep.TEMP.txt" />
+	</bean>
+
+</beans>

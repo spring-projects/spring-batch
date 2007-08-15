@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="orderFileDescriptor"
+		class="org.springframework.batch.io.file.support.transform.PrefixMatchingCompositeLineTokenizer">
+		<property name="tokenizers">
+			<map>
+				<entry key="HEA" value-ref="headerRecordDescriptor" />
+				<entry key="FOT" value-ref="footerRecordDescriptor" />
+				<entry key="BCU" value-ref="businessCustomerLineDescriptor" />
+				<entry key="NCU" value-ref="customerLineDescriptor" />
+				<entry key="BAD" value-ref="billingAddressLineDescriptor" />
+				<entry key="SAD" value-ref="shippingAddressLineDescriptor" />
+				<entry key="BIN" value-ref="billingLineDescriptor" />
+				<entry key="SIN" value-ref="shippingLineDescriptor" />
+				<entry key="LIT" value-ref="itemLineDescriptor" />
+				<entry key="" value-ref="defaultLineDescriptor" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="defaultLineDescriptor"
+		class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
+		<property name="lengths" value="120"/>
+	</bean>
+
+	<bean id="parentLineDescriptor" abstract="true"
+		class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer">
+		<property name="delimiter" value=";"/>
+	</bean>
+
+	<bean id="headerRecordDescriptor" parent="parentLineDescriptor">
+		<property name="names" value="LINE_ID,ORDER_ID,ORDER_DATE" />
+	</bean>
+
+	<bean id="footerRecordDescriptor" parent="parentLineDescriptor">
+		<property name="names" value="LINE_ID,TOTAL_LINE_ITEMS,TOTAL_ITEMS,TOTAL_PRICE" />
+	</bean>
+
+	<bean id="businessCustomerLineDescriptor" parent="parentLineDescriptor">
+		<property name="names" value="LINE_ID,COMPANY_NAME,REG_ID,VIP" />
+	</bean>
+
+	<bean id="customerLineDescriptor" parent="parentLineDescriptor">
+		<property name="names" value="LINE_ID,LAST_NAME,FIRST_NAME,MIDDLE_NAME,REGISTERED,REG_ID,VIP" />
+	</bean>
+
+	<bean id="billingAddressLineDescriptor" parent="parentLineDescriptor">
+		<property name="names" value="LINE_ID,ADDRESSEE,ADDR_LINE1,ADDR_LINE2,CITY,ZIP_CODE,STATE,COUNTRY" />
+	</bean>
+
+	<bean id="shippingAddressLineDescriptor" parent="parentLineDescriptor">
+		<property name="names" value="LINE_ID,ADDRESSEE,ADDR_LINE1,ADDR_LINE2,CITY,ZIP_CODE,STATE,COUNTRY" />
+	</bean>
+
+	<bean id="billingLineDescriptor" parent="parentLineDescriptor">
+		<property name="names" value="LINE_ID,PAYMENT_TYPE_ID,PAYMENT_DESC" />
+	</bean>
+
+	<bean id="shippingLineDescriptor" parent="parentLineDescriptor">
+		<property name="names" value="LINE_ID,SHIPPER_ID,SHIPPING_TYPE_ID,ADDITIONAL_SHIPPING_INFO" />
+	</bean>
+
+	<bean id="itemLineDescriptor" parent="parentLineDescriptor">
+		<property name="names"
+			value="LINE_ID,ITEM_ID,PRICE,DISCOUNT_PERC,DISCOUNT_AMOUNT,SHIPPING_PRICE,HANDLING_PRICE,QUANTITY,TOTAL_PRICE" />
+	</bean>
+
+</beans>

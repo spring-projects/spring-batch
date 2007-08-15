@@ -1,0 +1,208 @@
+                                    ------
+                                    Commit Periodically Use Case
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    January 2007
+
+Use Case: Commit Batch Process Periodically
+
+* Goal
+
+  Read a file line-by-line and process into database inserts, for
+  example using the Jdbc API.  Commit periodically, and if there is a
+  fault where the database transaction rolls back, then the file
+  reader is reset to the place it was after the last successful
+  commit.
+
+  To develop a batch process to achieve the goal above should be as
+  simple a process as possible.  The more that can be done with simple
+  POJOs and Spring configuration the better.
+
+* Scope
+
+  To keep things simple for now, assume that:
+
+    * All lines in the input file are in the same format and each line
+    generates a single database insert (or a fixed number).
+
+    * The file is read synchronously by a single consumer.
+
+* Preconditions
+
+  * A file exists in the right format, with a sufficiently large
+    number of lines to be realistic.
+
+  * A mechanism exists to force a rollback at a non-trivial position
+    (not during the first commit), but produce a successful operation
+    on the second try.
+
+  * A framework for retry exists, so that the case above can be
+    tested.
+
+* Success
+
+  Integration test confirms that
+
+    * All data are processed and records inserted successfully.
+
+    * When a rollback occurs and the retry is successful, the complete
+      dataset is processed (same result as successful run).
+
+    * Batch operations can be implemented without framework code (or
+      with minimal dependencies, e.g. through interfaces).  Launching
+      the batch might require access to framework code.
+
+* Description
+
+  The vanilla successful batch use case proceeds as follows:
+
+    [[1]] Container starts a transaction.
+
+    [[1]] Container makes resources available, e.g. opens file and
+    creates <<<FileChannel>>> for it.
+
+    [[1]] Client reads a line from the file, and converts it to a
+    database statement, then runs it.  
+
+    [[1]] Container increments counter.
+
+    [[1]] Repeat previous two steps until a counter is equal to chunk
+    size.
+
+    [[1]] Container commits database transaction.
+
+    [[1]] Repeat chunk processing until input source is exhausted.
+
+* Variations
+
+** Non-fatal Chunk Failure
+
+  If there is an unrecoverable database exception during execution of
+  client code:
+
+    [[1]] Container rolls back current transaction.
+
+    [[1]] Container resets input source to the point it was at before
+    failure.
+
+    [[1]] Container retries chunk.
+
+** Fatal Chunk Failure
+
+  If there is an error in the input data in the middle of a chunk
+  (could be manifested as database exception, e.g. uniqueness
+  exception, or nullable exception):
+  
+    [[1]] Container rolls back current transaction.
+
+    [[1]] Container terminates batch and notifies client of precise
+    details, including the line number of error, and the last line
+    that was committed (last of the previous chunk).
+
+  There is no need to reset the input source because the error is
+  fatal.
+
+  To restart:
+
+    [[1]] Operator truncates the input file so the completed chunks
+    are not repeated.
+
+    [[1]] Operator fixes bad line (if there was one), and starts the
+    batch process wit hthe same parameters.
+
+  Variations on this theme are also necessary, e.g. a tolerance for a
+  small number of bad records in the input data.
+
+* Implementation
+
+  * The concept of a batch iterator seems relevant here (see also the
+  {{{simple.html}simple}} use case).  The iterator could be more than
+  just a loop that might terminate early: here it could also manage
+  the file cursor on the input source.  In this design there is a
+  <<<ItemProvider>>> interface that can take care of termination and
+  iteration (e.g. iterator-like method signatures).
+
+  * Another design idea (more encapsulated and more in keeping with
+  existing Spring practice) is to make the data source transaction
+  aware, and for the client use it like a database resource, through a
+  template.  In this case there is a <<<FileInputTemplate>>>.  The
+  <<<ItemProvider>>> needs to be aware of the data source template, so
+  that it can terminate when the data is exhausted.
+
+  In this version of events there are two kinds of resource in play.
+  The transaction itself, and the data sources that are aware of the
+  transaction.  The comparison with <<<DataSourceTransactionManager>>>
+  and <<<JdbcTemplate>>> is obvious.  The client is often completely
+  unaware of the transaction manager, which is applied through an
+  interceptor, whereas the data source is used explicitly with its own
+  API through a template.  The Client can concentrate on his domain,
+  and not be concerned with infrastructure or resource handling.
+
+  * The analogy with <<<JmsTemplate>>> is even stronger.  If the input
+  data came from JMS instead of a file, we would hardly have to do
+  anything to implement very robust chunking.  JMS is the obvious best
+  practice and already provides all the transactional semantics we
+  need for chunking - simply roll back a transaction and the records
+  processed return to the message system for delivery to the next
+  consumer.  Bad records can be sent to a bad message queue for
+  independent processing.  JMS might ssem like overkill for a lot of
+  batch processes, but it is tempting to say that if the robustness is
+  needed then the we should take that as a sign that installing and
+  configuring JMS is worth the extra effort.
+
+  * Naturally we do not want to insist that the client code is aware
+  of the transaction that is surrounding it - this would be the normal
+  practice familiar from the Spring programming model.  Should a
+  client need access to transaction-scoped resources, the usual way to
+  do that is to wrap the transactional resource (data source etc.) in
+  a proxy that uses a synchronization, or a more generic thread-bound
+  resource (using <<<TransactionSynchronizationManager>>>).  The aim
+  is to retain this separation in a batch operation.  The batch
+  framework itself might provide some of these synchronizations.
+
+  * The {{{simple.html}Simple Batch Repeat}} is actually a pretty good
+  model for the chunk processing in this use case.  This observation
+  leads to another: that a batch of chunks is a nested (or composed)
+  batch - the outer termination policy is dependent only on the data
+  source having further records to process, the inner one is a simple
+  iterator (with a check for empty data).  A simplified programming
+  model for this is
+
++---
+RepeatCallback chunkCallback = new RepeatCallback() {
+
+    public boolean doInIteration(RepeatContext context) {
+
+        int count = 0;
+
+        do {
+
+           Object result = callback.doWithRepeat(context);
+
+        } while (result!=null && count++<chunkSize);
+
+        return result!=null;
+
+    }
+
+});
+
+batchTemplate.iterate(chunkCallback);
+
++---
+
+  The transaction boundary is demarcated at the chunk level
+  (<<<chunkCallback.doWithRepeat()>>>).  Thw termination policy depends
+  only on a data source eventually returning null.
+
+  * N.B. the chunkSize can be dynamic. E.g., if the chunk is long
+  during a nightime batch window, and short when the window is over,
+  in case the batch has to be terminated.
+
+  * Chunking can also be implemented simply in an
+  <<<ExecutionHandler>>>.  The handler just buffers records up to a
+  chunk size, and then executes them all in one step (which might be
+  transactional).  This is easier to implement, and easier to
+  configure for the clients, but cannot easily be made both concurrent
+  and transactional.

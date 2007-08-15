@@ -1,0 +1,101 @@
+                                    ------
+                                    Site Map
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    April 2007
+
+Spring Batch Site Map
+
+* Overview
+
+ * Main Site - high-level information and links to sub-projects
+   (called "modules" in Maven speak):
+
+  * Docs - reference documentation, user guides
+
+  * Infrastructure - CI build and technical information
+
+  * Integration Tests - reports on tests of infrastructure
+
+  * Container - CI and technical information about container layer
+
+* Main Site
+
+  * Splash page - welcome, mission statement, download links
+
+  * Whitepaper (JavaOne presentation translated to HTML)
+
+  * Occasional Articles (e.g. transactions)
+
+  * Use Cases
+
+  * Project Information (standdard Maven stuff)
+
+    * Developers
+
+    * Source Repository
+
+    * License
+
+    * etc.
+
+* Documentation
+
+  * Splash page - welcome, links to rest of reference docs.
+
+  * User Guides (docbook, Spring branded reference guides - HTML, HTML
+  Single Page and PDF).  Two choices: one big guide with parts as
+  listed below, or multiple mini-guides.  The former is probably
+  better.
+
+  Maybe we could also break each of these down a bit more...
+
+    * Infrastructure - How to use the core API
+
+    * Simple Container
+
+    * Partitioning Container
+
+    * Other Containers?
+
+  * Changelog
+
+* Infrastructure
+
+  * Splash page explaining the role of infrastructure, and high level
+  API packaging.
+
+  * Changelog
+
+  * Project information (duplicated from Main Site - Maven "feature")
+
+  * CI Reports
+
+    * JUnit test report
+
+    * Clover coverage
+
+    * JDepend report  
+
+    * Javadocs
+
+* Integration Tests  
+
+  * Changelog  
+
+  * Project information (duplicated from Main Site - Maven "feature" -
+    TODO: find a way to switch them off in sub-projects)
+
+  * CI Reports (same as for infrastructure).
+
+* Container
+
+  Should the use case go here (showing which ones are implemented)?
+
+  * Changelog
+
+  * Project information
+
+  * CI Reports (same as for infrastructure).
+

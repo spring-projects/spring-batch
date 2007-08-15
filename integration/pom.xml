@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>spring-batch-integration</artifactId>
+	<packaging>jar</packaging>
+	<name>Integration Tests</name>
+	<description>Integration tests for the Spring Batch Infrastructure</description>
+
+	<parent>
+		<groupId>org.springframework.batch</groupId>
+		<version>1.0-m2-SNAPSHOT</version>
+		<artifactId>spring-batch</artifactId>
+		<relativePath>..</relativePath>
+	</parent>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.batch</groupId>
+			<artifactId>spring-batch-infrastructure</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>1.8.0.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<version>10.2.1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-core</artifactId>
+			<version>4.2-incubator-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>mx4j</groupId>
+					<artifactId>mx4j</artifactId>
+				</exclusion>
+			</exclusions>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>1.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<!-- This is just for the JMS spec - could use javax.jms -->
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jms_1.1_spec</artifactId>
+			<version>1.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>mockobjects</groupId>
+					<artifactId>mockobjects-jdk1.4-j2ee1.3</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>mockobjects</groupId>
+					<artifactId>mockobjects-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>		
+	</dependencies>
+
+<!-- Reporting: it doesn't make much sense to have clover or Jdepend reports in this project but they are included by the parent anyway. -->
+</project>

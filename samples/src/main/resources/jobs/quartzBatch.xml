@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       		http://www.springframework.org/schema/aop
+ 			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+<!-- TODO update! -->	
+
+<!-- LAUNCHERS -->
+
+	<bean id="tradeLauncher"
+		class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass" value="com.accenture.adsj.refapp.batch.launch.QuartzBatchJobLauncher" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="batchRoot" 	value="src/main/resources/testBatchRoot" 		/>
+				<entry key="hostName" 	value="localhost" 			/>
+				<entry key="jobName" 	value="tradeJob" 			/>
+				<entry key="jobStream" 	value="testStream" 			/>
+				<entry key="userName" 	value="robert.kasanicky" 	/>
+				<entry key="jobRun" 	value="1" 					/>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="fixedLengthImportLauncher"
+		class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass" value="com.accenture.adsj.refapp.batch.launch.QuartzBatchJobLauncher" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="batchRoot" 	value="src/main/resources/testBatchRoot" 		/>
+				<entry key="hostName" 	value="localhost" 			/>
+				<entry key="jobName" 	value="fixedLengthImportJob"/>
+				<entry key="jobStream" 	value="testStream" 			/>
+				<entry key="userName" 	value="robert.kasanicky" 	/>
+				<entry key="jobRun" 	value="1" 					/>
+			</map>
+		</property>
+	</bean>
+
+
+<!-- TRIGGERS -->
+
+	<bean id="tradeSimpleTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+		<property name="jobDetail" ref="tradeLauncher" />
+		<property name="startDelay" value="20000" />
+		<property name="repeatInterval" value="30000" />
+		<property name="repeatCount" value="2" />
+	</bean>
+
+	<bean id="fixedLengthImportSimpleTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+		<property name="jobDetail" ref="fixedLengthImportLauncher" />
+		<property name="startDelay" value="1000" />
+		<property name="repeatInterval" value="1000000" />
+	</bean>
+
+	<bean id="tradeCronTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="tradeLauncher" />
+		<!-- run every morning at 6 AM -->
+		<property name="cronExpression" value="0 0 6 * * ?" />
+	</bean>
+
+
+<!-- SCHEDULER -->
+
+	<bean id="quartzScheduler"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="tradeCronTrigger" />
+				<ref bean="tradeSimpleTrigger" />
+				<ref bean="fixedLengthImportSimpleTrigger" />
+			</list>
+		</property>
+	</bean>
+
+</beans>

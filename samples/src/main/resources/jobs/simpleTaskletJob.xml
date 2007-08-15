@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       	http://www.springframework.org/schema/aop
+ 		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+
+	<import resource="../simple-container-definition.xml" />
+
+	<bean class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
+		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
+	</bean>
+
+	<bean id="jobConfiguration" parent="simpleJob">
+		<property name="name" value="simpleTaskletJob" />
+		<property name="steps">
+			<list>
+				<bean id="step1" parent="simpleStep">
+					<constructor-arg>
+						<bean id="tradeTasklet" class="org.springframework.batch.sample.module.SimpleTradeTasklet">
+							<property name="inputSource" ref="fileInputSource" />
+							<property name="tradeDao" ref="tradeDao" />
+						</bean>
+					</constructor-arg>
+					<property name="commitInterval" value="2" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+
+
+	<bean id="tradeDao" class="org.springframework.batch.sample.dao.JdbcTradeWriter">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="incrementer">
+			<bean parent="incrementerParent">
+				<property name="incrementerName" value="TRADE_SEQ" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="fileInputSource" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource">
+		<property name="resource" ref="fileLocator" />
+		<property name="tokenizer" ref="fixedFileDescriptor" />
+	</bean>
+
+	<bean id="fixedFileDescriptor" class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
+		<property name="names" value="ISIN, Quantity, Price, Customer" />
+		<property name="lengths" value="12, 3, 5, 9" />
+	</bean>
+
+	<bean id="fileLocator" class="org.springframework.core.io.ClassPathResource">
+		<constructor-arg type="java.lang.String"
+			value="data/simpleTaskletJob/input/20070122.teststream.ImportTradeDataStep.txt" />
+	</bean>
+	
+	<bean id="tradeLogAdvice" 
+	 	class="org.springframework.batch.sample.advice.TradeWriterLogAdvice" /> 
+	 
+	<aop:config>
+		<aop:aspect id="tradeWriterLogging" ref="tradeLogAdvice">
+		   
+		    <aop:after
+		      pointcut="execution( * org.springframework.batch.sample.dao.TradeWriter+.writeTrade(org.springframework.batch.sample.domain.Trade)) and args(trade)"
+		      method="doBasicLogging" />
+		      
+		</aop:aspect>
+	</aop:config>
+
+</beans>

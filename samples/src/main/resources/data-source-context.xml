@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+	<!--  Initialise the database before every test case: -->
+	<import resource="data-source-context-init.xml" />
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${batch.jdbc.driver}" />
+		<property name="url" value="${batch.jdbc.url}" />
+		<property name="username" value="${batch.jdbc.user}" />
+		<property name="password" value="${batch.jdbc.password}" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!--  Use this to set additional properties on beans at run time -->
+	<bean class="org.springframework.beans.factory.config.PropertyOverrideConfigurer">
+		<property name="location" value="classpath:batch.properties" />
+		<!-- Allow system properties (-D) to override those from file -->
+		<property name="localOverride" value="true"/>
+		<property name="properties">
+			<bean class="java.lang.System" factory-method="getProperties"/>
+		</property>
+		<property name="ignoreInvalidKeys" value="true" />
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:batch.properties" />
+		<property name="ignoreUnresolvablePlaceholders" value="false" />
+	</bean>
+
+	<bean id="incrementerParent" class="${batch.database.incrementer.class}" abstract="true">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="jobIncrementer" parent="incrementerParent">
+		<property name="incrementerName" value="BATCH_JOB_SEQ" />
+	</bean>
+
+	<bean id="jobExecutionIncrementer" parent="incrementerParent">
+		<property name="incrementerName" value="BATCH_JOB_EXECUTION_SEQ" />
+	</bean>
+
+	<bean id="stepIncrementer" parent="incrementerParent">
+		<property name="incrementerName" value="BATCH_STEP_SEQ" />
+	</bean>
+
+	<bean id="stepExecutionIncrementer" parent="incrementerParent">
+		<property name="incrementerName" value="BATCH_STEP_EXECUTION_SEQ" />
+	</bean>
+
+	<bean id="partitionIncrementer" parent="incrementerParent">
+		<property name="incrementerName" value="BATCH_PARTITION_SEQ" />
+	</bean>
+
+	<bean id="partitionInstanceIncrementer" parent="incrementerParent">
+		<property name="incrementerName" value="BATCH_PARTITION_EXECUTION_SEQ" />
+	</bean>
+
+</beans>

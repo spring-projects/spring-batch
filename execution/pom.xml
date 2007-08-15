@@ -1,0 +1,231 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>spring-batch-execution</artifactId>
+	<packaging>jar</packaging>
+	<name>Execution</name>
+	<description>
+		<!--  Use CDATA to keep it on a single line in the manifest -->
+		<![CDATA[Execution tools and implementations of Spring Batch Core interfaces]]>
+	</description>
+
+	<parent>
+		<groupId>org.springframework.batch</groupId>
+		<artifactId>spring-batch</artifactId>
+		<version>1.0-m2-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.batch</groupId>
+			<artifactId>spring-batch-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>1.8.0.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>1.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<!-- Needed by Hibernate if JTA is excluded -->
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jta_1.1_spec</artifactId>
+			<version>1.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<!-- Force Hibernate to use a particular nodep version of cglib in case of clash with Spring AOP -->
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>2.1_3</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate</artifactId>
+			<version>3.2.3.ga</version>
+			<optional>true</optional>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.transaction</groupId>
+					<artifactId>jta</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>cglib</groupId>
+					<artifactId>cglib</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sf.ehcache</groupId>
+					<artifactId>ehcache</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>asm</groupId>
+					<artifactId>asm-attrs</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>asm</groupId>
+					<artifactId>asm</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-sql</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<tasks>
+								<typedef resource="foundrylogic/vpp/typedef.properties" />
+								<taskdef resource="foundrylogic/vpp/taskdef.properties" />
+								<!-- Scripts for DAO tests - N.B. under source control. -->
+								<vppcopy
+									todir="${basedir}/src/test/resources/org/springframework/batch/execution/repository/dao" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/hsqldb.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/hsqldb.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="*.sql.vpp" excludes="schema*" />
+									<mapper type="glob" from="*.sql.vpp" to="*.sql" />
+								</vppcopy>
+								<!-- Reference script for HSQLDB - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/hsqldb.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/hsqldb.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-hsqldb.sql" />
+								</vppcopy>
+								<!-- Reference script for DB2 - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/db2.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/db2.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-db2.sql" />
+								</vppcopy>
+								<!-- Reference script for Derby - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/derby.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/derby.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-derby.sql" />
+								</vppcopy>
+								<!-- Reference script for Oracle - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/oracle10g.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/oracle10g.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-oracle10g.sql" />
+								</vppcopy>
+								<!-- Reference script for PostgreSQL - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/postgresql.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/postgresql.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-postgresql.sql" />
+								</vppcopy>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clover-plugin</artifactId>
+				<configuration>
+					<licenseLocation>${basedir}/src/test/resources/clover.license</licenseLocation>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>pre-site</phase>
+						<goals>
+							<goal>instrument</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clover-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</reporting>
+
+</project>

@@ -1,41 +1,22 @@
-<?xml version="1.0"?>
-<project
-		xmlns="http://maven.apache.org/POM/4.0.0"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>spring-batch-infrastructure</artifactId>
+	<packaging>jar</packaging>
+	<name>Infrastructure</name>
+	<description>
+		<!--  Use CDATA to keep it on a single line in the manifest -->
+		<![CDATA[The Spring Batch Infrastructure is a set of low-level components, interfaces and tools for batch processing applications and optimisations.]]>
+	</description>
 
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0-m2-SNAPSHOT</version>
+		<relativePath>..</relativePath>
 	</parent>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>spring-batch-infrastructure</artifactId>
-	<packaging>jar</packaging>
-	<name>Spring Batch Infrastructure</name>
-	<description>
-		The Spring Batch Infrastructure is a set of low-level components, interfaces and tools for batch processing
-		applications and optimizations.
-	</description>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clover-plugin</artifactId>
-				<configuration>
-					<licenseLocation>${basedir}/src/test/resources/clover.license</licenseLocation>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>pre-site</phase>
-						<goals>
-							<goal>instrument</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -44,20 +25,28 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>2.1_3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring</artifactId>
-			<version>2.0.3</version>
+			<version>2.1-m2</version>
 		</dependency>
 		<dependency>
 			<groupId>backport-util-concurrent</groupId>
 			<artifactId>backport-util-concurrent</artifactId>
 			<version>3.0</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
-<!-- This is just for the JMS spec - could use javax.jms -->
+			<!-- This is just for the JMS spec - could use javax.jms -->
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-jms_1.1_spec</artifactId>
 			<version>1.0</version>
+			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>mockobjects</groupId>
@@ -89,9 +78,26 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>1.8.0.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-mock</artifactId>
-			<version>2.0.3</version>
+			<version>2.1-m2</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>
@@ -145,70 +151,52 @@
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
 			<version>1.2.1</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>stax</groupId>
 			<artifactId>stax</artifactId>
 			<version>1.2.0</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>commons-validator</groupId>
-			<artifactId>commons-validator</artifactId>
-			<version>1.1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<version>10.1.1.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>1.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.experlog</groupId>
-			<artifactId>xapool</artifactId>
-			<version>1.5.0</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.1</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>geronimo-spec</groupId>
-			<artifactId>geronimo-spec-j2ee</artifactId>
-			<version>1.4-rc4</version>
-		</dependency>
-		<dependency>
-			<groupId>jotm</groupId>
-			<artifactId>jotm</artifactId>
-			<version>2.0.10</version>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.transaction</groupId>
-					<artifactId>jta</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>javax.resource</groupId>
-					<artifactId>connector</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springmodules</groupId>
-			<artifactId>spring-modules-validation</artifactId>
-			<version>0.7</version>
-		</dependency>
+	        <groupId>org.springframework.ws</groupId>
+			<artifactId>spring-oxm</artifactId>
+	        <version>1.0-rc2</version>
+	        <optional>true</optional>
+	        <exclusions>
+	        	<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-beans</artifactId>
+	        	</exclusion>
+	        	<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-core</artifactId>
+	        	</exclusion>
+	        </exclusions>
+		</dependency>		
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clover-plugin</artifactId>
+				<configuration>
+					<licenseLocation>${basedir}/src/test/resources/clover.license</licenseLocation>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>pre-site</phase>
+						<goals>
+							<goal>instrument</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 	<reporting>
 		<plugins>
 			<plugin>
@@ -217,4 +205,5 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
 </project>

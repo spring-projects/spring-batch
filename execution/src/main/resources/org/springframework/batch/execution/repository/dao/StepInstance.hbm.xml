@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" [
+   <!ENTITY % globals SYSTEM "classpath://org/springframework/batch/execution/repository/dao/globals.dtd">
+   %globals;
+]>
+
+<hibernate-mapping package="org.springframework.batch.core.domain">
+	<class name="StepInstance" table="BATCH_STEP">
+		<id name="id" type="long" column="ID">
+			&step-generator;
+		</id>
+		<version name="version" access="field"/>
+		<many-to-one name="job" update="false" column="JOB_ID" />
+		<property name="name" update="false" column="STEP_NAME" />
+		<property name="restartData"
+			type="org.springframework.batch.execution.repository.dao.RestartDataUserType" insert="false"
+			column="RESTART_DATA" />
+		<property name="status" type="org.springframework.batch.execution.repository.dao.BatchStatusUserType"
+			insert="false" column="STATUS" />
+	</class>
+</hibernate-mapping>

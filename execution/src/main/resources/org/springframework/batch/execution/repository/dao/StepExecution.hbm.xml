@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" [
+   <!ENTITY % globals SYSTEM "classpath://org/springframework/batch/execution/repository/dao/globals.dtd">
+   %globals;
+]>
+<hibernate-mapping package="org.springframework.batch.core.domain">
+
+	<class name="StepExecution" table="BATCH_STEP_EXECUTION">
+		<id name="id" type="long" column="ID">
+			&step-execution-generator;
+		</id>
+		<version name="version" access="field"/>
+		<property name="stepId" type="long" update="false" column="STEP_ID" access="field"/>
+		<property name="jobExecutionId" type="long" update="false" column="JOB_EXECUTION_ID" access="field"/>
+		<property name="startTime" column="START_TIME" />
+		<property name="endTime" column="END_TIME" />
+		<property name="status" type="org.springframework.batch.execution.repository.dao.BatchStatusUserType" column="STATUS" />
+		<property name="commitCount" column="COMMIT_COUNT" />
+		<property name="taskCount" column="TASK_COUNT" />
+		<property name="statistics" type="org.springframework.batch.execution.repository.dao.PropertiesUserType" column="TASK_STATISTICS" />
+		<property name="exitCode" column="EXIT_CODE" />
+	</class>
+
+</hibernate-mapping>
+

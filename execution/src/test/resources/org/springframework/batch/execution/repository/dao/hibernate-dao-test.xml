@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<import resource="hibernate-context.xml" />
+
+	<bean id="jobDao" class="org.springframework.batch.execution.repository.dao.HibernateJobDao">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<bean id="stepDao" class="org.springframework.batch.execution.repository.dao.HibernateStepDao">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+</beans>

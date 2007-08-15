@@ -1,0 +1,51 @@
+# FHE;ORDER_BATCH_ID(S8-4);ORDER_BATCH_DATE(YYYY-MM-DD)
+#
+#     HEA;ORDER_ID(N10);ORDER_DATE(YYYY-MM-DD)
+# [excl]  NCU;LAST_NAME(S35);FIRST_NAME(S35);MIDDLE_NAME(S35);REGISTERED(T/F);REG_ID(N8);VIP(T/F)
+# [excl]  BCU;COMPANY_NAME(S50);REG_ID(N8);VIP(T/F)
+#         BAD;ADDRESSEE(S60);ADDR_LINE1(S50);ADDR_LINE2(S50);CITY(S30);ZIP_CODE(S5);STATE(S2);COUNTRY(S50)
+# [opt]   SAD;ADDRESSEE(S60);ADDR_LINE1(S50);ADDR_LINE2(S50);CITY(S30);ZIP_CODE(S5);STATE(S2);COUNTRY(S50)
+#         BIN;PAYMENT_TYPE_ID(S4);PAYMENT_DESC(S30);
+#         LIT;ITEM_ID(N10);PRICE(N8.2);DISCOUNT_PERC(N3.2);DISCOUNT_AMOUNT(N8.2);SHIPPING_PRICE(N8.2);HANDLING_PRICE(N8.2);QUANTITY(N4);TOTAL_PRICE(N8.2)
+#         ... (1 .. n) ...
+#         SIN;SHIPPER_ID(S4);SHIPPING_TYPE_ID(S3);ADDITIONAL_SHIPPING_INFO(S100)
+#     FOT;TOTAL_LINE_ITEMS(N6);TOTAL_ITEMS(N6);TOTAL_PRICE(S8.2)
+#
+# FFT;TOTAL_ORDERS(N6);TOTAL_PRICE(N10.2)
+#
+# LINE_ID Description             LINE MANDATORY        OPTIONAL FIELDS*
+# FHE     File Header             YES                   NONE
+# HEA     Record Header           YES                   NONE
+# NCU     Non-Business Customer   EXCL WITH BCU         MIDDLE_NAME, REG_ID (if REGISTERED is 'F')
+# BCU     Business Customer       EXCL WITH NCU         NONE
+# BAD     Billing Address         YES                   ADDRESSEE, ADDR_LINE2, STATE (if COUNTRY is not 'United States')
+# SAD     Shipping Address        NO                    ADDR_LINE2, STATE (if COUNTRY is not 'United States')
+# BIN     Billing Info            YES                   NONE
+# LIT     Line Item               YES (1 to N lines)    DISCOUNT_PERC and DISCOUNT_AMOUNT are mutualy exclusive (only one of them can be non zero)
+# SIN     Shipping Info           YES                   ADDITIONAL_SHIPPING_INFO
+# FOT     Record Footer           YES                   NONE
+# FFT     File Footer             YES                   NONE
+#
+# * if field is optional at least empty field must be provided (';;')
+FHE;20070215-0001;2007-02-15
+HEA;0013100345;2007-02-15
+NCU;Smith;Peter;;T;20014539;F
+BAD;;Oak Street 31/A;;Small Town;00235;IL;US
+SAD;Smith, Elizabeth;Elm Street 17;;Some City;30011;FL;United States
+BIN;VISA;VISA-12345678903
+LIT;1044391041;37.49;0;0;4.99;2.99;1;45.47
+LIT;2134776319;221.99;5;0;7.99;2.99;1;221.87
+SIN;UPS;EXP;DELIVER ONLY ON WEEKDAYS
+FOT;2;2;267.34
+HEA;0013100346;2007-02-15
+BCU;Acme Factory of England;72155919;T
+BAD;;St. Andrews Road 31;;London;55342;;UK
+BIN;AMEX;AMEX-72345678903
+LIT;1044319101;1070.50;5;0;7.99;2.99;12;12335.46
+LIT;2134727619;21.79;5;0;7.99;2.99;12;380.17
+LIT;1044339101;79.95;0;5.5;4.99;2.99;4;329.72
+LIT;2134747619;55.29;10;0;7.99;2.99;6;364.45
+LIT;1044359101;339.99;10;0;7.99;2.99;2;633.94
+SIN;FEDX;AMS;
+FOT;5;36;14043.74
+FFT;2;14311.08

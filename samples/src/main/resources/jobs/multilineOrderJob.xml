@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       	http://www.springframework.org/schema/aop
+ 		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	<import resource="multilineOrderInputDescriptors.xml" />
+	<import resource="multilineOrderOutputDescriptors.xml" />
+	<import resource="multilineOrderIo.xml" />
+	<import resource="../simple-container-definition.xml" />
+
+	<bean
+		class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
+		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry" />
+	</bean>
+
+	<bean id="jobConfiguration" parent="simpleJob">
+		<property name="name" value="multilineOrderJob" />
+		<property name="steps">
+			<bean id="step1" parent="simpleStep">
+				<constructor-arg>
+					<bean
+						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+						<property name="itemProvider">
+							<bean class="org.springframework.batch.sample.module.OrderItemProvider">
+								<property name="inputSource" ref="fileInputTemplate" />
+								<property name="headerMapper" ref="headerFieldSetMapper" />
+								<property name="customerMapper" ref="customerFieldSetMapper" />
+								<property name="addressMapper" ref="addressFieldSetMapper" />
+								<property name="billingMapper" ref="billingFieldSetMapper" />
+								<property name="itemMapper" ref="orderItemFieldSetMapper" />
+								<property name="shippingMapper" ref="shippingFieldSetMapper" />
+								<property name="validator" ref="validator" />
+							</bean>
+						</property>
+						<property name="itemProcessor">
+							<bean class="org.springframework.batch.sample.module.process.OrderProcessor">
+								<property name="writer">
+									<bean class="org.springframework.batch.sample.dao.FlatFileOrderWriter">
+										<property name="outputSource" ref="flatFileOutputSource" />
+										<property name="converter">
+											<bean class="org.springframework.batch.sample.dao.OrderConverter">
+												<property name="aggregators" ref="outputDescriptors" />
+											</bean>
+										</property>
+									</bean>
+								</property>
+							</bean>
+						</property>
+					</bean>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="headerFieldSetMapper" class="org.springframework.batch.sample.mapping.HeaderFieldSetMapper" />
+	<bean id="customerFieldSetMapper" class="org.springframework.batch.sample.mapping.CustomerFieldSetMapper" />
+	<bean id="addressFieldSetMapper" class="org.springframework.batch.sample.mapping.AddressFieldSetMapper" />
+	<bean id="billingFieldSetMapper" class="org.springframework.batch.sample.mapping.BillingFieldSetMapper" />
+	<bean id="orderItemFieldSetMapper" class="org.springframework.batch.sample.mapping.OrderItemFieldSetMapper" />
+	<bean id="shippingFieldSetMapper" class="org.springframework.batch.sample.mapping.ShippingFieldSetMapper" />
+
+	<bean id="validator" class="org.springframework.batch.item.validator.SpringValidator">
+		<property name="validator">
+			<bean id="orderValidator" class="org.springmodules.validation.valang.ValangValidator">
+				<property name="valang">
+					<value>
+						<![CDATA[
+				            { orderId : ? > 0 AND ? <= 9999999999 : 'Incorrect order ID' : 'error.order.id' }
+				            { orderDate : isFutureDate(?) = FALSE : 'Future date is not allowed' : 'error.order.date.future' }
+				            { totalLines : ? = size(lineItems) : 'Bad count of order lines' : 'error.order.lines.badcount'}
+				            
+							{ customer.registered : customer.businessCustomer = FALSE OR ? = TRUE : 'Business customer must be registered' : 'error.customer.registration'}
+					        { customer.companyName : customer.businessCustomer = FALSE OR ? HAS TEXT : 'Company name for business customer is mandatory' : 'error.customer.companyname'}
+        					{ customer.firstName : customer.businessCustomer = TRUE OR ? HAS TEXT : 'Firstname for non-business customer is mandatory' : 'error.customer.firstname'}
+           					{ customer.lastName : customer.businessCustomer = TRUE OR ? HAS TEXT : 'Lastname name for non-business customer is mandatory' : 'error.customer.lastname'}
+        					{ customer.registrationId : customer.registered = FALSE OR (? > 0  AND ? < 99999999) : 'Incorrect registration ID' : 'error.customer.registrationid'}
+       
+					        { billingAddress.addressee : ? HAS NO TEXT OR length(?) <= 60  : 'Maximum length for Addressee is 60 characters' : 'error.baddress.addresse.length'}
+					        { billingAddress.addrLine1 : ? HAS TEXT AND length(?) <= 50  : 'Address line1 is mandatory and maximum length for address line1 is 50 characters' : 'error.baddress.addrline1.length'}
+					        { billingAddress.addrLine2 : ? HAS NO TEXT OR length(?) <= 50  : 'Maximum length for address line2 is 50 characters' : 'error.baddress.addrline2.length'}
+					        { billingAddress.city : ? HAS TEXT AND length(?) <= 30  : 'City is mandatory and maximum length for city is 30 characters' : 'error.baddress.city.length'}
+					        { billingAddress.zipCode : ? HAS TEXT AND length(?) <= 50  :  'Zipcode is mandatory and maximum length for zipcode is 5 characters' : 'error.baddress.zipcode.length'}
+	           				{ billingAddress.zipCode : match('[0-9]{5}',?) = TRUE : 'ZipCode must contain exactly 5 digits' : 'error.baddress.zipcode.format'}
+					        { billingAddress.state : (? HAS NO TEXT AND billingAddress.country != 'United States') OR (? HAS TEXT AND length(?) <= 2)  : 'Maximum length for state is 2 characters' : 'error.baddress.state.length'}
+					        { billingAddress.country : ? HAS TEXT AND length(?) <= 50  : 'Country is mandatory and maximum length for country is 50 characters' : 'error.baddress.country.length'}				            
+					        
+					        { shippingAddress.addressee : shippingAddress IS NULL OR (? HAS TEXT AND length(?) <= 60)  : 'Addressee is mandatory and maximum length for addressee is 60 characters' : 'error.saddress.addresse.length'}
+					        { shippingAddress.addrLine1 : shippingAddress IS NULL OR (? HAS TEXT AND length(?) <= 50)  : 'Address line1 is mandatory and maximum length for address line1 is 50 characters' : 'error.baddress.addrline1.length'}
+					        { shippingAddress.addrLine2 : shippingAddress IS NULL OR (? HAS NO TEXT OR length(?) <= 50)  : 'Maximum length for address line2 is 50 characters' : 'error.baddress.addrline2.length'}
+					        { shippingAddress.city : shippingAddress IS NULL OR (? HAS TEXT AND length(?) <= 30)  : 'City is mandatory and maximum length for city is 30 characters' : 'error.baddress.city.length'}
+					        { shippingAddress.zipCode : shippingAddress IS NULL OR (? HAS TEXT AND length(?) <= 50)  : 'Zipcode is mandatory and maximum length for zipcode is 5 characters' : 'error.baddress.zipcode.length'}
+	           				{ shippingAddress.zipCode : shippingAddress IS NULL OR (match('[0-9]{5}',?) = TRUE) : 'Zipcode must contain exactly 5 digits' : 'error.baddress.zipcode.format'}
+					        { shippingAddress.state : shippingAddress IS NULL OR ((? HAS NO TEXT AND billingAddress.country != 'United States') OR (? HAS TEXT AND length(?) <= 2))  : 'Maximum length for state is 2 characters' : 'error.baddress.state.length'}
+					        { shippingAddress.country : shippingAddress IS NULL OR (? HAS TEXT AND length(?) <= 50)  : 'Country is mandatory and maximum length for country is 50 characters' : 'error.baddress.country.length'}
+					        
+					        { billing.paymentId : ? IN 'VISA','AMEX','ECMC','DCIN','PAYP' : 'Invalid payment type' : 'error.billing.type' }
+					        { billing.paymentDesc : match('[A-Z]{4}-[0-9]{10,11}',?) = TRUE : 'Invalid format of payment description' : 'error.billing.desc' }
+					        
+					        { shipping.shipperId : ? IN 'FEDX', 'UPS', 'DHL', 'DPD' : 'Invalid shipper ID' : 'error.shipping.shipper'}
+					        { shipping.shippingTypeId : ? IN 'STD', 'EXP', 'AMS', 'AME' : 'Invalid shipping type' : 'error.shipping.type' }
+					        { shipping.shippingInfo : ? HAS NO TEXT OR length(?) <= 100 : 'Maximum length for additional shipping info is 100 characters' }
+					        
+					        { lineItems : validateTotalItemsCount(totalItems,?) = TRUE : 'Bad count of total line items' : 'error.lineitems.badcount' }
+					        { lineItems : validateIds(?) = TRUE : 'One or more invalid item IDs' : 'error.lineitems.id' }
+					        { lineItems : validatePrices(?) = TRUE : 'One or more invalid item prices' : 'error.lineitems.price' }
+					        { lineItems : validateDiscounts(?) = TRUE : 'One or more invalid item discounts' : 'error.lineitems.discount' }
+					        { lineItems : validateShippingPrices(?) = TRUE : 'One or more invalid item shipping prices' : 'error.lineitems.shipping' }
+					        { lineItems : validateHandlingPrices(?) = TRUE : 'One or more invalid item handling prices' : 'error.lineitems.handling' }
+					        { lineItems : validateQuantities(?) = TRUE : 'One or more invalid item quantities' : 'error.lineitems.quantity' }
+					        { lineItems : validateTotalPrices(?) = TRUE : 'One or more invalid item total prices' : 'error.lineitems.totalprice' }
+				        ]]>
+					</value>
+				</property>
+				<property name="customFunctions">
+					<map>
+						<entry key="isFutureDate"
+							value="org.springframework.batch.sample.validation.valang.custom.FutureDateFunction" />
+						<entry key="validateTotalItemsCount"
+							value="org.springframework.batch.sample.validation.valang.custom.TotalOrderItemsFunction" />
+						<entry key="validateIds"
+							value="org.springframework.batch.sample.validation.valang.custom.ValidateIdsFunction" />
+						<entry key="validatePrices"
+							value="org.springframework.batch.sample.validation.valang.custom.ValidatePricesFunction" />
+						<entry key="validateDiscounts"
+							value="org.springframework.batch.sample.validation.valang.custom.ValidateDiscountsFunction" />
+						<entry key="validateShippingPrices"
+							value="org.springframework.batch.sample.validation.valang.custom.ValidateShippingPricesFunction" />
+						<entry key="validateHandlingPrices"
+							value="org.springframework.batch.sample.validation.valang.custom.ValidateHandlingPricesFunction" />
+						<entry key="validateQuantities"
+							value="org.springframework.batch.sample.validation.valang.custom.ValidateQuantitiesFunction" />
+						<entry key="validateTotalPrices"
+							value="org.springframework.batch.sample.validation.valang.custom.ValidateTotalPricesFunction" />
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	<!-- "{" <key> : <rule> : <message> : [ <error_code> [ : <error_parameters> ] ] "}" -->
+
+	<bean id="fileInputLocator" class="org.springframework.core.io.ClassPathResource">
+		<constructor-arg type="java.lang.String"
+			value="data/multilineOrderJob/input/20070122.teststream.multilineOrderStep.txt" />
+	</bean>
+
+	<bean id="fileOutputLocator" class="org.springframework.core.io.FileSystemResource">
+		<constructor-arg type="java.lang.String" value="20070122.teststream.multilineOrderStep.TEMP.txt" />
+	</bean>
+</beans>

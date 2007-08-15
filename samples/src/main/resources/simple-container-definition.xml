@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+
+	<import resource="data-source-context.xml" />
+	<import resource="data-source-context-init.xml" />
+
+	<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+		<property name="scopes">
+			<map>
+				<entry key="step">
+					<bean class="org.springframework.batch.execution.scope.StepScope" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="batchContainer" class="org.springframework.batch.execution.facade.SimpleJobExecutorFacade">
+		<property name="jobRepository" ref="simpleJobRepository" />
+		<property name="jobConfigurationLocator" ref="jobConfigurationRegistry"/>
+		<property name="jobExecutor" ref="jobExecutor" />
+	</bean>
+
+	<bean class="org.springframework.batch.execution.bootstrap.SimpleJobLauncher">
+		<property name="batchContainer" ref="batchContainer" />
+	</bean>
+
+	<bean id="jobConfigurationRegistry" class="org.springframework.batch.execution.configuration.MapJobConfigurationRegistry"/>
+ 
+	<aop:config>
+		<aop:advisor pointcut="execution(* org.springframework.batch.container..*Repository+.*(..))"
+			advice-ref="txAdvice" />
+	</aop:config>
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" />
+		</tx:attributes>
+	</tx:advice>
+
+	<bean id="jobExecutor" class="org.springframework.batch.execution.job.DefaultJobExecutor">
+		<property name="jobRepository" ref="simpleJobRepository" />
+		<property name="stepExecutorResolver">
+			<bean class="org.springframework.batch.execution.step.DefaultStepExecutorFactory">
+				<property name="stepExecutorName" value="stepExecutor" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="stepExecutor" class="org.springframework.batch.execution.step.simple.SimpleStepExecutor"
+		scope="prototype">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="repository" ref="simpleJobRepository" />
+	</bean>
+
+	<bean id="simpleJobRepository" class="org.springframework.batch.execution.repository.SimpleJobRepository">
+		<constructor-arg ref="jobDao" />
+		<constructor-arg ref="stepDao" />
+	</bean>
+
+	<bean id="jobDao" class="org.springframework.batch.execution.repository.dao.SqlJobDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="jobIncrementer" ref="jobIncrementer" />
+		<property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" />
+	</bean>
+
+	<bean id="stepDao" class="org.springframework.batch.execution.repository.dao.SqlStepDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="stepIncrementer" ref="stepIncrementer" />
+		<property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" />
+	</bean>
+
+	<bean id="jobRuntimeInformationFactory"
+		class="org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory">
+		<property name="jobStream" value="TestStream" />
+		<property name="scheduleDate" value="20070505" />
+		<property name="jobRun" value="1" />
+	</bean>
+ 
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="int[]">
+					<bean class="org.springframework.batch.support.IntArrayPropertyEditor" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="simpleJob" class="org.springframework.batch.core.configuration.JobConfiguration"
+		abstract="true">
+		<property name="name" value="simpleJob" />
+		<property name="restartable" value="true" />
+	</bean>
+
+	<bean id="simpleStep" class="org.springframework.batch.execution.step.simple.SimpleStepConfiguration"
+		abstract="true">
+		<property name="allowStartIfComplete" value="true" />
+		<property name="saveRestartData" value="false" />
+		<property name="exceptionHandler">
+			<bean
+				class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler">
+				<property name="limit" value="5" />
+				<property name="useParent" value="true"/>
+			</bean>
+		</property>
+		<property name="commitInterval" value="1" />
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="int[]">
+					<bean class="org.springframework.batch.support.IntArrayPropertyEditor" />
+				</entry>
+				<entry key="java.util.Date">
+					<bean class="org.springframework.beans.propertyeditors.CustomDateEditor">
+						<constructor-arg>
+							<bean class="java.text.SimpleDateFormat">
+								<constructor-arg value="yyyyMMdd" />
+							</bean>
+						</constructor-arg>
+						<constructor-arg value="false" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="itemProcessorLogAdvice" class="org.springframework.batch.sample.advice.ProcessorLogAdvice" />
+
+	<aop:config>
+		<aop:aspect id="moduleLogging" ref="itemProcessorLogAdvice">
+
+			<aop:after
+				pointcut="execution( * org.springframework.batch.item.ItemProcessor+.process(Object)) and args(item)"
+				method="doStronglyTypedLogging" />
+
+		</aop:aspect>
+	</aop:config>
+
+</beans>

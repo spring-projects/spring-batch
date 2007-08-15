@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beansProjectDescription>
+	<configExtensions>
+		<configExtension>xml</configExtension>
+	</configExtensions>
+	<configs>
+		<config>src/main/resources/jobs/fixedLengthImportJob.xml</config>
+		<config>src/main/resources/jobs/multilineJob.xml</config>
+		<config>src/main/resources/jobs/multilineOrderInputDescriptors.xml</config>
+		<config>src/main/resources/jobs/multilineOrderIo.xml</config>
+		<config>src/main/resources/jobs/multilineOrderJob.xml</config>
+		<config>src/main/resources/jobs/multilineOrderOutputDescriptors.xml</config>
+		<config>src/main/resources/jobs/tradeJob.xml</config>
+		<config>src/main/resources/jobs/tradeJobIo.xml</config>
+		<config>src/main/resources/jobs/xmlJob.xml</config>
+		<config>src/main/resources/jobs/restartSample.xml</config>
+		<config>src/main/resources/data-source-context.xml</config>
+		<config>src/main/resources/simple-container-definition.xml</config>
+		<config>src/main/resources/jobs/beanWrapperMapperSampleJob.xml</config>
+		<config>src/main/resources/jobs/adhocLoopJob.xml</config>
+		<config>src/main/resources/jobs/infiniteLoopJob.xml</config>
+		<config>src/main/resources/data-source-context-init.xml</config>
+	</configs>
+	<configSets>
+	</configSets>
+</beansProjectDescription>

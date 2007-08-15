@@ -1,0 +1,8 @@
+Changelog: Spring Batch Samples
+
+* 1.0-M2
+
+** 2007/06/25
+
+  * Dave Syer: fixed xml sample by using scope="step" to control bean
+    lifecycle and stimulte call to close().

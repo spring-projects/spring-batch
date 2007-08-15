@@ -1,0 +1,290 @@
+                                    ------
+                                    Simple Batch Repeat Use Case
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    January 2007
+
+Use Case: Simple Batch Repeat
+
+* Goal
+
+  Repeat a simple operation such as processing a data item, or a
+  message, up to a fixed number of times, normally with a transaction
+  scoped to the whole batch.  Transaction resources are shared between
+  the operations in the batch, leading to performance benefits.
+
+* Scope
+
+  The operation to be repeated:
+
+    * Can expect to use and manage its own I/O or datastore resources,
+    but not necessarily transactions;
+
+    * May need to introspect the batch status (as a variation);
+
+    * Executes synchronously or asynchronously (as a variation).
+
+    * Is stateless - this is not a framework restriction in principle,
+    but simplifies the implementation for now.  See in the
+    {{{#store}Implementation}} section below for some notes on
+    stateful synchronisation;
+
+    * Should be implementable as a POJO if desired.
+
+* Preconditions
+
+  Client code can locate and acquire all the resources it needs for
+  the batched operation, and can force transactions to rollback for
+  testing purposes.
+
+* Success
+
+  * Verify that a successful batch executed a fixed number of times.
+
+  * Verify that a batch completes early but successfully if an
+    underlying transaction times out.
+
+  * Terminate a batch by failing one of the operations, and verify
+    that the preceding operations rolled back (subject to batch meta
+    data).
+
+  * Execute a batch asynchronously and verify that the correct number
+    of operations is performed.
+
+* Description
+
+  We are often interested in a specific scenario of this use case
+  where the batched operation is:
+
+    * Read a message or data item from an endpoint like a JMS
+      Destination.
+
+    * Do some business processing involving database reads and writes.
+
+  The vanilla successful batch use case proceeds as follows:
+
+    [[1]] Framework starts a batch, acquiring resources as needed and
+    creating a context for the execution.
+
+    [[1]] Client provides a batch operation in the form of a source of
+    data items and a processor acting on the data item.
+
+    [[1]] Framework executes batch operation.
+
+    [[1]] Repeat the last step until the batch size is reached.
+
+    [[1]] Framework commits the batch.  All database changes are
+    committed and received messages removed from the endpoints.
+
+* Variations
+
+** Rollback
+
+  If one of the operations rolls back it will throw an exception.
+  Normal transaction semantics determine what happens next.  Usually
+  (in the scenario described above) there is an outer transaction for
+  the whole batch, which rolls back as well: all the messages remain
+  unsent, and all the data remain uncommitted.  A retry will receive
+  exactly the same initial conditions.
+
+** Timeout
+
+  The batch size is not fixed.  The use case proceeds as above, but in
+  the middle of a batch operation execution:
+
+
+    [[1]] Framework determines that the batch has timed out operation
+    (e.g. while it was waiting for an incoming message).
+
+    [[1]] Framework commits the batch with all operations so far
+    complete - possibly a smaller than normal size.
+
+** Asynchronous Processing
+
+  Instead of the Framework waiting for each operation to complete it
+  could spin them off independently into separate threads or a work
+  queue.  The batch still has to have a definite endpoint, so the
+  Framework waits for all the operations to finish or fail
+  before cmpleting the batch.
+
+** Introspection of Batch Context
+
+  Client may wish to inspect the state of the ongoing batch operation,
+  and potentially force an early completion.
+
+* {Implementation}
+
+  * The completion of the batch loop is handled by a policy delegate
+  that we can use to strategise the concept of a loop that might
+  complete early.  This can cover both the timeout variation and the
+  vanilla use case flow.
+
+  * What form should the batch template (<<<RepeatOperations>>>)
+  interface take?  We might start with something like this:
+
++---
+batchTemplate.iterate(new RepeatCallback() {
+
+    public boolean doInIteration() {
+        // do stuff
+    }
+
+});
++---
+
+  * A nice tool for a batch operation in a callback is an iterator
+  through a data set or message endpoint (<<<ItemProvider>>>), coupled
+  with a handler for processing the item.  This adds a potential
+  implementation of <<<RepeatCallback>>> that knows about the
+  <<<ItemProvider>>> and adds a processor object.  E.g. as an
+  anonymous inner class:
+
++---
+final ItemProvider provider = new JmsItemProvider();
+final ItemProcessor processor = new ItemProcessor() {
+    public void process(Object data) {
+       // do something with the data (a record)
+    }
+};
+
+batchTemplate.execute(new RepeatCallback() {
+
+    public boolean doInIteration() {
+       Object data = provider.next();
+       if (data!=null) {
+           processor.process(data);
+       }
+       return data!=null;
+    }
+
+});
++---
+
+  * Is a batch template with callback the best implementation?  Could
+  we perhaps use or re-use <<<TaskExecutor>>> somehow?  Which is
+  better for the client:
+
++---
+batchTemplate.iterate(new RepeatCallback() {
+
+    public boolean doInIteration() {
+        // do stuff
+    }
+
+});
++---
+
+  where the batch template might itself use a <<<TaskExecutor>>>
+  internally, or
+
++---
+batchTemplate.iterate(new Runnable() {
+
+    public void run() {
+        // do stuff with data
+    };
+
+});
++---
+
+  where the batch template is a <<<TaskExecutor>>>.  Probably the
+  former because it is more encapsulated: it gives the framework more
+  freedom to implement the template in any way it needs to, e.g. to
+  accommodate more complicated use cases.
+
+  * To {store} up SQL operations until the end of a batch, and take
+  advantage of JDBC driver efficiencies, the client needs to store
+  some state during the batch, and also register a transaction
+  synchronisation.  For this kind of scenario we introduce an
+  interceptor framework in the template execution.  The template calls
+  back to interceptors, which themselves can strategise clean up and
+  close-type behaviour:
+
++---
+public class RepeatTemplate implements RepeatOperations {
+
+    public void iterate(RepeatCallback callback) {
+
+        // set up the batch
+        interceptors.open();
+        
+        while (running) {
+
+            // allow interceptor to pre-process and veto continuation
+            interceptor.before();
+
+            // continue only if batch is ongoing
+            if (running = callback.doInIteration()!=null) {
+                interceptor.after();
+            }
+
+        }
+
+        // clean up or commit the whole batch
+        interceptor.close();
+
+    }
+}
++---
+
+  The <<<RepeatInterceptor>>> can be stateful, and can store up inserts
+  until the end of the batch.  If the <<<RepeatTemplate.iterate>>> is
+  transactional then they will only happen if the transaction is
+  successful.
+
+  This way the client can even decide to use a batch interceptor
+  that runs in its own transaction at the end of the batch.
+
+  * There is no need for an overall batch timeout because the inner
+  operations are synchronous and have their own timeout metadata
+  though transaction definitions.  The whole batch (outer transaction)
+  may still have a timeout attribute, and then there is a corner case
+  where the batch operations are all successful, but because they all
+  took a long time the whole batch rolls back because of the timeout.
+
+  * The context of the ongoing batch is closely linked with the
+  completion policy.  The completion policy is pluggable into the
+  batch template, and acts as a factory for context objects which can
+  then be inspected by Client in the callback.  For example:
+
++---
+public class RepeatTemplate implements RepeatOperations {
+
+    public void iterate(RepeatCallback callback) {
+
+        // set up the batch session
+        RepeatContext context = completionPolicy.start();
+        
+        while (!completionPolicy.isComplete(context)) {
+
+            // callback gets the context as an argument
+            callback.doInIteration(context);
+
+            completionPolicy.update(context);
+        }
+
+    }
+}
++---
+
+  * The example above provides Client the opportunity to inspect the
+  context through the callback interface.  If Client is a POJO,
+  Framework has to create a callback and wrap it, in which case there
+  needs to be a global accessor for the current context or session.
+  The template is then responsible for registering the current context
+  with a <<<RepeatSynchronizationManager>>>.  E.g.client code can look
+  at the session and mark it as complete if desired
+  (c.f. <<<TransactionStatus>>>):
+
++---
+public Object doMyBatch() {
+
+    // do some processing
+
+    // something bad happened...
+    RepeatContext context = RepeatSynchronizationManager.getContext();
+    context.setCompleteOnly();
+
+}
++---

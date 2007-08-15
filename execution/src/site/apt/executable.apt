@@ -1,0 +1,38 @@
+
+  Tried to create an executable jar with this:
+
++---
+	<build>
+		<plugins>
+		<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>org.springframework.batch.container.bootstrap.BatchCommandLineLauncher</mainClass>
+              <addClasspath>true</addClasspath>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+		</plugins>
+	</build>
++---
+
+  But the resulting MANIFEST.MF is rubbish.  Look at the classpath
+  (where did that come from)?
+
++---
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: dsyer
+Build-Jdk: 1.5.0_09
+Main-Class: org.springframework.batch.container.bootstrap.BatchCommand
+ LineLauncher
+Class-Path: spring-2.1-m2.jar commons-logging-1.1.jar log4j-1.2.12.jar
+  dom4j-1.6.1.jar commons-lang-2.1.jar spring-batch-infrastructure-1.0
+ -m2-SNAPSHOT.jar antlr-2.7.6.jar commons-collections-2.1.1.jar hibern
+ ate-3.2.3.ga.jar spring-mock-2.1-m2.jar ehcache-1.2.3.jar
++---

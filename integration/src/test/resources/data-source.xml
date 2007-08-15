@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="dataSource" class="test.jdbc.datasource.InitializingDataSourceFactoryBean">
+		<property name="dataSource" ref="derby" />
+		<property name="initScript" value="org/springframework/batch/jms/init.sql" />
+		<property name="destroyScript" value="org/springframework/batch/jms/destroy.sql" />
+	</bean>
+
+	<bean id="hsql" class="org.springframework.jdbc.datasource.DriverManagerDataSource" lazy-init="true"
+		autowire-candidate="false">
+		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+		<property name="url" value="jdbc:hsqldb:mem:testdb" />
+	</bean>
+
+	<bean id="derby" class="test.jdbc.datasource.DerbyDataSourceFactoryBean" lazy-init="true" destroy-method="destroy"
+		autowire-candidate="false">
+		<property name="dataDirectory" value="derby-home" />
+	</bean>
+
+	<bean id="brokerService" class="org.apache.activemq.broker.BrokerService" init-method="start"
+		destroy-method="stop">
+		<property name="brokerName" value="broker" />
+		<property name="useJmx" value="false"/>
+		<property name="transportConnectorURIs">
+			<list>
+				<value>vm://localhost</value>
+			</list>
+		</property>
+		<property name="persistenceAdapter">
+			<!-- bean class="org.apache.activemq.store.memory.MemoryPersistenceAdapter"/-->
+			<bean class="org.apache.activemq.store.jdbc.JDBCPersistenceAdapter">
+				<property name="dataSource" ref="dataSource"/>
+				<property name="createTablesOnStartup" value="true" />
+			</bean>
+		</property>
+	</bean>
+
+</beans>

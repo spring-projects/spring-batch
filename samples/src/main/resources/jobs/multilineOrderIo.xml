@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 	xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource">
+		<property name="resource" ref="fileInputLocator" />
+		<property name="tokenizer" ref="orderFileDescriptor" />
+	</bean>
+
+	<bean id="flatFileOutputSource" class="org.springframework.batch.io.file.support.FlatFileOutputSource">
+		<property name="resource" ref="fileOutputLocator" />
+	</bean>
+
+	<bean id="delimitedLineAggregator" class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer" />
+
+	<bean id="fixedLineAggregator" class="org.springframework.batch.io.file.support.transform.FixedLengthLineAggregator" />
+	
+</beans>

@@ -1,0 +1,34 @@
+                                    ------
+                                    Scheduler Managed Use Case
+                                    ------
+                                    Wayne Lund
+                                    ------
+                                    May 2007
+
+Use Case: Scheduler Managed Processing
+
+* Goal
+
+  Ensure that an Enterprise Scheduler can interact with the Batch Launcher to start, stop, 
+  suspend and/or kill a batch job. 
+
+* Scope
+
+  * Batch jobs tends to run within carefully planned job stream schedules.  At a minimum this requires
+  an integration between the Batch Launcher (in the abstract) and the scheduler's control mechanism to 
+  start and stop batch jobs and then to understand the results of the batch job execution 
+  (e.g. COMPLETED, ABENDED, etc.) so that subsequent actions may be taken.  
+
+* Preconditions
+
+  * A mechanism has been established for the scheduler to launch a batch job.  This is often times
+  a simple unix or dos shell script.
+
+  * A mapping of exit codes to the error code numbers that the scheduler is expecting on the exiting
+  of a batch job.
+
+* Success
+
+  * Batch Jobs are launched and managed by scheduler
+
+* Description

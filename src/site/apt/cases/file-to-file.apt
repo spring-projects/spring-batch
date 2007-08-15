@@ -1,0 +1,89 @@
+                                    ------
+                                    Copy File to File
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    January 2007
+
+Use Case: Copy File to File
+
+* Goal
+
+  Read a file line-by-line and process into a file in a different
+  format (possibly different number of lines).  Commit periodically
+  and in the event of an error both data sources (input and output)
+  rollback to the last known good point.
+
+* Scope
+
+  To keep things simple for now, assume that:
+
+    * All lines in the file are in the same format and the final
+    output is an aggregate.
+
+    * The files are read and written synchronously by a single
+    consumer.
+
+    * This use case requires two kinds of transactional file source.
+    One is read-only and the other is write-only.  Only one consumer
+    can use the write-only source at a time.
+
+* Preconditions
+
+  * An input file exists in the right format, with a sufficiently
+    large number of lines to be realistic.
+
+* Success
+
+  Integration test confirms that
+
+    * All data are processed and output produced successfully.
+
+* Description
+
+  Very similar to the use case {{{chunks.html}Copy File to
+  Database}}, but involving transactional access to an output source
+  which is a file.  Also we are introducing the idea of an aggregate
+  function for the output.
+
+  The vanilla successful case proceeds as in the file to database
+  version, except that:
+
+  [[1]] A successful chunk results in a line in an intermediate file
+  output source.
+
+  [[1]] After all chunks are successfully processed the intermediate
+  file is itself processed in a single transaction to complete the
+  aggregate.  The output is itself sent to an output channel
+  (e.g. database or file).
+
+* Variations
+
+  * Chunk failure variations proceed as in the use case
+  {{{chunks.html}Copy File to Database}}.  In the case of a
+  restart after fatal failure, the intermediate output file need does
+  not need to be reset or re-created.
+
+* Implementation
+
+  * The write-only file source is new in this use case.  It has a
+  similar flavour to the read-only version, but also has more serious
+  implications for implementation and usage.  Since a file system is
+  not inherently transactional, when we create the write-only data
+  source we are assuming that consumers will play by the rules,
+  principally that there is only one consumer at a time.
+
+  * With some external limitations the write-only file source can be
+  implemented so that within a single JVM it will behave like a
+  transactional database datasource.  We can provide a
+  <<<FileOutputTemplate>>> that hides the resource acquisition and
+  release, and interacts with an existing transaction to provide the
+  transactional behaviour that is required.
+
+  * File-based transactional resources are a lot like messaging
+  clients.  We can send a message (write a line) through a sender
+  client, and receive a message (read a line) through a consumer
+  client.  In the case of a transaction rollback, all sent messages
+  are guaranteed not to reach consumers, and all received messages are
+  returned to the queue.  Maybe ActiveMQ has a file transport already?
+  Mule definitely does, but it isn't transactional.

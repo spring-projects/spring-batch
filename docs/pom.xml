@@ -1,0 +1,127 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>spring-batch-docs</artifactId>
+	<name>Documentation</name>
+	<packaging>pom</packaging>
+	<description>Spring Batch Documentation - reference guide and user manuals.</description>
+
+	<parent>
+		<groupId>org.springframework.batch</groupId>
+		<artifactId>spring-batch</artifactId>
+		<version>1.0-m2-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>agilejava</id>
+			<url>http://agilejava.com/maven</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.agilejava.docbkx</groupId>
+				<artifactId>docbkx-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>single-page</id>
+						<goals>
+							<goal>generate-html</goal>
+							<goal>generate-pdf</goal>
+						</goals>
+						<configuration>
+							<chunkedOutput>false</chunkedOutput>
+							<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
+							<foCustomization>${basedir}/src/docbkx/resources/xsl/fopdf.xsl</foCustomization>
+							<postProcess>
+								<copy todir="${basedir}/target/site/reference">
+									<fileset dir="${basedir}/target/docbkx">
+										<include name="**/*.pdf" />
+									</fileset>
+								</copy>
+								<copy todir="${basedir}/target/site/reference/html-single">
+									<fileset dir="${basedir}/target/docbkx/html">
+										<include name="**/*.html" />
+									</fileset>
+								</copy>
+								<copy todir="${basedir}/target/site/reference/html-single">
+									<fileset dir="${basedir}/src/docbkx/resources">
+										<include name="**/*.css" />
+									</fileset>
+								</copy>
+								<copy todir="${basedir}/target/site/reference/html-single">
+									<fileset dir="${basedir}/src/site/resources/reference">
+										<include name="**/*.png" />
+										<include name="**/*.gif" />
+										<include name="**/*.jpg" />
+									</fileset>
+								</copy>
+								<move file="${basedir}/target/site/reference/pdf/index.pdf"
+									tofile="${basedir}/target/site/reference/pdf/${artifactId}.pdf" failonerror="false" />
+							</postProcess>
+						</configuration>
+						<phase>pre-site</phase>
+					</execution>
+					<execution>
+						<id>multi-page</id>
+						<goals>
+							<goal>generate-html</goal>
+						</goals>
+						<configuration>
+							<chunkedOutput>true</chunkedOutput>
+							<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
+							<postProcess>
+								<copy todir="${basedir}/target/site/reference">
+									<fileset dir="${basedir}/target/docbkx">
+										<include name="**/*.html" />
+									</fileset>
+								</copy>
+								<copy todir="${basedir}/target/site/reference/html">
+									<fileset dir="${basedir}/src/docbkx/resources">
+										<include name="**/*.css" />
+										<include name="**/*.png" />
+										<include name="**/*.gif" />
+										<include name="**/*.jpg" />
+									</fileset>
+								</copy>
+								<copy todir="${basedir}/target/site/reference/html">
+									<fileset dir="${basedir}/src/site/resources/reference">
+										<include name="**/*.png" />
+										<include name="**/*.gif" />
+										<include name="**/*.jpg" />
+									</fileset>
+								</copy>
+							</postProcess>
+						</configuration>
+						<phase>pre-site</phase>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.docbook</groupId>
+						<artifactId>docbook-xml</artifactId>
+						<version>4.4</version>
+						<scope>runtime</scope>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<includes>index.xml</includes>
+					<htmlStylesheet>css/html.css</htmlStylesheet>
+					<xincludeSupported>true</xincludeSupported>
+					<sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
+					<entities>
+						<entity>
+							<name>version</name>
+							<value>${version}</value>
+						</entity>
+					</entities>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

@@ -1,0 +1,40 @@
+                                    ------
+                                    Spring Batch Overview
+                                    ------
+                                    Scott Wintermute
+                                    ------
+                                    May 2007
+
+General Principles and Guidelines for Batch Architectures
+
+ The following are a number of key principles, guidelines, and general considerations to take into consideration when building a batch solution.
+ 
+  * A batch architecture typically affects on-line architecture and vice versa. Design with both architectures and environments in mind using common building blocks when possible.
+
+  * Simplify as much as possible and avoid building complex logical structures in single batch applications.
+
+  * Process data as close to where the data physically resides as possible or vice versa (i.e., keep your data where your processing occurs).
+
+  * Minimize system resource use, especially I/O. Perform as many operations as possible in internal memory.
+
+  * Review application I/O (analyze SQL statements) to ensure that unnecessary physical I/O is avoided.  In particular, the following four common flaws need to be looked for:
+
+  ** Reading data for every transaction when the data could be read once and kept cached or in the working storage;
+
+  ** Rereading data for a transaction where the data was read earlier in the same transaction;
+
+  ** Causing unnecessary table or index scans;
+
+  ** Not specifying key values in the WHERE clause of an SQL statement.
+
+  * Do not do things twice in a batch run. For instance, if you need data summarization for reporting purposes, increment stored totals if possible when data is being initially processed, so your reporting application does not have to reprocess the same data. 
+  
+  * Allocate enough memory at the beginning of a batch application to avoid time-consuming reallocation during the process.
+
+  * Always assume the worst with regard to data integrity. Insert adequate checks and record validation to maintain data integrity.
+
+  * Implement checksums for internal validation where possible. For example, flat files should have a trailer record telling the total of records in the file and an aggregate of the key fields.
+
+  * Plan and execute stress tests as early as possible in a production-like environment with realistic data volumes.
+
+  * In large batch systems backups can be challenging, especially if the system is running concurrent with on-line on a 24-7 basis. Database backups are typically well taken care of in the on-line design, but file backups should be considered to be just as important. If the system depends on flat files, file backup procedures should not only be in place and documented, but regularly tested as well.

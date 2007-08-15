@@ -1,0 +1,101 @@
+                                    ------
+                                    Use Cases
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    January 2007
+
+Use Cases for Spring Batch
+
+  These are more like scenarios or flows than real use cases in formal
+  UML terms, but they serve a useful purpose as both.  We don't want
+  to be over formal, and probably code is being written and tested at
+  the same time as these use cases.  But there are many stakeholders
+  in this project, and use cases are a useful resource to make sure
+  they are all agreed on scope and certain implementation details.
+
+    * {{{simple.html}Simple Batch Repeat}}
+
+    * {{{retry.html}Automatic Retry After Failure}}
+
+    * {{{chunks.html}Commit Batch Process Periodically}}: chunk
+    processing.
+
+    * {{{async.html}Asynchronous Chunk Processing}}: parallel
+    processing within a chunk.
+    
+    * {{{file-to-file.html}Copy File to File in a Batch}}
+
+    * {{{parallel.html}Massively Parallel Batch Processing}}
+
+    * {{{restart.html}Manual Restart After Failure}}
+
+    * {{{steps.html}Sequential Processing of Dependent Steps}}
+
+    * {{{partial.html}Partial Processing}}: skip records (e.g. on rollback).
+
+    * Whole-Batch Transaction - transactional support for the whole
+    batch, not just chunks.  Quite a common requirement, but not
+    always practical using normal transaction support.  May require a
+    staging area, and a decision after it is full about whether to
+    copy it in one big batch (e.g. using native database tools) or
+    chunk it (e.g. if it is now in a form for which chunk failure is
+    easier to deal with).
+    
+    * {{{scheduled.html}Scheduled Processing}}: Batch Jobs controlled by scheduler (e.g. start, stop, suspend, kill)
+    
+
+* Actors
+
+  The following actors are involved in the use cases (Container and
+  Client being the most common / important).
+
+** Client or Business Domain
+
+  Code written by the batch developer.
+
+  One aim us that the client is a POJO - the batch behaviour, boundary
+  conditions, transactions etc. can be dealt with by the Container in
+  such as way that the client does not need to know about them.  The
+  client may have access to framework abstractions, like templated
+  data sources (<<<JdbcTemplate>>> etc.), but these should work the
+  same whether they are in a batch or not.
+
+** Container
+
+  An application that converts user requests for batch jobs into
+  running processes.  Container concerns are robustness, traceability,
+  manageability.
+
+** Framework
+
+  The Framework is the infrastructure code that the Container depends
+  on, and possibly spi implementations where knowledge of the
+  non-business logic resides.
+
+  The Framework provides two kinds of infrastruture (as per usual
+  Spring cornerstones <AOP> and <Portable Service Abstractions>):
+
+    * For cross-cutting concerns there are interceptors that can be
+    wrapped around client code without it needing any knowledge of the
+    Framework at all.  An existing parallel is with transaction
+    support - the client code can use <<<TransactionTemplate>>>
+    directly, but does not always need to.
+
+    * Concrete abstractions that allow access to resources in a
+    uniform way without needing to know the details of how they are
+    provided (e.g. partitioned).  Client code can use these
+    abstractions like it would a use a <<<DaoSupport>>>.
+
+** Operator
+
+  The batch operator is not a developer.  Tools are provided for the
+  Operator to be able to stop and start a batch, and to monitor the
+  progress and status of on ongoing or finished batch.
+
+** Business User
+
+  The Operator has technical skills, e.g. a member of an application
+  support team, but may need help with business-related decisions.
+  For instance if input data are bad, he would not expect to be able
+  to fix them alone because they might be bad for a business reason.

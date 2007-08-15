@@ -1,0 +1,16 @@
+<html>
+<body>
+<p>
+Infrastructure components are low-level re-usable abstractions that
+help with optimisation or common ETL-style problems.  Optimisations
+include repeating an operation automatically until a policy determines
+that the iteration is over.  Combining this with a transaction
+boundary optimises throughput by widening the transaction and sharing
+the resources amongst all the operations.  ETL support includes
+input/output operations like flat file parsing, and transaction
+synchronisations to make file access pseudo-transactional (e.g. return
+to last good line if a transaction rolls back).  There are also useful
+abstractions for generic input and output.
+</p>
+</body>
+</html>

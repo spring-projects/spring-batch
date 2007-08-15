@@ -1,0 +1,154 @@
+                                    ------
+                                    Partial Processing Use Case
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    January 2007
+
+Partial Processing
+
+* Goal
+
+  Support partial processing of a batch, without having to interrupt
+  or manually restart, but enabling corrective action to be taken
+  after the process has finished to complete the processing of failed
+  records.  A batch that is going to fail completely can be be
+  identified as soon as possible, but one which is substantially
+  alright can run as far as possible to prevent costly duplication.
+  Records that are skipped are reported in such a way that they can be
+  easily identified by the Operator and / or Business User and a new
+  batch created to finish the original goal.  By the same token, in
+  the case of an aborted batch where a minority of records are
+  processed successfully first time, it should be possible to identify
+  the successful records and exclude them from data presented on
+  restart.
+
+* Scope
+
+  Any batch should be configurable to support partial processing.
+
+* Preconditions
+
+  * A data source with a small number of bad records exists.
+
+* Success
+
+  * A test data set with a small number of bad records is run through
+    the batch processer and completes normally.  Operator confirms
+    that the good recirds are all processed and then fixes and
+    resubmits the bad records, and confirms that they are also
+    correctly processed with no duplicates.
+
+* Description
+
+  The vanilla flow proceeds as follows:
+
+    [[1]] Batch processing begins as per normal (see for example
+    {{{chunks.apt}chunk processing use case}}).
+
+    [[1]] A record is processed.  This step repeats until...
+
+    [[1]] Container detects a bad record, e.g. by catching a
+    classified execption.
+
+    [[1]] Container logs the exception in a way that identifies the
+    bad record easily and immediately to the Operator.
+
+    [[1]] Container stores an identifier for the bad record (or the
+    whole record) in a location designated to the Operator for that
+    purpose.
+
+    [[1]] Container determines that the batch can still succeed
+    despite the cumulative number or nature of bad records - the bad
+    record is skipped.  Container goes back to normal processing, and
+    eventually completes the whole batch.
+
+* Variations
+
+** Abort Batch Early
+
+  The batch cannot skip all records.  After each failure the decision
+  about whether to coninue has to be made: 
+
+    [[1]] When a record is processed successfully, Container logs the
+    event in a form that can be used later to identify successful
+    records in case the batch is aborted.
+
+    [[1]] Container determines that a sufficiently large fraction of
+    the records processed so far have failed.  The faction relevant is
+    to be specified through configuration meta data (not specified by
+    business logic).
+
+    [[1]] Container aborts the batch with a clear signal to the
+    Operator that it has aborted owing to an unacceptable number of
+    errors.
+
+* Implementation
+
+  * When the decision to abort is taken, Container may have
+  successfully processed a small number of records and the
+  corresponding transactions might have committed.  Those records that
+  were successfully processed on the first attempt are easy to
+  exclude from the restart, if transactional semantics are respected
+  by the item processing.
+
+  * The decision to abort is based on exception classification.  Each
+  time an item is processed, the framework needs to catch exceptions
+  and classify them as 
+  
+    * fatal: signals an abort - rethrow.
+
+    * transient: nominally fatal, but the operation is retryable.
+
+    * non-fatal: signals a skip.
+
+  The transient failure is really just a sub-type of fatal case.  It
+  is treated differently by the {{{retry.html}retry framework}} but
+  not necessarily by the vanilla batch.
+
+  * Actually we can't decide what action to take simply on the
+  evidence of the current exception.  What we need to do is decide,
+  potentially based on the whole history of exceptions in a given
+  batch, whether the latest one should trigger an abort.  E.g. a
+  simple and sensible policy would be to abort if the total number of
+  exceptions reaches a threshold, either absolute or relative to the
+  number of items processed.
+
+  * So how does it look?  In the template...
+
++---
+public void iterate(RepeatCallback callback) {
+
+    ...
+
+    try {
+        result = callback.doInIteration(context);
+    } catch (Exception e) {
+        handleException(e); // Maybe re-throw, maybe not...
+    }
+
+    ...
+
+}
++---
+
+  If the callback was transactional it has already rolled back.  If
+  the whole <<<iterate()>>> was transactional we need to rethrow
+
+  * If the processing is asynchronous, the template has to execute in
+  a separate thread (see {{{async.html}asynchronous example}}).  In
+  this case the whole thread (i.e. the <<<iterate()>>>) has to be
+  transactional.  Whoever is counting failed items needs to be
+  poooling information from multiple threads.
+
+  * It may also be the role of the framework to translate exceptions
+  into a batch-specific hierarchy.  This is not the same concern as
+  exception classification (as done for instance by the Spring Jdbc
+  and Jms templates).  Exception classification might also be of
+  value, but the argument is not as clear cut as the existing core
+  templates, where there is an underlying Jave EE API checked
+  exception to convert.  In the absence of a batch-specific exception
+  hierarchy definition, we could choose to leave exception translation
+  out of the batch framework.
+
+

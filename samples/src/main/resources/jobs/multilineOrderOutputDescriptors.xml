@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+	<util:map id="outputDescriptors">
+		<entry key="header" value-ref="outputHeader" />
+		<entry key="footer" value-ref="outputFooter" />
+		<entry key="customer" value-ref="outputCustomer" />
+		<entry key="address" value-ref="outputAddress" />
+		<entry key="billing" value-ref="outputBilling" />
+		<entry key="item" value-ref="outputLineItem" />
+	</util:map>
+
+	<bean id="outputHeader" class="org.springframework.batch.io.file.support.transform.FixedLengthLineAggregator"
+				p:lengths="12,10,30" />
+
+	<bean id="outputFooter"
+		class="org.springframework.batch.io.file.support.transform.FixedLengthLineAggregator"
+				p:lengths="10,20" />
+
+	<bean id="outputCustomer" class="org.springframework.batch.io.file.support.transform.FixedLengthLineAggregator"
+				p:lengths="9,10,10,10,10" />
+
+	<bean id="outputAddress"
+		class="org.springframework.batch.io.file.support.transform.FixedLengthLineAggregator"
+				p:lengths="8,20,10,10" />
+
+	<bean id="outputBilling"
+		class="org.springframework.batch.io.file.support.transform.FixedLengthLineAggregator"
+				p:lengths="8,10,20" />
+
+	<bean id="outputLineItem"
+		class="org.springframework.batch.io.file.support.transform.FixedLengthLineAggregator"
+				p:lengths="5,10,10" />
+
+</beans>

@@ -1,0 +1,20 @@
+RECORDTYPE1
+a,b,c
+d,e
+END
+
+RECORDTYPE2
+1:2:3
+4
+5:6
+END
+
+PERSON
+john, william, smith  #name
+55                    #age
+END
+
+ANIMAL
+tiger                 #spieces
+1                     #quantity
+END

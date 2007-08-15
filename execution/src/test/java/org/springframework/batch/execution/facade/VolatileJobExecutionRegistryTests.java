@@ -1,0 +1,78 @@
+/*
+ * Copyright 2006-2007 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.batch.execution.facade;
+
+import java.util.Collection;
+
+import junit.framework.TestCase;
+
+import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.runtime.JobExecutionContext;
+import org.springframework.batch.core.runtime.SimpleJobIdentifier;
+
+/**
+ * @author Dave Syer
+ * 
+ */
+public class VolatileJobExecutionRegistryTests extends TestCase {
+
+	private SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("foo");
+	private JobInstance job = new JobInstance(new Long(0));
+
+	private VolatileJobExecutionRegistry registry = new VolatileJobExecutionRegistry();
+
+	public void testAddAndRetrieveSingle() throws Exception {
+		JobExecutionContext context = registry.register(runtimeInformation, job);
+		assertEquals(context, registry.get(runtimeInformation));
+	}
+
+	public void testAddAndFindAll() throws Exception {
+		JobExecutionContext context = registry.register(runtimeInformation, job);
+		Collection list = registry.findAll();
+		assertEquals(1, list.size());
+		assertTrue(list.contains(context));
+	}
+
+	public void testAddAndFindAllMultiple() throws Exception {
+		JobExecutionContext context1 = registry.register(runtimeInformation, job);
+		JobExecutionContext context2 = registry.register(new SimpleJobIdentifier("spam"), job);
+		Collection list = registry.findAll();
+		assertEquals(2, list.size());
+		assertTrue(list.contains(context1));
+		assertTrue(list.contains(context2));
+	}
+
+	public void testAddAndFindByName() throws Exception {
+		JobExecutionContext context = registry.register(runtimeInformation, job);
+		registry.register(new SimpleJobIdentifier("bar"), job);
+		Collection list = registry.findByName(runtimeInformation.getName());
+		assertEquals(1, list.size());
+		assertTrue(list.contains(context));
+	}
+
+	public void testAddAndUnregister() throws Exception {
+		registry.register(runtimeInformation, job);
+		assertTrue(registry.isRegistered(runtimeInformation));
+		registry.unregister(runtimeInformation);
+		assertFalse(registry.isRegistered(runtimeInformation));
+	}
+
+	public void testAddAndIsRegistered() throws Exception {
+		assertFalse(registry.isRegistered(runtimeInformation));
+		registry.register(runtimeInformation, job);
+		assertTrue(registry.isRegistered(runtimeInformation));
+	}
+}

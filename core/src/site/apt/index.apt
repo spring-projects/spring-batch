@@ -1,0 +1,60 @@
+                                    ------
+                                    Simple Batch Execution Core
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    August 2007
+
+Overview of the Spring Batch Core Domain
+ 
+  The Spring Batch Core Domain consists of a public API for launching,
+  monitoring and managing batch jobs.
+
+[images/core-domain-overview.png] The Spring Batch Core Domain with
+dependencies to infrastructure indicated schematically.
+
+  The figure above shows the central parts of the core domain and its
+  main touch points with the batch application develepor
+  (<<<*Configuration>>>).  To launch a job there is a
+  <<<JobExecutor>>> interface and a facade for it that can be used to
+  simplify the launching for dumb clients like JMX or a command line.
+
+  A <<<JobConfiguration>>> is composed of a list of
+  <<<StepConfiguration>>>s, each of which is executed in turn by the
+  <<<JobExecutor>>>, delegating to a <<<StepExecutor>>>.  The
+  <<<StepExecutor>>> is a central strategy in the Spring Batch Core.
+  Implementations of <<<StepExecutor>>> are responsible for sharing
+  the work specified by the <<<StepConfiguration>>> out, but in ways
+  that the configuration doesn't need to be aware of.  For instance,
+  the same <<<StepConfiguration>>> might be used in a simple
+  in-process sequential executor, or in a multi-threaded
+  implementation, or one that delegates to remote calls to a
+  distributed system.
+
+[images/core-domain-extended.png] The Spring Batch Core Domain
+extended to include the datababase entities and identifier strategy.
+
+  A <<<JobConfiguration>>> can be re-used to create multiple job
+  instances and this is reflected in the figure above showing an
+  extended picture of the core domain.  When a <<<JobConfiguration>>>
+  is launched the <<<JobExecutor>>> first checks to see if a job with
+  the same <<<JobIdentifier>>> was already executed. We expect one of
+  the following outcomes, depending on the <<<JobExecutor>>>
+  implementation and <<<JobConfiguration>>>:
+
+    * If the job was not previously launched then it can be created
+    and executed.  A new <<<JobInstance>>> is created and stored in a
+    repository (usually a database).  A new <<<JobExecution>>> is also
+    created to track the progress of this particular execution.
+
+    * If the job was previously launched the <<<JobConfiguration>>>
+    has a flag indicating whether or not to continue and launch a new
+    execution (was this expected?).  The decision is parameterised to
+    depend on whether or not the job failed last time it was executed.
+
+    If the there was a previous failure - maybe the operator has fixed
+    some bad input and wants to run it again - then we might want to
+    restart the previous job.  Or it might be an ad-hoc request that
+    doesn't need to be distinguished from previous runs.  In either
+    case a new <<<JobExecution>>> is created and stored to monitor
+    this execution of the <<<JobInstance>>>.

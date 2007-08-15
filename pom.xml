@@ -1,87 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project
-		xmlns="http://maven.apache.org/POM/4.0.0"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch</artifactId>
-	<packaging>pom</packaging>
 	<name>Spring Batch</name>
-	<version>1.0-SNAPSHOT</version>
 	<description>
-		Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track
-		their execution, or simply as an optimisation for repetitive processing in a transactional environment. Spring
-		Batch is part of the Spring Portfolio.
+		<!--  Use CDATA to keep it on a single line in the manifest -->
+		<![CDATA[Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track	their execution, or simply as an optimisation for repetitive processing in a transactional environment. Spring Batch is part of the Spring Portfolio.]]>
 	</description>
-	<url>http://www.springframework.org/spring-batch</url>
+	<version>1.0-m2-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<url>http://static.springframework.org/spring-batch</url>
+	<organization>
+		<name>Interface 21</name>
+		<url>http://www.interface21.com</url>
+	</organization>
+	<scm>
+		<developerConnection>scm:svn:https://svn.interface21.com/svn/i21/spring-batch/trunk</developerConnection>
+	</scm>
 	<issueManagement>
 		<system>JIRA</system>
-		<url>http://opensource2.atlassian.com/projects/spring/browse/BATCH</url>
+		<url>http://opensource.atlassian.com/projects/spring/browse/BATCH</url>
 	</issueManagement>
+	<mailingLists>
+		<mailingList>
+			<name>Spring Batch Forum</name>
+			<post>http://forum.springframework.org/forumdisplay.php?f=41</post>
+			<archive>http://forum.springframework.org/forumdisplay.php?f=41</archive>
+		</mailingList>
+		<mailingList>
+			<subscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</subscribe>
+			<unsubscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</unsubscribe>
+			<name>Spring Batch Announce</name>
+			<archive>http://lists.interface21.com/archives/spring-batch-announce</archive>
+		</mailingList>
+	</mailingLists>
 	<ciManagement>
 		<system>Bamboo</system>
 		<url>http://build.springframework.org:8085/bamboo/browse/BATCH</url>
 	</ciManagement>
-	<inceptionYear>2007</inceptionYear>
-	<mailingLists>
-		<mailingList>
-			<name>spring-batch-announce</name>
-			<subscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</subscribe>
-			<unsubscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</unsubscribe>
-			<post>spring-batch-announce@lists.interface21.com</post>
-			<archive>http://lists.interface21.com/archives/spring-batch-announce/</archive>
-		</mailingList>
-	</mailingLists>
-	<developers>
-		<developer>
-			<id>dsyer</id>
-			<name>Dave Syer</name>
-			<email>dsyer@interface21.com</email>
-			<organization>Interface21</organization>
-			<organizationUrl>http://www.interface21.com</organizationUrl>
-			<roles>
-				<role>Lead</role>
-			</roles>
-			<timezone>+1</timezone>
-		</developer>
-	</developers>
 	<licenses>
 		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
-			<distribution>repo</distribution>
+			<name>Apache 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
-	<scm>
-		<connection>
-			scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
-		</connection>
-		<developerConnection>
-			scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
-		</developerConnection>
-		<url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk</url>
-	</scm>
-	<organization>
-		<name>Spring Framework</name>
-		<url>http://www.springframework.org</url>
-	</organization>
+
+	<properties>
+		<maven.test.failure.ignore>true</maven.test.failure.ignore>
+	</properties>
+
+	<modules>
+		<module>infrastructure</module>
+		<module>core</module>
+		<module>execution</module>
+		<module>samples</module>
+		<module>integration</module>
+		<module>docs</module> 
+  </modules>
+
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>deployment</id>
+			<distributionManagement>
+				<site>
+					<id>static.springframework.org</id>
+					<url>
+						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch
+					</url>
+				</site>
+			</distributionManagement>
+		</profile>
+		<profile>
+			<id>strict</id>
+			<properties>
+				<maven.test.failure.ignore>false</maven.test.failure.ignore>
+			</properties>
+		</profile>
+		<profile>
+			<id>fast</id>
+			<properties>
+				<maven.test.skip>true</maven.test.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>snapshots</id>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>apache-snapshots</id>
+					<url>http://people.apache.org/maven-snapshot-repository</url>
+				</pluginRepository>
+			</pluginRepositories>
+		</profile>
+	</profiles>
+
+	<distributionManagement>
+		<site>
+			<id>staging</id>
+			<url>file:///${user.dir}/target/staging</url>
+		</site>
+	</distributionManagement>
+
 	<build>
-		<extensions>
-			<extension>
-				<groupId>org.springframework.aws</groupId>
-				<artifactId>spring-aws-maven</artifactId>
-				<version>1.1.1</version>
-			</extension>
-		</extensions>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.4</source>
+					<target>1.4</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -89,7 +123,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.3</version>
 				<configuration>
-					<forkMode>once</forkMode>
+					<!--forkMode>pertest</forkMode-->
 					<includes>
 						<include>**/*Tests.java</include>
 					</includes>
@@ -145,6 +179,11 @@
 						<artifactId>ant-junit</artifactId>
 						<version>1.6.5</version>
 					</dependency>
+					<dependency>
+						<groupId>foundrylogic.vpp</groupId>
+						<artifactId>vpp</artifactId>
+						<version>2.2.1</version>
+					</dependency>
 				</dependencies>
 			</plugin>
 			<plugin>
@@ -167,19 +206,33 @@
 			</plugin>
 		</plugins>
 	</build>
-	<modules>
-		<!--<module>docs</module>-->
-		<module>infrastructure</module>
-		<!--<module>integration</module>-->
-		<!--<module>container-scratch</module>-->
-	</modules>
+
+	<repositories>
+		<repository>
+			<id>apache-snapshots</id>
+			<url>http://people.apache.org/maven-snapshot-repository</url>
+		</repository>
+		<repository>
+			<id>spring-snapshots</id>
+			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-snapshots</url>
+		</repository>
+	</repositories>
+
 	<pluginRepositories>
 		<pluginRepository>
-			<id>spring-external</id>
-			<name>Spring External Repository</name>
+			<id>spring</id>
+			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>spring-ext</id>
 			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext</url>
 		</pluginRepository>
+		<pluginRepository>
+			<id>objectstyle</id>
+			<url>http://objectstyle.org/maven2</url>
+		</pluginRepository>
 	</pluginRepositories>
+
 	<reporting>
 		<excludeDefaults>true</excludeDefaults>
 		<plugins>
@@ -222,23 +275,18 @@
 			</plugin>
 		</plugins>
 	</reporting>
-	<distributionManagement>
-		<downloadUrl>http://www.springframework.org/spring-batch</downloadUrl>
-		<repository>
-			<id>spring-milestone</id>
-			<name>Spring Milestone Repository</name>
-			<url>s3://maven.springframework.org/milestone</url>
-		</repository>
-		<snapshotRepository>
-			<id>spring-snapshot</id>
-			<name>Spring Snapshot Repository</name>
-			<url>s3://maven.springframework.org/snapshot</url>
-		</snapshotRepository>
-		<site>
-			<id>static.springframework.org</id>
-			<url>
-				scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-batch/site
-			</url>
-		</site>
-	</distributionManagement>
+
+	<developers>
+		<developer>
+			<id>dsyer</id>
+			<name>Dave Syer</name>
+			<email>dsyer@interface21.com</email>
+		</developer>
+		<developer>
+			<id>lward</id>
+			<name>Lucas Ward</name>
+			<email>lucas.l.ward@accenture.com</email>
+		</developer>
+	</developers>
+
 </project>

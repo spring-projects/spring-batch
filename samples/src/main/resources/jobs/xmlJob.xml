@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+
+	<import resource="../simple-container-definition.xml" />
+	
+	<bean class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
+		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
+	</bean>
+
+	<bean id="jobConfiguration" parent="simpleJob">
+		<property name="name" value="xmlJob" />
+		<property name="steps">
+			<bean id="step1" parent="simpleStep">
+				<constructor-arg>
+					<bean
+						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+						<property name="itemProvider">
+							<bean
+								class="org.springframework.batch.execution.tasklet.support.InputSourceItemProvider">
+								<property name="inputSource">
+									<bean class="org.springframework.batch.io.xml.XmlInputSource">
+										<property name="name" value="XmlFileInputSource" />
+										<property name="resource"
+											value="data/xmlJob/input/20070122.testStream.xmlFileStep.xml" />
+										<property name="validating" value="true" />
+										<property name="inputFactory">
+											<bean class="org.springframework.batch.io.xml.xstream.XStreamFactory">
+												<property name="config" ref="streamConfig2" />
+											</bean>
+										</property>
+									</bean>
+								</property>
+							</bean>
+						</property>
+						<property name="itemProcessor">
+							<bean class="org.springframework.batch.execution.tasklet.support.OutputSourceItemProcessor">
+								<property name="outputSource">
+									<bean class="org.springframework.batch.io.xml.XmlOutputSource" scope="step">
+										<aop:scoped-proxy/>
+										<property name="name" value="XmlFileOutputSource" />
+										<property name="resource" value="file:20070122.testStream.xmlFileStep.xml" />
+										<property name="outputFactory">
+											<bean class="org.springframework.batch.io.xml.xstream.XStreamFactory">
+												<property name="config" ref="streamConfig" />
+											</bean>
+										</property>
+									</bean>
+								</property>
+							</bean>
+						</property>
+					</bean>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="streamConfig" class="org.springframework.batch.io.xml.xstream.XStreamConfigurationFactoryBean">
+		<property name="configFile" value="xstream-config.xml" />
+	</bean>
+
+	<bean id="streamConfig2" class="org.springframework.batch.io.xml.xstream.XStreamConfiguration">
+		<property name="rootElementName" value="purchaseOrders" />
+		<property name="rootElementAttributes">
+			<map>
+				<entry key="xmlns" value="http://adsj.accenture.com/purchaseorders" />
+				<entry key="xmlns:xsi" value="http://www.w3.org/2001/XMLSchema-instance" />
+				<entry key="xsi:schemaLocation" value="http://adsj.accenture.com/purchaseorders purchaseorders.xsd" />
+			</map>
+		</property>
+		<property name="fieldAliases">
+			<list>
+				<bean class="org.springframework.batch.io.xml.xstream.FieldAlias">
+					<property name="aliasName" value="org.springframework.batch.sample.domain.xml.Customer" />
+					<property name="type" value="org.springframework.batch.sample.domain.xml.Order" />
+					<property name="fieldName" value="customer" />
+				</bean>
+				<bean class="org.springframework.batch.io.xml.xstream.FieldAlias">
+					<property name="aliasName" value="org.springframework.batch.sample.domain.xml.Shipper" />
+					<property name="type" value="org.springframework.batch.sample.domain.xml.Order" />
+					<property name="fieldName" value="shiper" />
+				</bean>
+			</list>
+		</property>
+		<property name="mappings">
+			<list>
+				<bean class="org.springframework.batch.io.xml.xstream.Mapping">
+					<property name="namespaceURI" value="http://adsj.accenture.com/purchaseorders" />
+					<property name="localPart" value="order" />
+					<property name="prefix" value="" />
+					<property name="className" value="org.springframework.batch.sample.domain.xml.Order" />
+				</bean>
+				<bean class="org.springframework.batch.io.xml.xstream.Mapping">
+					<property name="namespaceURI" value="http://adsj.accenture.com/purchaseorders" />
+					<property name="localPart" value="customer" />
+					<property name="prefix" value="" />
+					<property name="className" value="org.springframework.batch.sample.domain.xml.Customer" />
+				</bean>
+				<bean class="org.springframework.batch.io.xml.xstream.Mapping">
+					<property name="namespaceURI" value="http://adsj.accenture.com/purchaseorders" />
+					<property name="localPart" value="shipper" />
+					<property name="prefix" value="" />
+					<property name="className" value="org.springframework.batch.sample.domain.xml.Shipper" />
+				</bean>
+				<bean class="org.springframework.batch.io.xml.xstream.Mapping">
+					<property name="namespaceURI" value="http://adsj.accenture.com/purchaseorders" />
+					<property name="localPart" value="lineItem" />
+					<property name="prefix" value="" />
+					<property name="className" value="org.springframework.batch.sample.domain.xml.LineItem" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+</beans>

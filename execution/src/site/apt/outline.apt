@@ -1,0 +1,124 @@
+			------------------------------------------
+			 The Spring Batch - Reference Documentation
+			 ----------------------------------------
+			 Wayne Lund, Waseem Malik, Lucas Ward, Scott Wintermute, 
+			 Kerry O'Brien, Tomi Vanek
+			 -------------------------------------------
+			 May 2007
+
+Preface
+
+*1.    {{{introduction.html}Spring Container Batch Processing}}
+
+    *1.1.    Overview
+
+    *1.2   Usage Scenarios
+
+*2.    {{{overview.html}Architecture Overview}}
+
+	**2.1.    Introduction to Architecture Layers
+
+	**2.2.    Batch Applications
+
+	**2.3 	Container Application layer
+
+	**2.4 Container Support Layer
+
+    **2.5 The Container Core Layer
+      
+    **2.6 Using the Spring-batch infrastructure
+    
+    	*2.6.1 Infrastructure Provided I/O Support
+    	
+    	*2.6.2 Infrastucture Provided Base Services
+
+    *2.7.    Batch Execution Container Configurations
+
+        *2.7.1.    Single VM Simple Batch Execution Container - One Job, One Step, One Partition
+
+        *2.7.2.    Single VM Multi-threaded Batch Execution Container Configuration - One Job, One Step, Multiple Partitions
+
+	*2.7.3     Batch Execution Container Hosted in J2EE Container - managed environment
+
+		
+*3.    Core Batch Services
+
+    *3.1.    Launching Batch Jobs
+
+    *3.2.    Mapping Batch Error Codes to Launch Client Error Codes
+
+        *3.2.1.    Returning error codes to Enterprise Schedulers with command line interfaces
+
+        *3.2.2.    Web Request - returning error codes to "On-Demand Batch Requests"
+
+    *3.3.    Job Services
+
+        *3.3.1.    Step Configuration
+
+        *3.3.2.    Job Status Service
+
+        *3.3.3.    Job Status
+
+        *3.3.4.    Job Statistics
+
+    *3.4.    Step Services
+
+        *3.4.1.    Step Execution
+
+        *3.4.2.    Restart Services
+
+        *3.4.3.    Skip Services
+
+        *3.4.5.    Step Statistics
+
+    *3.5.    Data Providers - Operations, Templates and Convenience Callbacks
+
+        *3.5.1.    Wrapping input sources
+
+        *3.5.2.    Validation of input
+
+        *3.5.3.    Delimited File Data Providers
+
+        *3.5.4.    Fixed Position File Data Providers
+
+        *3.5.5.    XML File Data Providers
+
+        *3.5.6.    SQL Input Source Data Provider
+
+    *3.6.    Transaction Management
+
+        *3.6.1.    Transaction Synchronization with non-transactional resources
+
+    *3.7.    Partitioning Batch Jobs
+
+        *3.7.1.    Partitioning Strategies
+
+        *3.7.2.    Partitioning Job Steps
+
+        *3.7.3.    Partition Status
+
+        *3.7.4.    Partition Statistics
+
+        *3.7.5.    Handling Exceptions within partitions
+
+*4.    [Batch in a J2EE Container]
+
+*5.    [Testing Batch Jobs]
+
+    *5.1.    Unit Testing & Mock Objects Provided by the Framework
+
+    *5.2.    Integration Testing
+
+    *5.3.    Performance Testing Batch Jobs
+
+*6.    {{{samples.html}Practical Examples for Spring Batch}}
+
+    *6.1.    Sample Applications|Spring Reference-Application Job-Map
+
+    *6.2.    Running the Sample Batch Applications
+
+*7.   [INCUB:Batch XML Schema]
+
+*8.    {{{glossary.html}Glossary}}
+
+

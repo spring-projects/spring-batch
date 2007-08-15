@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       	http://www.springframework.org/schema/aop
+ 		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	<!-- The module used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from
+		multiple environments. -->
+
+	<import resource="../simple-container-definition.xml" />
+
+	<bean class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
+		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
+	</bean>
+
+	<bean id="jobConfiguration" parent="simpleJob">
+		<property name="steps">
+			<bean id="step1" parent="simpleStep">
+				<constructor-arg>
+					<bean id="module" class="org.springframework.batch.sample.module.InfiniteLoopTasklet"/>
+				</constructor-arg>
+				<property name="commitInterval" value="2" />
+			</bean>
+		</property>
+	</bean>
+
+</beans>

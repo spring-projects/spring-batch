@@ -1,0 +1,145 @@
+                                    ------
+                                    Architecture Overview
+                                    ------
+                                    Wayne Lund
+                                    ------
+                                    May 2007
+
+2.    Architecture Overview
+
+
+*2.1 Introduction
+
+  This chapter covers the overall spring batch architecture. The Spring Container Archtiecture is made up of five logical layers; 1) the Batch Application, 2) the Batch Application Layer, 3) the batch core layer, and 4) the batch infrastucture layer. 
+
+*----------*----------------*------------+
+|Provided By | Layer  | Description
+*----------*----------------*------------*
+| Application Developer | Batch Application | This is where the application writes their batch jobs and modules. |
+*----------*----------------*------------*
+| Spring Batch Execution Container | Container Application Layer | Allows for extending and overwriting of the batch support layer for custom requirements.  Facilities implemented in this layer could migrate down to Batch Support Layer.  This is also the layer to add the project specific jars required by job types (e.g. reporting jars like Crystal, Brio, etc, form generation jars like Central Pro or Adobe, etc). |
+*----------*----------------*------------*
+| Spring Batch Execution Container | Container Support Layer | Provides default implementations of batch core services including I/O, Restart, Partitioning, Statistics,  and configurations |
+*----------*----------------*------------*
+| Spring Batch Execution Container | Container Core Layer | Enables configuration, Common Services & Interfaces, management |
+*----------*----------------*------------*
+| Spring Batch Infrastructure | Batch-Infrastructure | Provides IO support, Batch style transactions, advanced exception handling, batch-template, batch-retry |
+*----------*----------------*------------*
+
+  [Figure 2.0] - Batch Architecture Layers
+
+  The batch architecture is modeled after a container architecture, meaning that there are managed resources essential to high performance batch architectures that are configured through a spring context.  The following sections will provide a quick review of each layer and their role in the batch architecture.
+
+*2.2 Batch Applications
+
+*2.3 Container Application Layer
+
+*2.4 Container Support Layer
+
+  The batch support layer provides default implementations for all interfaces, interceptors, advice and other core batch services.   Figure 2.3.1 illustrates the following logical packages.  !Batch Support.png!
+Although physically they break out into many more than depicted, logically you can think of the groupings in the following manner:
+* I/O Support packages
+* Restart Support
+* Lifecycle Support packages
+* DAO support layer
+
+ **2.4.1  I/O Support Packages
+
+  The I/O related packages are currently the richest packages in the batch architecture.  They are modeled after Spring Patterns of Operations and Templates. For example, you'll see FlatFileInputOperations accompanied with a FlatFileInputTemplate.  The FlatFileInputTemplate is wired up with a File Descriptor, which contains a Record Descriptor along with various other properties.  With the File and Record Descriptors the InputTemplate supports a callback method that allows for the mapping of a record into an object.  This support applies to fixed length records, delimited records and XML records.  To further simplify this a DefaultFlatFileDataProvider is supplied an input template, which contains the field and record descriptions, along with a line mapper that knows how to map the line to an object.  The next() operation on a record simply needs to readAndMap(lineMapper) a record.  This pattern is used over again for XML and SQL input for simple mapping of input records to objects.
+
+  In addition to declarative descriptions of the records that can be re-used by multiple batch jobs, the I/O facilities also support configurable validation strategies.  The two currently supported are Apache Commons Validator and Spring's VALang.
+
+ **2.4.2 Restart Support
+
+  The Restart Support provides implementations for a few common restart strategies that will be discussed further in the respective section. The following are provided out-of-the-box:
+   * IDList Restart Strategy - a strategy that supports a batch application where the application does not have a "process" flag and needs the batch architecture to track which records have been processed.  This is not the ideal scenario.
+   * Last Processed Restart Strategy - when the record can be identified through a where and order by only the last record(s) processed needs to be saved for restart.
+   * No Restart Strategy - some batch jobs simply can't support restart.  When they are re-run they are considered to be a new instance of a batch job.
+   * Sql Restart Strategy - \[need some additional javadoc for this strategy\].
+
+ **2.4.3 Lifecycle Support
+
+*2.5.    The Container Core Layer
+
+  The Batch Core interfaces and services are illiustrated in a simplied view of a package diagram.  There are roughly seven logical packages:
+  * Core Spring Extensions
+  * Core Batch Advice
+  * Core Batch Configuration
+  * Core Batch Repository
+  * Core Batch Tasklet
+  \\ !Batch Core.png!
+  [Figure 2.5] Batch Core Layer
+
+  In the actual physical packaging there are a few more packages but the above illistration serves as an overview of the logical services that the batch container provides. The following sections will provide an introduction into each set of core batch facilities. 
+
+ **2.5.1 Core Spring Extensions
+
+  The Core Spring extensions provide the scaffolding for a batch container.    This includes facilities for managing the batch architecture in terms of launching, suspending and stopping batch jobs.  There is house keeping that goes on, especially in concurrent batch jobs, related to ensuring that batch jobs quiese properly.  The lifecycle management provides services for the proper initialization and subsequent shutdown of batch resources and services. The batch architecture is flexible in terms of how batch jobs may be launched.  For example, batch jobs can be started via JMX facilities, scripts from the command line that launch a Java VM.  It can also support launching batch jobs through web services or http. There are no restrictions.  Finally, there are standard batch error codes.  These error codes can be exposed to external utilities, like Schedulers, to ensure that batch jobs expose the status of jobs to an operational environment.  This is especially important in the batch context where the modus operandi is headless, meaning unattended operation. 
+
+ **2.5.2 Core Batch Advice
+
+  Core Batch Advice is an inventory of the type of advice that batch architectures will inject during the runtime of a batch application.  These are defined as a set of extensible interfaces, with a number of default implementations in the support layer that provide some of the most common types of advice.  Partition Advice is helpful with large datasets that need to be "chunked" up and run concurrently for better through put.  Resource Advice is helpful for registering interest in transactional information so that file locations can be kept in sync with information processed within a transaction.  In addition, the resource is associated with the correct step context and its associated configuration properties. Skip advice is applied for records that the module is unable to process. Restart Advice is helpful for Restartable jobs where for advising the job on how to restart.  There is considerable variability on how restart can occur.  For example, a job may be marking records as "processed" and the restart advice will advise the process with query that restarts the job at the last successfully processed record. Finally, Statistics are vital in operational environments to report on records processed, records skipped and total number of records read.  In addition, certain batch jobs lend themselves to custom reporting to expose additional business level information like the number of trades processed or cases opened, etc.
+
+ **2.5.3 Core Batch Configuration
+
+  Batch configuration is considerably different from online web applications or SOA based applications.  The Core Batch Configuration provides a place for configuring runtime properties related to the batch application style.  This includes the ability to add Commit Policy.  In a batch style application it is often advantageous to keep the commit interval as high as possible when processing Logical Units of Work.  Whereas in an online web application with declarative transaction the transaction scope would be at the entrance to a business service, a batch transaction scope may include many logical units of work before a transaction commit is executed. A Start Policy allows a configuration to tell the batch job whether it is Restartable, and if so, what type of restart to initiate.  Some jobs are not restartable and care should be taken to ensure that information is not applied multiple times when the business rules do not allow for it. Exception policies deal with what to do when exceptions occur.  This impacts logging policies and exception handling.  The architecture defines a common set of exceptions that projects can apply handlers to like processing errors, validation errors, parsing errors, missing configuration parameters, etc.
+
+ **2.5.4 Container Repository
+
+  This is an internal package for storing the state of a batch job and any associated partition and step status.
+
+ **2.5.5 Core Batch Tasklet 
+
+  The core batch module is where control is handed off to the application.  There are a number of patterns that have been observed in processing batch data.  Spring Core Batch Tasklet implements the most common patterns and provides and extension point for additional Tasklet processing implementations.  The basic idea of module provides the facilities for reading and processing data. The simplest implementation of Tasklet, the ReadProcessTasklet, handles both the input and output of data within one class. An alternative implementation, the DataProviderProcessTasklet, provides functionality for 'split processing'. This type of processing is characterized by separating the reading and processing of batch data into two seperate classes: DataProvider and TaskletProcessor. The DataProvider class provides a solid means for reusablility and enforces good architecture practices. Because an object \*must\* be returned by the DataProider to continue processing, (Returning null indicates processing should end) a developer is forced to read in all relevant data, place it into domain or value objects, and return the object. The TaskletProcessor will then use this object within the business logic and final output.
+
+2.6 Container's Use of batch infrastructure
+
+ **2.6.1 Infrastructure Provided I/O
+
+  The I/O core interfaces and implementations provide facilities for simplifying the extraction of data from I/O sources like files and database tables.  The key concepts are FieldDescriptors and FieldSets along with appropriate CallBack Handlers.  These are modeled after common spring operations and templates like JdbcTemplate.  Through the use of LineMappers a developer needs only to describe a record format and write the appropriate callback method that maps the parsed record into an object of their choice.  These can either be true POJO objects or Value Objects (structures) that are subsequently available for the module to processs.  The interface for Field Descriptors also allows for a level of validation through the use of Spring's VALang or Apache's Common Validator.
+
+ **2.6.2 Core Batch Interceptors & Interceptor Services
+ 
+  * Batch Operations & Batch Template
+
+  Interceptors and the associated services are the key to how advise is applied in the batch architecture.  The interceptors are Point Cuts in the batch lifecycle that allow the injection of advise.  The shared lifecycle behavior abstracted through the BatchLifeCycleInterceptor defineds three methods; init, onError and finalize. All subclasses of LifeCycleInterceptor define default behavior for these three methods.  The JobLifecycleInterceptor further exposes the methods beforeJob(), beforeStep(), afterJob(), and afterStep() allowing hooks into the lifecycle for specific advise.  The Batch Architecture provides default implementations for all lifecycle point cuts, or interception points.   The Tasklet Interceptor, in addition to the standard lifecycle methods, implements logic around beforeLuw(), afterLuw(), commitIntervalStarted() and commitIntervalCompleted().  Having well defined lifecycle interception points allows for the easy insertion of custom advice into the batch runtime environment.
+
+2.7    Batch Esecution Container Configurations
+
+  In addition to core facilities for configuring or wiring together jobs and steps with required resources, policies, and interceptors, spring batch allows considerable flexibility in how scalability is achieved.  More options for scalability will be available in the future.  The important key for scalability in Java is the recognition that there is a limit to what one JVM may scale up to in terms of number of threads, managed resources, memory configuration, etc.  The spring batch architecture allows for the configuration of simple batch jobs where one VM and one process is sufficient to do perform the work within a batch window all the way through many threads distributed within a cluster of JEE servers.  The figure below illistrates the scalability spectrum.
+
+  This is not to be understood as the only way to scale batch jobs as there are many factors.  For example, other federated java architectures hold potential like Teracotta or Gigaspaces although there is no current implementation for these distributed models in the current batch architecture.
+  !scalability-model.png!
+  [Figure 2.3.1] - Scalability Model
+
+*2.7.1.    Single VM Simple Batch Execution Container - One Job, One Step, One Partition
+
+  The simplest configuration is one job with with step and hence, one implied partition.  Implied means that there is nothing for the developer to consider because the default number of partitions is one.  There is typically one input source and one output source in this simple configuration.  See the Simple Tasklet Job for an example of what this configuration looks like.  A simple configuration still typically configures a datasource context, the batch configuration for describing the Job, Step, along with the associated configured policies, field descriptors, and line mappers. !SimpleTradeConfiguration.jpg!
+  [Figure 2.3.1] Simple Container Configuration
+
+  The details of this configuration will be covered thoroughly in subsequent sections of the document but for now it should be understood that Job, the Step, the input template, the file descriptor with its associated line mapper, and the output (e.g. the TradeWriter). 
+
+*2.3.2.    Single VM Multi-threaded Batch Execution Container Configuration - One Job, One Step, Multiple Partitions
+
+  In a Single JVM using partitioning a multi-threaded execution is supported. \[This is still work in progress\]
+
+*2.3.3.    Batch Execution Container Hosted in J2EE Container - managed environment
+
+  The J2EE container model has fallen under fire over the past few years for many valid reasons. There are some things that the J2EE container do very well though that projects should consider when planning for scalability with batch architectures.  Commercial and open source containers like WebSphere, BEA and JBOSS typically:
+  
+   * manage datasources effectively along with attendent services like prepared statement caching.
+  
+   * manage transactions effectively including many configurable properties for long lived transactions.
+
+   * manage thread pools more effectively.
+  
+   * supply robust implementations of JTA, a requirement when batch jobs output to multiple XA resources like JMS and JDBC.
+  
+   * manage distribution effectively including domains, clusters and cells
+  
+   * provide robust JMX management for configuring, managing and administering distributed applications.
+   
+   * workload management facilities (clusters) provided by J2EE vendors
+ 
+  Projects are encouraged to deploy batch applications with the simplest configuration possible, but when federated JVMs are a requirement to process volumes of data within a batch window, batch-in-container provides an effective way of distributing the processing.  Spring Batch supports this through a simple change in configuration.  \[Work in progress on the exact implementation - being released as part of M2\].
+

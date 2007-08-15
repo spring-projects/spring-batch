@@ -1,0 +1,58 @@
+                                    ------
+                                    Spring Batch Scratch
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    March 2007
+
+
++---
+    |  restore;
+    |
+1   |  BATCH(repeat=until exhausted) {
+    |  
+2   |    RETRY(outer) {
+    |
+3   |      TX(datasource=batch) {
+    |
+4   |        TX(datasource=business) {
+    |
+5   |          BATCH(repeat=5) {
+    |
+6   |            RETRY(inner) {
+6.1 |              input;
+7   |            } PROCESS {
+    |              output;
+8   |            } RECOVER {
+    |              recover;
+    |            }
+    |  
+    |          }
+    |
+4.1 |          savepoint;
+    |
+    |        }
+    |
+    |      }
+    |
+    |    }
+    |
+    |  }
++---
+
+  * The order of the transaction nesting might be important, but only
+    if they are not XA, and only if there is a partial failure (inner
+    commits and the outer rolls back), and only if that happens on the
+    last attempt at RETRY(2).
+
+  * Batch TX is outside business TX so the worse that can happen is
+    that we might restart from the same point twice (if the inner TX
+    commits and the outer rolls back).  If they were the other way
+    round the batch savepoint(4.1) could commit and the business
+    processing (7) roll back - then we would miss the business
+    processing if the batch had to restart.
+
+  * The savepoint(4.1) needs to be implemented so that the state it
+    saves is synchronized with the business TX(4).  That way if TX(4)
+    rolls back the savepoint will always be the correct state to
+    restart if a partial failure is followed by a successful RETRY(2).

@@ -1,0 +1,279 @@
+                                    ------
+                                    Automatic Retry Use Case
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    January 2007
+
+Use Case: Automatic Retry
+
+* Goal
+
+  Support automatic retry of an operation if it fails in certain
+  pre-determined ways.  Client code is not aware of the details of
+  when and how many times to retry the operation, and various
+  strategies for those details are available.  The decision about
+  whether to retry or abandon lies with the Framework, but is
+  parameterisable through some retry meta data.
+
+  Retryable operations are usually transactional, but this can be
+  provided by a normal transaction template or interceptor
+  (transaction meta data are independent of the retry meta data).
+
+* Scope
+
+  Any operation can be retried, but there are restrictions on nesting
+  transactions (normally an inner transaction needs to be
+  propagation=NESTED).
+
+* Preconditions
+
+  An operation exists that can be forced to fail and is able to
+  succeed on a retry.
+
+* Success
+
+  * Verify that an operation fails and then succeeds on a retry.
+
+  * Verify that back off policy (time between retries) can be
+    strategised without changing client code.
+
+  * Verify that the retry policy can be strategised, and can be used
+    to change the number of retry attempts depending on the type of
+    exception thrown in the retry block.
+
+* Description
+
+  Successful retry proceeds as follows:
+
+    [[1]] Framework executes an operation provided by Client.
+
+    [[1]] The operation fails and Framework catches an exception,
+    classified as retryable.
+
+    [[1]] Framework waits for a pre-defined back off period.  The
+    period is not be fixed, but is strategised so that different
+    policies can be applied.  The most common and useful policy is an
+    exponentially increasing back off delay, with a ceiling.
+
+    [[1]] Framework repeats the operation.
+
+    [[1]] Processing is successful.
+
+    [[1]] Framework stores and / or logs statistics about the retry
+    for management purposes.  Details?
+
+* Variations
+
+  The following variations are supported.
+
+** Retry Failure
+
+  A retry can fail for a number of reasons.  E.g. if the number of
+  retries is too high, or there is a timeout, or an exception of
+  another sort that cannot be classified as retryable.
+
+    [[1]] Last retry attempt fails and Framework determines that
+    another retry is not permitted by the current policy.
+
+    [[1]] Framework records status for management purposes.
+
+    [[1]] Framework throws a recognisable exception?
+
+    [[1]] Control may return to client (if the exception was caught),
+    or the processing may end.
+
+** Transient and Non-transient Failures
+
+  We may wish to classify exceptions into (at least) three types, and
+  vary the retry policy based on the classification:
+
+    * Transient failures come from resources that are external and may
+    have independent lifecycles to the client process.  Examples are
+    database deadlock, network connectivity.  It is always worth
+    retrying on a transient failure, and normally we can keep retrying
+    (if not forever then for a very long time), in the belief that
+    eventually the resource will become available again.
+
+    * Non-transient failures can be retried a few times.  This is the
+    default.
+
+    * Non-retryable failures like a configuration or input data error
+    should not be retried (they will always fail the same way).
+
+** Early Termination
+ 
+  Normally client code is unaware of the Framework, but occasionally
+  emergency measures might be taken inside client code where all
+  further retry attempts are vetoed for the current block.
+
+** Stateful Retry
+
+  A stateful (or external) retry is used to force a roll back of an
+  external message (or other data) resource, so that the message will
+  be re-delivered.  The implementation has to be stateful so it can
+  remember the context for the failed message next time it is
+  delivered.  The additional features of a stateful retry, as opposed
+  to a normal rollback, are that:
+
+    * A message can be retried indefinitely or up to a set number of
+    times, after which an error processing route is taken.
+
+    * A back-off delay is used at the <beginning> of the retry
+    before any other transactional resources are enlisted.
+
+* Implementation
+
+  * The vanilla case and most of the variations can be achieved with a
+  simple template approach:
+
++---
+RetryTemplate retryTemplate = new RetryTemplate();
+retryTemplate.setRetryPolicy(new SimpleRetryPolicy(5));
+Object result = retryTemplate.execute(new RetryCallback() {
+    public Object doWithRetry(RetryContext context) throws Throwable {
+        // do some processing
+        return result;
+    }    
+});
++---
+
+  * Schematically we can represent the implementation of the [retry}
+  template as follows:
+
++---
+1   |  TRY {
+1.1 |    do something;
+2   |  } FAIL {
+2.1 |    if (retry limit reached) {
+2.2 |      rethrow exception;
+    |    } else {
+2.3 |      TRY(1) again;
+    |    }
+    |  }
++---
+
+  * The template has policies for back off and retry (whether or not
+  to retry the last exception).  The example above shows the retry
+  policy being set to simply retry all exceptions up to a limit of 5
+  times.
+
+  * The <<<RetryContext>>> has an API that allows clients to override
+  the retry policy.  The context can also be accessed as a thread
+  local from a static convenience class, in the case that the callback
+  is implemented as a wrapper around a POJO.
+
+  * External retry is the most difficult variation to implement, and
+  doesn't fit naturally into the template model above.  Two things
+  depend on the retry count - back-off delay and the decision to
+  follow the recovery path - so it needs to be available at the
+  beginning of every processing block.
+
+  We will discuss the implementation from a JMS-flavoured viewpoint,
+  where the current item being processed is a message.  This can be
+  generalised to more generic data types, as long as the item can be
+  rejected transactionally to signal that we require it to be
+  re-delivered to this or another consumer.  
+
+  Consider this pattern, which is very typical:
+
++---
+1   |  SESSION {
+2   |    receive; 
+3   |    RETRY {
+    |      remote access;
+    |    }
+    |  }
++---
+
+  A <<<RetryTemplate>>> is responsible for the RETRY(3) block.  But
+  we can't put the same wrapper around the whole process:
+
++---
+0   |  RETRY {                   // Do not do this!
+1   |    SESSION {
+2   |      receive; 
+3   |      RETRY {
+    |        remote access;
+    |      }
+    |    }
+    |  }
++---
+
+  because the receive(2) might not get the same message back on the
+  second and subsequent attempts (another consumer might get it, or it
+  might come out of order).  So external retry has a different flow -
+  it might be a different implementation of the same interface, or a
+  different parameterisation of the normal retry template.
+
+  We can break down the implementation of an external retry into steps
+  as follows:
+
++---
+1   |  SESSION {
+2   |    receive;
+3   |    TRY {
+3.1 |      if (already processed) {
+3.2 |         backoff;
+    |      }
+4   |      RETRY {
+    |        remote access;
+    |      }
+5   |    } FAIL {
+5.1 |      if (retry limit reached) {
+5.2 |        recover;
+    |      } else {
+5.3 |        rethrow exception;
+    |      }
+    |    }
+    |  }
++---
+
+  Decisions (3.1) and (5.1) require knowledge of the history of
+  processing the current message.  Note that the action on failure is
+  the opposite to the vanilla case {{{#retry}above}} - if the retry
+  limit is not reached then we rethrow the exception.
+
+  If the retry limit is not reached then the rethrow(5.3) causes the
+  SESSION(1) to roll back, and the message will be re-delivered.
+  RETRY(4) is a normal retry with a template.
+
+  The retry logic is easy to implement - the hard bit is that the
+  policies depend on the history of the message.  This requires some
+  special retry and back off policies that are aware of the history:
+
+    * When a message arrives, at the beginning of the TRY(3) above, we
+    need to update our knowledge of its history.
+
+    * The backoff policy can decide whether to back off immediately
+    when it is initialized at step (3.1).
+
+    * The retry decision at (5.1) has to be aware of the history as
+    well as some simple exception classification rules.
+
+    * If the retry cannot proceed the retry policy can take steps to
+    recover (5.2), e.g. send the current message to an error queue.
+    The exception should not propagate in this case.
+
+    * If we fail and rethrow (5.3), then we need to store the
+    knowledge of the message history somewhere where another consumer
+    can access it.
+
+  There is a small conundrum about what value to return from the
+  TRY(3) block if it ultimately fails (5.2) - a normal retry never
+  completes unless it is successful, but an external retry can
+  complete if it is unsuccessful.  The obvious choice is to return
+  null.  It probably won't matter in a messaging application anyway
+  because the client of the retry block probably isn't expecting
+  anything.  It may matter if the TRY(3) block is part of a batch
+  because the batch template uses null as a signal that the current
+  batch is complete.  But on the other hand it might be a good
+  strategy to close the batch if processing a message fails.
+
+  With JMS there is no indication in the <<<Message>>> how many times
+  it has been rejected - only a flag <<<getJMSRedelivered>>> to show
+  that it has failed at least once.  To count the number of retries,
+  we have to store a global map of messages (ids) to retry counts
+  (within a single VM - for more than one OS process each one has to
+  be independent).
+

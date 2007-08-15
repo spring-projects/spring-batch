@@ -1,0 +1,311 @@
+                                    ------
+                                    Building Spring Batch
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    April 2007
+
+Building Spring Batch
+
+  Spring Batch is organised as a reactor build in Maven (m2).  To
+  build from the command line use
+
++---
+$ mvn install
++---
+
+  or the goal of your choice (compile, test, etc.).  This builds the
+  artifact (e.g. jar file) from the project in the current directory,
+  and deploys it to you local m2 repo at
+  <<<${user.home}/.m2/repository>>>.  See below for instructions on how
+  to build the documentation and web site.
+
+  By default the whole project (including subprojects) will be built
+  using Maven's "reactor" plugin.  This can be expensive.  To build
+  only one module, cd to that directory first.  Or at the top level
+  use -N (for non-recursive) to exclude subprojects.
+
++---
+$ mvn -N install
++---
+
+* Skipping Tests
+
+  The profile <<fast>> skips all the tests, so 
+
++---
+mvn -o install -P fast
++---
+
+  is the quickest way to update your local repo (assuming the tests
+  are OK).  It is equivalent of setting <<<-Dmaven.test.skip=true>>>.
+
+* Eclipse IDE
+
+  Each of the reactor modules at the top level also builds on its own
+  if you use the (excellent) Eclipse-plugin for m2
+  (http://m2eclipse.codehaus.org/update/).  Get version 0.0.10 or
+  better, because it supports dependencies on Eclipse projects that
+  are themselves Maven parents of the current project.
+
+* Dependencies
+
+  If you get multiple versions of the same jar across projects, or a
+  jar is appearing in the classpath that you don't think is necessary,
+  look into the dependency structure and try and exclude it from
+  wherever it is being transitively included.  To see the dependencies
+  for a project look in the site for the dependency report.
+  Alternatively (very useful for quickly locating a rogue jar) use
+
++---
+$ mvn -P snapshots dependency:tree
++---
+
+  We use the "snapshots" profile here so that we get a snapshot of the
+  dependency plugin (older versions did not have the tree goal, but
+  newer versions are not stable enough to use in production).
+ 
+* Documentation
+
+  With the exception of reference docs, please put content in the
+  project that it is most closely associated with.  Here is a
+  {{{sitemap.html}site map}} to help you decide.
+
+** Quotidian Web Content
+
+  Maven allows you to choose from a range of source format for
+  building web content.  For Spring Batch we prefer the "almost plain
+  text" version.  See files under <<<src/site/apt>>> in all the projects
+  for examples, and also refer to the
+  {{{http://maven.apache.org/guides/mini/guide-apt-format.html}Apt
+  Format Guide}} on the Maven website.
+
+  N.B. you put .apt source files in a subdirectory called <<<apt>>>,
+  but they are moved to the top level when the site is built.  Thus
+  <<<apt/index.apt>>> becomes <<<index.html>>>.
+
+*** Using emacs to edit .apt files
+
+  Because the .apt format relies on indentation in plain text files,
+  the emacs auto-fill feature in text mode makes editing very
+  convenient.  Put this in your .emacs
+
++---
+(setq auto-mode-alist (cons '("\\.apt\\'" . text-mode) auto-mode-alist))
++---
+
+  Then use <<<M-q>>> to auto-fill the current paragraph.  Emacs
+  adjusts the indentation of all the lines to match the first one (or
+  the first two if the second is different.
+
+  If anyone knows how to do this with Eclipse or other editors, let us
+  know and we'll put a note here.
+
+** Reference Guide
+
+  The <<<docs>>> project is reserved for reference guides in the
+  normal Spring docbook format.  Each chapter of the reference guide
+  is in a separate xml file under <<<src/site/docbook/reference>>>.
+  The easiest way to work with the reference guide is to cd to the
+  <<<docs>>> module, and run Maven from there.
+
+  Use the DTD with a validating XML editor (e.g. Eclipse) to explore
+  the docbook format.  Also look at existing examples in Spring Batch
+  and in the Core Spring Framework source code.
+
+  N.B. there is no need to explicitly create section numbers in the
+  XML - this is done for you by the build when everything is stitched
+  together into a book.
+
+  N.B. you put docbook .xml source files in a subdirectory called
+  <<<docbook>>>, but they are moved to the top level when the site is
+  built.  Thus <<<docbook/reference/index.xml>>> becomes
+  <<<reference/index.html>>>.
+
+** Adding a new chapter to the Reference Guide
+
+  Here is a skeleton chapter including the DTD to get you started on a
+  new chapter.
+
++---
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="chapter-id">
+	<title>Chapter Title</title>
+	<section>
+		<title>Introduction</title>
+		<para></para>
+	</section>
+</chapter>
++---
+
+  Create a file with the template above, and put it in
+  <<<docbook/reference>>>.  Use lower case, dash separated file names
+  (XML style), e.g. <<<my-new-chapter.xml>>>.
+
+  Add the chapter to the master book in <<<index.xml>>> using
+
++---
+<xi:include href="my-new-chapter.xml"/>
++---
+
+* Adding graphics
+
+  Put (e.g.) PNG image content in <<<src/site/resources/images>>>, and
+  then refer to the file using the <<<images/>>> directory prefix.
+
+** In .apt
+
+  With no whitespace add the image name in square brackets (\[\]):
+
++---
+[images/MyFigure.png] Caption content here is not rendered by default
+in a browser (it's the ALT content)...
++---
+
+** In docbook
+
+  Use the \<mediaobject\> element:
+
++---
+<mediaobject>
+    <imageobject role="fo">
+        <imagedata fileref="src/site/resources/reference/images/mypic.png" format="PNG" align="center"/>
+    </imageobject>
+    <imageobject role="html">
+        <imagedata fileref="images/mypic.png" format="PNG" align="center"/>
+    </imageobject>
+    <caption>
+        <para>
+            Figure 1: the figure caption...
+        </para>
+    </caption>
+</mediaobject>
++---
+
+* Program Listings in Docbook (Including XML)
+
+  Use CDATA to save you from having to use the HTML escapes for all
+  the special characters.  E.g.
+
++---
+<programlisting><![CDATA[
+    <!-- ... my program listing here -->
+]]>
+</programlisting>
++---
+
+* Dynamic Editing
+
+  To see your changes to web site content as soon as you have typed
+  it, use
+
++---
+mvn site:run
++---
+ 
+  and go to http://localhost:8080.
+
+  In a project with unit tests, you can skip the tests and go straight
+  to the documentation using
+
++---
+mvn -o site:run -P fast
++---
+
+  If you are offline, or want to speed things up a bit, the "-o" stops
+  Maven from trying to resolve dependencies on the internet.
+  
+  Use -N to build only the current project, not subprojects,  So this
+  is pretty useful at the top level:
+
++---
+mvn -N -o site:run -P fast
++---
+
+  In the <<<docs>>> project the docbook reference guide shows up at
+  http://localhost:8080/reference/*.html, where * is the name of an
+  xml file with a chapter in it.  There is no link to these pages on
+  the site because the real docbook generated output is much nicer,
+  but this is still pretty useful for debugging and dynamic
+  editing. 
+
+  Note that the formatting is a bit limited compared to the whole
+  docbook stylesheet - Maven uses Doxia to squish all of docbook into
+  some simple wiki-like formatting rules.  In particular it can't
+  generate the index page in the format we need it, so you may see
+  errors from <<<mvn site:run>>> if you visit that page.  One of the
+  features is that the <<<\<xi:include\>>>> syntax we use to build the
+  index and table of contents in the docbook-generated pages does not
+  work.  Images are another problem.  Use the generated content from
+  <<<mvn site>>> to view these artifacts.
+
+* Building and deploying the web site
+
+  There is a bug in the m2 reactor (MNG-740) which means that we have
+  to install the parent pom to the local repo first. 
+
+  So do it this way:
+
++---
+$ mvn install -P fast
+$ mvn clean site site:deploy
++---
+
+  Add "-P deployment" to deploy to the real website (requires ssh
+  access to static.springframework.org).
+
+  The default without -P is to deploy to <<<target/staging>>>, so we
+  don't get accidental updates to the site.  To test the site contents
+  navigate with your browser to that directory.  The site:stage goal
+  deos not work properly for this build: all the subprojects are not
+  integrated into the staging site, so use site:deploy instead.
+
+  The static website content is not deleted during the deployment
+  process - merely replaced.  If you need to clean everything up from
+  scratch you need to delete the contents on the server as well
+  (using ssh).
+
+Problems?
+
+  Make sure your source code is up to date.  Delete everything from
+  your local Spring Batch repo
+  <<<${user.home}/.m2/repository/org/springframework/batch>>>.  If
+  necessary, delete a project or directory and update from SVN again.
+  
+  Try
+
++---
+$ mvn install
++---
+
+  or
+
++---
+$ mvn clean install
++---
+
+  or
+
++---
+$ mvn clean install -P fast
++---
+
+  from the top level, and
+
++---
+$ mvn -U ...
++---
+
+  from wherever you are (top level or sub-project).  The latter will
+  update any older plugins you have in your local Maven repository.
+  Some people have had trouble building the web site without this.
+
+  If you get <<<OutOfMemoryError>>> e.g. building the site, use
+  MAVEN_OPTS to boost the heap size (on the command line if you have a
+  sensible shell):
+
++---
+$ MAVEN_OPTS=-Xmx256m mvn site
++---
