@@ -16,6 +16,7 @@
 
 package org.springframework.batch.execution.facade;
 
+import java.io.File;
 import java.util.Calendar;
 
 import junit.framework.TestCase;
@@ -38,17 +39,22 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	 */
 	private BatchResourceFactoryBean resourceFactory = new BatchResourceFactoryBean();
 
-	private String PATTERN_STRING = "%BATCH_ROOT%\\%JOB_NAME%-%SCHEDULE_DATE%-%JOB_RUN%-%STREAM_NAME%";
+	private String rootDir = System.getProperty("java.io.tmpdir");
+	
+	private char pathsep = File.separatorChar;
+	
+	private String PATTERN_STRING = "%BATCH_ROOT%"+pathsep+"%JOB_NAME%-%SCHEDULE_DATE%-%JOB_RUN%-%STREAM_NAME%";
 
-	private String EXPECTED_ABSOLUTE_PATH = "C:\\temp\\testJob-20070730-0-testStream";
+	private String EXPECTED_ABSOLUTE_PATH = rootDir+"testJob-20070730-0-testStream";
 
-	private String NULL_JOB_NAME_PATH = "C:\\temp\\%JOB_NAME%-20070730-0-testStream";
+	private String NULL_JOB_NAME_PATH = rootDir+"%JOB_NAME%-20070730-0-testStream";
 
 	/**
 	 * mock step context
 	 */
 
 	protected void setUp() throws Exception {
+		assertNotNull(rootDir);
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.YEAR, 2007);
 		calendar.set(Calendar.MONTH, Calendar.JULY);
@@ -56,7 +62,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 		// define mock behaviour
 		resourceFactory.setScheduleDate("20070730");
-		resourceFactory.setRootDirectory("C:\\temp");
+		resourceFactory.setRootDirectory(rootDir);
 		resourceFactory.setJobName("testJob");
 		resourceFactory.setJobStream("testStream");
 		resourceFactory.setJobRun(0);
@@ -75,7 +81,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 		String returnedPath = resource.getFile().getAbsolutePath();
 
-		assertEquals(returnedPath, EXPECTED_ABSOLUTE_PATH);
+		assertEquals(EXPECTED_ABSOLUTE_PATH, returnedPath);
 	}
 
 	/**
