@@ -18,23 +18,16 @@ package org.springframework.batch.io.xml;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.AccessController;
-import java.util.Random;
 
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.easymock.internal.Range;
-import org.springframework.batch.io.xml.ObjectOutput;
-import org.springframework.batch.io.xml.ObjectOutputFactory;
-import org.springframework.batch.io.xml.XmlOutputSource;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.support.TransactionSynchronization;
-
-import sun.security.action.GetPropertyAction;
 
 /**
  * Unit tests for XmlOutputTemplate
@@ -55,11 +48,6 @@ public class XmlOutputSourceTests extends TestCase {
 
 	private ObjectOutputFactory objectOutputFactory;
 	
-	private String getTempDir() {
-		GetPropertyAction a = new GetPropertyAction("java.io.tmpdir");
-		return ((String) AccessController.doPrivileged(a));
-	}
-
 	/**
 	 * Set up XmlOutputTemplate: create mock for FileLocator,
 	 * ObjectOutputFactory and ObjectOutput.
@@ -67,7 +55,7 @@ public class XmlOutputSourceTests extends TestCase {
 	public void setUp() throws Exception {
 
 		// create File object
-		Resource file = new FileSystemResource(new File(getTempDir() + "test" + Integer.toString(new Random().nextInt() & 0xffff) + ".tmp"));
+		Resource file = new FileSystemResource(File.createTempFile("xml-output-test-", ".xml"));
 
 		// Create mock for ObjectOutput
 		ooControl = MockControl.createControl(ObjectOutput.class);
