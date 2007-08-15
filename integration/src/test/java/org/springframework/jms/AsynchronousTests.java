@@ -136,7 +136,7 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 		container.start();
 
 		// Need to sleep for at least a second here...
-		Thread.sleep(1000L);
+		Thread.sleep(3000L);
 
 		// We rolled back so the message might come in many times...
 		assertTrue(list.size() > 1);
