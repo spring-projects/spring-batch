@@ -18,17 +18,17 @@
 	
 	<bean id="scope" class="org.springframework.batch.execution.scope.StepScope" />
 	
-	<bean id="bean" class="org.springframework.batch.execution.scope.StepScopeContextAwareStepScopeTests$TestBean" scope="step" destroy-method="close">
+	<bean id="bean" class="org.springframework.batch.execution.scope.StepContextAwareStepScopeTests$TestBean" scope="step" destroy-method="close">
 		<property name="name" value="foo"/>
 	</bean>
 
-	<bean id="inner" class="org.springframework.batch.execution.scope.StepScopeContextAwareStepScopeTests$TestBean" scope="step">
+	<bean id="inner" class="org.springframework.batch.execution.scope.StepContextAwareStepScopeTests$TestBean" scope="step">
 		<property name="child">
-			<bean class="org.springframework.batch.execution.scope.StepScopeContextAwareStepScopeTests$TestBean" destroy-method="close"/>
+			<bean class="org.springframework.batch.execution.scope.StepContextAwareStepScopeTests$TestBean" destroy-method="close"/>
 		</property>
 	</bean>
 
-	<bean id="aware" class="org.springframework.batch.execution.scope.StepScopeContextAwareStepScopeTests$TestBeanAware" scope="step">
+	<bean id="aware" class="org.springframework.batch.execution.scope.StepContextAwareStepScopeTests$TestBeanAware" scope="step">
 		<property name="name" value="bar"/>
 	</bean>
 
