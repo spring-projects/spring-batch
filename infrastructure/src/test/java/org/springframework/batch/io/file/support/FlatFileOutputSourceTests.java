@@ -59,23 +59,38 @@ public class FlatFileOutputSourceTests extends TestCase {
 	protected void setUp() throws Exception {
 		
 		outputFile = File.createTempFile("flatfile-output-", ".tmp");
-		outputFile.createNewFile();
 
 		template.setResource(new FileSystemResource(outputFile));
 		template.afterPropertiesSet();
 
 		template.open();
 
-		reader = new BufferedReader(new FileReader(outputFile));
 	}
 
 	/**
 	 * Release resources and delete the temporary output file
 	 */
 	protected void tearDown() throws Exception {
-		reader.close();
+		if( reader != null){
+			reader.close();
+		}
 		template.close();
 		outputFile.delete();
+	}
+	
+	/*
+	 * Read a line from the output file, if the reader has not been
+	 * created, recreate.  This method is only necessary because
+	 * running the tests in a UNIX environment locks the file
+	 * if it's open for writing.
+	 */
+	private String readLine() throws IOException{
+		
+		if(reader == null){
+			reader = new BufferedReader(new FileReader(outputFile));
+		}
+		
+		return reader.readLine();
 	}
 
 	/**
@@ -83,8 +98,9 @@ public class FlatFileOutputSourceTests extends TestCase {
 	 */
 	public void testWriteString() throws IOException {
 		template.write(TEST_STRING);
-
-		String lineFromFile = reader.readLine();
+		template.close();
+		String lineFromFile = readLine();
+		
 		assertEquals(TEST_STRING, lineFromFile);
 	}
 
@@ -93,8 +109,8 @@ public class FlatFileOutputSourceTests extends TestCase {
 	 */
 	public void testWriteCollection() throws IOException {
 		template.write(Collections.singleton(TEST_STRING));
-
-		String lineFromFile = reader.readLine();
+		template.close();
+		String lineFromFile = readLine();
 		assertEquals(TEST_STRING, lineFromFile);
 	}
 
@@ -109,8 +125,8 @@ public class FlatFileOutputSourceTests extends TestCase {
 		});
 		Object data = new Object();
 		template.write(data);
-
-		String lineFromFile = reader.readLine();
+		template.close();
+		String lineFromFile = readLine();
 		// converter not used if input is String
 		assertEquals("FOO:" + data.toString(), lineFromFile);
 	}
@@ -126,8 +142,8 @@ public class FlatFileOutputSourceTests extends TestCase {
 		});
 		Object data = new Object();
 		template.write(data);
-
-		String lineFromFile = reader.readLine();
+		template.close();
+		String lineFromFile = readLine();
 		// converter not used if input is String
 		assertEquals("FOO:" + data.toString(), lineFromFile);
 	}
@@ -142,11 +158,11 @@ public class FlatFileOutputSourceTests extends TestCase {
 			}
 		});
 		Object data = new Object();
-		template.write(new Object[] { data, data });
-
-		String lineFromFile = reader.readLine();
+		template.write(new Object[] {data, data});
+		template.close();
+		String lineFromFile = readLine();
 		assertEquals("FOO:" + data.toString(), lineFromFile);
-		lineFromFile = reader.readLine();
+		lineFromFile = readLine();
 		assertEquals("FOO:" + data.toString(), lineFromFile);
 	}
 
@@ -172,8 +188,8 @@ public class FlatFileOutputSourceTests extends TestCase {
 			// expected
 			assertTrue("Wrong message: "+e, e.getMessage().toLowerCase().indexOf("infinite")>=0);
 		}
-
-		String lineFromFile = reader.readLine();
+		template.close();
+		String lineFromFile = readLine();
 		assertNull(lineFromFile);
 	}
 
@@ -187,8 +203,8 @@ public class FlatFileOutputSourceTests extends TestCase {
 			}
 		});
 		template.write(Collections.singleton(TEST_STRING));
-
-		String lineFromFile = reader.readLine();
+		template.close();
+		String lineFromFile = readLine();
 		// converter not used if input is String
 		assertEquals(TEST_STRING, lineFromFile);
 	}
@@ -203,8 +219,8 @@ public class FlatFileOutputSourceTests extends TestCase {
 			}
 		});
 		template.write(TEST_STRING);
-
-		String lineFromFile = reader.readLine();
+		template.close();
+		String lineFromFile = readLine();
 		// converter not used if input is String
 		assertEquals(TEST_STRING, lineFromFile);
 	}
@@ -214,10 +230,10 @@ public class FlatFileOutputSourceTests extends TestCase {
 	 */
 	public void testWriteArray() throws IOException {
 		template.write(new String[] { TEST_STRING, TEST_STRING });
-
-		String lineFromFile = reader.readLine();
+		template.close();
+		String lineFromFile = readLine();
 		assertEquals(TEST_STRING, lineFromFile);
-		lineFromFile = reader.readLine();
+		lineFromFile = readLine();
 		assertEquals(TEST_STRING, lineFromFile);
 	}
 
@@ -229,8 +245,8 @@ public class FlatFileOutputSourceTests extends TestCase {
 
 		// AggregatorStub ignores the LineDescriptor, so we pass null
 		template.write(args);
-
-		String lineFromFile = reader.readLine();
+		template.close();
+		String lineFromFile = readLine();
 		assertEquals(args, lineFromFile);
 	}
 
@@ -238,7 +254,8 @@ public class FlatFileOutputSourceTests extends TestCase {
 		template.write("testLine1");
 		// rollback
 		template.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
-		String lineFromFile = reader.readLine();
+		template.close();
+		String lineFromFile = readLine();
 		assertEquals(null, lineFromFile);
 	}
 
@@ -246,7 +263,8 @@ public class FlatFileOutputSourceTests extends TestCase {
 		template.write("testLine1");
 		// rollback
 		template.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
-		String lineFromFile = reader.readLine();
+		template.close();
+		String lineFromFile = readLine();
 		assertEquals("testLine1", lineFromFile);
 	}
 
@@ -254,7 +272,8 @@ public class FlatFileOutputSourceTests extends TestCase {
 		template.write("testLine1");
 		// rollback
 		template.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_UNKNOWN);
-		String lineFromFile = reader.readLine();
+		template.close();
+		String lineFromFile = readLine();
 		assertEquals("testLine1", lineFromFile);
 	}
 
@@ -312,7 +331,7 @@ public class FlatFileOutputSourceTests extends TestCase {
 
 		// verify what was written to the file
 		for (int i = 1; i < 9; i++) {
-			assertEquals("testLine" + i, reader.readLine());
+			assertEquals("testLine" + i, readLine());
 		}
 
 		// get statistics
