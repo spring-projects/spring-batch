@@ -70,7 +70,7 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 
 	private String filePattern = DEFAULT_PATTERN;
 
-	private String jobName = "";
+	private String jobName = null;
 
 	private String jobStream = "";
 
@@ -138,7 +138,7 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 		// TODO consider refactoring to void replacePattern() method and
 		// collecting variable fileName
 		fileName = replacePattern(fileName, BATCH_ROOT_PATTERN, rootDirectory);
-		fileName = replacePattern(fileName, JOB_NAME_PATTERN, jobName);
+		fileName = replacePattern(fileName, JOB_NAME_PATTERN, jobName==null?"job":jobName);
 		fileName = replacePattern(fileName, STEP_NAME_PATTERN, stepName);
 		fileName = replacePattern(fileName, STREAM_PATTERN, jobStream);
 		fileName = replacePattern(fileName, JOB_RUN_PATTERN, String.valueOf(jobRun));

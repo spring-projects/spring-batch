@@ -43,11 +43,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	
 	private char pathsep = File.separatorChar;
 	
-	private String PATTERN_STRING = "%BATCH_ROOT%"+pathsep+"%JOB_NAME%-%SCHEDULE_DATE%-%JOB_RUN%-%STREAM_NAME%";
-
-	private String EXPECTED_ABSOLUTE_PATH = rootDir+pathsep+"testJob-20070730-0-testStream";
-
-	private String NULL_JOB_NAME_PATH = rootDir+pathsep+"%JOB_NAME%-20070730-0-testStream";
+	private String PATTERN_STRING = "/%BATCH_ROOT%"+pathsep+"%JOB_NAME%-%SCHEDULE_DATE%-%JOB_RUN%-%STREAM_NAME%";
 
 	/**
 	 * mock step context
@@ -89,9 +85,11 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 		String returnedPath = resource.getFile().getAbsolutePath();
 
-		System.err.println(EXPECTED_ABSOLUTE_PATH);
+		String absolutePath = new File("/"+rootDir+pathsep+"testJob-20070730-0-testStream").getAbsolutePath();
+
+		System.err.println(absolutePath);
 		System.err.println(returnedPath);
-		assertEquals(EXPECTED_ABSOLUTE_PATH, returnedPath);
+		assertEquals(absolutePath, returnedPath);
 	}
 
 	/**
@@ -106,7 +104,13 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 		Resource resource = (Resource) resourceFactory.getObject();
 
-		assertEquals(NULL_JOB_NAME_PATH, resource.getFile().getAbsolutePath());
+		String returnedPath = resource.getFile().getAbsolutePath();
+
+		String absolutePath = new File("/"+rootDir+pathsep+"job-20070730-0-testStream").getAbsolutePath();
+
+		System.err.println(absolutePath);
+		System.err.println(returnedPath);
+		assertEquals(absolutePath, returnedPath);
 	}
 	
 	public void testObjectType() throws Exception {
