@@ -80,7 +80,7 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 		super.onTearDown();
 		container.stop();
 		// Need to give the container time to shutdown
-		Thread.sleep(1000L);
+		Thread.sleep(2000L);
 	}
 
 	List list = new ArrayList();
