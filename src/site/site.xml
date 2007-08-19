@@ -22,6 +22,7 @@
 		
 		<menu name="Spring Batch">
 			<item name="Home" href="index.html"/>
+			<item name="Features" href="features.html"/>
 			<item name="Use Cases" href="cases/index.html"/>
 			<item name="Transactions" href="transactions.html"/>
 			<item name="Batch Processing Strategies" href="batch-processing-strategies.html"/>
