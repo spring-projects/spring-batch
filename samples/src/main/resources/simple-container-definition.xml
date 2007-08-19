@@ -85,16 +85,6 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-		<property name="customEditors">
-			<map>
-				<entry key="int[]">
-					<bean class="org.springframework.batch.support.IntArrayPropertyEditor" />
-				</entry>
-			</map>
-		</property>
-	</bean>
-
 	<bean id="simpleJob" class="org.springframework.batch.core.configuration.JobConfiguration"
 		abstract="true">
 		<property name="name" value="simpleJob" />
