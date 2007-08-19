@@ -33,7 +33,7 @@
 	<bean id="jobConfigurationRegistry" class="org.springframework.batch.execution.configuration.MapJobConfigurationRegistry"/>
  
 	<aop:config>
-		<aop:advisor pointcut="execution(* org.springframework.batch.container..*Repository+.*(..))"
+		<aop:advisor pointcut="execution(* org.springframework.batch.execution..*Repository+.*(..))"
 			advice-ref="txAdvice" />
 	</aop:config>
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
