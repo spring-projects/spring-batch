@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.execution.tasklet.support.OutputSourceItemProcessor;
 import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.io.Skippable;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -118,6 +119,12 @@ public class OutputSourceItemProcessorTests extends TestCase {
 		Properties props = processor.getStatistics();
 		assertEquals(null, props.getProperty("a"));
 	}
+	
+	public void testSkip() {
+		processor.skip();
+		assertEquals(1, list.size());
+		assertEquals("after skip", list.get(0));
+	}
 
 	private List list = new ArrayList(); 
 
@@ -125,7 +132,7 @@ public class OutputSourceItemProcessorTests extends TestCase {
 	 * @author Dave Syer
 	 * 
 	 */
-	public class MockOutputSource implements OutputSource, StatisticsProvider, Restartable {
+	public class MockOutputSource implements OutputSource, StatisticsProvider, Restartable, Skippable {
 
 		private String value;
 
@@ -153,6 +160,10 @@ public class OutputSourceItemProcessorTests extends TestCase {
 
 		public void restoreFrom(RestartData data) {
 			value = data.getProperties().getProperty("value");
+		}
+
+		public void skip() {
+			list.add("after skip");	
 		}
 
 	}

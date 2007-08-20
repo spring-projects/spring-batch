@@ -19,6 +19,7 @@ package org.springframework.batch.execution.tasklet.support;
 import java.util.Properties;
 
 import org.springframework.batch.io.InputSource;
+import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.provider.AbstractItemProvider;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -29,9 +30,9 @@ import org.springframework.batch.statistics.StatisticsProvider;
  * take care of open and close operations. If necessary it should be registered
  * as a step scoped bean to ensure that the lifecycle methods are called.
  * 
- * @auther Dave Syer
+ * @author Dave Syer
  */
-public class InputSourceItemProvider extends AbstractItemProvider implements Restartable, StatisticsProvider {
+public class InputSourceItemProvider extends AbstractItemProvider implements Restartable, StatisticsProvider, Skippable {
 
 	private InputSource source;
 
@@ -87,5 +88,11 @@ public class InputSourceItemProvider extends AbstractItemProvider implements Res
 	 */
 	public void setInputSource(InputSource source) {
 		this.source = source;
+	}
+
+	public void skip() {
+		if (source instanceof Skippable) {
+			((Skippable)source).skip();
+		}
 	}
 }

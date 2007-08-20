@@ -3,6 +3,7 @@ package org.springframework.batch.execution.tasklet.support;
 import java.util.Properties;
 
 import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -14,7 +15,7 @@ import org.springframework.batch.statistics.StatisticsProvider;
  * 
  * @author Dave Syer
  */
-public class OutputSourceItemProcessor implements ItemProcessor, Restartable,
+public class OutputSourceItemProcessor implements ItemProcessor, Restartable, Skippable,
 		StatisticsProvider {
 
 	private OutputSource source;
@@ -70,6 +71,12 @@ public class OutputSourceItemProcessor implements ItemProcessor, Restartable,
 			return new Properties();
 		}
 		return ((StatisticsProvider) source).getStatistics();
+	}
+
+	public void skip() {
+		if (source instanceof Skippable) {
+			((Skippable)source).skip();
+		}
 	}
 
 }

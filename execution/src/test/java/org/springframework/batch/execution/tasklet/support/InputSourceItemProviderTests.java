@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.execution.tasklet.support.InputSourceItemProvider;
 import org.springframework.batch.io.InputSource;
+import org.springframework.batch.io.Skippable;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -77,11 +78,16 @@ public class InputSourceItemProviderTests extends TestCase {
 		itemProvider.restoreFrom(new GenericRestartData(PropertiesConverter.stringToProperties("value=bar")));
 		assertEquals("bar", itemProvider.next());
 	}
+	
+	public void testSkip() {
+		itemProvider.skip();
+		assertEquals("after skip", itemProvider.next());
+	}
 
-	private class MockInputSource implements InputSource, StatisticsProvider, Restartable {
+	private class MockInputSource implements InputSource, StatisticsProvider, Restartable, Skippable {
 
 		private Object value;
-
+		
 		public Properties getStatistics() {
 			return PropertiesConverter.stringToProperties("a=b");
 		}
@@ -106,6 +112,10 @@ public class InputSourceItemProviderTests extends TestCase {
 		}
 
 		public void open() {
+		}
+
+		public void skip() {
+			value = "after skip";
 		}
 
 	}
