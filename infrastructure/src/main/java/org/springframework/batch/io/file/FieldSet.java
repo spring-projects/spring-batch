@@ -24,13 +24,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-import org.springframework.batch.io.exception.BatchConfigurationException;
-import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
  * @author Rob Harrop
+ * @author Dave Syer
  */
 public final class FieldSet {
 
@@ -48,8 +47,11 @@ public final class FieldSet {
 	}
 
 	public FieldSet(String[] tokens, String[] names) {
-		if (tokens.length!=names.length) {
-			throw new IllegalArgumentException("Field names must be same length as values: names="+Arrays.asList(names)+", values="+Arrays.asList(tokens));
+		if (tokens.length != names.length) {
+			throw new IllegalArgumentException(
+					"Field names must be same length as values: names="
+							+ Arrays.asList(names) + ", values="
+							+ Arrays.asList(tokens));
 		}
 		this.tokens = tokens;
 		this.names = Arrays.asList(names);
@@ -58,8 +60,10 @@ public final class FieldSet {
 	/**
 	 * Read the {@link String} value at index '<code>index</code>'.
 	 * 
-	 * @param index the field index.
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @param index
+	 *            the field index.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 */
 	public String readString(int index) {
 		return readAndTrim(index);
@@ -68,9 +72,8 @@ public final class FieldSet {
 	/**
 	 * Read the {@link String} value from column with given '<code>name</code>'.
 	 * 
-	 * @param name the field name.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @param name
+	 *            the field name.
 	 */
 	public String readString(String name) {
 		return readString(indexOf(name));
@@ -79,8 +82,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>boolean</code>' value at index '<code>index</code>'.
 	 * 
-	 * @param index the field index.
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @param index
+	 *            the field index.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 */
 	public boolean readBoolean(int index) {
 		return readBoolean(index, "true");
@@ -89,9 +94,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>boolean</code>' value from column with given '<code>name</code>'.
 	 * 
-	 * @param name the field name.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @param name
+	 *            the field name.
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined.
 	 */
 	public boolean readBoolean(String name) {
 		return readBoolean(indexOf(name));
@@ -100,11 +106,14 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>boolean</code>' value at index '<code>index</code>'.
 	 * 
-	 * @param index the field index.
-	 * @param trueValue the value that signifies {@link Boolean#TRUE true};
-	 * case-sensitive.
-	 * @throws IndexOutOfBoundsException if the index is out of bounds, or if
-	 * the supplied <code>trueValue</code> is <code>null</code>.
+	 * @param index
+	 *            the field index.
+	 * @param trueValue
+	 *            the value that signifies {@link Boolean#TRUE true};
+	 *            case-sensitive.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds, or if the supplied
+	 *             <code>trueValue</code> is <code>null</code>.
 	 */
 	public boolean readBoolean(int index, String trueValue) {
 		Assert.notNull(trueValue, "'trueValue' cannot be null.");
@@ -117,12 +126,14 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>boolean</code>' value from column with given '<code>name</code>'.
 	 * 
-	 * @param name the field name.
-	 * @param trueValue the value that signifies {@link Boolean#TRUE true};
-	 * case-sensitive.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined, or if the supplied
-	 * <code>trueValue</code> is <code>null</code>.
+	 * @param name
+	 *            the field name.
+	 * @param trueValue
+	 *            the value that signifies {@link Boolean#TRUE true};
+	 *            case-sensitive.
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined, or if the
+	 *             supplied <code>trueValue</code> is <code>null</code>.
 	 */
 	public boolean readBoolean(String name, String trueValue) {
 		return readBoolean(indexOf(name), trueValue);
@@ -131,13 +142,16 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>char</code>' value at index '<code>index</code>'.
 	 * 
-	 * @param index the field index.
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @param index
+	 *            the field index.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 */
 	public char readChar(int index) {
 		String value = readAndTrim(index);
 
-		Assert.isTrue(value.length() == 1, "Cannot convert field value '" + value + "' to char.");
+		Assert.isTrue(value.length() == 1, "Cannot convert field value '"
+				+ value + "' to char.");
 
 		return value.charAt(0);
 	}
@@ -145,9 +159,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>char</code>' value from column with given '<code>name</code>'.
 	 * 
-	 * @param name the field name.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @param name
+	 *            the field name.
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined.
 	 */
 	public char readChar(String name) {
 		return readChar(indexOf(name));
@@ -156,8 +171,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>byte</code>' value at index '<code>index</code>'.
 	 * 
-	 * @param index the field index.
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @param index
+	 *            the field index.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 */
 	public byte readByte(int index) {
 		return Byte.parseByte(readAndTrim(index));
@@ -166,9 +183,8 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>byte</code>' value from column with given '<code>name</code>'.
 	 * 
-	 * @param name the field name.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @param name
+	 *            the field name.
 	 */
 	public byte readByte(String name) {
 		return readByte(indexOf(name));
@@ -177,8 +193,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>short</code>' value at index '<code>index</code>'.
 	 * 
-	 * @param index the field index.
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @param index
+	 *            the field index.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 */
 	public short readShort(int index) {
 		return Short.parseShort(readAndTrim(index));
@@ -187,9 +205,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>short</code>' value from column with given '<code>name</code>'.
 	 * 
-	 * @param name the field name.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @param name
+	 *            the field name.
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined.
 	 */
 	public short readShort(String name) {
 		return readShort(indexOf(name));
@@ -198,8 +217,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>int</code>' value at index '<code>index</code>'.
 	 * 
-	 * @param index the field index.
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @param index
+	 *            the field index.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 */
 	public int readInt(int index) {
 		return Integer.parseInt(readAndTrim(index));
@@ -208,9 +229,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>int</code>' value from column with given '<code>name</code>'.
 	 * 
-	 * @param name the field name.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @param name
+	 *            the field name.
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined.
 	 */
 	public int readInt(String name) {
 		return readInt(indexOf(name));
@@ -221,13 +243,16 @@ public final class FieldSet {
 	 * using the supplied <code>defaultValue</code> if the field value is
 	 * blank.
 	 * 
-	 * @param index the field index..
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @param index
+	 *            the field index..
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 */
 	public int readInt(int index, int defaultValue) {
 		String value = readAndTrim(index);
 
-		return StringUtils.hasLength(value) ? Integer.parseInt(value) : defaultValue;
+		return StringUtils.hasLength(value) ? Integer.parseInt(value)
+				: defaultValue;
 	}
 
 	/**
@@ -235,9 +260,10 @@ public final class FieldSet {
 	 * using the supplied <code>defaultValue</code> if the field value is
 	 * blank.
 	 * 
-	 * @param name the field name.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @param name
+	 *            the field name.
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined.
 	 */
 	public int readInt(String name, int defaultValue) {
 		return readInt(indexOf(name), defaultValue);
@@ -246,8 +272,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>long</code>' value at index '<code>index</code>'.
 	 * 
-	 * @param index the field index.
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @param index
+	 *            the field index.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 */
 	public long readLong(int index) {
 		return Long.parseLong(readAndTrim(index));
@@ -256,9 +284,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>long</code>' value from column with given '<code>name</code>'.
 	 * 
-	 * @param name the field name.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @param name
+	 *            the field name.
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined.
 	 */
 	public long readLong(String name) {
 		return readLong(indexOf(name));
@@ -269,13 +298,16 @@ public final class FieldSet {
 	 * using the supplied <code>defaultValue</code> if the field value is
 	 * blank.
 	 * 
-	 * @param index the field index..
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @param index
+	 *            the field index..
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 */
 	public long readLong(int index, long defaultValue) {
 		String value = readAndTrim(index);
 
-		return StringUtils.hasLength(value) ? Long.parseLong(value) : defaultValue;
+		return StringUtils.hasLength(value) ? Long.parseLong(value)
+				: defaultValue;
 	}
 
 	/**
@@ -283,9 +315,10 @@ public final class FieldSet {
 	 * using the supplied <code>defaultValue</code> if the field value is
 	 * blank.
 	 * 
-	 * @param name the field name.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @param name
+	 *            the field name.
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined.
 	 */
 	public long readLong(String name, long defaultValue) {
 		return readLong(indexOf(name), defaultValue);
@@ -294,8 +327,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>float</code>' value at index '<code>index</code>'.
 	 * 
-	 * @param index the field index.
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @param index
+	 *            the field index.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 */
 	public float readFloat(int index) {
 		return Float.parseFloat(readAndTrim(index));
@@ -304,9 +339,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>float</code>' value from column with given '<code>name</code>.
 	 * 
-	 * @param name the field name.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @param name
+	 *            the field name.
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined.
 	 */
 	public float readFloat(String name) {
 		return readFloat(indexOf(name));
@@ -315,8 +351,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>double</code>' value at index '<code>index</code>'.
 	 * 
-	 * @param index the field index.
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @param index
+	 *            the field index.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 */
 	public double readDouble(int index) {
 		return Double.parseDouble(readAndTrim(index));
@@ -325,9 +363,10 @@ public final class FieldSet {
 	/**
 	 * Read the '<code>double</code>' value from column with given '<code>name</code>.
 	 * 
-	 * @param name the field name.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @param name
+	 *            the field name.
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined.
 	 */
 	public double readDouble(String name) {
 		return readDouble(indexOf(name));
@@ -336,8 +375,10 @@ public final class FieldSet {
 	/**
 	 * Read the {@link java.math.BigDecimal} value at index '<code>index</code>'.
 	 * 
-	 * @param index the field index.
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @param index
+	 *            the field index.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 */
 	public BigDecimal readBigDecimal(int index) {
 		return readBigDecimal(index, null);
@@ -346,9 +387,10 @@ public final class FieldSet {
 	/**
 	 * Read the {@link java.math.BigDecimal} value from column with given '<code>name</code>.
 	 * 
-	 * @param name the field name.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @param name
+	 *            the field name.
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined.
 	 */
 	public BigDecimal readBigDecimal(String name) {
 		return readBigDecimal(name, null);
@@ -359,16 +401,20 @@ public final class FieldSet {
 	 * returning the supplied <code>defaultValue</code> if the trimmed string
 	 * value at index '<code>index</code>' is blank.
 	 * 
-	 * @param index the field index.
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @param index
+	 *            the field index.
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 */
 	public BigDecimal readBigDecimal(int index, BigDecimal defaultValue) {
 		String candidate = readAndTrim(index);
 
 		try {
-			return (StringUtils.hasText(candidate)) ? new BigDecimal(candidate) : defaultValue;
+			return (StringUtils.hasText(candidate)) ? new BigDecimal(candidate)
+					: defaultValue;
 		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Unparseable number: "+candidate);
+			throw new IllegalArgumentException("Unparseable number: "
+					+ candidate);
 		}
 	}
 
@@ -377,16 +423,17 @@ public final class FieldSet {
 	 * returning the supplied <code>defaultValue</code> if the trimmed string
 	 * value at index '<code>index</code>' is blank.
 	 * 
-	 * @param name the field name.
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @param name
+	 *            the field name.
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined.
 	 */
 	public BigDecimal readBigDecimal(String name, BigDecimal defaultValue) {
 		try {
 			return readBigDecimal(indexOf(name), defaultValue);
-		}
-		catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException(e.getMessage()+", name: ["+name+"]");			
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException(e.getMessage() + ", name: ["
+					+ name + "]");
 		}
 	}
 
@@ -394,10 +441,12 @@ public final class FieldSet {
 	 * Read the <code>java.util.Date</code> value in default format at
 	 * designated column <code>index</code>.
 	 * 
-	 * @param index the field index.
-	 * @param pattern the pattern describing the date and time format
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
-	 * @throws BatchCriticalException if the specified field cannot be parsed
+	 * @param index
+	 *            the field index.
+	 * @param pattern
+	 *            the pattern describing the date and time format
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
 	 * @see #DEFAULT_DATE_PATTERN
 	 */
 	public Date readDate(int index) {
@@ -408,9 +457,12 @@ public final class FieldSet {
 	 * Read the <code>java.sql.Date</code> value in given format from column
 	 * with given <code>name</code>.
 	 * 
-	 * @param name the field name.
-	 * @param pattern the pattern describing the date and time format
-	 * @throws BatchCriticalException if the specified field cannot be parsed
+	 * @param name
+	 *            the field name.
+	 * @param pattern
+	 *            the pattern describing the date and time format
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined.
 	 * @see #DEFAULT_DATE_PATTERN
 	 */
 	public Date readDate(String name) {
@@ -421,10 +473,14 @@ public final class FieldSet {
 	 * Read the <code>java.util.Date</code> value in default format at
 	 * designated column <code>index</code>.
 	 * 
-	 * @param index the field index.
-	 * @param pattern the pattern describing the date and time format
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
-	 * @throws BatchCriticalException if the specified field cannot be parsed
+	 * @param index
+	 *            the field index.
+	 * @param pattern
+	 *            the pattern describing the date and time format
+	 * @throws IndexOutOfBoundsException
+	 *             if the index is out of bounds.
+	 * @throws IllegalArgumentException
+	 *             if the date cannot be parsed.
 	 * 
 	 */
 	public Date readDate(int index, String pattern) {
@@ -433,9 +489,9 @@ public final class FieldSet {
 		String value = readAndTrim(index);
 		try {
 			date = sdf.parse(value);
-		}
-		catch (ParseException e) {
-			throw new IllegalArgumentException(e.getMessage()+", pattern: ["+pattern+"]");
+		} catch (ParseException e) {
+			throw new IllegalArgumentException(e.getMessage() + ", pattern: ["
+					+ pattern + "]");
 		}
 		return date;
 	}
@@ -444,17 +500,21 @@ public final class FieldSet {
 	 * Read the <code>java.sql.Date</code> value in given format from column
 	 * with given <code>name</code>.
 	 * 
-	 * @param name the field name.
-	 * @param pattern the pattern describing the date and time format
-	 * @throws BatchCriticalException if the specified field cannot be parsed
+	 * @param name
+	 *            the field name.
+	 * @param pattern
+	 *            the pattern describing the date and time format
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined or if the
+	 *             specified field cannot be parsed
 	 * 
 	 */
 	public Date readDate(String name, String pattern) {
 		try {
 			return readDate(indexOf(name), pattern);
-		}
-		catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException(e.getMessage()+", name: ["+name+"]");
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException(e.getMessage() + ", name: ["
+					+ name + "]");
 		}
 	}
 
@@ -468,15 +528,15 @@ public final class FieldSet {
 	/**
 	 * Read and trim the {@link String} value at '<code>index</code>'.
 	 * 
-	 * @throws NullPointerException if the field value is <code>null</code>.
+	 * @throws NullPointerException
+	 *             if the field value is <code>null</code>.
 	 */
 	private String readAndTrim(int index) {
 		String value = tokens[index];
 
 		if (value != null) {
 			return value.trim();
-		}
-		else {
+		} else {
 			return value;
 		}
 	}
@@ -484,26 +544,28 @@ public final class FieldSet {
 	/**
 	 * Read and trim the {@link String} value from column with given '<code>name</code>.
 	 * 
-	 * @throws BatchConfigurationException if the recordDescriptor is not
-	 * provided or column with given name is not defined.
+	 * @throws IllegalArgumentException
+	 *             if a column with given name is not defined.
 	 */
 	private int indexOf(String name) {
-		if (names==null) {
-			throw new IllegalArgumentException("Cannot access columns by name without meta data");
+		if (names == null) {
+			throw new IllegalArgumentException(
+					"Cannot access columns by name without meta data");
 		}
 		int index = names.indexOf(name);
-		if (index>=0) {
+		if (index >= 0) {
 			return index;
 		}
-		throw new IllegalArgumentException("Cannot access column ["+name+"] from "+names);
+		throw new IllegalArgumentException("Cannot access column [" + name
+				+ "] from " + names);
 	}
 
 	public String toString() {
-		if (names!=null) {
+		if (names != null) {
 			return getProperties().toString();
 		}
-		//TODO return "" instead of null?
-		return tokens==null ? null : Arrays.asList(tokens).toString();
+		// TODO return "" instead of null?
+		return tokens == null ? null : Arrays.asList(tokens).toString();
 	}
 
 	/**
@@ -515,9 +577,8 @@ public final class FieldSet {
 
 			if (this.tokens == null) {
 				return fs.tokens == null;
-			}
-			else {
-				return Arrays.equals(this.tokens,fs.tokens);
+			} else {
+				return Arrays.equals(this.tokens, fs.tokens);
 			}
 		}
 
@@ -533,11 +594,13 @@ public final class FieldSet {
 	 * 
 	 * @return some properties representing the fle set.
 	 * 
-	 * @throws IllegalStateException if the field name meta data is not available.
+	 * @throws IllegalStateException
+	 *             if the field name meta data is not available.
 	 */
 	public Properties getProperties() {
-		if (names==null) {
-			throw new IllegalStateException("Cannot create properties without meta data");
+		if (names == null) {
+			throw new IllegalStateException(
+					"Cannot create properties without meta data");
 		}
 		Properties props = new Properties();
 		for (int i = 0; i < tokens.length; i++) {
