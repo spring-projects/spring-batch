@@ -19,7 +19,7 @@ Use Case: Manual Restart After Failure
 * Scope
 
   Any batch should be able to restart gracefully, even if (depending
-  on chosen container or client implementation) it might have to go
+  on chosen execution or client implementation) it might have to go
   right back to the beginning.
 
 * Preconditions
@@ -28,8 +28,8 @@ Use Case: Manual Restart After Failure
   restart will be able to carry on processing a batch from where it
   left off.
 
-  * There exists a presistent storage mechanism for the initial
-    conditions.
+  * There exists a persistent storage mechanism for the initial
+  conditions.
 
 * Success
 
@@ -41,12 +41,12 @@ Use Case: Manual Restart After Failure
   [[1]] A batch operation encounters an exception which forces the
   process to stop processing.
 
-  [[1]] Container catches exception and classifies it.
+  [[1]] Framework catches exception and classifies it.
 
-  [[1]] Container logs event with enough information to identify the
+  [[1]] Framework logs event with enough information to identify the
   location of the job and the nature of the problem.
 
-  [[1]] Container saves initial condition from last commit point, to
+  [[1]] Framework saves initial condition from last commit point, to
   enable restart to start from the last known good operation.
 
   [[1]] Operator fixes problem (e.g. makes missing resource available,
@@ -54,7 +54,7 @@ Use Case: Manual Restart After Failure
 
   [[1]] Operator restarts batch.
 
-  [[1]] Container loads initial conditions and continues processing.
+  [[1]] Framework loads initial conditions and continues processing.
 
 * Variations
 

@@ -1,7 +1,3 @@
 Changelog: Spring Batch
 
-  See the individual subprojects for their changelogs:
-
-  * {{{spring-batch-infrastructure/changelog.html}Infrastructure}}
-
-  * {{{spring-batch-container/changelog.html}Container}}
+  See the changes report generated from {{{issue-tracking.html}JIRA}}.

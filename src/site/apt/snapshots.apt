@@ -1,0 +1,33 @@
+                                    ---------
+                                    Snapshots
+                                    ---------
+                                    Dave Syer
+                                    ------
+                                    August 2007
+
+Snapshot Builds
+
+	These builds are provided for testing and development purposes only. They are built by a Bamboo process 
+	automatically using the latest snapshot from Subversion.
+	
+	The snapshots are deloyed to a Maven2 snapshot repository. To use it, just add the following repository to your POM:
+
++---------------
+<repository>
+    <id>spring-s3</id>
+    <name>Springframework Maven SNAPSHOT Repository</name>
+    <url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
+</repository>
++---------------
+
+	Individual dependencies can then by added like so:
+
++---------------
+<dependency>
+    <groupId>org.springframework.batch</groupId>
+    <artifactId>spring-batch-core</artifactId>
+    <version>1.0-m2-SNAPSHOT</version>
+</dependency>
++---------------
+
+	Additionally, you can browse the repository with a web browser {{{http://s3browse.com/explore/maven.springframework.org/snapshot/org/springframework/batch}here}}.

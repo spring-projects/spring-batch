@@ -54,20 +54,20 @@ Use Case: Sequential Processing of Dependent Steps
 
   The vanilla successful case proceeds as follows:
 
-    [[1]] Container logs the start of a step, uniquely indentifying
+    [[1]] Framework logs the start of a step, uniquely indentifying
     the initial conditions.
 
-    [[1]] Container stores internal state so that initial conditions
+    [[1]] Framework stores internal state so that initial conditions
     can be re-created in the event of a restart.
 
     [[1]] Step execution proceeds as per one of the other use cases
     (e.g. {{{file-to-database.html}Copy File to Database}}), including
     transactional behaviour.
 
-    [[1]] Client instructs Container to store internal state needed by
+    [[1]] Client instructs Framework to store internal state needed by
     further steps (e.g. cached reference data).
 
-    [[1]] Container logs successful completion of step, and stores 
+    [[1]] Framework logs successful completion of step, and stores 
 
     [[1]] Repeat for next and subsequent steps.  Internal state is
     passed from one state to the next.
@@ -85,35 +85,35 @@ Use Case: Sequential Processing of Dependent Steps
     [[1]] Operator restarts batch with no configuration or input data
     changes.
 
-    [[1]] Container resumes batch from the last commit point of the
+    [[1]] Framework resumes batch from the last commit point of the
     failed step.
 
     [[1]] Sequence completes normally.
 
-  The process above could be carried out by the container entirely (no
+  The process above could be carried out by the framework entirely (no
   need for operator intervention) if a retry policy is in effect.
 
 ** Failure of Step Owing to Bad Initial State
 
   If a step fails because it receives bad data from an earlier step,
-  the Container cannot recover without intervention.
+  the Framework cannot recover without intervention.
 
     [[1]] Operator attempts to restart without doing anything to fix
     the problem.
 
-    [[1]] Container detects bad initial state immediately and fails
+    [[1]] Framework detects bad initial state immediately and fails
     fast.
 
   If the original problem can be located and fixed (e.g. input data
   for earlier step is revised):
 
-    [[1]] Operator restarts batch signalling to container which step
+    [[1]] Operator restarts batch signalling to framework which step
     to begin with.
 
-    [[1]] Container locates initial state for the first step to be
+    [[1]] Framework locates initial state for the first step to be
     executed.
 
-    [[1]] Container starts execution from the beginning of the desired
+    [[1]] Framework starts execution from the beginning of the desired
     state.  This time the input data are different, so the sequence
     can complete normally.
 

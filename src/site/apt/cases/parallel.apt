@@ -32,7 +32,7 @@ Use Case: Massively Parallel Batch Processing
   * A data source with multiple chunks (commitable units) - more chunks
   than parallel processes.
 
-  * A way for the container to launch parallel processes.
+  * A way for the framework to launch parallel processes.
 
 * Success
 
@@ -43,19 +43,19 @@ Use Case: Massively Parallel Batch Processing
 
 * Description
 
-  [[1]] Container splits input data into partitions.
+  [[1]] Framework splits input data into partitions.
 
-  [[1]] Container sends input data (or references to them) to
+  [[1]] Framework sends input data (or references to them) to
   processing nodes.
 
   [[1]] Processing nodes act independently, converting the input data
   and sending it transactionally to output source (as per normal
   single process batch).
 
-  [[1]] Container collects status data from individual nodes for
+  [[1]] Framework collects status data from individual nodes for
   reporting and auditing.
 
-  [[1]] When all nodes are complete Container decides that batch is
+  [[1]] When all nodes are complete Framework decides that batch is
   complete finishes processing.
 
 * Variations
@@ -64,17 +64,17 @@ Use Case: Massively Parallel Batch Processing
   an internal node failure have different implications for how to
   proceed.  In both cases, however
 
-    [[1]] Container catches exception and classifies it.  Rolls back
+    [[1]] Framework catches exception and classifies it.  Rolls back
     current transaction to preserve state of data (input and output).
 
-    [[1]] Container saves state for restart from last known good
+    [[1]] Framework saves state for restart from last known good
     point, including a pointer to the next input record.
 
   Then if a processing node detects bad data in the input source, it
   cannot be restarted or re-distributed because the data need to be
   modified for a successful outcome.
 
-    [[1]] Container alerts Operator of the location and nature of the
+    [[1]] Framework alerts Operator of the location and nature of the
     failure.
 
     [[1]] Operator waits for batch to finish - the overall status will
@@ -82,7 +82,7 @@ Use Case: Massively Parallel Batch Processing
 
     [[1]] Operator fixes problem and restarts batch.
 
-    [[1]] Container does not re-process data that has already been
+    [[1]] Framework does not re-process data that has already been
     processed successfully.  The parallel processing nodes are used as
     before.
 
@@ -90,7 +90,7 @@ Use Case: Massively Parallel Batch Processing
 
   If a processing node fails unrecoverably (e.g. after retry timeout),
   but with no indication that the input data were bad, then the data
-  can be re-used: Container returns unprocessed input data, and
+  can be re-used: Framework returns unprocessed input data, and
   redistributes it to other nodes.
 
 * Implementation
@@ -192,7 +192,7 @@ batchTemplate.iterate(new ItemProviderRepeatCallback(provider, processor));
     result might be unpredictable if data can be added to an input
     source while it is being read.
 
-  * If only one query is done by the Container and the results shared
+  * If only one query is done by the Framework and the results shared
   out amongst the nodes we face the issue of how to send the data
   between nodes.  Performance problems might ensue.  Plus (more
   seriously) the individual nodes would now need a different

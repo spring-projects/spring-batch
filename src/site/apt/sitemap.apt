@@ -18,7 +18,9 @@ Spring Batch Site Map
 
   * Integration Tests - reports on tests of infrastructure
 
-  * Container - CI and technical information about container layer
+  * Core - CI and technical information about core domain
+
+  * Execution - CI and technical information about execution (implementation of core)
 
 * Main Site
 
@@ -53,11 +55,11 @@ Spring Batch Site Map
 
     * Infrastructure - How to use the core API
 
-    * Simple Container
+    * Simple Execution Environment
 
-    * Partitioning Container
+    * Partitioning Execution Environment
 
-    * Other Containers?
+    * Other Execution Environments?
 
   * Changelog
 
@@ -89,13 +91,30 @@ Spring Batch Site Map
 
   * CI Reports (same as for infrastructure).
 
-* Container
+* Core
 
-  Should the use case go here (showing which ones are implemented)?
+  * Changelog  
+
+  * Project information (duplicated from Main Site - Maven "feature" -
+    TODO: find a way to switch them off in sub-projects)
+
+  * CI Reports (same as for infrastructure).
+
+* Execution
 
   * Changelog
 
   * Project information
 
   * CI Reports (same as for infrastructure).
+
+* Integration Tests  
+
+  * Changelog  
+
+  * Project information (duplicated from Main Site - Maven "feature" -
+    TODO: find a way to switch them off in sub-projects)
+
+  * CI Reports (same as for infrastructure).
+
 
