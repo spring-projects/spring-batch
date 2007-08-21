@@ -45,15 +45,20 @@ public abstract class AbstractBatchLauncherTests extends AbstractDependencyInjec
 		return jobConfiguration.getName();
 	}
 
-	public void setBatchContainerLauncher(SynchronousJobLauncher launcher) {
-		this.launcher = launcher;
-	}
-	
 	/**
 	 * @param jobConfiguration the jobConfiguration to set
 	 */
 	public void setJobConfiguration(JobConfiguration jobConfiguration) {
 		this.jobConfiguration = jobConfiguration;
+	}
+
+	/**
+	 * Public setter for the {@link SynchronousJobLauncher} property.
+	 *
+	 * @param launcher the launcher to set
+	 */
+	public void setLauncher(SynchronousJobLauncher launcher) {
+		this.launcher = launcher;
 	}
 
 }
