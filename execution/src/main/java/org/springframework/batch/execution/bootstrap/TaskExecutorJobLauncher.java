@@ -27,6 +27,7 @@ import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.execution.JobExecutorFacade;
 import org.springframework.batch.execution.NoSuchJobExecutionException;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.interceptor.RepeatOperationsApplicationEvent;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.context.ApplicationEvent;
@@ -96,7 +97,7 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements Appl
 	 * 
 	 * @throws IllegalStateException if JobConfiguration is null.
 	 */
-	protected void doRun(final JobIdentifier runtimeInformation) {
+	protected ExitStatus doRun(final JobIdentifier runtimeInformation) {
 
 		Assert.state(taskExecutor != null, "TaskExecutor must be provided");
 
@@ -116,6 +117,9 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements Appl
 				}
 			}
 		});
+
+		return ExitStatus.RUNNING;
+
 	}
 
 	/**

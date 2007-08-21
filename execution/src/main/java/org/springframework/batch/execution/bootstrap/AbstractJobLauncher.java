@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
  * concurrent processing of jobs.
  * 
  * @see JobLauncher
- * @author Lucas Ward
+ * @author Dave Syer
  */
 public abstract class AbstractJobLauncher implements JobLauncher,
 		InitializingBean, ApplicationListener {
@@ -147,15 +147,11 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 *            the {@link JobIdentifier} to start the launcher with.
 	 * @throws NoSuchJobConfigurationException
 	 */
-	protected abstract void doRun(JobIdentifier jobIdentifier)
+	protected abstract ExitStatus doRun(JobIdentifier jobIdentifier)
 			throws NoSuchJobConfigurationException;
 
 	/**
-	 * Start the provided container. The current thread will first be saved.
-	 * This may seem odd at first, however, this simple bootstrap requires that
-	 * only one thread can kick off a container, and that the first thread that
-	 * calls start is the 'processing thread'. If the container has already been
-	 * started, no exception will be thrown.
+	 * Start the provided {@link JobIdentifier}.
 	 * 
 	 * @throws NoSuchJobConfigurationException
 	 *             if the container cannot locate a job configuration
@@ -173,16 +169,14 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 		}
 
 		register(jobIdentifier);
-		doRun(jobIdentifier);
+		return doRun(jobIdentifier);
 
 		/*
-		 * Subclasses have to take care of unregistering the runtimeInformation -
-		 * if we do it here and doStart() is implemented to return immediately
+		 * Subclasses have to take care of unregistering the jobIdentifier -
+		 * if we do it here and doRun() is implemented to return immediately
 		 * without waiting for the job to finish, then we will have a job
 		 * running that is not in the registry.
 		 */
-
-		return ExitStatus.RUNNING;
 	}
 
 	/**
