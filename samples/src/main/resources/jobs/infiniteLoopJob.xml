@@ -9,8 +9,6 @@
 	<!-- The module used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from
 		multiple environments. -->
 
-	<import resource="../simple-container-definition.xml" />
-
 	<bean class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
 		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
 	</bean>

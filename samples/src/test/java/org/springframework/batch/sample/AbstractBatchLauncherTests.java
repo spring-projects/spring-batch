@@ -17,6 +17,7 @@ package org.springframework.batch.sample;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.execution.bootstrap.SynchronousJobLauncher;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
@@ -27,6 +28,14 @@ public abstract class AbstractBatchLauncherTests extends AbstractDependencyInjec
 
 	protected SynchronousJobLauncher launcher;
 	private JobConfiguration jobConfiguration;
+	
+	protected ConfigurableApplicationContext createApplicationContext(
+			String[] locations) {
+		String[] allLocations = new String[locations.length+1];
+		System.arraycopy(locations, 0, allLocations, 0, locations.length);
+		allLocations[locations.length] = "simple-container-definition.xml";
+		return super.createApplicationContext(allLocations);
+	}
 
 	/**
 	 * Subclasses can provide name of job to run. We guess it by looking at the

@@ -9,7 +9,6 @@
 	<import resource="multilineOrderInputDescriptors.xml" />
 	<import resource="multilineOrderOutputDescriptors.xml" />
 	<import resource="multilineOrderIo.xml" />
-	<import resource="../simple-container-definition.xml" />
 
 	<bean
 		class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
