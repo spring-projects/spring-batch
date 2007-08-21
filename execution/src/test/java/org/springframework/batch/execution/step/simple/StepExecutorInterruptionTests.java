@@ -36,6 +36,7 @@ import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
@@ -75,14 +76,14 @@ public class StepExecutorInterruptionTests extends TestCase {
 		JobExecutionContext jobExecutionContext = new JobExecutionContext(null, new JobInstance(new Long(0)));
 		final StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 		stepConfiguration.setTasklet(new Tasklet() {
-			public boolean execute() throws Exception {
+			public ExitStatus execute() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
 				double foo = 1;
 				for (int i = 2; i < 250; i++) {
 					foo = foo * i;
 				}
 				// always return true, so processing always continues
-				return foo != 1;
+				return new ExitStatus(foo != 1);
 			}
 		});
 

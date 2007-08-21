@@ -27,9 +27,9 @@ public class ExitStatusTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, int)}.
 	 */
 	public void testExitStatusBooleanInt() {
-		ExitStatus status = new ExitStatus(true, 10);
+		ExitStatus status = new ExitStatus(true, "10");
 		assertTrue(status.isContinuable());
-		assertEquals(10, status.getExitCode());
+		assertEquals("10", status.getExitCode());
 	}
 
 	/**
@@ -38,7 +38,7 @@ public class ExitStatusTests extends TestCase {
 	public void testExitStatusConstantsContinuable() {
 		ExitStatus status = ExitStatus.CONTINUABLE;
 		assertTrue(status.isContinuable());
-		assertEquals(0, status.getExitCode());
+		assertEquals("", status.getExitCode());
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class ExitStatusTests extends TestCase {
 	public void testExitStatusConstantsFinished() {
 		ExitStatus status = ExitStatus.FINISHED;
 		assertFalse(status.isContinuable());
-		assertEquals(0, status.getExitCode());
+		assertEquals("", status.getExitCode());
 	}
 
 	/**
@@ -62,43 +62,8 @@ public class ExitStatusTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}.
 	 */
 	public void testAndExitStatus() {
-		assertTrue(ExitStatus.CONTINUABLE.and(ExitStatus.CONTINUABLE).isContinuable());
-		assertFalse(ExitStatus.CONTINUABLE.and(ExitStatus.FINISHED).isContinuable());
+		assertTrue(ExitStatus.CONTINUABLE.and(ExitStatus.CONTINUABLE.isContinuable()).isContinuable());
+		assertFalse(ExitStatus.CONTINUABLE.and(ExitStatus.FINISHED.isContinuable()).isContinuable());
 	}
 
-	/**
-	 * Test method for {@link org.springframework.batch.repeat.ExitStatus#addExitCode(int)}.
-	 */
-	public void testAddExitCode() {
-		ExitStatus status = ExitStatus.FINISHED.addExitCode(10);
-		assertEquals(10, status.getExitCode());
-		assertFalse(status.isContinuable());
-	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.repeat.ExitStatus#addExitCode(int)}.
-	 */
-	public void testAddExitCodeBothNegative() {
-		ExitStatus status = ExitStatus.FINISHED.addExitCode(-2);
-		assertEquals(-2, status.getExitCode());
-		assertEquals(-3, status.addExitCode(-3).getExitCode());
-	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.repeat.ExitStatus#addExitCode(int)}.
-	 */
-	public void testAddExitCodeBothPositive() {
-		ExitStatus status = ExitStatus.FINISHED.addExitCode(2);
-		assertEquals(2, status.getExitCode());
-		assertEquals(3, status.addExitCode(3).getExitCode());
-	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.repeat.ExitStatus#addExitCode(int)}.
-	 */
-	public void testAddExitCodeNewNegative() {
-		ExitStatus status = ExitStatus.FINISHED.addExitCode(2);
-		assertEquals(2, status.getExitCode());
-		assertEquals(-3, status.addExitCode(-3).getExitCode());
-	}
 }

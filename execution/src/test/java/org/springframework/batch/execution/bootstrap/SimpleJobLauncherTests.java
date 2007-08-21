@@ -20,70 +20,24 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.core.configuration.JobConfiguration;
+import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.core.runtime.JobIdentifierFactory;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.execution.JobExecutorFacade;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 
 public class SimpleJobLauncherTests extends TestCase {
 
-	public void testAutoStartContainer() throws Exception {
-
-		MockControl containerControl = MockControl.createControl(JobExecutorFacade.class);
-		JobExecutorFacade mockContainer;
-
-		AbstractJobLauncher bootstrap = new SimpleJobLauncher();
-		final SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("foo");
-		bootstrap.setJobRuntimeInformationFactory(new JobIdentifierFactory() {
-			public JobIdentifier getJobIdentifier(String name) {
-				return runtimeInformation;
-			}
-		});
-		mockContainer = (JobExecutorFacade) containerControl.getMock();
-		bootstrap.setBatchContainer(mockContainer);
-
-		JobConfiguration jobConfiguration = new JobConfiguration("foo");
-		bootstrap.setJobConfigurationName(jobConfiguration.getName());
-
-		mockContainer.start(runtimeInformation);
-		containerControl.replay();
-
-		bootstrap.setAutoStart(true);
-
-		bootstrap.onApplicationEvent(new ContextRefreshedEvent(new GenericApplicationContext()));
-		// It ran and then stopped...
-		assertFalse(bootstrap.isRunning());
-
-		containerControl.verify();
-	}
-
-	public void testApplicationEventNotContextRefresh() throws Exception {
-
-		MockControl containerControl = MockControl.createControl(JobExecutorFacade.class);
-		JobExecutorFacade mockContainer;
-
-		AbstractJobLauncher bootstrap = new SimpleJobLauncher();
-		mockContainer = (JobExecutorFacade) containerControl.getMock();
-		bootstrap.setBatchContainer(mockContainer);
-
-		containerControl.replay();
-
-		bootstrap.setAutoStart(true);
-
-		bootstrap.onApplicationEvent(new ApplicationEvent(new GenericApplicationContext()) {
-		});
-		assertFalse(bootstrap.isRunning());
-
-		containerControl.verify();
-	}
-
 	public void testStartWithNoConfiguration() throws Exception {
-		final AbstractJobLauncher bootstrap = new SimpleJobLauncher();
+		final SimpleJobLauncher launcher = new SimpleJobLauncher();
 		try {
-			bootstrap.afterPropertiesSet();
+			launcher.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
@@ -93,9 +47,9 @@ public class SimpleJobLauncherTests extends TestCase {
 	}
 
 	public void testInitializeWithNoConfiguration() throws Exception {
-		final AbstractJobLauncher bootstrap = new SimpleJobLauncher();
+		final SimpleJobLauncher launcher = new SimpleJobLauncher();
 		try {
-			bootstrap.start();
+			launcher.run();
 			// should do nothing
 		}
 		catch (Exception e) {
@@ -103,83 +57,93 @@ public class SimpleJobLauncherTests extends TestCase {
 		}
 	}
 
-	public void testStartTwiceNotFatal() throws Exception {
-		AbstractJobLauncher bootstrap = new SimpleJobLauncher();
+	public void testRunTwiceNotFatal() throws Exception {
+		SimpleJobLauncher launcher = new SimpleJobLauncher();
 		final SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("foo");
-		bootstrap.setJobRuntimeInformationFactory(new JobIdentifierFactory() {
+		launcher.setJobIdentifierFactory(new JobIdentifierFactory() {
 			public JobIdentifier getJobIdentifier(String name) {
 				return runtimeInformation;
 			}
 		});
-		InterruptibleContainer container = new InterruptibleContainer();
-		bootstrap.setBatchContainer(container);
-		bootstrap.setJobConfigurationName(new JobConfiguration("foo").getName());
-		bootstrap.start();
-		bootstrap.start();
+		InterruptibleFacade jobExecutorFacade = new InterruptibleFacade();
+		launcher.setJobExecutorFacade(jobExecutorFacade);
+		launcher.setJobConfigurationName(new JobConfiguration("foo").getName());
+		launcher.run();
+		launcher.run();
 		// Both jobs finished running because they were not launched in a new
 		// Thread
-		assertFalse(bootstrap.isRunning());
+		assertFalse(launcher.isRunning());
 	}
 
 	public void testInterruptContainer() throws Exception {
-		final AbstractJobLauncher bootstrap = new SimpleJobLauncher();
+		final SimpleJobLauncher launcher = new SimpleJobLauncher();
 		final SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("foo");
-		bootstrap.setJobRuntimeInformationFactory(new JobIdentifierFactory() {
+		launcher.setJobIdentifierFactory(new JobIdentifierFactory() {
 			public JobIdentifier getJobIdentifier(String name) {
 				return runtimeInformation;
 			}
 		});
 
-		InterruptibleContainer container = new InterruptibleContainer();
-		bootstrap.setBatchContainer(container);
-		bootstrap.setJobConfigurationName(new JobConfiguration("foo").getName());
-
-		Thread bootstrapThread = new Thread() {
+		InterruptibleFacade jobExecutorFacade = new InterruptibleFacade();
+		launcher.setJobExecutorFacade(jobExecutorFacade);
+		launcher.setJobConfigurationName(new JobConfiguration("foo").getName());
+		
+		TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+		Runnable launcherRunnable = new Runnable() {
 			public void run() {
-				bootstrap.start();
+				System.out.println("run called");
+				launcher.run();
+				System.out.println("run finished.");
 			}
 		};
 
-		bootstrapThread.start();
-
+		taskExecutor.execute(launcherRunnable); 
+		
 		// give the thread a second to start up
+		System.out.println("first sleep");
 		Thread.sleep(100);
-		assertTrue(bootstrap.isRunning());
-		bootstrap.stop();
+		assertTrue(launcher.isRunning());
+		launcher.stop();
 		Thread.sleep(100);
-		assertFalse(bootstrap.isRunning());
+		assertFalse(launcher.isRunning());
 	}
 
-	public void testStopOnUnstartedContainer() {
+	public void testStopOnUnranLauncher() {
 
-		AbstractJobLauncher bootstrap = new SimpleJobLauncher();
+		SimpleJobLauncher launcher = new SimpleJobLauncher();
 
-		assertFalse(bootstrap.isRunning());
-		// no exception should be thrown if stop is called on unstarted
+		assertFalse(launcher.isRunning());
+		// no exception should be thrown if stop is called on unran
 		// container
 		// this is to fullfill the contract outlined in Lifecycle#stop().
-		bootstrap.stop();
+		launcher.stop();
 	}
 
-	private class InterruptibleContainer implements JobExecutorFacade {
+	private class InterruptibleFacade implements JobExecutorFacade {
 		/*
 		 * (non-Javadoc)
-		 * @see org.springframework.batch.container.BatchContainer#start()
+		 * @see org.springframework.batch.container.BatchContainer#run()
 		 */
-		public void start() {
+		public void run() {
 			try {
 				// 1 seconds should be long enough to allow the thread to be
-				// started and
-				// for interrupt to be called;
+				// run and for interrupt to be called;
+				System.out.println("Facade sleep called.");
 				Thread.sleep(300);
+				//return ExitStatus.FAILED;
+				
 			}
 			catch (InterruptedException ex) {
 				// thread interrupted, allow to exit normally
+				//return ExitStatus.FAILED;
 			}
+			
+			
 		}
 
-		public void start(JobIdentifier runtimeInformation) {
-			start();
+		public ExitStatus start(JobIdentifier runtimeInformation) {
+			run();
+			return ExitStatus.FAILED;
 		}
 
 		public void stop(JobIdentifier runtimeInformation) {

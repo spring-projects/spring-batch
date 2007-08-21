@@ -100,7 +100,7 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 		items = Collections.singletonList("foo");
 
 		// call execute
-		assertTrue(module.execute());
+		assertTrue(module.execute().isContinuable());
 
 		// verify method calls
 		assertEquals(1, list.size());
@@ -112,7 +112,7 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 		// TEST2: data provider returns null (nothing to read)
 
 		// call read
-		assertFalse(module.execute());
+		assertFalse(module.execute().isContinuable());
 
 	}
 

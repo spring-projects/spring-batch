@@ -51,7 +51,11 @@ public class StepExecution extends Entity {
 
 	private Long jobExecutionId;
 
-	private int exitCode;
+	private String exitCode = "";
+	
+	private String exitDescription = "";
+		
+	private Throwable exception;
 	
 	/**
 	 * Package private constructor for Hibernate
@@ -176,15 +180,30 @@ public class StepExecution extends Entity {
 	/**
 	 * @param exitCode
 	 */
-	public void setExitCode(int exitCode) {
+	public void setExitCode(String exitCode) {
 		this.exitCode = exitCode;
 	}
 
 	/**
 	 * @return the exitCode
 	 */
-	public int getExitCode() {
+	public String getExitCode() {
 		return exitCode;
 	}
 
+	public void setException(Throwable exception) {
+		this.exception = exception;
+	}
+	
+	public Throwable getException() {
+		return exception;
+	}
+	
+	public void setExitDescription(String exitDescription) {
+		this.exitDescription = exitDescription;
+	}
+	
+	public String getExitDescription() {
+		return exitDescription;
+	}
 }

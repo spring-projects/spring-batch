@@ -28,8 +28,7 @@ public class RepeatInterceptorAdapter implements RepeatInterceptor {
 	public void after(RepeatContext context, Object result) {
 	}
 
-	public ExitStatus close(RepeatContext context) {
-		return ExitStatus.CONTINUABLE;
+	public void close(RepeatContext context) {
 	}
 
 	public void onError(RepeatContext context, Throwable e) {

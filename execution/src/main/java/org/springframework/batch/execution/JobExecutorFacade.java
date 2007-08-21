@@ -18,6 +18,7 @@ package org.springframework.batch.execution;
 
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.runtime.JobIdentifier;
+import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Interface which defines a facade for running jobs. The interface is
@@ -40,7 +41,7 @@ public interface JobExecutorFacade {
 	 * 
 	 * @throws NoSuchJobConfigurationException
 	 */
-	void start(JobIdentifier runtimeInformation) throws NoSuchJobConfigurationException;
+	ExitStatus start(JobIdentifier runtimeInformation) throws NoSuchJobConfigurationException;
 
 	/**
 	 * Stop the job execution that was started with this runtime information.

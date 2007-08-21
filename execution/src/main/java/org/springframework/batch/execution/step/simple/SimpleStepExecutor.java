@@ -247,10 +247,13 @@ public class SimpleStepExecutor implements StepExecutor {
 			});
 
 			stepExecution.setExitCode(status.getExitCode());
+			stepExecution.setExitDescription(status.getExitDescription());
 			updateStatus(stepExecutionContext, BatchStatus.COMPLETED);
 			return status;
 		}
 		catch (RuntimeException e) {
+			
+			stepExecution.setException(e);
 			if (e.getCause() instanceof StepInterruptedException) {
 				updateStatus(stepExecutionContext, BatchStatus.STOPPED);
 				throw (StepInterruptedException) e.getCause();
@@ -320,11 +323,11 @@ public class SimpleStepExecutor implements StepExecutor {
 				});
 				// check for interruption before each item as well
 				interruptionPolicy.checkInterrupted(context);
-				boolean result = doTaskletProcessing(configuration.getTasklet(), stepExecutionContext.getStep());
+				ExitStatus exitStatus = doTaskletProcessing(configuration.getTasklet(), stepExecutionContext.getStep());
 				stepExecutionContext.getStepExecution().incrementTaskCount();
 				// check for interruption after each item as well
 				interruptionPolicy.checkInterrupted(context);
-				return new ExitStatus(result);
+				return exitStatus;
 			}
 		});
 	}
@@ -338,7 +341,7 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * @return boolean if there is more processing to do
 	 * @throws Exception if there is an error
 	 */
-	protected boolean doTaskletProcessing(Tasklet tasklet, StepInstance step) throws Exception {
+	protected ExitStatus doTaskletProcessing(Tasklet tasklet, StepInstance step) throws Exception {
 		return tasklet.execute();
 	}
 

@@ -31,6 +31,7 @@ import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.execution.JobExecutorFacade;
 import org.springframework.batch.execution.NoSuchJobExecutionException;
 import org.springframework.batch.execution.job.DefaultJobExecutor;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.util.Assert;
@@ -113,7 +114,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 	 * null
 	 * 
 	 */
-	public void start(JobIdentifier jobRuntimeInformation) throws NoSuchJobConfigurationException {
+	public ExitStatus start(JobIdentifier jobRuntimeInformation) throws NoSuchJobConfigurationException {
 
 		Assert.notNull(jobRuntimeInformation, "JobRuntimeInformation must not be null.");
 		Assert.notNull(jobRuntimeInformation.getName(), "JobRuntimeInformation name must not be null.");
@@ -129,11 +130,13 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 
 		final JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
 		JobExecutionContext jobExecutionContext = jobExecutionRegistry.register(jobRuntimeInformation, job);
+		
+		ExitStatus exitStatus = ExitStatus.FAILED;
 		try {
 			synchronized (mutex) {
 				running++;
 			}
-			jobExecutor.run(jobConfiguration, jobExecutionContext);
+			exitStatus = jobExecutor.run(jobConfiguration, jobExecutionContext);
 		}
 		finally {
 			synchronized (mutex) {
@@ -144,6 +147,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 			jobExecutionRegistry.unregister(jobRuntimeInformation);
 		}
 
+		return exitStatus;
 	}
 
 	/*

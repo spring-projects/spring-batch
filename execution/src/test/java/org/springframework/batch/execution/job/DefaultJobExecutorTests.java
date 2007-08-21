@@ -241,7 +241,5 @@ public class DefaultJobExecutorTests extends TestCase {
 		JobExecution jobExecution = (JobExecution) jobDao.findJobExecutions(job).get(0);
 		assertEquals(job.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());
-		int exitCode = status==BatchStatus.STOPPED || status==BatchStatus.FAILED ? -1 : 0;
-		assertEquals(exitCode, jobExecution.getExitCode());
 	}
 }

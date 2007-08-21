@@ -73,9 +73,9 @@ public class StepExecutionTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getExitCode()}.
 	 */
 	public void testGetExitCode() {
-		assertEquals(0, execution.getExitCode());
-		execution.setExitCode(23);
-		assertEquals(23, execution.getExitCode());
+		assertEquals("", execution.getExitCode());
+		execution.setExitCode("23");
+		assertEquals("23", execution.getExitCode());
 	}
 	
 	/**
@@ -187,4 +187,5 @@ public class StepExecutionTests extends TestCase {
 		assertTrue("Hash code not same as parent", new Entity(execution.getId()).hashCode()!=new StepExecution().hashCode());
 	}
 }
+
 

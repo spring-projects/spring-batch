@@ -35,7 +35,7 @@ public class JobExecution extends Entity {
 
 	private Long jobId;
 
-	private int exitCode;
+	private String exitCode = "";
 	
 	// Package private constructor for Hibernate
 	JobExecution() {}
@@ -85,14 +85,14 @@ public class JobExecution extends Entity {
 	/**
 	 * @param exitCode
 	 */
-	public void setExitCode(int exitCode) {
+	public void setExitCode(String exitCode) {
 		this.exitCode = exitCode;
 	}
 	
 	/**
 	 * @return the exitCode
 	 */
-	public int getExitCode() {
+	public String getExitCode() {
 		return exitCode;
 	}
 }

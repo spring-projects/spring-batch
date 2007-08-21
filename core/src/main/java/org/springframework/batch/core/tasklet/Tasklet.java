@@ -17,6 +17,7 @@
 package org.springframework.batch.core.tasklet;
 
 import org.springframework.batch.core.configuration.StepConfiguration;
+import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * The primary interface describing the touch-point between the batch developer
@@ -46,9 +47,10 @@ public interface Tasklet {
 	 * outside of this method will prevent the architecture from gracefully
 	 * shutting down and providing such features as transaction rollback.
 	 * 
-	 * @return boolean indicating whether the processing should continue (i.e.
+	 * @return ExitStatus indicating whether the processing should continue (i.e.
 	 * false when data are exhausted).
+	 * @see org.springframework.batch.repeat.ExitStatus
 	 */
-	public boolean execute() throws Exception;
+	public ExitStatus execute() throws Exception;
 
 }

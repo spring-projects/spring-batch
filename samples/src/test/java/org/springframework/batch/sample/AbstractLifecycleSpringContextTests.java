@@ -31,7 +31,7 @@ public abstract class AbstractLifecycleSpringContextTests extends AbstractBatchL
 
 	public void testLifecycle() throws Exception {
 		validatePreConditions();
-		launcher.start(getJobName());
+		launcher.run(getJobName());
 		launcher.stop();
 		validatePostConditions();
 	}

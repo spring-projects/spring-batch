@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Dave Syer
@@ -58,8 +59,8 @@ public class StepConfigurationSupportTests extends TestCase {
 	public void testGetTasklet() {
 		assertEquals(null, configuration.getTasklet());
 		Tasklet tasklet = new Tasklet() {
-			public boolean execute() throws Exception {
-				return false;
+			public ExitStatus execute() throws Exception {
+				return ExitStatus.FINISHED;
 			}
 		};
 		configuration.setTasklet(tasklet);

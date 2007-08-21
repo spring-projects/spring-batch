@@ -18,6 +18,7 @@ package org.springframework.batch.execution.step.simple;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
 /**
@@ -42,8 +43,8 @@ public class ChunkOperationsStepConfigurationTests extends TestCase {
 	 */
 	public void testStepExecutorStepConfigurationTasklet() {
 		Tasklet tasklet = new Tasklet() {
-			public boolean execute() throws Exception {
-				return false;
+			public ExitStatus execute() throws Exception {
+				return ExitStatus.FINISHED;
 			}
 		};
 		configuration = new ChunkOperationsStepConfiguration(tasklet);

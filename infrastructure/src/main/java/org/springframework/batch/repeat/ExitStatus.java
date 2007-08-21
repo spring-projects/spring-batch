@@ -37,20 +37,27 @@ public class ExitStatus {
 	/**
 	 * Convenient constant value representing finished processing with an error.
 	 */
-	public static ExitStatus FAILED = new ExitStatus(false, -1);
+	public static ExitStatus FAILED = new ExitStatus(false);
 
 	private final boolean continuable;
 
-	private final int exitCode;
+	private final String exitCode;
+	
+	private final String exitDescription;
 
 	public ExitStatus(boolean continuable) {
-		this(continuable, 0);
+		this(continuable, "", "");
 	}
 
-	public ExitStatus(boolean continuable, int exitCode) {
+	public ExitStatus(boolean continuable, String exitCode) {
+		this(continuable, exitCode, "");
+	}
+	
+	public ExitStatus(boolean continuable, String exitCode, String exitDescription){
 		super();
 		this.continuable = continuable;
 		this.exitCode = exitCode;
+		this.exitDescription = exitDescription;
 	}
 
 	/**
@@ -66,11 +73,20 @@ public class ExitStatus {
 	}
 
 	/**
-	 * Getter for the exit code (defaults to 0).
+	 * Getter for the exit code (defaults to blank).
 	 * @return the exit code.
 	 */
-	public int getExitCode() {
+	public String getExitCode() {
 		return exitCode;
+	}
+	
+	/**
+	 * Getter for the exit description (defaults to blank)
+	 * 
+	 * @return
+	 */
+	public String getExitDescription() {
+		return exitDescription;
 	}
 
 	/**
@@ -81,18 +97,7 @@ public class ExitStatus {
 	 * logical and of the current value and the argument provided.
 	 */
 	public ExitStatus and(boolean continuable) {
-		return and(new ExitStatus(continuable));
-	}
-
-	/**
-	 * Create a new {@link ExitStatus} with a logical combination of the
-	 * continuable flag and adding the other exit code.
-	 * @param other an other {@link ExitStatus}.
-	 * @return a new {@link ExitStatus} with {@link #isContinuable()} the
-	 * logical and of the current value and the other's.
-	 */
-	public ExitStatus and(ExitStatus other) {
-		return new ExitStatus(this.continuable && other.isContinuable(), exitCode).addExitCode(other.getExitCode());
+		return new ExitStatus(this.continuable && continuable);
 	}
 
 	/*
@@ -100,26 +105,8 @@ public class ExitStatus {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "continuable=" + continuable + ";exitCode=" + exitCode;
-	}
-
-	/**
-	 * Duplicates the existing status except that a new exit code is added as
-	 * per the argument. If both codes (the current and the new one provided)
-	 * are negative then the lower of the two is returned, otherwise the higher
-	 * or the two.
-	 * 
-	 * @param exitCode the new value of the exitCode
-	 * @return a new {@link ExitStatus} instance
-	 */
-	public ExitStatus addExitCode(int exitCode) {
-		if (this.exitCode < 0 || exitCode < 0) {
-			exitCode = Math.min(this.exitCode, exitCode);
-		}
-		else {
-			exitCode = Math.max(this.exitCode, exitCode);
-		}
-		return new ExitStatus(this.continuable, exitCode);
+		return "continuable=" + continuable + ";exitCode=" + exitCode + 
+		";exitDescription=" + exitDescription;
 	}
 
 }

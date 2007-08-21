@@ -40,7 +40,7 @@ public class GracefulShutdownFunctionalTest extends AbstractBatchLauncherTests {
 		Thread jobThread = new Thread(){
 			public void run(){
 				try {
-					launcher.start(getJobName());
+					launcher.run(getJobName());
 				}
 				catch (RepeatException e) {
 					if (!(e.getCause() instanceof InterruptedException)) {

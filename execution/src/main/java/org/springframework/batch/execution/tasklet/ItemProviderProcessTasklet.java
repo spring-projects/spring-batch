@@ -27,6 +27,7 @@ import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemProvider;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.retry.RetryOperations;
@@ -132,14 +133,14 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 	 * 
 	 * @see org.springframework.batch.core.tasklet.Tasklet#execute()
 	 */
-	public boolean execute() throws Exception {
+	public ExitStatus execute() throws Exception {
 		if (retryOperations != null) {
-			return retryOperations.execute(new ItemProviderRetryCallback(itemProvider, itemProcessor)) != null;
+			return new ExitStatus(retryOperations.execute(new ItemProviderRetryCallback(itemProvider, itemProcessor)) != null);
 		}
 		else {
 			Object data = itemProvider.next();
 			if (data == null) {
-				return false;
+				return ExitStatus.FINISHED;
 			}
 			RepeatContext context = RepeatSynchronizationManager.getContext();
 			Assert.state(context != null,
@@ -149,7 +150,7 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 			// No exception so clear context (we can't recover directly because
 			// the current transaction is going to roll back)
 			context.removeAttribute(ITEM_KEY);
-			return true;
+			return ExitStatus.CONTINUABLE;
 		}
 	}
 

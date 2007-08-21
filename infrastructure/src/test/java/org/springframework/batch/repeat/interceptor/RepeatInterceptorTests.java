@@ -149,14 +149,12 @@ public class RepeatInterceptorTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		final List calls = new ArrayList();
 		template.setInterceptors(new RepeatInterceptor[] { new RepeatInterceptorAdapter() {
-			public ExitStatus close(RepeatContext context) {
+			public void close(RepeatContext context) {
 				calls.add("1");
-				return ExitStatus.CONTINUABLE;
 			}
 		}, new RepeatInterceptorAdapter() {
-			public ExitStatus close(RepeatContext context) {
+			public void close(RepeatContext context) {
 				calls.add("2");
-				return ExitStatus.CONTINUABLE;
 			}
 		} });
 		template.iterate(new RepeatCallback() {
@@ -171,32 +169,6 @@ public class RepeatInterceptorTests extends TestCase {
 		assertEquals("[2, 1]", calls.toString());
 	}
 
-	public void testCloseInterceptorsCanChangeExitCode() throws Exception {
-		RepeatTemplate template = new RepeatTemplate();
-		final List calls = new ArrayList();
-		template.setInterceptors(new RepeatInterceptor[] { new RepeatInterceptorAdapter() {
-			public ExitStatus close(RepeatContext context) {
-				calls.add("1");
-				return ExitStatus.FINISHED.addExitCode(1);
-			}
-		}, new RepeatInterceptorAdapter() {
-			public ExitStatus close(RepeatContext context) {
-				calls.add("2");
-				return ExitStatus.CONTINUABLE;
-			}
-		} });
-		ExitStatus status = template.iterate(new RepeatCallback() {
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
-				count++;
-				return new ExitStatus(count < 2);
-			}
-		});
-		// Test that only one call comes in to the callback...
-		assertEquals(2, count);
-		// ... and the interceptor is called once.
-		assertEquals("[2, 1]", calls.toString());
-		assertEquals(1, status.getExitCode());
-	}
 
 	public void testOnErrorInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();

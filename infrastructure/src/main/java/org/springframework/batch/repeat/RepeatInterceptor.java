@@ -79,5 +79,5 @@ public interface RepeatInterceptor {
 	 * @param context the current batch context.
 	 * @return TODO
 	 */
-	ExitStatus close(RepeatContext context);
+	void close(RepeatContext context);
 }

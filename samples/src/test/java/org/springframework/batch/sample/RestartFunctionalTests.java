@@ -81,7 +81,7 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 
 	// load the application context and launch the job
 	private void runJob() throws Exception, Exception {
-		launcher.start(getJobName());
+		launcher.run(getJobName());
 	}
 
 }

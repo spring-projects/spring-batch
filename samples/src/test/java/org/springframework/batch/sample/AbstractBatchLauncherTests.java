@@ -17,6 +17,7 @@ package org.springframework.batch.sample;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.execution.bootstrap.JobLauncher;
+import org.springframework.batch.execution.bootstrap.SynchronousJobLauncher;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
@@ -25,7 +26,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
  */
 public abstract class AbstractBatchLauncherTests extends AbstractDependencyInjectionSpringContextTests {
 
-	protected JobLauncher launcher;
+	protected SynchronousJobLauncher launcher;
 	private JobConfiguration jobConfiguration;
 
 	/**
@@ -36,7 +37,7 @@ public abstract class AbstractBatchLauncherTests extends AbstractDependencyInjec
 		return jobConfiguration.getName();
 	}
 
-	public void setBatchContainerLauncher(JobLauncher launcher) {
+	public void setBatchContainerLauncher(SynchronousJobLauncher launcher) {
 		this.launcher = launcher;
 	}
 	

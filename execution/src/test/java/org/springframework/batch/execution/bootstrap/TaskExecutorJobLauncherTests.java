@@ -31,6 +31,7 @@ import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.core.runtime.JobIdentifierFactory;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.execution.JobExecutorFacade;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.interceptor.RepeatOperationsApplicationEvent;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.support.PropertiesConverter;
@@ -142,8 +143,9 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 			}
 		}
 
-		public void start(JobIdentifier runtimeInformation) {
+		public ExitStatus start(JobIdentifier runtimeInformation) {
 			start();
+			return ExitStatus.FAILED;
 		}
 
 		public void stop(JobIdentifier runtimeInformation) {

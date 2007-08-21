@@ -227,7 +227,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		Object[] parameters = new Object[] { stepExecution.getId(), new Long(0), stepExecution.getStepId(), stepExecution.getJobExecutionId(), 
 				stepExecution.getStartTime(), stepExecution.getEndTime(), stepExecution.getStatus().toString(),
 				stepExecution.getCommitCount(), stepExecution.getTaskCount(),
-				PropertiesConverter.propertiesToString(stepExecution.getStatistics()), new Integer(stepExecution.getExitCode()) };
+				PropertiesConverter.propertiesToString(stepExecution.getStatistics()), stepExecution.getExitCode() };
 		jdbcTemplate.update(SAVE_STEP_EXECUTION, parameters);
 
 	}
@@ -252,7 +252,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		Object[] parameters = new Object[] { stepExecution.getStartTime(), stepExecution.getEndTime(),
 				stepExecution.getStatus().toString(), stepExecution.getCommitCount(),
 				stepExecution.getTaskCount(), PropertiesConverter.propertiesToString(stepExecution.getStatistics()),
-				new Integer(stepExecution.getExitCode()),
+				stepExecution.getExitCode(),
 				stepExecution.getId() };
 		jdbcTemplate.update(UPDATE_STEP_EXECUTION, parameters);
 
@@ -292,7 +292,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 				stepExecution.setCommitCount(rs.getInt(6));
 				stepExecution.setTaskCount(rs.getInt(7));
 				stepExecution.setStatistics(PropertiesConverter.stringToProperties(rs.getString(8)));
-				stepExecution.setExitCode(rs.getInt(9));
+				stepExecution.setExitCode(rs.getString(9));
 				return stepExecution;
 			}
 		};

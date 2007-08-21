@@ -51,7 +51,7 @@ public class DefaultJobExecutor implements JobExecutor {
 
 	private StepExecutorFactory stepExecutorResolver = new DefaultStepExecutorFactory();
 
-	public void run(JobConfiguration configuration, JobExecutionContext jobExecutionContext)
+	public ExitStatus run(JobConfiguration configuration, JobExecutionContext jobExecutionContext)
 			throws BatchCriticalException {
 
 		JobInstance job = jobExecutionContext.getJob();
@@ -90,6 +90,8 @@ public class DefaultJobExecutor implements JobExecutor {
 			jobExecution.setExitCode(status.getExitCode());
 			jobRepository.saveOrUpdate(jobExecution);
 		}
+		
+		return status;
 	}
 
 	private void updateStatus(JobExecutionContext jobExecutionContext, BatchStatus status) {

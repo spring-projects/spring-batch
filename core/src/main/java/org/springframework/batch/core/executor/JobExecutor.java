@@ -19,6 +19,7 @@ package org.springframework.batch.core.executor;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Interface for running a job from its configuration.
@@ -30,6 +31,6 @@ import org.springframework.batch.io.exception.BatchCriticalException;
  */
 public interface JobExecutor {
 
-	public void run(JobConfiguration configuration, JobExecutionContext jobExecutionContext) throws BatchCriticalException;
+	public ExitStatus run(JobConfiguration configuration, JobExecutionContext jobExecutionContext) throws BatchCriticalException;
 	
 }

@@ -20,6 +20,7 @@ import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.core.tasklet.Recoverable;
 import org.springframework.batch.io.Skippable;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -50,13 +51,13 @@ public class DefaultStepExecutor extends SimpleStepExecutor {
 	 * @see org.springframework.batch.execution.step.simple.SimpleStepExecutor#doTaskletProcessing(org.springframework.batch.core.tasklet.Tasklet,
 	 * org.springframework.batch.core.domain.StepInstance)
 	 */
-	protected boolean doTaskletProcessing(Tasklet module, final StepInstance step) throws Exception {
+	protected ExitStatus doTaskletProcessing(Tasklet module, final StepInstance step) throws Exception {
 
-		boolean result = true;
+		ExitStatus exitStatus = ExitStatus.CONTINUABLE;
 
 		try {
 
-			result = super.doTaskletProcessing(module, step);
+			exitStatus = super.doTaskletProcessing(module, step);
 
 		}
 		catch (final Exception e) {
@@ -80,7 +81,7 @@ public class DefaultStepExecutor extends SimpleStepExecutor {
 
 		}
 
-		return result;
+		return exitStatus;
 	}
 
 }

@@ -20,6 +20,7 @@ package org.springframework.batch.sample.module;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet;
 import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Hacked {@link Tasklet} that throws exception on a given record number
@@ -36,7 +37,7 @@ public class ExceptionRestartableTasklet extends RestartableItemProviderTasklet 
 	/* (non-Javadoc)
 	 * @see Tasklet#execute()
 	 */
-	public boolean execute() throws Exception {
+	public ExitStatus execute() throws Exception {
 		
 		counter++;
 		if (counter == throwExceptionOnRecordNumber) {

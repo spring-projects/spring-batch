@@ -80,8 +80,9 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 		final SimpleJobIdentifier jobRuntimeInformation = new SimpleJobIdentifier("bar");
 		jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
 		jobExecutor = new JobExecutor() {
-			public void run(JobConfiguration configuration, JobExecutionContext jobExecutionContext) throws BatchCriticalException {
+			public ExitStatus run(JobConfiguration configuration, JobExecutionContext jobExecutionContext) throws BatchCriticalException {
 				jobExecutionContext.getJob().setIdentifier(jobRuntimeInformation);
+				return ExitStatus.FINISHED;
 			}
 		};
 		JobInstance job = new JobInstance();
@@ -104,7 +105,7 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 	
 	public void testIsRunning() throws Exception {
 		simpleContainer.setJobExecutor(new JobExecutor() {
-			public void run(JobConfiguration configuration, JobExecutionContext jobExecutionContext)
+			public ExitStatus run(JobConfiguration configuration, JobExecutionContext jobExecutionContext)
 					throws BatchCriticalException {
 				while (running) {
 					try {
@@ -113,7 +114,11 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 					catch (InterruptedException e) {
 						throw new BatchCriticalException("Interrupted unexpectedly!");
 					}
+					
+					
 				}
+				
+				return ExitStatus.FINISHED;
 			}
 		});
 		simpleContainer.setJobConfigurationLocator(new JobConfigurationLocator() {

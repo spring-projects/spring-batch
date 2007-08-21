@@ -74,9 +74,9 @@ public class JobExecutionTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getExitCode()}.
 	 */
 	public void testGetExitCode() {
-		assertEquals(0, execution.getExitCode());
-		execution.setExitCode(23);
-		assertEquals(23, execution.getExitCode());
+		assertEquals("", execution.getExitCode());
+		execution.setExitCode("23");
+		assertEquals("23", execution.getExitCode());
 	}
 
 }

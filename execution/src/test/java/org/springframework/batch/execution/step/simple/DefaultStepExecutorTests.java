@@ -36,6 +36,7 @@ import org.springframework.batch.execution.tasklet.ItemProviderProcessTasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemProvider;
 import org.springframework.batch.item.provider.ListItemProvider;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
@@ -129,13 +130,13 @@ public class DefaultStepExecutorTests extends TestCase {
 		final StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 		
 		stepConfiguration.setTasklet(new Tasklet() {
-			public boolean execute() throws Exception {
+			public ExitStatus execute() throws Exception {
 				assertEquals(step, stepExecutionContext.getStep());
 				assertEquals(1, jobExecutionContext.getChunkContexts().size());
 				assertEquals(1, jobExecutionContext.getStepContexts().size());
 				assertNotNull(StepSynchronizationManager.getContext().getJobIdentifier());
 				processed.add("foo");
-				return true;
+				return ExitStatus.CONTINUABLE;
 			}
 		});
 
@@ -166,7 +167,7 @@ public class DefaultStepExecutorTests extends TestCase {
 		
 		Tasklet module = new Tasklet(){
 
-			public boolean execute() throws Exception {
+			public ExitStatus execute() throws Exception {
 				int counter = 0;
 				counter++;
 				
@@ -174,7 +175,7 @@ public class DefaultStepExecutorTests extends TestCase {
 					throw new Exception();
 				}
 				
-				return true;
+				return ExitStatus.CONTINUABLE;
 			}
 			
 		};

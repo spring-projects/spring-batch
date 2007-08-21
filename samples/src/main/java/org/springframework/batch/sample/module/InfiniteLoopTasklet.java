@@ -19,6 +19,7 @@ package org.springframework.batch.sample.module;
 import java.util.Properties;
 
 import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.support.PropertiesConverter;
 
@@ -41,10 +42,10 @@ public class InfiniteLoopTasklet implements Tasklet, StatisticsProvider {
 		super();
 	}
 	
-	public boolean execute() throws Exception {
+	public ExitStatus execute() throws Exception {
 		Thread.sleep(500);
 		count++;
-		return true;
+		return ExitStatus.CONTINUABLE;
 	}
 	
 	/* (non-Javadoc)

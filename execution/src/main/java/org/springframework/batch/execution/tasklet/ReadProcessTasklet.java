@@ -17,6 +17,7 @@
 package org.springframework.batch.execution.tasklet;
 
 import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Provides the basic batch module for reading and processing data.
@@ -39,12 +40,12 @@ public abstract class ReadProcessTasklet implements Tasklet {
 	 * from the abstract read method will be returned to the {@link Tasklet}, to indicate
 	 * whether or not processing should continue.
 	 */
-	public final boolean execute() throws Exception {
+	public final ExitStatus execute() throws Exception {
 		if (!read()) {
-			return false;
+			return ExitStatus.FINISHED;
 		}
 		process();
-		return true;
+		return ExitStatus.CONTINUABLE;
 	}
 
 	/**

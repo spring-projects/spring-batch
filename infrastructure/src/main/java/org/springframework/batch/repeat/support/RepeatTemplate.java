@@ -245,7 +245,7 @@ public class RepeatTemplate implements RepeatOperations {
 				try {
 					for (int i = interceptors.length; i-- > 0;) {
 						RepeatInterceptor interceptor = interceptors[i];
-						result = result.and(interceptor.close(context));
+						interceptor.close(context);
 					}
 				}
 				finally {
