@@ -18,6 +18,7 @@ package org.springframework.batch.item.provider;
 
 import java.util.Properties;
 
+import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.item.validator.Validator;
@@ -33,8 +34,8 @@ import org.springframework.batch.statistics.StatisticsProvider;
  * 
  * @author Dave Syer
  */
-public class DefaultFlatFileItemProvider extends AbstractFieldSetItemProvider implements Restartable,
-		StatisticsProvider {
+public class FlatFileItemProvider extends AbstractFieldSetItemProvider implements Restartable,
+		StatisticsProvider, Skippable {
 
 	private FieldSetMapper mapper;
 	private Validator validator;
@@ -102,4 +103,14 @@ public class DefaultFlatFileItemProvider extends AbstractFieldSetItemProvider im
 		return ((StatisticsProvider) source).getStatistics();
 	}
 
+	/**
+	 * @return delegates to the input source if it is a
+	 * {@link Skippable}.
+	 * @see Skippable#skip()
+	 */
+	public void skip() {
+		if (source instanceof Skippable) {
+			((Skippable) source).skip();
+		}
+	}
 }

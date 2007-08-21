@@ -22,12 +22,13 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.ValidationException;
 import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.FieldSetInputSource;
 import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.io.file.support.DefaultFlatFileInputSource;
-import org.springframework.batch.item.provider.DefaultFlatFileItemProvider;
+import org.springframework.batch.item.provider.FlatFileItemProvider;
 import org.springframework.batch.item.validator.Validator;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
@@ -37,27 +38,33 @@ import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.core.io.ByteArrayResource;
 
 /**
- * Unit tests for {@link DefaultFlatFileItemProvider}
+ * Unit tests for {@link FlatFileItemProvider}
  * 
  * @author Robert Kasanicky
+ * @author Dave Syer
  */
-public class DefaultFlatFileItemProviderTests extends TestCase {
-	
+public class FlatFileItemProviderTests extends TestCase {
+
 	public static String FOO = "foo";
 	// object under test
-	private DefaultFlatFileItemProvider itemProvider = new DefaultFlatFileItemProvider();
-	
+	private FlatFileItemProvider itemProvider = new FlatFileItemProvider();
+
 	// Input source
 	private DefaultFlatFileInputSource source;
-	
-	//mock mapper
+
+	// mock mapper
 	private FieldSetMapper mapper;
-	
+
 	private List list = new ArrayList();
-	
+
 	// create mock objects and inject them into data provider
 	protected void setUp() throws Exception {
-		source = new DefaultFlatFileInputSource();
+		source = new DefaultFlatFileInputSource() {
+			public void skip() {
+				super.skip();
+				list.add("skipped");
+			}
+		};
 		source.setResource(new ByteArrayResource("a,b".getBytes()));
 		mapper = new FieldSetMapper() {
 			public Object mapLine(FieldSet fs) {
@@ -66,36 +73,43 @@ public class DefaultFlatFileItemProviderTests extends TestCase {
 		};
 		itemProvider.setSource(source);
 		itemProvider.setMapper(mapper);
-		assertTrue(Restartable.class.isAssignableFrom(DefaultFlatFileInputSource.class));
-		assertTrue(FieldSetInputSource.class.isAssignableFrom(DefaultFlatFileInputSource.class));
-		assertTrue(StatisticsProvider.class.isAssignableFrom(DefaultFlatFileInputSource.class));
+		assertTrue(Restartable.class
+				.isAssignableFrom(DefaultFlatFileInputSource.class));
+		assertTrue(Skippable.class
+				.isAssignableFrom(DefaultFlatFileInputSource.class));
+		assertTrue(FieldSetInputSource.class
+				.isAssignableFrom(DefaultFlatFileInputSource.class));
+		assertTrue(StatisticsProvider.class
+				.isAssignableFrom(DefaultFlatFileInputSource.class));
 	}
 
 	/**
 	 * Uses input template to provide the domain object.
 	 */
-	public void testNext() {	
+	public void testNext() {
 		Object result = itemProvider.next();
-		assertSame("domain object is provided by the input template", FOO, result);
+		assertSame("domain object is provided by the input template", FOO,
+				result);
 	}
-	
+
 	/**
 	 * Uses input template to provide the domain object.
 	 */
-	public void testNextWithValidator() {	
+	public void testNextWithValidator() {
 		itemProvider.setValidator(new Validator() {
 			public void validate(Object value) throws ValidationException {
 				list.add(value);
 			}
 		});
 		itemProvider.next();
-		assertSame("domain object is provided by the input template", FOO, list.get(0));
+		assertSame("domain object is provided by the input template", FOO, list
+				.get(0));
 	}
 
 	/**
 	 * Uses input template to provide the domain object.
 	 */
-	public void testNextWithValidatorAndInvalidData() {	
+	public void testNextWithValidatorAndInvalidData() {
 		itemProvider.setValidator(new Validator() {
 			public void validate(Object value) throws ValidationException {
 				throw new ValidationException("Invalid input");
@@ -114,10 +128,10 @@ public class DefaultFlatFileItemProviderTests extends TestCase {
 	 * Gets statistics from the input template
 	 */
 	public void testGetStatistics() {
-		Properties statistics = ((StatisticsProvider) source).getStatistics();		
+		Properties statistics = ((StatisticsProvider) source).getStatistics();
 		assertEquals(statistics, itemProvider.getStatistics());
 	}
-	
+
 	/**
 	 * Gets statistics from the input template
 	 */
@@ -132,58 +146,72 @@ public class DefaultFlatFileItemProviderTests extends TestCase {
 	 */
 	public void testGetRestartData() {
 		RestartData data = ((Restartable) source).getRestartData();
-		assertEquals(data.getProperties(), itemProvider.getRestartData().getProperties());
+		assertEquals(data.getProperties(), itemProvider.getRestartData()
+				.getProperties());
 	}
-	
+
 	/**
 	 * Forwarded restart data to input template
 	 */
 	public void testRestoreFrom() {
-		
+
 		final List list = new ArrayList();
-		
+
 		RestartData data = new RestartData() {
 
 			public Properties getProperties() {
 				list.add(FOO);
 				return ((Restartable) source).getRestartData().getProperties();
-			}};
-		
+			}
+		};
+
 		itemProvider.restoreFrom(data);
-		
-		//assertEquals(1, list.size()); getProperties are called multiple times due to null checks
+
+		// assertEquals(1, list.size()); getProperties are called multiple times
+		// due to null checks
 		assertTrue(list.size() > 0);
 	}
 
 	/**
 	 * Forward restart data to input template
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	public void testRestoreFromWithoutRestartable() throws Exception {
 		itemProvider.setSource(null);
 		try {
-			itemProvider.restoreFrom(new GenericRestartData(PropertiesConverter.stringToProperties("value=bar")));
+			itemProvider.restoreFrom(new GenericRestartData(PropertiesConverter
+					.stringToProperties("value=bar")));
 			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
+		} catch (IllegalStateException e) {
 			// expected
 		}
 	}
 
 	/**
 	 * Forward restart data to input template
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	public void testGetRestartDataWithoutRestartable() throws Exception {
 		itemProvider.setSource(null);
 		try {
 			itemProvider.getRestartData();
 			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
+		} catch (IllegalStateException e) {
 			// expected
 		}
 	}
 
+	/**
+	 * Forward restart data to input template
+	 * 
+	 * @throws Exception
+	 */
+	public void testSkippable() throws Exception {
+		assertEquals(0, list.size());
+		itemProvider.skip();
+		assertEquals(1, list.size());
+	}
 
 }
