@@ -96,7 +96,7 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements Appl
 	 * 
 	 * @throws IllegalStateException if JobConfiguration is null.
 	 */
-	protected void doStart(final JobIdentifier runtimeInformation) {
+	protected void doRun(final JobIdentifier runtimeInformation) {
 
 		Assert.state(taskExecutor != null, "TaskExecutor must be provided");
 

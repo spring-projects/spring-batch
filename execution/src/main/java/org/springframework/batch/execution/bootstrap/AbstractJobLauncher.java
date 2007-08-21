@@ -147,7 +147,7 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 *            the {@link JobIdentifier} to start the launcher with.
 	 * @throws NoSuchJobConfigurationException
 	 */
-	protected abstract void doStart(JobIdentifier jobIdentifier)
+	protected abstract void doRun(JobIdentifier jobIdentifier)
 			throws NoSuchJobConfigurationException;
 
 	/**
@@ -173,7 +173,7 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 		}
 
 		register(jobIdentifier);
-		doStart(jobIdentifier);
+		doRun(jobIdentifier);
 
 		/*
 		 * Subclasses have to take care of unregistering the runtimeInformation -
