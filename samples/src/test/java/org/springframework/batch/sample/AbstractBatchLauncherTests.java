@@ -16,7 +16,6 @@
 package org.springframework.batch.sample;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.execution.bootstrap.JobLauncher;
 import org.springframework.batch.execution.bootstrap.SynchronousJobLauncher;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
