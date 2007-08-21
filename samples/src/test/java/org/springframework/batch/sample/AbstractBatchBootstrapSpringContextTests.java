@@ -17,7 +17,7 @@
 package org.springframework.batch.sample;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.execution.bootstrap.AbstractJobLauncher;
+import org.springframework.batch.execution.bootstrap.JobLauncher;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
@@ -35,19 +35,19 @@ public abstract class AbstractBatchBootstrapSpringContextTests extends AbstractD
 
 	private static final String CONTAINER_DEFINITION_LOCATION = "simple-container-definition.xml";
 	
-	AbstractJobLauncher bootstrap;
+	JobLauncher launcher;
 	JobConfiguration jobConfiguration;
 	
 	protected String[] getConfigLocations() {
 		return new String[]{CONTAINER_DEFINITION_LOCATION, getJobConfigurationContextLocation()};
 	}
 	
-	public void testLifecycle(){
-		bootstrap.start();
+	public void testLifecycle() throws Exception {
+		launcher.run();
 	}
 	
-	public void setBootstrap(AbstractJobLauncher bootstrap){
-		this.bootstrap = bootstrap;
+	public void setLauncher(JobLauncher bootstrap){
+		this.launcher = bootstrap;
 	}
 	
 	protected abstract String getJobConfigurationContextLocation();

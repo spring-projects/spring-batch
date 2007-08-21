@@ -16,7 +16,7 @@
 package org.springframework.batch.sample;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.execution.bootstrap.SynchronousJobLauncher;
+import org.springframework.batch.execution.bootstrap.JobLauncher;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
@@ -26,7 +26,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
  */
 public abstract class AbstractBatchLauncherTests extends AbstractDependencyInjectionSpringContextTests {
 
-	protected SynchronousJobLauncher launcher;
+	protected JobLauncher launcher;
 	private JobConfiguration jobConfiguration;
 	
 	protected ConfigurableApplicationContext createApplicationContext(
@@ -53,11 +53,11 @@ public abstract class AbstractBatchLauncherTests extends AbstractDependencyInjec
 	}
 
 	/**
-	 * Public setter for the {@link SynchronousJobLauncher} property.
+	 * Public setter for the {@link JobLauncher} property.
 	 *
 	 * @param launcher the launcher to set
 	 */
-	public void setLauncher(SynchronousJobLauncher launcher) {
+	public void setLauncher(JobLauncher launcher) {
 		this.launcher = launcher;
 	}
 
