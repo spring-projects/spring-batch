@@ -17,7 +17,6 @@ package org.springframework.batch.repeat.interceptor;
 
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatInterceptor;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 
