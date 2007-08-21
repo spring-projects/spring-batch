@@ -16,7 +16,7 @@
 		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry" />
 	</bean>
 
-	<bean id="batchContainerOverride" parent="batchContainer">
+	<bean id="batchContainerOverride" parent="jobExecutorFacade">
 		<property name="jobExecutor">
 			<bean parent="jobExecutor">
 				<property name="stepExecutorResolver">
