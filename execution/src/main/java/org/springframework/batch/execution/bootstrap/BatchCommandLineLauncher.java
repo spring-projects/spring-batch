@@ -35,7 +35,7 @@ public class BatchCommandLineLauncher {
 
 	private ConfigurableApplicationContext parent;
 
-	private SynchronousJobLauncher launcher;
+	private JobLauncher launcher;
 
 	/**
 	 * Default constructor for the launcher. Sets up the parent context to use
@@ -51,7 +51,7 @@ public class BatchCommandLineLauncher {
 	 * 
 	 * @param launcher the launcher to set
 	 */
-	public void setLauncher(SynchronousJobLauncher launcher) {
+	public void setLauncher(JobLauncher launcher) {
 		this.launcher = launcher;
 	}
 

@@ -31,6 +31,8 @@ import org.springframework.batch.core.runtime.JobIdentifierFactory;
 import org.springframework.batch.execution.JobExecutorFacade;
 import org.springframework.batch.execution.NoSuchJobExecutionException;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory;
+import org.springframework.batch.io.exception.BatchConfigurationException;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -38,8 +40,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.util.Assert;
 
 /**
- * Base class for {@link JobLauncher} implementations making no
- * choices about concurrent processing of jobs.
+ * Base class for {@link JobLauncher} implementations making no choices about
+ * concurrent processing of jobs.
  * 
  * @see JobLauncher
  * @author Lucas Ward
@@ -47,7 +49,8 @@ import org.springframework.util.Assert;
 public abstract class AbstractJobLauncher implements JobLauncher,
 		InitializingBean, ApplicationListener {
 
-	private static final Log logger = LogFactory.getLog(AbstractJobLauncher.class);
+	private static final Log logger = LogFactory
+			.getLog(AbstractJobLauncher.class);
 
 	protected JobExecutorFacade batchContainer;
 
@@ -67,17 +70,19 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	/**
 	 * Setter for {@link JobIdentifier}.
 	 * 
-	 * @param jobRuntimeInformationFactory the jobRuntimeInformationFactory to
-	 * set
+	 * @param jobRuntimeInformationFactory
+	 *            the jobRuntimeInformationFactory to set
 	 */
-	public void setJobRuntimeInformationFactory(JobIdentifierFactory jobRuntimeInformationFactory) {
+	public void setJobRuntimeInformationFactory(
+			JobIdentifierFactory jobRuntimeInformationFactory) {
 		this.jobRuntimeInformationFactory = jobRuntimeInformationFactory;
 	}
 
 	/**
 	 * Setter for the {@link JobConfiguration} that this launcher will run.
 	 * 
-	 * @param jobConfiguration the jobConfiguration to set
+	 * @param jobConfiguration
+	 *            the jobConfiguration to set
 	 */
 	public void setJobConfigurationName(String jobConfiguration) {
 		this.jobConfigurationName = jobConfiguration;
@@ -113,24 +118,37 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	}
 
 	/**
-	 * If autostart flag is on, initialise on context start-up.
+	 * If autostart flag is on, initialise on context start-up and call {@link #run()}.
+	 * 
+	 * @throws BatchConfigurationException
+	 *             if the job tries to but cannot start because of a
+	 *             {@link NoSuchJobConfigurationException}.
 	 * 
 	 * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
+	 * 
 	 */
 	public void onApplicationEvent(ApplicationEvent event) {
-		if ((event instanceof ContextRefreshedEvent) && this.autoStart && !isRunning()) {
-			start();
+		if ((event instanceof ContextRefreshedEvent) && this.autoStart
+				&& !isRunning()) {
+			try {
+				run();
+			} catch (NoSuchJobConfigurationException e) {
+				throw new BatchConfigurationException(
+						"Cannot start job on context refresh", e);
+			}
 		}
 	}
 
 	/**
 	 * Extension point for subclasses. Implementations might choose to start the
 	 * job in a new thread or in the current thread.<br/>
-	 * @param runtimeInformation the {@link JobIdentifier} to start the
-	 * launcher with.
-	 * @throws NoSuchJobConfigurationException 
+	 * 
+	 * @param runtimeInformation
+	 *            the {@link JobIdentifier} to start the launcher with.
+	 * @throws NoSuchJobConfigurationException
 	 */
-	protected abstract void doStart(JobIdentifier jobIdentifier) throws NoSuchJobConfigurationException;
+	protected abstract void doStart(JobIdentifier jobIdentifier)
+			throws NoSuchJobConfigurationException;
 
 	/**
 	 * Start the provided container. The current thread will first be saved.
@@ -138,15 +156,19 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * only one thread can kick off a container, and that the first thread that
 	 * calls start is the 'processing thread'. If the container has already been
 	 * started, no exception will be thrown.
-	 * @throws NoSuchJobConfigurationException if the container cannot locate a job configuration
-	 * @throws IllegalStateException if JobConfiguration is null. 
+	 * 
+	 * @throws NoSuchJobConfigurationException
+	 *             if the container cannot locate a job configuration
+	 * @throws IllegalStateException
+	 *             if JobConfiguration is null.
 	 * @see Lifecycle#start().
 	 */
-	public void start(JobIdentifier jobIdentifier) throws NoSuchJobConfigurationException {
+	public ExitStatus run(JobIdentifier jobIdentifier)
+			throws NoSuchJobConfigurationException {
 
 		synchronized (monitor) {
 			if (isRunning(jobIdentifier)) {
-				return;
+				return ExitStatus.RUNNING;
 			}
 		}
 
@@ -159,63 +181,69 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 		 * without waiting for the job to finish, then we will have a job
 		 * running that is not in the registry.
 		 */
+
+		return ExitStatus.RUNNING;
 	}
 
 	/**
 	 * Start a job execution with the given name. If a job is already running
 	 * has no effect.
 	 * 
-	 * @param name the name to assign to the job
-	 * @throws NoSuchJobConfigurationException 
+	 * @param name
+	 *            the name to assign to the job
+	 * @throws NoSuchJobConfigurationException
 	 */
-	public void start(String name) throws NoSuchJobConfigurationException {
-		JobIdentifier runtimeInformation = jobRuntimeInformationFactory.getJobIdentifier(name);
-		this.start(runtimeInformation);
+	public ExitStatus run(String name) throws NoSuchJobConfigurationException {
+		JobIdentifier runtimeInformation = jobRuntimeInformationFactory
+				.getJobIdentifier(name);
+		return this.run(runtimeInformation);
 	}
 
 	/**
 	 * Start a job execution with default name and other runtime information
 	 * provided by the factory. If a job is already running has no effect. The
 	 * default name is taken from the enclosed {@link JobConfiguration}.
-	 * @throws NoSuchJobConfigurationException if the job configuration cannot be located
+	 * 
+	 * @throws NoSuchJobConfigurationException
+	 * 
+	 * @throws NoSuchJobConfigurationException
+	 *             if the job configuration cannot be located
 	 * 
 	 * @see #setJobRuntimeInformationFactory(JobIdentifierFactory)
 	 * @see org.springframework.context.Lifecycle#start()
 	 */
-	public void start() {
-		if (jobConfigurationName==null) {
-			return;
+	public ExitStatus run() throws NoSuchJobConfigurationException {
+		if (jobConfigurationName != null) {
+			return this.run(jobConfigurationName);
 		}
-		try {
-			this.start(jobConfigurationName);
-		}
-		catch (NoSuchJobConfigurationException e) {
-			logger.error("Could not start", e);
-		}
+		return ExitStatus.FAILED;
 	}
 
 	/**
 	 * Extension point for subclasses to stop a specific job.
-	 * @throws NoSuchJobExecutionException 
+	 * 
+	 * @throws NoSuchJobExecutionException
 	 * 
 	 * @see org.springframework.batch.container.bootstrap.BatchContainerLauncher#stop(JobRuntimeInformation))
 	 */
-	protected abstract void doStop(JobIdentifier runtimeInformation) throws NoSuchJobExecutionException;
+	protected abstract void doStop(JobIdentifier runtimeInformation)
+			throws NoSuchJobExecutionException;
 
 	/**
 	 * Stop all jobs if any are running. If not, no action will be taken.
 	 * Delegates to the {@link #doStop()} method.
-	 * @throws NoSuchJobExecutionException 
+	 * 
+	 * @throws NoSuchJobExecutionException
 	 * @see org.springframework.context.Lifecycle#stop()
 	 * @see org.springframework.batch.execution.bootstrap.JobLauncher#stop()
 	 */
 	final public void stop() {
-		for (Iterator iter = new HashSet(registry.keySet()).iterator(); iter.hasNext();) {
+		for (Iterator iter = new HashSet(registry.keySet()).iterator(); iter
+				.hasNext();) {
 			JobIdentifier context = (JobIdentifier) iter.next();
 			try {
 				stop(context);
-			}
-			catch (NoSuchJobExecutionException e) {
+			} catch (NoSuchJobExecutionException e) {
 				logger.error(e);
 			}
 		}
@@ -224,21 +252,24 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	/**
 	 * Stop a job with this {@link JobIdentifier}. Delegates to the
 	 * {@link #doStop(JobIdentifier)} method.
-	 * @throws NoSuchJobExecutionException 
+	 * 
+	 * @throws NoSuchJobExecutionException
 	 * 
 	 * @see org.springframework.batch.execution.bootstrap.JobLauncher#stop(org.springframework.batch.core.runtime.JobIdentifier)
 	 * @see BatchContainer#stop(JobRuntimeInformation))
 	 */
-	final public void stop(JobIdentifier runtimeInformation) throws NoSuchJobExecutionException {
+	final public void stop(JobIdentifier runtimeInformation)
+			throws NoSuchJobExecutionException {
 		synchronized (monitor) {
 			doStop(runtimeInformation);
 		}
 	}
 
 	/**
-	 * Stop all jobs with {@link JobIdentifier} having this name.
-	 * Delegates to the {@link #stop(JobIdentifier)}.
-	 * @throws NoSuchJobExecutionException 
+	 * Stop all jobs with {@link JobIdentifier} having this name. Delegates to
+	 * the {@link #stop(JobIdentifier)}.
+	 * 
+	 * @throws NoSuchJobExecutionException
 	 * 
 	 * @see org.springframework.batch.execution.bootstrap.JobLauncher#stop(java.lang.String)
 	 */
@@ -248,6 +279,7 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.container.bootstrap.BatchContainerLauncher#isRunning()
 	 */
 	public boolean isRunning() {
@@ -270,6 +302,7 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	/**
 	 * Convenient synchronized accessor for the registry. Can be used by
 	 * subclasses if necessary (but it isn't likely).
+	 * 
 	 * @param runtimeInformation
 	 */
 	protected void register(JobIdentifier runtimeInformation) {
@@ -280,8 +313,8 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 
 	/**
 	 * Convenient synchronized accessor for the registry. Must be used by
-	 * subclasses to release the {@link JobIdentifier} when a job is
-	 * finished (or stopped).
+	 * subclasses to release the {@link JobIdentifier} when a job is finished
+	 * (or stopped).
 	 * 
 	 * @param runtimeInformation
 	 */

@@ -13,79 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.batch.execution.bootstrap;
 
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.runtime.JobIdentifier;
-import org.springframework.batch.execution.JobExecutorFacade;
-import org.springframework.batch.execution.NoSuchJobExecutionException;
-import org.springframework.context.Lifecycle;
+import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * Simple interface for controlling a {@link JobExecutorFacade} for a single job
- * configuration, and also possibly ad-hoc executions, based on different
- * runtime information. Implementations should concentrate on launching and
- * controlling a single job, as configured in a {@link JobExecutorFacade} instance.
  * 
- * @author Dave Syer
- * @since 2.1
+ * @author Lucas Ward
  */
-public interface JobLauncher extends Lifecycle {
 
-	/**
-	 * Return whether or not a job execution is currently running.
-	 */
-	boolean isRunning();
-
-	/**
-	 * Start a job execution with the given runtime information.
-	 * @throws NoSuchJobConfigurationException
-	 */
-	void start(JobIdentifier runtimeInformation) throws NoSuchJobConfigurationException;
-
-	/**
-	 * Start a job execution with the given name and other runtime information
-	 * generated on the fly.
-	 * 
-	 * @param name the name to assign to the job
-	 * @throws NoSuchJobConfigurationException
-	 */
-	void start(String name) throws NoSuchJobConfigurationException;
-
-	/**
-	 * Start a job execution with default name and other runtime information
-	 * generated on the fly.<br/>
-	 * 
-	 * Because {@link Lifecycle#start()} does not throw checked exceptions this
-	 * also does not, so an error message and stack trace will be logged if the
-	 * required job(s) cannot be started.
-	 * 
-	 * @see org.springframework.context.Lifecycle#start()
-	 */
-	public void start();
-
-	/**
-	 * Stop the job execution that was started with this runtime information.
-	 * @param runtimeInformation the {@link JobIdentifier}.
-	 * @throws NoSuchJobExecutionException 
-	 */
-	void stop(JobIdentifier runtimeInformation) throws NoSuchJobExecutionException;
-
-	/**
-	 * Stop all currently executing jobs matching the given name. All jobs
-	 * started with {@link JobIdentifier} having this name will be
-	 * stopped.
-	 * @throws NoSuchJobExecutionException 
-	 */
-	void stop(String name) throws NoSuchJobExecutionException;
-
-	/**
-	 * Stop the current job executions if there are any. If not, no action will
-	 * be taken.
-	 * @throws NoSuchJobExecutionException 
-	 * 
-	 * @see org.springframework.context.Lifecycle#stop()
-	 */
+public interface JobLauncher {
+	
+	public ExitStatus run() throws NoSuchJobConfigurationException;
+	
+	public ExitStatus run(String jobName) throws NoSuchJobConfigurationException;
+	
+	public ExitStatus run(JobIdentifier jobIdentifier) throws NoSuchJobConfigurationException;
+	
 	public void stop();
+	
+	public boolean isRunning();
+	
 }

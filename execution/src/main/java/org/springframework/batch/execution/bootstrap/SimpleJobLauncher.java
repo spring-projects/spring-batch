@@ -43,7 +43,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @since 2.1
  */
-public class SimpleJobLauncher implements SynchronousJobLauncher {
+public class SimpleJobLauncher implements JobLauncher {
 	
 	private static final Log logger = LogFactory.getLog(SimpleJobLauncher.class);
 

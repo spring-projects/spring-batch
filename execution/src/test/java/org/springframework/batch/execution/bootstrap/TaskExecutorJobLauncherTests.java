@@ -43,12 +43,12 @@ import org.springframework.jmx.export.notification.UnableToSendNotificationExcep
 
 public class TaskExecutorJobLauncherTests extends TestCase {
 
-	private TaskExecutorJobLauncher bootstrap = new TaskExecutorJobLauncher();
+	private TaskExecutorJobLauncher launcher = new TaskExecutorJobLauncher();
 
 	protected void setUp() throws Exception {
 		super.setUp();
 		final SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("foo");
-		bootstrap.setJobRuntimeInformationFactory(new JobIdentifierFactory() {
+		launcher.setJobRuntimeInformationFactory(new JobIdentifierFactory() {
 			public JobIdentifier getJobIdentifier(String name) {
 				return runtimeInformation;
 			}
@@ -58,46 +58,46 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 	public void testStopContainer() throws Exception {
 
 		// Important (otherwise start() does not return!)
-		bootstrap.setTaskExecutor(new SimpleAsyncTaskExecutor());
+		launcher.setTaskExecutor(new SimpleAsyncTaskExecutor());
 
 		InterruptibleContainer container = new InterruptibleContainer();
-		bootstrap.setBatchContainer(container);
-		bootstrap.setJobConfigurationName(new JobConfiguration("foo").getName());
+		launcher.setBatchContainer(container);
+		launcher.setJobConfigurationName(new JobConfiguration("foo").getName());
 
-		bootstrap.start();
+		launcher.run();
 		// give the thread some time to start up:
 		Thread.sleep(100);
-		assertTrue(bootstrap.isRunning());
-		bootstrap.stop();
+		assertTrue(launcher.isRunning());
+		launcher.stop();
 		// ...and to shut down:
 		Thread.sleep(400);
-		assertFalse(bootstrap.isRunning());
+		assertFalse(launcher.isRunning());
 	}
 
 	public void testNormalApplicationEventNotRecognized() throws Exception {
-		bootstrap.onApplicationEvent(new ApplicationEvent("foo") {});
+		launcher.onApplicationEvent(new ApplicationEvent("foo") {});
 		// nothing happens
 	}
 	
 	public void testRepeatOperationsBeforeNotUsed() throws Exception {
 		final List list = new ArrayList();
-		bootstrap.setNotificationPublisher(new NotificationPublisher() {
+		launcher.setNotificationPublisher(new NotificationPublisher() {
 			public void sendNotification(Notification notification) throws UnableToSendNotificationException {
 				list.add(notification);
 			}
 		});
-		bootstrap.onApplicationEvent(new RepeatOperationsApplicationEvent(this, "foo", RepeatOperationsApplicationEvent.BEFORE) {});
+		launcher.onApplicationEvent(new RepeatOperationsApplicationEvent(this, "foo", RepeatOperationsApplicationEvent.BEFORE) {});
 		assertEquals(0, list.size());
 	}
 
 	public void testRepeatOperationsOpenUsed() throws Exception {
 		final List list = new ArrayList();
-		bootstrap.setNotificationPublisher(new NotificationPublisher() {
+		launcher.setNotificationPublisher(new NotificationPublisher() {
 			public void sendNotification(Notification notification) throws UnableToSendNotificationException {
 				list.add(notification);
 			}
 		});
-		bootstrap.onApplicationEvent(new RepeatOperationsApplicationEvent(this, "foo", RepeatOperationsApplicationEvent.OPEN));
+		launcher.onApplicationEvent(new RepeatOperationsApplicationEvent(this, "foo", RepeatOperationsApplicationEvent.OPEN));
 		assertEquals(1, list.size());
 		assertEquals("foo", ((Notification) list.get(0)).getMessage().substring(0, 3));
 	}
@@ -105,24 +105,24 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 	public void testStatisticsRetrieved() throws Exception {
 		MockControl control = MockControl.createControl(JobExecutorFacadeWithStatistics.class);
 		JobExecutorFacadeWithStatistics batchContainer = (JobExecutorFacadeWithStatistics) control.getMock();
-		bootstrap.setBatchContainer(batchContainer);
+		launcher.setBatchContainer(batchContainer);
 		
 		Properties properties = PropertiesConverter.stringToProperties("a=b");
 		control.expectAndReturn(batchContainer.getStatistics(), properties);
 		
 		control.replay();
-		assertEquals(properties, bootstrap.getStatistics());
+		assertEquals(properties, launcher.getStatistics());
 		control.verify();
 	}
 
 	public void testStatisticsNotRetrieved() throws Exception {
 		MockControl control = MockControl.createControl(JobExecutorFacade.class);
 		JobExecutorFacade batchContainer = (JobExecutorFacade) control.getMock();
-		bootstrap.setBatchContainer(batchContainer);
+		launcher.setBatchContainer(batchContainer);
 		
 		Properties properties = new Properties();
 		control.replay();
-		assertEquals(properties, bootstrap.getStatistics());
+		assertEquals(properties, launcher.getStatistics());
 		control.verify();
 	}
 
@@ -160,7 +160,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 	
 	public void testPublishApplicationEvent() throws Exception {
 		final List list = new ArrayList();
-		bootstrap.setApplicationEventPublisher(new ApplicationEventPublisher() {
+		launcher.setApplicationEventPublisher(new ApplicationEventPublisher() {
 			public void publishEvent(ApplicationEvent event) {
 				list.add(event);
 			}
@@ -168,13 +168,13 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 
 		MockControl control = MockControl.createControl(JobExecutorFacade.class);
 		JobExecutorFacade batchContainer = (JobExecutorFacade) control.getMock();
-		bootstrap.setBatchContainer(batchContainer);
+		launcher.setBatchContainer(batchContainer);
 		SimpleJobIdentifier jobRuntimeInformation = new SimpleJobIdentifier("spam");
 		batchContainer.start(jobRuntimeInformation);
 		control.setThrowable(new NoSuchJobConfigurationException("SPAM"));
 
 		control.replay();
-		bootstrap.start(jobRuntimeInformation);
+		launcher.run(jobRuntimeInformation);
 		assertEquals(1, list.size());
 		control.verify();
 	}
