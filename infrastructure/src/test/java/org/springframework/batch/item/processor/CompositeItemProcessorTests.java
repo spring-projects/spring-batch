@@ -1,4 +1,4 @@
-package org.springframework.batch.execution.tasklet.support;
+package org.springframework.batch.item.processor;
 
 import java.util.ArrayList;
 import java.util.Iterator;
