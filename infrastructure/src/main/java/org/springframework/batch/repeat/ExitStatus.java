@@ -27,6 +27,11 @@ public class ExitStatus {
 	/**
 	 * Convenient constant value representing unfinished processing.
 	 */
+	public static final ExitStatus RUNNING = new ExitStatus(true, "RUNNING");
+
+	/**
+	 * Convenient constant value representing unfinished processing.
+	 */
 	public static ExitStatus CONTINUABLE = new ExitStatus(true);
 
 	/**
