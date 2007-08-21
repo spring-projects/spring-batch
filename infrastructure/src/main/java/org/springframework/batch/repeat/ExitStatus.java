@@ -25,7 +25,8 @@ package org.springframework.batch.repeat;
 public class ExitStatus {
 
 	/**
-	 * Convenient constant value representing unfinished processing.
+	 * Convenient constant value for when we detect that processing is underway.
+	 * Used mainly by asynchronous launchers.
 	 */
 	public static final ExitStatus RUNNING = new ExitStatus(true, "RUNNING");
 
@@ -47,7 +48,7 @@ public class ExitStatus {
 	private final boolean continuable;
 
 	private final String exitCode;
-	
+
 	private final String exitDescription;
 
 	public ExitStatus(boolean continuable) {
@@ -57,8 +58,9 @@ public class ExitStatus {
 	public ExitStatus(boolean continuable, String exitCode) {
 		this(continuable, exitCode, "");
 	}
-	
-	public ExitStatus(boolean continuable, String exitCode, String exitDescription){
+
+	public ExitStatus(boolean continuable, String exitCode,
+			String exitDescription) {
 		super();
 		this.continuable = continuable;
 		this.exitCode = exitCode;
@@ -79,12 +81,13 @@ public class ExitStatus {
 
 	/**
 	 * Getter for the exit code (defaults to blank).
+	 * 
 	 * @return the exit code.
 	 */
 	public String getExitCode() {
 		return exitCode;
 	}
-	
+
 	/**
 	 * Getter for the exit description (defaults to blank)
 	 * 
@@ -97,9 +100,11 @@ public class ExitStatus {
 	/**
 	 * Create a new {@link ExitStatus} with a logical combination of the
 	 * continuable flag.
-	 * @param continuable true if the caller thinks it is safe to continue.
+	 * 
+	 * @param continuable
+	 *            true if the caller thinks it is safe to continue.
 	 * @return a new {@link ExitStatus} with {@link #isContinuable()} the
-	 * logical and of the current value and the argument provided.
+	 *         logical and of the current value and the argument provided.
 	 */
 	public ExitStatus and(boolean continuable) {
 		return new ExitStatus(this.continuable && continuable);
@@ -107,11 +112,12 @@ public class ExitStatus {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "continuable=" + continuable + ";exitCode=" + exitCode + 
-		";exitDescription=" + exitDescription;
+		return "continuable=" + continuable + ";exitCode=" + exitCode
+				+ ";exitDescription=" + exitDescription;
 	}
 
 }
