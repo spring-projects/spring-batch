@@ -24,7 +24,7 @@
 						<bean class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.execution.tasklet.support.DefaultFlatFileItemProvider">
+									class="org.springframework.batch.item.provider.DefaultFlatFileItemProvider">
 									<property name="source" ref="fileInputTemplate" />
 									<property name="mapper">
 										<bean class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
@@ -44,7 +44,7 @@
 						<bean class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.execution.tasklet.support.InputSourceItemProvider">
+									class="org.springframework.batch.item.provider.InputSourceItemProvider">
 									<property name="inputSource">
 										<bean class="org.springframework.batch.io.sql.SqlCursorInputSource">
 											<constructor-arg>
@@ -71,7 +71,7 @@
 						<bean class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.execution.tasklet.support.InputSourceItemProvider">
+									class="org.springframework.batch.item.provider.InputSourceItemProvider">
 									<property name="inputSource">
 										<bean class="org.springframework.batch.io.sql.SqlCursorInputSource">
 											<constructor-arg>

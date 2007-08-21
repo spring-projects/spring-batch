@@ -21,9 +21,9 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.execution.tasklet.support.OutputSourceItemProcessor;
 import org.springframework.batch.io.OutputSource;
 import org.springframework.batch.io.Skippable;
+import org.springframework.batch.item.processor.OutputSourceItemProcessor;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;

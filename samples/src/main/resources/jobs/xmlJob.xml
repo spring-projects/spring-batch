@@ -22,7 +22,7 @@
 						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 						<property name="itemProvider">
 							<bean
-								class="org.springframework.batch.execution.tasklet.support.InputSourceItemProvider">
+								class="org.springframework.batch.item.provider.InputSourceItemProvider">
 								<property name="inputSource">
 									<bean class="org.springframework.batch.io.xml.XmlInputSource">
 										<property name="name" value="XmlFileInputSource" />
@@ -39,7 +39,7 @@
 							</bean>
 						</property>
 						<property name="itemProcessor">
-							<bean class="org.springframework.batch.execution.tasklet.support.OutputSourceItemProcessor">
+							<bean class="org.springframework.batch.item.processor.OutputSourceItemProcessor">
 								<property name="outputSource">
 									<bean class="org.springframework.batch.io.xml.XmlOutputSource" scope="step">
 										<aop:scoped-proxy/>

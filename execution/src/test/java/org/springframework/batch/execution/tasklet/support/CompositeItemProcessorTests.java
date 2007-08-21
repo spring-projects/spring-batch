@@ -9,6 +9,7 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.processor.CompositeItemProcessor;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
