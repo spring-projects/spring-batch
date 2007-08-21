@@ -25,7 +25,6 @@ import org.springframework.batch.core.runtime.JobIdentifierFactory;
 import org.springframework.batch.execution.JobExecutorFacade;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.context.Lifecycle;
 import org.springframework.util.Assert;
 
 /**
@@ -38,7 +37,6 @@ import org.springframework.util.Assert;
  * interrupted via the stop method in another thread.
  * </p>
  * 
- * @see Lifecycle
  * @author Lucas Ward
  * @author Dave Syer
  * @since 2.1
