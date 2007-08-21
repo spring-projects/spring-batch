@@ -18,17 +18,12 @@ package org.springframework.batch.execution.bootstrap;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
 import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.core.runtime.JobIdentifierFactory;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.execution.JobExecutorFacade;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 
