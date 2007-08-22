@@ -130,6 +130,9 @@
 	</profiles>
 
 	<distributionManagement>
+		<downloadUrl>
+			http://www.springframework.org/spring-batch
+		</downloadUrl>
 		<site>
 			<id>staging</id>
 			<url>file:///${user.dir}/target/staging</url>
