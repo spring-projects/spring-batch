@@ -20,10 +20,10 @@
 	</organization>
 	<scm>
 		<url>
-			https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+			http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk
 		</url>
 		<connection>
-			scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+			scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
 		</connection>
 		<developerConnection>
 			scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
@@ -137,6 +137,15 @@
 			<id>staging</id>
 			<url>file:///${user.dir}/target/staging</url>
 		</site>
+		<repository>
+			<id>local</id>
+			<url>file:///${user.dir}/target/staging</url>
+		</repository>
+		<snapshotRepository>
+			<id>spring-snapshot</id>
+			<name>Spring Snapshot Repository</name>
+			<url>s3://maven.springframework.org/snapshot</url>
+		</snapshotRepository>
 	</distributionManagement>
 
 	<build>
