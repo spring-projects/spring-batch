@@ -34,13 +34,15 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * {@link FieldSetMapper} implementation based on bean property paths. The
  * {@link FieldSet} to be mapped should have field name meta data corresponding
  * to bean property paths in a prototype instance of the desired type. The
- * prototype instance is initialized by referring to to object by bean name in
- * the enclosing BeanFactory.<br/>
+ * prototype instance is initialized either by referring to to object by bean
+ * name in the enclosing BeanFactory, or by providing a class to instantiate
+ * reflectively.<br/>
  * 
  * Nested property paths, including indexed properties in maps and collections,
  * can be referenced by the {@link FieldSet} names. They will be converted to
@@ -70,9 +72,12 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class BeanWrapperFieldSetMapper implements FieldSetMapper, BeanFactoryAware, InitializingBean {
+public class BeanWrapperFieldSetMapper implements FieldSetMapper,
+		BeanFactoryAware, InitializingBean {
 
 	private String name;
+
+	private Class type;
 
 	private BeanFactory beanFactory;
 
@@ -82,6 +87,7 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper, BeanFactoryAwa
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
 	 */
 	public void setBeanFactory(BeanFactory beanFactory) {
@@ -94,30 +100,78 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper, BeanFactoryAwa
 	 * prototype scoped bean so that a new instance is returned for each field
 	 * set mapped.
 	 * 
+	 * Either this property or the type property must be specified, but not
+	 * both.
+	 * 
 	 * @param name
+	 *            the name of a prototype bean in the enclosing BeanFactory
 	 */
 	public void setPrototypeBeanName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * Public setter for the type of bean to create instead of using a prototype
+	 * bean. An object of this type will be created from its default constructor
+	 * for every call to {@link #mapLine(FieldSet)}.<br/>
+	 * 
+	 * Either this property or the prototype bean name must be specified, but
+	 * not both.
+	 * 
+	 * @param type
+	 *            the type to set
+	 */
+	public void setTargetType(Class type) {
+		this.type = type;
+	}
+
+	/**
+	 * Check that precisely one of type or prototype bean name is specified.
+	 * 
+	 * @throws IllegalStateException
+	 *             if neither is set or both properties are set.
+	 * 
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(name);
+		Assert.state(name != null || type != null,
+				"Either name or type must be provided.");
+		Assert.state(name == null || type == null,
+				"Both name and type cannot be specified together.");
 	}
 
 	/**
 	 * Map the {@link FieldSet} to an object retrieved from the enclosing Spring
 	 * context.
 	 * 
-	 * @throws NotWritablePropertyException if the {@link FieldSet} contains a
-	 * field that cannot be mapped to a bean property.
+	 * @throws NotWritablePropertyException
+	 *             if the {@link FieldSet} contains a field that cannot be
+	 *             mapped to a bean property.
 	 * 
 	 * @see org.springframework.batch.io.file.FieldSetMapper#mapLine(org.springframework.batch.io.file.FieldSet)
 	 */
 	public Object mapLine(FieldSet fs) {
-		Object copy = beanFactory.getBean(name);
+		Object copy = getBean();
 		BeanWrapper wrapper = new BeanWrapperImpl(copy);
 		wrapper.setPropertyValues(getBeanProperties(copy, fs.getProperties()));
 		return copy;
+	}
+
+	private Object getBean() {
+		if (name != null) {
+			return beanFactory.getBean(name);
+		}
+		try {
+			return type.newInstance();
+		} catch (InstantiationException e) {
+			ReflectionUtils.handleReflectionException(e);
+		} catch (IllegalAccessException e) {
+			ReflectionUtils.handleReflectionException(e);
+		}
+		throw new IllegalStateException(
+				"Internal error: could not create bean instance for mapping."); // should
+																				// not
+																				// happen
 	}
 
 	/**
@@ -128,7 +182,7 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper, BeanFactoryAwa
 	private Properties getBeanProperties(Object bean, Properties properties) {
 
 		Class cls = bean.getClass();
-		
+
 		// Map from field names to property names
 		Map matches = (Map) propertiesMatched.get(cls);
 		if (matches == null) {
@@ -159,8 +213,9 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper, BeanFactoryAwa
 	private String findPropertyName(Object bean, String key) {
 
 		Class cls = bean.getClass();
-		
-		int index = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(key);
+
+		int index = PropertyAccessorUtils
+				.getFirstNestedPropertySeparatorIndex(key);
 		String prefix;
 		String suffix;
 
@@ -174,32 +229,33 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper, BeanFactoryAwa
 				return null;
 			}
 
-			Object nestedValue = new BeanWrapperImpl(bean).getPropertyValue(nestedName);
+			Object nestedValue = new BeanWrapperImpl(bean)
+					.getPropertyValue(nestedName);
 			return nestedName + "." + findPropertyName(nestedValue, suffix);
 		}
-		
+
 		String name = null;
 		int distance = 0;
 		index = key.indexOf(PropertyAccessor.PROPERTY_KEY_PREFIX_CHAR);
-		
+
 		if (index > 0) {
 			prefix = key.substring(0, index);
 			suffix = key.substring(index);
-		}
-		else {
+		} else {
 			prefix = key;
 			suffix = "";
 		}
-		
+
 		while (name == null && distance <= distanceLimit) {
-			String[] candidates = PropertyMatches.forProperty(prefix, cls, distance).getPossibleMatches();
+			String[] candidates = PropertyMatches.forProperty(prefix, cls,
+					distance).getPossibleMatches();
 			// If we find precisely one match, then use that one...
 			if (candidates.length == 1) {
 				String candidate = candidates[0];
-				if (candidate.equals(prefix)) { // if it's the same don't replace it...
+				if (candidate.equals(prefix)) { // if it's the same don't
+					// replace it...
 					name = key;
-				}
-				else {
+				} else {
 					name = candidate + suffix;
 				}
 			}
@@ -208,7 +264,8 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper, BeanFactoryAwa
 		return name;
 	}
 
-	private void switchPropertyNames(Properties properties, String oldName, String newName) {
+	private void switchPropertyNames(Properties properties, String oldName,
+			String newName) {
 		String value = properties.getProperty(oldName);
 		properties.remove(oldName);
 		properties.setProperty(newName, value);

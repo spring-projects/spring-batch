@@ -34,6 +34,39 @@ import org.springframework.context.support.StaticApplicationContext;
 
 public class BeanWrapperFieldSetMapperTests extends TestCase {
 
+	public void testNameAndTypeSpecified() throws Exception {
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
+		mapper.setTargetType(TestObject.class);
+		mapper.setPrototypeBeanName("foo");
+		try {
+			mapper.afterPropertiesSet();
+		} catch (IllegalStateException e) {
+			// expected
+		}
+	}
+	
+	public void testNameNorTypeSpecified() throws Exception {
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
+		try {
+			mapper.afterPropertiesSet();
+		} catch (IllegalStateException e) {
+			// expected
+		}
+	}
+
+	public void testVanillaBeanCreatedFromType() throws Exception {
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
+		mapper.setTargetType(TestObject.class);
+		mapper.afterPropertiesSet();
+
+		FieldSet fieldSet = new FieldSet(new String[] { "This is some dummy string", "true", "C" }, new String[] {
+				"varString", "varBoolean", "varChar" });
+		TestObject result = (TestObject) mapper.mapLine(fieldSet);
+		assertEquals("This is some dummy string", result.getVarString());
+		assertEquals(true, result.isVarBoolean());
+		assertEquals('C', result.getVarChar());
+	}
+
 	public void testMapperWithSingleton() throws Exception {
 		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		StaticApplicationContext context = new StaticApplicationContext();
