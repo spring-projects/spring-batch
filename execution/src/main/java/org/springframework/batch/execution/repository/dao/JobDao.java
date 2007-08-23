@@ -45,7 +45,7 @@ public interface JobDao {
 	 * Identifier are found, then a list of size 0 will be returned.
 	 * 
 	 * @param jobIdentifier
-	 * @return List of jobs matching JobIdentifier
+	 * @return List of {@link JobInstance} objects matching {@link JobIdentifier}
 	 */
 	public List findJobs(JobIdentifier jobIdentifier);
 

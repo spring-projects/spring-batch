@@ -109,7 +109,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	 * @throws IllegalArgumentException if any JobRuntimeInformation fields are
 	 * null.
 	 */
-	public List findJobs(JobIdentifier jobIdentifier) {
+	public List findJobs(final JobIdentifier jobIdentifier) {
 
 		ScheduledJobIdentifier defaultJobId = (ScheduledJobIdentifier) jobIdentifier;
 		validateJobRuntimeInformation(defaultJobId);
@@ -122,6 +122,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 				JobInstance job = new JobInstance(new Long(rs.getLong(1)));
 				job.setStatus(BatchStatus.getStatus(rs.getString(2)));
+				job.setIdentifier(jobIdentifier);
 
 				return job;
 			}

@@ -98,6 +98,7 @@ public class SqlJobDaoTests extends AbstractTransactionalDataSourceSpringContext
 		assertTrue(jobs.size() == 1);
 		JobInstance tempJob = (JobInstance) jobs.get(0);
 		assertTrue(job.equals(tempJob));
+		assertEquals(jobRuntimeInformation, tempJob.getIdentifier());
 	}
 	
 	public void testFindJobWithNullRuntime(){
