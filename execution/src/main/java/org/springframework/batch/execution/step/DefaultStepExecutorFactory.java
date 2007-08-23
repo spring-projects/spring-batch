@@ -33,12 +33,17 @@ import org.springframework.util.Assert;
  * A {@link StepExecutorFactory} that uses a prototype bean in the application
  * context to satisfy the factory contract. If the prototype bean and
  * {@link StepConfiguration} are of known (simple) type, they can be combined to
- * add the commit interval information from the configuration.
+ * add the commit interval information from the configuration.<br/>
+ * 
+ * The nominated bean has to be a prototype because its state may be changed
+ * before it is used, applying values for things like commit interval from the
+ * {@link StepConfiguration}.
  * 
  * @author Dave Syer
  * 
  */
-public class DefaultStepExecutorFactory implements StepExecutorFactory, BeanFactoryAware, InitializingBean {
+public class DefaultStepExecutorFactory implements StepExecutorFactory,
+		BeanFactoryAware, InitializingBean {
 
 	private String stepExecutorName = null;
 
@@ -46,6 +51,7 @@ public class DefaultStepExecutorFactory implements StepExecutorFactory, BeanFact
 
 	/**
 	 * Setter for injected {@link BeanFactory}.
+	 * 
 	 * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
 	 */
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -60,11 +66,13 @@ public class DefaultStepExecutorFactory implements StepExecutorFactory, BeanFact
 	 */
 	public void afterPropertiesSet() throws Exception {
 		// Make an assertion that the bean exists and is of the correct type
-		Assert.notNull(beanFactory.getBean(stepExecutorName, StepExecutor.class),
-				"Step executor name must correspond to a StepExecutor instance.");
+		Assert
+				.notNull(beanFactory.getBean(stepExecutorName,
+						StepExecutor.class),
+						"Step executor name must correspond to a StepExecutor instance.");
 		Assert.state(beanFactory.isPrototype(stepExecutorName),
-				"StepExecutor must be a prototype.  Change the scope of the bean named '" + stepExecutorName
-						+ "' to prototype.");
+				"StepExecutor must be a prototype.  Change the scope of the bean named '"
+						+ stepExecutorName + "' to prototype.");
 	}
 
 	/**
@@ -94,7 +102,8 @@ public class DefaultStepExecutorFactory implements StepExecutorFactory, BeanFact
 	 * </ul>
 	 * <br/>
 	 * 
-	 * @throws IllegalStateException if no {@link StepExecutor} can be located.
+	 * @throws IllegalStateException
+	 *             if no {@link StepExecutor} can be located.
 	 * 
 	 * @see StepExecutorFactory#getExecutor(StepConfiguration)
 	 */
@@ -106,15 +115,18 @@ public class DefaultStepExecutorFactory implements StepExecutorFactory, BeanFact
 			RepeatTemplate template = new RepeatTemplate();
 			RepeatOperations repeatOperations = template;
 			if (configuration instanceof RepeatOperationsHolder) {
-				repeatOperations = ((RepeatOperationsHolder) configuration).getChunkOperations();
-				Assert.state(repeatOperations != null,
-						"Chunk operations obtained from step configuration must be non-null.");
+				repeatOperations = ((RepeatOperationsHolder) configuration)
+						.getChunkOperations();
+				Assert
+						.state(repeatOperations != null,
+								"Chunk operations obtained from step configuration must be non-null.");
+			} else if (configuration instanceof SimpleStepConfiguration) {
+				template.setCompletionPolicy(new SimpleCompletionPolicy(
+						((SimpleStepConfiguration) configuration)
+								.getCommitInterval()));
 			}
-			else if (configuration instanceof SimpleStepConfiguration) {
-				template.setCompletionPolicy(new SimpleCompletionPolicy(((SimpleStepConfiguration) configuration)
-						.getCommitInterval()));
-			}
-			((SimpleStepExecutor) executor).setChunkOperations(repeatOperations);
+			((SimpleStepExecutor) executor)
+					.setChunkOperations(repeatOperations);
 		}
 
 		return executor;
@@ -126,7 +138,8 @@ public class DefaultStepExecutorFactory implements StepExecutorFactory, BeanFact
 	 * corresponding bean must be prototype scoped, so that its properties can
 	 * be overridden per execution by the {@link StepConfiguration}.
 	 * 
-	 * @param stepExecutor the stepExecutor to set
+	 * @param stepExecutor
+	 *            the stepExecutor to set
 	 */
 	public void setStepExecutorName(String stepExecutorName) {
 		this.stepExecutorName = stepExecutorName;
@@ -138,7 +151,8 @@ public class DefaultStepExecutorFactory implements StepExecutorFactory, BeanFact
 	 * @return the step executor instance to use.
 	 */
 	private StepExecutor getStepExecutor() {
-		return (StepExecutor) beanFactory.getBean(stepExecutorName, StepExecutor.class);
+		return (StepExecutor) beanFactory.getBean(stepExecutorName,
+				StepExecutor.class);
 	}
 
 }
