@@ -18,28 +18,31 @@ package org.springframework.batch.sample.module;
 
 import java.util.Properties;
 
-import org.springframework.batch.execution.tasklet.ReadProcessTasklet;
+import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.execution.tasklet.ItemProviderProcessTasklet;
 import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.io.file.support.DefaultFlatFileInputSource;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.sample.dao.TradeWriter;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.batch.statistics.StatisticsProvider;
 
 /**
- * Simple implementation of a {@link ReadProcessTasklet}, which illustrates the
- * case when reading and processing of input is not separated. This can be
- * viable in cases, when the input reading and processing logic need not to be
- * reused in different contexts. In general it is recommended to separate these
- * two concerns.
+ * Simple implementation of a {@link Tasklet}, which illustrates the reading
+ * and processing of input data. This can be viable in cases, when the input
+ * reading and processing logic need not to be reused in different contexts. In
+ * general it is recommended to separate these two concerns using an
+ * {@link ItemProviderProcessTasklet}.
  * 
- * Note this class is NOT thread-safe, contrast to 'standard' module
- * implementations provided by the framework.
+ * Note this class is thread-safe, as per the 'standard' module implementations
+ * provided by the framework.
  * 
  * @author Robert Kasanicky
  * @author Lucas Ward
+ * @author Dave Syer
  */
-public class SimpleTradeTasklet extends ReadProcessTasklet implements StatisticsProvider {
+public class SimpleTradeTasklet implements Tasklet, StatisticsProvider {
 	/**
 	 * reads the data from input file
 	 */
@@ -66,31 +69,22 @@ public class SimpleTradeTasklet extends ReadProcessTasklet implements Statistics
 	private int tradeCount = 0;
 
 	/**
-	 * Read method, all reading from any input source(s) should be done here.
 	 * The input template is read using the readAndMap method, which accepts a
-	 * FieldSetMapper. This call returns an object (which should be a Trade
-	 * value object) then will be stored in a class-level variable for use by
-	 * the process method.
+	 * FieldSetMapper. This call returns a Trade object, which is then
+	 * processed. Because this is a simple example job, the data is simply
+	 * written out without any processing.
 	 */
-	public boolean read() {
+	public ExitStatus execute() throws Exception {
 		trade = (Trade) tradeFieldSetMapper.mapLine(inputSource.readFieldSet());
 
 		if (trade == null) {
 			// no Trade object returned, reading input is finished
-			return false;
+			return ExitStatus.FINISHED;
 		}
 
 		tradeCount++;
-		return true;
-	}
-
-	/**
-	 * Process the data obtained during the read() method. Because this is a
-	 * simple example job, the data is simply written out without any
-	 * processing.
-	 */
-	public void process() {
 		tradeWriter.writeTrade(trade);
+		return ExitStatus.CONTINUABLE;
 	}
 
 	/**

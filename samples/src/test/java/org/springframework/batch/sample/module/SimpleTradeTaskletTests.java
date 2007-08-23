@@ -14,7 +14,7 @@ public class SimpleTradeTaskletTests extends TestCase {
 	private boolean inputCalled = false;
 	private boolean writerCalled = false;
 
-	public void testReadAndProcess() {
+	public void testReadAndProcess() throws Exception {
 		
 		//create input
 		DefaultFlatFileInputSource input = new DefaultFlatFileInputSource() {
@@ -55,15 +55,13 @@ public class SimpleTradeTaskletTests extends TestCase {
 		
 		//call tested methods
 		//read method should return true, because input returned fieldset 
-		assertTrue(module.read());
-		//call process method - see asserts in writer.writeTrade()
-		module.process();
+		assertTrue(module.execute().isContinuable());
 		
 		//verify whether input and writer were called
 		assertTrue(inputCalled);
 		assertTrue(writerCalled);
 		
 		//read should return false, because input returned null
-		assertFalse(module.read());
+		assertFalse(module.execute().isContinuable());
 	}
 }
