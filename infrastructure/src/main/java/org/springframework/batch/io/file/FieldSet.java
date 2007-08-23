@@ -592,7 +592,7 @@ public final class FieldSet {
 	/**
 	 * Construct name-value pairs from the field names and string values.
 	 * 
-	 * @return some properties representing the file set.
+	 * @return some properties representing the field set.
 	 * 
 	 * @throws IllegalStateException
 	 *             if the field name meta data is not available.
