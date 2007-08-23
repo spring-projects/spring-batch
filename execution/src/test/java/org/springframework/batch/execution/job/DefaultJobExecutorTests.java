@@ -34,6 +34,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.runtime.StepExecutionContext;
+import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
@@ -94,9 +95,9 @@ public class DefaultJobExecutorTests extends TestCase {
 
 	private JobConfiguration jobConfiguration;
 
-	private SimpleJobIdentifier jobRuntimeInformation;
+	private SimpleJobIdentifier jobIdentifer;
 
-	private DefaultJobExecutor jobLifecycle;
+	private DefaultJobExecutor jobExecutor;
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -106,10 +107,10 @@ public class DefaultJobExecutorTests extends TestCase {
 		jobDao = new MapJobDao();
 		stepDao = new MapStepDao();
 		jobRepository = new SimpleJobRepository(jobDao, stepDao);
-		jobLifecycle = new DefaultJobExecutor();
-		jobLifecycle.setJobRepository(jobRepository);
+		jobExecutor = new DefaultJobExecutor();
+		jobExecutor.setJobRepository(jobRepository);
 
-		jobLifecycle.setStepExecutorResolver(new StepExecutorFactory() {
+		jobExecutor.setStepExecutorFactory(new StepExecutorFactory() {
 			public StepExecutor getExecutor(StepConfiguration configuration) {
 				return defaultStepLifecycle;
 			}
@@ -125,11 +126,11 @@ public class DefaultJobExecutorTests extends TestCase {
 		jobConfiguration = new JobConfiguration();
 		jobConfiguration.setSteps(stepConfigurations);
 
-		jobRuntimeInformation = new SimpleJobIdentifier("TestJob");
+		jobIdentifer = new SimpleJobIdentifier("TestJob");
 
-		job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
+		job = jobRepository.findOrCreateJob(jobConfiguration, jobIdentifer);
 
-		jobExecutionContext = new JobExecutionContext(jobRuntimeInformation, job);
+		jobExecutionContext = new JobExecutionContext(jobIdentifer, job);
 
 		List steps = job.getSteps();
 		step1 = (StepInstance) steps.get(0);
@@ -143,18 +144,43 @@ public class DefaultJobExecutorTests extends TestCase {
 		super.tearDown();
 	}
 
-	public void testRunWithDefaultLifecycle() throws Exception {
+	public void testRunNormally() throws Exception {
 
 		stepConfiguration1.setStartLimit(5);
 		stepConfiguration2.setStartLimit(5);
-		jobLifecycle.run(jobConfiguration, jobExecutionContext);
+		jobExecutor.run(jobConfiguration, jobExecutionContext);
+		assertEquals(2, list.size());
+		checkRepository(BatchStatus.COMPLETED);
+	}
+	
+	public void testRunWithDefaultStepExecutor() throws Exception {
+
+		jobExecutor = new DefaultJobExecutor();
+		jobExecutor.setJobRepository(jobRepository);
+		// do not set StepExecutorFactory...
+		stepConfiguration1.setStartLimit(5);
+		stepConfiguration1.setTasklet(new Tasklet() {
+			public ExitStatus execute() throws Exception {
+				list.add("1");
+				return ExitStatus.FINISHED;
+			}
+		});
+		stepConfiguration2.setStartLimit(5);
+		stepConfiguration2.setTasklet(new Tasklet() {
+			public ExitStatus execute() throws Exception {
+				list.add("2");
+				return ExitStatus.FINISHED;
+			}
+		});
+		jobExecutor.run(jobConfiguration, jobExecutionContext);
 		assertEquals(2, list.size());
 		checkRepository(BatchStatus.COMPLETED);
 	}
 
+
 	public void testExecutionContextIsSet() throws Exception {
 
-		testRunWithDefaultLifecycle();
+		testRunNormally();
 		assertEquals(job, jobExecutionContext.getJob());
 		assertEquals(step1, stepExecutionContext1.getStep());
 		assertEquals(step2, stepExecutionContext2.getStep());
@@ -162,7 +188,7 @@ public class DefaultJobExecutorTests extends TestCase {
 
 	public void testRunWithNonDefaultExecutor() throws Exception {
 
-		jobLifecycle.setStepExecutorResolver(new StepExecutorFactory() {
+		jobExecutor.setStepExecutorFactory(new StepExecutorFactory() {
 			public StepExecutor getExecutor(StepConfiguration configuration) {
 				return configuration == stepConfiguration2 ? defaultStepLifecycle : configurationStepLifecycle;
 			}
@@ -170,7 +196,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		stepConfiguration1.setStartLimit(5);
 		stepConfiguration2.setStartLimit(5);
 
-		jobLifecycle.run(jobConfiguration, jobExecutionContext);
+		jobExecutor.run(jobConfiguration, jobExecutionContext);
 
 		assertEquals(2, list.size());
 		assertEquals("special", list.get(0));
@@ -189,7 +215,7 @@ public class DefaultJobExecutorTests extends TestCase {
 			}
 		};
 		try {
-			jobLifecycle.run(jobConfiguration, jobExecutionContext);
+			jobExecutor.run(jobConfiguration, jobExecutionContext);
 		}
 		catch (BatchCriticalException e) {
 			assertEquals(exception, e.getCause());
@@ -209,7 +235,7 @@ public class DefaultJobExecutorTests extends TestCase {
 			}
 		};
 		try {
-			jobLifecycle.run(jobConfiguration, jobExecutionContext);
+			jobExecutor.run(jobConfiguration, jobExecutionContext);
 		}
 		catch (RuntimeException e) {
 			assertEquals(exception, e);
@@ -223,7 +249,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		stepConfiguration1.setStartLimit(0);
 
 		try{
-			jobLifecycle.run(jobConfiguration, jobExecutionContext);
+			jobExecutor.run(jobConfiguration, jobExecutionContext);
 			fail();
 		}
 		catch( Exception ex ){
@@ -235,7 +261,7 @@ public class DefaultJobExecutorTests extends TestCase {
 	 * Check JobRepository to ensure status is being saved.
 	 */
 	private void checkRepository(BatchStatus status) {
-		assertEquals(job, jobDao.findJobs(jobRuntimeInformation).get(0));
+		assertEquals(job, jobDao.findJobs(jobIdentifer).get(0));
 		// because map dao stores in memory, it can be checked directly
 		assertEquals(status, job.getStatus());
 		JobExecution jobExecution = (JobExecution) jobDao.findJobExecutions(job).get(0);

@@ -22,7 +22,7 @@
  
 	<bean id="jobLifecycle" class="org.springframework.batch.execution.job.DefaultJobExecutor">
 		<property name="jobRepository" ref="simpleJobRepository" />
-		<property name="stepExecutorResolver">
+		<property name="stepExecutorFactory">
 			<bean class="org.springframework.batch.execution.step.DefaultStepExecutorFactory">
 				<property name="stepExecutorName" value="stepLifecycle" />
 			</bean>

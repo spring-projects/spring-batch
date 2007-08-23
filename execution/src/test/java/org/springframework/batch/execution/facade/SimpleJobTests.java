@@ -79,7 +79,7 @@ public class SimpleJobTests extends TestCase {
 		super.setUp();
 		jobLifecycle.setJobRepository(repository);
 		stepLifecycle.setRepository(repository);
-		jobLifecycle.setStepExecutorResolver(new StepExecutorFactory() {
+		jobLifecycle.setStepExecutorFactory(new StepExecutorFactory() {
 			public StepExecutor getExecutor(StepConfiguration configuration) {
 				return stepLifecycle;
 			}

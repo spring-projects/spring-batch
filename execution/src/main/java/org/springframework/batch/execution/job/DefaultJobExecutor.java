@@ -33,13 +33,13 @@ import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.StepExecutionContext;
-import org.springframework.batch.execution.step.DefaultStepExecutorFactory;
+import org.springframework.batch.execution.step.SimpleStepExecutorFactory;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**
- * Default implementation of (@JobLifecycle) interface. Sequentially executes a
+ * Default implementation of (@link JobExecutor} interface. Sequentially executes a
  * job by iterating it's life of steps. Interruption of a job run is pluggable
  * by passing in various interruption policies.
  * 
@@ -47,9 +47,11 @@ import org.springframework.batch.repeat.RepeatContext;
  */
 public class DefaultJobExecutor implements JobExecutor {
 
+	private static final SimpleStepExecutorFactory DEFAULT_STEP_EXECUTOR_FACTORY = new SimpleStepExecutorFactory();
+
 	private JobRepository jobRepository;
 
-	private StepExecutorFactory stepExecutorResolver = new DefaultStepExecutorFactory();
+	private StepExecutorFactory stepExecutorFactory = DEFAULT_STEP_EXECUTOR_FACTORY;
 
 	public ExitStatus run(JobConfiguration configuration, JobExecutionContext jobExecutionContext)
 			throws BatchCriticalException {
@@ -69,7 +71,7 @@ public class DefaultJobExecutor implements JobExecutor {
 				StepConfiguration stepConfiguration = (StepConfiguration) j.next();
 				if (shouldStart(step, stepConfiguration)) {
 					updateStatus(jobExecutionContext, BatchStatus.STARTED);
-					StepExecutor stepExecutor = stepExecutorResolver.getExecutor(stepConfiguration);
+					StepExecutor stepExecutor = stepExecutorFactory.getExecutor(stepConfiguration);
 					StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 					status = stepExecutor.process(stepConfiguration, stepExecutionContext);
 				}
@@ -145,10 +147,11 @@ public class DefaultJobExecutor implements JobExecutor {
 
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
+		DEFAULT_STEP_EXECUTOR_FACTORY.setJobRepository(jobRepository);
 	}
 
-	public void setStepExecutorResolver(StepExecutorFactory stepExecutorResolver) {
-		this.stepExecutorResolver = stepExecutorResolver;
+	public void setStepExecutorFactory(StepExecutorFactory stepExecutorResolver) {
+		this.stepExecutorFactory = stepExecutorResolver;
 	}
 
 }
