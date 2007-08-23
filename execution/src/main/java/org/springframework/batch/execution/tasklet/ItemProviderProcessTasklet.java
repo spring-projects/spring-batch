@@ -42,7 +42,7 @@ import org.springframework.util.Assert;
 /**
  * A concrete implementation of the {@link Tasklet} interface that provides
  * functionality for 'split processing'. This type of processing is
- * characterised by separating the reading and processing of batch data into two
+ * characterized by separating the reading and processing of batch data into two
  * separate classes: ItemProvider and DataProcessor. The ItemProvider class
  * provides a solid means for re-usability and enforces good architecture
  * practices. Because an object *must* be returned by the {@link ItemProvider}
@@ -93,7 +93,7 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 
 	/**
 	 * Attribute key in the surrounding {@link RepeatContext} for the current
-	 * item being processed. Needed to provide recoverable behaviour if
+	 * item being processed. Needed to provide recoverable behavior if
 	 * {@link RetryOperations} are not provided.
 	 */
 	private static final String ITEM_KEY = ItemProviderProcessTasklet.class + ".ITEM";
