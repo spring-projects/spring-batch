@@ -17,12 +17,13 @@
 package org.springframework.batch.core.runtime;
 
 /**
- * A job configuration can be executed with many possible runtime parameters,
- * which identify the instance of the job. This factory allows job identifiers
- * to be created with different properties according to the
- * {@link JobIdentifier} strategy required. For example some projects or jobs
- * need a schedule date as part of the {@link JobIdentifier} and some do not
- * (e.g. for an ad-hoc execution a simple label might be enough).
+ * A factory for {@link JobIdentifier} instances. A job configuration can be
+ * executed with many possible runtime parameters, which identify the instance
+ * of the job. This factory allows job identifiers to be created with different
+ * properties according to the {@link JobIdentifier} strategy required. For
+ * example some projects or jobs need a schedule date as part of the
+ * {@link JobIdentifier} and some do not (e.g. for an ad-hoc execution a simple
+ * label might be enough).
  * 
  * 
  * @author Dave Syer
@@ -32,7 +33,9 @@ public interface JobIdentifierFactory {
 
 	/**
 	 * Get a new {@link JobIdentifier} instance.
-	 * @param name the name of the job configuration.
+	 * 
+	 * @param name
+	 *            the name of the job configuration.
 	 * @return a {@link JobIdentifier} with the same name.
 	 */
 	public JobIdentifier getJobIdentifier(String name);
