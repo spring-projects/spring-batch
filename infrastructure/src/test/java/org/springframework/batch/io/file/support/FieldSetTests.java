@@ -358,6 +358,11 @@ public class FieldSetTests extends TestCase {
 			// expected
 		}
 	}
+	
+	public void testPropertiesWithWhiteSpace() throws Exception{
+		
+		assertEquals("bar", new FieldSet(new String[] { "foo", "bar   " }, new String[] { "Foo", "Bar"}).getProperties().getProperty("Bar"));
+	}
 
 	public void testAccessByNameWhenNamesMissing() throws Exception {
 		try {

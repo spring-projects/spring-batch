@@ -592,7 +592,7 @@ public final class FieldSet {
 	/**
 	 * Construct name-value pairs from the field names and string values.
 	 * 
-	 * @return some properties representing the fle set.
+	 * @return some properties representing the file set.
 	 * 
 	 * @throws IllegalStateException
 	 *             if the field name meta data is not available.
@@ -604,7 +604,7 @@ public final class FieldSet {
 		}
 		Properties props = new Properties();
 		for (int i = 0; i < tokens.length; i++) {
-			props.setProperty((String) names.get(i), tokens[i]);
+			props.setProperty((String) names.get(i), readAndTrim(i));
 		}
 		return props;
 	}
