@@ -28,8 +28,8 @@ import org.easymock.MockControl;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.runtime.JobIdentifier;
-import org.springframework.batch.core.runtime.JobIdentifierFactory;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
+import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
 import org.springframework.batch.execution.JobExecutorFacade;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.interceptor.RepeatOperationsApplicationEvent;
@@ -47,12 +47,8 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		final SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("foo");
-		launcher.setJobRuntimeInformationFactory(new JobIdentifierFactory() {
-			public JobIdentifier getJobIdentifier(String name) {
-				return runtimeInformation;
-			}
-		});
+		launcher
+				.setJobRuntimeInformationFactory(new SimpleJobIdentifierFactory());
 	}
 
 	public void testStopContainer() throws Exception {
@@ -75,51 +71,62 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 	}
 
 	public void testNormalApplicationEventNotRecognized() throws Exception {
-		launcher.onApplicationEvent(new ApplicationEvent("foo") {});
+		launcher.onApplicationEvent(new ApplicationEvent("foo") {
+		});
 		// nothing happens
 	}
-	
+
 	public void testRepeatOperationsBeforeNotUsed() throws Exception {
 		final List list = new ArrayList();
 		launcher.setNotificationPublisher(new NotificationPublisher() {
-			public void sendNotification(Notification notification) throws UnableToSendNotificationException {
+			public void sendNotification(Notification notification)
+					throws UnableToSendNotificationException {
 				list.add(notification);
 			}
 		});
-		launcher.onApplicationEvent(new RepeatOperationsApplicationEvent(this, "foo", RepeatOperationsApplicationEvent.BEFORE) {});
+		launcher.onApplicationEvent(new RepeatOperationsApplicationEvent(this,
+				"foo", RepeatOperationsApplicationEvent.BEFORE) {
+		});
 		assertEquals(0, list.size());
 	}
 
 	public void testRepeatOperationsOpenUsed() throws Exception {
 		final List list = new ArrayList();
 		launcher.setNotificationPublisher(new NotificationPublisher() {
-			public void sendNotification(Notification notification) throws UnableToSendNotificationException {
+			public void sendNotification(Notification notification)
+					throws UnableToSendNotificationException {
 				list.add(notification);
 			}
 		});
-		launcher.onApplicationEvent(new RepeatOperationsApplicationEvent(this, "foo", RepeatOperationsApplicationEvent.OPEN));
+		launcher.onApplicationEvent(new RepeatOperationsApplicationEvent(this,
+				"foo", RepeatOperationsApplicationEvent.OPEN));
 		assertEquals(1, list.size());
-		assertEquals("foo", ((Notification) list.get(0)).getMessage().substring(0, 3));
+		assertEquals("foo", ((Notification) list.get(0)).getMessage()
+				.substring(0, 3));
 	}
-	
+
 	public void testStatisticsRetrieved() throws Exception {
-		MockControl control = MockControl.createControl(JobExecutorFacadeWithStatistics.class);
-		JobExecutorFacadeWithStatistics batchContainer = (JobExecutorFacadeWithStatistics) control.getMock();
+		MockControl control = MockControl
+				.createControl(JobExecutorFacadeWithStatistics.class);
+		JobExecutorFacadeWithStatistics batchContainer = (JobExecutorFacadeWithStatistics) control
+				.getMock();
 		launcher.setBatchContainer(batchContainer);
-		
+
 		Properties properties = PropertiesConverter.stringToProperties("a=b");
 		control.expectAndReturn(batchContainer.getStatistics(), properties);
-		
+
 		control.replay();
 		assertEquals(properties, launcher.getStatistics());
 		control.verify();
 	}
 
 	public void testStatisticsNotRetrieved() throws Exception {
-		MockControl control = MockControl.createControl(JobExecutorFacade.class);
-		JobExecutorFacade batchContainer = (JobExecutorFacade) control.getMock();
+		MockControl control = MockControl
+				.createControl(JobExecutorFacade.class);
+		JobExecutorFacade batchContainer = (JobExecutorFacade) control
+				.getMock();
 		launcher.setBatchContainer(batchContainer);
-		
+
 		Properties properties = new Properties();
 		control.replay();
 		assertEquals(properties, launcher.getStatistics());
@@ -136,8 +143,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 					// started and
 					// for interrupt to be called;
 					Thread.sleep(300);
-				}
-				catch (InterruptedException ex) {
+				} catch (InterruptedException ex) {
 					// thread intterrupted, allow to exit normally
 				}
 			}
@@ -157,7 +163,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 			return false;
 		}
 	}
-	
+
 	public void testPublishApplicationEvent() throws Exception {
 		final List list = new ArrayList();
 		launcher.setApplicationEventPublisher(new ApplicationEventPublisher() {
@@ -166,10 +172,13 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 			}
 		});
 
-		MockControl control = MockControl.createControl(JobExecutorFacade.class);
-		JobExecutorFacade batchContainer = (JobExecutorFacade) control.getMock();
+		MockControl control = MockControl
+				.createControl(JobExecutorFacade.class);
+		JobExecutorFacade batchContainer = (JobExecutorFacade) control
+				.getMock();
 		launcher.setBatchContainer(batchContainer);
-		SimpleJobIdentifier jobRuntimeInformation = new SimpleJobIdentifier("spam");
+		SimpleJobIdentifier jobRuntimeInformation = new SimpleJobIdentifier(
+				"spam");
 		batchContainer.start(jobRuntimeInformation);
 		control.setThrowable(new NoSuchJobConfigurationException("SPAM"));
 
@@ -179,7 +188,8 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 		control.verify();
 	}
 
-	private interface JobExecutorFacadeWithStatistics extends JobExecutorFacade, StatisticsProvider {
+	private interface JobExecutorFacadeWithStatistics extends
+			JobExecutorFacade, StatisticsProvider {
 	}
 
 }

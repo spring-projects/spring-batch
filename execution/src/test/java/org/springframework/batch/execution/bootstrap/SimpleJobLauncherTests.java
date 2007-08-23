@@ -20,8 +20,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.runtime.JobIdentifier;
-import org.springframework.batch.core.runtime.JobIdentifierFactory;
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
+import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
 import org.springframework.batch.execution.JobExecutorFacade;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -54,12 +53,7 @@ public class SimpleJobLauncherTests extends TestCase {
 
 	public void testRunTwiceNotFatal() throws Exception {
 		SimpleJobLauncher launcher = new SimpleJobLauncher();
-		final SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("foo");
-		launcher.setJobIdentifierFactory(new JobIdentifierFactory() {
-			public JobIdentifier getJobIdentifier(String name) {
-				return runtimeInformation;
-			}
-		});
+		launcher.setJobIdentifierFactory(new SimpleJobIdentifierFactory());
 		InterruptibleFacade jobExecutorFacade = new InterruptibleFacade();
 		launcher.setJobExecutorFacade(jobExecutorFacade);
 		launcher.setJobConfigurationName(new JobConfiguration("foo").getName());
@@ -72,12 +66,7 @@ public class SimpleJobLauncherTests extends TestCase {
 
 	public void testInterruptContainer() throws Exception {
 		final SimpleJobLauncher launcher = new SimpleJobLauncher();
-		final SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("foo");
-		launcher.setJobIdentifierFactory(new JobIdentifierFactory() {
-			public JobIdentifier getJobIdentifier(String name) {
-				return runtimeInformation;
-			}
-		});
+		launcher.setJobIdentifierFactory(new SimpleJobIdentifierFactory());
 
 		InterruptibleFacade jobExecutorFacade = new InterruptibleFacade();
 		launcher.setJobExecutorFacade(jobExecutorFacade);
