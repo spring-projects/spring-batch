@@ -10,15 +10,8 @@
 	<import resource="data-source-context.xml" />
 	<import resource="data-source-context-init.xml" />
 
-	<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
-		<property name="scopes">
-			<map>
-				<entry key="step">
-					<bean class="org.springframework.batch.execution.scope.StepScope" />
-				</entry>
-			</map>
-		</property>
-	</bean>
+	<!-- register the step scope with the application context -->
+	<bean class="org.springframework.batch.execution.scope.StepScope" />
 
 	<bean id="jobExecutorFacade" class="org.springframework.batch.execution.facade.SimpleJobExecutorFacade">
 		<property name="jobRepository" ref="simpleJobRepository" />

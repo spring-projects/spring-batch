@@ -19,7 +19,9 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
@@ -31,12 +33,14 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
  * @author Dave Syer
  * 
  */
-public class StepScope implements Scope, BeanFactoryAware, BeanPostProcessor {
+public class StepScope implements Scope, BeanFactoryAware, BeanPostProcessor,
+		BeanFactoryPostProcessor {
 
 	/**
 	 * Context key for clients to use for conversation identifier.
 	 */
 	public static final String ID_KEY = "JOB_IDENTIFIER";
+	private String name = "step";
 
 	/**
 	 * Injection callback for BeanFactory. Ensures that the bean factory
@@ -56,8 +60,9 @@ public class StepScope implements Scope, BeanFactoryAware, BeanPostProcessor {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.config.Scope#get(java.lang.String,
-	 * org.springframework.beans.factory.ObjectFactory)
+	 *      org.springframework.beans.factory.ObjectFactory)
 	 */
 	public Object get(String name, ObjectFactory objectFactory) {
 		SimpleStepContext context = getContext();
@@ -71,6 +76,7 @@ public class StepScope implements Scope, BeanFactoryAware, BeanPostProcessor {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.config.Scope#getConversationId()
 	 */
 	public String getConversationId() {
@@ -81,8 +87,9 @@ public class StepScope implements Scope, BeanFactoryAware, BeanPostProcessor {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.config.Scope#registerDestructionCallback(java.lang.String,
-	 * java.lang.Runnable)
+	 *      java.lang.Runnable)
 	 */
 	public void registerDestructionCallback(String name, Runnable callback) {
 		StepContext context = getContext();
@@ -91,6 +98,7 @@ public class StepScope implements Scope, BeanFactoryAware, BeanPostProcessor {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.config.Scope#remove(java.lang.String)
 	 */
 	public Object remove(String name) {
@@ -103,36 +111,65 @@ public class StepScope implements Scope, BeanFactoryAware, BeanPostProcessor {
 	 * can be used to store scoped bean instances.
 	 * 
 	 * @return the current step context which we can use as a scope storage
-	 * medium
+	 *         medium
 	 */
 	private SimpleStepContext getContext() {
 		SimpleStepContext context = StepSynchronizationManager.getContext();
 		if (context == null) {
-			throw new IllegalStateException("No context holder available for step scope");
+			throw new IllegalStateException(
+					"No context holder available for step scope");
 		}
 		return context;
 	}
 
 	/**
 	 * No-op.
+	 * 
 	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization(java.lang.Object,
-	 * java.lang.String)
+	 *      java.lang.String)
 	 */
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessAfterInitialization(Object bean, String beanName)
+			throws BeansException {
 		return bean;
 	}
 
 	/**
 	 * Check for {@link StepContextAware} and set context.
+	 * 
 	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization(java.lang.Object,
-	 * java.lang.String)
+	 *      java.lang.String)
 	 */
-	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessBeforeInitialization(Object bean, String beanName)
+			throws BeansException {
 		if (bean instanceof StepContextAware) {
 			SimpleStepContext context = getContext();
 			((StepContextAware) bean).setStepScopeContext(context);
 		}
 		return bean;
+	}
+
+	/**
+	 * Register this scope with the enclosing BeanFactory.
+	 * 
+	 * @param beanFactory
+	 *            the BeanFactory to register with
+	 * @throws BeansException
+	 *             if there is a problem.
+	 */
+	public void postProcessBeanFactory(
+			ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		beanFactory.registerScope(name, this);
+	}
+
+	/**
+	 * Public setter for the name property. This can then be used as a bean
+	 * definition attribute, e.g. scope="step".  Defaults to "step".
+	 * 
+	 * @param name
+	 *            the name to set for this scope.
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

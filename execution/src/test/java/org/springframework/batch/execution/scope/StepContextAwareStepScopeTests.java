@@ -66,6 +66,16 @@ public class StepContextAwareStepScopeTests extends TestCase {
 		assertEquals(context, bean.context);
 	}
 
+//	public void testScopedBeanWithInner() throws Exception {
+//		StepSynchronizationManager.open();
+//		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("scope-tests.xml", getClass());
+//		TestBean bean = ((TestBean) applicationContext.getBean("inner")).child;
+//		assertNotNull(bean);
+//		assertEquals("bar", bean.name);
+//		StepSynchronizationManager.close();
+//		assertEquals(1, list.size());
+//	}
+
 	public static class TestBean {
 		String name;
 		TestBean child;
