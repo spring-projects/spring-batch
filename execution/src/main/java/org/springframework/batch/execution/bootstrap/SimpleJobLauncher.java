@@ -158,15 +158,34 @@ public class SimpleJobLauncher implements JobLauncher {
 		}
 	}
 	
+	/**
+	 * The facade to which job launching will be delegated.
+	 *  
+	 * @param jobExecutorFacade a {@link JobExecutorFacade}.
+	 */
 	public void setJobExecutorFacade(JobExecutorFacade jobExecutorFacade) {
 		this.jobExecutorFacade = jobExecutorFacade;
 	}
-	
+
+	/**
+	 * Public setter for injecting {@link JobIdentifierFactory}. When a job is
+	 * launched by name the factory needs to be used to create a new identifier
+	 * for it.  Defaults to a {@link ScheduledJobIdentifierFactory}.
+	 * 
+	 * @param jobIdentifierFactory
+	 *            the {@link JobIdentifierFactory} to use when constructing
+	 *            identifiers for jobs.
+	 */
 	public void setJobIdentifierFactory(
 			JobIdentifierFactory jobIdentifierFactory) {
 		this.jobIdentifierFactory = jobIdentifierFactory;
 	}
 	
+    /**
+     * Public setter for the default job configuration name to launch if none is specified.
+     * 
+     * @param jobConfigurationName the name of a {@link JobConfiguration} in the registry.
+     */
     public void setJobConfigurationName(String jobConfigurationName) {
 		this.jobConfigurationName = jobConfigurationName;
 	}

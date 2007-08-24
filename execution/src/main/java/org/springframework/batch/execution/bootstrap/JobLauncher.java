@@ -17,23 +17,62 @@ package org.springframework.batch.execution.bootstrap;
 
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.runtime.JobIdentifier;
+import org.springframework.batch.execution.JobExecutorFacade;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
+ * Simple interface for controlling a job for a single job configuration, and
+ * also possibly ad-hoc executions, based on different runtime identifiers.
+ * Implementations should concentrate on managing jobs and delegate the
+ * launching to a {@link JobExecutorFacade}.
  * 
  * @author Lucas Ward
+ * @author Dave Syer
  */
 
 public interface JobLauncher {
-	
+
+	/**
+	 * Start a job execution with default name and other runtime information
+	 * generated on the fly.<br/>
+	 * 
+	 * @return the exit code from the job if it returns synchronously.
+	 * 
+	 */
 	public ExitStatus run() throws NoSuchJobConfigurationException;
-	
-	public ExitStatus run(String jobName) throws NoSuchJobConfigurationException;
-	
-	public ExitStatus run(JobIdentifier jobIdentifier) throws NoSuchJobConfigurationException;
-	
+
+	/**
+	 * Start a job execution with the given name and other runtime information
+	 * generated on the fly.
+	 * 
+	 * @param name
+	 *            the name to assign to the job
+	 * @return the exit code from the job if it returns synchronously.
+	 * @throws NoSuchJobConfigurationException
+	 */
+	public ExitStatus run(String jobName)
+			throws NoSuchJobConfigurationException;
+
+	/**
+	 * Start a job execution with the given runtime information.
+	 * 
+	 * @return the exit code from the job if it returns synchronously.
+	 * @throws NoSuchJobConfigurationException
+	 */
+	public ExitStatus run(JobIdentifier jobIdentifier)
+			throws NoSuchJobConfigurationException;
+
+	/**
+	 * Stop the current job executions if there are any. If not, no action will
+	 * be taken.
+	 * 
+	 * @see org.springframework.context.Lifecycle#stop()
+	 */
 	public void stop();
-	
+
+	/**
+	 * Return whether or not a job execution is currently running.
+	 */
 	public boolean isRunning();
-	
+
 }
