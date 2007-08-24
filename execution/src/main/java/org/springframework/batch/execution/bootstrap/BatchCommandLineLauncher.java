@@ -42,46 +42,48 @@ public class BatchCommandLineLauncher {
 	 * for all job executions using a context key {@link #PARENT_KEY}.
 	 */
 	public BatchCommandLineLauncher() {
-		parent = (ConfigurableApplicationContext) ContextSingletonBeanFactoryLocator.getInstance().useBeanFactory(
-				PARENT_KEY).getFactory();
+		parent = (ConfigurableApplicationContext) ContextSingletonBeanFactoryLocator
+				.getInstance().useBeanFactory(PARENT_KEY).getFactory();
 	}
 
 	/**
 	 * Injection setter for the {@link JobLauncher}.
 	 * 
-	 * @param launcher the launcher to set
+	 * @param launcher
+	 *            the launcher to set
 	 */
 	public void setLauncher(JobLauncher launcher) {
 		this.launcher = launcher;
 	}
 
 	/**
-	 * @param path the path to a Spring context configuration for this job
-	 * @param jobName the name of the job execution to use
+	 * @param path
+	 *            the path to a Spring context configuration for this job
+	 * @param jobName
+	 *            the name of the job execution to use
 	 * @throws NoSuchJobConfigurationException
 	 */
-	private void start(String path, String jobName) throws NoSuchJobConfigurationException {
+	private void start(String path, String jobName)
+			throws NoSuchJobConfigurationException {
 		if (!path.endsWith(".xml")) {
 			path = path + ".xml";
 		}
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { path }, parent);
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
+				new String[] { path }, parent);
 		context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
 				AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
 		try {
 			if (!launcher.isRunning()) {
 				if (jobName == null) {
 					launcher.run();
-				}
-				else {
+				} else {
 					launcher.run(jobName);
 				}
 			}
-		}
-		finally {
+		} finally {
 			try {
 				context.stop();
-			}
-			finally {
+			} finally {
 				context.close();
 			}
 		}
@@ -92,12 +94,17 @@ public class BatchCommandLineLauncher {
 	 * new Spring context for the job execution, and uses a common parent for
 	 * all such contexts.
 	 * 
-	 * @param args 0 - path to resource to load job configuration context
-	 * (default "job-configuration.xml"); 1 - runtime name for job execution
-	 * (default "job-execution-id").
+	 * @param args
+	 *            <ol>
+	 *            <li> path to resource to load job configuration context
+	 *            (default "job-configuration.xml");</li>
+	 *            <li>runtime name for job execution (default
+	 *            "job-execution-id").</li>
+	 *            </ol>
 	 * @throws NoSuchJobConfigurationException
 	 */
-	public static void main(String[] args) throws NoSuchJobConfigurationException {
+	public static void main(String[] args)
+			throws NoSuchJobConfigurationException {
 		String path = "job-configuration.xml";
 		String name = null;
 		if (args.length > 0) {
