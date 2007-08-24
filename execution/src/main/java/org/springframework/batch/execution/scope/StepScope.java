@@ -16,14 +16,10 @@
 package org.springframework.batch.execution.scope;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * Scope for step context. Objects in this scope with &lt;aop:scoped-proxy/&gt;
@@ -33,7 +29,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
  * @author Dave Syer
  * 
  */
-public class StepScope implements Scope, BeanFactoryAware, BeanPostProcessor,
+public class StepScope implements Scope,
 		BeanFactoryPostProcessor {
 
 	/**
@@ -41,22 +37,6 @@ public class StepScope implements Scope, BeanFactoryAware, BeanPostProcessor,
 	 */
 	public static final String ID_KEY = "JOB_IDENTIFIER";
 	private String name = "step";
-
-	/**
-	 * Injection callback for BeanFactory. Ensures that the bean factory
-	 * contains a BeanPostProcessor of this type (so if this bean is an inner
-	 * bean it will still be applied as a post processor).
-	 * 
-	 * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
-	 */
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		if (beanFactory instanceof DefaultListableBeanFactory) {
-			DefaultListableBeanFactory listable = (DefaultListableBeanFactory) beanFactory;
-			if (listable.getBeanNamesForType(getClass()).length == 0) {
-				listable.addBeanPostProcessor(this);
-			}
-		}
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -70,6 +50,10 @@ public class StepScope implements Scope, BeanFactoryAware, BeanPostProcessor,
 		if (scopedObject == null) {
 			scopedObject = objectFactory.getObject();
 			context.setAttribute(name, scopedObject);
+			if (scopedObject instanceof StepContextAware) {
+				((StepContextAware) scopedObject).setStepScopeContext(context);
+			}
+
 		}
 		return scopedObject;
 	}
@@ -120,32 +104,6 @@ public class StepScope implements Scope, BeanFactoryAware, BeanPostProcessor,
 					"No context holder available for step scope");
 		}
 		return context;
-	}
-
-	/**
-	 * No-op.
-	 * 
-	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization(java.lang.Object,
-	 *      java.lang.String)
-	 */
-	public Object postProcessAfterInitialization(Object bean, String beanName)
-			throws BeansException {
-		return bean;
-	}
-
-	/**
-	 * Check for {@link StepContextAware} and set context.
-	 * 
-	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization(java.lang.Object,
-	 *      java.lang.String)
-	 */
-	public Object postProcessBeforeInitialization(Object bean, String beanName)
-			throws BeansException {
-		if (bean instanceof StepContextAware) {
-			SimpleStepContext context = getContext();
-			((StepContextAware) bean).setStepScopeContext(context);
-		}
-		return bean;
 	}
 
 	/**
