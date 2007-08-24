@@ -21,8 +21,8 @@ import org.springframework.batch.execution.JobExecutorFacade;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * Simple interface for controlling a job for a single job configuration, and
- * also possibly ad-hoc executions, based on different runtime identifiers.
+ * Simple interface for controlling jobs from the job configuration registry,
+ * including possible ad-hoc executions, based on different runtime identifiers.
  * Implementations should concentrate on managing jobs and delegate the
  * launching to a {@link JobExecutorFacade}.
  * 
