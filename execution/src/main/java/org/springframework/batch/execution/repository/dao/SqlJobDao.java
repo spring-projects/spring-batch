@@ -53,7 +53,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	 */
 	public static final String DEFAULT_TABLE_PREFIX = "BATCH_";
 
-	private static String tablePrefix = DEFAULT_TABLE_PREFIX;
+	private String tablePrefix = DEFAULT_TABLE_PREFIX;
 
 	// Job SQL statements
 	private static final String CREATE_JOB = "INSERT into %PREFIX%JOB(ID, JOB_NAME, JOB_STREAM, SCHEDULE_DATE, JOB_RUN)"
@@ -94,7 +94,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	 *            the tablePrefix to set
 	 */
 	public void setTablePrefix(String tablePrefix) {
-		SqlJobDao.tablePrefix = tablePrefix;
+		this.tablePrefix = tablePrefix;
 	}
 
 	/**

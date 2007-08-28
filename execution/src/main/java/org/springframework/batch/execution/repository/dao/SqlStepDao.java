@@ -34,6 +34,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Sql implementation of StepDao. Uses Sequences (via Spring's
@@ -54,33 +55,47 @@ import org.springframework.util.Assert;
 public class SqlStepDao implements StepDao, InitializingBean {
 
 	// Step SQL statements
-	private static final String FIND_STEPS = "SELECT ID, STEP_NAME, STATUS, RESTART_DATA from BATCH_STEP where JOB_ID = ?";
+	private static final String FIND_STEPS = "SELECT ID, STEP_NAME, STATUS, RESTART_DATA from %PREFIX%STEP where JOB_ID = ?";
 
-	private static final String FIND_STEP = "SELECT ID, STATUS, RESTART_DATA from BATCH_STEP where JOB_ID = ? "
+	private static final String FIND_STEP = "SELECT ID, STATUS, RESTART_DATA from %PREFIX%STEP where JOB_ID = ? "
 			+ "and STEP_NAME = ?";
 
-	private static final String CREATE_STEP = "INSERT into BATCH_STEP(ID, JOB_ID, STEP_NAME) values (?, ?, ?)";
+	private static final String CREATE_STEP = "INSERT into %PREFIX%STEP(ID, JOB_ID, STEP_NAME) values (?, ?, ?)";
 
-	private static final String UPDATE_STEP = "UPDATE BATCH_STEP set STATUS = ?, RESTART_DATA = ? where ID = ?";
+	private static final String UPDATE_STEP = "UPDATE %PREFIX%STEP set STATUS = ?, RESTART_DATA = ? where ID = ?";
 
 	// StepExecution statements
-	private static final String SAVE_STEP_EXECUTION = "INSERT into BATCH_STEP_EXECUTION(ID, VERSION, STEP_ID, JOB_EXECUTION_ID, START_TIME, "
+	private static final String SAVE_STEP_EXECUTION = "INSERT into %PREFIX%STEP_EXECUTION(ID, VERSION, STEP_ID, JOB_EXECUTION_ID, START_TIME, "
 			+ "END_TIME, STATUS, COMMIT_COUNT, TASK_COUNT, TASK_STATISTICS, EXIT_CODE) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String UPDATE_STEP_EXECUTION = "UPDATE BATCH_STEP_EXECUTION set START_TIME = ?, END_TIME = ?, "
+	private static final String UPDATE_STEP_EXECUTION = "UPDATE %PREFIX%STEP_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ "STATUS = ?, COMMIT_COUNT = ?, TASK_COUNT = ?, TASK_STATISTICS = ?, EXIT_CODE = ? where ID = ?";
 
-	private static final String GET_STEP_EXECUTION_COUNT = "SELECT count(ID) from BATCH_STEP_EXECUTION where "
+	private static final String GET_STEP_EXECUTION_COUNT = "SELECT count(ID) from %PREFIX%STEP_EXECUTION where "
 			+ "STEP_ID = ?";
 
 	private static final String FIND_STEP_EXECUTIONS = "SELECT ID, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
-			+ " TASK_COUNT, TASK_STATISTICS, EXIT_CODE from BATCH_STEP_EXECUTION where STEP_ID = ?";
+			+ " TASK_COUNT, TASK_STATISTICS, EXIT_CODE from %PREFIX%STEP_EXECUTION where STEP_ID = ?";
 
 	private JdbcTemplate jdbcTemplate;
 
 	private DataFieldMaxValueIncrementer stepIncrementer;
 
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
+
+	private String tablePrefix = SqlJobDao.DEFAULT_TABLE_PREFIX;
+
+	/**
+	 * Public setter for the table prefix property. This will be prefixed to all
+	 * the table names before queries are executed. Defaults to
+	 * {@value #DEFAULT_TABLE_PREFIX}.
+	 * 
+	 * @param tablePrefix
+	 *            the tablePrefix to set
+	 */
+	public void setTablePrefix(String tablePrefix) {
+		this.tablePrefix = tablePrefix;
+	}
 
 	/**
 	 * Find one step for given job and stepName. A RowMapper is used to map each
@@ -113,7 +128,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 
 		};
 
-		List steps = jdbcTemplate.query(FIND_STEP, parameters, rowMapper);
+		List steps = jdbcTemplate.query(getQuery(FIND_STEP), parameters, rowMapper);
 
 		if (steps.size() == 0) {
 			// No step found
@@ -138,7 +153,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	 * @see StepDao#findSteps(Long)
 	 * 
 	 * Sql implementation which uses a RowMapper to populate a list of all rows
-	 * in the BATCH_STEP table with the same JOB_ID.
+	 * in the step table with the same JOB_ID.
 	 * 
 	 * @throws IllegalArgumentException if jobId is null.
 	 */
@@ -162,7 +177,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 			}
 		};
 
-		return jdbcTemplate.query(FIND_STEPS, parameters, rowMapper);
+		return jdbcTemplate.query(getQuery(FIND_STEPS), parameters, rowMapper);
 	}
 
 	/**
@@ -180,7 +195,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 
 		Long stepId = new Long(stepIncrementer.nextLongValue());
 		Object[] parameters = new Object[] { stepId, job.getId(), stepName };
-		jdbcTemplate.update(CREATE_STEP, parameters);
+		jdbcTemplate.update(getQuery(CREATE_STEP), parameters);
 
 		StepInstance step = new StepInstance(stepId);
 		step.setJob(job);
@@ -209,7 +224,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 				step.getId()
 		};
 		
-		jdbcTemplate.update(UPDATE_STEP, parameters);
+		jdbcTemplate.update(getQuery(UPDATE_STEP), parameters);
 	}
 
 	/**
@@ -228,7 +243,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 				stepExecution.getStartTime(), stepExecution.getEndTime(), stepExecution.getStatus().toString(),
 				stepExecution.getCommitCount(), stepExecution.getTaskCount(),
 				PropertiesConverter.propertiesToString(stepExecution.getStatistics()), stepExecution.getExitCode() };
-		jdbcTemplate.update(SAVE_STEP_EXECUTION, parameters);
+		jdbcTemplate.update(getQuery(SAVE_STEP_EXECUTION), parameters);
 
 	}
 
@@ -254,7 +269,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 				stepExecution.getTaskCount(), PropertiesConverter.propertiesToString(stepExecution.getStatistics()),
 				stepExecution.getExitCode(),
 				stepExecution.getId() };
-		jdbcTemplate.update(UPDATE_STEP_EXECUTION, parameters);
+		jdbcTemplate.update(getQuery(UPDATE_STEP_EXECUTION), parameters);
 
 	}
 
@@ -262,7 +277,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 
 		Object[] parameters = new Object[] { stepId };
 
-		return jdbcTemplate.queryForInt(GET_STEP_EXECUTION_COUNT, parameters);
+		return jdbcTemplate.queryForInt(getQuery(GET_STEP_EXECUTION_COUNT), parameters);
 	}
 
 	/**
@@ -297,7 +312,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 			}
 		};
 
-		return jdbcTemplate.query(FIND_STEP_EXECUTIONS, new Object[] { stepId }, rowMapper);
+		return jdbcTemplate.query(getQuery(FIND_STEP_EXECUTIONS), new Object[] { stepId }, rowMapper);
 
 	}
 
@@ -319,6 +334,10 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		Assert.notNull(stepExecutionIncrementer, "StepExecutionIncrementer canot be null.");
 	}
 
+	private String getQuery(String base) {
+		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
+	}
+	
 	/*
 	 * Validate StepExecution. At a minimum, JobId, StartTime, and
 	 * Status cannot be null.  EndTime can be null for an unfinished job.
