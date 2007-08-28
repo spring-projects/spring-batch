@@ -57,6 +57,10 @@
 					<groupId>mx4j</groupId>
 					<artifactId>mx4j</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.geronimo.specs</groupId>
+					<artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
+				</exclusion>
 			</exclusions>
 			<scope>test</scope>
 		</dependency>
