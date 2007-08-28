@@ -37,6 +37,7 @@ import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.SQLWarningException;
 import org.springframework.jdbc.core.RowMapper;
@@ -113,7 +114,8 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Peter Zozom
  */
-public class SqlCursorInputSource implements InputSource, DisposableBean, Restartable, StatisticsProvider, Skippable {
+public class SqlCursorInputSource implements InputSource, DisposableBean,
+		InitializingBean, Restartable, StatisticsProvider, Skippable {
 
 	private static Log log = LogFactory.getLog(SqlCursorInputSource.class);
 
@@ -158,17 +160,24 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 
 	private RowMapper mapper;
 
-	public SqlCursorInputSource(DataSource dataSource) {
-
-		this(dataSource, null);
+	/**
+	 * Assert that mandatory properties are set.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if either data source or sql properties not set.
+	 */
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(dataSource, "DataSOurce must be provided");
+		Assert.notNull(sql, "The SQL query must be provided");
 	}
 
-	public SqlCursorInputSource(DataSource dataSource, String sql) {
-
-		Assert.notNull(dataSource, "DataSource must not be null.");
-
+	/**
+	 * Public setter for the data source for injection purposes.
+	 * 
+	 * @param dataSource
+	 */
+	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
-		this.sql = sql;
 	}
 
 	/**
@@ -180,7 +189,8 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 	 * 
 	 * @returns Object returned by RowMapper
 	 * @throws DataAccessException
-	 * @throws IllegalStateExceptino if mapper is null.
+	 * @throws IllegalStateExceptino
+	 *             if mapper is null.
 	 */
 	public Object read() {
 
@@ -193,12 +203,12 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 		try {
 			if (!rs.next()) {
 				return null;
-			}
-			else {
+			} else {
 				currentProcessedRow++;
 				if (!skippedRows.isEmpty()) {
 					// while is necessary to handle successive skips.
-					while (skippedRows.contains(new Integer(currentProcessedRow))) {
+					while (skippedRows
+							.contains(new Integer(currentProcessedRow))) {
 						if (!rs.next()) {
 							return null;
 						}
@@ -209,9 +219,9 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 
 				return mapper.mapRow(rs, currentProcessedRow);
 			}
-		}
-		catch (SQLException se) {
-			throw getExceptionTranslator().translate("Trying to process next row", sql, se);
+		} catch (SQLException se) {
+			throw getExceptionTranslator().translate(
+					"Trying to process next row", sql, se);
 		}
 
 	}
@@ -239,14 +249,14 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 			currentProcessedRow = lastCommittedRow;
 			if (currentProcessedRow > 0) {
 				rs.absolute(currentProcessedRow);
-			}
-			else {
+			} else {
 				rs.beforeFirst();
 			}
 
-		}
-		catch (SQLException se) {
-			throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);
+		} catch (SQLException se) {
+			throw getExceptionTranslator().translate(
+					"Attempted to move ResultSet to last committed row", sql,
+					se);
 		}
 	}
 
@@ -279,10 +289,12 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 	// Check the result set is in synch with the currentRow attribute. This is
 	// important
 	// to ensure that the user hasn't modified the current row.
-	private void verifyCursorPosition(int expectedCurrentRow) throws SQLException {
+	private void verifyCursorPosition(int expectedCurrentRow)
+			throws SQLException {
 		if (verifyCursorPosition) {
 			if (expectedCurrentRow != this.rs.getRow()) {
-				throw new InvalidDataAccessResourceUsageException("Unexpected cursor position change.");
+				throw new InvalidDataAccessResourceUsageException(
+						"Unexpected cursor position change.");
 			}
 		}
 	}
@@ -300,18 +312,21 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 
 		try {
 			this.con = dataSource.getConnection();
-			this.stmt = this.con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY,
+			this.stmt = this.con.createStatement(
+					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY,
 					ResultSet.HOLD_CURSORS_OVER_COMMIT);
 			applyStatementSettings(this.stmt);
 			this.rs = this.stmt.executeQuery(sql);
 			handleWarnings(this.stmt.getWarnings());
-		}
-		catch (SQLException se) {
+		} catch (SQLException se) {
 			close();
-			throw getExceptionTranslator().translate("Executing query", stmt.toString(), se);
+			throw getExceptionTranslator().translate("Executing query",
+					stmt.toString(), se);
 		}
 
-		BatchTransactionSynchronizationManager.registerSynchronization(transactionSynchronization);
+		BatchTransactionSynchronizationManager
+				.registerSynchronization(transactionSynchronization);
 	}
 
 	/*
@@ -319,6 +334,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 	 * CallableStatement), applying statement settings such as fetch size, max
 	 * rows, and query timeout. @param stmt the JDBC Statement to prepare
 	 * @throws SQLException
+	 * 
 	 * @see #setFetchSize
 	 * @see #setMaxRows
 	 * @see #setQueryTimeout
@@ -344,9 +360,9 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 	protected SQLExceptionTranslator getExceptionTranslator() {
 		if (exceptionTranslator == null) {
 			if (dataSource != null) {
-				exceptionTranslator = new SQLErrorCodeSQLExceptionTranslator(dataSource);
-			}
-			else {
+				exceptionTranslator = new SQLErrorCodeSQLExceptionTranslator(
+						dataSource);
+			} else {
 				exceptionTranslator = new SQLStateSQLExceptionTranslator();
 			}
 		}
@@ -366,18 +382,20 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 		if (ignoreWarnings) {
 			SQLWarning warningToLog = warnings;
 			while (warningToLog != null) {
-				log.debug("SQLWarning ignored: SQL state '" + warningToLog.getSQLState() + "', error code '"
-						+ warningToLog.getErrorCode() + "', message [" + warningToLog.getMessage() + "]");
+				log.debug("SQLWarning ignored: SQL state '"
+						+ warningToLog.getSQLState() + "', error code '"
+						+ warningToLog.getErrorCode() + "', message ["
+						+ warningToLog.getMessage() + "]");
 				warningToLog = warningToLog.getNextWarning();
 			}
-		}
-		else {
+		} else {
 			throw new SQLWarningException("Warning not ignored", warnings);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.restart.Restartable#getRestartData()
 	 */
 	public RestartData getRestartData() {
@@ -386,32 +404,38 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.restart.Restartable#restoreFrom(org.springframework.batch.restart.RestartData)
 	 */
 	public void restoreFrom(RestartData data) {
-		if (data==null) return;
-		
+		if (data == null)
+			return;
+
 		if (rs == null) {
 			executeQuery();
 		}
 
 		try {
-			this.currentProcessedRow = Integer.parseInt(data.getProperties().getProperty(CURRENT_PROCESSED_ROW));
+			this.currentProcessedRow = Integer.parseInt(data.getProperties()
+					.getProperty(CURRENT_PROCESSED_ROW));
 			rs.absolute(currentProcessedRow);
-		}
-		catch (SQLException se) {
-			throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);
+		} catch (SQLException se) {
+			throw getExceptionTranslator().translate(
+					"Attempted to move ResultSet to last committed row", sql,
+					se);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.statistics.StatisticsProvider#getStatistics()
 	 */
 	public Properties getStatistics() {
 
 		Properties props = new Properties();
-		props.setProperty(CURRENT_PROCESSED_ROW, new Integer(currentProcessedRow).toString());
+		props.setProperty(CURRENT_PROCESSED_ROW, new Integer(
+				currentProcessedRow).toString());
 		props.setProperty(SKIP_COUNT, new Integer(skipCount).toString());
 		return props;
 	}
@@ -433,7 +457,8 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 	 * <code>ResultSet</code> object. If the fetch size specified is zero, the
 	 * JDBC driver ignores the value.
 	 * 
-	 * @param fetchSize the number of rows to fetch
+	 * @param fetchSize
+	 *            the number of rows to fetch
 	 * @see ResultSet#setFetchSize(int)
 	 */
 	public void setFetchSize(int fetchSize) {
@@ -444,7 +469,8 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 	 * Sets the limit for the maximum number of rows that any
 	 * <code>ResultSet</code> object can contain to the given number.
 	 * 
-	 * @param maxRows the new max rows limit; zero means there is no limit
+	 * @param maxRows
+	 *            the new max rows limit; zero means there is no limit
 	 * @see Statement#setMaxRows(int)
 	 */
 	public void setMaxRows(int maxRows) {
@@ -457,8 +483,9 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 	 * seconds. If the limit is exceeded, an <code>SQLException</code> is
 	 * thrown.
 	 * 
-	 * @param queryTimeout seconds the new query timeout limit in seconds; zero
-	 * means there is no limit
+	 * @param queryTimeout
+	 *            seconds the new query timeout limit in seconds; zero means
+	 *            there is no limit
 	 * @see Statement#setQueryTimeout(int)
 	 */
 	public void setQueryTimeout(int queryTimeout) {
@@ -468,7 +495,9 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 	/**
 	 * Set whether SQLWarnings should be ignored (only logged) or exception
 	 * should be thrown.
-	 * @param ignoreWarnings if TRUE, warnings are ignored
+	 * 
+	 * @param ignoreWarnings
+	 *            if TRUE, warnings are ignored
 	 */
 	public void setIgnoreWarnings(boolean ignoreWarnings) {
 		this.ignoreWarnings = ignoreWarnings;
@@ -477,7 +506,9 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 	/**
 	 * Allow verification of cursor position after current row is processed by
 	 * RowMapper or RowCallbackHandler. Default value is TRUE.
-	 * @param verifyCursorPosition if true, cursor position is verified
+	 * 
+	 * @param verifyCursorPosition
+	 *            if true, cursor position is verified
 	 */
 	public void setVerifyCursorPosition(boolean verifyCursorPosition) {
 		this.verifyCursorPosition = verifyCursorPosition;
@@ -512,18 +543,19 @@ public class SqlCursorInputSource implements InputSource, DisposableBean, Restar
 
 	}
 
-	private class SqlInputTransactionSynchronization extends TransactionSynchronizationAdapter {
+	private class SqlInputTransactionSynchronization extends
+			TransactionSynchronizationAdapter {
 
 		/*
 		 * @param status transaction status
+		 * 
 		 * @see org.springframework.transaction.support.TransactionSynchronization#afterCompletion(int)
 		 */
 		public void afterCompletion(int status) {
 
 			if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
 				reset();
-			}
-			else if (status == TransactionSynchronization.STATUS_COMMITTED) {
+			} else if (status == TransactionSynchronization.STATUS_COMMITTED) {
 				mark();
 			}
 		}

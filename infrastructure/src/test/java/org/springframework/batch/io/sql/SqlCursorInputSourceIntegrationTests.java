@@ -47,8 +47,10 @@ public class SqlCursorInputSourceIntegrationTests extends AbstractTransactionalD
 	
 	protected SqlCursorInputSource getNewInputSource(){
 		
-		return new SqlCursorInputSource(super.getJdbcTemplate().getDataSource(),
-		"SELECT * from T_FOOS");
+		SqlCursorInputSource result = new SqlCursorInputSource();
+		result.setDataSource(super.getJdbcTemplate().getDataSource());
+		result.setSql("SELECT * from T_FOOS");
+		return result;
 	}
 	
 	public void testNormalReading(){
