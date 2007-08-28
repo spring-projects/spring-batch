@@ -21,7 +21,7 @@ import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.execution.JobExecutorFacade;
+import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
