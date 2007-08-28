@@ -19,7 +19,6 @@ package org.springframework.batch.sample.dao;
 import org.springframework.batch.io.OutputSource;
 import org.springframework.batch.io.file.support.transform.Converter;
 import org.springframework.batch.sample.domain.Order;
-import org.springframework.beans.factory.DisposableBean;
 
 
 /**
