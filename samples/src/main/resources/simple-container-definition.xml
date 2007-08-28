@@ -98,7 +98,7 @@
 		<property name="commitInterval" value="1" />
 	</bean>
 
-	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+	<bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 		<property name="customEditors">
 			<map>
 				<entry key="int[]">

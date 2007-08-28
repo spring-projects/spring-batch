@@ -27,8 +27,6 @@
 		</property>
 	</bean>
 
-
-
 	<bean id="tradeDao" class="org.springframework.batch.sample.dao.JdbcTradeWriter">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="incrementer">
@@ -42,6 +40,12 @@
 		abstract="true">
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
+	</bean>
+	
+	<bean id="fileLocator" class="org.springframework.core.io.ClassPathResource">
+		<constructor-arg>
+			<value>/data/simpleTaskletJob/input/20070122.teststream.ImportTradeDataStep.txt</value>
+		</constructor-arg>
 	</bean>
 
 	<!-- TODO: refactor this to use aop:scoped-proxy when SPR-3804 is fixed -->
@@ -57,11 +61,6 @@
 		<property name="names" value="ISIN, Quantity, Price, Customer" />
 		<property name="lengths" value="12, 3, 5, 9" />
 	</bean>
-
-	<bean id="fileLocator" class="org.springframework.core.io.ClassPathResource">
-		<constructor-arg type="java.lang.String"
-			value="data/simpleTaskletJob/input/20070122.teststream.ImportTradeDataStep.txt" />
-	</bean>
 	
 	<bean id="tradeLogAdvice" 
 	 	class="org.springframework.batch.sample.advice.TradeWriterLogAdvice" /> 
@@ -75,5 +74,10 @@
 		      
 		</aop:aspect>
 	</aop:config>
+	
+	<bean parent="customEditorConfigurer"/>
+
+	<!-- register the step scope with the application context -->
+	<bean class="org.springframework.batch.execution.scope.StepScope" />
 
 </beans>
