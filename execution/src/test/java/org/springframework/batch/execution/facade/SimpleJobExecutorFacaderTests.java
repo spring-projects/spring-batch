@@ -34,7 +34,6 @@ import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.JobExecutionRegistry;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.runtime.StepExecutionContext;
-import org.springframework.batch.execution.NoSuchJobExecutionException;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.context.RepeatContextSupport;

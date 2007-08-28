@@ -28,8 +28,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.JobExecutionRegistry;
 import org.springframework.batch.core.runtime.JobIdentifier;
-import org.springframework.batch.execution.JobExecutorFacade;
-import org.springframework.batch.execution.NoSuchJobExecutionException;
 import org.springframework.batch.execution.job.DefaultJobExecutor;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
@@ -102,7 +100,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 	 * Locates a {@link JobConfiguration} by using the name of the provided
 	 * {@link JobIdentifier} and the {@link JobConfigurationLocator}.
 	 * 
-	 * @see org.springframework.batch.execution.JobExecutorFacade#start(org.springframework.batch.execution.common.domain.JobConfiguration,
+	 * @see org.springframework.batch.execution.facade.JobExecutorFacade#start(org.springframework.batch.execution.common.domain.JobConfiguration,
 	 * org.springframework.batch.core.runtime.JobIdentifier)
 	 * 
 	 * @throws IllegalArgumentException if the runtime information is null or

@@ -22,7 +22,7 @@ import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.core.runtime.JobIdentifierFactory;
-import org.springframework.batch.execution.JobExecutorFacade;
+import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.Assert;
