@@ -49,9 +49,7 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 	 */
 	public JobInstance createJob(JobIdentifier jobIdentifier) {
 
-		ScheduledJobIdentifier jobRuntimeInformation = (ScheduledJobIdentifier) jobIdentifier;
-
-		validateJobIdentifier(jobRuntimeInformation);
+		validateJobIdentifier(jobIdentifier);
 
 		JobInstance job = new JobInstance();
 		job.setIdentifier(jobIdentifier);
@@ -75,13 +73,16 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 
 		validateJobIdentifier(jobRuntimeInformation);
 
-		List list = this.getHibernateTemplate().executeFind(new HibernateCallback() {
-			public Object doInHibernate(Session session) {
-				Criteria criteria = session.createCriteria(JobInstance.class);
-				criteria.add(Expression.eq("identifier", jobRuntimeInformation));
-				return criteria.list();
-			}
-		});
+		List list = this.getHibernateTemplate().executeFind(
+				new HibernateCallback() {
+					public Object doInHibernate(Session session) {
+						Criteria criteria = session
+								.createCriteria(JobInstance.class);
+						criteria.add(Expression.eq("identifier",
+								jobRuntimeInformation));
+						return criteria.list();
+					}
+				});
 
 		return list;
 	}
@@ -93,12 +94,16 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 
 		Assert.notNull(jobId, "JobId cannot be null");
 
-		Long result = (Long) this.getHibernateTemplate().execute(new HibernateCallback() {
-			public Object doInHibernate(Session session) {
-				return session.createQuery("select count(id) from JobExecution where jobId = :jobId").setLong("jobId",
-						jobId.longValue()).uniqueResult();
-			}
-		});
+		Long result = (Long) this.getHibernateTemplate().execute(
+				new HibernateCallback() {
+					public Object doInHibernate(Session session) {
+						return session
+								.createQuery(
+										"select count(id) from JobExecution where jobId = :jobId")
+								.setLong("jobId", jobId.longValue())
+								.uniqueResult();
+					}
+				});
 
 		return (result == null) ? 0 : result.intValue();
 	}
@@ -137,13 +142,16 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 		validateJobExecution(jobExecution);
 
 		if (jobExecution.getId() == null) {
-			throw new IllegalArgumentException("JobExecution ID cannot be null.  JobExecution must be saved "
-					+ "before it can be updated.");
+			throw new IllegalArgumentException(
+					"JobExecution ID cannot be null.  JobExecution must be saved "
+							+ "before it can be updated.");
 		}
 
-		if (getHibernateTemplate().get(JobExecution.class, jobExecution.getId()) == null) {
-			throw new NoSuchBatchDomainObjectException("Invalid JobExecution, ID " + jobExecution.getId()
-					+ " not found.");
+		if (getHibernateTemplate()
+				.get(JobExecution.class, jobExecution.getId()) == null) {
+			throw new NoSuchBatchDomainObjectException(
+					"Invalid JobExecution, ID " + jobExecution.getId()
+							+ " not found.");
 		}
 
 		getHibernateTemplate().update(jobExecution);
@@ -156,13 +164,15 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 
 		final Long jobId = job.getId();
 
-		List list = this.getHibernateTemplate().executeFind(new HibernateCallback() {
-			public Object doInHibernate(Session session) {
-				Criteria criteria = session.createCriteria(JobExecution.class);
-				criteria.add(Expression.eq("jobId", jobId));
-				return criteria.list();
-			}
-		});
+		List list = this.getHibernateTemplate().executeFind(
+				new HibernateCallback() {
+					public Object doInHibernate(Session session) {
+						Criteria criteria = session
+								.createCriteria(JobExecution.class);
+						criteria.add(Expression.eq("jobId", jobId));
+						return criteria.list();
+					}
+				});
 
 		return list;
 	}
@@ -176,9 +186,12 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 	private void validateJobExecution(JobExecution jobExecution) {
 
 		Assert.notNull(jobExecution);
-		Assert.notNull(jobExecution.getJobId(), "JobExecution Job-Id cannot be null.");
-		Assert.notNull(jobExecution.getStartTime(), "JobExecution start time cannot be null.");
-		Assert.notNull(jobExecution.getStatus(), "JobExecution status cannot be null.");
+		Assert.notNull(jobExecution.getJobId(),
+				"JobExecution Job-Id cannot be null.");
+		Assert.notNull(jobExecution.getStartTime(),
+				"JobExecution start time cannot be null.");
+		Assert.notNull(jobExecution.getStatus(),
+				"JobExecution status cannot be null.");
 	}
 
 	/*
@@ -186,11 +199,19 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 	 * acceptable for any field to be blank, however null fields may cause odd
 	 * and vague exception reports from the database driver.
 	 */
-	private void validateJobIdentifier(ScheduledJobIdentifier jobRuntimeInformation) {
+	private void validateJobIdentifier(JobIdentifier jobIdentifier) {
 
-		Assert.notNull(jobRuntimeInformation, "JobRuntimeInformation cannot be null.");
-		Assert.notNull(jobRuntimeInformation.getName(), "JobRuntimeInformation name cannot be null.");
-		Assert.notNull(jobRuntimeInformation.getJobStream(), "JobRuntimeInformation JobStream cannot be null.");
-		Assert.notNull(jobRuntimeInformation.getScheduleDate(), "JobRuntimeInformation ScheduleDate cannot be null.");
+		Assert.notNull(jobIdentifier, "JobRuntimeInformation cannot be null.");
+		Assert.notNull(jobIdentifier.getName(),
+				"JobRuntimeInformation name cannot be null.");
+
+		if (jobIdentifier instanceof ScheduledJobIdentifier) {
+			ScheduledJobIdentifier jobRuntimeInformation = (ScheduledJobIdentifier) jobIdentifier;
+
+			Assert.notNull(jobRuntimeInformation.getJobStream(),
+					"JobRuntimeInformation JobStream cannot be null.");
+			Assert.notNull(jobRuntimeInformation.getScheduleDate(),
+					"JobRuntimeInformation ScheduleDate cannot be null.");
+		}
 	}
 }

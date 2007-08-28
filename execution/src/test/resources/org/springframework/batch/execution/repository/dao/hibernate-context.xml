@@ -25,6 +25,9 @@
 		<property name="lobHandler">
 			<bean class="org.springframework.jdbc.support.lob.DefaultLobHandler"/>
 		</property>
+		<property name="entityInterceptor">
+			<bean class="org.springframework.batch.execution.repository.dao.EntityNameInterceptor"/>
+		</property>
 	</bean>
 	
 	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
