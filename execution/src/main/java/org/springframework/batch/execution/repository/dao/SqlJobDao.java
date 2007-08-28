@@ -31,6 +31,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * SQL implementation of {@link JobDao}. Uses sequences (via Spring's
@@ -47,28 +48,35 @@ import org.springframework.util.Assert;
  */
 public class SqlJobDao implements JobDao, InitializingBean {
 
+	/**
+	 * Default value for the table prefix property.
+	 */
+	public static final String DEFAULT_TABLE_PREFIX = "BATCH_";
+
+	private static String tablePrefix = DEFAULT_TABLE_PREFIX;
+
 	// Job SQL statements
-	private static final String CREATE_JOB = "INSERT into BATCH_JOB(ID, JOB_NAME, JOB_STREAM, SCHEDULE_DATE, JOB_RUN)"
+	private static final String CREATE_JOB = "INSERT into %PREFIX%JOB(ID, JOB_NAME, JOB_STREAM, SCHEDULE_DATE, JOB_RUN)"
 			+ " values (?, ?, ?, ?, ?)";
 
-	private static final String FIND_JOBS = "SELECT ID, STATUS from BATCH_JOB where JOB_NAME = ? and "
+	private static final String FIND_JOBS = "SELECT ID, STATUS from %PREFIX%JOB where JOB_NAME = ? and "
 			+ "JOB_STREAM = ? and SCHEDULE_DATE = ? and JOB_RUN = ?";
 
-	private static final String UPDATE_JOB = "UPDATE BATCH_JOB set STATUS = ? where ID = ?";
+	private static final String UPDATE_JOB = "UPDATE %PREFIX%JOB set STATUS = ? where ID = ?";
 
-	private static final String GET_JOB_EXECUTION_COUNT = "SELECT count(ID) from BATCH_JOB_EXECUTION "
+	private static final String GET_JOB_EXECUTION_COUNT = "SELECT count(ID) from %PREFIX%JOB_EXECUTION "
 			+ "where JOB_ID = ?";
 
 	// Job Execution SqlStatements
-	private static final String UPDATE_JOB_EXECUTION = "UPDATE BATCH_JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
+	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ " STATUS = ? where ID = ?";
 
-	private static final String SAVE_JOB_EXECUTION = "INSERT into BATCH_JOB_EXECUTION(ID, JOB_ID, START_TIME, END_TIME, STATUS)"
+	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(ID, JOB_ID, START_TIME, END_TIME, STATUS)"
 			+ " values (?, ?, ?, ?, ?)";
 
-	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM BATCH_JOB_EXECUTION WHERE ID=?";
+	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE ID=?";
 
-	private static final String FIND_JOB_EXECUTIONS = "SELECT ID, START_TIME, END_TIME, STATUS from BATCH_JOB_EXECUTION"
+	private static final String FIND_JOB_EXECUTIONS = "SELECT ID, START_TIME, END_TIME, STATUS from %PREFIX%JOB_EXECUTION"
 			+ " where JOB_ID = ?";
 
 	private JdbcTemplate jdbcTemplate;
@@ -76,6 +84,18 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	private DataFieldMaxValueIncrementer jobIncrementer;
 
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
+
+	/**
+	 * Public setter for the table prefix property. This will be prefixed to all
+	 * the table names before queries are executed. Defaults to
+	 * {@value #DEFAULT_TABLE_PREFIX}.
+	 * 
+	 * @param tablePrefix
+	 *            the tablePrefix to set
+	 */
+	public void setTablePrefix(String tablePrefix) {
+		SqlJobDao.tablePrefix = tablePrefix;
+	}
 
 	/**
 	 * In this sql implementation a job id is obtained by asking the
@@ -94,12 +114,10 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		ScheduledJobIdentifier defaultJobId = getScheduledJobIdentifier(jobIdentifier);
 
 		Long jobId = new Long(jobIncrementer.nextLongValue());
-		Object[] parameters = new Object[] { jobId,
-				defaultJobId.getName(),
-				defaultJobId.getJobStream(),
-				defaultJobId.getScheduleDate(),
+		Object[] parameters = new Object[] { jobId, defaultJobId.getName(),
+				defaultJobId.getJobStream(), defaultJobId.getScheduleDate(),
 				new Long(defaultJobId.getJobRun()) };
-		jdbcTemplate.update(CREATE_JOB, parameters);
+		jdbcTemplate.update(getCreateJobQuery(), parameters);
 
 		JobInstance job = new JobInstance(jobId);
 		job.setIdentifier(jobIdentifier);
@@ -107,8 +125,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	}
 
 	/**
-	 * The BATCH_JOB table is queried for <strong>any</strong> jobs that match
-	 * the given identifier, adding them to a list via the RowMapper callback.
+	 * The job table is queried for <strong>any</strong> jobs that match the
+	 * given identifier, adding them to a list via the RowMapper callback.
 	 * 
 	 * @see JobDao#findJobs(JobIdentifier)
 	 * @throws IllegalArgumentException
@@ -135,7 +153,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 			}
 		};
 
-		return jdbcTemplate.query(FIND_JOBS, parameters, rowMapper);
+		return jdbcTemplate.query(getFindJobsQuery(), parameters, rowMapper);
 	}
 
 	/**
@@ -151,7 +169,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 		Object[] parameters = new Object[] { job.getStatus().toString(),
 				job.getId() };
-		jdbcTemplate.update(UPDATE_JOB, parameters);
+		jdbcTemplate.update(getUpdateJobQuery(), parameters);
 	}
 
 	/**
@@ -173,7 +191,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		Object[] parameters = new Object[] { jobExecution.getId(),
 				jobExecution.getJobId(), jobExecution.getStartTime(),
 				jobExecution.getEndTime(), jobExecution.getStatus().toString() };
-		jdbcTemplate.update(SAVE_JOB_EXECUTION, parameters);
+		jdbcTemplate.update(getSaveJobExecutionQuery(), parameters);
 	}
 
 	/**
@@ -201,14 +219,14 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		// Check if given JobExecution's Id already exists, if none is found it
 		// is invalid and
 		// an exception should be thrown.
-		if (jdbcTemplate.queryForInt(CHECK_JOB_EXECUTION_EXISTS,
+		if (jdbcTemplate.queryForInt(getCheckJobExecutionExistsQuery(),
 				new Object[] { jobExecution.getId() }) != 1) {
 			throw new NoSuchBatchDomainObjectException(
 					"Invalid JobExecution, ID " + jobExecution.getId()
 							+ " not found.");
 		}
 
-		jdbcTemplate.update(UPDATE_JOB_EXECUTION, parameters);
+		jdbcTemplate.update(getUpdateJobExecutionQuery(), parameters);
 	}
 
 	/**
@@ -222,7 +240,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 		Object[] parameters = new Object[] { jobId };
 
-		return jdbcTemplate.queryForInt(GET_JOB_EXECUTION_COUNT, parameters);
+		return jdbcTemplate.queryForInt(getJobExecutionCountQuery(), parameters);
 	}
 
 	public List findJobExecutions(JobInstance job) {
@@ -247,8 +265,44 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 		};
 
-		return jdbcTemplate.query(FIND_JOB_EXECUTIONS, new Object[] { jobId },
+		return jdbcTemplate.query(getFindJobExecutionsQuery(), new Object[] { jobId },
 				rowMapper);
+	}
+
+	private String getQuery(String base) {
+		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
+	}
+	
+	private String getCreateJobQuery() {
+		return getQuery(CREATE_JOB);
+	}
+	
+	private String getFindJobsQuery() {
+		return getQuery(FIND_JOBS);
+	}
+	
+	private String getUpdateJobQuery() {
+		return getQuery(UPDATE_JOB);
+	}
+	
+	private String getSaveJobExecutionQuery() {
+		return getQuery(SAVE_JOB_EXECUTION);
+	}
+	
+	private String getUpdateJobExecutionQuery() {
+		return getQuery(UPDATE_JOB_EXECUTION);
+	}
+	
+	private String getCheckJobExecutionExistsQuery() {
+		return getQuery(CHECK_JOB_EXECUTION_EXISTS);
+	}
+	
+	private String getJobExecutionCountQuery() {
+		return getQuery(GET_JOB_EXECUTION_COUNT);
+	}
+
+	private String getFindJobExecutionsQuery() {
+		return getQuery(FIND_JOB_EXECUTIONS);
 	}
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {

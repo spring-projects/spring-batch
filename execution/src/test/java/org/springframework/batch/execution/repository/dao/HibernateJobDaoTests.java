@@ -24,7 +24,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.util.ClassUtils;
 
-public class HibernateJobDaoTests extends SqlJobDaoTests {
+public class HibernateJobDaoTests extends BaseJobDaoTests {
 	
 	private SessionFactory sessionFactory;
 	
