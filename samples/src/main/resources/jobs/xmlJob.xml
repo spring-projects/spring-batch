@@ -22,7 +22,8 @@
 							<bean
 								class="org.springframework.batch.item.provider.InputSourceItemProvider">
 								<property name="inputSource">
-									<bean class="org.springframework.batch.io.xml.XmlInputSource">
+									<bean class="org.springframework.batch.io.xml.XmlInputSource" scope="step">
+										<aop:scoped-proxy/>
 										<property name="name" value="XmlFileInputSource" />
 										<property name="resource"
 											value="data/xmlJob/input/20070122.testStream.xmlFileStep.xml" />

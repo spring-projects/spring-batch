@@ -38,10 +38,20 @@
 		</property>
 	</bean>
 
-	<bean id="fileInputSource" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource">
+	<bean id="abstractInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
+		abstract="true">
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
 	</bean>
+
+	<!-- TODO: refactor this to use aop:scoped-proxy when SPR-3804 is fixed -->
+	<bean id="scopedInputTemplate" parent="abstractInputTemplate" autowire-candidate="false" scope="step"/>
+	<bean id="fileInputSource" class="org.springframework.aop.scope.ScopedProxyFactoryBean" autowire-candidate="false">
+		<property name="proxyTargetClass" value="true"/>
+		<property name="targetBeanName" value="scopedInputTemplate"/>
+	</bean>
+
+	<bean id="testInputTemplate" parent="abstractInputTemplate"/>
 
 	<bean id="fixedFileDescriptor" class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
 		<property name="names" value="ISIN, Quantity, Price, Customer" />

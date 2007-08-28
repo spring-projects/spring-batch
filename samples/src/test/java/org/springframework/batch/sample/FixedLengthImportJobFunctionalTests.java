@@ -51,8 +51,6 @@ public class FixedLengthImportJobFunctionalTests extends AbstractLifecycleSpring
 	 */
 	protected void validatePostConditions() {
 		
-		//ensure the input source is starts from the beginning
-		inputSource.close();
 		inputSource.open();
 		
 		jdbcTemplate.query("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", new RowCallbackHandler() {

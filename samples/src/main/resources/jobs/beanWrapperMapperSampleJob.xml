@@ -58,12 +58,16 @@
 
 	<!-- INFRASTRUCTURE SETUP -->
 
-	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource">
+	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
+		scope="step" >
+		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
 	</bean>
 	
-	<bean id="fileInputTemplate2" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource">
+	<bean id="fileInputTemplate2" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
+		scope="step">
+		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator2" />
 		<property name="tokenizer" ref="fixedFileDescriptor2" />
 <!--		<property name="validator" ref="fixedValidator" />-->
