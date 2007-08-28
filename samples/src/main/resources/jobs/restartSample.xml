@@ -32,6 +32,7 @@
 					</bean>
 				</property>
 				<property name="commitInterval" value="2" />
+				<property name="saveRestartData" value="true"/>
 			</bean>
 		</property>
 	</bean>
@@ -40,7 +41,9 @@
 
 	<!-- INFRASTRUCTURE SETUP -->
 
-	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource">
+	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
+		scope="step" >
+		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
 	</bean>

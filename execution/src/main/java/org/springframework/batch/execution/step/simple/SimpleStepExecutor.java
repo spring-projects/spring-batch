@@ -166,9 +166,9 @@ public class SimpleStepExecutor implements StepExecutor {
 			stepExecution.setStartTime(new Timestamp(System.currentTimeMillis()));
 			updateStatus(stepExecutionContext, BatchStatus.STARTED);
 
-			final boolean shouldPersistRestartData = ((AbstractStepConfiguration) configuration).isSaveRestartData();
+			final boolean saveRestartData = ((AbstractStepConfiguration) configuration).isSaveRestartData();
 
-			if (shouldPersistRestartData) {
+			if (saveRestartData) {
 				restoreFromRestartData(module, step.getRestartData());
 			}
 
@@ -222,7 +222,7 @@ public class SimpleStepExecutor implements StepExecutor {
 										}
 									}
 
-									if (shouldPersistRestartData) {
+									if (saveRestartData) {
 										step.setRestartData(getRestartData(module));
 										jobRepository.update(step);
 									}
