@@ -37,8 +37,9 @@ import org.springframework.util.ClassUtils;
  * jobs, to have an id for creating steps.
  * 
  * @author Lucas Ward
+ * @author Dave Syer
  */
-public class BaseStepDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
+public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
 
 	protected JobDao jobDao;
 

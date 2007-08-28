@@ -33,7 +33,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
 
-public class BaseJobDaoTests extends
+/**
+ * @author Dave Syer
+ *
+ */
+public abstract class AbstractJobDaoTests extends
 		AbstractTransactionalDataSourceSpringContextTests {
 
 	private static final String GET_JOB_EXECUTION = "SELECT JOB_ID, START_TIME, END_TIME, STATUS from "

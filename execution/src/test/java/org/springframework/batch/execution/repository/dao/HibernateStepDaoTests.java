@@ -24,7 +24,7 @@ import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.util.ClassUtils;
 
-public class HibernateStepDaoTests extends BaseStepDaoTests {
+public class HibernateStepDaoTests extends AbstractStepDaoTests {
 
 	private SessionFactory sessionFactory;
 

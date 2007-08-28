@@ -2,7 +2,7 @@ package org.springframework.batch.execution.repository.dao;
 
 import org.springframework.dao.DataAccessException;
 
-public class SqlStepDaoTests extends BaseStepDaoTests {
+public class SqlStepDaoTests extends AbstractStepDaoTests {
 
 	protected void onSetUpBeforeTransaction() throws Exception {
 		((SqlStepDao) stepDao).setTablePrefix(SqlJobDao.DEFAULT_TABLE_PREFIX);
