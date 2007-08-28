@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.util.ClassUtils;
 
 public class HibernateJobDaoTests extends SqlJobDaoTests {
@@ -48,20 +47,6 @@ public class HibernateJobDaoTests extends SqlJobDaoTests {
 		List executions = jdbcTemplate.queryForList("SELECT * FROM BATCH_JOB_EXECUTION where JOB_ID=?", new Object[] {job.getId()});
 		assertEquals(1, executions.size());
 		assertEquals(jobExecution.getEndTime(), ((Map)executions.get(0)).get("END_TIME"));
-	}
-	
-	public void testJobWithSimpleJobIdentifier() throws Exception {
-		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("Job1");
-		
-		// Create job.
-		job = jobDao.createJob(jobIdentifier);
-
-		sessionFactory.getCurrentSession().flush();
-		
-		List jobs = jdbcTemplate.queryForList("SELECT * FROM BATCH_JOB where ID=?", new Object[] {job.getId()});
-		assertEquals(1, jobs.size());
-		assertEquals(job.getName(), ((Map)jobs.get(0)).get("JOB_NAME"));
-		
 	}
 	
 }

@@ -34,12 +34,13 @@ import org.springframework.util.Assert;
 
 /**
  * SQL implementation of {@link JobDao}. Uses sequences (via Spring's
+ * 
  * @link DataFieldMaxValueIncrementer abstraction) to create all primary keys
- * before inserting a new row. Objects are checked to ensure all mandatory
- * fields to be stored are not null. If any are found to be null, an
- * IllegalArgumentException will be thrown. This could be left to JdbcTemplate,
- * however, the exception will be fairly vague, and fails to highlight which
- * field caused the exception.
+ *       before inserting a new row. Objects are checked to ensure all mandatory
+ *       fields to be stored are not null. If any are found to be null, an
+ *       IllegalArgumentException will be thrown. This could be left to
+ *       JdbcTemplate, however, the exception will be fairly vague, and fails to
+ *       highlight which field caused the exception.
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -83,21 +84,25 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	 * date) into an INSERT statement.
 	 * 
 	 * @see JobDao#createJob(JobIdentifier)
-	 * @throws IllegalArgumentException if any JobRuntimeInformation fields are
-	 * null.
+	 * @throws IllegalArgumentException
+	 *             if any JobRuntimeInformation fields are null.
 	 */
 	public JobInstance createJob(JobIdentifier jobIdentifier) {
 
-		ScheduledJobIdentifier jobRuntimeInformation = (ScheduledJobIdentifier) jobIdentifier;
-		validateJobRuntimeInformation(jobRuntimeInformation);
+		validateJobIdentifier(jobIdentifier);
+
+		ScheduledJobIdentifier defaultJobId = getScheduledJobIdentifier(jobIdentifier);
 
 		Long jobId = new Long(jobIncrementer.nextLongValue());
-		Object[] parameters = new Object[] { jobId, jobRuntimeInformation.getName(),
-				jobRuntimeInformation.getJobStream(), jobRuntimeInformation.getScheduleDate(),
-				new Long(jobRuntimeInformation.getJobRun()) };
+		Object[] parameters = new Object[] { jobId,
+				defaultJobId.getName(),
+				defaultJobId.getJobStream(),
+				defaultJobId.getScheduleDate(),
+				new Long(defaultJobId.getJobRun()) };
 		jdbcTemplate.update(CREATE_JOB, parameters);
 
 		JobInstance job = new JobInstance(jobId);
+		job.setIdentifier(jobIdentifier);
 		return job;
 	}
 
@@ -106,16 +111,18 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	 * the given identifier, adding them to a list via the RowMapper callback.
 	 * 
 	 * @see JobDao#findJobs(JobIdentifier)
-	 * @throws IllegalArgumentException if any JobRuntimeInformation fields are
-	 * null.
+	 * @throws IllegalArgumentException
+	 *             if any JobRuntimeInformation fields are null.
 	 */
 	public List findJobs(final JobIdentifier jobIdentifier) {
 
-		ScheduledJobIdentifier defaultJobId = (ScheduledJobIdentifier) jobIdentifier;
-		validateJobRuntimeInformation(defaultJobId);
+		validateJobIdentifier(jobIdentifier);
 
-		Object[] parameters = new Object[] { defaultJobId.getName(), defaultJobId.getJobStream(),
-				defaultJobId.getScheduleDate(), new Integer(defaultJobId.getJobRun()) };
+		ScheduledJobIdentifier defaultJobId = getScheduledJobIdentifier(jobIdentifier);
+
+		Object[] parameters = new Object[] { defaultJobId.getName(),
+				defaultJobId.getJobStream(), defaultJobId.getScheduleDate(),
+				new Integer(defaultJobId.getJobRun()) };
 
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -133,7 +140,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 	/**
 	 * @see JobDao#update(JobInstance)
-	 * @throws IllegalArgumentException if Job, Job.status, or job.id is null
+	 * @throws IllegalArgumentException
+	 *             if Job, Job.status, or job.id is null
 	 */
 	public void update(JobInstance job) {
 
@@ -141,7 +149,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		Assert.notNull(job.getStatus(), "Job Status cannot be Null");
 		Assert.notNull(job.getId(), "Job ID cannot be null");
 
-		Object[] parameters = new Object[] { job.getStatus().toString(), job.getId() };
+		Object[] parameters = new Object[] { job.getStatus().toString(),
+				job.getId() };
 		jdbcTemplate.update(UPDATE_JOB, parameters);
 	}
 
@@ -152,16 +161,18 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	 * via a SQL INSERT statement.
 	 * 
 	 * @see JobDao#save(JobExecution)
-	 * @throws IllegalArgumentException if jobExecution is null, as well as any
-	 * of it's fields to be persisted.
+	 * @throws IllegalArgumentException
+	 *             if jobExecution is null, as well as any of it's fields to be
+	 *             persisted.
 	 */
 	public void save(JobExecution jobExecution) {
 
 		validateJobExecution(jobExecution);
 
 		jobExecution.setId(new Long(jobExecutionIncrementer.nextLongValue()));
-		Object[] parameters = new Object[] { jobExecution.getId(), jobExecution.getJobId(),
-				jobExecution.getStartTime(), jobExecution.getEndTime(), jobExecution.getStatus().toString() };
+		Object[] parameters = new Object[] { jobExecution.getId(),
+				jobExecution.getJobId(), jobExecution.getStartTime(),
+				jobExecution.getEndTime(), jobExecution.getStatus().toString() };
 		jdbcTemplate.update(SAVE_JOB_EXECUTION, parameters);
 	}
 
@@ -177,20 +188,24 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 		validateJobExecution(jobExecution);
 
-		Object[] parameters = new Object[] { jobExecution.getStartTime(), jobExecution.getEndTime(),
-				jobExecution.getStatus().toString(), jobExecution.getId() };
+		Object[] parameters = new Object[] { jobExecution.getStartTime(),
+				jobExecution.getEndTime(), jobExecution.getStatus().toString(),
+				jobExecution.getId() };
 
 		if (jobExecution.getId() == null) {
-			throw new IllegalArgumentException("JobExecution ID cannot be null.  JobExecution must be saved "
-					+ "before it can be updated.");
+			throw new IllegalArgumentException(
+					"JobExecution ID cannot be null.  JobExecution must be saved "
+							+ "before it can be updated.");
 		}
 
 		// Check if given JobExecution's Id already exists, if none is found it
 		// is invalid and
 		// an exception should be thrown.
-		if (jdbcTemplate.queryForInt(CHECK_JOB_EXECUTION_EXISTS, new Object[] { jobExecution.getId() }) != 1) {
-			throw new NoSuchBatchDomainObjectException("Invalid JobExecution, ID " + jobExecution.getId()
-					+ " not found.");
+		if (jdbcTemplate.queryForInt(CHECK_JOB_EXECUTION_EXISTS,
+				new Object[] { jobExecution.getId() }) != 1) {
+			throw new NoSuchBatchDomainObjectException(
+					"Invalid JobExecution, ID " + jobExecution.getId()
+							+ " not found.");
 		}
 
 		jdbcTemplate.update(UPDATE_JOB_EXECUTION, parameters);
@@ -198,7 +213,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 	/**
 	 * @see JobDao#getJobExecutionCount(JobInstance)
-	 * @throws IllegalArgumentException if jobId is null.
+	 * @throws IllegalArgumentException
+	 *             if jobId is null.
 	 */
 	public int getJobExecutionCount(Long jobId) {
 
@@ -231,7 +247,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 		};
 
-		return jdbcTemplate.query(FIND_JOB_EXECUTIONS, new Object[] { jobId }, rowMapper);
+		return jdbcTemplate.query(FIND_JOB_EXECUTIONS, new Object[] { jobId },
+				rowMapper);
 	}
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -242,12 +259,14 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		this.jobIncrementer = jobIncrementer;
 	}
 
-	public void setJobExecutionIncrementer(DataFieldMaxValueIncrementer jobExecutionIncrementer) {
+	public void setJobExecutionIncrementer(
+			DataFieldMaxValueIncrementer jobExecutionIncrementer) {
 		this.jobExecutionIncrementer = jobExecutionIncrementer;
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 * 
 	 * Ensure jdbcTemplate and incrementers have been provided.
@@ -256,7 +275,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 		Assert.notNull(jdbcTemplate, "JdbcTemplate cannot be null");
 		Assert.notNull(jobIncrementer, "JobIncrementor cannot be null");
-		Assert.notNull(jobExecutionIncrementer, "JobExecutionIncrementer cannot be null");
+		Assert.notNull(jobExecutionIncrementer,
+				"JobExecutionIncrementer cannot be null");
 	}
 
 	/*
@@ -268,24 +288,49 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	private void validateJobExecution(JobExecution jobExecution) {
 
 		Assert.notNull(jobExecution);
-		Assert.notNull(jobExecution.getJobId(), "JobExecution Job-Id cannot be null.");
-		Assert.notNull(jobExecution.getStartTime(), "JobExecution start time cannot be null.");
-		Assert.notNull(jobExecution.getStatus(), "JobExecution status cannot be null.");
+		Assert.notNull(jobExecution.getJobId(),
+				"JobExecution Job-Id cannot be null.");
+		Assert.notNull(jobExecution.getStartTime(),
+				"JobExecution start time cannot be null.");
+		Assert.notNull(jobExecution.getStatus(),
+				"JobExecution status cannot be null.");
 	}
 
 	/*
 	 * Validate JobRuntimeInformation. Due to differing requirements, it is
 	 * acceptable for any field to be blank, however null fields may cause odd
 	 * and vague exception reports from the database driver.
-	 * 
-	 * TODO: remove dependency on ScheduledJobIdentifier
 	 */
-	private void validateJobRuntimeInformation(ScheduledJobIdentifier jobRuntimeInformation) {
+	private void validateJobIdentifier(JobIdentifier jobIdentifier) {
 
-		Assert.notNull(jobRuntimeInformation, "JobRuntimeInformation cannot be null.");
-		Assert.notNull(jobRuntimeInformation.getName(), "JobRuntimeInformation name cannot be null.");
-		Assert.notNull(jobRuntimeInformation.getJobStream(), "JobRuntimeInformation JobStream cannot be null.");
-		Assert.notNull(jobRuntimeInformation.getScheduleDate(), "JobRuntimeInformation ScheduleDate cannot be null.");
+		Assert.notNull(jobIdentifier, "JobRuntimeInformation cannot be null.");
+		Assert.notNull(jobIdentifier.getName(),
+				"JobRuntimeInformation name cannot be null.");
+
+		if (jobIdentifier instanceof ScheduledJobIdentifier) {
+			ScheduledJobIdentifier jobRuntimeInformation = (ScheduledJobIdentifier) jobIdentifier;
+
+			Assert.notNull(jobRuntimeInformation.getJobStream(),
+					"JobRuntimeInformation JobStream cannot be null.");
+			Assert.notNull(jobRuntimeInformation.getScheduleDate(),
+					"JobRuntimeInformation ScheduleDate cannot be null.");
+		}
+	}
+
+	/**
+	 * Convert a {@link JobIdentifier} to a {@link ScheduledJobIdentifier} by
+	 * supplying additional fields with null values, as necessary.
+	 * 
+	 * @param jobIdentifier
+	 *            a {@link JobIdentifier}
+	 * @return a {@link ScheduledJobIdentifier} with the same name
+	 */
+	private ScheduledJobIdentifier getScheduledJobIdentifier(
+			JobIdentifier jobIdentifier) {
+		if (jobIdentifier instanceof ScheduledJobIdentifier) {
+			return (ScheduledJobIdentifier) jobIdentifier;
+		}
+		return new ScheduledJobIdentifier(jobIdentifier.getName());
 	}
 
 }

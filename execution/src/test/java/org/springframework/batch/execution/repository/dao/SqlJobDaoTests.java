@@ -21,33 +21,38 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
+import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
 
-public class SqlJobDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
+public class SqlJobDaoTests extends
+		AbstractTransactionalDataSourceSpringContextTests {
 
-	private static final String GET_JOB_EXECUTION = "SELECT JOB_ID, START_TIME, END_TIME, STATUS from " +
-			"BATCH_JOB_EXECUTION where ID = ?";
-	
+	private static final String GET_JOB_EXECUTION = "SELECT JOB_ID, START_TIME, END_TIME, STATUS from "
+			+ "BATCH_JOB_EXECUTION where ID = ?";
+
 	protected JobDao jobDao;
-	
+
 	protected ScheduledJobIdentifier jobRuntimeInformation;
-	
+
 	protected JobInstance job;
-	
+
 	protected JobExecution jobExecution;
-	
-	protected Timestamp jobExecutionStartTime = new Timestamp(System.currentTimeMillis());
-	
+
+	protected Timestamp jobExecutionStartTime = new Timestamp(System
+			.currentTimeMillis());
+
 	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "sql-dao-test.xml") };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(
+				getClass(), "sql-dao-test.xml") };
 	}
 
 	/*
@@ -57,17 +62,18 @@ public class SqlJobDaoTests extends AbstractTransactionalDataSourceSpringContext
 	public void setJobRepositoryDao(JobDao jobRepositoryDao) {
 		this.jobDao = jobRepositoryDao;
 	}
-		
+
 	protected void onSetUpInTransaction() throws Exception {
 		jobRuntimeInformation = new ScheduledJobIdentifier("Job1");
 		jobRuntimeInformation.setName("Job1");
 		jobRuntimeInformation.setJobStream("TestStream");
 		jobRuntimeInformation.setJobRun(1);
-		jobRuntimeInformation.setScheduleDate(new SimpleDateFormat("yyyyMMdd").parse("20070505"));
-		
+		jobRuntimeInformation.setScheduleDate(new SimpleDateFormat("yyyyMMdd")
+				.parse("20070505"));
+
 		// Create job.
 		job = jobDao.createJob(jobRuntimeInformation);
-		
+
 		// Create an execution
 		jobExecutionStartTime = new Timestamp(System.currentTimeMillis());
 		jobExecution = new JobExecution(job.getId());
@@ -75,49 +81,53 @@ public class SqlJobDaoTests extends AbstractTransactionalDataSourceSpringContext
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobDao.save(jobExecution);
 	}
-	
+
 	public void testVersionIsNotNullForJob() throws Exception {
-		int version = jdbcTemplate.queryForInt("select version from BATCH_JOB where ID="+job.getId());
-		assertEquals(0, version);
-	}
-	
-	public void testVersionIsNotNullForJobExecution() throws Exception {
-		int version = jdbcTemplate.queryForInt("select version from BATCH_JOB_EXECUTION where ID="+jobExecution.getId());
+		int version = jdbcTemplate
+				.queryForInt("select version from BATCH_JOB where ID="
+						+ job.getId());
 		assertEquals(0, version);
 	}
 
-	public void testFindNonExistentJob(){
+	public void testVersionIsNotNullForJobExecution() throws Exception {
+		int version = jdbcTemplate
+				.queryForInt("select version from BATCH_JOB_EXECUTION where ID="
+						+ jobExecution.getId());
+		assertEquals(0, version);
+	}
+
+	public void testFindNonExistentJob() {
 		// No job should be found since it hasn't been created.
 		List jobs = jobDao.findJobs(new ScheduledJobIdentifier("Job2"));
 		assertTrue(jobs.size() == 0);
 	}
-	
-	public void testFindJob(){
-		
+
+	public void testFindJob() {
+
 		List jobs = jobDao.findJobs(jobRuntimeInformation);
 		assertTrue(jobs.size() == 1);
 		JobInstance tempJob = (JobInstance) jobs.get(0);
 		assertTrue(job.equals(tempJob));
 		assertEquals(jobRuntimeInformation, tempJob.getIdentifier());
 	}
-	
-	public void testFindJobWithNullRuntime(){
-		
+
+	public void testFindJobWithNullRuntime() {
+
 		ScheduledJobIdentifier runtimeInformation = null;
-		
-		try{
+
+		try {
 			jobDao.findJobs(runtimeInformation);
 			fail();
-		}catch(IllegalArgumentException ex){
-			//expected
+		} catch (IllegalArgumentException ex) {
+			// expected
 		}
 	}
-	
-	public void testUpdateJob(){
+
+	public void testUpdateJob() {
 		// Update the returned job with a new status
 		job.setStatus(BatchStatus.COMPLETED);
 		jobDao.update(job);
-		
+
 		// The job just updated should be found, with the saved status.
 		List jobs = jobDao.findJobs(jobRuntimeInformation);
 		assertTrue(jobs.size() == 1);
@@ -125,25 +135,25 @@ public class SqlJobDaoTests extends AbstractTransactionalDataSourceSpringContext
 		assertTrue(job.equals(tempJob));
 		assertEquals(tempJob.getStatus(), BatchStatus.COMPLETED);
 	}
-	
-	public void testUpdateJobWithNullId(){
-		
+
+	public void testUpdateJobWithNullId() {
+
 		JobInstance testJob = new JobInstance(null);
-		try{
+		try {
 			jobDao.update(testJob);
 			fail();
-		}catch(IllegalArgumentException ex){
-			//expected
+		} catch (IllegalArgumentException ex) {
+			// expected
 		}
 	}
-	
-	public void testUpdateNullJob(){
-		
-		JobInstance testJob = null;	
-		try{
+
+	public void testUpdateNullJob() {
+
+		JobInstance testJob = null;
+		try {
 			jobDao.update(testJob);
-		}catch(IllegalArgumentException ex){
-			//expected
+		} catch (IllegalArgumentException ex) {
+			// expected
 		}
 	}
 
@@ -152,71 +162,90 @@ public class SqlJobDaoTests extends AbstractTransactionalDataSourceSpringContext
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		jobExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
 		jobDao.update(jobExecution);
-		
+
 		List executions = retrieveJobExecution(jobExecution.getId());
 		assertEquals(executions.size(), 1);
-		assertEquals(jobExecution, ((JobExecution)executions.get(0)));
+		assertEquals(jobExecution, ((JobExecution) executions.get(0)));
 	}
-	
-	public void testUpdateInvalidJobExecution(){
-		
+
+	public void testUpdateInvalidJobExecution() {
+
 		JobExecution execution = new JobExecution(job.getId());
-		//id is invalid
+		// id is invalid
 		execution.setId(new Long(29432));
-		try{
+		try {
 			jobDao.update(execution);
 			fail();
-		}catch(NoSuchBatchDomainObjectException ex){
-			//expected
+		} catch (NoSuchBatchDomainObjectException ex) {
+			// expected
 		}
 	}
-	
-	public void testUpdateNullIdJobExection(){
-		
+
+	public void testUpdateNullIdJobExection() {
+
 		JobExecution execution = new JobExecution(job.getId());
-		try{
+		try {
 			jobDao.update(execution);
 			fail();
-		}catch(IllegalArgumentException ex){
-			//expected
+		} catch (IllegalArgumentException ex) {
+			// expected
 		}
 	}
-	
-	public void testIncrementExecutionCount(){
-		
+
+	public void testIncrementExecutionCount() {
+
 		// 1 JobExection already added in setup
 		assertEquals(jobDao.getJobExecutionCount(job.getId()), 1);
-		
+
 		// Save new JobExecution for same job
 		JobExecution testJobExecution = new JobExecution(job.getId());
 		jobDao.save(testJobExecution);
-		//JobExecutionCount should be incremented by 1
+		// JobExecutionCount should be incremented by 1
 		assertEquals(jobDao.getJobExecutionCount(job.getId()), 2);
 	}
-	
-	public void testZeroExecutionCount(){
-		
-		JobInstance testJob = jobDao.createJob(new ScheduledJobIdentifier("TestJob"));
-		//no jobExecutions saved for new job, count should be 0
+
+	public void testZeroExecutionCount() {
+
+		JobInstance testJob = jobDao.createJob(new ScheduledJobIdentifier(
+				"TestJob"));
+		// no jobExecutions saved for new job, count should be 0
 		assertEquals(jobDao.getJobExecutionCount(testJob.getId()), 0);
 	}
-	
-	private List retrieveJobExecution(final Long id){
-		
-		RowMapper rowMapper = new RowMapper(){
+
+	public void testJobWithSimpleJobIdentifier() throws Exception {
+		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("Job1");
+
+		// Create job.
+		job = jobDao.createJob(jobIdentifier);
+
+		// sessionFactory.getCurrentSession().flush();
+
+		List jobs = jdbcTemplate.queryForList(
+				"SELECT * FROM BATCH_JOB where ID=?", new Object[] { job
+						.getId() });
+		assertEquals(1, jobs.size());
+		assertEquals(job.getName(), ((Map) jobs.get(0)).get("JOB_NAME"));
+
+	}
+
+	private List retrieveJobExecution(final Long id) {
+
+		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-				
-				JobExecution execution = new JobExecution(new Long(rs.getLong(1)));
+
+				JobExecution execution = new JobExecution(new Long(rs
+						.getLong(1)));
 				execution.setStartTime(rs.getTimestamp(2));
 				execution.setEndTime(rs.getTimestamp(3));
 				execution.setStatus(BatchStatus.getStatus(rs.getString(4)));
 				execution.setId(id);
-				
+
 				return execution;
 			}
 		};
-		
-		return jdbcTemplate.query(GET_JOB_EXECUTION, new Object[]{id}, rowMapper);
+
+		return jdbcTemplate.query(GET_JOB_EXECUTION, new Object[] { id },
+				rowMapper);
 	}
 
 }
