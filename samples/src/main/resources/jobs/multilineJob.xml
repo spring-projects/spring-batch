@@ -11,7 +11,6 @@
 	</bean>
 
 	<bean id="jobConfiguration" parent="simpleJob">
-		<property name="name" value="multilineJob" />
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
 				<constructor-arg>
@@ -76,5 +75,11 @@
 		<property name="names" value="ISIN,Quantity,Price,Customer" />
 		<property name="lengths" value="12,3,5,9" />
 	</bean>
+	
+	<bean parent="customEditorConfigurer"/>
+
+	<!-- register the step scope with the application context -->
+	<bean class="org.springframework.batch.execution.scope.StepScope" />
+	
 
 </beans>

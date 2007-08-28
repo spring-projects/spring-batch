@@ -16,10 +16,9 @@
 	</bean>
 
 	<bean id="jobConfiguration" parent="simpleJob">
-		<property name="name" value="multilineOrderJob" />
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
-				<constructor-arg>
+				<property name="tasklet">
 					<bean
 						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 						<property name="itemProvider">
@@ -49,7 +48,7 @@
 							</bean>
 						</property>
 					</bean>
-				</constructor-arg>
+				</property>
 			</bean>
 		</property>
 	</bean>
@@ -148,4 +147,10 @@
 	<bean id="fileOutputLocator" class="org.springframework.core.io.FileSystemResource">
 		<constructor-arg type="java.lang.String" value="20070122.teststream.multilineOrderStep.TEMP.txt" />
 	</bean>
+	
+	<bean parent="customEditorConfigurer"/>
+
+	<!-- register the step scope with the application context -->
+	<bean class="org.springframework.batch.execution.scope.StepScope" />
+	
 </beans>

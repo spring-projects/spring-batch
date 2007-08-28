@@ -29,7 +29,7 @@ import org.springframework.beans.factory.DisposableBean;
  * 
  * @author Dave Syer
  */
-public class FlatFileOrderWriter implements OrderWriter, DisposableBean {
+public class FlatFileOrderWriter implements OrderWriter {
     /**
      * Takes care of writing to a file
      */
@@ -56,24 +56,6 @@ public class FlatFileOrderWriter implements OrderWriter, DisposableBean {
         outputSource.write(converter.convert(data));
     }
     
-    public void open() {
-    	outputSource.open();
-    }
-    
-    public void close() {
-    	outputSource.close();
-    }
-
-	/**
-	 * Calls close to ensure that bean factories can close and always release
-	 * resources.
-	 * 
-	 * @see org.springframework.beans.factory.DisposableBean#destroy()
-	 */
-	public void destroy() throws Exception {
-		close();
-	}
-
 	public void setOutputSource(OutputSource outputSource) {
         this.outputSource = outputSource;
     }

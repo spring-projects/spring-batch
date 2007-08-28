@@ -116,4 +116,9 @@
 		</property>
 	</bean>
 
+	
+
+	<!-- register the step scope with the application context -->
+	<bean class="org.springframework.batch.execution.scope.StepScope" />
+	
 </beans>

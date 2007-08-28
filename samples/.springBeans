@@ -20,23 +20,8 @@
 		<config>src/main/resources/jobs/adhocLoopJob.xml</config>
 		<config>src/main/resources/jobs/infiniteLoopJob.xml</config>
 		<config>src/main/resources/data-source-context-init.xml</config>
-		<config>src/main/resources/jobs/compositeProcessorSample.xml</config>
 	</configs>
 	<configSets>
-		<configSet>
-			<name><![CDATA[multilineOrder]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>/execution/src/test/resources/simple-container-definition.xml</config>
-				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/jobs/multilineOrderInputDescriptors.xml</config>
-				<config>src/main/resources/jobs/multilineOrderIo.xml</config>
-				<config>src/main/resources/jobs/multilineOrderJob.xml</config>
-				<config>src/main/resources/jobs/multilineOrderOutputDescriptors.xml</config>
-			</configs>
-		</configSet>
 		<configSet>
 			<name><![CDATA[adhocLoop]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
@@ -131,10 +116,23 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
-				<config>src/main/resources/jobs/compositeProcessorSample.xml</config>
 				<config>src/main/resources/simple-container-definition.xml</config>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[multilineOrder]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/multilineOrderInputDescriptors.xml</config>
+				<config>src/main/resources/jobs/multilineOrderIo.xml</config>
+				<config>src/main/resources/jobs/multilineOrderJob.xml</config>
+				<config>src/main/resources/jobs/multilineOrderOutputDescriptors.xml</config>
+				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 	</configSets>

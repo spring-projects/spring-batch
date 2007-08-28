@@ -46,24 +46,6 @@ public class FlatFileOrderWriterTests extends TestCase {
 		writer.setOutputSource(output);
 	}
 
-	public void testOpen() {
-		
-		//call tested method
-		writer.open();
-		//verify method calls
-		assertEquals(1, list.size());
-
-	}
-	
-	public void testClose() {
-		
-		//call tested method
-		writer.close();
-		//verify method calls
-		assertEquals(1, list.size());
-
-	}
-
 	public void testWrite() {
 		
 		//Create and set-up Order

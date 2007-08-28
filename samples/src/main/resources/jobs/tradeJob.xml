@@ -125,4 +125,8 @@
 			value="20070122.testStream.CustomerReportStep.TEMP.txt" />
 	</bean>
 
+	<!-- register the step scope with the application context -->
+	<bean class="org.springframework.batch.execution.scope.StepScope" />
+	
+
 </beans>

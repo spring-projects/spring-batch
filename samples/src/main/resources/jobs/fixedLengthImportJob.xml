@@ -12,10 +12,9 @@
 	</bean>
 
 	<bean id="jobConfiguration" parent="simpleJob">
-		<property name="name" value="fixedLengthImportJob" />
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
-				<constructor-arg>   
+				<property name="tasklet">   
 					<bean
 						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 						<property name="itemProvider">
@@ -32,7 +31,7 @@
 							</bean>
 						</property>
 					</bean>
-				</constructor-arg>
+				</property>
 			</bean>
 		</property>
 	</bean>
@@ -92,4 +91,9 @@
 
 	<bean id="fieldSetMapper" class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
 
+	<bean parent="customEditorConfigurer"/>
+
+	<!-- register the step scope with the application context -->
+	<bean class="org.springframework.batch.execution.scope.StepScope" />
+	
 </beans>

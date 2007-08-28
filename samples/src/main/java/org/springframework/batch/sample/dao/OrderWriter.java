@@ -16,13 +16,12 @@
 
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.sample.domain.Order;
 
 /**
  * Interface for writing <code>Order</code> objects.
  */
-public interface OrderWriter extends ResourceLifecycle {
+public interface OrderWriter {
 
     public void write(Order order);
     

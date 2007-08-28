@@ -80,7 +80,6 @@
 
 	<bean id="simpleJob" class="org.springframework.batch.core.configuration.JobConfiguration"
 		abstract="true">
-		<property name="name" value="simpleJob" />
 		<property name="restartable" value="true" />
 	</bean>
 

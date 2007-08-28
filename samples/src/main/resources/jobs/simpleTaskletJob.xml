@@ -11,7 +11,6 @@
 	</bean>
 
 	<bean id="jobConfiguration" parent="simpleJob">
-		<property name="name" value="simpleTaskletJob" />
 		<property name="steps">
 			<list>
 				<bean id="step1" parent="simpleStep">

@@ -35,7 +35,7 @@ public class CompositeProcessorSampleFunctionalTests extends AbstractLifecycleSp
 	
 //	@Override
 	protected String[] getConfigLocations() {
-		return new String[]{"jobs/compositeProcessorSample.xml"};
+		return new String[]{"jobs/compositeProcessorSampleJob.xml"};
 	}
 
 	/* (non-Javadoc)
