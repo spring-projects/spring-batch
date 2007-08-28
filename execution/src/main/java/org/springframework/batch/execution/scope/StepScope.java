@@ -20,6 +20,7 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
+import org.springframework.core.Ordered;
 
 /**
  * Scope for step context. Objects in this scope with &lt;aop:scoped-proxy/&gt;
@@ -30,7 +31,17 @@ import org.springframework.beans.factory.config.Scope;
  * 
  */
 public class StepScope implements Scope,
-		BeanFactoryPostProcessor {
+		BeanFactoryPostProcessor, Ordered {
+
+	private int order = Ordered.LOWEST_PRECEDENCE;
+
+	public void setOrder(int order) {
+		this.order = order;
+	}
+
+	public int getOrder() {
+		return order;
+	}
 
 	/**
 	 * Context key for clients to use for conversation identifier.
