@@ -21,7 +21,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
-import org.springframework.batch.execution.JobExecutorFacade;
+import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
