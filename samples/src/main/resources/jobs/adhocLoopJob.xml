@@ -32,7 +32,7 @@
 		</property>
 	</bean>
 
-	<bean id="batchBootstrap"
+	<bean id="jobLauncher"
 		class="org.springframework.batch.execution.bootstrap.TaskExecutorJobLauncher">
 		<property name="jobExecutorFacade" ref="jobExecutorFacadeOverride" />
 		<property name="taskExecutor">
@@ -75,9 +75,9 @@
 		<property name="beans">
 			<map>
 				<entry
-					key="spring:service=lifecycle,bean=batchBootstrap">
+					key="spring:service=lifecycle,bean=jobLauncher">
 					<bean class="org.springframework.aop.framework.ProxyFactoryBean">
-						<property name="target" ref="batchBootstrap"/>
+						<property name="target" ref="jobLauncher"/>
 						<property name="interfaces">
 							<list>
 								<value>org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher</value>
@@ -95,7 +95,7 @@
 				<property name="interfaceMappings">
 					<map>
 						<entry
-							key="spring:service=lifecycle,bean=batchBootstrap"
+							key="spring:service=lifecycle,bean=jobLauncher"
 							value="org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher" />
 					</map>
 				</property>
