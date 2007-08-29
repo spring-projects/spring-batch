@@ -105,7 +105,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		processingThread.interrupt();
 
 		int count = 0;
-		while (processingThread.isAlive() && count < 150) {
+		while (processingThread.isAlive() && count < 1000) {
 			Thread.sleep(20);
 			count++;
 		}
