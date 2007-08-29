@@ -364,7 +364,20 @@
 						<link>
 							http://jakarta.apache.org/velocity/api/
 						</link>
+						<link>
+							http://static.springframework.org/spring/docs/2.1.x/api/
+						</link>
+						<link>
+							http://static.springframework.org/spring-batch/spring-batch-infrastructure/apidocs/
+						</link>
+						<link>
+							http://static.springframework.org/spring-batch/spring-batch-core/apidocs/
+						</link>
+						<link>
+							http://static.springframework.org/spring-batch/spring-batch-execution/apidocs/
+						</link>
 					</links>
+					<aggregate>true</aggregate>
 				</configuration>
 			</plugin>
 		</plugins>
