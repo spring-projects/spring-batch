@@ -30,7 +30,7 @@
 			<item name="Building" href="building.html"/>
 			<item name="FAQ" href="faq.html"/>
 			<item name="Changelog" href="changelog.html"/>
-			<item name="Downloads" href="snapshots.html"/>
+			<item name="Downloads" href="downloads.html"/>
 		</menu>
 		<menu ref="modules"/>
 		<menu ref="reports"/>

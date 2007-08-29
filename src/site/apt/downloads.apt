@@ -1,0 +1,46 @@
+                                    ---------
+                                    Downloads
+                                    ---------
+                                    Dave Syer
+                                    ------
+                                    August 2007
+
+Milestone Builds
+
+  These builds are provided for evaluation and community feedback.  They will have a release identifier ending in "-mX" where X is the milestone number.  The curent release is <<1.0-m2>>.
+	
+  The builds consist of a set of jar artifacts deloyed to a Maven2 repository. To use it, just add the following repository to your POM:
+
++---------------
+<repository>
+    <id>spring-s3</id>
+    <name>Springframework Maven MILESTONE Repository</name>
+    <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+</repository>
++---------------
+
+  Individual dependencies can then by added like so:
+
++---------------
+<dependency>
+    <groupId>org.springframework.batch</groupId>
+    <artifactId>spring-batch-core</artifactId>
+    <version>1.0-m2</version>
+</dependency>
++---------------
+
+  The Execution module has dependencies on Core and Infrastructure, so you only need to include that to build and run jobs with Spring Batch.  I.e.
+
++---------------
+<dependency>
+    <groupId>org.springframework.batch</groupId>
+    <artifactId>spring-batch-execution</artifactId>
+    <version>1.0-m2</version>
+</dependency>
++---------------
+
+  Additionally, you can browse the repository with a web browser {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}here}}.
+
+Snapshot Builds
+
+  Nightly snapshots are also available through the same process with slightly different URLs.  See {{{snapshots.html}here}} for details.
