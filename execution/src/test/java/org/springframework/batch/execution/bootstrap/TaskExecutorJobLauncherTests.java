@@ -48,7 +48,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		launcher
-				.setJobRuntimeInformationFactory(new SimpleJobIdentifierFactory());
+				.setJobIdentifierFactory(new SimpleJobIdentifierFactory());
 	}
 
 	public void testStopContainer() throws Exception {
@@ -57,7 +57,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 		launcher.setTaskExecutor(new SimpleAsyncTaskExecutor());
 
 		InterruptibleContainer container = new InterruptibleContainer();
-		launcher.setBatchContainer(container);
+		launcher.setJobExecutorFacade(container);
 		launcher.setJobConfigurationName(new JobConfiguration("foo").getName());
 
 		launcher.run();
@@ -110,7 +110,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 				.createControl(JobExecutorFacadeWithStatistics.class);
 		JobExecutorFacadeWithStatistics batchContainer = (JobExecutorFacadeWithStatistics) control
 				.getMock();
-		launcher.setBatchContainer(batchContainer);
+		launcher.setJobExecutorFacade(batchContainer);
 
 		Properties properties = PropertiesConverter.stringToProperties("a=b");
 		control.expectAndReturn(batchContainer.getStatistics(), properties);
@@ -125,7 +125,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 				.createControl(JobExecutorFacade.class);
 		JobExecutorFacade batchContainer = (JobExecutorFacade) control
 				.getMock();
-		launcher.setBatchContainer(batchContainer);
+		launcher.setJobExecutorFacade(batchContainer);
 
 		Properties properties = new Properties();
 		control.replay();
@@ -176,7 +176,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 				.createControl(JobExecutorFacade.class);
 		JobExecutorFacade batchContainer = (JobExecutorFacade) control
 				.getMock();
-		launcher.setBatchContainer(batchContainer);
+		launcher.setJobExecutorFacade(batchContainer);
 		SimpleJobIdentifier jobRuntimeInformation = new SimpleJobIdentifier(
 				"spam");
 		batchContainer.start(jobRuntimeInformation);

@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.repeat;
 
+import java.io.Serializable;
+
 /**
  * Value object used to carry information about the status of a
  * {@link RepeatOperations}.
@@ -22,7 +24,7 @@ package org.springframework.batch.repeat;
  * @author Dave Syer
  * 
  */
-public class ExitStatus {
+public class ExitStatus implements Serializable {
 
 	/**
 	 * Convenient constant value for when we detect that processing is underway.
@@ -118,6 +120,16 @@ public class ExitStatus {
 	public String toString() {
 		return "continuable=" + continuable + ";exitCode=" + exitCode
 				+ ";exitDescription=" + exitDescription;
+	}
+
+	/**
+	 * Add an exit code to an existing {@link ExitStatus}.
+	 * 
+	 * @param code the code to add
+	 * @return a new {@link ExitStatus} with the same properties but a new exit code.
+	 */
+	public ExitStatus addExitCode(String code) {
+		return new ExitStatus(continuable, code, exitDescription);
 	}
 
 }

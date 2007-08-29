@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -13,16 +14,18 @@
 
 	<bean
 		class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
-		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry" />
+		<property name="jobConfigurationRegistry"
+			ref="jobConfigurationRegistry" />
 	</bean>
 
-	<bean id="batchContainerOverride" parent="jobExecutorFacade">
+	<bean id="jobExecutorFacadeOverride" parent="jobExecutorFacade">
 		<property name="jobExecutor">
 			<bean parent="jobExecutor">
 				<property name="stepExecutorFactory">
 					<bean
 						class="org.springframework.batch.execution.step.DefaultStepExecutorFactory">
-						<property name="stepExecutorName" value="notifyingStepExecutor" />
+						<property name="stepExecutorName"
+							value="notifyingStepExecutor" />
 					</bean>
 				</property>
 			</bean>
@@ -31,18 +34,22 @@
 
 	<bean id="batchBootstrap"
 		class="org.springframework.batch.execution.bootstrap.TaskExecutorJobLauncher">
-		<property name="batchContainer" ref="batchContainerOverride" />
+		<property name="jobExecutorFacade" ref="jobExecutorFacadeOverride" />
 		<property name="taskExecutor">
-			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+			<bean
+				class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
 		</property>
 		<property name="autoStart" value="false" />
+		<property name="jobConfigurationName" value="jobConfiguration"/>
 	</bean>
 
 	<bean id="jobConfiguration" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
 				<constructor-arg>
-					<bean id="module" class="org.springframework.batch.sample.module.InfiniteLoopTasklet" scope="step">
+					<bean id="module"
+						class="org.springframework.batch.sample.module.InfiniteLoopTasklet"
+						scope="step">
 						<aop:scoped-proxy />
 					</bean>
 				</constructor-arg>
@@ -51,9 +58,11 @@
 		</property>
 	</bean>
 
-	<bean id="notifyingStepExecutor" parent="stepExecutor" scope="prototype">
+	<bean id="notifyingStepExecutor" parent="stepExecutor"
+		scope="prototype">
 		<property name="stepOperations">
-			<bean class="org.springframework.batch.repeat.support.RepeatTemplate">
+			<bean
+				class="org.springframework.batch.repeat.support.RepeatTemplate">
 				<property name="interceptor">
 					<bean
 						class="org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatInterceptor" />
@@ -65,19 +74,45 @@
 	<bean class="org.springframework.jmx.export.MBeanExporter">
 		<property name="beans">
 			<map>
-				<entry key="spring:service=lifecycle,bean=batchBootstrap">
-					<ref bean="batchBootstrap" />
+				<entry
+					key="spring:service=lifecycle,bean=batchBootstrap">
+					<bean class="org.springframework.aop.framework.ProxyFactoryBean">
+						<property name="target" ref="batchBootstrap"/>
+						<property name="interfaces">
+							<list>
+								<value>org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher</value>
+								<value>org.springframework.jmx.export.notification.NotificationPublisherAware</value>
+							</list>
+						</property>
+						<property name="interceptorNames" value="convertingMethodInterceptor"/>
+					</bean>
 				</entry>
 			</map>
 		</property>
+		<property name="assembler">
+			<bean
+				class="org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler">
+				<property name="interfaceMappings">
+					<map>
+						<entry
+							key="spring:service=lifecycle,bean=batchBootstrap"
+							value="org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher" />
+					</map>
+				</property>
+			</bean>
+		</property>
 	</bean>
+	
+	<bean id="convertingMethodInterceptor" class="org.springframework.batch.execution.bootstrap.support.TypeConverterMethodInterceptor"/>
 
-	<bean id="logAdvice" class="org.springframework.batch.sample.advice.MethodExecutionLogAdvice" />
+	<bean id="logAdvice"
+		class="org.springframework.batch.sample.advice.MethodExecutionLogAdvice" />
 
 	<aop:config>
 		<aop:aspect ref="logAdvice">
 
-			<aop:after pointcut="execution( * org.springframework.batch.sample..InfiniteLoopTasklet+.execute(..))"
+			<aop:after
+				pointcut="execution( * org.springframework.batch.sample..InfiniteLoopTasklet+.execute(..))"
 				method="doBasicLogging" />
 
 		</aop:aspect>

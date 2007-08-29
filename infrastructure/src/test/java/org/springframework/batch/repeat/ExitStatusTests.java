@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.repeat;
 
+import org.apache.commons.lang.SerializationUtils;
+
 import junit.framework.TestCase;
 
 /**
@@ -66,4 +68,26 @@ public class ExitStatusTests extends TestCase {
 		assertFalse(ExitStatus.CONTINUABLE.and(ExitStatus.FINISHED.isContinuable()).isContinuable());
 	}
 
+	public void testAddExitCode() throws Exception {
+		ExitStatus status = ExitStatus.CONTINUABLE.addExitCode("FOO");
+		assertTrue(ExitStatus.CONTINUABLE!=status);
+		assertTrue(status.isContinuable());
+		assertEquals("FOO", status.getExitCode());
+	}
+
+	public void testAddExitCodeWithDescription() throws Exception {
+		ExitStatus status = new ExitStatus(true, "BAR", "Bar").addExitCode("FOO");
+		assertEquals("FOO", status.getExitCode());
+		assertEquals("Bar", status.getExitDescription());
+	}
+	
+	public void testSerializable() throws Exception {
+		ExitStatus status = ExitStatus.CONTINUABLE.addExitCode("FOO");
+		byte[] bytes = SerializationUtils.serialize(status);
+		Object object = SerializationUtils.deserialize(bytes);
+		assertTrue(object instanceof ExitStatus);
+		ExitStatus restored = (ExitStatus) object;
+		assertTrue(restored.isContinuable());
+		assertEquals("FOO", restored.getExitCode());
+	}
 }

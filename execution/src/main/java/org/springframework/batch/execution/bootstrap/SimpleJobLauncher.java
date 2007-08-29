@@ -58,7 +58,7 @@ public class SimpleJobLauncher implements JobLauncher {
 	/**
 	 * Check that mandatory properties are set.
 	 * 
-	 * @see #setBatchContainer(JobExecutorFacade)
+	 * @see #setJobExecutorFacade(JobExecutorFacade)
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
@@ -124,7 +124,7 @@ public class SimpleJobLauncher implements JobLauncher {
 	 * default name is taken from the enclosed {@link JobConfiguration}.
 	 * @throws NoSuchJobConfigurationException if the job configuration cannot be located
 	 * 
-	 * @see #setJobRuntimeInformationFactory(JobIdentifierFactory)
+	 * @see #setJobIdentifierFactory(JobIdentifierFactory)
 	 * @see org.springframework.context.Lifecycle#start()
 	 */
 	public ExitStatus run(){

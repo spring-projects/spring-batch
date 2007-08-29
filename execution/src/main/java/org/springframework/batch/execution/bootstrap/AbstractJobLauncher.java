@@ -73,7 +73,7 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * @param jobRuntimeInformationFactory
 	 *            the jobRuntimeInformationFactory to set
 	 */
-	public void setJobRuntimeInformationFactory(
+	public void setJobIdentifierFactory(
 			JobIdentifierFactory jobRuntimeInformationFactory) {
 		this.jobRuntimeInformationFactory = jobRuntimeInformationFactory;
 	}
@@ -103,14 +103,14 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * 
 	 * @param batchContainer
 	 */
-	public void setBatchContainer(JobExecutorFacade batchContainer) {
+	public void setJobExecutorFacade(JobExecutorFacade batchContainer) {
 		this.batchContainer = batchContainer;
 	}
 
 	/**
 	 * Check that mandatory properties are set.
 	 * 
-	 * @see #setBatchContainer(JobExecutorFacade)
+	 * @see #setJobExecutorFacade(JobExecutorFacade)
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
@@ -203,7 +203,7 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * @throws NoSuchJobConfigurationException
 	 *             if the job configuration cannot be located
 	 * 
-	 * @see #setJobRuntimeInformationFactory(JobIdentifierFactory)
+	 * @see #setJobIdentifierFactory(JobIdentifierFactory)
 	 * @see org.springframework.context.Lifecycle#start()
 	 */
 	public ExitStatus run() throws NoSuchJobConfigurationException {

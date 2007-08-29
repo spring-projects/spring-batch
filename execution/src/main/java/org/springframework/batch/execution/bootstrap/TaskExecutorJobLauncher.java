@@ -53,10 +53,12 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @since 2.1
  */
-public class TaskExecutorJobLauncher extends AbstractJobLauncher implements ApplicationListener,
-		NotificationPublisherAware, ApplicationEventPublisherAware {
+public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
+		ApplicationListener, NotificationPublisherAware,
+		ApplicationEventPublisherAware {
 
-	private static final Log logger = LogFactory.getLog(TaskExecutorJobLauncher.class);
+	private static final Log logger = LogFactory
+			.getLog(TaskExecutorJobLauncher.class);
 
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
 
@@ -68,9 +70,11 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements Appl
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.context.ApplicationEventPublisherAware#setApplicationEventPublisher(org.springframework.context.ApplicationEventPublisher)
 	 */
-	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+	public void setApplicationEventPublisher(
+			ApplicationEventPublisher applicationEventPublisher) {
 		this.applicationEventPublisher = applicationEventPublisher;
 	}
 
@@ -78,7 +82,8 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements Appl
 	 * Setter for the {@link TaskExecutor}. Defaults to a
 	 * {@link SyncTaskExecutor}.
 	 * 
-	 * @param taskExecutor the taskExecutor to set
+	 * @param taskExecutor
+	 *            the taskExecutor to set
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
@@ -86,16 +91,19 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements Appl
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.jmx.export.notification.NotificationPublisherAware#setNotificationPublisher(org.springframework.jmx.export.notification.NotificationPublisher)
 	 */
-	public void setNotificationPublisher(NotificationPublisher notificationPublisher) {
+	public void setNotificationPublisher(
+			NotificationPublisher notificationPublisher) {
 		this.notificationPublisher = notificationPublisher;
 	}
 
 	/**
 	 * Start the provided container using the task executor provided.
 	 * 
-	 * @throws IllegalStateException if JobConfiguration is null.
+	 * @throws IllegalStateException
+	 *             if JobConfiguration is null.
 	 */
 	protected ExitStatus doRun(final JobIdentifier runtimeInformation) {
 
@@ -105,14 +113,16 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements Appl
 			public void run() {
 				try {
 					batchContainer.start(runtimeInformation);
-				}
-				catch (NoSuchJobConfigurationException e) {
-					applicationEventPublisher.publishEvent(new RepeatOperationsApplicationEvent(runtimeInformation,
-							"No such job", RepeatOperationsApplicationEvent.ERROR));
-					logger.error("JobConfiguration could not be located inside Runnable for runtime information: ["
-							+ runtimeInformation + "]", e);
-				}
-				finally {
+				} catch (NoSuchJobConfigurationException e) {
+					applicationEventPublisher
+							.publishEvent(new RepeatOperationsApplicationEvent(
+									runtimeInformation, "No such job",
+									RepeatOperationsApplicationEvent.ERROR));
+					logger
+							.error(
+									"JobConfiguration could not be located inside Runnable for runtime information: ["
+											+ runtimeInformation + "]", e);
+				} finally {
 					unregister(runtimeInformation);
 				}
 			}
@@ -125,11 +135,13 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements Appl
 	/**
 	 * Delegates to the underlying {@link JobExecutorFacade}. Does not wait for
 	 * the jobs to stop (probably therefore returns immediately).
-	 * @throws NoSuchJobExecutionException 
+	 * 
+	 * @throws NoSuchJobExecutionException
 	 * 
 	 * @see org.springframework.context.Lifecycle#stop()
 	 */
-	protected void doStop(JobIdentifier runtimeInformation) throws NoSuchJobExecutionException {
+	protected void doStop(JobIdentifier runtimeInformation)
+			throws NoSuchJobExecutionException {
 		batchContainer.stop(runtimeInformation);
 		// TODO: wait for the jobs to stop?
 	}
@@ -146,9 +158,11 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements Appl
 		if (applicationEvent instanceof RepeatOperationsApplicationEvent) {
 			RepeatOperationsApplicationEvent event = (RepeatOperationsApplicationEvent) applicationEvent;
 			int type = event.getType();
-			if (type == RepeatOperationsApplicationEvent.OPEN || type == RepeatOperationsApplicationEvent.CLOSE
+			if (type == RepeatOperationsApplicationEvent.OPEN
+					|| type == RepeatOperationsApplicationEvent.CLOSE
 					|| type == RepeatOperationsApplicationEvent.ERROR) {
-				String message = event.getMessage() + "; source=" + event.getSource();
+				String message = event.getMessage() + "; source="
+						+ event.getSource();
 				logger.info(message);
 				publish(message);
 			}
@@ -164,8 +178,8 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements Appl
 	 * for information purposes only.
 	 * 
 	 * @return Properties representing the last {@link JobExecutionContext}
-	 * objects passed up from the underlying execution. If there are no jobs
-	 * running it will be empty.
+	 *         objects passed up from the underlying execution. If there are no
+	 *         jobs running it will be empty.
 	 */
 	public Properties getStatistics() {
 		if (batchContainer instanceof StatisticsProvider) {
@@ -180,8 +194,17 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements Appl
 	 */
 	private void publish(String message) {
 		if (notificationPublisher != null) {
-			notificationPublisher.sendNotification(new Notification("RepeatOperationsApplicationEvent", this,
-					notificationCount++, message));
+			Notification notification = new Notification(
+					"RepeatOperationsApplicationEvent", this,
+					notificationCount++, message);
+			/*
+			 * We can't create a notification with a null source, but we can set
+			 * it to null after creation(!). We want it to be null so that
+			 * Spring will replace it automatically with the ObjectName (in
+			 * ModelMBeanNotificationPublisher).
+			 */
+			notification.setSource(null);
+			notificationPublisher.sendNotification(notification);
 		}
 	}
 
