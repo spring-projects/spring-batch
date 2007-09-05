@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.runtime;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 
 /**
  * @author Dave Syer
@@ -62,4 +65,11 @@ public class SimpleJobIdentifier implements JobIdentifier {
 		return "name=" + name;
 	}
 
+	public boolean equals(Object obj) {
+		return EqualsBuilder.reflectionEquals(this, obj);
+	}
+	
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
+	}
 }

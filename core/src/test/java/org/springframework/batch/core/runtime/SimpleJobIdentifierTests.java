@@ -52,4 +52,8 @@ public class SimpleJobIdentifierTests extends TestCase {
 				.indexOf("name=") >= 0);
 	}
 
+	public void testEquals(){
+		SimpleJobIdentifier testIdentifier = new SimpleJobIdentifier("foo");
+		assertEquals(testIdentifier,identifier);
+	}
 }
