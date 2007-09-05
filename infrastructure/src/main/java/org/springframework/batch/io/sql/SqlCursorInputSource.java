@@ -414,9 +414,14 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 		if (rs == null) {
 			executeQuery();
 		}
+		
+		Properties restartProperties = data.getProperties();
+		if(restartProperties.containsKey(CURRENT_PROCESSED_ROW) == false){
+			return;
+		}
 
 		try {
-			this.currentProcessedRow = Integer.parseInt(data.getProperties()
+			this.currentProcessedRow = Integer.parseInt(restartProperties
 					.getProperty(CURRENT_PROCESSED_ROW));
 			rs.absolute(currentProcessedRow);
 		} catch (SQLException se) {

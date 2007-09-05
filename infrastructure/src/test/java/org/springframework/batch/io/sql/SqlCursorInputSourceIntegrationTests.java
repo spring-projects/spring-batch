@@ -7,6 +7,7 @@ import java.util.Properties;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
+import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -92,6 +93,12 @@ public class SqlCursorInputSourceIntegrationTests extends AbstractTransactionalD
 		foo = (Foo)sqlCursorInputSource.read();
 		
 		validateFoo(3, "bar3", 3, foo);
+	}
+	
+	public void testRestartWithEmptyRestartData(){
+		
+		RestartData restartData = new GenericRestartData(new Properties());
+		sqlCursorInputSource.restoreFrom(restartData);
 	}
 	
 	public void testReadWithNullMapper(){
