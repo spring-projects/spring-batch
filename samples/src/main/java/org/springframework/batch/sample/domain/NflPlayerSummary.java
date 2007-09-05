@@ -95,4 +95,8 @@ public class NflPlayerSummary {
 		this.totalTd = totalTd;
 	}
 	
+	
+	public String toString() {
+		return "NFL Player Summary: ID=" + id + " Year=" + year;
+	}
 }

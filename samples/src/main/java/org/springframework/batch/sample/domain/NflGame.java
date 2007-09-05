@@ -199,4 +199,9 @@ public class NflGame {
 	}
 	
 	
+	public String toString() {
+
+		return "NFL Game: ID=" + id + " " + team + " vs. " + opponent + 
+		" - " + year;
+	}
 }

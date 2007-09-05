@@ -16,7 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class SqlNflPlayerDao implements NflPlayerDao, InitializingBean {
 
 	public static final String INSERT_PLAYER = "INSERT into players(player_id, " +
-			"last_name, first_name, position, year_of_birth, year_drafted)" +
+			"last_name, first_name, pos, year_of_birth, year_drafted)" +
 			" values (?,?,?,?,?,?)";
 	
 	DataSource dataSource;

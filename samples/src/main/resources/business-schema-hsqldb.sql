@@ -37,12 +37,12 @@ INSERT INTO customer (id, version, name, credit) VALUES (3, 0, 'customer3', 1000
 INSERT INTO customer (id, version, name, credit) VALUES (4, 0, 'customer4', 100000);
 
 CREATE TABLE PLAYERS (
-	PLAYER_ID char(8) not null primary key,
+	PLAYER_ID char(8) primary key,
 	LAST_NAME varchar(35) not null,
 	FIRST_NAME varchar(25) not null,
-	POSITION varchar(10),
-	YEAR_OF_BIRTH integer not null,
-	YEAR_DRAFTED integer not null);
+	POS varchar(10),
+	YEAR_OF_BIRTH BIGINT not null,
+	YEAR_DRAFTED BIGINT not null);
 
 CREATE TABLE GAMES (
    PLAYER_ID char(8) not null,

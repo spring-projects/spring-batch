@@ -6,6 +6,7 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
 	<!--  Initialise the database before every test case: -->
+	<import resource="data-source-context-init.xml"/>
 
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="${batch.jdbc.driver}" />
