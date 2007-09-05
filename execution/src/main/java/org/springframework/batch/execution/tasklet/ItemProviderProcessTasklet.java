@@ -43,7 +43,7 @@ import org.springframework.util.Assert;
  * A concrete implementation of the {@link Tasklet} interface that provides
  * functionality for 'split processing'. This type of processing is
  * characterized by separating the reading and processing of batch data into two
- * separate classes: ItemProvider and DataProcessor. The ItemProvider class
+ * separate classes: ItemProvider and ItemProcessor. The ItemProvider class
  * provides a solid means for re-usability and enforces good architecture
  * practices. Because an object *must* be returned by the {@link ItemProvider}
  * to continue processing, (returning null indicates processing should end) a

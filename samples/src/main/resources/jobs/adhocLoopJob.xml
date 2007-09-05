@@ -48,7 +48,7 @@
 			<bean id="step1" parent="simpleStep">
 				<constructor-arg>
 					<bean id="module"
-						class="org.springframework.batch.sample.module.InfiniteLoopTasklet"
+						class="org.springframework.batch.sample.tasklet.InfiniteLoopTasklet"
 						scope="step">
 						<aop:scoped-proxy />
 					</bean>

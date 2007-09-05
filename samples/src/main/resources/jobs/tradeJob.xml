@@ -40,7 +40,7 @@
 							</property>
 							<property name="itemProcessor">
 								<bean
-									class="org.springframework.batch.sample.module.process.TradeProcessor"
+									class="org.springframework.batch.sample.item.processor.TradeProcessor"
 									p:writer-ref="tradeDao" />
 							</property>
 						</bean>
@@ -59,7 +59,7 @@
 							</property>
 							<property name="itemProcessor">
 								<bean
-									class="org.springframework.batch.sample.module.process.CustomerUpdateProcessor"
+									class="org.springframework.batch.sample.item.processor.CustomerUpdateProcessor"
 									p:dao-ref="customerDao" />
 							</property>
 						</bean>
@@ -77,7 +77,7 @@
 							</property>
 							<property name="itemProcessor">
 								<bean
-									class="org.springframework.batch.sample.module.process.CustomerCreditUpdateProcessor"
+									class="org.springframework.batch.sample.item.processor.CustomerCreditUpdateProcessor"
 									p:writer-ref="customerReportOutputSource" />
 							</property>
 						</bean>

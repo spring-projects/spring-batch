@@ -22,7 +22,7 @@
 					<bean
 						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 						<property name="itemProvider">
-							<bean class="org.springframework.batch.sample.module.OrderItemProvider">
+							<bean class="org.springframework.batch.sample.item.provider.OrderItemProvider">
 								<property name="inputSource" ref="fileInputTemplate" />
 								<property name="headerMapper" ref="headerFieldSetMapper" />
 								<property name="customerMapper" ref="customerFieldSetMapper" />
@@ -34,7 +34,7 @@
 							</bean>
 						</property>
 						<property name="itemProcessor">
-							<bean class="org.springframework.batch.sample.module.process.OrderProcessor">
+							<bean class="org.springframework.batch.sample.item.processor.OrderProcessor">
 								<property name="writer">
 									<bean class="org.springframework.batch.sample.dao.FlatFileOrderWriter">
 										<property name="outputSource" ref="flatFileOutputSource" />

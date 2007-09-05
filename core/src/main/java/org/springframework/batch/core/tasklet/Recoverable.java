@@ -17,7 +17,7 @@
 package org.springframework.batch.core.tasklet;
 
 /**
- * Marker interface for {@link Tasklet} implementations that are able totake a
+ * Marker interface for {@link Tasklet} implementations that are able to take a
  * recovery action in the case that an exception is thrown inside
  * {@link Tasklet#execute()}. Containers must ensure that the recover method is
  * called in a different transactional context than the failed execution, e.g.

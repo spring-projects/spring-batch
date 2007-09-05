@@ -17,13 +17,13 @@
 					<bean
 						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 						<property name="itemProvider">
-							<bean class="org.springframework.batch.sample.module.CollectionItemProvider">
+							<bean class="org.springframework.batch.sample.item.provider.CollectionItemProvider">
 								<property name="inputSource" ref="fileInputTemplate" />
 								<property name="fieldSetMapper" ref="tradeLineMapper" />
 							</bean>
 						</property>
 						<property name="itemProcessor">
-							<bean class="org.springframework.batch.sample.module.process.DefaultFlatFileProcessor">
+							<bean class="org.springframework.batch.sample.item.processor.DefaultFlatFileProcessor">
 								<property name="flatFileOutputSource">
 									<bean class="org.springframework.batch.io.file.support.FlatFileOutputSource"
 										scope="step" >

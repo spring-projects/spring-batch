@@ -34,12 +34,12 @@ public class FieldSetTests extends TestCase {
 		super.setUp();
 
 		tokens = new String[] { "TestString", "true", "C", "10", "-472", "354224", "543", "124.3", "424.3", "324",
-				null, "2007-10-12", "12-10-2007" };
+				null, "2007-10-12", "12-10-2007", "" };
 		names = new String[] { "String", "Boolean", "Char", "Byte", "Short", "Integer", "Long", "Float", "Double",
-				"BigDecimal", "Null", "Date", "DatePattern" };
+				"BigDecimal", "Null", "Date", "DatePattern", "BlankInput" };
 
 		fieldSet = new FieldSet(tokens, names);
-		assertTrue(fieldSet.getFieldCount() == 13);
+		assertTrue(fieldSet.getFieldCount() == 14);
 
 	}
 
@@ -173,6 +173,28 @@ public class FieldSetTests extends TestCase {
 	public void testReadInt() throws Exception {
 		assertEquals(354224, fieldSet.readInt(5));
 		assertEquals(354224, fieldSet.readInt("Integer"));
+	}
+
+	public void testReadBlankInt(){
+		
+		//Trying to parse a blank field as an integer, but without a default
+		//value should throw a NumberFormatException
+		try{
+			fieldSet.readInt(13);
+			fail();
+		}
+		catch(NumberFormatException ex){
+			//expected
+		}
+		
+		try{
+			fieldSet.readInt("BlankInput");
+			fail();
+		}
+		catch(NumberFormatException ex){
+			//expected
+		}
+		
 	}
 
 	public void testReadLong() throws Exception {

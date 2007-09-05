@@ -20,6 +20,7 @@
 		<config>src/main/resources/jobs/adhocLoopJob.xml</config>
 		<config>src/main/resources/jobs/infiniteLoopJob.xml</config>
 		<config>src/main/resources/data-source-context-init.xml</config>
+		<config>src/main/resources/jobs/nfljob.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -132,6 +133,16 @@
 				<config>src/main/resources/jobs/multilineOrderIo.xml</config>
 				<config>src/main/resources/jobs/multilineOrderJob.xml</config>
 				<config>src/main/resources/jobs/multilineOrderOutputDescriptors.xml</config>
+				<config>src/main/resources/simple-container-definition.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[nfl]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/nfljob.xml</config>
 				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>

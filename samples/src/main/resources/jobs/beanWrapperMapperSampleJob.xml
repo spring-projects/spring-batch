@@ -27,7 +27,7 @@
 								</bean>
 							</property>
 							<property name="itemProcessor">
-								<bean class="org.springframework.batch.sample.module.process.TradeProcessor">
+								<bean class="org.springframework.batch.sample.item.processor.TradeProcessor">
 									<property name="writer" ref="tradeDao" />
 								</bean>
 							</property>
@@ -46,7 +46,7 @@
 								</bean>
 							</property>
 							<property name="itemProcessor">
-								<bean class="org.springframework.batch.sample.module.process.PersonProcessor" />
+								<bean class="org.springframework.batch.sample.item.processor.PersonProcessor" />
 							</property>
 						</bean>
 					</constructor-arg>

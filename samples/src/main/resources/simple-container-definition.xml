@@ -8,7 +8,6 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<import resource="data-source-context.xml" />
-	<import resource="data-source-context-init.xml" />
 
 	<!-- register the step scope with the application context -->
 	<bean class="org.springframework.batch.execution.scope.StepScope" />
@@ -116,7 +115,7 @@
 			</map>
 		</property>
 	</bean>
-
+ 
 	<bean id="itemProcessorLogAdvice" class="org.springframework.batch.sample.advice.ProcessorLogAdvice" />
 
 	<aop:config>

@@ -5,6 +5,7 @@ import java.util.Properties;
 import org.springframework.batch.io.OutputSource;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
@@ -38,26 +39,24 @@ public class OutputSourceItemProcessor implements ItemProcessor, Restartable, Sk
 
 	/**
 	 * @see Restartable#getRestartData()
-	 * @throws IllegalStateException if the parent template is not itself
-	 * {@link Restartable}.
 	 */
 	public RestartData getRestartData() {
-		if (!(source instanceof Restartable)) {
-			throw new IllegalStateException("Output Source is not Restartable");
+		if (source instanceof Restartable) {
+			return ((Restartable) source).getRestartData();
 		}
-		return ((Restartable) source).getRestartData();
+		else{
+			return new GenericRestartData(new Properties());
+		}
 	}
 
 	/**
 	 * @see Restartable#restoreFrom(RestartData)
-	 * @throws IllegalStateException if the parent template is not itself
-	 * {@link Restartable}.
 	 */
 	public void restoreFrom(RestartData data) {
-		if (!(source instanceof Restartable)) {
-			throw new IllegalStateException("Output Source is not Restartable");
+		if (source instanceof Restartable) {
+			((Restartable) source).restoreFrom(data);
 		}
-		((Restartable) source).restoreFrom(data);
+		
 	}
 
 	/**
