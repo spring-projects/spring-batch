@@ -18,10 +18,10 @@ public class SqlNflGameDao extends JdbcDaoSupport implements OutputSource{
 		
 		NflGame game = (NflGame)output;
 		
-		Object[] args = new Object[]{game.getId(),game.getYear(),game.getTeam(),game.getWeek(),
-				game.getOpponent(),game.getCompletes(),game.getAttempts(),game.getPassingYards(),
-				game.getPassingTd(),game.getInterceptions(),game.getRushes(),game.getRushYards(),
-				game.getReceptions(),game.getReceptionYards(),game.getTotalTd()};
+		Object[] args = new Object[]{game.getId(),new Integer(game.getYear()),game.getTeam(),new Integer(game.getWeek()), 
+                game.getOpponent(),new Integer(game.getCompletes()),new Integer(game.getAttempts()),new Integer(game.getPassingYards()), 
+                new Integer(game.getPassingTd()),new Integer(game.getInterceptions()),new Integer(game.getRushes()),new Integer(game.getRushYards()), 
+                new Integer(game.getReceptions()),new Integer(game.getReceptionYards()),new Integer(game.getTotalTd())}; 
 		
 		this.getJdbcTemplate().update(INSERT_GAME, args);
 	}

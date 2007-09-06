@@ -15,7 +15,7 @@
 			<list>
 				<bean id="step1" parent="simpleStep">
 					<constructor-arg>
-						<bean id="tradeTasklet" class="org.springframework.batch.sample.module.SimpleTradeTasklet">
+						<bean id="tradeTasklet" class="org.springframework.batch.sample.tasklet.SimpleTradeTasklet">
 							<property name="inputSource" ref="fileInputSource" />
 							<property name="tradeDao" ref="tradeDao" />
 						</bean>

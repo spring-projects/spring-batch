@@ -29,7 +29,7 @@
 							<bean class="org.springframework.batch.item.processor.CompositeItemProcessor" >
 								<property name="itemProcessors" >
 									<list>
-										<bean class="org.springframework.batch.sample.module.process.TradeProcessor">
+										<bean class="org.springframework.batch.sample.item.processor.TradeProcessor">
 											<property name="writer" ref="tradeDao" />
 										</bean>
 										
