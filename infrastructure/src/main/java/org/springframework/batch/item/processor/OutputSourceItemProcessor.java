@@ -9,6 +9,7 @@ import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.util.Assert;
 
 /**
  * Simple wrapper around {@link OutputSource} providing {@link Restartable} and
@@ -41,6 +42,9 @@ public class OutputSourceItemProcessor implements ItemProcessor, Restartable, Sk
 	 * @see Restartable#getRestartData()
 	 */
 	public RestartData getRestartData() {
+		
+		Assert.state(source != null, "Source must not be null.");
+		
 		if (source instanceof Restartable) {
 			return ((Restartable) source).getRestartData();
 		}
@@ -53,6 +57,9 @@ public class OutputSourceItemProcessor implements ItemProcessor, Restartable, Sk
 	 * @see Restartable#restoreFrom(RestartData)
 	 */
 	public void restoreFrom(RestartData data) {
+		
+		Assert.state(source != null, "Source must not be null.");
+		
 		if (source instanceof Restartable) {
 			((Restartable) source).restoreFrom(data);
 		}
