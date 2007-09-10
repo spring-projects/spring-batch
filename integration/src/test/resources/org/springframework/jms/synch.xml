@@ -9,7 +9,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<import resource="classpath:/data-source.xml"/>
-
+  
 	<!-- Transaction manager for a datasource -->
 	<bean id="transactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
