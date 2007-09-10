@@ -1,5 +1,7 @@
 package org.springframework.batch.sample.domain;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+
 /**
  * Domain object representing the summary of a given Nfl Player's 
  * year.
@@ -98,5 +100,9 @@ public class NflPlayerSummary {
 	
 	public String toString() {
 		return "NFL Player Summary: ID=" + id + " Year=" + year;
+	}
+	
+	public boolean equals(Object obj) {
+		return EqualsBuilder.reflectionEquals(this, obj);
 	}
 }

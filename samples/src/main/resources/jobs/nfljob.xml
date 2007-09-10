@@ -42,8 +42,7 @@
 									<property name="nflPlayerDao">
 										<bean
 											class="org.springframework.batch.sample.dao.SqlNflPlayerDao">
-											<constructor-arg
-												ref="dataSource" />
+											<property name="dataSource" ref="dataSource" />
 										</bean>
 									</property>
 								</bean>

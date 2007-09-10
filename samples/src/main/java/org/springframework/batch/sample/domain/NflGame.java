@@ -1,5 +1,7 @@
 package org.springframework.batch.sample.domain;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+
 public class NflGame {
 	
 	private String id;
@@ -203,5 +205,9 @@ public class NflGame {
 
 		return "NFL Game: ID=" + id + " " + team + " vs. " + opponent + 
 		" - " + year;
+	}
+	
+	public boolean equals(Object obj) {
+		return EqualsBuilder.reflectionEquals(this, obj);
 	}
 }
