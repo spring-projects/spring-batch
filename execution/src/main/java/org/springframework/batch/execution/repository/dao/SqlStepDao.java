@@ -30,6 +30,7 @@ import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
@@ -77,7 +78,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	private static final String FIND_STEP_EXECUTIONS = "SELECT ID, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
 			+ " TASK_COUNT, TASK_STATISTICS, EXIT_CODE from %PREFIX%STEP_EXECUTION where STEP_ID = ?";
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	private DataFieldMaxValueIncrementer stepIncrementer;
 
@@ -316,7 +317,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 
 	}
 
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
