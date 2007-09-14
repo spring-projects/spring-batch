@@ -24,6 +24,7 @@ import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -94,6 +95,8 @@ public class SimpleStepExecutor implements StepExecutor {
 	private RepeatOperations stepOperations = new RepeatTemplate();
 
 	private JobRepository jobRepository;
+	
+	private ExitCodeExceptionClassifier exceptionClassifier = new SimpleExitCodeExceptionClassifier();
 
 	// default to checking current thread for interruption.
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
@@ -246,13 +249,13 @@ public class SimpleStepExecutor implements StepExecutor {
 
 			});
 
-			stepExecution.setExitCode(status.getExitCode());
-			stepExecution.setExitDescription(status.getExitDescription());
 			updateStatus(stepExecutionContext, BatchStatus.COMPLETED);
 			return status;
 		}
 		catch (RuntimeException e) {
 			
+			//classify exception so an exit code can be stored.
+			status = exceptionClassifier.classifyForExitCode(e);
 			stepExecution.setException(e);
 			if (e.getCause() instanceof StepInterruptedException) {
 				updateStatus(stepExecutionContext, BatchStatus.STOPPED);
@@ -262,8 +265,11 @@ public class SimpleStepExecutor implements StepExecutor {
 				updateStatus(stepExecutionContext, BatchStatus.FAILED);
 				throw e;
 			}
+			
 		}
 		finally {
+			stepExecution.setExitCode(status.getExitCode());
+			stepExecution.setExitDescription(status.getExitDescription());
 			stepExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
 			try {
 				jobRepository.saveOrUpdate(stepExecution);
@@ -377,5 +383,16 @@ public class SimpleStepExecutor implements StepExecutor {
 	 */
 	public void setInterruptionPolicy(StepInterruptionPolicy interruptionPolicy) {
 		this.interruptionPolicy = interruptionPolicy;
+	}
+	
+	/**
+	 * Setter for the {@link ExitCodeExceptionClassifier} that will be used
+	 * to classify any exception that causes a job to fail.
+	 * 
+	 * @param exceptionClassifier
+	 */
+	public void setExceptionClassifier(
+			ExitCodeExceptionClassifier exceptionClassifier) {
+		this.exceptionClassifier = exceptionClassifier;
 	}
 }

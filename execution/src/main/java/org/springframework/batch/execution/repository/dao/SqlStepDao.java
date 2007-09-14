@@ -39,16 +39,17 @@ import org.springframework.util.StringUtils;
 
 /**
  * Sql implementation of StepDao. Uses Sequences (via Spring's
- * @link DataFieldMaxValueIncrementer abstraction) to create all Step and
- * StepExecution primary keys before inserting a new row. All objects are
- * checked to ensure all fields to be stored are not null. If any are found to
- * be null, an IllegalArgumentException will be thrown. This could be left to
- * JdbcTemplate, however, the exception will be fairly vague, and fails to
- * highlight which field caused the exception.
  * 
- * TODO: JavaDoc should be geared more towards usability, the comments
- * above are useful information, and should be there, but needs usability 
- * stuff.  Depends on the step dao java docs as well.
+ * @link DataFieldMaxValueIncrementer abstraction) to create all Step and
+ *       StepExecution primary keys before inserting a new row. All objects are
+ *       checked to ensure all fields to be stored are not null. If any are
+ *       found to be null, an IllegalArgumentException will be thrown. This
+ *       could be left to JdbcTemplate, however, the exception will be fairly
+ *       vague, and fails to highlight which field caused the exception.
+ * 
+ * TODO: JavaDoc should be geared more towards usability, the comments above are
+ * useful information, and should be there, but needs usability stuff. Depends
+ * on the step dao java docs as well.
  * 
  * @author Lucas Ward
  * @see StepDao
@@ -67,16 +68,18 @@ public class SqlStepDao implements StepDao, InitializingBean {
 
 	// StepExecution statements
 	private static final String SAVE_STEP_EXECUTION = "INSERT into %PREFIX%STEP_EXECUTION(ID, VERSION, STEP_ID, JOB_EXECUTION_ID, START_TIME, "
-			+ "END_TIME, STATUS, COMMIT_COUNT, TASK_COUNT, TASK_STATISTICS, EXIT_CODE) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "END_TIME, STATUS, COMMIT_COUNT, TASK_COUNT, TASK_STATISTICS, EXIT_CODE, EXIT_MESSAGE) "
+			+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String UPDATE_STEP_EXECUTION = "UPDATE %PREFIX%STEP_EXECUTION set START_TIME = ?, END_TIME = ?, "
-			+ "STATUS = ?, COMMIT_COUNT = ?, TASK_COUNT = ?, TASK_STATISTICS = ?, EXIT_CODE = ? where ID = ?";
+			+ "STATUS = ?, COMMIT_COUNT = ?, TASK_COUNT = ?, TASK_STATISTICS = ?, EXIT_CODE = ?, "
+			+ "EXIT_MESSAGE = ? where ID = ?";
 
 	private static final String GET_STEP_EXECUTION_COUNT = "SELECT count(ID) from %PREFIX%STEP_EXECUTION where "
 			+ "STEP_ID = ?";
 
 	private static final String FIND_STEP_EXECUTIONS = "SELECT ID, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
-			+ " TASK_COUNT, TASK_STATISTICS, EXIT_CODE from %PREFIX%STEP_EXECUTION where STEP_ID = ?";
+			+ " TASK_COUNT, TASK_STATISTICS, EXIT_CODE, EXIT_MESSAGE from %PREFIX%STEP_EXECUTION where STEP_ID = ?";
 
 	private JdbcOperations jdbcTemplate;
 
@@ -105,8 +108,10 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	 * anymore than one step is found, an exception is thrown.
 	 * 
 	 * @see StepDao#findStep(Long, String)
-	 * @throws IllegalArgumentException if job, stepName, or job.id is null.
-	 * @throws NoSuchBatchDomainObjectException if more than one step is found.
+	 * @throws IllegalArgumentException
+	 *             if job, stepName, or job.id is null.
+	 * @throws NoSuchBatchDomainObjectException
+	 *             if more than one step is found.
 	 */
 	public StepInstance findStep(JobInstance job, String stepName) {
 
@@ -122,30 +127,30 @@ public class SqlStepDao implements StepDao, InitializingBean {
 
 				StepInstance step = new StepInstance(new Long(rs.getLong(1)));
 				step.setStatus(BatchStatus.getStatus(rs.getString(2)));
-				step.setRestartData(
-						new GenericRestartData(PropertiesConverter.stringToProperties(rs.getString(3))));
+				step.setRestartData(new GenericRestartData(PropertiesConverter
+						.stringToProperties(rs.getString(3))));
 				return step;
 			}
 
 		};
 
-		List steps = jdbcTemplate.query(getQuery(FIND_STEP), parameters, rowMapper);
+		List steps = jdbcTemplate.query(getQuery(FIND_STEP), parameters,
+				rowMapper);
 
 		if (steps.size() == 0) {
 			// No step found
 			return null;
-		}
-		else if (steps.size() == 1) {
+		} else if (steps.size() == 1) {
 			StepInstance step = (StepInstance) steps.get(0);
 			step.setName(stepName);
 			return step;
-		}
-		else {
+		} else {
 			// This error will likely never be thrown, because there should
 			// never be two steps with the same name and Job_ID due to database
 			// constraints.
-			throw new NoSuchBatchDomainObjectException("Step Invalid, multiple steps found for StepName:" + stepName
-					+ " and JobId:" + job.getId());
+			throw new NoSuchBatchDomainObjectException(
+					"Step Invalid, multiple steps found for StepName:"
+							+ stepName + " and JobId:" + job.getId());
 		}
 
 	}
@@ -156,7 +161,8 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	 * Sql implementation which uses a RowMapper to populate a list of all rows
 	 * in the step table with the same JOB_ID.
 	 * 
-	 * @throws IllegalArgumentException if jobId is null.
+	 * @throws IllegalArgumentException
+	 *             if jobId is null.
 	 */
 	public List findSteps(Long jobId) {
 
@@ -172,8 +178,8 @@ public class SqlStepDao implements StepDao, InitializingBean {
 				step.setName(rs.getString(2));
 				String status = rs.getString(3);
 				step.setStatus(BatchStatus.getStatus(status));
-				step.setRestartData(
-						new GenericRestartData(PropertiesConverter.stringToProperties(rs.getString(3))));
+				step.setRestartData(new GenericRestartData(PropertiesConverter
+						.stringToProperties(rs.getString(3))));
 				return step;
 			}
 		};
@@ -187,7 +193,8 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	 * DataFieldMaxValueIncrementer)
 	 * 
 	 * @see StepDao#createStep(JobInstance, String)
-	 * @throws IllegalArgumentException if job or stepName is null.
+	 * @throws IllegalArgumentException
+	 *             if job or stepName is null.
 	 */
 	public StepInstance createStep(JobInstance job, String stepName) {
 
@@ -206,7 +213,8 @@ public class SqlStepDao implements StepDao, InitializingBean {
 
 	/**
 	 * @see StepDao#update(StepInstance)
-	 * @throws IllegalArgumentException if step, or it's status and id is null.
+	 * @throws IllegalArgumentException
+	 *             if step, or it's status and id is null.
 	 */
 	public void update(final StepInstance step) {
 
@@ -219,12 +227,11 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		if (restartData != null) {
 			restartProps = restartData.getProperties();
 		}
-		
-		Object[] parameters = new Object[]{ step.getStatus().toString(), 
+
+		Object[] parameters = new Object[] { step.getStatus().toString(),
 				PropertiesConverter.propertiesToString(restartProps),
-				step.getId()
-		};
-		
+				step.getId() };
+
 		jdbcTemplate.update(getQuery(UPDATE_STEP), parameters);
 	}
 
@@ -240,10 +247,19 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		validateStepExecution(stepExecution);
 
 		stepExecution.setId(new Long(stepExecutionIncrementer.nextLongValue()));
-		Object[] parameters = new Object[] { stepExecution.getId(), new Long(0), stepExecution.getStepId(), stepExecution.getJobExecutionId(), 
-				stepExecution.getStartTime(), stepExecution.getEndTime(), stepExecution.getStatus().toString(),
-				stepExecution.getCommitCount(), stepExecution.getTaskCount(),
-				PropertiesConverter.propertiesToString(stepExecution.getStatistics()), stepExecution.getExitCode() };
+		Object[] parameters = new Object[] {
+				stepExecution.getId(),
+				new Long(0),
+				stepExecution.getStepId(),
+				stepExecution.getJobExecutionId(),
+				stepExecution.getStartTime(),
+				stepExecution.getEndTime(),
+				stepExecution.getStatus().toString(),
+				stepExecution.getCommitCount(),
+				stepExecution.getTaskCount(),
+				PropertiesConverter.propertiesToString(stepExecution
+						.getStatistics()), stepExecution.getExitCode(),
+				stepExecution.getExitDescription() };
 		jdbcTemplate.update(getQuery(SAVE_STEP_EXECUTION), parameters);
 
 	}
@@ -254,8 +270,9 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	public void update(StepExecution stepExecution) {
 
 		validateStepExecution(stepExecution);
-		Assert.notNull(stepExecution.getId(), "StepExecution Id cannot be null. StepExecution must saved"
-				+ " before it can be updated.");
+		Assert.notNull(stepExecution.getId(),
+				"StepExecution Id cannot be null. StepExecution must saved"
+						+ " before it can be updated.");
 
 		// TODO: Not sure if this is a good idea on step execution considering
 		// it is saved at every commit
@@ -265,10 +282,15 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		// return; // throw exception?
 		// }
 
-		Object[] parameters = new Object[] { stepExecution.getStartTime(), stepExecution.getEndTime(),
-				stepExecution.getStatus().toString(), stepExecution.getCommitCount(),
-				stepExecution.getTaskCount(), PropertiesConverter.propertiesToString(stepExecution.getStatistics()),
-				stepExecution.getExitCode(),
+		Object[] parameters = new Object[] {
+				stepExecution.getStartTime(),
+				stepExecution.getEndTime(),
+				stepExecution.getStatus().toString(),
+				stepExecution.getCommitCount(),
+				stepExecution.getTaskCount(),
+				PropertiesConverter.propertiesToString(stepExecution
+						.getStatistics()), stepExecution.getExitCode(),
+				stepExecution.getExitDescription(),
 				stepExecution.getId() };
 		jdbcTemplate.update(getQuery(UPDATE_STEP_EXECUTION), parameters);
 
@@ -278,7 +300,8 @@ public class SqlStepDao implements StepDao, InitializingBean {
 
 		Object[] parameters = new Object[] { stepId };
 
-		return jdbcTemplate.queryForInt(getQuery(GET_STEP_EXECUTION_COUNT), parameters);
+		return jdbcTemplate.queryForInt(getQuery(GET_STEP_EXECUTION_COUNT),
+				parameters);
 	}
 
 	/**
@@ -286,9 +309,10 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	 * they will not be returned with reconstituted object.
 	 * 
 	 * @see StepDao#getStepExecution(Long)
-	 * @throws IllegalArgumentException if id is null.
-	 * @throws NoSuchBatchDomainObjectException if more than one step execution is
-	 * returned.
+	 * @throws IllegalArgumentException
+	 *             if id is null.
+	 * @throws NoSuchBatchDomainObjectException
+	 *             if more than one step execution is returned.
 	 */
 	public List findStepExecutions(StepInstance step) {
 
@@ -300,20 +324,24 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-				StepExecution stepExecution = new StepExecution(stepId, new Long(rs.getLong(2)));
+				StepExecution stepExecution = new StepExecution(stepId,
+						new Long(rs.getLong(2)));
 				stepExecution.setId(new Long(rs.getLong(1)));
 				stepExecution.setStartTime(rs.getTimestamp(3));
 				stepExecution.setEndTime(rs.getTimestamp(4));
 				stepExecution.setStatus(BatchStatus.getStatus(rs.getString(5)));
 				stepExecution.setCommitCount(rs.getInt(6));
 				stepExecution.setTaskCount(rs.getInt(7));
-				stepExecution.setStatistics(PropertiesConverter.stringToProperties(rs.getString(8)));
+				stepExecution.setStatistics(PropertiesConverter
+						.stringToProperties(rs.getString(8)));
 				stepExecution.setExitCode(rs.getString(9));
+				stepExecution.setExitDescription(rs.getString(10));
 				return stepExecution;
 			}
 		};
 
-		return jdbcTemplate.query(getQuery(FIND_STEP_EXECUTIONS), new Object[] { stepId }, rowMapper);
+		return jdbcTemplate.query(getQuery(FIND_STEP_EXECUTIONS),
+				new Object[] { stepId }, rowMapper);
 
 	}
 
@@ -325,32 +353,37 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		this.stepIncrementer = stepIncrementer;
 	}
 
-	public void setStepExecutionIncrementer(DataFieldMaxValueIncrementer stepExecutionIncrementer) {
+	public void setStepExecutionIncrementer(
+			DataFieldMaxValueIncrementer stepExecutionIncrementer) {
 		this.stepExecutionIncrementer = stepExecutionIncrementer;
 	}
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jdbcTemplate, "JdbcTemplate cannot be null.");
 		Assert.notNull(stepIncrementer, "StepIncrementer cannot be null.");
-		Assert.notNull(stepExecutionIncrementer, "StepExecutionIncrementer canot be null.");
+		Assert.notNull(stepExecutionIncrementer,
+				"StepExecutionIncrementer canot be null.");
 	}
 
 	private String getQuery(String base) {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
 	}
-	
+
 	/*
-	 * Validate StepExecution. At a minimum, JobId, StartTime, and
-	 * Status cannot be null.  EndTime can be null for an unfinished job.
+	 * Validate StepExecution. At a minimum, JobId, StartTime, and Status cannot
+	 * be null. EndTime can be null for an unfinished job.
 	 * 
 	 * @param jobExecution @throws IllegalArgumentException
 	 */
 	private void validateStepExecution(StepExecution stepExecution) {
 
 		Assert.notNull(stepExecution);
-		Assert.notNull(stepExecution.getStepId(), "StepExecution Step-Id cannot be null.");
-		Assert.notNull(stepExecution.getStartTime(), "StepExecution start time cannot be null.");
-		Assert.notNull(stepExecution.getStatus(), "StepExecution status cannot be null.");
+		Assert.notNull(stepExecution.getStepId(),
+				"StepExecution Step-Id cannot be null.");
+		Assert.notNull(stepExecution.getStartTime(),
+				"StepExecution start time cannot be null.");
+		Assert.notNull(stepExecution.getStatus(),
+				"StepExecution status cannot be null.");
 	}
 
 }

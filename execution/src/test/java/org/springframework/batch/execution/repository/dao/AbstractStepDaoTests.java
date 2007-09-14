@@ -24,6 +24,7 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.batch.restart.GenericRestartData;
@@ -160,12 +161,16 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		statistics.setProperty("statistic.key1", "0");
 		statistics.setProperty("statistic.key2", "5");
 		execution.setStatistics(statistics);
+		execution.setExitCode(ExitCodeExceptionClassifier.FATAL_EXCEPTION);
+		execution.setExitDescription("java.lang.Exception");
 		stepDao.save(execution);
 		List executions = stepDao.findStepExecutions(step2);
 		assertEquals(1, executions.size());
 		StepExecution tempExecution = (StepExecution)executions.get(0);
 		assertEquals(execution, tempExecution);
 		assertEquals(execution.getStatistics(), tempExecution.getStatistics());
+		assertEquals(tempExecution.getExitCode(), execution.getExitCode());
+		assertEquals(tempExecution.getExitDescription(), execution.getExitDescription());
 	}
 	
 	public void testUpdateStepExecution(){
@@ -175,10 +180,15 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepExecution.setCommitCount(5);
 		stepExecution.setTaskCount(5);
 		stepExecution.setStatistics(new Properties());
+		stepExecution.setExitCode(ExitCodeExceptionClassifier.FATAL_EXCEPTION);
+		stepExecution.setExitDescription("java.lang.Exception");
 		stepDao.update(stepExecution);
 		List executions = stepDao.findStepExecutions(step1);
 		assertEquals(1, executions.size());
-		assertEquals(stepExecution, (StepExecution)executions.get(0));
+		StepExecution tempExecution = (StepExecution)executions.get(0);
+		assertEquals(stepExecution, tempExecution);
+		assertEquals(tempExecution.getExitCode(), stepExecution.getExitCode());
+		assertEquals(tempExecution.getExitDescription(), stepExecution.getExitDescription());
 	}
 	
 	public void testUpdateStepExecutionWithNullId(){

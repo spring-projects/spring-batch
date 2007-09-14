@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.runtime.StepExecutionContext;
@@ -165,7 +166,7 @@ public class DefaultStepExecutorTests extends TestCase {
 	
 	public void testIncrementRollbackCount(){
 		
-		Tasklet module = new Tasklet(){
+		Tasklet tasklet = new Tasklet(){
 
 			public ExitStatus execute() throws Exception {
 				int counter = 0;
@@ -181,7 +182,7 @@ public class DefaultStepExecutorTests extends TestCase {
 		};
 		
 		StepInstance step = new StepInstance(new Long(1));
-		stepConfiguration.setTasklet(module);
+		stepConfiguration.setTasklet(tasklet);
 		JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(3)));
 		StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 		
@@ -192,6 +193,37 @@ public class DefaultStepExecutorTests extends TestCase {
 			assertEquals(step.getStepExecution().getRollbackCount(), new Integer(1));
 		}
 		
+	}
+	
+	public void testExitCodeClassification(){
+		
+		Tasklet tasklet = new Tasklet(){
+
+			public ExitStatus execute() throws Exception {
+				int counter = 0;
+				counter++;
+				
+				if(counter == 1){
+					throw new RuntimeException();
+				}
+				
+				return ExitStatus.CONTINUABLE;
+			}
+			
+		};
+		
+		StepInstance step = new StepInstance(new Long(1));
+		stepConfiguration.setTasklet(tasklet);
+		JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(3)));
+		StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
+		
+		try{
+			stepExecutor.process(stepConfiguration, stepExecutionContext);
+		}
+		catch(Exception ex){
+			assertEquals(step.getStepExecution().getExitCode(), ExitCodeExceptionClassifier.FATAL_EXCEPTION);
+			assertEquals(step.getStepExecution().getExitDescription(), "java.lang.RuntimeException");
+		}
 	}
 
 }
