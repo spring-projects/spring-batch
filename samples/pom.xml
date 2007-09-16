@@ -46,6 +46,10 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-mock</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>quartz</groupId>
 			<artifactId>quartz</artifactId>
 			<version>1.5.1</version>
