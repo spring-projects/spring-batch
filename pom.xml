@@ -268,8 +268,8 @@
 			</plugin>
 		</plugins>
 	</build>
-	
-		<dependencyManagement>
+
+	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>aspectj</groupId>
