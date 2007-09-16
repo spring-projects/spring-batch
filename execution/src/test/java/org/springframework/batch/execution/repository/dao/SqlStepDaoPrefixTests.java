@@ -1,7 +1,6 @@
 package org.springframework.batch.execution.repository.dao;
 
-import java.util.ArrayList;
-import java.util.List;
+import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.core.domain.BatchStatus;
@@ -9,8 +8,6 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-
-import junit.framework.TestCase;
 
 /**
  * Unit Test of SqlStepDao that only tests prefix matching. A
