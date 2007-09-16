@@ -25,23 +25,16 @@
 		<dependency>
 			<groupId>aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
-			<version>1.5.3</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springmodules</groupId>
 			<artifactId>spring-modules-validation</artifactId>
 			<version>0.8</version>
 			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring</artifactId>
-				</exclusion>
 				<exclusion>
 					<groupId>rhino</groupId>
 					<artifactId>js</artifactId>
@@ -72,25 +65,16 @@
 		<dependency>
 			<groupId>hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>1.8.0.7</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>1.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
-			<version>1.2.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-collections</groupId>
-					<artifactId>commons-collections</artifactId>
-				</exclusion>
-			</exclusions>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -102,28 +86,23 @@
 		<dependency>
 			<groupId>easymock</groupId>
 			<artifactId>easymock</artifactId>
-			<version>1.1</version>
-			<scope>test</scope>
 		</dependency>
 		<!-- optional dependency from infrastructure -->
 		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib-nodep</artifactId>
-			<version>2.1_3</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- optional dependency from infrastructure -->
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
-			<version>1.2.1</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- optional dependency from infrastructure -->
 		<dependency>
 			<groupId>stax</groupId>
 			<artifactId>stax</artifactId>
-			<version>1.2.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

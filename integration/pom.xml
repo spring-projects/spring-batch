@@ -31,13 +31,11 @@
 		<dependency>
 			<groupId>hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>1.8.0.7</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.derby</groupId>
@@ -47,7 +45,7 @@
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-core</artifactId>
-			<version>5.0-SNAPSHOT</version>
+			<version>4.2-incubator-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-logging</groupId>
@@ -67,8 +65,6 @@
 		<dependency>
 			<groupId>easymock</groupId>
 			<artifactId>easymock</artifactId>
-			<version>1.1</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<!-- This is just for the JMS spec - could use javax.jms -->
