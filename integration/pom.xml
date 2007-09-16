@@ -22,11 +22,24 @@
 		<maven.test.skip>true</maven.test.skip>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>spring-ext</id>
+			<url>
+				https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext
+			</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
 			<artifactId>spring-batch-infrastructure</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-mock</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>hsqldb</groupId>
@@ -45,7 +58,7 @@
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-core</artifactId>
-			<version>4.2-incubator-SNAPSHOT</version>
+			<version>4.2-incubator-35</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-logging</groupId>
@@ -57,10 +70,16 @@
 				</exclusion>
 				<exclusion>
 					<groupId>org.apache.geronimo.specs</groupId>
-					<artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
+					<artifactId>
+						geronimo-j2ee-management_1.0_spec
+					</artifactId>
 				</exclusion>
 			</exclusions>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>easymock</groupId>
