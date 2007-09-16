@@ -1,7 +1,6 @@
 package org.springframework.batch.sample.item.provider;
 
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.io.file.FieldSetInputSource;
 import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.io.file.support.DefaultFlatFileInputSource;
 import org.springframework.batch.item.ItemProvider;
