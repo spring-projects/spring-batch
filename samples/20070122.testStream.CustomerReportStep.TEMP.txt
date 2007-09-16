@@ -1,4 +1,0 @@
-customer1	99901.66
-customer2	99969.1
-customer3	99890.75
-customer4	99876.61
