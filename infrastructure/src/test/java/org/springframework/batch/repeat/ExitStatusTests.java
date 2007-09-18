@@ -49,7 +49,7 @@ public class ExitStatusTests extends TestCase {
 	public void testExitStatusConstantsFinished() {
 		ExitStatus status = ExitStatus.FINISHED;
 		assertFalse(status.isContinuable());
-		assertEquals("", status.getExitCode());
+		assertEquals("COMPLETED", status.getExitCode());
 	}
 
 	/**
