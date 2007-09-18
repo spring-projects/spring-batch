@@ -40,12 +40,12 @@ public class ExitStatus implements Serializable {
 	/**
 	 * Convenient constant value representing finished processing.
 	 */
-	public static ExitStatus FINISHED = new ExitStatus(false);
+	public static ExitStatus FINISHED = new ExitStatus(false, "COMPLETED");
 
 	/**
 	 * Convenient constant value representing finished processing with an error.
 	 */
-	public static ExitStatus FAILED = new ExitStatus(false);
+	public static ExitStatus FAILED = new ExitStatus(false, "FAILED");
 
 	private final boolean continuable;
 
