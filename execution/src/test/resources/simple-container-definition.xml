@@ -71,6 +71,8 @@
 		<property name="scheduleDate" value="20070505" />
 		<property name="jobRun" value="1" />
 	</bean>
+	
+	<bean class="org.springframework.batch.execution.bootstrap.support.SimpleJvmExitCodeMapper" />
 
 	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 		<property name="customEditors">

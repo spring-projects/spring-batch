@@ -26,6 +26,7 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
@@ -34,6 +35,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.StepExecutionContext;
 import org.springframework.batch.execution.step.SimpleStepExecutorFactory;
+import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
@@ -52,6 +54,8 @@ public class DefaultJobExecutor implements JobExecutor {
 	private JobRepository jobRepository;
 
 	private StepExecutorFactory stepExecutorFactory = DEFAULT_STEP_EXECUTOR_FACTORY;
+	
+	private ExitCodeExceptionClassifier exceptionClassifier = new SimpleExitCodeExceptionClassifier();
 
 	public ExitStatus run(JobConfiguration configuration, JobExecutionContext jobExecutionContext)
 			throws BatchCriticalException {
@@ -81,10 +85,12 @@ public class DefaultJobExecutor implements JobExecutor {
 		}
 		catch (StepInterruptedException e) {
 			updateStatus(jobExecutionContext, BatchStatus.STOPPED);
+			status = exceptionClassifier.classifyForExitCode(e);
 			rethrow(e);
 		}
 		catch (Throwable t) {
 			updateStatus(jobExecutionContext, BatchStatus.FAILED);
+			status = exceptionClassifier.classifyForExitCode(t);
 			rethrow(t);
 		}
 		finally {
@@ -154,4 +160,8 @@ public class DefaultJobExecutor implements JobExecutor {
 		this.stepExecutorFactory = stepExecutorResolver;
 	}
 
+	public void setExceptionClassifier(
+			ExitCodeExceptionClassifier exceptionClassifier) {
+		this.exceptionClassifier = exceptionClassifier;
+	}
 }

@@ -16,6 +16,8 @@
 package org.springframework.batch.execution.step.simple;
 
 
+import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
+import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.repeat.ExitStatus;
 
 import junit.framework.TestCase;
@@ -63,5 +65,12 @@ public class SimpleExitCodeExceptionClassifierTests extends TestCase {
 		ExitStatus exitStatus = (ExitStatus)classifier.classify(null);
 		assertEquals(exitStatus.getExitCode(), "FATAL_EXCEPTION");
 		assertEquals(exitStatus.getExitDescription(), "");
+	}
+	
+	public void testClassifyInterruptedException(){
+		ExitStatus exitStatus = (ExitStatus)classifier.classifyForExitCode(new StepInterruptedException(""));
+		assertEquals(exitStatus.getExitCode(), ExitCodeExceptionClassifier.STEP_INTERRUPTED);
+		assertEquals(exitStatus.getExitDescription(), 
+				StepInterruptedException.class.getName());
 	}
 }

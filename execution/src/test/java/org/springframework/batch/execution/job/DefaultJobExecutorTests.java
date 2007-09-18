@@ -27,6 +27,7 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.core.executor.StepInterruptedException;
@@ -221,7 +222,7 @@ public class DefaultJobExecutorTests extends TestCase {
 			assertEquals(exception, e.getCause());
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.STOPPED);
+		checkRepository(BatchStatus.STOPPED, ExitCodeExceptionClassifier.STEP_INTERRUPTED);
 	}
 
 	public void testFailed() throws Exception {
@@ -241,7 +242,7 @@ public class DefaultJobExecutorTests extends TestCase {
 			assertEquals(exception, e);
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.FAILED);
+		checkRepository(BatchStatus.FAILED, ExitCodeExceptionClassifier.FATAL_EXCEPTION);
 	}
 
 	public void testStepShouldNotStart() throws Exception {
@@ -260,12 +261,19 @@ public class DefaultJobExecutorTests extends TestCase {
 	/*
 	 * Check JobRepository to ensure status is being saved.
 	 */
-	private void checkRepository(BatchStatus status) {
+	private void checkRepository(BatchStatus status, String exitCode) {
 		assertEquals(job, jobDao.findJobs(jobIdentifer).get(0));
 		// because map dao stores in memory, it can be checked directly
 		assertEquals(status, job.getStatus());
 		JobExecution jobExecution = (JobExecution) jobDao.findJobExecutions(job).get(0);
 		assertEquals(job.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());
+		if(exitCode != null){
+			assertEquals(jobExecution.getExitCode(), exitCode); 
+		}
+	}
+	
+	private void checkRepository(BatchStatus status){
+		checkRepository(status, null);
 	}
 }

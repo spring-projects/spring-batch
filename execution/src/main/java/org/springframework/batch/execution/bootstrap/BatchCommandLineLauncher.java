@@ -17,6 +17,7 @@
 package org.springframework.batch.execution.bootstrap;
 
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
@@ -34,6 +35,7 @@ public class BatchCommandLineLauncher {
 	public static final String PARENT_KEY = "simple-container";
 
 	private ConfigurableApplicationContext parent;
+	private JvmExitCodeMapper exitCodeMapper;
 
 	private JobLauncher launcher;
 
@@ -57,14 +59,23 @@ public class BatchCommandLineLauncher {
 	}
 
 	/**
+	 * Injection setter for the {@link JvmExitCodeMapper}.
+	 * 
+	 * @param exitCodeMapper
+	 *            the exitCodeMapper to set
+	 */
+	public void setExitCodeMapper(JvmExitCodeMapper exitCodeMapper) {
+		this.exitCodeMapper = exitCodeMapper;
+	}
+
+	/**
 	 * @param path
 	 *            the path to a Spring context configuration for this job
 	 * @param jobName
 	 *            the name of the job execution to use
 	 * @throws NoSuchJobConfigurationException
 	 */
-	private void start(String path, String jobName)
-			throws NoSuchJobConfigurationException {
+	int start(String path, String jobName) {
 		if (!path.endsWith(".xml")) {
 			path = path + ".xml";
 		}
@@ -72,14 +83,21 @@ public class BatchCommandLineLauncher {
 				new String[] { path }, parent);
 		context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
 				AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+
+		ExitStatus status = null;
+
 		try {
 			if (!launcher.isRunning()) {
 				if (jobName == null) {
-					launcher.run();
+					status = launcher.run();
 				} else {
-					launcher.run(jobName);
+					status = launcher.run(jobName);
 				}
 			}
+		} catch (NoSuchJobConfigurationException e) { 
+			status = new ExitStatus(false, 
+					JvmExitCodeMapper.BATCH_EXITCODE_NO_SUCH_JOBCONFIGURATION,
+					"Could not locate JobConfiguration \"" + jobName + "\"" );
 		} finally {
 			try {
 				context.stop();
@@ -87,6 +105,7 @@ public class BatchCommandLineLauncher {
 				context.close();
 			}
 		}
+		return exitCodeMapper.getExitCode(status.getExitCode());
 	}
 
 	/**
@@ -103,8 +122,8 @@ public class BatchCommandLineLauncher {
 	 *            </ol>
 	 * @throws NoSuchJobConfigurationException
 	 */
-	public static void main(String[] args)
-			throws NoSuchJobConfigurationException {
+	public static void main(String[] args) {
+		
 		String path = "job-configuration.xml";
 		String name = null;
 		if (args.length > 0) {
@@ -114,7 +133,9 @@ public class BatchCommandLineLauncher {
 			name = args[1];
 		}
 		BatchCommandLineLauncher command = new BatchCommandLineLauncher();
-		command.start(path, name);
+		int result = command.start(path, name);
+		System.exit(result);
+		
 	}
 
 }
