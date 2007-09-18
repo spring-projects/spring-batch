@@ -25,6 +25,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
+import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.runtime.StepExecutionContext;
@@ -38,6 +39,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemProvider;
 import org.springframework.batch.item.provider.ListItemProvider;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
@@ -195,7 +197,7 @@ public class DefaultStepExecutorTests extends TestCase {
 		
 	}
 	
-	public void testExitCodeClassification(){
+	public void testExitCodeDefaultClassification(){
 		
 		Tasklet tasklet = new Tasklet(){
 
@@ -226,4 +228,50 @@ public class DefaultStepExecutorTests extends TestCase {
 		}
 	}
 
+	/*
+	 * StepExecutor will never pass StepInterruptedException to the exceptionClassifier.
+	 * This may or may not stay the same, so the test will remain commented out 
+	 * for reference purposes.
+	 */
+/*	public void testExitCodeInterruptedClassification(){
+		
+		StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy(){
+
+			public void checkInterrupted(RepeatContext context)
+					throws StepInterruptedException {
+				throw new StepInterruptedException("");
+			}
+			
+		};
+		
+		stepExecutor.setInterruptionPolicy(interruptionPolicy);
+		
+		Tasklet tasklet = new Tasklet(){
+
+			public ExitStatus execute() throws Exception {
+				int counter = 0;
+				counter++;
+				
+				if(counter == 1){
+					throw new StepInterruptedException("");
+				}
+				
+				return ExitStatus.CONTINUABLE;
+			}
+			
+		};
+		
+		StepInstance step = new StepInstance(new Long(1));
+		stepConfiguration.setTasklet(tasklet);
+		JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(3)));
+		StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
+		
+		try{
+			stepExecutor.process(stepConfiguration, stepExecutionContext);
+		}
+		catch(Exception ex){
+			assertEquals(ExitCodeExceptionClassifier.STEP_INTERRUPTED, step.getStepExecution().getExitCode() );
+			assertEquals(step.getStepExecution().getExitDescription(), "java.lang.RuntimeException");
+		}
+	}*/
 }
