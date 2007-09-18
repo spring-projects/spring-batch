@@ -29,6 +29,7 @@ import org.springframework.batch.repeat.ExitStatus;
 public interface ExitCodeExceptionClassifier extends ExceptionClassifier {
 
 	static final String FATAL_EXCEPTION = "FATAL_EXCEPTION";
+	static final String STEP_INTERRUPTED = "STEP_INTERRUPTED";
 	
 	/**
 	 * Typesafe version of classify that explicitly returns an {@link ExitStatus}
