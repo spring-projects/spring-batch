@@ -69,10 +69,10 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 	// Job Execution SqlStatements
 	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
-			+ " STATUS = ? where ID = ?";
+			+ " STATUS = ?, EXIT_CODE = ? where ID = ?";
 
-	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(ID, JOB_ID, START_TIME, END_TIME, STATUS)"
-			+ " values (?, ?, ?, ?, ?)";
+	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(ID, JOB_ID, START_TIME, " +
+			"END_TIME, STATUS, EXIT_CODE) values (?, ?, ?, ?, ?, ?)";
 
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE ID=?";
 
@@ -190,7 +190,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		jobExecution.setId(new Long(jobExecutionIncrementer.nextLongValue()));
 		Object[] parameters = new Object[] { jobExecution.getId(),
 				jobExecution.getJobId(), jobExecution.getStartTime(),
-				jobExecution.getEndTime(), jobExecution.getStatus().toString() };
+				jobExecution.getEndTime(), jobExecution.getStatus().toString(),
+				jobExecution.getExitCode()};
 		jdbcTemplate.update(getSaveJobExecutionQuery(), parameters);
 	}
 
@@ -208,7 +209,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 		Object[] parameters = new Object[] { jobExecution.getStartTime(),
 				jobExecution.getEndTime(), jobExecution.getStatus().toString(),
-				jobExecution.getId() };
+				jobExecution.getExitCode(), jobExecution.getId() };
 
 		if (jobExecution.getId() == null) {
 			throw new IllegalArgumentException(

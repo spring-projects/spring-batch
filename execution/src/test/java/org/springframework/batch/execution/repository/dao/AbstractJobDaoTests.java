@@ -40,7 +40,7 @@ import org.springframework.util.ClassUtils;
 public abstract class AbstractJobDaoTests extends
 		AbstractTransactionalDataSourceSpringContextTests {
 
-	private static final String GET_JOB_EXECUTION = "SELECT JOB_ID, START_TIME, END_TIME, STATUS from "
+	private static final String GET_JOB_EXECUTION = "SELECT JOB_ID, START_TIME, END_TIME, STATUS, EXIT_CODE from "
 			+ "BATCH_JOB_EXECUTION where ID = ?";
 
 	protected JobDao jobDao;
@@ -164,12 +164,21 @@ public abstract class AbstractJobDaoTests extends
 	public void testUpdateJobExecution() {
 
 		jobExecution.setStatus(BatchStatus.COMPLETED);
+		jobExecution.setExitCode("COMPLETED");
 		jobExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
 		jobDao.update(jobExecution);
 
 		List executions = retrieveJobExecution(jobExecution.getId());
 		assertEquals(executions.size(), 1);
-		assertEquals(jobExecution, ((JobExecution) executions.get(0)));
+		validateJobExecution(jobExecution, (JobExecution) executions.get(0));
+	
+	}
+	
+	public void testSaveJobExecution(){
+		
+		List executions = retrieveJobExecution(jobExecution.getId());
+		assertEquals(executions.size(), 1);
+		validateJobExecution(jobExecution, (JobExecution) executions.get(0));
 	}
 
 	public void testUpdateInvalidJobExecution() {
@@ -231,6 +240,16 @@ public abstract class AbstractJobDaoTests extends
 		assertEquals(job.getName(), ((Map) jobs.get(0)).get("JOB_NAME"));
 
 	}
+	
+	private void validateJobExecution(JobExecution lhs, JobExecution rhs){
+		
+		//equals operator only checks id
+		assertEquals(lhs, rhs);
+		assertEquals(lhs.getStartTime(), rhs.getStartTime());
+		assertEquals(lhs.getEndTime(), rhs.getEndTime());
+		assertEquals(lhs.getStatus(), rhs.getStatus());
+		assertEquals(lhs.getExitCode(), rhs.getExitCode());
+	}
 
 	private List retrieveJobExecution(final Long id) {
 
@@ -242,6 +261,7 @@ public abstract class AbstractJobDaoTests extends
 				execution.setStartTime(rs.getTimestamp(2));
 				execution.setEndTime(rs.getTimestamp(3));
 				execution.setStatus(BatchStatus.getStatus(rs.getString(4)));
+				execution.setExitCode(rs.getString(5));
 				execution.setId(id);
 
 				return execution;

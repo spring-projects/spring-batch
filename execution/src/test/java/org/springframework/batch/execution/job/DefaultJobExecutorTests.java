@@ -175,7 +175,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		});
 		jobExecutor.run(jobConfiguration, jobExecutionContext);
 		assertEquals(2, list.size());
-		checkRepository(BatchStatus.COMPLETED);
+		checkRepository(BatchStatus.COMPLETED, ExitStatus.FINISHED.getExitCode());
 	}
 
 
