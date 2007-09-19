@@ -203,7 +203,10 @@ public class RepeatTemplate implements RepeatOperations {
 					executeAfterInterceptors(context, value);
 					// An exception alone is not sufficient grounds for not
 					// continuing
-					result = result.and(canContinue(value));
+					
+					if(value instanceof ExitStatus){
+						result = (ExitStatus)value;
+					}
 
 					// N.B. the order may be important here:
 					if (isComplete(context, value) || isMarkedComplete(context)) {

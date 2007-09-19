@@ -387,5 +387,20 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		assertFalse(result.isContinuable());
 
 	}
+	
+	public void testCustomExitCode(){
+		
+		ExitStatus status = template.iterate(new RepeatCallback(){
+
+			public ExitStatus doInIteration(RepeatContext context)
+					throws Exception {
+				ExitStatus exitStatus = new ExitStatus(false, "CUSTOM_CODE");
+				return exitStatus;
+			}
+			
+		});
+		
+		assertEquals("CUSTOM_CODE", status.getExitCode());
+	}
 
 }

@@ -66,6 +66,11 @@ public class ExitStatusTests extends TestCase {
 	public void testAndExitStatus() {
 		assertTrue(ExitStatus.CONTINUABLE.and(ExitStatus.CONTINUABLE.isContinuable()).isContinuable());
 		assertFalse(ExitStatus.CONTINUABLE.and(ExitStatus.FINISHED.isContinuable()).isContinuable());
+		assertTrue(ExitStatus.FINISHED.and(ExitStatus.CONTINUABLE.isContinuable()).getExitCode() 
+				== ExitStatus.FINISHED.getExitCode());
+		ExitStatus status = new ExitStatus(false, "CUSTOM_CODE", "CUSTOM_DESCRIPTION");
+		assertTrue(status.and(true).getExitCode() == "CUSTOM_CODE");
+		assertTrue(status.and(true).getExitDescription() == "CUSTOM_DESCRIPTION");
 	}
 
 	public void testAddExitCode() throws Exception {

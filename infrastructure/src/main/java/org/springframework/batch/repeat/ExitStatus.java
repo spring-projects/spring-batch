@@ -109,7 +109,7 @@ public class ExitStatus implements Serializable {
 	 *         logical and of the current value and the argument provided.
 	 */
 	public ExitStatus and(boolean continuable) {
-		return new ExitStatus(this.continuable && continuable);
+		return new ExitStatus(this.continuable && continuable, this.exitCode, this.exitDescription);
 	}
 
 	/*
