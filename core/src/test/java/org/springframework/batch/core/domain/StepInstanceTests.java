@@ -50,7 +50,7 @@ public class StepInstanceTests extends TestCase {
 	 */
 	public void testGetRestartData() {
 		assertNotNull(instance.getRestartData());
-		assertEquals(null, instance.getRestartData().getProperties());
+		assertTrue(instance.getRestartData().getProperties().isEmpty());
 		instance.setRestartData(new GenericRestartData(new Properties() {{
 			setProperty("foo", "bar");
 		}}));
@@ -104,7 +104,7 @@ public class StepInstanceTests extends TestCase {
 		instance.setJob(new JobInstance(new Long(23)));
 		assertEquals(23, instance.getJobId().longValue());
 	}
-	
+
 	public void testEqualsWithSameIdentifier() throws Exception {
 		JobInstance job = new JobInstance(new Long(100));
 		StepInstance step1 = new StepInstance(new Long(0));
@@ -116,7 +116,7 @@ public class StepInstanceTests extends TestCase {
 		step2.setName(stepName);
 		assertEquals(step1, step2);
 	}
-	
+
 	public void testToString() throws Exception {
 		assertTrue("Should contain name", instance.toString().indexOf("name=")>=0);
 		assertTrue("Should contain status", instance.toString().indexOf("status=")>=0);
