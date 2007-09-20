@@ -32,6 +32,9 @@ import org.springframework.batch.repeat.ExitStatus;
 
 public interface JobLauncher {
 
+	public static final String NO_SUCH_JOB_CONFIGURATION = "NO_SUCH_JOB_CONFIGURATION";
+	public static final String JOB_CONFIGURATION_NOT_PROVIDED = "JOB_CONFIGURATION_NOT_PROVIDED";
+
 	/**
 	 * Start a job execution with default name and other runtime information
 	 * generated on the fly.<br/>

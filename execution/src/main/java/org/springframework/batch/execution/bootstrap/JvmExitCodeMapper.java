@@ -31,7 +31,7 @@ public interface JvmExitCodeMapper extends ExitCodeMapper {
 	
 	static int JVM_EXITCODE_COMPLETED = 0;
 	static int JVM_EXITCODE_GENERIC_ERROR = 1;
-	static int JVM_EXITCODE_NO_SUCH_JOBCONFIGURATION = 2;
+	static int JVM_EXITCODE_JOB_CONFIGURATION_ERROR = 2;
 	
 	/**
 	 * Transform the exitcode known by the batchframework into a JVM return

@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.bootstrap;
+package org.springframework.batch.execution.bootstrap.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
-import org.springframework.batch.execution.bootstrap.support.JvmSystemExiter;
-import org.springframework.batch.execution.bootstrap.support.SimpleJvmExitCodeMapper;
+import org.springframework.batch.execution.bootstrap.JobLauncher;
+import org.springframework.batch.execution.bootstrap.JvmExitCodeMapper;
+import org.springframework.batch.execution.bootstrap.SystemExiter;
 import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
@@ -69,7 +67,7 @@ public class BatchCommandLineLauncher {
 
 	/**
 	 * Injection setter for the {@link JobLauncher}.
-	 * 
+	 *
 	 * @param launcher
 	 *            the launcher to set
 	 */
@@ -79,7 +77,7 @@ public class BatchCommandLineLauncher {
 
 	/**
 	 * Injection setter for the {@link ExitCodeExceptionClassifier}
-	 * 
+	 *
 	 * @param exceptionClassifier
 	 */
 	public void setExceptionClassifier(
@@ -89,7 +87,7 @@ public class BatchCommandLineLauncher {
 
 	/**
 	 * Injection setter for the {@link JvmExitCodeMapper}.
-	 * 
+	 *
 	 * @param exitCodeMapper
 	 *            the exitCodeMapper to set
 	 */
@@ -99,7 +97,7 @@ public class BatchCommandLineLauncher {
 
 	/**
 	 * Injection setter for the {@link SystemExiter}.
-	 * 
+	 *
 	 * @param systemExitor
 	 */
 	public void setSystemExiter(SystemExiter systemExitor) {
@@ -123,7 +121,7 @@ public class BatchCommandLineLauncher {
 
 		ExitStatus status = ExitStatus.FAILED;
 		ClassPathXmlApplicationContext context = null;
-		
+
 		try {
 			ClassPathXmlApplicationContext parent = (ClassPathXmlApplicationContext) beanFactoryLocator
 					.useBeanFactory(parentKey).getFactory();
@@ -174,7 +172,7 @@ public class BatchCommandLineLauncher {
 	 * Launch a batch job using a {@link BatchCommandLineLauncher}. Creates a
 	 * new Spring context for the job execution, and uses a common parent for
 	 * all such contexts.
-	 * 
+	 *
 	 * @param args
 	 *            <ol>
 	 *            <li> classpath location of resource to load job configuration

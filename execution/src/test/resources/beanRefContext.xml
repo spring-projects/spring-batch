@@ -10,13 +10,13 @@
 
 	<bean id="testBatchEnvironment" class="org.springframework.context.support.ClassPathXmlApplicationContext">
 		<constructor-arg>
-			<value>org/springframework/batch/execution/bootstrap/test-batch-environment.xml</value>
+			<value>org/springframework/batch/execution/bootstrap/support/test-batch-environment.xml</value>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="testBatchEnvironmentNoLauncher" class="org.springframework.context.support.ClassPathXmlApplicationContext">
 		<constructor-arg>
-			<value>org/springframework/batch/execution/bootstrap/test-batch-environment-no-launcher.xml</value>
+			<value>org/springframework/batch/execution/bootstrap/support/test-batch-environment-no-launcher.xml</value>
 		</constructor-arg>
 	</bean>
 

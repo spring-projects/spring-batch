@@ -19,13 +19,11 @@ package org.springframework.batch.execution.bootstrap.support;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.batch.execution.bootstrap.JvmExitCodeMapper;
-import org.springframework.batch.repeat.ExitCodeMapper;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
-import org.springframework.core.io.ClassPathResource;
-
 import junit.framework.TestCase;
+
+import org.springframework.batch.execution.bootstrap.JobLauncher;
+import org.springframework.batch.execution.bootstrap.JvmExitCodeMapper;
+import org.springframework.batch.repeat.ExitStatus;
 
 public class SimpleJvmExitCodeMapperTests extends TestCase {
 
@@ -40,9 +38,10 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 		
 		ecm2 = new SimpleJvmExitCodeMapper();
 		Map ecm2Map = new HashMap();
-		ecm2Map.put(JvmExitCodeMapper.BATCH_EXITCODE_COMPLETED, new Integer(-1));
-		ecm2Map.put(JvmExitCodeMapper.BATCH_EXITCODE_GENERIC_ERROR, new Integer(-2));
-		ecm2Map.put(JvmExitCodeMapper.BATCH_EXITCODE_NO_SUCH_JOBCONFIGURATION, new Integer(-3));
+		ecm2Map.put(ExitStatus.FINISHED.getExitCode(), new Integer(-1));
+		ecm2Map.put(ExitStatus.FAILED.getExitCode(), new Integer(-2));
+		ecm2Map.put(JobLauncher.JOB_CONFIGURATION_NOT_PROVIDED, new Integer(-3));
+		ecm2Map.put(JobLauncher.NO_SUCH_JOB_CONFIGURATION, new Integer(-3));
 		ecm2.setMapping(ecm2Map);
 	}
 
@@ -52,24 +51,29 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 
 	public void testGetExitCodeWithpPredefinedCodes() {
 		assertEquals(
-				ecm.getExitCode(ExitCodeMapper.BATCH_EXITCODE_COMPLETED),
+				ecm.getExitCode(ExitStatus.FINISHED.getExitCode()),
 				JvmExitCodeMapper.JVM_EXITCODE_COMPLETED);
 		assertEquals(
-				ecm.getExitCode(ExitCodeMapper.BATCH_EXITCODE_GENERIC_ERROR),
+				ecm.getExitCode(ExitStatus.FAILED.getExitCode()),
 				JvmExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR);
 		assertEquals(
-				ecm.getExitCode(ExitCodeMapper.BATCH_EXITCODE_NO_SUCH_JOBCONFIGURATION),
-				JvmExitCodeMapper.JVM_EXITCODE_NO_SUCH_JOBCONFIGURATION);		
+				ecm.getExitCode(JobLauncher.JOB_CONFIGURATION_NOT_PROVIDED),
+				JvmExitCodeMapper.JVM_EXITCODE_JOB_CONFIGURATION_ERROR);		
+		assertEquals(
+				ecm.getExitCode(JobLauncher.NO_SUCH_JOB_CONFIGURATION),
+				JvmExitCodeMapper.JVM_EXITCODE_JOB_CONFIGURATION_ERROR);		
 	}
 	
 	public void testGetExitCodeWithPredefinedCodesOverridden() {
-		System.out.println(ecm2.getExitCode(ExitCodeMapper.BATCH_EXITCODE_COMPLETED));
+		System.out.println(ecm2.getExitCode(ExitStatus.FINISHED.getExitCode()));
 		assertEquals(
-				ecm2.getExitCode(ExitCodeMapper.BATCH_EXITCODE_COMPLETED), -1);
+				ecm2.getExitCode(ExitStatus.FINISHED.getExitCode()), -1);
 		assertEquals(
-				ecm2.getExitCode(ExitCodeMapper.BATCH_EXITCODE_GENERIC_ERROR), -2);
+				ecm2.getExitCode(ExitStatus.FAILED.getExitCode()), -2);
 		assertEquals(
-				ecm2.getExitCode(ExitCodeMapper.BATCH_EXITCODE_NO_SUCH_JOBCONFIGURATION), -3);		
+				ecm2.getExitCode(JobLauncher.JOB_CONFIGURATION_NOT_PROVIDED), -3);		
+		assertEquals(
+				ecm2.getExitCode(JobLauncher.NO_SUCH_JOB_CONFIGURATION), -3);		
 	}
 
 	public void testGetExitCodeWithCustomCode() {

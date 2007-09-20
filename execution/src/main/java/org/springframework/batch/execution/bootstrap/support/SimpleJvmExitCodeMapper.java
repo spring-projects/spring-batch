@@ -21,7 +21,10 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.execution.bootstrap.JobLauncher;
 import org.springframework.batch.execution.bootstrap.JvmExitCodeMapper;
+import org.springframework.batch.execution.bootstrap.SimpleJobLauncher;
+import org.springframework.batch.repeat.ExitStatus;
 
 
 /**
@@ -40,12 +43,14 @@ public class SimpleJvmExitCodeMapper implements JvmExitCodeMapper {
 	
 	public SimpleJvmExitCodeMapper(){
 		mapping = new HashMap();
-		mapping.put(BATCH_EXITCODE_COMPLETED, 
+		mapping.put(ExitStatus.FINISHED.getExitCode(), 
 				new Integer(JVM_EXITCODE_COMPLETED));
-		mapping.put(BATCH_EXITCODE_GENERIC_ERROR, 
+		mapping.put(ExitStatus.FAILED.getExitCode(), 
 				new Integer(JVM_EXITCODE_GENERIC_ERROR));
-		mapping.put(BATCH_EXITCODE_NO_SUCH_JOBCONFIGURATION, 
-				new Integer(JVM_EXITCODE_NO_SUCH_JOBCONFIGURATION));
+		mapping.put(JobLauncher.JOB_CONFIGURATION_NOT_PROVIDED, 
+				new Integer(JVM_EXITCODE_JOB_CONFIGURATION_ERROR));
+		mapping.put(JobLauncher.NO_SUCH_JOB_CONFIGURATION, 
+				new Integer(JVM_EXITCODE_JOB_CONFIGURATION_ERROR));
 	}
 
 	public Map getMapping() {

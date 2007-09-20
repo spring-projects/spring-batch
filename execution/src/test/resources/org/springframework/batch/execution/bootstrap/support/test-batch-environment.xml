@@ -6,11 +6,13 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
-	
+
+	<bean id="simpleContainerLauncher" class="org.springframework.batch.execution.bootstrap.support.MockJobLauncher" />
+
 	<bean id="jobConfigurationRegistry" class="org.springframework.batch.execution.configuration.MapJobConfigurationRegistry"/>
-	
+
 	<bean class="org.springframework.batch.execution.bootstrap.support.SimpleJvmExitCodeMapper" />
 
-	<bean class="org.springframework.batch.execution.bootstrap.MockSystemExiter" />
-	 
+	<bean class="org.springframework.batch.execution.bootstrap.support.MockSystemExiter" />
+
 </beans>

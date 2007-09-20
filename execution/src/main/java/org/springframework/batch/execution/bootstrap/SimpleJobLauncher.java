@@ -129,7 +129,7 @@ public class SimpleJobLauncher implements JobLauncher {
 	 */
 	public ExitStatus run(){
 		if (jobConfigurationName==null) {
-			return new ExitStatus(false, "JOB_CONFIGURATION_NOT_PROVIDED", "No JobConfiguration was " +
+			return new ExitStatus(false, JOB_CONFIGURATION_NOT_PROVIDED, "No JobConfiguration was " +
 					"provided to the launcher.");
 		}
 		try {
@@ -138,7 +138,7 @@ public class SimpleJobLauncher implements JobLauncher {
 		catch (NoSuchJobConfigurationException e) {
 			logger.error("JobExecutorFacade failed to find a JobConfiguration" +
 					" for the provided JobIdentifier", e);
-			return new ExitStatus(false, "NO_SUCH_JOB_CONFIGURATION", "JobExecutor Facade failed" +
+			return new ExitStatus(false, NO_SUCH_JOB_CONFIGURATION, "JobExecutor Facade failed" +
 					"to find a JobConfiguration for the provided JobIdentifier");
 		}
 	}
