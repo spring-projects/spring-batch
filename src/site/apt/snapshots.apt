@@ -10,7 +10,7 @@ Snapshot Builds
 	These builds are provided for testing and development purposes only. They are built by a Bamboo process 
 	automatically using the latest snapshot from Subversion.
 	
-	The snapshots are deloyed to a Maven2 snapshot repository. To use it, just add the following repository to your POM:
+	The snapshots are deloyed to a Maven2 snapshot repository. To use it, just add the following repository to your POM (inside a \<repositories\> element at the top level):
 
 +---------------
 <repository>
@@ -20,7 +20,7 @@ Snapshot Builds
 </repository>
 +---------------
 
-	Individual dependencies can then by added like so:
+	Individual dependencies can then by added like so (inside a \<dependencies\> element at the top level):
 
 +---------------
 <dependency>

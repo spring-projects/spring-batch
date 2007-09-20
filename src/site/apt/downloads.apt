@@ -9,7 +9,7 @@ Milestone Builds
 
   These builds are provided for evaluation and community feedback.  They will have a release identifier ending in "-mX" where X is the milestone number.  The curent release is <<1.0-m2>>.
 	
-  The builds consist of a set of jar artifacts deloyed to a Maven2 repository. To use it, just add the following repository to your POM:
+  The builds consist of a set of jar artifacts deployed to a Maven2 repository. To use it, just add the following repository to your POM (inside a \<repositories\> element at the top level):
 
 +---------------
 <repository>
@@ -19,7 +19,7 @@ Milestone Builds
 </repository>
 +---------------
 
-  Individual dependencies can then by added like so:
+  Individual dependencies can then by added like so (inside a \<dependencies\> element at the top level):
 
 +---------------
 <dependency>
@@ -39,7 +39,7 @@ Milestone Builds
 </dependency>
 +---------------
 
-  Additionally, you can browse the repository with a web browser {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}here}}.
+  Additionally, you can browse the repository with a web browser {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/spring-batch}here}}.
 
 Snapshot Builds
 
