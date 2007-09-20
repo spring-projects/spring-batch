@@ -2,9 +2,21 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-	<bean id="simple-container" class="org.springframework.context.support.ClassPathXmlApplicationContext">
+	<bean id="batchExecutionEnvironment" class="org.springframework.context.support.ClassPathXmlApplicationContext">
 		<constructor-arg>
 			<value>simple-container-definition.xml</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="testBatchEnvironment" class="org.springframework.context.support.ClassPathXmlApplicationContext">
+		<constructor-arg>
+			<value>org/springframework/batch/execution/bootstrap/test-batch-environment.xml</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="testBatchEnvironmentNoLauncher" class="org.springframework.context.support.ClassPathXmlApplicationContext">
+		<constructor-arg>
+			<value>org/springframework/batch/execution/bootstrap/test-batch-environment-no-launcher.xml</value>
 		</constructor-arg>
 	</bean>
 

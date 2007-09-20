@@ -11,10 +11,10 @@
 		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
 	</bean>
 
-	<bean id="test-job" parent="simpleJob">
+	<bean id="test-job" class="org.springframework.batch.core.configuration.JobConfiguration">
 		<property name="name" value="test-job"/>
 		<property name="steps">
-			<bean id="step1" parent="simpleStep">
+			<bean id="step1" class="org.springframework.batch.execution.step.simple.SimpleStepConfiguration">
 				<constructor-arg>
 					<bean
 						class="org.springframework.batch.execution.tasklet.ItemProviderProcessTasklet">
