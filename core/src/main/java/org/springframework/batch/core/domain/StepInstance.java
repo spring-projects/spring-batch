@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.domain;
 
+import java.util.Properties;
+
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 
@@ -30,7 +32,7 @@ import org.springframework.batch.restart.RestartData;
  * it's ID, which is obtained from a JobRepository. Two steps with the same name
  * and same job can be considered the same step.
  * </p>
- * 
+ *
  * <p>
  * Because each step represents a runnable batch artifact with it's own
  * lifecycle, each step contains status and an execution count. Status
@@ -39,10 +41,10 @@ import org.springframework.batch.restart.RestartData;
  * this individual step. It should be noted that a restartable job will create a
  * new step instance (the same logical step, with a different ID) for every run.
  * </p>
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ *
  */
 public class StepInstance extends Entity {
 
@@ -51,7 +53,7 @@ public class StepInstance extends Entity {
 	// TODO declare transient or make serializable
 	private BatchStatus status;
 
-	private RestartData restartData = new GenericRestartData(null);
+	private RestartData restartData = new GenericRestartData(new Properties());
 
 	private int stepExecutionCount = 0;
 
