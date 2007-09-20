@@ -104,6 +104,7 @@ import org.springframework.util.Assert;
  * because of an error on output, the input source will be returned to row 1.
  * Calling read while on row 1 will move the current row to 3, not 2, because 2
  * has been marked as skipped.
+ * </p>
  * 
  * <p>
  * Calling close on this Input Source will cause all resources it is currently
