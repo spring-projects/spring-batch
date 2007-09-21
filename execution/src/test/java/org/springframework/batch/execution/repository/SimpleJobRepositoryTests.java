@@ -33,12 +33,13 @@ import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
+import org.springframework.batch.restart.GenericRestartData;
 
 /*
  * Test SimpleJobRepository.  The majority of test cases are tested using EasyMock,
- * however, there were some issues with using it for the stepDao when testing finding 
- * or creating steps, so an actual mock class had to be written. 
- * 
+ * however, there were some issues with using it for the stepDao when testing finding
+ * or creating steps, so an actual mock class had to be written.
+ *
  * @author Lucas Ward
  *
  */
@@ -69,14 +70,14 @@ public class SimpleJobRepositoryTests extends TestCase {
 	StepInstance databaseStep1;
 
 	StepInstance databaseStep2;
-	
+
 	List steps;
 
 	public void setUp() throws Exception {
 
 		jobDao = (JobDao) jobDaoControl.getMock();
 		stepDao = (StepDao) stepDaoControl.getMock();
-		
+
 		jobRepository = new SimpleJobRepository(jobDao, stepDao);
 
 		jobRuntimeInformation = new SimpleJobIdentifier("RepositoryTest");
@@ -99,14 +100,17 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 		databaseStep1 = new StepInstance(new Long(1));
 		databaseStep2 = new StepInstance(new Long(2));
-		
+
 		steps = new ArrayList();
 		steps.add(databaseStep1);
 		steps.add(databaseStep2);
 	}
-	
+
+	/*
+	 * Test a restartable job, that has not been run before.
+	 */
 	public void testCreateRestartableJob(){
-	
+
 		List jobs = new ArrayList();
 
 		jobDao.findJobs(jobRuntimeInformation);
@@ -128,7 +132,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		step = (StepInstance) it.next();
 		assertTrue(step.equals(databaseStep2));
 	}
-	
+
 	public void testRestartedJob(){
 		List jobs = new ArrayList();
 		jobDao.findJobs(jobRuntimeInformation);
@@ -157,9 +161,9 @@ public class SimpleJobRepositoryTests extends TestCase {
 		assertTrue(step.equals(databaseStep2));
 		assertTrue(step.getStepExecutionCount() == 1);
 	}
-	
+
 	public void testCreateNonRestartableJob(){
-		
+
 		List jobs = new ArrayList();
 
 		jobDao.findJobs(jobRuntimeInformation);
@@ -247,7 +251,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		stepDaoControl.replay();
 		jobRepository.update(step);
 	}
-	
+
 	public void testUpdateStepExecution(){
 		StepExecution stepExecution = new StepExecution(new Long(10), null);
 		stepExecution.setId(new Long(11));
@@ -256,10 +260,10 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobRepository.saveOrUpdate(stepExecution);
 		stepDaoControl.verify();
 	}
-	
+
 	public void testSaveStepExecution(){
 		StepExecution stepExecution = new StepExecution(new Long(10), null);
-		//TODO: Not sure why, but calling save on the EasyMock stepDao causes a NullPointerException 
+		//TODO: Not sure why, but calling save on the EasyMock stepDao causes a NullPointerException
 //		stepDao.save(stepExecution);
 //		stepDaoControl.replay();
 		jobRepository.saveOrUpdate(stepExecution);
@@ -278,6 +282,68 @@ public class SimpleJobRepositoryTests extends TestCase {
 		catch (Exception ex) {
 			// expected
 		}
+	}
+
+	/*
+	 * Test to ensure that if a StepDao returns invalid
+	 * restart data, it is corrected.
+	 */
+	public void testCreateStepsFixesInvalidRestartData(){
+
+		List jobs = new ArrayList();
+
+		jobDao.findJobs(jobRuntimeInformation);
+		jobDaoControl.setReturnValue(jobs);
+		jobDao.createJob(jobRuntimeInformation);
+		jobDaoControl.setReturnValue(databaseJob);
+		stepDao.createStep(databaseJob, "TestStep1");
+		databaseStep1.setRestartData(null);
+		stepDaoControl.setReturnValue(databaseStep1);
+		stepDao.createStep(databaseJob, "TestStep2");
+		databaseStep2.setRestartData(new GenericRestartData(null));
+		stepDaoControl.setReturnValue(databaseStep2);
+		stepDaoControl.replay();
+		jobDaoControl.replay();
+		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
+		List jobSteps = job.getSteps();
+		Iterator it = jobSteps.iterator();
+		StepInstance step = (StepInstance) it.next();
+		assertTrue(step.equals(databaseStep1));
+		assertTrue(step.getRestartData().getProperties().isEmpty());
+		step = (StepInstance) it.next();
+		assertTrue(step.equals(databaseStep2));
+		assertTrue(step.getRestartData().getProperties().isEmpty());
+	}
+
+	public void testFindStepsFixesInvalidRestartData(){
+		List jobs = new ArrayList();
+		jobDao.findJobs(jobRuntimeInformation);
+		jobs.add(databaseJob);
+		jobDaoControl.setReturnValue(jobs);
+		stepDao.findStep(databaseJob, "TestStep1");
+		databaseStep1.setRestartData(null);
+		stepDaoControl.setReturnValue(databaseStep1);
+		stepDao.getStepExecutionCount(databaseStep1.getId());
+		stepDaoControl.setReturnValue(1);
+		stepDao.findStep(databaseJob, "TestStep2");
+		databaseStep2.setRestartData(new GenericRestartData(null));
+		stepDaoControl.setReturnValue(databaseStep2);
+		stepDao.getStepExecutionCount(databaseStep2.getId());
+		stepDaoControl.setReturnValue(1);
+		stepDaoControl.replay();
+		jobDao.getJobExecutionCount(databaseJob.getId());
+		jobDaoControl.setReturnValue(1);
+		jobDaoControl.replay();
+		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
+		assertTrue(job.equals(databaseJob));
+		List jobSteps = job.getSteps();
+		Iterator it = jobSteps.iterator();
+		StepInstance step = (StepInstance) it.next();
+		assertTrue(step.equals(databaseStep1));
+		assertTrue(step.getRestartData().getProperties().isEmpty());
+		step = (StepInstance) it.next();
+		assertTrue(step.getRestartData().getProperties().isEmpty());
+		assertTrue(step.equals(databaseStep2));
 	}
 
 	/**

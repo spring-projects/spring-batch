@@ -61,15 +61,15 @@ import org.springframework.util.Assert;
  * operations should not do any concurrent execution. N.B. usually that means
  * that the chunk operations should be a {@link RepeatTemplate} (which is the
  * default).<br/>
- * 
+ *
  * Clients can use interceptors in the step operations to intercept or listen to
  * the iteration on a step-wide basis, for instance to get a callback when the
  * step is complete. Those that want callbacks at the level of an individual
  * tasks, can specify interceptors for the chunk operations.
- * 
+ *
  * @author Dave Syer
  * @author Lucas Ward
- * 
+ *
  */
 public class SimpleStepExecutor implements StepExecutor {
 
@@ -95,7 +95,7 @@ public class SimpleStepExecutor implements StepExecutor {
 	private RepeatOperations stepOperations = new RepeatTemplate();
 
 	private JobRepository jobRepository;
-	
+
 	private ExitCodeExceptionClassifier exceptionClassifier = new SimpleExitCodeExceptionClassifier();
 
 	// default to checking current thread for interruption.
@@ -155,6 +155,7 @@ public class SimpleStepExecutor implements StepExecutor {
 			throws BatchCriticalException, StepInterruptedException {
 
 		final StepInstance step = stepExecutionContext.getStep();
+		boolean isRestart = step.getStepExecutionCount() > 0 ? true : false;
 		Assert.notNull(step);
 
 		final StepExecution stepExecution = stepExecutionContext.getStepExecution();
@@ -171,7 +172,7 @@ public class SimpleStepExecutor implements StepExecutor {
 
 			final boolean saveRestartData = ((AbstractStepConfiguration) configuration).isSaveRestartData();
 
-			if (saveRestartData) {
+			if (saveRestartData && isRestart) {
 				restoreFromRestartData(module, step.getRestartData());
 			}
 
@@ -253,7 +254,7 @@ public class SimpleStepExecutor implements StepExecutor {
 			return status;
 		}
 		catch (RuntimeException e) {
-			
+
 			//classify exception so an exit code can be stored.
 			status = exceptionClassifier.classifyForExitCode(e);
 			stepExecution.setException(e);
@@ -265,7 +266,7 @@ public class SimpleStepExecutor implements StepExecutor {
 				updateStatus(stepExecutionContext, BatchStatus.FAILED);
 				throw e;
 			}
-			
+
 		}
 		finally {
 			stepExecution.setExitCode(status.getExitCode());
@@ -311,7 +312,7 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * transaction. The transaction is programmatically started and stopped
 	 * outside this method, so subclasses that override do not need to create a
 	 * transaction.
-	 * 
+	 *
 	 * @param configuration the current step configuration
 	 * @param stepExecutionContext the current step, containing the
 	 * {@link Tasklet} with the business logic.
@@ -384,11 +385,11 @@ public class SimpleStepExecutor implements StepExecutor {
 	public void setInterruptionPolicy(StepInterruptionPolicy interruptionPolicy) {
 		this.interruptionPolicy = interruptionPolicy;
 	}
-	
+
 	/**
 	 * Setter for the {@link ExitCodeExceptionClassifier} that will be used
 	 * to classify any exception that causes a job to fail.
-	 * 
+	 *
 	 * @param exceptionClassifier
 	 */
 	public void setExceptionClassifier(

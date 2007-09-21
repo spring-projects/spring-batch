@@ -19,6 +19,7 @@ package org.springframework.batch.execution.repository;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.StepConfiguration;
@@ -32,21 +33,22 @@ import org.springframework.batch.core.repository.NoSuchBatchDomainObjectExceptio
 import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
+import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.util.Assert;
 
 /**
- * 
+ *
  * <p>
  * Simple Job Repository that stores Jobs, JobExecutions, Steps, and
  * StepExecutions using the provided JobDao and StepDao.
  * <p>
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  * @see JobRepository
  * @see StepDao
  * @see JobDao
- * 
+ *
  */
 public class SimpleJobRepository implements JobRepository {
 
@@ -62,15 +64,15 @@ public class SimpleJobRepository implements JobRepository {
 
 	/**
 	 * <p>
-	 * Find or Create a Job(@link Job) based on the passed in RuntimeInformation
-	 * and Configuration. JobRuntimeInformation contains the following fields
-	 * which logically identify a job: JobName, JobStream, JobRun, and Schedule
-	 * Date. However, unique identification of a job can only come from the
-	 * database, and therefore must come from JobDao by either creating a new
-	 * job or finding an existing one, which will ensure that the id field of
-	 * the job is populated with the correct value.
+	 * Find or Create a JobInstance(@link JobInstance) based on the passed in
+	 * RuntimeInformation and Configuration. JobRuntimeInformation contains the
+	 * following fields which logically identify a job: JobName, JobStream,
+	 * JobRun, and Schedule Date. However, unique identification of a job can
+	 * only come from the database, and therefore must come from JobDao by
+	 * either creating a new job or finding an existing one, which will ensure
+	 * that the id field of the job is populated with the correct value.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * There are two ways in which the method determines if a job should be
 	 * created or an existing one should be returned. The first is
@@ -81,9 +83,8 @@ public class SimpleJobRepository implements JobRepository {
 	 * (there must be at least 1) and it will be returned. If no job is found, a
 	 * new one will be created based on the configuration.
 	 * </p>
-	 * 
-	 * @see JobRepository#findOrCreateJob(JobConfiguration,
-	 * JobIdentifier)
+	 *
+	 * @see JobRepository#findOrCreateJob(JobConfiguration, JobIdentifier)
 	 */
 	public JobInstance findOrCreateJob(JobConfiguration jobConfiguration, JobIdentifier runtimeInformation) {
 
@@ -126,7 +127,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * identifer, because it must be updatable separately. If an id isn't found,
 	 * a new JobExecution is created, if one is found, the current row is
 	 * updated.
-	 * 
+	 *
 	 * @param JobExecution to be stored.
 	 * @throws IllegalArgumentException if jobExecution is null.
 	 */
@@ -149,7 +150,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * Update an existing job. A job must have been obtained from the
 	 * findOrCreateJob method, otherwise it is likely that the id is incorrect
 	 * or non-existant.
-	 * 
+	 *
 	 * @param job to be updated.
 	 * @throws IllegalArgumentException if Job or it's Id is null.
 	 */
@@ -167,7 +168,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * saved and an id will be set, otherwise it will be updated. It should be
 	 * noted that assigning an ID randomly will likely cause an exception
 	 * depending on the StepDao implementation.
-	 * 
+	 *
 	 * @param StepExecution to be saved.
 	 * @throws IllegalArgumentException if stepExecution is null.
 	 */
@@ -188,7 +189,7 @@ public class SimpleJobRepository implements JobRepository {
 
 	/**
 	 * Update the given step.
-	 * 
+	 *
 	 * @param StepInstance to be updated.
 	 * @throws IllegalArgumentException if step or it's id is null.
 	 */
@@ -224,6 +225,10 @@ public class SimpleJobRepository implements JobRepository {
 		while (i.hasNext()) {
 			StepConfiguration stepConfiguration = (StepConfiguration) i.next();
 			StepInstance step = stepDao.createStep(job, stepConfiguration.getName());
+			//Ensure valid restart data is being returned.
+			if(step.getRestartData() == null || step.getRestartData().getProperties() == null){
+				step.setRestartData(new GenericRestartData(new Properties()));
+			}
 			steps.add(step);
 		}
 
@@ -243,7 +248,10 @@ public class SimpleJobRepository implements JobRepository {
 			if (step != null) {
 
 				step.setStepExecutionCount(stepDao.getStepExecutionCount(step.getId()));
-
+				//Ensure valid restart data is being returned.
+				if(step.getRestartData() == null || step.getRestartData().getProperties() == null){
+					step.setRestartData(new GenericRestartData(new Properties()));
+				}
 				steps.add(step);
 			}
 		}

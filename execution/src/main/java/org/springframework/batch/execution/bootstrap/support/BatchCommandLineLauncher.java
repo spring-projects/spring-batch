@@ -32,6 +32,50 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 
 /**
+ *<p>Basic Launcher for starting jobs from the command line.  In general,
+ * it is assumed that this launcher will primarily be used to start
+ * a job via a script from an Enterprise Scheduler.  Therefore, exit codes
+ * are mapped to integers so that schedulers can use the returned values to
+ * determine the next course of action.  The returned values can also
+ * be useful to operations teams in determining what should happen upon failure.
+ * For example, a returned code of 5 might mean that some resource wasn't available
+ * and the job should be restarted.  However, a code of 10 might mean that something
+ * critical has happened and the issue should be escalated.</p>
+ *
+ * <p>With any launch of a batch job within Spring Batch, a minimum of two contexts
+ * must be loaded.  One is the context containing the JobConfiguration, the other
+ * contains the 'Execution Environment'.  That is, the JobExecutorFacade (which
+ * contains all the executors, plus the repository), the JobIdentifierFactory, and
+ * a normal JobLauncher.  This command line launcher loads these application contexts
+ * by first loading the execution environment context via a
+ * {@link ContextSingletonBeanFactoryLocator}, which will search for the default
+ * key from classpath*:beanRefContext.xml to return the context.  This will then
+ * be used as the parent to the JobConfiguration context.  All required dependencies
+ * of the launcher will then be satisfied by autowiring by type from the combined
+ * application context.  Default values are provided for all fields except the JobLauncher.
+ * Therefore, if autowiring fails to set it (it should be noted that dependency checking
+ * is disabled because most of the fields have default values and thus don't require
+ * dependencies to be fulfilled via autowiring) then an exception will be thrown.
+ * It should be noted that even if an exception is thrown by this class, it will be
+ * mapped to an integer and returned.</p>
+ *
+ * <p>One odd field might be noticed in the launcher, SystemExiter.  This class is
+ * used to exit from the main method, rather than calling System.exit directly.  This
+ * is because unit testing a class the calls System.exit() is impossible without
+ * kicking off the test within a new Jvm, which it is possible to do, however it is a
+ * complex solution, much more so than strategizing the exiter.</p>
+ *
+ * <p>VM Arguments vs. Program arguments:  Because all of the arguments to the main
+ * method are optional, VM arguments are used:
+ *
+ * <ul>
+ * 	<li>-Djob.configuration.path: the classpath location of the JobConfiguration
+ * to use
+ * 	<li>-Djob.name: job name to be passed to the {@link JobLauncher}
+ *  <li>-Dbatch.execution.environment.key: the key in beanRefContext.xml used to load
+ *  the execution envrionement.
+ * </ul>
+ *
  * @author Dave Syer
  * @author Lucas Ward
  * @since 2.1
@@ -113,6 +157,8 @@ public class BatchCommandLineLauncher {
 	 *            the path to a Spring context configuration for this job
 	 * @param jobName
 	 *            the name of the job execution to use
+	 * @parm parentKey the key to be loaded by ContextSingletonBeanFactoryLocator and
+	 * used as the parent context.
 	 * @throws NoSuchJobConfigurationException
 	 * @throws IllegalStateException
 	 *             if JobLauncher is not autowired by the ApplicationContext
@@ -171,18 +217,17 @@ public class BatchCommandLineLauncher {
 	/**
 	 * Launch a batch job using a {@link BatchCommandLineLauncher}. Creates a
 	 * new Spring context for the job execution, and uses a common parent for
-	 * all such contexts.
+	 * all such contexts.  No exception should be thrown from this method, rather
+	 * exceptions should be logged and an integer returned.
 	 *
 	 * @param args
-	 *            <ol>
-	 *            <li> classpath location of resource to load job configuration
-	 *            context (default "job-configuration.xml");</li>
-	 *            <li>runtime name of Job (default "job-execution-id").</li>
-	 *            <li> parent context key for use in pulling the correct
-	 *            beanFactory from the beanRefContext.xml (@see
-	 *            ContextSingletonBeanFactoryLocator)</li>
-	 *            </ol>
-	 * @throws NoSuchJobConfigurationException
+	 * <ul>
+	 * 	<li>-Djob.configuration.path: the classpath location of the JobConfiguration
+	 * 		to use
+	 * 	<li>-Djob.name: job name to be passed to the {@link JobLauncher}
+	 *  <li>-Dbatch.execution.environment.key: the key in beanRefContext.xml used to load
+	 *  the execution envrionement.
+	 * </ul>
 	 */
 	public static void main(String[] args) {
 
