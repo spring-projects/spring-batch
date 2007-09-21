@@ -21,13 +21,13 @@ import java.util.Properties;
 public class GenericRestartData implements RestartData {
 
 	private Properties data;
-	
+
 	public GenericRestartData(Properties data){
 		this.data = data;
 	}
-	
+
 	public Properties getProperties(){
 		return data;
 	}
-	
+
 }
