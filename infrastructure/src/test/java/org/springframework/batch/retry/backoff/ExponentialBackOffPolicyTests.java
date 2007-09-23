@@ -88,7 +88,7 @@ public class ExponentialBackOffPolicyTests extends TestCase {
 
 	private void assertEqualsApprox(long desired, long actual, long variance) {
 		long lower = desired - variance;
-		long upper = desired + 2.5 * variance;
+		long upper = desired + 5 * variance / 2;
 		assertTrue("Expected value to be between '" + lower + "' and '" + upper + "' but was '" + actual + "'",
 				lower <= actual && actual <= upper);
 	}
