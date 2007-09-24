@@ -1,0 +1,17 @@
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:bk="http://springframework.org/batch/sample/io/oxm/domain"
+    targetNamespace="http://springframework.org/batch/sample/io/oxm/domain"
+    elementFormDefault="qualified">
+    <xs:element name="trade">
+     <xs:complexType>
+        <xs:sequence>
+            <xs:element name="isin" type="xs:string"/>
+            <xs:element name="quantity" type="xs:long"/>
+            <xs:element name="price" type="xs:decimal"/>
+            <xs:element name="customer" type="xs:string"/>
+        </xs:sequence>
+     </xs:complexType>    
+    </xs:element>    
+</xs:schema>
+
