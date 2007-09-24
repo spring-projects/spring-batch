@@ -82,6 +82,22 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+	        <groupId>org.springframework.ws</groupId>
+			<artifactId>spring-oxm</artifactId>
+	        <version>1.0-rc2</version>
+	        <optional>true</optional>
+	        <exclusions>
+	        	<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-beans</artifactId>
+	        	</exclusion>
+	        	<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-core</artifactId>
+	        	</exclusion>
+	        </exclusions>
+		</dependency>
+		<dependency>
 			<groupId>geronimo-spec</groupId>
 			<artifactId>geronimo-spec-j2ee</artifactId>
 			<version>1.4-rc4</version>
