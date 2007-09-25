@@ -1,40 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean id="simpleFacade" class="org.springframework.batch.execution.facade.SimpleJobExecutorFacade">
+	<bean id="simpleFacade"
+		class="org.springframework.batch.execution.facade.SimpleJobExecutorFacade">
 		<property name="jobRepository" ref="simpleJobRepository" />
-		<property name="jobConfigurationLocator" ref="jobConfigurationRegistry"/>
+		<property name="jobConfigurationLocator"
+			ref="jobConfigurationRegistry" />
 		<property name="jobExecutor" ref="jobLifecycle" />
 	</bean>
-	
-	<bean id="simpleContainerLauncher" class="org.springframework.batch.execution.bootstrap.SimpleJobLauncher">
+
+	<bean id="simpleContainerLauncher"
+		class="org.springframework.batch.execution.bootstrap.SimpleJobLauncher">
 		<property name="jobExecutorFacade" ref="simpleFacade" />
-		<property name="jobIdentifierFactory" ref="jobRuntimeInformationFactory"/>
+		<property name="jobIdentifierFactory"
+			ref="jobRuntimeInformationFactory" />
 	</bean>
 
-	<bean id="jobConfigurationRegistry" class="org.springframework.batch.execution.configuration.MapJobConfigurationRegistry"/>
- 
-	<bean id="jobLifecycle" class="org.springframework.batch.execution.job.DefaultJobExecutor">
+	<bean id="jobConfigurationRegistry"
+		class="org.springframework.batch.execution.configuration.MapJobConfigurationRegistry" />
+
+	<bean id="jobLifecycle"
+		class="org.springframework.batch.execution.job.DefaultJobExecutor">
 		<property name="jobRepository" ref="simpleJobRepository" />
 		<property name="stepExecutorFactory">
-			<bean class="org.springframework.batch.execution.step.DefaultStepExecutorFactory">
+			<bean
+				class="org.springframework.batch.execution.step.DefaultStepExecutorFactory">
 				<property name="stepExecutorName" value="stepLifecycle" />
 			</bean>
 		</property>
 	</bean>
 
-	<bean id="simpleJob" class="org.springframework.batch.core.configuration.JobConfiguration"
+	<bean id="simpleJob"
+		class="org.springframework.batch.core.configuration.JobConfiguration"
 		abstract="true">
 		<property name="restartable" value="true" />
 	</bean>
 
-	<bean id="simpleStep" class="org.springframework.batch.execution.step.simple.SimpleStepConfiguration"
+	<bean id="simpleStep"
+		class="org.springframework.batch.execution.step.simple.SimpleStepConfiguration"
 		abstract="true">
 		<property name="allowStartIfComplete" value="true" />
 		<property name="saveRestartData" value="false" />
@@ -42,27 +53,33 @@
 			<bean
 				class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler">
 				<property name="limit" value="5" />
-				<property name="useParent" value="true"/>
+				<property name="useParent" value="true" />
 			</bean>
 		</property>
 	</bean>
 
-	<bean id="stepLifecycle" class="org.springframework.batch.execution.step.simple.SimpleStepExecutor" scope="prototype">
+	<bean id="stepLifecycle"
+		class="org.springframework.batch.execution.step.simple.SimpleStepExecutor"
+		scope="prototype">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="repository" ref="simpleJobRepository" />
 	</bean>
 
-	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+	<bean id="transactionManager"
+		class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
 
-	<bean id="simpleJobRepository" class="org.springframework.batch.execution.repository.SimpleJobRepository">
+	<bean id="simpleJobRepository"
+		class="org.springframework.batch.execution.repository.SimpleJobRepository">
 		<constructor-arg ref="jobDao" />
 		<constructor-arg ref="stepDao" />
 	</bean>
 
-	<bean id="jobDao" class="org.springframework.batch.execution.repository.dao.MapJobDao"/>
+	<bean id="jobDao"
+		class="org.springframework.batch.execution.repository.dao.MapJobDao" />
 	<!-- init-method="clear"/-->
 
-	<bean id="stepDao" class="org.springframework.batch.execution.repository.dao.MapStepDao" />
+	<bean id="stepDao"
+		class="org.springframework.batch.execution.repository.dao.MapStepDao" />
 	<!-- init-method="clear"/-->
 
 	<bean id="jobRuntimeInformationFactory"
@@ -71,26 +88,34 @@
 		<property name="scheduleDate" value="20070505" />
 		<property name="jobRun" value="1" />
 	</bean>
-	
-	<bean class="org.springframework.batch.execution.bootstrap.support.SimpleJvmExitCodeMapper" />
 
-	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+	<bean
+		class="org.springframework.batch.execution.bootstrap.support.SimpleJvmExitCodeMapper" />
+
+	<bean
+		class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 		<property name="customEditors">
 			<map>
 				<entry key="int[]">
-					<bean class="org.springframework.batch.support.IntArrayPropertyEditor" />
+					<bean
+						class="org.springframework.batch.support.IntArrayPropertyEditor" />
 				</entry>
 				<entry key="java.util.Date">
-					<bean class="org.springframework.beans.propertyeditors.CustomDateEditor">
+					<bean
+						class="org.springframework.beans.propertyeditors.CustomDateEditor">
 						<constructor-arg>
 							<bean class="java.text.SimpleDateFormat">
-								<constructor-arg value="yyyyMMdd"/>
+								<constructor-arg value="yyyyMMdd" />
 							</bean>
 						</constructor-arg>
-						<constructor-arg value="false"/>
+						<constructor-arg value="false" />
 					</bean>
 				</entry>
 			</map>
 		</property>
 	</bean>
+
+	<bean
+		class="org.springframework.batch.execution.bootstrap.support.BatchCommandLineLauncherTests$StubSystemExiter" />
+
 </beans>

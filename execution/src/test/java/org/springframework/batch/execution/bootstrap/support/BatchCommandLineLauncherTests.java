@@ -15,10 +15,8 @@
  */
 package org.springframework.batch.execution.bootstrap.support;
 
-import org.easymock.MockControl;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
-import org.springframework.batch.execution.bootstrap.JvmExitCodeMapper;
-import org.springframework.batch.execution.bootstrap.support.BatchCommandLineLauncher;
+import junit.framework.TestCase;
+
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -26,16 +24,11 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import junit.framework.TestCase;
-
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class BatchCommandLineLauncherTests extends TestCase {
-
-	private static final String DEFAULT_PARENT_KEY = "batchExecutionEnvironment";
-	private static final String DEFAULT_JOB_CONFIGURATION_PATH = "job-configuration.xml";
 
 	private static final String JOB_CONFIGURATION_PATH_KEY = "job.configuration.path";
 	private static final String JOB_NAME_KEY = "job.name";
@@ -44,19 +37,16 @@ public class BatchCommandLineLauncherTests extends TestCase {
 	private static final String TEST_BATCH_ENVIRONMENT_KEY = "testBatchEnvironment";
 	private static final String TEST_BATCH_ENVIRONMENT_NO_LAUNCHER_KEY = "testBatchEnvironmentNoLauncher";
 
-	BeanFactoryLocator beanFactoryLocator = ContextSingletonBeanFactoryLocator.getInstance();
+	BeanFactoryLocator beanFactoryLocator = ContextSingletonBeanFactoryLocator
+			.getInstance();
 
-	ClassPathXmlApplicationContext context;
-
-	MockJobLauncher mockJobLauncher;
-	MockSystemExiter mockSystemExiter;
+	StubJobLauncher jobLauncher;
+	StubSystemExiter systemExiter;
 
 	protected void setUp() throws Exception {
 		super.setUp();
-
-		context = (ClassPathXmlApplicationContext)beanFactoryLocator.useBeanFactory(TEST_BATCH_ENVIRONMENT_KEY).getFactory();
-		context.getAutowireCapableBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
-		System.setProperty(BATCH_EXECUTION_ENVIRONMENT_KEY, TEST_BATCH_ENVIRONMENT_KEY);
+		System.setProperty(BATCH_EXECUTION_ENVIRONMENT_KEY,
+				TEST_BATCH_ENVIRONMENT_KEY);
 	}
 
 	protected void tearDown() throws Exception {
@@ -66,65 +56,118 @@ public class BatchCommandLineLauncherTests extends TestCase {
 		System.clearProperty(BATCH_EXECUTION_ENVIRONMENT_KEY);
 	}
 
-	public void setMockJobLauncher(MockJobLauncher mockJobLauncher){
-		this.mockJobLauncher = mockJobLauncher;
-	}
+	public void testParentWithNoLauncher() {
+		buildContext(TEST_BATCH_ENVIRONMENT_NO_LAUNCHER_KEY);
+		assertNotNull(systemExiter);
 
-	public void setMockSystemExiter(MockSystemExiter mockSystemExiter) {
-		this.mockSystemExiter = mockSystemExiter;
-	}
-
-	public void testParentWithNoLauncher(){
-		context = (ClassPathXmlApplicationContext)beanFactoryLocator.useBeanFactory(TEST_BATCH_ENVIRONMENT_NO_LAUNCHER_KEY).getFactory();
-		context.getAutowireCapableBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-		System.setProperty(BATCH_EXECUTION_ENVIRONMENT_KEY, TEST_BATCH_ENVIRONMENT_NO_LAUNCHER_KEY);
+		System.setProperty(BATCH_EXECUTION_ENVIRONMENT_KEY,
+				TEST_BATCH_ENVIRONMENT_NO_LAUNCHER_KEY);
 
 		BatchCommandLineLauncher.main(new String[0]);
 
-		assertEquals(JvmExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR, mockSystemExiter.getStatus());
+		assertEquals(ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR, systemExiter
+				.getStatus());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.bootstrap.support.BatchCommandLineLauncher#main(java.lang.String[])}.
+	 * Test method for
+	 * {@link org.springframework.batch.execution.bootstrap.support.BatchCommandLineLauncher#main(java.lang.String[])}.
+	 * 
 	 * @throws Exception
 	 */
 	public void testDefaultNameAndPath() throws Exception {
 
-		mockJobLauncher.setReturnValue(ExitStatus.FINISHED);
+		buildContext(TEST_BATCH_ENVIRONMENT_KEY);
+		assertNotNull(jobLauncher);
+		assertNotNull(systemExiter);
+
+		jobLauncher.setReturnValue(ExitStatus.FINISHED);
 
 		BatchCommandLineLauncher.main(new String[0]);
 
-		assertEquals(JvmExitCodeMapper.JVM_EXITCODE_COMPLETED, mockSystemExiter.getStatus());
-		assertEquals(mockJobLauncher.getLastRunCalled(), MockJobLauncher.RUN_NO_ARGS);
+		assertEquals(ExitCodeMapper.JVM_EXITCODE_COMPLETED, systemExiter
+				.getStatus());
+		assertEquals(jobLauncher.getLastRunCalled(),
+				StubJobLauncher.RUN_NO_ARGS);
 	}
 
-	public void testCustomJobName(){
+	public void testCustomJobName() {
 
-		mockJobLauncher.setReturnValue(ExitStatus.FINISHED);
+		buildContext(TEST_BATCH_ENVIRONMENT_KEY);
+		assertNotNull(jobLauncher);
+		assertNotNull(systemExiter);
+		jobLauncher.setReturnValue(ExitStatus.FINISHED);
 
 		System.setProperty(JOB_NAME_KEY, "foo");
 		BatchCommandLineLauncher.main(new String[0]);
 
-		assertEquals(JvmExitCodeMapper.JVM_EXITCODE_COMPLETED, mockSystemExiter.getStatus());
-		assertEquals(mockJobLauncher.getLastRunCalled(), MockJobLauncher.RUN_JOB_NAME);
+		assertEquals(ExitCodeMapper.JVM_EXITCODE_COMPLETED, systemExiter
+				.getStatus());
+		assertEquals(jobLauncher.getLastRunCalled(),
+				StubJobLauncher.RUN_JOB_NAME);
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.bootstrap.support.BatchCommandLineLauncher#main(java.lang.String[])}.
+	 * Test method for
+	 * {@link org.springframework.batch.execution.bootstrap.support.BatchCommandLineLauncher#main(java.lang.String[])}.
+	 * 
 	 * @throws Exception
 	 */
 	public void testMainWithDefaultArguments() throws Exception {
-		//can't test this without running the whole test in another jvm.
-		//BatchCommandLineLauncher.main(new String[0]);
+		// We can only test this without running the whole test in another jvm
+		// by using a special SystemExiter in the default configuration because
+		// otherwise it calls System.exit() by default.
+		BatchCommandLineLauncher.main(new String[0]);
 	}
 
-
-
-	public void testInvalidJobConfig(){
-		//also not testable without kicking off in a new jvm, since autowiring happens
-		//after the context is loaded.
-/*		System.setProperty(JOB_CONFIGURATION_PATH_KEY, "foo");
-
-		BatchCommandLineLauncher.main(new String[0]);*/
+	public void testInvalidJobConfig() {
+		// To test this without kicking off in a new jvm, we have to autowire
+		// the launcher (in BatchCommandLineLauncher.start) from the parent,
+		// *then* the child context.
+		buildContext(BatchCommandLineLauncher.DEFAULT_PARENT_KEY);
+		assertNotNull(systemExiter);
+		System.setProperty(JOB_CONFIGURATION_PATH_KEY, "foo");
+		BatchCommandLineLauncher.main(new String[0]);
 	}
+
+	private void buildContext(String key) {
+		ConfigurableApplicationContext context = (ClassPathXmlApplicationContext) beanFactoryLocator
+				.useBeanFactory(key).getFactory();
+		context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
+				AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+	}
+
+	public static class StubSystemExiter implements SystemExiter {
+
+		private int status;
+
+		public void exit(int status) {
+			this.status = status;
+		}
+
+		public int getStatus() {
+			return status;
+		}
+	}
+
+	/**
+	 * Public setter for the {@link StubJobLauncher} property.
+	 * 
+	 * @param jobLauncher
+	 *            the jobLauncher to set
+	 */
+	public void setJobLauncher(StubJobLauncher jobLauncher) {
+		this.jobLauncher = jobLauncher;
+	}
+
+	/**
+	 * Public setter for the {@link StubSystemExiter} property.
+	 * 
+	 * @param systemExiter
+	 *            the systemExiter to set
+	 */
+	public void setSystemExiter(StubSystemExiter systemExiter) {
+		this.systemExiter = systemExiter;
+	}
+
 }

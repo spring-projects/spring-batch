@@ -17,7 +17,6 @@ package org.springframework.batch.execution.bootstrap;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.execution.bootstrap.BatchExecutionRequestEvent;
 import org.springframework.context.ApplicationEvent;
 
 /**

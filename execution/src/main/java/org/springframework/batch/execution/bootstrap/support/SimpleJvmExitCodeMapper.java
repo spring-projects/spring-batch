@@ -22,20 +22,19 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.execution.bootstrap.JobLauncher;
-import org.springframework.batch.execution.bootstrap.JvmExitCodeMapper;
-import org.springframework.batch.execution.bootstrap.SimpleJobLauncher;
 import org.springframework.batch.repeat.ExitStatus;
 
 
 /**
- * An implementation of JvmExitCodeMapper that can be configured 
- * through the Spring ApplicationContext
+ * An implementation of {@link ExitCodeMapper} that can be configured 
+ * through a map from batch exit codes (String) to integer results.
  * 
  * @author Stijn Maller
  * @author Lucas Ward
+ * @author Dave Syer
  */
 
-public class SimpleJvmExitCodeMapper implements JvmExitCodeMapper {
+public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 
 	protected Log logger = LogFactory.getLog(getClass());
 	

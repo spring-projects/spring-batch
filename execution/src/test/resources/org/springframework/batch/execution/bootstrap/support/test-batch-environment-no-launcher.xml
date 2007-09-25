@@ -10,7 +10,8 @@
 	<bean id="jobConfigurationRegistry" class="org.springframework.batch.execution.configuration.MapJobConfigurationRegistry"/>
 
 	<bean class="org.springframework.batch.execution.bootstrap.support.SimpleJvmExitCodeMapper" />
-
-	<bean class="org.springframework.batch.execution.bootstrap.support.MockSystemExiter" />
+	
+	<bean
+		class="org.springframework.batch.execution.bootstrap.support.BatchCommandLineLauncherTests$StubSystemExiter" />
 
 </beans>

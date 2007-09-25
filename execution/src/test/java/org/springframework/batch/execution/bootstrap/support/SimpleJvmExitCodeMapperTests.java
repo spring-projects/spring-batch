@@ -22,7 +22,6 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.springframework.batch.execution.bootstrap.JobLauncher;
-import org.springframework.batch.execution.bootstrap.JvmExitCodeMapper;
 import org.springframework.batch.repeat.ExitStatus;
 
 public class SimpleJvmExitCodeMapperTests extends TestCase {
@@ -52,16 +51,16 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 	public void testGetExitCodeWithpPredefinedCodes() {
 		assertEquals(
 				ecm.getExitCode(ExitStatus.FINISHED.getExitCode()),
-				JvmExitCodeMapper.JVM_EXITCODE_COMPLETED);
+				ExitCodeMapper.JVM_EXITCODE_COMPLETED);
 		assertEquals(
 				ecm.getExitCode(ExitStatus.FAILED.getExitCode()),
-				JvmExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR);
+				ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR);
 		assertEquals(
 				ecm.getExitCode(JobLauncher.JOB_CONFIGURATION_NOT_PROVIDED),
-				JvmExitCodeMapper.JVM_EXITCODE_JOB_CONFIGURATION_ERROR);		
+				ExitCodeMapper.JVM_EXITCODE_JOB_CONFIGURATION_ERROR);		
 		assertEquals(
 				ecm.getExitCode(JobLauncher.NO_SUCH_JOB_CONFIGURATION),
-				JvmExitCodeMapper.JVM_EXITCODE_JOB_CONFIGURATION_ERROR);		
+				ExitCodeMapper.JVM_EXITCODE_JOB_CONFIGURATION_ERROR);		
 	}
 	
 	public void testGetExitCodeWithPredefinedCodesOverridden() {
@@ -83,7 +82,7 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 	public void testGetExitCodeWithDefaultCode() {
 		assertEquals(
 				ecm.getExitCode("UNDEFINED_CUSTOM_CODE"),
-				JvmExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR);		
+				ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR);		
 	}
 	
 	

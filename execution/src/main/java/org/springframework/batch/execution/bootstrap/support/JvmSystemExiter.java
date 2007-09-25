@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.execution.bootstrap.support;
 
-import org.springframework.batch.execution.bootstrap.SystemExiter;
 
 /**
  * Implementation of the {@link SystemExiter} interface

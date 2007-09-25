@@ -14,7 +14,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Lucas Ward
  *
  */
-public class MockJobLauncher implements JobLauncher {
+public class StubJobLauncher implements JobLauncher {
 
 	public static final int RUN_NO_ARGS = 0;
 	public static final int RUN_JOB_NAME = 1;
