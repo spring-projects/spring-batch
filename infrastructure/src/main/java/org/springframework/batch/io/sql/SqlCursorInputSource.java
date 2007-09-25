@@ -56,7 +56,7 @@ import org.springframework.util.Assert;
  * JdbcDriver used must be version 3.0 or higher. This is because earlier
  * versions do not support holding a ResultSet open over commits.
  * </p>
- * 
+ *
  * <p>
  * Each call to read() will call the provided RowMapper, (NOTE: Calling read()
  * without setting a RowMapper will result in an IllegalStateException!) passing
@@ -72,19 +72,19 @@ import org.springframework.util.Assert;
  * each call to read() returns the ResultSet at the correct line, regardless of
  * rollbacks, restarts, or skips.
  * </p>
- * 
+ *
  * <p>
  * Restart: This implementation contains basic, simple restart. The current row
  * is returned as restart data, and when restored from that same data, the
  * cursor is opened and the current row set to the value within the restart
  * data.
  * </p>
- * 
+ *
  * <p>
  * Statistics: There are two statistics returned by this input source: the
  * current line being processed and the number of lines that have been skipped.
  * </p>
- * 
+ *
  * <p>
  * Transactions: At first glance, it may appear odd that Spring's
  * TransactionSynchronization abstraction is used for something that is reading
@@ -95,7 +95,7 @@ import org.springframework.util.Assert;
  * current row can be moved back to the same row number as it was on when commit
  * was called.
  * </p>
- * 
+ *
  * <p>
  * Calling skip will indicate to the input source that a record is bad and
  * should not be represented to the user if the transaction is rolled back. For
@@ -105,13 +105,13 @@ import org.springframework.util.Assert;
  * Calling read while on row 1 will move the current row to 3, not 2, because 2
  * has been marked as skipped.
  * </p>
- * 
+ *
  * <p>
  * Calling close on this Input Source will cause all resources it is currently
  * using to be freed. (Connection, resultset, etc). If read() is called on the
  * same instance again, the cursor will simply be reopened starting at row 0.
  * </p>
- * 
+ *
  * @author Lucas Ward
  * @author Peter Zozom
  */
@@ -163,7 +163,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 
 	/**
 	 * Assert that mandatory properties are set.
-	 * 
+	 *
 	 * @throws IllegalArgumentException
 	 *             if either data source or sql properties not set.
 	 */
@@ -174,7 +174,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 
 	/**
 	 * Public setter for the data source for injection purposes.
-	 * 
+	 *
 	 * @param dataSource
 	 */
 	public void setDataSource(DataSource dataSource) {
@@ -187,7 +187,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 	 * this instance before, the cursor will be opened. If there are skipped
 	 * records for this commit scope, an internal list of skipped records will
 	 * be checked to ensure that only a valid row is given to the mapper.
-	 * 
+	 *
 	 * @returns Object returned by RowMapper
 	 * @throws DataAccessException
 	 * @throws IllegalStateExceptino
@@ -216,9 +216,12 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 						currentProcessedRow++;
 					}
 				}
+
+				Object mappedResult = mapper.mapRow(rs, currentProcessedRow);
+
 				verifyCursorPosition(currentProcessedRow);
 
-				return mapper.mapRow(rs, currentProcessedRow);
+				return mappedResult;
 			}
 		} catch (SQLException se) {
 			throw getExceptionTranslator().translate(
@@ -242,7 +245,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 
 	/**
 	 * Set the ResultSet's current row to the last marked position.
-	 * 
+	 *
 	 * @throws DataAccessException
 	 */
 	private void reset() {
@@ -265,7 +268,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 	 * Close this input source. The ResultSet, Statement and Connection created
 	 * will be closed. This must be called or the connection and cursor will be
 	 * held open indefinitely!
-	 * 
+	 *
 	 * @see org.springframework.batch.item.ResourceLifecycle#close()
 	 */
 	public void close() {
@@ -280,7 +283,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 	/**
 	 * Calls close to ensure that bean factories can close and always release
 	 * resources.
-	 * 
+	 *
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
@@ -323,7 +326,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 		} catch (SQLException se) {
 			close();
 			throw getExceptionTranslator().translate("Executing query",
-					stmt.toString(), se);
+					getSql(), se);
 		}
 
 		BatchTransactionSynchronizationManager
@@ -335,7 +338,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 	 * CallableStatement), applying statement settings such as fetch size, max
 	 * rows, and query timeout. @param stmt the JDBC Statement to prepare
 	 * @throws SQLException
-	 * 
+	 *
 	 * @see #setFetchSize
 	 * @see #setMaxRows
 	 * @see #setQueryTimeout
@@ -373,10 +376,10 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 	/*
 	 * Throw a SQLWarningException if we're not ignoring warnings, else log the
 	 * warnings (at debug level).
-	 * 
+	 *
 	 * @param warning the warnings object from the current statement. May be
 	 * <code>null</code>, in which case this method does nothing.
-	 * 
+	 *
 	 * @see org.springframework.jdbc.SQLWarningException
 	 */
 	private void handleWarnings(SQLWarning warnings) throws SQLWarningException {
@@ -389,14 +392,14 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 						+ warningToLog.getMessage() + "]");
 				warningToLog = warningToLog.getNextWarning();
 			}
-		} else {
+		} else if(warnings != null){
 			throw new SQLWarningException("Warning not ignored", warnings);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.restart.Restartable#getRestartData()
 	 */
 	public RestartData getRestartData() {
@@ -405,7 +408,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.restart.Restartable#restoreFrom(org.springframework.batch.restart.RestartData)
 	 */
 	public void restoreFrom(RestartData data) {
@@ -415,7 +418,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 		if (rs == null) {
 			executeQuery();
 		}
-		
+
 		Properties restartProperties = data.getProperties();
 		if(restartProperties.containsKey(CURRENT_PROCESSED_ROW) == false){
 			return;
@@ -434,7 +437,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.statistics.StatisticsProvider#getStatistics()
 	 */
 	public Properties getStatistics() {
@@ -462,7 +465,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 	 * fetched from the database when more rows are needed for this
 	 * <code>ResultSet</code> object. If the fetch size specified is zero, the
 	 * JDBC driver ignores the value.
-	 * 
+	 *
 	 * @param fetchSize
 	 *            the number of rows to fetch
 	 * @see ResultSet#setFetchSize(int)
@@ -474,7 +477,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 	/**
 	 * Sets the limit for the maximum number of rows that any
 	 * <code>ResultSet</code> object can contain to the given number.
-	 * 
+	 *
 	 * @param maxRows
 	 *            the new max rows limit; zero means there is no limit
 	 * @see Statement#setMaxRows(int)
@@ -488,7 +491,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 	 * <code>Statement</code> object to execute to the given number of
 	 * seconds. If the limit is exceeded, an <code>SQLException</code> is
 	 * thrown.
-	 * 
+	 *
 	 * @param queryTimeout
 	 *            seconds the new query timeout limit in seconds; zero means
 	 *            there is no limit
@@ -501,7 +504,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 	/**
 	 * Set whether SQLWarnings should be ignored (only logged) or exception
 	 * should be thrown.
-	 * 
+	 *
 	 * @param ignoreWarnings
 	 *            if TRUE, warnings are ignored
 	 */
@@ -512,7 +515,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 	/**
 	 * Allow verification of cursor position after current row is processed by
 	 * RowMapper or RowCallbackHandler. Default value is TRUE.
-	 * 
+	 *
 	 * @param verifyCursorPosition
 	 *            if true, cursor position is verified
 	 */
@@ -522,7 +525,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 
 	/**
 	 * Set the RowMapper to be used for all calls to read().
-	 * 
+	 *
 	 * @param mapper
 	 */
 	public void setMapper(RowMapper mapper) {
@@ -533,7 +536,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 	 * Set the sql statement to be used when creating the cursor. This statement
 	 * should be a complete and valid Sql statement, as it will be run directly
 	 * without any modification.
-	 * 
+	 *
 	 * @param sql
 	 */
 	public void setSql(String sql) {
@@ -554,7 +557,7 @@ public class SqlCursorInputSource implements InputSource, DisposableBean,
 
 		/*
 		 * @param status transaction status
-		 * 
+		 *
 		 * @see org.springframework.transaction.support.TransactionSynchronization#afterCompletion(int)
 		 */
 		public void afterCompletion(int status) {
