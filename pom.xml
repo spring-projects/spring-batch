@@ -321,7 +321,7 @@
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring</artifactId>
-				<version>2.1-m3</version>
+				<version>2.1-m4</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-logging</groupId>
@@ -359,51 +359,9 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-mock</artifactId>
-				<version>2.1-m3</version>
+				<artifactId>spring-test</artifactId>
+				<version>2.1-m4</version>
 				<scope>test</scope>
-				<exclusions>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-aop</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-beans</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-context</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-core</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-dao</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-jdbc</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-jpa</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-support</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-web</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-webmvc</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>easymock</groupId>
@@ -439,31 +397,27 @@
 
 	<repositories>
 		<repository>
-			<id>apache-snapshots</id>
-			<url>
-				http://people.apache.org/maven-snapshot-repository
-			</url>
+			<id>spring-milestone</id>
+			<name>Spring Portfolio Milestone Repository</name>
+			<url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
 		</repository>
 		<repository>
-			<id>spring-snapshots</id>
-			<url>
-				https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-snapshots
-			</url>
+			<id>spring-external</id>
+			<name>Spring Portfolio Milestone Repository</name>
+			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
+		</repository>
+		<repository>
+			<id>apache-snapshot</id>
+			<name>Apache Foundation Snapshot Repository</name>
+			<url>http://people.apache.org/maven-snapshot-repository</url>
 		</repository>
 	</repositories>
 
 	<pluginRepositories>
 		<pluginRepository>
-			<id>spring</id>
-			<url>
-				https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo
-			</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>spring-ext</id>
-			<url>
-				https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext
-			</url>
+			<id>spring-external</id>
+			<name>Spring Portfolio Milestone Repository</name>
+			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
 		</pluginRepository>
 		<pluginRepository>
 			<id>objectstyle</id>

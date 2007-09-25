@@ -22,15 +22,6 @@
 		<maven.test.skip>true</maven.test.skip>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>spring-ext</id>
-			<url>
-				https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext
-			</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
@@ -39,7 +30,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-mock</artifactId>
+			<artifactId>spring-test</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>hsqldb</groupId>
@@ -58,7 +49,7 @@
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-core</artifactId>
-			<version>4.2-incubator-35</version>
+			<version>5.0-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-logging</groupId>
