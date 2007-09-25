@@ -1,6 +1,9 @@
 package org.springframework.batch.io.stax;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -15,13 +18,15 @@ import javax.xml.stream.events.XMLEvent;
 import junit.framework.TestCase;
 
 import org.springframework.batch.restart.RestartData;
+import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.support.TransactionSynchronization;
 
 /**
  * Tests for {@link StaxEventReaderInputSource}.
- * 
+ *
  * @author Robert Kasanicky
  */
 public class StaxEventReaderInputSourceTests extends TestCase {
@@ -32,7 +37,7 @@ public class StaxEventReaderInputSourceTests extends TestCase {
 	// test xml input
 	private String xml = "<root> <fragment> <misc1/> </fragment> <misc2/> <fragment> testString </fragment> </root>";
 
-	private FragmentDeserializer deserializer = new FragmentDeserializerMock();
+	private FragmentDeserializer deserializer = new MockFragmentDeserializer();
 
 	private static final String FRAGMENT_ROOT_ELEMENT = "fragment";
 
@@ -40,15 +45,34 @@ public class StaxEventReaderInputSourceTests extends TestCase {
 		source = createNewInputSouce();
 	}
 
+	public void testAfterPropertiesSet() throws Exception{
+		source.afterPropertiesSet();
+	}
+
+	public void testAfterPropertesSetException() throws Exception{
+		source.setResource(null);
+		try{
+			source.afterPropertiesSet();
+			fail();
+		}catch(IllegalArgumentException ex){
+			//expected;
+		}
+	}
+
 	/**
+	 * Regular usage scenario.
 	 * InputSource should pass XML fragments to deserializer wrapped with
 	 * StartDocument and EndDocument events.
 	 */
-	public void testFragmentWrapping() {
+	public void testFragmentWrapping() throws Exception {
+		source.afterPropertiesSet();
+
 		// see asserts in the mock deserializer
 		assertNotNull(source.read());
 		assertNotNull(source.read());
 		assertNull(source.read()); // there are only two fragments
+
+		source.destroy();
 	}
 
 	/**
@@ -95,10 +119,10 @@ public class StaxEventReaderInputSourceTests extends TestCase {
 	}
 
 	/**
-	 * Rollback to last commited record. 
+	 * Rollback to last commited record.
 	 */
 	public void testRollback() {
-		
+
 		//rollback between deserializing records
 		List first = (List) source.read();
 		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
@@ -107,8 +131,8 @@ public class StaxEventReaderInputSourceTests extends TestCase {
 		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
 
 		assertEquals(second, source.read());
-		
-		
+
+
 		//rollback while deserializing record
 		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
 		source.setFragmentDeserializer(new ExceptionFragmentDeserializer());
@@ -119,7 +143,7 @@ public class StaxEventReaderInputSourceTests extends TestCase {
 			source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
 		}
 		source.setFragmentDeserializer(deserializer);
-	
+
 		assertEquals(second, source.read());
 	}
 
@@ -139,6 +163,45 @@ public class StaxEventReaderInputSourceTests extends TestCase {
 		assertEquals(NUMBER_OF_RECORDS, extractRecordCountFrom(source.getStatistics()));
 		source.read();
 		assertEquals(NUMBER_OF_RECORDS, extractRecordCountFrom(source.getStatistics()));
+	}
+
+	public void testClose() throws Exception{
+
+		MockStaxEventReaderInputSource newSource = new MockStaxEventReaderInputSource();
+		Resource resource = new ByteArrayResource(xml.getBytes());
+		newSource.setResource(resource);
+
+		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
+		newSource.setFragmentDeserializer(deserializer);
+
+		Object item = newSource.read();
+		assertNotNull(item);
+		assertTrue(newSource.isOpenCalled());
+
+		newSource.destroy();
+		newSource.setOpenCalled(false);
+		//calling read again should require re-initialization because of close
+		item = newSource.read();
+		assertNotNull(item);
+		assertTrue(newSource.isOpenCalled());
+	}
+
+	public void testOpenBadIOInput(){
+
+		source.setResource(new AbstractResource(){
+			public String getDescription() { return null; }
+
+			public InputStream getInputStream() throws IOException {
+				throw new IOException();
+			}
+		});
+
+		try{
+			source.open();
+		}catch(DataAccessResourceFailureException ex){
+			assertTrue(ex.getCause() instanceof IOException);
+		}
+
 	}
 
 	private int extractRecordCountFrom(Properties statistics) {
@@ -163,7 +226,7 @@ public class StaxEventReaderInputSourceTests extends TestCase {
 	 * document events for the fragment root & end tags + skips the fragment
 	 * contents.
 	 */
-	private static class FragmentDeserializerMock implements FragmentDeserializer {
+	private static class MockFragmentDeserializer implements FragmentDeserializer {
 
 		/**
 		 * A simple mapFragment implementation checking the
@@ -225,7 +288,7 @@ public class StaxEventReaderInputSourceTests extends TestCase {
 	/**
 	 * Moves cursor inside the fragment body and causes rollback.
 	 */
-	private class ExceptionFragmentDeserializer implements FragmentDeserializer {
+	private static class ExceptionFragmentDeserializer implements FragmentDeserializer {
 
 		public Object deserializeFragment(XMLEventReader eventReader) {
 			eventReader.next();
@@ -234,4 +297,21 @@ public class StaxEventReaderInputSourceTests extends TestCase {
 
 	}
 
+	private class MockStaxEventReaderInputSource extends StaxEventReaderInputSource {
+
+		private boolean openCalled = false;
+
+		public void open() {
+			super.open();
+			openCalled = true;
+		}
+
+		public boolean isOpenCalled() {
+			return openCalled;
+		}
+
+		public void setOpenCalled(boolean openCalled) {
+			this.openCalled = openCalled;
+		}
+	}
 }

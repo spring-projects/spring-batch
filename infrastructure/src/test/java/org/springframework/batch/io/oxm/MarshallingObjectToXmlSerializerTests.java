@@ -61,6 +61,7 @@ public class MarshallingObjectToXmlSerializerTests extends TestCase {
 		mockMarshaller.setThrowException(true);
 		try{
 			xmlSerializer.serializeObject(new Object());
+			fail("Exception expected");
 		}catch(DataAccessResourceFailureException ex){
 			//expected
 		}

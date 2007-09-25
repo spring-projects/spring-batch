@@ -8,7 +8,6 @@ import javax.xml.transform.Result;
 import org.springframework.batch.io.stax.ObjectToXmlSerializer;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.oxm.Marshaller;
-import org.springframework.util.Assert;
 import org.springframework.xml.transform.StaxResult;
 
 /**

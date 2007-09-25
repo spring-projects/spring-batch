@@ -8,25 +8,28 @@ import org.springframework.util.Assert;
 
 /**
  * Utility methods for files used in batch processing.
- * 
- * @author peter.zozom
+ *
+ * @author Peter Zozom
  */
 public class FileUtils {
 
+	// forbids instantiation
+	private FileUtils() {}
+
 	/**
-	 * Set up output file for batch processing. This method implements common logic for 
+	 * Set up output file for batch processing. This method implements common logic for
 	 * handling output files when starting or restarting job/step.
-	 * <p> When starting output file processing, method creates/overwrites new file. 
-	 * When restaring output file processing, method checks whether file is writable. 
-	 * 
+	 * When starting output file processing, method creates/overwrites new file.
+	 * When restarting output file processing, method checks whether file is writable.
+	 *
 	 * @param file file to be set up
 	 * @param restarted TRUE signalizes that we are restarting output file processing
-	 * @param overwriteOutputFile If set to TRUE, output file will be overwritten 
+	 * @param overwriteOutputFile If set to TRUE, output file will be overwritten
 	 * (this flag is ignored when processing is restart)
-	 * 
+	 *
 	 * @throws IllegalArgumentException when file is NULL
-	 * @throws IllegalStateException when staring output file processing, file exists and 
-	 * flag "shouldDeleteExisting" is set to FALSE 
+	 * @throws IllegalStateException when staring output file processing, file exists and
+	 * flag "shouldDeleteExisting" is set to FALSE
 	 * @throws DataAccessResourceFailureException when unable to create file or file is not writable
 	 */
 	public static void setUpOutputFile(File file, boolean restarted,
@@ -37,8 +40,10 @@ public class FileUtils {
 		try {
 			if (!restarted) {
 				if (file.exists()) {
-					Assert.state(overwriteOutputFile, "File already exists: ["
-							+ file.getAbsolutePath() + "]");
+					if(!overwriteOutputFile){
+						throw new  DataAccessResourceFailureException("File already exists: ["
+						+ file.getAbsolutePath() + "]");
+					}
 					file.delete();
 				}
 

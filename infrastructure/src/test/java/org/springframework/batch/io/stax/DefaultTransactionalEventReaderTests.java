@@ -32,6 +32,7 @@ public class DefaultTransactionalEventReaderTests extends TestCase {
 	 * Rollback scenario.
 	 */
 	public void testRollback() throws Exception {
+		assertTrue(reader.hasNext());
 		reader.nextEvent(); //start document
 		reader.nextEvent(); //start root element
 		reader.nextEvent(); //whitespace
@@ -44,8 +45,22 @@ public class DefaultTransactionalEventReaderTests extends TestCase {
 		assertTrue(EventHelper.endElementName(reader.peek()).equals("misc1"));
 		
 		reader.onRollback(); // now we should be at the last commit point
+		assertTrue(reader.hasNext());
 		assertTrue(EventHelper.startElementName(reader.nextEvent()).equals("fragment"));
 		reader.nextEvent();
 		assertTrue(EventHelper.startElementName(reader.nextEvent()).equals("misc1"));
+	}
+	
+	/**
+	 * Remove operation is not supported
+	 */
+	public void testRemove() {
+		try {
+			reader.remove();
+			fail("UnsupportedOperationException expected on calling remove()");
+		}
+		catch (UnsupportedOperationException e) {
+			// expected
+		}
 	}
 }
