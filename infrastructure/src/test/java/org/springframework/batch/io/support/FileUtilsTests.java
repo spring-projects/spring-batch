@@ -106,12 +106,18 @@ public class FileUtilsTests extends TestCase {
 
 	public void testBadFile(){
 
-		File file = new File("#:/.out");
+		File file = new File("new file"){
+			public boolean createNewFile() throws IOException {
+				throw new IOException();
+			}
+		};
 		try{
 			FileUtils.setUpOutputFile(file, false, false);
 			fail();
 		}catch(DataAccessResourceFailureException ex){
 			assertTrue(ex.getCause() instanceof IOException);
+		}finally{
+			file.delete();
 		}
 	}
 
