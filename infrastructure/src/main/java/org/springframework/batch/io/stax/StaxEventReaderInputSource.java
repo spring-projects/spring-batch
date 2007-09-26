@@ -86,22 +86,21 @@ public class StaxEventReaderInputSource implements InputSource, Skippable, Resta
 		return item;
 	}
 
-	// TODO make sure exception stack is not lost in any case.
 	public void close() {
+		initialized = false;
 		try {
-			initialized = false;
 			fragmentReader.close();
+			inputStream.close();
 		}
 		catch (XMLStreamException e) {
 			throw new DataAccessResourceFailureException("Error while closing event reader", e);
 		}
+		catch (IOException e) {
+			throw new DataAccessResourceFailureException("Error while closing input stream", e);
+		}
 		finally {
-			try {
-				inputStream.close();
-			}
-			catch (IOException e) {
-				throw new DataAccessResourceFailureException("Error while closing input stream", e);
-			}
+			fragmentReader = null;
+			inputStream = null;
 		}
 	}
 

@@ -47,7 +47,8 @@ public class DefaultFragmentEventReaderTests extends TestCase {
 	 * peek() has no side effects on the inner state of reader.
 	 */
 	public void testFragmentWrapping() throws XMLStreamException {
-
+		
+		assertTrue(fragmentReader.hasNext());
 		moveCursorToNextElementEvent(); // move to root start
 		fragmentReader.nextEvent(); // skip root
 		moveCursorToNextElementEvent(); // move to fragment start
@@ -75,6 +76,7 @@ public class DefaultFragmentEventReaderTests extends TestCase {
 		
 		// now the reader should behave like the document has finished
 		assertTrue(fragmentReader.peek() == null);
+		assertFalse(fragmentReader.hasNext());
 		
 		try{
 			fragmentReader.nextEvent();
@@ -107,6 +109,7 @@ public class DefaultFragmentEventReaderTests extends TestCase {
 		XMLEvent misc2 = fragmentReader.nextEvent(); 
 		assertTrue(EventHelper.startElementName(misc2).equals("misc2"));
 	}
+	
 
 	private void moveCursorToNextElementEvent() throws XMLStreamException {
 		XMLEvent event = eventReader.peek();

@@ -97,7 +97,7 @@ public class StaxEventWriterOutputSourceTests extends TestCase {
 		source = newOutputSource();
 		source.restoreFrom(restartData);
 		source.write(record);
-		source.close();
+		source.destroy();
 
 		// check the output is concatenation of 'before restart' and 'after restart' writes.
 		String outputFile = outputFileContent();
@@ -187,13 +187,20 @@ public class StaxEventWriterOutputSourceTests extends TestCase {
 	/**
 	 * @return new instance of fully configured output source
 	 */
-	private StaxEventWriterOutputSource newOutputSource() {
+	private StaxEventWriterOutputSource newOutputSource() throws Exception {
 		StaxEventWriterOutputSource source = new StaxEventWriterOutputSource();
 		source.setResource(resource);
 
 		Marshaller marshaller = new SimpleMarshaller();
 		MarshallingObjectToXmlSerializer serializer = new MarshallingObjectToXmlSerializer(marshaller);
 		source.setSerializer(serializer);
+		
+		source.setEncoding("UTF-8");
+		source.setRootTagName("root");
+		source.setVersion("1.0");
+		source.setOverwriteOutput(true);
+		
+		source.afterPropertiesSet();
 
 		return source;
 	}

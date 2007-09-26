@@ -251,17 +251,11 @@ public class StaxEventWriterOutputSource implements OutputSource, Restartable,
 		registerSynchronization();
 
 		File file;
+		FileOutputStream os = null;
+		
 		try {
 			file = resource.getFile();
 			FileUtils.setUpOutputFile(file, restarted, overwriteOutput);
-		} catch (IOException ioe) {
-			throw new DataAccessResourceFailureException(
-					"Unable to write to file resource: [" + resource + "]", ioe);
-		}
-
-		FileOutputStream os = null;
-
-		try {
 			os = new FileOutputStream(file, true);
 			channel = os.getChannel();
 			setPosition(position);
