@@ -12,7 +12,6 @@
 		<config>src/main/resources/jobs/multilineOrderOutputDescriptors.xml</config>
 		<config>src/main/resources/jobs/tradeJob.xml</config>
 		<config>src/main/resources/jobs/tradeJobIo.xml</config>
-		<config>src/main/resources/jobs/xmlJob.xml</config>
 		<config>src/main/resources/jobs/restartSample.xml</config>
 		<config>src/main/resources/data-source-context.xml</config>
 		<config>src/main/resources/simple-container-definition.xml</config>
@@ -21,6 +20,7 @@
 		<config>src/main/resources/jobs/infiniteLoopJob.xml</config>
 		<config>src/main/resources/data-source-context-init.xml</config>
 		<config>src/main/resources/jobs/nfljob.xml</config>
+		<config>src/main/resources/jobs/xmlStaxJob.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -102,17 +102,6 @@
 			</configs>
 		</configSet>
 		<configSet>
-			<name><![CDATA[xml]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/jobs/xmlJob.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
-			</configs>
-		</configSet>
-		<configSet>
 			<name><![CDATA[compositeProcessor]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
@@ -144,6 +133,17 @@
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/jobs/nfljob.xml</config>
 				<config>src/main/resources/simple-container-definition.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[xmlStax]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/simple-container-definition.xml</config>
+				<config>src/main/resources/jobs/xmlStaxJob.xml</config>
 			</configs>
 		</configSet>
 	</configSets>
