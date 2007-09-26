@@ -16,9 +16,16 @@
 
 package org.springframework.batch.sample;
 
-import org.springframework.batch.sample.AbstractLifecycleSpringContextTests;
+import java.io.FileReader;
+
+import org.custommonkey.xmlunit.XMLAssert;
+import org.custommonkey.xmlunit.XMLUnit;
+
 
 public class XmlStaxJobFunctionalTests extends AbstractLifecycleSpringContextTests {
+	
+	private static final String OUTPUT_FILE = "20070918.testStream.xmlFileStep.output.xml";
+	private static final String EXPECTED_OUTPUT_FILE = "src/main/resources/data/staxJob/output/expected-output.xml";
 	
 //	@Override
 	protected String[] getConfigLocations() {
@@ -30,21 +37,9 @@ public class XmlStaxJobFunctionalTests extends AbstractLifecycleSpringContextTes
 	 */
 	protected void validatePostConditions() throws Exception {
 		applicationContext.close(); //make sure the output file is closed
-	
-		/* TODO compare DOM to the expected output -> does not work as expected yet, fails on correct output
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document expectedOutput = builder.parse( 
-				new File("src/main/resources/data/staxJob/input/20070918.testStream.xmlFileStep.output.xml"));
 		
-		Document actualOutput = builder.parse(
-				new File("20070918.testStream.xmlFileStep.output.xml"));
-	
-		expectedOutput.normalize();
-		actualOutput.normalize();
-		
-		assertTrue(expectedOutput.isEqualNode(actualOutput));
-		*/
+		XMLUnit.setIgnoreWhitespace(true);
+		XMLAssert.assertXMLEqual(new FileReader(EXPECTED_OUTPUT_FILE), new FileReader(OUTPUT_FILE));
 	}
 
 }

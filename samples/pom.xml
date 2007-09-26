@@ -125,6 +125,12 @@
 			<artifactId>stax</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>xmlunit</groupId>
+			<artifactId>xmlunit</artifactId>
+			<scope>test</scope>
+			<version>1.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

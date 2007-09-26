@@ -10,7 +10,7 @@
 	<bean class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
 		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
 	</bean>
- 
+
 	<bean id="jobConfiguration" parent="simpleJob">
 		<property name="steps">
 			<list>
@@ -51,7 +51,7 @@
 						</bean>
 					</constructor-arg>
 				</bean>
-				
+
 			</list>
 		</property>
 	</bean>
@@ -64,7 +64,7 @@
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
 	</bean>
-	
+
 	<bean id="fileInputTemplate2" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
 		scope="step">
 		<aop:scoped-proxy />
@@ -78,13 +78,13 @@
 		<property name="names" value="ISIN,Quantity,price, CUSTOMER" />
 		<property name="lengths" value="12, 3, 5, 9" />
 	</bean>
-	
+
 	<bean id="fixedFileDescriptor2"
 		class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
 		<property name="names" value="Title, FirstName, LastName, Age, Address.AddrLine1, children[0].name, children[1].name" />
 		<property name="lengths" value="5, 15, 20, 5, 10, 10, 10" />
 	</bean>
-	
+
 	<bean id="fixedValidator" class="org.springframework.batch.item.validator.SpringValidator">
 		<property name="validator">
 			<bean id="tradeValidator" class="org.springmodules.validation.valang.ValangValidator">
@@ -114,16 +114,16 @@
 		<constructor-arg type="java.lang.String"
 			value="data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 	</bean>
-	
+
 	<bean id="fileLocator2" class="org.springframework.core.io.ClassPathResource">
 		<constructor-arg type="java.lang.String"
 			value="data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportPersonDataStep.txt" />
 	</bean>
-	
+
 	<bean id="fieldSetMapper" class="org.springframework.batch.io.file.support.mapping.BeanWrapperFieldSetMapper">
 		<property name="prototypeBeanName" value="trade"/>
 	</bean>
-	
+
 	<bean id="fieldSetMapper2" class="org.springframework.batch.io.file.support.mapping.BeanWrapperFieldSetMapper">
 		<property name="prototypeBeanName" value="person"/>
 	</bean>
@@ -136,5 +136,5 @@
 
 	<!-- register the step scope with the application context -->
 	<bean class="org.springframework.batch.execution.scope.StepScope" />
-	
+
 </beans>
