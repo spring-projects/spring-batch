@@ -7,7 +7,7 @@
 	<bean id="jobDao" class="org.springframework.batch.execution.repository.dao.HibernateJobDao">
 		<property name="sessionFactory" ref="sessionFactory"></property>
 	</bean>
- 
+
 	<bean id="stepDao" class="org.springframework.batch.execution.repository.dao.HibernateStepDao">
 		<property name="sessionFactory" ref="sessionFactory"></property>
 	</bean>
