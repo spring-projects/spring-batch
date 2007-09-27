@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-docs</artifactId>
@@ -10,7 +9,7 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch</artifactId>
-		<version>1.0-m2-SNAPSHOT</version>
+		<version>1.0-m2</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -60,8 +59,7 @@
 										<include name="**/*.jpg" />
 									</fileset>
 								</copy>
-								<move file="${basedir}/target/site/reference/pdf/index.pdf"
-									tofile="${basedir}/target/site/reference/pdf/${artifactId}.pdf" failonerror="false" />
+								<move file="${basedir}/target/site/reference/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/${artifactId}.pdf" failonerror="false" />
 							</postProcess>
 						</configuration>
 						<phase>pre-site</phase>
