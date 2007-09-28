@@ -18,7 +18,7 @@ package org.springframework.batch.retry.aop;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.aop.framework.ReflectiveMethodInvocation;
+import org.springframework.aop.ProxyMethodInvocation;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryOperations;
@@ -57,16 +57,12 @@ public class RetryOperationsInterceptor implements MethodInterceptor {
 				 * ReflectiveMethodInvocation (but how often would another
 				 * implementation come along?).
 				 */
-				MethodInvocation clone = invocation;
-				if (invocation instanceof ReflectiveMethodInvocation) {
-					clone = ((ReflectiveMethodInvocation) invocation)
-							.invocableClone();
+				if (invocation instanceof ProxyMethodInvocation) {
+					return ((ProxyMethodInvocation) invocation).invocableClone().proceed();
 				} else {
 					throw new IllegalStateException(
 							"MethodInvocation of the wrong type detected - this should not happen with Spring AOP, so please raise an issue if you see this exception");
 				}
-
-				return clone.proceed();
 			}
 
 		});

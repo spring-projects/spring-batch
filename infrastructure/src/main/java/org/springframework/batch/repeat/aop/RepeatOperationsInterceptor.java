@@ -18,11 +18,11 @@ package org.springframework.batch.repeat.aop;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.aop.framework.ReflectiveMethodInvocation;
+import org.springframework.aop.ProxyMethodInvocation;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.exception.RepeatException;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.util.Assert;
@@ -71,8 +71,8 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 				try {
 
 					MethodInvocation clone = invocation;
-					if (invocation instanceof ReflectiveMethodInvocation) {
-						clone = ((ReflectiveMethodInvocation) invocation)
+					if (invocation instanceof ProxyMethodInvocation) {
+						clone = ((ProxyMethodInvocation) invocation)
 								.invocableClone();
 					} else {
 						throw new IllegalStateException(
