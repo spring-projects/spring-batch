@@ -27,12 +27,12 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.exception.RepeatException;
-import org.springframework.batch.retry.policy.SimpleRetryPolicy;
-import org.springframework.batch.retry.support.RetryTemplate;
+import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.repeat.support.RepeatTemplate;
 
 public class RepeatOperationsInterceptorTests extends TestCase {
 
@@ -73,6 +73,17 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		assertEquals(1, calls.size());
 	}
 
+	public void testVoidServiceSunnyDay() throws Exception {
+		((Advised) service).addAdvice(interceptor);
+		RepeatTemplate template = new RepeatTemplate();
+		// N.B. the default completion policy results in an infinite loop, so we
+		// need to set the chunk size.
+		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
+		interceptor.setRepeatOperations(template);
+		service.alternate();
+		assertEquals(2, target.count);
+	}
+
 	public void testCallbackWithException() throws Exception {
 		((Advised) service).addAdvice(interceptor);
 		try {
@@ -102,11 +113,12 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 				return invocation.proceed();
 			}
 		});
-		RetryTemplate template = new RetryTemplate();
-		template.setRetryPolicy(new SimpleRetryPolicy(2));
+		RepeatTemplate template = new RepeatTemplate();
+		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
+		interceptor.setRepeatOperations(template);
 		service.service();
-		assertEquals(3, target.count);
-		assertEquals(3, list.size());
+		assertEquals(2, target.count);
+		assertEquals(2, list.size());
 	}
 
 	public void testIllegalMethodInvocationType() throws Throwable {
@@ -143,6 +155,8 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	private interface Service {
 		Object service() throws Exception;
 
+		void alternate() throws Exception;
+
 		Object exception() throws Exception;
 
 		Object error() throws Exception;
@@ -160,6 +174,10 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 			}
 		}
 
+		public void alternate() throws Exception {
+			count++;
+		}
+
 		public Object exception() throws Exception {
 			throw new RuntimeException("Duh! Stupid.");
 		}
@@ -168,4 +186,5 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 			throw new Error("Duh! Stupid.");
 		}
 	}
+
 }

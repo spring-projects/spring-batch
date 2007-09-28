@@ -67,6 +67,10 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 					}
 					
 					// N.B. discards return value if there is one
+					if (clone.getMethod().getGenericReturnType().equals(Void.TYPE)) {
+						clone.proceed();
+						return ExitStatus.CONTINUABLE;
+					}
 					return new ExitStatus(clone.proceed() != null);
 				}
 				catch (Throwable e) {
