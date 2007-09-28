@@ -18,6 +18,7 @@ package org.springframework.batch.retry.aop;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryOperations;
@@ -38,12 +39,26 @@ public class RetryOperationsInterceptor implements MethodInterceptor {
 		this.retryTemplate = retryTemplate;
 	}
 
-	public Object invoke(final MethodInvocation methodInvocation) throws Throwable {
+	public Object invoke(final MethodInvocation invocation) throws Throwable {
 		// TODO: use the method name to initialise a statistics context
 		return this.retryTemplate.execute(new RetryCallback() {
 
 			public Object doWithRetry(RetryContext context) throws Throwable {
-				return methodInvocation.proceed();
+
+				/*
+				 * If we don't copy the invocation carefully it won't keep a
+				 * reference to the other interceptors in the chain. We don't
+				 * have a choice here but to specialise to
+				 * ReflectiveMethodInvocation (but how often would another
+				 * implementation come along?).
+				 */
+				MethodInvocation clone = invocation;
+				if (invocation instanceof ReflectiveMethodInvocation) {
+					clone = ((ReflectiveMethodInvocation) invocation)
+							.invocableClone();
+				}
+
+				return clone.proceed();
 			}
 
 		});

@@ -21,12 +21,16 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.exception.RepeatException;
+import org.springframework.batch.retry.policy.SimpleRetryPolicy;
+import org.springframework.batch.retry.support.RetryTemplate;
 
 public class RepeatOperationsInterceptorTests extends TestCase {
 
@@ -86,6 +90,22 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		catch (RepeatException e) {
 			assertEquals("Unexpected", e.getMessage().substring(0, 10));
 		}
+	}
+
+	public void testInterceptorChainWithRetry() throws Exception {
+		((Advised) service).addAdvice(interceptor);
+		final List list = new ArrayList();
+		((Advised) service).addAdvice(new MethodInterceptor() {
+			public Object invoke(MethodInvocation invocation) throws Throwable {
+				list.add("chain");
+				return invocation.proceed();
+			}
+		});
+		RetryTemplate template = new RetryTemplate();
+		template.setRetryPolicy(new SimpleRetryPolicy(2));
+		service.service();
+		assertEquals(3, target.count);
+		assertEquals(3, list.size());
 	}
 
 	private interface Service {

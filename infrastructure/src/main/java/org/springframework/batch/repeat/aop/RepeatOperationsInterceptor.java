@@ -18,6 +18,7 @@ package org.springframework.batch.repeat.aop;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
@@ -50,14 +51,21 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	 * 
 	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
 	 */
-	public Object invoke(final MethodInvocation methodInvocation) throws Throwable {
+	public Object invoke(final MethodInvocation invocation) throws Throwable {
 
 		batchTempate.iterate(new RepeatCallback() {
 
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				try {
+
+					MethodInvocation clone = invocation;
+					if (invocation instanceof ReflectiveMethodInvocation) {
+						clone = ((ReflectiveMethodInvocation) invocation)
+								.invocableClone();
+					}
+					
 					// N.B. discards return value if there is one
-					return new ExitStatus(methodInvocation.proceed() != null);
+					return new ExitStatus(clone.proceed() != null);
 				}
 				catch (Throwable e) {
 					if (e instanceof Exception) {

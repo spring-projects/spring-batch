@@ -16,12 +16,18 @@
 
 package org.springframework.batch.retry.aop;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestCase;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.target.SingletonTargetSource;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
+import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 
 public class RetryOperationsInterceptorTests extends TestCase {
@@ -43,6 +49,23 @@ public class RetryOperationsInterceptorTests extends TestCase {
 		((Advised) service).addAdvice(interceptor);
 		service.service();
 		assertEquals(2, target.count);
+	}
+
+	public void testInterceptorChainWithRetry() throws Exception {
+		((Advised) service).addAdvice(interceptor);
+		final List list = new ArrayList();
+		((Advised) service).addAdvice(new MethodInterceptor() {
+			public Object invoke(MethodInvocation invocation) throws Throwable {
+				list.add("chain");
+				return invocation.proceed();
+			}
+		});
+		RetryTemplate template = new RetryTemplate();
+		template.setRetryPolicy(new SimpleRetryPolicy(2));
+		interceptor.setRetryTemplate(template);
+		service.service();
+		assertEquals(2, target.count);
+		assertEquals(2, list.size());
 	}
 
 	public void testRetryExceptionAfterTooManyAttempts() throws Exception {
