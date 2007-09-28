@@ -29,6 +29,7 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.dao.JobDao;
@@ -162,9 +163,63 @@ public class SimpleJobRepositoryTests extends TestCase {
 		assertTrue(step.getStepExecutionCount() == 1);
 	}
 
+	//Test that a restartable job that has multiple instances throws an exception.
+	public void testFindRestartableJobWithMultipleInstances(){
+
+		List jobs = new ArrayList();
+		jobs.add(databaseJob);
+		jobs.add(new JobInstance());
+		jobDao.findJobs(jobRuntimeInformation);
+		jobDaoControl.setReturnValue(jobs);
+		jobDaoControl.replay();
+
+		try{
+			jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
+			fail();
+		}catch(BatchRestartException ex){
+			//expected
+		}
+
+		jobDaoControl.verify();
+	}
+
+	public void testRestartJobStartLimitExceeded(){
+
+		jobConfiguration.setStartLimit(1);
+
+		List jobs = new ArrayList();
+		jobDao.findJobs(jobRuntimeInformation);
+		jobs.add(databaseJob);
+		jobDaoControl.setReturnValue(jobs);
+		stepDao.findStep(databaseJob, "TestStep1");
+		stepDaoControl.setReturnValue(databaseStep1);
+		stepDao.getStepExecutionCount(databaseStep1.getId());
+		stepDaoControl.setReturnValue(1);
+		stepDao.findStep(databaseJob, "TestStep2");
+		stepDaoControl.setReturnValue(databaseStep2);
+		stepDao.getStepExecutionCount(databaseStep2.getId());
+		stepDaoControl.setReturnValue(1);
+		stepDaoControl.replay();
+		jobDao.getJobExecutionCount(databaseJob.getId());
+		//return a greater execution count then the start limit, should throw exception
+		jobDaoControl.setReturnValue(2);
+		jobDaoControl.replay();
+
+		try{
+			jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
+			fail();
+		}catch(BatchRestartException ex){
+			//expected
+		}
+
+		jobDaoControl.verify();
+		stepDaoControl.verify();
+	}
+
 	public void testCreateNonRestartableJob(){
 
 		List jobs = new ArrayList();
+		jobConfiguration.setRestartable(false);
 
 		jobDao.findJobs(jobRuntimeInformation);
 		jobDaoControl.setReturnValue(jobs);

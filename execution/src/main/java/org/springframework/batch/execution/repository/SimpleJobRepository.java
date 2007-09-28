@@ -85,6 +85,8 @@ public class SimpleJobRepository implements JobRepository {
 	 * </p>
 	 *
 	 * @see JobRepository#findOrCreateJob(JobConfiguration, JobIdentifier)
+	 * @throws BatchRestartException if more than one JobInstance if found
+	 * 	or if JobInstance.getJobExecutionCount() is greater than JobConfiguration.getStartLimit()
 	 */
 	public JobInstance findOrCreateJob(JobConfiguration jobConfiguration, JobIdentifier runtimeInformation) {
 
@@ -115,7 +117,7 @@ public class SimpleJobRepository implements JobRepository {
 		}
 		else {
 			// More than one job found, throw exception
-			throw new NoSuchBatchDomainObjectException("Error obtaining" + "previous job run: "
+			throw new BatchRestartException("Error restarting job, more than one JobInstance found for: "
 					+ jobConfiguration.toString());
 		}
 	}
