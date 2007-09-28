@@ -28,21 +28,32 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.util.Assert;
 
 /**
+ * A {@link MethodInterceptor} that can be used to automatically repeat calls to
+ * a method on a service. The injected {@link RepeatOperations} is used to
+ * control the completion of the loop. By default it will repeat until the
+ * target method returns null. Be careful when injecting a bespoke
+ * {@link RepeatOperations} that the loop will actually terminate, because the
+ * default policy for a vanilla {@link RepeatTemplate} will never complete if
+ * the return type of the target method is void (the value returned is always
+ * not-null, representing the {@link Void#TYPE}).
+ * 
  * @author Dave Syer
  * @since 2.1
  */
 public class RepeatOperationsInterceptor implements MethodInterceptor {
 
-	private RepeatOperations batchTempate = new RepeatTemplate();
+	private RepeatOperations repeatOperations = new RepeatTemplate();
 
 	/**
 	 * Setter for the {@link RepeatOperations}.
+	 * 
 	 * @param batchTempate
-	 * @throws IllegalArgumentException if the argument is null.
+	 * @throws IllegalArgumentException
+	 *             if the argument is null.
 	 */
 	public void setRepeatOperations(RepeatOperations batchTempate) {
-		Assert.notNull(batchTempate, "'batchTemplate' cannot be null.");
-		this.batchTempate = batchTempate;
+		Assert.notNull(batchTempate, "'repeatOperations' cannot be null.");
+		this.repeatOperations = batchTempate;
 	}
 
 	/**
@@ -53,9 +64,10 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	 */
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 
-		batchTempate.iterate(new RepeatCallback() {
+		repeatOperations.iterate(new RepeatCallback() {
 
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public ExitStatus doInIteration(RepeatContext context)
+					throws Exception {
 				try {
 
 					MethodInvocation clone = invocation;
@@ -63,28 +75,29 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 						clone = ((ReflectiveMethodInvocation) invocation)
 								.invocableClone();
 					} else {
-						throw new IllegalStateException("MethodInvocation of the wrong type detected - this should not happen with Spring AOP, so please raise an issue if you see this exception");
+						throw new IllegalStateException(
+								"MethodInvocation of the wrong type detected - this should not happen with Spring AOP, so please raise an issue if you see this exception");
 					}
-					
+
 					// N.B. discards return value if there is one
-					if (clone.getMethod().getGenericReturnType().equals(Void.TYPE)) {
+					if (clone.getMethod().getGenericReturnType().equals(
+							Void.TYPE)) {
 						clone.proceed();
 						return ExitStatus.CONTINUABLE;
 					}
 					return new ExitStatus(clone.proceed() != null);
-				}
-				catch (Throwable e) {
+				} catch (Throwable e) {
 					if (e instanceof Exception) {
 						throw (Exception) e;
-					}
-					else {
-						throw new RepeatException("Unexpected error in batch interceptor", e);
+					} else {
+						throw new RepeatException(
+								"Unexpected error in batch interceptor", e);
 					}
 				}
 			}
 
 		});
-		
+
 		return null;
 	}
 

@@ -26,22 +26,27 @@ import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
 
 /**
+ * A {@link MethodInterceptor} that can be used to automatically retry calls to
+ * a method on a service if it fails. The injected {@link RetryOperations} is
+ * used to control the number of retries. By default it will retry a fixed
+ * number of times, according to the defaults in {@link RetryTemplate}.
+ * 
  * @author Rob Harrop
  * @author Dave Syer
  * @since 2.1
  */
 public class RetryOperationsInterceptor implements MethodInterceptor {
 
-	private RetryOperations retryTemplate = new RetryTemplate();
+	private RetryOperations retryOperations = new RetryTemplate();
 
 	public void setRetryTemplate(RetryOperations retryTemplate) {
-		Assert.notNull(retryTemplate, "'retryTemplate' cannot be null.");
-		this.retryTemplate = retryTemplate;
+		Assert.notNull(retryTemplate, "'retryOperations' cannot be null.");
+		this.retryOperations = retryTemplate;
 	}
 
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 		// TODO: use the method name to initialise a statistics context
-		return this.retryTemplate.execute(new RetryCallback() {
+		return this.retryOperations.execute(new RetryCallback() {
 
 			public Object doWithRetry(RetryContext context) throws Throwable {
 
@@ -57,7 +62,8 @@ public class RetryOperationsInterceptor implements MethodInterceptor {
 					clone = ((ReflectiveMethodInvocation) invocation)
 							.invocableClone();
 				} else {
-					throw new IllegalStateException("MethodInvocation of the wrong type detected - this should not happen with Spring AOP, so please raise an issue if you see this exception");
+					throw new IllegalStateException(
+							"MethodInvocation of the wrong type detected - this should not happen with Spring AOP, so please raise an issue if you see this exception");
 				}
 
 				return clone.proceed();
