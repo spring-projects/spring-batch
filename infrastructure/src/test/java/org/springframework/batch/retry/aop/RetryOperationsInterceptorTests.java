@@ -16,6 +16,8 @@
 
 package org.springframework.batch.retry.aop;
 
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,6 +83,37 @@ public class RetryOperationsInterceptorTests extends TestCase {
 			assertTrue(e.getMessage().startsWith("Not enough calls"));
 		}
 		assertEquals(1, target.count);
+	}
+	
+	public void testIllegalMethodInvocationType() throws Throwable {
+		try {
+			interceptor.invoke(new MethodInvocation() {
+				public Method getMethod() {
+					return null;
+				}
+
+				public Object[] getArguments() {
+					return null;
+				}
+
+				public AccessibleObject getStaticPart() {
+					return null;
+				}
+
+				public Object getThis() {
+					return null;
+				}
+
+				public Object proceed() throws Throwable {
+					return null;
+				}
+			});
+			fail("IllegalStateException expected");
+		} catch (IllegalStateException e) {
+			assertTrue("Exception message should contain MethodInvocation: "
+					+ e.getMessage(), e.getMessage()
+					.indexOf("MethodInvocation") >= 0);
+		}
 	}
 
 	private interface Service {

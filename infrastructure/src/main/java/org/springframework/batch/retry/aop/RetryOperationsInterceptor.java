@@ -56,6 +56,8 @@ public class RetryOperationsInterceptor implements MethodInterceptor {
 				if (invocation instanceof ReflectiveMethodInvocation) {
 					clone = ((ReflectiveMethodInvocation) invocation)
 							.invocableClone();
+				} else {
+					throw new IllegalStateException("MethodInvocation of the wrong type detected - this should not happen with Spring AOP, so please raise an issue if you see this exception");
 				}
 
 				return clone.proceed();

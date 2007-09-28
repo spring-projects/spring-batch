@@ -16,6 +16,8 @@
 
 package org.springframework.batch.repeat.aop;
 
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +46,8 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		super.setUp();
 		interceptor = new RepeatOperationsInterceptor();
 		target = new ServiceImpl();
-		ProxyFactory factory = new ProxyFactory(RepeatOperations.class.getClassLoader());
+		ProxyFactory factory = new ProxyFactory(RepeatOperations.class
+				.getClassLoader());
 		factory.setInterfaces(new Class[] { Service.class });
 		factory.setTarget(target);
 		service = (Service) factory.getProxy();
@@ -75,8 +78,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		try {
 			service.exception();
 			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals("Duh", e.getMessage().substring(0, 3));
 		}
 	}
@@ -86,8 +88,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		try {
 			service.error();
 			fail("Expected BatchException");
-		}
-		catch (RepeatException e) {
+		} catch (RepeatException e) {
 			assertEquals("Unexpected", e.getMessage().substring(0, 10));
 		}
 	}
@@ -108,6 +109,37 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		assertEquals(3, list.size());
 	}
 
+	public void testIllegalMethodInvocationType() throws Throwable {
+		try {
+			interceptor.invoke(new MethodInvocation() {
+				public Method getMethod() {
+					return null;
+				}
+
+				public Object[] getArguments() {
+					return null;
+				}
+
+				public AccessibleObject getStaticPart() {
+					return null;
+				}
+
+				public Object getThis() {
+					return null;
+				}
+
+				public Object proceed() throws Throwable {
+					return null;
+				}
+			});
+			fail("IllegalStateException expected");
+		} catch (IllegalStateException e) {
+			assertTrue("Exception message should contain MethodInvocation: "
+					+ e.getMessage(), e.getMessage()
+					.indexOf("MethodInvocation") >= 0);
+		}
+	}
+
 	private interface Service {
 		Object service() throws Exception;
 
@@ -123,8 +155,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 			count++;
 			if (count <= 2) {
 				return new Integer(count);
-			}
-			else {
+			} else {
 				return null;
 			}
 		}
