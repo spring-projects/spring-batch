@@ -19,17 +19,14 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
-import org.easymock.MockControl;
-import org.springframework.xml.stream.XmlEventStreamReader;
+import junit.framework.TestCase;
 
-import com.bea.xml.stream.XMLEventReaderBase;
+import org.easymock.MockControl;
+
 import com.bea.xml.stream.events.StartDocumentEvent;
 import com.bea.xml.stream.util.NamespaceContextImpl;
-
-import junit.framework.TestCase;
 
 /**
  * @author Lucas Ward
