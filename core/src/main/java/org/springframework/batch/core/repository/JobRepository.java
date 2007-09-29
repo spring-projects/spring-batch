@@ -51,16 +51,18 @@ public interface JobRepository {
 	 * job that is uniquely identified by JobIdentifier already exists, it's
 	 * persisted values (including ID) will be returned in a new Job object. If
 	 * no previous run is found, a new job will be created and returned.
-	 * @param jobConfiguration - describes the configuration for jobs and steps
-	 * @param runtimeInformation TODO
+	 * 
+	 * @param jobConfiguration
+	 *            describes the configuration for this job
+	 * @param jobIdentifier
+	 *            identifies this particular run of the configuration across
+	 *            possible restarts
 	 * 
 	 * @return a valid job
 	 * 
-	 * 
-	 * @throws NoSuchBatchDomainObjectException if more than one job is found for
-	 * the given configuration.
 	 */
-	public JobInstance findOrCreateJob(JobConfiguration jobConfiguration, JobIdentifier jobIdentifier);
+	public JobInstance findOrCreateJob(JobConfiguration jobConfiguration,
+			JobIdentifier jobIdentifier);
 
 	/**
 	 * Update a Job.
