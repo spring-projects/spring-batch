@@ -42,9 +42,9 @@ public class JobInstance extends Entity {
 	private int jobExecutionCount;
 
 	/**
-	 * @deprecated should only be used by Hibernate
+	 * Package private constructor for Hibernate use only
 	 */
-	public JobInstance() {
+	JobInstance() {
 		this(null);
 	}
 
