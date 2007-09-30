@@ -31,7 +31,7 @@ import org.springframework.batch.repeat.RepeatContext;
  */
 public class JobExecution extends Entity {
 
-	private transient JobInstance job;
+	private JobInstance job;
 
 	private transient Collection stepExecutions = new HashSet();
 
@@ -44,8 +44,6 @@ public class JobExecution extends Entity {
 	private Timestamp startTime = new Timestamp(System.currentTimeMillis());
 
 	private Timestamp endTime = null;
-
-	private Long jobId;
 
 	private String exitCode = "";
 
@@ -62,9 +60,6 @@ public class JobExecution extends Entity {
 	 */
 	public JobExecution(JobInstance job, Long id) {
 		this.job = job;
-		if (job != null) {
-			this.jobId = job.getId();
-		}
 		setId(id);
 	}
 	
@@ -108,7 +103,10 @@ public class JobExecution extends Entity {
 	 * @return the id of the enclosing job
 	 */
 	public Long getJobId() {
-		return jobId;
+		if (job != null) {
+			return job.getId();
+		}
+		return null;
 	}
 
 	/**
