@@ -66,7 +66,7 @@ public class JobExecutionTests extends TestCase {
 	 */
 	public void testGetJobId() {
 		assertEquals(11, execution.getJobId().longValue());
-		execution.setJobId(new Long(23));
+		execution = new JobExecution(new Long(23));
 		assertEquals(23, execution.getJobId().longValue());
 	}
 

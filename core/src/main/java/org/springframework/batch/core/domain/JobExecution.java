@@ -78,10 +78,6 @@ public class JobExecution extends Entity {
 		return jobId;
 	}
 
-	public void setJobId(Long jobId) {
-		this.jobId = jobId;
-	}
-
 	/**
 	 * @param exitCode
 	 */
