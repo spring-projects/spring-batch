@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.configuration.StepConfiguration;
-import org.springframework.batch.core.runtime.StepExecutionContext;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.FieldSetInputSource;
 import org.springframework.batch.io.file.FieldSetMapper;
@@ -75,7 +75,7 @@ public class OrderItemProvider extends AbstractItemProvider {
     }
 
     /**
-     * @see org.springframework.batch.execution.io.FieldSetCallback#process(StepConfiguration, StepExecutionContext)
+     * @see org.springframework.batch.execution.io.FieldSetCallback#process(StepConfiguration, StepExecution)
      */
     private void process(FieldSet fieldSet) {
         //finish processing if we hit the end of file

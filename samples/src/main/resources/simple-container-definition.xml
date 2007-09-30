@@ -64,6 +64,7 @@
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="stepIncrementer" ref="stepIncrementer" />
 		<property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" />
+		<property name="jobDao" ref="jobDao"/>
 	</bean>
 
 	<bean id="jobRuntimeInformationFactory"
