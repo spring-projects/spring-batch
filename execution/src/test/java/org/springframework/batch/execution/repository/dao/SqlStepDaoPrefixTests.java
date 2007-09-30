@@ -26,7 +26,7 @@ public class SqlStepDaoPrefixTests extends TestCase {
 	
 	StepExecution stepExecution = new StepExecution(new Long(1), new Long(2));
 	StepInstance step = new StepInstance(new Long(1));
-	JobInstance job = new JobInstance(new Long(1));
+	JobInstance job = new JobInstance(null, new Long(1));
 	
 	MockControl stepExecutionIncrementerControl = MockControl.createControl(DataFieldMaxValueIncrementer.class);
 	DataFieldMaxValueIncrementer stepExecutionIncrementer;

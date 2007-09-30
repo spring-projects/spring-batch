@@ -73,7 +73,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 		List steps = job.getSteps();
 		final StepInstance step = (StepInstance) steps.get(0);
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(null, new JobInstance(new Long(0)));
+		JobExecutionContext jobExecutionContext = new JobExecutionContext(null, new JobInstance(null, new Long(0)));
 		final StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 		stepConfiguration.setTasklet(new Tasklet() {
 			public ExitStatus execute() throws Exception {

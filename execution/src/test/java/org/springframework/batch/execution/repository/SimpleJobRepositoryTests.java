@@ -97,7 +97,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 		jobConfiguration.setSteps(stepConfigurations);
 
-		databaseJob = new JobInstance(new Long(1));
+		databaseJob = new JobInstance(jobRuntimeInformation, new Long(1));
 
 		databaseStep1 = new StepInstance(new Long(1));
 		databaseStep2 = new StepInstance(new Long(2));
@@ -168,7 +168,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 		List jobs = new ArrayList();
 		jobs.add(databaseJob);
-		jobs.add(new JobInstance());
+		jobs.add(new JobInstance(jobRuntimeInformation));
 		jobDao.findJobs(jobRuntimeInformation);
 		jobDaoControl.setReturnValue(jobs);
 		jobDaoControl.replay();
@@ -254,7 +254,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		}
 
 		// successful update
-		updateJob = new JobInstance(new Long(0L));
+		updateJob = new JobInstance(null, new Long(0L));
 		jobDao.update(updateJob);
 		jobDaoControl.replay();
 		jobRepository.update(updateJob);

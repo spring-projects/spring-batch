@@ -119,8 +119,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 				new Long(defaultJobId.getJobRun()) };
 		jdbcTemplate.update(getCreateJobQuery(), parameters);
 
-		JobInstance job = new JobInstance(jobId);
-		job.setIdentifier(jobIdentifier);
+		JobInstance job = new JobInstance(jobIdentifier, jobId);
 		return job;
 	}
 
@@ -145,9 +144,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-				JobInstance job = new JobInstance(new Long(rs.getLong(1)));
+				JobInstance job = new JobInstance(jobIdentifier, new Long(rs.getLong(1)));
 				job.setStatus(BatchStatus.getStatus(rs.getString(2)));
-				job.setIdentifier(jobIdentifier);
 
 				return job;
 			}

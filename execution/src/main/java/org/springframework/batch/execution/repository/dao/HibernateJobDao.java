@@ -51,8 +51,7 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 
 		validateJobIdentifier(jobIdentifier);
 
-		JobInstance job = new JobInstance();
-		job.setIdentifier(jobIdentifier);
+		JobInstance job = new JobInstance(jobIdentifier);
 
 		Long jobId = (Long) getHibernateTemplate().save(job);
 

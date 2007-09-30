@@ -94,7 +94,8 @@ public class DefaultStepExecutorTests extends TestCase {
 	public void testStepExecutor() throws Exception {
 
 		StepInstance step = new StepInstance(new Long(9));
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(3)));
+		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
+		JobExecutionContext jobExecutionContext = new JobExecutionContext(jobIdentifier, new JobInstance(jobIdentifier, new Long(3)));
 		StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 
 		stepExecutor.process(stepConfiguration, stepExecutionContext);
@@ -111,7 +112,8 @@ public class DefaultStepExecutorTests extends TestCase {
 
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecution(new StepExecution(new Long(1), new Long(2)));
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(1)));
+		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
+		JobExecutionContext jobExecutionContext = new JobExecutionContext(jobIdentifier, new JobInstance(jobIdentifier, new Long(1)));
 
 		StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 		stepExecutor.processChunk(stepConfiguration, stepExecutionContext);
@@ -129,7 +131,8 @@ public class DefaultStepExecutorTests extends TestCase {
 
 		final StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecution(new StepExecution(new Long(1),new Long(1)));
-		final JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(3)));
+		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
+		final JobExecutionContext jobExecutionContext = new JobExecutionContext(jobIdentifier, new JobInstance(jobIdentifier, new Long(3)));
 		final StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 
 		stepConfiguration.setTasklet(new Tasklet() {
@@ -154,16 +157,12 @@ public class DefaultStepExecutorTests extends TestCase {
 		stepExecutor.setRepository(repository);
 
 		StepInstance step = new StepInstance(new Long(1));
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(3)));
+		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
+		JobExecutionContext jobExecutionContext = new JobExecutionContext(jobIdentifier, new JobInstance(jobIdentifier, new Long(3)));
 		StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
-
-		JobInstance job = new JobInstance(new Long(1));
-		job.setIdentifier(new SimpleJobIdentifier("foo_bar"));
 
 		stepExecutor.process(stepConfiguration, stepExecutionContext);
 		assertEquals(1, processed.size());
-
-		// assertEquals(1, repository.findJobs(job.?).size());
 	}
 
 	public void testIncrementRollbackCount(){
@@ -185,7 +184,8 @@ public class DefaultStepExecutorTests extends TestCase {
 
 		StepInstance step = new StepInstance(new Long(1));
 		stepConfiguration.setTasklet(tasklet);
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(3)));
+		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
+		JobExecutionContext jobExecutionContext = new JobExecutionContext(jobIdentifier, new JobInstance(jobIdentifier, new Long(3)));
 		StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 
 		try{
@@ -216,7 +216,8 @@ public class DefaultStepExecutorTests extends TestCase {
 
 		StepInstance step = new StepInstance(new Long(1));
 		stepConfiguration.setTasklet(tasklet);
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(3)));
+		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
+		JobExecutionContext jobExecutionContext = new JobExecutionContext(jobIdentifier, new JobInstance(jobIdentifier, new Long(3)));
 		StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 
 		try{
@@ -238,7 +239,8 @@ public class DefaultStepExecutorTests extends TestCase {
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepConfiguration.setTasklet(tasklet);
 		stepConfiguration.setSaveRestartData(true);
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(3)));
+		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
+		JobExecutionContext jobExecutionContext = new JobExecutionContext(jobIdentifier, new JobInstance(jobIdentifier, new Long(3)));
 		StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 
 		try{
@@ -261,7 +263,8 @@ public class DefaultStepExecutorTests extends TestCase {
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepConfiguration.setTasklet(tasklet);
 		stepConfiguration.setSaveRestartData(true);
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(3)));
+		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
+		JobExecutionContext jobExecutionContext = new JobExecutionContext(jobIdentifier, new JobInstance(jobIdentifier, new Long(3)));
 		StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 
 		try{
@@ -284,7 +287,8 @@ public class DefaultStepExecutorTests extends TestCase {
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepConfiguration.setTasklet(tasklet);
 		stepConfiguration.setSaveRestartData(false);
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(3)));
+		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
+		JobExecutionContext jobExecutionContext = new JobExecutionContext(jobIdentifier, new JobInstance(jobIdentifier, new Long(3)));
 		StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 
 		try{
@@ -310,7 +314,8 @@ public class DefaultStepExecutorTests extends TestCase {
 			return ExitStatus.FINISHED;
 		}});
 		stepConfiguration.setSaveRestartData(true);
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(3)));
+		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
+		JobExecutionContext jobExecutionContext = new JobExecutionContext(jobIdentifier, new JobInstance(jobIdentifier, new Long(3)));
 		StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
 
 		try{

@@ -40,7 +40,7 @@ public class MapStepDaoTests extends TestCase {
 	
 	protected void setUp() throws Exception {
 		MapStepDao.clear();
-		job = new JobInstance(new Long(jobId++));
+		job = new JobInstance(null, new Long(jobId++));
 		step = dao.createStep(job, "foo");	
 	}
 	
@@ -79,7 +79,7 @@ public class MapStepDaoTests extends TestCase {
 	}
 	
 	public void testFindSingleWithEmptyResults() throws Exception {
-		StepInstance result = dao.findStep(new JobInstance(new Long(22)), "bar");
+		StepInstance result = dao.findStep(new JobInstance(null, new Long(22)), "bar");
 		assertEquals(null, result);		
 	}
 

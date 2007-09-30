@@ -13,28 +13,24 @@ public class EntityNameInterceptorTests extends TestCase {
 	private EntityNameInterceptor interceptor = new EntityNameInterceptor();
 	
 	public void testGetEntityNameForScheduledJobIdentifier() {
-		JobInstance job = new JobInstance();
-		job.setIdentifier(new ScheduledJobIdentifier("foo"));
+		JobInstance job = new JobInstance(new ScheduledJobIdentifier("foo"));
 		assertEquals("ScheduledJobInstance", interceptor.getEntityName(job));
 	}
 
 	public void testGetEntityNameForSimpleJobIdentifier() {
-		JobInstance job = new JobInstance();
-		job.setIdentifier(new SimpleJobIdentifier("foo"));
+		JobInstance job = new JobInstance(new SimpleJobIdentifier("foo"));
 		assertEquals("SimpleJobInstance", interceptor.getEntityName(job));
 	}
 
 	public void testSetIdentifierTypesWithString() {
 		interceptor.setIdentifierTypes(Collections.singletonMap(ScheduledJobIdentifier.class.getName(), "foo"));
-		JobInstance job = new JobInstance();
-		job.setIdentifier(new ScheduledJobIdentifier("foo"));
+		JobInstance job = new JobInstance(new ScheduledJobIdentifier("foo"));
 		assertEquals("foo", interceptor.getEntityName(job));
 	}
 
 	public void testSetIdentifierTypesWithClass() {
 		interceptor.setIdentifierTypes(Collections.singletonMap(ScheduledJobIdentifier.class, "foo"));
-		JobInstance job = new JobInstance();
-		job.setIdentifier(new ScheduledJobIdentifier("foo"));
+		JobInstance job = new JobInstance(new ScheduledJobIdentifier("foo"));
 		assertEquals("foo", interceptor.getEntityName(job));
 	}
 

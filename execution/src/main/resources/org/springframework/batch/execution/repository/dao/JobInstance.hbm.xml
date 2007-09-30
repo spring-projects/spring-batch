@@ -25,7 +25,7 @@
 
 		<subclass entity-name="ScheduledJobInstance" name="JobInstance"
 			discriminator-value="Scheduled">
-			<component name="identifier"
+			<component name="identifier" access="field"
 				class="org.springframework.batch.execution.runtime.ScheduledJobIdentifier">
 				<property name="name" update="false" column="JOB_NAME" />
 				<property name="jobStream" update="false"
@@ -38,7 +38,7 @@
 
 		<subclass entity-name="SimpleJobInstance" name="JobInstance"
 			discriminator-value="Simple">
-			<component name="identifier"
+			<component name="identifier" access="field"
 				class="org.springframework.batch.core.runtime.SimpleJobIdentifier">
 				<property name="name" update="false" column="JOB_NAME" />
 			</component>

@@ -127,7 +127,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 				.getJobConfiguration(jobRuntimeInformation.getName());
 
 		final JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
-		JobExecutionContext jobExecutionContext = jobExecutionRegistry.register(jobRuntimeInformation, job);
+		JobExecutionContext jobExecutionContext = jobExecutionRegistry.register(job);
 		
 		ExitStatus exitStatus = ExitStatus.FAILED;
 		try {

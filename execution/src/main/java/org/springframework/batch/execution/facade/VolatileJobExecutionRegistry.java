@@ -98,7 +98,10 @@ public class VolatileJobExecutionRegistry implements JobExecutionRegistry {
 	 * @see org.springframework.batch.container.common.executor.JobExecutionRegistry#register(org.springframework.batch.container.common.runtime.JobRuntimeInformation,
 	 * org.springframework.batch.container.common.domain.JobExecution)
 	 */
-	public JobExecutionContext register(JobIdentifier jobIdentifier, JobInstance job) {
+	public JobExecutionContext register(JobInstance job) {
+		
+		JobIdentifier jobIdentifier = job.getIdentifier();
+		
 		if (isRegistered(jobIdentifier)) {
 			return get(jobIdentifier);
 		}

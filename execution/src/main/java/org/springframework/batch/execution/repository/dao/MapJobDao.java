@@ -45,8 +45,7 @@ public class MapJobDao implements JobDao {
 	}
 
 	public JobInstance createJob(JobIdentifier jobIdentifier) {
-		JobInstance job = new JobInstance(new Long(currentId++));
-		job.setIdentifier(jobIdentifier);
+		JobInstance job = new JobInstance(jobIdentifier, new Long(currentId++));
 
 		jobsById.put(job.getId(), job);
 		return job;
