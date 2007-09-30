@@ -22,21 +22,24 @@ import junit.framework.TestCase;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class StepExecutionTests extends TestCase {
 
-	private StepExecution execution = new StepExecution(new Long(11), new Long(23));
-	
+	private StepExecution execution = newStepExecution(new Long(11),
+			new Long(23));
+
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#JobExecution()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#JobExecution()}.
 	 */
 	public void testStepExecution() {
 		assertNull(new StepExecution().getId());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getEndTime()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#getEndTime()}.
 	 */
 	public void testGetEndTime() {
 		assertNull(execution.getEndTime());
@@ -45,7 +48,8 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getStartTime()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#getStartTime()}.
 	 */
 	public void testGetStartTime() {
 		assertNotNull(execution.getStartTime());
@@ -54,7 +58,8 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getStatus()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#getStatus()}.
 	 */
 	public void testGetStatus() {
 		assertEquals(BatchStatus.STARTING, execution.getStatus());
@@ -63,53 +68,59 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
 	 */
 	public void testGetJobId() {
 		assertEquals(23, execution.getJobExecutionId().longValue());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getExitCode()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#getExitCode()}.
 	 */
 	public void testGetExitCode() {
 		assertEquals("", execution.getExitCode());
 		execution.setExitCode("23");
 		assertEquals("23", execution.getExitCode());
 	}
-	
+
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepExecution#incrementCommitCount()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.StepExecution#incrementCommitCount()}.
 	 */
 	public void testIncrementCommitCount() {
 		int before = execution.getCommitCount().intValue();
 		execution.incrementCommitCount();
 		int after = execution.getCommitCount().intValue();
-		assertEquals(before+1, after);
+		assertEquals(before + 1, after);
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepExecution#incrementTaskCount()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.StepExecution#incrementTaskCount()}.
 	 */
 	public void testIncrementLuwCount() {
 		int before = execution.getTaskCount().intValue();
 		execution.incrementTaskCount();
 		int after = execution.getTaskCount().intValue();
-		assertEquals(before+1, after);
+		assertEquals(before + 1, after);
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepExecution#incrementRollbackCount()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.StepExecution#incrementRollbackCount()}.
 	 */
 	public void testIncrementRollbackCount() {
 		int before = execution.getRollbackCount().intValue();
 		execution.incrementRollbackCount();
 		int after = execution.getRollbackCount().intValue();
-		assertEquals(before+1, after);
+		assertEquals(before + 1, after);
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepExecution#getCommitCount()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.StepExecution#getCommitCount()}.
 	 */
 	public void testGetCommitCount() {
 		execution.setCommitCount(123);
@@ -117,7 +128,8 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepExecution#getTaskCount()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.StepExecution#getTaskCount()}.
 	 */
 	public void testGetTaskCount() {
 		execution.setTaskCount(123);
@@ -125,7 +137,8 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepExecution#getRollbackCount()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.StepExecution#getRollbackCount()}.
 	 */
 	public void testGetRollbackCount() {
 		execution.setRollbackCount(123);
@@ -133,59 +146,73 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepExecution#getStepId()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.StepExecution#getStepId()}.
 	 */
 	public void testGetStepId() {
 		assertEquals(11, execution.getStepId().longValue());
 	}
-	
+
 	public void testToString() throws Exception {
-		assertTrue("Should contain task count: "+execution.toString(), execution.toString().indexOf("task")>=0);
-		assertTrue("Should contain commit count: "+execution.toString(), execution.toString().indexOf("commit")>=0);
-		assertTrue("Should contain rollback count: "+execution.toString(), execution.toString().indexOf("rollback")>=0);
+		assertTrue("Should contain task count: " + execution.toString(),
+				execution.toString().indexOf("task") >= 0);
+		assertTrue("Should contain commit count: " + execution.toString(),
+				execution.toString().indexOf("commit") >= 0);
+		assertTrue("Should contain rollback count: " + execution.toString(),
+				execution.toString().indexOf("rollback") >= 0);
 	}
-	
+
 	public void testStatistics() throws Exception {
 		assertNotNull(execution.getStatistics());
-		execution.setStatistics(new Properties() {{
-			setProperty("foo", "bar");
-		}});
+		execution.setStatistics(new Properties() {
+			{
+				setProperty("foo", "bar");
+			}
+		});
 		assertEquals("bar", execution.getStatistics().getProperty("foo"));
 	}
-	
+
 	public void testEqualsWithSameIdentifier() throws Exception {
-		StepExecution step1 = new StepExecution(new Long(100), new Long(11));
-		StepExecution step2 = new StepExecution(new Long(100), new Long(11));
+		StepExecution step1 = newStepExecution(new Long(100), new Long(11));
+		StepExecution step2 = newStepExecution(new Long(100), new Long(11));
 		assertEquals(step1, step2);
 	}
 
 	public void testEqualsWithNull() throws Exception {
-		StepExecution step = new StepExecution(new Long(100), new Long(11));
+		StepExecution step = newStepExecution(new Long(100), new Long(11));
 		assertFalse(step.equals(null));
 	}
 
 	public void testEqualsWithNullIdentifiers() throws Exception {
-		StepExecution step = new StepExecution(new Long(100), new Long(11));
+		StepExecution step = newStepExecution(new Long(100), new Long(11));
 		assertFalse(step.equals(new StepExecution()));
 	}
-	
+
 	public void testEqualsWithNullJob() throws Exception {
-		StepExecution step = new StepExecution(null, new Long(11));
+		StepExecution step = newStepExecution(null, new Long(11));
 		assertFalse(step.equals(new StepExecution()));
 	}
 
 	public void testEqualsWithNullStep() throws Exception {
-		StepExecution step = new StepExecution(new Long(11), null);
+		StepExecution step = newStepExecution(new Long(11), null);
 		assertFalse(step.equals(new StepExecution()));
 	}
 
 	public void testHashCode() throws Exception {
-		assertTrue("Hash code same as parent", new Entity(execution.getId()).hashCode()!=execution.hashCode());
+		assertTrue("Hash code same as parent", new Entity(execution.getId())
+				.hashCode() != execution.hashCode());
 	}
 
 	public void testHashCodeWithNullIds() throws Exception {
-		assertTrue("Hash code not same as parent", new Entity(execution.getId()).hashCode()!=new StepExecution().hashCode());
+		assertTrue("Hash code not same as parent",
+				new Entity(execution.getId()).hashCode() != new StepExecution()
+						.hashCode());
+	}
+
+	private StepExecution newStepExecution(Long long1, Long long2) {
+		JobInstance job = new JobInstance(null);
+		StepInstance step = new StepInstance(job, "foo", long1);
+		StepExecution execution = new StepExecution(step, new JobExecution(job, long2));
+		return execution;
 	}
 }
-
-

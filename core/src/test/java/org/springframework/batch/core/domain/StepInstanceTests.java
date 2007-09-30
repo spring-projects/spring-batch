@@ -72,7 +72,7 @@ public class StepInstanceTests extends TestCase {
 	public void testGetJob() {
 		assertEquals(null, instance.getJob());
 		JobInstance job = new JobInstance(null);
-		instance.setJob(job);
+		instance = new StepInstance(job, null);
 		assertEquals(job, instance.getJob());
 	}
 
@@ -81,7 +81,7 @@ public class StepInstanceTests extends TestCase {
 	 */
 	public void testGetStepExecution() {
 		assertEquals(null, instance.getStepExecution());
-		StepExecution execution = new StepExecution(instance.getId(), new Long(111));
+		StepExecution execution = new StepExecution(instance, new JobExecution(instance.getJob(), new Long(111)));
 		instance.setStepExecution(execution);
 		assertNotNull(execution.getJobExecutionId());
 		assertEquals(execution.getJobExecutionId(), instance.getStepExecution().getJobExecutionId());
@@ -92,7 +92,7 @@ public class StepInstanceTests extends TestCase {
 	 */
 	public void testGetName() {
 		assertEquals(null, instance.getName());
-		instance.setName("foo");
+		instance = new StepInstance(null, "foo");
 		assertEquals("foo", instance.getName());
 	}
 
@@ -101,19 +101,14 @@ public class StepInstanceTests extends TestCase {
 	 */
 	public void testGetJobId() {
 		assertEquals(null, instance.getJobId());
-		instance.setJob(new JobInstance(null, new Long(23)));
+		instance = new StepInstance(new JobInstance(null, new Long(23)), null);
 		assertEquals(23, instance.getJobId().longValue());
 	}
 
 	public void testEqualsWithSameIdentifier() throws Exception {
 		JobInstance job = new JobInstance(null, new Long(100));
-		StepInstance step1 = new StepInstance(new Long(0));
-		StepInstance step2 = new StepInstance(new Long(0));
-		step1.setJob(job);
-		step2.setJob(job);
-		String stepName = "foo";
-		step1.setName(stepName);
-		step2.setName(stepName);
+		StepInstance step1 = new StepInstance(job, "foo", new Long(0));
+		StepInstance step2 = new StepInstance(job, "foo", new Long(0));
 		assertEquals(step1, step2);
 	}
 

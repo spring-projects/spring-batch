@@ -19,13 +19,17 @@ import java.sql.Timestamp;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.runtime.SimpleJobIdentifier;
+import org.springframework.batch.repeat.context.RepeatContextSupport;
+
 /**
  * @author Dave Syer
  *
  */
 public class JobExecutionTests extends TestCase {
 
-	private JobExecution execution = new JobExecution(new Long(11));
+	private JobExecution execution = new JobExecution(new JobInstance(null, new Long(11)));
+	private JobExecution context = new JobExecution(new JobInstance(new SimpleJobIdentifier("foo"), new Long(11)));
 	
 	/**
 	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#JobExecution()}.
@@ -66,7 +70,7 @@ public class JobExecutionTests extends TestCase {
 	 */
 	public void testGetJobId() {
 		assertEquals(11, execution.getJobId().longValue());
-		execution = new JobExecution(new Long(23));
+		execution = new JobExecution(new JobInstance(null, new Long(23)));
 		assertEquals(23, execution.getJobId().longValue());
 	}
 
@@ -79,4 +83,43 @@ public class JobExecutionTests extends TestCase {
 		assertEquals("23", execution.getExitCode());
 	}
 
+	public void testContextContainsInfo() throws Exception {
+		assertEquals("foo", context.getJobIdentifier().getName());
+	}
+
+	public void testNullContexts() throws Exception {
+		assertEquals(0, context.getStepContexts().size());
+		assertEquals(0, context.getChunkContexts().size());
+	}
+	
+	public void testStepContext() throws Exception {
+		context.registerStepContext(new RepeatContextSupport(null));
+		assertEquals(1, context.getStepContexts().size());
+	}
+
+	public void testAddAndRemoveStepContext() throws Exception {
+		context.registerStepContext(new RepeatContextSupport(null));
+		assertEquals(1, context.getStepContexts().size());
+		context.unregisterStepContext(new RepeatContextSupport(null));
+		assertEquals(0, context.getStepContexts().size());
+	}
+
+	public void testAddAndRemoveStepExecution() throws Exception {
+		assertEquals(0, context.getStepExecutions().size());
+		context.registerStepExecution(new StepExecution(null, null));
+		assertEquals(1, context.getStepExecutions().size());
+	}
+
+	public void testAddAndRemoveChunkContext() throws Exception {
+		context.registerChunkContext(new RepeatContextSupport(null));
+		assertEquals(1, context.getChunkContexts().size());
+		context.unregisterChunkContext(new RepeatContextSupport(null));
+		assertEquals(0, context.getChunkContexts().size());
+	}
+
+	public void testRemoveChunkContext() throws Exception {
+		context.unregisterChunkContext(new RepeatContextSupport(null));
+		assertEquals(0, context.getChunkContexts().size());
+	}
+	
 }

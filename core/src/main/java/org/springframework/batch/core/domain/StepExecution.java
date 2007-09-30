@@ -28,11 +28,15 @@ import java.util.Properties;
  * respectively.
  * 
  * @author Lucas Ward
+ * @author Dave Syer
  * 
  */
 public class StepExecution extends Entity {
 
-	// TODO declare transient or make serializable
+	private JobExecution jobExecution;
+
+	private StepInstance step;
+
 	private BatchStatus status = BatchStatus.STARTING;
 
 	private int taskCount = 0;
@@ -47,10 +51,6 @@ public class StepExecution extends Entity {
 
 	private Properties statistics = new Properties();
 
-	private Long stepId;
-
-	private Long jobExecutionId;
-
 	private String exitCode = "";
 	
 	private String exitDescription = "";
@@ -64,10 +64,21 @@ public class StepExecution extends Entity {
 		super();
 	}
 
-	public StepExecution(Long stepId, Long jobExecutionId) {
+	/**
+	 * Constructor with mandatory properties.
+	 * 
+	 * @param step the step to which this execution belongs
+	 * @param jobExecution the current job execution 
+	 */ 
+	public StepExecution(StepInstance step, JobExecution jobExecution, Long id) {
 		this();
-		this.stepId = stepId;
-		this.jobExecutionId = jobExecutionId;
+		this.step= step;
+		this.jobExecution = jobExecution;
+		setId(id);
+	}
+
+	public StepExecution(StepInstance step, JobExecution jobExecution) {
+		this(step, jobExecution, null);
 	}
 
 	public void incrementCommitCount() {
@@ -139,7 +150,10 @@ public class StepExecution extends Entity {
 	}
 
 	public Long getStepId() {
-		return stepId;
+		if (step!=null) {
+			return step.getId();
+		}
+		return null;
 	}
 
 	/**
@@ -147,13 +161,18 @@ public class StepExecution extends Entity {
 	 * @return the jobExecutionId
 	 */
 	public Long getJobExecutionId() {
-		return jobExecutionId;
+		if (jobExecution!=null) {			
+			return jobExecution.getId();
+		}
+		return null;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.container.common.domain.Entity#equals(java.lang.Object)
 	 */
 	public boolean equals(Object obj) {
+		Object stepId = getStepId();
+		Object jobExecutionId = getJobExecutionId();
 		if (stepId==null && jobExecutionId==null || !(obj instanceof StepExecution) || getId()!=null) {			
 			return super.equals(obj);
 		}
@@ -168,6 +187,8 @@ public class StepExecution extends Entity {
 	 * @see org.springframework.batch.container.common.domain.Entity#hashCode()
 	 */
 	public int hashCode() {
+		Object stepId = getStepId();
+		Object jobExecutionId = getJobExecutionId();
 		return super.hashCode() + 31*(stepId!=null ? stepId.hashCode() : 0) + 91*(jobExecutionId!=null ? jobExecutionId.hashCode() : 0);
 	}
 		
@@ -206,4 +227,22 @@ public class StepExecution extends Entity {
 	public String getExitDescription() {
 		return exitDescription;
 	}
+
+	/**
+	 * Accessor for the step governing this execution.
+	 * @return the step
+	 */
+	public StepInstance getStep() {
+		return step;
+	}
+
+	/**
+	 * Accessor for the execution context information of the enclosing job.
+	 * @return the {@link jobExecutionContext} that was used to start this step
+	 * execution.
+	 */
+	public JobExecution getJobExecution() {
+		return jobExecution;
+	}
+
 }

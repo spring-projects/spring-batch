@@ -40,7 +40,7 @@ public interface JobExecutionRegistry {
 	 * 
 	 * @throws NullPointerException if the first parameter is null.
 	 */
-	JobExecutionContext register(JobInstance job);
+	JobExecution register(JobInstance job);
 
 	/**
 	 * Check if a given {@link JobExecution}, or one with the same id property,
@@ -60,33 +60,33 @@ public interface JobExecutionRegistry {
 	void unregister(JobIdentifier jobIdentifier);
 
 	/**
-	 * Find all the currently registered {@link JobExecutionContext} objects.
+	 * Find all the currently registered {@link JobExecution} objects.
 	 * 
 	 * @return all the currently registered contexts.
 	 */
 	Collection findAll();
 	
 	/**
-	 * Return a collection of {@link JobExecutionContext} objects representing
+	 * Return a collection of {@link JobExecution} objects representing
 	 * the currently executing jobs with {@link JobRuntimeInformation} having
 	 * the given name.
 	 * 
 	 * @param name the name of the {@link JobRuntimeInformation} as a to key the
 	 * search. The name can be null, in which case the key is null, i.e.
 	 * {@link JobRuntimeInformation} instances with null name will match.
-	 * @return a {@link Collection} of {@link JobExecutionContext}.
+	 * @return a {@link Collection} of {@link JobExecution}.
 	 */
 	Collection findByName(String name);
 
 	/**
-	 * Return a {@link JobExecutionContext} representing the currently executing
+	 * Return a {@link JobExecution} representing the currently executing
 	 * jobs with the given {@link JobRuntimeInformation}.
 	 * 
 	 * @param runtimeInformation the {@link JobIdentifier} to use as a
 	 * search key.
-	 * @return the {@link JobExecutionContext} that was registered under the
+	 * @return the {@link JobExecution} that was registered under the
 	 * given key, if there is one, null otherwise.
 	 */
-	JobExecutionContext get(JobIdentifier jobIdentifier);
+	JobExecution get(JobIdentifier jobIdentifier);
 
 }

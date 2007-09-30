@@ -61,12 +61,25 @@ public class StepInstance extends Entity {
 
 	private String name;
 
-	public StepInstance() {
+	/**
+	 * Package private constructor for Hibernate only 
+	 */
+	StepInstance() {
 		this(null);
 	}
 
 	public StepInstance(Long stepId) {
+		this(null, null, stepId);
+	}
+
+	public StepInstance(JobInstance job, String name) {
+		this(job, name, null);
+	}
+	
+	public StepInstance(JobInstance job, String name, Long stepId) {
 		setId(stepId);
+		this.job = job;
+		this.name = name;
 	}
 
 	public int getStepExecutionCount() {
@@ -93,10 +106,6 @@ public class StepInstance extends Entity {
 		this.status = status;
 	}
 
-	public void setJob(JobInstance job) {
-		this.job = job;
-	}
-
 	public JobInstance getJob() {
 		return job;
 	}
@@ -107,10 +116,6 @@ public class StepInstance extends Entity {
 
 	public void setStepExecution(StepExecution stepInstance) {
 		this.stepExecution = stepInstance;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getName() {

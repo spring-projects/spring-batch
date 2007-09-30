@@ -17,7 +17,7 @@
 package org.springframework.batch.core.executor;
 
 import org.springframework.batch.core.configuration.StepConfiguration;
-import org.springframework.batch.core.runtime.StepExecutionContext;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -28,7 +28,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * trackable with the step execution context ({@see Step#getContext()}). The
  * configuration should be treated as immutable.<br/>
  * 
- * Because step execution paramaters and policies can vary from step to step, a
+ * Because step execution parameters and policies can vary from step to step, a
  * {@link StepExecutor} should be created by the caller using a
  * {@link StepExecutorFactory}.
  * 
@@ -45,11 +45,11 @@ public interface StepExecutor {
 	 * Contains a recipe for the business logic of an individual processing
 	 * operation. Also used to determine policies for commit intervals and
 	 * exception handling, for instance.
-	 * @param stepExecutionContext an entity representing the step to be executed
+	 * @param stepExecution an entity representing the step to be executed
 	 * @throws StepInterruptedException if the step is interrupted externally
 	 * @throws BatchCriticalException if there is a problem that needs to be
 	 * signalled to the caller
 	 */
-	ExitStatus process(StepConfiguration configuration, StepExecutionContext stepExecutionContext) throws StepInterruptedException, BatchCriticalException;
+	ExitStatus process(StepConfiguration configuration, StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException;
 
 }
