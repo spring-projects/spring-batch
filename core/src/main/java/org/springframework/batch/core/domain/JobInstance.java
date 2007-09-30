@@ -41,13 +41,21 @@ public class JobInstance extends Entity {
 
 	private int jobExecutionCount;
 
+	/**
+	 * @deprecated should only be used by Hibernate
+	 */
 	public JobInstance() {
 		this(null);
 	}
 
-	public JobInstance(Long id) {
+	public JobInstance(JobIdentifier identifier, Long id) {
 		super();
 		setId(id);
+		this.identifier = identifier;
+	}
+
+	public JobInstance(JobIdentifier identifier) {
+		this(identifier, null);
 	}
 
 	public BatchStatus getStatus() {
@@ -85,15 +93,6 @@ public class JobInstance extends Entity {
 	 */
 	public JobIdentifier getIdentifier() {
 		return identifier;
-	}
-
-	/**
-	 * Public setter for the identifier.
-	 *
-	 * @param identifier the identifier to set
-	 */
-	public void setIdentifier(JobIdentifier identifier) {
-		this.identifier = identifier;
 	}
 
 	/**

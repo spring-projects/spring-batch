@@ -106,8 +106,9 @@ public class StepExecutionContextTests extends TestCase {
 	 * @return
 	 */
 	private StepExecutionContext createContext(String name, int jobId, int stepId) {
-		JobInstance job = new JobInstance(new Long(jobId));
-		return new StepExecutionContext(new JobExecutionContext(new SimpleJobIdentifier(name), job), new StepInstance(
+		JobIdentifier jobIdentifier = new SimpleJobIdentifier(name);
+		JobInstance job = new JobInstance(jobIdentifier, new Long(jobId));
+		return new StepExecutionContext(new JobExecutionContext(jobIdentifier, job), new StepInstance(
 				new Long(stepId)));
 	}
 }

@@ -33,16 +33,14 @@ public interface JobExecutionRegistry {
 	/**
 	 * Register a job instance and obtain the runtime context of the
 	 * execution.
-	 * 
-	 * @param runtimeInformation the {@link JobRuntimeInformation} that can be
+	 * @param job containing the {@link JobRuntimeInformation} that can be
 	 * used to identify this execution in subsequent calls to the registry. Must
 	 * not be null.
-	 * @param job 
 	 * @param the {@link JobInstance} instance to register.
 	 * 
 	 * @throws NullPointerException if the first parameter is null.
 	 */
-	JobExecutionContext register(JobIdentifier jobIdentifier, JobInstance job);
+	JobExecutionContext register(JobInstance job);
 
 	/**
 	 * Check if a given {@link JobExecution}, or one with the same id property,

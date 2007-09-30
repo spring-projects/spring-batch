@@ -113,6 +113,7 @@ public class JobExecutionContextTests extends TestCase {
 	}
 
 	private JobExecutionContext createContext(String name, int jobId) {
-		return new JobExecutionContext(new SimpleJobIdentifier(name), new JobInstance(new Long(jobId)));
+		JobIdentifier jobIdentifier = new SimpleJobIdentifier(name);
+		return new JobExecutionContext(jobIdentifier, new JobInstance(jobIdentifier, new Long(jobId)));
 	}
 }
