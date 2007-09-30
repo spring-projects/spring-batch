@@ -23,7 +23,6 @@ import javax.management.Notification;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
-import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.batch.execution.facade.NoSuchJobExecutionException;

@@ -80,7 +80,7 @@ public abstract class AbstractJobDaoTests extends
 
 		// Create an execution
 		jobExecutionStartTime = new Timestamp(System.currentTimeMillis());
-		jobExecution = new JobExecution(job.getId());
+		jobExecution = new JobExecution(new JobInstance(jobRuntimeInformation, job.getId()));
 		jobExecution.setStartTime(jobExecutionStartTime);
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobDao.save(jobExecution);
@@ -183,7 +183,7 @@ public abstract class AbstractJobDaoTests extends
 
 	public void testUpdateInvalidJobExecution() {
 
-		JobExecution execution = new JobExecution(job.getId());
+		JobExecution execution = new JobExecution(job);
 		// id is invalid
 		execution.setId(new Long(29432));
 		try {
@@ -196,7 +196,7 @@ public abstract class AbstractJobDaoTests extends
 
 	public void testUpdateNullIdJobExection() {
 
-		JobExecution execution = new JobExecution(job.getId());
+		JobExecution execution = new JobExecution(job);
 		try {
 			jobDao.update(execution);
 			fail();
@@ -211,7 +211,7 @@ public abstract class AbstractJobDaoTests extends
 		assertEquals(jobDao.getJobExecutionCount(job.getId()), 1);
 
 		// Save new JobExecution for same job
-		JobExecution testJobExecution = new JobExecution(job.getId());
+		JobExecution testJobExecution = new JobExecution(job);
 		jobDao.save(testJobExecution);
 		// JobExecutionCount should be incremented by 1
 		assertEquals(jobDao.getJobExecutionCount(job.getId()), 2);
@@ -256,8 +256,8 @@ public abstract class AbstractJobDaoTests extends
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-				JobExecution execution = new JobExecution(new Long(rs
-						.getLong(1)));
+				JobExecution execution = new JobExecution(new JobInstance(jobRuntimeInformation, new Long(rs
+						.getLong(1))));
 				execution.setStartTime(rs.getTimestamp(2));
 				execution.setEndTime(rs.getTimestamp(3));
 				execution.setStatus(BatchStatus.getStatus(rs.getString(4)));

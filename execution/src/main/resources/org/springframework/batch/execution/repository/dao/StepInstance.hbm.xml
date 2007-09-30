@@ -12,8 +12,8 @@
 			&step-generator;
 		</id>
 		<version name="version" access="field"/>
-		<many-to-one name="job" update="false" column="JOB_ID" />
-		<property name="name" update="false" column="STEP_NAME" />
+		<many-to-one name="job" update="false" column="JOB_ID" access="field"/>
+		<property name="name" update="false" column="STEP_NAME" access="field"/>
 		<property name="restartData"
 			type="org.springframework.batch.execution.repository.dao.RestartDataUserType" insert="false"
 			column="RESTART_DATA" />

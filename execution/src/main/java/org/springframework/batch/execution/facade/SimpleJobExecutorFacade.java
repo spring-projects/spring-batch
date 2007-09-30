@@ -22,10 +22,10 @@ import java.util.Properties;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.JobConfigurationLocator;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.JobExecutionRegistry;
 import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.execution.job.DefaultJobExecutor;
@@ -127,7 +127,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 				.getJobConfiguration(jobRuntimeInformation.getName());
 
 		final JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
-		JobExecutionContext jobExecutionContext = jobExecutionRegistry.register(job);
+		JobExecution jobExecutionContext = jobExecutionRegistry.register(job);
 		
 		ExitStatus exitStatus = ExitStatus.FAILED;
 		try {
@@ -153,7 +153,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 	 * @see org.springframework.batch.container.BatchContainer#stop(org.springframework.batch.container.common.runtime.JobRuntimeInformation)
 	 */
 	public void stop(JobIdentifier runtimeInformation) throws NoSuchJobExecutionException {
-		JobExecutionContext jobExecutionContext = (JobExecutionContext) jobExecutionRegistry.get(runtimeInformation);
+		JobExecution jobExecutionContext = jobExecutionRegistry.get(runtimeInformation);
 		if (jobExecutionContext == null) {
 			throw new NoSuchJobExecutionException("No such Job is executing: [" + runtimeInformation + "]");
 		}
@@ -193,7 +193,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 		int i = 0;
 		Properties props = new Properties();
 		for (Iterator iter = jobExecutionRegistry.findAll().iterator(); iter.hasNext();) {
-			JobExecutionContext element = (JobExecutionContext) iter.next();
+			JobExecution element = (JobExecution) iter.next();
 			i++;
 			String runtime = "job" + i;
 			props.setProperty(runtime, "" + element.getJobIdentifier());

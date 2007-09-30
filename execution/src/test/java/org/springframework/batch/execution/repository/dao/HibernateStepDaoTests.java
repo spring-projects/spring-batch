@@ -19,6 +19,7 @@ package org.springframework.batch.execution.repository.dao;
 import java.util.Properties;
 
 import org.hibernate.SessionFactory;
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.support.PropertiesConverter;
@@ -38,7 +39,7 @@ public class HibernateStepDaoTests extends AbstractStepDaoTests {
 
 	public void testSaveStatistics() throws Exception {
 		StepInstance step = stepDao.createStep(job, "foo");
-		StepExecution stepExecution = new StepExecution(step.getId(), new Long(10));
+		StepExecution stepExecution = new StepExecution(step, new JobExecution(step.getJob()));
 		Properties statistics = new Properties();
 		statistics.setProperty("x", "y");
 		statistics.setProperty("a", "b");

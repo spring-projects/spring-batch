@@ -22,10 +22,12 @@ import java.util.List;
 import java.util.Properties;
 
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
+import org.springframework.batch.execution.repository.dao.SqlJobDao.JobExecutionRowMapper;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.support.PropertiesConverter;
@@ -37,7 +39,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Sql implementation of StepDao. Uses Sequences (via Spring's
+ * Sql implementation of {@link StepDao}. Uses Sequences (via Spring's
  * 
  * @link DataFieldMaxValueIncrementer abstraction) to create all Step and
  *       StepExecution primary keys before inserting a new row. All objects are
@@ -82,6 +84,8 @@ public class SqlStepDao implements StepDao, InitializingBean {
 
 	private JdbcOperations jdbcTemplate;
 
+	private JobDao jobDao;
+
 	private DataFieldMaxValueIncrementer stepIncrementer;
 
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
@@ -98,6 +102,16 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	 */
 	public void setTablePrefix(String tablePrefix) {
 		this.tablePrefix = tablePrefix;
+	}
+
+	/**
+	 * Injection setter for job dao. Used to save {@link JobExecution}
+	 * instances.
+	 * 
+	 * @param jobDao a {@link JobDao}
+	 */
+	public void setJobDao(JobDao jobDao) {
+		this.jobDao = jobDao;
 	}
 
 	/**
@@ -141,7 +155,6 @@ public class SqlStepDao implements StepDao, InitializingBean {
 			return null;
 		} else if (steps.size() == 1) {
 			StepInstance step = (StepInstance) steps.get(0);
-			step.setName(stepName);
 			return step;
 		} else {
 			// This error will likely never be thrown, because there should
@@ -155,7 +168,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	}
 
 	/**
-	 * @see StepDao#findSteps(Long)
+	 * @see StepDao#findSteps(JobInstance)
 	 * 
 	 * Sql implementation which uses a RowMapper to populate a list of all rows
 	 * in the step table with the same JOB_ID.
@@ -163,18 +176,18 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	 * @throws IllegalArgumentException
 	 *             if jobId is null.
 	 */
-	public List findSteps(Long jobId) {
+	public List findSteps(final JobInstance job) {
 
-		Assert.notNull(jobId, "JobId cannot be null.");
+		Assert.notNull(job, "Job cannot be null.");
 
-		Object[] parameters = new Object[] { jobId };
+		Object[] parameters = new Object[] { job.getId() };
 
 		RowMapper rowMapper = new RowMapper() {
 
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-				StepInstance step = new StepInstance(new Long(rs.getLong(1)));
-				step.setName(rs.getString(2));
+				StepInstance step = new StepInstance(job, rs.getString(2),
+						new Long(rs.getLong(1)));
 				String status = rs.getString(3);
 				step.setStatus(BatchStatus.getStatus(status));
 				step.setRestartData(new GenericRestartData(PropertiesConverter
@@ -204,9 +217,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		Object[] parameters = new Object[] { stepId, job.getId(), stepName };
 		jdbcTemplate.update(getQuery(CREATE_STEP), parameters);
 
-		StepInstance step = new StepInstance(stepId);
-		step.setJob(job);
-		step.setName(stepName);
+		StepInstance step = new StepInstance(job, stepName, stepId);
 		return step;
 	}
 
@@ -245,6 +256,8 @@ public class SqlStepDao implements StepDao, InitializingBean {
 
 		validateStepExecution(stepExecution);
 
+		cascadeJobExecution(stepExecution.getJobExecution());
+
 		stepExecution.setId(new Long(stepExecutionIncrementer.nextLongValue()));
 		Object[] parameters = new Object[] {
 				stepExecution.getId(),
@@ -261,6 +274,14 @@ public class SqlStepDao implements StepDao, InitializingBean {
 				stepExecution.getExitDescription() };
 		jdbcTemplate.update(getQuery(SAVE_STEP_EXECUTION), parameters);
 
+	}
+
+	private void cascadeJobExecution(JobExecution jobExecution) {
+		if (jobExecution.getId() != null) {
+			// assume already saved...
+			return;
+		}
+		jobDao.save(jobExecution);
 	}
 
 	/**
@@ -289,8 +310,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 				stepExecution.getTaskCount(),
 				PropertiesConverter.propertiesToString(stepExecution
 						.getStatistics()), stepExecution.getExitCode(),
-				stepExecution.getExitDescription(),
-				stepExecution.getId() };
+				stepExecution.getExitDescription(), stepExecution.getId() };
 		jdbcTemplate.update(getQuery(UPDATE_STEP_EXECUTION), parameters);
 
 	}
@@ -313,19 +333,21 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	 * @throws NoSuchBatchDomainObjectException
 	 *             if more than one step execution is returned.
 	 */
-	public List findStepExecutions(StepInstance step) {
+	public List findStepExecutions(final StepInstance step) {
 
 		Assert.notNull(step, "Step cannot be null.");
 		Assert.notNull(step.getId(), "Step id cannot be null.");
 
-		final Long stepId = step.getId();
-
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-				StepExecution stepExecution = new StepExecution(stepId,
-						new Long(rs.getLong(2)));
-				stepExecution.setId(new Long(rs.getLong(1)));
+				JobExecution jobExecution = (JobExecution) jdbcTemplate
+						.queryForObject(
+								getQuery(JobExecutionRowMapper.GET_JOB_EXECUTION),
+								new Object[] { new Long(rs.getLong(2)) },
+								new JobExecutionRowMapper(step.getJob()));
+				StepExecution stepExecution = new StepExecution(step,
+						jobExecution, new Long(rs.getLong(1)));
 				stepExecution.setStartTime(rs.getTimestamp(3));
 				stepExecution.setEndTime(rs.getTimestamp(4));
 				stepExecution.setStatus(BatchStatus.getStatus(rs.getString(5)));
@@ -340,7 +362,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		};
 
 		return jdbcTemplate.query(getQuery(FIND_STEP_EXECUTIONS),
-				new Object[] { stepId }, rowMapper);
+				new Object[] { step.getId() }, rowMapper);
 
 	}
 

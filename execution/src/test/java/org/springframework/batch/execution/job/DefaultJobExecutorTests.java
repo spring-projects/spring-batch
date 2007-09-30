@@ -26,15 +26,14 @@ import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
-import org.springframework.batch.core.runtime.StepExecutionContext;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
@@ -63,7 +62,7 @@ public class DefaultJobExecutorTests extends TestCase {
 	private List list = new ArrayList();
 
 	StepExecutor defaultStepLifecycle = new StepExecutor() {
-		public ExitStatus process(StepConfiguration configuration, StepExecutionContext stepExecutionContext)
+		public ExitStatus process(StepConfiguration configuration, StepExecution stepExecution)
 				throws StepInterruptedException, BatchCriticalException {
 			list.add("default");
 			return ExitStatus.FINISHED;
@@ -71,7 +70,7 @@ public class DefaultJobExecutorTests extends TestCase {
 	};
 
 	StepExecutor configurationStepLifecycle = new StepExecutor() {
-		public ExitStatus process(StepConfiguration configuration, StepExecutionContext stepExecutionContext)
+		public ExitStatus process(StepConfiguration configuration, StepExecution stepExecution)
 				throws StepInterruptedException, BatchCriticalException {
 			list.add("special");
 			return ExitStatus.FINISHED;
@@ -80,15 +79,15 @@ public class DefaultJobExecutorTests extends TestCase {
 
 	private JobInstance job;
 
-	private JobExecutionContext jobExecutionContext;
+	private JobExecution jobExecution;
 
 	private StepInstance step1;
 
 	private StepInstance step2;
 
-	private StepExecutionContext stepExecutionContext1;
+	private StepExecution stepExecution1;
 
-	private StepExecutionContext stepExecutionContext2;
+	private StepExecution stepExecution2;
 
 	private AbstractStepConfiguration stepConfiguration1;
 
@@ -131,13 +130,13 @@ public class DefaultJobExecutorTests extends TestCase {
 
 		job = jobRepository.findOrCreateJob(jobConfiguration, jobIdentifer);
 
-		jobExecutionContext = new JobExecutionContext(jobIdentifer, job);
+		jobExecution = new JobExecution(job);
 
 		List steps = job.getSteps();
 		step1 = (StepInstance) steps.get(0);
 		step2 = (StepInstance) steps.get(1);
-		stepExecutionContext1 = new StepExecutionContext(jobExecutionContext, step1);
-		stepExecutionContext2 = new StepExecutionContext(jobExecutionContext, step2);
+		stepExecution1 = new StepExecution(step1, jobExecution);
+		stepExecution2 = new StepExecution(step2, jobExecution);
 
 	}
 
@@ -149,7 +148,7 @@ public class DefaultJobExecutorTests extends TestCase {
 
 		stepConfiguration1.setStartLimit(5);
 		stepConfiguration2.setStartLimit(5);
-		jobExecutor.run(jobConfiguration, jobExecutionContext);
+		jobExecutor.run(jobConfiguration, jobExecution);
 		assertEquals(2, list.size());
 		checkRepository(BatchStatus.COMPLETED);
 	}
@@ -173,7 +172,7 @@ public class DefaultJobExecutorTests extends TestCase {
 				return ExitStatus.FINISHED;
 			}
 		});
-		jobExecutor.run(jobConfiguration, jobExecutionContext);
+		jobExecutor.run(jobConfiguration, jobExecution);
 		assertEquals(2, list.size());
 		checkRepository(BatchStatus.COMPLETED, ExitStatus.FINISHED.getExitCode());
 	}
@@ -182,9 +181,9 @@ public class DefaultJobExecutorTests extends TestCase {
 	public void testExecutionContextIsSet() throws Exception {
 
 		testRunNormally();
-		assertEquals(job, jobExecutionContext.getJob());
-		assertEquals(step1, stepExecutionContext1.getStep());
-		assertEquals(step2, stepExecutionContext2.getStep());
+		assertEquals(job, jobExecution.getJob());
+		assertEquals(step1, stepExecution1.getStep());
+		assertEquals(step2, stepExecution2.getStep());
 	}
 
 	public void testRunWithNonDefaultExecutor() throws Exception {
@@ -197,7 +196,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		stepConfiguration1.setStartLimit(5);
 		stepConfiguration2.setStartLimit(5);
 
-		jobExecutor.run(jobConfiguration, jobExecutionContext);
+		jobExecutor.run(jobConfiguration, jobExecution);
 
 		assertEquals(2, list.size());
 		assertEquals("special", list.get(0));
@@ -210,13 +209,13 @@ public class DefaultJobExecutorTests extends TestCase {
 		stepConfiguration2.setStartLimit(5);
 		final StepInterruptedException exception = new StepInterruptedException("Interrupt!");
 		defaultStepLifecycle = new StepExecutor() {
-			public ExitStatus process(StepConfiguration configuration, StepExecutionContext stepExecutionContext)
+			public ExitStatus process(StepConfiguration configuration, StepExecution stepExecution)
 					throws StepInterruptedException, BatchCriticalException {
 				throw exception;
 			}
 		};
 		try {
-			jobExecutor.run(jobConfiguration, jobExecutionContext);
+			jobExecutor.run(jobConfiguration, jobExecution);
 		}
 		catch (BatchCriticalException e) {
 			assertEquals(exception, e.getCause());
@@ -230,13 +229,13 @@ public class DefaultJobExecutorTests extends TestCase {
 		stepConfiguration2.setStartLimit(5);
 		final RuntimeException exception = new RuntimeException("Foo!");
 		defaultStepLifecycle = new StepExecutor() {
-			public ExitStatus process(StepConfiguration configuration, StepExecutionContext stepExecutionContext)
+			public ExitStatus process(StepConfiguration configuration, StepExecution stepExecution)
 					throws StepInterruptedException, BatchCriticalException {
 				throw exception;
 			}
 		};
 		try {
-			jobExecutor.run(jobConfiguration, jobExecutionContext);
+			jobExecutor.run(jobConfiguration, jobExecution);
 		}
 		catch (RuntimeException e) {
 			assertEquals(exception, e);
@@ -250,7 +249,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		stepConfiguration1.setStartLimit(0);
 
 		try{
-			jobExecutor.run(jobConfiguration, jobExecutionContext);
+			jobExecutor.run(jobConfiguration, jobExecution);
 			fail();
 		}
 		catch( Exception ex ){

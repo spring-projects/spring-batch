@@ -22,14 +22,14 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
-import org.springframework.batch.core.runtime.StepExecutionContext;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
@@ -73,8 +73,8 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 		List steps = job.getSteps();
 		final StepInstance step = (StepInstance) steps.get(0);
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(null, new JobInstance(null, new Long(0)));
-		final StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
+		JobExecution jobExecutionContext = new JobExecution(new JobInstance(null, new Long(0)));
+		final StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 		stepConfiguration.setTasklet(new Tasklet() {
 			public ExitStatus execute() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
@@ -90,7 +90,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		Thread processingThread = new Thread() {
 			public void run() {
 				try {
-					executor.process(stepConfiguration, stepExecutionContext);
+					executor.process(stepConfiguration, stepExecution);
 				}
 				catch (StepInterruptedException e) {
 					// do nothing...

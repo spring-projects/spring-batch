@@ -28,13 +28,13 @@ import org.springframework.batch.core.domain.StepInstance;
  * TODO: Add java doc.
  * 
  * @author Lucas Ward
- *
+ * 
  */
 public interface StepDao {
 
 	/**
-	 * Find a step with the given JobId and Step Name. Return null if none
-	 * are found.
+	 * Find a step with the given JobId and Step Name. Return null if none are
+	 * found.
 	 * 
 	 * @param jobId
 	 * @param stepName
@@ -43,15 +43,17 @@ public interface StepDao {
 	public StepInstance findStep(JobInstance job, String stepName);
 
 	/**
-	 * Find all steps with the given Job ID.
+	 * Find all steps with the given Job.
 	 * 
-	 * @param jobId
-	 * @return
+	 * @param job
+	 *            the job to use as a search key
+	 * @return list of {@link StepInstance}
 	 */
-	public List findSteps(Long jobId);
+	public List findSteps(JobInstance job);
 
 	/**
 	 * Create a step for the given Step Name and Job Id.
+	 * 
 	 * @param job
 	 * @param stepName
 	 * 
@@ -91,15 +93,17 @@ public interface StepDao {
 	 * Return the count of StepExecutions with the given StepId.
 	 * 
 	 * @param stepId
-	 * @return
+	 * @return the number of step executions for this step TODO: change
+	 *         signature to search by {@link StepInstance}
 	 */
 	public int getStepExecutionCount(Long stepId);
-	
+
 	/**
-	 * Return all StepExecutions for the given step. 
+	 * Return all StepExecutions for the given step.
 	 * 
-	 * @param id
-	 * @return list of stepExecutions
+	 * @param step
+	 *            the step to use as a search key
+	 * @return list of stepExecutions 
 	 */
 	public List findStepExecutions(StepInstance step);
 }

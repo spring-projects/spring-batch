@@ -28,11 +28,9 @@ import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.JobExecutionContext;
-import org.springframework.batch.core.runtime.StepExecutionContext;
 import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.SimpleStepContext;
+import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -75,7 +73,7 @@ public class SimpleStepExecutor implements StepExecutor {
 
 	/**
 	 * Key placed in step scope context to identify the
-	 * {@link StepExecutionContext}.
+	 * {@link StepExecution}.
 	 */
 	public static final String STEP_KEY = "STEP";
 
@@ -149,16 +147,15 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * @throws StepInterruptedException if the step or a chunk is interrupted
 	 * @throws RuntimeException if there is an exception during a chunk
 	 * execution
-	 * @see StepExecutor#process(StepConfiguration, StepExecutionContext)
+	 * @see StepExecutor#process(StepConfiguration, StepExecution)
 	 */
-	public ExitStatus process(final StepConfiguration configuration, final StepExecutionContext stepExecutionContext)
+	public ExitStatus process(final StepConfiguration configuration, final StepExecution stepExecution)
 			throws BatchCriticalException, StepInterruptedException {
 
-		final StepInstance step = stepExecutionContext.getStep();
+		final StepInstance step = stepExecution.getStep();
 		boolean isRestart = step.getStepExecutionCount() > 0 ? true : false;
 		Assert.notNull(step);
 
-		final StepExecution stepExecution = stepExecutionContext.getStepExecution();
 		final Tasklet module = configuration.getTasklet();
 		step.setStepExecution(stepExecution);
 
@@ -168,7 +165,7 @@ public class SimpleStepExecutor implements StepExecutor {
 
 		try {
 			stepExecution.setStartTime(new Timestamp(System.currentTimeMillis()));
-			updateStatus(stepExecutionContext, BatchStatus.STARTED);
+			updateStatus(stepExecution, BatchStatus.STARTED);
 
 			final boolean saveRestartData = ((AbstractStepConfiguration) configuration).isSaveRestartData();
 
@@ -180,18 +177,18 @@ public class SimpleStepExecutor implements StepExecutor {
 
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
 
-					stepExecutionContext.getJobExecutionContext().registerStepContext(context);
+					stepExecution.getJobExecution().registerStepContext(context);
 					context.registerDestructionCallback("STEP_EXECUTION_CONTEXT_CALLBACK", new Runnable() {
 						public void run() {
-							stepExecutionContext.getJobExecutionContext().unregisterStepContext(context);
+							stepExecution.getJobExecution().unregisterStepContext(context);
 						}
 					});
-					stepScopeContext.setJobIdentifier(stepExecutionContext.getJobExecutionContext().getJobIdentifier());
-					context.setAttribute(StepScope.ID_KEY, stepExecutionContext.getJobExecutionContext()
+					stepScopeContext.setJobIdentifier(stepExecution.getJobExecution().getJobIdentifier());
+					context.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution()
 							.getJobIdentifier());
 					// Mark the context as a step context as a hint to scope
 					// implementations.
-					context.setAttribute(STEP_KEY, stepExecutionContext);
+					context.setAttribute(STEP_KEY, stepExecution);
 					// Add the step execution as an attribute so monitoring
 					// clients can see it.
 					context.setAttribute(STEP_EXECUTION_KEY, stepExecution);
@@ -208,7 +205,7 @@ public class SimpleStepExecutor implements StepExecutor {
 									ExitStatus result;
 
 									try {
-										result = processChunk(configuration, stepExecutionContext);
+										result = processChunk(configuration, stepExecution);
 									}
 									catch (Throwable t) {
 										/*
@@ -250,7 +247,7 @@ public class SimpleStepExecutor implements StepExecutor {
 
 			});
 
-			updateStatus(stepExecutionContext, BatchStatus.COMPLETED);
+			updateStatus(stepExecution, BatchStatus.COMPLETED);
 			return status;
 		}
 		catch (RuntimeException e) {
@@ -259,11 +256,11 @@ public class SimpleStepExecutor implements StepExecutor {
 			status = exceptionClassifier.classifyForExitCode(e);
 			stepExecution.setException(e);
 			if (e.getCause() instanceof StepInterruptedException) {
-				updateStatus(stepExecutionContext, BatchStatus.STOPPED);
+				updateStatus(stepExecution, BatchStatus.STOPPED);
 				throw (StepInterruptedException) e.getCause();
 			}
 			else {
-				updateStatus(stepExecutionContext, BatchStatus.FAILED);
+				updateStatus(stepExecution, BatchStatus.FAILED);
 				throw e;
 			}
 
@@ -294,14 +291,13 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * @param stepExecution the current stepExecution
 	 * @param status the status to set
 	 */
-	private void updateStatus(StepExecutionContext stepExecutionContext, BatchStatus status) {
-		StepInstance step = stepExecutionContext.getStep();
-		StepExecution stepExecution = stepExecutionContext.getStepExecution();
+	private void updateStatus(StepExecution stepExecution, BatchStatus status) {
+		StepInstance step = stepExecution.getStep();
 		stepExecution.setStatus(status);
 		step.setStatus(status);
 		jobRepository.update(step);
 		jobRepository.saveOrUpdate(stepExecution);
-		for (Iterator iter = stepExecutionContext.getJobExecutionContext().getStepContexts().iterator(); iter.hasNext();) {
+		for (Iterator iter = stepExecution.getJobExecution().getStepContexts().iterator(); iter.hasNext();) {
 			RepeatContext context = (RepeatContext) iter.next();
 			context.setAttribute("JOB_STATUS", status);
 		}
@@ -314,24 +310,24 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * transaction.
 	 *
 	 * @param configuration the current step configuration
-	 * @param stepExecutionContext the current step, containing the
+	 * @param stepExecution the current step, containing the
 	 * {@link Tasklet} with the business logic.
 	 * @return true if there is more data to process.
 	 */
 	protected final ExitStatus processChunk(final StepConfiguration configuration,
-			final StepExecutionContext stepExecutionContext) {
+			final StepExecution stepExecution) {
 		return chunkOperations.iterate(new RepeatCallback() {
 			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
-				stepExecutionContext.getJobExecutionContext().registerChunkContext(context);
+				stepExecution.getJobExecution().registerChunkContext(context);
 				context.registerDestructionCallback("CHUNK_EXECUTION_CONTEXT_CALLBACK", new Runnable() {
 					public void run() {
-						stepExecutionContext.getJobExecutionContext().unregisterStepContext(context);
+						stepExecution.getJobExecution().unregisterStepContext(context);
 					}
 				});
 				// check for interruption before each item as well
 				interruptionPolicy.checkInterrupted(context);
-				ExitStatus exitStatus = doTaskletProcessing(configuration.getTasklet(), stepExecutionContext.getStep());
-				stepExecutionContext.getStepExecution().incrementTaskCount();
+				ExitStatus exitStatus = doTaskletProcessing(configuration.getTasklet(), stepExecution.getStep());
+				stepExecution.incrementTaskCount();
 				// check for interruption after each item as well
 				interruptionPolicy.checkInterrupted(context);
 				return exitStatus;

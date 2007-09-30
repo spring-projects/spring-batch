@@ -22,8 +22,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.JobExecutionRegistry;
 import org.springframework.batch.core.runtime.JobIdentifier;
 
@@ -74,10 +74,10 @@ public class VolatileJobExecutionRegistry implements JobExecutionRegistry {
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.container.common.executor.JobExecutionRegistry#findByRuntimeInformation(org.springframework.batch.container.common.runtime.JobRuntimeInformation)
 	 */
-	public JobExecutionContext get(JobIdentifier runtimeInformation) {
+	public JobExecution get(JobIdentifier runtimeInformation) {
 
 		synchronized (this.contexts) {
-			return (JobExecutionContext) contexts.get(runtimeInformation);
+			return (JobExecution) contexts.get(runtimeInformation);
 		}
 
 	}
@@ -98,14 +98,14 @@ public class VolatileJobExecutionRegistry implements JobExecutionRegistry {
 	 * @see org.springframework.batch.container.common.executor.JobExecutionRegistry#register(org.springframework.batch.container.common.runtime.JobRuntimeInformation,
 	 * org.springframework.batch.container.common.domain.JobExecution)
 	 */
-	public JobExecutionContext register(JobInstance job) {
+	public JobExecution register(JobInstance job) {
 		
 		JobIdentifier jobIdentifier = job.getIdentifier();
 		
 		if (isRegistered(jobIdentifier)) {
 			return get(jobIdentifier);
 		}
-		JobExecutionContext context = new JobExecutionContext(jobIdentifier, job);
+		JobExecution context = new JobExecution(job);
 
 		synchronized (this.contexts) {
 			contexts.put(jobIdentifier, context);

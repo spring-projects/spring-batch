@@ -19,8 +19,8 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.configuration.StepConfigurationSupport;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.executor.StepExecutor;
-import org.springframework.batch.core.runtime.StepExecutionContext;
 import org.springframework.batch.execution.step.simple.SimpleStepConfiguration;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.io.exception.BatchCriticalException;
@@ -90,7 +90,7 @@ public class DefaultStepExecutorFactoryTests extends TestCase {
 
 	public void testSuccessfulStepExecutorWithSimpleConfigurationAndNotSimpleExecutor() throws Exception {
 		StepExecutor executor = new StepExecutor() {
-			public ExitStatus process(StepConfiguration configuration, StepExecutionContext stepExecutionContext) throws BatchCriticalException {
+			public ExitStatus process(StepConfiguration configuration, StepExecution stepExecution) throws BatchCriticalException {
 				return ExitStatus.FINISHED;
 			}
 		};

@@ -26,10 +26,10 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
-import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.tasklet.Tasklet;
@@ -123,7 +123,7 @@ public class SimpleJobTests extends TestCase {
 
 		assertEquals(job.getName(), "real.job");
 
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(runtimeInformation, job);
+		JobExecution jobExecutionContext = new JobExecution(job);
 
 		jobLifecycle.run(jobConfiguration, jobExecutionContext);
 		assertEquals(BatchStatus.COMPLETED, job.getStatus());
@@ -170,7 +170,7 @@ public class SimpleJobTests extends TestCase {
 		jobConfiguration.addStep(step);
 
 		JobInstance job = repository.findOrCreateJob(jobConfiguration, runtimeInformation);
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(runtimeInformation, job);
+		JobExecution jobExecutionContext = new JobExecution(job);
 		jobLifecycle.run(jobConfiguration, jobExecutionContext);
 
 		assertEquals(BatchStatus.COMPLETED, job.getStatus());
@@ -194,7 +194,7 @@ public class SimpleJobTests extends TestCase {
 		jobConfiguration.addStep(step);
 
 		JobInstance job = repository.findOrCreateJob(jobConfiguration, runtimeInformation);
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(runtimeInformation, job);
+		JobExecution jobExecutionContext = new JobExecution(job);
 		try {
 			jobLifecycle.run(jobConfiguration, jobExecutionContext);
 			fail("Expected RuntimeException");

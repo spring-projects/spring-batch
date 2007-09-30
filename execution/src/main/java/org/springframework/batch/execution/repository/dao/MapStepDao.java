@@ -48,9 +48,7 @@ public class MapStepDao implements StepDao {
 	}
 
 	public StepInstance createStep(JobInstance job, String stepName) {
-		StepInstance step = new StepInstance(new Long(currentId++));
-		step.setName(stepName);
-		step.setJob(job);
+		StepInstance step = new StepInstance(job, stepName, new Long(currentId++));
 		Set steps = (Set) stepsByJobId.get(job.getId());
 		if (steps==null) {
 			steps = TransactionAwareProxyFactory.createTransactionalSet();
@@ -74,8 +72,8 @@ public class MapStepDao implements StepDao {
 		return null;
 	}
 
-	public List findSteps(Long jobId) {
-		Set steps = (Set) stepsByJobId.get(jobId);
+	public List findSteps(JobInstance job) {
+		Set steps = (Set) stepsByJobId.get(job.getId());
 		if (steps==null) {
 			return new ArrayList();
 		}

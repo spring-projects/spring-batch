@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
@@ -24,9 +25,9 @@ public class SqlStepDaoPrefixTests extends TestCase {
 	
 	MockJdbcTemplate jdbcTemplate = new MockJdbcTemplate();
 	
-	StepExecution stepExecution = new StepExecution(new Long(1), new Long(2));
-	StepInstance step = new StepInstance(new Long(1));
 	JobInstance job = new JobInstance(null, new Long(1));
+	StepInstance step = new StepInstance(job, "foo", new Long(1));
+	StepExecution stepExecution = new StepExecution(step, new JobExecution(job));
 	
 	MockControl stepExecutionIncrementerControl = MockControl.createControl(DataFieldMaxValueIncrementer.class);
 	DataFieldMaxValueIncrementer stepExecutionIncrementer;
@@ -37,6 +38,7 @@ public class SqlStepDaoPrefixTests extends TestCase {
 		super.setUp();
 		
 		stepDao = new SqlStepDao();
+		stepDao.setJobDao(new MapJobDao());
 		stepExecutionIncrementer = (DataFieldMaxValueIncrementer)stepExecutionIncrementerControl.getMock();
 		stepIncrementer = (DataFieldMaxValueIncrementer)stepIncrementerControl.getMock();
 		
@@ -88,7 +90,7 @@ public class SqlStepDaoPrefixTests extends TestCase {
 	
 	public void testModifiedFindSteps(){
 		stepDao.setTablePrefix("FOO_");
-		stepDao.findSteps(new Long(1));
+		stepDao.findSteps(new JobInstance(null, new Long(1)));
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("FOO_STEP") != -1);
 	}
 	
@@ -119,7 +121,7 @@ public class SqlStepDaoPrefixTests extends TestCase {
 	}
 	
 	public void testDefaultFindSteps(){
-		stepDao.findSteps(new Long(1));
+		stepDao.findSteps(new JobInstance(null, new Long(1)));
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP") != -1);
 	}
 	

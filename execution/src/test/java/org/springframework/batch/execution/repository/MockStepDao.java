@@ -33,18 +33,16 @@ public class MockStepDao implements StepDao {
 	public StepInstance createStep(JobInstance job, String stepName) {
 		StepInstance newStep = (StepInstance) newSteps.get(currentNewStep);
 		currentNewStep++;
-		newStep.setName(stepName);
 		return newStep;
 	}
 
 	public StepInstance findStep(JobInstance job, String stepName) {
 		StepInstance newStep = (StepInstance) newSteps.get(currentNewStep);
 		currentNewStep++;
-		newStep.setName(stepName);
 		return newStep;
 	}
 
-	public List findSteps(Long jobId) {
+	public List findSteps(JobInstance job) {
 		return newSteps;
 	}
 

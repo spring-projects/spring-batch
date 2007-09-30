@@ -62,19 +62,19 @@ public class MapStepDaoTests extends TestCase {
 	}
 	
 	public void testCreateAndRetrieveSingleFromList() throws Exception {
-		List result = dao.findSteps(job.getId());
+		List result = dao.findSteps(job);
 		assertTrue(result.contains(step));
 	}
 
 	public void testCreateAndRetrieveMultiple() throws Exception {
 		step = dao.createStep(job, "bar");
-		List result = dao.findSteps(job.getId());
+		List result = dao.findSteps(job);
 		assertEquals(2, result.size());
 		assertTrue(result.contains(step));		
 	}
 	
 	public void testFindWithEmptyResults() throws Exception {
-		List result = dao.findSteps(new Long(22));
+		List result = dao.findSteps(new JobInstance(null, new Long(22)));
 		assertEquals(0, result.size());		
 	}
 	
@@ -88,20 +88,20 @@ public class MapStepDaoTests extends TestCase {
 	}
 
 	public void testSaveExecutionUpdatesId() throws Exception {
-		StepExecution execution = new StepExecution(step.getId(), null);
+		StepExecution execution = new StepExecution(step, null);
 		assertNull(execution.getId());
 		dao.save(execution);
 		assertNotNull(execution.getId());
 	}
 
 	public void testCorrectExecutionCountForExisting() throws Exception {
-		dao.save(new StepExecution(step.getId(), null));
+		dao.save(new StepExecution(step, null));
 		assertEquals(1, dao.getStepExecutionCount(step.getId()));
 	}
 	
 	public void testOnlyOneExecutionPerStep() throws Exception {
-		dao.save(new StepExecution(step.getId(), null));
-		dao.save(new StepExecution(step.getId(), null));
+		dao.save(new StepExecution(step, null));
+		dao.save(new StepExecution(step, null));
 		assertEquals(2, dao.getStepExecutionCount(step.getId()));
 	}
 

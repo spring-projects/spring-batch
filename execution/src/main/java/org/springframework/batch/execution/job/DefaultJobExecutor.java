@@ -25,6 +25,7 @@ import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.executor.JobExecutor;
@@ -32,8 +33,6 @@ import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.JobExecutionContext;
-import org.springframework.batch.core.runtime.StepExecutionContext;
 import org.springframework.batch.execution.step.SimpleStepExecutorFactory;
 import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
 import org.springframework.batch.io.exception.BatchCriticalException;
@@ -57,12 +56,11 @@ public class DefaultJobExecutor implements JobExecutor {
 	
 	private ExitCodeExceptionClassifier exceptionClassifier = new SimpleExitCodeExceptionClassifier();
 
-	public ExitStatus run(JobConfiguration configuration, JobExecutionContext jobExecutionContext)
+	public ExitStatus run(JobConfiguration configuration, JobExecution jobExecution)
 			throws BatchCriticalException {
 
-		JobInstance job = jobExecutionContext.getJob();
-		JobExecution jobExecution = jobExecutionContext.getJobExecution();
-		updateStatus(jobExecutionContext, BatchStatus.STARTING);
+		JobInstance job = jobExecution.getJob();
+		updateStatus(jobExecution, BatchStatus.STARTING);
 
 		List steps = job.getSteps();
 
@@ -74,22 +72,22 @@ public class DefaultJobExecutor implements JobExecutor {
 				StepInstance step = (StepInstance) i.next();
 				StepConfiguration stepConfiguration = (StepConfiguration) j.next();
 				if (shouldStart(step, stepConfiguration)) {
-					updateStatus(jobExecutionContext, BatchStatus.STARTED);
+					updateStatus(jobExecution, BatchStatus.STARTED);
 					StepExecutor stepExecutor = stepExecutorFactory.getExecutor(stepConfiguration);
-					StepExecutionContext stepExecutionContext = new StepExecutionContext(jobExecutionContext, step);
-					status = stepExecutor.process(stepConfiguration, stepExecutionContext);
+					StepExecution stepExecution = new StepExecution(step, jobExecution);
+					status = stepExecutor.process(stepConfiguration, stepExecution);
 				}
 			}
 
-			updateStatus(jobExecutionContext, BatchStatus.COMPLETED);
+			updateStatus(jobExecution, BatchStatus.COMPLETED);
 		}
 		catch (StepInterruptedException e) {
-			updateStatus(jobExecutionContext, BatchStatus.STOPPED);
+			updateStatus(jobExecution, BatchStatus.STOPPED);
 			status = exceptionClassifier.classifyForExitCode(e);
 			rethrow(e);
 		}
 		catch (Throwable t) {
-			updateStatus(jobExecutionContext, BatchStatus.FAILED);
+			updateStatus(jobExecution, BatchStatus.FAILED);
 			status = exceptionClassifier.classifyForExitCode(t);
 			rethrow(t);
 		}
@@ -102,14 +100,13 @@ public class DefaultJobExecutor implements JobExecutor {
 		return status;
 	}
 
-	private void updateStatus(JobExecutionContext jobExecutionContext, BatchStatus status) {
-		JobInstance job = jobExecutionContext.getJob();
-		JobExecution jobExecution = jobExecutionContext.getJobExecution();
+	private void updateStatus(JobExecution jobExecution, BatchStatus status) {
+		JobInstance job = jobExecution.getJob();
 		jobExecution.setStatus(status);
 		job.setStatus(status);
 		jobRepository.update(job);
 		jobRepository.saveOrUpdate(jobExecution);
-		for (Iterator iter = jobExecutionContext.getStepContexts().iterator(); iter.hasNext();) {
+		for (Iterator iter = jobExecution.getStepContexts().iterator(); iter.hasNext();) {
 			RepeatContext context = (RepeatContext) iter.next();
 			context.setAttribute("JOB_STATUS", status);
 		}

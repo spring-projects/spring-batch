@@ -71,13 +71,10 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ " STATUS = ?, EXIT_CODE = ? where ID = ?";
 
-	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(ID, JOB_ID, START_TIME, " +
-			"END_TIME, STATUS, EXIT_CODE) values (?, ?, ?, ?, ?, ?)";
+	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(ID, JOB_ID, START_TIME, "
+			+ "END_TIME, STATUS, EXIT_CODE) values (?, ?, ?, ?, ?, ?)";
 
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE ID=?";
-
-	private static final String FIND_JOB_EXECUTIONS = "SELECT ID, START_TIME, END_TIME, STATUS from %PREFIX%JOB_EXECUTION"
-			+ " where JOB_ID = ?";
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -144,7 +141,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-				JobInstance job = new JobInstance(jobIdentifier, new Long(rs.getLong(1)));
+				JobInstance job = new JobInstance(jobIdentifier, new Long(rs
+						.getLong(1)));
 				job.setStatus(BatchStatus.getStatus(rs.getString(2)));
 
 				return job;
@@ -189,7 +187,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		Object[] parameters = new Object[] { jobExecution.getId(),
 				jobExecution.getJobId(), jobExecution.getStartTime(),
 				jobExecution.getEndTime(), jobExecution.getStatus().toString(),
-				jobExecution.getExitCode()};
+				jobExecution.getExitCode() };
 		jdbcTemplate.update(getSaveJobExecutionQuery(), parameters);
 	}
 
@@ -239,69 +237,49 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 		Object[] parameters = new Object[] { jobId };
 
-		return jdbcTemplate.queryForInt(getJobExecutionCountQuery(), parameters);
+		return jdbcTemplate
+				.queryForInt(getJobExecutionCountQuery(), parameters);
 	}
 
-	public List findJobExecutions(JobInstance job) {
+	public List findJobExecutions(final JobInstance job) {
 
 		Assert.notNull(job, "Job cannot be null.");
 		Assert.notNull(job.getId(), "Job Id cannot be null.");
 
-		final Long jobId = job.getId();
-
-		RowMapper rowMapper = new RowMapper() {
-
-			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-				JobExecution jobExecution = new JobExecution(jobId);
-				jobExecution.setId(new Long(rs.getLong(1)));
-				jobExecution.setStartTime(rs.getTimestamp(2));
-				jobExecution.setEndTime(rs.getTimestamp(3));
-				jobExecution.setStatus(BatchStatus.getStatus(rs.getString(4)));
-
-				return jobExecution;
-			}
-
-		};
-
-		return jdbcTemplate.query(getFindJobExecutionsQuery(), new Object[] { jobId },
-				rowMapper);
+		return jdbcTemplate.query(getQuery(JobExecutionRowMapper.FIND_JOB_EXECUTIONS),
+				new Object[] { job.getId() }, new JobExecutionRowMapper(job));
 	}
 
 	private String getQuery(String base) {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
 	}
-	
+
 	private String getCreateJobQuery() {
 		return getQuery(CREATE_JOB);
 	}
-	
+
 	private String getFindJobsQuery() {
 		return getQuery(FIND_JOBS);
 	}
-	
+
 	private String getUpdateJobQuery() {
 		return getQuery(UPDATE_JOB);
 	}
-	
+
 	private String getSaveJobExecutionQuery() {
 		return getQuery(SAVE_JOB_EXECUTION);
 	}
-	
+
 	private String getUpdateJobExecutionQuery() {
 		return getQuery(UPDATE_JOB_EXECUTION);
 	}
-	
+
 	private String getCheckJobExecutionExistsQuery() {
 		return getQuery(CHECK_JOB_EXECUTION_EXISTS);
 	}
-	
+
 	private String getJobExecutionCountQuery() {
 		return getQuery(GET_JOB_EXECUTION_COUNT);
-	}
-
-	private String getFindJobExecutionsQuery() {
-		return getQuery(FIND_JOB_EXECUTIONS);
 	}
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -384,6 +362,37 @@ public class SqlJobDao implements JobDao, InitializingBean {
 			return (ScheduledJobIdentifier) jobIdentifier;
 		}
 		return new ScheduledJobIdentifier(jobIdentifier.getName());
+	}
+
+	/**
+	 * Re-usable mapper for {@link JobExecution} instances.
+	 * @author Dave Syer
+	 *
+	 */
+	public static class JobExecutionRowMapper implements RowMapper {
+		
+		public static final String FIND_JOB_EXECUTIONS = "SELECT ID, START_TIME, END_TIME, STATUS from %PREFIX%JOB_EXECUTION"
+			+ " where JOB_ID = ?";
+
+		public static final String GET_JOB_EXECUTION = "SELECT ID, START_TIME, END_TIME, STATUS from %PREFIX%JOB_EXECUTION"
+			+ " where ID = ?";
+
+		private JobInstance job;
+
+		public JobExecutionRowMapper(JobInstance job) {
+			super();
+			this.job = job;
+		}
+
+		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+			JobExecution jobExecution = new JobExecution(job);
+			jobExecution.setId(new Long(rs.getLong(1)));
+			jobExecution.setStartTime(rs.getTimestamp(2));
+			jobExecution.setEndTime(rs.getTimestamp(3));
+			jobExecution.setStatus(BatchStatus.getStatus(rs.getString(4)));
+			return jobExecution;
+		}
+
 	}
 
 }

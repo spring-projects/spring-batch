@@ -30,10 +30,11 @@ import org.springframework.util.Assert;
 
 /**
  * It represents an implementation of {@link StepDao} functionality based
- * on the Hibernate ORM framework. Its advantage is the independency of implementation
+ * on the Hibernate ORM framework. Its advantage is the independence of implementation
  * on the underlying database.
  *
- * @author tomas.slanina
+ * @author Tomas Slanina
+ * @author Dave Syer
  */
 public class HibernateStepDao extends HibernateDaoSupport implements StepDao {
 	
@@ -45,9 +46,7 @@ public class HibernateStepDao extends HibernateDaoSupport implements StepDao {
 		Assert.notNull(job, "Job cannot be null.");
 		Assert.notNull(stepName, "StepName cannot be null.");
 		
-		StepInstance step = new StepInstance();
-		step.setName(stepName);
-		step.setJob(job);
+		StepInstance step = new StepInstance(job, stepName);
 		
 		Long stepId = (Long)getHibernateTemplate().save(step);
 		
@@ -78,20 +77,20 @@ public class HibernateStepDao extends HibernateDaoSupport implements StepDao {
 	}
 
 	/**
-	 * @see StepDao#findSteps(Long)
+	 * @see StepDao#findSteps(JobInstance)
 	 * 
 	 * Hibernate is asked to get all jobs that matches criteria. Afterwards, result is mapped into domain objects.
 	 * It should be noted that restart data must be requested separately.
 	 * 
 	 */
-	public List findSteps(final Long jobId) {
+	public List findSteps(final JobInstance job) {
 		
-		Assert.notNull(jobId, "JobId cannot be null.");
+		Assert.notNull(job, "JobId cannot be null.");
 		
 		List list = this.getHibernateTemplate().executeFind(new HibernateCallback() {
             public Object doInHibernate(Session session) {
                 Criteria criteria = session.createCriteria(StepInstance.class);
-                criteria.add(Expression.eq("job.id", jobId));
+                criteria.add(Expression.eq("job.id", job.getId()));
                 return criteria.list();
             }
         });
@@ -105,7 +104,7 @@ public class HibernateStepDao extends HibernateDaoSupport implements StepDao {
 	public int getStepExecutionCount(final Long stepId) {
 		Long result = (Long) this.getHibernateTemplate().execute(new HibernateCallback() {
             public Object doInHibernate(Session session) {
-                return session.createQuery("select count(id) from StepExecution s where s.stepId = :stepId")
+                return session.createQuery("select count(id) from StepExecution s where s.step.id = :stepId")
                 		.setLong("stepId", stepId.longValue())
                 		.uniqueResult();
             }
@@ -151,17 +150,14 @@ public class HibernateStepDao extends HibernateDaoSupport implements StepDao {
 		getHibernateTemplate().update(stepExecution);
 	}
 	
-	public List findStepExecutions(StepInstance step) {
+	public List findStepExecutions(final StepInstance step) {
 		
 		Assert.notNull(step, "Step cannot be null.");
-		Assert.notNull(step.getId(), "Step id cannot be null.");
-		
-		final Long stepId = step.getId();
-		
+				
 		List results = this.getHibernateTemplate().executeFind(new HibernateCallback() {
             public Object doInHibernate(Session session) {
                 Criteria criteria = session.createCriteria(StepExecution.class);
-                criteria.add(Expression.eq("stepId", stepId));
+                criteria.add(Expression.eq("step.id", step.getId()));
                 return criteria.list();
             }
         });

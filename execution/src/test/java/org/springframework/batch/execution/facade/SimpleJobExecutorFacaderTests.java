@@ -26,14 +26,14 @@ import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.JobConfigurationLocator;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.configuration.StepConfiguration;
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.JobExecutionContext;
 import org.springframework.batch.core.runtime.JobExecutionRegistry;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
-import org.springframework.batch.core.runtime.StepExecutionContext;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
@@ -59,7 +59,7 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 	JobConfiguration jobConfiguration = new JobConfiguration();
 
 	StepExecutor stepExecutor = new StepExecutor() {
-		public ExitStatus process(StepConfiguration configuration, StepExecutionContext stepExecutionContext) throws BatchCriticalException {
+		public ExitStatus process(StepConfiguration configuration, StepExecution stepExecution) throws BatchCriticalException {
 			return ExitStatus.FINISHED;
 		}
 	};
@@ -79,12 +79,12 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 		final SimpleJobIdentifier jobRuntimeInformation = new SimpleJobIdentifier("bar");
 		jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
 		jobExecutor = new JobExecutor() {
-			public ExitStatus run(JobConfiguration configuration, JobExecutionContext jobExecutionContext) throws BatchCriticalException {
+			public ExitStatus run(JobConfiguration configuration, JobExecution jobExecutionContext) throws BatchCriticalException {
 				return ExitStatus.FINISHED;
 			}
 		};
 		JobInstance job = new JobInstance(jobRuntimeInformation);
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(jobRuntimeInformation, job);
+		JobExecution jobExecutionContext = new JobExecution(job);
 		jobRepositoryControl.setReturnValue(job);
 		jobExecutor.run(jobConfiguration, jobExecutionContext);
 		jobRepositoryControl.replay();
@@ -103,7 +103,7 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 	
 	public void testIsRunning() throws Exception {
 		simpleContainer.setJobExecutor(new JobExecutor() {
-			public ExitStatus run(JobConfiguration configuration, JobExecutionContext jobExecutionContext)
+			public ExitStatus run(JobConfiguration configuration, JobExecution jobExecutionContext)
 					throws BatchCriticalException {
 				while (running) {
 					try {
@@ -187,7 +187,7 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 		JobExecutionRegistry jobExecutionRegistry = new VolatileJobExecutionRegistry();
 		simpleContainer.setJobExecutionRegistry(jobExecutionRegistry);
 		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
-		JobExecutionContext context = jobExecutionRegistry.register(new JobInstance(runtimeInformation, new Long(0)));
+		JobExecution context = jobExecutionRegistry.register(new JobInstance(runtimeInformation, new Long(0)));
 
 		RepeatContextSupport stepContext = new RepeatContextSupport(null);
 		RepeatContextSupport chunkContext = new RepeatContextSupport(stepContext);
@@ -212,7 +212,7 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 		JobExecutionRegistry jobExecutionRegistry = (JobExecutionRegistry) control.getMock();
 		simpleContainer.setJobExecutionRegistry(jobExecutionRegistry);
 		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(runtimeInformation, new JobInstance(runtimeInformation, new Long(0)));
+		JobExecution jobExecutionContext = new JobExecution(new JobInstance(runtimeInformation, new Long(0)));
 		jobExecutionContext.registerStepContext(new RepeatContextSupport(null));
 		jobExecutionContext.registerChunkContext(new RepeatContextSupport(null));
 		control.expectAndReturn(jobExecutionRegistry.findAll(), Collections.singleton(jobExecutionContext));
