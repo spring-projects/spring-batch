@@ -98,7 +98,7 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 					public Object doInHibernate(Session session) {
 						return session
 								.createQuery(
-										"select count(id) from JobExecution where jobId = :jobId")
+										"select count(id) from JobExecution where job.id = :jobId")
 								.setLong("jobId", jobId.longValue())
 								.uniqueResult();
 					}

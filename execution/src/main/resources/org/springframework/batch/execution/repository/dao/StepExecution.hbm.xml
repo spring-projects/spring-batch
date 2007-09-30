@@ -13,7 +13,7 @@
 		</id>
 		<version name="version" access="field"/>
 		<many-to-one name="step" update="false" column="STEP_ID" access="field"/>
-		<many-to-one name="jobExecution" cascade="save-update" update="false" column="JOB_EXECUTION_ID" access="field"/>
+		<many-to-one name="jobExecution" cascade="all" update="false" column="JOB_EXECUTION_ID" access="field"/>
 		<property name="startTime" column="START_TIME" />
 		<property name="endTime" column="END_TIME" />
 		<property name="status" type="org.springframework.batch.execution.repository.dao.BatchStatusUserType" column="STATUS" />

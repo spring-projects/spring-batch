@@ -80,7 +80,7 @@ public abstract class AbstractJobDaoTests extends
 
 		// Create an execution
 		jobExecutionStartTime = new Timestamp(System.currentTimeMillis());
-		jobExecution = new JobExecution(new JobInstance(jobRuntimeInformation, job.getId()));
+		jobExecution = new JobExecution(job);
 		jobExecution.setStartTime(jobExecutionStartTime);
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobDao.save(jobExecution);
