@@ -12,7 +12,7 @@
 			&job-execution-generator;
 		</id>
 		<version name="version" access="field"/>
-		<property name="jobId" type="long" update="false" column="JOB_ID" />
+		<property name="jobId" type="long" update="false" column="JOB_ID" access="field"/>
 		<property name="startTime" column="START_TIME" />
 		<property name="endTime" column="END_TIME" />
 		<property name="status" type="org.springframework.batch.execution.repository.dao.BatchStatusUserType" column="STATUS" />

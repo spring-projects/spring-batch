@@ -261,7 +261,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	}
 
-	public void testSaveOrUpdateJobExecution() {
+	public void testSaveOrUpdateInvalidJobExecution() {
 
 		// failure scenario - must have job ID
 		JobExecution jobExecution = new JobExecution(null);
@@ -272,9 +272,13 @@ public class SimpleJobRepositoryTests extends TestCase {
 		catch (Exception ex) {
 			// expected
 		}
+	}
+	
+	public void testSaveOrUpdateValidJobExecution() throws Exception {
+
+		JobExecution jobExecution = new JobExecution(new Long(1));
 
 		// new execution - call save on job dao
-		jobExecution.setJobId(new Long(1));
 		jobDao.save(jobExecution);
 		jobDaoControl.replay();
 		jobRepository.saveOrUpdate(jobExecution);
