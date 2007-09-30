@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
@@ -75,12 +76,27 @@ public class JobExecutionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getExitCode()}.
+	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
+	 */
+	public void testGetJobIdForNullJob() {
+		execution = new JobExecution(null);
+		assertEquals(null, execution.getJobId());
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
+	 */
+	public void testGetJob() {
+		assertNotNull(execution.getJob());
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getExitStatus()}.
 	 */
 	public void testGetExitCode() {
-		assertEquals("", execution.getExitCode());
-		execution.setExitCode("23");
-		assertEquals("23", execution.getExitCode());
+		assertEquals(ExitStatus.UNKNOWN, execution.getExitStatus());
+		execution.setExitStatus(new ExitStatus(true, "23"));
+		assertEquals("23", execution.getExitStatus().getExitCode());
 	}
 
 	public void testContextContainsInfo() throws Exception {

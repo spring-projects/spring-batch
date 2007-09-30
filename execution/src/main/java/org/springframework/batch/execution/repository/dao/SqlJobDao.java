@@ -26,6 +26,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
 import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -69,10 +70,10 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 	// Job Execution SqlStatements
 	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
-			+ " STATUS = ?, EXIT_CODE = ? where ID = ?";
+			+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ? where ID = ?";
 
 	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(ID, JOB_ID, START_TIME, "
-			+ "END_TIME, STATUS, EXIT_CODE) values (?, ?, ?, ?, ?, ?)";
+			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) values (?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE ID=?";
 
@@ -187,7 +188,9 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		Object[] parameters = new Object[] { jobExecution.getId(),
 				jobExecution.getJobId(), jobExecution.getStartTime(),
 				jobExecution.getEndTime(), jobExecution.getStatus().toString(),
-				jobExecution.getExitCode() };
+				jobExecution.getExitStatus().isContinuable() ? "Y" : "N",
+				jobExecution.getExitStatus().getExitCode(),
+				jobExecution.getExitStatus().getExitDescription() };
 		jdbcTemplate.update(getSaveJobExecutionQuery(), parameters);
 	}
 
@@ -205,7 +208,10 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 		Object[] parameters = new Object[] { jobExecution.getStartTime(),
 				jobExecution.getEndTime(), jobExecution.getStatus().toString(),
-				jobExecution.getExitCode(), jobExecution.getId() };
+				jobExecution.getExitStatus().isContinuable() ? "Y" : "N",
+				jobExecution.getExitStatus().getExitCode(),
+				jobExecution.getExitStatus().getExitDescription(),
+				jobExecution.getId() };
 
 		if (jobExecution.getId() == null) {
 			throw new IllegalArgumentException(
@@ -246,7 +252,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		Assert.notNull(job, "Job cannot be null.");
 		Assert.notNull(job.getId(), "Job Id cannot be null.");
 
-		return jdbcTemplate.query(getQuery(JobExecutionRowMapper.FIND_JOB_EXECUTIONS),
+		return jdbcTemplate.query(
+				getQuery(JobExecutionRowMapper.FIND_JOB_EXECUTIONS),
 				new Object[] { job.getId() }, new JobExecutionRowMapper(job));
 	}
 
@@ -366,16 +373,17 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 	/**
 	 * Re-usable mapper for {@link JobExecution} instances.
+	 * 
 	 * @author Dave Syer
-	 *
+	 * 
 	 */
 	public static class JobExecutionRowMapper implements RowMapper {
-		
-		public static final String FIND_JOB_EXECUTIONS = "SELECT ID, START_TIME, END_TIME, STATUS from %PREFIX%JOB_EXECUTION"
-			+ " where JOB_ID = ?";
 
-		public static final String GET_JOB_EXECUTION = "SELECT ID, START_TIME, END_TIME, STATUS from %PREFIX%JOB_EXECUTION"
-			+ " where ID = ?";
+		public static final String FIND_JOB_EXECUTIONS = "SELECT ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
+				+ " where JOB_ID = ?";
+
+		public static final String GET_JOB_EXECUTION = "SELECT ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
+				+ " where ID = ?";
 
 		private JobInstance job;
 
@@ -390,6 +398,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 			jobExecution.setStartTime(rs.getTimestamp(2));
 			jobExecution.setEndTime(rs.getTimestamp(3));
 			jobExecution.setStatus(BatchStatus.getStatus(rs.getString(4)));
+			jobExecution.setExitStatus(new ExitStatus("Y".equals(rs
+					.getString(5)), rs.getString(6), rs.getString(7)));
 			return jobExecution;
 		}
 

@@ -71,7 +71,9 @@ public class DefaultStepExecutorTests extends TestCase {
 		return module;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
@@ -79,7 +81,8 @@ public class DefaultStepExecutorTests extends TestCase {
 		stepExecutor = new DefaultStepExecutor();
 		stepExecutor.setRepository(new JobRepositorySupport());
 		stepConfiguration = new SimpleStepConfiguration();
-		stepConfiguration.setTasklet(getTasklet(new String[] {"foo", "bar", "spam"}));
+		stepConfiguration.setTasklet(getTasklet(new String[] { "foo", "bar",
+				"spam" }));
 		// Only process one chunk:
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
@@ -94,8 +97,10 @@ public class DefaultStepExecutorTests extends TestCase {
 
 		StepInstance step = new StepInstance(new Long(9));
 		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
-		JobExecution jobExecutionContext = new JobExecution(new JobInstance(jobIdentifier, new Long(3)));
-		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
+		JobExecution jobExecutionContext = new JobExecution(new JobInstance(
+				jobIdentifier, new Long(3)));
+		StepExecution stepExecution = new StepExecution(step,
+				jobExecutionContext);
 
 		stepExecutor.process(stepConfiguration, stepExecution);
 		assertEquals(1, processed.size());
@@ -111,7 +116,8 @@ public class DefaultStepExecutorTests extends TestCase {
 
 		StepInstance step = new StepInstance(new Long(1));
 		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
-		JobExecution jobExecution = new JobExecution(new JobInstance(jobIdentifier, new Long(1)));
+		JobExecution jobExecution = new JobExecution(new JobInstance(
+				jobIdentifier, new Long(1)));
 		step.setStepExecution(new StepExecution(step, jobExecution));
 
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
@@ -130,16 +136,19 @@ public class DefaultStepExecutorTests extends TestCase {
 
 		final StepInstance step = new StepInstance(new Long(1));
 		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
-		final JobExecution jobExecution = new JobExecution(new JobInstance(jobIdentifier, new Long(3)));
-		step.setStepExecution(new StepExecution(step,jobExecution));
-		final StepExecution stepExecution = new StepExecution(step, jobExecution);
+		final JobExecution jobExecution = new JobExecution(new JobInstance(
+				jobIdentifier, new Long(3)));
+		step.setStepExecution(new StepExecution(step, jobExecution));
+		final StepExecution stepExecution = new StepExecution(step,
+				jobExecution);
 
 		stepConfiguration.setTasklet(new Tasklet() {
 			public ExitStatus execute() throws Exception {
 				assertEquals(step, stepExecution.getStep());
 				assertEquals(1, jobExecution.getChunkContexts().size());
 				assertEquals(1, jobExecution.getStepContexts().size());
-				assertNotNull(StepSynchronizationManager.getContext().getJobIdentifier());
+				assertNotNull(StepSynchronizationManager.getContext()
+						.getJobIdentifier());
 				processed.add("foo");
 				return ExitStatus.CONTINUABLE;
 			}
@@ -152,27 +161,30 @@ public class DefaultStepExecutorTests extends TestCase {
 
 	public void testRepository() throws Exception {
 
-		SimpleJobRepository repository = new SimpleJobRepository(new MapJobDao(), new MapStepDao());
+		SimpleJobRepository repository = new SimpleJobRepository(
+				new MapJobDao(), new MapStepDao());
 		stepExecutor.setRepository(repository);
 
 		StepInstance step = new StepInstance(new Long(1));
 		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
-		JobExecution jobExecutionContext = new JobExecution(new JobInstance(jobIdentifier, new Long(3)));
-		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
+		JobExecution jobExecutionContext = new JobExecution(new JobInstance(
+				jobIdentifier, new Long(3)));
+		StepExecution stepExecution = new StepExecution(step,
+				jobExecutionContext);
 
 		stepExecutor.process(stepConfiguration, stepExecution);
 		assertEquals(1, processed.size());
 	}
 
-	public void testIncrementRollbackCount(){
+	public void testIncrementRollbackCount() {
 
-		Tasklet tasklet = new Tasklet(){
+		Tasklet tasklet = new Tasklet() {
 
 			public ExitStatus execute() throws Exception {
 				int counter = 0;
 				counter++;
 
-				if(counter == 1){
+				if (counter == 1) {
 					throw new Exception();
 				}
 
@@ -184,27 +196,29 @@ public class DefaultStepExecutorTests extends TestCase {
 		StepInstance step = new StepInstance(new Long(1));
 		stepConfiguration.setTasklet(tasklet);
 		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
-		JobExecution jobExecutionContext = new JobExecution(new JobInstance(jobIdentifier, new Long(3)));
-		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
+		JobExecution jobExecutionContext = new JobExecution(new JobInstance(
+				jobIdentifier, new Long(3)));
+		StepExecution stepExecution = new StepExecution(step,
+				jobExecutionContext);
 
-		try{
+		try {
 			stepExecutor.process(stepConfiguration, stepExecution);
-		}
-		catch(Exception ex){
-			assertEquals(step.getStepExecution().getRollbackCount(), new Integer(1));
+		} catch (Exception ex) {
+			assertEquals(step.getStepExecution().getRollbackCount(),
+					new Integer(1));
 		}
 
 	}
 
-	public void testExitCodeDefaultClassification(){
+	public void testExitCodeDefaultClassification() {
 
-		Tasklet tasklet = new Tasklet(){
+		Tasklet tasklet = new Tasklet() {
 
 			public ExitStatus execute() throws Exception {
 				int counter = 0;
 				counter++;
 
-				if(counter == 1){
+				if (counter == 1) {
 					throw new RuntimeException();
 				}
 
@@ -216,35 +230,39 @@ public class DefaultStepExecutorTests extends TestCase {
 		StepInstance step = new StepInstance(new Long(1));
 		stepConfiguration.setTasklet(tasklet);
 		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
-		JobExecution jobExecutionContext = new JobExecution(new JobInstance(jobIdentifier, new Long(3)));
-		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
+		JobExecution jobExecutionContext = new JobExecution(new JobInstance(
+				jobIdentifier, new Long(3)));
+		StepExecution stepExecution = new StepExecution(step,
+				jobExecutionContext);
 
-		try{
+		try {
 			stepExecutor.process(stepConfiguration, stepExecution);
-		}
-		catch(Exception ex){
-			assertEquals(step.getStepExecution().getExitCode(), ExitCodeExceptionClassifier.FATAL_EXCEPTION);
-			assertEquals(step.getStepExecution().getExitDescription(), "java.lang.RuntimeException");
+		} catch (Exception ex) {
+			assertEquals(step.getStepExecution().getExitStatus(),
+					new ExitStatus(false,
+							ExitCodeExceptionClassifier.FATAL_EXCEPTION,
+							"java.lang.RuntimeException"));
 		}
 	}
-
 
 	/*
 	 * make sure a job that has never been executed before, but does have
 	 * saveRestartData = true, doesn't have restoreFrom called on it.
 	 */
-	public void testNonRestartedJob(){
+	public void testNonRestartedJob() {
 		StepInstance step = new StepInstance(new Long(1));
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepConfiguration.setTasklet(tasklet);
 		stepConfiguration.setSaveRestartData(true);
 		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
-		JobExecution jobExecutionContext = new JobExecution(new JobInstance(jobIdentifier, new Long(3)));
-		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
+		JobExecution jobExecutionContext = new JobExecution(new JobInstance(
+				jobIdentifier, new Long(3)));
+		StepExecution stepExecution = new StepExecution(step,
+				jobExecutionContext);
 
-		try{
+		try {
 			stepExecutor.process(stepConfiguration, stepExecution);
-		}catch(Throwable t){
+		} catch (Throwable t) {
 			fail();
 		}
 
@@ -253,22 +271,24 @@ public class DefaultStepExecutorTests extends TestCase {
 	}
 
 	/*
-	 * make sure a job that has been executed before, and is therefore being restarted,
-	 * is restored.
+	 * make sure a job that has been executed before, and is therefore being
+	 * restarted, is restored.
 	 */
-	public void testRestartedJob(){
+	public void testRestartedJob() {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepConfiguration.setTasklet(tasklet);
 		stepConfiguration.setSaveRestartData(true);
 		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
-		JobExecution jobExecutionContext = new JobExecution(new JobInstance(jobIdentifier, new Long(3)));
-		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
+		JobExecution jobExecutionContext = new JobExecution(new JobInstance(
+				jobIdentifier, new Long(3)));
+		StepExecution stepExecution = new StepExecution(step,
+				jobExecutionContext);
 
-		try{
+		try {
 			stepExecutor.process(stepConfiguration, stepExecution);
-		}catch(Throwable t){
+		} catch (Throwable t) {
 			fail();
 		}
 
@@ -277,22 +297,24 @@ public class DefaultStepExecutorTests extends TestCase {
 	}
 
 	/*
-	 * Test that a job that is being restarted, but has saveRestartData
-	 * set to false, doesn't have restore or getRestartData called on it.
+	 * Test that a job that is being restarted, but has saveRestartData set to
+	 * false, doesn't have restore or getRestartData called on it.
 	 */
-	public void testNoSaveRestartDataRestartableJob(){
+	public void testNoSaveRestartDataRestartableJob() {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepConfiguration.setTasklet(tasklet);
 		stepConfiguration.setSaveRestartData(false);
 		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
-		JobExecution jobExecutionContext = new JobExecution(new JobInstance(jobIdentifier, new Long(3)));
-		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
+		JobExecution jobExecutionContext = new JobExecution(new JobInstance(
+				jobIdentifier, new Long(3)));
+		StepExecution stepExecution = new StepExecution(step,
+				jobExecutionContext);
 
-		try{
+		try {
 			stepExecutor.process(stepConfiguration, stepExecution);
-		}catch(Throwable t){
+		} catch (Throwable t) {
 			fail();
 		}
 
@@ -301,30 +323,31 @@ public class DefaultStepExecutorTests extends TestCase {
 	}
 
 	/*
-	 * Even though the job is restarted, and saveRestartData is true,
-	 * nothing will be restored because the Tasklet does not implement
-	 * Restartable.
+	 * Even though the job is restarted, and saveRestartData is true, nothing
+	 * will be restored because the Tasklet does not implement Restartable.
 	 */
-	public void testRestartJobOnNonRestartableTasklet(){
+	public void testRestartJobOnNonRestartableTasklet() {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
-		stepConfiguration.setTasklet(new Tasklet(){
+		stepConfiguration.setTasklet(new Tasklet() {
 			public ExitStatus execute() throws Exception {
-			return ExitStatus.FINISHED;
-		}});
+				return ExitStatus.FINISHED;
+			}
+		});
 		stepConfiguration.setSaveRestartData(true);
 		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
-		JobExecution jobExecution = new JobExecution(new JobInstance(jobIdentifier, new Long(3)));
+		JobExecution jobExecution = new JobExecution(new JobInstance(
+				jobIdentifier, new Long(3)));
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
-		try{
+		try {
 			stepExecutor.process(stepConfiguration, stepExecution);
-		}catch(Throwable t){
+		} catch (Throwable t) {
 			fail();
 		}
 	}
 
-	private class MockRestartableTasklet implements Tasklet, Restartable{
+	private class MockRestartableTasklet implements Tasklet, Restartable {
 
 		private boolean getRestartDataCalled = false;
 		private boolean restoreFromCalled = false;
@@ -352,49 +375,42 @@ public class DefaultStepExecutorTests extends TestCase {
 	}
 
 	/*
-	 * StepExecutor will never pass StepInterruptedException to the exceptionClassifier.
-	 * This may or may not stay the same, so the test will remain commented out
-	 * for reference purposes.
+	 * StepExecutor will never pass StepInterruptedException to the
+	 * exceptionClassifier. This may or may not stay the same, so the test will
+	 * remain commented out for reference purposes.
 	 */
-/*	public void testExitCodeInterruptedClassification(){
-
-		StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy(){
-
-			public void checkInterrupted(RepeatContext context)
-					throws StepInterruptedException {
-				throw new StepInterruptedException("");
-			}
-
-		};
-
-		stepExecutor.setInterruptionPolicy(interruptionPolicy);
-
-		Tasklet tasklet = new Tasklet(){
-
-			public ExitStatus execute() throws Exception {
-				int counter = 0;
-				counter++;
-
-				if(counter == 1){
-					throw new StepInterruptedException("");
-				}
-
-				return ExitStatus.CONTINUABLE;
-			}
-
-		};
-
-		StepInstance step = new StepInstance(new Long(1));
-		stepConfiguration.setTasklet(tasklet);
-		JobExecutionContext jobExecutionContext = new JobExecutionContext(new SimpleJobIdentifier("FOO"), new JobInstance(new Long(3)));
-		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
-
-		try{
-			stepExecutor.process(stepConfiguration, stepExecution);
-		}
-		catch(Exception ex){
-			assertEquals(ExitCodeExceptionClassifier.STEP_INTERRUPTED, step.getStepExecution().getExitCode() );
-			assertEquals(step.getStepExecution().getExitDescription(), "java.lang.RuntimeException");
-		}
-	}*/
+	/*
+	 * public void testExitCodeInterruptedClassification(){
+	 * 
+	 * StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy(){
+	 * 
+	 * public void checkInterrupted(RepeatContext context) throws
+	 * StepInterruptedException { throw new StepInterruptedException(""); }
+	 *  };
+	 * 
+	 * stepExecutor.setInterruptionPolicy(interruptionPolicy);
+	 * 
+	 * Tasklet tasklet = new Tasklet(){
+	 * 
+	 * public ExitStatus execute() throws Exception { int counter = 0;
+	 * counter++;
+	 * 
+	 * if(counter == 1){ throw new StepInterruptedException(""); }
+	 * 
+	 * return ExitStatus.CONTINUABLE; }
+	 *  };
+	 * 
+	 * StepInstance step = new StepInstance(new Long(1));
+	 * stepConfiguration.setTasklet(tasklet); JobExecutionContext
+	 * jobExecutionContext = new JobExecutionContext(new
+	 * SimpleJobIdentifier("FOO"), new JobInstance(new Long(3))); StepExecution
+	 * stepExecution = new StepExecution(step, jobExecutionContext);
+	 * 
+	 * try{ stepExecutor.process(stepConfiguration, stepExecution); }
+	 * catch(Exception ex){
+	 * assertEquals(ExitCodeExceptionClassifier.STEP_INTERRUPTED,
+	 * step.getStepExecution().getExitCode() );
+	 * assertEquals(step.getStepExecution().getExitDescription(),
+	 * "java.lang.RuntimeException"); } }
+	 */
 }

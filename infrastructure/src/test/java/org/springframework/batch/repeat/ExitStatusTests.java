@@ -40,7 +40,7 @@ public class ExitStatusTests extends TestCase {
 	public void testExitStatusConstantsContinuable() {
 		ExitStatus status = ExitStatus.CONTINUABLE;
 		assertTrue(status.isContinuable());
-		assertEquals("", status.getExitCode());
+		assertEquals("CONTINUABLE", status.getExitCode());
 	}
 
 	/**
@@ -50,6 +50,24 @@ public class ExitStatusTests extends TestCase {
 		ExitStatus status = ExitStatus.FINISHED;
 		assertFalse(status.isContinuable());
 		assertEquals("COMPLETED", status.getExitCode());
+	}
+	
+	/**
+	 * Test equality of exit statuses.
+	 * 
+	 * @throws Exception
+	 */
+	public void testEqualsWithSameProperties() throws Exception {
+		assertEquals(ExitStatus.CONTINUABLE, new ExitStatus(true, "CONTINUABLE"));
+	}
+
+	/**
+	 * Test equality of exit statuses.
+	 * 
+	 * @throws Exception
+	 */
+	public void testEqualsWithNull() throws Exception {
+		assertFalse(ExitStatus.CONTINUABLE.equals(null));
 	}
 
 	/**

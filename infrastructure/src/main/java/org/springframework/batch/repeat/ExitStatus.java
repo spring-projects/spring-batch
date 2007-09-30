@@ -33,19 +33,24 @@ public class ExitStatus implements Serializable {
 	public static final ExitStatus RUNNING = new ExitStatus(true, "RUNNING");
 
 	/**
+	 * Convenient constant value representing unknown state - assumed continuable.
+	 */
+	public static final ExitStatus UNKNOWN = new ExitStatus(true, "UNKNOWN");
+
+	/**
 	 * Convenient constant value representing unfinished processing.
 	 */
-	public static ExitStatus CONTINUABLE = new ExitStatus(true);
+	public static final ExitStatus CONTINUABLE = new ExitStatus(true, "CONTINUABLE");
 
 	/**
 	 * Convenient constant value representing finished processing.
 	 */
-	public static ExitStatus FINISHED = new ExitStatus(false, "COMPLETED");
+	public static final ExitStatus FINISHED = new ExitStatus(false, "COMPLETED");
 
 	/**
 	 * Convenient constant value representing finished processing with an error.
 	 */
-	public static ExitStatus FAILED = new ExitStatus(false, "FAILED");
+	public static final ExitStatus FAILED = new ExitStatus(false, "FAILED");
 
 	private final boolean continuable;
 
@@ -120,6 +125,18 @@ public class ExitStatus implements Serializable {
 	public String toString() {
 		return "continuable=" + continuable + ";exitCode=" + exitCode
 				+ ";exitDescription=" + exitDescription;
+	}
+	
+	/**
+	 * Compare the fields one by one.
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object obj) {
+		if (obj==null) {
+			return false;
+		}
+		return toString().equals(obj.toString());
 	}
 
 	/**

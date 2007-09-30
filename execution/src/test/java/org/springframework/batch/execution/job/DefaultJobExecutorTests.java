@@ -174,7 +174,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		});
 		jobExecutor.run(jobConfiguration, jobExecution);
 		assertEquals(2, list.size());
-		checkRepository(BatchStatus.COMPLETED, ExitStatus.FINISHED.getExitCode());
+		checkRepository(BatchStatus.COMPLETED, ExitStatus.FINISHED);
 	}
 
 
@@ -221,7 +221,7 @@ public class DefaultJobExecutorTests extends TestCase {
 			assertEquals(exception, e.getCause());
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.STOPPED, ExitCodeExceptionClassifier.STEP_INTERRUPTED);
+		checkRepository(BatchStatus.STOPPED, new ExitStatus(false, ExitCodeExceptionClassifier.STEP_INTERRUPTED));
 	}
 
 	public void testFailed() throws Exception {
@@ -241,7 +241,7 @@ public class DefaultJobExecutorTests extends TestCase {
 			assertEquals(exception, e);
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.FAILED, ExitCodeExceptionClassifier.FATAL_EXCEPTION);
+		checkRepository(BatchStatus.FAILED, new ExitStatus(false, ExitCodeExceptionClassifier.FATAL_EXCEPTION));
 	}
 
 	public void testStepShouldNotStart() throws Exception {
@@ -260,15 +260,15 @@ public class DefaultJobExecutorTests extends TestCase {
 	/*
 	 * Check JobRepository to ensure status is being saved.
 	 */
-	private void checkRepository(BatchStatus status, String exitCode) {
+	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
 		assertEquals(job, jobDao.findJobs(jobIdentifer).get(0));
 		// because map dao stores in memory, it can be checked directly
 		assertEquals(status, job.getStatus());
 		JobExecution jobExecution = (JobExecution) jobDao.findJobExecutions(job).get(0);
 		assertEquals(job.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());
-		if(exitCode != null){
-			assertEquals(jobExecution.getExitCode(), exitCode); 
+		if(exitStatus != null){
+			assertEquals(jobExecution.getExitStatus().getExitCode(), exitStatus.getExitCode()); 
 		}
 	}
 	

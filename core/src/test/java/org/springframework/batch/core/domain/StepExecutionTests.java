@@ -18,6 +18,8 @@ package org.springframework.batch.core.domain;
 import java.sql.Timestamp;
 import java.util.Properties;
 
+import org.springframework.batch.repeat.ExitStatus;
+
 import junit.framework.TestCase;
 
 /**
@@ -77,12 +79,12 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getExitCode()}.
+	 * {@link org.springframework.batch.core.domain.JobExecution#getExitStatus()}.
 	 */
 	public void testGetExitCode() {
-		assertEquals("", execution.getExitCode());
-		execution.setExitCode("23");
-		assertEquals("23", execution.getExitCode());
+		assertEquals(ExitStatus.UNKNOWN, execution.getExitStatus());
+		execution.setExitStatus(ExitStatus.FINISHED);
+		assertEquals(ExitStatus.FINISHED, execution.getExitStatus());
 	}
 
 	/**

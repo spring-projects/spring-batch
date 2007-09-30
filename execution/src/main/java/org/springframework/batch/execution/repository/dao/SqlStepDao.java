@@ -28,6 +28,7 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
 import org.springframework.batch.execution.repository.dao.SqlJobDao.JobExecutionRowMapper;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.support.PropertiesConverter;
@@ -69,18 +70,18 @@ public class SqlStepDao implements StepDao, InitializingBean {
 
 	// StepExecution statements
 	private static final String SAVE_STEP_EXECUTION = "INSERT into %PREFIX%STEP_EXECUTION(ID, VERSION, STEP_ID, JOB_EXECUTION_ID, START_TIME, "
-			+ "END_TIME, STATUS, COMMIT_COUNT, TASK_COUNT, TASK_STATISTICS, EXIT_CODE, EXIT_MESSAGE) "
-			+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "END_TIME, STATUS, COMMIT_COUNT, TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) "
+			+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String UPDATE_STEP_EXECUTION = "UPDATE %PREFIX%STEP_EXECUTION set START_TIME = ?, END_TIME = ?, "
-			+ "STATUS = ?, COMMIT_COUNT = ?, TASK_COUNT = ?, TASK_STATISTICS = ?, EXIT_CODE = ?, "
+			+ "STATUS = ?, COMMIT_COUNT = ?, TASK_COUNT = ?, TASK_STATISTICS = ?, CONTINUABLE = ? , EXIT_CODE = ?, "
 			+ "EXIT_MESSAGE = ? where ID = ?";
 
 	private static final String GET_STEP_EXECUTION_COUNT = "SELECT count(ID) from %PREFIX%STEP_EXECUTION where "
 			+ "STEP_ID = ?";
 
 	private static final String FIND_STEP_EXECUTIONS = "SELECT ID, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
-			+ " TASK_COUNT, TASK_STATISTICS, EXIT_CODE, EXIT_MESSAGE from %PREFIX%STEP_EXECUTION where STEP_ID = ?";
+			+ " TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%STEP_EXECUTION where STEP_ID = ?";
 
 	private JdbcOperations jdbcTemplate;
 
@@ -108,7 +109,8 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	 * Injection setter for job dao. Used to save {@link JobExecution}
 	 * instances.
 	 * 
-	 * @param jobDao a {@link JobDao}
+	 * @param jobDao
+	 *            a {@link JobDao}
 	 */
 	public void setJobDao(JobDao jobDao) {
 		this.jobDao = jobDao;
@@ -270,8 +272,10 @@ public class SqlStepDao implements StepDao, InitializingBean {
 				stepExecution.getCommitCount(),
 				stepExecution.getTaskCount(),
 				PropertiesConverter.propertiesToString(stepExecution
-						.getStatistics()), stepExecution.getExitCode(),
-				stepExecution.getExitDescription() };
+						.getStatistics()),
+				stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
+				stepExecution.getExitStatus().getExitCode(),
+				stepExecution.getExitStatus().getExitDescription() };
 		jdbcTemplate.update(getQuery(SAVE_STEP_EXECUTION), parameters);
 
 	}
@@ -309,8 +313,11 @@ public class SqlStepDao implements StepDao, InitializingBean {
 				stepExecution.getCommitCount(),
 				stepExecution.getTaskCount(),
 				PropertiesConverter.propertiesToString(stepExecution
-						.getStatistics()), stepExecution.getExitCode(),
-				stepExecution.getExitDescription(), stepExecution.getId() };
+						.getStatistics()),
+				stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
+				stepExecution.getExitStatus().getExitCode(),
+				stepExecution.getExitStatus().getExitDescription(),
+				stepExecution.getId() };
 		jdbcTemplate.update(getQuery(UPDATE_STEP_EXECUTION), parameters);
 
 	}
@@ -355,8 +362,8 @@ public class SqlStepDao implements StepDao, InitializingBean {
 				stepExecution.setTaskCount(rs.getInt(7));
 				stepExecution.setStatistics(PropertiesConverter
 						.stringToProperties(rs.getString(8)));
-				stepExecution.setExitCode(rs.getString(9));
-				stepExecution.setExitDescription(rs.getString(10));
+				stepExecution.setExitStatus(new ExitStatus("Y".equals(rs
+						.getString(9)), rs.getString(10), rs.getString(11)));
 				return stepExecution;
 			}
 		};

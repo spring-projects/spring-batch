@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.springframework.batch.core.runtime.JobIdentifier;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**
@@ -45,7 +46,7 @@ public class JobExecution extends Entity {
 
 	private Timestamp endTime = null;
 
-	private String exitCode = "";
+	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
 	// Package private constructor for Hibernate
 	JobExecution() {
@@ -110,17 +111,17 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * @param exitCode
+	 * @param exitStatus
 	 */
-	public void setExitCode(String exitCode) {
-		this.exitCode = exitCode;
+	public void setExitStatus(ExitStatus exitStatus) {
+		this.exitStatus = exitStatus;
 	}
 
 	/**
 	 * @return the exitCode
 	 */
-	public String getExitCode() {
-		return exitCode;
+	public ExitStatus getExitStatus() {
+		return exitStatus;
 	}
 
 	/**
@@ -130,7 +131,7 @@ public class JobExecution extends Entity {
 	 * be multiple active contexts.
 	 * 
 	 * @return all the chunk contexts that have been registered and not
-	 *         unregistered. A collection opf {@link RepeatContext} objects.
+	 *         unregistered. A collection of {@link RepeatContext} objects.
 	 */
 	public Collection getChunkContexts() {
 		synchronized (chunkContexts) {

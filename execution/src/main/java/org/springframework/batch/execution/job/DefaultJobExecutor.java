@@ -93,7 +93,7 @@ public class DefaultJobExecutor implements JobExecutor {
 		}
 		finally {
 			jobExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
-			jobExecution.setExitCode(status.getExitCode());
+			jobExecution.setExitStatus(status);
 			jobRepository.saveOrUpdate(jobExecution);
 		}
 		

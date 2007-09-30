@@ -16,7 +16,11 @@
 		<property name="startTime" column="START_TIME" />
 		<property name="endTime" column="END_TIME" />
 		<property name="status" type="org.springframework.batch.execution.repository.dao.BatchStatusUserType" column="STATUS" />
-		<property name="exitCode" column="EXIT_CODE" />
+		<property name="exitStatus" type="org.springframework.batch.execution.repository.dao.ExitStatusUserType">
+			<column name="CONTINUABLE"/>
+			<column name="EXIT_CODE"/>
+			<column name="EXIT_MESSAGE"/>
+		</property>
 	</class>
 
 </hibernate-mapping>

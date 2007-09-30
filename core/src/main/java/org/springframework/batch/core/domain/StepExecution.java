@@ -19,6 +19,8 @@ package org.springframework.batch.core.domain;
 import java.sql.Timestamp;
 import java.util.Properties;
 
+import org.springframework.batch.repeat.ExitStatus;
+
 /**
  * Batch domain object representation the execution of a step. Unlike
  * JobExecution, there are four additional properties: luwCount, commitCount,
@@ -51,10 +53,8 @@ public class StepExecution extends Entity {
 
 	private Properties statistics = new Properties();
 
-	private String exitCode = "";
+	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
 	
-	private String exitDescription = "";
-		
 	private Throwable exception;
 	
 	/**
@@ -199,17 +199,17 @@ public class StepExecution extends Entity {
 
 
 	/**
-	 * @param exitCode
+	 * @param exitStatus
 	 */
-	public void setExitCode(String exitCode) {
-		this.exitCode = exitCode;
+	public void setExitStatus(ExitStatus exitStatus) {
+		this.exitStatus = exitStatus;
 	}
 
 	/**
 	 * @return the exitCode
 	 */
-	public String getExitCode() {
-		return exitCode;
+	public ExitStatus getExitStatus() {
+		return exitStatus;
 	}
 
 	public void setException(Throwable exception) {
@@ -218,14 +218,6 @@ public class StepExecution extends Entity {
 	
 	public Throwable getException() {
 		return exception;
-	}
-	
-	public void setExitDescription(String exitDescription) {
-		this.exitDescription = exitDescription;
-	}
-	
-	public String getExitDescription() {
-		return exitDescription;
 	}
 
 	/**

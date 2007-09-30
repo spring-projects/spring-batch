@@ -266,8 +266,7 @@ public class SimpleStepExecutor implements StepExecutor {
 
 		}
 		finally {
-			stepExecution.setExitCode(status.getExitCode());
-			stepExecution.setExitDescription(status.getExitDescription());
+			stepExecution.setExitStatus(status);
 			stepExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
 			try {
 				jobRepository.saveOrUpdate(stepExecution);
