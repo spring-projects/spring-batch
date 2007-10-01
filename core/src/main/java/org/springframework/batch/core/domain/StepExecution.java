@@ -55,8 +55,6 @@ public class StepExecution extends Entity {
 
 	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
 	
-	private Throwable exception;
-	
 	/**
 	 * Package private constructor for Hibernate
 	 */
@@ -210,14 +208,6 @@ public class StepExecution extends Entity {
 	 */
 	public ExitStatus getExitStatus() {
 		return exitStatus;
-	}
-
-	public void setException(Throwable exception) {
-		this.exception = exception;
-	}
-	
-	public Throwable getException() {
-		return exception;
 	}
 
 	/**
