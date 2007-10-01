@@ -19,47 +19,53 @@ package org.springframework.batch.execution.repository.dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 
+import org.hibernate.HibernateException;
 import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.jdbc.support.lob.LobCreator;
-import org.springframework.jdbc.support.lob.LobHandler;
-import org.springframework.orm.hibernate3.support.ClobStringType;
 
 /**
  * User type object to help Hibernate to persist {@link BatchStatus} objects
- * (just plonking it a Clob).
+ * (just plonking it a String).
  * 
- * @author tomas.slanina
+ * @author Dave Syer
  * 
  */
-public class BatchStatusUserType extends ClobStringType {
+public class BatchStatusUserType extends ImmutableValueUserType {
 
-	/**
-	 * Get a {@link BatchStatus} from a Clob.
-	 * 
-	 * @return a {@link BatchStatus} object whose string representation is the
-	 * same as the database value.
-	 * 
-	 * @see org.springframework.orm.hibernate3.support.ClobStringType#nullSafeGetInternal(java.sql.ResultSet,
-	 * java.lang.String[], java.lang.Object,
-	 * org.springframework.jdbc.support.lob.LobHandler)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.execution.repository.dao.ImmutableValueUserType#sqlTypes()
 	 */
-	protected Object nullSafeGetInternal(ResultSet rs, String[] names, Object owner, LobHandler lobHandler)
-			throws SQLException {
-		String status = (String) super.nullSafeGetInternal(rs, names, owner, lobHandler);
-		return BatchStatus.getStatus(status);
+	public int[] sqlTypes() {
+		return new int[] { Types.VARCHAR };
 	}
 
 	/**
-	 * Convert an object to a string and then pop it in a Clob.
-	 * 
-	 * @see org.springframework.orm.hibernate3.support.ClobStringType#nullSafeSetInternal(java.sql.PreparedStatement,
-	 * int, java.lang.Object, org.springframework.jdbc.support.lob.LobCreator)
+	 * Get the 
+	 * @see org.springframework.batch.execution.repository.dao.ImmutableValueUserType#nullSafeGet(java.sql.ResultSet, java.lang.String[], java.lang.Object)
 	 */
-	protected void nullSafeSetInternal(PreparedStatement ps, int index, Object value, LobCreator lobCreator)
-			throws SQLException {
-		String status = (value == null) ? "" : value.toString();
-		super.nullSafeSetInternal(ps, index, status, lobCreator);
+	public Object nullSafeGet(ResultSet rs, String[] names, Object owner)
+			throws HibernateException, SQLException {
+		return BatchStatus.getStatus(rs.getString(names[0]));
+	}
+
+
+
+	/** 
+	 * Plonk a String representation of the status in the prepared statement.
+	 * 
+	 * @see org.springframework.batch.execution.repository.dao.ImmutableValueUserType#nullSafeSet(java.sql.PreparedStatement, java.lang.Object, int)
+	 */
+	public void nullSafeSet(PreparedStatement st, Object value, int index)
+			throws HibernateException, SQLException {
+		st.setString(index, value.toString());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.execution.repository.dao.ImmutableValueUserType#returnedClass()
+	 */
+	public Class returnedClass() {
+		return BatchStatus.class;
 	}
 
 }

@@ -38,6 +38,18 @@ public class ImmutableValueUserTypeTests extends TestCase {
 		assertEquals("foo", type.disassemble("foo"));
 	}
 
+	public void testEqualsWithNullObjects() {
+		assertTrue(type.equals(null, null));
+	}
+
+	public void testEqualsWithFirstNullObject() {
+		assertFalse(type.equals(null, "foo"));
+	}
+
+	public void testEqualsWithSecondNullObject() {
+		assertFalse(type.equals("foo", null));
+	}
+
 	public void testEqualsWithEqualObjects() {
 		assertTrue(type.equals("foo", "foo"));
 	}

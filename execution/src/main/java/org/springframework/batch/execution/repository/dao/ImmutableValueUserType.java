@@ -31,6 +31,12 @@ public abstract class ImmutableValueUserType implements UserType {
 	}
 
 	public boolean equals(Object x, Object y) throws HibernateException {
+		if (x==null && y==null) {
+			return true;
+		}
+		if (x==null) {
+			return false;
+		}
 		return x.equals(y);
 	}
 
