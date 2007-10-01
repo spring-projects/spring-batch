@@ -20,47 +20,61 @@ import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * <p>Simple implementation of {@link ExitCodeExceptionClassifier} that returns basic 
- * String exit codes, and defaults to the class name of the throwable
- * for the message.  Most users will want to write their own implementation
- * that creates more specific exit codes for different exception types.</p>
+ * <p>
+ * Simple implementation of {@link ExitCodeExceptionClassifier} that returns
+ * basic String exit codes, and defaults to the class name of the throwable for
+ * the message. Most users will want to write their own implementation that
+ * creates more specific exit codes for different exception types.
+ * </p>
  * 
  * @author Lucas Ward
- *
+ * 
  */
 public class SimpleExitCodeExceptionClassifier implements
 		ExitCodeExceptionClassifier {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.core.executor.ExitCodeExceptionClassifier#classifyForExitCode(java.lang.Throwable)
 	 */
 	public ExitStatus classifyForExitCode(Throwable throwable) {
-		return (ExitStatus)classify(throwable);
+		return (ExitStatus) classify(throwable);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.common.ExceptionClassifier#classify(java.lang.Throwable)
 	 */
 	public Object classify(Throwable throwable) {
-		
+
 		ExitStatus exitStatus = ExitStatus.FAILED;
-		
-		if(throwable instanceof StepInterruptedException){
-			exitStatus = new ExitStatus(false, STEP_INTERRUPTED, StepInterruptedException.class.getName());
+
+		if (throwable instanceof StepInterruptedException) {
+			exitStatus = new ExitStatus(false, STEP_INTERRUPTED,
+					StepInterruptedException.class.getName());
+		} else {
+			String message = "";
+			if (throwable!=null) {
+				message = throwable.getClass().getName();
+				if (throwable.getMessage()!=null) {
+					message += ": " + throwable.getMessage();
+				}
+			}
+			exitStatus = new ExitStatus(false, FATAL_EXCEPTION, message);
 		}
-		else{
-			exitStatus = new ExitStatus(false, 
-					FATAL_EXCEPTION, throwable == null ? "" : throwable.getClass().getName());
-		}
-		
+
 		return exitStatus;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.common.ExceptionClassifier#getDefault()
 	 */
 	public Object getDefault() {
-		//return without message since we don't know what the exception is
+		// return without message since we don't know what the exception is
 		return new ExitStatus(false, FATAL_EXCEPTION);
 	}
 

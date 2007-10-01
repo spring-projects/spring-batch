@@ -254,7 +254,6 @@ public class SimpleStepExecutor implements StepExecutor {
 
 			//classify exception so an exit code can be stored.
 			status = exceptionClassifier.classifyForExitCode(e);
-			stepExecution.setException(e);
 			if (e.getCause() instanceof StepInterruptedException) {
 				updateStatus(stepExecution, BatchStatus.STOPPED);
 				throw (StepInterruptedException) e.getCause();

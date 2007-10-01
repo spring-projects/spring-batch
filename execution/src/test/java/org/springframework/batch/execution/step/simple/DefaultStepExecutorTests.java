@@ -238,10 +238,10 @@ public class DefaultStepExecutorTests extends TestCase {
 		try {
 			stepExecutor.process(stepConfiguration, stepExecution);
 		} catch (Exception ex) {
-			assertEquals(step.getStepExecution().getExitStatus(),
-					new ExitStatus(false,
-							ExitCodeExceptionClassifier.FATAL_EXCEPTION,
-							"java.lang.RuntimeException"));
+			assertEquals(new ExitStatus(false,
+					ExitCodeExceptionClassifier.FATAL_EXCEPTION,
+					"java.lang.RuntimeException"), step.getStepExecution()
+					.getExitStatus());
 		}
 	}
 
@@ -385,8 +385,7 @@ public class DefaultStepExecutorTests extends TestCase {
 	 * StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy(){
 	 * 
 	 * public void checkInterrupted(RepeatContext context) throws
-	 * StepInterruptedException { throw new StepInterruptedException(""); }
-	 *  };
+	 * StepInterruptedException { throw new StepInterruptedException(""); } };
 	 * 
 	 * stepExecutor.setInterruptionPolicy(interruptionPolicy);
 	 * 
@@ -397,8 +396,7 @@ public class DefaultStepExecutorTests extends TestCase {
 	 * 
 	 * if(counter == 1){ throw new StepInterruptedException(""); }
 	 * 
-	 * return ExitStatus.CONTINUABLE; }
-	 *  };
+	 * return ExitStatus.CONTINUABLE; } };
 	 * 
 	 * StepInstance step = new StepInstance(new Long(1));
 	 * stepConfiguration.setTasklet(tasklet); JobExecutionContext
