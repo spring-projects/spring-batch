@@ -34,7 +34,7 @@ public class ScheduledJobIdentifierFactory implements JobIdentifierFactory {
 
 	private int jobRun = 0;
 
-	private Date scheduleDate = new Date(0L);
+	private Date scheduleDate = new Date();
 
 	public JobIdentifier getJobIdentifier(String name) {
 
