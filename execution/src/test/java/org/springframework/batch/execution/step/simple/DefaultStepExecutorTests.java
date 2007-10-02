@@ -118,7 +118,6 @@ public class DefaultStepExecutorTests extends TestCase {
 		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
 		JobExecution jobExecution = new JobExecution(new JobInstance(
 				jobIdentifier, new Long(1)));
-		step.setStepExecution(new StepExecution(step, jobExecution));
 
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 		stepExecutor.processChunk(stepConfiguration, stepExecution);
@@ -138,7 +137,6 @@ public class DefaultStepExecutorTests extends TestCase {
 		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
 		final JobExecution jobExecution = new JobExecution(new JobInstance(
 				jobIdentifier, new Long(3)));
-		step.setStepExecution(new StepExecution(step, jobExecution));
 		final StepExecution stepExecution = new StepExecution(step,
 				jobExecution);
 
@@ -204,8 +202,7 @@ public class DefaultStepExecutorTests extends TestCase {
 		try {
 			stepExecutor.process(stepConfiguration, stepExecution);
 		} catch (Exception ex) {
-			assertEquals(step.getStepExecution().getRollbackCount(),
-					new Integer(1));
+			assertEquals(stepExecution.getRollbackCount(), new Integer(1));
 		}
 
 	}
@@ -240,7 +237,7 @@ public class DefaultStepExecutorTests extends TestCase {
 		} catch (Exception ex) {
 			assertEquals(new ExitStatus(false,
 					ExitCodeExceptionClassifier.FATAL_EXCEPTION,
-					"java.lang.RuntimeException"), step.getStepExecution()
+					"java.lang.RuntimeException"), stepExecution
 					.getExitStatus());
 		}
 	}

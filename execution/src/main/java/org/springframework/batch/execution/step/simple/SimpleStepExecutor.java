@@ -157,7 +157,6 @@ public class SimpleStepExecutor implements StepExecutor {
 		Assert.notNull(step);
 
 		final Tasklet module = configuration.getTasklet();
-		step.setStepExecution(stepExecution);
 
 		ExitStatus status = ExitStatus.FAILED;
 
