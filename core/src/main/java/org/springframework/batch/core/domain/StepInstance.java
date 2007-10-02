@@ -57,8 +57,6 @@ public class StepInstance extends Entity {
 
 	private int stepExecutionCount = 0;
 
-	private StepExecution stepExecution;
-
 	private String name;
 
 	/**
@@ -108,14 +106,6 @@ public class StepInstance extends Entity {
 
 	public JobInstance getJob() {
 		return job;
-	}
-
-	public StepExecution getStepExecution() {
-		return stepExecution;
-	}
-
-	public void setStepExecution(StepExecution stepInstance) {
-		this.stepExecution = stepInstance;
 	}
 
 	public String getName() {

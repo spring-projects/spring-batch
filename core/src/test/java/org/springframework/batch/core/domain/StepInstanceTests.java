@@ -77,17 +77,6 @@ public class StepInstanceTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepInstance#getStepExecution()}.
-	 */
-	public void testGetStepExecution() {
-		assertEquals(null, instance.getStepExecution());
-		StepExecution execution = new StepExecution(instance, new JobExecution(instance.getJob(), new Long(111)));
-		instance.setStepExecution(execution);
-		assertNotNull(execution.getJobExecutionId());
-		assertEquals(execution.getJobExecutionId(), instance.getStepExecution().getJobExecutionId());
-	}
-
-	/**
 	 * Test method for {@link org.springframework.batch.core.domain.StepInstance#getName()}.
 	 */
 	public void testGetName() {
