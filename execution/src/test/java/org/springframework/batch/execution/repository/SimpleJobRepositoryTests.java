@@ -35,6 +35,7 @@ import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
 import org.springframework.batch.restart.GenericRestartData;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
 /*
  * Test SimpleJobRepository.  The majority of test cases are tested using EasyMock,
@@ -176,7 +177,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		try{
 			jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
 			fail();
-		}catch(BatchRestartException ex){
+		}catch(IncorrectResultSizeDataAccessException ex){
 			//expected
 		}
 
@@ -273,7 +274,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 			// expected
 		}
 	}
-	
+
 	public void testSaveOrUpdateValidJobExecution() throws Exception {
 
 		JobExecution jobExecution = new JobExecution(new JobInstance(null, new Long(1)));

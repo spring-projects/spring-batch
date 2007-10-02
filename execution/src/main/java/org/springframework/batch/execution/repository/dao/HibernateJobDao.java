@@ -34,8 +34,8 @@ import org.springframework.util.Assert;
  * Implementation of {@link JobDao} functionality based on the Hibernate ORM
  * framework. Its advantage is the independence of implementation on the
  * underlying database.
- * 
- * @author tomas.slanina
+ *
+ * @author Tomas Slanina
  * @author Dave Syer
  */
 
@@ -43,7 +43,7 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 
 	/**
 	 * @see JobDao#createJob(JobIdentifier)
-	 * 
+	 *
 	 * In this Hibernate implementation a job is stored into the database. Id is
 	 * obtained from Hibernate.
 	 */
@@ -62,7 +62,7 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 
 	/**
 	 * @see JobDao#findJobs(JobIdentifier)
-	 * 
+	 *
 	 * Hibernate is asked to get all jobs that matches criteria. Afterwards,
 	 * result is mapped into domain objects.
 	 */
@@ -109,7 +109,7 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 
 	/**
 	 * @see JobDao#save(JobExecution)
-	 * 
+	 *
 	 * Hibernate implementation persists JobExecution instance. Id is obtained
 	 * from Hibernate.
 	 */
@@ -168,7 +168,7 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 					public Object doInHibernate(Session session) {
 						Criteria criteria = session
 								.createCriteria(JobExecution.class);
-						criteria.add(Expression.eq("jobId", jobId));
+						criteria.add(Expression.eq("job.id", jobId));
 						return criteria.list();
 					}
 				});
@@ -179,7 +179,7 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 	/*
 	 * Validate JobExecution. At a minimum, JobId, StartTime, EndTime, and
 	 * Status cannot be null.
-	 * 
+	 *
 	 * @param jobExecution @throws IllegalArgumentException
 	 */
 	private void validateJobExecution(JobExecution jobExecution) {

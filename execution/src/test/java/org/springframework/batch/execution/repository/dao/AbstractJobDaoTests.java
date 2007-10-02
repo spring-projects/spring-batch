@@ -36,7 +36,7 @@ import org.springframework.util.ClassUtils;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public abstract class AbstractJobDaoTests extends
 		AbstractTransactionalDataSourceSpringContextTests {
@@ -170,15 +170,15 @@ public abstract class AbstractJobDaoTests extends
 		jobExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
 		jobDao.update(jobExecution);
 
-		List executions = retrieveJobExecution(jobExecution.getId());
+		List executions = jobDao.findJobExecutions(job);
 		assertEquals(executions.size(), 1);
 		validateJobExecution(jobExecution, (JobExecution) executions.get(0));
 
 	}
 
-	public void testSaveJobExecution() {
+	public void testSaveJobExecution(){
 
-		List executions = retrieveJobExecution(jobExecution.getId());
+		List executions = jobDao.findJobExecutions(job);
 		assertEquals(executions.size(), 1);
 		validateJobExecution(jobExecution, (JobExecution) executions.get(0));
 	}
@@ -243,37 +243,21 @@ public abstract class AbstractJobDaoTests extends
 
 	}
 
-	private void validateJobExecution(JobExecution lhs, JobExecution rhs) {
+	public void testFindJobExecutions(){
 
-		// equals operator only checks id
+		List results = jobDao.findJobExecutions(job);
+		assertEquals(results.size(), 1);
+		validateJobExecution(jobExecution, (JobExecution)results.get(0));
+	}
+
+	private void validateJobExecution(JobExecution lhs, JobExecution rhs){
+
+		//equals operator only checks id
 		assertEquals(lhs, rhs);
 		assertEquals(lhs.getStartTime(), rhs.getStartTime());
 		assertEquals(lhs.getEndTime(), rhs.getEndTime());
 		assertEquals(lhs.getStatus(), rhs.getStatus());
 		assertEquals(lhs.getExitStatus(), rhs.getExitStatus());
-	}
-
-	private List retrieveJobExecution(final Long id) {
-
-		RowMapper rowMapper = new RowMapper() {
-			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-				JobExecution execution = new JobExecution(new JobInstance(
-						jobRuntimeInformation, new Long(rs.getLong(1))));
-				execution.setStartTime(rs.getTimestamp(2));
-				execution.setEndTime(rs.getTimestamp(3));
-				execution.setStatus(BatchStatus.getStatus(rs.getString(4)));
-				// TODO: Add boolean for continuable to queries
-				execution.setExitStatus(new ExitStatus("Y".equals(rs
-						.getString(5)), rs.getString(6), rs.getString(7)));
-				execution.setId(id);
-
-				return execution;
-			}
-		};
-
-		return jdbcTemplate.query(GET_JOB_EXECUTION, new Object[] { id },
-				rowMapper);
 	}
 
 }
