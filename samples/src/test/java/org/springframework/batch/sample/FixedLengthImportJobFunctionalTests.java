@@ -23,6 +23,7 @@ import java.sql.SQLException;
 
 import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.FieldSetInputSource;
+import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -51,7 +52,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractLifecycleSpring
 	 */
 	protected void validatePostConditions() {
 		
-		inputSource.open();
+		((ResourceLifecycle) inputSource).open();
 		
 		jdbcTemplate.query("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", new RowCallbackHandler() {
 			

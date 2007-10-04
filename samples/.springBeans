@@ -19,7 +19,6 @@
 		<config>src/main/resources/jobs/adhocLoopJob.xml</config>
 		<config>src/main/resources/jobs/infiniteLoopJob.xml</config>
 		<config>src/main/resources/data-source-context-init.xml</config>
-		<config>src/main/resources/jobs/nfljob.xml</config>
 		<config>src/main/resources/jobs/xmlStaxJob.xml</config>
 	</configs>
 	<configSets>
@@ -131,7 +130,6 @@
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/jobs/nfljob.xml</config>
 				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
