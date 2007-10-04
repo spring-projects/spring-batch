@@ -16,7 +16,6 @@
 
 package org.springframework.batch.io;
 
-import org.springframework.batch.item.ResourceLifecycle;
 
 /**
  * Basic interface for generic input operations. Class implementing this
@@ -27,7 +26,7 @@ import org.springframework.batch.item.ResourceLifecycle;
  * 
  * @author Dave Syer
  */
-public interface InputSource extends ResourceLifecycle {
+public interface InputSource {
 
 	/**
 	 * Read record from input stream and map it to an object.

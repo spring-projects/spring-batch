@@ -31,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.Skippable;
+import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
@@ -38,6 +39,7 @@ import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.SQLWarningException;
 import org.springframework.jdbc.core.RowMapper;
@@ -115,7 +117,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Peter Zozom
  */
-public class SqlCursorInputSource implements InputSource, DisposableBean,
+public class SqlCursorInputSource implements InputSource, ResourceLifecycle, DisposableBean,
 		InitializingBean, Restartable, StatisticsProvider, Skippable {
 
 	private static Log log = LogFactory.getLog(SqlCursorInputSource.class);

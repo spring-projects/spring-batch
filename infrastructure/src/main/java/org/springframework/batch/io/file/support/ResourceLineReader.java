@@ -29,6 +29,7 @@ import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.file.support.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.io.file.support.separator.RecordSeparatorPolicy;
+import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -46,13 +47,13 @@ import org.springframework.util.Assert;
  * prefixes) and they will be ignored. The default is "#", so lines starting
  * with a pound sign will be ignored.<br/>
  * 
- * All the public methods that interact wit hthe underlying resource (open,
+ * All the public methods that interact with the underlying resource (open,
  * close, read etc.) are synchronized on this.<br/>
  * 
  * @author Dave Syer
  * @author Rob Harrop
  */
-public class ResourceLineReader implements InputSource, DisposableBean {
+public class ResourceLineReader implements ResourceLifecycle, InputSource, DisposableBean {
 
 	private static final Collection DEFAULT_COMMENTS = Collections.singleton("#");
 

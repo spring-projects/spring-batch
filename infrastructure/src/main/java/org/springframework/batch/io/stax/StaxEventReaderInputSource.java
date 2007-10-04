@@ -14,6 +14,7 @@ import javax.xml.stream.events.StartElement;
 
 import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.Skippable;
+import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
@@ -37,7 +38,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventReaderInputSource implements InputSource, Skippable, Restartable, StatisticsProvider, InitializingBean, DisposableBean {
+public class StaxEventReaderInputSource implements InputSource, ResourceLifecycle, Skippable, Restartable, StatisticsProvider, InitializingBean, DisposableBean {
 
 	public static final String READ_COUNT_STATISTICS_NAME = "StaxEventReaderInputSource.readCount";
 

@@ -24,6 +24,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.springframework.batch.io.InputSource;
+import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -50,7 +51,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * 
  */
-public class SingleKeySqlDrivingQueryInputSource implements InputSource, Restartable {
+public class SingleKeySqlDrivingQueryInputSource implements ResourceLifecycle, InputSource, Restartable {
 
 	private static final String RESTART_KEY = "SingleKeySqlDrivingQueryInputSource.lastProcessedKey";
 

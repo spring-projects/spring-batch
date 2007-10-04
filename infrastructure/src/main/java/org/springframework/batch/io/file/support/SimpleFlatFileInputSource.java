@@ -40,14 +40,14 @@ import org.springframework.util.Assert;
  * 
  * A {@link SimpleFlatFileInputSource} is not thread safe because it maintains
  * state in the form of a {@link ResourceLineReader}. Be careful to configure a
- * {@link SimpleFlatFileInputSource} using an appropiate factory or scope so
+ * {@link SimpleFlatFileInputSource} using an appropriate factory or scope so
  * that it is not shared between threads.<br/>
  * 
  * @see FieldSetInputSource
  * 
  * @author Dave Syer
  */
-public class SimpleFlatFileInputSource implements FieldSetInputSource, InitializingBean, DisposableBean {
+public class SimpleFlatFileInputSource implements ResourceLifecycle, FieldSetInputSource, InitializingBean, DisposableBean {
 
 	// default encoding for input files - set to ISO-8859-1
 	public static final String DEFAULT_CHARSET = "ISO-8859-1";
