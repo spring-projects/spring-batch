@@ -5,9 +5,6 @@
 	</configExtensions>
 	<configs>
 		<config>src/test/resources/org/springframework/batch/jms/jms-context.xml</config>
-		<config>src/test/resources/org/springframework/jms/asynch.xml</config>
-		<config>src/test/resources/org/springframework/jms/synch.xml</config>
-		<config>src/test/resources/org/springframework/jms/tx.xml</config>
 		<config>src/test/resources/data-source.xml</config>
 	</configs>
 	<configSets>
@@ -17,7 +14,6 @@
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/test/resources/data-source.xml</config>
-				<config>src/test/resources/org/springframework/jms/synch.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -35,7 +31,6 @@
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/test/resources/data-source.xml</config>
-				<config>src/test/resources/org/springframework/jms/asynch.xml</config>
 			</configs>
 		</configSet>
 	</configSets>
