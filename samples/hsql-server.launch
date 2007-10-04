@@ -2,7 +2,7 @@
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/batch-samples"/>
+<listEntry value="/samples"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="samples"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
