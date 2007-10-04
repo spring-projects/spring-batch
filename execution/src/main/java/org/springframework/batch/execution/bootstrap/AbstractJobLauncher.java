@@ -188,6 +188,9 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * @throws NoSuchJobConfigurationException
 	 */
 	public ExitStatus run(String name) throws NoSuchJobConfigurationException {
+		if (name==null) {
+			throw new NoSuchJobConfigurationException("Null job name cannot be located.");
+		}
 		JobIdentifier runtimeInformation = jobRuntimeInformationFactory
 				.getJobIdentifier(name);
 		return this.run(runtimeInformation);
@@ -210,7 +213,7 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 		if (jobConfigurationName != null) {
 			return this.run(jobConfigurationName);
 		}
-		return ExitStatus.FAILED;
+		throw new NoSuchJobConfigurationException("Null default job name cannot be located.");
 	}
 
 	/**

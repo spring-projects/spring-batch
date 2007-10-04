@@ -16,8 +16,6 @@
 
 package org.springframework.batch.execution.bootstrap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.runtime.JobIdentifier;
@@ -43,8 +41,6 @@ import org.springframework.util.Assert;
  */
 public class SimpleJobLauncher implements JobLauncher {
 	
-	private static final Log logger = LogFactory.getLog(SimpleJobLauncher.class);
-
 	private volatile Thread processingThread;
 
 	private volatile boolean running = false;
@@ -114,6 +110,9 @@ public class SimpleJobLauncher implements JobLauncher {
 	 * @throws NoSuchJobConfigurationException 
 	 */
 	public ExitStatus run(String name) throws NoSuchJobConfigurationException {
+		if (name==null) {
+			throw new NoSuchJobConfigurationException("Null job name cannot be located.");
+		}
 		JobIdentifier runtimeInformation = jobIdentifierFactory.getJobIdentifier(name);
 		return this.run(runtimeInformation);
 	}
@@ -127,20 +126,11 @@ public class SimpleJobLauncher implements JobLauncher {
 	 * @see #setJobIdentifierFactory(JobIdentifierFactory)
 	 * @see org.springframework.context.Lifecycle#start()
 	 */
-	public ExitStatus run(){
+	public ExitStatus run() throws NoSuchJobConfigurationException{
 		if (jobConfigurationName==null) {
-			return new ExitStatus(false, JOB_CONFIGURATION_NOT_PROVIDED, "No JobConfiguration was " +
-					"provided to the launcher.");
+			throw new NoSuchJobConfigurationException("Null default job name cannot be located.");
 		}
-		try {
-			return this.run(jobConfigurationName);
-		}
-		catch (NoSuchJobConfigurationException e) {
-			logger.error("JobExecutorFacade failed to find a JobConfiguration" +
-					" for the provided JobIdentifier", e);
-			return new ExitStatus(false, NO_SUCH_JOB_CONFIGURATION, "JobExecutor Facade failed" +
-					"to find a JobConfiguration for the provided JobIdentifier");
-		}
+		return this.run(jobConfigurationName);
 	}
 
 	/**

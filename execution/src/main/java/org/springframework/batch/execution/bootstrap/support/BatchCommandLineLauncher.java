@@ -259,7 +259,7 @@ public class BatchCommandLineLauncher {
 		String name = System.getProperty(JOB_NAME_KEY);
 		String parentKey = System.getProperty(BATCH_EXECUTION_ENVIRONMENT_KEY,
 				DEFAULT_PARENT_KEY);
-
+		
 		BatchCommandLineLauncher command = new BatchCommandLineLauncher();
 		int result = command.start(path, name, parentKey);
 		command.exit(result);

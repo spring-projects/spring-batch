@@ -19,6 +19,7 @@ package org.springframework.batch.execution.bootstrap;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
+import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
 import org.springframework.batch.execution.facade.JobExecutorFacade;
@@ -45,9 +46,10 @@ public class SimpleJobLauncherTests extends TestCase {
 		try {
 			launcher.run();
 			// should do nothing
+			fail("Expected NoSuchJobConfigurationException");
 		}
-		catch (Exception e) {
-			fail("Unexpected IllegalStateException");
+		catch (NoSuchJobConfigurationException e) {
+			assertTrue("Message should mention null job name: "+e.getMessage(), e.getMessage().toLowerCase().indexOf("null")>=0);
 		}
 	}
 
@@ -75,16 +77,18 @@ public class SimpleJobLauncherTests extends TestCase {
 		TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
 		Runnable launcherRunnable = new Runnable() {
 			public void run() {
-				System.out.println("run called");
-				launcher.run();
-				System.out.println("run finished.");
+				try {
+					launcher.run();
+				} catch (NoSuchJobConfigurationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		};
 
 		taskExecutor.execute(launcherRunnable); 
 		
 		// give the thread a second to start up
-		System.out.println("first sleep");
 		Thread.sleep(100);
 		assertTrue(launcher.isRunning());
 		launcher.stop();
@@ -112,7 +116,6 @@ public class SimpleJobLauncherTests extends TestCase {
 			try {
 				// 1 seconds should be long enough to allow the thread to be
 				// run and for interrupt to be called;
-				System.out.println("Facade sleep called.");
 				Thread.sleep(300);
 				//return ExitStatus.FAILED;
 				
