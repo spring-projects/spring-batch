@@ -48,3 +48,4 @@ hoc
 unbind
 tasklet
 bespoke
+standalone
