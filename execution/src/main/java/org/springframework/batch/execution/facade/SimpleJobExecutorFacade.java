@@ -127,14 +127,14 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 				.getJobConfiguration(jobRuntimeInformation.getName());
 
 		final JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
-		JobExecution jobExecutionContext = jobExecutionRegistry.register(job);
+		JobExecution jobExecution = jobExecutionRegistry.register(job);
 		
 		ExitStatus exitStatus = ExitStatus.FAILED;
 		try {
 			synchronized (mutex) {
 				running++;
 			}
-			exitStatus = jobExecutor.run(jobConfiguration, jobExecutionContext);
+			exitStatus = jobExecutor.run(jobConfiguration, jobExecution);
 		}
 		finally {
 			synchronized (mutex) {
