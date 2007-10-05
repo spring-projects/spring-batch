@@ -52,7 +52,7 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	private static final Log logger = LogFactory
 			.getLog(AbstractJobLauncher.class);
 
-	protected JobExecutorFacade batchContainer;
+	protected JobExecutorFacade jobExecutorFacade;
 
 	private String jobConfigurationName;
 
@@ -103,8 +103,8 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * 
 	 * @param batchContainer
 	 */
-	public void setJobExecutorFacade(JobExecutorFacade batchContainer) {
-		this.batchContainer = batchContainer;
+	public void setJobExecutorFacade(JobExecutorFacade jobExecutorFacade) {
+		this.jobExecutorFacade = jobExecutorFacade;
 	}
 
 	/**
@@ -114,7 +114,7 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(batchContainer);
+		Assert.notNull(jobExecutorFacade);
 	}
 
 	/**
@@ -168,7 +168,7 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 			throws NoSuchJobConfigurationException {
 
 		synchronized (monitor) {
-			if (isRunning(jobIdentifier)) {
+			if (isInternalRunning(jobIdentifier)) {
 				return ExitStatus.RUNNING;
 			}
 		}
@@ -181,10 +181,9 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 		});
 
 		/*
-		 * Subclasses have to take care of unregistering the jobIdentifier - if
-		 * we do it here and doRun() is implemented to return immediately
-		 * without waiting for the job to finish, then we will have a job
-		 * running that is not in the registry.
+		 * Subclasses don't explicitly have to take care of unregistering the
+		 * jobIdentifier - they just have to call the exitCallback when the job
+		 * is finished.
 		 */
 	}
 
@@ -285,8 +284,9 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 		this.stop(jobIdentifierFactory.getJobIdentifier(name));
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Check each registered {@link JobIdentifier} to see if it is running (@see
+	 * {@link #isRunning(JobIdentifier)}), and if any are, then return true.
 	 * 
 	 * @see org.springframework.batch.container.bootstrap.BatchContainerLauncher#isRunning()
 	 */
@@ -294,17 +294,29 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 		Collection jobs = new HashSet(registry.keySet());
 		for (Iterator iter = jobs.iterator(); iter.hasNext();) {
 			JobIdentifier jobIdentifier = (JobIdentifier) iter.next();
-			if (!isRunning(jobIdentifier)) {
-				return false;
+			if (isInternalRunning(jobIdentifier)) {
+				return true;
 			}
 		}
 		return !jobs.isEmpty();
 	}
 
-	protected boolean isRunning(JobIdentifier jobIdentifier) {
-		synchronized (registry) {
-			return registry.get(jobIdentifier) != null;
+	private boolean isInternalRunning(JobIdentifier jobIdentifier) {
+		synchronized(registry) {
+			return isRunning(jobIdentifier) && registry.containsKey(jobIdentifier);
 		}
+	}
+
+	/**
+	 * Extension point for subclasses to check an individual
+	 * {@link JobIdentifier} to see if it is running. As long as at least one
+	 * job is running the launcher is deemed to be running.
+	 * 
+	 * @param jobIdentifier a {@link JobIdentifier}
+	 * @return always true.  Subclasses can override and provide more accurate information.
+	 */
+	protected boolean isRunning(JobIdentifier jobIdentifier) {
+		return true;
 	}
 
 	/**

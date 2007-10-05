@@ -111,7 +111,7 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
 		taskExecutor.execute(new Runnable() {
 			public void run() {
 				try {
-					batchContainer.start(runtimeInformation);
+					jobExecutorFacade.start(runtimeInformation);
 				} catch (NoSuchJobConfigurationException e) {
 					applicationEventPublisher
 							.publishEvent(new RepeatOperationsApplicationEvent(
@@ -141,7 +141,7 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
 	 */
 	protected void doStop(JobIdentifier runtimeInformation)
 			throws NoSuchJobExecutionException {
-		batchContainer.stop(runtimeInformation);
+		jobExecutorFacade.stop(runtimeInformation);
 		// TODO: wait for the jobs to stop?
 	}
 
@@ -181,8 +181,8 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
 	 *         jobs running it will be empty.
 	 */
 	public Properties getStatistics() {
-		if (batchContainer instanceof StatisticsProvider) {
-			return ((StatisticsProvider) batchContainer).getStatistics();
+		if (jobExecutorFacade instanceof StatisticsProvider) {
+			return ((StatisticsProvider) jobExecutorFacade).getStatistics();
 		} else {
 			return new Properties();
 		}

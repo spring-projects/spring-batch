@@ -60,6 +60,7 @@ public class SimpleJobLauncherTests extends TestCase {
 		launcher.setJobExecutorFacade(jobExecutorFacade);
 		launcher.setJobConfigurationName(new JobConfiguration("foo").getName());
 		launcher.run();
+		assertFalse(launcher.isRunning());
 		launcher.run();
 		// Both jobs finished running because they were not launched in a new
 		// Thread
