@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
  * 
  * <p>
  * This simple implementation does not run the job asynchronously, so the start
- * method will not return before the job ends. However, the job execution to be
+ * method will not return before the job ends. However, the job execution can be
  * interrupted via the stop method in another thread.
  * </p>
  * 
@@ -63,11 +63,11 @@ public class SimpleJobLauncher extends AbstractJobLauncher {
 	 * @throws IllegalStateException
 	 *             if JobConfiguration is null.
 	 */
-	protected ExitStatus doRun(JobIdentifier jobIdentifier, Runnable exitCallback)
-			throws NoSuchJobConfigurationException {
+	protected ExitStatus doRun(JobIdentifier jobIdentifier,
+			Runnable exitCallback) throws NoSuchJobConfigurationException {
 
 		Assert.notNull(jobIdentifier, "JobIdentifier must not be null.");
-		Assert.isTrue(running==0,
+		Assert.isTrue(running == 0,
 				"This launcher can run only one job at at time.");
 
 		/*
