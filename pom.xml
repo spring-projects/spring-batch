@@ -488,6 +488,7 @@
 						</link>
 					</links>
 					<aggregate>true</aggregate>
+					<excludePackageNames>org.springframework.batch.sample</excludePackageNames>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -498,6 +499,11 @@
 			<id>dsyer</id>
 			<name>Dave Syer</name>
 			<email>dsyer@interface21.com</email>
+		</developer>
+		<developer>
+			<id>nebhale</id>
+			<name>Ben Hale</name>
+			<email>bhale@interface21.com</email>
 		</developer>
 		<developer>
 			<id>lward</id>
