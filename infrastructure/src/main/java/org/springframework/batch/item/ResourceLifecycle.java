@@ -17,20 +17,20 @@
 package org.springframework.batch.item;
 
 /**
- * Common interface for classes that require initialization before they can be
+ * Common interface for classes that require initialisation before they can be
  * used and need to free resources after they are no longer used.
  */
 public interface ResourceLifecycle {
 	/**
-	 * This method will be invoked at the start of processing to allow
-	 * initialization of resources.
+	 * This method should be invoked by clients at the start of processing to
+	 * allow initialisation of resources.
 	 * 
 	 */
 	public void open();
 
 	/**
-	 * This method will be called invoked after the completion of each step and
-	 * the implementing class should close all managed resources.
+	 * This method should be invoked by clients after the completion of each
+	 * step and the implementing class should close all managed resources.
 	 * 
 	 */
 	public void close();
