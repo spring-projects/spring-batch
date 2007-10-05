@@ -32,6 +32,7 @@ import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
+import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.SimpleStepConfiguration;
 import org.springframework.batch.execution.tasklet.ItemProviderProcessTasklet;
@@ -183,6 +184,9 @@ public class DefaultStepExecutorTests extends TestCase {
 						.getStepExecution());
 				assertEquals(stepExecution, StepSynchronizationManager.getContext()
 						.getStepExecution());
+				// StepScope can obtain id information....
+				assertNotNull(StepSynchronizationManager.getContext()
+						.getAttribute(StepScope.ID_KEY));
 			}
 		});
 
