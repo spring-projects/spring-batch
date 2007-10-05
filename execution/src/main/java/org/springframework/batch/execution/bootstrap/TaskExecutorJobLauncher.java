@@ -88,8 +88,8 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
 		this.taskExecutor = taskExecutor;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Injection setter.
 	 * 
 	 * @see org.springframework.jmx.export.notification.NotificationPublisherAware#setNotificationPublisher(org.springframework.jmx.export.notification.NotificationPublisher)
 	 */
@@ -99,28 +99,29 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
 	}
 
 	/**
-	 * Start the provided container using the task executor provided.
+	 * Start the job using the task executor provided.
 	 * 
-	 * @throws IllegalStateException
-	 *             if JobConfiguration is null.
+	 * @throws NoSuchJobConfigurationException
+	 *             if a job configuration cannot be located.
 	 */
-	protected ExitStatus doRun(final JobIdentifier runtimeInformation, final Runnable exitCallback) {
+	protected ExitStatus doRun(final JobIdentifier jobIdentifier,
+			final Runnable exitCallback) {
 
 		Assert.state(taskExecutor != null, "TaskExecutor must be provided");
 
 		taskExecutor.execute(new Runnable() {
 			public void run() {
 				try {
-					jobExecutorFacade.start(runtimeInformation);
+					jobExecutorFacade.start(jobIdentifier);
 				} catch (NoSuchJobConfigurationException e) {
 					applicationEventPublisher
 							.publishEvent(new RepeatOperationsApplicationEvent(
-									runtimeInformation, "No such job",
+									jobIdentifier, "No such job",
 									RepeatOperationsApplicationEvent.ERROR));
 					logger
 							.error(
-									"JobConfiguration could not be located inside Runnable for runtime information: ["
-											+ runtimeInformation + "]", e);
+									"JobConfiguration could not be located inside Runnable for identifier: ["
+											+ jobIdentifier + "]", e);
 				} finally {
 					exitCallback.run();
 				}
@@ -133,15 +134,15 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
 
 	/**
 	 * Delegates to the underlying {@link JobExecutorFacade}. Does not wait for
-	 * the jobs to stop (probably therefore returns immediately).
+	 * the jobs to stop (therefore returns immediately by default).
 	 * 
 	 * @throws NoSuchJobExecutionException
 	 * 
 	 * @see org.springframework.context.Lifecycle#stop()
 	 */
-	protected void doStop(JobIdentifier runtimeInformation)
+	protected void doStop(JobIdentifier jobIdentifier)
 			throws NoSuchJobExecutionException {
-		jobExecutorFacade.stop(runtimeInformation);
+		jobExecutorFacade.stop(jobIdentifier);
 		// TODO: wait for the jobs to stop?
 	}
 
@@ -189,7 +190,9 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
 	}
 
 	/**
-	 * @param event
+	 * Publish the provided message to an external listener if there is one.
+	 * 
+	 * @param message the message to publish
 	 */
 	private void publish(String message) {
 		if (notificationPublisher != null) {
