@@ -21,81 +21,101 @@ import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.FieldSetInputSource;
 import org.springframework.batch.io.file.FieldSetMapper;
+import org.springframework.batch.item.ItemProvider;
 import org.springframework.batch.item.provider.AbstractItemProvider;
 
-
+/**
+ * An {@link ItemProvider} that delivers a list as its item, storing up objects
+ * from the injected {@link InputSource} until they are ready to be packed out
+ * as a collection.<br/>
+ * 
+ * This class is thread safe (it can be used concurrently by multiple threads) as
+ * long as the {@link InputSource} is also thread safe.
+ * 
+ * @author Dave Syer
+ * 
+ */
 public class CollectionItemProvider extends AbstractItemProvider {
-	
-	private static final Log log = LogFactory.getLog(CollectionItemProvider.class);
-	
-    private FieldSetInputSource inputSource;
 
-    //collects simple records
-    private Collection multiRecord;
+	private static final Log log = LogFactory
+			.getLog(CollectionItemProvider.class);
 
-    //marks we have finished reading one whole multiRecord
-    private boolean recordFinished;
+	private FieldSetInputSource inputSource;
 
-    //mapps a sigle line to a simple record
-    private FieldSetMapper fieldSetMapper;
+	// maps a single line to a simple record
+	private FieldSetMapper fieldSetMapper;
 
-    public Object next() {
-        recordFinished = false;
+	/**
+	 * Get the next list of records.
+	 * 
+	 * @see org.springframework.batch.item.ItemProvider#next()
+	 */
+	public Object next() {
+		ResultHolder holder = new ResultHolder();
 
-        while (!recordFinished) {
-            process(inputSource.readFieldSet());
-        }
+		while (process(inputSource.readFieldSet(), holder)) {
+			continue;
+		}
 
-        if (multiRecord != null) {
-            Collection result = new ArrayList(multiRecord);
-            multiRecord = null;
+		if (!holder.exhausted) {
+			return holder.records;
+		} else {
+			return null;
+		}
+	}
 
-            return result;
-        } else {
-            return null;
-        }
-    }
+	private boolean process(FieldSet fieldSet, ResultHolder holder) {
+		// finish processing if we hit the end of file
+		if (fieldSet == null) {
+			log.debug("Exhausted InputSource");
+			holder.exhausted = true;
+			return false;
+		}
 
-    private void process(FieldSet fieldSet) {
-        //finish processing if we hit the end of file
-        if (fieldSet == null) {
-            log.debug("FINISHED");
-            recordFinished = true;
-            multiRecord = null;
+		// start a new collection
+		if (fieldSet.readString(0).equals("BEGIN")) {
+			log.debug("Start of new record detected");
+			return true;
+		}
 
-            return;
-        }
+		// mark we are finished with current collection
+		if (fieldSet.readString(0).equals("END")) {
+			log.debug("End of record detected");
+			return false;
+		}
 
-        //start a new collection
-        if (fieldSet.readString(0).equals("BEGIN")) {
-        	log.debug("STARTING NEW RECORD");
-            multiRecord = new ArrayList();
+		// add a simple record to the current collection
+		log.debug("Mapping: " + fieldSet);
+		holder.records.add(fieldSetMapper.mapLine(fieldSet));
+		return true;
+	}
 
-            return;
-        }
+	/**
+	 * Injection setter for {@link InputSource}.
+	 * @param inputSource an {@link InputSource}.
+	 */
+	public void setInputSource(FieldSetInputSource inputSource) {
+		this.inputSource = inputSource;
+	}
 
-        //mark we are finished with current collection
-        if (fieldSet.readString(0).equals("END")) {
-        	log.debug("END OF RECORD");
-            recordFinished = true;
+	public void setFieldSetMapper(FieldSetMapper mapper) {
+		this.fieldSetMapper = mapper;
+	}
 
-            return;
-        }
-
-        //add a simple record to the current collection
-        log.debug("MAPPING: " + fieldSet);
-        multiRecord.add(fieldSetMapper.mapLine(fieldSet));
-    }
-
-    public void setInputSource(FieldSetInputSource inputTemplate) {
-        this.inputSource = inputTemplate;
-    }
-
-    public void setFieldSetMapper(FieldSetMapper mapper) {
-        this.fieldSetMapper = mapper;
-    }
+	/**
+	 * Private class for temporary state management while item is being
+	 * collected.
+	 * 
+	 * @author Dave Syer
+	 * 
+	 */
+	private class ResultHolder {
+		Collection records = new ArrayList();
+		boolean exhausted = false;
+	}
 
 }

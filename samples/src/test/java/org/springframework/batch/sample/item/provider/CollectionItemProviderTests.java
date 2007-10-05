@@ -11,11 +11,10 @@ import org.springframework.batch.io.file.FieldSetInputSource;
 import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.sample.item.provider.CollectionItemProvider;
 
-public class CollectionItemProviderTest extends TestCase {
+public class CollectionItemProviderTests extends TestCase {
 
 	private MockControl inputControl;
 	private FieldSetInputSource input;
-	private MockControl mapperControl;
 	private FieldSetMapper mapper;
 	private CollectionItemProvider provider;
 	
@@ -26,12 +25,9 @@ public class CollectionItemProviderTest extends TestCase {
 		input = (FieldSetInputSource) inputControl.getMock();
 		
 		//create mock for mapper
-		mapperControl = MockControl.createControl(FieldSetMapper.class);
-		mapper = (FieldSetMapper) mapperControl.getMock();
-		mapperControl.setDefaultMatcher(MockControl.ALWAYS_MATCHER);
-		mapper.mapLine(null);
-		mapperControl.setDefaultReturnValue("line");
-		mapperControl.replay();
+		mapper = new FieldSetMapper() {
+			public Object mapLine(FieldSet fs) { return fs.readString(0); }
+		};
 		
 		//create provider
 		provider = new CollectionItemProvider();
@@ -55,7 +51,7 @@ public class CollectionItemProviderTest extends TestCase {
 		//read object
 		Object result = provider.next();
 		
-		//it should be collection od 3 strings "line"
+		//it should be collection of 3 strings "line"
 		assertTrue(result instanceof Collection);
 		Collection lines = (Collection)result;
 		assertEquals(3, lines.size());
