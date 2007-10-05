@@ -103,7 +103,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 	 * @see org.springframework.batch.execution.facade.JobExecutorFacade#start(org.springframework.batch.execution.common.domain.JobConfiguration,
 	 * org.springframework.batch.core.domain.JobIdentifier)
 	 * 
-	 * @throws IllegalArgumentException if the runtime information is null or
+	 * @throws IllegalArgumentException if the {@link JobIdentifier} is null or
 	 * its name is null
 	 * @throws IllegalStateException if the {@link JobConfigurationLocator} does
 	 * not contain a {@link JobConfiguration} with the name provided.
@@ -112,21 +112,21 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 	 * null
 	 * 
 	 */
-	public ExitStatus start(JobIdentifier jobRuntimeInformation) throws NoSuchJobConfigurationException {
+	public ExitStatus start(JobIdentifier jobIdentifier) throws NoSuchJobConfigurationException {
 
-		Assert.notNull(jobRuntimeInformation, "JobRuntimeInformation must not be null.");
-		Assert.notNull(jobRuntimeInformation.getName(), "JobRuntimeInformation name must not be null.");
+		Assert.notNull(jobIdentifier, "JobIdentifier must not be null.");
+		Assert.notNull(jobIdentifier.getName(), "JobIdentifier name must not be null.");
 
-		Assert.state(!jobExecutionRegistry.isRegistered(jobRuntimeInformation),
+		Assert.state(!jobExecutionRegistry.isRegistered(jobIdentifier),
 				"A job with this JobRuntimeInformation is already executing in this container");
 
 		Assert.state(jobExecutor != null, "JobExecutor must be provided.");
 		Assert.state(jobConfigurationLocator != null, "JobConfigurationLocator must be provided.");
 
 		JobConfiguration jobConfiguration = jobConfigurationLocator
-				.getJobConfiguration(jobRuntimeInformation.getName());
+				.getJobConfiguration(jobIdentifier.getName());
 
-		final JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
+		final JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobIdentifier);
 		JobExecution jobExecution = jobExecutionRegistry.register(job);
 		
 		ExitStatus exitStatus = ExitStatus.FAILED;
@@ -142,7 +142,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 				// not running any more
 				running--;
 			}
-			jobExecutionRegistry.unregister(jobRuntimeInformation);
+			jobExecutionRegistry.unregister(jobIdentifier);
 		}
 
 		return exitStatus;
