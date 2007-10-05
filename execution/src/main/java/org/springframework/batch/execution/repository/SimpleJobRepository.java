@@ -24,16 +24,15 @@ import java.util.Properties;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
 import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.util.Assert;
 
 /**
@@ -117,8 +116,8 @@ public class SimpleJobRepository implements JobRepository {
 		}
 		else {
 			// More than one job found, throw exception
-			throw new IncorrectResultSizeDataAccessException("Error restarting job, more than one JobInstance found for: "
-					+ jobConfiguration.toString(), 1, jobs.size());
+			throw new BatchRestartException("Error restarting job, more than one JobInstance found for: "
+					+ jobConfiguration.toString());
 		}
 	}
 

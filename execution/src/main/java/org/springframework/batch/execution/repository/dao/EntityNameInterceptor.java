@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.hibernate.EmptyInterceptor;
+import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.util.ClassUtils;
 
