@@ -45,7 +45,7 @@ import org.springframework.util.Assert;
  * 
  * <p>
  * This implementation can run jobs asynchronously. Jobs are stopped by calling
- * the container stop methods, which is a graceful shutdown.
+ * the stop method in the {@link JobExecutorFacade}, which is a graceful shutdown.
  * </p>
  * 
  * @see JobExecutorFacade
