@@ -26,7 +26,6 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
 import org.springframework.batch.execution.repository.dao.SqlJobDao.JobExecutionRowMapper;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.restart.GenericRestartData;

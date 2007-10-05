@@ -25,17 +25,16 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.StepConfiguration;
+import org.springframework.batch.core.configuration.StepConfigurationSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
-import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
 import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
 /*
  * Test SimpleJobRepository.  The majority of test cases are tested using EasyMock,
@@ -88,9 +87,9 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobConfiguration.setName("RepositoryTest");
 		jobConfiguration.setRestartable(true);
 
-		stepConfiguration1 = new StubStepConfiguration("TestStep1");
+		stepConfiguration1 = new StepConfigurationSupport("TestStep1");
 
-		stepConfiguration2 = new StubStepConfiguration("TestStep2");
+		stepConfiguration2 = new StepConfigurationSupport("TestStep2");
 
 		List stepConfigurations = new ArrayList();
 		stepConfigurations.add(stepConfiguration1);
@@ -169,15 +168,15 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 		List jobs = new ArrayList();
 		jobs.add(databaseJob);
-		jobs.add(new JobInstance(jobRuntimeInformation));
+		jobs.add(new JobInstance(jobRuntimeInformation, new Long(127)));
 		jobDao.findJobs(jobRuntimeInformation);
 		jobDaoControl.setReturnValue(jobs);
 		jobDaoControl.replay();
 
 		try{
 			jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
-			fail();
-		}catch(IncorrectResultSizeDataAccessException ex){
+			fail("Expected BatchRestartException");
+		}catch(BatchRestartException e){
 			//expected
 		}
 
@@ -404,39 +403,6 @@ public class SimpleJobRepositoryTests extends TestCase {
 		step = (StepInstance) it.next();
 		assertTrue(step.getRestartData().getProperties().isEmpty());
 		assertTrue(step.equals(databaseStep2));
-	}
-
-	/**
-	 * @author Dave Syer
-	 *
-	 */
-	private class StubStepConfiguration implements StepConfiguration {
-
-		private String name;
-
-		/**
-		 * @param name
-		 */
-		public StubStepConfiguration(String name) {
-			this.name = name;
-		}
-
-		public Tasklet getTasklet() {
-			return null;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public int getStartLimit() {
-			return 1;
-		}
-
-		public boolean isAllowStartIfComplete() {
-			return true;
-		}
-
 	}
 
 }

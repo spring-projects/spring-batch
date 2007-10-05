@@ -16,8 +16,6 @@
 
 package org.springframework.batch.execution.repository.dao;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -30,7 +28,6 @@ import org.springframework.batch.core.repository.NoSuchBatchDomainObjectExceptio
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
 
@@ -40,10 +37,6 @@ import org.springframework.util.ClassUtils;
  */
 public abstract class AbstractJobDaoTests extends
 		AbstractTransactionalDataSourceSpringContextTests {
-
-	private static final String GET_JOB_EXECUTION = "SELECT JOB_ID, START_TIME, END_TIME, STATUS, "
-			+ "CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from "
-			+ "BATCH_JOB_EXECUTION where ID = ?";
 
 	protected JobDao jobDao;
 
