@@ -37,7 +37,7 @@
 	<bean id="jobExecutor" class="org.springframework.batch.execution.job.DefaultJobExecutor">
 		<property name="jobRepository" ref="simpleJobRepository" />
 		<property name="stepExecutorFactory">
-			<bean class="org.springframework.batch.execution.step.DefaultStepExecutorFactory">
+			<bean class="org.springframework.batch.execution.step.PrototypeBeanStepExecutorFactory">
 				<property name="stepExecutorName" value="stepExecutor" />
 			</bean>
 		</property>
@@ -83,7 +83,7 @@
 		<property name="restartable" value="true" />
 	</bean>
 
-	<bean id="simpleStep" class="org.springframework.batch.execution.step.simple.SimpleStepConfiguration"
+	<bean id="simpleStep" class="org.springframework.batch.execution.step.SimpleStepConfiguration"
 		abstract="true">
 		<property name="allowStartIfComplete" value="true" />
 		<property name="saveRestartData" value="false" />
