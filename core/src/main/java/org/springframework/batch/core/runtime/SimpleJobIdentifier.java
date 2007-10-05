@@ -17,6 +17,7 @@ package org.springframework.batch.core.runtime;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.springframework.batch.core.domain.JobIdentifier;
 
 
 /**

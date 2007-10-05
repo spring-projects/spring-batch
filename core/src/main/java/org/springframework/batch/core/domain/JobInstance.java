@@ -19,7 +19,6 @@ package org.springframework.batch.core.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.runtime.JobIdentifier;
 
 /**
  * Batch domain object representing a job instance. A job instance is defined as

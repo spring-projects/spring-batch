@@ -17,7 +17,6 @@ package org.springframework.batch.core.domain;
 
 import java.util.Collections;
 
-import org.springframework.batch.core.runtime.JobIdentifier;
 
 import junit.framework.TestCase;
 

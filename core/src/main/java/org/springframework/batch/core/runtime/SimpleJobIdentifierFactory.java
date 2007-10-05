@@ -1,5 +1,7 @@
 package org.springframework.batch.core.runtime;
 
+import org.springframework.batch.core.domain.JobIdentifier;
+
 
 /**
  * Factory for {@link SimpleJobIdentifier} instances.

@@ -20,7 +20,6 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 

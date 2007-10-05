@@ -30,6 +30,7 @@ public class StepConfigurationSupport implements StepConfiguration {
 	private int startLimit = Integer.MAX_VALUE;
 	private Tasklet tasklet;
 	private boolean allowStartIfComplete;
+	private boolean saveRestartData = false;
 	
 	/**
 	 * Default constructor for {@link StepConfigurationSupport}.
@@ -112,6 +113,14 @@ public class StepConfigurationSupport implements StepConfiguration {
 	 */
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
 		this.allowStartIfComplete = allowStartIfComplete;
+	}
+
+	public void setSaveRestartData(boolean saveRestartData) {
+		this.saveRestartData = saveRestartData;
+	}
+
+	public boolean isSaveRestartData() {
+		return saveRestartData;
 	}
 
 }

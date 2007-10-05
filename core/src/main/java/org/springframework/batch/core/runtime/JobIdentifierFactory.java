@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.runtime;
 
+import org.springframework.batch.core.domain.JobIdentifier;
+
 /**
  * A factory for {@link JobIdentifier} instances. A job configuration can be
  * executed with many possible runtime parameters, which identify the instance

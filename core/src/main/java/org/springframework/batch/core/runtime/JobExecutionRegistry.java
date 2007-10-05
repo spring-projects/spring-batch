@@ -18,6 +18,7 @@ package org.springframework.batch.core.runtime;
 import java.util.Collection;
 
 import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 
 /**

@@ -40,10 +40,16 @@ public interface StepConfiguration {
 	Tasklet getTasklet();
 
 	/**
-	 * @return true if a job that is already marked as complete can be started
+	 * @return true if a step that is already marked as complete can be started
 	 * again.
 	 */
 	boolean isAllowStartIfComplete();
+	
+	/**
+	 * Flag to indicate if restart data needs to be saved for this step.
+	 * @return true if restart data should be saved
+	 */
+	boolean isSaveRestartData();
 
 	/**
 	 * @return the number of times a job can be started with the same
