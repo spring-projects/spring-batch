@@ -26,7 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
-import org.springframework.batch.core.runtime.JobIdentifier;
+import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.runtime.JobIdentifierFactory;
 import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.batch.execution.facade.NoSuchJobExecutionException;
@@ -252,7 +252,7 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * 
 	 * @throws NoSuchJobExecutionException
 	 * 
-	 * @see org.springframework.batch.execution.bootstrap.JobLauncher#stop(org.springframework.batch.core.runtime.JobIdentifier)
+	 * @see org.springframework.batch.execution.bootstrap.JobLauncher#stop(org.springframework.batch.core.domain.JobIdentifier)
 	 * @see BatchContainer#stop(JobRuntimeInformation))
 	 */
 	final public void stop(JobIdentifier runtimeInformation)

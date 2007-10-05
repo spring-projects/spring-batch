@@ -166,7 +166,7 @@ public class SimpleStepExecutor implements StepExecutor {
 			stepExecution.setStartTime(new Timestamp(System.currentTimeMillis()));
 			updateStatus(stepExecution, BatchStatus.STARTED);
 
-			final boolean saveRestartData = ((AbstractStepConfiguration) configuration).isSaveRestartData();
+			final boolean saveRestartData = configuration.isSaveRestartData();
 
 			if (saveRestartData && isRestart) {
 				restoreFromRestartData(module, step.getRestartData());

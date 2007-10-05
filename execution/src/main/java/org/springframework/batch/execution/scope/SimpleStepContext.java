@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.batch.core.runtime.JobIdentifier;
+import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
 
 /**

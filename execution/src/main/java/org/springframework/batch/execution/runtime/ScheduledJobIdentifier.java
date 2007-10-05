@@ -20,7 +20,7 @@ import java.util.Date;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.springframework.batch.core.runtime.JobIdentifier;
+import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 
 public class ScheduledJobIdentifier extends SimpleJobIdentifier implements JobIdentifier {

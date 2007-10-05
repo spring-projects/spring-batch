@@ -21,6 +21,7 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.configuration.StepConfigurationSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
@@ -32,6 +33,7 @@ import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
+import org.springframework.batch.execution.step.SimpleStepConfiguration;
 import org.springframework.batch.execution.tasklet.ItemProviderProcessTasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemProvider;
@@ -54,7 +56,7 @@ public class DefaultStepExecutorTests extends TestCase {
 
 	private DefaultStepExecutor stepExecutor;
 
-	private AbstractStepConfiguration stepConfiguration;
+	private StepConfigurationSupport stepConfiguration;
 
 	private ItemProvider getProvider(String[] args) {
 		return new ListItemProvider(Arrays.asList(args));

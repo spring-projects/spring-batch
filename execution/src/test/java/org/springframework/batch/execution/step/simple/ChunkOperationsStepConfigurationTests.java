@@ -18,6 +18,7 @@ package org.springframework.batch.execution.step.simple;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.execution.step.ChunkOperationsStepConfiguration;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
@@ -30,7 +31,7 @@ public class ChunkOperationsStepConfigurationTests extends TestCase {
 	ChunkOperationsStepConfiguration configuration = new ChunkOperationsStepConfiguration();
 	
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.simple.ChunkOperationsStepConfiguration#StepExecutorStepConfiguration(org.springframework.batch.core.executor.StepExecutor)}.
+	 * Test method for {@link org.springframework.batch.execution.step.ChunkOperationsStepConfiguration#StepExecutorStepConfiguration(org.springframework.batch.core.executor.StepExecutor)}.
 	 */
 	public void testStepExecutorStepConfigurationRepeatOperations() {
 		RepeatTemplate executor = new RepeatTemplate();
@@ -39,7 +40,7 @@ public class ChunkOperationsStepConfigurationTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.simple.ChunkOperationsStepConfiguration#StepExecutorStepConfiguration(org.springframework.batch.core.tasklet.Tasklet)}.
+	 * Test method for {@link org.springframework.batch.execution.step.ChunkOperationsStepConfiguration#StepExecutorStepConfiguration(org.springframework.batch.core.tasklet.Tasklet)}.
 	 */
 	public void testStepExecutorStepConfigurationTasklet() {
 		Tasklet tasklet = new Tasklet() {
@@ -52,7 +53,7 @@ public class ChunkOperationsStepConfigurationTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.simple.ChunkOperationsStepConfiguration#getChunkOperations()}.
+	 * Test method for {@link org.springframework.batch.execution.step.ChunkOperationsStepConfiguration#getChunkOperations()}.
 	 */
 	public void testGetExecutor() {
 		assertNull(configuration.getChunkOperations());

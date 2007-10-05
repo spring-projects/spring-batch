@@ -19,7 +19,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.StepConfigurationSupport;
 import org.springframework.batch.execution.step.simple.JobRepositorySupport;
-import org.springframework.batch.execution.step.simple.SimpleStepConfiguration;
 
 /**
  * @author Dave Syer

@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.StepConfiguration;
+import org.springframework.batch.core.configuration.StepConfigurationSupport;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
@@ -40,8 +41,7 @@ import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.execution.step.simple.AbstractStepConfiguration;
-import org.springframework.batch.execution.step.simple.SimpleStepConfiguration;
+import org.springframework.batch.execution.step.SimpleStepConfiguration;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -89,9 +89,9 @@ public class DefaultJobExecutorTests extends TestCase {
 
 	private StepExecution stepExecution2;
 
-	private AbstractStepConfiguration stepConfiguration1;
+	private StepConfigurationSupport stepConfiguration1;
 
-	private AbstractStepConfiguration stepConfiguration2;
+	private StepConfigurationSupport stepConfiguration2;
 
 	private JobConfiguration jobConfiguration;
 

@@ -19,7 +19,6 @@ import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.execution.step.simple.SimpleStepConfiguration;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;

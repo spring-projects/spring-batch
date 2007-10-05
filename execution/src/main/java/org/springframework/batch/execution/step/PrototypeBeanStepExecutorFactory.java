@@ -18,7 +18,6 @@ package org.springframework.batch.execution.step;
 import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
-import org.springframework.batch.execution.step.simple.SimpleStepConfiguration;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -42,7 +41,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class DefaultStepExecutorFactory implements StepExecutorFactory,
+public class PrototypeBeanStepExecutorFactory implements StepExecutorFactory,
 		BeanFactoryAware, InitializingBean {
 
 	private String stepExecutorName = null;

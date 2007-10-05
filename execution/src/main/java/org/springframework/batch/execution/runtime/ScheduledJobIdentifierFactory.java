@@ -18,7 +18,7 @@ package org.springframework.batch.execution.runtime;
 
 import java.util.Date;
 
-import org.springframework.batch.core.runtime.JobIdentifier;
+import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.runtime.JobIdentifierFactory;
 
 /**

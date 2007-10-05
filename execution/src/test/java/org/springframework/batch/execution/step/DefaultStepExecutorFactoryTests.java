@@ -21,7 +21,6 @@ import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.configuration.StepConfigurationSupport;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.executor.StepExecutor;
-import org.springframework.batch.execution.step.simple.SimpleStepConfiguration;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -37,7 +36,7 @@ import org.springframework.context.support.StaticApplicationContext;
  */
 public class DefaultStepExecutorFactoryTests extends TestCase {
 
-	private DefaultStepExecutorFactory factory = new DefaultStepExecutorFactory();
+	private PrototypeBeanStepExecutorFactory factory = new PrototypeBeanStepExecutorFactory();
 	private StaticApplicationContext applicationContext = new StaticApplicationContext();
 	
 	protected void setUp() throws Exception {

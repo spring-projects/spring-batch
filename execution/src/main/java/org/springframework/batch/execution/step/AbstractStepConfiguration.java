@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step;
 
 import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.configuration.StepConfigurationSupport;
@@ -32,8 +32,6 @@ import org.springframework.beans.factory.BeanNameAware;
 public class AbstractStepConfiguration extends StepConfigurationSupport implements BeanNameAware {
 
 	private int skipLimit = 0;
-
-	private boolean saveRestartData = false;
 
 	private ExceptionHandler exceptionHandler;
 
@@ -78,14 +76,6 @@ public class AbstractStepConfiguration extends StepConfigurationSupport implemen
 
 	public int getSkipLimit() {
 		return skipLimit;
-	}
-
-	public void setSaveRestartData(boolean saveRestartData) {
-		this.saveRestartData = saveRestartData;
-	}
-
-	public boolean isSaveRestartData() {
-		return saveRestartData;
 	}
 
 }

@@ -23,9 +23,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.runtime.JobExecutionRegistry;
-import org.springframework.batch.core.runtime.JobIdentifier;
 
 /**
  * Simple in-memory implementation of {@link JobExecutionRegistry}.

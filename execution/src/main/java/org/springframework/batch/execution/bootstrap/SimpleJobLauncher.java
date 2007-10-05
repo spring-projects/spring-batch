@@ -18,7 +18,7 @@ package org.springframework.batch.execution.bootstrap;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
-import org.springframework.batch.core.runtime.JobIdentifier;
+import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.runtime.JobIdentifierFactory;
 import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory;

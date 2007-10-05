@@ -21,14 +21,15 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
+import org.springframework.batch.core.configuration.StepConfigurationSupport;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.JobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
@@ -36,6 +37,7 @@ import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
+import org.springframework.batch.execution.step.SimpleStepConfiguration;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -50,7 +52,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private JobInstance job;
 
-	private AbstractStepConfiguration stepConfiguration;
+	private StepConfigurationSupport stepConfiguration;
 
 	private SimpleStepExecutor executor;
 
