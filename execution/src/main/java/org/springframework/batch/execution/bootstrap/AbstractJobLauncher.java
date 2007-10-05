@@ -279,20 +279,20 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * 
 	 * @see org.springframework.batch.container.bootstrap.BatchContainerLauncher#isRunning()
 	 */
-	public boolean isRunning() {
+	final public boolean isRunning() {
 		Collection jobs = new HashSet(registry.keySet());
 		for (Iterator iter = jobs.iterator(); iter.hasNext();) {
-			JobIdentifier context = (JobIdentifier) iter.next();
-			if (!isRunning(context)) {
+			JobIdentifier jobIdentifier = (JobIdentifier) iter.next();
+			if (!isRunning(jobIdentifier)) {
 				return false;
 			}
 		}
 		return !jobs.isEmpty();
 	}
 
-	protected boolean isRunning(JobIdentifier runtimeInformation) {
+	protected boolean isRunning(JobIdentifier jobIdentifier) {
 		synchronized (registry) {
-			return registry.get(runtimeInformation) != null;
+			return registry.get(jobIdentifier) != null;
 		}
 	}
 
