@@ -23,6 +23,7 @@ import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
@@ -32,7 +33,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class SimpleStepExecutorFactory implements StepExecutorFactory {
+public class SimpleStepExecutorFactory implements StepExecutorFactory, InitializingBean {
 
 	private JobRepository jobRepository;
 
@@ -70,8 +71,21 @@ public class SimpleStepExecutorFactory implements StepExecutorFactory {
 
 	}
 
+	/**
+	 * Public setter for {@link JobRepository}.
+	 * 
+	 * @param jobRepository is a mandatory dependence (no default).
+	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
 
+	/**
+	 * Assert that all mandatory properties are set (the {@link JobRepository}).
+	 * 
+	 * @throws Exception
+	 */
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(jobRepository);
+	}
 }

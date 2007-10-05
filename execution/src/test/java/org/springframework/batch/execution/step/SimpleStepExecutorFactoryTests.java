@@ -62,4 +62,14 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 							"JobRepository") >= 0);
 		}
 	}
+	
+	public void testMandatoryProperties() throws Exception {
+		factory = new SimpleStepExecutorFactory();
+		try {
+			factory.afterPropertiesSet();
+			fail("Expected IllegalArgumentException");
+		} catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
 }
