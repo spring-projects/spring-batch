@@ -161,6 +161,7 @@ public class SimpleStepExecutor implements StepExecutor {
 		ExitStatus status = ExitStatus.FAILED;
 
 		final SimpleStepContext stepScopeContext = StepSynchronizationManager.open();
+		stepScopeContext.setStepExecution(stepExecution);
 
 		try {
 			stepExecution.setStartTime(new Timestamp(System.currentTimeMillis()));
@@ -182,7 +183,6 @@ public class SimpleStepExecutor implements StepExecutor {
 							stepExecution.getJobExecution().unregisterStepContext(context);
 						}
 					});
-					stepScopeContext.setStepExecution(stepExecution);
 					context.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution()
 							.getJobIdentifier());
 					// Mark the context as a step context as a hint to scope

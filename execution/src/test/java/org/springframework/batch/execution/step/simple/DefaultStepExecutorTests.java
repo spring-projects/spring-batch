@@ -39,6 +39,8 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemProvider;
 import org.springframework.batch.item.provider.ListItemProvider;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.interceptor.RepeatInterceptorAdapter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.restart.RestartData;
@@ -57,6 +59,8 @@ public class DefaultStepExecutorTests extends TestCase {
 	private DefaultStepExecutor stepExecutor;
 
 	private StepConfigurationSupport stepConfiguration;
+
+	private RepeatTemplate template;
 
 	private ItemProvider getProvider(String[] args) {
 		return new ListItemProvider(Arrays.asList(args));
@@ -85,8 +89,7 @@ public class DefaultStepExecutorTests extends TestCase {
 		stepConfiguration = new SimpleStepConfiguration();
 		stepConfiguration.setTasklet(getTasklet(new String[] { "foo", "bar",
 				"spam" }));
-		// Only process one chunk:
-		RepeatTemplate template = new RepeatTemplate();
+		template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		stepExecutor.setStepOperations(template);
 		// Only process one item:
@@ -110,7 +113,7 @@ public class DefaultStepExecutorTests extends TestCase {
 
 	public void testChunkExecutor() throws Exception {
 
-		RepeatTemplate template = new RepeatTemplate();
+		template = new RepeatTemplate();
 
 		// Only process one item:
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
@@ -129,7 +132,7 @@ public class DefaultStepExecutorTests extends TestCase {
 
 	public void testStepContextInitialized() throws Exception {
 
-		RepeatTemplate template = new RepeatTemplate();
+		template = new RepeatTemplate();
 
 		// Only process one item:
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
@@ -151,6 +154,35 @@ public class DefaultStepExecutorTests extends TestCase {
 						.getStepExecution());
 				processed.add("foo");
 				return ExitStatus.CONTINUABLE;
+			}
+		});
+
+		stepExecutor.process(stepConfiguration, stepExecution);
+		assertEquals(1, processed.size());
+
+	}
+
+	public void testStepContextInitializedBeforeTasklet() throws Exception {
+
+		template = new RepeatTemplate();
+
+		// Only process one chunk:
+		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
+		stepExecutor.setStepOperations(template);
+
+		final StepInstance step = new StepInstance(new Long(1));
+		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("FOO");
+		final JobExecution jobExecution = new JobExecution(new JobInstance(
+				jobIdentifier, new Long(3)));
+		final StepExecution stepExecution = new StepExecution(step,
+				jobExecution);
+
+		template.setInterceptor(new RepeatInterceptorAdapter() {
+			public void open(RepeatContext context) {
+				assertNotNull(StepSynchronizationManager.getContext()
+						.getStepExecution());
+				assertEquals(stepExecution, StepSynchronizationManager.getContext()
+						.getStepExecution());
 			}
 		});
 
