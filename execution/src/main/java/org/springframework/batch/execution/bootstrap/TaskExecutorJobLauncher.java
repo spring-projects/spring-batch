@@ -104,7 +104,7 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
 	 * @throws IllegalStateException
 	 *             if JobConfiguration is null.
 	 */
-	protected ExitStatus doRun(final JobIdentifier runtimeInformation) {
+	protected ExitStatus doRun(final JobIdentifier runtimeInformation, final Runnable exitCallback) {
 
 		Assert.state(taskExecutor != null, "TaskExecutor must be provided");
 
@@ -122,7 +122,7 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
 									"JobConfiguration could not be located inside Runnable for runtime information: ["
 											+ runtimeInformation + "]", e);
 				} finally {
-					unregister(runtimeInformation);
+					exitCallback.run();
 				}
 			}
 		});

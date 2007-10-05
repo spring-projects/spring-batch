@@ -62,20 +62,20 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	// later and then manually start:
 	private volatile boolean autoStart = false;
 
-	private JobIdentifierFactory jobRuntimeInformationFactory = new ScheduledJobIdentifierFactory();
+	private JobIdentifierFactory jobIdentifierFactory = new ScheduledJobIdentifierFactory();
 
 	// A private registry for keeping track of running jobs.
 	private volatile Map registry = new HashMap();
 
 	/**
-	 * Setter for {@link JobIdentifier}.
+	 * Setter for {@link JobIdentifierFactory}.
 	 * 
-	 * @param jobRuntimeInformationFactory
-	 *            the jobRuntimeInformationFactory to set
+	 * @param jobIdentifierFactory
+	 *            the {@link JobIdentifierFactory} to set
 	 */
 	public void setJobIdentifierFactory(
-			JobIdentifierFactory jobRuntimeInformationFactory) {
-		this.jobRuntimeInformationFactory = jobRuntimeInformationFactory;
+			JobIdentifierFactory jobIdentifierFactory) {
+		this.jobIdentifierFactory = jobIdentifierFactory;
 	}
 
 	/**
@@ -118,7 +118,8 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	}
 
 	/**
-	 * If autostart flag is on, initialise on context start-up and call {@link #run()}.
+	 * If autostart flag is on, initialise on context start-up and call
+	 * {@link #run()}.
 	 * 
 	 * @throws BatchConfigurationException
 	 *             if the job tries to but cannot start because of a
@@ -143,12 +144,16 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * Extension point for subclasses. Implementations might choose to start the
 	 * job in a new thread or in the current thread.<br/>
 	 * 
+	 * @param exitCallback
+	 *            a callback that should be called by the implementation after
+	 *            the job has ended
+	 * 
 	 * @param runtimeInformation
 	 *            the {@link JobIdentifier} to start the launcher with.
 	 * @throws NoSuchJobConfigurationException
 	 */
-	protected abstract ExitStatus doRun(JobIdentifier jobIdentifier)
-			throws NoSuchJobConfigurationException;
+	protected abstract ExitStatus doRun(JobIdentifier jobIdentifier,
+			Runnable exitCallback) throws NoSuchJobConfigurationException;
 
 	/**
 	 * Start the provided {@link JobIdentifier}.
@@ -159,7 +164,7 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 *             if JobConfiguration is null.
 	 * @see Lifecycle#start().
 	 */
-	public ExitStatus run(JobIdentifier jobIdentifier)
+	public ExitStatus run(final JobIdentifier jobIdentifier)
 			throws NoSuchJobConfigurationException {
 
 		synchronized (monitor) {
@@ -169,11 +174,15 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 		}
 
 		register(jobIdentifier);
-		return doRun(jobIdentifier);
+		return doRun(jobIdentifier, new Runnable() {
+			public void run() {
+				unregister(jobIdentifier);
+			}
+		});
 
 		/*
-		 * Subclasses have to take care of unregistering the jobIdentifier -
-		 * if we do it here and doRun() is implemented to return immediately
+		 * Subclasses have to take care of unregistering the jobIdentifier - if
+		 * we do it here and doRun() is implemented to return immediately
 		 * without waiting for the job to finish, then we will have a job
 		 * running that is not in the registry.
 		 */
@@ -188,10 +197,11 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * @throws NoSuchJobConfigurationException
 	 */
 	public ExitStatus run(String name) throws NoSuchJobConfigurationException {
-		if (name==null) {
-			throw new NoSuchJobConfigurationException("Null job name cannot be located.");
+		if (name == null) {
+			throw new NoSuchJobConfigurationException(
+					"Null job name cannot be located.");
 		}
-		JobIdentifier runtimeInformation = jobRuntimeInformationFactory
+		JobIdentifier runtimeInformation = jobIdentifierFactory
 				.getJobIdentifier(name);
 		return this.run(runtimeInformation);
 	}
@@ -213,7 +223,8 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 		if (jobConfigurationName != null) {
 			return this.run(jobConfigurationName);
 		}
-		throw new NoSuchJobConfigurationException("Null default job name cannot be located.");
+		throw new NoSuchJobConfigurationException(
+				"Null default job name cannot be located.");
 	}
 
 	/**
@@ -271,7 +282,7 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * @see org.springframework.batch.execution.bootstrap.JobLauncher#stop(java.lang.String)
 	 */
 	final public void stop(String name) throws NoSuchJobExecutionException {
-		this.stop(jobRuntimeInformationFactory.getJobIdentifier(name));
+		this.stop(jobIdentifierFactory.getJobIdentifier(name));
 	}
 
 	/*
@@ -300,11 +311,11 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * Convenient synchronized accessor for the registry. Can be used by
 	 * subclasses if necessary (but it isn't likely).
 	 * 
-	 * @param runtimeInformation
+	 * @param jobIdentifier
 	 */
-	protected void register(JobIdentifier runtimeInformation) {
+	private void register(JobIdentifier jobIdentifier) {
 		synchronized (registry) {
-			registry.put(runtimeInformation, runtimeInformation);
+			registry.put(jobIdentifier, jobIdentifier);
 		}
 	}
 
@@ -313,11 +324,11 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * subclasses to release the {@link JobIdentifier} when a job is finished
 	 * (or stopped).
 	 * 
-	 * @param runtimeInformation
+	 * @param jobIdentifier
 	 */
-	protected void unregister(JobIdentifier runtimeInformation) {
+	private void unregister(JobIdentifier jobIdentifier) {
 		synchronized (registry) {
-			registry.remove(runtimeInformation);
+			registry.remove(jobIdentifier);
 		}
 	}
 
