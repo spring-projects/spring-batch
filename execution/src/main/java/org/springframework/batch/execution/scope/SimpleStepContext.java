@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
 
 /**
@@ -36,7 +36,7 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 
 	private Map callbacks = new HashMap();
 	private StepContext parent;
-	private JobIdentifier jobIdentifier;
+	private StepExecution stepExecution;
 	
 	/**
 	 * Default constructor.
@@ -123,17 +123,17 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 
 
 	/**
-	 * @param jobIdentifier
+	 * @param stepExecution
 	 */
-	public void setJobIdentifier(JobIdentifier jobIdentifier) {
-		this.jobIdentifier = jobIdentifier;
+	public void setStepExecution(StepExecution stepExecution) {
+		this.stepExecution = stepExecution;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.execution.scope.StepContext#getJobIdentifier()
 	 */
-	public JobIdentifier getJobIdentifier() {
-		return jobIdentifier;
+	public StepExecution getStepExecution() {
+		return stepExecution;
 	}
 
 }

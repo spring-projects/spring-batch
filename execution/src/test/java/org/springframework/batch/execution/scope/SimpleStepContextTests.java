@@ -20,13 +20,13 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
+import org.springframework.batch.core.domain.StepExecution;
 
 /**
  * @author Dave Syer
  *
  */
-public class StepScopeContextTests extends TestCase {
+public class SimpleStepContextTests extends TestCase {
 
 	private SimpleStepContext context = new SimpleStepContext(new SimpleStepContext());
 	
@@ -45,12 +45,12 @@ public class StepScopeContextTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.scope.SimpleStepContext#getJobIdentifier()}.
+	 * Test method for {@link org.springframework.batch.execution.scope.SimpleStepContext#getStepExecution()}.
 	 */
 	public void testGetJobIdentifier() {
-		assertNull(context.getJobIdentifier());
-		context.setJobIdentifier(new SimpleJobIdentifier("bar"));
-		assertEquals("bar", context.getJobIdentifier().getName());
+		assertNull(context.getStepExecution());
+		context.setStepExecution(new StepExecution(null, null));
+		assertNotNull(context.getStepExecution());
 	}
 
 	private List list = new ArrayList();

@@ -148,7 +148,7 @@ public class DefaultStepExecutorTests extends TestCase {
 				assertEquals(1, jobExecution.getChunkContexts().size());
 				assertEquals(1, jobExecution.getStepContexts().size());
 				assertNotNull(StepSynchronizationManager.getContext()
-						.getJobIdentifier());
+						.getStepExecution());
 				processed.add("foo");
 				return ExitStatus.CONTINUABLE;
 			}

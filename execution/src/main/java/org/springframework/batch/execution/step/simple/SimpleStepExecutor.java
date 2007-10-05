@@ -182,7 +182,7 @@ public class SimpleStepExecutor implements StepExecutor {
 							stepExecution.getJobExecution().unregisterStepContext(context);
 						}
 					});
-					stepScopeContext.setJobIdentifier(stepExecution.getJobExecution().getJobIdentifier());
+					stepScopeContext.setStepExecution(stepExecution);
 					context.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution()
 							.getJobIdentifier());
 					// Mark the context as a step context as a hint to scope

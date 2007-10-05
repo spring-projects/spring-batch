@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.execution.scope;
 
-import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.core.AttributeAccessor;
 
 /**
@@ -27,12 +27,12 @@ import org.springframework.core.AttributeAccessor;
 public interface StepContext extends AttributeAccessor {
 
 	/**
-	 * Accessor for the {@link JobIdentifier} associated with the currently
+	 * Accessor for the {@link StepExecution} associated with the currently
 	 * executing step.
 	 * 
-	 * @return the {@link JobIdentifier} associated with the current step
+	 * @return the {@link StepExecution} associated with the current step
 	 */
-	JobIdentifier getJobIdentifier();
+	StepExecution getStepExecution();
 	
 	/**
 	 * Accessor for the parent context.
