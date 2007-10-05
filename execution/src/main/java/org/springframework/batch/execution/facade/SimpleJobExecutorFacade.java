@@ -126,7 +126,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 		JobConfiguration jobConfiguration = jobConfigurationLocator
 				.getJobConfiguration(jobIdentifier.getName());
 
-		final JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobIdentifier);
+		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobIdentifier);
 		JobExecution jobExecution = jobExecutionRegistry.register(job);
 		
 		ExitStatus exitStatus = ExitStatus.FAILED;
@@ -161,7 +161,6 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 			RepeatContext context = (RepeatContext) iter.next();
 			context.setTerminateOnly();
 		}
-		;
 		for (Iterator iter = jobExecutionContext.getChunkContexts().iterator(); iter.hasNext();) {
 			RepeatContext context = (RepeatContext) iter.next();
 			context.setTerminateOnly();
