@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-infrastructure</artifactId>
@@ -90,21 +92,21 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-	        <groupId>org.springframework.ws</groupId>
+			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-oxm</artifactId>
-	        <version>1.0.0</version>
-	        <optional>true</optional>
-	        <exclusions>
-	        	<exclusion>
+			<version>1.0.0</version>
+			<optional>true</optional>
+			<exclusions>
+				<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring-beans</artifactId>
-	        	</exclusion>
-	        	<exclusion>
+				</exclusion>
+				<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring-core</artifactId>
-	        	</exclusion>
-	        </exclusions>
-		</dependency>		
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -113,7 +115,9 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clover-plugin</artifactId>
 				<configuration>
-					<licenseLocation>${basedir}/src/test/resources/clover.license</licenseLocation>
+					<licenseLocation>
+						${basedir}/src/test/resources/clover.license
+					</licenseLocation>
 				</configuration>
 				<executions>
 					<execution>
