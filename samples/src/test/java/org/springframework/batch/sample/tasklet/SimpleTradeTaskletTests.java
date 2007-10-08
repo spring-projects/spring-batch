@@ -16,25 +16,24 @@ public class SimpleTradeTaskletTests extends TestCase {
 	private boolean writerCalled = false;
 
 	public void testReadAndProcess() throws Exception {
-		
+
 		//create input
 		DefaultFlatFileInputSource input = new DefaultFlatFileInputSource() {
-			
+
 			private boolean done = false;
-			
-			public FieldSet readFieldSet() {
+
+			public Object read() {
 				if (!done) {
-					FieldSet fs = new FieldSet(new String[] {"1234","5","100","testName"},
-							   new String[] {"ISIN", "quantity", "price", "customer"});
+					Trade trade = new Trade("1234", 5, new BigDecimal(100), "testName");
 					inputCalled = true;
 					done = true;
-					return fs;
+					return trade;
 				} else {
 					return null;
 				}
 			}
 		};
-		
+
 		//create writer
 		TradeWriter writer = new TradeWriter() {
 			public void writeTrade(Trade trade) {
@@ -46,22 +45,22 @@ public class SimpleTradeTaskletTests extends TestCase {
 			}
 			public void write(Object output) {}
 			public void close() {}
-			public void open() {}			
+			public void open() {}
 		};
-		
+
 		//create module
 		SimpleTradeTasklet module = new SimpleTradeTasklet();
 		module.setInputSource(input);
 		module.setTradeDao(writer);
-		
+
 		//call tested methods
-		//read method should return true, because input returned fieldset 
+		//read method should return true, because input returned fieldset
 		assertTrue(module.execute().isContinuable());
-		
+
 		//verify whether input and writer were called
 		assertTrue(inputCalled);
 		assertTrue(writerCalled);
-		
+
 		//read should return false, because input returned null
 		assertFalse(module.execute().isContinuable());
 	}

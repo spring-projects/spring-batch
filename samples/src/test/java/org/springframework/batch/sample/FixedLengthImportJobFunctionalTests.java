@@ -21,23 +21,25 @@ import java.io.FileReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.file.FieldSet;
-import org.springframework.batch.io.file.FieldSetInputSource;
+import org.springframework.batch.io.file.support.DefaultFlatFileInputSource;
 import org.springframework.batch.item.ResourceLifecycle;
+import org.springframework.batch.sample.domain.Trade;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 public class FixedLengthImportJobFunctionalTests extends AbstractLifecycleSpringContextTests {
-	
+
 	//expected line length in input file (sum of pattern lengths + 2, because the counter is appended twice)
 	private static final int LINE_LENGTH = 29;
 
 	//auto-injected attributes
 	private JdbcOperations jdbcTemplate;
 	private Resource fileLocator;
-	private FieldSetInputSource inputSource; 
-	
+	private DefaultFlatFileInputSource inputSource;
+
 	protected void onSetUp() throws Exception {
 		super.onSetUp();
 		jdbcTemplate.update("delete from TRADE");
@@ -51,21 +53,21 @@ public class FixedLengthImportJobFunctionalTests extends AbstractLifecycleSpring
 	 * check that records have been correctly written to database
 	 */
 	protected void validatePostConditions() {
-		
-		((ResourceLifecycle) inputSource).open();
-		
+
+		inputSource.open();
+
 		jdbcTemplate.query("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", new RowCallbackHandler() {
-			
+
 			public void processRow(ResultSet rs) throws SQLException {
-				FieldSet fieldSet = inputSource.readFieldSet();
-				assertEquals(fieldSet.readString(0), rs.getString(2));
-				assertEquals(fieldSet.readLong(1),rs.getLong(3));
-				assertEquals(fieldSet.readBigDecimal(2), rs.getBigDecimal(4));
-				assertEquals(fieldSet.readString(3), rs.getString(5));
+				Trade trade = (Trade)inputSource.read();
+				assertEquals(trade.getIsin(), rs.getString(2));
+				assertEquals(trade.getQuantity(),rs.getLong(3));
+				assertEquals(trade.getPrice(), rs.getBigDecimal(4));
+				assertEquals(trade.getCustomer(), rs.getString(5));
 			}
-			
+
 		});
-		
+
 		assertNull(inputSource.read());
 	}
 
@@ -89,8 +91,8 @@ public class FixedLengthImportJobFunctionalTests extends AbstractLifecycleSpring
 	public void setFileLocator(Resource fileLocator) {
 		this.fileLocator = fileLocator;
 	}
-	
-	public void setFieldSetInputSource(FieldSetInputSource inputSource){
+
+	public void setDefaultFlatFileInputSource(DefaultFlatFileInputSource inputSource){
 		this.inputSource = inputSource;
 	}
 }

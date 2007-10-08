@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
@@ -10,7 +10,7 @@
 		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
 	</bean>
 
-	<bean id="jobConfiguration" parent="simpleJob">
+	<bean id="simpleTrade" parent="simpleJob">
 		<property name="steps">
 			<list>
 				<bean id="step1" parent="simpleStep">
@@ -38,13 +38,8 @@
 	<bean id="abstractInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
 		abstract="true">
 		<property name="resource" ref="fileLocator" />
-		<property name="tokenizer" ref="fixedFileDescriptor" />
-	</bean>
-	
-	<bean id="fileLocator" class="org.springframework.core.io.ClassPathResource">
-		<constructor-arg>
-			<value>/data/simpleTaskletJob/input/20070122.teststream.ImportTradeDataStep.txt</value>
-		</constructor-arg>
+		<property name="tokenizer" ref="tradeTokenizer" />
+		<property name="fieldSetMapper" ref="tradeMapper" />
 	</bean>
 
 	<!-- TODO: refactor this to use aop:scoped-proxy when SPR-3804 is fixed -->
@@ -54,26 +49,33 @@
 		<property name="targetBeanName" value="scopedInputTemplate"/>
 	</bean>
 
-	<bean id="testInputTemplate" parent="abstractInputTemplate"/>
+	<bean id="testInputTemplate" parent="abstractInputTemplate" />
 
-	<bean id="fixedFileDescriptor" class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
+	<bean id="tradeMapper" class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
+
+	<bean id="fileLocator" class="org.springframework.core.io.ClassPathResource">
+		<constructor-arg type="java.lang.String"
+			value="/data/simpleTaskletJob/input/20070122.teststream.ImportTradeDataStep.txt" />
+	</bean>
+
+	<bean id="tradeTokenizer" class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
 		<property name="names" value="ISIN, Quantity, Price, Customer" />
 		<property name="lengths" value="12, 3, 5, 9" />
 	</bean>
-	
-	<bean id="tradeLogAdvice" 
-	 	class="org.springframework.batch.sample.advice.TradeWriterLogAdvice" /> 
-	 
+
+	<bean id="tradeLogAdvice"
+	 	class="org.springframework.batch.sample.advice.TradeWriterLogAdvice" />
+
 	<aop:config>
 		<aop:aspect id="tradeWriterLogging" ref="tradeLogAdvice">
-		   
+
 		    <aop:after
 		      pointcut="execution( * org.springframework.batch.sample.dao.TradeWriter+.writeTrade(org.springframework.batch.sample.domain.Trade)) and args(trade)"
 		      method="doBasicLogging" />
-		      
+
 		</aop:aspect>
 	</aop:config>
-	
+
 	<bean parent="customEditorConfigurer"/>
 
 	<!-- register the step scope with the application context -->

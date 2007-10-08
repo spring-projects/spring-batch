@@ -14,14 +14,13 @@
 	<bean id="jobConfiguration" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
-				<constructor-arg>   
+				<constructor-arg>
 					<bean
 						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 						<property name="itemProvider">
 							<bean
-								class="org.springframework.batch.item.provider.FlatFileItemProvider">
-								<property name="source" ref="fileInputTemplate" />
-								<property name="mapper" ref="fieldSetMapper" />
+								class="org.springframework.batch.item.provider.ValidatingItemProvider">
+								<property name="inputSource" ref="fileInputTemplate" />
 								<property name="validator" ref="fixedValidator" />
 							</bean>
 						</property>
@@ -32,7 +31,7 @@
 										<bean class="org.springframework.batch.sample.item.processor.TradeProcessor">
 											<property name="writer" ref="tradeDao" />
 										</bean>
-										
+
 										<bean class="org.springframework.batch.item.processor.OutputSourceItemProcessor">
 											<property name="outputSource" ref="flatFileOutputSource" />
 										</bean>
@@ -53,6 +52,7 @@
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
+		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 
 	<bean id="fixedFileDescriptor" class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
@@ -83,11 +83,11 @@
 
 		</property>
 	</bean>
-	
+
 	<bean class="org.springframework.batch.io.file.support.FlatFileOutputSource" id="flatFileOutputSource">
 		<property name="resource" ref="customerFileLocator" />
 	</bean>
-	
+
 	<bean id="customerFileLocator" class="org.springframework.core.io.FileSystemResource">
 		<constructor-arg type="java.lang.String" value="20070122.testStream.ParallelCustomerReportStep.TEMP.txt" />
 	</bean>
@@ -103,5 +103,5 @@
 
 	<!-- register the step scope with the application context -->
 	<bean class="org.springframework.batch.execution.scope.StepScope" />
-	
+
 </beans>

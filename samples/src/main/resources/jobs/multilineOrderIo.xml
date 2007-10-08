@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans 	xmlns="http://www.springframework.org/schema/beans" 
+<beans 	xmlns="http://www.springframework.org/schema/beans"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xmlns:p="http://www.springframework.org/schema/p"
 		xmlns:aop="http://www.springframework.org/schema/aop"
-		xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		xsi:schemaLocation="http://www.springframework.org/schema/beans
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
@@ -13,6 +13,9 @@
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileInputLocator" />
 		<property name="tokenizer" ref="orderFileDescriptor" />
+		<property name="fieldSetMapper">
+			<bean class="org.springframework.batch.sample.mapping.PassThroughFieldSetMapper" />
+		</property>
 	</bean>
 
 	<bean id="flatFileOutputSource" class="org.springframework.batch.io.file.support.FlatFileOutputSource"
@@ -24,5 +27,5 @@
 	<bean id="delimitedLineAggregator" class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer" />
 
 	<bean id="fixedLineAggregator" class="org.springframework.batch.io.file.support.transform.FixedLengthLineAggregator" />
-	
+
 </beans>

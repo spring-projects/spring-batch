@@ -18,9 +18,8 @@
 					<bean class="org.springframework.batch.sample.tasklet.ExceptionRestartableTasklet">
 						<property name="itemProvider">
 							<bean
-								class="org.springframework.batch.item.provider.FlatFileItemProvider">
-								<property name="source" ref="fileInputTemplate" />
-								<property name="mapper" ref="fieldSetMapper" />
+								class="org.springframework.batch.item.provider.ValidatingItemProvider">
+								<property name="inputSource" ref="fileInputSource" />
 								<property name="validator" ref="fixedValidator" />
 							</bean>
 						</property>
@@ -41,11 +40,12 @@
 
 	<!-- INFRASTRUCTURE SETUP -->
 
-	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
+	<bean id="fileInputSource" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
 		scope="step" >
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
+		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 
 	<bean id="fixedFileDescriptor" class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">

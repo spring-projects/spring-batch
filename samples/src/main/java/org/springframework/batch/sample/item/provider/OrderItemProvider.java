@@ -22,8 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.file.FieldSet;
-import org.springframework.batch.io.file.FieldSetInputSource;
 import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.item.provider.AbstractItemProvider;
 import org.springframework.batch.item.validator.Validator;
@@ -42,7 +42,7 @@ import org.springframework.batch.sample.domain.ShippingInfo;
  */
 public class OrderItemProvider extends AbstractItemProvider {
     private static Log log = LogFactory.getLog(OrderItemProvider.class);
-    private FieldSetInputSource inputSource;
+    private InputSource inputSource;
     private Order order;
     private boolean recordFinished;
     private FieldSetMapper headerMapper;
@@ -60,7 +60,7 @@ public class OrderItemProvider extends AbstractItemProvider {
         recordFinished = false;
 
         while (!recordFinished) {
-            process(inputSource.readFieldSet());
+            process((FieldSet)inputSource.read());
         }
 
         if (order!=null) {
@@ -70,7 +70,7 @@ public class OrderItemProvider extends AbstractItemProvider {
 
         Object result = order;
         order = null;
-        
+
         return result;
     }
 
@@ -88,7 +88,7 @@ public class OrderItemProvider extends AbstractItemProvider {
         }
 
         String lineId = fieldSet.readString(0);
-        
+
         //start a new Order
         if (Order.LINE_ID_HEADER.equals(lineId)) {
             log.debug("STARTING NEW RECORD");
@@ -119,7 +119,7 @@ public class OrderItemProvider extends AbstractItemProvider {
                 order.setCustomer((Customer) customerMapper.mapLine(fieldSet));
                 order.getCustomer().setBusinessCustomer(true);
             }
-            
+
             return;
         }
 
@@ -130,7 +130,7 @@ public class OrderItemProvider extends AbstractItemProvider {
                 order.setCustomer((Customer) customerMapper.mapLine(fieldSet));
                 order.getCustomer().setBusinessCustomer(false);
             }
-            
+
             return;
         }
 
@@ -166,10 +166,10 @@ public class OrderItemProvider extends AbstractItemProvider {
             }
 
             order.getLineItems().add(itemMapper.mapLine(fieldSet));
-            
+
             return;
         }
-        
+
         log.debug("Could not map LINE_ID="+lineId);
 
     }
@@ -190,8 +190,8 @@ public class OrderItemProvider extends AbstractItemProvider {
         this.headerMapper = headerMapper;
     }
 
-    public void setInputSource(FieldSetInputSource inputTemplate) {
-        this.inputSource = inputTemplate;
+    public void setInputSource(InputSource inputSource) {
+        this.inputSource = inputSource;
     }
 
     public void setItemMapper(FieldSetMapper itemMapper) {
@@ -205,5 +205,5 @@ public class OrderItemProvider extends AbstractItemProvider {
     public void setValidator(Validator validator) {
         this.validator = validator;
     }
-    
+
 }

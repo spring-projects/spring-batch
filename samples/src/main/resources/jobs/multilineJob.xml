@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
@@ -18,7 +18,7 @@
 						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 						<property name="itemProvider">
 							<bean class="org.springframework.batch.sample.item.provider.CollectionItemProvider">
-								<property name="inputSource" ref="fileInputTemplate" />
+								<property name="inputSource" ref="fileInputSource" />
 								<property name="fieldSetMapper" ref="tradeLineMapper" />
 							</bean>
 						</property>
@@ -39,11 +39,14 @@
 		</property>
 	</bean>
 
-	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
+	<bean id="fileInputSource" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource" value="classpath:data/multilineJob/input/20070122.teststream.multilineStep.txt" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
+		<property name="fieldSetMapper">
+			<bean class="org.springframework.batch.sample.mapping.PassThroughFieldSetMapper" />
+		</property>
 		<!-- <property name="validator" ref="fixedValidator" /> -->
 	</bean>
 
@@ -68,18 +71,18 @@
 	<bean id="endRecordDescriptor"
 		class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
 		<property name="lengths" value="3" />
-	</bean>  
+	</bean>
 
 	<bean id="tradeRecordDescriptor"
 		class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
 		<property name="names" value="ISIN,Quantity,Price,Customer" />
 		<property name="lengths" value="12,3,5,9" />
 	</bean>
-	
+
 	<bean parent="customEditorConfigurer"/>
 
 	<!-- register the step scope with the application context -->
 	<bean class="org.springframework.batch.execution.scope.StepScope" />
-	
+
 
 </beans>

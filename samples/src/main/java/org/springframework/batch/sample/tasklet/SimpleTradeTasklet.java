@@ -34,34 +34,25 @@ import org.springframework.batch.statistics.StatisticsProvider;
  * reading and processing logic need not to be reused in different contexts. In
  * general it is recommended to separate these two concerns using an
  * {@link ItemProviderProcessTasklet}.
- * 
+ *
  * Note this class is thread-safe, as per the 'standard' module implementations
  * provided by the framework.
- * 
+ *
  * @author Robert Kasanicky
  * @author Lucas Ward
  * @author Dave Syer
  */
 public class SimpleTradeTasklet implements Tasklet, StatisticsProvider {
-	/**
+
+	/*
 	 * reads the data from input file
 	 */
 	private DefaultFlatFileInputSource inputSource;
 
-	/**
-	 * maps a line to a Trade object
-	 */
-	private FieldSetMapper tradeFieldSetMapper = new TradeFieldSetMapper();
-
-	/**
+	/*
 	 * writes a Trade object to output
 	 */
 	private TradeWriter tradeWriter;
-
-	/**
-	 * domain object being processed
-	 */
-	private Trade trade;
 
 	/**
 	 * number of trade objects processed
@@ -75,7 +66,7 @@ public class SimpleTradeTasklet implements Tasklet, StatisticsProvider {
 	 * written out without any processing.
 	 */
 	public ExitStatus execute() throws Exception {
-		trade = (Trade) tradeFieldSetMapper.mapLine(inputSource.readFieldSet());
+		Trade trade = (Trade)inputSource.read();
 
 		if (trade == null) {
 			// no Trade object returned, reading input is finished
@@ -85,30 +76,6 @@ public class SimpleTradeTasklet implements Tasklet, StatisticsProvider {
 		tradeCount++;
 		tradeWriter.writeTrade(trade);
 		return ExitStatus.CONTINUABLE;
-	}
-
-	/**
-	 * Inner class which implements the FieldSetMapper interface. It contains
-	 * one method, mapLine, which accepts a FieldSet as a parameter. This method
-	 * will be called by the inputSource when it is passed in.
-	 * 
-	 */
-	private static class TradeFieldSetMapper implements FieldSetMapper {
-		public Object mapLine(FieldSet fieldSet) {
-
-			if (fieldSet == null) {
-				return null;
-			}
-
-			Trade trade = new Trade();
-			trade.setIsin(fieldSet.readString("ISIN"));
-			trade.setQuantity(fieldSet.readLong(1));
-			trade.setPrice(fieldSet.readBigDecimal(2));
-			trade.setCustomer(fieldSet.readString(3));
-
-			return trade;
-
-		}
 	}
 
 	public void setInputSource(DefaultFlatFileInputSource inputTemplate) {

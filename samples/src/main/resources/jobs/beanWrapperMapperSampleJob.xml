@@ -20,9 +20,8 @@
 							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.item.provider.FlatFileItemProvider">
-									<property name="source" ref="fileInputTemplate" />
-									<property name="mapper" ref="fieldSetMapper" />
+									class="org.springframework.batch.item.provider.ValidatingItemProvider">
+									<property name="inputSource" ref="fileInputTemplate" />
 									<property name="validator" ref="fixedValidator" />
 								</bean>
 							</property>
@@ -40,9 +39,8 @@
 							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.item.provider.FlatFileItemProvider">
-									<property name="source" ref="fileInputTemplate2" />
-									<property name="mapper" ref="fieldSetMapper2" />
+									class="org.springframework.batch.item.provider.InputSourceItemProvider">
+									<property name="inputSource" ref="fileInputTemplate2" />
 								</bean>
 							</property>
 							<property name="itemProcessor">
@@ -63,6 +61,7 @@
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
+		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 
 	<bean id="fileInputTemplate2" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
@@ -70,6 +69,7 @@
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator2" />
 		<property name="tokenizer" ref="fixedFileDescriptor2" />
+		<property name="fieldSetMapper" ref="fieldSetMapper2" />
 <!--		<property name="validator" ref="fixedValidator" />-->
 	</bean>
 

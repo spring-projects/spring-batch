@@ -19,9 +19,8 @@
 						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 						<property name="itemProvider">
 							<bean
-								class="org.springframework.batch.item.provider.FlatFileItemProvider">
-								<property name="source" ref="fileInputTemplate" />
-								<property name="mapper" ref="fieldSetMapper" />
+								class="org.springframework.batch.item.provider.ValidatingItemProvider">
+								<property name="inputSource" ref="fileInputTemplate" />
 								<property name="validator" ref="fixedValidator" />
 							</bean>
 						</property>
@@ -42,6 +41,7 @@
 		abstract="true">
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
+		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 
 	<!-- TODO: refactor this to use aop:scoped-proxy when SPR-3804 is fixed -->
@@ -51,7 +51,7 @@
 		<property name="targetBeanName" value="scopedInputTemplate"/>
 	</bean>
 
-	<bean id="testInputTemplate" parent="abstractInputTemplate"/>
+	<bean id="testInputTemplate" parent="abstractInputTemplate" />
 
 	<bean id="fixedFileDescriptor" class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
 		<property name="names" value="ISIN, Quantity, Price, Customer" />

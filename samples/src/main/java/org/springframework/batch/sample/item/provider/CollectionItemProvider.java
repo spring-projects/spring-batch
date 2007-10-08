@@ -23,7 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.file.FieldSet;
-import org.springframework.batch.io.file.FieldSetInputSource;
 import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.item.ItemProvider;
 import org.springframework.batch.item.provider.AbstractItemProvider;
@@ -32,32 +31,32 @@ import org.springframework.batch.item.provider.AbstractItemProvider;
  * An {@link ItemProvider} that delivers a list as its item, storing up objects
  * from the injected {@link InputSource} until they are ready to be packed out
  * as a collection.<br/>
- * 
+ *
  * This class is thread safe (it can be used concurrently by multiple threads) as
  * long as the {@link InputSource} is also thread safe.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class CollectionItemProvider extends AbstractItemProvider {
 
 	private static final Log log = LogFactory
 			.getLog(CollectionItemProvider.class);
 
-	private FieldSetInputSource inputSource;
+	private InputSource inputSource;
 
 	// maps a single line to a simple record
 	private FieldSetMapper fieldSetMapper;
 
 	/**
 	 * Get the next list of records.
-	 * 
+	 *
 	 * @see org.springframework.batch.item.ItemProvider#next()
 	 */
 	public Object next() {
 		ResultHolder holder = new ResultHolder();
 
-		while (process(inputSource.readFieldSet(), holder)) {
+		while (process((FieldSet)inputSource.read(), holder)) {
 			continue;
 		}
 
@@ -98,7 +97,7 @@ public class CollectionItemProvider extends AbstractItemProvider {
 	 * Injection setter for {@link InputSource}.
 	 * @param inputSource an {@link InputSource}.
 	 */
-	public void setInputSource(FieldSetInputSource inputSource) {
+	public void setInputSource(InputSource inputSource) {
 		this.inputSource = inputSource;
 	}
 
@@ -109,9 +108,9 @@ public class CollectionItemProvider extends AbstractItemProvider {
 	/**
 	 * Private class for temporary state management while item is being
 	 * collected.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private class ResultHolder {
 		Collection records = new ArrayList();

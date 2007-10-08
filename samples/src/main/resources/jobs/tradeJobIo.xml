@@ -32,6 +32,9 @@
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="tradeFileDescriptor" />
+		<property name="fieldSetMapper">
+			<bean class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
+		</property>
 	</bean>
 
 	<bean id="tradeFileDescriptor"

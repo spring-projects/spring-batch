@@ -3,7 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
        		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        		http://www.springframework.org/schema/aop
  			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
@@ -27,13 +27,9 @@
 							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.item.provider.FlatFileItemProvider">
-									<property name="source"
+									class="org.springframework.batch.item.provider.ValidatingItemProvider">
+									<property name="inputSource"
 										ref="fileInputTemplate" />
-									<property name="mapper">
-										<bean
-											class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
-									</property>
 									<property name="validator"
 										ref="tradeValidator" />
 								</bean>
@@ -127,6 +123,6 @@
 
 	<!-- register the step scope with the application context -->
 	<bean class="org.springframework.batch.execution.scope.StepScope" />
-	
+
 
 </beans>
