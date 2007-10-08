@@ -19,17 +19,18 @@ package org.springframework.batch.repeat.support;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.file.FieldSet;
+import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.io.file.support.SimpleFlatFileInputSource;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.provider.AbstractFieldSetItemProvider;
+import org.springframework.batch.item.provider.InputSourceItemProvider;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 /**
  * Base class for simple tests with small trade data set.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public abstract class AbstractTradeBatchTests extends TestCase {
 
@@ -46,18 +47,21 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 		provider = new TradeItemProvider(resource);
 	}
 
-	protected static class TradeItemProvider extends AbstractFieldSetItemProvider {
+	protected static class TradeItemProvider extends InputSourceItemProvider {
 
 		protected TradeItemProvider(Resource resource) throws Exception {
 			super();
-			SimpleFlatFileInputSource template = new SimpleFlatFileInputSource();
-			template.setResource(resource);
-			template.afterPropertiesSet();
-			setSource(template);
+			SimpleFlatFileInputSource inputSource = new SimpleFlatFileInputSource();
+			inputSource.setResource(resource);
+			inputSource.setFieldSetMapper(new TradeMapper());
+			inputSource.afterPropertiesSet();
+			setInputSource(inputSource);
 		}
+	}
 
-		protected Object transform(FieldSet fieldSet) {
-			return new Trade(fieldSet);
+	protected static class TradeMapper implements FieldSetMapper{
+		public Object mapLine(FieldSet fs) {
+			return new Trade(fs);
 		}
 	}
 

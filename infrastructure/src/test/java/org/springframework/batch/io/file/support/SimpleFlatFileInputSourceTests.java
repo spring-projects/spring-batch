@@ -23,8 +23,10 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.exception.BatchEnvironmentException;
+import org.springframework.batch.io.exception.FlatFileParsingException;
 import org.springframework.batch.io.exception.ValidationException;
 import org.springframework.batch.io.file.FieldSet;
+import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.io.file.support.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.io.file.support.transform.LineTokenizer;
 import org.springframework.core.io.ByteArrayResource;
@@ -33,14 +35,14 @@ import org.springframework.core.io.Resource;
 
 /**
  * Tests for {@link SimpleFlatFileInputSourceTests}
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class SimpleFlatFileInputSourceTests extends TestCase {
 
 	// object under test
-	private SimpleFlatFileInputSource template = new SimpleFlatFileInputSource();
+	private SimpleFlatFileInputSource inputSource = new SimpleFlatFileInputSource();
 
 	// common value used for writing to a file
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
@@ -52,26 +54,33 @@ public class SimpleFlatFileInputSourceTests extends TestCase {
 		}
 	};
 
+	private FieldSetMapper fieldSetMapper = new FieldSetMapper(){
+		public Object mapLine(FieldSet fs) {
+			return fs;
+		}
+	};
+
 	/**
 	 * Create inputFile, inject mock/stub dependencies for tested object,
 	 * initialize the tested object
 	 */
 	protected void setUp() throws Exception {
 
-		template.setResource(getInputResource(TEST_STRING));
-		template.setTokenizer(tokenizer);
-		template.afterPropertiesSet();
+		inputSource.setResource(getInputResource(TEST_STRING));
+		inputSource.setTokenizer(tokenizer);
+		inputSource.setFieldSetMapper(fieldSetMapper);
+		inputSource.afterPropertiesSet();
 
 		// context argument is necessary only for the FileLocator, which
 		// is mocked
-		template.open();
+		inputSource.open();
 	}
 
 	/**
 	 * Release resources.
 	 */
 	protected void tearDown() throws Exception {
-		template.close();
+		inputSource.close();
 	}
 
 	private Resource getInputResource(String input) {
@@ -81,72 +90,81 @@ public class SimpleFlatFileInputSourceTests extends TestCase {
 	/**
 	 * Regular usage of <code>read</code> method
 	 */
-	public void testReadFieldSet() throws IOException {
-		assertEquals("[FlatFileInputTemplate-TestData]", template.readFieldSet().toString());
-	}
-
-	/**
-	 * Regular usage of <code>read</code> method
-	 */
 	public void testRead() throws IOException {
-		assertEquals("[FlatFileInputTemplate-TestData]", template.read().toString());
+		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
 	}
 
 	/**
 	 * Regular usage of <code>read</code> method
 	 */
 	public void testReadExhausted() throws IOException {
-		assertEquals("[FlatFileInputTemplate-TestData]", template.read().toString());
-		assertEquals(null, template.read());
+		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
+		assertEquals(null, inputSource.read());
 	}
 
 	/**
 	 * Regular usage of <code>read</code> method
 	 */
-	public void testReadWithError() throws IOException {
-		template.setTokenizer(new LineTokenizer() {
+	public void testReadWithTokenizerError() throws IOException {
+		inputSource.setTokenizer(new LineTokenizer() {
 			public FieldSet tokenize(String line) {
 				throw new RuntimeException("foo");
 			}
 		});
 		try {
-			template.read();
-			fail("Expected ValidationException");
-		} catch (ValidationException e) {
-			assertTrue(e.getMessage().indexOf("at line")>=0);
-			assertTrue(e.getMessage().indexOf("at line 1")>=0);
+			inputSource.read();
+			fail("Expected ParsingException");
+		} catch (FlatFileParsingException e) {
+			assertEquals(e.getInput(), TEST_STRING);
+			assertEquals(e.getLineNumber(), 1);
+		}
+	}
+
+	public void testReadWithMapperError() throws IOException {
+		inputSource.setFieldSetMapper(new FieldSetMapper(){
+			public Object mapLine(FieldSet fs) {
+				throw new RuntimeException("foo");
+			}
+		});
+
+		try {
+			inputSource.read();
+			fail("Expected ParsingException");
+		} catch (FlatFileParsingException e) {
+			assertEquals(e.getInput(), TEST_STRING);
+			assertEquals(e.getLineNumber(), 1);
 		}
 	}
 
 	public void testReadBeforeOpen() throws Exception {
-		template = new SimpleFlatFileInputSource();
-		template.setResource(getInputResource(TEST_STRING));
-		assertEquals("[FlatFileInputTemplate-TestData]", template.readFieldSet().toString());
+		inputSource = new SimpleFlatFileInputSource();
+		inputSource.setResource(getInputResource(TEST_STRING));
+		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
 	}
 
 	public void testCloseBeforeOpen() throws Exception {
-		template = new SimpleFlatFileInputSource();
-		template.setResource(getInputResource(TEST_STRING));
-		template.close();
+		inputSource = new SimpleFlatFileInputSource();
+		inputSource.setResource(getInputResource(TEST_STRING));
+		inputSource.close();
 		// The open still happens automatically on a read...
-		assertEquals("[FlatFileInputTemplate-TestData]", template.readFieldSet().toString());
+		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
 	}
 
 	public void testCloseOnDestroy() throws Exception {
 		final List list = new ArrayList();
-		template = new SimpleFlatFileInputSource() {
+		inputSource = new SimpleFlatFileInputSource() {
 			public void close() {
 				list.add("close");
 			}
 		};
-		template.destroy();
+		inputSource.destroy();
 		assertEquals(1, list.size());
 	}
 
 	public void testInitializationWithNullResource() throws Exception {
-		template = new SimpleFlatFileInputSource();
+		inputSource = new SimpleFlatFileInputSource();
 		try {
-			template.afterPropertiesSet();
+			inputSource.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
@@ -155,23 +173,23 @@ public class SimpleFlatFileInputSourceTests extends TestCase {
 	}
 
 	public void testOpenTwiceHasNoEffect() throws Exception {
-		template.open();
+		inputSource.open();
 		testRead();
 	}
 
 	public void testSetValidEncoding() throws Exception {
-		template = new SimpleFlatFileInputSource();
-		template.setEncoding("UTF-8");
-		template.setResource(getInputResource(TEST_STRING));
+		inputSource = new SimpleFlatFileInputSource();
+		inputSource.setEncoding("UTF-8");
+		inputSource.setResource(getInputResource(TEST_STRING));
 		testRead();
 	}
 
 	public void testSetNullEncoding() throws Exception {
-		template = new SimpleFlatFileInputSource();
-		template.setEncoding(null);
-		template.setResource(getInputResource(TEST_STRING));
+		inputSource = new SimpleFlatFileInputSource();
+		inputSource.setEncoding(null);
+		inputSource.setResource(getInputResource(TEST_STRING));
 		try {
-			template.open();
+			inputSource.open();
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
@@ -180,11 +198,11 @@ public class SimpleFlatFileInputSourceTests extends TestCase {
 	}
 
 	public void testSetInvalidEncoding() throws Exception {
-		template = new SimpleFlatFileInputSource();
-		template.setEncoding("foo");
-		template.setResource(getInputResource(TEST_STRING));
+		inputSource = new SimpleFlatFileInputSource();
+		inputSource.setEncoding("foo");
+		inputSource.setResource(getInputResource(TEST_STRING));
 		try {
-			template.open();
+			inputSource.open();
 			fail("Expected BatchEnvironmentException");
 		}
 		catch (BatchEnvironmentException e) {
@@ -194,12 +212,12 @@ public class SimpleFlatFileInputSourceTests extends TestCase {
 	}
 
 	public void testEncoding() throws Exception {
-		template.setEncoding("UTF-8");
+		inputSource.setEncoding("UTF-8");
 		testRead();
 	}
 
 	public void testRecordSeparator() throws Exception {
-		template.setRecordSeparatorPolicy(new DefaultRecordSeparatorPolicy());
+		inputSource.setRecordSeparatorPolicy(new DefaultRecordSeparatorPolicy());
 		testRead();
 	}
 

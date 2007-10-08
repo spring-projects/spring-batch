@@ -31,7 +31,7 @@ import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * Unit test for {@link InputSourceItemProvider}
- * 
+ *
  * @author Robert Kasanicky
  */
 public class InputSourceItemProviderTests extends TestCase {
@@ -45,6 +45,21 @@ public class InputSourceItemProviderTests extends TestCase {
 	protected void setUp() throws Exception {
 		source = new MockInputSource(this);
 		itemProvider.setInputSource(source);
+	}
+
+	public void testAfterPropertiesSet()throws Exception{
+		//shouldn't throw an exception since the input source is set
+		itemProvider.afterPropertiesSet();
+	}
+
+	public void testNullInputSource(){
+		try{
+			itemProvider.setInputSource(null);
+			itemProvider.afterPropertiesSet();
+			fail();
+		}catch(Exception ex){
+			assertTrue(ex instanceof IllegalArgumentException);
+		}
 	}
 
 	/**
@@ -78,7 +93,7 @@ public class InputSourceItemProviderTests extends TestCase {
 		itemProvider.restoreFrom(new GenericRestartData(PropertiesConverter.stringToProperties("value=bar")));
 		assertEquals("bar", itemProvider.next());
 	}
-	
+
 	public void testSkip() {
 		itemProvider.skip();
 		assertEquals("after skip", itemProvider.next());
@@ -87,7 +102,7 @@ public class InputSourceItemProviderTests extends TestCase {
 	private class MockInputSource implements InputSource, StatisticsProvider, Restartable, Skippable {
 
 		private Object value;
-		
+
 		public Properties getStatistics() {
 			return PropertiesConverter.stringToProperties("a=b");
 		}

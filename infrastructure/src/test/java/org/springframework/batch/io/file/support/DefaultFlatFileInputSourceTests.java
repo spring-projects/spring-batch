@@ -21,6 +21,7 @@ import java.io.IOException;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.file.FieldSet;
+import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.io.file.support.DefaultFlatFileInputSource;
 import org.springframework.batch.io.file.support.transform.LineTokenizer;
 import org.springframework.batch.restart.RestartData;
@@ -30,16 +31,16 @@ import org.springframework.transaction.support.TransactionSynchronization;
 
 /**
  * Tests for {@link DefaultFlatFileInputSource}
- * 
+ *
  * @author robert.kasanicky
- * 
+ *
  * TODO only regular reading is tested currently, add exception cases, restart,
  * skip, validation...
  */
 public class DefaultFlatFileInputSourceTests extends TestCase {
 
 	// object under test
-	private DefaultFlatFileInputSource template = new DefaultFlatFileInputSource();
+	private DefaultFlatFileInputSource inputSource = new DefaultFlatFileInputSource();
 
 	// common value used for writing to a file
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
@@ -51,25 +52,31 @@ public class DefaultFlatFileInputSourceTests extends TestCase {
 		}
 	};
 
+	private FieldSetMapper fieldSetMapper = new FieldSetMapper(){
+		public Object mapLine(FieldSet fs) {
+			return fs;
+		}
+	};
+
 	/**
 	 * Create inputFile, inject mock/stub dependencies for tested object,
 	 * initialize the tested object
 	 */
 	protected void setUp() throws Exception {
 
-		template.setResource(getInputResource(TEST_STRING));
-		template.setTokenizer(tokenizer);
-
+		inputSource.setResource(getInputResource(TEST_STRING));
+		inputSource.setTokenizer(tokenizer);
+		inputSource.setFieldSetMapper(fieldSetMapper);
 		// context argument is necessary only for the FileLocator, which
 		// is mocked
-		template.open();
+		inputSource.open();
 	}
 
 	/**
 	 * Release resources and delete the temporary file
 	 */
 	protected void tearDown() throws Exception {
-		template.close();
+		inputSource.close();
 	}
 
 	private Resource getInputResource(String input) {
@@ -82,25 +89,25 @@ public class DefaultFlatFileInputSourceTests extends TestCase {
 	 */
 	public void testSkip() throws IOException {
 
-		template.close();
-		template.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		template.open();
+		inputSource.close();
+		inputSource.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		inputSource.open();
 
 		// read some records
-		template.readFieldSet(); // #1
-		template.readFieldSet(); // #2
+		inputSource.read(); // #1
+		inputSource.read(); // #2
 		// commit them
-		template.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+		inputSource.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
 		// read next record
-		template.readFieldSet(); // # 3
+		inputSource.read(); // # 3
 		// mark record as skipped
-		template.skip();
+		inputSource.skip();
 		// read next records
-		template.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
+		inputSource.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
 
 		// we should now process all records after first commit point, that are
 		// not marked as skipped
-		assertEquals("[testLine4]", template.readFieldSet().toString());
+		assertEquals("[testLine4]", inputSource.read().toString());
 
 		// TODO update
 		// Map statistics = template.getStatistics();
@@ -117,14 +124,14 @@ public class DefaultFlatFileInputSourceTests extends TestCase {
 	 */
 	public void testTransactionSynchronizationUnknown() throws IOException {
 
-		template.close();
-		template.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		template.open();
+		inputSource.close();
+		inputSource.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		inputSource.open();
 
 		// read some records
-		template.readFieldSet();
-		template.skip();
-		template.readFieldSet();
+		inputSource.read();
+		inputSource.skip();
+		inputSource.read();
 		// TODO
 		// statistics = template.getStatistics();
 		// skipped = (String)
@@ -134,7 +141,7 @@ public class DefaultFlatFileInputSourceTests extends TestCase {
 
 		// call unknown, which has no influence and therefore statistics should
 		// be the same
-		template.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_UNKNOWN);
+		inputSource.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_UNKNOWN);
 		// TODO
 		// statistics = template.getStatistics();
 		// assertEquals(skipped, (String)
@@ -142,51 +149,51 @@ public class DefaultFlatFileInputSourceTests extends TestCase {
 		// assertEquals(read, (String)
 		// statistics.get(FlatFileInputTemplate.READ_STATISTICS_NAME));
 	}
-	
+
 	public void testRestartFromNullData() throws Exception {
-		template.restoreFrom(null);
-		assertEquals("[FlatFileInputTemplate-TestData]", template.readFieldSet().toString());
+		inputSource.restoreFrom(null);
+		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
 	}
-	
+
 	public void testRestartWithNullReader() throws Exception {
-		template = new DefaultFlatFileInputSource();
-		template.setResource(getInputResource(TEST_STRING));
+		inputSource = new DefaultFlatFileInputSource();
+		inputSource.setResource(getInputResource(TEST_STRING));
 		// do not open the template...
-		template.restoreFrom(template.getRestartData());
-		assertEquals("[FlatFileInputTemplate-TestData]", template.readFieldSet().toString());
+		inputSource.restoreFrom(inputSource.getRestartData());
+		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
 	}
 
 	public void testRestart() throws IOException {
 
-		template.close();
-		template.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		template.open();
+		inputSource.close();
+		inputSource.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		inputSource.open();
 
 		// read some records
-		template.readFieldSet();
-		template.readFieldSet();
+		inputSource.read();
+		inputSource.read();
 		// commit them
-		template.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+		inputSource.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
 		// read next two records
-		template.readFieldSet();
-		template.readFieldSet();
+		inputSource.read();
+		inputSource.read();
 
 		// get restart data
-		RestartData restartData = template.getRestartData();
+		RestartData restartData = inputSource.getRestartData();
 		// TODO
 		// assertEquals("4", (String) restartData);
 		// close input
-		template.close();
+		inputSource.close();
 
-		template.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		inputSource.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 
 		// init for restart
-		template.open();
-		template.restoreFrom(restartData);
+		inputSource.open();
+		inputSource.restoreFrom(restartData);
 
 		// read remaining records
-		assertEquals("[testLine5]", template.readFieldSet().toString());
-		assertEquals("[testLine6]", template.readFieldSet().toString());
+		assertEquals("[testLine5]", inputSource.read().toString());
+		assertEquals("[testLine6]", inputSource.read().toString());
 
 		// TODO
 		// Map statistics = template.getStatistics();

@@ -19,9 +19,10 @@ package org.springframework.batch.io.file.support;
 import java.io.IOException;
 
 import org.springframework.batch.io.InputSource;
+import org.springframework.batch.io.exception.FlatFileParsingException;
 import org.springframework.batch.io.exception.ValidationException;
 import org.springframework.batch.io.file.FieldSet;
-import org.springframework.batch.io.file.FieldSetInputSource;
+import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.io.file.support.separator.RecordSeparatorPolicy;
 import org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer;
 import org.springframework.batch.io.file.support.transform.LineTokenizer;
@@ -37,17 +38,17 @@ import org.springframework.util.Assert;
  * The location of the file is defined by the resource property. To separate the
  * structure of the file, {@link LineTokenizer} is used to parse data obtained
  * from the file. <br/>
- * 
+ *
  * A {@link SimpleFlatFileInputSource} is not thread safe because it maintains
  * state in the form of a {@link ResourceLineReader}. Be careful to configure a
  * {@link SimpleFlatFileInputSource} using an appropriate factory or scope so
  * that it is not shared between threads.<br/>
- * 
+ *
  * @see FieldSetInputSource
- * 
+ *
  * @author Dave Syer
  */
-public class SimpleFlatFileInputSource implements ResourceLifecycle, FieldSetInputSource, InitializingBean, DisposableBean {
+public class SimpleFlatFileInputSource implements InputSource, InitializingBean, DisposableBean {
 
 	// default encoding for input files - set to ISO-8859-1
 	public static final String DEFAULT_CHARSET = "ISO-8859-1";
@@ -63,6 +64,8 @@ public class SimpleFlatFileInputSource implements ResourceLifecycle, FieldSetInp
 	private RecordSeparatorPolicy recordSeparatorPolicy;
 
 	private LineTokenizer tokenizer = new DelimitedLineTokenizer();
+
+	private FieldSetMapper fieldSetMapper;
 
 	private String encoding = DEFAULT_CHARSET;
 
@@ -80,7 +83,7 @@ public class SimpleFlatFileInputSource implements ResourceLifecycle, FieldSetInp
 	 * Public setter for the recordSeparatorPolicy. Used to determine where the
 	 * line endings are and do things like continue over a line ending if inside
 	 * a quoted string.
-	 * 
+	 *
 	 * @param recordSeparatorPolicy the recordSeparatorPolicy to set
 	 */
 	public void setRecordSeparatorPolicy(RecordSeparatorPolicy recordSeparatorPolicy) {
@@ -90,6 +93,7 @@ public class SimpleFlatFileInputSource implements ResourceLifecycle, FieldSetInp
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource);
 		Assert.state(resource.exists(), "Resource must exist: [" + resource + "]");
+		Assert.notNull(fieldSetMapper, "FieldSetMapper must not be null.");
 	}
 
 	/**
@@ -107,7 +111,7 @@ public class SimpleFlatFileInputSource implements ResourceLifecycle, FieldSetInp
 
 	/**
 	 * Close and null out the reader.
-	 * 
+	 *
 	 * @see ResourceLifecycle
 	 */
 	public void close() {
@@ -124,7 +128,7 @@ public class SimpleFlatFileInputSource implements ResourceLifecycle, FieldSetInp
 	/**
 	 * Calls close to ensure that bean factories can close and always release
 	 * resources.
-	 * 
+	 *
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
@@ -139,31 +143,21 @@ public class SimpleFlatFileInputSource implements ResourceLifecycle, FieldSetInp
 	/**
 	 * A wrapper for {@link #readFieldSet()} to make this into a real
 	 * {@link InputSource}.
-	 * 
+	 *
 	 * @see org.springframework.batch.io.InputSource#read()
 	 */
-	public final Object read() {
-		return readFieldSet();
-	}
-
-	/**
-	 * Get the next {@link FieldSet} from the input.
-	 * 
-	 * @see org.springframework.batch.io.file.FieldSetInputSource#readFieldSet()
-	 */
-	public FieldSet readFieldSet() {
+	public Object read() {
 		String line = readLine();
 
 		if (line != null) {
 			try {
-				return this.tokenizer.tokenize(line);
+				FieldSet tokenizedLine = tokenizer.tokenize(line);
+				return fieldSetMapper.mapLine(tokenizedLine);
 			}
-			catch (RuntimeException ve) {
+			catch (RuntimeException ex) {
 				// add current line count to message and re-throw
-				// TODO: wrap the exception more carefully to preserve type etc.
-				ValidationException newVe = new ValidationException("Validation error at line "
-						+ getReader().getCurrentLineCount() + ": " + ve.getMessage());
-				throw newVe;
+				throw new FlatFileParsingException("Parsing error", ex, line,
+						getReader().getCurrentLineCount());
 			}
 		}
 		return null;
@@ -172,7 +166,7 @@ public class SimpleFlatFileInputSource implements ResourceLifecycle, FieldSetInp
 	/**
 	 * Setter for the encoding for this input source. Default value is
 	 * {@value #DEFAULT_CHARSET}.
-	 * 
+	 *
 	 * @param encoding a properties object which possibly contains the encoding
 	 * for this input file;
 	 */
@@ -185,6 +179,15 @@ public class SimpleFlatFileInputSource implements ResourceLifecycle, FieldSetInp
 	 */
 	public void setTokenizer(LineTokenizer lineTokenizer) {
 		this.tokenizer = lineTokenizer;
+	}
+
+	/**
+	 * Set the FieldSetMapper to be used for each line.
+	 *
+	 * @param fieldSetMapper
+	 */
+	public void setFieldSetMapper(FieldSetMapper fieldSetMapper) {
+		this.fieldSetMapper = fieldSetMapper;
 	}
 
 	// Returns object representing state of the input template.

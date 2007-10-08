@@ -23,7 +23,6 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.io.file.FieldSetInputSource;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
@@ -37,7 +36,7 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
  * This class is a {@link FieldSetInputSource} that supports restart,
  * skipping invalid lines and storing statistics.
  * </p>
- * 
+ *
  * @author Waseem Malik
  * @author Tomas Slanina
  * @author Robert Kasanicky
@@ -49,13 +48,13 @@ public class DefaultFlatFileInputSource extends SimpleFlatFileInputSource implem
 	public static final String READ_STATISTICS_NAME = "lines.read.count";
 
 	public static final String SKIPPED_STATISTICS_NAME = "skipped.lines.count";
-	
+
 	private Set skippedLines = new HashSet();
 
 	private TransactionSynchronization transactionSynchronization = new ResourceLineReaderTransactionSynchronization();
-	
+
 	private Properties statistics = new Properties();
-	
+
 	/**
 	 * Initialize the input source.
 	 */
@@ -73,14 +72,14 @@ public class DefaultFlatFileInputSource extends SimpleFlatFileInputSource implem
 	 * This method initialises the Input Source for Restart. It opens the input
 	 * file and position the buffer reader according to information provided by
 	 * the restart data
-	 * 
+	 *
 	 * @param restartData restartData information
 	 */
 	public void restoreFrom(RestartData data) {
-		
+
 		//TODO this does not look very nice...
-		if (data==null || 
-			data.getProperties() == null || 
+		if (data==null ||
+			data.getProperties() == null ||
 			data.getProperties().getProperty(READ_STATISTICS_NAME) == null ||
 			getReader()==null) {
 			// do nothing
@@ -173,7 +172,7 @@ public class DefaultFlatFileInputSource extends SimpleFlatFileInputSource implem
 		/**
 		 * TransactionSynchronization method indicating that a transaction has
 		 * completed.
-		 * 
+		 *
 		 * @param status indicates whether it was a rollback or commit
 		 */
 		public void afterCompletion(int status) {
