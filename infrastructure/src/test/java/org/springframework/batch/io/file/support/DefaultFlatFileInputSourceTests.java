@@ -158,6 +158,7 @@ public class DefaultFlatFileInputSourceTests extends TestCase {
 	public void testRestartWithNullReader() throws Exception {
 		inputSource = new DefaultFlatFileInputSource();
 		inputSource.setResource(getInputResource(TEST_STRING));
+		inputSource.setFieldSetMapper(fieldSetMapper);
 		// do not open the template...
 		inputSource.restoreFrom(inputSource.getRestartData());
 		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());

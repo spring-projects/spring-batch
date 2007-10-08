@@ -139,12 +139,14 @@ public class SimpleFlatFileInputSourceTests extends TestCase {
 	public void testReadBeforeOpen() throws Exception {
 		inputSource = new SimpleFlatFileInputSource();
 		inputSource.setResource(getInputResource(TEST_STRING));
+		inputSource.setFieldSetMapper(fieldSetMapper);
 		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
 	}
 
 	public void testCloseBeforeOpen() throws Exception {
 		inputSource = new SimpleFlatFileInputSource();
 		inputSource.setResource(getInputResource(TEST_STRING));
+		inputSource.setFieldSetMapper(fieldSetMapper);
 		inputSource.close();
 		// The open still happens automatically on a read...
 		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
@@ -181,6 +183,7 @@ public class SimpleFlatFileInputSourceTests extends TestCase {
 		inputSource = new SimpleFlatFileInputSource();
 		inputSource.setEncoding("UTF-8");
 		inputSource.setResource(getInputResource(TEST_STRING));
+		inputSource.setFieldSetMapper(fieldSetMapper);
 		testRead();
 	}
 
