@@ -28,13 +28,6 @@ public class FlatFileOrderWriterTests extends TestCase {
 			list.add(output);
 		}
 
-		public void close() {
-			list.add("close");
-		}
-
-		public void open() {
-			list.add("open");
-		}
 	};
 
 	private FlatFileOrderWriter writer;

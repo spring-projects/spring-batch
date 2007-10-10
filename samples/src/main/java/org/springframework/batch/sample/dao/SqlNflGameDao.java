@@ -34,14 +34,4 @@ public class SqlNflGameDao extends JdbcDaoSupport implements OutputSource {
 		this.getJdbcTemplate().update(INSERT_GAME, args);
 	}
 
-	public void close() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void open() {
-		// TODO Auto-generated method stub
-
-	}
-
 }

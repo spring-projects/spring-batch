@@ -3,6 +3,7 @@ package org.springframework.batch.sample.dao;
 import java.math.BigDecimal;
 
 import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.sample.domain.CustomerCredit;
 
 import org.easymock.MockControl;
@@ -11,15 +12,15 @@ import junit.framework.TestCase;
 public class FlatFileCustomerCreditWriterTests extends TestCase {
 
 	private MockControl outputControl;
-	private OutputSource output;
+	private ResourceLifecycleOutputSource output;
 	private FlatFileCustomerCreditWriter writer;
 	
 	public void setUp() throws Exception {
 		super.setUp();
 		
 		//create mock for OutputSource
-		outputControl = MockControl.createControl(OutputSource.class);
-		output = (OutputSource)outputControl.getMock();
+		outputControl = MockControl.createControl(ResourceLifecycleOutputSource.class);
+		output = (ResourceLifecycleOutputSource)outputControl.getMock();
 		
 		//create new writer
 		writer = new FlatFileCustomerCreditWriter();
@@ -72,5 +73,9 @@ public class FlatFileCustomerCreditWriterTests extends TestCase {
 		
 		//verify method calls
 		outputControl.verify();
+	}
+	
+	private interface ResourceLifecycleOutputSource extends OutputSource, ResourceLifecycle {
+		
 	}
 }

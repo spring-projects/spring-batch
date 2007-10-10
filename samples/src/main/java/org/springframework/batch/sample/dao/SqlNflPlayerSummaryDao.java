@@ -28,14 +28,4 @@ public class SqlNflPlayerSummaryDao extends JdbcDaoSupport implements OutputSour
 		getJdbcTemplate().update(INSERT_SUMMARY, args);
 	}
 
-	public void close() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void open() {
-		// TODO Auto-generated method stub
-
-	}
-
 }

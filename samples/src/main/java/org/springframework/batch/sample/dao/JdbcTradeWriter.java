@@ -70,10 +70,4 @@ public class JdbcTradeWriter implements TradeWriter {
 		this.writeTrade((Trade)output);
 	}
 
-	public void close() {
-	}
-
-	public void open() {
-	}
-
 }

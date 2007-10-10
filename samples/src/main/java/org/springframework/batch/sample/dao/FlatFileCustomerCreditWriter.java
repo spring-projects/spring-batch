@@ -17,9 +17,9 @@
 package org.springframework.batch.sample.dao;
 
 import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.sample.domain.CustomerCredit;
 import org.springframework.beans.factory.DisposableBean;
-
 
 /**
  * Writes customer's credit information in a file.
@@ -27,46 +27,54 @@ import org.springframework.beans.factory.DisposableBean;
  * @see CustomerCreditWriter
  * @author Robert Kasanicky
  */
-public class FlatFileCustomerCreditWriter implements CustomerCreditWriter, DisposableBean {
-    
+public class FlatFileCustomerCreditWriter implements CustomerCreditWriter,
+		DisposableBean {
+
 	private OutputSource outputSource;
-    
+
 	private String separator = "\t";
-	
-	private volatile boolean opened = false; 
 
-    public void write(CustomerCredit customerCredit) {
-    	
-    	if (!opened) {
-    		open();
-    	}
+	private volatile boolean opened = false;
 
-        String line = "" + customerCredit.getName() + separator + customerCredit.getCredit();
+	public void write(CustomerCredit customerCredit) {
 
-        outputSource.write(line);
-    }
+		if (!opened) {
+			open();
+		}
 
-    public void setSeparator(String separator) {
-        this.separator = separator;
-    }
+		String line = "" + customerCredit.getName() + separator
+				+ customerCredit.getCredit();
 
-    public void setOutputSource(OutputSource outputSource) {
-        this.outputSource = outputSource;
-    }
-    
-    public void open() {
-    	outputSource.open();
-    	opened = true;
-    }
-    
-    public void close() {
-    	outputSource.close();
-    }
-    
-    /* (non-Javadoc)
-     * @see org.springframework.beans.factory.DisposableBean#destroy()
-     */
-    public void destroy() throws Exception {
-    	close();
-    }
+		outputSource.write(line);
+	}
+
+	public void setSeparator(String separator) {
+		this.separator = separator;
+	}
+
+	public void setOutputSource(OutputSource outputSource) {
+		this.outputSource = outputSource;
+	}
+
+	public void open() {
+		if (outputSource instanceof ResourceLifecycle) {
+			((ResourceLifecycle) outputSource).open();
+		}
+		opened = true;
+	}
+
+	public void close() {
+		if (outputSource instanceof ResourceLifecycle) {
+			((ResourceLifecycle) outputSource).close();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.beans.factory.DisposableBean#destroy()
+	 */
+	public void destroy() throws Exception {
+		close();
+	}
 }

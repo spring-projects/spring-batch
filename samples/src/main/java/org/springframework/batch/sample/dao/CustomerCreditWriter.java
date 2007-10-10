@@ -24,7 +24,7 @@ import org.springframework.batch.sample.domain.CustomerCredit;
  * 
  * @author Robert Kasanicky
  */
-public interface CustomerCreditWriter extends ResourceLifecycle{
+public interface CustomerCreditWriter extends ResourceLifecycle {
 
 	void write(CustomerCredit customerCredit);
 	

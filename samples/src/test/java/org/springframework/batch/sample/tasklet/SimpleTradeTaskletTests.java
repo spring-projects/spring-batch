@@ -7,7 +7,6 @@ import junit.framework.TestCase;
 import org.springframework.batch.io.file.support.DefaultFlatFileInputSource;
 import org.springframework.batch.sample.dao.TradeWriter;
 import org.springframework.batch.sample.domain.Trade;
-import org.springframework.batch.sample.tasklet.SimpleTradeTasklet;
 
 public class SimpleTradeTaskletTests extends TestCase {
 
@@ -43,8 +42,6 @@ public class SimpleTradeTaskletTests extends TestCase {
 				writerCalled = true;
 			}
 			public void write(Object output) {}
-			public void close() {}
-			public void open() {}
 		};
 
 		//create module
