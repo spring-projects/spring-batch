@@ -21,30 +21,36 @@ import java.util.List;
 
 /**
  * Tokenizer used to process data obtained from files with fixed-length format.
- * Columns are specified by array of Range objects ({@link #setColumns(Range[])}).  
+ * Columns are specified by array of Range objects ({@link #setColumns(Range[])}).
  * 
  * @author tomas.slanina
  * @author peter.zozom
+ * @author Dave Syer
  */
 public class FixedLengthTokenizer extends AbstractLineTokenizer {
-	
+
 	private Range[] ranges;
-		
+
 	/**
-	 * Set the column ranges.
-	 * @param ranges
+	 * Set the column ranges. Used in conjunction with the
+	 * {@link RangeArrayPropertyEditor} this property can be set in the form of
+	 * a String describing the range boundaries, e.g. "1,4,7" or "1-3,4-6,7" or
+	 * "1-2,4-5,7-10".
+	 * 
+	 * @param ranges the column ranges expected in the input
 	 */
 	public void setColumns(Range[] ranges) {
 		this.ranges = ranges;
 	}
-		
+
 	/**
 	 * Yields the tokens resulting from the splitting of the supplied
 	 * <code>line</code>.
 	 * 
-	 * @param line the line to be tokenised (can be <code>null</code>)
+	 * @param line
+	 *            the line to be tokenised (can be <code>null</code>)
 	 * 
-	 * @return the resulting tokens
+	 * @return the resulting tokens (empty if the line is null)
 	 */
 	protected List doTokenize(String line) {
 		List tokens = new ArrayList(ranges.length);
@@ -55,16 +61,14 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 
 		for (int i = 0; i < ranges.length; i++) {
 
-			int startPos = ranges[i].getMin()-1;
+			int startPos = ranges[i].getMin() - 1;
 			int endPos = ranges[i].getMax();
-			
+
 			if (lineLength >= endPos) {
 				token = line.substring(startPos, endPos);
-			}
-			else if (lineLength >= startPos) {
+			} else if (lineLength >= startPos) {
 				token = line.substring(startPos);
-			}
-			else {
+			} else {
 				token = "";
 			}
 

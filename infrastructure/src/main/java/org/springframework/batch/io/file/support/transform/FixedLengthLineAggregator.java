@@ -21,26 +21,30 @@ import java.util.Arrays;
 import org.springframework.util.Assert;
 
 /**
- * LineAggregator implementation which produces line by aggregating provided 
- * strings into columns with fixed length. Columns are specified by array of ranges 
- * ({@link #setColumns(Range[])}.</br> 
+ * LineAggregator implementation which produces line by aggregating provided
+ * strings into columns with fixed length. Columns are specified by array of
+ * ranges ({@link #setColumns(Range[])}.</br>
  * 
  * @author tomas.slanina
- * @author peter.zozom 
+ * @author peter.zozom
+ * @author Dave Syer
  */
 public class FixedLengthLineAggregator implements LineAggregator {
 
 	private static final int ALIGN_CENTER = 1;
 	private static final int ALIGN_RIGHT = 2;
 	private static final int ALIGN_LEFT = 3;
-	
+
 	private Range[] ranges;
 	private int lastColumn;
 	private int align = ALIGN_LEFT;
 	private char padding = ' ';
-	
+
 	/**
-	 * Set column ranges.
+	 * Set column ranges. Used in conjunction with the
+	 * {@link RangeArrayPropertyEditor} this property can be set in the form of
+	 * a String describing the range boundaries, e.g. "1,4,7" or "1-3,4-6,7" or
+	 * "1-2,4-5,7-10".
 	 * 
 	 * @param columns
 	 *            array of Range objects which specify column start and end
@@ -51,11 +55,13 @@ public class FixedLengthLineAggregator implements LineAggregator {
 		lastColumn = findLastColumn(columns);
 		this.ranges = columns;
 	}
-			
+
 	/**
-	 * Aggregate provided strings into single line using specified column ranges.
+	 * Aggregate provided strings into single line using specified column
+	 * ranges.
 	 * 
-	 * @param args arrays of strings representing data to be aggregated
+	 * @param args
+	 *            arrays of strings representing data to be aggregated
 	 * @return aggregated strings
 	 */
 	public String aggregate(String[] args) {
@@ -65,100 +71,107 @@ public class FixedLengthLineAggregator implements LineAggregator {
 		Assert.isTrue(args.length <= ranges.length,
 				"Number of arguments must match number of fields in a record");
 
-		//calculate line length
-		int lineLength = ranges[lastColumn].hasMaxValue() ? ranges[lastColumn].getMax()
-				: ranges[lastColumn].getMin() + args[lastColumn].length() - 1;
-				
-		//create stringBuffer with length of line filled with padding characters
-		char[] emptyLine = new char[lineLength]; 
+		// calculate line length
+		int lineLength = ranges[lastColumn].hasMaxValue() ? ranges[lastColumn]
+				.getMax() : ranges[lastColumn].getMin()
+				+ args[lastColumn].length() - 1;
+
+		// create stringBuffer with length of line filled with padding
+		// characters
+		char[] emptyLine = new char[lineLength];
 		Arrays.fill(emptyLine, padding);
-		
+
 		StringBuffer stringBuffer = new StringBuffer(lineLength);
 		stringBuffer.append(emptyLine);
-		
-		//aggregate all strings
-		for(int i = 0; i < args.length; i++) {
-			
-			//offset where text will be inserted
-			int start = ranges[i].getMin() - 1;			
-			
-			//calculate column length
+
+		// aggregate all strings
+		for (int i = 0; i < args.length; i++) {
+
+			// offset where text will be inserted
+			int start = ranges[i].getMin() - 1;
+
+			// calculate column length
 			int columnLength;
 			if ((i == lastColumn) && (!ranges[lastColumn].hasMaxValue())) {
 				columnLength = args[lastColumn].length();
 			} else {
 				columnLength = ranges[i].getMax() - ranges[i].getMin() + 1;
 			}
-			
+
 			String textToInsert = (args[i] == null) ? "" : args[i];
 
-			Assert.isTrue(columnLength >= textToInsert.length(), 
-					"Supplied text: " + textToInsert + " is longer than defined length: " + columnLength);			
-			
+			Assert
+					.isTrue(columnLength >= textToInsert.length(),
+							"Supplied text: " + textToInsert
+									+ " is longer than defined length: "
+									+ columnLength);
+
 			switch (align) {
-				case ALIGN_RIGHT:
-					start += (columnLength - textToInsert.length());
-					break;
-				case ALIGN_CENTER:
-					start += ((columnLength - textToInsert.length()) / 2);
-					break;
-				case ALIGN_LEFT:
-					//nothing to do
-					break;
+			case ALIGN_RIGHT:
+				start += (columnLength - textToInsert.length());
+				break;
+			case ALIGN_CENTER:
+				start += ((columnLength - textToInsert.length()) / 2);
+				break;
+			case ALIGN_LEFT:
+				// nothing to do
+				break;
 			}
 
-			stringBuffer.replace(start, start + textToInsert.length(), textToInsert);
+			stringBuffer.replace(start, start + textToInsert.length(),
+					textToInsert);
 		}
-				
+
 		return stringBuffer.toString();
 	}
-	
+
 	/**
-	 * Recognized alignments are <code>CENTER, RIGHT, LEFT</code>.
-	 * An IllegalArgumentException is thrown in case the argument does not
-	 * match any of the recognized values.
+	 * Recognized alignments are <code>CENTER, RIGHT, LEFT</code>. An
+	 * IllegalArgumentException is thrown in case the argument does not match
+	 * any of the recognized values.
 	 * 
-	 * @param alignment the alignment to be used
+	 * @param alignment
+	 *            the alignment to be used
 	 */
 	public void setAlignment(String alignment) {
 		if ("CENTER".equalsIgnoreCase(alignment)) {
 			this.align = ALIGN_CENTER;
-		}
-		else if ("RIGHT".equalsIgnoreCase(alignment)) {
+		} else if ("RIGHT".equalsIgnoreCase(alignment)) {
 			this.align = ALIGN_RIGHT;
-		}
-		else if ("LEFT".equalsIgnoreCase(alignment)) {
+		} else if ("LEFT".equalsIgnoreCase(alignment)) {
 			this.align = ALIGN_LEFT;
-		}
-		else {
-			throw new IllegalArgumentException("Only 'CENTER', 'RIGHT' or 'LEFT' are allowed alignment values");
+		} else {
+			throw new IllegalArgumentException(
+					"Only 'CENTER', 'RIGHT' or 'LEFT' are allowed alignment values");
 		}
 	}
-	
+
 	/**
-	 * Setter for padding (default space).
-	 * @param padding the padding character
+	 * Setter for padding (default is space).
+	 * 
+	 * @param padding
+	 *            the padding character
 	 */
 	public void setPadding(char padding) {
 		this.padding = padding;
 	}
 
 	/*
-	 * Find last column. Columns are not sorted.
-	 * Returns index of last column (column with highest offset).
+	 * Find last column. Columns are not sorted. Returns index of last column
+	 * (column with highest offset).
 	 */
 	private int findLastColumn(Range[] columns) {
-		
+
 		int lastOffset = 1;
 		int lastIndex = 0;
-		
-		for(int i = 0; i < columns.length; i++) {
+
+		for (int i = 0; i < columns.length; i++) {
 			if (columns[i].getMin() > lastOffset) {
 				lastOffset = columns[i].getMin();
 				lastIndex = i;
 			}
 		}
-		
+
 		return lastIndex;
 	}
 }
