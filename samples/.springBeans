@@ -126,15 +126,6 @@
 			</configs>
 		</configSet>
 		<configSet>
-			<name><![CDATA[nfl]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
-			</configs>
-		</configSet>
-		<configSet>
 			<name><![CDATA[xmlStax]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
@@ -143,6 +134,16 @@
 				<config>src/main/resources/data-source-context-init.xml</config>
 				<config>src/main/resources/simple-container-definition.xml</config>
 				<config>src/main/resources/jobs/xmlStaxJob.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[nfl]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/simple-container-definition.xml</config>
+				<config>src/main/resources/jobs/nflJob.xml</config>
 			</configs>
 		</configSet>
 	</configSets>
