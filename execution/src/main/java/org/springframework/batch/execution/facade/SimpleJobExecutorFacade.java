@@ -48,7 +48,8 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsProvider {
+public class SimpleJobExecutorFacade implements JobExecutorFacade,
+		JobExecutionListener, StatisticsProvider {
 
 	private JobExecutor jobExecutor;
 
@@ -81,18 +82,23 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 	/**
 	 * Setter for the job execution registry. The default should be adequate so
 	 * this setter method is mainly used for testing.
-	 * @param jobExecutionRegistry the jobExecutionRegistry to set
+	 * 
+	 * @param jobExecutionRegistry
+	 *            the jobExecutionRegistry to set
 	 */
-	public void setJobExecutionRegistry(JobExecutionRegistry jobExecutionRegistry) {
+	public void setJobExecutionRegistry(
+			JobExecutionRegistry jobExecutionRegistry) {
 		this.jobExecutionRegistry = jobExecutionRegistry;
 	}
 
 	/**
 	 * Setter for injection of {@link JobConfigurationLocator}.
 	 * 
-	 * @param jobConfigurationLocator the jobConfigurationLocator to set
+	 * @param jobConfigurationLocator
+	 *            the jobConfigurationLocator to set
 	 */
-	public void setJobConfigurationLocator(JobConfigurationLocator jobConfigurationLocator) {
+	public void setJobConfigurationLocator(
+			JobConfigurationLocator jobConfigurationLocator) {
 		this.jobConfigurationLocator = jobConfigurationLocator;
 	}
 
@@ -101,67 +107,101 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 	 * {@link JobIdentifier} and the {@link JobConfigurationLocator}.
 	 * 
 	 * @see org.springframework.batch.execution.facade.JobExecutorFacade#start(org.springframework.batch.execution.common.domain.JobConfiguration,
-	 * org.springframework.batch.core.domain.JobIdentifier)
+	 *      org.springframework.batch.core.domain.JobIdentifier)
 	 * 
-	 * @throws IllegalArgumentException if the {@link JobIdentifier} is null or
-	 * its name is null
-	 * @throws IllegalStateException if the {@link JobConfigurationLocator} does
-	 * not contain a {@link JobConfiguration} with the name provided.
-	 * @throws IllegalStateException if the {@link JobExecutor} is null
-	 * @throws IllegalStateException if the {@link JobConfigurationLocator} is
-	 * null
+	 * @throws IllegalArgumentException
+	 *             if the {@link JobIdentifier} is null or its name is null
+	 * @throws IllegalStateException
+	 *             if the {@link JobConfigurationLocator} does not contain a
+	 *             {@link JobConfiguration} with the name provided.
+	 * @throws IllegalStateException
+	 *             if the {@link JobExecutor} is null
+	 * @throws IllegalStateException
+	 *             if the {@link JobConfigurationLocator} is null
 	 * 
 	 */
-	public ExitStatus start(JobIdentifier jobIdentifier) throws NoSuchJobConfigurationException {
+	public ExitStatus start(JobIdentifier jobIdentifier)
+			throws NoSuchJobConfigurationException {
 
 		Assert.notNull(jobIdentifier, "JobIdentifier must not be null.");
-		Assert.notNull(jobIdentifier.getName(), "JobIdentifier name must not be null.");
+		Assert.notNull(jobIdentifier.getName(),
+				"JobIdentifier name must not be null.");
 
-		Assert.state(!jobExecutionRegistry.isRegistered(jobIdentifier),
-				"A job with this JobRuntimeInformation is already executing in this container");
+		Assert
+				.state(!jobExecutionRegistry.isRegistered(jobIdentifier),
+						"A job with this JobRuntimeInformation is already executing in this container");
 
 		Assert.state(jobExecutor != null, "JobExecutor must be provided.");
-		Assert.state(jobConfigurationLocator != null, "JobConfigurationLocator must be provided.");
+		Assert.state(jobConfigurationLocator != null,
+				"JobConfigurationLocator must be provided.");
 
 		JobConfiguration jobConfiguration = jobConfigurationLocator
 				.getJobConfiguration(jobIdentifier.getName());
 
-		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobIdentifier);
+		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration,
+				jobIdentifier);
 		JobExecution jobExecution = jobExecutionRegistry.register(job);
-		
-		ExitStatus exitStatus = ExitStatus.FAILED;
+
 		try {
-			synchronized (mutex) {
-				running++;
-			}
-			exitStatus = jobExecutor.run(jobConfiguration, jobExecution);
-		}
-		finally {
-			synchronized (mutex) {
-				// assume execution is synchronous so when we get to here we are
-				// not running any more
-				running--;
-			}
-			jobExecutionRegistry.unregister(jobIdentifier);
+
+			this.before(jobExecution);
+
+			jobExecutor.run(jobConfiguration, jobExecution);
+
+		} finally {
+
+			this.after(jobExecution);
+
 		}
 
-		return exitStatus;
+		return jobExecution.getExitStatus();
+	}
+
+	/**
+	 * Internal accounting for the job execution. Callback at start of job.
+	 * 
+	 * @param execution
+	 */
+	public void before(JobExecution execution) {
+		synchronized (mutex) {
+			running++;
+		}
+	}
+
+	/**
+	 * Internal accounting for the job execution. Callback at end of job.
+	 * 
+	 * @param execution
+	 */
+	public void after(JobExecution execution) {
+		synchronized (mutex) {
+			// assume execution is synchronous so when we get to here we are
+			// not running any more
+			running--;
+		}
+		jobExecutionRegistry.unregister(execution.getJobIdentifier());
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.container.BatchContainer#stop(org.springframework.batch.container.common.runtime.JobRuntimeInformation)
 	 */
-	public void stop(JobIdentifier runtimeInformation) throws NoSuchJobExecutionException {
-		JobExecution jobExecutionContext = jobExecutionRegistry.get(runtimeInformation);
+	public void stop(JobIdentifier runtimeInformation)
+			throws NoSuchJobExecutionException {
+		JobExecution jobExecutionContext = jobExecutionRegistry
+				.get(runtimeInformation);
 		if (jobExecutionContext == null) {
-			throw new NoSuchJobExecutionException("No such Job is executing: [" + runtimeInformation + "]");
+			throw new NoSuchJobExecutionException("No such Job is executing: ["
+					+ runtimeInformation + "]");
 		}
-		for (Iterator iter = jobExecutionContext.getStepContexts().iterator(); iter.hasNext();) {
+		for (Iterator iter = jobExecutionContext.getStepContexts().iterator(); iter
+				.hasNext();) {
 			RepeatContext context = (RepeatContext) iter.next();
 			context.setTerminateOnly();
 		}
-		for (Iterator iter = jobExecutionContext.getChunkContexts().iterator(); iter.hasNext();) {
+		for (Iterator iter = jobExecutionContext.getChunkContexts().iterator(); iter
+				.hasNext();) {
 			RepeatContext context = (RepeatContext) iter.next();
 			context.setTerminateOnly();
 		}
@@ -191,20 +231,23 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade, StatisticsPro
 	public Properties getStatistics() {
 		int i = 0;
 		Properties props = new Properties();
-		for (Iterator iter = jobExecutionRegistry.findAll().iterator(); iter.hasNext();) {
+		for (Iterator iter = jobExecutionRegistry.findAll().iterator(); iter
+				.hasNext();) {
 			JobExecution element = (JobExecution) iter.next();
 			i++;
 			String runtime = "job" + i;
 			props.setProperty(runtime, "" + element.getJobIdentifier());
 			int j = 0;
-			for (Iterator iterator = element.getStepContexts().iterator(); iterator.hasNext();) {
+			for (Iterator iterator = element.getStepContexts().iterator(); iterator
+					.hasNext();) {
 				RepeatContext context = (RepeatContext) iterator.next();
 				j++;
 				props.setProperty(runtime + ".step" + j, "" + context);
 
 			}
 			j = 0;
-			for (Iterator iterator = element.getChunkContexts().iterator(); iterator.hasNext();) {
+			for (Iterator iterator = element.getChunkContexts().iterator(); iterator
+					.hasNext();) {
 				RepeatContext context = (RepeatContext) iterator.next();
 				j++;
 				props.setProperty(runtime + ".chunk" + j, "" + context);

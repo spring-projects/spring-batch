@@ -22,6 +22,7 @@ import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
+import org.springframework.batch.execution.facade.JobExecutionListener;
 import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -109,6 +110,7 @@ public class SimpleJobLauncherTests extends TestCase {
 	}
 
 	private class InterruptibleFacade implements JobExecutorFacade {
+
 		/*
 		 * (non-Javadoc)
 		 * @see org.springframework.batch.container.BatchContainer#run()
@@ -126,12 +128,17 @@ public class SimpleJobLauncherTests extends TestCase {
 				//return ExitStatus.FAILED;
 			}
 			
-			
 		}
 
 		public ExitStatus start(JobIdentifier runtimeInformation) {
 			run();
 			return ExitStatus.FAILED;
+		}
+		
+		public ExitStatus start(JobIdentifier jobIdentifier,
+				JobExecutionListener listener)
+				throws NoSuchJobConfigurationException {
+			throw new UnsupportedOperationException("Not implemented");
 		}
 
 		public void stop(JobIdentifier runtimeInformation) {

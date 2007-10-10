@@ -144,9 +144,14 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * Extension point for subclasses. Implementations might choose to start the
 	 * job in a new thread or in the current thread.<br/>
 	 * 
+	 * @param jobIdentifier
+	 *            the identifier of the job to run
 	 * @param exitCallback
 	 *            a callback that should be called by the implementation after
-	 *            the job has ended
+	 *            the job has ended (or failed)
+	 * 
+	 * @return an {@link ExitStatus} indicating the current knowledge of the
+	 *         state of the job.
 	 * 
 	 * @param runtimeInformation
 	 *            the {@link JobIdentifier} to start the launcher with.
@@ -302,8 +307,9 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	}
 
 	private boolean isInternalRunning(JobIdentifier jobIdentifier) {
-		synchronized(registry) {
-			return isRunning(jobIdentifier) && registry.containsKey(jobIdentifier);
+		synchronized (registry) {
+			return isRunning(jobIdentifier)
+					&& registry.containsKey(jobIdentifier);
 		}
 	}
 
@@ -312,8 +318,10 @@ public abstract class AbstractJobLauncher implements JobLauncher,
 	 * {@link JobIdentifier} to see if it is running. As long as at least one
 	 * job is running the launcher is deemed to be running.
 	 * 
-	 * @param jobIdentifier a {@link JobIdentifier}
-	 * @return always true.  Subclasses can override and provide more accurate information.
+	 * @param jobIdentifier
+	 *            a {@link JobIdentifier}
+	 * @return always true. Subclasses can override and provide more accurate
+	 *         information.
 	 */
 	protected boolean isRunning(JobIdentifier jobIdentifier) {
 		return true;

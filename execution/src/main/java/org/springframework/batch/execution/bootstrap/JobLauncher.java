@@ -21,10 +21,9 @@ import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * Simple interface for controlling jobs from the job configuration registry,
- * including possible ad-hoc executions, based on different runtime identifiers.
- * Implementations should concentrate on managing jobs and delegate the
- * launching to a {@link JobExecutorFacade}.
+ * Simple interface for controlling jobs, including possible ad-hoc executions,
+ * based on different runtime identifiers. Implementations should concentrate on
+ * managing jobs and delegate the launching to a {@link JobExecutorFacade}.
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -32,25 +31,26 @@ import org.springframework.batch.repeat.ExitStatus;
 
 public interface JobLauncher {
 
-	public static final String NO_SUCH_JOB_CONFIGURATION = "NO_SUCH_JOB_CONFIGURATION";
-	public static final String JOB_CONFIGURATION_NOT_PROVIDED = "JOB_CONFIGURATION_NOT_PROVIDED";
-
 	/**
 	 * Start a job execution with default name and other runtime information
 	 * generated on the fly.<br/>
 	 * 
-	 * @return the exit code from the job if it returns synchronously.
+	 * @return the exit code from the job if it returns synchronously. If the
+	 *         implementation is asynchronous, the status might well be unknown.
 	 * 
 	 */
 	public ExitStatus run() throws NoSuchJobConfigurationException;
 
 	/**
 	 * Start a job execution with the given name and other runtime information
-	 * generated on the fly.
+	 * generated on the fly. The name is used to locate a job configuration, and
+	 * the other runtime information is used to identify the job instance.
 	 * 
 	 * @param name
-	 *            the name to assign to the job
-	 * @return the exit code from the job if it returns synchronously.
+	 *            the name to assign to the job configuration
+	 * @return the exit code from the job if it returns synchronously. If the
+	 *         implementation is asynchronous, the status might well be unknown.
+	 * 
 	 * @throws NoSuchJobConfigurationException
 	 */
 	public ExitStatus run(String jobName)
@@ -59,7 +59,9 @@ public interface JobLauncher {
 	/**
 	 * Start a job execution with the given runtime information.
 	 * 
-	 * @return the exit code from the job if it returns synchronously.
+	 * @return the exit code from the job if it returns synchronously. If the
+	 *         implementation is asynchronous, the status might well be unknown.
+	 * 
 	 * @throws NoSuchJobConfigurationException
 	 */
 	public ExitStatus run(JobIdentifier jobIdentifier)
@@ -74,7 +76,10 @@ public interface JobLauncher {
 	public void stop();
 
 	/**
-	 * Return whether or not a job execution is currently running.
+	 * Check whether or not any job execution is currently running.
+	 * 
+	 * @return true if this launcher started a job or jobs and one can be
+	 *         determined to be in an active state.
 	 */
 	public boolean isRunning();
 

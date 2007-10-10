@@ -30,6 +30,7 @@ import org.springframework.batch.core.configuration.NoSuchJobConfigurationExcept
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
+import org.springframework.batch.execution.facade.JobExecutionListener;
 import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.interceptor.RepeatOperationsApplicationEvent;
@@ -148,12 +149,18 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 				}
 			}
 		}
+		
+		public ExitStatus start(JobIdentifier jobIdentifier,
+				JobExecutionListener listener)
+				throws NoSuchJobConfigurationException {
+			throw new UnsupportedOperationException("Not implemented");
+		}
 
 		public ExitStatus start(JobIdentifier runtimeInformation) {
 			start();
 			return ExitStatus.FAILED;
 		}
-
+		
 		public void stop(JobIdentifier runtimeInformation) {
 			running = false;
 		}

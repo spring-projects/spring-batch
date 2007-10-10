@@ -218,7 +218,7 @@ public class BatchCommandLineLauncher {
 			logger.fatal("Could not locate JobConfiguration \"" + jobName
 					+ "\"", e);
 			status = new ExitStatus(false,
-					JobLauncher.NO_SUCH_JOB_CONFIGURATION);
+					ExitCodeMapper.NO_SUCH_JOB_CONFIGURATION);
 		} catch (Throwable t) {
 			logger.fatal(t);
 			status = exceptionClassifier.classifyForExitCode(t);

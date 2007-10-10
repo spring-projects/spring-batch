@@ -16,6 +16,8 @@ public interface ExitCodeMapper {
 	static int JVM_EXITCODE_COMPLETED = 0;
 	static int JVM_EXITCODE_GENERIC_ERROR = 1;
 	static int JVM_EXITCODE_JOB_CONFIGURATION_ERROR = 2;
+	public static final String NO_SUCH_JOB_CONFIGURATION = "NO_SUCH_JOB_CONFIGURATION";
+	public static final String JOB_CONFIGURATION_NOT_PROVIDED = "JOB_CONFIGURATION_NOT_PROVIDED";
 
 	/**
 	 * Transform the exitcode known by the batchframework into an exitcode in the

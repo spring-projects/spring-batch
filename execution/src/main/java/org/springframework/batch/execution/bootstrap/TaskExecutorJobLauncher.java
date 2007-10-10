@@ -23,6 +23,7 @@ import javax.management.Notification;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.batch.execution.facade.NoSuchJobExecutionException;
@@ -45,7 +46,8 @@ import org.springframework.util.Assert;
  * 
  * <p>
  * This implementation can run jobs asynchronously. Jobs are stopped by calling
- * the stop method in the {@link JobExecutorFacade}, which is a graceful shutdown.
+ * the stop method in the {@link JobExecutorFacade}, which is a graceful
+ * shutdown.
  * </p>
  * 
  * @see JobExecutorFacade
@@ -99,10 +101,14 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
 	}
 
 	/**
-	 * Start the job using the task executor provided.
+	 * Start the job using the task executor provided. An {@link Runnable} is
+	 * passed in by the caller which we need to call in a finally block.
 	 * 
 	 * @throws NoSuchJobConfigurationException
 	 *             if a job configuration cannot be located.
+	 *             
+	 * @see org.springframework.batch.execution.bootstrap.AbstractJobLauncher#doRun(org.springframework.batch.core.domain.JobIdentifier,
+	 *      java.lang.Runnable)
 	 */
 	protected ExitStatus doRun(final JobIdentifier jobIdentifier,
 			final Runnable exitCallback) {
@@ -118,17 +124,16 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
 							.publishEvent(new RepeatOperationsApplicationEvent(
 									jobIdentifier, "No such job",
 									RepeatOperationsApplicationEvent.ERROR));
-					logger
-							.error(
-									"JobConfiguration could not be located inside Runnable for identifier: ["
-											+ jobIdentifier + "]", e);
+					logger.error(
+							"JobConfiguration could not be located inside Runnable for identifier: ["
+									+ jobIdentifier + "]", e);
 				} finally {
 					exitCallback.run();
 				}
 			}
 		});
 
-		return ExitStatus.RUNNING;
+		return ExitStatus.UNKNOWN;
 
 	}
 
@@ -177,9 +182,9 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
 	 * be out of date by the time this method is called, so it should be used
 	 * for information purposes only.
 	 * 
-	 * @return Properties representing the last {@link JobExecutionContext}
-	 *         objects passed up from the underlying execution. If there are no
-	 *         jobs running it will be empty.
+	 * @return Properties representing the {@link JobExecution} objects passed
+	 *         up from the underlying execution. If there are no jobs running it
+	 *         will be empty.
 	 */
 	public Properties getStatistics() {
 		if (jobExecutorFacade instanceof StatisticsProvider) {
@@ -192,7 +197,8 @@ public class TaskExecutorJobLauncher extends AbstractJobLauncher implements
 	/**
 	 * Publish the provided message to an external listener if there is one.
 	 * 
-	 * @param message the message to publish
+	 * @param message
+	 *            the message to publish
 	 */
 	private void publish(String message) {
 		if (notificationPublisher != null) {

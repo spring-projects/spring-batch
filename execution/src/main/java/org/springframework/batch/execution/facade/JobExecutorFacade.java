@@ -24,8 +24,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * Interface which defines a facade for running jobs. The interface is
  * intentionally minimal, and depends only on simple java types, so that the
  * facade can be used to launch a job from basic environments like a command
- * line or a JMX console. TODO: remove dependency on
- * {@link JobIdentifier}?
+ * line or a JMX console. TODO: remove dependency on {@link JobIdentifier}?
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -35,21 +34,25 @@ public interface JobExecutorFacade {
 	/**
 	 * Start a job execution identifiable by the {@link JobIdentifier}.
 	 * Implementations normally require a job configuration to be locatable
-	 * corresponding to the {@link JobIdentifier}, preferably matching
-	 * them at least by name.
-	 * @param runtimeInformation
+	 * corresponding to the {@link JobIdentifier}, preferably matching them at
+	 * least by name.
+	 * 
+	 * @param jobIdentifier
 	 * 
 	 * @throws NoSuchJobConfigurationException
 	 */
-	ExitStatus start(JobIdentifier runtimeInformation) throws NoSuchJobConfigurationException;
+	ExitStatus start(JobIdentifier jobIdentifier)
+			throws NoSuchJobConfigurationException;
 
 	/**
 	 * Stop the job execution that was started with this runtime information.
-	 * @param runtimeInformation the {@link JobIdentifier}.
-	 * @throws NoSuchJobExecutionException if a job with this runtime
-	 * information is not running
+	 * 
+	 * @param jobIdentifier
+	 *            the {@link JobIdentifier}.
+	 * @throws NoSuchJobExecutionException
+	 *             if a job with this runtime information is not running
 	 */
-	void stop(JobIdentifier runtimeInformation) throws NoSuchJobExecutionException;
+	void stop(JobIdentifier jobIdentifier) throws NoSuchJobExecutionException;
 
 	/**
 	 * Simple check for whether or not there are jobs in progress. Can be used

@@ -44,9 +44,9 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class SimpleJobExecutorFacaderTests extends TestCase {
+public class SimpleJobExecutorFacadeTests extends TestCase {
 
-	SimpleJobExecutorFacade simpleContainer = new SimpleJobExecutorFacade();
+	SimpleJobExecutorFacade jobExecutorFacade = new SimpleJobExecutorFacade();
 
 	JobExecutor jobExecutor;
 
@@ -68,41 +68,50 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 
 		super.setUp();
 		jobConfiguration.setName("TestJob");
-		jobExecutor = (JobExecutor) jobLifecycleControl.getMock();
-		simpleContainer.setJobExecutor(jobExecutor);
+		jobExecutorFacade.setJobExecutor(jobExecutor);
 		jobRepository = (JobRepository) jobRepositoryControl.getMock();
-		simpleContainer.setJobRepository(jobRepository);
+		jobExecutorFacade.setJobRepository(jobRepository);
 	}
 
 	public void testNormalStart() throws Exception {
 
-		final SimpleJobIdentifier jobRuntimeInformation = new SimpleJobIdentifier("bar");
-		jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
+		JobInstance job = setUpFacadeForNormalStart();
+		jobExecutorFacade.start(jobIdentifier);
+		assertEquals(job, jobExecution.getJob());
+		assertEquals("bar", job.getName());
+		jobRepositoryControl.verify();
+		
+	}
+
+	private JobInstance setUpFacadeForNormalStart() {
+		jobIdentifier = new SimpleJobIdentifier("bar");
+		jobRepository.findOrCreateJob(jobConfiguration, jobIdentifier);
 		jobExecutor = new JobExecutor() {
 			public ExitStatus run(JobConfiguration configuration, JobExecution jobExecutionContext) throws BatchCriticalException {
+				jobExecution = jobExecutionContext;
 				return ExitStatus.FINISHED;
 			}
 		};
-		JobInstance job = new JobInstance(jobRuntimeInformation);
-		JobExecution jobExecutionContext = new JobExecution(job);
+		jobExecutorFacade.setJobExecutor(jobExecutor);
+		JobInstance job = new JobInstance(jobIdentifier);
 		jobRepositoryControl.setReturnValue(job);
-		jobExecutor.run(jobConfiguration, jobExecutionContext);
 		jobRepositoryControl.replay();
-		simpleContainer.setJobConfigurationLocator(new JobConfigurationLocator() {
+		jobExecutorFacade.setJobConfigurationLocator(new JobConfigurationLocator() {
 			public JobConfiguration getJobConfiguration(String name) throws NoSuchJobConfigurationException {
 				return jobConfiguration;
 			}
 		});
-		simpleContainer.start(jobRuntimeInformation);
-		assertEquals(job, jobExecutionContext.getJob());
-		assertEquals("bar", job.getName());
-		jobRepositoryControl.verify();
+		return job;
 	}
-	
+
 	private volatile boolean running = false;
+
+	private JobExecution jobExecution;
+
+	private SimpleJobIdentifier jobIdentifier;
 	
 	public void testIsRunning() throws Exception {
-		simpleContainer.setJobExecutor(new JobExecutor() {
+		jobExecutorFacade.setJobExecutor(new JobExecutor() {
 			public ExitStatus run(JobConfiguration configuration, JobExecution jobExecutionContext)
 					throws BatchCriticalException {
 				while (running) {
@@ -119,14 +128,14 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 				return ExitStatus.FINISHED;
 			}
 		});
-		simpleContainer.setJobConfigurationLocator(new JobConfigurationLocator() {
+		jobExecutorFacade.setJobConfigurationLocator(new JobConfigurationLocator() {
 			public JobConfiguration getJobConfiguration(String name) throws NoSuchJobConfigurationException {
 				return jobConfiguration;
 			}
 		});
-		final SimpleJobIdentifier jobRuntimeInformation = new SimpleJobIdentifier("foo");
-		jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation);
-		JobInstance job = new JobInstance(jobRuntimeInformation);
+		final SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("foo");
+		jobRepository.findOrCreateJob(jobConfiguration, jobIdentifier);
+		JobInstance job = new JobInstance(jobIdentifier);
 		jobRepositoryControl.setReturnValue(job);
 		jobRepositoryControl.replay();
 		
@@ -134,7 +143,7 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 		new Thread(new Runnable() {
 			public void run() {
 				try {
-					simpleContainer.start(jobRuntimeInformation);
+					jobExecutorFacade.start(jobIdentifier);
 				}
 				catch (NoSuchJobConfigurationException e) {
 					System.err.println("Shouldn't happen");
@@ -143,22 +152,22 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 		}).start();
 		// Give Thread time to start
 		Thread.sleep(100L);
-		assertTrue(simpleContainer.isRunning());
+		assertTrue(jobExecutorFacade.isRunning());
 		running = false;
 		int count = 0;
-		while(simpleContainer.isRunning() && count ++<5) {
+		while(jobExecutorFacade.isRunning() && count ++<5) {
 			Thread.sleep(100L);
 		}
-		assertFalse(simpleContainer.isRunning());
+		assertFalse(jobExecutorFacade.isRunning());
 		jobRepositoryControl.verify();
 	}
 
 	public void testInvalidState() throws Exception {
 
-		simpleContainer.setJobExecutor(null);
+		jobExecutorFacade.setJobExecutor(null);
 
 		try {
-			simpleContainer.start(new SimpleJobIdentifier("TestJob"));
+			jobExecutorFacade.start(new SimpleJobIdentifier("TestJob"));
 			fail("Expected IllegalStateException");
 		}
 		catch (IllegalStateException ex) {
@@ -169,12 +178,12 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 	public void testStopWithNoJob() throws Exception {
 		MockControl control = MockControl.createControl(JobExecutionRegistry.class);
 		JobExecutionRegistry jobExecutionRegistry = (JobExecutionRegistry) control.getMock();
-		simpleContainer.setJobExecutionRegistry(jobExecutionRegistry);
+		jobExecutorFacade.setJobExecutionRegistry(jobExecutionRegistry);
 		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
 		control.expectAndReturn(jobExecutionRegistry.get(runtimeInformation), null);
 		control.replay();
 		try {
-			simpleContainer.stop(runtimeInformation);
+			jobExecutorFacade.stop(runtimeInformation);
 			fail("Expected NoSuchJobExecutionException");
 		} catch (NoSuchJobExecutionException e) {
 			// expected
@@ -185,7 +194,7 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 
 	public void testStop() throws Exception {
 		JobExecutionRegistry jobExecutionRegistry = new VolatileJobExecutionRegistry();
-		simpleContainer.setJobExecutionRegistry(jobExecutionRegistry);
+		jobExecutorFacade.setJobExecutionRegistry(jobExecutionRegistry);
 		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
 		JobExecution context = jobExecutionRegistry.register(new JobInstance(runtimeInformation, new Long(0)));
 
@@ -193,7 +202,7 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 		RepeatContextSupport chunkContext = new RepeatContextSupport(stepContext);
 		context.registerStepContext(stepContext);
 		context.registerChunkContext(chunkContext);
-		simpleContainer.stop(runtimeInformation);
+		jobExecutorFacade.stop(runtimeInformation);
 
 		// It is only unregistered when the start method finishes, and it hasn't
 		// been called.
@@ -204,20 +213,20 @@ public class SimpleJobExecutorFacaderTests extends TestCase {
 	}
 
 	public void testStatisticsWithNoContext() throws Exception {
-		assertNotNull(simpleContainer.getStatistics());
+		assertNotNull(jobExecutorFacade.getStatistics());
 	}
 
 	public void testStatisticsWithContext() throws Exception {
 		MockControl control = MockControl.createControl(JobExecutionRegistry.class);
 		JobExecutionRegistry jobExecutionRegistry = (JobExecutionRegistry) control.getMock();
-		simpleContainer.setJobExecutionRegistry(jobExecutionRegistry);
+		jobExecutorFacade.setJobExecutionRegistry(jobExecutionRegistry);
 		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
 		JobExecution jobExecutionContext = new JobExecution(new JobInstance(runtimeInformation, new Long(0)));
 		jobExecutionContext.registerStepContext(new RepeatContextSupport(null));
 		jobExecutionContext.registerChunkContext(new RepeatContextSupport(null));
 		control.expectAndReturn(jobExecutionRegistry.findAll(), Collections.singleton(jobExecutionContext));
 		control.replay();
-		Properties statistics = simpleContainer.getStatistics();
+		Properties statistics = jobExecutorFacade.getStatistics();
 		assertNotNull(statistics);
 		assertTrue(statistics.containsKey("job1.step1"));
 		control.verify();
