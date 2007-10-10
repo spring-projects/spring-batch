@@ -39,7 +39,7 @@ Milestone Builds
 </dependency>
 +---------------
 
-  Additionally, you can browse the repository with a web browser {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/spring-batch}here}}.
+  Additionally, you can browse the repository with a web browser {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}here}}.  If you are downloading the jar files manually from there you can see the internal and external project dependencies in the <<<spring-batch-*/*.pom>>> files.  You will probably need <<<spring-batch-execution>>>, <<<spring-batch-core>>> and <<<spring-batch-infrastructure>>>.
 
 Snapshot Builds
 
