@@ -45,8 +45,7 @@ public class InputSourceItemProvider extends AbstractItemProvider implements Res
 	 * @see org.springframework.batch.item.ItemProvider#next()
 	 */
 	public Object next() {
-		Object value = inputSource.read();
-		return value;
+		return inputSource.read();
 	}
 
 	/**

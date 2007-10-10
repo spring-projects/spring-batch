@@ -57,6 +57,10 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 			inputSource.afterPropertiesSet();
 			setInputSource(inputSource);
 		}
+
+		public synchronized Object next() {
+			return super.next();
+		}
 	}
 
 	protected static class TradeMapper implements FieldSetMapper{
