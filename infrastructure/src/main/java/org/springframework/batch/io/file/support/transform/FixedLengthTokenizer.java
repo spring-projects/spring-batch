@@ -21,22 +21,23 @@ import java.util.List;
 
 /**
  * Tokenizer used to process data obtained from files with fixed-length format.
+ * Columns are specified by array of Range objects ({@link #setColumns(Range[])}).  
  * 
  * @author tomas.slanina
+ * @author peter.zozom
  */
 public class FixedLengthTokenizer extends AbstractLineTokenizer {
 	
-	private int[] lengths = new int[0];
-	
+	private Range[] ranges;
+		
 	/**
-	 * Setter for field lengths.
-	 * 
-	 * @param lengths
+	 * Set the column ranges.
+	 * @param ranges
 	 */
-	public void setLengths(int[] lengths) {
-		this.lengths = lengths;
+	public void setColumns(Range[] ranges) {
+		this.ranges = ranges;
 	}
-	
+		
 	/**
 	 * Yields the tokens resulting from the splitting of the supplied
 	 * <code>line</code>.
@@ -46,17 +47,17 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 	 * @return the resulting tokens
 	 */
 	protected List doTokenize(String line) {
-		List tokens = new ArrayList();
+		List tokens = new ArrayList(ranges.length);
 		int lineLength;
-		int startPos = 0;
-		int endPos = 0;
 		String token;
 
-		lineLength = (line == null) ? (-1) : line.length();
+		lineLength = line.length();
 
-		for (int i = 0; i < lengths.length; i++) {
-			endPos += lengths[i];
+		for (int i = 0; i < ranges.length; i++) {
 
+			int startPos = ranges[i].getMin()-1;
+			int endPos = ranges[i].getMax();
+			
 			if (lineLength >= endPos) {
 				token = line.substring(startPos, endPos);
 			}
@@ -68,7 +69,6 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 			}
 
 			tokens.add(token);
-			startPos = endPos;
 		}
 
 		return tokens;

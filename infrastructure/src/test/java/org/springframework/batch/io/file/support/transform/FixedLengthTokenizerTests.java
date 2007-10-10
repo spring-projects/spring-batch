@@ -28,23 +28,23 @@ public class FixedLengthTokenizerTests extends TestCase {
 	private String line = null;
 
 	/**
-	 * even if null or empty string is tokenized, tokenizer returns as many
-	 * empty tokens as defined by recordDescriptor.
+	 * if null or empty string is tokenized, tokenizer returns empty fieldset 
+	 * (with no tokens).
 	 */
 	public void testTokenizeEmptyString() {
-		tokenizer.setLengths(new int[] {5,5,5});
-		FieldSet tokens = tokenizer.tokenize(null);
-		assertEquals(0, tokens.getFieldCount());
-	}
-
-	public void testTokenizeNullString() {
-		tokenizer.setLengths(new int[] {5,5,5});
+		tokenizer.setColumns(new Range[] {new Range(1,5),new Range(6,10),new Range(11,15)});
 		FieldSet tokens = tokenizer.tokenize("");
 		assertEquals(0, tokens.getFieldCount());
 	}
 
+	public void testTokenizeNullString() {
+		tokenizer.setColumns(new Range[] {new Range(1,5),new Range(6,10),new Range(11,15)});
+		FieldSet tokens = tokenizer.tokenize(null);
+		assertEquals(0, tokens.getFieldCount());
+	}
+
 	public void testTokenizeRegularUse() {
-		tokenizer.setLengths(new int[] {2,5,5});
+		tokenizer.setColumns(new Range[] {new Range(1,2),new Range(3,7),new Range(8,12)});
 		// test shorter line as defined by record descriptor
 		line = "H1";
 		FieldSet tokens = tokenizer.tokenize(line);
@@ -55,7 +55,7 @@ public class FixedLengthTokenizerTests extends TestCase {
 	}
 	
 	public void testNormalLength() throws Exception {
-		tokenizer.setLengths(new int[] {10,15,5});
+		tokenizer.setColumns(new Range[] {new Range(1,10),new Range(11,25),new Range(26,30)});
 		// test shorter line as defined by record descriptor
 		line = "H1";
 		FieldSet tokens = tokenizer.tokenize(line);
@@ -69,7 +69,7 @@ public class FixedLengthTokenizerTests extends TestCase {
 	}
 	
 	public void testLongerLinesRestIgnored() throws Exception {
-		tokenizer.setLengths(new int[] {10,15,5});
+		tokenizer.setColumns(new Range[] {new Range(1,10),new Range(11,25),new Range(26,30)});
 		// test shorter line as defined by record descriptor
 		line = "H1";
 		FieldSet tokens = tokenizer.tokenize(line);
@@ -81,9 +81,23 @@ public class FixedLengthTokenizerTests extends TestCase {
 		assertEquals(line.substring(10, 25).trim(), tokens.readString(1));
 		assertEquals(line.substring(25, 30).trim(), tokens.readString(2));		
 	}
+
+	public void testNonAdjacentRangesUnsorted() throws Exception {
+		tokenizer.setColumns(new Range[] {new Range(14,28), new Range(34,38), new Range(1,10)});
+		// test shorter line as defined by record descriptor
+		line = "H1";
+		FieldSet tokens = tokenizer.tokenize(line);
+		// test normal length
+		line = "H1        +++12345678       +++++12345+++";
+		tokens = tokenizer.tokenize(line);
+		assertEquals(3, tokens.getFieldCount());
+		assertEquals(line.substring(0, 10).trim(), tokens.readString(2));
+		assertEquals(line.substring(13, 28).trim(), tokens.readString(0));
+		assertEquals(line.substring(33, 38).trim(), tokens.readString(1));		
+	}
 	
 	public void testAnotherTypeOfRecord() throws Exception {
-		tokenizer.setLengths(new int[] {5,10,10,2});
+		tokenizer.setColumns(new Range[] {new Range(1,5),new Range(6,15),new Range(16,25),new Range(26,27)});
 		// test shorter line as defined by record descriptor
 		line = "H1";
 		FieldSet tokens = tokenizer.tokenize(line);
@@ -99,14 +113,15 @@ public class FixedLengthTokenizerTests extends TestCase {
 
 	public void testTokenizerInvalidSetup() {
 		tokenizer.setNames(new String[] {"a", "b"});
-		tokenizer.setLengths(new int[] {5,5,5,2});
+		tokenizer.setColumns(new Range[] {new Range(1,5),new Range(6,15),new Range(16,25),new Range(26,27)});
 
 		try {
-			tokenizer.tokenize("McDonalds - I'm lovin' it.");
-			fail("tokenizer works even with invalid names!");
+			tokenizer.tokenize("Test tokenize");
+			fail("Exception was expected: too few names provided");
 		}
 		catch (Exception e) {
 			assertTrue(true);
 		}
 	}
+
 }

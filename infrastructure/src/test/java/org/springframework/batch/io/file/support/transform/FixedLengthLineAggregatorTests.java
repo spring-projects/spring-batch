@@ -24,6 +24,7 @@ import junit.framework.TestCase;
  * Unit tests for {@link FixedLengthLineAggregator}
  * 
  * @author robert.kasanicky
+ * @author peter.zozom
  */
 public class FixedLengthLineAggregatorTests extends TestCase {
 
@@ -31,14 +32,14 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 	private FixedLengthLineAggregator aggregator = new FixedLengthLineAggregator();
 
 	/**
-	 * Record descriptor is null => BatchCriticalException
+	 * If no ranges are specified, IllegalArgumentException is thrown
 	 */
 	public void testAggregateNullRecordDescriptor() {
 		String[] args = { "does not matter what is here" };
 
 		try {
 			aggregator.aggregate(args);
-			fail("should not work with null LineDescriptor");
+			fail("should not work with no ranges specified");
 		}
 		catch (IllegalArgumentException expected) {
 			// expected
@@ -46,31 +47,31 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 	}
 
 	/**
-	 * Argument count does not match the number of fields in the
-	 * LineDescriptor
+	 * Count of aggregated strings does not match the number of columns 
 	 */
 	public void testAggregateWrongArgumentCount() {
-		String[] args = { "only one argument" };
-		aggregator.setLengths(new int[0]);
+		String[] string = { "only one test string" };
+		aggregator.setColumns(new Range[0]);
 
 		try {
-			aggregator.aggregate(args);
-			fail("Wrong argument count, exception exptected");
+			aggregator.aggregate(string);
+			fail("Exception expected: count of aggregated strings"
+					+ " does not match the number of columns");
 		}
 		catch (IllegalArgumentException expected) {
-			assertTrue(true);
+			// expected
 		}
 	}
 
 	/**
-	 * Argument length exceeds the length specified by FieldDescriptor
+	 * Text length exceeds the length of the column.
 	 */
 	public void testAggregateInvalidInputLength() {
 		String[] args = { "Oversize" };
-		aggregator.setLengths(new int[] {args[0].length()-1});
+		aggregator.setColumns(new Range[] {new Range(1,args[0].length()-1)});
 		try {
 			aggregator.aggregate(args);
-			fail("Invalid argument length, exception should have been thrown");
+			fail("Invalid text length, exception should have been thrown");
 		}
 		catch (IllegalArgumentException expected) {
 			// expected
@@ -78,51 +79,92 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 	}
 
 	/**
-	 * Regular use with valid LineDescriptor
+	 * Test aggregation
 	 */
 	public void testAggregate() {
 		String[] args = { "Matchsize", "Smallsize" };
-		aggregator.setLengths(new int[] {args[0].length(), args[1].length()});
-		String result = aggregator.aggregate(args);
+		aggregator.setColumns(new Range[] {new Range(1,9), new Range(10,18)});
+		String result = aggregator.aggregate(args);		
 		assertEquals("MatchsizeSmallsize", result);
 	}
 
 	/**
-	 * Regular use with valid LineDescriptor
+	 * Test aggregation with last range unbound
+	 */
+	public void testAggregateWithLastRangeUnbound() {
+		String[] args = { "Matchsize", "Smallsize" };
+		aggregator.setColumns(new Range[] {new Range(1,12), new Range(13)});
+		String result = aggregator.aggregate(args);		
+		assertEquals("Matchsize   Smallsize", result);
+	}
+
+	
+	/**
+	 * Test aggregation with right alignment
 	 */
 	public void testAggregateFormattedRight() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setAlignment("right");
-		aggregator.setLengths(new int[] {args[0].length()+4, args[1].length()+1});
+		aggregator.setColumns(new Range[] {new Range(1,13), new Range(14,23)});
 		String result = aggregator.aggregate(args);
-		assertEquals(result, "    Matchsize Smallsize");
+		assertEquals(23,result.length());
+		assertEquals(result, "    Matchsize Smallsize");		
 	}
 
 	/**
-	 * Regular use with valid LineDescriptor
+	 * Test aggregation with center alignment
 	 */
 	public void testAggregateFormattedCenter() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setAlignment("center");
-		aggregator.setLengths(new int[] {args[0].length()+4, args[1].length()+1});
+		aggregator.setColumns(new Range[] {new Range(1,13), new Range(14,25)});
 		String result = aggregator.aggregate(args);
-		assertEquals(result, "  Matchsize  Smallsize ");
+		assertEquals(result, "  Matchsize   Smallsize  ");
 	}
 
+	/**
+	 * Test aggregation with left alignment
+	 */
+	public void testAggregateWithCustomPadding() {
+		String[] args = { "Matchsize", "Smallsize" };
+		aggregator.setPadding('.');
+		aggregator.setAlignment("left");
+		aggregator.setColumns(new Range[] {new Range(1,13), new Range(14,24)});
+		String result = aggregator.aggregate(args);
+		assertEquals(result, "Matchsize....Smallsize..");
+	}
+
+	/**
+	 * Test aggregation with left alignment
+	 */
+	public void testAggregateFormattedLeft() {
+		String[] args = { "Matchsize", "Smallsize" };
+		aggregator.setAlignment("left");
+		aggregator.setColumns(new Range[] {new Range(1,13), new Range(14,24)});
+		String result = aggregator.aggregate(args);
+		assertEquals(result, "Matchsize    Smallsize  ");
+	}
+
+	
+	/**
+	 * Try set ivalid alignment
+	 */
+	public void testInvalidAlignment() {
+		try {
+			aggregator.setAlignment("foo");
+			fail("Exception was expected: invalid alignment value");
+		} catch (IllegalArgumentException iae) {
+			// expected
+		}
+	}
+	
 	/**
 	 * If one of the passed arguments is null, string filled with spaces should
 	 * be returned
 	 */
 	public void testAggregateNullArgument() {
 		String[] args = { null };
-
-		aggregator.setLengths(new int[] {3});
-
-		try {
-			assertEquals("   ", aggregator.aggregate(args));
-		}
-		catch (NullPointerException unexpected) {
-			fail("incorrect handling of null arguments");
-		}
+		aggregator.setColumns(new Range[] {new Range(1,3)});
+		assertEquals("   ", aggregator.aggregate(args));
 	}
 }
