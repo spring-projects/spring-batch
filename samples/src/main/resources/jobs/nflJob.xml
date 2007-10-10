@@ -16,7 +16,7 @@
 		<property name="steps">
 			<list>
 				<bean id="playerload"
-					class="org.springframework.batch.execution.step.simple.SimpleStepConfiguration">
+					class="org.springframework.batch.execution.step.SimpleStepConfiguration">
 					<property name="commitInterval" value="100"></property>
 					<property name="startLimit" value="100" />
 					<property name="saveRestartData" value="true" />
@@ -26,13 +26,9 @@
 							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.sample.item.provider.NflPlayerItemProvider">
+									class="org.springframework.batch.item.provider.InputSourceItemProvider">
 									<property name="inputSource"
 										ref="playerFileInputSource" />
-									<property name="fieldSetMapper">
-										<bean
-											class="org.springframework.batch.sample.mapping.NflPlayerMapper" />
-									</property>
 								</bean>
 							</property>
 							<property name="itemProcessor">
@@ -50,7 +46,7 @@
 					</property>
 				</bean>
 				<bean id="gameLoad"
-					class="org.springframework.batch.execution.step.simple.SimpleStepConfiguration">
+					class="org.springframework.batch.execution.step.SimpleStepConfiguration">
 					<property name="commitInterval" value="100" />
 					<property name="startLimit" value="100" />
 					<property name="saveRestartData" value="true" />
@@ -59,13 +55,9 @@
 							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.item.provider.FlatFileItemProvider">
-									<property name="source"
+									class="org.springframework.batch.item.provider.InputSourceItemProvider">
+									<property name="inputSource"
 										ref="gameFileInputSource" />
-									<property name="mapper">
-										<bean
-											class="org.springframework.batch.sample.mapping.NflGameMapper" />
-									</property>
 								</bean>
 							</property>
 							<property name="itemProcessor">
@@ -84,7 +76,7 @@
 					</property>
 				</bean>
 				<bean id="playerSummarization"
-					class="org.springframework.batch.execution.step.simple.SimpleStepConfiguration">
+					class="org.springframework.batch.execution.step.SimpleStepConfiguration">
 					<property name="commitInterval" value="100" />
 					<property name="startLimit" value="100" />
 					<property name="saveRestartData" value="true" />
@@ -132,6 +124,10 @@
 					value="ID,lastName,firstName,position,birthYear,debutYear" />
 			</bean>
 		</property>
+		<property name="fieldSetMapper">
+			<bean
+				class="org.springframework.batch.sample.mapping.NflPlayerMapper" />
+		</property>
 	</bean>
 
 	<bean id="gameFileInputSource"
@@ -148,6 +144,10 @@
 				<property name="names"
 					value="id,year,team,week,opponent,completes,attempts,passingYards,passingTd,interceptions,rushes,rushYards,receptions,receptionYards,totalTd" />
 			</bean>
+		</property>
+		<property name="fieldSetMapper">
+			<bean
+				class="org.springframework.batch.sample.mapping.NflGameMapper" />
 		</property>
 	</bean>
 
