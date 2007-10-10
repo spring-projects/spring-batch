@@ -16,8 +16,6 @@
 
 package org.springframework.batch.io;
 
-import org.springframework.batch.item.ResourceLifecycle;
-
 /**
  * Basic interface for generic output operations. Class implementing this
  * interface will be responsible for serializing objects to output source.
@@ -26,7 +24,7 @@ import org.springframework.batch.item.ResourceLifecycle;
  * 
  * @author Dave Syer
  */
-public interface OutputSource extends ResourceLifecycle {
+public interface OutputSource  {
 
 	/**
 	 * Writes provided value object to an output stream or similar.

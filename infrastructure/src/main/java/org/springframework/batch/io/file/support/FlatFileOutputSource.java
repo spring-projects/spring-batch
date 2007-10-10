@@ -62,7 +62,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileOutputSource implements OutputSource, Restartable, StatisticsProvider, InitializingBean,
+public class FlatFileOutputSource implements OutputSource, ResourceLifecycle, Restartable, StatisticsProvider, InitializingBean,
 		DisposableBean {
 
 	/**

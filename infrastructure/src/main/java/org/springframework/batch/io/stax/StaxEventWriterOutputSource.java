@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.springframework.batch.io.OutputSource;
 import org.springframework.batch.io.support.FileUtils;
+import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
@@ -40,7 +41,7 @@ import org.springframework.util.CollectionUtils;
  * @author Peter Zozom
  *
  */
-public class StaxEventWriterOutputSource implements OutputSource, Restartable,
+public class StaxEventWriterOutputSource implements OutputSource, ResourceLifecycle, Restartable,
 		StatisticsProvider, InitializingBean, DisposableBean {
 
 	// default encoding
