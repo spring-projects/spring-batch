@@ -23,7 +23,7 @@
 
 	<bean id="defaultLineDescriptor"
 		class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
-		<property name="lengths" value="120"/>
+		<property name="columns" value="1-120" />
 	</bean>
 
 	<bean id="parentLineDescriptor" abstract="true"
