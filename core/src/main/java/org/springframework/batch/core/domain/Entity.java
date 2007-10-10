@@ -72,6 +72,9 @@ public class Entity implements Serializable {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object other) {
+		if (other == this) {
+			return true;
+		}
 		if (other == null) {
 			return false;
 		}
