@@ -24,7 +24,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.exception.FlatFileParsingException;
-import org.springframework.batch.io.exception.ValidationException;
 import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.io.file.support.separator.DefaultRecordSeparatorPolicy;
