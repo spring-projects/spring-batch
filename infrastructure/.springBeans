@@ -6,6 +6,7 @@
 	<configs>
 		<config>src/test/resources/org/springframework/batch/io/file/support/mapping/bean-wrapper.xml</config>
 		<config>src/test/resources/org/springframework/batch/io/sql/data-source-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/retry/aop/retry-transaction-test.xml</config>
 	</configs>
 	<configSets>
 	</configSets>

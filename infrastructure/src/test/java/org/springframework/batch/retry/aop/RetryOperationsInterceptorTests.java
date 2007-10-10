@@ -31,6 +31,10 @@ import org.springframework.aop.target.SingletonTargetSource;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.ClassUtils;
 
 public class RetryOperationsInterceptorTests extends TestCase {
 
@@ -39,18 +43,25 @@ public class RetryOperationsInterceptorTests extends TestCase {
 	private Service service;
 
 	private ServiceImpl target;
+	
+	private static int count;
+
+	private static int transactionCount;
 
 	protected void setUp() throws Exception {
 		super.setUp();
 		interceptor = new RetryOperationsInterceptor();
 		target = new ServiceImpl();
-		service = (Service) ProxyFactory.getProxy(Service.class, new SingletonTargetSource(target));
+		service = (Service) ProxyFactory.getProxy(Service.class,
+				new SingletonTargetSource(target));
+		count = 0;
+		transactionCount = 0;
 	}
 
 	public void testDefaultInterceptorSunnyDay() throws Exception {
 		((Advised) service).addAdvice(interceptor);
 		service.service();
-		assertEquals(2, target.count);
+		assertEquals(2, count);
 	}
 
 	public void testInterceptorChainWithRetry() throws Exception {
@@ -66,7 +77,7 @@ public class RetryOperationsInterceptorTests extends TestCase {
 		template.setRetryPolicy(new SimpleRetryPolicy(2));
 		interceptor.setRetryTemplate(template);
 		service.service();
-		assertEquals(2, target.count);
+		assertEquals(2, count);
 		assertEquals(2, list.size());
 	}
 
@@ -78,13 +89,26 @@ public class RetryOperationsInterceptorTests extends TestCase {
 		try {
 			service.service();
 			fail("Expected Exception.");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			assertTrue(e.getMessage().startsWith("Not enough calls"));
 		}
-		assertEquals(1, target.count);
+		assertEquals(1, count);
 	}
-	
+
+	public void testOutsideTransaction() throws Exception {
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
+				ClassUtils.addResourcePathToPackagePath(getClass(),
+						"retry-transaction-test.xml"));
+		Object object = context.getBean("bean");
+		assertNotNull(object);
+		assertTrue(object instanceof Service);
+		Service bean = (Service) object ;
+		bean.doTansactional();
+		assertEquals(2, count);
+		// Expect 2 separate transactions...
+		assertEquals(2, transactionCount);
+	}
+
 	public void testIllegalMethodInvocationType() throws Throwable {
 		try {
 			interceptor.invoke(new MethodInvocation() {
@@ -116,12 +140,14 @@ public class RetryOperationsInterceptorTests extends TestCase {
 		}
 	}
 
-	private interface Service {
+	public static interface Service {
 		void service() throws Exception;
+		void doTansactional() throws Exception;
 	}
 
-	private static class ServiceImpl implements Service {
-		private int count = 0;
+	public static class ServiceImpl implements Service {
+		
+		private boolean enteredTransaction = false;
 
 		public void service() throws Exception {
 			count++;
@@ -129,5 +155,21 @@ public class RetryOperationsInterceptorTests extends TestCase {
 				throw new Exception("Not enough calls: " + count);
 			}
 		}
+		public void doTansactional() throws Exception {
+			if (TransactionSynchronizationManager.isActualTransactionActive() && !enteredTransaction) {
+				transactionCount++;
+				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+					public void beforeCompletion() {
+						enteredTransaction = false;
+					}
+				});
+				enteredTransaction  = true;
+			}
+			count++;
+			if (count==1) {
+				throw new RuntimeException("Rollback please");
+			}
+		}
+
 	}
 }
