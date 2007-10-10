@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.support.DefaultFlatFileInputSource;
 import org.springframework.batch.sample.dao.TradeWriter;
 import org.springframework.batch.sample.domain.Trade;

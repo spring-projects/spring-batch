@@ -21,10 +21,7 @@ import java.io.FileReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.support.DefaultFlatFileInputSource;
-import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcOperations;
