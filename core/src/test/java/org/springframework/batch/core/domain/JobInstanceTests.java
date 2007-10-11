@@ -17,6 +17,8 @@ package org.springframework.batch.core.domain;
 
 import java.util.Collections;
 
+import org.springframework.batch.core.runtime.SimpleJobIdentifier;
+
 
 import junit.framework.TestCase;
 
@@ -75,11 +77,7 @@ public class JobInstanceTests extends TestCase {
 	 */
 	public void testGetIdentifier() {
 		assertEquals(null, instance.getIdentifier());
-		instance = new JobInstance(new JobIdentifier() {
-			public String getName() {
-				return "foo";
-			}
-		});
+		instance = new JobInstance(new SimpleJobIdentifier("foo"));
 		assertEquals("foo", instance.getIdentifier().getName());
 	}
 	
@@ -88,11 +86,7 @@ public class JobInstanceTests extends TestCase {
 	 */
 	public void testGetName() {
 		assertEquals(null, instance.getName());
-		instance = new JobInstance(new JobIdentifier() {
-			public String getName() {
-				return "foo";
-			}
-		});
+		instance = new JobInstance(new SimpleJobIdentifier("foo"));
 		assertEquals("foo", instance.getName());
 	}
 	

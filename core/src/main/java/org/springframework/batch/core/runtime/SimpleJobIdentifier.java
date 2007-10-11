@@ -60,9 +60,19 @@ public class SimpleJobIdentifier implements JobIdentifier {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	
+
+	/**
+	 * Just uses the name as a label.
+	 * 
+	 * @see org.springframework.batch.core.domain.JobIdentifier#getLabel()
+	 */
+	public String getLabel() {
+		return this.name;
+	}
 
 	public String toString() {
-
 		return "name=" + name;
 	}
 
