@@ -16,6 +16,8 @@
 
 package org.springframework.batch.execution.runtime;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -24,6 +26,8 @@ import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 
 public class ScheduledJobIdentifier extends SimpleJobIdentifier implements JobIdentifier {
+
+	private static final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
 	private Date scheduleDate = new Date(0);
 
@@ -59,6 +63,12 @@ public class ScheduledJobIdentifier extends SimpleJobIdentifier implements JobId
 
 	public void setScheduleDate(Date scheduleDate) {
 		this.scheduleDate = scheduleDate;
+	}
+	
+	
+
+	public String getLabel() {
+		return super.getLabel()+"-"+jobStream+"-"+jobRun+"-"+dateFormat.format(scheduleDate);
 	}
 
 	public String toString() {

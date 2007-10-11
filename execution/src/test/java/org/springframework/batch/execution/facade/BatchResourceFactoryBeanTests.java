@@ -19,7 +19,6 @@ package org.springframework.batch.execution.facade;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import junit.framework.TestCase;
 
@@ -44,37 +43,43 @@ import org.springframework.util.StringUtils;
 public class BatchResourceFactoryBeanTests extends TestCase {
 
 	/**
-	 * object under test
+	 * Object under test
 	 */
 	private BatchResourceFactoryBean resourceFactory = new BatchResourceFactoryBean();
 
 	private String rootDir = getRootDir();
-
+	
 	private char pathsep = File.separatorChar;
 
-	private String PATTERN_STRING = "/%BATCH_ROOT%" + pathsep
-			+ "%JOB_NAME%-%SCHEDULE_DATE%-%JOB_RUN%-%STREAM_NAME%";
+	private String path = "data" + pathsep;
+
+	private ScheduledJobIdentifier identifier;
 
 	/**
 	 * mock step context
 	 */
 
 	protected void setUp() throws Exception {
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.YEAR, 2007);
-		calendar.set(Calendar.MONTH, Calendar.JULY);
-		calendar.set(Calendar.DAY_OF_MONTH, 30);
 
-		// define mock behaviour
-		resourceFactory.setScheduleDate("20070730");
 		resourceFactory.setRootDirectory(rootDir);
-		resourceFactory.setJobName("testJob");
-		resourceFactory.setJobStream("testStream");
-		resourceFactory.setJobRun(0);
-		resourceFactory.setStepName("testStep");
-		resourceFactory.setFilePattern(PATTERN_STRING);
+
+		identifier = new ScheduledJobIdentifier("testJob");
+		// define mock behaviour
+		identifier.setScheduleDate(new SimpleDateFormat("yyyyMMdd")
+		.parse("20070730"));
+		identifier.setJobStream("testStream");
+		identifier.setJobRun(11);
+		
+		SimpleStepContext context = new SimpleStepContext();
+		JobInstance job = new JobInstance(identifier);
+		JobExecution jobExecution = new JobExecution(job);
+		StepInstance step = new StepInstance(job, "bar");
+		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		context.setStepExecution(stepExecution);
+		resourceFactory.setStepContext(context);
 
 		resourceFactory.afterPropertiesSet();
+		
 	}
 
 	private String getRootDir() {
@@ -90,20 +95,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	 * regular use with valid context and pattern provided
 	 */
 	public void testCreateFileName() throws Exception {
-		doTestPathName("testJob-20070730-0-testStream");
-	}
-
-	/**
-	 * Set the job name to null and attempt to get the resource, %JOB_NAME%
-	 * should not be replaced.
-	 */
-	public void testNullJobName() throws Exception {
-
-		resourceFactory.setJobName(null);
-		// set singleton to false so a new instance is returned.
-		resourceFactory.setSingleton(false);
-
-		doTestPathName("job-20070730-0-testStream");
+		doTestPathName("testJob-testStream-11-20070730-bar.txt", path);
 	}
 
 	public void testObjectType() throws Exception {
@@ -112,7 +104,6 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 	public void testNullFilePattern() throws Exception {
 		resourceFactory = new BatchResourceFactoryBean();
-		resourceFactory.setSingleton(false);
 		resourceFactory.setFilePattern(null);
 		try {
 			resourceFactory.getObject();
@@ -120,6 +111,12 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		} catch (IllegalArgumentException e) {
 			// expected
 		}
+	}
+
+	public void testNonStandardFilePattern() throws Exception {
+		resourceFactory.setFilePattern("%BATCH_ROOT%/data/%JOB_NAME%/"
+				+ "%STEP_NAME%+%JOB_IDENTIFIER%");
+		doTestPathName("bar+testJob-testStream-11-20070730", path);
 	}
 
 	public void testResoureLoaderAware() throws Exception {
@@ -135,30 +132,11 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		assertTrue(resource.exists());
 	}
 
-	public void testStepContextAware() throws Exception {
-
-		SimpleStepContext context = new SimpleStepContext();
-		ScheduledJobIdentifier identifier = new ScheduledJobIdentifier("foo");
-		identifier.setJobStream("stream");
-		identifier.setJobRun(11);
-		identifier.setScheduleDate(new SimpleDateFormat("yyyyMMdd")
-				.parse("20070801"));
-		JobInstance job = new JobInstance(identifier);
-		JobExecution jobExecution = new JobExecution(job);
-		StepInstance step = new StepInstance(job, "bar");
-		StepExecution stepExecution = new StepExecution(step, jobExecution);
-		context.setStepExecution(stepExecution);
-		resourceFactory.setStepContext(context);
-
-		doTestPathName("foo-20070801-11-stream");
-
-	}
-	
 	public void testRootDirectoryEndsWithForwardSlash() throws Exception {
 		String rootDir = getRootDir();
 		rootDir = StringUtils.replace(rootDir, File.separator, "/") + "/";
 		resourceFactory.setRootDirectory(rootDir);
-		doTestPathName("testJob-20070730-0-testStream");
+		doTestPathName("testJob-testStream-11-20070730-bar.txt", path);
 	}
 
 	public void testRootDirectoryEndsWithBackSlash() throws Exception {
@@ -166,38 +144,18 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		rootDir = StringUtils.replace(rootDir, File.separator, "\\") + "\\";
 		resourceFactory.setRootDirectory(rootDir);
 		// TODO: this one fails on UNIX (so Bamboo)...
-//		doTestPathName("testJob-20070730-0-testStream");
+//		doTestPathName("testJob-testStream-11-20070730-bar.txt");
 	}
 
-	public void testDateFormatPattern() throws Exception {
-		resourceFactory.setDateFormatPattern("ddMMyyyy");
-
-		SimpleStepContext context = new SimpleStepContext();
-		ScheduledJobIdentifier identifier = new ScheduledJobIdentifier("foo");
-		identifier.setJobStream("stream");
-		identifier.setJobRun(11);
-		identifier.setScheduleDate(new SimpleDateFormat("yyyyMMdd")
-				.parse("20070802"));
-		JobInstance job = new JobInstance(identifier);
-		JobExecution jobExecution = new JobExecution(job);
-		StepInstance step = new StepInstance(job, "bar");
-		StepExecution stepExecution = new StepExecution(step, jobExecution);
-		context.setStepExecution(stepExecution);
-		resourceFactory.setStepContext(context);
-
-		doTestPathName("foo-02082007-11-stream");
-	}
-
-	private void doTestPathName(String filename) throws Exception, IOException {
+	private void doTestPathName(String filename, String path) throws Exception, IOException {
 		Resource resource = (Resource) resourceFactory.getObject();
 		
 		String returnedPath = resource.getFile().getAbsolutePath();
 		
-		String absolutePath = new File("/" + rootDir + pathsep
-				+ filename).getAbsolutePath();
+		String absolutePath = new File("/" + rootDir + pathsep + path + identifier.getName() + pathsep + filename).getAbsolutePath();
 		
-		// System.err.println(absolutePath);
-		// System.err.println(returnedPath);
+		System.err.println(absolutePath);
+		System.err.println(returnedPath);
 		assertEquals(absolutePath, returnedPath);
 	}
 	

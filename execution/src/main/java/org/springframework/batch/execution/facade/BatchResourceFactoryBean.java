@@ -17,11 +17,9 @@
 package org.springframework.batch.execution.facade;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;
 import org.springframework.beans.factory.FactoryBean;
@@ -34,18 +32,16 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * *******This class is currently undergoing heavy refactoring*****************
- * 
  * Strategy for locating different resources on the file system. For each unique
  * step, the same file handle will be returned. A unique step is defined as
- * having the same job name, job run, schedule date, stream name, and step name.
- * An external file mover (such as an EAI solution) should rename and move any
- * input files to conform to the patter defined by the file pattern.<br/>
+ * having the same job identifier and step name. An external file mover (such
+ * as an EAI solution) should rename and move any input files to conform to the
+ * patter defined by the file pattern.<br/>
  * 
  * If no pattern is passed in, then following default is used:
  * 
  * <pre>
- * %BATCH_ROOT%/job_data/%JOB_NAME%/%SCHEDULE_DATE%-%STREAM_NAME%-%STEP_NAME%.txt
+ * %BATCH_ROOT%/job_data/%JOB_NAME%/%JOB_IDENTIFIER%-%STEP_NAME%.txt
  * </pre>
  * 
  * The %% variables are replaced with the corresponding bean property at run
@@ -57,41 +53,32 @@ import org.springframework.util.StringUtils;
  * 
  * @see FactoryBean
  */
-public class BatchResourceFactoryBean extends AbstractFactoryBean implements ResourceLoaderAware, StepContextAware {
+public class BatchResourceFactoryBean extends AbstractFactoryBean implements
+		ResourceLoaderAware, StepContextAware {
 
 	private static final String BATCH_ROOT_PATTERN = "%BATCH_ROOT%";
 
-	private static final String JOB_NAME_PATTERN = "%JOB_NAME%";
+	private static final String JOB_IDENTIFIER_PATTERN = "%JOB_IDENTIFIER%";
 
-	private static final String JOB_RUN_PATTERN = "%JOB_RUN%";
+	private static final String JOB_NAME_PATTERN = "%JOB_NAME%";
 
 	private static final String STEP_NAME_PATTERN = "%STEP_NAME%";
 
-	private static final String STREAM_PATTERN = "%STREAM_NAME%";
-
-	private static final String SCHEDULE_DATE_PATTERN = "%SCHEDULE_DATE%";
-
-	private static final String DEFAULT_PATTERN = "%BATCH_ROOT%/job_data/%JOB_NAME%/"
-			+ "%SCHEDULE_DATE%-%STREAM_NAME%-%STEP_NAME%.txt";
+	private static final String DEFAULT_PATTERN = "%BATCH_ROOT%/data/%JOB_NAME%/"
+			+ "%JOB_IDENTIFIER%-%STEP_NAME%.txt";
 
 	private String filePattern = DEFAULT_PATTERN;
 
 	private String jobName = null;
-
-	private String jobStream = "";
-
-	private int jobRun = 0;
-	
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
-	private String scheduleDate = "";
 
 	private String rootDirectory = "";
 
 	private String stepName = "";
 
 	private ResourceLoader resourceLoader;
-	
+
+	private JobIdentifier jobIdentifier;
+
 	/**
 	 * Always false because we are usually expecting to be step scoped.
 	 * 
@@ -103,29 +90,26 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.context.ResourceLoaderAware#setResourceLoader(org.springframework.core.io.ResourceLoader)
 	 */
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.execution.scope.StepContextAware#setStepScopeContext(org.springframework.core.AttributeAccessor)
 	 */
 	public void setStepContext(StepContext context) {
-		Assert.state(context.getStepExecution()!=null, "The StepContext does not have an execution.");
+		Assert.state(context.getStepExecution() != null,
+				"The StepContext does not have an execution.");
 		StepExecution execution = context.getStepExecution();
 		stepName = execution.getStep().getName();
 		jobName = execution.getStep().getJob().getName();
-		JobIdentifier identifier = execution.getJobExecution().getJobIdentifier();
-		if (identifier instanceof ScheduledJobIdentifier) {
-			ScheduledJobIdentifier scheduledJobIdentifier = (ScheduledJobIdentifier) identifier;
-			jobStream = scheduledJobIdentifier.getJobStream();
-			jobRun = scheduledJobIdentifier.getJobRun();
-			scheduleDate = dateFormat.format(scheduledJobIdentifier.getScheduleDate());
-		}
-		
+		jobIdentifier = execution.getJobExecution()
+				.getJobIdentifier();
 	}
 
 	/**
@@ -150,7 +134,8 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 	/**
 	 * helper method for <code>createFileName()</code>
 	 */
-	private String replacePattern(String string, String pattern, String replacement) {
+	private String replacePattern(String string, String pattern,
+			String replacement) {
 
 		// check to ensure pattern exists in string.
 		if (string.indexOf(pattern) != -1) {
@@ -174,11 +159,10 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 		// TODO consider refactoring to void replacePattern() method and
 		// collecting variable fileName
 		fileName = replacePattern(fileName, BATCH_ROOT_PATTERN, rootDirectory);
-		fileName = replacePattern(fileName, JOB_NAME_PATTERN, jobName==null?"job":jobName);
+		fileName = replacePattern(fileName, JOB_NAME_PATTERN,
+				jobName == null ? "job" : jobName);
 		fileName = replacePattern(fileName, STEP_NAME_PATTERN, stepName);
-		fileName = replacePattern(fileName, STREAM_PATTERN, jobStream);
-		fileName = replacePattern(fileName, JOB_RUN_PATTERN, String.valueOf(jobRun));
-		fileName = replacePattern(fileName, SCHEDULE_DATE_PATTERN, scheduleDate);
+		fileName = replacePattern(fileName, JOB_IDENTIFIER_PATTERN, jobIdentifier==null ? "step": jobIdentifier.getLabel());
 
 		return fileName;
 	}
@@ -189,33 +173,10 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 
 	public void setRootDirectory(String rootDirectory) {
 		this.rootDirectory = rootDirectory;
-		if (rootDirectory!=null && rootDirectory.endsWith(File.separator)) {
-			this.rootDirectory = rootDirectory.substring(0, rootDirectory.lastIndexOf(File.separator));
+		if (rootDirectory != null && rootDirectory.endsWith(File.separator)) {
+			this.rootDirectory = rootDirectory.substring(0, rootDirectory
+					.lastIndexOf(File.separator));
 		}
-	}
-
-	public void setStepName(String stepName) {
-		this.stepName = stepName;
-	}
-
-	public void setJobName(String jobName) {
-		this.jobName = jobName;
-	}
-
-	public void setJobRun(int jobRun) {
-		this.jobRun = jobRun;
-	}
-
-	public void setJobStream(String jobStream) {
-		this.jobStream = jobStream;
-	}
-
-	public void setScheduleDate(String scheduleDate) {
-		this.scheduleDate = scheduleDate;
-	}
-	
-	public void setDateFormatPattern(String pattern) {
-		dateFormat = new SimpleDateFormat(pattern);
 	}
 
 }
