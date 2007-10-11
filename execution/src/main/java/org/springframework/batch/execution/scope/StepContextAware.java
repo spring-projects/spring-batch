@@ -15,14 +15,13 @@
  */
 package org.springframework.batch.execution.scope;
 
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.core.AttributeAccessor;
-
 /**
- * Marker interface for beans to be injected with a {@link RepeatContext}.
- * Useful for business logic implementations that want to store some state in
- * the context, to communicate between iterations, or with an enclosing
- * interceptor.
+ * Marker interface for beans to be injected with a {@link StepContext}. Useful
+ * for business logic implementations that want to store some state in the
+ * context, to communicate between iterations, or with an enclosing executor.<br/>
+ * 
+ * A bean which is step scoped which also implements this interface will be
+ * injected with the context at the start of the bean lifecycle.
  * 
  * @author Dave Syer
  * 
@@ -30,9 +29,10 @@ import org.springframework.core.AttributeAccessor;
 public interface StepContextAware {
 
 	/**
-	 * Callback for injection of {@link RepeatContext}.
+	 * Callback for injection of {@link StepContext}.
 	 * 
-	 * @param context the current context supplied by framework.
+	 * @param context
+	 *            the current context supplied by framework.
 	 */
-	void setStepScopeContext(AttributeAccessor context);
+	void setStepContext(StepContext context);
 }

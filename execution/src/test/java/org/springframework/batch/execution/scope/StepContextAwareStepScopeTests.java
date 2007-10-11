@@ -66,15 +66,17 @@ public class StepContextAwareStepScopeTests extends TestCase {
 		assertEquals(context, bean.context);
 	}
 
-//	public void testScopedBeanWithInner() throws Exception {
-//		StepSynchronizationManager.open();
-//		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("scope-tests.xml", getClass());
-//		TestBean bean = ((TestBean) applicationContext.getBean("inner")).child;
-//		assertNotNull(bean);
-//		assertEquals("bar", bean.name);
-//		StepSynchronizationManager.close();
-//		assertEquals(1, list.size());
-//	}
+	public void testScopedBeanWithInner() throws Exception {
+		StepSynchronizationManager.open();
+		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(
+				"scope-tests.xml", getClass());
+		TestBean bean = ((TestBean) applicationContext.getBean("inner")).child;
+		assertNotNull(bean);
+		assertEquals("bar", bean.name);
+		StepSynchronizationManager.close();
+		// TODO: Still a bug in Spring Core?  Preventing destroy method from being called in inner bean.
+		// assertEquals(1, list.size());
+	}
 
 	public static class TestBean {
 		String name;
@@ -92,7 +94,7 @@ public class StepContextAwareStepScopeTests extends TestCase {
 
 	public static class TestBeanAware extends TestBean implements StepContextAware {
 		AttributeAccessor context;
-		public void setStepScopeContext(AttributeAccessor context) {
+		public void setStepContext(StepContext context) {
 			this.context = context;
 		}
 	}

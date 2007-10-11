@@ -62,7 +62,7 @@ public class StepScope implements Scope,
 			scopedObject = objectFactory.getObject();
 			context.setAttribute(name, scopedObject);
 			if (scopedObject instanceof StepContextAware) {
-				((StepContextAware) scopedObject).setStepScopeContext(context);
+				((StepContextAware) scopedObject).setStepContext(context);
 			}
 
 		}

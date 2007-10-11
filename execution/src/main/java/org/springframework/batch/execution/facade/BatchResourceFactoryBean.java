@@ -17,7 +17,13 @@
 package org.springframework.batch.execution.facade;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 
+import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
+import org.springframework.batch.execution.scope.StepContext;
+import org.springframework.batch.execution.scope.StepContextAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.context.ResourceLoaderAware;
@@ -51,7 +57,7 @@ import org.springframework.util.StringUtils;
  * 
  * @see FactoryBean
  */
-public class BatchResourceFactoryBean extends AbstractFactoryBean implements ResourceLoaderAware {
+public class BatchResourceFactoryBean extends AbstractFactoryBean implements ResourceLoaderAware, StepContextAware {
 
 	private static final String BATCH_ROOT_PATTERN = "%BATCH_ROOT%";
 
@@ -75,6 +81,8 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 	private String jobStream = "";
 
 	private int jobRun = 0;
+	
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
 	private String scheduleDate = "";
 
@@ -83,6 +91,15 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 	private String stepName = "";
 
 	private ResourceLoader resourceLoader;
+	
+	/**
+	 * Always false because we are usually expecting to be step scoped.
+	 * 
+	 * @see org.springframework.beans.factory.config.AbstractFactoryBean#isSingleton()
+	 */
+	public boolean isSingleton() {
+		return false;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -90,6 +107,25 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 	 */
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.execution.scope.StepContextAware#setStepScopeContext(org.springframework.core.AttributeAccessor)
+	 */
+	public void setStepContext(StepContext context) {
+		Assert.state(context.getStepExecution()!=null, "The StepContext does not have an execution.");
+		StepExecution execution = context.getStepExecution();
+		stepName = execution.getStep().getName();
+		jobName = execution.getStep().getJob().getName();
+		JobIdentifier identifier = execution.getJobExecution().getJobIdentifier();
+		if (identifier instanceof ScheduledJobIdentifier) {
+			ScheduledJobIdentifier scheduledJobIdentifier = (ScheduledJobIdentifier) identifier;
+			jobStream = scheduledJobIdentifier.getJobStream();
+			jobRun = scheduledJobIdentifier.getJobRun();
+			scheduleDate = dateFormat.format(scheduledJobIdentifier.getScheduleDate());
+		}
+		
 	}
 
 	/**
@@ -176,6 +212,10 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 
 	public void setScheduleDate(String scheduleDate) {
 		this.scheduleDate = scheduleDate;
+	}
+	
+	public void setDateFormatPattern(String pattern) {
+		dateFormat = new SimpleDateFormat(pattern);
 	}
 
 }

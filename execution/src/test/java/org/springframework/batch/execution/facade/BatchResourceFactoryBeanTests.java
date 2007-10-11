@@ -17,13 +17,22 @@
 package org.springframework.batch.execution.facade;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
+import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 /**
  * Unit tests for {@link BatchResourceFactoryBean}
@@ -40,10 +49,11 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	private BatchResourceFactoryBean resourceFactory = new BatchResourceFactoryBean();
 
 	private String rootDir = getRootDir();
-	
+
 	private char pathsep = File.separatorChar;
-	
-	private String PATTERN_STRING = "/%BATCH_ROOT%"+pathsep+"%JOB_NAME%-%SCHEDULE_DATE%-%JOB_RUN%-%STREAM_NAME%";
+
+	private String PATTERN_STRING = "/%BATCH_ROOT%" + pathsep
+			+ "%JOB_NAME%-%SCHEDULE_DATE%-%JOB_RUN%-%STREAM_NAME%";
 
 	/**
 	 * mock step context
@@ -70,7 +80,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	private String getRootDir() {
 		String rootDir = System.getProperty("java.io.tmpdir");
 		assertNotNull(rootDir);
-		if (rootDir!=null && rootDir.endsWith(File.separator)) {
+		if (rootDir != null && rootDir.endsWith(File.separator)) {
 			rootDir = rootDir.substring(0, rootDir.lastIndexOf(File.separator));
 		}
 		return rootDir;
@@ -80,16 +90,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	 * regular use with valid context and pattern provided
 	 */
 	public void testCreateFileName() throws Exception {
-
-		Resource resource = (Resource) resourceFactory.getObject();
-
-		String returnedPath = resource.getFile().getAbsolutePath();
-
-		String absolutePath = new File("/"+rootDir+pathsep+"testJob-20070730-0-testStream").getAbsolutePath();
-
-		System.err.println(absolutePath);
-		System.err.println(returnedPath);
-		assertEquals(absolutePath, returnedPath);
+		doTestPathName("testJob-20070730-0-testStream");
 	}
 
 	/**
@@ -102,21 +103,13 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		// set singleton to false so a new instance is returned.
 		resourceFactory.setSingleton(false);
 
-		Resource resource = (Resource) resourceFactory.getObject();
-
-		String returnedPath = resource.getFile().getAbsolutePath();
-
-		String absolutePath = new File("/"+rootDir+pathsep+"job-20070730-0-testStream").getAbsolutePath();
-
-		System.err.println(absolutePath);
-		System.err.println(returnedPath);
-		assertEquals(absolutePath, returnedPath);
+		doTestPathName("job-20070730-0-testStream");
 	}
-	
+
 	public void testObjectType() throws Exception {
 		assertEquals(Resource.class, resourceFactory.getObjectType());
 	}
-	
+
 	public void testNullFilePattern() throws Exception {
 		resourceFactory = new BatchResourceFactoryBean();
 		resourceFactory.setSingleton(false);
@@ -128,7 +121,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 			// expected
 		}
 	}
-	
+
 	public void testResoureLoaderAware() throws Exception {
 		resourceFactory = new BatchResourceFactoryBean();
 		resourceFactory.setSingleton(false);
@@ -142,4 +135,69 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		assertTrue(resource.exists());
 	}
 
+	public void testStepContextAware() throws Exception {
+
+		SimpleStepContext context = new SimpleStepContext();
+		ScheduledJobIdentifier identifier = new ScheduledJobIdentifier("foo");
+		identifier.setJobStream("stream");
+		identifier.setJobRun(11);
+		identifier.setScheduleDate(new SimpleDateFormat("yyyyMMdd")
+				.parse("20070801"));
+		JobInstance job = new JobInstance(identifier);
+		JobExecution jobExecution = new JobExecution(job);
+		StepInstance step = new StepInstance(job, "bar");
+		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		context.setStepExecution(stepExecution);
+		resourceFactory.setStepContext(context);
+
+		doTestPathName("foo-20070801-11-stream");
+
+	}
+	
+	public void testRootDirectoryEndsWithForwardSlash() throws Exception {
+		String rootDir = getRootDir();
+		rootDir = StringUtils.replace(rootDir, File.separator, "/") + "/";
+		resourceFactory.setRootDirectory(rootDir);
+		doTestPathName("testJob-20070730-0-testStream");
+	}
+
+	public void testRootDirectoryEndsWithBackSlash() throws Exception {
+		String rootDir = getRootDir();
+		rootDir = StringUtils.replace(rootDir, File.separator, "\\") + "\\";
+		resourceFactory.setRootDirectory(rootDir);
+		doTestPathName("testJob-20070730-0-testStream");
+	}
+
+	public void testDateFormatPattern() throws Exception {
+		resourceFactory.setDateFormatPattern("ddMMyyyy");
+
+		SimpleStepContext context = new SimpleStepContext();
+		ScheduledJobIdentifier identifier = new ScheduledJobIdentifier("foo");
+		identifier.setJobStream("stream");
+		identifier.setJobRun(11);
+		identifier.setScheduleDate(new SimpleDateFormat("yyyyMMdd")
+				.parse("20070802"));
+		JobInstance job = new JobInstance(identifier);
+		JobExecution jobExecution = new JobExecution(job);
+		StepInstance step = new StepInstance(job, "bar");
+		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		context.setStepExecution(stepExecution);
+		resourceFactory.setStepContext(context);
+
+		doTestPathName("foo-02082007-11-stream");
+	}
+
+	private void doTestPathName(String filename) throws Exception, IOException {
+		Resource resource = (Resource) resourceFactory.getObject();
+		
+		String returnedPath = resource.getFile().getAbsolutePath();
+		
+		String absolutePath = new File("/" + rootDir + pathsep
+				+ filename).getAbsolutePath();
+		
+		System.err.println(absolutePath);
+		System.err.println(returnedPath);
+		assertEquals(absolutePath, returnedPath);
+	}
+	
 }
