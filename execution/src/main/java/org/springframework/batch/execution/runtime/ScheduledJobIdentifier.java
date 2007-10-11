@@ -17,6 +17,7 @@
 package org.springframework.batch.execution.runtime;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -29,16 +30,23 @@ public class ScheduledJobIdentifier extends SimpleJobIdentifier implements JobId
 
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
-	private Date scheduleDate = new Date(0);
-
+	private Date scheduleDate;
+	
 	private int jobRun = 0;
 
 	private String jobStream = "";
 
-	ScheduledJobIdentifier() {}
+	ScheduledJobIdentifier() {
+		this(null);
+	}
 	
 	public ScheduledJobIdentifier(String name) {
 		super(name);
+		try {
+			scheduleDate = dateFormat.parse("19700101");
+		} catch (ParseException e) {
+			throw new IllegalStateException("Could not parse trivial date 19700101");
+		}
 	}
 
 	public int getJobRun() {
