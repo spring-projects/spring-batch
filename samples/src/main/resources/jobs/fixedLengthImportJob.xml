@@ -44,11 +44,8 @@
 		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 
-	<!-- TODO: refactor this to use aop:scoped-proxy when SPR-3804 is fixed -->
-	<bean id="scopedInputTemplate" parent="abstractInputTemplate" autowire-candidate="false" scope="step"/>
-	<bean id="fileInputTemplate" class="org.springframework.aop.scope.ScopedProxyFactoryBean" autowire-candidate="false">
-		<property name="proxyTargetClass" value="true"/>
-		<property name="targetBeanName" value="scopedInputTemplate"/>
+	<bean id="fileInputTemplate" parent="abstractInputTemplate" autowire-candidate="false" scope="step">
+		<aop:scoped-proxy/>
 	</bean>
 
 	<bean id="testInputTemplate" parent="abstractInputTemplate" />
