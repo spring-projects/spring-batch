@@ -82,7 +82,8 @@ public class SimpleStepContextTests extends TestCase {
 			}
 		});
 		context.close();
-		assertEquals(0, list.size());
+		// Yes the callback should be called even if the attribute is missing - for inner beans
+		assertEquals(1, list.size());
 	}
 
 	/**
