@@ -95,7 +95,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	 * regular use with valid context and pattern provided
 	 */
 	public void testCreateFileName() throws Exception {
-		// doTestPathName("testJob-testStream-11-20070730-bar.txt", path);
+		doTestPathName("testJob-testStream-11-20070730-bar.txt", path);
 	}
 
 	public void testObjectType() throws Exception {
@@ -114,7 +114,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	}
 
 	public void testNonStandardFilePattern() throws Exception {
-		resourceFactory.setFilePattern("%BATCH_ROOT%/data/%JOB_NAME%/"
+		resourceFactory.setFilePattern("/%BATCH_ROOT%/data/%JOB_NAME%/"
 				+ "%STEP_NAME%+%JOB_IDENTIFIER%");
 		doTestPathName("bar+testJob-testStream-11-20070730", path);
 	}
@@ -141,10 +141,10 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 	public void testRootDirectoryEndsWithBackSlash() throws Exception {
 		String rootDir = getRootDir();
-		rootDir = StringUtils.replace(rootDir, File.separator, "\\") + "\\";
+		rootDir = "/"+StringUtils.replace(rootDir, File.separator, "\\") + "\\";
 		resourceFactory.setRootDirectory(rootDir);
 		// TODO: this one fails on UNIX (so Bamboo)...
-//		doTestPathName("testJob-testStream-11-20070730-bar.txt");
+		doTestPathName("testJob-testStream-11-20070730-bar.txt", path);
 	}
 
 	private void doTestPathName(String filename, String path) throws Exception, IOException {
@@ -154,9 +154,10 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		
 		String absolutePath = new File("/" + rootDir + pathsep + path + identifier.getName() + pathsep + filename).getAbsolutePath();
 		
-		// System.err.println(absolutePath);
-		// System.err.println(returnedPath);
-		// assertEquals(absolutePath, returnedPath);
+		System.err.println(path);
+		System.err.println(absolutePath);
+		System.err.println(returnedPath);
+		assertEquals(absolutePath, returnedPath);
 	}
 	
 }

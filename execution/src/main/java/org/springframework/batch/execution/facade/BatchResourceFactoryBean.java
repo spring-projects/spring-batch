@@ -64,7 +64,7 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 
 	private static final String STEP_NAME_PATTERN = "%STEP_NAME%";
 
-	private static final String DEFAULT_PATTERN = "%BATCH_ROOT%/data/%JOB_NAME%/"
+	private static final String DEFAULT_PATTERN = "/%BATCH_ROOT%/data/%JOB_NAME%/"
 			+ "%JOB_IDENTIFIER%-%STEP_NAME%.txt";
 
 	private String filePattern = DEFAULT_PATTERN;
@@ -137,6 +137,8 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 	private String replacePattern(String string, String pattern,
 			String replacement) {
 
+	    if (string==null) return null;
+
 		// check to ensure pattern exists in string.
 		if (string.indexOf(pattern) != -1) {
 			return StringUtils.replace(string, pattern, replacement);
@@ -168,11 +170,11 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 	}
 
 	public void setFilePattern(String filePattern) {
-		this.filePattern = filePattern;
+	    this.filePattern = replacePattern(filePattern, "\\", File.separator);
 	}
 
 	public void setRootDirectory(String rootDirectory) {
-		this.rootDirectory = rootDirectory;
+		this.rootDirectory = replacePattern(rootDirectory, "\\", File.separator);
 		if (rootDirectory != null && rootDirectory.endsWith(File.separator)) {
 			this.rootDirectory = rootDirectory.substring(0, rootDirectory
 					.lastIndexOf(File.separator));
