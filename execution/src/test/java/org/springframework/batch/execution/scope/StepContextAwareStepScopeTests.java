@@ -74,8 +74,7 @@ public class StepContextAwareStepScopeTests extends TestCase {
 		assertNotNull(bean);
 		assertEquals("bar", bean.name);
 		StepSynchronizationManager.close();
-		// TODO: Still a bug in Spring Core?  Preventing destroy method from being called in inner bean.
-		// assertEquals(1, list.size());
+		assertEquals(1, list.size());
 	}
 
 	public static class TestBean {

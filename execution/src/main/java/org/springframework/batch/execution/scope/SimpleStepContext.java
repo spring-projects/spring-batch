@@ -30,14 +30,15 @@ import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
  * Simple implementation of {@link StepContext}.
  * 
  * @author Dave Syer
- *
+ * 
  */
-public class SimpleStepContext extends SynchronizedAttributeAccessor implements StepContext {
+public class SimpleStepContext extends SynchronizedAttributeAccessor implements
+		StepContext {
 
 	private Map callbacks = new HashMap();
 	private StepContext parent;
 	private StepExecution stepExecution;
-	
+
 	/**
 	 * Default constructor.
 	 */
@@ -52,8 +53,10 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 		super();
 		this.parent = parent;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.execution.scope.StepContext#getParent()
 	 */
 	public StepContext getParent() {
@@ -62,11 +65,15 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#registerDestructionCallback(java.lang.String,
-	 * java.lang.Runnable)
+	 *      java.lang.Runnable)
 	 */
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.execution.scope.StepContext#registerDestructionCallback(java.lang.String, java.lang.Runnable)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.execution.scope.StepContext#registerDestructionCallback(java.lang.String,
+	 *      java.lang.Runnable)
 	 */
 	public void registerDestructionCallback(String name, Runnable callback) {
 		synchronized (callbacks) {
@@ -94,11 +101,17 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 
 		for (Iterator iter = copy.iterator(); iter.hasNext();) {
 			Map.Entry entry = (Map.Entry) iter.next();
-			String name = (String) entry.getKey();
 			Set set = (Set) entry.getValue();
 			for (Iterator iterator = set.iterator(); iterator.hasNext();) {
 				Runnable callback = (Runnable) iterator.next();
-				if (hasAttribute(name) && callback != null) {
+				/*
+				 * There used to be a check here to make sure there was an
+				 * attribute with the given name, but an inner bean is not
+				 * registered with the bean factory, so the destroy method is
+				 * only called in inner bean if we make the callback
+				 * unconditionally.
+				 */
+				if (callback != null) {
 					/*
 					 * The documentation of the interface says that these
 					 * callbacks must not throw exceptions, but we don't trust
@@ -106,8 +119,7 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 					 */
 					try {
 						callback.run();
-					}
-					catch (RuntimeException t) {
+					} catch (RuntimeException t) {
 						errors.add(t);
 					}
 				}
@@ -121,7 +133,6 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 		throw (RuntimeException) errors.get(0);
 	}
 
-
 	/**
 	 * @param stepExecution
 	 */
@@ -129,7 +140,9 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 		this.stepExecution = stepExecution;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.execution.scope.StepContext#getJobIdentifier()
 	 */
 	public StepExecution getStepExecution() {
