@@ -143,7 +143,6 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		String rootDir = getRootDir();
 		rootDir = "/"+StringUtils.replace(rootDir, File.separator, "\\") + "\\";
 		resourceFactory.setRootDirectory(rootDir);
-		// TODO: this one fails on UNIX (so Bamboo)...
 		doTestPathName("testJob-testStream-11-20070730-bar.txt", path);
 	}
 
@@ -154,9 +153,8 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		
 		String absolutePath = new File("/" + rootDir + pathsep + path + identifier.getName() + pathsep + filename).getAbsolutePath();
 		
-		System.err.println(path);
-		System.err.println(absolutePath);
-		System.err.println(returnedPath);
+		// System.err.println(absolutePath);
+		// System.err.println(returnedPath);
 		assertEquals(absolutePath, returnedPath);
 	}
 	
