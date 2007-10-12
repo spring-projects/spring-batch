@@ -34,18 +34,21 @@ import org.springframework.util.StringUtils;
 /**
  * Strategy for locating different resources on the file system. For each unique
  * step, the same file handle will be returned. A unique step is defined as
- * having the same job identifier and step name. An external file mover (such
- * as an EAI solution) should rename and move any input files to conform to the
+ * having the same job identifier and step name. An external file mover (such as
+ * an EAI solution) should rename and move any input files to conform to the
  * patter defined by the file pattern.<br/>
  * 
  * If no pattern is passed in, then following default is used:
  * 
  * <pre>
- * %BATCH_ROOT%/job_data/%JOB_NAME%/%JOB_IDENTIFIER%-%STEP_NAME%.txt
+ * /%BATCH_ROOT%/job_data/%JOB_NAME%/%JOB_IDENTIFIER%-%STEP_NAME%.txt
  * </pre>
  * 
  * The %% variables are replaced with the corresponding bean property at run
- * time, when the factory method is executed.
+ * time, when the factory method is executed. Note that the default pattern
+ * starts with a forward slash "/", which means the root directory will be
+ * interpreted as an absolute path if it too starts with "/" (because of the
+ * implementation of the Spring Core Resource abstractions).
  * 
  * @author Tomas Slanina
  * @author Lucas Ward
@@ -108,8 +111,7 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 		StepExecution execution = context.getStepExecution();
 		stepName = execution.getStep().getName();
 		jobName = execution.getStep().getJob().getName();
-		jobIdentifier = execution.getJobExecution()
-				.getJobIdentifier();
+		jobIdentifier = execution.getJobExecution().getJobIdentifier();
 	}
 
 	/**
@@ -137,7 +139,8 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 	private String replacePattern(String string, String pattern,
 			String replacement) {
 
-	    if (string==null) return null;
+		if (string == null)
+			return null;
 
 		// check to ensure pattern exists in string.
 		if (string.indexOf(pattern) != -1) {
@@ -164,13 +167,14 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 		fileName = replacePattern(fileName, JOB_NAME_PATTERN,
 				jobName == null ? "job" : jobName);
 		fileName = replacePattern(fileName, STEP_NAME_PATTERN, stepName);
-		fileName = replacePattern(fileName, JOB_IDENTIFIER_PATTERN, jobIdentifier==null ? "step": jobIdentifier.getLabel());
+		fileName = replacePattern(fileName, JOB_IDENTIFIER_PATTERN,
+				jobIdentifier == null ? "step" : jobIdentifier.getLabel());
 
 		return fileName;
 	}
 
 	public void setFilePattern(String filePattern) {
-	    this.filePattern = replacePattern(filePattern, "\\", File.separator);
+		this.filePattern = replacePattern(filePattern, "\\", File.separator);
 	}
 
 	public void setRootDirectory(String rootDirectory) {
