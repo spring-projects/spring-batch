@@ -34,7 +34,7 @@ import org.springframework.context.support.StaticApplicationContext;
  * @author Dave Syer
  *
  */
-public class DefaultStepExecutorFactoryTests extends TestCase {
+public class PrototypeBeanStepExecutorFactoryTests extends TestCase {
 
 	private PrototypeBeanStepExecutorFactory factory = new PrototypeBeanStepExecutorFactory();
 	private StaticApplicationContext applicationContext = new StaticApplicationContext();

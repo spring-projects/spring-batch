@@ -84,7 +84,7 @@ public class ScheduledJobIdentifier extends SimpleJobIdentifier implements JobId
 	 * stream, run, and schedule date.
 	 */
 	public boolean equals(Object other) {
-		return EqualsBuilder.reflectionEquals(this, other);
+		return EqualsBuilder.reflectionEquals(this, other) || EqualsBuilder.reflectionEquals(other, this);
 	}
 	
 	public int hashCode() {

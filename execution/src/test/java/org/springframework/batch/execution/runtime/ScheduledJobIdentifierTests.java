@@ -16,6 +16,7 @@
 package org.springframework.batch.execution.runtime;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import junit.framework.TestCase;
 
@@ -62,5 +63,31 @@ public class ScheduledJobIdentifierTests extends TestCase {
 		instance.setJobRun(1);
 		assertEquals(1, instance.getJobRun());
 	}
+	
+	public void testEqualsSelf() throws Exception {
+		assertEquals(instance, instance);
+	}
 
+	public void testEqualsInstanceWithSameProperties() throws Exception {
+		ScheduledJobIdentifier other = new ScheduledJobIdentifier(instance.getName());
+		other.setJobRun(instance.getJobRun());
+		other.setJobStream(instance.getJobStream());
+		other.setScheduleDate(instance.getScheduleDate());
+		assertEquals(instance, other);
+		assertEquals(instance.hashCode(), other.hashCode());
+	}
+
+	public void testEqualsInstanceWithTimestamp() throws Exception {
+		ScheduledJobIdentifier other = new ScheduledJobIdentifier(instance.getName());
+		other.setJobRun(instance.getJobRun());
+		other.setJobStream(instance.getJobStream());
+		other.setScheduleDate(new Timestamp(instance.getScheduleDate().getTime()));
+		assertEquals(instance, other);
+		assertEquals(other, instance);
+		assertEquals(instance.hashCode(), other.hashCode());
+	}
+
+	public void testEqualsNull() throws Exception {
+		assertNotSame(null, instance);
+	}
 }
