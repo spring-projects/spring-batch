@@ -35,14 +35,4 @@ public interface JobIdentifier {
 	 */
 	public String getName();
 
-	/**
-	 * Dynamic property that uniquely identifies this object in human-readable
-	 * form. Might be used to construct a filename or database column value, so
-	 * generally implementations should stick to succinct strings containing all
-	 * the information available without whitespace or special characters.
-	 * 
-	 * @return a label that identifies this object
-	 */
-	public String getLabel();
-
 }

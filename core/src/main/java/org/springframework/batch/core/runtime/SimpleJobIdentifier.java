@@ -18,6 +18,7 @@ package org.springframework.batch.core.runtime;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.util.ClassUtils;
 
 
 /**
@@ -61,19 +62,8 @@ public class SimpleJobIdentifier implements JobIdentifier {
 		this.name = name;
 	}
 	
-	
-
-	/**
-	 * Just uses the name as a label.
-	 * 
-	 * @see org.springframework.batch.core.domain.JobIdentifier#getLabel()
-	 */
-	public String getLabel() {
-		return this.name;
-	}
-
 	public String toString() {
-		return "name=" + name;
+		return ClassUtils.getShortName(getClass())+": name=" + name;
 	}
 
 	public boolean equals(Object obj) {
