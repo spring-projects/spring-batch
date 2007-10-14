@@ -73,14 +73,7 @@ public class ScheduledJobIdentifier extends SimpleJobIdentifier implements JobId
 		this.scheduleDate = scheduleDate;
 	}
 	
-	
-
-	public String getLabel() {
-		return super.getLabel()+"-"+jobStream+"-"+jobRun+"-"+dateFormat.format(scheduleDate);
-	}
-
 	public String toString() {
-
 		return super.toString() + ",stream=" + jobStream + ",run=" + jobRun + ",scheduleDate="
 				+ scheduleDate;
 	}

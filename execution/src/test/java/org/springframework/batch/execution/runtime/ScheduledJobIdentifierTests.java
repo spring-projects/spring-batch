@@ -16,7 +16,6 @@
 package org.springframework.batch.execution.runtime;
 
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 
 import junit.framework.TestCase;
 
@@ -64,22 +63,4 @@ public class ScheduledJobIdentifierTests extends TestCase {
 		assertEquals(1, instance.getJobRun());
 	}
 
-	
-	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getLabel()}.
-	 */
-	public void testDefaultGetLabel() throws Exception {
-		assertEquals("null--0-19700101", instance.getLabel());
-	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getLabel()}.
-	 */
-	public void testGetLabelWithAllProperties() throws Exception {
-		instance.setName("foo");
-		instance.setJobStream("bar");
-		instance.setJobRun(11);
-		instance.setScheduleDate(new SimpleDateFormat("yyyyMMdd").parse("20070730"));
-		assertEquals("foo-bar-11-20070730", instance.getLabel());
-	}
 }

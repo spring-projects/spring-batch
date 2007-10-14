@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.facade;
+package org.springframework.batch.execution.resource;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,9 +23,11 @@ import java.text.SimpleDateFormat;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.execution.resource.BatchResourceFactoryBean;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.core.io.ByteArrayResource;
@@ -96,6 +98,18 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	 */
 	public void testCreateFileName() throws Exception {
 		doTestPathName("testJob-testStream-11-20070730-bar.txt", path);
+	}
+
+	/**
+	 * regular use with valid context and pattern provided
+	 */
+	public void testSetLabelGenerator() throws Exception {
+		resourceFactory.setJobIdentifierLabelGenerator(new JobIdentifierLabelGenerator() {
+			public String getLabel(JobIdentifier jobIdentifier) {
+				return "foo";
+			}
+		});
+		doTestPathName("foo-bar.txt", path);
 	}
 
 	public void testObjectType() throws Exception {

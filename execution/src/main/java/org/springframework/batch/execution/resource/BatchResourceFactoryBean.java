@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.facade;
+package org.springframework.batch.execution.resource;
 
 import java.io.File;
 
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.execution.resource.support.DefaultJobIdentifierLabelGenerator;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;
 import org.springframework.beans.factory.FactoryBean;
@@ -48,7 +49,11 @@ import org.springframework.util.StringUtils;
  * time, when the factory method is executed. Note that the default pattern
  * starts with a forward slash "/", which means the root directory will be
  * interpreted as an absolute path if it too starts with "/" (because of the
- * implementation of the Spring Core Resource abstractions).
+ * implementation of the Spring Core Resource abstractions).<br/>
+ * 
+ * It doesn't make much sense to use this factory unless it is step scoped, but
+ * note that it is thread safe only if it is step scoped and its mutators are
+ * not used except for configuration.
  * 
  * @author Tomas Slanina
  * @author Lucas Ward
@@ -78,12 +83,14 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 
 	private String stepName = "";
 
-	private ResourceLoader resourceLoader;
+	private ResourceLoader resourceLoader = new FileSystemResourceLoader();
 
 	private JobIdentifier jobIdentifier;
 
+	private JobIdentifierLabelGenerator jobIdentifierLabelGenerator = new DefaultJobIdentifierLabelGenerator();
+
 	/**
-	 * Always false because we are usually expecting to be step scoped.
+	 * Always false because we are expecting to be step scoped.
 	 * 
 	 * @see org.springframework.beans.factory.config.AbstractFactoryBean#isSingleton()
 	 */
@@ -100,8 +107,20 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 		this.resourceLoader = resourceLoader;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Public setter for the {@link JobIdentifierLabelGenerator} property.
+	 * 
+	 * @param jobIdentifierLabelGenerator
+	 *            the {@link JobIdentifierLabelGenerator} to set
+	 */
+	public void setJobIdentifierLabelGenerator(
+			JobIdentifierLabelGenerator jobIdentifierLabelGenerator) {
+		this.jobIdentifierLabelGenerator = jobIdentifierLabelGenerator;
+	}
+
+	/**
+	 * Collect the properties of the enclosing {@link StepExecution} that will
+	 * be needed to create a file name.
 	 * 
 	 * @see org.springframework.batch.execution.scope.StepContextAware#setStepScopeContext(org.springframework.core.AttributeAccessor)
 	 */
@@ -121,11 +140,6 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 	 * @return a resource representing the file on the file system.
 	 */
 	protected Object createInstance() {
-
-		if (resourceLoader == null) {
-			resourceLoader = new FileSystemResourceLoader();
-		}
-
 		return resourceLoader.getResource(createFileName());
 	}
 
@@ -168,7 +182,7 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 				jobName == null ? "job" : jobName);
 		fileName = replacePattern(fileName, STEP_NAME_PATTERN, stepName);
 		fileName = replacePattern(fileName, JOB_IDENTIFIER_PATTERN,
-				jobIdentifier == null ? "step" : jobIdentifier.getLabel());
+				jobIdentifierLabelGenerator.getLabel(jobIdentifier));
 
 		return fileName;
 	}
