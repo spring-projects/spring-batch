@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Foo">
+
+  <resultMap id="fooResult" class="org.springframework.batch.io.sample.domain.Foo">
+  	 <result property="id" column="ID" />
+     <result property="name" column="NAME" />
+     <result property="value" column="VALUE" />
+  </resultMap>
+
+  <select id="getAllFooIds" resultClass="int">
+  	select ID from T_FOOS
+  </select>
+
+  <select id="getFooById" parameterClass="int" resultMap="fooResult">
+  	select ID, NAME, VALUE from T_FOOS where ID = #value#
+  </select>
+
+  <select id="getAllFoos" resultMap="fooResult">
+  	select ID, NAME, VALUE from T_FOOS
+  </select>
+
+  <select id="getAllFooIdsRestart" resultClass="int">
+  	select ID from T_FOOS where ID > #id#
+  </select>
+
+  <insert id="insertFoo" parameterClass="org.springframework.batch.io.sample.domain.Foo">
+  	insert INTO T_WRITE_FOOS (ID, NAME, VALUE) VALUES (#id#, #name#, #value#)
+  </insert>
+
+  <update id="updateFoo" parameterClass="org.springframework.batch.io.sample.domain.Foo">
+  	update T_WRITE_FOOS set NAME = #name#, VALUE = #value# where ID = #id#
+  </update>
+
+  <delete id="deleteFoo" parameterClass="org.springframework.batch.io.sample.domain.Foo">
+  	delete from T_WRITE_FOOS where ID = #id#
+  </delete>
+
+</sqlMap>

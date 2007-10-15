@@ -162,6 +162,8 @@ public class SqlCursorInputSource implements InputSource, ResourceLifecycle, Dis
 	private final SqlInputTransactionSynchronization transactionSynchronization = new SqlInputTransactionSynchronization();
 
 	private RowMapper mapper;
+	
+	private boolean initialized = false;
 
 	/**
 	 * Assert that mandatory properties are set.
@@ -197,8 +199,8 @@ public class SqlCursorInputSource implements InputSource, ResourceLifecycle, Dis
 	 */
 	public Object read() {
 
-		if (this.rs == null) {
-			this.executeQuery();
+		if (!initialized) {
+			open();
 		}
 
 		Assert.state(mapper != null, "Mapper must not be null.");
@@ -274,6 +276,7 @@ public class SqlCursorInputSource implements InputSource, ResourceLifecycle, Dis
 	 * @see org.springframework.batch.item.ResourceLifecycle#close()
 	 */
 	public void close() {
+		initialized = false;
 		JdbcUtils.closeResultSet(this.rs);
 		JdbcUtils.closeStatement(this.stmt);
 		JdbcUtils.closeConnection(this.con);
@@ -328,7 +331,7 @@ public class SqlCursorInputSource implements InputSource, ResourceLifecycle, Dis
 		} catch (SQLException se) {
 			close();
 			throw getExceptionTranslator().translate("Executing query",
-					getSql(), se);
+					sql, se);
 		}
 
 		BatchTransactionSynchronizationManager
@@ -414,12 +417,12 @@ public class SqlCursorInputSource implements InputSource, ResourceLifecycle, Dis
 	 * @see org.springframework.batch.restart.Restartable#restoreFrom(org.springframework.batch.restart.RestartData)
 	 */
 	public void restoreFrom(RestartData data) {
+		Assert.state(!initialized);
+		
 		if (data == null)
 			return;
 
-		if (rs == null) {
-			executeQuery();
-		}
+		open();
 
 		Properties restartProperties = data.getProperties();
 		if(restartProperties.containsKey(CURRENT_PROCESSED_ROW) == false){
@@ -545,17 +548,14 @@ public class SqlCursorInputSource implements InputSource, ResourceLifecycle, Dis
 		this.sql = sql;
 	}
 
-	public String getSql() {
-		return sql;
-	}
-
 	public void open() {
-		// TODO Auto-generated method stub
+		Assert.isNull(rs);
+		executeQuery();
+		initialized = true;
 
 	}
 
-	private class SqlInputTransactionSynchronization extends
-			TransactionSynchronizationAdapter {
+	private class SqlInputTransactionSynchronization extends TransactionSynchronizationAdapter {
 
 		/*
 		 * @param status transaction status

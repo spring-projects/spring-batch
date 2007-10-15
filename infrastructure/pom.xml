@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-infrastructure</artifactId>
@@ -102,20 +100,44 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.ws</groupId>
+	        <groupId>org.springframework.ws</groupId>
 			<artifactId>spring-oxm</artifactId>
-			<version>1.0.0</version>
-			<optional>true</optional>
-			<exclusions>
-				<exclusion>
+	        <version>1.0.0</version>
+	        <optional>true</optional>
+	        <exclusions>
+	        	<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring-beans</artifactId>
-				</exclusion>
-				<exclusion>
+	        	</exclusion>
+	        	<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring-core</artifactId>
-				</exclusion>
-			</exclusions>
+	        	</exclusion>
+	        </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<!-- Needed by Hibernate if JTA is excluded -->
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jta_1.1_spec</artifactId>
+			<version>1.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<!-- Force Hibernate to use a particular nodep version of cglib in case of clash with Spring AOP -->
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ibatis</groupId>
+			<artifactId>ibatis-sqlmap</artifactId>
+			<version>2.3.0</version>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 
@@ -125,9 +147,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clover-plugin</artifactId>
 				<configuration>
-					<licenseLocation>
-						${basedir}/src/test/resources/clover.license
-					</licenseLocation>
+					<licenseLocation>${basedir}/src/test/resources/clover.license</licenseLocation>
 				</configuration>
 				<executions>
 					<execution>
