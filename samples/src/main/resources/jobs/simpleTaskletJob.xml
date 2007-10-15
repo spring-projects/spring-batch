@@ -42,7 +42,7 @@
 	</bean>
 
 	<!-- This input source is injected into the test case to verify the output - not used by the job at all -->
-	<bean class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource">
+	<bean id="testInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource">
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="tradeTokenizer" />
 		<property name="fieldSetMapper" ref="tradeMapper" />
