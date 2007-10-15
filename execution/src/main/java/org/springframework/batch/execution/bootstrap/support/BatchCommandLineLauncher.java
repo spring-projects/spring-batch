@@ -58,7 +58,7 @@ import org.springframework.util.Assert;
  * fields except the JobLauncher. Therefore, if autowiring fails to set it (it
  * should be noted that dependency checking is disabled because most of the
  * fields have default values and thus don't require dependencies to be
- * fulfilled via autowiring) then an exception will be thrown. It should be
+ * fulfilled via autowiring) then an exception will be thrown. It should also be
  * noted that even if an exception is thrown by this class, it will be mapped to
  * an integer and returned.
  * </p>
