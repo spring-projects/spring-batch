@@ -129,6 +129,24 @@
 			<scope>test</scope>
 			<version>1.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<!-- Needed by Hibernate if JTA is excluded -->
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jta_1.1_spec</artifactId>
+			<version>1.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<!-- Force Hibernate to use a particular nodep version of cglib in case of clash with Spring AOP -->
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<optional>true</optional>
+		</dependency>		
 	</dependencies>
 
 	<build>

@@ -23,18 +23,27 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 
 public class CustomerCredit {
+	private int id;
     private String name;
     private BigDecimal credit;
 
     public String toString() {
-        return "CustomerCredit [name=" + name + ", credit=" + credit + "]";
+        return "CustomerCredit [id=" + id +",name=" + name + ", credit=" + credit + "]";
     }
 
     public BigDecimal getCredit() {
         return credit;
     }
 
-    public void setCredit(BigDecimal credit) {
+    public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setCredit(BigDecimal credit) {
         this.credit = credit;
     }
 
@@ -44,6 +53,10 @@ public class CustomerCredit {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public void increaseCreditBy(BigDecimal sum) {
+    	this.credit = this.credit.add(sum);
     }
     
     public boolean equals(Object o) {

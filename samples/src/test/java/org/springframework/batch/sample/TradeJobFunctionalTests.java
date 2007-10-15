@@ -20,11 +20,12 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 
@@ -34,16 +35,16 @@ public class TradeJobFunctionalTests extends AbstractLifecycleSpringContextTests
 	private static final String GET_TRADES = "SELECT isin, quantity, price, customer FROM trade";
 	private static final String GET_CUSTOMERS = "SELECT name, credit FROM customer";
 	
-	private ArrayList customers;
-	private ArrayList trades;
+	private List customers;
+	private List trades;
 	private int activeRow = 0;
 	
-	private JdbcTemplate jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 	
 	/**
 	 * @param jdbcTemplate the jdbcTemplate to set
 	 */
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 	

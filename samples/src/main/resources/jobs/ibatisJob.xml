@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+
+<description>
+	Example for iBATIS integration.
+</description>
+
+	<bean class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
+		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
+	</bean>
+
+	<bean id="jobConfiguration" parent="simpleJob">
+		<property name="steps">
+			<bean id="step1" parent="simpleStep">
+				<property name="tasklet">
+					<bean
+						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+						<property name="itemProvider">
+							<bean class="org.springframework.batch.item.provider.InputSourceItemProvider">
+								<property name="inputSource" ref="ibatisInputSource" />
+							</bean>
+						</property>
+						<property name="itemProcessor">
+							<bean class="org.springframework.batch.sample.item.processor.CustomerCreditIncreaseProcessor">
+								<property name="outputSource">
+									<bean class="org.springframework.batch.sample.dao.IbatisCustomerCreditWriter"
+										scope="step">
+										<aop:scoped-proxy />
+										<property name="sqlMapClient" ref="sqlMapClient" />
+										<property name="statementId" value="updateCredit" />
+									</bean>
+								</property>
+							</bean>
+						</property>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="ibatisInputSource" class="org.springframework.batch.io.orm.ibatis.IbatisInputSource"
+		scope="step" >
+		<aop:scoped-proxy />
+		<property name="drivingQueryId" value="getAllCustomerCreditIds" />
+		<property name="detailsQueryId" value="getCustomerCreditById" />
+		<property name="sqlMapClient" ref="sqlMapClient" />
+	</bean>
+
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="ibatis-config.xml" />
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+
+
+
+	<bean parent="customEditorConfigurer"/>
+
+	<!-- register the step scope with the application context -->
+	<bean class="org.springframework.batch.execution.scope.StepScope" />
+
+</beans>

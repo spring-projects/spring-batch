@@ -23,7 +23,7 @@ import org.springframework.beans.factory.DisposableBean;
 
 /**
  * Writes customer's credit information in a file.
- * 
+ *
  * @see CustomerCreditWriter
  * @author Robert Kasanicky
  */
@@ -71,10 +71,14 @@ public class FlatFileCustomerCreditWriter implements CustomerCreditWriter,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
 		close();
+	}
+
+	public void write(Object output) {
+		write((CustomerCredit)output);
 	}
 }

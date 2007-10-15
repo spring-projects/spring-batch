@@ -16,16 +16,17 @@
 
 package org.springframework.batch.sample.dao;
 
+import org.springframework.batch.io.OutputSource;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.sample.domain.CustomerCredit;
 
 /**
  * Interface for writing customer's credit information to output.
- * 
+ *
  * @author Robert Kasanicky
  */
-public interface CustomerCreditWriter extends ResourceLifecycle {
+public interface CustomerCreditWriter extends OutputSource {
 
 	void write(CustomerCredit customerCredit);
-	
+
 }

@@ -23,7 +23,7 @@
 	</bean>
 
 	<bean id="jobConfigurationRegistry" class="org.springframework.batch.execution.configuration.MapJobConfigurationRegistry"/>
- 
+
 	<aop:config>
 		<aop:advisor pointcut="execution(* org.springframework.batch.execution..*Repository+.*(..))"
 			advice-ref="txAdvice" />
@@ -73,7 +73,7 @@
 		<property name="scheduleDate" value="20070505" />
 		<property name="jobRun" value="1" />
 	</bean>
- 
+
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
@@ -119,7 +119,7 @@
 			</map>
 		</property>
 	</bean>
- 
+
 	<bean id="itemProcessorLogAdvice" class="org.springframework.batch.sample.advice.ProcessorLogAdvice" />
 
 	<aop:config>

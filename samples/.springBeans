@@ -20,7 +20,12 @@
 		<config>src/main/resources/jobs/infiniteLoopJob.xml</config>
 		<config>src/main/resources/data-source-context-init.xml</config>
 		<config>src/main/resources/jobs/xmlStaxJob.xml</config>
+		<config>src/main/resources/jobs/hibernateJob.xml</config>
+		<config>src/main/resources/jobs/ibatisJob.xml</config>
+		<config>src/main/resources/jobs/compositeProcessorSampleJob.xml</config>
 		<config>src/main/resources/jobs/nflJob.xml</config>
+		<config>src/main/resources/jobs/simpleTaskletJob.xml</config>
+		<config>src/main/resources/beanRefContext.xml</config>	
 	</configs>
 	<configSets>
 		<configSet>
