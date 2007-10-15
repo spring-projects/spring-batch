@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.sql.SingleKeySqlDrivingQueryInputSource;
 import org.springframework.batch.io.support.AbstractDrivingQueryInputSource;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
@@ -48,7 +47,7 @@ public class IbatisDrivingQueryInputSource extends AbstractDrivingQueryInputSour
 
 	/**
 	 * Restore the keys list given the provided restart data.
-	 * 
+	 *
 	 * @see org.springframework.batch.io.support.AbstractDrivingQueryInputSource#restoreKeys(org.springframework.batch.restart.RestartData)
 	 */
 	public List restoreKeys(RestartData data) {
