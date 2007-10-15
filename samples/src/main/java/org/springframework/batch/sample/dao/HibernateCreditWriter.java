@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.io.OutputSource;
 import org.springframework.batch.sample.domain.CustomerCredit;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 

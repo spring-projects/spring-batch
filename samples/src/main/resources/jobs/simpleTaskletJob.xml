@@ -41,20 +41,17 @@
 		</property>
 	</bean>
 
-	<bean id="abstractInputTemplate"
-		class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
-		abstract="true">
+	<!-- This input source is injected into the test case to verify the output - not used by the job at all -->
+	<bean class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource">
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="tradeTokenizer" />
 		<property name="fieldSetMapper" ref="tradeMapper" />
 	</bean>
 
-	<bean id="fileInputSource" parent="abstractInputTemplate"
+	<bean id="fileInputSource" parent="testInputTemplate"
 		autowire-candidate="false" scope="step">
 		<aop:scoped-proxy />
 	</bean>
-
-	<bean id="testInputTemplate" parent="abstractInputTemplate" />
 
 	<bean id="tradeMapper"
 		class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
