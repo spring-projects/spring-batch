@@ -40,15 +40,15 @@ public class CompositeKeySqlDrivingQueryInputSource extends
 
 	public static final String RESTART_KEY = "CompositeKeySqlDrivingQueryInputSource.key";
 
-	JdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
-	RowMapper keyMapper;
+	private RowMapper keyMapper;
 
-	String drivingQuery;
+	private String drivingQuery;
 
-	String restartQuery;
+	private String restartQuery;
 
-	CompositeKeyRestartDataConverter restartDataConverter;
+	private CompositeKeyRestartDataConverter restartDataConverter;
 
 	public CompositeKeySqlDrivingQueryInputSource() {
 		super();

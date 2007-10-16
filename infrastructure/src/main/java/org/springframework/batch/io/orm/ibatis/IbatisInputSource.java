@@ -16,17 +16,25 @@
 package org.springframework.batch.io.orm.ibatis;
 
 /**
- * @author Lucas Ward
+ * Extension of {@link IbatisDrivingQueryInputSource} that maps keys to
+ * objects.  An iBatis query id must be set to map and return each 'detail record'.
  *
+ * @author Lucas Ward
+ * @see IbatisDrivingQueryInputSource
  */
 public class IbatisInputSource extends IbatisDrivingQueryInputSource {
 
-	String detailsQueryId;
+	private String detailsQueryId;
 
+
+	/**
+	 * Overriden read that uses the returned key as arguments to the details query.
+	 *
+	 * @see org.springframework.batch.io.support.AbstractDrivingQueryInputSource#read()
+	 */
 	public Object read() {
 		return getSqlMapClientTemplate().queryForObject(detailsQueryId, super.read());
 	}
-
 
 	/**
 	 * @param detailsQueryId id of the iBATIS select statement that will used

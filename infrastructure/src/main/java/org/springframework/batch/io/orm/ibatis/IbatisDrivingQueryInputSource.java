@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Properties;
 
 import org.springframework.batch.io.InputSource;
+import org.springframework.batch.io.sql.SingleKeySqlDrivingQueryInputSource;
 import org.springframework.batch.io.support.AbstractDrivingQueryInputSource;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 import org.springframework.util.Assert;
 
@@ -18,12 +18,12 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * {@link SingleKeySqlDrivingQueryInputSource} but does not make assumptions about the primary key
  * structure.
  *
- * @see SingleKeySqlDrivingQueryInputSource
  *
  * @author Robert Kasanicky
  * @author Lucas Ward
+ * @see AbstractDrivingQueryInputSource
  */
-public class IbatisDrivingQueryInputSource extends AbstractDrivingQueryInputSource implements Restartable {
+public class IbatisDrivingQueryInputSource extends AbstractDrivingQueryInputSource {
 
 	public static final String RESTART_KEY = "IbatisDrivingQueryInputSource.keyIndex";
 
@@ -33,11 +33,19 @@ public class IbatisDrivingQueryInputSource extends AbstractDrivingQueryInputSour
 
 	private String restartQueryId;
 
+	/*
+	 * Retrieve the keys using the provided driving query id.
+	 *
+	 * @see org.springframework.batch.io.support.AbstractDrivingQueryInputSource#retrieveKeys()
+	 */
 	protected List retrieveKeys() {
 		return sqlMapClientTemplate.queryForList(drivingQuery);
 	}
 
-
+	/*
+	 *
+	 * @see org.springframework.batch.restart.Restartable#getRestartData()
+	 */
 	public RestartData getRestartData() {
 		Properties props = new Properties();
 		props.setProperty(RESTART_KEY, getCurrentKey().toString());
