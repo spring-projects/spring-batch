@@ -5,8 +5,6 @@ import java.util.NoSuchElementException;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
@@ -49,9 +47,7 @@ public class DefaultFragmentEventReaderTests extends TestCase {
 	public void testFragmentWrapping() throws XMLStreamException {
 		
 		assertTrue(fragmentReader.hasNext());
-		moveCursorToNextElementEvent(); // move to root start
-		fragmentReader.nextEvent(); // skip root
-		moveCursorToNextElementEvent(); // move to fragment start
+		moveCursorBeforeFragmentStart();
 
 		fragmentReader.markStartFragment(); // mark the fragment
 		assertTrue(EventHelper.startElementName(eventReader.peek()).equals("fragment"));
@@ -93,9 +89,7 @@ public class DefaultFragmentEventReaderTests extends TestCase {
 	 * the fragment.
 	 */
 	public void testMarkFragmentProcessed() throws XMLStreamException {
-		moveCursorToNextElementEvent(); // move to root start
-		fragmentReader.nextEvent(); // skip root
-		moveCursorToNextElementEvent(); // move to fragment start
+		moveCursorBeforeFragmentStart();
 
 		fragmentReader.markStartFragment(); // mark the fragment start
 		
@@ -110,10 +104,35 @@ public class DefaultFragmentEventReaderTests extends TestCase {
 		assertTrue(EventHelper.startElementName(misc2).equals("misc2"));
 	}
 	
+	/**
+	 * Cursor is moved to the end of the fragment as usually even
+	 * if nothing was read from the event reader after beginning
+	 * of fragment was marked.
+	 */
+	public void testMarkFragmentProcessedImmediatelyAfterMarkFragmentStart() throws Exception {
+		moveCursorBeforeFragmentStart();
+
+		fragmentReader.markStartFragment();
+		fragmentReader.markFragmentProcessed();
+		
+		fragmentReader.nextEvent(); // skip whitespace
+		// the next element after fragment end is <misc2/>
+		XMLEvent misc2 = fragmentReader.nextEvent(); 
+		assertTrue(EventHelper.startElementName(misc2).equals("misc2"));
+	}
+	
 
 	private void moveCursorToNextElementEvent() throws XMLStreamException {
 		XMLEvent event = eventReader.peek();
-		while (!(event instanceof StartElement) && !(event instanceof EndElement)) {
+		while (!event.isStartElement() && !event.isEndElement()) {
+			eventReader.nextEvent();
+			event = eventReader.peek();
+		}
+	}
+	
+	private void moveCursorBeforeFragmentStart() throws XMLStreamException {
+		XMLEvent event = eventReader.peek();
+		while (!event.isStartElement() || !EventHelper.startElementName(event).equals("fragment")) {
 			eventReader.nextEvent();
 			event = eventReader.peek();
 		}

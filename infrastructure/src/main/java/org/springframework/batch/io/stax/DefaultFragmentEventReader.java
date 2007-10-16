@@ -157,7 +157,7 @@ class DefaultFragmentEventReader extends AbstractEventReaderWrapper implements F
 	 * being read until the end.
 	 */
 	public void markFragmentProcessed() {
-		if (insideFragment) {
+		if (insideFragment|| startFragmentFollows) {
 			try {
 				while (!(nextEvent() instanceof EndDocument)) {
 					// just read all events until EndDocument
