@@ -22,31 +22,87 @@ import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.runtime.SimpleJobIdentifier;
+import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.util.ClassUtils;
 
 public class HibernateJobDaoTests extends AbstractJobDaoTests {
-	
+
 	private SessionFactory sessionFactory;
-	
+
 	protected String[] getConfigLocations(){
 		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "hibernate-dao-test.xml") };
 	}
-	
+
 	public void setSessionFactory(SessionFactory sessionFactory){
 		this.sessionFactory = sessionFactory;
 	}
-	
+
 	public void testUpdateJobExecution() {
 
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		jobExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
 		jobDao.update(jobExecution);
-		
+
 		sessionFactory.getCurrentSession().flush();
-		
+
 		List executions = jdbcTemplate.queryForList("SELECT * FROM BATCH_JOB_EXECUTION where JOB_ID=?", new Object[] {job.getId()});
 		assertEquals(1, executions.size());
 		assertEquals(jobExecution.getEndTime(), ((Map)executions.get(0)).get("END_TIME"));
 	}
-	
+
+	public void testCreateSimpleJobExecution(){
+
+		JobIdentifier simpleIdentifier = new SimpleJobIdentifier("SimpleJob");
+
+		JobInstance simpleJob = jobDao.createJob(simpleIdentifier);
+
+		List jobs = jobDao.findJobs(simpleIdentifier);
+
+		assertEquals(jobs.size(), 1);
+		JobInstance testJob = (JobInstance)jobs.get(0);
+		assertEquals(simpleJob, testJob);
+	}
+
+	public void testNullIdentifierName(){
+
+		JobIdentifier simpleIdentifier = new SimpleJobIdentifier(null);
+
+		try{
+			jobDao.createJob(simpleIdentifier);
+			fail();
+		}catch(IllegalArgumentException ex){
+			//expected
+		}
+	}
+
+	public void testEmptyIdentifierName(){
+
+		JobIdentifier simpleIdentifier = new SimpleJobIdentifier("");
+
+		try{
+			jobDao.createJob(simpleIdentifier);
+			fail();
+		}catch(IllegalArgumentException ex){
+			//expected
+		}
+
+	}
+
+	public void testNullScheduleDate(){
+
+		ScheduledJobIdentifier scheduledIdentifier = new ScheduledJobIdentifier("ScheduledJob");
+		scheduledIdentifier.setJobRun(0);
+		scheduledIdentifier.setJobStream(null);
+
+		try{
+			jobDao.createJob(scheduledIdentifier);
+			fail();
+		}catch(IllegalArgumentException ex){
+			//expected
+		}
+	}
+
 }
