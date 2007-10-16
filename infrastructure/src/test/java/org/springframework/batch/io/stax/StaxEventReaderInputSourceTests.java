@@ -15,6 +15,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
@@ -49,11 +50,32 @@ public class StaxEventReaderInputSourceTests extends TestCase {
 
 	public void testAfterPropertesSetException() throws Exception{
 		source.setResource(null);
-		try{
+		try {
 			source.afterPropertiesSet();
 			fail();
-		}catch(IllegalArgumentException ex){
+		}
+		catch (IllegalArgumentException e){
 			//expected;
+		}
+		
+		source = createNewInputSouce();
+		source.setFragmentRootElementName("");
+		try {
+			source.afterPropertiesSet();
+			fail();
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+		}
+		
+		source = createNewInputSouce();
+		source.setFragmentDeserializer(null);
+		try {
+			source.afterPropertiesSet();
+			fail();
+		}
+		catch (IllegalArgumentException e) {
+			// expected
 		}
 	}
 
@@ -95,12 +117,42 @@ public class StaxEventReaderInputSourceTests extends TestCase {
 	public void testRestart() {
 		source.read();
 		RestartData restartData = source.getRestartData();
+		assertEquals("1", restartData.getProperties().
+				getProperty("StaxEventReaderInputSource.recordcount"));
 		List expectedAfterRestart = (List) source.read();
 
 		source = createNewInputSouce();
 		source.restoreFrom(restartData);
 		List afterRestart = (List) source.read();
 		assertEquals(expectedAfterRestart.size(), afterRestart.size());
+	}
+	
+	/**
+	 * Restore point must not exceed end of file,
+	 * input source must not be already initialized when restoring.
+	 */
+	public void testInvalidRestore() {
+		Properties props = new Properties() {{
+			final String MORE_RECORDS_THAN_INPUT_CONTAINS = "100000";
+			setProperty("StaxEventReaderInputSource.recordcount", MORE_RECORDS_THAN_INPUT_CONTAINS);
+		}};
+		try {
+			source.restoreFrom(new GenericRestartData(props));
+			fail();
+		}
+		catch (IllegalStateException e) {
+			// expected
+		}
+		
+		source = createNewInputSouce();
+		source.open();
+		try {
+			source.restoreFrom(new GenericRestartData(new Properties()));
+			fail();
+		}
+		catch (IllegalStateException e) {
+			// expected
+		}
 	}
 
 	/**
