@@ -176,7 +176,7 @@ public class FieldSetTests extends TestCase {
 	}
 
 	public void testReadBlankInt(){
-		
+
 		//Trying to parse a blank field as an integer, but without a default
 		//value should throw a NumberFormatException
 		try{
@@ -186,7 +186,7 @@ public class FieldSetTests extends TestCase {
 		catch(NumberFormatException ex){
 			//expected
 		}
-		
+
 		try{
 			fieldSet.readInt("BlankInput");
 			fail();
@@ -194,7 +194,7 @@ public class FieldSetTests extends TestCase {
 		catch(NumberFormatException ex){
 			//expected
 		}
-		
+
 	}
 
 	public void testReadLong() throws Exception {
@@ -332,7 +332,7 @@ public class FieldSetTests extends TestCase {
 		assertFalse(fs1.equals(fs2));
 
 	}
-	
+
 	public void testHashCode() throws Exception {
 		assertEquals(fieldSet.hashCode(), new FieldSet(tokens).hashCode());
 	}
@@ -363,7 +363,7 @@ public class FieldSetTests extends TestCase {
 
 	public void testToStringNullTokens() throws Exception {
 		fieldSet = new FieldSet(null);
-		assertEquals(null, fieldSet.toString());
+		assertEquals("", fieldSet.toString());
 	}
 
 	public void testProperties() throws Exception {
@@ -380,9 +380,9 @@ public class FieldSetTests extends TestCase {
 			// expected
 		}
 	}
-	
+
 	public void testPropertiesWithWhiteSpace() throws Exception{
-		
+
 		assertEquals("bar", new FieldSet(new String[] { "foo", "bar   " }, new String[] { "Foo", "Bar"}).getProperties().getProperty("Bar"));
 	}
 
