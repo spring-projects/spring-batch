@@ -28,6 +28,7 @@
 		<aop:advisor pointcut="execution(* org.springframework.batch.execution..*Repository+.*(..))"
 			advice-ref="txAdvice" />
 	</aop:config>
+
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
 			<tx:method name="*" />

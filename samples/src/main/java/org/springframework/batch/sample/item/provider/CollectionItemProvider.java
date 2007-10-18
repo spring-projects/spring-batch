@@ -112,7 +112,7 @@ public class CollectionItemProvider extends AbstractItemProvider {
 	 * @author Dave Syer
 	 *
 	 */
-	private class ResultHolder {
+	private static class ResultHolder {
 		Collection records = new ArrayList();
 		boolean exhausted = false;
 	}

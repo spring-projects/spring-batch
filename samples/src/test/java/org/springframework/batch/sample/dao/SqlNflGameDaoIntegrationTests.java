@@ -67,7 +67,7 @@ public class SqlNflGameDaoIntegrationTests extends
 		assertEquals(tempGame, game);
 	}
 	
-	public class NflGameRowMapper implements RowMapper {
+	public static class NflGameRowMapper implements RowMapper {
 
 		public Object mapRow(ResultSet rs, int arg1) throws SQLException{
 			

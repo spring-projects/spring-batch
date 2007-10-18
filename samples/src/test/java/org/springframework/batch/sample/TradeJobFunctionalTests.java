@@ -119,7 +119,7 @@ public class TradeJobFunctionalTests extends AbstractLifecycleSpringContextTests
 		assertTrue(((Resource)applicationContext.getBean("fileLocator")).exists());
 	}
 	
-	private class Customer {
+	private static class Customer {
 		private String name;
 		private double credit;
 		
