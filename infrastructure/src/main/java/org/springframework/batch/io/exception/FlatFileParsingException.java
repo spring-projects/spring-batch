@@ -27,6 +27,8 @@ package org.springframework.batch.io.exception;
  */
 public class FlatFileParsingException extends ParsingException {
 
+	private static final long serialVersionUID = 2529197834044942724L;
+
 	private String input;
 	private int lineNumber;
 

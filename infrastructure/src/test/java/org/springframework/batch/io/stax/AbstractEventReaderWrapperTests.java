@@ -19,11 +19,11 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
+import junit.framework.TestCase;
+
 import org.easymock.MockControl;
 
 import com.bea.xml.stream.events.StartDocumentEvent;
-
-import junit.framework.TestCase;
 
 /**
  * @author Lucas Ward
@@ -126,7 +126,7 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 		mockEventReaderControl.verify();
 	}
 
-	private class StubEventReader extends AbstractEventReaderWrapper{
+	private static class StubEventReader extends AbstractEventReaderWrapper{
 		public StubEventReader(XMLEventReader wrappedEventReader) {
 			super(wrappedEventReader);
 		}

@@ -159,7 +159,7 @@ public abstract class AbstractDrivingQueryInputSource implements InputSource, Re
 
 		keys = restoreKeys(data);
 
-		if(keys != null & keys.size() > 0){
+		if(keys != null && keys.size() > 0){
 			keysIterator = keys.listIterator();
 			initialized = true;
 		}

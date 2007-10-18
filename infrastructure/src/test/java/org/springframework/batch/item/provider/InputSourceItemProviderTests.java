@@ -22,7 +22,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.item.provider.InputSourceItemProvider;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -99,7 +98,7 @@ public class InputSourceItemProviderTests extends TestCase {
 		assertEquals("after skip", itemProvider.next());
 	}
 
-	private class MockInputSource implements InputSource, StatisticsProvider, Restartable, Skippable {
+	private static class MockInputSource implements InputSource, StatisticsProvider, Restartable, Skippable {
 
 		private Object value;
 

@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.sql.CompositeKeySqlDrivingQueryInputSource;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.jdbc.core.RowMapper;
@@ -48,7 +47,7 @@ public class CompositeKeySqlDrivingQueryInputSourceIntegrationTests extends
 		return fooInputSource;
 	}
 
-	private class FooRestartDataConverter implements CompositeKeyRestartDataConverter{
+	private static class FooRestartDataConverter implements CompositeKeyRestartDataConverter{
 
 		private static final String ID_RESTART_KEY = "FooRestartDataConverter.id";
 		private static final String VALUE_RESTART_KEY = "FooRestartDataConverter.value";
@@ -70,7 +69,7 @@ public class CompositeKeySqlDrivingQueryInputSourceIntegrationTests extends
 		}
 	}
 
-	private class FooCompositeKeyMapper implements RowMapper{
+	private static class FooCompositeKeyMapper implements RowMapper{
 		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 			List key = new ArrayList();
 			key.add(new Long(rs.getLong(1)));

@@ -69,7 +69,7 @@ public class FlatFileOutputSource implements OutputSource, ResourceLifecycle, Re
 	 * @author dsyer
 	 * 
 	 */
-	public class BooleanHolder {
+	public static class BooleanHolder {
 
 		public boolean value;
 

@@ -347,7 +347,7 @@ public class StaxEventReaderInputSourceTests extends TestCase {
 
 	}
 
-	private class MockStaxEventReaderInputSource extends StaxEventReaderInputSource {
+	private static class MockStaxEventReaderInputSource extends StaxEventReaderInputSource {
 
 		private boolean openCalled = false;
 

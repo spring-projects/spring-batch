@@ -46,11 +46,11 @@ public class Order {
 	}
 
 	public Date getDate() {
-		return date;
+		return (Date)date.clone();
 	}
 
 	public void setDate(Date date) {
-		this.date = date;
+		this.date = date == null ? null : (Date)date.clone();
 	}
 
 	public List getLineItems() {

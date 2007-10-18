@@ -43,17 +43,19 @@ public final class FieldSet {
 	private List names;
 
 	public FieldSet(String[] tokens) {
-		this.tokens = tokens;
+		this.tokens = tokens == null ? null : (String[])tokens.clone();
 	}
 
 	public FieldSet(String[] tokens, String[] names) {
+		Assert.notNull(tokens);
+		Assert.notNull(names);
 		if (tokens.length != names.length) {
 			throw new IllegalArgumentException(
 					"Field names must be same length as values: names="
 							+ Arrays.asList(names) + ", values="
 							+ Arrays.asList(tokens));
 		}
-		this.tokens = tokens;
+		this.tokens = (String[])tokens.clone();
 		this.names = Arrays.asList(names);
 	}
 
@@ -564,8 +566,8 @@ public final class FieldSet {
 		if (names != null) {
 			return getProperties().toString();
 		}
-		// TODO return "" instead of null?
-		return tokens == null ? null : Arrays.asList(tokens).toString();
+		
+		return tokens == null ? "" : Arrays.asList(tokens).toString();
 	}
 
 	/**
@@ -586,7 +588,18 @@ public final class FieldSet {
 	}
 
 	public int hashCode() {
-		return (tokens == null) ? 0 : tokens.hashCode();
+		//this algorithm was taken from java 1.5 jdk Arrays.hashCode(Object[])
+        if (tokens == null) {
+        	return 0;
+        }            
+ 
+        int result = 1;
+ 
+        for (int i = 0; i < tokens.length; i++) {
+            result = 31 * result + (tokens[i] == null ? 0 : tokens[i].hashCode());
+        }
+ 
+        return result;		
 	}
 
 	/**

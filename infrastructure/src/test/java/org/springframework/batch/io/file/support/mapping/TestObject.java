@@ -43,11 +43,11 @@ public class TestObject {
 	Date varDate;
 
 	public Date getVarDate() {
-		return varDate;
+		return (Date)varDate.clone();
 	}
 
 	public void setVarDate(Date varDate) {
-		this.varDate = varDate;
+		this.varDate = varDate == null ? null : (Date)varDate.clone();
 	}
 
 	public TestObject() {

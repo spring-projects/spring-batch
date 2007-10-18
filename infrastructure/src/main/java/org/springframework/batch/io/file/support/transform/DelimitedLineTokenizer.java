@@ -101,60 +101,57 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 * Yields the tokens resulting from the splitting of the supplied
 	 * <code>line</code>.
 	 * 
-	 * @param line the line to be tokenised (can be <code>null</code>)
+	 * @param line the line to be tokenized
 	 * 
 	 * @return the resulting tokens
 	 */
-	public List doTokenize(String line) {
+	protected List doTokenize(String line) {
 
 		List tokens = new ArrayList();
 
+		//line is never null in current implementation
+		//line is checked in parent: AbstractLineTokenizer.tokenize()
 		char[] chars = line.toCharArray();
 		boolean inQuoted = false;
 		char lastChar = 0;
 		int lastCut = 0;
 		int length = chars.length;
 
-		// TODO if line was null there would be exception while getting chars
-		// value
-		if (line != null) {
-
-			for (int i = 0; i < length; i++) {
-
-				char currentChar = chars[i];
-				boolean isEnd = (i == (length - 1));
-
-				if ((isDelimiterCharacter(currentChar) && !inQuoted) || isEnd) {
-					int endPosition = (isEnd ? (length - lastCut) : (i - lastCut));
-
-					if (isEnd && isDelimiterCharacter(currentChar)) {
-						endPosition--;
-					}
-
-					String value = null;
-
-					if (isQuoteCharacter(lastChar) || isQuoteCharacter(currentChar)) {
-						value = new String(chars, lastCut + 1, endPosition - 2);
-						value = StringUtils.replace(value, "" + quoteCharacter + quoteCharacter, "" + quoteCharacter);
-					}
-					else {
-						value = new String(chars, lastCut, endPosition);
-					}
-
-					tokens.add(value);
-
-					if (isEnd && (isDelimiterCharacter(currentChar))) {
-						tokens.add("");
-					}
-
-					lastCut = i + 1;
+		for (int i = 0; i < length; i++) {
+	
+			char currentChar = chars[i];
+			boolean isEnd = (i == (length - 1));
+	
+			if ((isDelimiterCharacter(currentChar) && !inQuoted) || isEnd) {
+				int endPosition = (isEnd ? (length - lastCut) : (i - lastCut));
+	
+				if (isEnd && isDelimiterCharacter(currentChar)) {
+					endPosition--;
 				}
-				else if (isQuoteCharacter(currentChar)) {
-					inQuoted = !inQuoted;
+	
+				String value = null;
+	
+				if (isQuoteCharacter(lastChar) || isQuoteCharacter(currentChar)) {
+					value = new String(chars, lastCut + 1, endPosition - 2);
+					value = StringUtils.replace(value, "" + quoteCharacter + quoteCharacter, "" + quoteCharacter);
 				}
-
-				lastChar = currentChar;
+				else {
+					value = new String(chars, lastCut, endPosition);
+				}
+	
+				tokens.add(value);
+	
+				if (isEnd && (isDelimiterCharacter(currentChar))) {
+					tokens.add("");
+				}
+	
+				lastCut = i + 1;
 			}
+			else if (isQuoteCharacter(currentChar)) {
+				inQuoted = !inQuoted;
+			}
+	
+			lastChar = currentChar;
 		}
 
 		return tokens;

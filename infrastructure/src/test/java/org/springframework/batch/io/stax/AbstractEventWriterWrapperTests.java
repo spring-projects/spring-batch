@@ -126,7 +126,7 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 		mockEventWriterControl.verify();
 	}
 
-	private class StubEventWriter extends AbstractEventWriterWrapper{
+	private static class StubEventWriter extends AbstractEventWriterWrapper{
 		public StubEventWriter(XMLEventWriter wrappedEventWriter) {
 			super(wrappedEventWriter);
 		}

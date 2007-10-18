@@ -13,7 +13,8 @@ public class SingleKeySqlDrivingQueryInputSourceIntegrationTests extends Abstrac
 	 */
 	protected InputSource createInputSource() throws Exception {
 
-		SingleKeySqlDrivingQueryInputSource inputSource = new SingleKeySqlDrivingQueryInputSource(getJdbcTemplate(), "SELECT ID from T_FOOS order by ID");
+		SingleKeySqlDrivingQueryInputSource inputSource = new SingleKeySqlDrivingQueryInputSource(getJdbcTemplate(),
+				"SELECT ID from T_FOOS order by ID");
 		inputSource.setRestartQuery("SELECT ID from T_FOOS where ID > ? order by ID");
 		return new FooInputSource(inputSource, getJdbcTemplate());
 

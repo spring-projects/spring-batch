@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.item.provider;
 
+import junit.framework.TestCase;
+
 import org.easymock.MockControl;
 import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.exception.ValidationException;
 import org.springframework.batch.item.validator.Validator;
-
-import junit.framework.TestCase;
 
 /**
  * @author Lucas Ward
@@ -99,7 +99,7 @@ public class ValidatingItemProviderTests extends TestCase {
 		validatorControl.verify();
 	}
 
-	private class MockInputSource implements InputSource{
+	private static class MockInputSource implements InputSource{
 
 		Object value;
 

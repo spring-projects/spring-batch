@@ -24,11 +24,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Result;
 
+import junit.framework.TestCase;
+
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
-
-import junit.framework.TestCase;
 
 /**
  *
@@ -67,7 +67,7 @@ public class MarshallingObjectToXmlSerializerTests extends TestCase {
 		}
 	}
 
-	private class MockMarshaller implements Marshaller{
+	private static class MockMarshaller implements Marshaller{
 
 		private Object marshalledObject;
 		private boolean throwException = false;
@@ -93,7 +93,7 @@ public class MarshallingObjectToXmlSerializerTests extends TestCase {
 		}
 	}
 
-	private class StubXmlEventWriter implements XMLEventWriter{
+	private static class StubXmlEventWriter implements XMLEventWriter{
 
 		public void add(XMLEvent arg0) throws XMLStreamException {		}
 

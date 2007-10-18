@@ -24,6 +24,8 @@ package org.springframework.batch.io.exception;
  */
 public class ParsingException extends RuntimeException {
 
+	private static final long serialVersionUID = 2953386084409312312L;
+
 	public ParsingException(String message) {
 		super(message);
 	}
