@@ -21,7 +21,7 @@
 						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 						<property name="itemProvider">
 							<bean
-								class="org.springframework.batch.sample.item.provider.CollectionItemProvider">
+								class="org.springframework.batch.item.provider.AggregateItemProvider">
 								<property name="inputSource"
 									ref="fileInputSource" />
 							</bean>
