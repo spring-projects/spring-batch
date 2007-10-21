@@ -66,7 +66,7 @@ public class SimpleStepConfigurationTests extends TestCase {
 	 */
 	public void testSetBeanName() {
 		configuration.setBeanName("bar");
-		assertEquals("foo", configuration.getName());
+		assertEquals("bar", configuration.getName());
 	}
 
 	/**

@@ -67,7 +67,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	protected void setUp() throws Exception {
 
 		super.setUp();
-		jobConfiguration.setName("TestJob");
+		jobConfiguration.setBeanName("TestJob");
 		jobExecutorFacade.setJobExecutor(jobExecutor);
 		jobRepository = (JobRepository) jobRepositoryControl.getMock();
 		jobExecutorFacade.setJobRepository(jobRepository);

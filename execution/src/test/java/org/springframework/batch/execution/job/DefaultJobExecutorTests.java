@@ -116,10 +116,8 @@ public class DefaultJobExecutorTests extends TestCase {
 			}
 		});
 
-		stepConfiguration1 = new SimpleStepConfiguration();
-		stepConfiguration1.setName("TestStep1");
-		stepConfiguration2 = new SimpleStepConfiguration();
-		stepConfiguration2.setName("TestStep2");
+		stepConfiguration1 = new SimpleStepConfiguration("TestStep1");
+		stepConfiguration2 = new SimpleStepConfiguration("TestStep2");
 		List stepConfigurations = new ArrayList();
 		stepConfigurations.add(stepConfiguration1);
 		stepConfigurations.add(stepConfiguration2);

@@ -29,7 +29,7 @@ import org.springframework.beans.factory.BeanNameAware;
  * @author Dave Syer
  * 
  */
-public class AbstractStepConfiguration extends StepConfigurationSupport implements BeanNameAware {
+public class AbstractStepConfiguration extends StepConfigurationSupport {
 
 	private int skipLimit = 0;
 
@@ -43,23 +43,11 @@ public class AbstractStepConfiguration extends StepConfigurationSupport implemen
 	}
 
 	/**
-	 * Convenent constructor for setting only the name property.
+	 * Convenient constructor for setting only the name property.
 	 * @param name
 	 */
 	public AbstractStepConfiguration(String name) {
 		super(name);
-	}
-
-	/**
-	 * Set the name property if it has not already been set explicitly (and is
-	 * therefore not null).
-	 * 
-	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
-	 */
-	public void setBeanName(String name) {
-		if (getName() == null) {
-			setName(name);
-		}
 	}
 
 	public ExceptionHandler getExceptionHandler() {

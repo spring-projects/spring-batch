@@ -57,7 +57,7 @@ public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
 		MapJobConfigurationRegistry registry = new MapJobConfigurationRegistry();
 		processor.setJobConfigurationRegistry(registry);
 		JobConfiguration configuration = new JobConfiguration();
-		configuration.setName("foo");
+		configuration.setBeanName("foo");
 		assertEquals(configuration, processor.postProcessAfterInitialization(configuration, "bar"));
 		assertEquals(configuration, registry.getJobConfiguration("foo"));
 	}
@@ -66,7 +66,7 @@ public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
 		MapJobConfigurationRegistry registry = new MapJobConfigurationRegistry();
 		processor.setJobConfigurationRegistry(registry);
 		JobConfiguration configuration = new JobConfiguration();
-		configuration.setName("foo");
+		configuration.setBeanName("foo");
 		processor.postProcessAfterInitialization(configuration, "bar");
 		try {
 			processor.postProcessAfterInitialization(configuration, "spam");
@@ -81,7 +81,7 @@ public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
 		MapJobConfigurationRegistry registry = new MapJobConfigurationRegistry();
 		processor.setJobConfigurationRegistry(registry);
 		JobConfiguration configuration = new JobConfiguration();
-		configuration.setName("foo");
+		configuration.setBeanName("foo");
 		assertEquals(configuration, processor.postProcessAfterInitialization(configuration, "bar"));
 		processor.destroy();
 		try {

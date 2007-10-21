@@ -84,7 +84,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobRuntimeInformation = new SimpleJobIdentifier("RepositoryTest");
 
 		jobConfiguration = new JobConfiguration();
-		jobConfiguration.setName("RepositoryTest");
+		jobConfiguration.setBeanName("RepositoryTest");
 		jobConfiguration.setRestartable(true);
 
 		stepConfiguration1 = new StepConfigurationSupport("TestStep1");

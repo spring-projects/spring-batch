@@ -12,7 +12,6 @@
 	</bean>
 
 	<bean id="test-job" class="org.springframework.batch.core.configuration.JobConfiguration">
-		<property name="name" value="test-job"/>
 		<property name="steps">
 			<bean id="step1" class="org.springframework.batch.execution.step.SimpleStepConfiguration">
 				<constructor-arg>

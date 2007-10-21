@@ -64,7 +64,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		stepConfiguration = new SimpleStepConfiguration();
 		jobConfiguration.addStep(stepConfiguration);
 		JobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
-		jobConfiguration.setName("testJob");
+		jobConfiguration.setBeanName("testJob");
 		job = jobRepository.findOrCreateJob(jobConfiguration, runtimeInformation);
 		executor = new SimpleStepExecutor();
 	}
