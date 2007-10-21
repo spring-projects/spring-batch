@@ -35,9 +35,9 @@ public class JobConfiguration implements BeanNameAware {
 	private List stepConfigurations = new ArrayList();
 
 	private String name;
-	
+
 	private boolean restartable = false;
-	
+
 	private int startLimit = Integer.MAX_VALUE;
 
 	/**
@@ -50,6 +50,7 @@ public class JobConfiguration implements BeanNameAware {
 	/**
 	 * Convenience constructor to immediately add name (which is mandatory but
 	 * not final).
+	 * 
 	 * @param name
 	 */
 	public JobConfiguration(String name) {
@@ -57,18 +58,18 @@ public class JobConfiguration implements BeanNameAware {
 		this.name = name;
 	}
 
+	/**
+	 * The callback from {@link BeanNameAware} comes after the setters, so it
+	 * will always overwrite the name with the bean id.
+	 * 
+	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
+	 */
 	public void setBeanName(String name) {
-		if (this.name == null) {
-			this.name = name;
-		}
+		this.name = name;
 	}
 
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public List getStepConfigurations() {
@@ -83,19 +84,19 @@ public class JobConfiguration implements BeanNameAware {
 	public void addStep(StepConfiguration stepConfiguration) {
 		this.stepConfigurations.add(stepConfiguration);
 	}
-	
+
 	public int getStartLimit() {
 		return startLimit;
 	}
-	
+
 	public void setStartLimit(int startLimit) {
 		this.startLimit = startLimit;
 	}
-	
+
 	public void setRestartable(boolean restartable) {
 		this.restartable = restartable;
 	}
-	
+
 	public boolean isRestartable() {
 		return restartable;
 	}

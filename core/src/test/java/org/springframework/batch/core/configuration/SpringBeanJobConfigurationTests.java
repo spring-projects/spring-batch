@@ -1,0 +1,69 @@
+/*
+ * Copyright 2006-2007 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.batch.core.configuration;
+
+import junit.framework.TestCase;
+
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.support.ChildBeanDefinition;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.context.support.StaticApplicationContext;
+
+public class SpringBeanJobConfigurationTests extends TestCase {
+
+	public void testBeanName() throws Exception {
+		StaticApplicationContext context = new StaticApplicationContext();
+		JobConfiguration configuration = new JobConfiguration();
+		context.getAutowireCapableBeanFactory().initializeBean(configuration,
+				"bean");
+		assertNotNull(configuration.getName());
+		configuration.setBeanName("foo");
+		context.getAutowireCapableBeanFactory().initializeBean(configuration,
+				"bean");
+		assertEquals("bean", configuration.getName());
+	}
+
+	public void testBeanNameWithBeanDefinition() throws Exception {
+		GenericApplicationContext context = new GenericApplicationContext();
+		ConstructorArgumentValues args = new ConstructorArgumentValues();
+		args.addGenericArgumentValue("foo");
+		context.registerBeanDefinition("bean", new RootBeanDefinition(
+				JobConfiguration.class, args, null));
+		JobConfiguration configuration = (JobConfiguration) context
+				.getBean("bean");
+		assertNotNull(configuration.getName());
+		assertEquals("bean", configuration.getName());
+		configuration.setBeanName("foo");
+		assertEquals("foo", configuration.getName());
+	}
+
+	public void testBeanNameWithParentBeanDefinition() throws Exception {
+		GenericApplicationContext context = new GenericApplicationContext();
+		ConstructorArgumentValues args = new ConstructorArgumentValues();
+		args.addGenericArgumentValue("bar");
+		context.registerBeanDefinition("parent", new RootBeanDefinition(
+				JobConfiguration.class, args, null));
+		context.registerBeanDefinition("bean", new ChildBeanDefinition("parent"));
+		JobConfiguration configuration = (JobConfiguration) context
+				.getBean("bean");
+		assertNotNull(configuration.getName());
+		assertEquals("bean", configuration.getName());
+		configuration.setBeanName("foo");
+		assertEquals("foo", configuration.getName());
+	}
+}

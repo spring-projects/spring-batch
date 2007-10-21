@@ -40,8 +40,7 @@ public class StepConfigurationSupportTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.core.configuration.StepConfigurationSupport#getName()}.
 	 */
 	public void testGetName() {
-		configuration.setName("foo");
-		assertEquals("foo", configuration.getName());
+		assertEquals("step", configuration.getName());
 	}
 
 	/**

@@ -42,7 +42,7 @@ public class JobConfigurationTests extends TestCase {
 	 */
 	public void testSetBeanName() {
 		configuration.setBeanName("foo");
-		assertEquals("job", configuration.getName());
+		assertEquals("foo", configuration.getName());
 	}
 
 	/**
@@ -50,18 +50,9 @@ public class JobConfigurationTests extends TestCase {
 	 * {@link org.springframework.batch.core.configuration.JobConfiguration#setBeanName(java.lang.String)}.
 	 */
 	public void testSetBeanNameWithNullName() {
-		configuration.setName(null);
+		configuration = new JobConfiguration(null);
 		assertEquals(null, configuration.getName());
 		configuration.setBeanName("foo");
-		assertEquals("foo", configuration.getName());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.JobConfiguration#setName(java.lang.String)}.
-	 */
-	public void testSetName() {
-		configuration.setName("foo");
 		assertEquals("foo", configuration.getName());
 	}
 
