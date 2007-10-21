@@ -21,9 +21,21 @@ package org.springframework.batch.io.file;
  * Interface that is used to map data obtained from a file into an object.
  * 
  * @author tomas.slanina
+ * @author Dave Syer
  * 
  */
 public interface FieldSetMapper {
+	
+	/**
+	 * Marker for the beginning of a multi-object record.
+	 */
+	static Object BEGIN_RECORD = new Object();
+
+	/**
+	 * Marker for the end of a multi-object record.
+	 */
+	static Object END_RECORD = new Object();
+
 	/**
 	 * Method used to map data obtained from a file into an object.
 	 */
