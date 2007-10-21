@@ -31,6 +31,14 @@ public class TradeFieldSetMapper implements FieldSetMapper {
 	
     public Object mapLine(FieldSet fieldSet) {
     	
+    	if ("BEGIN".equals(fieldSet.readString(0))) {
+    		return FieldSetMapper.BEGIN_RECORD;
+    	}
+    	
+    	if ("END".equals(fieldSet.readString(0))) {
+    		return FieldSetMapper.END_RECORD;
+    	}
+
     	Trade trade = new Trade();
     	trade.setIsin(fieldSet.readString(0));
         trade.setQuantity(fieldSet.readLong(1));

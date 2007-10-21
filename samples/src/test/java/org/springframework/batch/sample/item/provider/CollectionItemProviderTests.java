@@ -7,15 +7,12 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.FieldSetMapper;
-import org.springframework.batch.sample.item.provider.CollectionItemProvider;
 
 public class CollectionItemProviderTests extends TestCase {
 
 	private MockControl inputControl;
 	private InputSource input;
-	private FieldSetMapper mapper;
 	private CollectionItemProvider provider;
 
 	public void setUp() {
@@ -24,26 +21,20 @@ public class CollectionItemProviderTests extends TestCase {
 		inputControl = MockControl.createControl(InputSource.class);
 		input = (InputSource) inputControl.getMock();
 
-		//create mock for mapper
-		mapper = new FieldSetMapper() {
-			public Object mapLine(FieldSet fs) { return fs.readString(0); }
-		};
-
 		//create provider
 		provider = new CollectionItemProvider();
 		provider.setInputSource(input);
-		provider.setFieldSetMapper(mapper);
 	}
 
 	public void testNext() {
 
 		//set-up mock input
 		input.read();
-		inputControl.setReturnValue(new FieldSet(new String[] {"BEGIN"}));
+		inputControl.setReturnValue(FieldSetMapper.BEGIN_RECORD);
 		input.read();
-		inputControl.setReturnValue(new FieldSet(new String[] {"line"}),3);
+		inputControl.setReturnValue("line",3);
 		input.read();
-		inputControl.setReturnValue(new FieldSet(new String[] {"END"}));
+		inputControl.setReturnValue(FieldSetMapper.END_RECORD);
 		input.read();
 		inputControl.setReturnValue(null);
 		inputControl.replay();

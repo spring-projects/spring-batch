@@ -36,5 +36,13 @@ public class TradeFieldSetMapperTests extends AbstractFieldSetMapperTests{
 	protected FieldSetMapper fieldSetMapper() {
 		return new TradeFieldSetMapper();
 	}
+	
+	public void testBeginRecord() throws Exception {
+		assertEquals(FieldSetMapper.BEGIN_RECORD, fieldSetMapper().mapLine(new FieldSet(new String[] {"BEGIN"})));
+	}
+
+	public void testEndRecord() throws Exception {
+		assertEquals(FieldSetMapper.END_RECORD, fieldSetMapper().mapLine(new FieldSet(new String[] {"END"})));
+	}
 
 }

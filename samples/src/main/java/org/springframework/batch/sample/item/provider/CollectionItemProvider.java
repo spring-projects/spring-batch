@@ -22,7 +22,6 @@ import java.util.Collection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.item.ItemProvider;
 import org.springframework.batch.item.provider.AbstractItemProvider;
@@ -45,9 +44,6 @@ public class CollectionItemProvider extends AbstractItemProvider {
 
 	private InputSource inputSource;
 
-	// maps a single line to a simple record
-	private FieldSetMapper fieldSetMapper;
-
 	/**
 	 * Get the next list of records.
 	 *
@@ -56,7 +52,7 @@ public class CollectionItemProvider extends AbstractItemProvider {
 	public Object next() {
 		ResultHolder holder = new ResultHolder();
 
-		while (process((FieldSet)inputSource.read(), holder)) {
+		while (process(inputSource.read(), holder)) {
 			continue;
 		}
 
@@ -67,29 +63,29 @@ public class CollectionItemProvider extends AbstractItemProvider {
 		}
 	}
 
-	private boolean process(FieldSet fieldSet, ResultHolder holder) {
+	private boolean process(Object value, ResultHolder holder) {
 		// finish processing if we hit the end of file
-		if (fieldSet == null) {
+		if (value == null) {
 			log.debug("Exhausted InputSource");
 			holder.exhausted = true;
 			return false;
 		}
 
 		// start a new collection
-		if (fieldSet.readString(0).equals("BEGIN")) {
+		if (value == FieldSetMapper.BEGIN_RECORD) {
 			log.debug("Start of new record detected");
 			return true;
 		}
 
 		// mark we are finished with current collection
-		if (fieldSet.readString(0).equals("END")) {
+		if (value == FieldSetMapper.END_RECORD) {
 			log.debug("End of record detected");
 			return false;
 		}
 
 		// add a simple record to the current collection
-		log.debug("Mapping: " + fieldSet);
-		holder.records.add(fieldSetMapper.mapLine(fieldSet));
+		log.debug("Mapping: " + value);
+		holder.records.add(value);
 		return true;
 	}
 
@@ -99,10 +95,6 @@ public class CollectionItemProvider extends AbstractItemProvider {
 	 */
 	public void setInputSource(InputSource inputSource) {
 		this.inputSource = inputSource;
-	}
-
-	public void setFieldSetMapper(FieldSetMapper mapper) {
-		this.fieldSetMapper = mapper;
 	}
 
 	/**
