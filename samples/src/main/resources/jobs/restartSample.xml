@@ -11,7 +11,7 @@
 		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
 	</bean>
 
-	<bean id="jobConfiguration" parent="simpleJob" p:name="restartSample">
+	<bean id="restartSample" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
 				<property name="tasklet">

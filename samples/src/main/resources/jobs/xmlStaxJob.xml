@@ -13,8 +13,7 @@
 		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
 	</bean>
 
-	<bean id="jobConfiguration" parent="simpleJob">
-		<property name="name" value="xmlStaxJob" />
+	<bean id="xmlStaxJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
 				<constructor-arg>
