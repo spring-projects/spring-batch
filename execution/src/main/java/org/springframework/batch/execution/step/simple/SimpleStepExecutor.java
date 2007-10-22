@@ -77,11 +77,6 @@ public class SimpleStepExecutor implements StepExecutor {
 	 */
 	private static final String STEP_EXECUTION_KEY = "STEP_EXECUTION";
 
-	/**
-	 * Attribute key for statistics instance in step context.
-	 */
-	public static final String STATISTICS_KEY = "STATISTICS";
-
 	private RepeatOperations chunkOperations = new RepeatTemplate();
 
 	private RepeatOperations stepOperations = new RepeatTemplate();
@@ -239,8 +234,6 @@ public class SimpleStepExecutor implements StepExecutor {
 									}
 									Properties statistics = getStatistics(module);
 									stepExecution.setStatistics(statistics);
-									context.setAttribute(STATISTICS_KEY,
-											statistics);
 									stepExecution.incrementCommitCount();
 									jobRepository.saveOrUpdate(stepExecution);
 									return result;

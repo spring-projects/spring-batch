@@ -16,7 +16,10 @@
 
 package org.springframework.batch.execution.facade;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
@@ -63,6 +66,18 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 	private int running = 0;
 
 	private Object mutex = new Object();
+
+	private List listeners = new ArrayList();
+
+	/**
+	 * Public setter for the listeners property.
+	 * 
+	 * @param listeners
+	 *            the listeners to set - a list of {@link JobExecutionListener}.
+	 */
+	public void setJobExecutionListeners(List listeners) {
+		this.listeners = listeners;
+	}
 
 	/**
 	 * Public accessor for the running property.
@@ -158,7 +173,9 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 	}
 
 	/**
-	 * Internal accounting for the job execution. Callback at start of job.
+	 * Internal accounting for the job execution. Callback at start of job,
+	 * dealing with internal housekeeping before delegating to listeners in the
+	 * order that they were given.
 	 * 
 	 * @param execution
 	 */
@@ -166,14 +183,28 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 		synchronized (mutex) {
 			running++;
 		}
+		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+			JobExecutionListener listener = (JobExecutionListener) iterator
+					.next();
+			listener.before(execution);
+		}
 	}
 
 	/**
-	 * Internal accounting for the job execution. Callback at end of job.
+	 * Internal accounting for the job execution. Callback at end of job
+	 * delegating first to listeners, in reverse order to the list supplied, and
+	 * then finally dealing with internal housekeeping.
 	 * 
 	 * @param execution
 	 */
 	public void after(JobExecution execution) {
+		ArrayList reversed = new ArrayList(listeners);
+		Collections.reverse(reversed);
+		for (Iterator iterator = reversed.iterator(); iterator.hasNext();) {
+			JobExecutionListener listener = (JobExecutionListener) iterator
+					.next();
+			listener.after(execution);
+		}
 		synchronized (mutex) {
 			// assume execution is synchronous so when we get to here we are
 			// not running any more

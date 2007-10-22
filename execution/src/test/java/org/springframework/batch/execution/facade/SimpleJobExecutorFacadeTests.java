@@ -16,7 +16,9 @@
 
 package org.springframework.batch.execution.facade;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -25,12 +27,9 @@ import org.easymock.MockControl;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.JobConfigurationLocator;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
-import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.executor.JobExecutor;
-import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.JobExecutionRegistry;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
@@ -46,23 +45,23 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
  */
 public class SimpleJobExecutorFacadeTests extends TestCase {
 
-	SimpleJobExecutorFacade jobExecutorFacade = new SimpleJobExecutorFacade();
+	private SimpleJobExecutorFacade jobExecutorFacade = new SimpleJobExecutorFacade();
 
-	JobExecutor jobExecutor;
+	private JobExecutor jobExecutor;
 
-	MockControl jobLifecycleControl = MockControl.createControl(JobExecutor.class);
+	private JobRepository jobRepository;
 
-	JobRepository jobRepository;
+	private MockControl jobRepositoryControl = MockControl.createControl(JobRepository.class);
 
-	MockControl jobRepositoryControl = MockControl.createControl(JobRepository.class);
+	private JobConfiguration jobConfiguration = new JobConfiguration();
 
-	JobConfiguration jobConfiguration = new JobConfiguration();
+	private volatile boolean running = false;
 
-	StepExecutor stepExecutor = new StepExecutor() {
-		public ExitStatus process(StepConfiguration configuration, StepExecution stepExecution) throws BatchCriticalException {
-			return ExitStatus.FINISHED;
-		}
-	};
+	private SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier();
+	
+	private JobExecution jobExecution = new JobExecution(new JobInstance(jobIdentifier));
+
+	private List list = new ArrayList();
 
 	protected void setUp() throws Exception {
 
@@ -104,12 +103,6 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 		return job;
 	}
 
-	private volatile boolean running = false;
-
-	private JobExecution jobExecution;
-
-	private SimpleJobIdentifier jobIdentifier;
-	
 	public void testIsRunning() throws Exception {
 		jobExecutorFacade.setJobExecutor(new JobExecutor() {
 			public ExitStatus run(JobConfiguration configuration, JobExecution jobExecutionContext)
@@ -231,4 +224,42 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 		assertTrue(statistics.containsKey("job1.step1"));
 		control.verify();
 	}
+
+	public void testListenersCalledLastOnAfter() throws Exception {
+		List listeners = new ArrayList();
+		listeners.add(new JobExecutionListenerSupport() {
+			public void after(JobExecution execution) {
+				list.add("two");
+			}
+		});
+		listeners.add(new JobExecutionListenerSupport() {
+			public void after(JobExecution execution) {
+				list.add("one");
+			}
+		});
+		jobExecutorFacade.setJobExecutionListeners(listeners);
+		jobExecutorFacade.after(jobExecution);
+		assertEquals(2, list.size());
+		assertEquals("two", list.get(1));
+	}
+	
+	public void testOrderedListenersCalledFirstOnBefore() throws Exception {
+		List listeners = new ArrayList();
+		listeners.add(new JobExecutionListenerSupport() {
+			public void before(JobExecution execution) {
+				list.add("one");
+			}
+		});
+		listeners.add(new JobExecutionListenerSupport() {
+			public void before(JobExecution execution) {
+				list.add("two");
+			}
+		});
+		jobExecutorFacade.setJobExecutionListeners(listeners);
+		jobExecutorFacade.before(jobExecution);
+		assertEquals(2, list.size());
+		assertEquals("two", list.get(1));
+	}
+
 }
+
