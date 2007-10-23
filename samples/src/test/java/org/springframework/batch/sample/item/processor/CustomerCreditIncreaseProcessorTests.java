@@ -2,11 +2,11 @@ package org.springframework.batch.sample.item.processor;
 
 import java.math.BigDecimal;
 
+import junit.framework.TestCase;
+
 import org.easymock.MockControl;
 import org.springframework.batch.io.OutputSource;
 import org.springframework.batch.sample.domain.CustomerCredit;
-
-import junit.framework.TestCase;
 
 /**
  * Tests for {@link CustomerCreditIncreaseProcessor}.
@@ -30,7 +30,6 @@ public class CustomerCreditIncreaseProcessorTests extends TestCase{
 		outputSource = (OutputSource) outputSourceControl.getMock();
 		processor.setOutputSource(outputSource);
 	}
-
 
 	/**
 	 * Increases customer's credit by fixed value

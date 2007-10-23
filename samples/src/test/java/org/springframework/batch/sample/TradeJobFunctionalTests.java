@@ -20,7 +20,10 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.core.io.FileSystemResource;
@@ -40,6 +43,7 @@ public class TradeJobFunctionalTests extends AbstractLifecycleSpringContextTests
 	private int activeRow = 0;
 	
 	private JdbcOperations jdbcTemplate;
+	private Map credits = new HashMap();
 	
 	/**
 	 * @param jdbcTemplate the jdbcTemplate to set
@@ -58,8 +62,13 @@ public class TradeJobFunctionalTests extends AbstractLifecycleSpringContextTests
 	protected void onSetUp() throws Exception {
 		super.onSetUp();
 		jdbcTemplate.update("delete from TRADE");
+		List list = jdbcTemplate.queryForList("select name, CREDIT from customer");
+		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
+			Map map = (Map) iterator.next();
+			credits.put(map.get("NAME"), map.get("CREDIT"));
+		}
 	}
-
+	
 	public void testLifecycle() throws Exception{
 		super.testLifecycle();
 	}
@@ -68,10 +77,10 @@ public class TradeJobFunctionalTests extends AbstractLifecycleSpringContextTests
 		
 		// assertTrue(((Resource)applicationContext.getBean("customerFileLocator")).exists());
 		
-		customers = new ArrayList() {{add(new Customer("customer1", (100000 - 98.34)));
-			add(new Customer("customer2", (100000 - 18.12 - 12.78)));
-			add(new Customer("customer3", (100000 - 109.25)));
-			add(new Customer("customer4", (100000 - 123.39)));}}; 
+		customers = new ArrayList() {{add(new Customer("customer1", (((Double)credits.get("customer1")).doubleValue() - 98.34)));
+			add(new Customer("customer2", (((Double)credits.get("customer2")).doubleValue() - 18.12 - 12.78)));
+			add(new Customer("customer3", (((Double)credits.get("customer3")).doubleValue() - 109.25)));
+			add(new Customer("customer4", (((Double)credits.get("customer4")).doubleValue() - 123.39)));}}; 
 
 		trades = new ArrayList() {{add(new Trade("UK21341EAH45", 978, new BigDecimal("98.34"), "customer1"));
 			add(new Trade("UK21341EAH46", 112, new BigDecimal("18.12"), "customer2"));
@@ -101,15 +110,14 @@ public class TradeJobFunctionalTests extends AbstractLifecycleSpringContextTests
 			public void processRow(ResultSet rs) throws SQLException {
 				Customer customer = (Customer)customers.get(activeRow++);
 				
-				assertTrue(customer.getName().equals(rs.getString(1)));
-				assertTrue(customer.getCredit() == rs.getDouble(2));
+				assertEquals(customer.getName(),rs.getString(1));
+				assertEquals(customer.getCredit(), rs.getDouble(2), .01);
 			}
 		});
 		
-		assertTrue(customers.size() == activeRow);
+		assertEquals(customers.size(), activeRow);
 		
 		// check content of the output file
-		
 		
 //		 Clean up
 		((FileSystemResource)applicationContext.getBean("customerFileLocator")).getFile().delete();

@@ -30,7 +30,6 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractLifecy
 		this.jdbcTemplate = jdbcTemplate;
 	}
 	
-	
 	/**
 	 * All customers have the same credit
 	 */
@@ -61,6 +60,7 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractLifecy
 			}
 			
 		});
+		
 	}
 
 }
