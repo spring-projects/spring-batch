@@ -31,6 +31,7 @@ import org.springframework.batch.repeat.ExitStatus;
  */
 public interface JobExecutor {
 
-	public ExitStatus run(JobConfiguration configuration, JobExecution jobExecution) throws BatchCriticalException;
+	public ExitStatus run(JobConfiguration configuration, JobExecution execution) throws BatchCriticalException;
 	
+	public ExitStatus run(JobConfiguration configuration, JobExecution execution, JobExecutionListener listener) throws BatchCriticalException;
 }
