@@ -59,7 +59,8 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 
 	private JobRepository jobRepository;
 
-	private Map jobExecutionRegistry = new HashMap();
+	// Package access for unit testing...
+	Map jobExecutionRegistry = new HashMap();
 
 	// there is no sensible default for this
 	private JobConfigurationLocator jobConfigurationLocator;
@@ -141,7 +142,6 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration,
 				jobIdentifier);
 		JobExecution jobExecution = new JobExecution(job);
-		jobExecutionRegistry.put(jobIdentifier, jobExecution);
 
 		try {
 
@@ -152,7 +152,6 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 		} finally {
 
 			this.after(jobExecution);
-			jobExecutionRegistry.remove(jobIdentifier);
 
 		}
 
@@ -169,6 +168,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 	public void before(JobExecution execution) {
 		synchronized (mutex) {
 			running++;
+			jobExecutionRegistry.put(execution.getJobIdentifier(), execution);
 		}
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			JobExecutionListener listener = (JobExecutionListener) iterator
@@ -195,6 +195,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 		synchronized (mutex) {
 			// assume execution is synchronous so when we get to here we are
 			// not running any more
+			jobExecutionRegistry.remove(execution.getJobIdentifier());
 			running--;
 		}
 	}

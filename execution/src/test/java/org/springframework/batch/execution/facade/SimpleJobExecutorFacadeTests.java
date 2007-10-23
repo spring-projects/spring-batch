@@ -16,7 +16,6 @@
 
 package org.springframework.batch.execution.facade;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,6 @@ import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.util.ReflectionUtils;
 
 /**
  * SimpleBatchContainer unit tests.
@@ -248,9 +246,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	private void registerExecution(SimpleJobIdentifier runtimeInformation,
 			JobExecution execution) throws NoSuchFieldException,
 			IllegalAccessException {
-		Field field = SimpleJobExecutorFacade.class.getDeclaredField("jobExecutionRegistry");
-		ReflectionUtils.makeAccessible(field);
-		Map map = (Map) field.get(jobExecutorFacade);
+		Map map = (Map) jobExecutorFacade.jobExecutionRegistry;
 		map.put(runtimeInformation, execution);
 	}
 
