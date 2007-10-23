@@ -30,7 +30,7 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
  * @author Dave Syer
  * 
  */
-public abstract class CountingCompletionPolicy extends CompletionPolicySupport {
+public abstract class CountingCompletionPolicy extends DefaultResultCompletionPolicy {
 
 	/**
 	 * Session key for global counter.

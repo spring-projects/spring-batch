@@ -18,6 +18,7 @@ package org.springframework.batch.repeat.policy;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 
@@ -31,6 +32,28 @@ public class CountingCompletionPolicyTests extends TestCase {
 		};
 		RepeatContext context = policy.start(null);
 		assertTrue(policy.isComplete(context));
+	}
+
+	public void testNullResult() throws Exception {
+		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
+			protected int getCount(RepeatContext context) {
+				return 1;
+			};
+		};
+		policy.setMaxCount(10);
+		RepeatContext context = policy.start(null);
+		assertTrue(policy.isComplete(context, null));
+	}
+
+	public void testFinishedResult() throws Exception {
+		CountingCompletionPolicy policy = new CountingCompletionPolicy() {
+			protected int getCount(RepeatContext context) {
+				return 1;
+			};
+		};
+		policy.setMaxCount(10);
+		RepeatContext context = policy.start(null);
+		assertTrue(policy.isComplete(context, ExitStatus.FINISHED));
 	}
 
 	public void testDefaultBehaviourWithUpdate() throws Exception {
