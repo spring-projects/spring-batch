@@ -16,9 +16,10 @@
 
 package org.springframework.batch.execution.facade;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -31,11 +32,11 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.JobExecutionRegistry;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * SimpleBatchContainer unit tests.
@@ -169,12 +170,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	}
 
 	public void testStopWithNoJob() throws Exception {
-		MockControl control = MockControl.createControl(JobExecutionRegistry.class);
-		JobExecutionRegistry jobExecutionRegistry = (JobExecutionRegistry) control.getMock();
-		jobExecutorFacade.setJobExecutionRegistry(jobExecutionRegistry);
 		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
-		control.expectAndReturn(jobExecutionRegistry.get(runtimeInformation), null);
-		control.replay();
 		try {
 			jobExecutorFacade.stop(runtimeInformation);
 			fail("Expected NoSuchJobExecutionException");
@@ -182,24 +178,18 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 			// expected
 			assertTrue(e.getMessage().indexOf("TestJob")>=0);
 		}
-		control.verify();
 	}
 
 	public void testStop() throws Exception {
-		JobExecutionRegistry jobExecutionRegistry = new VolatileJobExecutionRegistry();
-		jobExecutorFacade.setJobExecutionRegistry(jobExecutionRegistry);
 		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
-		JobExecution context = jobExecutionRegistry.register(new JobInstance(runtimeInformation, new Long(0)));
+		JobExecution execution = new JobExecution(new JobInstance(runtimeInformation, new Long(0)));
+		registerExecution(runtimeInformation, execution);
 
 		RepeatContextSupport stepContext = new RepeatContextSupport(null);
 		RepeatContextSupport chunkContext = new RepeatContextSupport(stepContext);
-		context.registerStepContext(stepContext);
-		context.registerChunkContext(chunkContext);
+		execution.registerStepContext(stepContext);
+		execution.registerChunkContext(chunkContext);
 		jobExecutorFacade.stop(runtimeInformation);
-
-		// It is only unregistered when the start method finishes, and it hasn't
-		// been called.
-		assertTrue(jobExecutionRegistry.isRegistered(runtimeInformation));
 
 		assertTrue(stepContext.isCompleteOnly());
 		assertTrue(chunkContext.isCompleteOnly());
@@ -210,19 +200,13 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	}
 
 	public void testStatisticsWithContext() throws Exception {
-		MockControl control = MockControl.createControl(JobExecutionRegistry.class);
-		JobExecutionRegistry jobExecutionRegistry = (JobExecutionRegistry) control.getMock();
-		jobExecutorFacade.setJobExecutionRegistry(jobExecutionRegistry);
 		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
-		JobExecution jobExecutionContext = new JobExecution(new JobInstance(runtimeInformation, new Long(0)));
-		jobExecutionContext.registerStepContext(new RepeatContextSupport(null));
-		jobExecutionContext.registerChunkContext(new RepeatContextSupport(null));
-		control.expectAndReturn(jobExecutionRegistry.findAll(), Collections.singleton(jobExecutionContext));
-		control.replay();
+		JobExecution execution = new JobExecution(new JobInstance(runtimeInformation, new Long(0)));
+		registerExecution(runtimeInformation, execution);
+		execution.registerStepContext(new RepeatContextSupport(null));
 		Properties statistics = jobExecutorFacade.getStatistics();
 		assertNotNull(statistics);
 		assertTrue(statistics.containsKey("job1.step1"));
-		control.verify();
 	}
 
 	public void testListenersCalledLastOnAfter() throws Exception {
@@ -261,5 +245,15 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 		assertEquals("two", list.get(1));
 	}
 
+	private void registerExecution(SimpleJobIdentifier runtimeInformation,
+			JobExecution execution) throws NoSuchFieldException,
+			IllegalAccessException {
+		Field field = SimpleJobExecutorFacade.class.getDeclaredField("jobExecutionRegistry");
+		ReflectionUtils.makeAccessible(field);
+		Map map = (Map) field.get(jobExecutorFacade);
+		map.put(runtimeInformation, execution);
+	}
+
 }
+
 

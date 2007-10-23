@@ -18,8 +18,10 @@ package org.springframework.batch.execution.facade;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
@@ -30,7 +32,6 @@ import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.JobExecutionRegistry;
 import org.springframework.batch.execution.job.DefaultJobExecutor;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
@@ -54,11 +55,11 @@ import org.springframework.util.Assert;
 public class SimpleJobExecutorFacade implements JobExecutorFacade,
 		JobExecutionListener, StatisticsProvider {
 
-	private JobExecutor jobExecutor;
+	private JobExecutor jobExecutor = new DefaultJobExecutor();
 
 	private JobRepository jobRepository;
 
-	private JobExecutionRegistry jobExecutionRegistry = new VolatileJobExecutionRegistry();
+	private Map jobExecutionRegistry = new HashMap();
 
 	// there is no sensible default for this
 	private JobConfigurationLocator jobConfigurationLocator;
@@ -88,22 +89,6 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 		synchronized (mutex) {
 			return running > 0;
 		}
-	}
-
-	public SimpleJobExecutorFacade() {
-		jobExecutor = new DefaultJobExecutor();
-	}
-
-	/**
-	 * Setter for the job execution registry. The default should be adequate so
-	 * this setter method is mainly used for testing.
-	 * 
-	 * @param jobExecutionRegistry
-	 *            the jobExecutionRegistry to set
-	 */
-	public void setJobExecutionRegistry(
-			JobExecutionRegistry jobExecutionRegistry) {
-		this.jobExecutionRegistry = jobExecutionRegistry;
 	}
 
 	/**
@@ -143,7 +128,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 				"JobIdentifier name must not be null.");
 
 		Assert
-				.state(!jobExecutionRegistry.isRegistered(jobIdentifier),
+				.state(!jobExecutionRegistry.containsKey(jobIdentifier),
 						"A job with this JobRuntimeInformation is already executing in this container");
 
 		Assert.state(jobExecutor != null, "JobExecutor must be provided.");
@@ -155,7 +140,8 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 
 		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration,
 				jobIdentifier);
-		JobExecution jobExecution = jobExecutionRegistry.register(job);
+		JobExecution jobExecution = new JobExecution(job);
+		jobExecutionRegistry.put(jobIdentifier, jobExecution);
 
 		try {
 
@@ -166,6 +152,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 		} finally {
 
 			this.after(jobExecution);
+			jobExecutionRegistry.remove(jobIdentifier);
 
 		}
 
@@ -210,7 +197,6 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 			// not running any more
 			running--;
 		}
-		jobExecutionRegistry.unregister(execution.getJobIdentifier());
 	}
 
 	/*
@@ -220,7 +206,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 	 */
 	public void stop(JobIdentifier runtimeInformation)
 			throws NoSuchJobExecutionException {
-		JobExecution jobExecutionContext = jobExecutionRegistry
+		JobExecution jobExecutionContext = (JobExecution) jobExecutionRegistry
 				.get(runtimeInformation);
 		if (jobExecutionContext == null) {
 			throw new NoSuchJobExecutionException("No such Job is executing: ["
@@ -262,7 +248,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 	public Properties getStatistics() {
 		int i = 0;
 		Properties props = new Properties();
-		for (Iterator iter = jobExecutionRegistry.findAll().iterator(); iter
+		for (Iterator iter = jobExecutionRegistry.values().iterator(); iter
 				.hasNext();) {
 			JobExecution element = (JobExecution) iter.next();
 			i++;
