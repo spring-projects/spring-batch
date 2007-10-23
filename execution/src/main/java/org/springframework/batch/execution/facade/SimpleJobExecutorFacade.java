@@ -30,6 +30,7 @@ import org.springframework.batch.core.configuration.NoSuchJobConfigurationExcept
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.executor.JobExecutionListener;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.job.DefaultJobExecutor;
@@ -142,17 +143,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 				jobIdentifier);
 		JobExecution jobExecution = new JobExecution(job);
 
-		try {
-
-			this.before(jobExecution);
-
-			jobExecutor.run(jobConfiguration, jobExecution);
-
-		} finally {
-
-			this.after(jobExecution);
-
-		}
+		jobExecutor.run(jobConfiguration, jobExecution, this);
 
 		return jobExecution.getExitStatus();
 	}
