@@ -59,8 +59,7 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 
 	private JobRepository jobRepository;
 
-	// Package access for unit testing...
-	Map jobExecutionRegistry = new HashMap();
+	private Map jobExecutionRegistry = new HashMap();
 
 	// there is no sensible default for this
 	private JobConfigurationLocator jobConfigurationLocator;
