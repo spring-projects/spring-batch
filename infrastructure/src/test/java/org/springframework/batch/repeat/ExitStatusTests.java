@@ -104,6 +104,15 @@ public class ExitStatusTests extends TestCase {
 		assertEquals("Bar", status.getExitDescription());
 	}
 	
+	public void testRunningIsRunning() throws Exception {
+		assertTrue(ExitStatus.RUNNING.isRunning());
+		assertTrue(new ExitStatus(true, "RUNNING").isRunning());
+	}
+	
+	public void testUnkownIsRunning() throws Exception {
+		assertTrue(ExitStatus.UNKNOWN.isRunning());
+	}
+
 	public void testSerializable() throws Exception {
 		ExitStatus status = ExitStatus.CONTINUABLE.addExitCode("FOO");
 		byte[] bytes = SerializationUtils.serialize(status);

@@ -149,4 +149,13 @@ public class ExitStatus implements Serializable {
 		return new ExitStatus(continuable, code, exitDescription);
 	}
 
+	/**
+	 * Check if this status represents a running process.
+	 * 
+	 * @return tru eif the exit code is "RUNNING" or "UNKNOWN"
+	 */
+	public boolean isRunning() {
+		return "RUNNING".equals(this.exitCode) || "UNKNOWN".equals(this.exitCode);
+	}
+
 }
