@@ -32,8 +32,8 @@ public abstract class AbstractBatchLauncherTests extends AbstractDependencyInjec
 	protected ConfigurableApplicationContext createApplicationContext(
 			String[] locations) {
 		String[] allLocations = new String[locations.length+1];
-		System.arraycopy(locations, 0, allLocations, 0, locations.length);
-		allLocations[locations.length] = "simple-container-definition.xml";
+		System.arraycopy(locations, 0, allLocations, 1, locations.length);
+		allLocations[0] = "simple-container-definition.xml";
 		return super.createApplicationContext(allLocations);
 	}
 
