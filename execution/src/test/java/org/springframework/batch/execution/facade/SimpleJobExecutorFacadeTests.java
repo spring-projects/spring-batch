@@ -30,8 +30,6 @@ import org.springframework.batch.core.configuration.JobConfigurationLocator;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.executor.AbstractJobExecutor;
-import org.springframework.batch.core.executor.JobExecutionListenerSupport;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
@@ -90,7 +88,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	private JobInstance setUpFacadeForNormalStart() {
 		jobIdentifier = new SimpleJobIdentifier("bar");
 		jobRepository.findOrCreateJob(jobConfiguration, jobIdentifier);
-		jobExecutor = new AbstractJobExecutor() {
+		jobExecutor = new JobExecutor() {
 			public ExitStatus run(JobConfiguration configuration,
 					JobExecution execution)
 					throws BatchCriticalException {
@@ -114,7 +112,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	}
 
 	public void testIsRunning() throws Exception {
-		jobExecutorFacade.setJobExecutor(new AbstractJobExecutor() {
+		jobExecutorFacade.setJobExecutor(new JobExecutor() {
 			public ExitStatus run(JobConfiguration configuration,
 					JobExecution execution)
 					throws BatchCriticalException {
@@ -193,6 +191,15 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 				"TestJob");
 		JobExecution execution = new JobExecution(new JobInstance(
 				runtimeInformation, new Long(0)));
+		
+		List listeners = new ArrayList();
+		listeners.add(new JobExecutionListenerSupport() {
+			public void stop(JobExecution execution) {
+				list.add("one");
+			}
+		});
+		jobExecutorFacade.setJobExecutionListeners(listeners);
+
 		registerExecution(runtimeInformation, execution);
 
 		RepeatContextSupport stepContext = new RepeatContextSupport(null);
@@ -204,6 +211,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 
 		assertTrue(stepContext.isCompleteOnly());
 		assertTrue(chunkContext.isCompleteOnly());
+		assertEquals(1, list.size());
 	}
 
 	public void testStatisticsWithNoContext() throws Exception {
@@ -220,6 +228,24 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 		Properties statistics = jobExecutorFacade.getStatistics();
 		assertNotNull(statistics);
 		assertTrue(statistics.containsKey("job1.step1"));
+	}
+
+	public void testListenersCalledLastOnStop() throws Exception {
+		List listeners = new ArrayList();
+		listeners.add(new JobExecutionListenerSupport() {
+			public void stop(JobExecution execution) {
+				list.add("one");
+			}
+		});
+		listeners.add(new JobExecutionListenerSupport() {
+			public void stop(JobExecution execution) {
+				list.add("two");
+			}
+		});
+		jobExecutorFacade.setJobExecutionListeners(listeners);
+		jobExecutorFacade.stop(jobExecution);
+		assertEquals(2, list.size());
+		assertEquals("two", list.get(1));
 	}
 
 	public void testListenersCalledLastOnAfter() throws Exception {

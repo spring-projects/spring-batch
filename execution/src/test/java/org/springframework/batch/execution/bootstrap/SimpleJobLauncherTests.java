@@ -21,12 +21,10 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.domain.JobIdentifier;
-import org.springframework.batch.core.executor.JobExecutionListener;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
+import org.springframework.batch.execution.facade.JobExecutionListener;
 import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 
 public class SimpleJobLauncherTests extends TestCase {
 
@@ -35,8 +33,7 @@ public class SimpleJobLauncherTests extends TestCase {
 		try {
 			launcher.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			// expected
 			assertTrue(e.getMessage().indexOf("required") >= 0);
 		}
@@ -48,9 +45,10 @@ public class SimpleJobLauncherTests extends TestCase {
 			launcher.run();
 			// should do nothing
 			fail("Expected NoSuchJobConfigurationException");
-		}
-		catch (NoSuchJobConfigurationException e) {
-			assertTrue("Message should mention null job name: "+e.getMessage(), e.getMessage().toLowerCase().indexOf("null")>=0);
+		} catch (NoSuchJobConfigurationException e) {
+			assertTrue("Message should mention null job name: "
+					+ e.getMessage(), e.getMessage().toLowerCase().indexOf(
+					"null") >= 0);
 		}
 	}
 
@@ -68,44 +66,13 @@ public class SimpleJobLauncherTests extends TestCase {
 		assertFalse(launcher.isRunning());
 	}
 
-	public void testInterruptContainer() throws Exception {
-		final SimpleJobLauncher launcher = new SimpleJobLauncher();
-		launcher.setJobIdentifierFactory(new SimpleJobIdentifierFactory());
-
-		InterruptibleFacade jobExecutorFacade = new InterruptibleFacade();
-		launcher.setJobExecutorFacade(jobExecutorFacade);
-		launcher.setJobConfigurationName(new JobConfiguration("foo").getName());
-		
-		TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-		Runnable launcherRunnable = new Runnable() {
-			public void run() {
-				try {
-					launcher.run();
-				} catch (NoSuchJobConfigurationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};
-
-		taskExecutor.execute(launcherRunnable); 
-		
-		// give the thread a second to start up
-		Thread.sleep(100);
-		assertTrue(launcher.isRunning());
-		launcher.stop();
-		Thread.sleep(100);
-		assertFalse(launcher.isRunning());
-	}
-
-	public void testStopOnUnranLauncher() {
+	public void testStopOnNotRunningLauncher() {
 
 		SimpleJobLauncher launcher = new SimpleJobLauncher();
 
 		assertFalse(launcher.isRunning());
-		// no exception should be thrown if stop is called on unran
-		// container
-		// this is to fullfill the contract outlined in Lifecycle#stop().
+		// no exception should be thrown if stop is called on
+		// a launcher that is not running.
 		launcher.stop();
 	}
 
@@ -113,6 +80,7 @@ public class SimpleJobLauncherTests extends TestCase {
 
 		/*
 		 * (non-Javadoc)
+		 * 
 		 * @see org.springframework.batch.container.BatchContainer#run()
 		 */
 		public void run() {
@@ -120,21 +88,19 @@ public class SimpleJobLauncherTests extends TestCase {
 				// 1 seconds should be long enough to allow the thread to be
 				// run and for interrupt to be called;
 				Thread.sleep(300);
-				//return ExitStatus.FAILED;
-				
-			}
-			catch (InterruptedException ex) {
+				// return ExitStatus.FAILED;
+
+			} catch (InterruptedException ex) {
 				// thread interrupted, allow to exit normally
-				//return ExitStatus.FAILED;
+				// return ExitStatus.FAILED;
 			}
-			
 		}
 
 		public ExitStatus start(JobIdentifier runtimeInformation) {
 			run();
 			return ExitStatus.FAILED;
 		}
-		
+
 		public ExitStatus start(JobIdentifier jobIdentifier,
 				JobExecutionListener listener)
 				throws NoSuchJobConfigurationException {
@@ -144,7 +110,7 @@ public class SimpleJobLauncherTests extends TestCase {
 		public void stop(JobIdentifier runtimeInformation) {
 			// not needed
 		}
-		
+
 		public boolean isRunning() {
 			// not needed
 			return false;

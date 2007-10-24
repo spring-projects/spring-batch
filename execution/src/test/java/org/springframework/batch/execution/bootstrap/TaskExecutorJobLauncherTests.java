@@ -20,31 +20,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.management.Notification;
-
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.domain.JobIdentifier;
-import org.springframework.batch.core.executor.JobExecutionListener;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
+import org.springframework.batch.execution.facade.JobExecutionListener;
 import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.interceptor.RepeatOperationsApplicationEvent;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.jmx.export.notification.NotificationPublisher;
-import org.springframework.jmx.export.notification.UnableToSendNotificationException;
 
 public class TaskExecutorJobLauncherTests extends TestCase {
 
-	private TaskExecutorJobLauncher launcher = new TaskExecutorJobLauncher();
+	private SimpleJobLauncher launcher = new SimpleJobLauncher();
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -75,35 +70,6 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 		launcher.onApplicationEvent(new ApplicationEvent("foo") {
 		});
 		// nothing happens
-	}
-
-	public void testRepeatOperationsBeforeNotUsed() throws Exception {
-		final List list = new ArrayList();
-		launcher.setNotificationPublisher(new NotificationPublisher() {
-			public void sendNotification(Notification notification)
-					throws UnableToSendNotificationException {
-				list.add(notification);
-			}
-		});
-		launcher.onApplicationEvent(new RepeatOperationsApplicationEvent(this,
-				"foo", RepeatOperationsApplicationEvent.BEFORE) {
-		});
-		assertEquals(0, list.size());
-	}
-
-	public void testRepeatOperationsOpenUsed() throws Exception {
-		final List list = new ArrayList();
-		launcher.setNotificationPublisher(new NotificationPublisher() {
-			public void sendNotification(Notification notification)
-					throws UnableToSendNotificationException {
-				list.add(notification);
-			}
-		});
-		launcher.onApplicationEvent(new RepeatOperationsApplicationEvent(this,
-				"foo", RepeatOperationsApplicationEvent.OPEN));
-		assertEquals(1, list.size());
-		assertEquals("foo", ((Notification) list.get(0)).getMessage()
-				.substring(0, 3));
 	}
 
 	public void testStatisticsRetrieved() throws Exception {

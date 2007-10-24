@@ -30,7 +30,6 @@ import org.springframework.batch.core.configuration.NoSuchJobConfigurationExcept
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.executor.JobExecutionListener;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.job.DefaultJobExecutor;
@@ -141,11 +140,16 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 
 		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration,
 				jobIdentifier);
-		JobExecution jobExecution = new JobExecution(job);
+		JobExecution execution = new JobExecution(job);
 
-		jobExecutor.run(jobConfiguration, jobExecution, this);
+		this.before(execution);
+		try {
+			jobExecutor.run(jobConfiguration, execution);
+		} finally {
+			this.after(execution);
+		}
 
-		return jobExecution.getExitStatus();
+		return execution.getExitStatus();
 	}
 
 	/**
@@ -164,6 +168,19 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 			JobExecutionListener listener = (JobExecutionListener) iterator
 					.next();
 			listener.before(execution);
+		}
+	}
+
+	/**
+	 * Broadcast stop signal to all the registered listeners.
+	 * 
+	 * @param execution
+	 */
+	public void stop(JobExecution execution) {
+		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+			JobExecutionListener listener = (JobExecutionListener) iterator
+					.next();
+			listener.stop(execution);
 		}
 	}
 
@@ -190,29 +207,32 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Send a stop signal to all the running executions by setting their
+	 * {@link RepeatContext} to terminate only. Then call the
+	 * {@link JobExecutionListener#stop(JobExecution)} method.
 	 * 
 	 * @see org.springframework.batch.container.BatchContainer#stop(org.springframework.batch.container.common.runtime.JobRuntimeInformation)
 	 */
 	public void stop(JobIdentifier runtimeInformation)
 			throws NoSuchJobExecutionException {
-		JobExecution jobExecutionContext = (JobExecution) jobExecutionRegistry
+		JobExecution execution = (JobExecution) jobExecutionRegistry
 				.get(runtimeInformation);
-		if (jobExecutionContext == null) {
+		if (execution == null) {
 			throw new NoSuchJobExecutionException("No such Job is executing: ["
 					+ runtimeInformation + "]");
 		}
-		for (Iterator iter = jobExecutionContext.getStepContexts().iterator(); iter
+		for (Iterator iter = execution.getStepContexts().iterator(); iter
 				.hasNext();) {
 			RepeatContext context = (RepeatContext) iter.next();
 			context.setTerminateOnly();
 		}
-		for (Iterator iter = jobExecutionContext.getChunkContexts().iterator(); iter
+		for (Iterator iter = execution.getChunkContexts().iterator(); iter
 				.hasNext();) {
 			RepeatContext context = (RepeatContext) iter.next();
 			context.setTerminateOnly();
 		}
+		this.stop(execution);
 	}
 
 	/**

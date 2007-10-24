@@ -28,8 +28,8 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.executor.AbstractJobExecutor;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
+import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.core.executor.StepInterruptedException;
@@ -47,7 +47,7 @@ import org.springframework.batch.repeat.RepeatContext;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class DefaultJobExecutor extends AbstractJobExecutor {
+public class DefaultJobExecutor implements JobExecutor {
 
 	private static final SimpleStepExecutorFactory DEFAULT_STEP_EXECUTOR_FACTORY = new SimpleStepExecutorFactory();
 
