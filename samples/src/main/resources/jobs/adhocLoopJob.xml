@@ -33,7 +33,7 @@
 	</bean>
 
 	<bean id="jobLauncher"
-		class="org.springframework.batch.execution.bootstrap.TaskExecutorJobLauncher">
+		class="org.springframework.batch.execution.bootstrap.SimpleJobLauncher">
 		<property name="jobExecutorFacade" ref="jobExecutorFacadeOverride" />
 		<property name="taskExecutor">
 			<bean
