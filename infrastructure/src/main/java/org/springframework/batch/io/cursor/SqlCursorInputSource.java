@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.io.sql;
+package org.springframework.batch.io.cursor;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

@@ -1,6 +1,7 @@
 package org.springframework.batch.io.sql;
 
 import org.springframework.batch.io.InputSource;
+import org.springframework.batch.io.cursor.SqlCursorInputSource;
 
 /**
  * Tests for {@link SqlCursorInputSource}

@@ -1,7 +1,7 @@
 package org.springframework.batch.io.sql;
 
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.sql.SingleKeySqlDrivingQueryInputSource;
+import org.springframework.batch.io.driving.SingleKeySqlDrivingQueryInputSource;
 
 public class SingleKeySqlDrivingQueryInputSourceIntegrationTests extends AbstractSqlInputSourceIntegrationTests {
 

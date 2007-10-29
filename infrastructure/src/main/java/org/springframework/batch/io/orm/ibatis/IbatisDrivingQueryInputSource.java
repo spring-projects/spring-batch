@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.sql.SingleKeySqlDrivingQueryInputSource;
+import org.springframework.batch.io.driving.SingleKeySqlDrivingQueryInputSource;
 import org.springframework.batch.io.support.AbstractDrivingQueryInputSource;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;

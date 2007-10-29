@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Properties;
 
 import org.springframework.batch.io.InputSource;
+import org.springframework.batch.io.driving.CompositeKeySqlDrivingQueryInputSource;
+import org.springframework.batch.io.driving.RestartDataConverter;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.jdbc.core.RowMapper;
