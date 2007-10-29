@@ -47,7 +47,7 @@ public class CompositeKeySqlDrivingQueryInputSourceIntegrationTests extends
 		return fooInputSource;
 	}
 
-	private static class FooRestartDataConverter implements CompositeKeyRestartDataConverter{
+	private static class FooRestartDataConverter implements RestartDataConverter{
 
 		private static final String ID_RESTART_KEY = "FooRestartDataConverter.id";
 		private static final String VALUE_RESTART_KEY = "FooRestartDataConverter.value";

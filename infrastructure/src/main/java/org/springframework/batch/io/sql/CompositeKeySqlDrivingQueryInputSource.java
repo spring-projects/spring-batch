@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.springframework.batch.io.support.AbstractDrivingQueryInputSource;
 import org.springframework.batch.restart.RestartData;
+import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.util.Assert;
@@ -42,13 +43,13 @@ public class CompositeKeySqlDrivingQueryInputSource extends
 
 	private JdbcTemplate jdbcTemplate;
 
-	private RowMapper keyMapper;
+	private RowMapper keyMapper = new ColumnMapRowMapper();
 
 	private String drivingQuery;
 
 	private String restartQuery;
 
-	private CompositeKeyRestartDataConverter restartDataConverter;
+	private RestartDataConverter restartDataConverter;
 
 	public CompositeKeySqlDrivingQueryInputSource() {
 		super();
@@ -110,7 +111,7 @@ public class CompositeKeySqlDrivingQueryInputSource extends
 	 * @param restartDataConverter
 	 */
 	public void setRestartDataConverter(
-			CompositeKeyRestartDataConverter restartDataConverter) {
+			RestartDataConverter restartDataConverter) {
 		this.restartDataConverter = restartDataConverter;
 	}
 
@@ -130,6 +131,5 @@ public class CompositeKeySqlDrivingQueryInputSource extends
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jdbcTemplate, "The JdbcTemplate must not be null.");
 		Assert.hasText(drivingQuery, "The DrivingQuery must not be null or empty.");
-		Assert.notNull(keyMapper, "The key RowMapper must not be null.");
 	}
 }

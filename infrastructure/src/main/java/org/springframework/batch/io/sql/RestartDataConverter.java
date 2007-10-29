@@ -24,7 +24,7 @@ import org.springframework.batch.restart.RestartData;
  * @author Lucas Ward
  *
  */
-public interface CompositeKeyRestartDataConverter {
+public interface RestartDataConverter {
 
 	/**
 	 * Given the provided composite key, return a RestartData representation.
