@@ -2,14 +2,14 @@ package org.springframework.batch.io.cursor;
 
 import org.hibernate.SessionFactory;
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.cursor.HibernateInputSource;
+import org.springframework.batch.io.cursor.HibernateCursorInputSource;
 import org.springframework.batch.io.support.AbstractDataSourceInputSourceIntegrationTests;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
 /**
- * Tests for {@link HibernateInputSource}
+ * Tests for {@link HibernateCursorInputSource}
  * 
  * @author Robert Kasanicky
  */
@@ -25,7 +25,7 @@ public class HibernateInputSourceIntegrationTests extends AbstractDataSourceInpu
 		
 		String hsqlQuery = "from Foo";
 		
-		HibernateInputSource inputSource = new HibernateInputSource();
+		HibernateCursorInputSource inputSource = new HibernateCursorInputSource();
 		inputSource.setQueryString(hsqlQuery);
 		inputSource.setSessionFactory(sessionFactory);
 		inputSource.afterPropertiesSet();

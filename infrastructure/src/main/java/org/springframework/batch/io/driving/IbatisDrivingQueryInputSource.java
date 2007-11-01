@@ -18,6 +18,8 @@ package org.springframework.batch.io.driving;
 import org.springframework.batch.io.driving.support.IbatisKeyGenerator;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 
+import com.ibatis.sqlmap.client.SqlMapClient;
+
 /**
  * Extension of {@link DrivingQueryInputSource} that maps keys to
  * objects.  An iBatis query id must be set to map and return each 'detail record'.
@@ -25,7 +27,7 @@ import org.springframework.orm.ibatis.SqlMapClientTemplate;
  * @author Lucas Ward
  * @see IbatisKeyGenerator
  */
-public class IbatisInputSource extends DrivingQueryInputSource {
+public class IbatisDrivingQueryInputSource extends DrivingQueryInputSource {
 
 	private String detailsQueryId;
 
@@ -54,8 +56,8 @@ public class IbatisInputSource extends DrivingQueryInputSource {
 	 * 
 	 * @param sqlMapClientTemplate
 	 */
-	public void setSqlMapClientTemplate(
-			SqlMapClientTemplate sqlMapClientTemplate) {
-		this.sqlMapClientTemplate = sqlMapClientTemplate;
+	public void setSqlMapClient(
+			SqlMapClient sqlMapClient) {
+		this.sqlMapClientTemplate = new SqlMapClientTemplate(sqlMapClient);
 	}
 }

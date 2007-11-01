@@ -45,11 +45,16 @@
 		</property>
 	</bean>
 
-	<bean id="ibatisInputSource" class="org.springframework.batch.io.driving.IbatisInputSource"
+	<bean id="ibatisInputSource" class="org.springframework.batch.io.driving.IbatisDrivingQueryInputSource"
 		scope="step" >
 		<aop:scoped-proxy />
-		<property name="drivingQueryId" value="getAllCustomerCreditIds" />
 		<property name="detailsQueryId" value="getCustomerCreditById" />
+		<property name="sqlMapClient" ref="sqlMapClient" />
+		<property name="keyGenerator" ref="ibatisKeyGenerator" />
+	</bean>
+
+	<bean id="ibatisKeyGenerator" class="org.springframework.batch.io.driving.support.IbatisKeyGenerator">
+		<property name="drivingQueryId" value="getAllCustomerCreditIds" />
 		<property name="sqlMapClient" ref="sqlMapClient" />
 	</bean>
 

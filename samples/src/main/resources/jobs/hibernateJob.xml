@@ -43,7 +43,7 @@
 		</property>
 	</bean>
 
-	<bean id="hibernateInputSource" class="org.springframework.batch.io.cursor.HibernateInputSource"
+	<bean id="hibernateInputSource" class="org.springframework.batch.io.cursor.HibernateCursorInputSource"
 		scope="step" >
 		<aop:scoped-proxy />
 		<property name="queryString" value="from CustomerCredit" />

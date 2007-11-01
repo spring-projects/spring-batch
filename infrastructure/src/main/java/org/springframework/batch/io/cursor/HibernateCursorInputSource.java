@@ -31,16 +31,17 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * {@link InputSource} for reading database records built on top of Hibernate.
  * 
  * @author Robert Kasanicky
  */
-public class HibernateInputSource implements InputSource, Restartable, InitializingBean, DisposableBean,
+public class HibernateCursorInputSource implements InputSource, Restartable, InitializingBean, DisposableBean,
 	ResourceLifecycle {
 	
-	private static final String RESTART_DATA_ROW_NUMBER_KEY = "HibernateInputSource.rowNumber";
+	private static final String RESTART_DATA_ROW_NUMBER_KEY = ClassUtils.getShortName(HibernateCursorInputSource.class)+".rowNumber";
 
 	private SessionFactory sessionFactory;
 	private StatelessSession session;
