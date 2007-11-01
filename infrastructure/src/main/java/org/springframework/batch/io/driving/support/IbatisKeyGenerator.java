@@ -1,11 +1,11 @@
-package org.springframework.batch.io.orm.ibatis;
+package org.springframework.batch.io.driving.support;
 
 import java.util.List;
 import java.util.Properties;
 
 import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.driving.DrivingQueryInputSource;
-import org.springframework.batch.io.driving.support.SingleColumnJdbcKeyGenerator;
+import org.springframework.batch.io.driving.KeyGenerator;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
@@ -14,16 +14,15 @@ import org.springframework.util.Assert;
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
- * Driving query {@link InputSource} based on iBATIS ORM framework. It is functionally similar to
+ * {@link KeyGenerator} based on iBATIS ORM framework. It is functionally similar to
  * {@link SingleColumnJdbcKeyGenerator} but does not make assumptions about the primary key
  * structure.
- *
  *
  * @author Robert Kasanicky
  * @author Lucas Ward
  * @see DrivingQueryInputSource
  */
-public class IbatisDrivingQueryInputSource extends DrivingQueryInputSource {
+public class IbatisKeyGenerator implements KeyGenerator {
 
 	public static final String RESTART_KEY = "IbatisDrivingQueryInputSource.keyIndex";
 
@@ -38,7 +37,7 @@ public class IbatisDrivingQueryInputSource extends DrivingQueryInputSource {
 	 *
 	 * @see org.springframework.batch.io.support.AbstractDrivingQueryInputSource#retrieveKeys()
 	 */
-	protected List retrieveKeys() {
+	public List retrieveKeys() {
 		return sqlMapClientTemplate.queryForList(drivingQuery);
 	}
 
@@ -46,9 +45,9 @@ public class IbatisDrivingQueryInputSource extends DrivingQueryInputSource {
 	 *
 	 * @see org.springframework.batch.restart.Restartable#getRestartData()
 	 */
-	public RestartData getRestartData() {
+	public RestartData getKeyAsRestartData(Object key) {
 		Properties props = new Properties();
-		props.setProperty(RESTART_KEY, getCurrentKey().toString());
+		props.setProperty(RESTART_KEY, key.toString());
 
 		return new GenericRestartData(props);
 	}

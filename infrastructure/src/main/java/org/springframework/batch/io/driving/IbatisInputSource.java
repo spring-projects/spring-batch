@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.io.orm.ibatis;
+package org.springframework.batch.io.driving;
+
+import org.springframework.batch.io.driving.support.IbatisKeyGenerator;
+import org.springframework.orm.ibatis.SqlMapClientTemplate;
 
 /**
- * Extension of {@link IbatisDrivingQueryInputSource} that maps keys to
+ * Extension of {@link DrivingQueryInputSource} that maps keys to
  * objects.  An iBatis query id must be set to map and return each 'detail record'.
  *
  * @author Lucas Ward
- * @see IbatisDrivingQueryInputSource
+ * @see IbatisKeyGenerator
  */
-public class IbatisInputSource extends IbatisDrivingQueryInputSource {
+public class IbatisInputSource extends DrivingQueryInputSource {
 
 	private String detailsQueryId;
 
+	private SqlMapClientTemplate sqlMapClientTemplate;
 
 	/**
 	 * Overriden read that uses the returned key as arguments to the details query.
@@ -33,7 +37,7 @@ public class IbatisInputSource extends IbatisDrivingQueryInputSource {
 	 * @see org.springframework.batch.io.driving.DrivingQueryInputSource#read()
 	 */
 	public Object read() {
-		return getSqlMapClientTemplate().queryForObject(detailsQueryId, super.read());
+		return sqlMapClientTemplate.queryForObject(detailsQueryId, super.read());
 	}
 
 	/**
@@ -43,5 +47,15 @@ public class IbatisInputSource extends IbatisDrivingQueryInputSource {
 	 */
 	public void setDetailsQueryId(String detailsQueryId) {
 		this.detailsQueryId = detailsQueryId;
+	}
+	
+	/**
+	 * Set the {@link SqlMapClientTemplate} to use for this input source.
+	 * 
+	 * @param sqlMapClientTemplate
+	 */
+	public void setSqlMapClientTemplate(
+			SqlMapClientTemplate sqlMapClientTemplate) {
+		this.sqlMapClientTemplate = sqlMapClientTemplate;
 	}
 }

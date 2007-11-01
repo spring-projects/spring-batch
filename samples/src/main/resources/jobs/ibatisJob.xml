@@ -45,7 +45,7 @@
 		</property>
 	</bean>
 
-	<bean id="ibatisInputSource" class="org.springframework.batch.io.orm.ibatis.IbatisInputSource"
+	<bean id="ibatisInputSource" class="org.springframework.batch.io.driving.IbatisInputSource"
 		scope="step" >
 		<aop:scoped-proxy />
 		<property name="drivingQueryId" value="getAllCustomerCreditIds" />

@@ -1,8 +1,8 @@
-package org.springframework.batch.io.orm.hibernate;
+package org.springframework.batch.io.cursor;
 
 import org.hibernate.SessionFactory;
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.orm.hibernate.HibernateInputSource;
+import org.springframework.batch.io.cursor.HibernateInputSource;
 import org.springframework.batch.io.support.AbstractDataSourceInputSourceIntegrationTests;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;

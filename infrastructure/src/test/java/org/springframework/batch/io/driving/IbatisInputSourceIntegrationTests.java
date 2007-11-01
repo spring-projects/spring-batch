@@ -1,10 +1,12 @@
-package org.springframework.batch.io.orm.ibatis;
+package org.springframework.batch.io.driving;
 
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.orm.ibatis.IbatisDrivingQueryInputSource;
+import org.springframework.batch.io.driving.IbatisInputSource;
+import org.springframework.batch.io.driving.support.IbatisKeyGenerator;
 import org.springframework.batch.io.support.AbstractDataSourceInputSourceIntegrationTests;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
+import org.springframework.orm.ibatis.SqlMapClientTemplate;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -22,12 +24,16 @@ public class IbatisInputSourceIntegrationTests extends AbstractDataSourceInputSo
 		factory.setDataSource(super.getJdbcTemplate().getDataSource());
 		factory.afterPropertiesSet();
 		SqlMapClient sqlMapClient = (SqlMapClient) factory.getObject();
+		SqlMapClientTemplate sqlMapClientTemplate = new SqlMapClientTemplate(sqlMapClient);
 
 		IbatisInputSource inputSource = new IbatisInputSource();
-		inputSource.setDrivingQueryId("getAllFooIds");
+		IbatisKeyGenerator keyGenerator = new IbatisKeyGenerator();
+		keyGenerator.setDrivingQueryId("getAllFooIds");
 		inputSource.setDetailsQueryId("getFooById");
-		inputSource.setRestartQueryId("getAllFooIdsRestart");
-		inputSource.setSqlMapClient(sqlMapClient);
+		keyGenerator.setRestartQueryId("getAllFooIdsRestart");
+		keyGenerator.setSqlMapClient(sqlMapClient);
+		inputSource.setSqlMapClientTemplate(sqlMapClientTemplate);
+		inputSource.setKeyGenerator(keyGenerator);
 
 		return inputSource;
 	}
