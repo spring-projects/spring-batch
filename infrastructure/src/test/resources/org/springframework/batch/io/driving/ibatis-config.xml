@@ -7,6 +7,6 @@
 		to false, input source would load all data into memory! -->
 	<settings lazyLoadingEnabled="true"/>
 
-	<sqlMap resource="org/springframework/batch/io/orm/ibatis/ibatis-foo.xml" />
+	<sqlMap resource="org/springframework/batch/io/driving/ibatis-foo.xml" />
 
 </sqlMapConfig>
