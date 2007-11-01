@@ -1,4 +1,4 @@
-package org.springframework.batch.io.sql;
+package org.springframework.batch.io.driving;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -30,7 +30,7 @@ public class IbatisInputSource extends IbatisDrivingQueryInputSource {
 	/**
 	 * Overriden read that uses the returned key as arguments to the details query.
 	 *
-	 * @see org.springframework.batch.io.support.AbstractDrivingQueryInputSource#read()
+	 * @see org.springframework.batch.io.driving.DrivingQueryInputSource#read()
 	 */
 	public Object read() {
 		return getSqlMapClientTemplate().queryForObject(detailsQueryId, super.read());

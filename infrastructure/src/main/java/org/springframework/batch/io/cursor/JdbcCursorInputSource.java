@@ -117,10 +117,10 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Peter Zozom
  */
-public class SqlCursorInputSource implements InputSource, ResourceLifecycle, DisposableBean,
+public class JdbcCursorInputSource implements InputSource, ResourceLifecycle, DisposableBean,
 		InitializingBean, Restartable, StatisticsProvider, Skippable {
 
-	private static Log log = LogFactory.getLog(SqlCursorInputSource.class);
+	private static Log log = LogFactory.getLog(JdbcCursorInputSource.class);
 
 	public static final int VALUE_NOT_SET = -1;
 

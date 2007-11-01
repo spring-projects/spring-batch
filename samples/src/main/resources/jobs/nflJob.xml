@@ -152,7 +152,7 @@
 	</bean>
 
 	<bean id="playerSummarizationSource"
-		class="org.springframework.batch.io.cursor.SqlCursorInputSource">
+		class="org.springframework.batch.io.cursor.JdbcCursorInputSource">
 		<property name="dataSource" ref="dataSource" />
 		<property name="mapper">
 			<bean

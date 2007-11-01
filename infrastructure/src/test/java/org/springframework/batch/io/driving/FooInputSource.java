@@ -1,7 +1,7 @@
-package org.springframework.batch.io.sql;
+package org.springframework.batch.io.driving;
 
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.support.AbstractDrivingQueryInputSource;
+import org.springframework.batch.io.driving.DrivingQueryInputSource;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
 import org.springframework.beans.factory.DisposableBean;
@@ -10,10 +10,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 class FooInputSource implements InputSource, Restartable, DisposableBean, InitializingBean{
 
-	AbstractDrivingQueryInputSource inputSource;
+	DrivingQueryInputSource inputSource;
 	FooDao fooDao = new SingleKeyFooDao();
 
-	public FooInputSource(AbstractDrivingQueryInputSource inputSource, JdbcTemplate jdbcTemplate) {
+	public FooInputSource(DrivingQueryInputSource inputSource, JdbcTemplate jdbcTemplate) {
 		this.inputSource = inputSource;
 		fooDao.setJdbcTemplate(jdbcTemplate);
 	}

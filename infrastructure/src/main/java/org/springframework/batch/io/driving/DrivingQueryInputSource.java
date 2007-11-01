@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.io.support;
+package org.springframework.batch.io.driving;
 
 import java.util.Iterator;
 import java.util.List;
@@ -46,8 +46,8 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  *
  */
-public abstract class AbstractDrivingQueryInputSource implements InputSource, ResourceLifecycle,
-	DisposableBean, Restartable, InitializingBean {
+public class DrivingQueryInputSource implements InputSource, ResourceLifecycle, InitializingBean,
+	DisposableBean, Restartable {
 
 	private boolean initialized = false;
 
@@ -58,10 +58,27 @@ public abstract class AbstractDrivingQueryInputSource implements InputSource, Re
 	private int currentIndex = 0;
 
 	private int lastCommitIndex = 0;
+	
+	private KeyGenerator keyGenerator;
 
 	private TransactionSynchronization synchronization =
 		new DrivingQueryInputSourceTransactionSynchronization();
 
+	public DrivingQueryInputSource() {	
+		
+	}
+	
+	/**
+	 * Initialize the input source with the provided keys list.
+	 * 
+	 * @param keys
+	 */
+	public DrivingQueryInputSource(List keys) {	
+		this.keys = keys;
+		this.keysIterator = keys.iterator();
+	}
+
+	
 	/**
 	 * Return the next key in the List.  If the InputSource has not been initialized yet,
 	 * then {@link AbstractDrivingQueryInputSource.open()} will be called.
@@ -121,7 +138,7 @@ public abstract class AbstractDrivingQueryInputSource implements InputSource, Re
 
 		Assert.state(keys == null || initialized, "Cannot open an already opened input source" +
 				", call close() first.");
-		keys = retrieveKeys();
+		keys = keyGenerator.retrieveKeys();
 		keysIterator = keys.listIterator();
 		BatchTransactionSynchronizationManager.registerSynchronization(synchronization);
 		initialized = true;
@@ -144,9 +161,9 @@ public abstract class AbstractDrivingQueryInputSource implements InputSource, Re
 	 * being restored from</strong> otherwise it is invalid.
 	 *
 	 * @throws IllegalArgumentException if restart data or it's properties is null.
-	 * @throws IllegalStateException if the input source has already been intialized.
+	 * @throws IllegalStateException if the input source has already been initialized.
 	 */
-	public void restoreFrom(RestartData data) {
+	public final void restoreFrom(RestartData data) {
 
 		Assert.notNull(data, "RestartData must not be null.");
 		Assert.notNull(data.getProperties(), "RestartData properties must not be null.");
@@ -157,7 +174,7 @@ public abstract class AbstractDrivingQueryInputSource implements InputSource, Re
 			return;
 		}
 
-		keys = restoreKeys(data);
+		keys = keyGenerator.restoreKeys(data);
 
 		if(keys != null && keys.size() > 0){
 			keysIterator = keys.listIterator();
@@ -165,20 +182,10 @@ public abstract class AbstractDrivingQueryInputSource implements InputSource, Re
 		}
 	}
 
-	//Abstract Methods
-	/**
-	 * @return list of keys returned by the driving query
-	 */
-	protected abstract List retrieveKeys();
-
-	/**
-	 * Restore the keys list based on provided restart data.
-	 *
-	 * @param restartData, the restart data to restore the keys list from.
-	 * @return a list of keys.
-	 */
-	protected abstract List restoreKeys(RestartData restartData);
-
+	public RestartData getRestartData() {
+		return keyGenerator.getKeyAsRestartData(getCurrentKey());
+	}
+	
 	/**
 	 * Encapsulates transaction events handling.
 	 */
@@ -191,4 +198,19 @@ public abstract class AbstractDrivingQueryInputSource implements InputSource, Re
 			}
 		}
 	}
+	
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(keyGenerator, "The KeyGenerator must not be null.");
+	}
+	
+	/**
+	 * Set the key generation strategy to use for this input source.
+	 * 
+	 * @param keyGenerator
+	 */
+	public void setKeyGenerator(
+			KeyGenerator keyGenerator) {
+		this.keyGenerator = keyGenerator;
+	}
+
 }

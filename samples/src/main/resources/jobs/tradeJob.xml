@@ -83,7 +83,7 @@
 	</bean>
 
 	<bean id="tradeSqlInputSOurce"
-		class="org.springframework.batch.io.cursor.SqlCursorInputSource"
+		class="org.springframework.batch.io.cursor.JdbcCursorInputSource"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="dataSource" ref="dataSource" />
@@ -96,7 +96,7 @@
 	</bean>
 
 
-	<bean id="customerSqlInputSource" class="org.springframework.batch.io.cursor.SqlCursorInputSource"
+	<bean id="customerSqlInputSource" class="org.springframework.batch.io.cursor.JdbcCursorInputSource"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="dataSource" ref="dataSource" />

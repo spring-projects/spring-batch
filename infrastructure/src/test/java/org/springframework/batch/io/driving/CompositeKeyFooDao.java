@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.io.sql;
+package org.springframework.batch.io.driving;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.batch.io.sample.domain.Foo;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -38,8 +39,8 @@ public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
 	 */
 	public Foo getFoo(Object key) {
 
-		List keys = (List)key;
-		Object[] args = new Object[]{keys.get(0), keys.get(1)};
+		Map keys = (Map)key;
+		Object[] args = keys.values().toArray();
 
 		RowMapper fooMapper = new RowMapper(){
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {

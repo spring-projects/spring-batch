@@ -13,45 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.io.driving;
+package org.springframework.batch.io.driving.support;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.io.support.AbstractDrivingQueryInputSource;
+import org.springframework.batch.io.driving.DrivingQueryInputSource;
+import org.springframework.batch.io.driving.KeyGenerator;
 import org.springframework.batch.restart.RestartData;
-import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * <p>Sql implementation of the DrivingQueryInputSource that works for composite keys.
+ * <p>Jdbc implementation of the {@link KeyGenerator} interface that works for composite keys.
  * (i.e. keys represented by multiple columns)  A sql query to be used to return the keys and
- * a RowMapper to map each row in the resultset to an Object must be set in order for the
- * InputSource to work correctly.
+ * a {@link RestartDataRowMapper} to map each row in the resultset to an Object must be set in 
+ * order to work correctly.
  * </p>
  *
  * @author Lucas Ward
- * @see AbstractDrivingQueryInputSource
+ * @see DrivingQueryInputSource
+ * @since 1.0
  */
-public class CompositeKeySqlDrivingQueryInputSource extends
-		AbstractDrivingQueryInputSource {
+public class MultipleColumnJdbcKeyGenerator implements
+		KeyGenerator {
 
 	public static final String RESTART_KEY = "CompositeKeySqlDrivingQueryInputSource.key";
 
 	private JdbcTemplate jdbcTemplate;
 
-	private RowMapper keyMapper = new ColumnMapRowMapper();
+	private RestartDataRowMapper keyMapper = new ColumnMapRestartDataRowMapper();
 
-	private String drivingQuery;
+	private String sql;
 
-	private String restartQuery;
-
-	private RestartDataConverter restartDataConverter;
-
-	public CompositeKeySqlDrivingQueryInputSource() {
+	private String restartSql;
+	
+	public MultipleColumnJdbcKeyGenerator() {
 		super();
 	}
 
@@ -59,38 +57,37 @@ public class CompositeKeySqlDrivingQueryInputSource extends
 	 * Construct a new InputSource.
 	 *
 	 * @param jdbcTemplate
-	 * @param drivingQuery - Sql statement that returns all keys to process.
+	 * @param sql - Sql statement that returns all keys to process.
 	 * @param keyMapper - RowMapper that maps each row of the ResultSet to an object.
 	 */
-	public CompositeKeySqlDrivingQueryInputSource(JdbcTemplate jdbcTemplate,
-			String drivingQuery, RowMapper keyMapper){
+	public MultipleColumnJdbcKeyGenerator(JdbcTemplate jdbcTemplate,
+			String sql){
 		this();
 		Assert.notNull(jdbcTemplate, "The JdbcTemplate must not be null.");
-		Assert.hasText(drivingQuery, "The DrivingQuery must not be null or empty.");
+		Assert.hasText(sql, "The DrivingQuery must not be null or empty.");
 		Assert.notNull(keyMapper, "The key RowMapper must not be null.");
 		this.jdbcTemplate = jdbcTemplate;
-		this.drivingQuery = drivingQuery;
-		this.keyMapper = keyMapper;
+		this.sql = sql;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.sql.scratch.AbstractDrivingQueryInputSource#retrieveKeys()
 	 */
-	protected List retrieveKeys() {
-		return jdbcTemplate.query(drivingQuery, keyMapper);
+	public List retrieveKeys() {
+		return jdbcTemplate.query(sql, keyMapper);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.sql.scratch.AbstractDrivingQueryInputSource#restoreKeys(org.springframework.batch.restart.RestartData)
 	 */
-	protected List restoreKeys(RestartData restartData) {
+	public List restoreKeys(RestartData restartData) {
 
-		Assert.state(restartDataConverter != null, "RestartDataConverter must not be null.");
-		Assert.state(StringUtils.hasText(restartQuery), "The RestartQuery must not be null or empty" +
+		Assert.state(keyMapper != null, "KeyMapper must not be null.");
+		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty" +
 		" in order to restart.");
 
 		if (restartData.getProperties() != null) {
-			return jdbcTemplate.query(restartQuery, restartDataConverter.createArguments(restartData), keyMapper);
+			return jdbcTemplate.query(restartSql, keyMapper.createSetter(restartData), keyMapper);
 		}
 
 		return new ArrayList();
@@ -99,20 +96,9 @@ public class CompositeKeySqlDrivingQueryInputSource extends
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.restart.Restartable#getRestartData()
 	 */
-	public RestartData getRestartData() {
-		Assert.state(restartDataConverter != null, "RestartDataConverter must not be null.");
-		return restartDataConverter.createRestartData(getCurrentKey());
-	}
-
-	/**
-	 * Set the {@link RestartDataConverter} used to convert a composite key to
-	 * RestartData and back again.
-	 *
-	 * @param restartDataConverter
-	 */
-	public void setRestartDataConverter(
-			RestartDataConverter restartDataConverter) {
-		this.restartDataConverter = restartDataConverter;
+	public RestartData getKeyAsRestartData(Object key) {
+		Assert.state(keyMapper != null, "RestartDataConverter must not be null.");
+		return keyMapper.createRestartData(key);
 	}
 
 	/**
@@ -122,7 +108,7 @@ public class CompositeKeySqlDrivingQueryInputSource extends
 	 * @param restartQuery
 	 */
 	public void setRestartQuery(String restartQuery) {
-		this.restartQuery = restartQuery;
+		this.restartSql = restartQuery;
 	}
 
 	/* (non-Javadoc)
@@ -130,6 +116,40 @@ public class CompositeKeySqlDrivingQueryInputSource extends
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jdbcTemplate, "The JdbcTemplate must not be null.");
-		Assert.hasText(drivingQuery, "The DrivingQuery must not be null or empty.");
+		Assert.hasText(sql, "The DrivingQuery must not be null or empty.");
+		Assert.notNull(keyMapper, "The key RowMapper must not be null.");
+	}
+	
+	/**
+	 * Set the {@link RestartDataRowMapper} to be used to map a resultset
+	 * to keys.
+	 * 
+	 * @param keyMapper
+	 */
+	public void setKeyMapper(RestartDataRowMapper keyMapper) {
+		this.keyMapper = keyMapper;
+	}
+	
+	/**
+	 * Set the sql statement used to generate the keys list.
+	 * 
+	 * @param sql
+	 */
+	public void setSql(String sql) {
+		this.sql = sql;
+	}
+	
+	/**
+	 * Set the sql statement to be used to restore the keys list
+	 * after a restart.
+	 * 
+	 * @param restartSql
+	 */
+	public void setRestartSql(String restartSql) {
+		this.restartSql = restartSql;
+	}
+	
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
 	}
 }

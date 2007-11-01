@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Properties;
 
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.driving.SingleKeySqlDrivingQueryInputSource;
-import org.springframework.batch.io.support.AbstractDrivingQueryInputSource;
+import org.springframework.batch.io.driving.DrivingQueryInputSource;
+import org.springframework.batch.io.driving.support.SingleColumnJdbcKeyGenerator;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
@@ -15,15 +15,15 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * Driving query {@link InputSource} based on iBATIS ORM framework. It is functionally similar to
- * {@link SingleKeySqlDrivingQueryInputSource} but does not make assumptions about the primary key
+ * {@link SingleColumnJdbcKeyGenerator} but does not make assumptions about the primary key
  * structure.
  *
  *
  * @author Robert Kasanicky
  * @author Lucas Ward
- * @see AbstractDrivingQueryInputSource
+ * @see DrivingQueryInputSource
  */
-public class IbatisDrivingQueryInputSource extends AbstractDrivingQueryInputSource {
+public class IbatisDrivingQueryInputSource extends DrivingQueryInputSource {
 
 	public static final String RESTART_KEY = "IbatisDrivingQueryInputSource.keyIndex";
 
@@ -56,7 +56,7 @@ public class IbatisDrivingQueryInputSource extends AbstractDrivingQueryInputSour
 	/**
 	 * Restore the keys list given the provided restart data.
 	 *
-	 * @see org.springframework.batch.io.support.AbstractDrivingQueryInputSource#restoreKeys(org.springframework.batch.restart.RestartData)
+	 * @see org.springframework.batch.io.driving.DrivingQueryInputSource#restoreKeys(org.springframework.batch.restart.RestartData)
 	 */
 	public List restoreKeys(RestartData data) {
 
