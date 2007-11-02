@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
-import org.springframework.batch.execution.bootstrap.JobLauncher;
+import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.access.BeanFactoryLocator;

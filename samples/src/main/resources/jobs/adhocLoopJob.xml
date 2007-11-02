@@ -18,7 +18,10 @@
 			ref="jobConfigurationRegistry" />
 	</bean>
 
-	<bean id="jobExecutorFacadeOverride" parent="jobExecutorFacade">
+	<bean id="jobLauncher"
+		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
+		<property name="jobRepository" ref="simpleJobRepository" />
+		<property name="jobConfigurationLocator" ref="jobConfigurationRegistry"/>
 		<property name="jobExecutor">
 			<bean parent="jobExecutor">
 				<property name="stepExecutorFactory">
@@ -30,11 +33,6 @@
 				</property>
 			</bean>
 		</property>
-	</bean>
-
-	<bean id="jobLauncher"
-		class="org.springframework.batch.execution.bootstrap.SimpleJobLauncher">
-		<property name="jobExecutorFacade" ref="jobExecutorFacadeOverride" />
 		<property name="taskExecutor">
 			<bean
 				class="org.springframework.core.task.SimpleAsyncTaskExecutor" />

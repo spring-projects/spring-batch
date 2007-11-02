@@ -14,7 +14,7 @@
 	</bean>
 	
 	<!-- Override the default jobExecutorFacade to provide a listener that can interrupt the job -->
-	<bean id="jobExecutorFacade" class="org.springframework.batch.execution.facade.SimpleJobExecutorFacade">
+	<bean id="jobExecutorFacade" class="org.springframework.batch.execution.launch.SimpleJobExecutorFacade">
 		<property name="jobRepository" ref="simpleJobRepository" />
 		<property name="jobConfigurationLocator" ref="jobConfigurationRegistry"/>
 		<property name="jobExecutor" ref="jobExecutor" />

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.facade;
+package org.springframework.batch.execution.launch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +21,8 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.execution.facade.JobExecutionListener;
-import org.springframework.batch.execution.facade.JobExecutionListenerSupport;
+import org.springframework.batch.execution.launch.JobExecutionListener;
+import org.springframework.batch.execution.launch.JobExecutionListenerSupport;
 
 /**
  * @author Dave Syer
@@ -34,7 +34,7 @@ public class JobExecutionListenerSupportTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.facade.JobExecutionListenerSupport#after(org.springframework.batch.core.domain.JobExecution)}.
+	 * {@link org.springframework.batch.execution.launch.JobExecutionListenerSupport#after(org.springframework.batch.core.domain.JobExecution)}.
 	 */
 	public void testAfter() {
 		JobExecutionListener listener = new JobExecutionListenerSupport() {
@@ -50,7 +50,7 @@ public class JobExecutionListenerSupportTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.facade.JobExecutionListenerSupport#before(org.springframework.batch.core.domain.JobExecution)}.
+	 * {@link org.springframework.batch.execution.launch.JobExecutionListenerSupport#before(org.springframework.batch.core.domain.JobExecution)}.
 	 */
 	public void testBefore() {
 		JobExecutionListener listener = new JobExecutionListenerSupport() {
@@ -66,7 +66,7 @@ public class JobExecutionListenerSupportTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.facade.JobExecutionListenerSupport#before(org.springframework.batch.core.domain.JobExecution)}.
+	 * {@link org.springframework.batch.execution.launch.JobExecutionListenerSupport#before(org.springframework.batch.core.domain.JobExecution)}.
 	 */
 	public void testStop() {
 		JobExecutionListener listener = new JobExecutionListenerSupport() {

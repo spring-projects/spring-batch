@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.bootstrap;
+package org.springframework.batch.execution.launch;
 
 import java.util.Collections;
 
@@ -26,8 +26,8 @@ import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.execution.bootstrap.support.ThreadInterruptJobExecutionListener;
 import org.springframework.batch.execution.configuration.MapJobConfigurationRegistry;
-import org.springframework.batch.execution.facade.JobExecutorFacade;
-import org.springframework.batch.execution.facade.SimpleJobExecutorFacade;
+import org.springframework.batch.execution.launch.JobExecutorFacade;
+import org.springframework.batch.execution.launch.SimpleJobExecutorFacade;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;

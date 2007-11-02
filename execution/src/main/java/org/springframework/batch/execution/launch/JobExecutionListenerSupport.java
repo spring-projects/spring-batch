@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.facade;
+package org.springframework.batch.execution.launch;
 
 import org.springframework.batch.core.domain.JobExecution;
 
@@ -29,7 +29,7 @@ public class JobExecutionListenerSupport implements JobExecutionListener {
 	/**
 	 * No-op for subclasses to extend.
 	 * 
-	 * @see org.springframework.batch.execution.facade.JobExecutionListener#after(org.springframework.batch.core.domain.JobExecution)
+	 * @see org.springframework.batch.execution.launch.JobExecutionListener#after(org.springframework.batch.core.domain.JobExecution)
 	 */
 	public void after(JobExecution execution) {
 		// no-op
@@ -38,7 +38,7 @@ public class JobExecutionListenerSupport implements JobExecutionListener {
 	/**
 	 * No-op for subclasses to extend.
 	 * 
-	 * @see org.springframework.batch.execution.facade.JobExecutionListener#before(org.springframework.batch.core.domain.JobExecution)
+	 * @see org.springframework.batch.execution.launch.JobExecutionListener#before(org.springframework.batch.core.domain.JobExecution)
 	 */
 	public void before(JobExecution execution) {
 		// no-op
@@ -47,7 +47,7 @@ public class JobExecutionListenerSupport implements JobExecutionListener {
 	/**
 	 * No-op for subclasses to extend.
 	 * 
-	 * @see org.springframework.batch.execution.facade.JobExecutionListener#stop(org.springframework.batch.core.domain.JobExecution)
+	 * @see org.springframework.batch.execution.launch.JobExecutionListener#stop(org.springframework.batch.core.domain.JobExecution)
 	 */
 	public void stop(JobExecution execution) {
 		// no-op

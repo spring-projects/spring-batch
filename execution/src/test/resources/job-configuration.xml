@@ -24,7 +24,7 @@
 							</bean>
 						</property>
 						<property name="itemProcessor">
-							<bean class="org.springframework.batch.execution.facade.EmptyItemProcessor"/>
+							<bean class="org.springframework.batch.execution.launch.EmptyItemProcessor"/>
 						</property>
 					</bean>
 				</constructor-arg>

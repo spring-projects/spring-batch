@@ -29,7 +29,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
  */
 public abstract class AbstractLifecycleSpringContextTests extends AbstractBatchLauncherTests {
 
-	public void testLifecycle() throws Exception {
+	public void testLaunchJob() throws Exception {
 		validatePreConditions();
 		launcher.run(getJobName());
 		launcher.stop();

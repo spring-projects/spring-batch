@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.bootstrap;
+package org.springframework.batch.execution.launch;
 
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.domain.JobIdentifier;
-import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.bootstrap;
+package org.springframework.batch.execution.launch;
 
 import junit.framework.TestCase;
 
@@ -22,8 +22,9 @@ import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
-import org.springframework.batch.execution.facade.JobExecutionListener;
-import org.springframework.batch.execution.facade.JobExecutorFacade;
+import org.springframework.batch.execution.launch.JobExecutionListener;
+import org.springframework.batch.execution.launch.JobExecutorFacade;
+import org.springframework.batch.execution.launch.SimpleJobLauncher;
 import org.springframework.batch.repeat.ExitStatus;
 
 public class SimpleJobLauncherTests extends TestCase {

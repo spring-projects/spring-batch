@@ -16,15 +16,22 @@
 
 package org.springframework.batch.core.executor;
 
+import org.springframework.batch.io.exception.BatchCriticalException;
+
 /**
- * Exception to indicate the the lifecycle has been interrupted.
+ * Exception to indicate the the lifecycle has been interrupted. The exception
+ * state indicated is not normally recoverable by batch application clients, but
+ * internally it is useful to force a check. The exception will be wrapped in a
+ * runtime exception (usually {@link BatchCriticalException} before reaching the
+ * client.
  * 
  * @author Lucas Ward
- *
+ * @author Dave Syer
+ * 
  */
 public class StepInterruptedException extends Exception {
 
-	public StepInterruptedException(String msg){
+	public StepInterruptedException(String msg) {
 		super(msg);
 	}
 }

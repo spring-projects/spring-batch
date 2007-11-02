@@ -19,7 +19,7 @@ package org.springframework.batch.sample;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.repeat.exception.RepeatException;
+import org.springframework.batch.core.executor.StepInterruptedException;
 
 /**
  * Functional test for graceful shutdown.  A batch container is started in a new thread,
@@ -42,8 +42,8 @@ public class GracefulShutdownFunctionalTest extends AbstractBatchLauncherTests {
 				try {
 					launcher.run(getJobName());
 				}
-				catch (RepeatException e) {
-					if (!(e.getCause() instanceof InterruptedException)) {
+				catch (RuntimeException e) {
+					if (!(e.getCause() instanceof StepInterruptedException)) {
 						errors.add(e);						
 					}
 				}

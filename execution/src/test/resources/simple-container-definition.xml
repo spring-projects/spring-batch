@@ -9,17 +9,12 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean id="simpleFacade"
-		class="org.springframework.batch.execution.facade.SimpleJobExecutorFacade">
+	<bean id="simpleContainerLauncher"
+		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="simpleJobRepository" />
 		<property name="jobConfigurationLocator"
 			ref="jobConfigurationRegistry" />
 		<property name="jobExecutor" ref="jobLifecycle" />
-	</bean>
-
-	<bean id="simpleContainerLauncher"
-		class="org.springframework.batch.execution.bootstrap.SimpleJobLauncher">
-		<property name="jobExecutorFacade" ref="simpleFacade" />
 		<property name="jobIdentifierFactory"
 			ref="jobRuntimeInformationFactory" />
 	</bean>

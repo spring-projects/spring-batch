@@ -3,7 +3,6 @@ package org.springframework.batch.io.driving.support;
 import java.util.List;
 import java.util.Properties;
 
-import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.driving.DrivingQueryInputSource;
 import org.springframework.batch.io.driving.KeyGenerator;
 import org.springframework.batch.restart.GenericRestartData;

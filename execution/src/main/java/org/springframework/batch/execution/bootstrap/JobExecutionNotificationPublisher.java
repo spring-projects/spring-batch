@@ -16,9 +16,10 @@
 
 package org.springframework.batch.execution.bootstrap;
 
-
 import javax.management.Notification;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.interceptor.RepeatOperationsApplicationEvent;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -31,8 +32,11 @@ import org.springframework.jmx.export.notification.NotificationPublisherAware;
  * @author Dave Syer
  * @since 2.1
  */
-public class JobExecutionNotificationPublisher implements
-		ApplicationListener, NotificationPublisherAware {
+public class JobExecutionNotificationPublisher implements ApplicationListener,
+		NotificationPublisherAware {
+
+	protected static final Log logger = LogFactory
+			.getLog(JobExecutionNotificationPublisher.class);
 
 	private NotificationPublisher notificationPublisher;
 
@@ -53,7 +57,7 @@ public class JobExecutionNotificationPublisher implements
 	 * close we log the event at INFO level and send a JMX notification if we
 	 * are also an MBean.
 	 * 
-	 * @see org.springframework.batch.execution.bootstrap.SimpleJobLauncher#onApplicationEvent(org.springframework.context.ApplicationEvent)
+	 * @see org.springframework.batch.execution.launch.SimpleJobLauncher#onApplicationEvent(org.springframework.context.ApplicationEvent)
 	 */
 	public void onApplicationEvent(ApplicationEvent applicationEvent) {
 		if (applicationEvent instanceof RepeatOperationsApplicationEvent) {
@@ -64,7 +68,7 @@ public class JobExecutionNotificationPublisher implements
 					|| type == RepeatOperationsApplicationEvent.ERROR) {
 				String message = event.getMessage() + "; source="
 						+ event.getSource();
-				SimpleJobLauncher.logger.info(message);
+				logger.info(message);
 				publish(message);
 			}
 			return;

@@ -69,8 +69,8 @@ public class TradeJobFunctionalTests extends AbstractLifecycleSpringContextTests
 		}
 	}
 	
-	public void testLifecycle() throws Exception{
-		super.testLifecycle();
+	public void testLaunchJob() throws Exception{
+		super.testLaunchJob();
 	}
 
 	protected void validatePostConditions() {

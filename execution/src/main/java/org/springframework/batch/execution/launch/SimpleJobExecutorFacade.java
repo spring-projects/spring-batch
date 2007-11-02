@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.facade;
+package org.springframework.batch.execution.launch;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,27 +48,31 @@ import org.springframework.util.Assert;
  * run the job.
  * </p>
  * 
+ * <p>
+ * Listeners can be registered for callbacks at the start and end of a job.
+ * </p>
+ * 
  * @author Lucas Ward
  * @author Dave Syer
  * 
  */
-public class SimpleJobExecutorFacade implements JobExecutorFacade,
+class SimpleJobExecutorFacade implements JobExecutorFacade,
 		JobExecutionListener, StatisticsProvider {
-
-	private JobExecutor jobExecutor = new DefaultJobExecutor();
-
-	private JobRepository jobRepository;
 
 	private Map jobExecutionRegistry = new HashMap();
 
+	private JobExecutor jobExecutor = new DefaultJobExecutor();
+	
+	private JobRepository jobRepository;
+	
 	// there is no sensible default for this
 	private JobConfigurationLocator jobConfigurationLocator;
+	
+	private List listeners = new ArrayList();
 
 	private int running = 0;
 
 	private Object mutex = new Object();
-
-	private List listeners = new ArrayList();
 
 	/**
 	 * Public setter for the listeners property.
@@ -103,10 +107,28 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 	}
 
 	/**
+	 * Setter for {@link JobExecutor}.
+	 * 
+	 * @param jobExecutor
+	 */
+	public void setJobExecutor(JobExecutor jobExecutor) {
+		this.jobExecutor = jobExecutor;
+	}
+
+	/**
+	 * Setter for {@link JobRepository}.
+	 * 
+	 * @param jobRepository
+	 */
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
+	}
+
+	/**
 	 * Locates a {@link JobConfiguration} by using the name of the provided
 	 * {@link JobIdentifier} and the {@link JobConfigurationLocator}.
 	 * 
-	 * @see org.springframework.batch.execution.facade.JobExecutorFacade#start(org.springframework.batch.execution.common.domain.JobConfiguration,
+	 * @see org.springframework.batch.execution.launch.JobExecutorFacade#start(org.springframework.batch.execution.common.domain.JobConfiguration,
 	 *      org.springframework.batch.core.domain.JobIdentifier)
 	 * 
 	 * @throws IllegalArgumentException
@@ -233,24 +255,6 @@ public class SimpleJobExecutorFacade implements JobExecutorFacade,
 			context.setTerminateOnly();
 		}
 		this.stop(execution);
-	}
-
-	/**
-	 * Setter for {@link JobExecutor}.
-	 * 
-	 * @param jobExecutor
-	 */
-	public void setJobExecutor(JobExecutor jobExecutor) {
-		this.jobExecutor = jobExecutor;
-	}
-
-	/**
-	 * Setter for {@link JobRepository}.
-	 * 
-	 * @param jobRepository
-	 */
-	public void setJobRepository(JobRepository jobRepository) {
-		this.jobRepository = jobRepository;
 	}
 
 	/**

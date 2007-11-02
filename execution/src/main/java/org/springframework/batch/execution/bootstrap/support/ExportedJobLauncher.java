@@ -16,7 +16,7 @@
 
 package org.springframework.batch.execution.bootstrap.support;
 
-import org.springframework.batch.execution.bootstrap.JobLauncher;
+import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**

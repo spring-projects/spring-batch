@@ -2,7 +2,7 @@ package org.springframework.batch.execution.bootstrap.support;
 
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.domain.JobIdentifier;
-import org.springframework.batch.execution.bootstrap.JobLauncher;
+import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**

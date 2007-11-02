@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.bootstrap;
+package org.springframework.batch.execution.launch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +28,9 @@ import org.springframework.batch.core.configuration.NoSuchJobConfigurationExcept
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
-import org.springframework.batch.execution.facade.JobExecutionListener;
-import org.springframework.batch.execution.facade.JobExecutorFacade;
+import org.springframework.batch.execution.launch.JobExecutionListener;
+import org.springframework.batch.execution.launch.JobExecutorFacade;
+import org.springframework.batch.execution.launch.SimpleJobLauncher;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.support.PropertiesConverter;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.facade;
+package org.springframework.batch.execution.launch;
 
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.domain.JobIdentifier;
@@ -22,14 +22,13 @@ import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Interface which defines a facade for running jobs. The interface is
- * intentionally minimal, and depends only on simple java types, so that the
- * facade can be used to launch a job from basic environments like a command
- * line or a JMX console. TODO: remove dependency on {@link JobIdentifier}?
+ * intentionally minimal and package private. It is convenient to be able to
+ * test a {@link JobLauncher} with stub implementations of this interface.
  * 
  * @author Lucas Ward
  * @author Dave Syer
  */
-public interface JobExecutorFacade {
+interface JobExecutorFacade {
 
 	/**
 	 * Start a job execution identifiable by the {@link JobIdentifier}.

@@ -15,13 +15,12 @@
  */
 package org.springframework.batch.execution.bootstrap;
 
-import org.springframework.batch.execution.facade.JobExecutorFacade;
 import org.springframework.batch.repeat.interceptor.RepeatOperationsApplicationEvent;
 import org.springframework.context.ApplicationEvent;
 
 /**
  * {@link ApplicationEvent} that encodes a request from the execution layer to a
- * running {@link JobExecutorFacade}.
+ * running job.
  * 
  * @author Dave Syer
  * 
@@ -32,7 +31,7 @@ public class BatchExecutionRequestEvent extends ApplicationEvent {
 	 * Constructor for {@link BatchExecutionRequestEvent}. The source is the
 	 * execution layer service implementation that is sending the signal.<br/>
 	 * 
-	 * TODO: the source sould be Serializable so really it should be just a
+	 * TODO: the source should be Serializable so really it should be just a
 	 * message about the request?
 	 * 
 	 * Currently encodes a request to publish back a

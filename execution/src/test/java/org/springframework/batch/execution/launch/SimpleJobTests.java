@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.facade;
+package org.springframework.batch.execution.launch;
 
 import java.util.ArrayList;
 import java.util.Arrays;

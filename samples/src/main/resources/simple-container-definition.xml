@@ -12,14 +12,10 @@
 	<!-- register the step scope with the application context -->
 	<bean class="org.springframework.batch.execution.scope.StepScope" />
 
-	<bean id="jobExecutorFacade" class="org.springframework.batch.execution.facade.SimpleJobExecutorFacade">
+	<bean class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="simpleJobRepository" />
 		<property name="jobConfigurationLocator" ref="jobConfigurationRegistry"/>
 		<property name="jobExecutor" ref="jobExecutor" />
-	</bean>
-
-	<bean class="org.springframework.batch.execution.bootstrap.SimpleJobLauncher">
-		<property name="jobExecutorFacade" ref="jobExecutorFacade" />
 	</bean>
 
 	<bean id="jobConfigurationRegistry" class="org.springframework.batch.execution.configuration.MapJobConfigurationRegistry"/>

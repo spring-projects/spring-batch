@@ -16,8 +16,8 @@
 package org.springframework.batch.execution.bootstrap.support;
 
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.execution.facade.JobExecutionListener;
-import org.springframework.batch.execution.facade.JobExecutionListenerSupport;
+import org.springframework.batch.execution.launch.JobExecutionListener;
+import org.springframework.batch.execution.launch.JobExecutionListenerSupport;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.Assert;
 
@@ -42,7 +42,7 @@ public class ThreadInterruptJobExecutionListener extends
 	 * 'processing thread'. If the container has already been started, no
 	 * exception will be thrown.
 	 * 
-	 * @see org.springframework.batch.execution.facade.JobExecutionListenerSupport#before(org.springframework.batch.core.domain.JobExecution)
+	 * @see org.springframework.batch.execution.launch.JobExecutionListenerSupport#before(org.springframework.batch.core.domain.JobExecution)
 	 */
 	public void before(JobExecution execution) {
 		Assert.isTrue(running == 0,
@@ -60,7 +60,7 @@ public class ThreadInterruptJobExecutionListener extends
 	 * Interrupt the thread that is running the job if the {@link ExitStatus}
 	 * indicates that it is still running.
 	 * 
-	 * @see org.springframework.batch.execution.facade.JobExecutionListenerSupport#stop(org.springframework.batch.core.domain.JobExecution)
+	 * @see org.springframework.batch.execution.launch.JobExecutionListenerSupport#stop(org.springframework.batch.core.domain.JobExecution)
 	 */
 	public void stop(JobExecution execution) {
 		if (execution==null || execution.getExitStatus().isRunning()) {
@@ -71,7 +71,7 @@ public class ThreadInterruptJobExecutionListener extends
 	/**
 	 * internal housekeeping.
 	 * 
-	 * @see org.springframework.batch.execution.facade.JobExecutionListenerSupport#after(org.springframework.batch.core.domain.JobExecution)
+	 * @see org.springframework.batch.execution.launch.JobExecutionListenerSupport#after(org.springframework.batch.core.domain.JobExecution)
 	 */
 	public void after(JobExecution execution) {
 		running--;
