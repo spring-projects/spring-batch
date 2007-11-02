@@ -100,7 +100,7 @@ public class JobExecutionTests extends TestCase {
 	}
 
 	public void testContextContainsInfo() throws Exception {
-		assertEquals("foo", context.getJobIdentifier().getName());
+		assertEquals("foo", context.getJob().getIdentifier().getName());
 	}
 
 	public void testNullContexts() throws Exception {

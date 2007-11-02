@@ -139,16 +139,6 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Accessor for the runtime information of this execution.
-	 * 
-	 * @return the {@link JobRuntimeInformation} that was used to start this job
-	 *         execution.
-	 */
-	public JobIdentifier getJobIdentifier() {
-		return job.getIdentifier();
-	}
-
-	/**
 	 * Accessor for the potentially multiple step contexts that are in progress.
 	 * In a single-threaded, sequential execution there would normally be only
 	 * one current step, but in more complicated scenarios there might be

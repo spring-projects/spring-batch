@@ -184,7 +184,7 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	public void before(JobExecution execution) {
 		synchronized (mutex) {
 			running++;
-			jobExecutionRegistry.put(execution.getJobIdentifier(), execution);
+			jobExecutionRegistry.put(execution.getJob().getIdentifier(), execution);
 		}
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			JobExecutionListener listener = (JobExecutionListener) iterator
@@ -224,7 +224,7 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 		synchronized (mutex) {
 			// assume execution is synchronous so when we get to here we are
 			// not running any more
-			jobExecutionRegistry.remove(execution.getJobIdentifier());
+			jobExecutionRegistry.remove(execution.getJob().getIdentifier());
 			running--;
 		}
 	}
@@ -268,7 +268,7 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 			JobExecution element = (JobExecution) iter.next();
 			i++;
 			String runtime = "job" + i;
-			props.setProperty(runtime, "" + element.getJobIdentifier());
+			props.setProperty(runtime, "" + element.getJob().getIdentifier());
 			int j = 0;
 			for (Iterator iterator = element.getStepContexts().iterator(); iterator
 					.hasNext();) {
