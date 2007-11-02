@@ -62,7 +62,8 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	 */
 	public static final String ERROR = "error";
 
-	protected final Log logger = LogFactory.getLog(LogOrRethrowExceptionHandler.class);
+	protected final Log logger = LogFactory
+			.getLog(LogOrRethrowExceptionHandler.class);
 
 	private ExceptionClassifier exceptionClassifier = new ExceptionClassifierSupport() {
 		public Object classify(Throwable throwable) {
@@ -83,26 +84,33 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	/**
 	 * Classify the throwables and decide whether to rethrow based on the
 	 * result. The context is not used.
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 * 
 	 * @see {@link ExceptionHandler#handleExceptions(RepeatContext, Collection)}
 	 */
-	public void handleExceptions(RepeatContext context, Collection throwables) throws RuntimeException {
+	public void handleExceptions(RepeatContext context, Collection throwables)
+			throws RuntimeException {
 
 		for (Iterator iter = throwables.iterator(); iter.hasNext();) {
 			Throwable throwable = (Throwable) iter.next();
 			Object key = exceptionClassifier.classify(throwable);
 			if (ERROR.equals(key)) {
-				logger.error("Exception encountered in batch repeat.", throwable);
-			}
-			if (WARN.equals(key)) {
-				logger.warn("Exception encountered in batch repeat.", throwable);
-			}
-			if (DEBUG.equals(key) && logger.isDebugEnabled()) {
-				logger.debug("Exception encountered in batch repeat.", throwable);
-			}
-			if (RETHROW.equals(key)) {
+				logger.error("Exception encountered in batch repeat.",
+						throwable);
+			} else if (WARN.equals(key)) {
+				logger
+						.warn("Exception encountered in batch repeat.",
+								throwable);
+			} else if (DEBUG.equals(key) && logger.isDebugEnabled()) {
+				logger.debug("Exception encountered in batch repeat.",
+						throwable);
+			} else if (RETHROW.equals(key)) {
 				DefaultExceptionHandler.rethrow(throwable);
+			} else {
+				throw new IllegalStateException(
+						"Unclassified exception encountered.  Did you mean to classifiy this as 'rethrow'?",
+						throwable);
 			}
 		}
 

@@ -96,4 +96,19 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 		assertNotNull(writer.toString());
 	}
 
+	public void testUnclassifiedException() throws Exception {
+		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
+			public Object classify(Throwable throwable) {
+				return "DEFAULT";
+			}
+		});
+		try {
+			handler.handleExceptions(context, Collections.singleton(new Error("Foo")));
+			fail("Expected IllegalStateException");
+		} catch (IllegalStateException e) {
+			assertTrue(e.getMessage().toLowerCase().indexOf("unclassified")>=0);
+			assertEquals("Foo", e.getCause().getMessage());
+		}
+	}
+
 }
