@@ -11,12 +11,10 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.io.driving.support.ColumnMapRestartDataRowMapper;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.core.CollectionFactory;
 import org.springframework.jdbc.core.PreparedStatementSetter;
-import org.springframework.jdbc.core.SqlTypeValue;
 import org.springframework.util.ClassUtils;
 
 /**

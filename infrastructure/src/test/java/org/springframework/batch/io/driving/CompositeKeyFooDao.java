@@ -17,7 +17,6 @@ package org.springframework.batch.io.driving;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.batch.io.sample.domain.Foo;

@@ -1,7 +1,6 @@
 package org.springframework.batch.io.driving;
 
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.driving.DrivingQueryInputSource;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
 import org.springframework.beans.factory.DisposableBean;

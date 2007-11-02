@@ -16,7 +16,6 @@
 package org.springframework.batch.io.driving;
 
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.driving.DrivingQueryInputSource;
 import org.springframework.batch.io.driving.support.MultipleColumnJdbcKeyGenerator;
 import org.springframework.batch.io.sql.AbstractSqlInputSourceIntegrationTests;
 

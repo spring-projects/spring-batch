@@ -202,7 +202,7 @@ public class DrivingQueryInputSourceTests extends TestCase {
 
 		public List restoreKeys(RestartData restartData) {
 			
-			assertEquals(this.restartData, restartData);
+			assertEquals(MockKeyGenerator.restartData, restartData);
 			return restartKeys;
 		}
 
