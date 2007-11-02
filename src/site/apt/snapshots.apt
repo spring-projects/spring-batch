@@ -7,9 +7,10 @@
 
 Snapshot Builds
 
-	These builds are provided for testing and development purposes only. They are built by a Bamboo process 
-	automatically using the latest snapshot from Subversion.
+	These builds are provided for testing and development purposes only. They are built by a Bamboo process automatically using the latest snapshot from Subversion.
 	
+	You can browse the {{{http://s3browse.com/explore/maven.springframework.org/snapshot/org/springframework/batch}repository}} with a web browser.  If you are downloading the jar files manually from there you can see the internal and external project dependencies in the <<<spring-batch-*/*.pom>>> files.  You will probably need <<<spring-batch-execution>>>, <<<spring-batch-core>>> and <<<spring-batch-infrastructure>>>.
+
 	The snapshots are deloyed to a Maven2 snapshot repository. To use it, just add the following repository to your POM (inside a \<repositories\> element at the top level):
 
 +---------------
@@ -30,4 +31,3 @@ Snapshot Builds
 </dependency>
 +---------------
 
-	Additionally, you can browse the repository with a web browser {{{http://s3browse.com/explore/maven.springframework.org/snapshot/org/springframework/batch}here}}.  If you are downloading the jar files manually from there you can see the internal and external project dependencies in the <<<spring-batch-*/*.pom>>> files.  You will probably need <<<spring-batch-execution>>>, <<<spring-batch-core>>> and <<<spring-batch-infrastructure>>>.
