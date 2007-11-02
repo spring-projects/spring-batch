@@ -178,6 +178,9 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	public void afterPropertiesSet() throws Exception {
 		if (jobExecutorFacade==null) {
 			logger.debug("Using SimpleJobExecutorFacade");
+			Assert.notNull(jobConfigurationLocator);
+			Assert.notNull(jobExecutor);
+			Assert.notNull(jobRepository);
 			SimpleJobExecutorFacade jobExecutorFacade = new SimpleJobExecutorFacade();
 			jobExecutorFacade.setJobConfigurationLocator(jobConfigurationLocator);
 			jobExecutorFacade.setJobExecutionListeners(listeners);
