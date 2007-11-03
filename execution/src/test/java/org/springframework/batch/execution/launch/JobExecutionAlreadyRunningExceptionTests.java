@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.execution.launch;
 
-import org.springframework.batch.core.AbstractExceptionTests;
+import org.springframework.batch.execution.AbstractExceptionTests;
 
 /**
  * @author Dave Syer
