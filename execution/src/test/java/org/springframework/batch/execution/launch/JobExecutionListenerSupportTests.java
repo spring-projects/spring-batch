@@ -70,13 +70,13 @@ public class JobExecutionListenerSupportTests extends TestCase {
 	 */
 	public void testStop() {
 		JobExecutionListener listener = new JobExecutionListenerSupport() {
-			public void stop(JobExecution execution) {
-				super.stop(execution);
+			public void onStop(JobExecution execution) {
+				super.onStop(execution);
 				list.add("stop");
 			}
 		};
 
-		listener.stop(null);
+		listener.onStop(null);
 		assertEquals(1, list.size());
 	}
 }

@@ -21,7 +21,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
-public class MultilineJobFunctionalTests extends AbstractLifecycleSpringContextTests {
+public class MultilineJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	private static final String EXPECTED_RESULT = 
 		"[Trade: [isin=UK21341EAH45,quantity=978,price=98.34,customer=customer1], Trade: [isin=UK21341EAH46,quantity=112,price=18.12,customer=customer2]]" +

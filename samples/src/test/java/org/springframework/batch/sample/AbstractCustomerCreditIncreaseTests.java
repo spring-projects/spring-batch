@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.RowMapper;
  * 
  * @author Robert Kasanicky
  */
-public abstract class AbstractCustomerCreditIncreaseTests extends AbstractLifecycleSpringContextTests {
+public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValidatingBatchLauncherTests {
 
 	private JdbcOperations jdbcTemplate;
 	

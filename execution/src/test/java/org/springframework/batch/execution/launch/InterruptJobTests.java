@@ -60,12 +60,13 @@ public class InterruptJobTests extends TestCase {
 
 		registry.register(new JobConfiguration("foo"));
 		final SimpleJobIdentifier identifier = new SimpleJobIdentifier("foo");
+		final JobExecution execution = facade.createNewExecution(identifier);
 
 		TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
 		Runnable launcherRunnable = new Runnable() {
 			public void run() {
 				try {
-					facade.start(identifier);
+					facade.start(execution);
 				} catch (NoSuchJobConfigurationException e) {
 					fail("Unexpected NoSuchJobConfigurationException");
 				}

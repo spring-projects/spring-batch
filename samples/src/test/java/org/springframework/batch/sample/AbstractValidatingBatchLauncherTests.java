@@ -27,7 +27,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
  * @author Lucas Ward
  * @see AbstractDependencyInjectionSpringContextTests
  */
-public abstract class AbstractLifecycleSpringContextTests extends AbstractBatchLauncherTests {
+public abstract class AbstractValidatingBatchLauncherTests extends AbstractBatchLauncherTests {
 
 	public void testLaunchJob() throws Exception {
 		validatePreConditions();

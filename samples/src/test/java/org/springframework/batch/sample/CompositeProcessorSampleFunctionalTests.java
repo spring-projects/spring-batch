@@ -16,7 +16,7 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 
-public class CompositeProcessorSampleFunctionalTests extends AbstractLifecycleSpringContextTests {
+public class CompositeProcessorSampleFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	private static final String GET_TRADES = "SELECT isin, quantity, price, customer FROM trade order by isin";
 	

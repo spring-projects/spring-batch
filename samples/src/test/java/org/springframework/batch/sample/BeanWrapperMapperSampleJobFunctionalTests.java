@@ -17,7 +17,7 @@
 package org.springframework.batch.sample;
 
 
-public class BeanWrapperMapperSampleJobFunctionalTests extends AbstractLifecycleSpringContextTests {
+public class BeanWrapperMapperSampleJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 	
 	protected String[] getConfigLocations() {
 		return new String[]{"jobs/beanWrapperMapperSampleJob.xml"};

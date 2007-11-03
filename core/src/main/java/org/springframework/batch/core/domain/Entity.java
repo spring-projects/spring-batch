@@ -81,11 +81,11 @@ public class Entity implements Serializable {
 		if (!(other instanceof Entity)) {
 			return false;
 		}
-		Entity step = (Entity) other;
-		if (id == null || step.getId() == null) {
-			return step == this;
+		Entity entity = (Entity) other;
+		if (id == null || entity.getId() == null) {
+			return entity == this;
 		}
-		return id.equals(step.getId());
+		return id.equals(entity.getId());
 	}
 
 	/**

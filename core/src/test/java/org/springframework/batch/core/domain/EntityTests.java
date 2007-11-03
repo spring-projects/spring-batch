@@ -60,6 +60,29 @@ public class EntityTests extends TestCase {
 	/**
 	 * Test method for {@link org.springframework.batch.core.domain.Entity#equals(java.lang.Object)}.
 	 */
+	public void testEqualsSelf() {
+		assertEquals(entity, entity);		
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.domain.Entity#equals(java.lang.Object)}.
+	 */
+	public void testEqualsSelfWithNullId() {
+		entity = new Entity(null);
+		assertEquals(entity, entity);		
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.domain.Entity#equals(java.lang.Object)}.
+	 */
+	public void testEqualsEntityWithNullId() {
+		entity = new Entity(null);
+		assertNotSame(entity, new Entity(null));		
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.domain.Entity#equals(java.lang.Object)}.
+	 */
 	public void testEqualsEntity() {
 		assertEquals(entity, new Entity(entity.getId()));		
 	}

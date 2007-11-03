@@ -78,23 +78,32 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 		jobExecutorFacade.setJobRepository(jobRepository);
 	}
 
-	public void testNormalStart() throws Exception {
+	public void testCreateNewExecution() throws Exception {
 
 		JobInstance job = setUpFacadeForNormalStart();
-		jobExecutorFacade.start(jobIdentifier);
+		jobExecution = jobExecutorFacade.createNewExecution(jobIdentifier);
 		assertEquals(job, jobExecution.getJob());
 		assertEquals("bar", job.getName());
 		jobRepositoryControl.verify();
 
 	}
 
-	private JobInstance setUpFacadeForNormalStart() {
+	public void testNormalStart() throws Exception {
+
+		JobInstance job = setUpFacadeForNormalStart();
+		jobExecution = jobExecutorFacade.createNewExecution(jobIdentifier);
+		jobExecutorFacade.start(jobExecution);
+		assertEquals(job, jobExecution.getJob());
+		assertEquals("bar", job.getName());
+		jobRepositoryControl.verify();
+
+	}
+
+	private JobInstance setUpFacadeForNormalStart() throws NoSuchJobConfigurationException {
 		jobIdentifier = new SimpleJobIdentifier("bar");
-		jobRepository.findOrCreateJob(jobConfiguration, jobIdentifier);
 		jobExecutor = new JobExecutor() {
 			public ExitStatus run(JobConfiguration configuration,
-					JobExecution execution)
-					throws BatchCriticalException {
+					JobExecution execution) throws BatchCriticalException {
 				jobExecution = execution;
 				return ExitStatus.FINISHED;
 			}
@@ -102,6 +111,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 		jobExecutorFacade.setJobExecutor(jobExecutor);
 		JobInstance job = new JobInstance(jobIdentifier);
 		jobExecution = new JobExecution(job);
+		jobRepository.findOrCreateJob(jobConfiguration, jobIdentifier);
 		jobRepositoryControl.setReturnValue(job);
 		jobRepositoryControl.replay();
 		jobExecutorFacade
@@ -117,8 +127,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	public void testIsRunning() throws Exception {
 		jobExecutorFacade.setJobExecutor(new JobExecutor() {
 			public ExitStatus run(JobConfiguration configuration,
-					JobExecution execution)
-					throws BatchCriticalException {
+					JobExecution execution) throws BatchCriticalException {
 				while (running) {
 					try {
 						Thread.sleep(100L);
@@ -137,17 +146,12 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 						return jobConfiguration;
 					}
 				});
-		final SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("foo");
-		jobRepository.findOrCreateJob(jobConfiguration, jobIdentifier);
-		JobInstance job = new JobInstance(jobIdentifier);
-		jobRepositoryControl.setReturnValue(job);
-		jobRepositoryControl.replay();
 
 		running = true;
 		new Thread(new Runnable() {
 			public void run() {
 				try {
-					jobExecutorFacade.start(jobIdentifier);
+					jobExecutorFacade.start(jobExecution);
 				} catch (NoSuchJobConfigurationException e) {
 					System.err.println("Shouldn't happen");
 				}
@@ -162,17 +166,16 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 			Thread.sleep(100L);
 		}
 		assertFalse(jobExecutorFacade.isRunning());
-		jobRepositoryControl.verify();
 	}
 
-	public void testInvalidState() throws Exception {
+	public void testInvalidInitialisation() throws Exception {
 
-		jobExecutorFacade.setJobExecutor(null);
+		jobExecutorFacade = new SimpleJobExecutorFacade();
 
 		try {
-			jobExecutorFacade.start(new SimpleJobIdentifier("TestJob"));
+			jobExecutorFacade.afterPropertiesSet();
 			fail("Expected IllegalStateException");
-		} catch (IllegalStateException ex) {
+		} catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -194,10 +197,10 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 				"TestJob");
 		JobExecution execution = new JobExecution(new JobInstance(
 				runtimeInformation, new Long(0)));
-		
+
 		List listeners = new ArrayList();
 		listeners.add(new JobExecutionListenerSupport() {
-			public void stop(JobExecution execution) {
+			public void onStop(JobExecution execution) {
 				list.add("one");
 			}
 		});
@@ -236,17 +239,17 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	public void testListenersCalledLastOnStop() throws Exception {
 		List listeners = new ArrayList();
 		listeners.add(new JobExecutionListenerSupport() {
-			public void stop(JobExecution execution) {
+			public void onStop(JobExecution execution) {
 				list.add("one");
 			}
 		});
 		listeners.add(new JobExecutionListenerSupport() {
-			public void stop(JobExecution execution) {
+			public void onStop(JobExecution execution) {
 				list.add("two");
 			}
 		});
 		jobExecutorFacade.setJobExecutionListeners(listeners);
-		jobExecutorFacade.stop(jobExecution);
+		jobExecutorFacade.onStop(jobExecution);
 		assertEquals(2, list.size());
 		assertEquals("two", list.get(1));
 	}

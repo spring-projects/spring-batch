@@ -20,12 +20,10 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
-import org.springframework.batch.execution.launch.JobExecutionListener;
-import org.springframework.batch.execution.launch.JobExecutorFacade;
-import org.springframework.batch.execution.launch.SimpleJobLauncher;
-import org.springframework.batch.repeat.ExitStatus;
 
 public class SimpleJobLauncherTests extends TestCase {
 
@@ -97,15 +95,14 @@ public class SimpleJobLauncherTests extends TestCase {
 			}
 		}
 
-		public ExitStatus start(JobIdentifier runtimeInformation) {
+		public void start(JobExecution execution)
+				throws NoSuchJobConfigurationException {
 			run();
-			return ExitStatus.FAILED;
 		}
 
-		public ExitStatus start(JobIdentifier jobIdentifier,
-				JobExecutionListener listener)
+		public JobExecution createNewExecution(JobIdentifier jobIdentifier)
 				throws NoSuchJobConfigurationException {
-			throw new UnsupportedOperationException("Not implemented");
+			return new JobExecution(new JobInstance(jobIdentifier));
 		}
 
 		public void stop(JobIdentifier runtimeInformation) {

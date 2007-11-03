@@ -209,9 +209,9 @@ public class BatchCommandLineLauncher {
 
 			if (!launcher.isRunning()) {
 				if (jobName == null) {
-					status = launcher.run();
+					status = launcher.run().getExitStatus();
 				} else {
-					status = launcher.run(jobName);
+					status = launcher.run(jobName).getExitStatus();
 				}
 			}
 		} catch (NoSuchJobConfigurationException e) {

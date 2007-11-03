@@ -15,36 +15,26 @@
  */
 package org.springframework.batch.execution.launch;
 
-import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.AbstractExceptionTests;
 
 /**
- * Listener interface for the job execution lifecycle.
- * 
  * @author Dave Syer
- * 
+ *
  */
-public interface JobExecutionListener {
+public class JobExecutionAlreadyRunningExceptionTests extends AbstractExceptionTests {
 
-	/**
-	 * Callback for the start of a job, before any steps are processed.
-	 * 
-	 * @param execution
-	 *            the current {@link JobExecution}
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
-	void before(JobExecution execution);
+	public Exception getException(String msg) throws Exception {
+		return new JobExecutionAlreadyRunningException(msg);
+	}
 
-	/**
-	 * Callback for the start of a job, after all steps are processed, or on an
-	 * error.
-	 * 
-	 * @param execution
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String, java.lang.Throwable)
 	 */
-	void after(JobExecution execution);
+	public Exception getException(String msg, Throwable t) throws Exception {
+		return new JobExecutionAlreadyRunningException(msg, t);
+	}
 
-	/**
-	 * Callback for a job that has been stopped, or asked to stop.
-	 * 
-	 * @param execution
-	 */
-	void onStop(JobExecution execution);
 }

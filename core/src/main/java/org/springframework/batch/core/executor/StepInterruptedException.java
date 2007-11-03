@@ -29,7 +29,7 @@ import org.springframework.batch.io.exception.BatchCriticalException;
  * @author Dave Syer
  * 
  */
-public class StepInterruptedException extends Exception {
+public class StepInterruptedException extends JobExecutionException {
 
 	public StepInterruptedException(String msg) {
 		super(msg);

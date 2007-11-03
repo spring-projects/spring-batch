@@ -1,9 +1,9 @@
 package org.springframework.batch.execution.bootstrap.support;
 
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.execution.launch.JobLauncher;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Mock Job Launcher.  Normally, something like EasyMock would
@@ -21,7 +21,7 @@ public class StubJobLauncher implements JobLauncher {
 	public static final int RUN_JOB_IDENTIFIER =2 ;
 
 	private int lastRunCalled = RUN_NO_ARGS;
-	private ExitStatus returnValue = ExitStatus.FINISHED;
+	private JobExecution returnValue = null;
 
 	private boolean isRunning = false;
 
@@ -29,18 +29,18 @@ public class StubJobLauncher implements JobLauncher {
 		return isRunning;
 	}
 
-	public ExitStatus run() throws NoSuchJobConfigurationException {
+	public JobExecution run() throws NoSuchJobConfigurationException {
 		lastRunCalled = RUN_NO_ARGS;
 		return returnValue;
 	}
 
-	public ExitStatus run(String jobName)
+	public JobExecution run(String jobName)
 			throws NoSuchJobConfigurationException {
 		lastRunCalled = RUN_JOB_NAME;
 		return returnValue;
 	}
 
-	public ExitStatus run(JobIdentifier jobIdentifier)
+	public JobExecution run(JobIdentifier jobIdentifier)
 			throws NoSuchJobConfigurationException {
 		lastRunCalled = RUN_JOB_IDENTIFIER;
 		return returnValue;
@@ -50,7 +50,7 @@ public class StubJobLauncher implements JobLauncher {
 
 	}
 
-	public void setReturnValue(ExitStatus returnValue){
+	public void setReturnValue(JobExecution returnValue){
 		this.returnValue = returnValue;
 	}
 

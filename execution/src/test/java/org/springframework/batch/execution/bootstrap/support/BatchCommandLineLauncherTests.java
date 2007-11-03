@@ -17,6 +17,9 @@ package org.springframework.batch.execution.bootstrap.support;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -81,7 +84,7 @@ public class BatchCommandLineLauncherTests extends TestCase {
 		assertNotNull(jobLauncher);
 		assertNotNull(systemExiter);
 
-		jobLauncher.setReturnValue(ExitStatus.FINISHED);
+		setReturnValue(ExitStatus.FINISHED);
 
 		BatchCommandLineLauncher.main(new String[0]);
 
@@ -91,12 +94,18 @@ public class BatchCommandLineLauncherTests extends TestCase {
 				StubJobLauncher.RUN_NO_ARGS);
 	}
 
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.execution.bootstrap.support.BatchCommandLineLauncher#main(java.lang.String[])}.
+	 * 
+	 * @throws Exception
+	 */
 	public void testCustomJobName() {
 
 		buildContext(TEST_BATCH_ENVIRONMENT_KEY);
 		assertNotNull(jobLauncher);
 		assertNotNull(systemExiter);
-		jobLauncher.setReturnValue(ExitStatus.FINISHED);
+		setReturnValue(ExitStatus.FINISHED);
 
 		System.setProperty(JOB_NAME_KEY, "foo");
 		BatchCommandLineLauncher.main(new String[0]);
@@ -107,6 +116,12 @@ public class BatchCommandLineLauncherTests extends TestCase {
 				StubJobLauncher.RUN_JOB_NAME);
 	}
 
+	private void setReturnValue(ExitStatus status) {
+		JobExecution execution = new JobExecution(new JobInstance(new SimpleJobIdentifier("foo")));
+		execution.setExitStatus(status);
+		jobLauncher.setReturnValue(execution);
+	}
+	
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.execution.bootstrap.support.BatchCommandLineLauncher#main(java.lang.String[])}.

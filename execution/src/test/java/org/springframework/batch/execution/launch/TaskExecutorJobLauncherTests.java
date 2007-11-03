@@ -25,13 +25,11 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
-import org.springframework.batch.execution.launch.JobExecutionListener;
-import org.springframework.batch.execution.launch.JobExecutorFacade;
-import org.springframework.batch.execution.launch.SimpleJobLauncher;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.context.ApplicationEvent;
@@ -44,8 +42,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		launcher
-				.setJobIdentifierFactory(new SimpleJobIdentifierFactory());
+		launcher.setJobIdentifierFactory(new SimpleJobIdentifierFactory());
 	}
 
 	public void testStopContainer() throws Exception {
@@ -58,9 +55,36 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 		launcher.setJobConfigurationName(new JobConfiguration("foo").getName());
 
 		launcher.run();
+		// give the thread some time to start up...
+		Thread.sleep(100);
+		assertTrue(launcher.isRunning());
+		launcher.stop();
+		// ...and to shut down:
+		Thread.sleep(400);
+		assertFalse(launcher.isRunning());
+	}
+
+	public void testRunTwice() throws Exception {
+
+		// Important (otherwise start() does not return!)
+		launcher.setTaskExecutor(new SimpleAsyncTaskExecutor());
+
+		InterruptibleContainer container = new InterruptibleContainer();
+		launcher.setJobExecutorFacade(container);
+		launcher.setJobConfigurationName(new JobConfiguration("foo").getName());
+
+		launcher.run();
 		// give the thread some time to start up:
 		Thread.sleep(100);
 		assertTrue(launcher.isRunning());
+		try {
+			launcher.run();
+			fail("Expected JobExecutionAlreadyRunningException");
+		} catch (JobExecutionAlreadyRunningException e) {
+			// expected
+		}
+		// give the thread some time to start up...
+		Thread.sleep(100);
 		launcher.stop();
 		// ...and to shut down:
 		Thread.sleep(400);
@@ -112,22 +136,21 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 					// for interrupt to be called;
 					Thread.sleep(300);
 				} catch (InterruptedException ex) {
-					// thread intterrupted, allow to exit normally
+					// thread interrupted, allow to exit normally
 				}
 			}
 		}
-		
-		public ExitStatus start(JobIdentifier jobIdentifier,
-				JobExecutionListener listener)
+
+		public void start(JobExecution execution)
 				throws NoSuchJobConfigurationException {
-			throw new UnsupportedOperationException("Not implemented");
+			start();
 		}
 
-		public ExitStatus start(JobIdentifier runtimeInformation) {
-			start();
-			return ExitStatus.FAILED;
+		public JobExecution createNewExecution(JobIdentifier jobIdentifier)
+				throws NoSuchJobConfigurationException {
+			return new JobExecution(new JobInstance(jobIdentifier));
 		}
-		
+
 		public void stop(JobIdentifier runtimeInformation) {
 			running = false;
 		}
@@ -148,12 +171,15 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 
 		MockControl control = MockControl
 				.createControl(JobExecutorFacade.class);
-		JobExecutorFacade batchContainer = (JobExecutorFacade) control
-				.getMock();
-		launcher.setJobExecutorFacade(batchContainer);
+		JobExecutorFacade facade = (JobExecutorFacade) control.getMock();
+		launcher.setJobExecutorFacade(facade);
 		SimpleJobIdentifier jobRuntimeInformation = new SimpleJobIdentifier(
 				"spam");
-		batchContainer.start(jobRuntimeInformation);
+		JobExecution execution = new JobExecution(new JobInstance(
+				jobRuntimeInformation));
+		control.expectAndReturn(facade
+				.createNewExecution(jobRuntimeInformation), execution);
+		facade.start(execution);
 		control.setThrowable(new NoSuchJobConfigurationException("SPAM"));
 
 		control.replay();

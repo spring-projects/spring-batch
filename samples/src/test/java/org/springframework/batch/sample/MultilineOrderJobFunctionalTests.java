@@ -23,7 +23,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
-public class MultilineOrderJobFunctionalTests extends AbstractLifecycleSpringContextTests {
+public class MultilineOrderJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 	//private static final Log log = LogFactory.getLog(MultilineOrderJobFunctionalTests.class);
 
 	private static final String EXPECTED_OUTPUT = 

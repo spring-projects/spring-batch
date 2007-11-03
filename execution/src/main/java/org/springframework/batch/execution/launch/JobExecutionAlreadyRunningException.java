@@ -15,36 +15,27 @@
  */
 package org.springframework.batch.execution.launch;
 
-import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.executor.JobExecutionException;
 
 /**
- * Listener interface for the job execution lifecycle.
- * 
  * @author Dave Syer
- * 
+ *
  */
-public interface JobExecutionListener {
+public class JobExecutionAlreadyRunningException extends JobExecutionException {
 
 	/**
-	 * Callback for the start of a job, before any steps are processed.
-	 * 
-	 * @param execution
-	 *            the current {@link JobExecution}
+	 * @param msg
 	 */
-	void before(JobExecution execution);
+	public JobExecutionAlreadyRunningException(String msg) {
+		super(msg);
+	}
 
 	/**
-	 * Callback for the start of a job, after all steps are processed, or on an
-	 * error.
-	 * 
-	 * @param execution
+	 * @param msg
+	 * @param cause
 	 */
-	void after(JobExecution execution);
+	public JobExecutionAlreadyRunningException(String msg, Throwable cause) {
+		super(msg, cause);
+	}
 
-	/**
-	 * Callback for a job that has been stopped, or asked to stop.
-	 * 
-	 * @param execution
-	 */
-	void onStop(JobExecution execution);
 }

@@ -60,9 +60,9 @@ public class ThreadInterruptJobExecutionListener extends
 	 * Interrupt the thread that is running the job if the {@link ExitStatus}
 	 * indicates that it is still running.
 	 * 
-	 * @see org.springframework.batch.execution.launch.JobExecutionListenerSupport#stop(org.springframework.batch.core.domain.JobExecution)
+	 * @see org.springframework.batch.execution.launch.JobExecutionListenerSupport#onStop(org.springframework.batch.core.domain.JobExecution)
 	 */
-	public void stop(JobExecution execution) {
+	public void onStop(JobExecution execution) {
 		if (execution==null || execution.getExitStatus().isRunning()) {
 			processingThread.interrupt();
 		}

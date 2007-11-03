@@ -33,7 +33,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 
 
 
-public class TradeJobFunctionalTests extends AbstractLifecycleSpringContextTests {
+public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	private static final String GET_TRADES = "SELECT isin, quantity, price, customer FROM trade";
 	private static final String GET_CUSTOMERS = "SELECT name, credit FROM customer";

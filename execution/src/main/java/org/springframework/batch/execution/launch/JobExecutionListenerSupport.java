@@ -47,9 +47,9 @@ public class JobExecutionListenerSupport implements JobExecutionListener {
 	/**
 	 * No-op for subclasses to extend.
 	 * 
-	 * @see org.springframework.batch.execution.launch.JobExecutionListener#stop(org.springframework.batch.core.domain.JobExecution)
+	 * @see org.springframework.batch.execution.launch.JobExecutionListener#onStop(org.springframework.batch.core.domain.JobExecution)
 	 */
-	public void stop(JobExecution execution) {
+	public void onStop(JobExecution execution) {
 		// no-op
 	}
 	

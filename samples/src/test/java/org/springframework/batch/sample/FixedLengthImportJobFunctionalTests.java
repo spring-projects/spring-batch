@@ -27,7 +27,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
-public class FixedLengthImportJobFunctionalTests extends AbstractLifecycleSpringContextTests {
+public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	//expected line length in input file (sum of pattern lengths + 2, because the counter is appended twice)
 	private static final int LINE_LENGTH = 29;

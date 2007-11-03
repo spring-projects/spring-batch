@@ -33,9 +33,9 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.job.DefaultJobExecutor;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
@@ -57,17 +57,17 @@ import org.springframework.util.Assert;
  * 
  */
 class SimpleJobExecutorFacade implements JobExecutorFacade,
-		JobExecutionListener, StatisticsProvider {
+		JobExecutionListener, StatisticsProvider, InitializingBean {
 
 	private Map jobExecutionRegistry = new HashMap();
 
 	private JobExecutor jobExecutor = new DefaultJobExecutor();
-	
+
 	private JobRepository jobRepository;
-	
+
 	// there is no sensible default for this
 	private JobConfigurationLocator jobConfigurationLocator;
-	
+
 	private List listeners = new ArrayList();
 
 	private int running = 0;
@@ -82,6 +82,18 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	 */
 	public void setJobExecutionListeners(List listeners) {
 		this.listeners = listeners;
+	}
+
+	/**
+	 * Check mandatory properties (jobConfigurationLocator,
+	 * jobRepository).
+	 * 
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(jobRepository, "JobRepository must be provided.");
+		Assert.notNull(jobConfigurationLocator,
+				"JobConfigurationLocator must be provided.");
 	}
 
 	/**
@@ -128,23 +140,18 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	 * Locates a {@link JobConfiguration} by using the name of the provided
 	 * {@link JobIdentifier} and the {@link JobConfigurationLocator}.
 	 * 
-	 * @see org.springframework.batch.execution.launch.JobExecutorFacade#start(org.springframework.batch.execution.common.domain.JobConfiguration,
-	 *      org.springframework.batch.core.domain.JobIdentifier)
+	 * @param jobConfiguration
 	 * 
 	 * @throws IllegalArgumentException
 	 *             if the {@link JobIdentifier} is null or its name is null
-	 * @throws IllegalStateException
+	 * @throws NoSuchJobConfigurationException
 	 *             if the {@link JobConfigurationLocator} does not contain a
 	 *             {@link JobConfiguration} with the name provided.
-	 * @throws IllegalStateException
-	 *             if the {@link JobExecutor} is null
-	 * @throws IllegalStateException
-	 *             if the {@link JobConfigurationLocator} is null
 	 * 
+	 * @see org.springframework.batch.execution.launch.JobExecutorFacade#createNewExecution(org.springframework.batch.core.domain.JobIdentifier)
 	 */
-	public ExitStatus start(JobIdentifier jobIdentifier)
+	public JobExecution createNewExecution(JobIdentifier jobIdentifier)
 			throws NoSuchJobConfigurationException {
-
 		Assert.notNull(jobIdentifier, "JobIdentifier must not be null.");
 		Assert.notNull(jobIdentifier.getName(),
 				"JobIdentifier name must not be null.");
@@ -153,16 +160,32 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 				.state(!jobExecutionRegistry.containsKey(jobIdentifier),
 						"A job with this JobRuntimeInformation is already executing in this container");
 
-		Assert.state(jobExecutor != null, "JobExecutor must be provided.");
-		Assert.state(jobConfigurationLocator != null,
-				"JobConfigurationLocator must be provided.");
-
 		JobConfiguration jobConfiguration = jobConfigurationLocator
 				.getJobConfiguration(jobIdentifier.getName());
 
 		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration,
 				jobIdentifier);
-		JobExecution execution = new JobExecution(job);
+		return new JobExecution(job);
+	}
+
+	/**
+	 * Starts a job execution that was previously acquired from the
+	 * {@link #createNewExecution(JobIdentifier)} method.
+	 * 
+	 * @see org.springframework.batch.execution.launch.JobExecutorFacade#start(JobExecution)
+	 * 
+	 * @throws NoSuchJobConfigurationException
+	 *             if the {@link JobConfigurationLocator} does not contain a
+	 *             {@link JobConfiguration} with the name provided by the
+	 *             enclosed {@link JobIdentifier}.
+	 * 
+	 */
+	public void start(JobExecution execution)
+			throws NoSuchJobConfigurationException {
+
+		JobConfiguration jobConfiguration = jobConfigurationLocator
+				.getJobConfiguration(execution.getJob().getIdentifier()
+						.getName());
 
 		this.before(execution);
 		try {
@@ -171,7 +194,6 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 			this.after(execution);
 		}
 
-		return execution.getExitStatus();
 	}
 
 	/**
@@ -180,11 +202,14 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	 * order that they were given.
 	 * 
 	 * @param execution
+	 * 
+	 * @see JobExecutionListener#before(JobExecution)
 	 */
 	public void before(JobExecution execution) {
 		synchronized (mutex) {
 			running++;
-			jobExecutionRegistry.put(execution.getJob().getIdentifier(), execution);
+			jobExecutionRegistry.put(execution.getJob().getIdentifier(),
+					execution);
 		}
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			JobExecutionListener listener = (JobExecutionListener) iterator
@@ -197,12 +222,14 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	 * Broadcast stop signal to all the registered listeners.
 	 * 
 	 * @param execution
+	 * 
+	 * @see JobExecutionListener#onStop(JobExecution)
 	 */
-	public void stop(JobExecution execution) {
+	public void onStop(JobExecution execution) {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			JobExecutionListener listener = (JobExecutionListener) iterator
 					.next();
-			listener.stop(execution);
+			listener.onStop(execution);
 		}
 	}
 
@@ -212,6 +239,8 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	 * then finally dealing with internal housekeeping.
 	 * 
 	 * @param execution
+	 * 
+	 * @see JobExecutionListener#after(JobExecution)
 	 */
 	public void after(JobExecution execution) {
 		ArrayList reversed = new ArrayList(listeners);
@@ -232,9 +261,9 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	/**
 	 * Send a stop signal to all the running executions by setting their
 	 * {@link RepeatContext} to terminate only. Then call the
-	 * {@link JobExecutionListener#stop(JobExecution)} method.
+	 * {@link JobExecutionListener#onStop(JobExecution)} method.
 	 * 
-	 * @see org.springframework.batch.container.BatchContainer#stop(org.springframework.batch.container.common.runtime.JobRuntimeInformation)
+	 * @see org.springframework.batch.container.BatchContainer#onStop(org.springframework.batch.container.common.runtime.JobRuntimeInformation)
 	 */
 	public void stop(JobIdentifier runtimeInformation)
 			throws NoSuchJobExecutionException {
@@ -254,10 +283,13 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 			RepeatContext context = (RepeatContext) iter.next();
 			context.setTerminateOnly();
 		}
-		this.stop(execution);
+		this.onStop(execution);
 	}
 
 	/**
+	 * Provides a snapshot of properties from running jobs (the ones that were
+	 * launched from this {@link JobExecutorFacade).
+	 * 
 	 * @return a read-only view of the state of the running jobs.
 	 */
 	public Properties getStatistics() {

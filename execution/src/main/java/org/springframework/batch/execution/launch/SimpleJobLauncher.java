@@ -38,7 +38,6 @@ import org.springframework.batch.core.runtime.JobIdentifierFactory;
 import org.springframework.batch.execution.job.DefaultJobExecutor;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory;
 import org.springframework.batch.io.exception.BatchConfigurationException;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.interceptor.RepeatOperationsApplicationEvent;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.beans.factory.InitializingBean;
@@ -52,8 +51,8 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
 
 /**
- * Base class for {@link JobLauncher} implementations making no choices about
- * concurrent processing of jobs.
+ * Generic {@link JobLauncher} allowing choice of strategy for concurrent
+ * execution and .
  * 
  * @see JobLauncher
  * @author Dave Syer
@@ -65,19 +64,22 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 			.getLog(SimpleJobLauncher.class);
 
 	private JobExecutor jobExecutor = new DefaultJobExecutor();
-	
+
+	// there is no sensible default for this
 	private JobRepository jobRepository;
-	
+
 	// there is no sensible default for this
 	private JobConfigurationLocator jobConfigurationLocator;
-	
-	private List listeners = new ArrayList();
 
+	// this can be defaulted from some other properties (see
+	// afterPropertiesSet())
 	private JobExecutorFacade jobExecutorFacade;
 
-	private String jobConfigurationName;
+	private TaskExecutor taskExecutor = new SyncTaskExecutor();
 
-	private final Object monitor = new Object();
+	private List listeners = new ArrayList();
+
+	private String jobConfigurationName;
 
 	// Do not autostart by default - allow user to set job configuration
 	// later and then manually start:
@@ -85,12 +87,12 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 
 	private JobIdentifierFactory jobIdentifierFactory = new ScheduledJobIdentifierFactory();
 
+	private final Object monitor = new Object();
+
 	// A private registry for keeping track of running jobs.
 	private volatile Map registry = new HashMap();
 
-	private TaskExecutor taskExecutor = new SyncTaskExecutor();
-
-	ApplicationEventPublisher applicationEventPublisher;
+	private ApplicationEventPublisher applicationEventPublisher;
 
 	/**
 	 * Setter for {@link JobIdentifierFactory}.
@@ -122,7 +124,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	public void setAutoStart(boolean autoStart) {
 		this.autoStart = autoStart;
 	}
-	
+
 	/**
 	 * Public setter for the listeners property.
 	 * 
@@ -134,7 +136,8 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	}
 
 	/**
-	 * Setter for injection of {@link JobConfigurationLocator}.
+	 * Setter for injection of {@link JobConfigurationLocator}. Mandatory with
+	 * no default.
 	 * 
 	 * @param jobConfigurationLocator
 	 *            the jobConfigurationLocator to set
@@ -145,7 +148,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	}
 
 	/**
-	 * Setter for {@link JobExecutor}.
+	 * Setter for {@link JobExecutor}. Defaults to a {@link DefaultJobExecutor}.
 	 * 
 	 * @param jobExecutor
 	 */
@@ -154,35 +157,38 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	}
 
 	/**
-	 * Setter for {@link JobRepository}.
+	 * Setter for {@link JobRepository}. Mandatory with no default.
 	 * 
 	 * @param jobRepository
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
-	}	
+	}
 
 	/**
-	 * Setter for {@link JobExecutorFacade}.
+	 * Setter for {@link JobExecutorFacade}. Package private because it is only
+	 * used for testing purposes.
 	 */
 	void setJobExecutorFacade(JobExecutorFacade jobExecutorFacade) {
 		this.jobExecutorFacade = jobExecutorFacade;
 	}
 
 	/**
-	 * Check that mandatory properties are set.
+	 * Check that mandatory properties are set and create a {@link JobExecutor}
+	 * if one wasn't provided.
 	 * 
 	 * @see #setJobExecutorFacade(JobExecutorFacade)
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		if (jobExecutorFacade==null) {
+		if (jobExecutorFacade == null) {
 			logger.debug("Using SimpleJobExecutorFacade");
 			Assert.notNull(jobConfigurationLocator);
 			Assert.notNull(jobExecutor);
 			Assert.notNull(jobRepository);
 			SimpleJobExecutorFacade jobExecutorFacade = new SimpleJobExecutorFacade();
-			jobExecutorFacade.setJobConfigurationLocator(jobConfigurationLocator);
+			jobExecutorFacade
+					.setJobConfigurationLocator(jobConfigurationLocator);
 			jobExecutorFacade.setJobExecutionListeners(listeners);
 			jobExecutorFacade.setJobExecutor(jobExecutor);
 			jobExecutorFacade.setJobRepository(jobRepository);
@@ -208,7 +214,10 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 				run();
 			} catch (NoSuchJobConfigurationException e) {
 				throw new BatchConfigurationException(
-						"Cannot start job on context refresh", e);
+						"Cannot start job on context refresh because it does not exist", e);
+			} catch (JobExecutionAlreadyRunningException e) {
+				throw new BatchConfigurationException(
+						"Cannot start job on context refresh because it is already running", e);
 			}
 		}
 	}
@@ -222,19 +231,20 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * @return
 	 * @throws NoSuchJobConfigurationException
 	 */
-	protected final ExitStatus runInternal(final JobIdentifier jobIdentifier)
+	protected final void runInternal(JobExecution execution)
 			throws NoSuchJobConfigurationException {
+
+		JobIdentifier jobIdentifier = execution.getJob().getIdentifier();
 
 		synchronized (monitor) {
 			if (isInternalRunning(jobIdentifier)) {
-				return ExitStatus.RUNNING;
+				return;
 			}
 		}
 
-		register(jobIdentifier);
-
+		register(execution);
 		try {
-			return jobExecutorFacade.start(jobIdentifier);
+			jobExecutorFacade.start(execution);
 		} finally {
 			unregister(jobIdentifier);
 		}
@@ -244,16 +254,30 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	/**
 	 * Start the job using the task executor provided.
 	 * 
+	 * @throws NoSuchJobConfigurationException
+	 *             if the identifier cannot be used to locate a
+	 *             {@link JobConfiguration}.
+	 * 
 	 * @see org.springframework.batch.execution.launch.SimpleJobLauncher#run(org.springframework.batch.core.domain.JobIdentifier)
 	 */
-	public ExitStatus run(final JobIdentifier jobIdentifier) {
+	public JobExecution run(final JobIdentifier jobIdentifier)
+			throws NoSuchJobConfigurationException,
+			JobExecutionAlreadyRunningException {
 
-		Assert.state(taskExecutor != null, "TaskExecutor must be provided");
+		if (get(jobIdentifier) != null) {
+			throw new JobExecutionAlreadyRunningException(
+					"A job is already executing with this identifier: ["
+							+ jobIdentifier + "]");
+		}
+		final JobExecution execution = jobExecutorFacade
+				.createNewExecution(jobIdentifier);
+		// TODO: throw JobExecutionAlreadyRunningException if it is in a running
+		// state (someone else launched it)
 
 		taskExecutor.execute(new Runnable() {
 			public void run() {
 				try {
-					runInternal(jobIdentifier);
+					runInternal(execution);
 				} catch (NoSuchJobConfigurationException e) {
 					applicationEventPublisher
 							.publishEvent(new RepeatOperationsApplicationEvent(
@@ -266,7 +290,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 			}
 		});
 
-		return ExitStatus.UNKNOWN;
+		return execution;
 
 	}
 
@@ -277,8 +301,9 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * @param name
 	 *            the name to assign to the job
 	 * @throws NoSuchJobConfigurationException
+	 * @throws JobExecutionAlreadyRunningException 
 	 */
-	public ExitStatus run(String name) throws NoSuchJobConfigurationException {
+	public JobExecution run(String name) throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException {
 		if (name == null) {
 			throw new NoSuchJobConfigurationException(
 					"Null job name cannot be located.");
@@ -297,11 +322,12 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * 
 	 * @throws NoSuchJobConfigurationException
 	 *             if the job configuration cannot be located
+	 * @throws JobExecutionAlreadyRunningException 
 	 * 
 	 * @see #setJobIdentifierFactory(JobIdentifierFactory)
 	 * @see org.springframework.context.Lifecycle#start()
 	 */
-	public ExitStatus run() throws NoSuchJobConfigurationException {
+	public JobExecution run() throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException {
 		if (jobConfigurationName != null) {
 			return this.run(jobConfigurationName);
 		}
@@ -408,15 +434,28 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	}
 
 	/**
-	 * Convenient synchronized accessor for the registry. Can be used by
-	 * subclasses if necessary (but it isn't likely).
+	 * Convenient synchronized accessor for the registry.
 	 * 
 	 * @param jobIdentifier
 	 */
-	private void register(JobIdentifier jobIdentifier) {
+	private void register(JobExecution execution) {
 		synchronized (registry) {
-			registry.put(jobIdentifier, jobIdentifier);
+			registry.put(execution.getJob().getIdentifier(), execution);
 		}
+	}
+
+	/**
+	 * Convenient synchronized accessor for the registry.
+	 * 
+	 * @param jobIdentifier
+	 */
+	private JobExecution get(JobIdentifier jobIdentifier) {
+		synchronized (registry) {
+			if (registry.containsKey(jobIdentifier)) {
+				return (JobExecution) registry.get(jobIdentifier);
+			}
+		}
+		return null;
 	}
 
 	/**

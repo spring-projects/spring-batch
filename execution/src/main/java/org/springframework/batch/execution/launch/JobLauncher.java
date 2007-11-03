@@ -16,13 +16,12 @@
 package org.springframework.batch.execution.launch;
 
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Simple interface for controlling jobs, including possible ad-hoc executions,
- * based on different runtime identifiers. Implementations should concentrate on
- * managing jobs and delegate the launching to a {@link JobExecutorFacade}.
+ * based on different runtime identifiers.
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -36,9 +35,10 @@ public interface JobLauncher {
 	 * 
 	 * @return the exit code from the job if it returns synchronously. If the
 	 *         implementation is asynchronous, the status might well be unknown.
+	 * @throws JobExecutionAlreadyRunningException 
 	 * 
 	 */
-	public ExitStatus run() throws NoSuchJobConfigurationException;
+	public JobExecution run() throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException;
 
 	/**
 	 * Start a job execution with the given name and other runtime information
@@ -51,9 +51,10 @@ public interface JobLauncher {
 	 *         implementation is asynchronous, the status might well be unknown.
 	 * 
 	 * @throws NoSuchJobConfigurationException
+	 * @throws JobExecutionAlreadyRunningException 
 	 */
-	public ExitStatus run(String jobName)
-			throws NoSuchJobConfigurationException;
+	public JobExecution run(String jobName)
+			throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException;
 
 	/**
 	 * Start a job execution with the given runtime information.
@@ -63,8 +64,8 @@ public interface JobLauncher {
 	 * 
 	 * @throws NoSuchJobConfigurationException
 	 */
-	public ExitStatus run(JobIdentifier jobIdentifier)
-			throws NoSuchJobConfigurationException;
+	public JobExecution run(JobIdentifier jobIdentifier)
+			throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException;
 
 	/**
 	 * Stop the current job executions if there are any. If not, no action will
