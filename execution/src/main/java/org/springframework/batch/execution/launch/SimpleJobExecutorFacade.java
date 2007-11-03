@@ -85,8 +85,7 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	}
 
 	/**
-	 * Check mandatory properties (jobConfigurationLocator,
-	 * jobRepository).
+	 * Check mandatory properties (jobConfigurationLocator, jobRepository).
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
@@ -140,7 +139,7 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	 * Locates a {@link JobConfiguration} by using the name of the provided
 	 * {@link JobIdentifier} and the {@link JobConfigurationLocator}.
 	 * 
-	 * @param jobConfiguration
+	 * @param jobIdentifier the identifier of the job that is being prepared.
 	 * 
 	 * @throws IllegalArgumentException
 	 *             if the {@link JobIdentifier} is null or its name is null
@@ -148,9 +147,9 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	 *             if the {@link JobConfigurationLocator} does not contain a
 	 *             {@link JobConfiguration} with the name provided.
 	 * 
-	 * @see org.springframework.batch.execution.launch.JobExecutorFacade#createNewExecution(org.springframework.batch.core.domain.JobIdentifier)
+	 * @see org.springframework.batch.execution.launch.JobExecutorFacade#createExecutionFrom(org.springframework.batch.core.domain.JobIdentifier)
 	 */
-	public JobExecution createNewExecution(JobIdentifier jobIdentifier)
+	public JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
 			throws NoSuchJobConfigurationException {
 		Assert.notNull(jobIdentifier, "JobIdentifier must not be null.");
 		Assert.notNull(jobIdentifier.getName(),
@@ -165,12 +164,18 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 
 		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration,
 				jobIdentifier);
-		return new JobExecution(job);
+		JobExecution execution = new JobExecution(job);
+		
+		// Save the JobExecution so that it picks up an ID (useful for clients
+		// monitoring asynchronous executions):
+		jobRepository.saveOrUpdate(execution);
+		
+		return execution;
 	}
 
 	/**
 	 * Starts a job execution that was previously acquired from the
-	 * {@link #createNewExecution(JobIdentifier)} method.
+	 * {@link #createExecutionFrom(JobIdentifier)} method.
 	 * 
 	 * @see org.springframework.batch.execution.launch.JobExecutorFacade#start(JobExecution)
 	 * 

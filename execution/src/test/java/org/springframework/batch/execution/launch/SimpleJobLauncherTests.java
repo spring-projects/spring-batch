@@ -100,7 +100,7 @@ public class SimpleJobLauncherTests extends TestCase {
 			run();
 		}
 
-		public JobExecution createNewExecution(JobIdentifier jobIdentifier)
+		public JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
 				throws NoSuchJobConfigurationException {
 			return new JobExecution(new JobInstance(jobIdentifier));
 		}

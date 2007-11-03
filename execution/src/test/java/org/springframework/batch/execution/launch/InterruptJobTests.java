@@ -60,7 +60,7 @@ public class InterruptJobTests extends TestCase {
 
 		registry.register(new JobConfiguration("foo"));
 		final SimpleJobIdentifier identifier = new SimpleJobIdentifier("foo");
-		final JobExecution execution = facade.createNewExecution(identifier);
+		final JobExecution execution = facade.createExecutionFrom(identifier);
 
 		TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
 		Runnable launcherRunnable = new Runnable() {

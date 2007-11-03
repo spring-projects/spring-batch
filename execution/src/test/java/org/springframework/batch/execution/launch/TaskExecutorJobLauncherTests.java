@@ -146,7 +146,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 			start();
 		}
 
-		public JobExecution createNewExecution(JobIdentifier jobIdentifier)
+		public JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
 				throws NoSuchJobConfigurationException {
 			return new JobExecution(new JobInstance(jobIdentifier));
 		}
@@ -178,7 +178,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 		JobExecution execution = new JobExecution(new JobInstance(
 				jobRuntimeInformation));
 		control.expectAndReturn(facade
-				.createNewExecution(jobRuntimeInformation), execution);
+				.createExecutionFrom(jobRuntimeInformation), execution);
 		facade.start(execution);
 		control.setThrowable(new NoSuchJobConfigurationException("SPAM"));
 

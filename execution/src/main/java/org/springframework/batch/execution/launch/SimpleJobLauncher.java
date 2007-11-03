@@ -214,10 +214,12 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 				run();
 			} catch (NoSuchJobConfigurationException e) {
 				throw new BatchConfigurationException(
-						"Cannot start job on context refresh because it does not exist", e);
+						"Cannot start job on context refresh because it does not exist",
+						e);
 			} catch (JobExecutionAlreadyRunningException e) {
 				throw new BatchConfigurationException(
-						"Cannot start job on context refresh because it is already running", e);
+						"Cannot start job on context refresh because it is already running",
+						e);
 			}
 		}
 	}
@@ -270,7 +272,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 							+ jobIdentifier + "]");
 		}
 		final JobExecution execution = jobExecutorFacade
-				.createNewExecution(jobIdentifier);
+				.createExecutionFrom(jobIdentifier);
 		// TODO: throw JobExecutionAlreadyRunningException if it is in a running
 		// state (someone else launched it)
 
@@ -301,9 +303,11 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * @param name
 	 *            the name to assign to the job
 	 * @throws NoSuchJobConfigurationException
-	 * @throws JobExecutionAlreadyRunningException 
+	 * @throws JobExecutionAlreadyRunningException
 	 */
-	public JobExecution run(String name) throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException {
+	public JobExecution run(String name)
+			throws NoSuchJobConfigurationException,
+			JobExecutionAlreadyRunningException {
 		if (name == null) {
 			throw new NoSuchJobConfigurationException(
 					"Null job name cannot be located.");
@@ -322,12 +326,13 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * 
 	 * @throws NoSuchJobConfigurationException
 	 *             if the job configuration cannot be located
-	 * @throws JobExecutionAlreadyRunningException 
+	 * @throws JobExecutionAlreadyRunningException
 	 * 
 	 * @see #setJobIdentifierFactory(JobIdentifierFactory)
 	 * @see org.springframework.context.Lifecycle#start()
 	 */
-	public JobExecution run() throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException {
+	public JobExecution run() throws NoSuchJobConfigurationException,
+			JobExecutionAlreadyRunningException {
 		if (jobConfigurationName != null) {
 			return this.run(jobConfigurationName);
 		}

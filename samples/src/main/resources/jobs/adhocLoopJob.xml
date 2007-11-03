@@ -40,7 +40,7 @@
 		<property name="autoStart" value="false" />
 		<property name="jobConfigurationName" value="jobConfiguration"/>
 	</bean>
-
+	
 	<bean id="jobConfiguration" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
@@ -73,18 +73,18 @@
 		<property name="beans">
 			<map>
 				<entry
-					key="spring:service=lifecycle,bean=jobLauncher">
+					key="spring:service=batch,bean=jobLauncher">
 					<bean class="org.springframework.aop.framework.ProxyFactoryBean">
 						<property name="target" ref="jobLauncher"/>
 						<property name="interfaces">
 							<list>
 								<value>org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher</value>
-								<value>org.springframework.jmx.export.notification.NotificationPublisherAware</value>
 							</list>
 						</property>
 						<property name="interceptorNames" value="convertingMethodInterceptor"/>
 					</bean>
 				</entry>
+				<entry key="spring:service=batch,bean=notificationPublisher" value-ref="notificationPublisher"/>
 			</map>
 		</property>
 		<property name="assembler">
@@ -93,13 +93,15 @@
 				<property name="interfaceMappings">
 					<map>
 						<entry
-							key="spring:service=lifecycle,bean=jobLauncher"
+							key="spring:service=batch,bean=jobLauncher"
 							value="org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher" />
 					</map>
 				</property>
 			</bean>
 		</property>
 	</bean>
+	
+	<bean id="notificationPublisher" class="org.springframework.batch.execution.bootstrap.JobExecutionNotificationPublisher"/>
 	
 	<bean id="convertingMethodInterceptor" class="org.springframework.batch.execution.bootstrap.support.TypeConverterMethodInterceptor"/>
 

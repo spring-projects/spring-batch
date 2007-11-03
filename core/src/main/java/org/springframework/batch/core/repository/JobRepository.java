@@ -76,13 +76,14 @@ public interface JobRepository {
 	public void update(JobInstance job);
 
 	/**
-	 * Save or Update a JobExecution. If no ID is found a new instance will be
-	 * created. (saved). If an ID does exist it will be updated. It is not
-	 * advisable that an ID be assigned to a JobExecution before calling this
-	 * method. Instead, it should be left blank, to be assigned by a
-	 * JobRepository.
+	 * Save or Update a {@link JobExecution}. If no ID is found a new instance
+	 * will be saved. If an ID does exist it will be updated. The ID should only
+	 * be assigned to a {@link JobExecution} by calling this method - it should
+	 * be left blank on the first call, and assigned by the
+	 * {@link JobRepository}.
 	 * 
-	 * Preconditions: JobExecution must contain a valid JobId.
+	 * Preconditions: {@link JobExecution} must contain a valid
+	 * {@link JobInstance}.
 	 * 
 	 * @param jobInstance
 	 */
@@ -91,8 +92,9 @@ public interface JobRepository {
 	/**
 	 * Update a step.
 	 * 
-	 * Preconditions: Step must contain a valid ID. This can be ensured by first
-	 * obtaining a Job from findOrCreateJob, and accessing it's step list.
+	 * Preconditions: {@link StepInstance} must contain a valid ID. This can be
+	 * ensured by first obtaining a {@link JobInstance} from findOrCreateJob,
+	 * and accessing it's step list.
 	 * 
 	 * @param step
 	 * @see StepInstance

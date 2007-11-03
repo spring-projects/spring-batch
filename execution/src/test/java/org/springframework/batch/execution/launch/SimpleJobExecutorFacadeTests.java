@@ -24,6 +24,7 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
+import org.easymock.AbstractMatcher;
 import org.easymock.MockControl;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.JobConfigurationLocator;
@@ -33,9 +34,6 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
-import org.springframework.batch.execution.launch.JobExecutionListenerSupport;
-import org.springframework.batch.execution.launch.NoSuchJobExecutionException;
-import org.springframework.batch.execution.launch.SimpleJobExecutorFacade;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
@@ -81,9 +79,8 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	public void testCreateNewExecution() throws Exception {
 
 		JobInstance job = setUpFacadeForNormalStart();
-		jobExecution = jobExecutorFacade.createNewExecution(jobIdentifier);
+		jobExecution = jobExecutorFacade.createExecutionFrom(jobIdentifier);
 		assertEquals(job, jobExecution.getJob());
-		assertEquals("bar", job.getName());
 		jobRepositoryControl.verify();
 
 	}
@@ -91,7 +88,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	public void testNormalStart() throws Exception {
 
 		JobInstance job = setUpFacadeForNormalStart();
-		jobExecution = jobExecutorFacade.createNewExecution(jobIdentifier);
+		jobExecution = jobExecutorFacade.createExecutionFrom(jobIdentifier);
 		jobExecutorFacade.start(jobExecution);
 		assertEquals(job, jobExecution.getJob());
 		assertEquals("bar", job.getName());
@@ -99,7 +96,8 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 
 	}
 
-	private JobInstance setUpFacadeForNormalStart() throws NoSuchJobConfigurationException {
+	private JobInstance setUpFacadeForNormalStart()
+			throws NoSuchJobConfigurationException {
 		jobIdentifier = new SimpleJobIdentifier("bar");
 		jobExecutor = new JobExecutor() {
 			public ExitStatus run(JobConfiguration configuration,
@@ -113,6 +111,17 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 		jobExecution = new JobExecution(job);
 		jobRepository.findOrCreateJob(jobConfiguration, jobIdentifier);
 		jobRepositoryControl.setReturnValue(job);
+		jobRepository.saveOrUpdate(jobExecution);
+		jobRepositoryControl.setMatcher(new AbstractMatcher() {
+			protected boolean argumentMatches(Object expected, Object actual) {
+				if (actual instanceof JobExecution) {
+					jobExecution = (JobExecution) actual;
+					return true;
+				} else {
+					return super.argumentMatches(expected, actual);
+				}
+			}
+		});
 		jobRepositoryControl.replay();
 		jobExecutorFacade
 				.setJobConfigurationLocator(new JobConfigurationLocator() {

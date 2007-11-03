@@ -42,7 +42,7 @@ interface JobExecutorFacade {
 	 * 
 	 * @throws NoSuchJobConfigurationException
 	 */
-	JobExecution createNewExecution(JobIdentifier jobIdentifier)
+	JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
 			throws NoSuchJobConfigurationException;
 
 	/**
