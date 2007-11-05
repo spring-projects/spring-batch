@@ -24,7 +24,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 
 public class XmlStaxJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 	
-	private static final String OUTPUT_FILE = "20070918.testStream.xmlFileStep.output.xml";
+	private static final String OUTPUT_FILE = "target/test-outputs/20070918.testStream.xmlFileStep.output.xml";
 	private static final String EXPECTED_OUTPUT_FILE = "src/main/resources/data/staxJob/output/expected-output.xml";
 	
 //	@Override

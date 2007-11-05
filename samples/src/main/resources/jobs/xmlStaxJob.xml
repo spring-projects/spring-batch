@@ -51,7 +51,7 @@
 	</bean>
 
 	<bean class="org.springframework.batch.io.file.support.StaxEventWriterOutputSource" id="tradeStaxWriter">
-		<property name="resource" value="file:20070918.testStream.xmlFileStep.output.xml" />
+		<property name="resource" value="file:target/test-outputs/20070918.testStream.xmlFileStep.output.xml" />
 		<property name="serializer" ref="tradeMarshallingSerializer" />
 		<property name="rootTagName" value="trades" />
 		<property name="overwriteOutput" value="true" />

@@ -79,7 +79,7 @@ public class CompositeProcessorSampleFunctionalTests extends AbstractValidatingB
 
 	private void checkOutputFile() throws FileNotFoundException, IOException {
 		List outputLines = IOUtils.readLines(
-				new FileInputStream("20070122.testStream.ParallelCustomerReportStep.TEMP.txt"));
+				new FileInputStream("target/test-outputs/20070122.testStream.ParallelCustomerReportStep.TEMP.txt"));
 		
 		String output = "";
 		for (Iterator iterator = outputLines.listIterator(); iterator.hasNext();) {

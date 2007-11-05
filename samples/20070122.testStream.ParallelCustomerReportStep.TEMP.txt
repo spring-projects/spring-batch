@@ -1,5 +1,0 @@
-Trade: [isin=UK21341EAH41,quantity=211,price=31.11,customer=customer1]
-Trade: [isin=UK21341EAH42,quantity=212,price=32.11,customer=customer2]
-Trade: [isin=UK21341EAH43,quantity=213,price=33.11,customer=customer3]
-Trade: [isin=UK21341EAH44,quantity=214,price=34.11,customer=customer4]
-Trade: [isin=UK21341EAH45,quantity=215,price=35.11,customer=customer5]

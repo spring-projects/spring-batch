@@ -35,7 +35,7 @@
 										scope="step">
 										<aop:scoped-proxy />
 										<property name="resource"
-											value="file:20070122.testStream.multilineStep.txt" />
+											value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
 									</bean>
 								</property>
 							</bean>

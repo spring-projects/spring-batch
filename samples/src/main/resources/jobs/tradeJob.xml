@@ -117,7 +117,7 @@
 	<bean id="customerFileLocator"
 		class="org.springframework.core.io.FileSystemResource">
 		<constructor-arg type="java.lang.String"
-			value="20070122.testStream.CustomerReportStep.TEMP.txt" />
+			value="target/test-outputs/20070122.testStream.CustomerReportStep.TEMP.txt" />
 	</bean>
 
 	<!-- register the step scope with the application context -->

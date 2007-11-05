@@ -456,6 +456,10 @@ public class FlatFileOutputSource extends AbstractTransactionalIoSource implemen
 							throw new BatchEnvironmentException("Resource already exists: " + resource);
 						}
 					}
+					String parent = file.getParent();
+					if (parent!=null) {
+						new File(parent).mkdirs();
+					}
 					file.createNewFile();
 				}
 

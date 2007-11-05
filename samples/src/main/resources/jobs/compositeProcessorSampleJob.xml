@@ -89,7 +89,7 @@
 	</bean>
 
 	<bean id="customerFileLocator" class="org.springframework.core.io.FileSystemResource">
-		<constructor-arg type="java.lang.String" value="20070122.testStream.ParallelCustomerReportStep.TEMP.txt" />
+		<constructor-arg type="java.lang.String" value="target/test-outputs/20070122.testStream.ParallelCustomerReportStep.TEMP.txt" />
 	</bean>
 
 	<bean id="fileLocator" class="org.springframework.core.io.ClassPathResource">

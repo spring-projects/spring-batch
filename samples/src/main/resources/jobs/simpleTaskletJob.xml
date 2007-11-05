@@ -59,7 +59,7 @@
 	<bean id="fileLocator"
 		class="org.springframework.core.io.ClassPathResource">
 		<constructor-arg type="java.lang.String"
-			value="/data/simpleTaskletJob/input/20070122.teststream.ImportTradeDataStep.txt" />
+			value="data/simpleTaskletJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 	</bean>
 
 	<bean id="tradeTokenizer"

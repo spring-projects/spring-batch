@@ -46,7 +46,7 @@ public class MultilineOrderJobFunctionalTests extends AbstractValidatingBatchLau
 	"END_ORDER:14043.74            ";
 
 	
-	private Resource fileOutputLocator = new FileSystemResource("20070122.teststream.multilineOrderStep.TEMP.txt");
+	private Resource fileOutputLocator = new FileSystemResource("target/test-outputs/20070122.teststream.multilineOrderStep.TEMP.txt");
 	
 //	@Override
 	protected String[] getConfigLocations() {

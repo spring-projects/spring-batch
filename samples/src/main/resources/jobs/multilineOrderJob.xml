@@ -145,7 +145,7 @@
 	</bean>
 
 	<bean id="fileOutputLocator" class="org.springframework.core.io.FileSystemResource">
-		<constructor-arg type="java.lang.String" value="20070122.teststream.multilineOrderStep.TEMP.txt" />
+		<constructor-arg type="java.lang.String" value="target/test-outputs/20070122.teststream.multilineOrderStep.TEMP.txt" />
 	</bean>
 
 	<bean parent="customEditorConfigurer"/>
