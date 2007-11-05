@@ -16,6 +16,7 @@
 
 package org.springframework.batch.execution.step.simple;
 
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.core.tasklet.Recoverable;
@@ -51,7 +52,7 @@ public class DefaultStepExecutor extends SimpleStepExecutor {
 	 * @see org.springframework.batch.execution.step.simple.SimpleStepExecutor#doTaskletProcessing(org.springframework.batch.core.tasklet.Tasklet,
 	 * org.springframework.batch.core.domain.StepInstance)
 	 */
-	protected ExitStatus doTaskletProcessing(Tasklet module, final StepInstance step) throws Exception {
+	protected ExitStatus doTaskletProcessing(Tasklet module, final StepExecution step) throws Exception {
 
 		ExitStatus exitStatus = ExitStatus.CONTINUABLE;
 

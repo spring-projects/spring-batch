@@ -336,7 +336,7 @@ public class SimpleStepExecutor implements StepExecutor {
 				// check for interruption before each item as well
 				interruptionPolicy.checkInterrupted(context);
 				ExitStatus exitStatus = doTaskletProcessing(configuration
-						.getTasklet(), stepExecution.getStep());
+						.getTasklet(), stepExecution);
 				stepExecution.incrementTaskCount();
 				// check for interruption after each item as well
 				interruptionPolicy.checkInterrupted(context);
@@ -352,13 +352,13 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * 
 	 * @param tasklet
 	 *            the unit of business logic to execute
-	 * @param step
+	 * @param stepExecution
 	 *            the current step
 	 * @return boolean if there is more processing to do
 	 * @throws Exception
 	 *             if there is an error
 	 */
-	protected ExitStatus doTaskletProcessing(Tasklet tasklet, StepInstance step)
+	protected ExitStatus doTaskletProcessing(Tasklet tasklet, StepExecution stepExecution)
 			throws Exception {
 		return tasklet.execute();
 	}
