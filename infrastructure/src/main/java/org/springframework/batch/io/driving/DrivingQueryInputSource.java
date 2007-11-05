@@ -26,8 +26,6 @@ import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.util.Assert;
 
 /**

@@ -34,7 +34,6 @@ import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.file.support.transform.Converter;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ResourceLifecycle;
-import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -43,8 +42,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.util.Assert;
 
 /**
