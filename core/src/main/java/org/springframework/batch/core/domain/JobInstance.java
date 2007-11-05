@@ -100,5 +100,12 @@ public class JobInstance extends Entity {
 	public String getName() {
 		return identifier==null ? null : identifier.getName();
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.Entity#toString()
+	 */
+	public String toString() {
+		return super.toString()+", identifier=["+identifier+"]";
+	}
 
 }

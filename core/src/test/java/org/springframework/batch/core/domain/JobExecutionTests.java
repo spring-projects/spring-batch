@@ -138,4 +138,13 @@ public class JobExecutionTests extends TestCase {
 		assertEquals(0, context.getChunkContexts().size());
 	}
 	
+	public void testToString() throws Exception {
+		assertTrue("JobExecution string does not contain id", context.toString().indexOf("id=")>=0);
+		assertTrue("JobExecution string does not contain name: "+context, context.toString().indexOf("foo")>=0);
+	}
+	
+	public void testToStringWithNullJob() throws Exception {
+		context = new JobExecution();
+		assertTrue("JobExecution string does not contain id", context.toString().indexOf("id=")>=0);
+	}
 }

@@ -227,4 +227,11 @@ public class JobExecution extends Entity {
 	public void registerStepExecution(StepExecution stepExecution) {
 		this.stepExecutions.add(stepExecution);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.Entity#toString()
+	 */
+	public String toString() {
+		return super.toString()+", job=["+job+"]";
+	}
 }
