@@ -18,6 +18,7 @@ package org.springframework.batch.execution.repository.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 import org.springframework.batch.core.domain.BatchStatus;
@@ -191,7 +192,9 @@ public class SqlJobDao implements JobDao, InitializingBean {
 				jobExecution.getExitStatus().isContinuable() ? "Y" : "N",
 				jobExecution.getExitStatus().getExitCode(),
 				jobExecution.getExitStatus().getExitDescription() };
-		jdbcTemplate.update(getSaveJobExecutionQuery(), parameters);
+		jdbcTemplate.update(getSaveJobExecutionQuery(), parameters, new int[] {
+				Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP,
+				Types.VARCHAR, Types.CHAR, Types.VARCHAR, Types.VARCHAR });
 	}
 
 	/**
@@ -229,7 +232,10 @@ public class SqlJobDao implements JobDao, InitializingBean {
 							+ " not found.");
 		}
 
-		jdbcTemplate.update(getUpdateJobExecutionQuery(), parameters);
+		jdbcTemplate.update(getUpdateJobExecutionQuery(), parameters,
+				new int[] { Types.TIMESTAMP,
+						Types.TIMESTAMP, Types.VARCHAR, Types.CHAR,
+						Types.VARCHAR, Types.VARCHAR, Types.INTEGER });
 	}
 
 	/**
