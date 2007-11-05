@@ -16,6 +16,7 @@
 
 package org.springframework.batch.sample.domain;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -24,8 +25,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * @author Rob Harrop
+ * @author Dave Syer
  */
-public class Trade {
+public class Trade implements Serializable {
     private String isin = "";
     private long quantity = 0;
     private BigDecimal price = new BigDecimal(0);
