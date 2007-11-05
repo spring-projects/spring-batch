@@ -344,12 +344,13 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * Extension point for subclasses to stop a specific job.
 	 * 
 	 * @throws NoSuchJobExecutionException
-	 * 
-	 * @see org.springframework.batch.container.bootstrap.BatchContainerLauncher#stop(JobRuntimeInformation))
 	 */
 	protected void doStop(JobIdentifier jobIdentifier)
 			throws NoSuchJobExecutionException {
-		jobExecutorFacade.stop(jobIdentifier);
+		JobExecution execution = get(jobIdentifier);
+		if (execution != null) {
+			jobExecutorFacade.stop(execution);
+		}
 	}
 
 	/**

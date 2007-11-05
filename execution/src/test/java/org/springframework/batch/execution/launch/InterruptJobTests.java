@@ -78,7 +78,7 @@ public class InterruptJobTests extends TestCase {
 		// give the thread a second to start up
 		Thread.sleep(100);
 		assertTrue(facade.isRunning());
-		facade.stop(identifier);
+		facade.stop(execution);
 		Thread.sleep(100);
 		assertFalse(facade.isRunning());
 	}

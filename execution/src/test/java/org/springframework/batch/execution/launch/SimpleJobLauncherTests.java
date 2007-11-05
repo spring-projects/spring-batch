@@ -105,7 +105,7 @@ public class SimpleJobLauncherTests extends TestCase {
 			return new JobExecution(new JobInstance(jobIdentifier));
 		}
 
-		public void stop(JobIdentifier runtimeInformation) {
+		public void stop(JobExecution execution) {
 			// not needed
 		}
 

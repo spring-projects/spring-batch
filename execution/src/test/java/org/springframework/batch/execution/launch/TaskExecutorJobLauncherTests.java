@@ -151,7 +151,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 			return new JobExecution(new JobInstance(jobIdentifier));
 		}
 
-		public void stop(JobIdentifier runtimeInformation) {
+		public void stop(JobExecution execution) {
 			running = false;
 		}
 

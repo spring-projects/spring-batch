@@ -264,19 +264,16 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	}
 
 	/**
-	 * Send a stop signal to all the running executions by setting their
+	 * Send a stop signal to the running execution by setting all their
 	 * {@link RepeatContext} to terminate only. Then call the
 	 * {@link JobExecutionListener#onStop(JobExecution)} method.
 	 * 
 	 * @see org.springframework.batch.container.BatchContainer#onStop(org.springframework.batch.container.common.runtime.JobRuntimeInformation)
 	 */
-	public void stop(JobIdentifier runtimeInformation)
+	public void stop(JobExecution execution)
 			throws NoSuchJobExecutionException {
-		JobExecution execution = (JobExecution) jobExecutionRegistry
-				.get(runtimeInformation);
-		if (execution == null) {
-			throw new NoSuchJobExecutionException("No such Job is executing: ["
-					+ runtimeInformation + "]");
+		if (!jobExecutionRegistry.containsValue(execution)) {
+			throw new NoSuchJobExecutionException("The job is not executing in this executor: ["+execution+"]");
 		}
 		for (Iterator iter = execution.getStepContexts().iterator(); iter
 				.hasNext();) {

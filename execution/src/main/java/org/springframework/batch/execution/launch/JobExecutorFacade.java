@@ -62,7 +62,7 @@ interface JobExecutorFacade {
 	 * @throws NoSuchJobExecutionException
 	 *             if a job with this runtime information is not running
 	 */
-	void stop(JobIdentifier jobIdentifier) throws NoSuchJobExecutionException;
+	void stop(JobExecution execution) throws NoSuchJobExecutionException;
 
 	/**
 	 * Simple check for whether or not there are jobs in progress. Can be used

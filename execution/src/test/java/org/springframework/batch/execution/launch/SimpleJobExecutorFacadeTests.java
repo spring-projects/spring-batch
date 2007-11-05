@@ -192,12 +192,14 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	public void testStopWithNoJob() throws Exception {
 		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier(
 				"TestJob");
+		JobExecution execution = new JobExecution(new JobInstance(
+				runtimeInformation, new Long(0)));
 		try {
-			jobExecutorFacade.stop(runtimeInformation);
+			jobExecutorFacade.stop(execution);
 			fail("Expected NoSuchJobExecutionException");
 		} catch (NoSuchJobExecutionException e) {
 			// expected
-			assertTrue(e.getMessage().indexOf("TestJob") >= 0);
+			assertTrue("Wrong message in exception: "+e.getMessage(), e.getMessage().indexOf("TestJob") >= 0);
 		}
 	}
 
@@ -222,7 +224,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 				stepContext);
 		execution.registerStepContext(stepContext);
 		execution.registerChunkContext(chunkContext);
-		jobExecutorFacade.stop(runtimeInformation);
+		jobExecutorFacade.stop(execution);
 
 		assertTrue(stepContext.isCompleteOnly());
 		assertTrue(chunkContext.isCompleteOnly());
