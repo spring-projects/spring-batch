@@ -20,7 +20,6 @@ import java.io.File;
 
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.execution.resource.support.DefaultJobIdentifierLabelGenerator;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;
 import org.springframework.beans.factory.FactoryBean;
