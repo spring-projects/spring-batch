@@ -140,6 +140,15 @@ public class ExitStatus implements Serializable {
 	}
 
 	/**
+	 * Compatible with the equals implementation.
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	public int hashCode() {
+		return toString().hashCode();
+	}
+
+	/**
 	 * Add an exit code to an existing {@link ExitStatus}.
 	 * 
 	 * @param code the code to add
