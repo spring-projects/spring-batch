@@ -71,6 +71,15 @@ public class ExitStatusTests extends TestCase {
 	}
 
 	/**
+	 * Test equality of exit statuses.
+	 * 
+	 * @throws Exception
+	 */
+	public void testHashcode() throws Exception {
+		assertEquals(ExitStatus.CONTINUABLE.toString().hashCode(), ExitStatus.CONTINUABLE.hashCode());
+	}
+
+	/**
 	 * Test method for {@link org.springframework.batch.repeat.ExitStatus#and(boolean)}.
 	 */
 	public void testAndBoolean() {
