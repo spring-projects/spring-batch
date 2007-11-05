@@ -32,6 +32,7 @@ import org.springframework.batch.io.OutputSource;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.file.support.transform.Converter;
+import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.GenericRestartData;
@@ -62,8 +63,9 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileOutputSource implements OutputSource, ResourceLifecycle, Restartable, StatisticsProvider, InitializingBean,
-		DisposableBean {
+public class FlatFileOutputSource extends AbstractTransactionalIoSource implements 
+	OutputSource, ResourceLifecycle, Restartable, StatisticsProvider, InitializingBean,
+	DisposableBean {
 
 	/**
 	 * @author dsyer
@@ -88,8 +90,6 @@ public class FlatFileOutputSource implements OutputSource, ResourceLifecycle, Re
 	private Properties statistics = new Properties();
 
 	private RestartData restartData = new GenericRestartData(new Properties());
-
-	private TransactionSynchronization transactionSynchronization = new FlatFileOutputTemplateTransactionSynchronization();
 
 	private OutputState state = new OutputState();
 
@@ -125,16 +125,16 @@ public class FlatFileOutputSource implements OutputSource, ResourceLifecycle, Re
 	}
 
 	/**
-	 * Commit the transaction.
+	 * Commit the transaction.   
 	 */
-	private void transactionComitted() {
+	protected void transactionCommitted() {
 		getOutputState().mark();
 	}
 
 	/**
 	 * Rollback the transaction.
 	 */
-	private void transactionRolledback() {
+	protected void transactionRolledBack() {
 		getOutputState().checkFileSize();
 		resetPositionForRestart();
 	}
@@ -246,7 +246,7 @@ public class FlatFileOutputSource implements OutputSource, ResourceLifecycle, Re
 	 * @see ResourceLifecycle#open()
 	 */
 	public void open() {
-		registerSynchronization();
+		super.registerSynchronization();
 	}
 
 	/**
@@ -281,20 +281,9 @@ public class FlatFileOutputSource implements OutputSource, ResourceLifecycle, Re
 
 	}
 
-	// Registers a new transaction synchronization for the current thread.
-	private void registerSynchronization() {
-		BatchTransactionSynchronizationManager.registerSynchronization(this.transactionSynchronization);
-	}
-
 	// Returns object representing state.
 	private OutputState getOutputState() {
 		return (OutputState) state;
-	}
-
-	// added package visibility method so that tests can invoke transaction
-	// events
-	TransactionSynchronization getTransactionSynchronization() {
-		return this.transactionSynchronization;
 	}
 
 	/**
@@ -554,25 +543,4 @@ public class FlatFileOutputSource implements OutputSource, ResourceLifecycle, Re
 		}
 
 	}
-
-	/**
-	 * Encapsulates transaction events.
-	 */
-	private class FlatFileOutputTemplateTransactionSynchronization extends TransactionSynchronizationAdapter {
-		/**
-		 * TransactionSynchronization method indicating that a transaction has
-		 * completed.
-		 * 
-		 * @param status indicates whether it was a rollback or commit
-		 */
-		public void afterCompletion(int status) {
-			if (status == TransactionSynchronization.STATUS_COMMITTED) {
-				transactionComitted();
-			}
-			else if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-				transactionRolledback();
-			}
-		}
-	}
-
 }

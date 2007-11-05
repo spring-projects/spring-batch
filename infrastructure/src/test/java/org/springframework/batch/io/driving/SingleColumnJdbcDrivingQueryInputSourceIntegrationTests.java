@@ -2,9 +2,9 @@ package org.springframework.batch.io.driving;
 
 import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.driving.support.SingleColumnJdbcKeyGenerator;
-import org.springframework.batch.io.sql.AbstractSqlInputSourceIntegrationTests;
+import org.springframework.batch.io.sql.AbstractJdbcInputSourceIntegrationTests;
 
-public class SingleColumnJdbcDrivingQueryInputSourceIntegrationTests extends AbstractSqlInputSourceIntegrationTests {
+public class SingleColumnJdbcDrivingQueryInputSourceIntegrationTests extends AbstractJdbcInputSourceIntegrationTests {
 
 	protected InputSource source;
 

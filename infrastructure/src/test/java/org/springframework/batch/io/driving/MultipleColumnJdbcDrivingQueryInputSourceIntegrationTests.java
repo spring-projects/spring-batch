@@ -17,14 +17,14 @@ package org.springframework.batch.io.driving;
 
 import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.driving.support.MultipleColumnJdbcKeyGenerator;
-import org.springframework.batch.io.sql.AbstractSqlInputSourceIntegrationTests;
+import org.springframework.batch.io.sql.AbstractJdbcInputSourceIntegrationTests;
 
 /**
  * @author Lucas Ward
  *
  */
 public class MultipleColumnJdbcDrivingQueryInputSourceIntegrationTests extends
-		AbstractSqlInputSourceIntegrationTests {
+		AbstractJdbcInputSourceIntegrationTests {
 
 	protected InputSource createInputSource() throws Exception {
 

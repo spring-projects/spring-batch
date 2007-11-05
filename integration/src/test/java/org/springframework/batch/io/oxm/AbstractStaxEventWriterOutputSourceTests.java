@@ -11,8 +11,9 @@ import junit.framework.TestCase;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.springframework.batch.io.file.support.StaxEventWriterOutputSource;
+import org.springframework.batch.io.file.support.oxm.MarshallingObjectToXmlSerializer;
 import org.springframework.batch.io.oxm.domain.Trade;
-import org.springframework.batch.io.stax.StaxEventWriterOutputSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;

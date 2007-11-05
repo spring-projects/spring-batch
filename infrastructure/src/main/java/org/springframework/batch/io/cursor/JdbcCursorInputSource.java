@@ -31,8 +31,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.Skippable;
+import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ResourceLifecycle;
-import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -47,8 +47,6 @@ import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.util.Assert;
 
 /**
@@ -117,7 +115,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Peter Zozom
  */
-public class JdbcCursorInputSource implements InputSource, ResourceLifecycle, DisposableBean,
+public class JdbcCursorInputSource extends AbstractTransactionalIoSource implements InputSource, ResourceLifecycle, DisposableBean,
 		InitializingBean, Restartable, StatisticsProvider, Skippable {
 
 	private static Log log = LogFactory.getLog(JdbcCursorInputSource.class);
@@ -158,8 +156,6 @@ public class JdbcCursorInputSource implements InputSource, ResourceLifecycle, Di
 	private int currentProcessedRow = 0;
 
 	private int lastCommittedRow = 0;
-
-	private final SqlInputTransactionSynchronization transactionSynchronization = new SqlInputTransactionSynchronization();
 
 	private RowMapper mapper;
 	
@@ -242,7 +238,7 @@ public class JdbcCursorInputSource implements InputSource, ResourceLifecycle, Di
 	 * Mark the current row. Calling reset will cause the result set to be set
 	 * to the current row when mark was called.
 	 */
-	private void mark() {
+	protected void transactionCommitted() {
 		lastCommittedRow = currentProcessedRow;
 		skippedRows.clear();
 	}
@@ -252,7 +248,7 @@ public class JdbcCursorInputSource implements InputSource, ResourceLifecycle, Di
 	 *
 	 * @throws DataAccessException
 	 */
-	private void reset() {
+	protected void transactionRolledBack() {
 		try {
 			currentProcessedRow = lastCommittedRow;
 			if (currentProcessedRow > 0) {
@@ -334,8 +330,7 @@ public class JdbcCursorInputSource implements InputSource, ResourceLifecycle, Di
 					sql, se);
 		}
 
-		BatchTransactionSynchronizationManager
-				.registerSynchronization(transactionSynchronization);
+		super.registerSynchronization();
 	}
 
 	/*
@@ -554,22 +549,4 @@ public class JdbcCursorInputSource implements InputSource, ResourceLifecycle, Di
 		initialized = true;
 
 	}
-
-	private class SqlInputTransactionSynchronization extends TransactionSynchronizationAdapter {
-
-		/*
-		 * @param status transaction status
-		 *
-		 * @see org.springframework.transaction.support.TransactionSynchronization#afterCompletion(int)
-		 */
-		public void afterCompletion(int status) {
-
-			if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-				reset();
-			} else if (status == TransactionSynchronization.STATUS_COMMITTED) {
-				mark();
-			}
-		}
-	}
-
 }

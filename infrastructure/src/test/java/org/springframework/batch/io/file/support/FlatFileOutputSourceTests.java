@@ -28,6 +28,8 @@ import org.springframework.batch.io.file.support.transform.Converter;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionSynchronizationUtils;
 
 /**
  * Tests of regular usage for {@link FlatFileOutputSource} Exception cases will
@@ -41,7 +43,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 public class FlatFileOutputSourceTests extends TestCase {
 
 	// object under test
-	private FlatFileOutputSource template = new FlatFileOutputSource();
+	private FlatFileOutputSource inputSource = new FlatFileOutputSource();
 
 	// String to be written into file by the FlatFileInputTemplate
 	private static final String TEST_STRING = "FlatFileOutputTemplateTest-OutputData";
@@ -58,12 +60,17 @@ public class FlatFileOutputSourceTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		
+		if(TransactionSynchronizationManager.isSynchronizationActive()){
+			TransactionSynchronizationManager.clearSynchronization();
+		}
+		TransactionSynchronizationManager.initSynchronization();
+		
 		outputFile = File.createTempFile("flatfile-output-", ".tmp");
 
-		template.setResource(new FileSystemResource(outputFile));
-		template.afterPropertiesSet();
+		inputSource.setResource(new FileSystemResource(outputFile));
+		inputSource.afterPropertiesSet();
 
-		template.open();
+		inputSource.open();
 
 	}
 
@@ -74,7 +81,7 @@ public class FlatFileOutputSourceTests extends TestCase {
 		if( reader != null){
 			reader.close();
 		}
-		template.close();
+		inputSource.close();
 		outputFile.delete();
 	}
 	
@@ -97,8 +104,8 @@ public class FlatFileOutputSourceTests extends TestCase {
 	 * Regular usage of <code>write(String)</code> method
 	 */
 	public void testWriteString() throws IOException {
-		template.write(TEST_STRING);
-		template.close();
+		inputSource.write(TEST_STRING);
+		inputSource.close();
 		String lineFromFile = readLine();
 		
 		assertEquals(TEST_STRING, lineFromFile);
@@ -108,8 +115,8 @@ public class FlatFileOutputSourceTests extends TestCase {
 	 * Regular usage of <code>write(String)</code> method
 	 */
 	public void testWriteCollection() throws IOException {
-		template.write(Collections.singleton(TEST_STRING));
-		template.close();
+		inputSource.write(Collections.singleton(TEST_STRING));
+		inputSource.close();
 		String lineFromFile = readLine();
 		assertEquals(TEST_STRING, lineFromFile);
 	}
@@ -118,14 +125,14 @@ public class FlatFileOutputSourceTests extends TestCase {
 	 * Regular usage of <code>write(String)</code> method
 	 */
 	public void testWriteWithConverter() throws IOException {
-		template.setConverter(new Converter() {
+		inputSource.setConverter(new Converter() {
 			public Object convert(Object input) {
 				return "FOO:" + input;
 			}
 		});
 		Object data = new Object();
-		template.write(data);
-		template.close();
+		inputSource.write(data);
+		inputSource.close();
 		String lineFromFile = readLine();
 		// converter not used if input is String
 		assertEquals("FOO:" + data.toString(), lineFromFile);
@@ -135,14 +142,14 @@ public class FlatFileOutputSourceTests extends TestCase {
 	 * Regular usage of <code>write(String)</code> method
 	 */
 	public void testWriteWithConverterAndInfiniteLoop() throws IOException {
-		template.setConverter(new Converter() {
+		inputSource.setConverter(new Converter() {
 			public Object convert(Object input) {
 				return "FOO:" + input;
 			}
 		});
 		Object data = new Object();
-		template.write(data);
-		template.close();
+		inputSource.write(data);
+		inputSource.close();
 		String lineFromFile = readLine();
 		// converter not used if input is String
 		assertEquals("FOO:" + data.toString(), lineFromFile);
@@ -152,14 +159,14 @@ public class FlatFileOutputSourceTests extends TestCase {
 	 * Regular usage of <code>write(String)</code> method
 	 */
 	public void testWriteWithConverterAndInfiniteLoopInCollection() throws IOException {
-		template.setConverter(new Converter() {
+		inputSource.setConverter(new Converter() {
 			public Object convert(Object input) {
 				return "FOO:" + input;
 			}
 		});
 		Object data = new Object();
-		template.write(new Object[] {data, data});
-		template.close();
+		inputSource.write(new Object[] {data, data});
+		inputSource.close();
 		String lineFromFile = readLine();
 		assertEquals("FOO:" + data.toString(), lineFromFile);
 		lineFromFile = readLine();
@@ -170,7 +177,7 @@ public class FlatFileOutputSourceTests extends TestCase {
 	 * Regular usage of <code>write(String)</code> method
 	 */
 	public void testWriteWithConverterAndInfiniteLoopInConvertedCollection() throws IOException {
-		template.setConverter(new Converter() {
+		inputSource.setConverter(new Converter() {
 			boolean converted = false;
 			public Object convert(Object input) {
 				if (converted) {
@@ -182,13 +189,13 @@ public class FlatFileOutputSourceTests extends TestCase {
 		});
 		Object data = new Object();
 		try {
-			template.write(data);
+			inputSource.write(data);
 			fail("Expected IllegalStateException");
 		} catch (IllegalStateException e) {
 			// expected
 			assertTrue("Wrong message: "+e, e.getMessage().toLowerCase().indexOf("infinite")>=0);
 		}
-		template.close();
+		inputSource.close();
 		String lineFromFile = readLine();
 		assertNull(lineFromFile);
 	}
@@ -197,13 +204,13 @@ public class FlatFileOutputSourceTests extends TestCase {
 	 * Regular usage of <code>write(String)</code> method
 	 */
 	public void testWriteWithConverterAndString() throws IOException {
-		template.setConverter(new Converter() {
+		inputSource.setConverter(new Converter() {
 			public Object convert(Object input) {
 				return "FOO:" + input;
 			}
 		});
-		template.write(Collections.singleton(TEST_STRING));
-		template.close();
+		inputSource.write(Collections.singleton(TEST_STRING));
+		inputSource.close();
 		String lineFromFile = readLine();
 		// converter not used if input is String
 		assertEquals(TEST_STRING, lineFromFile);
@@ -213,13 +220,13 @@ public class FlatFileOutputSourceTests extends TestCase {
 	 * Regular usage of <code>write(String)</code> method
 	 */
 	public void testWriteWithConverterAndCollectionOfString() throws IOException {
-		template.setConverter(new Converter() {
+		inputSource.setConverter(new Converter() {
 			public Object convert(Object input) {
 				return "FOO:" + input;
 			}
 		});
-		template.write(TEST_STRING);
-		template.close();
+		inputSource.write(TEST_STRING);
+		inputSource.close();
 		String lineFromFile = readLine();
 		// converter not used if input is String
 		assertEquals(TEST_STRING, lineFromFile);
@@ -229,8 +236,8 @@ public class FlatFileOutputSourceTests extends TestCase {
 	 * Regular usage of <code>write(String)</code> method
 	 */
 	public void testWriteArray() throws IOException {
-		template.write(new String[] { TEST_STRING, TEST_STRING });
-		template.close();
+		inputSource.write(new String[] { TEST_STRING, TEST_STRING });
+		inputSource.close();
 		String lineFromFile = readLine();
 		assertEquals(TEST_STRING, lineFromFile);
 		lineFromFile = readLine();
@@ -244,35 +251,35 @@ public class FlatFileOutputSourceTests extends TestCase {
 		String args = "1";
 
 		// AggregatorStub ignores the LineDescriptor, so we pass null
-		template.write(args);
-		template.close();
+		inputSource.write(args);
+		inputSource.close();
 		String lineFromFile = readLine();
 		assertEquals(args, lineFromFile);
 	}
 
 	public void testRollback() throws Exception {
-		template.write("testLine1");
+		inputSource.write("testLine1");
 		// rollback
-		template.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
-		template.close();
+		rollback();
+		inputSource.close();
 		String lineFromFile = readLine();
 		assertEquals(null, lineFromFile);
 	}
 
 	public void testCommit() throws Exception {
-		template.write("testLine1");
+		inputSource.write("testLine1");
 		// rollback
-		template.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
-		template.close();
+		commit();
+		inputSource.close();
 		String lineFromFile = readLine();
 		assertEquals("testLine1", lineFromFile);
 	}
 
 	public void testUnknown() throws Exception {
-		template.write("testLine1");
+		inputSource.write("testLine1");
 		// rollback
-		template.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_UNKNOWN);
-		template.close();
+		unknown();
+		inputSource.close();
 		String lineFromFile = readLine();
 		assertEquals("testLine1", lineFromFile);
 	}
@@ -280,38 +287,38 @@ public class FlatFileOutputSourceTests extends TestCase {
 	public void testRestart() throws IOException {
 
 		// write some lines
-		template.write("testLine1");
-		template.write("testLine2");
-		template.write("testLine3");
+		inputSource.write("testLine1");
+		inputSource.write("testLine2");
+		inputSource.write("testLine3");
 
 		// commit
-		template.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
-
+		commit();
+		
 		// this will be rolled back...
-		template.write("this will be rolled back");
+		inputSource.write("this will be rolled back");
 
 		// rollback
-		template.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
-
+		rollback();
+		
 		// write more lines
-		template.write("testLine4");
-		template.write("testLine5");
+		inputSource.write("testLine4");
+		inputSource.write("testLine5");
 
 		// commit
-		template.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
-
+		commit();
+		
 		// get restart data
-		RestartData restartData = template.getRestartData();
+		RestartData restartData = inputSource.getRestartData();
 		// close template
-		template.close();
+		inputSource.close();
 
 		// init for restart
-		template.setBufferSize(0);
-		template.open();
+		inputSource.setBufferSize(0);
+		inputSource.open();
 
 		// try empty restart data...
 		try {
-			template.restoreFrom(null);
+			inputSource.restoreFrom(null);
 			assertTrue(true);
 		}
 		catch (IllegalArgumentException iae) {
@@ -319,15 +326,15 @@ public class FlatFileOutputSourceTests extends TestCase {
 		}
 
 		// init with correct data
-		template.restoreFrom(restartData);
+		inputSource.restoreFrom(restartData);
 
 		// write more lines
-		template.write("testLine6");
-		template.write("testLine7");
-		template.write("testLine8");
+		inputSource.write("testLine6");
+		inputSource.write("testLine7");
+		inputSource.write("testLine8");
 
 		// close template
-		template.close();
+		inputSource.close();
 
 		// verify what was written to the file
 		for (int i = 1; i < 9; i++) {
@@ -344,9 +351,9 @@ public class FlatFileOutputSourceTests extends TestCase {
 	}
 
 	public void testAfterPropertiesSetChecksMandatory() throws Exception {
-		template = new FlatFileOutputSource();
+		inputSource = new FlatFileOutputSource();
 		try {
-			template.afterPropertiesSet();
+			inputSource.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
@@ -355,10 +362,28 @@ public class FlatFileOutputSourceTests extends TestCase {
 	}
 
 	public void testDefaultRestartData() throws Exception {
-		template = new FlatFileOutputSource();
-		RestartData restartData = template.getRestartData();
+		inputSource = new FlatFileOutputSource();
+		RestartData restartData = inputSource.getRestartData();
 		assertNotNull(restartData);
 		// TODO: assert the properties of the default restart data
 		assertEquals(1, restartData.getProperties().size());
+	}
+	
+	private void commit() {
+		TransactionSynchronizationUtils.invokeAfterCompletion(
+				TransactionSynchronizationManager.getSynchronizations(),
+				TransactionSynchronization.STATUS_COMMITTED);
+	}
+
+	private void rollback() {
+		TransactionSynchronizationUtils.invokeAfterCompletion(
+				TransactionSynchronizationManager.getSynchronizations(),
+				TransactionSynchronization.STATUS_ROLLED_BACK);
+	}
+	
+	private void unknown() {
+		TransactionSynchronizationUtils.invokeAfterCompletion(
+				TransactionSynchronizationManager.getSynchronizations(),
+				TransactionSynchronization.STATUS_UNKNOWN);
 	}
 }

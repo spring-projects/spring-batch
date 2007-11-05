@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.io.InputSource;
+import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.RestartData;
@@ -44,10 +45,10 @@ import org.springframework.util.Assert;
  *
  *
  * @author Lucas Ward
- *
+ * @since 1.0
  */
-public class DrivingQueryInputSource implements InputSource, ResourceLifecycle, InitializingBean,
-	DisposableBean, Restartable {
+public class DrivingQueryInputSource extends AbstractTransactionalIoSource implements InputSource, 
+	ResourceLifecycle, InitializingBean, DisposableBean, Restartable {
 
 	private boolean initialized = false;
 
@@ -60,9 +61,6 @@ public class DrivingQueryInputSource implements InputSource, ResourceLifecycle, 
 	private int lastCommitIndex = 0;
 	
 	private KeyGenerator keyGenerator;
-
-	private TransactionSynchronization synchronization =
-		new DrivingQueryInputSourceTransactionSynchronization();
 
 	public DrivingQueryInputSource() {	
 		
@@ -140,7 +138,7 @@ public class DrivingQueryInputSource implements InputSource, ResourceLifecycle, 
 				", call close() first.");
 		keys = keyGenerator.retrieveKeys();
 		keysIterator = keys.listIterator();
-		BatchTransactionSynchronizationManager.registerSynchronization(synchronization);
+		super.registerSynchronization();
 		initialized = true;
 	}
 
@@ -186,19 +184,6 @@ public class DrivingQueryInputSource implements InputSource, ResourceLifecycle, 
 		return keyGenerator.getKeyAsRestartData(getCurrentKey());
 	}
 	
-	/**
-	 * Encapsulates transaction events handling.
-	 */
-	private class DrivingQueryInputSourceTransactionSynchronization extends TransactionSynchronizationAdapter {
-		public void afterCompletion(int status) {
-			if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-				keysIterator = keys.listIterator(lastCommitIndex);
-			} else if (status == TransactionSynchronization.STATUS_COMMITTED) {
-				lastCommitIndex = currentIndex;
-			}
-		}
-	}
-	
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(keyGenerator, "The KeyGenerator must not be null.");
 	}
@@ -211,6 +196,14 @@ public class DrivingQueryInputSource implements InputSource, ResourceLifecycle, 
 	public void setKeyGenerator(
 			KeyGenerator keyGenerator) {
 		this.keyGenerator = keyGenerator;
+	}
+
+	protected void transactionCommitted() {
+		lastCommitIndex = currentIndex;
+	}
+
+	protected void transactionRolledBack() {
+		keysIterator = keys.listIterator(lastCommitIndex);
 	}
 
 }
