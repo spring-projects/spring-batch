@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        		http://www.springframework.org/schema/aop
  			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 
-	<bean class="org.springframework.batch.sample.dao.JdbcTradeWriter" id="tradeDao"
-		p:jdbcTemplate-ref="jdbcTemplate">
+	<bean class="org.springframework.batch.sample.dao.JdbcTradeWriter"
+		id="tradeDao" p:jdbcTemplate-ref="jdbcTemplate">
 		<property name="incrementer">
 			<bean parent="incrementerParent">
 				<property name="incrementerName" value="TRADE_SEQ" />
@@ -16,24 +18,32 @@
 		</property>
 	</bean>
 
-	<bean class="org.springframework.batch.sample.dao.JdbcCustomerDebitWriter" id="customerDao" p:jdbcTemplate-ref="jdbcTemplate" />
+	<bean
+		class="org.springframework.batch.sample.dao.JdbcCustomerDebitWriter"
+		id="customerDao" p:jdbcTemplate-ref="jdbcTemplate" />
 
-	<bean class="org.springframework.batch.sample.dao.FlatFileCustomerCreditWriter" id="customerReportOutputSource"
-		p:outputSource-ref="customerFlatFileOutputSource" />
-
-	<bean class="org.springframework.batch.io.file.support.FlatFileOutputSource" id="customerFlatFileOutputSource"
-		scope="step" >
+	<bean
+		class="org.springframework.batch.sample.dao.FlatFileCustomerCreditWriter"
+		id="customerReportOutputSource" scope="step">
 		<aop:scoped-proxy />
-		<property name="resource" ref="customerFileLocator" />
+		<property name="outputSource">
+			<bean
+				class="org.springframework.batch.io.file.support.FlatFileOutputSource"
+				id="customerFlatFileOutputSource">
+				<property name="resource" ref="customerFileLocator" />
+			</bean>
+		</property>
 	</bean>
 
-	<bean class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource" id="fileInputTemplate"
-		scope="step">
+	<bean
+		class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
+		id="fileInputTemplate" scope="step">
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="tradeFileDescriptor" />
 		<property name="fieldSetMapper">
-			<bean class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
+			<bean
+				class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
 		</property>
 	</bean>
 
@@ -42,9 +52,11 @@
 		<property name="names" value="ISIN, Quantity, Price, Customer" />
 	</bean>
 
-	<bean id="tradeValidator" class="org.springframework.batch.item.validator.SpringValidator">
+	<bean id="tradeValidator"
+		class="org.springframework.batch.item.validator.SpringValidator">
 		<property name="validator">
-			<bean class="org.springmodules.validation.valang.ValangValidator">
+			<bean
+				class="org.springmodules.validation.valang.ValangValidator">
 				<property name="valang">
 					<value>
 						<![CDATA[
