@@ -43,7 +43,7 @@ public final class FieldSet {
 	private List names;
 
 	public FieldSet(String[] tokens) {
-		this.tokens = tokens == null ? null : (String[])tokens.clone();
+		this.tokens = tokens == null ? null : (String[]) tokens.clone();
 	}
 
 	public FieldSet(String[] tokens, String[] names) {
@@ -55,7 +55,7 @@ public final class FieldSet {
 							+ Arrays.asList(names) + ", values="
 							+ Arrays.asList(tokens));
 		}
-		this.tokens = (String[])tokens.clone();
+		this.tokens = (String[]) tokens.clone();
 		this.names = Arrays.asList(names);
 	}
 
@@ -539,7 +539,7 @@ public final class FieldSet {
 		if (value != null) {
 			return value.trim();
 		} else {
-			return value;
+			return null;
 		}
 	}
 
@@ -566,7 +566,7 @@ public final class FieldSet {
 		if (names != null) {
 			return getProperties().toString();
 		}
-		
+
 		return tokens == null ? "" : Arrays.asList(tokens).toString();
 	}
 
@@ -588,22 +588,24 @@ public final class FieldSet {
 	}
 
 	public int hashCode() {
-		//this algorithm was taken from java 1.5 jdk Arrays.hashCode(Object[])
-        if (tokens == null) {
-        	return 0;
-        }            
- 
-        int result = 1;
- 
-        for (int i = 0; i < tokens.length; i++) {
-            result = 31 * result + (tokens[i] == null ? 0 : tokens[i].hashCode());
-        }
- 
-        return result;		
+		// this algorithm was taken from java 1.5 jdk Arrays.hashCode(Object[])
+		if (tokens == null) {
+			return 0;
+		}
+
+		int result = 1;
+
+		for (int i = 0; i < tokens.length; i++) {
+			result = 31 * result
+					+ (tokens[i] == null ? 0 : tokens[i].hashCode());
+		}
+
+		return result;
 	}
 
 	/**
-	 * Construct name-value pairs from the field names and string values.
+	 * Construct name-value pairs from the field names and string values. Null
+	 * values are omitted.
 	 * 
 	 * @return some properties representing the field set.
 	 * 
@@ -617,7 +619,10 @@ public final class FieldSet {
 		}
 		Properties props = new Properties();
 		for (int i = 0; i < tokens.length; i++) {
-			props.setProperty((String) names.get(i), readAndTrim(i));
+			String value = readAndTrim(i);
+			if (value != null) {
+				props.setProperty((String) names.get(i), value);
+			}
 		}
 		return props;
 	}

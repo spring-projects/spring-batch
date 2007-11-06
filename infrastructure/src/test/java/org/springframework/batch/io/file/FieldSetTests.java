@@ -386,6 +386,13 @@ public class FieldSetTests extends TestCase {
 		assertEquals("bar", new FieldSet(new String[] { "foo", "bar   " }, new String[] { "Foo", "Bar"}).getProperties().getProperty("Bar"));
 	}
 
+	public void testPropertiesWithNullValues() throws Exception{
+
+		fieldSet = new FieldSet(new String[] { null, "bar" }, new String[] { "Foo", "Bar"});
+		assertEquals("bar", fieldSet.getProperties().getProperty("Bar"));
+		assertEquals(null, fieldSet.getProperties().getProperty("Foo"));
+	}
+
 	public void testAccessByNameWhenNamesMissing() throws Exception {
 		try {
 			new FieldSet(new String[] { "1", "2" }).readInt("a");
