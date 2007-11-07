@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
 	<bean id="dataSource" class="test.jdbc.datasource.InitializingDataSourceFactoryBean">
-		<property name="dataSource" ref="derby" />
+		<property name="dataSource" ref="hsql" />
 		<property name="initScript" value="org/springframework/batch/jms/init.sql" />
 		<property name="destroyScript" value="org/springframework/batch/jms/destroy.sql" />
 	</bean>
@@ -29,11 +29,11 @@
 			</list>
 		</property>
 		<property name="persistenceAdapter">
-			<!-- bean class="org.apache.activemq.store.memory.MemoryPersistenceAdapter"/-->
-			<bean class="org.apache.activemq.store.jdbc.JDBCPersistenceAdapter">
+			<bean class="org.apache.activemq.store.memory.MemoryPersistenceAdapter"/>
+			<!-- bean class="org.apache.activemq.store.jdbc.JDBCPersistenceAdapter">
 				<property name="dataSource" ref="dataSource"/>
 				<property name="createTablesOnStartup" value="true" />
-			</bean>
+			</bean-->
 		</property>
 	</bean>
 

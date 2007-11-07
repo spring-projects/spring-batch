@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>batch-core</name>
+	<name>core</name>
 	<comment>Simple container application for batch processing, using the
 		Spring Batch Framework to express a domain of Jobs, Steps,
 		Chunks, etc.</comment>

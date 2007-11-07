@@ -61,7 +61,6 @@
 		<dependency>
 			<groupId>aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
-			<version>1.5.3</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

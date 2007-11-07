@@ -49,7 +49,7 @@
 								<bean
 									class="org.springframework.batch.item.provider.InputSourceItemProvider">
 									<property name="inputSource"
-										ref="tradeSqlInputSOurce" />
+										ref="tradeSqlInputSource" />
 								</bean>
 							</property>
 							<property name="itemProcessor">
@@ -82,7 +82,7 @@
 		</property>
 	</bean>
 
-	<bean id="tradeSqlInputSOurce"
+	<bean id="tradeSqlInputSource"
 		class="org.springframework.batch.io.cursor.JdbcCursorInputSource"
 		scope="step">
 		<aop:scoped-proxy />
@@ -119,9 +119,5 @@
 		<constructor-arg type="java.lang.String"
 			value="target/test-outputs/20070122.testStream.CustomerReportStep.TEMP.txt" />
 	</bean>
-
-	<!-- register the step scope with the application context -->
-	<bean class="org.springframework.batch.execution.scope.StepScope" />
-
 
 </beans>
