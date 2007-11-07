@@ -10,9 +10,9 @@
 	<import resource="data-source-context.xml" />
 
 	<!-- register the step scope with the application context -->
-	<bean class="org.springframework.batch.execution.scope.StepScope" />
+	<bean id="stepScope" class="org.springframework.batch.execution.scope.StepScope" />
 
-	<bean class="org.springframework.batch.execution.launch.SimpleJobLauncher">
+	<bean id="jobLauncher" class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="simpleJobRepository" />
 		<property name="jobConfigurationLocator" ref="jobConfigurationRegistry"/>
 		<property name="jobExecutor" ref="jobExecutor" />
