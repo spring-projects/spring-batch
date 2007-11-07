@@ -75,13 +75,20 @@ public class DefaultJobExecutor implements JobExecutor {
 		ExitStatus status = ExitStatus.FAILED;
 
 		try {
-			for (Iterator i = steps.iterator(), j = configuration
-					.getStepConfigurations().iterator(); i.hasNext()
+
+			int startedCount = 0;
+
+			List stepConfigurations = configuration
+					.getStepConfigurations();
+			for (Iterator i = steps.iterator(), j = stepConfigurations.iterator(); i.hasNext()
 					&& j.hasNext();) {
+
 				StepInstance step = (StepInstance) i.next();
 				StepConfiguration stepConfiguration = (StepConfiguration) j
 						.next();
+				
 				if (shouldStart(step, stepConfiguration)) {
+					startedCount++;
 					updateStatus(execution, BatchStatus.STARTED);
 					StepExecutor stepExecutor = stepExecutorFactory
 							.getExecutor(stepConfiguration);
@@ -91,8 +98,17 @@ public class DefaultJobExecutor implements JobExecutor {
 							stepExecution);
 				}
 			}
+			
+			if (startedCount==0) {
+				if (stepConfigurations.size()>0) {
+					status = ExitStatus.FINISHED.addExitDescription("All steps already completed.  No processing was done.");
+				} else {
+					status = ExitStatus.FINISHED.addExitDescription("No steps configured for this job.");
+				}
+			}
 
 			updateStatus(execution, BatchStatus.COMPLETED);
+
 		} catch (StepInterruptedException e) {
 			updateStatus(execution, BatchStatus.STOPPED);
 			status = exceptionClassifier.classifyForExitCode(e);

@@ -167,4 +167,14 @@ public class ExitStatus implements Serializable {
 		return "RUNNING".equals(this.exitCode) || "UNKNOWN".equals(this.exitCode);
 	}
 
+	/**
+	 * Add an exit description to an existing {@link ExitStatus}.
+	 * 
+	 * @param description the description to add
+	 * @return a new {@link ExitStatus} with the same properties but a new exit description
+	 */
+	public ExitStatus addExitDescription(String description) {
+		return new ExitStatus(continuable, exitCode, description);
+	}
+
 }

@@ -62,16 +62,18 @@ public class DefaultJobExecutorTests extends TestCase {
 	private List list = new ArrayList();
 
 	StepExecutor defaultStepLifecycle = new StepExecutor() {
-		public ExitStatus process(StepConfiguration configuration, StepExecution stepExecution)
-				throws StepInterruptedException, BatchCriticalException {
+		public ExitStatus process(StepConfiguration configuration,
+				StepExecution stepExecution) throws StepInterruptedException,
+				BatchCriticalException {
 			list.add("default");
 			return ExitStatus.FINISHED;
 		}
 	};
 
 	StepExecutor configurationStepLifecycle = new StepExecutor() {
-		public ExitStatus process(StepConfiguration configuration, StepExecution stepExecution)
-				throws StepInterruptedException, BatchCriticalException {
+		public ExitStatus process(StepConfiguration configuration,
+				StepExecution stepExecution) throws StepInterruptedException,
+				BatchCriticalException {
 			list.add("special");
 			return ExitStatus.FINISHED;
 		}
@@ -150,7 +152,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		assertEquals(2, list.size());
 		checkRepository(BatchStatus.COMPLETED);
 	}
-	
+
 	public void testRunWithDefaultStepExecutor() throws Exception {
 
 		jobExecutor = new DefaultJobExecutor();
@@ -175,7 +177,6 @@ public class DefaultJobExecutorTests extends TestCase {
 		checkRepository(BatchStatus.COMPLETED, ExitStatus.FINISHED);
 	}
 
-
 	public void testExecutionContextIsSet() throws Exception {
 
 		testRunNormally();
@@ -188,7 +189,8 @@ public class DefaultJobExecutorTests extends TestCase {
 
 		jobExecutor.setStepExecutorFactory(new StepExecutorFactory() {
 			public StepExecutor getExecutor(StepConfiguration configuration) {
-				return configuration == stepConfiguration2 ? defaultStepLifecycle : configurationStepLifecycle;
+				return configuration == stepConfiguration2 ? defaultStepLifecycle
+						: configurationStepLifecycle;
 			}
 		});
 		stepConfiguration1.setStartLimit(5);
@@ -205,21 +207,23 @@ public class DefaultJobExecutorTests extends TestCase {
 	public void testInterrupted() throws Exception {
 		stepConfiguration1.setStartLimit(5);
 		stepConfiguration2.setStartLimit(5);
-		final StepInterruptedException exception = new StepInterruptedException("Interrupt!");
+		final StepInterruptedException exception = new StepInterruptedException(
+				"Interrupt!");
 		defaultStepLifecycle = new StepExecutor() {
-			public ExitStatus process(StepConfiguration configuration, StepExecution stepExecution)
+			public ExitStatus process(StepConfiguration configuration,
+					StepExecution stepExecution)
 					throws StepInterruptedException, BatchCriticalException {
 				throw exception;
 			}
 		};
 		try {
 			jobExecutor.run(jobConfiguration, jobExecution);
-		}
-		catch (BatchCriticalException e) {
+		} catch (BatchCriticalException e) {
 			assertEquals(exception, e.getCause());
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.STOPPED, new ExitStatus(false, ExitCodeExceptionClassifier.STEP_INTERRUPTED));
+		checkRepository(BatchStatus.STOPPED, new ExitStatus(false,
+				ExitCodeExceptionClassifier.STEP_INTERRUPTED));
 	}
 
 	public void testFailed() throws Exception {
@@ -227,32 +231,53 @@ public class DefaultJobExecutorTests extends TestCase {
 		stepConfiguration2.setStartLimit(5);
 		final RuntimeException exception = new RuntimeException("Foo!");
 		defaultStepLifecycle = new StepExecutor() {
-			public ExitStatus process(StepConfiguration configuration, StepExecution stepExecution)
+			public ExitStatus process(StepConfiguration configuration,
+					StepExecution stepExecution)
 					throws StepInterruptedException, BatchCriticalException {
 				throw exception;
 			}
 		};
 		try {
 			jobExecutor.run(jobConfiguration, jobExecution);
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals(exception, e);
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.FAILED, new ExitStatus(false, ExitCodeExceptionClassifier.FATAL_EXCEPTION));
+		checkRepository(BatchStatus.FAILED, new ExitStatus(false,
+				ExitCodeExceptionClassifier.FATAL_EXCEPTION));
 	}
 
 	public void testStepShouldNotStart() throws Exception {
 		// Start policy will return false, keeping the step from being started.
 		stepConfiguration1.setStartLimit(0);
 
-		try{
+		try {
 			jobExecutor.run(jobConfiguration, jobExecution);
-			fail();
+			fail("Expected BatchCriticalException");
+		} catch (BatchCriticalException ex) {
+			// expected
+			assertTrue("Wrong message in exception: " + ex.getMessage(), ex
+					.getMessage().indexOf("start limit exceeded") >= 0);
 		}
-		catch( Exception ex ){
-			//expected
-		}
+	}
+
+	public void testNoSteps() throws Exception {
+		jobConfiguration.setSteps(new ArrayList());
+
+		jobExecutor.run(jobConfiguration, jobExecution);
+		ExitStatus exitStatus = jobExecution.getExitStatus();
+		assertTrue("Wrong message in execution: " + exitStatus, exitStatus
+				.getExitDescription().indexOf("No steps configured") >= 0);
+	}
+
+	public void testNoStepsExecuted() throws Exception {
+		step1.setStatus(BatchStatus.COMPLETED);
+		step2.setStatus(BatchStatus.COMPLETED);
+
+		jobExecutor.run(jobConfiguration, jobExecution);
+		ExitStatus exitStatus = jobExecution.getExitStatus();
+		assertTrue("Wrong message in execution: " + exitStatus, exitStatus
+				.getExitDescription().indexOf("steps already completed") >= 0);
 	}
 
 	/*
@@ -262,15 +287,17 @@ public class DefaultJobExecutorTests extends TestCase {
 		assertEquals(job, jobDao.findJobs(jobIdentifer).get(0));
 		// because map dao stores in memory, it can be checked directly
 		assertEquals(status, job.getStatus());
-		JobExecution jobExecution = (JobExecution) jobDao.findJobExecutions(job).get(0);
+		JobExecution jobExecution = (JobExecution) jobDao
+				.findJobExecutions(job).get(0);
 		assertEquals(job.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());
-		if(exitStatus != null){
-			assertEquals(jobExecution.getExitStatus().getExitCode(), exitStatus.getExitCode()); 
+		if (exitStatus != null) {
+			assertEquals(jobExecution.getExitStatus().getExitCode(), exitStatus
+					.getExitCode());
 		}
 	}
-	
-	private void checkRepository(BatchStatus status){
+
+	private void checkRepository(BatchStatus status) {
 		checkRepository(status, null);
 	}
 }
