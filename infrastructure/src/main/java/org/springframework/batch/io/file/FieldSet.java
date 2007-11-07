@@ -58,6 +58,21 @@ public final class FieldSet {
 		this.tokens = (String[]) tokens.clone();
 		this.names = Arrays.asList(names);
 	}
+	
+	/**
+	 * Public accessor for the names property.
+	 *
+	 * @return the names
+	 * 
+	 * @throws IllegalStateException if the names are not defined
+	 */
+	public String[] getNames() {
+		if (names == null) {
+			throw new IllegalStateException(
+					"Field names are not known");
+		}
+		return (String[]) names.toArray();
+	}
 
 	/**
 	 * Read the {@link String} value at index '<code>index</code>'.

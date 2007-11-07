@@ -39,8 +39,22 @@ public class FieldSetTests extends TestCase {
 				"BigDecimal", "Null", "Date", "DatePattern", "BlankInput" };
 
 		fieldSet = new FieldSet(tokens, names);
-		assertTrue(fieldSet.getFieldCount() == 14);
+		assertEquals(14, fieldSet.getFieldCount());
 
+	}
+	
+	public void testNames() throws Exception {
+		assertEquals(fieldSet.getFieldCount(), fieldSet.getNames().length);
+	}
+
+	public void testNamesNotKnown() throws Exception {
+		fieldSet = new FieldSet(new String[]{"foo"});
+		try {
+			fieldSet.getNames();
+			fail("Expected IllegalStateException");
+		} catch (IllegalStateException e) {
+			// expected
+		}
 	}
 
 	public void testReadString() throws ParseException {
@@ -313,6 +327,10 @@ public class FieldSetTests extends TestCase {
 		FieldSet fs1 = new FieldSet(tokens1);
 		FieldSet fs2 = new FieldSet(tokens2);
 		assertEquals(fs1, fs2);
+	}
+
+	public void testNullField() {
+		assertEquals(null, fieldSet.readString(10));
 	}
 
 	public void testEqualsNull() {
