@@ -75,16 +75,10 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 		List list = this.getHibernateTemplate().executeFind(
 				new HibernateCallback() {
 					public Object doInHibernate(Session session) {
-						String type = "JobInstance";
-						
-						if (jobRuntimeInformation instanceof ScheduledJobIdentifier) {
-							type = "ScheduledJobInstance";
-						}
-						
-						Criteria criteria = session.createCriteria(type);
-						
+						Criteria criteria = session
+								.createCriteria(JobInstance.class);
 						criteria.add(Expression.eq("identifier",
-								(ScheduledJobIdentifier)jobRuntimeInformation));
+								jobRuntimeInformation));
 						return criteria.list();
 					}
 				});
@@ -152,7 +146,8 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 							+ "before it can be updated.");
 		}
 
-		if (!exists(jobExecution)) {
+		if (getHibernateTemplate()
+				.get(JobExecution.class, jobExecution.getId()) == null) {
 			throw new NoSuchBatchDomainObjectException(
 					"Invalid JobExecution, ID " + jobExecution.getId()
 							+ " not found.");
@@ -161,16 +156,6 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 		getHibernateTemplate().update(jobExecution);
 	}
 
-	private boolean exists(final JobExecution jobExecution) {
-		JobExecution execution = (JobExecution) getHibernateTemplate().get(JobExecution.class, jobExecution.getId());
-		
-		if (execution != null) {
-			getHibernateTemplate().evict(execution);
-		} 
-		
-		return (execution != null);
-	}
-	
 	public List findJobExecutions(JobInstance job) {
 
 		Assert.notNull(job, "Job cannot be null.");
