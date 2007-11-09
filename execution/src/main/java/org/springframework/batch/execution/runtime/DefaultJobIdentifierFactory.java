@@ -16,32 +16,29 @@
 
 package org.springframework.batch.execution.runtime;
 
-import java.util.Date;
-
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.runtime.JobIdentifierFactory;
 
 /**
- * {@link JobIdentifierFactory} for creating {@link ScheduledJobIdentifier}
+ * {@link JobIdentifierFactory} for creating {@link DefaultJobIdentifierFactory}
  * instances.
  * 
  * @author Dave Syer
  * 
  */
-public class ScheduledJobIdentifierFactory extends DefaultJobIdentifierFactory implements JobIdentifierFactory {
+public class DefaultJobIdentifierFactory implements JobIdentifierFactory {
 
-	private Date scheduleDate = new Date();
+	protected String key = "key";
 
 	public JobIdentifier getJobIdentifier(String name) {
 
-		ScheduledJobIdentifier identifier = new ScheduledJobIdentifier(name);
-		identifier.setJobKey(key);
-		identifier.setScheduleDate(scheduleDate);
-		return identifier;
+		DefaultJobIdentifier runtimeInformation = new DefaultJobIdentifier(name);
+		runtimeInformation.setJobKey(key);
+		return runtimeInformation;
 	}
 
-	public void setScheduleDate(Date scheduleDate) {
-		this.scheduleDate = scheduleDate;
+	public void setJobKey(String key) {
+		this.key = key;
 	}
 
 }

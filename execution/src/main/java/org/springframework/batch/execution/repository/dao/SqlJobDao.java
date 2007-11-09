@@ -37,13 +37,12 @@ import org.springframework.util.StringUtils;
 
 /**
  * SQL implementation of {@link JobDao}. Uses sequences (via Spring's
- * 
- * @link DataFieldMaxValueIncrementer abstraction) to create all primary keys
- *       before inserting a new row. Objects are checked to ensure all mandatory
- *       fields to be stored are not null. If any are found to be null, an
- *       IllegalArgumentException will be thrown. This could be left to
- *       JdbcTemplate, however, the exception will be fairly vague, and fails to
- *       highlight which field caused the exception.
+ * {@link DataFieldMaxValueIncrementer} abstraction) to create all primary keys
+ * before inserting a new row. Objects are checked to ensure all mandatory
+ * fields to be stored are not null. If any are found to be null, an
+ * IllegalArgumentException will be thrown. This could be left to JdbcTemplate,
+ * however, the exception will be fairly vague, and fails to highlight which
+ * field caused the exception.
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -58,11 +57,11 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	private String tablePrefix = DEFAULT_TABLE_PREFIX;
 
 	// Job SQL statements
-	private static final String CREATE_JOB = "INSERT into %PREFIX%JOB(ID, JOB_NAME, JOB_STREAM, SCHEDULE_DATE, JOB_RUN)"
-			+ " values (?, ?, ?, ?, ?)";
+	private static final String CREATE_JOB = "INSERT into %PREFIX%JOB(ID, JOB_NAME, JOB_KEY, SCHEDULE_DATE)"
+			+ " values (?, ?, ?, ?)";
 
 	private static final String FIND_JOBS = "SELECT ID, STATUS from %PREFIX%JOB where JOB_NAME = ? and "
-			+ "JOB_STREAM = ? and SCHEDULE_DATE = ? and JOB_RUN = ?";
+			+ "JOB_KEY = ? and SCHEDULE_DATE = ?";
 
 	private static final String UPDATE_JOB = "UPDATE %PREFIX%JOB set STATUS = ? where ID = ?";
 
@@ -99,12 +98,12 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	/**
 	 * In this sql implementation a job id is obtained by asking the
 	 * jobIncrementer (which is likely a sequence) for the nextLong, and then
-	 * passing the Id and identifier values (job name, stream, run, schedule
-	 * date) into an INSERT statement.
+	 * passing the Id and identifier values (job name, jobKey, schedule date)
+	 * into an INSERT statement.
 	 * 
 	 * @see JobDao#createJob(JobIdentifier)
 	 * @throws IllegalArgumentException
-	 *             if any JobRuntimeInformation fields are null.
+	 *             if any {@link JobIdentifier} fields are null.
 	 */
 	public JobInstance createJob(JobIdentifier jobIdentifier) {
 
@@ -114,8 +113,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 		Long jobId = new Long(jobIncrementer.nextLongValue());
 		Object[] parameters = new Object[] { jobId, defaultJobId.getName(),
-				defaultJobId.getJobStream(), defaultJobId.getScheduleDate(),
-				new Long(defaultJobId.getJobRun()) };
+				defaultJobId.getJobKey(), defaultJobId.getScheduleDate() };
 		jdbcTemplate.update(getCreateJobQuery(), parameters);
 
 		JobInstance job = new JobInstance(jobIdentifier, jobId);
@@ -128,7 +126,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	 * 
 	 * @see JobDao#findJobs(JobIdentifier)
 	 * @throws IllegalArgumentException
-	 *             if any JobRuntimeInformation fields are null.
+	 *             if any {@link JobIdentifier} fields are null.
 	 */
 	public List findJobs(final JobIdentifier jobIdentifier) {
 
@@ -137,8 +135,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		ScheduledJobIdentifier defaultJobId = getScheduledJobIdentifier(jobIdentifier);
 
 		Object[] parameters = new Object[] { defaultJobId.getName(),
-				defaultJobId.getJobStream(), defaultJobId.getScheduleDate(),
-				new Integer(defaultJobId.getJobRun()) };
+				defaultJobId.getJobKey(), defaultJobId.getScheduleDate() };
 
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -232,10 +229,11 @@ public class SqlJobDao implements JobDao, InitializingBean {
 							+ " not found.");
 		}
 
-		jdbcTemplate.update(getUpdateJobExecutionQuery(), parameters,
-				new int[] { Types.TIMESTAMP,
-						Types.TIMESTAMP, Types.VARCHAR, Types.CHAR,
-						Types.VARCHAR, Types.VARCHAR, Types.INTEGER });
+		jdbcTemplate
+				.update(getUpdateJobExecutionQuery(), parameters,
+						new int[] { Types.TIMESTAMP, Types.TIMESTAMP,
+								Types.VARCHAR, Types.CHAR, Types.VARCHAR,
+								Types.VARCHAR, Types.INTEGER });
 	}
 
 	/**
@@ -340,24 +338,24 @@ public class SqlJobDao implements JobDao, InitializingBean {
 				"JobExecution status cannot be null.");
 	}
 
-	/*
-	 * Validate JobRuntimeInformation. Due to differing requirements, it is
+	/**
+	 * Validate {@link JobIdentifier}. Due to differing requirements, it is
 	 * acceptable for any field to be blank, however null fields may cause odd
 	 * and vague exception reports from the database driver.
 	 */
 	private void validateJobIdentifier(JobIdentifier jobIdentifier) {
 
-		Assert.notNull(jobIdentifier, "JobRuntimeInformation cannot be null.");
+		Assert.notNull(jobIdentifier, "JobIdentifier cannot be null.");
 		Assert.notNull(jobIdentifier.getName(),
-				"JobRuntimeInformation name cannot be null.");
+				"JobIdentifier name cannot be null.");
 
 		if (jobIdentifier instanceof ScheduledJobIdentifier) {
-			ScheduledJobIdentifier jobRuntimeInformation = (ScheduledJobIdentifier) jobIdentifier;
+			ScheduledJobIdentifier identifier = (ScheduledJobIdentifier) jobIdentifier;
 
-			Assert.notNull(jobRuntimeInformation.getJobStream(),
-					"JobRuntimeInformation JobStream cannot be null.");
-			Assert.notNull(jobRuntimeInformation.getScheduleDate(),
-					"JobRuntimeInformation ScheduleDate cannot be null.");
+			Assert.notNull(identifier.getJobKey(),
+					"JobIdentifier JobKey cannot be null.");
+			Assert.notNull(identifier.getScheduleDate(),
+					"JobIdentifier ScheduleDate cannot be null.");
 		}
 	}
 

@@ -65,8 +65,7 @@ public abstract class AbstractJobDaoTests extends
 	protected void onSetUpInTransaction() throws Exception {
 		jobRuntimeInformation = new ScheduledJobIdentifier("Job1");
 		jobRuntimeInformation.setName("Job1");
-		jobRuntimeInformation.setJobStream("TestStream");
-		jobRuntimeInformation.setJobRun(1);
+		jobRuntimeInformation.setJobKey("TestStream");
 		jobRuntimeInformation.setScheduleDate(new SimpleDateFormat("yyyyMMdd")
 				.parse("20070505"));
 

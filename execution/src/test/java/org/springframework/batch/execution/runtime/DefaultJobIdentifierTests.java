@@ -15,24 +15,21 @@
  */
 package org.springframework.batch.execution.runtime;
 
-import java.sql.Date;
-import java.sql.Timestamp;
-
 import junit.framework.TestCase;
 
 /**
  * @author Dave Syer
  *
  */
-public class ScheduledJobIdentifierTests extends TestCase {
+public class DefaultJobIdentifierTests extends TestCase {
 
-	private ScheduledJobIdentifier instance = new ScheduledJobIdentifier(null);
+	private DefaultJobIdentifier instance = new DefaultJobIdentifier(null);
 
 	/**
 	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getName()}.
 	 */
 	public void testDefaultConstructor() {
-		instance = new ScheduledJobIdentifier();
+		instance = new DefaultJobIdentifier();
 		assertEquals(null, instance.getName());
 		instance.setName("foo");
 		assertEquals("foo", instance.getName());
@@ -56,31 +53,21 @@ public class ScheduledJobIdentifierTests extends TestCase {
 		assertEquals("foo", instance.getJobKey());
 	}
 
-	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getScheduleDate()}.
-	 */
-	public void testGetScheduleDate() {
-		assertNotNull(instance.getScheduleDate());
-		instance.setScheduleDate(new Date(100L));
-		assertEquals(100L, instance.getScheduleDate().getTime());
-	}
 	
 	public void testEqualsSelf() throws Exception {
 		assertEquals(instance, instance);
 	}
 
 	public void testEqualsInstanceWithSameProperties() throws Exception {
-		ScheduledJobIdentifier other = new ScheduledJobIdentifier(instance.getName());
+		DefaultJobIdentifier other = new DefaultJobIdentifier(instance.getName());
 		other.setJobKey(instance.getJobKey());
-		other.setScheduleDate(instance.getScheduleDate());
 		assertEquals(instance, other);
 		assertEquals(instance.hashCode(), other.hashCode());
 	}
 
 	public void testEqualsInstanceWithTimestamp() throws Exception {
-		ScheduledJobIdentifier other = new ScheduledJobIdentifier(instance.getName());
+		DefaultJobIdentifier other = new DefaultJobIdentifier(instance.getName());
 		other.setJobKey(instance.getJobKey());
-		other.setScheduleDate(new Timestamp(instance.getScheduleDate().getTime()));
 		assertEquals(instance, other);
 		assertEquals(other, instance);
 		assertEquals(instance.hashCode(), other.hashCode());
@@ -92,6 +79,5 @@ public class ScheduledJobIdentifierTests extends TestCase {
 	
 	public void testToString() throws Exception {
 		assertTrue("String does not contain key: "+instance, instance.toString().indexOf("key=")>=0);
-		assertTrue("String does not contain date: "+instance, instance.toString().indexOf("scheduleDate=")>=0);
 	}
 }

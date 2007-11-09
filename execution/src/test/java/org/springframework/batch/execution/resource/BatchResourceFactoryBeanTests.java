@@ -69,8 +69,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		// define mock behaviour
 		identifier.setScheduleDate(new SimpleDateFormat("yyyyMMdd")
 		.parse("20070730"));
-		identifier.setJobStream("testStream");
-		identifier.setJobRun(11);
+		identifier.setJobKey("testStream");
 		
 		SimpleStepContext context = new SimpleStepContext();
 		JobInstance job = new JobInstance(identifier);
@@ -97,7 +96,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	 * regular use with valid context and pattern provided
 	 */
 	public void testCreateFileName() throws Exception {
-		doTestPathName("testJob-testStream-11-20070730-bar.txt", path);
+		doTestPathName("testJob-testStream-20070730-bar.txt", path);
 	}
 
 	/**
@@ -130,7 +129,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	public void testNonStandardFilePattern() throws Exception {
 		resourceFactory.setFilePattern("/%BATCH_ROOT%/data/%JOB_NAME%/"
 				+ "%STEP_NAME%+%JOB_IDENTIFIER%");
-		doTestPathName("bar+testJob-testStream-11-20070730", path);
+		doTestPathName("bar+testJob-testStream-20070730", path);
 	}
 
 	public void testResoureLoaderAware() throws Exception {
@@ -150,14 +149,14 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		String rootDir = getRootDir();
 		rootDir = StringUtils.replace(rootDir, File.separator, "/") + "/";
 		resourceFactory.setRootDirectory(rootDir);
-		doTestPathName("testJob-testStream-11-20070730-bar.txt", path);
+		doTestPathName("testJob-testStream-20070730-bar.txt", path);
 	}
 
 	public void testRootDirectoryEndsWithBackSlash() throws Exception {
 		String rootDir = getRootDir();
 		rootDir = "/"+StringUtils.replace(rootDir, File.separator, "\\") + "\\";
 		resourceFactory.setRootDirectory(rootDir);
-		doTestPathName("testJob-testStream-11-20070730-bar.txt", path);
+		doTestPathName("testJob-testStream-20070730-bar.txt", path);
 	}
 
 	private void doTestPathName(String filename, String path) throws Exception, IOException {

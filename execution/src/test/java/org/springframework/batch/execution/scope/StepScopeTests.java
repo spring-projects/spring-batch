@@ -20,12 +20,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.execution.scope.StepScope;
-import org.springframework.batch.execution.scope.SimpleStepContext;
-import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.context.support.StaticApplicationContext;
 
 /**
  * @author Dave Syer
@@ -187,6 +185,21 @@ public class StepScopeTests extends TestCase {
 		context.setAttribute("foo", "bar");
 		scope.remove("foo");
 		assertFalse(context.hasAttribute("foo"));
+	}
+	
+	public void testOrder() throws Exception {
+		assertEquals(Integer.MAX_VALUE, scope.getOrder());
+		scope.setOrder(11);
+		assertEquals(11, scope.getOrder());
+	}
+	
+	public void testName() throws Exception {
+		scope.setName("foo");
+		StaticApplicationContext beanFactory = new StaticApplicationContext();
+		scope.postProcessBeanFactory(beanFactory.getDefaultListableBeanFactory());
+		String[] scopes = beanFactory.getDefaultListableBeanFactory().getRegisteredScopeNames();
+		assertEquals(1, scopes.length);
+		assertEquals("foo", scopes[0]);
 	}
 
 }

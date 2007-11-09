@@ -2,11 +2,12 @@ package org.springframework.batch.execution.repository.dao;
 
 import java.util.Collections;
 
+import junit.framework.TestCase;
+
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
+import org.springframework.batch.execution.runtime.DefaultJobIdentifier;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
-
-import junit.framework.TestCase;
 
 public class EntityNameInterceptorTests extends TestCase {
 
@@ -15,6 +16,11 @@ public class EntityNameInterceptorTests extends TestCase {
 	public void testGetEntityNameForScheduledJobIdentifier() {
 		JobInstance job = new JobInstance(new ScheduledJobIdentifier("foo"));
 		assertEquals("ScheduledJobInstance", interceptor.getEntityName(job));
+	}
+
+	public void testGetEntityNameForDefaultJobIdentifier() {
+		JobInstance job = new JobInstance(new DefaultJobIdentifier("foo"));
+		assertEquals("DefaultJobInstance", interceptor.getEntityName(job));
 	}
 
 	public void testGetEntityNameForSimpleJobIdentifier() {

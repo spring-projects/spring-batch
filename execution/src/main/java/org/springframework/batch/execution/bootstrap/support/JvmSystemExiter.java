@@ -15,20 +15,22 @@
  */
 package org.springframework.batch.execution.bootstrap.support;
 
-
 /**
- * Implementation of the {@link SystemExiter} interface
- * that calls the standards System.exit method.  It should
- * be noted that there will be no unit tests for this class,
- * since there is only one line of actual code, that would only
- * be testable by mocking System or Runtime.
+ * Implementation of the {@link SystemExiter} interface that calls the standards
+ * System.exit method. It should be noted that there will be no unit tests for
+ * this class, since there is only one line of actual code, that would only be
+ * testable by mocking System or Runtime.
  * 
  * @author Lucas Ward
- *
+ * @author Dave Syer
+ * 
  */
 public class JvmSystemExiter implements SystemExiter {
 
-	/* (non-Javadoc)
+	/**
+	 * Delegate call to System.exit() with the argument provided. Do not use
+	 * this at home children!
+	 * 
 	 * @see org.springframework.batch.execution.bootstrap.SystemExiter#exit(int)
 	 */
 	public void exit(int status) {

@@ -28,11 +28,20 @@
 			<component name="identifier" access="field"
 				class="org.springframework.batch.execution.runtime.ScheduledJobIdentifier">
 				<property name="name" update="false" column="JOB_NAME" />
-				<property name="jobStream" update="false"
-					column="JOB_STREAM" />
+				<property name="jobKey" update="false"
+					column="JOB_KEY" />
 				<property name="scheduleDate" update="false"
 					column="SCHEDULE_DATE" />
-				<property name="jobRun" update="false" column="JOB_RUN" />
+			</component>
+		</subclass>
+
+		<subclass entity-name="DefaultJobInstance" name="JobInstance"
+			discriminator-value="Default">
+			<component name="identifier" access="field"
+				class="org.springframework.batch.execution.runtime.ScheduledJobIdentifier">
+				<property name="name" update="false" column="JOB_NAME" />
+				<property name="jobKey" update="false"
+					column="JOB_KEY" />
 			</component>
 		</subclass>
 

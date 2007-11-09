@@ -24,18 +24,13 @@ import java.util.Date;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.batch.core.domain.JobIdentifier;
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 
-public class ScheduledJobIdentifier extends SimpleJobIdentifier implements JobIdentifier {
+public class ScheduledJobIdentifier extends DefaultJobIdentifier implements JobIdentifier {
 
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
 	private Date scheduleDate;
 	
-	private int jobRun = 0;
-
-	private String jobStream = "";
-
 	ScheduledJobIdentifier() {
 		this(null);
 	}
@@ -49,22 +44,6 @@ public class ScheduledJobIdentifier extends SimpleJobIdentifier implements JobId
 		}
 	}
 
-	public int getJobRun() {
-		return jobRun;
-	}
-
-	public void setJobRun(int jobRun) {
-		this.jobRun = jobRun;
-	}
-
-	public String getJobStream() {
-		return jobStream;
-	}
-
-	public void setJobStream(String jobStream) {
-		this.jobStream = jobStream;
-	}
-
 	public Date getScheduleDate() {
 		return scheduleDate;
 	}
@@ -74,7 +53,7 @@ public class ScheduledJobIdentifier extends SimpleJobIdentifier implements JobId
 	}
 	
 	public String toString() {
-		return super.toString() + ",stream=" + jobStream + ",run=" + jobRun + ",scheduleDate="
+		return super.toString() + ",scheduleDate="
 				+ scheduleDate;
 	}
 

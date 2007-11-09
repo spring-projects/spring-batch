@@ -1,12 +1,16 @@
 package org.springframework.batch.execution.repository.dao;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.hibernate.EmptyInterceptor;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.execution.runtime.DefaultJobIdentifier;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.util.ClassUtils;
 
@@ -25,11 +29,15 @@ import org.springframework.util.ClassUtils;
 public class EntityNameInterceptor extends EmptyInterceptor {
 
 	private static final String SIMPLE_JOB_INSTANCE = "SimpleJobInstance";
-	private Map identifierTypes = new HashMap();
+	private Map identifierTypes;
+	private Set entrySet;
 
-	{
-		identifierTypes.put(ScheduledJobIdentifier.class,
+	public EntityNameInterceptor() {
+		Map types = new HashMap();
+		types.put(ScheduledJobIdentifier.class,
 				"ScheduledJobInstance");
+		types.put(DefaultJobIdentifier.class, "DefaultJobInstance");
+		setIdentifierTypes(types);
 	};
 
 	/**
@@ -45,6 +53,7 @@ public class EntityNameInterceptor extends EmptyInterceptor {
 	 *            the identifierTypes to set
 	 */
 	public void setIdentifierTypes(Map types) {
+
 		this.identifierTypes = new HashMap();
 		for (Iterator iterator = types.entrySet().iterator(); iterator
 				.hasNext();) {
@@ -63,6 +72,10 @@ public class EntityNameInterceptor extends EmptyInterceptor {
 				}
 			}
 		}
+
+		this.entrySet = new TreeSet(new ClassComparator());
+		entrySet.addAll(identifierTypes.keySet());
+
 	}
 
 	/**
@@ -75,16 +88,38 @@ public class EntityNameInterceptor extends EmptyInterceptor {
 	public String getEntityName(Object object) {
 		if (object instanceof JobInstance) {
 			JobInstance instance = (JobInstance) object;
-			for (Iterator iterator = identifierTypes.entrySet().iterator(); iterator
-					.hasNext();) {
-				Map.Entry entry = (Map.Entry) iterator.next();
-				Class key = (Class) entry.getKey();
+
+			for (Iterator iterator = entrySet.iterator(); iterator.hasNext();) {
+				Class key = (Class) iterator.next();
 				if (key.isAssignableFrom(instance.getIdentifier().getClass())) {
-					return (String) entry.getValue();
+					return (String) identifierTypes.get(key);
 				}
 			}
 			return SIMPLE_JOB_INSTANCE;
 		}
 		return super.getEntityName(object);
 	}
+
+	/**
+	 * Comparator for classes to order by inheritance.
+	 * 
+	 * @author Dave Syer
+	 * 
+	 */
+	private class ClassComparator implements Comparator {
+		/**
+		 * @return 1 if arg0 is assignable from arg1
+		 * @return -1 otherwise
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		public int compare(Object arg0, Object arg1) {
+			Class cls0 = (Class) arg0;
+			Class cls1 = (Class) arg1;
+			if (cls0.isAssignableFrom(cls1)) {
+				return 1;
+			}
+			return -1;
+		}
+	}
+
 }

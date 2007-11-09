@@ -51,8 +51,7 @@ public class DefaultJobIdentifierLabelGenerator implements
 		}
 		if (jobIdentifier instanceof ScheduledJobIdentifier) {
 			ScheduledJobIdentifier id = (ScheduledJobIdentifier) jobIdentifier;
-			return jobIdentifier.getName() + "-" + id.getJobStream() + "-"
-					+ id.getJobRun() + "-"
+			return jobIdentifier.getName() + "-" + id.getJobKey() + "-"
 					+ dateFormat.format(id.getScheduleDate());
 		}
 		return jobIdentifier.getName();

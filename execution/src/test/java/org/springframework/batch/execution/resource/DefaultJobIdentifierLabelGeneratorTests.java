@@ -30,7 +30,7 @@ public class DefaultJobIdentifierLabelGeneratorTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.execution.resource.DefaultJobIdentifierLabelGenerator#getLabel()}.
 	 */
 	public void testDefaultGetLabel() throws Exception {
-		assertEquals("null--0-19700101", instance.getLabel(new ScheduledJobIdentifier(null)));
+		assertEquals("null--19700101", instance.getLabel(new ScheduledJobIdentifier(null)));
 	}
 
 	/**
@@ -39,10 +39,9 @@ public class DefaultJobIdentifierLabelGeneratorTests extends TestCase {
 	public void testGetLabelWithAllProperties() throws Exception {
 		ScheduledJobIdentifier identifier = new ScheduledJobIdentifier(null);
 		identifier.setName("foo");
-		identifier.setJobStream("bar");
-		identifier.setJobRun(11);
+		identifier.setJobKey("bar");
 		identifier.setScheduleDate(new SimpleDateFormat("yyyyMMdd").parse("20070730"));
-		assertEquals("foo-bar-11-20070730", instance.getLabel(identifier));
+		assertEquals("foo-bar-20070730", instance.getLabel(identifier));
 	}
 
 }

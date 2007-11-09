@@ -94,8 +94,7 @@ public class HibernateJobDaoTests extends AbstractJobDaoTests {
 	public void testNullScheduleDate(){
 
 		ScheduledJobIdentifier scheduledIdentifier = new ScheduledJobIdentifier("ScheduledJob");
-		scheduledIdentifier.setJobRun(0);
-		scheduledIdentifier.setJobStream(null);
+		scheduledIdentifier.setJobKey(null);
 
 		try{
 			jobDao.createJob(scheduledIdentifier);

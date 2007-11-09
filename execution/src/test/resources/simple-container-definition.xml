@@ -79,9 +79,8 @@
 
 	<bean id="jobRuntimeInformationFactory"
 		class="org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory">
-		<property name="jobStream" value="TestStream" />
+		<property name="jobKey" value="TestStream" />
 		<property name="scheduleDate" value="20070505" />
-		<property name="jobRun" value="1" />
 	</bean>
 
 	<bean
