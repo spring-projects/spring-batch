@@ -10,12 +10,10 @@
 	<import resource="multilineOrderOutputDescriptors.xml" />
 	<import resource="multilineOrderIo.xml" />
 
-	<bean
-		class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
-		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry" />
-	</bean>
+	<bean parent="stepScope"/>
+	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
 
-	<bean id="jobConfiguration" parent="simpleJob">
+	<bean id="multilineOrderJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
 				<property name="tasklet">

@@ -9,13 +9,9 @@
  			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 	<import resource="tradeJobIo.xml" />
-	<!--import resource="tradeJobAop.xml" /-->
 
-	<bean
-		class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
-		<property name="jobConfigurationRegistry"
-			ref="jobConfigurationRegistry" />
-	</bean>
+	<bean parent="stepScope"/>
+	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
 
 	<bean id="tradeJob" parent="simpleJob">
 		<property name="steps">

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
-	<configExtensions>
-		<configExtension>xml</configExtension>
-	</configExtensions>
+	<version>1</version>
+	<pluginVersion><![CDATA[2.0.2.v200710312100]]></pluginVersion>
+	<configSuffixes>
+		<configSuffix><![CDATA[xml]]></configSuffix>
+	</configSuffixes>
 	<configs>
 		<config>src/main/resources/jobs/fixedLengthImportJob.xml</config>
 		<config>src/main/resources/jobs/multilineJob.xml</config>
@@ -25,7 +27,7 @@
 		<config>src/main/resources/jobs/compositeProcessorSampleJob.xml</config>
 		<config>src/main/resources/jobs/nflJob.xml</config>
 		<config>src/main/resources/jobs/simpleTaskletJob.xml</config>
-		<config>src/main/resources/beanRefContext.xml</config>	
+		<config>src/main/resources/beanRefContext.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -149,6 +151,16 @@
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/simple-container-definition.xml</config>
 				<config>src/main/resources/jobs/nflJob.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[simpleTasklet]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/simpleTaskletJob.xml</config>
+				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 	</configSets>

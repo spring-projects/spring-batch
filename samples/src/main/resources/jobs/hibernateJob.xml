@@ -11,9 +11,8 @@
 	Example for Hibernate integration.
 </description>
 
-	<bean class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
-		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
-	</bean>
+	<bean parent="stepScope"/>
+	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
 
 	<bean id="jobConfiguration" parent="simpleJob">
 		<property name="steps">

@@ -7,24 +7,21 @@
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-	<bean
-		class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
-		<property name="jobConfigurationRegistry"
-			ref="jobConfigurationRegistry" />
-	</bean>
+	<bean parent="stepScope"/>
+	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
 
-	<bean id="simpleTrade" parent="simpleJob">
+	<bean id="simpleTaskletJob" parent="simpleJob">
 		<property name="steps">
 			<list>
 				<bean id="step1" parent="simpleStep">
-					<constructor-arg>
+					<property name="tasklet">
 						<bean id="tradeTasklet"
 							class="org.springframework.batch.sample.tasklet.SimpleTradeTasklet">
 							<property name="inputSource"
 								ref="fileInputSource" />
 							<property name="tradeDao" ref="tradeDao" />
 						</bean>
-					</constructor-arg>
+					</property>
 					<property name="commitInterval" value="2" />
 				</bean>
 			</list>

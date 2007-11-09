@@ -9,14 +9,13 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-	<bean class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
-		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
-	</bean>
+	<bean parent="stepScope"/>
+	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
 
 	<bean id="xmlStaxJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
-				<constructor-arg>
+				<property name="tasklet">
 					<bean
 						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 						<property name="itemProvider">
@@ -45,7 +44,7 @@
 									p:outputSource-ref="tradeStaxWriter" />
 						</property>
 					</bean>
-				</constructor-arg>
+				</property>
 			</bean>
 		</property>
 	</bean>

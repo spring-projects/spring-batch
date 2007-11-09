@@ -13,52 +13,57 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.batch.sample;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.execution.launch.JobLauncher;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
- * @author Dave Syer
+ * Abstract unit test for running functional tests by getting context locations for
+ * both the container and configuration separately and having them auto wired in 
+ * by type.  This allows the two to be completely separated, and remove any
+ * 'configuration coupling' between the two.  However, it is still purely
+ * theoretical until a decision is made as to how job configuration and container 
+ * configuration files are pulled together.
+ * 
+ * @author Lucas Ward
  *
  */
 public abstract class AbstractBatchLauncherTests extends AbstractDependencyInjectionSpringContextTests {
 
-	protected JobLauncher launcher;
-	private JobConfiguration jobConfiguration;
+	private static final String CONTAINER_DEFINITION_LOCATION = "simple-container-definition.xml";
 	
+	JobLauncher launcher;
+	JobConfiguration jobConfiguration; 
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.test.AbstractSingleSpringContextTests#createApplicationContext(java.lang.String[])
+	 */
 	protected ConfigurableApplicationContext createApplicationContext(
 			String[] locations) {
-		String[] allLocations = new String[locations.length+1];
-		System.arraycopy(locations, 0, allLocations, 1, locations.length);
-		allLocations[0] = "simple-container-definition.xml";
-		return super.createApplicationContext(allLocations);
+		ApplicationContext parent = new ClassPathXmlApplicationContext(CONTAINER_DEFINITION_LOCATION);
+		return new ClassPathXmlApplicationContext(locations, parent);
 	}
-
-	/**
-	 * Subclasses can provide name of job to run. We guess it by looking at the
-	 * unique job configuration name.
-	 */
-	protected String getJobName() {
-		return jobConfiguration.getName();
+	
+	public void setLauncher(JobLauncher bootstrap){
+		this.launcher = bootstrap;
 	}
-
+	
 	/**
+	 * Public setter for the {@link JobConfiguration} property.
+	 *
 	 * @param jobConfiguration the jobConfiguration to set
 	 */
 	public void setJobConfiguration(JobConfiguration jobConfiguration) {
 		this.jobConfiguration = jobConfiguration;
 	}
-
-	/**
-	 * Public setter for the {@link JobLauncher} property.
-	 *
-	 * @param launcher the launcher to set
-	 */
-	public void setLauncher(JobLauncher launcher) {
-		this.launcher = launcher;
+	
+	protected String getJobName() {
+		return jobConfiguration.getName();
 	}
-
 }

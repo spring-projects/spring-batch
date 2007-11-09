@@ -7,15 +7,14 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
-		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
-	</bean>
+	<bean parent="stepScope"/>
+	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
 
 	<bean id="jobConfiguration" parent="simpleJob">
 		<property name="steps">
 			<list>
 				<bean id="step1" parent="simpleStep">
-					<constructor-arg>
+					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 							<property name="itemProvider">
@@ -31,10 +30,10 @@
 								</bean>
 							</property>
 						</bean>
-					</constructor-arg>
+					</property>
 				</bean>
 				<bean id="step2" parent="simpleStep">
-					<constructor-arg>
+					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
 							<property name="itemProvider">
@@ -47,7 +46,7 @@
 								<bean class="org.springframework.batch.sample.item.processor.PersonProcessor" />
 							</property>
 						</bean>
-					</constructor-arg>
+					</property>
 				</bean>
 
 			</list>

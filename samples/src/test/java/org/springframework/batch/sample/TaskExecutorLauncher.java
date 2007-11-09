@@ -15,21 +15,43 @@
  */
 package org.springframework.batch.sample;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class TaskExecutorLauncher {
 
 	public static void main(String[] args) throws Exception {
-		final String path = "jobs/adhocLoopJob.xml";
+
+		// Paths to individual job configurations. Each one must include the
+		// step scope and the jobConfigurationRegistryBeanPostProcessor.
+		final String[] paths = new String[] { "jobs/adhocLoopJob.xml",
+				"jobs/nflJob.xml" };
+
+		// The simple execution environment will be used as a parent
+		// context for each of the job contexts. The standard version of this
+		// from the Spring Batch samples does not have an MBean for the
+		// JobLauncher, nor does the JobLauncher have an asynchronous
+		// TaskExecutor. The adhocLoopJob has both, which is why it has to be
+		// included in the paths above.
+		final ApplicationContext parent = new ClassPathXmlApplicationContext(
+				"simple-container-definition.xml");
+
 		new Thread(new Runnable() {
 			public void run() {
-				new ClassPathXmlApplicationContext(path);
+				for (int i = 0; i < paths.length; i++) {
+					String path = paths[i];
+					new ClassPathXmlApplicationContext(new String[] { path },
+							parent);
+				}
 			};
 		}).start();
+
+		System.out.println("Started application.  Please connect using JMX.");
 		System.in.read();
+
 	}
 }
