@@ -33,19 +33,27 @@ public class ExitStatus implements Serializable {
 	public static final ExitStatus RUNNING = new ExitStatus(true, "RUNNING");
 
 	/**
-	 * Convenient constant value representing unknown state - assumed continuable.
+	 * Convenient constant value representing unknown state - assumed
+	 * continuable.
 	 */
 	public static final ExitStatus UNKNOWN = new ExitStatus(true, "UNKNOWN");
 
 	/**
 	 * Convenient constant value representing unfinished processing.
 	 */
-	public static final ExitStatus CONTINUABLE = new ExitStatus(true, "CONTINUABLE");
+	public static final ExitStatus CONTINUABLE = new ExitStatus(true,
+			"CONTINUABLE");
 
 	/**
 	 * Convenient constant value representing finished processing.
 	 */
 	public static final ExitStatus FINISHED = new ExitStatus(false, "COMPLETED");
+
+	/**
+	 * Convenient constant value representing job that did no processing (e.g.
+	 * because it was already complete).
+	 */
+	public static final ExitStatus NOOP = new ExitStatus(false, "NOOP");
 
 	/**
 	 * Convenient constant value representing finished processing with an error.
@@ -114,7 +122,8 @@ public class ExitStatus implements Serializable {
 	 *         logical and of the current value and the argument provided.
 	 */
 	public ExitStatus and(boolean continuable) {
-		return new ExitStatus(this.continuable && continuable, this.exitCode, this.exitDescription);
+		return new ExitStatus(this.continuable && continuable, this.exitCode,
+				this.exitDescription);
 	}
 
 	/*
@@ -126,14 +135,14 @@ public class ExitStatus implements Serializable {
 		return "continuable=" + continuable + ";exitCode=" + exitCode
 				+ ";exitDescription=" + exitDescription;
 	}
-	
+
 	/**
 	 * Compare the fields one by one.
 	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object obj) {
-		if (obj==null) {
+		if (obj == null) {
 			return false;
 		}
 		return toString().equals(obj.toString());
@@ -151,8 +160,10 @@ public class ExitStatus implements Serializable {
 	/**
 	 * Add an exit code to an existing {@link ExitStatus}.
 	 * 
-	 * @param code the code to add
-	 * @return a new {@link ExitStatus} with the same properties but a new exit code.
+	 * @param code
+	 *            the code to add
+	 * @return a new {@link ExitStatus} with the same properties but a new exit
+	 *         code.
 	 */
 	public ExitStatus addExitCode(String code) {
 		return new ExitStatus(continuable, code, exitDescription);
@@ -164,14 +175,17 @@ public class ExitStatus implements Serializable {
 	 * @return tru eif the exit code is "RUNNING" or "UNKNOWN"
 	 */
 	public boolean isRunning() {
-		return "RUNNING".equals(this.exitCode) || "UNKNOWN".equals(this.exitCode);
+		return "RUNNING".equals(this.exitCode)
+				|| "UNKNOWN".equals(this.exitCode);
 	}
 
 	/**
 	 * Add an exit description to an existing {@link ExitStatus}.
 	 * 
-	 * @param description the description to add
-	 * @return a new {@link ExitStatus} with the same properties but a new exit description
+	 * @param description
+	 *            the description to add
+	 * @return a new {@link ExitStatus} with the same properties but a new exit
+	 *         description
 	 */
 	public ExitStatus addExitDescription(String description) {
 		return new ExitStatus(continuable, exitCode, description);

@@ -101,9 +101,9 @@ public class DefaultJobExecutor implements JobExecutor {
 			
 			if (startedCount==0) {
 				if (stepConfigurations.size()>0) {
-					status = ExitStatus.FINISHED.addExitDescription("All steps already completed.  No processing was done.");
+					status = ExitStatus.NOOP.addExitDescription("All steps already completed.  No processing was done.");
 				} else {
-					status = ExitStatus.FINISHED.addExitDescription("No steps configured for this job.");
+					status = ExitStatus.NOOP.addExitDescription("No steps configured for this job.");
 				}
 			}
 
