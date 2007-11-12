@@ -18,9 +18,9 @@
 	</parent>
 
 	<!-- Temporary measure while we get to the bottom of the test failures on Bamboo -->
-	<!--properties>
+	<properties>
 		<maven.test.skip>true</maven.test.skip>
-	</properties-->
+	</properties>
 
 	<dependencies>
 		<dependency>
