@@ -26,6 +26,7 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
+import org.springframework.batch.execution.runtime.DefaultJobIdentifier;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -224,13 +225,26 @@ public abstract class AbstractJobDaoTests extends
 		// Create job.
 		job = jobDao.createJob(jobIdentifier);
 
-		// sessionFactory.getCurrentSession().flush();
+		List jobs = jdbcTemplate.queryForList(
+				"SELECT * FROM BATCH_JOB where ID=?", new Object[] { job
+						.getId() });
+		assertEquals(1, jobs.size());
+		assertEquals(job.getName(), ((Map) jobs.get(0)).get("JOB_NAME"));
+
+	}
+
+	public void testJobWithDefaultJobIdentifier() throws Exception {
+		DefaultJobIdentifier jobIdentifier = new DefaultJobIdentifier("Job1", "testKey");
+
+		// Create job.
+		job = jobDao.createJob(jobIdentifier);
 
 		List jobs = jdbcTemplate.queryForList(
 				"SELECT * FROM BATCH_JOB where ID=?", new Object[] { job
 						.getId() });
 		assertEquals(1, jobs.size());
 		assertEquals(job.getName(), ((Map) jobs.get(0)).get("JOB_NAME"));
+		assertEquals(jobIdentifier.getJobKey(), ((Map) jobs.get(0)).get("JOB_KEY"));
 
 	}
 

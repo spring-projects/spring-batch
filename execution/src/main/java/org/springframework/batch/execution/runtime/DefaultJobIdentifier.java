@@ -43,6 +43,14 @@ public class DefaultJobIdentifier extends SimpleJobIdentifier implements
 		super(name);
 	}
 
+	/**
+	 * @param name the name for the job
+	 */
+	public DefaultJobIdentifier(String name, String key) {
+		this(name);
+		this.key = key;
+	}
+
 	public String getJobKey() {
 		return key;
 	}

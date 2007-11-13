@@ -26,6 +26,7 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
+import org.springframework.batch.execution.runtime.DefaultJobIdentifier;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
@@ -371,6 +372,10 @@ public class SqlJobDao implements JobDao, InitializingBean {
 			JobIdentifier jobIdentifier) {
 		if (jobIdentifier instanceof ScheduledJobIdentifier) {
 			return (ScheduledJobIdentifier) jobIdentifier;
+		}
+		if (jobIdentifier instanceof DefaultJobIdentifier) {
+			return new ScheduledJobIdentifier(jobIdentifier.getName(),
+					((DefaultJobIdentifier) jobIdentifier).getJobKey());
 		}
 		return new ScheduledJobIdentifier(jobIdentifier.getName());
 	}

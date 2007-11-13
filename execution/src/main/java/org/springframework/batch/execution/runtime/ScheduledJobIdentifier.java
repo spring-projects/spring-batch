@@ -37,6 +37,19 @@ public class ScheduledJobIdentifier extends DefaultJobIdentifier implements JobI
 	
 	public ScheduledJobIdentifier(String name) {
 		super(name);
+		initDate();
+	}
+
+	/**
+	 * @param name
+	 * @param key
+	 */
+	public ScheduledJobIdentifier(String name, String key) {
+		super(name, key);
+		initDate();
+	}
+
+	private void initDate() {
 		try {
 			scheduleDate = dateFormat.parse("19700101");
 		} catch (ParseException e) {
