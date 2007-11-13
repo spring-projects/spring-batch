@@ -256,6 +256,9 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 				currentLineCount++;
 				while (isComment(line)) {
 					line = reader.readLine();
+					if (line == null) {
+					    return null;
+					}
 					currentLineCount++;
 				}
 			}

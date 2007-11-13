@@ -123,6 +123,14 @@ public class ResourceLineReaderTests extends TestCase {
 		String line = (String) reader.read();
 		assertEquals("3", line);		
 	}
+
+    public void testCommentOnTheLastLine() throws Exception {
+        Resource resource = new ByteArrayResource("1\n#last line".getBytes());
+        ResourceLineReader reader = new ResourceLineReader(resource);
+        reader.read();
+        String line = (String) reader.read();
+        assertNull(line);        
+    }
 	
 	public void testResetNewReader() throws Exception {
 		Resource resource = new ByteArrayResource("1\n4\n5".getBytes());
