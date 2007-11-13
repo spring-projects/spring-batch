@@ -61,6 +61,8 @@ public class SimpleFlatFileInputSource implements InputSource, InitializingBean,
 	private ResourceLineReader reader;
 
 	private RecordSeparatorPolicy recordSeparatorPolicy;
+	
+	private String[] comments;
 
 	private LineTokenizer tokenizer = new DelimitedLineTokenizer();
 
@@ -89,6 +91,17 @@ public class SimpleFlatFileInputSource implements InputSource, InitializingBean,
 		this.recordSeparatorPolicy = recordSeparatorPolicy;
 	}
 
+	/**
+	 * Setter for comment prefixes. Can be used to ignore header lines as well
+	 * by using e.g. the first couple of column names as a prefix.
+	 * 
+	 * @param comments an array of comment line prefixes.
+	 */
+	public void setComments(String[] comments) {
+		this.comments = new String[comments.length];
+		System.arraycopy(comments, 0, this.comments, 0, comments.length);
+	}
+
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource);
 		Assert.state(resource.exists(), "Resource must exist: [" + resource + "]");
@@ -103,6 +116,9 @@ public class SimpleFlatFileInputSource implements InputSource, InitializingBean,
 			reader = new ResourceLineReader(resource, encoding);
 			if (recordSeparatorPolicy!=null) {
 				reader.setRecordSeparatorPolicy(recordSeparatorPolicy);
+			}
+			if (comments!=null) {
+				reader.setComments(comments);
 			}
 			reader.open();
 		}

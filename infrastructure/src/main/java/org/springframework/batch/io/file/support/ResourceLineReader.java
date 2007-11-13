@@ -50,12 +50,18 @@ import org.springframework.util.Assert;
  * All the public methods that interact with the underlying resource (open,
  * close, read etc.) are synchronized on this.<br/>
  * 
+ * Package private because this is not intended to be a public API - used
+ * internally by the flat file input sources. That makes abuses of the fact that
+ * it is stateful easier to control.<br/>
+ * 
  * @author Dave Syer
  * @author Rob Harrop
  */
-public class ResourceLineReader implements ResourceLifecycle, InputSource, DisposableBean {
+class ResourceLineReader implements ResourceLifecycle, InputSource,
+		DisposableBean {
 
-	private static final Collection DEFAULT_COMMENTS = Collections.singleton("#");
+	private static final Collection DEFAULT_COMMENTS = Collections
+			.singleton("#");
 
 	private static final String DEFAULT_ENCODING = "ISO-8859-1";
 
@@ -88,9 +94,11 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 	 * {@link DefaultRecordSeparatorPolicy}. Ideally should not be changed once
 	 * a reader is in use, but it would not be fatal if it was.
 	 * 
-	 * @param recordSeparatorPolicy the new {@link RecordSeparatorPolicy}
+	 * @param recordSeparatorPolicy
+	 *            the new {@link RecordSeparatorPolicy}
 	 */
-	public void setRecordSeparatorPolicy(RecordSeparatorPolicy recordSeparatorPolicy) {
+	public void setRecordSeparatorPolicy(
+			RecordSeparatorPolicy recordSeparatorPolicy) {
 		/*
 		 * The rest of the code accesses the policy in synchronized blocks,
 		 * copying the reference before using it. So in principle it can be
@@ -103,7 +111,8 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 	 * Setter for comment prefixes. Can be used to ignore header lines as well
 	 * by using e.g. the first couple of column names as a prefix.
 	 * 
-	 * @param comments an array of comment line prefixes.
+	 * @param comments
+	 *            an array of comment line prefixes.
 	 */
 	public void setComments(String[] comments) {
 		this.comments = new HashSet(Arrays.asList(comments));
@@ -115,8 +124,9 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 	 * 
 	 * @return a String.
 	 * 
-	 * @throws BatchEnvironmentException if there is an IOException while
-	 * accessing the input resource.
+	 * @throws BatchEnvironmentException
+	 *             if there is an IOException while accessing the input
+	 *             resource.
 	 * 
 	 * @see org.springframework.batch.item.provider.support.InputSource#read()
 	 */
@@ -129,7 +139,8 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 		if (line != null) {
 			StringBuffer buffer = new StringBuffer(record);
 			while (line != null && !recordSeparatorPolicy.isEndOfRecord(record)) {
-				buffer.append(recordSeparatorPolicy.preProcess(line = readLine()));
+				buffer.append(recordSeparatorPolicy
+						.preProcess(line = readLine()));
 				record = buffer.toString();
 			}
 		}
@@ -148,7 +159,7 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 	 * @return
 	 */
 	private State getState() {
-		if (state==null) {
+		if (state == null) {
 			open();
 		}
 		return state;
@@ -167,9 +178,11 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 
 	/**
 	 * Close the reader associated with this input source.
+	 * 
 	 * @see org.springframework.batch.io.InputSource#close()
-	 * @throws BatchEnvironmentException if there is an {@link IOException}
-	 * during the close operation.
+	 * @throws BatchEnvironmentException
+	 *             if there is an {@link IOException} during the close
+	 *             operation.
 	 */
 	public synchronized void close() {
 		if (state == null) {
@@ -177,8 +190,7 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 		}
 		try {
 			state.close();
-		}
-		finally {
+		} finally {
 			state = null;
 		}
 	}
@@ -194,6 +206,7 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 
 	/**
 	 * Getter for current line count (not the current number of lines returned).
+	 * 
 	 * @return the current line count.
 	 */
 	public int getCurrentLineCount() {
@@ -207,7 +220,8 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 	 * 
 	 * @see #reset()
 	 * 
-	 * @throws BatchEnvironmentException if the mark could not be set.
+	 * @throws BatchEnvironmentException
+	 *             if the mark could not be set.
 	 */
 	public synchronized void mark() {
 		getState().mark();
@@ -218,8 +232,9 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 	 * 
 	 * @see #mark()
 	 * 
-	 * @throws BatchEnvironmentException if the reset is unsuccessful, e.g. if
-	 * the read-ahead limit was breached.
+	 * @throws BatchEnvironmentException
+	 *             if the reset is unsuccessful, e.g. if the read-ahead limit
+	 *             was breached.
 	 */
 	public synchronized void reset() {
 		getState().reset();
@@ -257,13 +272,14 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 				while (isComment(line)) {
 					line = reader.readLine();
 					if (line == null) {
-					    return null;
+						return null;
 					}
 					currentLineCount++;
 				}
-			}
-			catch (IOException e) {
-				throw new BatchEnvironmentException("Unable to read from resource '" + resource + "' at line "+currentLineCount, e);
+			} catch (IOException e) {
+				throw new BatchEnvironmentException(
+						"Unable to read from resource '" + resource
+								+ "' at line " + currentLineCount, e);
 			}
 			return line;
 		}
@@ -273,10 +289,11 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 		 */
 		public void open() {
 			try {
-				reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), encoding));
-			}
-			catch (IOException e) {
-				throw new BatchEnvironmentException("Could not open resource", e);
+				reader = new BufferedReader(new InputStreamReader(resource
+						.getInputStream(), encoding));
+			} catch (IOException e) {
+				throw new BatchEnvironmentException("Could not open resource",
+						e);
 			}
 		}
 
@@ -290,11 +307,9 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 			}
 			try {
 				reader.close();
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				throw new BatchEnvironmentException("Could not close reader", e);
-			}
-			finally {
+			} finally {
 				currentLineCount = 0;
 				markedLineCount = -1;
 			}
@@ -315,14 +330,14 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 			try {
 				reader.mark(READ_AHEAD_LIMIT);
 				markedLineCount = currentLineCount;
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				throw new BatchEnvironmentException("Could not mark reader", e);
 			}
 		}
 
 		/**
-		 * Reset the reader and line counters to the last marked position if possible.
+		 * Reset the reader and line counters to the last marked position if
+		 * possible.
 		 */
 		public void reset() {
 
@@ -332,8 +347,7 @@ public class ResourceLineReader implements ResourceLifecycle, InputSource, Dispo
 			try {
 				this.reader.reset();
 				currentLineCount = markedLineCount;
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				throw new BatchEnvironmentException("Could not reset reader", e);
 			}
 

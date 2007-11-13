@@ -223,6 +223,12 @@ public class SimpleFlatFileInputSourceTests extends TestCase {
 		testRead();
 	}
 
+	public void testComments() throws Exception {
+		inputSource.setResource(getInputResource("% Comment\n"+TEST_STRING));
+		inputSource.setComments(new String[] {"%"});
+		testRead();
+	}
+
 	public void testInvalidFile() throws IOException {
 		DefaultFlatFileInputSource ffit = new DefaultFlatFileInputSource();
 
