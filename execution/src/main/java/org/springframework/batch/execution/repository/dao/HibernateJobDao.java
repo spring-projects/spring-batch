@@ -146,12 +146,15 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 							+ "before it can be updated.");
 		}
 
-		if (getHibernateTemplate()
-				.get(JobExecution.class, jobExecution.getId()) == null) {
+		JobExecution other = (JobExecution) getHibernateTemplate()
+				.get(JobExecution.class, jobExecution.getId());
+		if (other == null) {
 			throw new NoSuchBatchDomainObjectException(
 					"Invalid JobExecution, ID " + jobExecution.getId()
 							+ " not found.");
 		}
+		
+		getHibernateTemplate().evict(other);
 
 		getHibernateTemplate().update(jobExecution);
 	}

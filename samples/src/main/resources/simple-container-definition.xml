@@ -10,6 +10,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<import resource="data-source-context.xml" />
+	<import resource="hibernate-context.xml" />
 
 	<!-- register the step scope with the application context -->
 	<bean id="stepScope"
@@ -38,7 +39,7 @@
 			advice-ref="txAdvice" />
 	</aop:config>
 
-	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+	<tx:advice id="txAdvice" transaction-manager="${batch.transaction.manager}">
 		<tx:attributes>
 			<tx:method name="*" />
 		</tx:attributes>
@@ -58,17 +59,17 @@
 	<bean id="stepExecutor"
 		class="org.springframework.batch.execution.step.simple.SimpleStepExecutor"
 		scope="prototype">
-		<property name="transactionManager" ref="transactionManager" />
+		<property name="transactionManager" ref="${batch.transaction.manager}" />
 		<property name="repository" ref="simpleJobRepository" />
 	</bean>
 
 	<bean id="simpleJobRepository"
 		class="org.springframework.batch.execution.repository.SimpleJobRepository">
-		<constructor-arg ref="jobDao" />
-		<constructor-arg ref="stepDao" />
+		<constructor-arg ref="${batch.jobdao}" />
+		<constructor-arg ref="${batch.stepdao}" />
 	</bean>
 
-	<bean id="jobDao"
+	<bean id="sqlJobDao" lazy-init="true"
 		class="org.springframework.batch.execution.repository.dao.SqlJobDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="jobIncrementer" ref="jobIncrementer" />
@@ -76,13 +77,23 @@
 			ref="jobExecutionIncrementer" />
 	</bean>
 
-	<bean id="stepDao"
+	<bean id="sqlStepDao" lazy-init="true"
 		class="org.springframework.batch.execution.repository.dao.SqlStepDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="stepIncrementer" ref="stepIncrementer" />
 		<property name="stepExecutionIncrementer"
 			ref="stepExecutionIncrementer" />
-		<property name="jobDao" ref="jobDao" />
+		<property name="jobDao" ref="sqlJobDao" />
+	</bean>
+
+	<bean id="hibernateJobDao" lazy-init="true"
+		class="org.springframework.batch.execution.repository.dao.HibernateJobDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+
+	<bean id="hibernateStepDao" lazy-init="true"
+		class="org.springframework.batch.execution.repository.dao.HibernateStepDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
 	</bean>
 
 	<bean id="jobRuntimeInformationFactory"

@@ -58,7 +58,7 @@ public class BatchStatusUserType extends ImmutableValueUserType {
 	 */
 	public void nullSafeSet(PreparedStatement st, Object value, int index)
 			throws HibernateException, SQLException {
-		st.setString(index, value.toString());
+		st.setString(index, value!=null ? value.toString() : null);
 	}
 
 	/* (non-Javadoc)

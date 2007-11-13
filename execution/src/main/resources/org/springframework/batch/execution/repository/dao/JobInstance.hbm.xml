@@ -14,7 +14,7 @@
 		</id>
 
 		<discriminator
-			formula="case when SCHEDULE_DATE is NULL then 'Scheduled' else 'Simple' end"
+			formula="case when JOB_KEY is NULL then 'Simple' when SCHEDULE_DATE is NULL then 'Default' else 'Scheduled' end"
 			type="string" />
 
 		<version name="version" access="field" />

@@ -16,9 +16,13 @@
 
 package org.springframework.batch.execution.repository.dao;
 
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.SessionFactory;
+import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
@@ -54,4 +58,25 @@ public class HibernateStepDaoTests extends AbstractStepDaoTests {
 		//assertEquals("x=y, a=b", returnedStatistics);
 		assertEquals(fromDb, statistics);
 	}
+	
+	public void testUpdateDetachedStepExecution() {
+
+		sessionFactory.getCurrentSession().evict(stepExecution);
+		
+		stepExecution.setStatus(BatchStatus.COMPLETED);
+		stepExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
+		stepDao.update(stepExecution);
+
+		sessionFactory.getCurrentSession().flush();
+
+		List executions = jdbcTemplate.queryForList(
+				"SELECT * FROM BATCH_STEP_EXECUTION where STEP_ID=?",
+				new Object[] { step1.getId() });
+		assertEquals(1, executions.size());
+		assertEquals(stepExecution.getEndTime(), ((Map) executions.get(0))
+				.get("END_TIME"));
+
+	}
+
+
 }

@@ -32,11 +32,12 @@ public class HibernateJobDaoTests extends AbstractJobDaoTests {
 
 	private SessionFactory sessionFactory;
 
-	protected String[] getConfigLocations(){
-		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "hibernate-dao-test.xml") };
+	protected String[] getConfigLocations() {
+		return new String[] { ClassUtils.addResourcePathToPackagePath(
+				getClass(), "hibernate-dao-test.xml") };
 	}
 
-	public void setSessionFactory(SessionFactory sessionFactory){
+	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 
@@ -48,12 +49,34 @@ public class HibernateJobDaoTests extends AbstractJobDaoTests {
 
 		sessionFactory.getCurrentSession().flush();
 
-		List executions = jdbcTemplate.queryForList("SELECT * FROM BATCH_JOB_EXECUTION where JOB_ID=?", new Object[] {job.getId()});
+		List executions = jdbcTemplate.queryForList(
+				"SELECT * FROM BATCH_JOB_EXECUTION where JOB_ID=?",
+				new Object[] { job.getId() });
 		assertEquals(1, executions.size());
-		assertEquals(jobExecution.getEndTime(), ((Map)executions.get(0)).get("END_TIME"));
+		assertEquals(jobExecution.getEndTime(), ((Map) executions.get(0))
+				.get("END_TIME"));
 	}
 
-	public void testCreateSimpleJobExecution(){
+	public void testUpdateDetachedJobExecution() {
+
+		sessionFactory.getCurrentSession().evict(jobExecution);
+		
+		jobExecution.setStatus(BatchStatus.COMPLETED);
+		jobExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
+		jobDao.update(jobExecution);
+
+		sessionFactory.getCurrentSession().flush();
+
+		List executions = jdbcTemplate.queryForList(
+				"SELECT * FROM BATCH_JOB_EXECUTION where JOB_ID=?",
+				new Object[] { job.getId() });
+		assertEquals(1, executions.size());
+		assertEquals(jobExecution.getEndTime(), ((Map) executions.get(0))
+				.get("END_TIME"));
+
+	}
+
+	public void testCreateSimpleJobExecution() {
 
 		JobIdentifier simpleIdentifier = new SimpleJobIdentifier("SimpleJob");
 
@@ -62,45 +85,46 @@ public class HibernateJobDaoTests extends AbstractJobDaoTests {
 		List jobs = jobDao.findJobs(simpleIdentifier);
 
 		assertEquals(jobs.size(), 1);
-		JobInstance testJob = (JobInstance)jobs.get(0);
+		JobInstance testJob = (JobInstance) jobs.get(0);
 		assertEquals(simpleJob, testJob);
 	}
 
-	public void testNullIdentifierName(){
+	public void testNullIdentifierName() {
 
 		JobIdentifier simpleIdentifier = new SimpleJobIdentifier(null);
 
-		try{
+		try {
 			jobDao.createJob(simpleIdentifier);
 			fail();
-		}catch(IllegalArgumentException ex){
-			//expected
+		} catch (IllegalArgumentException ex) {
+			// expected
 		}
 	}
 
-	public void testEmptyIdentifierName(){
+	public void testEmptyIdentifierName() {
 
 		JobIdentifier simpleIdentifier = new SimpleJobIdentifier("");
 
-		try{
+		try {
 			jobDao.createJob(simpleIdentifier);
 			fail();
-		}catch(IllegalArgumentException ex){
-			//expected
+		} catch (IllegalArgumentException ex) {
+			// expected
 		}
 
 	}
 
-	public void testNullScheduleDate(){
+	public void testNullScheduleDate() {
 
-		ScheduledJobIdentifier scheduledIdentifier = new ScheduledJobIdentifier("ScheduledJob");
+		ScheduledJobIdentifier scheduledIdentifier = new ScheduledJobIdentifier(
+				"ScheduledJob");
 		scheduledIdentifier.setJobKey(null);
 
-		try{
+		try {
 			jobDao.createJob(scheduledIdentifier);
 			fail();
-		}catch(IllegalArgumentException ex){
-			//expected
+		} catch (IllegalArgumentException ex) {
+			// expected
 		}
 	}
 

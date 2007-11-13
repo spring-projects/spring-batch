@@ -177,12 +177,11 @@ public abstract class AbstractJobDaoTests extends
 
 	public void testUpdateInvalidJobExecution() {
 
-		JobExecution execution = new JobExecution(job);
 		// id is invalid
-		execution.setId(new Long(29432));
+		JobExecution execution = new JobExecution(job, new Long(29432));
 		try {
 			jobDao.update(execution);
-			fail();
+			fail("Expected NoSuchBatchDomainObjectException");
 		} catch (NoSuchBatchDomainObjectException ex) {
 			// expected
 		}
