@@ -13,12 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step;
+package org.springframework.batch.execution.step.simple;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.StepConfigurationSupport;
-import org.springframework.batch.execution.step.simple.JobRepositorySupport;
+import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.execution.step.SimpleStepConfiguration;
+import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 
 /**
  * @author Dave Syer
@@ -34,6 +44,27 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 	
 	public void testSuccessfulStepExecutor() throws Exception {
 		assertNotNull(factory.getExecutor(new SimpleStepConfiguration()));
+	}
+
+	public void testSuccessfulExceptionHandler() throws Exception {
+		SimpleStepConfiguration configuration = new SimpleStepConfiguration();
+		final List list = new ArrayList();
+		configuration.setExceptionHandler(new ExceptionHandler() {
+			public void handleExceptions(RepeatContext context,
+					Collection throwables) throws RuntimeException {
+				list.addAll(throwables);
+				throw new RuntimeException("Oops");
+			}
+		});
+		SimpleStepExecutor executor = (SimpleStepExecutor) factory.getExecutor(configuration);
+		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(11)), new JobExecution(new JobInstance(null), new Long(12)));
+		try {
+			executor.processChunk(configuration, stepExecution);
+			fail("Expected RuntimeException");
+		} catch (RuntimeException e) {
+			assertEquals("Oops", e.getMessage());
+		}
+		assertEquals(1, list.size());
 	}
 
 	public void testUnsuccessfulWrongConfiguration() throws Exception {
