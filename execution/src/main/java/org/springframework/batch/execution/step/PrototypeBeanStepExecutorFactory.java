@@ -123,6 +123,7 @@ public class PrototypeBeanStepExecutorFactory implements StepExecutorFactory,
 				template.setCompletionPolicy(new SimpleCompletionPolicy(
 						((SimpleStepConfiguration) configuration)
 								.getCommitInterval()));
+				template.setExceptionHandler(((SimpleStepConfiguration)configuration).getExceptionHandler());
 			}
 			((SimpleStepExecutor) executor)
 					.setChunkOperations(repeatOperations);

@@ -164,7 +164,7 @@ public class SimpleStepExecutor implements StepExecutor {
 		// Add the job identifier so that it can be used to identify
 		// the conversation in StepScope
 		stepScopeContext.setAttribute(StepScope.ID_KEY, stepExecution
-		.getJobExecution().getJob().getIdentifier());
+				.getJobExecution().getJob().getIdentifier());
 
 		try {
 			stepExecution
@@ -198,47 +198,51 @@ public class SimpleStepExecutor implements StepExecutor {
 					// interruption.
 					interruptionPolicy.checkInterrupted(context);
 
-					ExitStatus result = (ExitStatus) new TransactionTemplate(
-							transactionManager)
-							.execute(new TransactionCallback() {
-								public Object doInTransaction(
-										TransactionStatus status) {
-									// New transaction obtained, resynchronize
-									// TransactionSyncrhonization objects
-									BatchTransactionSynchronizationManager
-											.resynchronize();
-									ExitStatus result;
+					ExitStatus result;
+					try {
+						result = (ExitStatus) new TransactionTemplate(
+								transactionManager)
+								.execute(new TransactionCallback() {
+									public Object doInTransaction(
+											TransactionStatus status) {
+										// New transaction obtained,
+										// resynchronize
+										// TransactionSyncrhonization objects
+										BatchTransactionSynchronizationManager
+												.resynchronize();
+										ExitStatus result;
 
-									try {
 										result = processChunk(configuration,
 												stepExecution);
-									} catch (Throwable t) {
-										/*
-										 * any exception thrown within the
-										 * transaction template will
-										 * automatically cause the transaction
-										 * to rollback
-										 */
-										stepExecution.incrementRollbackCount();
-										if (t instanceof RuntimeException) {
-											throw (RuntimeException) t;
-										} else {
-											throw new RuntimeException(t);
-										}
-									}
 
-									if (saveRestartData) {
-										step
-												.setRestartData(getRestartData(module));
-										jobRepository.update(step);
+										if (saveRestartData) {
+											step
+													.setRestartData(getRestartData(module));
+											jobRepository.update(step);
+										}
+										Properties statistics = getStatistics(module);
+										stepExecution.setStatistics(statistics);
+										stepExecution.incrementCommitCount();
+										jobRepository
+												.saveOrUpdate(stepExecution);
+										return result;
 									}
-									Properties statistics = getStatistics(module);
-									stepExecution.setStatistics(statistics);
-									stepExecution.incrementCommitCount();
-									jobRepository.saveOrUpdate(stepExecution);
-									return result;
-								}
-							});
+								});
+					} catch (Throwable t) {
+						/*
+						 * Any exception thrown within the transaction template
+						 * will automatically cause the transaction to rollback.
+						 * We need to include exceptions during an attempted
+						 * commit (e.g. Hibernate flush) so this catch block
+						 * comes outside the transaction.
+						 */
+						stepExecution.incrementRollbackCount();
+						if (t instanceof RuntimeException) {
+							throw (RuntimeException) t;
+						} else {
+							throw new RuntimeException(t);
+						}
+					}
 
 					// Check for interruption after transaction as well, so that
 					// the interrupted exception is correctly propagated up to
@@ -358,8 +362,8 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * @throws Exception
 	 *             if there is an error
 	 */
-	protected ExitStatus doTaskletProcessing(Tasklet tasklet, StepExecution stepExecution)
-			throws Exception {
+	protected ExitStatus doTaskletProcessing(Tasklet tasklet,
+			StepExecution stepExecution) throws Exception {
 		return tasklet.execute();
 	}
 
