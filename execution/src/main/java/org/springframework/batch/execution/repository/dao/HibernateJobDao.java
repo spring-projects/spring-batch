@@ -203,17 +203,17 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 	 */
 	private void validateJobIdentifier(JobIdentifier jobIdentifier) {
 
-		Assert.notNull(jobIdentifier, "JobRuntimeInformation cannot be null.");
+		Assert.notNull(jobIdentifier, "JobIdentifier cannot be null.");
 		Assert.hasText(jobIdentifier.getName(),
-				"JobRuntimeInformation name cannot be null or empty.");
+				"JobIdentifier name cannot be null or empty.");
 
 		if (jobIdentifier instanceof ScheduledJobIdentifier) {
 			ScheduledJobIdentifier jobRuntimeInformation = (ScheduledJobIdentifier) jobIdentifier;
 
 			Assert.notNull(jobRuntimeInformation.getJobKey(),
-					"JobRuntimeInformation JobStream cannot be null.");
+					"ScheduledJobIdentifier JobKey cannot be null.");
 			Assert.notNull(jobRuntimeInformation.getScheduleDate(),
-					"JobRuntimeInformation ScheduleDate cannot be null.");
+					"ScheduledJobIdentifier ScheduleDate cannot be null.");
 		}
 	}
 }
