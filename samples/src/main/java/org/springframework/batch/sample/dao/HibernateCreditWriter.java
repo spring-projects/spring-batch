@@ -20,23 +20,47 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author Lucas Ward
- *
+ * 
  */
 public class HibernateCreditWriter extends HibernateDaoSupport implements
 		CustomerCreditWriter {
 
-	/* (non-Javadoc)
+	private boolean failOnFlush = false;
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.sample.dao.CustomerCreditWriter#write(org.springframework.batch.sample.domain.CustomerCredit)
 	 */
 	public void write(CustomerCredit customerCredit) {
-		getHibernateTemplate().update(customerCredit);
+		if (!failOnFlush ) {
+			getHibernateTemplate().update(customerCredit);
+		} else {
+			// try to insert one with a duplicate ID
+			CustomerCredit newCredit = new CustomerCredit();
+			newCredit.setId(customerCredit.getId());
+			newCredit.setName(customerCredit.getName());
+			newCredit.setCredit(customerCredit.getCredit());
+			getHibernateTemplate().save(newCredit);
+		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.io.OutputSource#write(java.lang.Object)
 	 */
 	public void write(Object output) {
-		write((CustomerCredit)output);
+		write((CustomerCredit) output);
+	}
+
+	/**
+	 * Public setter for the {@link boolean} property.
+	 *
+	 * @param failOnFlush true if you want to fail on flush (for testing)
+	 */
+	public void setFailOnFlush(boolean failOnFlush) {
+		this.failOnFlush = failOnFlush;
 	}
 
 }

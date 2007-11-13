@@ -34,7 +34,7 @@ public class GracefulShutdownFunctionalTest extends AbstractBatchLauncherTests {
 		return new String[] {"jobs/infiniteLoopJob.xml"};
 	}
 
-	public void testJob()throws Exception {
+	public void testLaunchJob() throws Exception {
 		final List errors = new ArrayList();
 		
 		Thread jobThread = new Thread(){

@@ -31,8 +31,7 @@ public abstract class AbstractValidatingBatchLauncherTests extends AbstractBatch
 
 	public void testLaunchJob() throws Exception {
 		validatePreConditions();
-		launcher.run(getJobName());
-		launcher.stop();
+		super.testLaunchJob();
 		validatePostConditions();
 	}
 

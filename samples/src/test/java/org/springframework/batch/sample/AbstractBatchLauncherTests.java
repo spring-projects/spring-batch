@@ -24,46 +24,60 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
- * Abstract unit test for running functional tests by getting context locations for
- * both the container and configuration separately and having them auto wired in 
- * by type.  This allows the two to be completely separated, and remove any
- * 'configuration coupling' between the two.  However, it is still purely
- * theoretical until a decision is made as to how job configuration and container 
- * configuration files are pulled together.
+ * Abstract unit test for running functional tests by getting context locations
+ * for both the container and configuration separately and having them auto
+ * wired in by type. This allows the two to be completely separated, and remove
+ * any 'configuration coupling' between the two. However, it is still purely
+ * theoretical until a decision is made as to how job configuration and
+ * container configuration files are pulled together.
  * 
  * @author Lucas Ward
- *
+ * 
  */
-public abstract class AbstractBatchLauncherTests extends AbstractDependencyInjectionSpringContextTests {
+public abstract class AbstractBatchLauncherTests extends
+		AbstractDependencyInjectionSpringContextTests {
 
 	private static final String CONTAINER_DEFINITION_LOCATION = "simple-container-definition.xml";
-	
+
 	JobLauncher launcher;
-	JobConfiguration jobConfiguration; 
-	
-	/* (non-Javadoc)
+	private JobConfiguration jobConfiguration;
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.test.AbstractSingleSpringContextTests#createApplicationContext(java.lang.String[])
 	 */
 	protected ConfigurableApplicationContext createApplicationContext(
 			String[] locations) {
-		ApplicationContext parent = new ClassPathXmlApplicationContext(CONTAINER_DEFINITION_LOCATION);
+		ApplicationContext parent = new ClassPathXmlApplicationContext(
+				CONTAINER_DEFINITION_LOCATION);
 		return new ClassPathXmlApplicationContext(locations, parent);
 	}
-	
-	public void setLauncher(JobLauncher bootstrap){
+
+	public void setLauncher(JobLauncher bootstrap) {
 		this.launcher = bootstrap;
 	}
-	
+
 	/**
 	 * Public setter for the {@link JobConfiguration} property.
-	 *
-	 * @param jobConfiguration the jobConfiguration to set
+	 * 
+	 * @param jobConfiguration
+	 *            the jobConfiguration to set
 	 */
 	public void setJobConfiguration(JobConfiguration jobConfiguration) {
 		this.jobConfiguration = jobConfiguration;
 	}
-	
+
 	protected String getJobName() {
 		return jobConfiguration.getName();
+	}
+
+	/**
+	 * @throws Exception 
+	 * 
+	 */
+	public void testLaunchJob() throws Exception {
+		launcher.run(getJobName());
+		launcher.stop();
 	}
 }

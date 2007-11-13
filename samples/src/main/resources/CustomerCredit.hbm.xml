@@ -4,13 +4,15 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-	<class name="org.springframework.batch.sample.domain.CustomerCredit" table="CUSTOMER">
-        <id name="id" column="ID">
-            <generator class="native"/>
-        </id>
-        <property name="id" />
-        <property name="name" />
-        <property name="credit" />
-    </class>
+	<class name="org.springframework.batch.sample.domain.CustomerCredit"
+		table="CUSTOMER">
+		<id name="id" column="ID">
+			<!-- To make the job fail on flush we need assigned IDs -->
+			<generator class="assigned" />
+		</id>
+		<property name="id" />
+		<property name="name" />
+		<property name="credit" />
+	</class>
 
 </hibernate-mapping>

@@ -24,8 +24,7 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 	private static final String CREDIT_COLUMN = "CREDIT";
 	
 	private List creditsBeforeUpdate;
-	
-	
+		
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
