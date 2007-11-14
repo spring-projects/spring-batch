@@ -60,7 +60,7 @@ public class HibernateJobDaoTests extends AbstractJobDaoTests {
 	public void testUpdateDetachedJobExecution() {
 
 		sessionFactory.getCurrentSession().evict(jobExecution);
-		
+
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		jobExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
 		jobDao.update(jobExecution);

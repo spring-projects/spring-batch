@@ -122,6 +122,34 @@ public abstract class AbstractJobDaoTests extends
 		}
 	}
 
+	/**
+	 * Test that ensures that if you create a job with a given name, then find a
+	 * job with the same name, but other pieces of the identifier different, you
+	 * get no result, not the existing one.
+	 */
+	public void testCreateJobWithExistingName() {
+		ScheduledJobIdentifier scheduledIdentifier = new ScheduledJobIdentifier(
+				"ScheduledJob");
+
+		jobDao.createJob(scheduledIdentifier);
+
+		// Modifying the key should bring back a completely different
+		// JobInstance
+		ScheduledJobIdentifier newIdentifier = new ScheduledJobIdentifier(
+				"ScheduledJob");
+		newIdentifier.setJobKey("different key");
+
+		List jobs;
+		jobs = jobDao.findJobs(scheduledIdentifier);
+		assertEquals(1, jobs.size());
+		JobInstance job = (JobInstance) jobs.get(0);
+		assertEquals(scheduledIdentifier, job.getIdentifier());
+
+		jobs = jobDao.findJobs(newIdentifier);
+		assertEquals(0, jobs.size());
+
+	}
+
 	public void testUpdateJob() {
 		// Update the returned job with a new status
 		job.setStatus(BatchStatus.COMPLETED);

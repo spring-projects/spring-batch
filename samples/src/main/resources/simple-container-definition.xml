@@ -89,6 +89,7 @@
 	<bean id="hibernateJobDao" lazy-init="true"
 		class="org.springframework.batch.execution.repository.dao.HibernateJobDao">
 		<property name="sessionFactory" ref="sessionFactory"/>
+		<property name="entityNameLocator" ref="entityNameLocator"/>
 	</bean>
 
 	<bean id="hibernateStepDao" lazy-init="true"

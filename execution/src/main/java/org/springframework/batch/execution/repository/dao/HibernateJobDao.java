@@ -26,6 +26,7 @@ import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.util.Assert;
@@ -39,8 +40,28 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  */
 
-public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
+public class HibernateJobDao extends HibernateDaoSupport implements JobDao, InitializingBean {
 
+	private EntityNameLocator entityNameLocator;
+	
+	/**
+	 * Public setter for the {@link EntityNameLocator} property.
+	 *
+	 * @param entityNameLocator the entityNameLocator to set
+	 */
+	public void setEntityNameLocator(EntityNameLocator entityNameLocator) {
+		this.entityNameLocator = entityNameLocator;
+	}
+	
+	/**
+	 * Check mandatory properties ({@link #entityNameLocator}).
+	 * @see org.springframework.dao.support.DaoSupport#initDao()
+	 */
+	protected void initDao() throws Exception {
+		Assert.notNull(entityNameLocator, "An EntityNameLocator must be provided.");
+		super.initDao();
+	}
+	
 	/**
 	 * @see JobDao#createJob(JobIdentifier)
 	 *
@@ -75,8 +96,9 @@ public class HibernateJobDao extends HibernateDaoSupport implements JobDao {
 		List list = this.getHibernateTemplate().executeFind(
 				new HibernateCallback() {
 					public Object doInHibernate(Session session) {
+						String entityName = entityNameLocator.locate(jobRuntimeInformation.getClass());
 						Criteria criteria = session
-								.createCriteria(JobInstance.class);
+								.createCriteria(entityName);
 						criteria.add(Expression.eq("identifier",
 								jobRuntimeInformation));
 						return criteria.list();

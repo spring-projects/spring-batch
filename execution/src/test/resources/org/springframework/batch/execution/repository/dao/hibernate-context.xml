@@ -26,9 +26,15 @@
 			<bean class="org.springframework.jdbc.support.lob.DefaultLobHandler"/>
 		</property>
 		<property name="entityInterceptor">
-			<bean class="org.springframework.batch.execution.repository.dao.EntityNameInterceptor"/>
+			<bean
+				class="org.springframework.batch.execution.repository.dao.EntityNameInterceptor">
+					<property name="entityNameLocator" ref="entityNameLocator"/>
+			</bean>
 		</property>
 	</bean>
+
+	<bean id="entityNameLocator"
+		class="org.springframework.batch.execution.repository.dao.JobIdentifierEntityNameLocator" />
 	
 	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
