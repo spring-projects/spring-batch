@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+
+<description>
+	The intent is to to give an example of how existing bean
+	definitions (e.g. from custom application's domain layer)
+	can be integrated into a batch job.
+</description>
+
+	<bean class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
+		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
+	</bean>
+
+	<bean id="jobConfiguration" parent="simpleJob">
+		<property name="steps">
+			<bean id="step1" parent="simpleStep">
+				<property name="tasklet">
+					<bean
+						class="org.springframework.batch.execution.tasklet.ItemProviderProcessTasklet">
+						<property name="itemProvider">
+							<bean class="org.springframework.batch.item.provider.DelegatingItemProvider">
+								<property name="targetObject" ref="delegatingObject" />
+								<property name="targetMethod" value="getData" />
+							</bean>
+						</property>
+						<property name="itemProcessor">
+							<bean class="org.springframework.batch.item.processor.PropertyExtractingDelegatingItemProcessor">
+								<property name="targetObject" ref="delegatingObject" />
+								<property name="targetMethod" value="processPerson" />
+								<property name="fieldsUsedAsTargetMethodArguments">
+									<list>
+										<value>firstName</value>
+										<value>address.city</value>
+									</list>
+								</property>
+							</bean>
+						</property>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="delegatingObject" class="org.springframework.batch.sample.domain.PersonService" />
+	
+</beans>

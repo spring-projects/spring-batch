@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
-	<version>1</version>
-	<pluginVersion><![CDATA[2.0.2.v200710312100]]></pluginVersion>
-	<configSuffixes>
-		<configSuffix><![CDATA[xml]]></configSuffix>
-	</configSuffixes>
+	<configExtensions>
+		<configExtension>xml</configExtension>
+	</configExtensions>
 	<configs>
 		<config>src/main/resources/jobs/fixedLengthImportJob.xml</config>
 		<config>src/main/resources/jobs/multilineJob.xml</config>
@@ -28,6 +26,7 @@
 		<config>src/main/resources/jobs/nflJob.xml</config>
 		<config>src/main/resources/jobs/simpleTaskletJob.xml</config>
 		<config>src/main/resources/beanRefContext.xml</config>
+		<config>src/main/resources/jobs/delegatingJob.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
