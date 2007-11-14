@@ -19,6 +19,7 @@ import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.execution.step.RepeatOperationsHolder;
 import org.springframework.batch.execution.step.SimpleStepConfiguration;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
@@ -62,14 +63,29 @@ public class SimpleStepExecutorFactory implements StepExecutorFactory,
 
 		SimpleStepExecutor executor = new SimpleStepExecutor();
 		executor.setRepository(jobRepository);
+
 		RepeatTemplate template = new RepeatTemplate();
 		RepeatOperations repeatOperations = template;
-		SimpleStepConfiguration simpleConfiguration = (SimpleStepConfiguration) configuration;
-		template.setCompletionPolicy(new SimpleCompletionPolicy(
-				simpleConfiguration.getCommitInterval()));
-		ExceptionHandler exceptionHandler = simpleConfiguration.getExceptionHandler();
-		if (exceptionHandler!=null) {
-			template.setExceptionHandler(exceptionHandler);
+		
+		if (configuration instanceof RepeatOperationsHolder) {
+			
+			repeatOperations = ((RepeatOperationsHolder) configuration)
+					.getChunkOperations();
+			Assert
+					.state(repeatOperations != null,
+							"Chunk operations obtained from step configuration must be non-null.");
+
+		} else {
+
+			SimpleStepConfiguration simpleConfiguration = (SimpleStepConfiguration) configuration;
+			template.setCompletionPolicy(new SimpleCompletionPolicy(
+					simpleConfiguration.getCommitInterval()));
+			ExceptionHandler exceptionHandler = simpleConfiguration
+					.getExceptionHandler();
+			if (exceptionHandler != null) {
+				template.setExceptionHandler(exceptionHandler);
+			}
+
 		}
 
 		executor.setChunkOperations(repeatOperations);

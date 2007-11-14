@@ -235,7 +235,8 @@ public class RepeatTemplate implements RepeatOperations {
 					for (int i = interceptors.length; i-- > 0;) {
 						RepeatInterceptor interceptor = interceptors[i];
 						interceptor.onError(context, t);
-						logger.error("Exception intercepted (" + (i + 1) + " of " + interceptors.length + ")", t);
+						// This is not an error - only log at debug level.
+						logger.debug("Exception intercepted (" + (i + 1) + " of " + interceptors.length + ")", t);
 					}
 				}
 

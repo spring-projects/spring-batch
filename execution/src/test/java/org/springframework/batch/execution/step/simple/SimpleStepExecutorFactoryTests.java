@@ -26,9 +26,14 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.execution.step.RepeatOperationsHolder;
 import org.springframework.batch.execution.step.SimpleStepConfiguration;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
+import org.springframework.batch.repeat.interceptor.RepeatInterceptorAdapter;
+import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.repeat.support.RepeatTemplate;
 
 /**
  * @author Dave Syer
@@ -41,7 +46,7 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 	protected void setUp() throws Exception {
 		factory.setJobRepository(new JobRepositorySupport());
 	}
-	
+
 	public void testSuccessfulStepExecutor() throws Exception {
 		assertNotNull(factory.getExecutor(new SimpleStepConfiguration()));
 	}
@@ -56,13 +61,41 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 				throw new RuntimeException("Oops");
 			}
 		});
-		SimpleStepExecutor executor = (SimpleStepExecutor) factory.getExecutor(configuration);
-		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(11)), new JobExecution(new JobInstance(null), new Long(12)));
+		SimpleStepExecutor executor = (SimpleStepExecutor) factory
+				.getExecutor(configuration);
+		StepExecution stepExecution = new StepExecution(new StepInstance(
+				new Long(11)), new JobExecution(new JobInstance(null),
+				new Long(12)));
 		try {
 			executor.processChunk(configuration, stepExecution);
 			fail("Expected RuntimeException");
 		} catch (RuntimeException e) {
 			assertEquals("Oops", e.getMessage());
+		}
+		assertEquals(1, list.size());
+	}
+
+	public void testSuccessfulRepeatOperationsHolder() throws Exception {
+		RepeatTemplate repeatTemplate = new RepeatTemplate();
+		final List list = new ArrayList();
+		repeatTemplate.setInterceptor(new RepeatInterceptorAdapter() {
+			public void onError(RepeatContext context, Throwable e) {
+				list.add(e);
+			}
+		});
+		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
+		SimpleHolderStepConfiguration configuration = new SimpleHolderStepConfiguration(
+				repeatTemplate);
+		SimpleStepExecutor executor = (SimpleStepExecutor) factory
+				.getExecutor(configuration);
+		StepExecution stepExecution = new StepExecution(new StepInstance(
+				new Long(11)), new JobExecution(new JobInstance(null),
+				new Long(12)));
+		try {
+			executor.processChunk(configuration, stepExecution);
+			fail("Expected RuntimeException");
+		} catch (NullPointerException e) {
+			// expected
 		}
 		assertEquals(1, list.size());
 	}
@@ -87,13 +120,12 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException e) {
 			// expected
-			assertTrue(
-					"Error message does not contain JobRepository: "
-							+ e.getMessage(), e.getMessage().indexOf(
-							"JobRepository") >= 0);
+			assertTrue("Error message does not contain JobRepository: "
+					+ e.getMessage(),
+					e.getMessage().indexOf("JobRepository") >= 0);
 		}
 	}
-	
+
 	public void testMandatoryProperties() throws Exception {
 		factory = new SimpleStepExecutorFactory();
 		try {
@@ -103,4 +135,22 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 			// expected
 		}
 	}
+
+	/**
+	 * @author Dave Syer
+	 * 
+	 */
+	public class SimpleHolderStepConfiguration extends SimpleStepConfiguration
+			implements RepeatOperationsHolder {
+		private RepeatOperations executor;
+
+		public SimpleHolderStepConfiguration(RepeatOperations executor) {
+			this.executor = executor;
+		}
+
+		public RepeatOperations getChunkOperations() {
+			return executor;
+		}
+	}
+
 }
