@@ -15,6 +15,11 @@
  */
 package org.springframework.batch.sample.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatInterceptor;
 import org.springframework.batch.sample.domain.CustomerCredit;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -23,9 +28,20 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * 
  */
 public class HibernateCreditWriter extends HibernateDaoSupport implements
-		CustomerCreditWriter {
+		CustomerCreditWriter, RepeatInterceptor {
 
 	private boolean failOnFlush = false;
+	private boolean first = true;
+	private List errors = new ArrayList();
+	
+	/**
+	 * Public accessor for the errors property.
+	 *
+	 * @return the errors - a list of Throwable instances
+	 */
+	public List getErrors() {
+		return errors;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -33,7 +49,7 @@ public class HibernateCreditWriter extends HibernateDaoSupport implements
 	 * @see org.springframework.batch.sample.dao.CustomerCreditWriter#write(org.springframework.batch.sample.domain.CustomerCredit)
 	 */
 	public void write(CustomerCredit customerCredit) {
-		if (!failOnFlush ) {
+		if (!failOnFlush || !first) {
 			getHibernateTemplate().update(customerCredit);
 		} else {
 			// try to insert one with a duplicate ID
@@ -42,6 +58,7 @@ public class HibernateCreditWriter extends HibernateDaoSupport implements
 			newCredit.setName(customerCredit.getName());
 			newCredit.setCredit(customerCredit.getCredit());
 			getHibernateTemplate().save(newCredit);
+			first = false; // fail on the first record only
 		}
 	}
 
@@ -63,4 +80,33 @@ public class HibernateCreditWriter extends HibernateDaoSupport implements
 		this.failOnFlush = failOnFlush;
 	}
 
+	public void after(RepeatContext context, Object result) {
+	}
+
+	public void before(RepeatContext context) {
+	}
+
+	/**
+	 * Flush the Hibernate session so that any batch exceptions are within the RepeatContext.
+	 * 
+	 * @see org.springframework.batch.repeat.RepeatInterceptor#close(org.springframework.batch.repeat.RepeatContext)
+	 */
+	public void close(RepeatContext context) {
+		try {
+			getHibernateTemplate().flush();
+		} catch (RuntimeException e) {
+			onError(context, e);
+			throw e;
+		}
+	}
+
+	public void onError(RepeatContext context, Throwable e) {
+		errors.add(e);
+	}
+
+	public void open(RepeatContext context) {
+		errors.clear();
+	}
+
+	
 }

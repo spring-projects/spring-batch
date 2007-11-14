@@ -1,6 +1,7 @@
 package org.springframework.batch.sample;
 
 import org.springframework.batch.sample.dao.HibernateCreditWriter;
+import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.orm.hibernate3.HibernateJdbcException;
 
@@ -57,8 +58,11 @@ public class HibernateFailureJobFunctionalTests extends
 		try {
 			super.testLaunchJob();
 		} catch (HibernateJdbcException e) {
-			// Comment this out to see the test fail...
-			// fail("This exception is evil");
+			// This is what would happen if the flush happened outside the RepeatContext:
+			throw e;
+		} catch (UncategorizedSQLException e) {
+			// Expected, but check that the exception was registered:
+			assertEquals(1, writer.getErrors().size());
 		}
 		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
 		assertEquals(before, after);

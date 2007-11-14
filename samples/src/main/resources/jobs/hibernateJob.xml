@@ -16,7 +16,7 @@
 
 	<bean id="jobConfiguration" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="simpleStep">
+			<bean id="step1" class="org.springframework.batch.execution.step.ChunkOperationsStepConfiguration">
 				<property name="tasklet">
 					<bean
 						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
@@ -31,6 +31,16 @@
 							<bean
 								class="org.springframework.batch.sample.item.processor.CustomerCreditIncreaseProcessor">
 								<property name="outputSource" ref="hibernateOutputSource"/>
+							</bean>
+						</property>
+					</bean>
+				</property>
+				<property name="chunkOperations">
+					<bean class="org.springframework.batch.repeat.support.RepeatTemplate">
+						<property name="interceptor" ref="hibernateOutputSource"/>
+						<property name="completionPolicy">
+							<bean class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
+								<property name="chunkSize" value="3"/>
 							</bean>
 						</property>
 					</bean>
