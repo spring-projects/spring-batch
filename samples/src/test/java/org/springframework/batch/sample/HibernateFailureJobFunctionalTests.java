@@ -57,6 +57,7 @@ public class HibernateFailureJobFunctionalTests extends
 		assertTrue(before>0);
 		try {
 			super.testLaunchJob();
+			fail("Expected an Exception");
 		} catch (HibernateJdbcException e) {
 			// This is what would happen if the flush happened outside the RepeatContext:
 			throw e;

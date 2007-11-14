@@ -59,7 +59,8 @@ public class HibernateCursorInputSource implements InputSource, Restartable, Ini
 			open();
 		}
 		if (cursor.next()) {
-			return cursor.get(0);
+			Object data = cursor.get(0);
+			return data;
 		}
 		return null;
 	}

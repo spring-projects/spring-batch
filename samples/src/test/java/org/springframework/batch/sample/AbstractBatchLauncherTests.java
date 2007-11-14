@@ -18,6 +18,7 @@ package org.springframework.batch.sample;
 
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.execution.launch.JobLauncher;
+import org.springframework.batch.execution.runtime.DefaultJobIdentifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -77,7 +78,8 @@ public abstract class AbstractBatchLauncherTests extends
 	 * 
 	 */
 	public void testLaunchJob() throws Exception {
-		launcher.run(getJobName());
+		// Make sure the job is unique by the test case that runs it, not just its name:
+		launcher.run(new DefaultJobIdentifier(getJobName(), this.getClass().getName()));
 		launcher.stop();
 	}
 }

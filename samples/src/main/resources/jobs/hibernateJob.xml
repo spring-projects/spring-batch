@@ -14,7 +14,7 @@
 	<bean parent="stepScope" />
 	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
-	<bean id="jobConfiguration" parent="simpleJob">
+	<bean id="hibernateJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" class="org.springframework.batch.execution.step.ChunkOperationsStepConfiguration">
 				<property name="tasklet">

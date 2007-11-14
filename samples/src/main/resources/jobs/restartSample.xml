@@ -11,7 +11,7 @@
 	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
 	<bean parent="customEditorConfigurer"/>
 
-	<bean id="restartSample" parent="simpleJob">
+	<bean id="restartSampleJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
 				<property name="tasklet">

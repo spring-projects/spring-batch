@@ -10,7 +10,7 @@
 	<bean parent="stepScope"/>
 	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
 
-	<bean id="jobConfiguration" parent="simpleJob">
+	<bean id="beanWrapperMapperJob" parent="simpleJob">
 		<property name="steps">
 			<list>
 				<bean id="step1" parent="simpleStep">

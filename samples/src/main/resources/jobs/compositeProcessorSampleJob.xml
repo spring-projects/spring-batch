@@ -10,7 +10,7 @@
 	<bean parent="stepScope"/>
 	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
 
-	<bean id="jobConfiguration" parent="simpleJob">
+	<bean id="compositeProcessorJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
 				<property name="tasklet">

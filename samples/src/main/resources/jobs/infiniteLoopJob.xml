@@ -25,7 +25,7 @@
 	</bean>
 	
 
-	<bean id="jobConfiguration" parent="simpleJob">
+	<bean id="infiniteLoopJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
 				<property name="tasklet">
