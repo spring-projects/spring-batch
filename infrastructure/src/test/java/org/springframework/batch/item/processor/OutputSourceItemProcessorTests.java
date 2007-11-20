@@ -47,6 +47,7 @@ public class OutputSourceItemProcessorTests extends TestCase {
 	protected void setUp() throws Exception {
 		source = new MockOutputSource("test");
 		processor.setOutputSource(source);
+		processor.afterPropertiesSet();
 	}
 
 	public void testProcess() throws Exception {
@@ -126,6 +127,20 @@ public class OutputSourceItemProcessorTests extends TestCase {
 		assertEquals("after skip", list.get(0));
 	}
 
+	/**
+	 * Output source property must be set.
+	 */
+	public void testAfterPropertiesSet() throws Exception {
+		processor.setOutputSource(null);
+		try {
+			processor.afterPropertiesSet();
+			fail();
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
+	
 	private List list = new ArrayList(); 
 
 	/**

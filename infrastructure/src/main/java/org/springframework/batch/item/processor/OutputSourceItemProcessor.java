@@ -9,6 +9,7 @@ import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
@@ -16,23 +17,33 @@ import org.springframework.util.Assert;
  * {@link StatisticsProvider} where the {@link OutputSource} does.
  * 
  * @author Dave Syer
+ * @author Robert Kasanicky
  */
 public class OutputSourceItemProcessor implements ItemProcessor, Restartable, Skippable,
-		StatisticsProvider {
+		StatisticsProvider, InitializingBean {
 
 	private OutputSource source;
 
-	/* (non-Javadoc)
+	/**
+	 * Calls {@link #doProcess(Object)} and then writes the result to the output source.
+	 * 
 	 * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
 	 */
-	public void process(Object data) throws Exception {
-		source.write(data);
+	final public void process(Object item) throws Exception {
+		Object result = doProcess(item);
+		source.write(result);
+	}
+
+	/**
+	 * By default returns the argument. This method is an extension point
+	 * meant to be overridden by subclasses that implement processing logic. 
+	 */
+	protected Object doProcess(Object item) {
+		return item;
 	}
 
 	/**
 	 * Setter for output source.
-	 * 
-	 * @param source
 	 */
 	public void setOutputSource(OutputSource source) {
 		this.source = source;
@@ -83,6 +94,11 @@ public class OutputSourceItemProcessor implements ItemProcessor, Restartable, Sk
 		if (source instanceof Skippable) {
 			((Skippable)source).skip();
 		}
+	}
+
+	
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(source);
 	}
 
 }
