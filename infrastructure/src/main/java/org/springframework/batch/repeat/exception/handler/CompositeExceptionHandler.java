@@ -16,7 +16,6 @@
 
 package org.springframework.batch.repeat.exception.handler;
 
-import java.util.Collection;
 
 import org.springframework.batch.repeat.RepeatContext;
 
@@ -38,12 +37,12 @@ public class CompositeExceptionHandler implements ExceptionHandler {
 	 * Iterate over the handlers delegating the call to each in turn. The chain
 	 * ends if an exception is thrown.
 	 * 
-	 * @see ExceptionHandler#handleExceptions(RepeatContext, Collection)
+	 * @see ExceptionHandler#handleException(RepeatContext, Throwable)
 	 */
-	public void handleExceptions(RepeatContext context, Collection throwables) throws RuntimeException {
+	public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
 		for (int i = 0; i < handlers.length; i++) {
 			ExceptionHandler handler = handlers[i];
-			handler.handleExceptions(context, throwables);
+			handler.handleException(context, throwable);
 		}
 	}
 }

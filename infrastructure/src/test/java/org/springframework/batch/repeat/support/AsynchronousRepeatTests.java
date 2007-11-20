@@ -41,7 +41,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		final String threadName = Thread.currentThread().getName();
 		final Set threadNames = new HashSet();
 
-		final RepeatCallback callback = new ItemProviderRepeatCallback(provider, executor) {
+		final RepeatCallback callback = new ItemProviderRepeatCallback(provider, processor) {
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
@@ -53,7 +53,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		template.iterate(callback);
 		// Shouldn't be necessary to wait:
 		// Thread.sleep(500);
-		assertEquals(NUMBER_OF_ITEMS, executor.count);
+		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		assertTrue(threadNames.size() > 1);
 	}
 
@@ -72,7 +72,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		final String threadName = Thread.currentThread().getName();
 		final Set threadNames = new HashSet();
 
-		final RepeatCallback stepCallback = new ItemProviderRepeatCallback(provider, executor) {
+		final RepeatCallback stepCallback = new ItemProviderRepeatCallback(provider, processor) {
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
@@ -90,7 +90,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		jobTemplate.iterate(jobCallback);
 		// Shouldn't be necessary to wait:
 		// Thread.sleep(500);
-		assertEquals(NUMBER_OF_ITEMS, executor.count);
+		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		// Because of the throttling and queing internally to a TaskExecutor,
 		// more than one thread wil be used - the number used is (as of writing)
 		// one less than the throttle limit of the template.

@@ -16,7 +16,6 @@
 
 package org.springframework.batch.repeat.exception.handler;
 
-import java.util.Collection;
 
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.RepeatException;
@@ -31,26 +30,25 @@ import org.springframework.batch.repeat.exception.RepeatException;
 public class DefaultExceptionHandler implements ExceptionHandler {
 
 	/**
-	 * Rethrow the first throwable in the collection's iterator. Wrap in a
+	 * Rethrow the throwable in the collection's iterator. Wrap in a
 	 * {@link RepeatException} if the first instance is not a
 	 * {@link RuntimeException}.
 	 * 
-	 * @see org.springframework.batch.repeat.exception.handler.ExceptionHandler#handleExceptions(RepeatContext,
-	 * java.util.Collection)
+	 * @see org.springframework.batch.repeat.exception.handler.ExceptionHandler#handleException(RepeatContext,
+	 * Throwable)
 	 */
-	public void handleExceptions(RepeatContext context, Collection throwables) throws RuntimeException {
+	public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
 
-		Throwable t = (Throwable) throwables.iterator().next();
-		rethrow(t);
+		rethrow(throwable);
 
 	}
 
 	/**
 	 * Convenience method to rethrow the Throwable instance. Wraps it in a
-	 * {@link RepeatException} if it is not a {@link RuntimeException}.
+	 * {@link RepeatException} if it is not a {@link Exception}.
 	 * 
 	 * @param throwable a Throwable.
-	 * @throws RuntimeException if the throwable is a RuntimeException just
+	 * @throws RuntimeException if the throwable is a {@link RuntimeException} just
 	 * rethrow, otherwise wrap in a {@link RepeatException}
 	 */
 	public static void rethrow(Throwable throwable) throws RuntimeException {

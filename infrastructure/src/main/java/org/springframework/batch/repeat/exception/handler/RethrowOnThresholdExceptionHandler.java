@@ -16,7 +16,6 @@
 
 package org.springframework.batch.repeat.exception.handler;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -40,7 +39,8 @@ import org.springframework.util.Assert;
  */
 public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 
-	protected final Log logger = LogFactory.getLog(RethrowOnThresholdExceptionHandler.class);
+	protected final Log logger = LogFactory
+			.getLog(RethrowOnThresholdExceptionHandler.class);
 
 	private ExceptionClassifier exceptionClassifier = new ExceptionClassifierSupport();
 
@@ -50,10 +50,11 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 
 	/**
 	 * Flag to indicate the the exception counters should be shared between
-	 * sibling contexts in a nested batch.  Default is false.
+	 * sibling contexts in a nested batch. Default is false.
 	 * 
-	 * @param useParent true if the parent context should be used to store the
-	 * counters.
+	 * @param useParent
+	 *            true if the parent context should be used to store the
+	 *            counters.
 	 */
 	public void setUseParent(boolean useParent) {
 		this.useParent = useParent;
@@ -74,16 +75,21 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 * are usually String literals, depending on the {@link ExceptionClassifier}
 	 * implementation used.
 	 * 
-	 * @param thresholds the threshold value map.
+	 * @param thresholds
+	 *            the threshold value map.
 	 */
 	public void setThresholds(Map thresholds) {
 		for (Iterator iter = thresholds.entrySet().iterator(); iter.hasNext();) {
 			Map.Entry entry = (Map.Entry) iter.next();
 			if (!(entry.getKey() instanceof String)) {
-				logger.warn("Key in thresholds map is not of type String: " + entry.getKey());
+				logger.warn("Key in thresholds map is not of type String: "
+						+ entry.getKey());
 			}
-			Assert.state(entry.getValue() instanceof Integer, "Threshold value must be of type Integer.  "
-					+ "Try using the value-type attribute if you care configuring this map via xml.");
+			Assert
+					.state(
+							entry.getValue() instanceof Integer,
+							"Threshold value must be of type Integer.  "
+									+ "Try using the value-type attribute if you care configuring this map via xml.");
 		}
 		this.thresholds = thresholds;
 	}
@@ -104,28 +110,27 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 * Classify the throwables and decide whether to rethrow based on the
 	 * result. The context is used to accumulate the number of exceptions of the
 	 * same type according to the classifier.
-	 * @throws Exception 
 	 * 
-	 * @see {@link ExceptionHandler#handleExceptions(RepeatContext, Collection)}
+	 * @throws Exception
+	 * @see {@link ExceptionHandler#handleException(RepeatContext, Throwable)}
 	 */
-	public void handleExceptions(RepeatContext context, Collection throwables) throws RuntimeException {
+	public void handleException(RepeatContext context, Throwable throwable)
+			throws RuntimeException {
 
-		for (Iterator iter = throwables.iterator(); iter.hasNext();) {
-			Throwable throwable = (Throwable) iter.next();
-			Object key = exceptionClassifier.classify(throwable);
-			RepeatContextCounter counter = getCounter(context, key);
-			counter.increment();
-			int count = counter.getCount();
-			Integer threshold = (Integer) thresholds.get(key);
-			if (threshold == null || count > threshold.intValue()) {
-				DefaultExceptionHandler.rethrow(throwable);
-			}
+		Object key = exceptionClassifier.classify(throwable);
+		RepeatContextCounter counter = getCounter(context, key);
+		counter.increment();
+		int count = counter.getCount();
+		Integer threshold = (Integer) thresholds.get(key);
+		if (threshold == null || count > threshold.intValue()) {
+			DefaultExceptionHandler.rethrow(throwable);
 		}
 
 	}
 
 	private RepeatContextCounter getCounter(RepeatContext context, Object key) {
-		String attribute = RethrowOnThresholdExceptionHandler.class + "." + key.toString();
+		String attribute = RethrowOnThresholdExceptionHandler.class + "."
+				+ key.toString();
 		// Creates a new counter and stores it in the correct context:
 		return new RepeatContextCounter(context, attribute, useParent);
 	}

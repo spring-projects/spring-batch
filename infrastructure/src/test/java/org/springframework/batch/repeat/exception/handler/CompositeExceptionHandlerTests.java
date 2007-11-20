@@ -17,8 +17,6 @@
 package org.springframework.batch.repeat.exception.handler;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -31,7 +29,7 @@ public class CompositeExceptionHandlerTests extends TestCase {
 	
 	public void testNewHandler() throws Exception {
 		try {
-			handler.handleExceptions(null, Collections.singleton(new RuntimeException()));
+			handler.handleException(null, new RuntimeException());
 		}
 		catch (RuntimeException e) {
 			fail("Unexpected RuntimeException");
@@ -42,17 +40,17 @@ public class CompositeExceptionHandlerTests extends TestCase {
 		final List list = new ArrayList();
 		handler.setHandlers(new ExceptionHandler[] {
 			new ExceptionHandler() {
-				public void handleExceptions(RepeatContext context, Collection throwables) {
+				public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
 					list.add("1");
 				}
 			},
 			new ExceptionHandler() {
-				public void handleExceptions(RepeatContext context, Collection throwables) {
+				public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
 					list.add("2");
 				}
 			}
 		});
-		handler.handleExceptions(null, Collections.singleton(new RuntimeException()));
+		handler.handleException(null, new RuntimeException());
 		assertEquals(2, list.size());
 		assertEquals("1", list.get(0));
 		assertEquals("2", list.get(1));

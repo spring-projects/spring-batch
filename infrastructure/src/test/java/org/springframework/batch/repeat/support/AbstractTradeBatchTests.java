@@ -38,7 +38,7 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 
 	Resource resource = new ClassPathResource("trades.csv", getClass());
 
-	protected TradeProcessor executor = new TradeProcessor();
+	protected TradeProcessor processor = new TradeProcessor();
 
 	protected TradeItemProvider provider;
 

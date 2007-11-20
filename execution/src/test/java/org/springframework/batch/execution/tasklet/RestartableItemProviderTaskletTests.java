@@ -143,7 +143,7 @@ public class RestartableItemProviderTaskletTests extends TestCase {
 		assertNotNull(data);
 		// restore from restart data (see asserts in mock classes)
 		module.restoreFrom(data);
-		System.err.println(data.getProperties());
+		//System.err.println(data.getProperties());
 	}
 	
 }

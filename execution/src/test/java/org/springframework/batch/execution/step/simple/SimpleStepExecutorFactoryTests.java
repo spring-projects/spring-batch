@@ -16,7 +16,6 @@
 package org.springframework.batch.execution.step.simple;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -55,9 +54,9 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 		SimpleStepConfiguration configuration = new SimpleStepConfiguration();
 		final List list = new ArrayList();
 		configuration.setExceptionHandler(new ExceptionHandler() {
-			public void handleExceptions(RepeatContext context,
-					Collection throwables) throws RuntimeException {
-				list.addAll(throwables);
+			public void handleException(RepeatContext context,
+					Throwable throwable) throws RuntimeException {
+				list.add(throwable);
 				throw new RuntimeException("Oops");
 			}
 		});

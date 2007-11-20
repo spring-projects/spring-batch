@@ -17,7 +17,6 @@
 package org.springframework.batch.repeat.support;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.batch.repeat.RepeatCallback;
@@ -45,8 +44,8 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	}
 
 	public void testExecute() throws Exception {
-		template.iterate(new ItemProviderRepeatCallback(provider, executor));
-		assertEquals(NUMBER_OF_ITEMS, executor.count);
+		template.iterate(new ItemProviderRepeatCallback(provider, processor));
+		assertEquals(NUMBER_OF_ITEMS, processor.count);
 	}
 
 	/**
@@ -58,9 +57,9 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 
-		template.iterate(new ItemProviderRepeatCallback(provider, executor));
+		template.iterate(new ItemProviderRepeatCallback(provider, processor));
 
-		assertEquals(2, executor.count);
+		assertEquals(2, processor.count);
 
 	}
 
@@ -168,8 +167,9 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		final List list = new ArrayList();
 
 		template.setExceptionHandler(new ExceptionHandler() {
-			public void handleExceptions(RepeatContext context, Collection throwables) {
-				list.addAll(throwables);
+			public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
+				list.add(throwable);
+				throw (RuntimeException) throwable;
 			}
 		});
 
@@ -197,11 +197,11 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 */
 	public void testEarlyCompletionWithContext() throws Exception {
 
-		ExitStatus result = template.iterate(new ItemProviderRepeatCallback(provider, executor) {
+		ExitStatus result = template.iterate(new ItemProviderRepeatCallback(provider, processor) {
 
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				ExitStatus result = super.doInIteration(context);
-				if (executor.count >= 2) {
+				if (processor.count >= 2) {
 					context.setCompleteOnly();
 					// If we return null the batch will terminate anyway
 					// without an exception...
@@ -211,7 +211,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		});
 
 		// 2 items were processed before completion signalled
-		assertEquals(2, executor.count);
+		assertEquals(2, processor.count);
 
 		// Not all items processed
 		assertTrue(result.isContinuable());
@@ -225,11 +225,11 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 */
 	public void testEarlyCompletionWithContextTerminated() throws Exception {
 
-		ExitStatus result = template.iterate(new ItemProviderRepeatCallback(provider, executor) {
+		ExitStatus result = template.iterate(new ItemProviderRepeatCallback(provider, processor) {
 
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				ExitStatus result = super.doInIteration(context);
-				if (executor.count >= 2) {
+				if (processor.count >= 2) {
 					context.setTerminateOnly();
 					// If we return null the batch will terminate anyway
 					// without an exception...
@@ -239,7 +239,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		});
 
 		// 2 items were processed before completion signalled
-		assertEquals(2, executor.count);
+		assertEquals(2, processor.count);
 
 		// Not all items processed
 		assertTrue(result.isContinuable());
@@ -321,8 +321,8 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 * @throws Exception
 	 */
 	public void testResult() throws Exception {
-		ExitStatus result = template.iterate(new ItemProviderRepeatCallback(provider, executor));
-		assertEquals(NUMBER_OF_ITEMS, executor.count);
+		ExitStatus result = template.iterate(new ItemProviderRepeatCallback(provider, processor));
+		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		// We are complete - do not expect to be called again
 		assertFalse(result.isContinuable());
 	}
@@ -360,13 +360,13 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		ExitStatus result = ExitStatus.FINISHED;
 
 		try {
-			result = template.iterate(new ItemProviderRepeatCallback(provider, executor) {
+			result = template.iterate(new ItemProviderRepeatCallback(provider, processor) {
 
 				public ExitStatus doInIteration(RepeatContext context) throws Exception {
 					ExitStatus result = super.doInIteration(context);
-					if (executor.count >= 2) {
+					if (processor.count >= 2) {
 						context.setCompleteOnly();
-						throw new RuntimeException("Barf second try count=" + executor.count);
+						throw new RuntimeException("Barf second try count=" + processor.count);
 					}
 					return result;
 				}
@@ -379,7 +379,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		}
 
 		// 2 items were processed before completion signalled
-		assertEquals(2, executor.count);
+		assertEquals(2, processor.count);
 
 		System.err.println(result);
 

@@ -18,6 +18,7 @@ package org.springframework.batch.repeat.support;
 
 import java.util.List;
 
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
@@ -68,8 +69,10 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	/**
 	 * Setter for task executor to be used to run the individual item callbacks.
 	 * 
-	 * @param taskExecutor a TaskExecutor
-	 * @throws IllegalArgumentException if the argument is null
+	 * @param taskExecutor
+	 *            a TaskExecutor
+	 * @throws IllegalArgumentException
+	 *             if the argument is null
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		Assert.notNull(taskExecutor);
@@ -84,10 +87,12 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * method so there is no need to synchronize access.
 	 * 
 	 * @see org.springframework.batch.repeat.support.AbstracBatchemplate#getNextResult(org.springframework.batch.item.RepeatContext,
-	 * org.springframework.batch.repeat.RepeatCallback,
-	 * org.springframework.batch.TerminationContext, java.util.List)
+	 *      org.springframework.batch.repeat.RepeatCallback,
+	 *      org.springframework.batch.TerminationContext, java.util.List)
 	 */
-	protected Object getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state) {
+	protected ExitStatus getNextResult(RepeatContext context,
+			RepeatCallback callback, RepeatInternalState state)
+			throws Throwable {
 
 		ExecutingRunnable runnable = null;
 
@@ -121,12 +126,14 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		Object result;
 		try {
 			result = queue.take().getResult();
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			result = e;
+			throw e;
 		}
-		return result;
+		if (result instanceof Throwable) {
+			throw (Throwable) result;
+		}
+		return (ExitStatus) result;
 	}
 
 	/**
@@ -152,22 +159,22 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			Object value;
 			try {
 				value = future.getResult();
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				// TODO: cancel batch?
 				Thread.currentThread().interrupt();
 				value = e;
 			}
 			if (value instanceof Throwable) {
 				state.getThrowables().add(value);
+			} else {
+				result = result && canContinue((ExitStatus) value);
+				executeAfterInterceptors(future.getContext(), value);
 			}
-
-			executeAfterInterceptors(future.getContext(), value);
-			result = result && canContinue(value);
 
 		}
 
-		Assert.state(futures.isEmpty(), "Future results should be empty at end of batch.");
+		Assert.state(futures.isEmpty(),
+				"Future results should be empty at end of batch.");
 
 		return result;
 	}
@@ -192,7 +199,8 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 		Object result;
 
-		public ExecutingRunnable(RepeatCallback callback, RepeatContext context, ResultQueue queue) {
+		public ExecutingRunnable(RepeatCallback callback,
+				RepeatContext context, ResultQueue queue) {
 
 			super();
 
@@ -216,22 +224,19 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		public void run() {
 			try {
 				result = callback.doInIteration(context);
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				result = e;
-			}
-			finally {
+			} finally {
 				queue.put(this);
 			}
 		}
-
-		// TODO: Should we support cancellations?
 
 		/**
 		 * Get the result - never blocks because the queue manages waiting for
 		 * the task to finish.
 		 * 
-		 * @throws InterruptedException if the thread is interrupted.
+		 * @throws InterruptedException
+		 *             if the thread is interrupted.
 		 */
 		public Object getResult() throws InterruptedException {
 			return result;
@@ -291,10 +296,10 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 				synchronized (lock) {
 					count++;
 				}
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				throw new RepeatException("InterruptedException waiting for to acquire lock on input.");
+				throw new RepeatException(
+						"InterruptedException waiting for to acquire lock on input.");
 			}
 		}
 
@@ -314,10 +319,10 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 					// Decrement the counter only when the result is collected.
 					count--;
 				}
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				throw new RepeatException("Interrupted while waiting for result.");
+				throw new RepeatException(
+						"Interrupted while waiting for result.");
 			}
 			return value;
 		}
@@ -338,14 +343,15 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		 * until it is ready.
 		 * 
 		 * @return the result.
-		 * @throws InterruptedException if the thread is interrupted while
-		 * waiting for the result.
+		 * @throws InterruptedException
+		 *             if the thread is interrupted while waiting for the
+		 *             result.
 		 * @throws IllegalStateException
 		 */
 		Object getResult() throws InterruptedException;
 
 		/**
-		 * Get the context in which the result evaluation is execututing.
+		 * Get the context in which the result evaluation is executing.
 		 * 
 		 * @return the context of the result evaluation.
 		 */
@@ -361,7 +367,8 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * N.B. when used with a thread pooled {@link TaskExecutor} it doesn't make
 	 * sense for the throttle limit to be less than the thread pool size.
 	 * 
-	 * @param throttleLimit the throttleLimit to set.
+	 * @param throttleLimit
+	 *            the throttleLimit to set.
 	 */
 	public void setThrottleLimit(int throttleLimit) {
 		this.throttleLimit = throttleLimit;

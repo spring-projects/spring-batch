@@ -21,10 +21,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatInterceptor;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -221,8 +221,8 @@ public class RepeatInterceptorTests extends TestCase {
 			// expected
 		}
 		assertEquals(0, count);
-		// The after is executed, then the on error...
-		assertEquals("[1, 2]", calls.toString());
+		// The after is not executed, if there is an error...
+		assertEquals("[2]", calls.toString());
 	}
 
 	public void testAsynchronousOnErrorInterceptorsPrecedence() throws Exception {
@@ -250,10 +250,14 @@ public class RepeatInterceptorTests extends TestCase {
 		}
 		catch (IllegalStateException e) {
 			// expected
+			assertEquals("Bogus", e.getMessage());
 		}
 		assertEquals(0, count);
-		// The after is executed, then the on error...
-		assertEquals(calls.lastIndexOf("1") + 1, calls.indexOf("2"));
-		assertEquals(fails.size() * 2, calls.size());
+		System.err.println(calls);
+		// The after is not executed on error...
+		assertEquals("2", calls.get(0));
+		assertEquals("2", calls.get(calls.size()-1));
+		assertFalse(calls.contains("1"));
+		assertEquals(fails.size(), calls.size());
 	}
 }

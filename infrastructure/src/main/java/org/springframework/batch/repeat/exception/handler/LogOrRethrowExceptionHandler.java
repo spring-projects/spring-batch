@@ -16,9 +16,6 @@
 
 package org.springframework.batch.repeat.exception.handler;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.common.ExceptionClassifier;
@@ -85,33 +82,26 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	 * Classify the throwables and decide whether to rethrow based on the
 	 * result. The context is not used.
 	 * 
-	 * @throws Exception
+	 * @throws RuntimeException
 	 * 
-	 * @see {@link ExceptionHandler#handleExceptions(RepeatContext, Collection)}
+	 * @see {@link ExceptionHandler#handleException(RepeatContext, Throwable)}
 	 */
-	public void handleExceptions(RepeatContext context, Collection throwables)
+	public void handleException(RepeatContext context, Throwable throwable)
 			throws RuntimeException {
 
-		for (Iterator iter = throwables.iterator(); iter.hasNext();) {
-			Throwable throwable = (Throwable) iter.next();
-			Object key = exceptionClassifier.classify(throwable);
-			if (ERROR.equals(key)) {
-				logger.error("Exception encountered in batch repeat.",
-						throwable);
-			} else if (WARN.equals(key)) {
-				logger
-						.warn("Exception encountered in batch repeat.",
-								throwable);
-			} else if (DEBUG.equals(key) && logger.isDebugEnabled()) {
-				logger.debug("Exception encountered in batch repeat.",
-						throwable);
-			} else if (RETHROW.equals(key)) {
-				DefaultExceptionHandler.rethrow(throwable);
-			} else {
-				throw new IllegalStateException(
-						"Unclassified exception encountered.  Did you mean to classifiy this as 'rethrow'?",
-						throwable);
-			}
+		Object key = exceptionClassifier.classify(throwable);
+		if (ERROR.equals(key)) {
+			logger.error("Exception encountered in batch repeat.", throwable);
+		} else if (WARN.equals(key)) {
+			logger.warn("Exception encountered in batch repeat.", throwable);
+		} else if (DEBUG.equals(key) && logger.isDebugEnabled()) {
+			logger.debug("Exception encountered in batch repeat.", throwable);
+		} else if (RETHROW.equals(key)) {
+			DefaultExceptionHandler.rethrow(throwable);
+		} else {
+			throw new IllegalStateException(
+					"Unclassified exception encountered.  Did you mean to classifiy this as 'rethrow'?",
+					throwable);
 		}
 
 	}

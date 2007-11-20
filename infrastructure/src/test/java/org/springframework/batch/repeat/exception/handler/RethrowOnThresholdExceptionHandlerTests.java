@@ -34,7 +34,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 	
 	public void testRuntimeException() throws Exception {
 		try {
-			handler.handleExceptions(context, Collections.singleton(new RuntimeException("Foo")));
+			handler.handleException(context, new RuntimeException("Foo"));
 			fail("Expected RuntimeException");
 		} catch (RuntimeException e) {
 			assertEquals("Foo", e.getMessage());
@@ -43,7 +43,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 
 	public void testError() throws Exception {
 		try {
-			handler.handleExceptions(context, Collections.singleton(new Error("Foo")));
+			handler.handleException(context, new Error("Foo"));
 			fail("Expected BatchException");
 		} catch (RepeatException e) {
 			assertEquals("Foo", e.getCause().getMessage());
@@ -58,7 +58,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 		});
 		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
 		// No exception...
-		handler.handleExceptions(context, Collections.singleton(new RuntimeException("Foo")));
+		handler.handleException(context, new RuntimeException("Foo"));
 		RepeatContextCounter counter = new RepeatContextCounter(context, RethrowOnThresholdExceptionHandler.class + ".RuntimeException");
 		assertNotNull(counter);
 		assertEquals(1, counter.getCount());
@@ -72,9 +72,9 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 		});
 		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
 		// No exception...
-		handler.handleExceptions(context, Collections.singleton(new RuntimeException("Foo")));
+		handler.handleException(context, new RuntimeException("Foo"));
 		try {
-			handler.handleExceptions(context, Collections.singleton(new RuntimeException("Foo")));
+			handler.handleException(context, new RuntimeException("Foo"));
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {
@@ -100,11 +100,11 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 		});
 		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
 		// No exception...
-		handler.handleExceptions(context, Collections.singleton(new RuntimeException("Foo")));
+		handler.handleException(context, new RuntimeException("Foo"));
 		context = new RepeatContextSupport(parent);
 		try {
 			// No exception again - context is changed...
-			handler.handleExceptions(context, Collections.singleton(new RuntimeException("Foo")));
+			handler.handleException(context, new RuntimeException("Foo"));
 		}
 		catch (RuntimeException e) {
 			fail("Unexpected Error");
@@ -120,10 +120,10 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
 		handler.setUseParent(true);
 		// No exception...
-		handler.handleExceptions(context, Collections.singleton(new RuntimeException("Foo")));
+		handler.handleException(context, new RuntimeException("Foo"));
 		context = new RepeatContextSupport(parent);
 		try {
-			handler.handleExceptions(context, Collections.singleton(new RuntimeException("Foo")));
+			handler.handleException(context, new RuntimeException("Foo"));
 			fail("Expected Error");
 		}
 		catch (RuntimeException e) {

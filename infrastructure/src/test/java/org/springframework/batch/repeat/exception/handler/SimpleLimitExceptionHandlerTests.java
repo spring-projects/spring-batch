@@ -17,14 +17,13 @@
 package org.springframework.batch.repeat.exception.handler;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.exception.TransactionInvalidException;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
 
 /**
  * Unit tests for {@link SimpleLimitExceptionHandler}
@@ -36,144 +35,195 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 
 	// object under test
 	private SimpleLimitExceptionHandler handler = new SimpleLimitExceptionHandler();
-	
+
 	public void testInitializeWithNullContext() throws Exception {
 		try {
-			handler.handleExceptions(null, Collections.singleton(new RuntimeException("foo")));
+			handler.handleException(null, new RuntimeException("foo"));
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
-	
-	public void testInitializeWithNullContextAndEmptyList() throws Exception {
+
+	public void testInitializeWithNullContextAndNullException()
+			throws Exception {
 		try {
-			handler.handleExceptions(null, Collections.EMPTY_LIST);
-		} catch (Exception e) {
-			fail("Unexpected IllegalArgumentException");
+			handler.handleException(null, null);
+		} catch (NullPointerException e) {
+			// expected;
 		}
 	}
 
 	/**
-	 * Other than TransactionInvalidException should be rethrown, ignoring the exception limit.
+	 * Other than TransactionInvalidException should be rethrown, ignoring the
+	 * exception limit.
+	 * 
+	 * @throws Exception
 	 */
-	public void testNormalExceptionThrown() {
-		List throwables = Collections.singletonList(new RuntimeException("foo"));
-		
+	public void testNormalExceptionThrown() throws Exception {
+		Throwable throwable = new RuntimeException("foo");
+
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
-		
-		try{
-			handler.handleExceptions(new RepeatContextSupport(null), throwables);
+
+		try {
+			handler.handleException(new RepeatContextSupport(null), throwable);
 			fail("Exception swallowed.");
 		} catch (RuntimeException expected) {
-			assertTrue("Exception is rethrown, ignoring the exception limit",true);
-			assertSame(throwables.get(0), expected);
+			assertTrue("Exception is rethrown, ignoring the exception limit",
+					true);
+			assertSame(expected, throwable);
 		}
 	}
-	
+
 	/**
-	 * TransactionInvalidException should only be rethrown below the exception limit.
+	 * TransactionInvalidException should only be rethrown below the exception
+	 * limit.
+	 * 
+	 * @throws Exception
 	 */
-	public void testLimitedExceptionTypeNotThrown() {
-		List throwables = Collections.singletonList(new RuntimeException("foo"));
-		
+	public void testLimitedExceptionTypeNotThrown() throws Exception {
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
 		handler.setType(RuntimeException.class);
-		
-		try{
-			handler.handleExceptions(new RepeatContextSupport(null), throwables);
+
+		try {
+			handler.handleException(new RepeatContextSupport(null),
+					new RuntimeException("foo"));
 		} catch (RuntimeException expected) {
 			fail("Unexpected exception.");
 		}
 	}
 
 	/**
-	 * TransactionInvalidException should only be rethrown below the exception limit.
+	 * TransactionInvalidException should only be rethrown below the exception
+	 * limit.
+	 * 
+	 * @throws Exception
 	 */
-	public void testLimitedExceptionNotThrownFromSiblings() {
-		List throwables = Collections.singletonList(new RuntimeException("foo"));
-		
+	public void testLimitedExceptionNotThrownFromSiblings() throws Exception {
+		Throwable throwable = new RuntimeException("foo");
+
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
 		handler.setType(RuntimeException.class);
-		
+
 		RepeatContextSupport parent = new RepeatContextSupport(null);
 
-		try{
+		try {
 			RepeatContextSupport context = new RepeatContextSupport(parent);
-			handler.handleExceptions(context, throwables);
+			handler.handleException(context, throwable);
 			context = new RepeatContextSupport(parent);
-			handler.handleExceptions(context, throwables);
+			handler.handleException(context, throwable);
 		} catch (RuntimeException expected) {
 			fail("Unexpected exception.");
 		}
 	}
 
 	/**
-	 * TransactionInvalidException should only be rethrown below the exception limit.
+	 * TransactionInvalidException should only be rethrown below the exception
+	 * limit.
+	 * 
+	 * @throws Exception
 	 */
-	public void testLimitedExceptionThrownFromSiblingsWhenUsingParent() {
-		List throwables = Collections.singletonList(new RuntimeException("foo"));
-		
+	public void testLimitedExceptionThrownFromSiblingsWhenUsingParent()
+			throws Exception {
+		Throwable throwable = new RuntimeException("foo");
+
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
 		handler.setType(RuntimeException.class);
 		handler.setUseParent(true);
-		
+
 		RepeatContextSupport parent = new RepeatContextSupport(null);
 
-		try{
+		try {
 			RepeatContextSupport context = new RepeatContextSupport(parent);
-			handler.handleExceptions(context, throwables);
+			handler.handleException(context, throwable);
 			context = new RepeatContextSupport(parent);
-			handler.handleExceptions(context, throwables);
+			handler.handleException(context, throwable);
 			fail("Expected exception.");
 		} catch (RuntimeException expected) {
-			assertSame(throwables.get(0), expected);
+			assertSame(throwable, expected);
 		}
 	}
 
 	/**
-	 * TransactionInvalidExceptions are swallowed until the exception limit is exceeded.
-	 * After the limit is exceeded exceptions are rethrown as BatchCriticalExceptions
+	 * TransactionInvalidExceptions are swallowed until the exception limit is
+	 * exceeded. After the limit is exceeded exceptions are rethrown as
+	 * BatchCriticalExceptions
 	 */
-	public void testExceptionThrownAboveLimit() {
-		
+	public void testExceptionNotThrownBelowLimit() throws Exception {
+
 		final int EXCEPTION_LIMIT = 3;
 		handler.setLimit(EXCEPTION_LIMIT);
-		
-		List throwables = new ArrayList() {{
-			for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
-				add(new TransactionInvalidException("below exception limit"));
+
+		List throwables = new ArrayList() {
+			{
+				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
+					add(new TransactionInvalidException("below exception limit"));
+				}
 			}
-		}};
-		
+		};
+
 		RepeatContextSupport context = new RepeatContextSupport(null);
 
 		try {
-			handler.handleExceptions(context, throwables);
-			assertTrue("exceptions up to limit are swallowed", true);
+			for (Iterator iterator = throwables.iterator(); iterator.hasNext();) {
+				Throwable throwable = (Throwable) iterator.next();
+
+				handler.handleException(context, throwable);
+				assertTrue("exceptions up to limit are swallowed", true);
+
+			}
 		} catch (RuntimeException unexpected) {
 			fail("exception rethrown although exception limit was not exceeded");
 		}
-		
-		
-		throwables = new ArrayList() {{
-			add(new TransactionInvalidException("above exception limit"));
-		}};
-		
-		// after reaching the limit, behaviour should be idempotent
-		final int ARBITRARY_REPEAT_COUNT = 2;
-		for (int i = 0; i < ARBITRARY_REPEAT_COUNT; i++) {		
-			try {
-				handler.handleExceptions(context, throwables);
-				fail("exception above exception limit swallowed");
-			} catch (TransactionInvalidException expected) {
-				assertSame(throwables.get(0), expected);
+
+	}
+
+	/**
+	 * TransactionInvalidExceptions are swallowed until the exception limit is
+	 * exceeded. After the limit is exceeded exceptions are rethrown as
+	 * BatchCriticalExceptions
+	 */
+	public void testExceptionThrownAboveLimit() throws Exception {
+
+		final int EXCEPTION_LIMIT = 3;
+		handler.setLimit(EXCEPTION_LIMIT);
+
+		List throwables = new ArrayList() {
+			{
+				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
+					add(new TransactionInvalidException("below exception limit"));
+				}
 			}
+		};
+
+		throwables
+				.add(new TransactionInvalidException("above exception limit"));
+
+		RepeatContextSupport context = new RepeatContextSupport(null);
+
+		try {
+			for (Iterator iterator = throwables.iterator(); iterator.hasNext();) {
+				Throwable throwable = (Throwable) iterator.next();
+
+				handler.handleException(context, throwable);
+				assertTrue("exceptions up to limit are swallowed", true);
+
+			}
+		} catch (TransactionInvalidException expected) {
+			assertEquals("above exception limit", expected.getMessage());
+		}
+
+		// after reaching the limit, behaviour should be idempotent
+		try {
+			handler.handleException(context, new RuntimeException("foo"));
+			assertTrue("exceptions up to limit are swallowed", true);
+
+		} catch (RuntimeException expected) {
+			assertEquals("foo", expected.getMessage());
 		}
 	}
-	
 }

@@ -16,18 +16,16 @@
 
 package org.springframework.batch.repeat.exception.handler;
 
-import java.util.Collection;
-
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**
- * Policy to allow strategies for rethrowing exceptions in the case of
- * termination. Normally a {@link CompletionPolicy} will be used to decide
- * whether to end a batch including when there is an exception, and the
- * {@link ExceptionHandler} is used to distinguish between normal and abnormal
- * ending. An abnormal ending would normally result in an
- * {@link ExceptionHandler} throwing an exception.
+ * Handler to allow strategies for rethrowing exceptions. Normally a
+ * {@link CompletionPolicy} will be used to decide whether to end a batch when
+ * there is no exception, and the {@link ExceptionHandler} is used to signal an
+ * abnormal ending. An abnormal ending would normally result in an
+ * {@link ExceptionHandler} throwing an exception. The caller will catch and
+ * rethrow it if necessary.
  * 
  * @author Dave Syer
  * 
@@ -35,17 +33,21 @@ import org.springframework.batch.repeat.RepeatContext;
 public interface ExceptionHandler {
 
 	/**
-	 * Deal with a collection of throwables accumulated during a batch. The
-	 * collection may consist of RuntimeExceptions or other unchecked
-	 * exceptions.
-	 * @param context the current {@link RepeatContext}. Can be used to store
-	 * state (via attributes), for example to count the number of occurrences of
-	 * a particular exception type and implement a threshold policy.
-	 * @param throwables a collection of non-checked exceptions.
+	 * Deal with a Throwable during a batch. The input might be
+	 * RuntimeExceptions or other unchecked exceptions.
 	 * 
-	 * @throws any or all of the exception types passed in, or a wrapped
-	 * exception if one is an error or checked exception.
+	 * @param context
+	 *            the current {@link RepeatContext}. Can be used to store state
+	 *            (via attributes), for example to count the number of
+	 *            occurrences of a particular exception type and implement a
+	 *            threshold policy.
+	 * @param throwable
+	 *            an exception.
+	 * @throws RuntimeException
+	 *             implementations must wrap and rethrow other Throwables
+	 *             appropriately.
 	 */
-	void handleExceptions(RepeatContext context, Collection throwables) throws RuntimeException;
+	void handleException(RepeatContext context, Throwable throwable)
+			throws RuntimeException;
 
 }

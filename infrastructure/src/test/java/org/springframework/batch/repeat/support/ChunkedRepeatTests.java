@@ -46,7 +46,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	public void testChunkedBatchWithTerminationPolicy() throws Exception {
 
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
-		final RepeatCallback callback = new ItemProviderRepeatCallback(provider, executor);
+		final RepeatCallback callback = new ItemProviderRepeatCallback(provider, processor);
 
 		final RepeatTemplate chunkTemplate = new RepeatTemplate();
 		// The policy is resettable so we only have to resolve this dependency
@@ -62,7 +62,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 		});
 
-		assertEquals(NUMBER_OF_ITEMS, executor.count);
+		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		// The chunk executes 3 times because the last one
 		// returns false. We terminate the main batch when
 		// we encounter a partially empty chunk.
@@ -77,10 +77,10 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	 * 
 	 * @throws Exception
 	 */
-	public void testAsynchronousChunkedBatchWithTerminationPolicy() throws Exception {
+	public void testAsynchronousChunkedBatchWithCompletionPolicy() throws Exception {
 
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
-		final RepeatCallback callback = new ItemProviderRepeatCallback(provider, executor);
+		final RepeatCallback callback = new ItemProviderRepeatCallback(provider, processor);
 
 		final TaskExecutorRepeatTemplate chunkTemplate = new TaskExecutorRepeatTemplate();
 		// The policy is resettable so we only have to resolve this dependency
@@ -97,9 +97,9 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 		});
 
-		assertEquals(NUMBER_OF_ITEMS, executor.count);
+		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		assertFalse(result.isContinuable());
-		assertEquals(3, count);
+		assertTrue("Expected at least 3 chunks but found: "+count, count>=3);
 
 	}
 
@@ -158,7 +158,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 				}
 			};
 			chunker.reset();
-			template.iterate(new ItemProviderRepeatCallback(truncated, executor) {
+			template.iterate(new ItemProviderRepeatCallback(truncated, processor) {
 
 				public ExitStatus doInIteration(RepeatContext context) throws Exception {
 					ExitStatus result = super.doInIteration(context);
@@ -173,7 +173,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 		}
 
-		assertEquals(NUMBER_OF_ITEMS, executor.count);
+		assertEquals(NUMBER_OF_ITEMS, processor.count);
 
 	}
 

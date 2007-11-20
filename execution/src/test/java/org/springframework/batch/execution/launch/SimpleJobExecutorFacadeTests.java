@@ -162,7 +162,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 				try {
 					jobExecutorFacade.start(jobExecution);
 				} catch (NoSuchJobConfigurationException e) {
-					System.err.println("Shouldn't happen");
+					throw new IllegalStateException("Shouldn't happen");
 				}
 			}
 		}).start();

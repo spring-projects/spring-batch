@@ -16,7 +16,6 @@
 
 package org.springframework.batch.repeat.exception.handler;
 
-import java.util.Collection;
 import java.util.HashMap;
 
 import org.springframework.batch.common.ExceptionClassifierSupport;
@@ -78,11 +77,11 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * @see #setType(Class)
 	 * @see #setLimit(int)
 	 * 
-	 * @see org.springframework.batch.repeat.exception.handler.ExceptionHandler#handleExceptions(org.springframework.batch.repeat.RepeatContext,
-	 * java.util.Collection)
+	 * @see org.springframework.batch.repeat.exception.handler.ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
+	 * Throwable)
 	 */
-	public void handleExceptions(RepeatContext context, Collection throwables) throws RuntimeException {
-		delegate.handleExceptions(context, throwables);
+	public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
+		delegate.handleException(context, throwable);
 	}
 
 	/**

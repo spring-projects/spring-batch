@@ -17,7 +17,6 @@
 package org.springframework.batch.repeat.exception.handler;
 
 import java.io.StringWriter;
-import java.util.Collections;
 
 import junit.framework.TestCase;
 
@@ -47,7 +46,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 	
 	public void testRuntimeException() throws Exception {
 		try {
-			handler.handleExceptions(context, Collections.singleton(new RuntimeException("Foo")));
+			handler.handleException(context, new RuntimeException("Foo"));
 			fail("Expected RuntimeException");
 		} catch (RuntimeException e) {
 			assertEquals("Foo", e.getMessage());
@@ -56,7 +55,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 
 	public void testError() throws Exception {
 		try {
-			handler.handleExceptions(context, Collections.singleton(new Error("Foo")));
+			handler.handleException(context, new Error("Foo"));
 			fail("Expected BatchException");
 		} catch (RepeatException e) {
 			assertEquals("Foo", e.getCause().getMessage());
@@ -70,7 +69,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 			}
 		});
 		// No exception...
-		handler.handleExceptions(context, Collections.singleton(new Error("Foo")));
+		handler.handleException(context, new Error("Foo"));
 		assertNotNull(writer.toString());
 	}
 
@@ -81,7 +80,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 			}
 		});
 		// No exception...
-		handler.handleExceptions(context, Collections.singleton(new Error("Foo")));
+		handler.handleException(context, new Error("Foo"));
 		assertNotNull(writer.toString());
 	}
 	
@@ -92,7 +91,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 			}
 		});
 		// No exception...
-		handler.handleExceptions(context, Collections.singleton(new Error("Foo")));
+		handler.handleException(context, new Error("Foo"));
 		assertNotNull(writer.toString());
 	}
 
@@ -103,7 +102,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 			}
 		});
 		try {
-			handler.handleExceptions(context, Collections.singleton(new Error("Foo")));
+			handler.handleException(context, new Error("Foo"));
 			fail("Expected IllegalStateException");
 		} catch (IllegalStateException e) {
 			assertTrue(e.getMessage().toLowerCase().indexOf("unclassified")>=0);

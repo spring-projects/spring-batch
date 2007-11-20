@@ -29,20 +29,22 @@ public interface RepeatInterceptor {
 	 * Called by the framework before each batch item. Implementers can halt a
 	 * batch by setting the complete flag on the context.
 	 * 
-	 * @param context the current batch context.
+	 * @param context
+	 *            the current batch context.
 	 */
 	void before(RepeatContext context);
 
 	/**
-	 * Called by the framework after each item has been processed, including if
-	 * the item processing results in an exception, in which case result is an
-	 * Exception. This method is called as soon as the result is known, whereas
-	 * {@link #onError(RepeatContext, Throwable)} is only guaranteed to be
-	 * called at some time after the failure occurred.
+	 * Called by the framework after each item has been processed, unless the
+	 * item processing results in an exception. This method is called as soon as
+	 * the result is known.
 	 * 
-	 * @param context the current batch context
-	 * @param result the result of the callback item - ExitStatus in normal
-	 * circumstances, but might be null or an Exception in abnormal cases.
+	 * @param context
+	 *            the current batch context
+	 * @param result
+	 *            the result of the callback item - ExitStatus in normal
+	 *            circumstances, but might be null or an Exception in abnormal
+	 *            cases.
 	 */
 	void after(RepeatContext context, Object result);
 
@@ -54,20 +56,23 @@ public interface RepeatInterceptor {
 	 * enclosing batches (the whole job), the would need to use the parent
 	 * context (recursively).
 	 * 
-	 * @param context the current batch context
+	 * @param context
+	 *            the current batch context
 	 */
 	void open(RepeatContext context);
 
 	/**
-	 * Called at the end of a batch if any callback fails by throwing an
-	 * exception. There will be one call to this method for each exception
-	 * thrown during a repeat operation (e.g. a chunk).<br/>
+	 * Called when a repeat callback fails by throwing an exception. There will
+	 * be one call to this method for each exception thrown during a repeat
+	 * operation (e.g. a chunk).<br/>
 	 * 
 	 * There is no need to re-throw the exception here - that will be done by
 	 * the enclosing framework.
 	 * 
-	 * @param context the current batch context
-	 * @param e the error that was encountered in an item callback.
+	 * @param context
+	 *            the current batch context
+	 * @param e
+	 *            the error that was encountered in an item callback.
 	 */
 	void onError(RepeatContext context, Throwable e);
 
@@ -76,8 +81,8 @@ public interface RepeatInterceptor {
 	 * completion (i.e. even after an exception). Implementers can use this
 	 * method to clean up any resources.
 	 * 
-	 * @param context the current batch context.
-	 * @return TODO
+	 * @param context
+	 *            the current batch context.
 	 */
 	void close(RepeatContext context);
 }

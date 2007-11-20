@@ -18,7 +18,6 @@ package org.springframework.batch.execution.launch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -71,15 +70,15 @@ public class SimpleJobTests extends TestCase {
 
 	private ItemProvider provider;
 
-	private DefaultJobExecutor jobLifecycle = new DefaultJobExecutor();;
+	private DefaultJobExecutor jobExecutor = new DefaultJobExecutor();;
 
 	private DefaultStepExecutor stepLifecycle = new DefaultStepExecutor();
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		jobLifecycle.setJobRepository(repository);
+		jobExecutor.setJobRepository(repository);
 		stepLifecycle.setRepository(repository);
-		jobLifecycle.setStepExecutorFactory(new StepExecutorFactory() {
+		jobExecutor.setStepExecutorFactory(new StepExecutorFactory() {
 			public StepExecutor getExecutor(StepConfiguration configuration) {
 				return stepLifecycle;
 			}
@@ -125,7 +124,7 @@ public class SimpleJobTests extends TestCase {
 
 		JobExecution jobExecutionContext = new JobExecution(job);
 
-		jobLifecycle.run(jobConfiguration, jobExecutionContext);
+		jobExecutor.run(jobConfiguration, jobExecutionContext);
 		assertEquals(BatchStatus.COMPLETED, job.getStatus());
 		assertEquals(3, processed.size());
 		assertTrue(processed.contains("foo"));
@@ -136,13 +135,14 @@ public class SimpleJobTests extends TestCase {
 
 		JobConfiguration jobConfiguration = new JobConfiguration();
 		JobIdentifier runtimeInformation = new SimpleJobIdentifier("real.job");
+		final List throwables = new ArrayList();
 
 		RepeatTemplate chunkOperations = new RepeatTemplate();
 		// Always handle the exception a check it is the right one...
 		chunkOperations.setExceptionHandler(new ExceptionHandler() {
-			public void handleExceptions(RepeatContext context, Collection throwables) {
-				assertEquals(1, throwables.size());
-				assertEquals("Try again Dummy!", ((Throwable) throwables.iterator().next()).getMessage());
+			public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
+				throwables.add(throwable);
+				assertEquals("Try again Dummy!", throwable.getMessage());
 			}
 		});
 		stepLifecycle.setChunkOperations(chunkOperations);
@@ -170,8 +170,8 @@ public class SimpleJobTests extends TestCase {
 		jobConfiguration.addStep(step);
 
 		JobInstance job = repository.findOrCreateJob(jobConfiguration, runtimeInformation);
-		JobExecution jobExecutionContext = new JobExecution(job);
-		jobLifecycle.run(jobConfiguration, jobExecutionContext);
+		JobExecution jobExecution = new JobExecution(job);
+		jobExecutor.run(jobConfiguration, jobExecution);
 
 		assertEquals(BatchStatus.COMPLETED, job.getStatus());
 		assertEquals(0, processed.size());
@@ -196,7 +196,7 @@ public class SimpleJobTests extends TestCase {
 		JobInstance job = repository.findOrCreateJob(jobConfiguration, runtimeInformation);
 		JobExecution jobExecutionContext = new JobExecution(job);
 		try {
-			jobLifecycle.run(jobConfiguration, jobExecutionContext);
+			jobExecutor.run(jobConfiguration, jobExecutionContext);
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {
