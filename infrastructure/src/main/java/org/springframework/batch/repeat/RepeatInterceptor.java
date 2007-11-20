@@ -42,11 +42,9 @@ public interface RepeatInterceptor {
 	 * @param context
 	 *            the current batch context
 	 * @param result
-	 *            the result of the callback item - ExitStatus in normal
-	 *            circumstances, but might be null or an Exception in abnormal
-	 *            cases.
+	 *            the result of the callback
 	 */
-	void after(RepeatContext context, Object result);
+	void after(RepeatContext context, ExitStatus result);
 
 	/**
 	 * Called once at the start of a complete batch, before any items are

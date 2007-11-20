@@ -50,7 +50,7 @@ import org.springframework.util.Assert;
  * the {@link RepeatCallback} can consider using a custom
  * {@link RepeatInterceptor} instead of trying to customise the
  * {@link CompletionPolicy}. This is generally a friendlier interface to
- * implement, and the {@link RepeatInterceptor#after(RepeatContext, Object)}
+ * implement, and the {@link RepeatInterceptor#after(RepeatContext, ExitStatus)}
  * method is passed in the result of the callback, which would be an instance of
  * {@link Throwable} if the business processing had thrown an exception. If the
  * exception is not to be propagated to the caller, then a non-default

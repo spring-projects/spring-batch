@@ -83,11 +83,11 @@ public class RepeatInterceptorTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		final List calls = new ArrayList();
 		template.setInterceptors(new RepeatInterceptor[] { new RepeatInterceptorAdapter() {
-			public void after(RepeatContext context, Object result) {
+			public void after(RepeatContext context, ExitStatus result) {
 				calls.add("1");
 			}
 		}, new RepeatInterceptorAdapter() {
-			public void after(RepeatContext context, Object result) {
+			public void after(RepeatContext context, ExitStatus result) {
 				calls.add("2");
 			}
 		} });
@@ -201,7 +201,7 @@ public class RepeatInterceptorTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		final List calls = new ArrayList();
 		template.setInterceptors(new RepeatInterceptor[] { new RepeatInterceptorAdapter() {
-			public void after(RepeatContext context, Object result) {
+			public void after(RepeatContext context, ExitStatus result) {
 				calls.add("1");
 			}
 		}, new RepeatInterceptorAdapter() {
@@ -231,7 +231,7 @@ public class RepeatInterceptorTests extends TestCase {
 		final List calls = new ArrayList();
 		final List fails = new ArrayList();
 		template.setInterceptors(new RepeatInterceptor[] { new RepeatInterceptorAdapter() {
-			public void after(RepeatContext context, Object result) {
+			public void after(RepeatContext context, ExitStatus result) {
 				calls.add("1");
 			}
 		}, new RepeatInterceptorAdapter() {

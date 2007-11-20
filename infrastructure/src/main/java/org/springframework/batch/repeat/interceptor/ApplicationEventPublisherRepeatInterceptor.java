@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.repeat.interceptor;
 
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatInterceptor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,7 +42,7 @@ public class ApplicationEventPublisherRepeatInterceptor implements ApplicationEv
 	 * @see org.springframework.batch.repeat.RepeatInterceptor#after(org.springframework.batch.repeat.RepeatContext,
 	 * java.lang.Object)
 	 */
-	public void after(RepeatContext context, Object result) {
+	public void after(RepeatContext context, ExitStatus result) {
 		publish(context, "After repeat callback with result=[" + result + "]", RepeatOperationsApplicationEvent.AFTER);
 	}
 

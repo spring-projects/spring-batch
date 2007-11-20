@@ -18,6 +18,7 @@ package org.springframework.batch.repeat.interceptor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.context.ApplicationEvent;
@@ -50,10 +51,10 @@ public class ApplicationEventPublisherRepeatInterceptorTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatInterceptor#after(org.springframework.batch.repeat.RepeatContext, java.lang.Object)}.
+	 * Test method for {@link org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatInterceptor#after(org.springframework.batch.repeat.RepeatContext, ExitStatus)}.
 	 */
 	public void testAfter() {
-		interceptor.after(context, Boolean.TRUE);
+		interceptor.after(context, ExitStatus.CONTINUABLE);
 		assertEquals(1, list.size());
 		RepeatOperationsApplicationEvent event = (RepeatOperationsApplicationEvent) list.get(0);
 		assertEquals(RepeatOperationsApplicationEvent.AFTER, event.getType());

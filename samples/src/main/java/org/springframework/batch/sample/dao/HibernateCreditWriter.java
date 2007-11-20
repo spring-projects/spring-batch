@@ -18,6 +18,7 @@ package org.springframework.batch.sample.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatInterceptor;
 import org.springframework.batch.sample.domain.CustomerCredit;
@@ -80,7 +81,7 @@ public class HibernateCreditWriter extends HibernateDaoSupport implements
 		this.failOnFlush = failOnFlush;
 	}
 
-	public void after(RepeatContext context, Object result) {
+	public void after(RepeatContext context, ExitStatus result) {
 	}
 
 	public void before(RepeatContext context) {
