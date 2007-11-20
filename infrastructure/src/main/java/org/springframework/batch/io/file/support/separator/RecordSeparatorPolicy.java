@@ -31,11 +31,11 @@ public interface RecordSeparatorPolicy {
 	/**
 	 * Signal the end of a record based on the content of a line, being the
 	 * latest line read from an input source. The input is what you would expect
-	 * from {@link BufferedReader#readLine()} - i.e. no line spearator character
+	 * from {@link BufferedReader#readLine()} - i.e. no line separator character
 	 * at the end. But it might have line separators embedded in it.
 	 * 
 	 * @param line a String without a newline character at the end.
-	 * @return tru if this line is the end of a record.
+	 * @return true if this line is the end of a record.
 	 */
 	boolean isEndOfRecord(String line);
 
@@ -48,7 +48,7 @@ public interface RecordSeparatorPolicy {
 	String postProcess(String record);
 
 	/**
-	 * Preprocess a line befor eit is appended to a record. Can be used to
+	 * Preprocess a line before it is appended to a record. Can be used to
 	 * remove a prefix or line-continuation marker.
 	 * 
 	 * @param line the current line.
