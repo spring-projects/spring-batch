@@ -16,6 +16,7 @@
 
 package org.springframework.batch.repeat.policy;
 
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
@@ -32,9 +33,9 @@ public class CompletionPolicySupport implements CompletionPolicy {
 	 * Delegate to {@link #isComplete(RepeatContext)}.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext,
-	 * java.lang.Object)
+	 * ExitStatus)
 	 */
-	public boolean isComplete(RepeatContext context, Object result) {
+	public boolean isComplete(RepeatContext context, ExitStatus result) {
 		return isComplete(context);
 	}
 

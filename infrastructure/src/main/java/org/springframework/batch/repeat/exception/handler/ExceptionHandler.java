@@ -23,7 +23,7 @@ import org.springframework.batch.repeat.RepeatContext;
  * Handler to allow strategies for rethrowing exceptions. Normally a
  * {@link CompletionPolicy} will be used to decide whether to end a batch when
  * there is no exception, and the {@link ExceptionHandler} is used to signal an
- * abnormal ending. An abnormal ending would normally result in an
+ * abnormal ending - an abnormal ending would result in an
  * {@link ExceptionHandler} throwing an exception. The caller will catch and
  * rethrow it if necessary.
  * 
@@ -34,7 +34,7 @@ public interface ExceptionHandler {
 
 	/**
 	 * Deal with a Throwable during a batch. The input might be
-	 * RuntimeExceptions or other unchecked exceptions.
+	 * RuntimeException or other unchecked exceptions.
 	 * 
 	 * @param context
 	 *            the current {@link RepeatContext}. Can be used to store state

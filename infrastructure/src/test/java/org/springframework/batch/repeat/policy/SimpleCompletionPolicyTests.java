@@ -18,6 +18,7 @@ package org.springframework.batch.repeat.policy;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
 public class SimpleCompletionPolicyTests extends TestCase {
@@ -26,7 +27,7 @@ public class SimpleCompletionPolicyTests extends TestCase {
 
 	RepeatContext context;
 
-	Object dummy = "foo";
+	ExitStatus dummy = ExitStatus.CONTINUABLE;
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -58,17 +59,6 @@ public class SimpleCompletionPolicyTests extends TestCase {
 		assertFalse(policy.isComplete(context, dummy));
 		policy.update(context);
 		assertTrue(policy.isComplete(context, null));
-	}
-
-	public void testTerminationAfterException() throws Exception {
-		policy.update(context);
-		try {
-			assertTrue(policy.isComplete(context, new IllegalStateException("foo")));
-		}
-		catch (IllegalStateException e) {
-			assertEquals("foo", e.getMessage());
-			fail("Unxpected IllegalStateException");
-		}
 	}
 
 	public void testReset() throws Exception {

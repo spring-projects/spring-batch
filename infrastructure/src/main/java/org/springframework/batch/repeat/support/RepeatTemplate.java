@@ -207,7 +207,7 @@ public class RepeatTemplate implements RepeatOperations {
 						// continuing
 
 						try {
-							
+
 							for (int i = interceptors.length; i-- > 0;) {
 								RepeatInterceptor interceptor = interceptors[i];
 								interceptor.onError(context, throwable);
@@ -218,16 +218,18 @@ public class RepeatTemplate implements RepeatOperations {
 										+ interceptors.length + ")", throwable);
 							}
 
-							exceptionHandler.handleException(context,
-									throwable);
-							
+							exceptionHandler
+									.handleException(context, throwable);
+
 						} catch (Throwable handled) {
 							throwables.add(handled);
 						}
 					}
 
 					// N.B. the order may be important here:
-					if (isComplete(context, result) || isMarkedComplete(context) || !throwables.isEmpty()) {
+					if (isComplete(context, result)
+							|| isMarkedComplete(context)
+							|| !throwables.isEmpty()) {
 						running = false;
 					}
 				}
@@ -280,8 +282,10 @@ public class RepeatTemplate implements RepeatOperations {
 	private static Exception rethrow(Throwable next) throws RuntimeException {
 		if (next instanceof RuntimeException) {
 			throw (RuntimeException) next;
-		};
-		throw new RepeatException("Rethrowing exception that is no RuntimeException.", next);
+		}
+		;
+		throw new RepeatException(
+				"Rethrowing exception that is no RuntimeException.", next);
 	}
 
 	/**
@@ -314,7 +318,8 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @see {@link #isComplete(RepeatContext)}
 	 */
 	protected ExitStatus getNextResult(RepeatContext context,
-			RepeatCallback callback, RepeatInternalState state) throws Throwable {
+			RepeatCallback callback, RepeatInternalState state)
+			throws Throwable {
 		try {
 			update(context);
 			return callback.doInIteration(context);
@@ -369,14 +374,12 @@ public class RepeatTemplate implements RepeatOperations {
 	 *            the result of the callback to process.
 	 */
 	protected void executeAfterInterceptors(final RepeatContext context,
-			Object value) {
+			ExitStatus value) {
 
 		// Don't re-throw exceptions here: let the exception handler deal with
 		// that...
 
-		if (value != null
-				&& ((value instanceof ExitStatus)
-						&& ((ExitStatus) value).isContinuable() || (value instanceof Throwable))) {
+		if (value != null && value.isContinuable()) {
 			for (int i = interceptors.length; i-- > 0;) {
 				RepeatInterceptor interceptor = interceptors[i];
 				interceptor.after(context, value);
@@ -390,9 +393,9 @@ public class RepeatTemplate implements RepeatOperations {
 	 * Delegate to the {@link CompletionPolicy}.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext,
-	 *      Object)
+	 *      ExitStatus)
 	 */
-	public boolean isComplete(RepeatContext context, Object result) {
+	public boolean isComplete(RepeatContext context, ExitStatus result) {
 		boolean complete = completionPolicy.isComplete(context, result);
 		if (complete) {
 			logger

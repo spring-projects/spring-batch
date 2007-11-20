@@ -22,8 +22,8 @@ import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Very simple {@link CompletionPolicy} that bases its decision on the result of
- * a batch operation. If the result is Boolean.FALSE, null or an instance of
- * Throwable the batch is complete, otherwise not.
+ * a batch operation. If the result is null or not continuable according to the
+ * {@link ExitStatus} the batch is complete, otherwise not.
  * 
  * @author Dave Syer
  * 
@@ -31,15 +31,14 @@ import org.springframework.batch.repeat.ExitStatus;
 public class DefaultResultCompletionPolicy extends CompletionPolicySupport {
 
 	/**
-	 * True if the result is null, a {@link ExitStatus} indicating completion,
-	 * or an instance of Throwable.
+	 * True if the result is null, or a {@link ExitStatus} indicating
+	 * completion.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext,
-	 * java.lang.Object)
+	 *      ExitStatus)
 	 */
-	public boolean isComplete(RepeatContext context, Object result) {
-		return (result == null || (result instanceof Throwable) || (result instanceof ExitStatus && !((ExitStatus) result)
-				.isContinuable()));
+	public boolean isComplete(RepeatContext context, ExitStatus result) {
+		return (result == null || !result.isContinuable());
 	}
 
 	/**

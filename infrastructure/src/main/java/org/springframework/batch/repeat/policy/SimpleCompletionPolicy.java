@@ -16,6 +16,7 @@
 
 package org.springframework.batch.repeat.policy;
 
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -62,11 +63,11 @@ public class SimpleCompletionPolicy extends DefaultResultCompletionPolicy {
 	 * Terminate if the chunk size has been reached, or the result is null.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext,
-	 * Object)
+	 * ExitStatus)
 	 * @throws Exception (normally terminating the batch) if the result is
 	 * itself an exception.
 	 */
-	public boolean isComplete(RepeatContext context, Object result) {
+	public boolean isComplete(RepeatContext context, ExitStatus result) {
 		return super.isComplete(context, result) || ((SimpleTerminationContext) context).isComplete();
 	}
 

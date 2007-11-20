@@ -47,46 +47,4 @@ public class TimeoutCompletionPolicyTests extends TestCase {
 		assertTrue(policy.isComplete(context));
 	}
 
-	public void testException() throws Exception {
-		TimeoutTerminationPolicy policy = new TimeoutTerminationPolicy();
-		RepeatContext context = policy.start(null);
-		assertFalse(policy.isComplete(context));
-		try {
-			policy.isComplete(context, new RuntimeException("foo"));
-		}
-		catch (RuntimeException e) {
-			// expected
-			assertEquals("foo", e.getMessage());
-		}
-		assertFalse(policy.isComplete(context));
-	}
-
-	public void testError() throws Exception {
-		TimeoutTerminationPolicy policy = new TimeoutTerminationPolicy();
-		RepeatContext context = policy.start(null);
-		assertFalse(policy.isComplete(context));
-		try {
-			policy.isComplete(context, new Error("foo"));
-		}
-		catch (Error e) {
-			// expected
-			assertEquals("foo", e.getMessage());
-		}
-		assertFalse(policy.isComplete(context));
-	}
-
-	public void testThrowable() throws Exception {
-		TimeoutTerminationPolicy policy = new TimeoutTerminationPolicy();
-		RepeatContext context = policy.start(null);
-		assertFalse(policy.isComplete(context));
-		try {
-			policy.isComplete(context, new Throwable("foo"));
-		}
-		catch (Throwable e) {
-			// expected
-			assertEquals("foo", e.getCause().getMessage());
-		}
-		assertFalse(policy.isComplete(context));
-	}
-
 }

@@ -167,8 +167,9 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			if (value instanceof Throwable) {
 				state.getThrowables().add(value);
 			} else {
-				result = result && canContinue((ExitStatus) value);
-				executeAfterInterceptors(future.getContext(), value);
+				ExitStatus status = (ExitStatus) value;
+				result = result && canContinue(status);
+				executeAfterInterceptors(future.getContext(), status);
 			}
 
 		}

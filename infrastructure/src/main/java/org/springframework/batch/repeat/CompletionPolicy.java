@@ -41,7 +41,7 @@ public interface CompletionPolicy {
 	 * 
 	 * @see #isComplete(RepeatContext)
 	 */
-	boolean isComplete(RepeatContext context, Object result);
+	boolean isComplete(RepeatContext context, ExitStatus result);
 
 	/**
 	 * Allow policy to signal completion according to internal state, without
