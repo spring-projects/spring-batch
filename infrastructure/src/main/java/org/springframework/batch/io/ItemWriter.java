@@ -18,18 +18,19 @@ package org.springframework.batch.io;
 
 /**
  * Basic interface for generic output operations. Class implementing this
- * interface will be responsible for serializing objects to output source.
- * Generally, it is responsibility of implementing class to decide which
- * technology to use for mapping and how it should be configured.
+ * interface will be responsible for serializing objects. Generally, it is
+ * responsibility of implementing class to decide which technology to use for
+ * mapping and how it should be configured.
  * 
  * @author Dave Syer
  */
-public interface ItemWriter  {
+public interface ItemWriter {
 
 	/**
 	 * Writes provided object to an output stream or similar.
 	 * 
-	 * @param item the object to write.
+	 * @param item
+	 *            the object to write.
 	 */
 	public void write(Object item);
 }

@@ -34,7 +34,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
- * StaxEventWriterOutputSource is implementation of {@link ItemWriter} which uses
+ * An implementation of {@link ItemWriter} which uses
  * StAX and {@link ObjectToXmlSerializer} for serializing object to XML.
  *
  * This output source also provides restart, statistics and transaction
@@ -98,7 +98,7 @@ public class StaxEventWriterItemWriter implements ItemWriter, ResourceLifecycle,
 	private XMLEventWriter delegateEventWriter;
 
 	// transaction synchronization object
-	private TransactionSynchronization synchronization = new StaxEventWriterOutputSourceTransactionSychronization();
+	private TransactionSynchronization synchronization = new StaxEventWriterItemWriterTransactionSychronization();
 
 	// byte offset in file channel at last commit point
 	private long lastCommitPointPosition = 0;
@@ -472,7 +472,7 @@ public class StaxEventWriterItemWriter implements ItemWriter, ResourceLifecycle,
 	/**
 	 * Encapsulates transaction events for the StaxEventWriterOutputSource.
 	 */
-	private class StaxEventWriterOutputSourceTransactionSychronization extends
+	private class StaxEventWriterItemWriterTransactionSychronization extends
 			TransactionSynchronizationAdapter {
 
 		public void afterCompletion(int status) {

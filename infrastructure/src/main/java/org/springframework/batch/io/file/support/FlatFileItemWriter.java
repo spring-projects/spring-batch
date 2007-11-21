@@ -46,14 +46,14 @@ import org.springframework.util.Assert;
 
 /**
  * This class is an output target that writes data to a file or stream. The
- * output source also provides restart, statistics and transaction features by
+ * writer also provides restart, statistics and transaction features by
  * implementing corresponding interfaces where possible (with a file). The
  * location of the file is defined by a {@link Resource} and must represent a
  * writable file.<br/>
  * 
  * Uses buffered writer to improve performance.<br/>
  * 
- * Use {@link #write(String)} method to output a line to an output source.
+ * Use {@link #write(String)} method to output a line to an item writer.
  * 
  * @author Waseem Malik
  * @author Tomas Slanina
@@ -284,8 +284,8 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	}
 
 	/**
-	 * Encapsulates the runtime state of the output source. All state changing
-	 * operations on the output source go through this class.
+	 * Encapsulates the runtime state of the writer. All state changing
+	 * operations on the writer go through this class.
 	 */
 	private class OutputState {
 		// default encoding for writing to output files - set to UTF-8.
@@ -383,7 +383,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 				fileChannel.close();
 			}
 			catch (IOException ioe) {
-				throw new BatchEnvironmentException("Unable to close the the Output Source", ioe);
+				throw new BatchEnvironmentException("Unable to close the the ItemWriter", ioe);
 			}
 		}
 
@@ -403,7 +403,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 				linesWritten++;
 			}
 			catch (IOException e) {
-				throw new BatchCriticalException("An Error occured while trying to write to FileWriterOutputSource", e);
+				throw new BatchCriticalException("An Error occured while trying to write to FlatFileItemWriter", e);
 			}
 		}
 

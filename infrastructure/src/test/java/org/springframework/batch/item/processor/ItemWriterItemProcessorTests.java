@@ -46,7 +46,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		source = new MockOutputSource("test");
-		processor.setOutputSource(source);
+		processor.setItemWriter(source);
 		processor.afterPropertiesSet();
 	}
 
@@ -87,7 +87,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testGetRestartDataWithoutRestartable() throws Exception {
-		processor.setOutputSource(null);
+		processor.setItemWriter(null);
 		try {
 			processor.getRestartData();
 			fail("Expected IllegalStateException");
@@ -102,7 +102,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testRestoreFromWithoutRestartable() throws Exception {
-		processor.setOutputSource(null);
+		processor.setItemWriter(null);
 		try {
 			processor.restoreFrom(new GenericRestartData(PropertiesConverter.stringToProperties("value=bar")));
 			fail("Expected IllegalStateException");
@@ -116,7 +116,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 * Gets statistics from the input template
 	 */
 	public void testGetStatisticsWithoutStatisticsProvider() {
-		processor.setOutputSource(null);
+		processor.setItemWriter(null);
 		Properties props = processor.getStatistics();
 		assertEquals(null, props.getProperty("a"));
 	}
@@ -128,10 +128,10 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	}
 
 	/**
-	 * Output source property must be set.
+	 * ItemWriter property must be set.
 	 */
 	public void testAfterPropertiesSet() throws Exception {
-		processor.setOutputSource(null);
+		processor.setItemWriter(null);
 		try {
 			processor.afterPropertiesSet();
 			fail();

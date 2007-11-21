@@ -47,7 +47,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 
 	protected void setUp() throws Exception {
 		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", "xml"));
-		source = newOutputSource();
+		source = createItemWriter();
 	}
 
 	/**
@@ -94,8 +94,8 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
 		RestartData restartData = source.getRestartData();
 
-		// create new output source from saved restart data and continue writing
-		source = newOutputSource();
+		// create new writer from saved restart data and continue writing
+		source = createItemWriter();
 		source.restoreFrom(restartData);
 		source.write(record);
 		source.destroy();
@@ -186,9 +186,9 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	}
 
 	/**
-	 * @return new instance of fully configured output source
+	 * @return new instance of fully configured writer
 	 */
-	private StaxEventWriterItemWriter newOutputSource() throws Exception {
+	private StaxEventWriterItemWriter createItemWriter() throws Exception {
 		StaxEventWriterItemWriter source = new StaxEventWriterItemWriter();
 		source.setResource(resource);
 

@@ -25,7 +25,7 @@ public class ItemWriterItemProcessor implements ItemProcessor, Restartable, Skip
 	private ItemWriter source;
 
 	/**
-	 * Calls {@link #doProcess(Object)} and then writes the result to the output source.
+	 * Calls {@link #doProcess(Object)} and then writes the result to the {@link ItemWriter}.
 	 * 
 	 * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
 	 */
@@ -43,9 +43,9 @@ public class ItemWriterItemProcessor implements ItemProcessor, Restartable, Skip
 	}
 
 	/**
-	 * Setter for output source.
+	 * Setter for {@link ItemWriter}.
 	 */
-	public void setOutputSource(ItemWriter source) {
+	public void setItemWriter(ItemWriter source) {
 		this.source = source;
 	}
 
