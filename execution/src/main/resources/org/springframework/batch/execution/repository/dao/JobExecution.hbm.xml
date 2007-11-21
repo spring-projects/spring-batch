@@ -15,11 +15,11 @@
 		<many-to-one name="job" cascade="all" update="false" column="JOB_ID" access="field"/>
 		<property name="startTime" column="START_TIME" />
 		<property name="endTime" column="END_TIME" />
-		<property name="status" type="org.springframework.batch.execution.repository.dao.BatchStatusUserType" column="STATUS" />
+		<property name="status" type="org.springframework.batch.execution.repository.dao.BatchStatusUserType" column="STATUS" length="10"/>
 		<property name="exitStatus" type="org.springframework.batch.execution.repository.dao.ExitStatusUserType">
 			<column name="CONTINUABLE"/>
-			<column name="EXIT_CODE"/>
-			<column name="EXIT_MESSAGE"/>
+			<column name="EXIT_CODE" length="20"/>
+			<column name="EXIT_MESSAGE" length="250"/>
 		</property>
 	</class>
 

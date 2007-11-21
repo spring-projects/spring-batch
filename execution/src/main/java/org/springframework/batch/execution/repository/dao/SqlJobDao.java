@@ -21,6 +21,8 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
@@ -49,6 +51,8 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  */
 public class SqlJobDao implements JobDao, InitializingBean {
+	
+	protected static final Log logger = LogFactory.getLog(SqlJobDao.class);
 
 	/**
 	 * Default value for the table prefix property.
@@ -77,6 +81,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) values (?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE ID=?";
+
+	private static final int EXIT_MESSAGE_LENGTH = 250;
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -207,11 +213,16 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 		validateJobExecution(jobExecution);
 
+		String exitDescription = jobExecution.getExitStatus().getExitDescription();
+		if (exitDescription!=null && exitDescription.length()>EXIT_MESSAGE_LENGTH) {
+			exitDescription = exitDescription.substring(0, EXIT_MESSAGE_LENGTH);
+			logger.debug("Truncating long message before update of JobExecution: "+jobExecution);
+		}
 		Object[] parameters = new Object[] { jobExecution.getStartTime(),
 				jobExecution.getEndTime(), jobExecution.getStatus().toString(),
 				jobExecution.getExitStatus().isContinuable() ? "Y" : "N",
 				jobExecution.getExitStatus().getExitCode(),
-				jobExecution.getExitStatus().getExitDescription(),
+				exitDescription,
 				jobExecution.getId() };
 
 		if (jobExecution.getId() == null) {

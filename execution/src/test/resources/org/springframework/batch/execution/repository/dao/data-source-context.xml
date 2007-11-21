@@ -6,7 +6,7 @@
 		<property name="dataSource">
 			<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 				<property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
-				<property name="url" value="jdbc:hsqldb:mem:testdb"/>
+				<property name="url" value="jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true"/>
 			</bean>
 		</property>
 		<property name="initScript" value="org/springframework/batch/execution/repository/dao/init.sql" />

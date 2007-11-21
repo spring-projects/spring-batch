@@ -26,10 +26,13 @@ import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.ClassUtils;
 
 public class HibernateJobDaoTests extends AbstractJobDaoTests {
 
+	private static final String LONG_STRING = BatchHibernateInterceptorTests.LONG_STRING;
+	
 	private SessionFactory sessionFactory;
 
 	protected String[] getConfigLocations() {
@@ -87,6 +90,22 @@ public class HibernateJobDaoTests extends AbstractJobDaoTests {
 		assertEquals(jobs.size(), 1);
 		JobInstance testJob = (JobInstance) jobs.get(0);
 		assertEquals(simpleJob, testJob);
+	}
+
+	public void testUpdateJobExecutionWithLongExitCode() {
+
+		assertTrue(LONG_STRING.length()>250);
+		jobExecution.setExitStatus(ExitStatus.FINISHED.addExitDescription(LONG_STRING));
+		jobDao.update(jobExecution);
+
+		sessionFactory.getCurrentSession().flush();
+
+		List executions = jdbcTemplate.queryForList(
+				"SELECT * FROM BATCH_JOB_EXECUTION where JOB_ID=?",
+				new Object[] { job.getId() });
+		assertEquals(1, executions.size());
+		assertEquals(LONG_STRING.substring(0, 250), ((Map) executions.get(0))
+				.get("EXIT_MESSAGE"));
 	}
 
 	public void testNullIdentifierName() {

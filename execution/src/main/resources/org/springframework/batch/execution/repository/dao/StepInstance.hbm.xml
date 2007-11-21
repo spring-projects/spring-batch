@@ -16,8 +16,8 @@
 		<property name="name" update="false" column="STEP_NAME" access="field"/>
 		<property name="restartData"
 			type="org.springframework.batch.execution.repository.dao.RestartDataUserType" insert="false"
-			column="RESTART_DATA" />
+			column="RESTART_DATA" length="250"/>
 		<property name="status" type="org.springframework.batch.execution.repository.dao.BatchStatusUserType"
-			insert="false" column="STATUS" />
+			insert="false" column="STATUS" length="10"/>
 	</class>
 </hibernate-mapping>

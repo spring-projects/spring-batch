@@ -22,6 +22,8 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
@@ -55,9 +57,12 @@ import org.springframework.util.StringUtils;
  * on the step dao java docs as well.
  * 
  * @author Lucas Ward
+ * @author Dave Syer
  * @see StepDao
  */
 public class SqlStepDao implements StepDao, InitializingBean {
+
+	protected static final Log logger = LogFactory.getLog(SqlStepDao.class);
 
 	// Step SQL statements
 	private static final String FIND_STEPS = "SELECT ID, STEP_NAME, STATUS, RESTART_DATA from %PREFIX%STEP where JOB_ID = ?";
@@ -83,6 +88,8 @@ public class SqlStepDao implements StepDao, InitializingBean {
 
 	private static final String FIND_STEP_EXECUTIONS = "SELECT ID, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
 			+ " TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%STEP_EXECUTION where STEP_ID = ?";
+
+	private static final int EXIT_MESSAGE_LENGTH = 250;
 
 	private JdbcOperations jdbcTemplate;
 
@@ -314,6 +321,12 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		// return; // throw exception?
 		// }
 
+		String exitDescription = stepExecution.getExitStatus().getExitDescription();
+		if (exitDescription!=null && exitDescription.length()>EXIT_MESSAGE_LENGTH) {
+			exitDescription = exitDescription.substring(0, EXIT_MESSAGE_LENGTH);
+			logger.debug("Truncating long message before update of StepExecution: "+stepExecution);
+		}
+
 		Object[] parameters = new Object[] {
 				stepExecution.getStartTime(),
 				stepExecution.getEndTime(),
@@ -324,7 +337,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 						.getStatistics()),
 				stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
 				stepExecution.getExitStatus().getExitCode(),
-				stepExecution.getExitStatus().getExitDescription(),
+				exitDescription,
 				stepExecution.getId() };
 		jdbcTemplate
 				.update(getQuery(UPDATE_STEP_EXECUTION), parameters,

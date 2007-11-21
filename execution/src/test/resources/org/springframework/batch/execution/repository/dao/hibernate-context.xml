@@ -27,7 +27,7 @@
 		</property>
 		<property name="entityInterceptor">
 			<bean
-				class="org.springframework.batch.execution.repository.dao.EntityNameInterceptor">
+				class="org.springframework.batch.execution.repository.dao.BatchHibernateInterceptor">
 					<property name="entityNameLocator" ref="entityNameLocator"/>
 			</bean>
 		</property>

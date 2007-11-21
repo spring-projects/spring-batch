@@ -26,11 +26,13 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.util.ClassUtils;
 
 public class HibernateStepDaoTests extends AbstractStepDaoTests {
 
+	private static final String LONG_STRING = BatchHibernateInterceptorTests.LONG_STRING;
 	private SessionFactory sessionFactory;
 
 	public void setSessionFactory(SessionFactory sessionFactory) {
@@ -78,5 +80,21 @@ public class HibernateStepDaoTests extends AbstractStepDaoTests {
 
 	}
 
+	public void testUpdateStepExecutionWithLongDescription() {
+
+		assertTrue(LONG_STRING.length()>250);
+		stepExecution.setExitStatus(ExitStatus.FINISHED.addExitDescription(LONG_STRING));
+		stepDao.update(stepExecution);
+
+		sessionFactory.getCurrentSession().flush();
+
+		List executions = jdbcTemplate.queryForList(
+				"SELECT * FROM BATCH_STEP_EXECUTION where STEP_ID=?",
+				new Object[] { step1.getId() });
+		assertEquals(1, executions.size());
+		assertEquals(LONG_STRING.substring(0, 250), ((Map) executions.get(0))
+				.get("EXIT_MESSAGE"));
+
+	}
 
 }
