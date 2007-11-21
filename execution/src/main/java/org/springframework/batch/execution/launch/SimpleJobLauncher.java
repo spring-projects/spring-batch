@@ -489,11 +489,13 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	}
 
 	/**
-	 * Accessor for the job executions passed back in response to a call to
-	 * {@link #requestContextNotification()}. Because the request is
-	 * potentially fulfilled asynchronously, and only on demand, the data might
-	 * be out of date by the time this method is called, so it should be used
-	 * for information purposes only.
+	 * Accessor for the job executions currently in progress (and having been
+	 * started from this launcher). If you launch a job synchronously then it
+	 * will have finished when the {@link #run()} method returns, so there will
+	 * be no statistics. Because the request is potentially fulfilled
+	 * asynchronously, and only on demand, the data might be out of date by the
+	 * time this method is called, so it should be used for information purposes
+	 * only.
 	 * 
 	 * @return Properties representing the {@link JobExecution} objects passed
 	 *         up from the underlying execution. If there are no jobs running it
