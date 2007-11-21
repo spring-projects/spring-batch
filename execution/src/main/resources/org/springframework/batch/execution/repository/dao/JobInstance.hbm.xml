@@ -29,7 +29,7 @@
 				class="org.springframework.batch.execution.runtime.ScheduledJobIdentifier">
 				<property name="name" update="false" column="JOB_NAME" />
 				<property name="jobKey" update="false"
-					column="JOB_KEY" />
+					column="JOB_KEY" length="250"/>
 				<property name="scheduleDate" update="false"
 					column="SCHEDULE_DATE" />
 			</component>
@@ -41,7 +41,7 @@
 				class="org.springframework.batch.execution.runtime.ScheduledJobIdentifier">
 				<property name="name" update="false" column="JOB_NAME" />
 				<property name="jobKey" update="false"
-					column="JOB_KEY" />
+					column="JOB_KEY" length="250"/>
 			</component>
 		</subclass>
 
