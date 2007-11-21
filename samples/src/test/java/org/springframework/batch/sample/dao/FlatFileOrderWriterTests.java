@@ -9,7 +9,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.io.ItemWriter;
 import org.springframework.batch.io.file.support.transform.LineAggregator;
 import org.springframework.batch.sample.LineAggregatorStub;
 import org.springframework.batch.sample.domain.Address;
@@ -22,7 +22,7 @@ public class FlatFileOrderWriterTests extends TestCase {
 
 	List list = new ArrayList();
 	
-	private OutputSource output = new OutputSource() {
+	private ItemWriter output = new ItemWriter() {
 		
 		public void write(Object output) {
 			list.add(output);

@@ -1,15 +1,15 @@
 package org.springframework.batch.item.processor;
 
-import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.io.ItemWriter;
 import org.springframework.util.Assert;
 
 /**
  * Transforms the item using injected {@link ItemTransformer}
- * before it is written to output by {@link OutputSource}.
+ * before it is written to output by {@link ItemWriter}.
  * 
  * @author Robert Kasanicky
  */
-public class TransformerOutputSourceItemProcessor extends OutputSourceItemProcessor {
+public class TransformerWriterItemProcessor extends ItemWriterItemProcessor {
 
 	private ItemTransformer itemTransformer;
 
@@ -22,7 +22,7 @@ public class TransformerOutputSourceItemProcessor extends OutputSourceItemProces
 
 	/**
 	 * @param itemTransformer will transform the item before
-	 * it is passed to {@link OutputSource}.
+	 * it is passed to {@link ItemWriter}.
 	 */
 	public void setItemTransformer(ItemTransformer itemTransformer) {
 		this.itemTransformer = itemTransformer;

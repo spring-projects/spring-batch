@@ -21,9 +21,9 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.io.ItemWriter;
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.item.processor.OutputSourceItemProcessor;
+import org.springframework.batch.item.processor.ItemWriterItemProcessor;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -34,11 +34,11 @@ import org.springframework.batch.support.PropertiesConverter;
  * @author Dave Syer
  * 
  */
-public class OutputSourceItemProcessorTests extends TestCase {
+public class ItemWriterItemProcessorTests extends TestCase {
 
-	private OutputSourceItemProcessor processor = new OutputSourceItemProcessor();
+	private ItemWriterItemProcessor processor = new ItemWriterItemProcessor();
 
-	private OutputSource source;
+	private ItemWriter source;
 
 	/*
 	 * (non-Javadoc)
@@ -147,7 +147,7 @@ public class OutputSourceItemProcessorTests extends TestCase {
 	 * @author Dave Syer
 	 * 
 	 */
-	public class MockOutputSource implements OutputSource, StatisticsProvider, Restartable, Skippable {
+	public class MockOutputSource implements ItemWriter, StatisticsProvider, Restartable, Skippable {
 
 		private String value;
 

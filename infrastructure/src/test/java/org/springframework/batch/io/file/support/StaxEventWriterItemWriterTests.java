@@ -11,7 +11,7 @@ import javax.xml.transform.Result;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.FileUtils;
-import org.springframework.batch.io.file.support.StaxEventWriterOutputSource;
+import org.springframework.batch.io.file.support.StaxEventWriterItemWriter;
 import org.springframework.batch.io.file.support.oxm.MarshallingObjectToXmlSerializer;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.core.io.FileSystemResource;
@@ -25,10 +25,10 @@ import org.springframework.xml.transform.StaxResult;
 /**
  * Tests for {@link StaxStreamWriterOutputSource}.
  */
-public class StaxEventWriterOutputSourceTests extends TestCase {
+public class StaxEventWriterItemWriterTests extends TestCase {
 
 	// object under test
-	private StaxEventWriterOutputSource source;
+	private StaxEventWriterItemWriter source;
 
 	// output file
 	private Resource resource;
@@ -119,7 +119,7 @@ public class StaxEventWriterOutputSourceTests extends TestCase {
 		final int NUMBER_OF_RECORDS = 10;
 		for (int i = 0; i < NUMBER_OF_RECORDS; i++) {
 			String writeStatistics =
-				source.getStatistics().getProperty(StaxEventWriterOutputSource.WRITE_STATISTICS_NAME);
+				source.getStatistics().getProperty(StaxEventWriterItemWriter.WRITE_STATISTICS_NAME);
 
 			assertEquals(String.valueOf(i), writeStatistics);
 			source.write(record);
@@ -188,8 +188,8 @@ public class StaxEventWriterOutputSourceTests extends TestCase {
 	/**
 	 * @return new instance of fully configured output source
 	 */
-	private StaxEventWriterOutputSource newOutputSource() throws Exception {
-		StaxEventWriterOutputSource source = new StaxEventWriterOutputSource();
+	private StaxEventWriterItemWriter newOutputSource() throws Exception {
+		StaxEventWriterItemWriter source = new StaxEventWriterItemWriter();
 		source.setResource(resource);
 
 		Marshaller marshaller = new SimpleMarshaller();

@@ -5,7 +5,7 @@ import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.xstream.XStreamMarshaller;
 
 public class XStreamMarshallingTests extends
-		AbstractStaxEventWriterOutputSourceTests {
+		AbstractStaxEventWriterItemWriterTests {
 
 	protected Marshaller getMarshaller() throws Exception {
 		XStreamMarshaller marshaller = new XStreamMarshaller();

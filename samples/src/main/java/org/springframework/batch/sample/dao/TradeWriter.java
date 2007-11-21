@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.io.ItemWriter;
 import org.springframework.batch.sample.domain.Trade;
 
 
@@ -26,7 +26,7 @@ import org.springframework.batch.sample.domain.Trade;
  *
  * @author Robert Kasanicky
  */
-public interface TradeWriter extends OutputSource{
+public interface TradeWriter extends ItemWriter{
     /**
      * Write a trade object to some kind of output,
      * different implementations can write to file, database etc.

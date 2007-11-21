@@ -2,7 +2,7 @@ package org.springframework.batch.sample.item.processor;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.file.support.FlatFileOutputSource;
+import org.springframework.batch.io.file.support.FlatFileItemWriter;
 import org.springframework.batch.sample.item.processor.DefaultFlatFileProcessor;
 
 public class DefaultFlatFileProcessorTests extends TestCase {
@@ -12,7 +12,7 @@ public class DefaultFlatFileProcessorTests extends TestCase {
 		final Object testLine = new Object();
 		
 		//create output source
-		FlatFileOutputSource output = new FlatFileOutputSource() {
+		FlatFileItemWriter output = new FlatFileItemWriter() {
 			public void write(Object line) {
 				assertEquals(""+testLine, line);
 			}

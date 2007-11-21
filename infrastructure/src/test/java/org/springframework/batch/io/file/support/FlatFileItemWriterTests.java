@@ -32,7 +32,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.transaction.support.TransactionSynchronizationUtils;
 
 /**
- * Tests of regular usage for {@link FlatFileOutputSource} Exception cases will
+ * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will
  * be in separate TestCase classes with different <code>setUp</code> and
  * <code>tearDown</code> methods
  * 
@@ -40,10 +40,10 @@ import org.springframework.transaction.support.TransactionSynchronizationUtils;
  * @author Dave Syer
  * 
  */
-public class FlatFileOutputSourceTests extends TestCase {
+public class FlatFileItemWriterTests extends TestCase {
 
 	// object under test
-	private FlatFileOutputSource inputSource = new FlatFileOutputSource();
+	private FlatFileItemWriter inputSource = new FlatFileItemWriter();
 
 	// String to be written into file by the FlatFileInputTemplate
 	private static final String TEST_STRING = "FlatFileOutputTemplateTest-OutputData";
@@ -351,7 +351,7 @@ public class FlatFileOutputSourceTests extends TestCase {
 	}
 
 	public void testAfterPropertiesSetChecksMandatory() throws Exception {
-		inputSource = new FlatFileOutputSource();
+		inputSource = new FlatFileItemWriter();
 		try {
 			inputSource.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
@@ -362,7 +362,7 @@ public class FlatFileOutputSourceTests extends TestCase {
 	}
 
 	public void testDefaultRestartData() throws Exception {
-		inputSource = new FlatFileOutputSource();
+		inputSource = new FlatFileItemWriter();
 		RestartData restartData = inputSource.getRestartData();
 		assertNotNull(restartData);
 		// TODO: assert the properties of the default restart data

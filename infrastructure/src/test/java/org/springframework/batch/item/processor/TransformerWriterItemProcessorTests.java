@@ -3,26 +3,26 @@ package org.springframework.batch.item.processor;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.io.ItemWriter;
 
 /**
- * Tests for {@link TransformerOutputSourceItemProcessor}.
+ * Tests for {@link TransformerWriterItemProcessor}.
  * 
  * @author Robert Kasanicky
  */
-public class TransformerOutputSourceItemProcessorTests extends TestCase {
+public class TransformerWriterItemProcessorTests extends TestCase {
 
-	private TransformerOutputSourceItemProcessor processor = new TransformerOutputSourceItemProcessor();
+	private TransformerWriterItemProcessor processor = new TransformerWriterItemProcessor();
 
 	private ItemTransformer transformer;
-	private OutputSource outputSource;
+	private ItemWriter outputSource;
 
 	private MockControl tControl = MockControl.createControl(ItemTransformer.class);
-	private MockControl outControl = MockControl.createControl(OutputSource.class);
+	private MockControl outControl = MockControl.createControl(ItemWriter.class);
 
 	protected void setUp() throws Exception {
 		transformer = (ItemTransformer) tControl.getMock();
-		outputSource = (OutputSource) outControl.getMock();
+		outputSource = (ItemWriter) outControl.getMock();
 		
 		processor.setItemTransformer(transformer);
 		processor.setOutputSource(outputSource);

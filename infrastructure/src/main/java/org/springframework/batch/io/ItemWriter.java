@@ -24,12 +24,12 @@ package org.springframework.batch.io;
  * 
  * @author Dave Syer
  */
-public interface OutputSource  {
+public interface ItemWriter  {
 
 	/**
-	 * Writes provided value object to an output stream or similar.
+	 * Writes provided object to an output stream or similar.
 	 * 
-	 * @param output the value object
+	 * @param item the object to write.
 	 */
-	public void write(Object output);
+	public void write(Object item);
 }

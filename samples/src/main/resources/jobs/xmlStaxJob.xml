@@ -40,7 +40,7 @@
 						</property>
 
 						<property name="itemProcessor">
-								<bean class="org.springframework.batch.item.processor.OutputSourceItemProcessor"
+								<bean class="org.springframework.batch.item.processor.ItemWriterItemProcessor"
 									p:outputSource-ref="tradeStaxWriter" />
 						</property>
 					</bean>
@@ -49,7 +49,7 @@
 		</property>
 	</bean>
 
-	<bean class="org.springframework.batch.io.file.support.StaxEventWriterOutputSource" id="tradeStaxWriter">
+	<bean class="org.springframework.batch.io.file.support.StaxEventWriterItemWriter" id="tradeStaxWriter">
 		<property name="resource" value="file:target/test-outputs/20070918.testStream.xmlFileStep.output.xml" />
 		<property name="serializer" ref="tradeMarshallingSerializer" />
 		<property name="rootTagName" value="trades" />

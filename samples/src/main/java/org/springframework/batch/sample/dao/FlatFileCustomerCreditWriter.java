@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.io.ItemWriter;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.sample.domain.CustomerCredit;
 import org.springframework.beans.factory.DisposableBean;
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.DisposableBean;
 public class FlatFileCustomerCreditWriter implements CustomerCreditWriter,
 		DisposableBean {
 
-	private OutputSource outputSource;
+	private ItemWriter outputSource;
 
 	private String separator = "\t";
 
@@ -52,7 +52,7 @@ public class FlatFileCustomerCreditWriter implements CustomerCreditWriter,
 		this.separator = separator;
 	}
 
-	public void setOutputSource(OutputSource outputSource) {
+	public void setOutputSource(ItemWriter outputSource) {
 		this.outputSource = outputSource;
 	}
 

@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.io.ItemWriter;
 import org.springframework.batch.io.file.support.transform.Converter;
 import org.springframework.batch.sample.domain.Order;
 
@@ -32,7 +32,7 @@ public class FlatFileOrderWriter implements OrderWriter {
     /**
      * Takes care of writing to a file
      */
-    private OutputSource outputSource;
+    private ItemWriter outputSource;
 
     /**
      * Converter for order
@@ -55,7 +55,7 @@ public class FlatFileOrderWriter implements OrderWriter {
         outputSource.write(converter.convert(data));
     }
     
-	public void setOutputSource(OutputSource outputSource) {
+	public void setOutputSource(ItemWriter outputSource) {
         this.outputSource = outputSource;
     }
 

@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.io.ItemWriter;
 import org.springframework.batch.sample.domain.CustomerCredit;
 
 /**
@@ -17,8 +17,8 @@ public class CustomerCreditIncreaseProcessorTests extends TestCase{
 
 	private CustomerCreditIncreaseProcessor processor = new CustomerCreditIncreaseProcessor();
 	
-	private OutputSource outputSource;
-	private MockControl outputSourceControl = MockControl.createStrictControl(OutputSource.class);
+	private ItemWriter outputSource;
+	private MockControl outputSourceControl = MockControl.createStrictControl(ItemWriter.class);
 	
 	private CustomerCredit customerCredit = new CustomerCredit();
 	
@@ -27,7 +27,7 @@ public class CustomerCreditIncreaseProcessorTests extends TestCase{
 		customerCredit.setId(1);
 		customerCredit.setName("testCustomer");
 		
-		outputSource = (OutputSource) outputSourceControl.getMock();
+		outputSource = (ItemWriter) outputSourceControl.getMock();
 		processor.setOutputSource(outputSource);
 	}
 

@@ -4,7 +4,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.castor.CastorMarshaller;
 
-public class CastorMarshallingTests extends AbstractStaxEventWriterOutputSourceTests {
+public class CastorMarshallingTests extends AbstractStaxEventWriterItemWriterTests {
 
 	protected Marshaller getMarshaller() throws Exception {
 

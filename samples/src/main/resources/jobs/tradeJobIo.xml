@@ -28,7 +28,7 @@
 		<aop:scoped-proxy />
 		<property name="outputSource">
 			<bean
-				class="org.springframework.batch.io.file.support.FlatFileOutputSource"
+				class="org.springframework.batch.io.file.support.FlatFileItemWriter"
 				id="customerFlatFileOutputSource">
 				<property name="resource" ref="customerFileLocator" />
 			</bean>

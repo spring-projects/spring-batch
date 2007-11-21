@@ -1,11 +1,11 @@
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.io.ItemWriter;
 import org.springframework.batch.sample.domain.NflGame;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.util.Assert;
 
-public class SqlNflGameDao extends JdbcDaoSupport implements OutputSource {
+public class SqlNflGameDao extends JdbcDaoSupport implements ItemWriter {
 
 	private static final String INSERT_GAME = "INSERT into GAMES(player_id,year,team,week,opponent,"
 			+ "completes,attempts,passing_yards,passing_td,interceptions,rushes,rush_yards,"

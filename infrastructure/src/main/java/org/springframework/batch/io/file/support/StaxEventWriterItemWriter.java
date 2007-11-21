@@ -14,7 +14,7 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 
-import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.io.ItemWriter;
 import org.springframework.batch.io.file.support.stax.NoStartEndDocumentStreamWriter;
 import org.springframework.batch.io.file.support.stax.ObjectToXmlSerializer;
 import org.springframework.batch.io.support.FileUtils;
@@ -34,7 +34,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
- * StaxEventWriterOutputSource is implementation of {@link OutputSource} which uses
+ * StaxEventWriterOutputSource is implementation of {@link ItemWriter} which uses
  * StAX and {@link ObjectToXmlSerializer} for serializing object to XML.
  *
  * This output source also provides restart, statistics and transaction
@@ -43,7 +43,7 @@ import org.springframework.util.CollectionUtils;
  * @author Peter Zozom
  *
  */
-public class StaxEventWriterOutputSource implements OutputSource, ResourceLifecycle, Restartable,
+public class StaxEventWriterItemWriter implements ItemWriter, ResourceLifecycle, Restartable,
 		StatisticsProvider, InitializingBean, DisposableBean {
 
 	// default encoding
@@ -367,7 +367,7 @@ public class StaxEventWriterOutputSource implements OutputSource, ResourceLifecy
 	 * Write the value object to XML stream.
 	 *
 	 * @param output the value object
-	 * @see org.springframework.batch.io.OutputSource#write(java.lang.Object)
+	 * @see org.springframework.batch.io.ItemWriter#write(java.lang.Object)
 	 */
 	public void write(Object output) {
 

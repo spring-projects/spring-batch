@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.io.OutputSource;
+import org.springframework.batch.io.ItemWriter;
 import org.springframework.batch.sample.domain.CustomerCredit;
 
 /**
@@ -24,7 +24,7 @@ import org.springframework.batch.sample.domain.CustomerCredit;
  *
  * @author Robert Kasanicky
  */
-public interface CustomerCreditWriter extends OutputSource {
+public interface CustomerCreditWriter extends ItemWriter {
 
 	void write(CustomerCredit customerCredit);
 

@@ -31,7 +31,7 @@
 											<property name="writer" ref="tradeDao" />
 										</bean>
 
-										<bean class="org.springframework.batch.item.processor.OutputSourceItemProcessor">
+										<bean class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
 											<property name="outputSource" ref="flatFileOutputSource" />
 										</bean>
 									</list>
@@ -83,7 +83,7 @@
 		</property>
 	</bean>
 
-	<bean class="org.springframework.batch.io.file.support.FlatFileOutputSource" id="flatFileOutputSource">
+	<bean class="org.springframework.batch.io.file.support.FlatFileItemWriter" id="flatFileOutputSource">
 		<property name="resource" ref="customerFileLocator" />
 	</bean>
 
