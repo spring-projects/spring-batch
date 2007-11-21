@@ -28,7 +28,7 @@ import org.springframework.xml.transform.StaxResult;
 public class StaxEventWriterItemWriterTests extends TestCase {
 
 	// object under test
-	private StaxEventWriterItemWriter source;
+	private StaxEventWriterItemWriter writer;
 
 	// output file
 	private Resource resource;
@@ -47,7 +47,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 
 	protected void setUp() throws Exception {
 		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", "xml"));
-		source = createItemWriter();
+		writer = createItemWriter();
 	}
 
 	/**
@@ -56,10 +56,10 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	public void testWrite() throws Exception {
 		Marshaller marshaller = new InputCheckMarshaller();
 		MarshallingObjectToXmlSerializer serializer = new MarshallingObjectToXmlSerializer(marshaller);
-		source.setSerializer(serializer);
+		writer.setSerializer(serializer);
 
 		// see asserts in the marshaller
-		source.write(record);
+		writer.write(record);
 
 	}
 
@@ -67,10 +67,10 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	 * Rolled back records should not be written to output file.
 	 */
 	public void testRollback() throws Exception {
-		source.write(record);
+		writer.write(record);
 
 		// rollback
-		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
+		writer.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
 		assertEquals("", outputFileContent());
 	}
 
@@ -78,10 +78,10 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	 * Commited output is written to the output file.
 	 */
 	public void testCommit() throws Exception {
-		source.write(record);
+		writer.write(record);
 
 		// commit
-		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+		writer.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
 		assertTrue(outputFileContent().indexOf(TEST_STRING) != NOT_FOUND);
 	}
 
@@ -90,15 +90,15 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	 */
 	public void testRestart() throws Exception {
 		// write records
-		source.write(record);
-		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
-		RestartData restartData = source.getRestartData();
+		writer.write(record);
+		writer.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+		RestartData restartData = writer.getRestartData();
 
 		// create new writer from saved restart data and continue writing
-		source = createItemWriter();
-		source.restoreFrom(restartData);
-		source.write(record);
-		source.destroy();
+		writer = createItemWriter();
+		writer.restoreFrom(restartData);
+		writer.write(record);
+		writer.destroy();
 
 		// check the output is concatenation of 'before restart' and 'after restart' writes.
 		String outputFile = outputFileContent();
@@ -119,10 +119,10 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 		final int NUMBER_OF_RECORDS = 10;
 		for (int i = 0; i < NUMBER_OF_RECORDS; i++) {
 			String writeStatistics =
-				source.getStatistics().getProperty(StaxEventWriterItemWriter.WRITE_STATISTICS_NAME);
+				writer.getStatistics().getProperty(StaxEventWriterItemWriter.WRITE_STATISTICS_NAME);
 
 			assertEquals(String.valueOf(i), writeStatistics);
-			source.write(record);
+			writer.write(record);
 		}
 	}
 
@@ -130,16 +130,16 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	 * Open method writes the root tag, close method adds corresponding end tag.
 	 */
 	public void testOpenAndClose() throws IOException {
-		source.setRootTagName("testroot");
-		source.setRootElementAttributes(new HashMap() {{
+		writer.setRootTagName("testroot");
+		writer.setRootElementAttributes(new HashMap() {{
 			put("attribute", "value");
 		}});
-		source.open();
-		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+		writer.open();
+		writer.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
 
 		assertTrue(outputFileContent().indexOf("<testroot attribute=\"value\"") != NOT_FOUND);
 
-		source.close();
+		writer.close();
 		assertTrue(outputFileContent().endsWith("</testroot>"));
 	}
 

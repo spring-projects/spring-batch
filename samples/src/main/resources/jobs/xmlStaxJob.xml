@@ -41,7 +41,7 @@
 
 						<property name="itemProcessor">
 								<bean class="org.springframework.batch.item.processor.ItemWriterItemProcessor"
-									p:outputSource-ref="tradeStaxWriter" />
+									p:itemWriter-ref="tradeStaxWriter" />
 						</property>
 					</bean>
 				</property>

@@ -21,7 +21,7 @@ import org.springframework.oxm.Marshaller;
 
 public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 
-	private StaxEventWriterItemWriter source = new StaxEventWriterItemWriter();
+	private StaxEventWriterItemWriter writer = new StaxEventWriterItemWriter();
 
 	private Resource resource;
 
@@ -41,9 +41,9 @@ public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 	 */
 	public void testWrite() throws Exception {
 		for (Iterator iterator = objects.listIterator(); iterator.hasNext();) {
-			source.write(iterator.next());
+			writer.write(iterator.next());
 		}
-		source.close();
+		writer.close();
 		XMLUnit.setIgnoreWhitespace(true);
 		XMLAssert.assertXMLEqual(new FileReader(expected.getFile()), new FileReader(resource.getFile()));
 
@@ -54,10 +54,10 @@ public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 		//File outputFile = File.createTempFile("AbstractStaxStreamWriterOutputSourceTests", "xml");
 		outputFile = File.createTempFile(this.getClass().getSimpleName(), ".xml");
 		resource = new FileSystemResource(outputFile);
-		source.setResource(resource);
+		writer.setResource(resource);
 
 		MarshallingObjectToXmlSerializer mapper = new MarshallingObjectToXmlSerializer(getMarshaller());
-		source.setSerializer(mapper);
+		writer.setSerializer(mapper);
 	}
 
 	protected void tearDown() throws Exception {

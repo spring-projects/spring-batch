@@ -38,15 +38,15 @@ public class ItemWriterItemProcessorTests extends TestCase {
 
 	private ItemWriterItemProcessor processor = new ItemWriterItemProcessor();
 
-	private ItemWriter source;
+	private ItemWriter writer;
 
 	/*
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
-		source = new MockOutputSource("test");
-		processor.setItemWriter(source);
+		writer = new MockOutputSource("test");
+		processor.setItemWriter(writer);
 		processor.afterPropertiesSet();
 	}
 

@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
 public class ItemWriterItemProcessor implements ItemProcessor, Restartable, Skippable,
 		StatisticsProvider, InitializingBean {
 
-	private ItemWriter source;
+	private ItemWriter writer;
 
 	/**
 	 * Calls {@link #doProcess(Object)} and then writes the result to the {@link ItemWriter}.
@@ -31,7 +31,7 @@ public class ItemWriterItemProcessor implements ItemProcessor, Restartable, Skip
 	 */
 	final public void process(Object item) throws Exception {
 		Object result = doProcess(item);
-		source.write(result);
+		writer.write(result);
 	}
 
 	/**
@@ -45,8 +45,8 @@ public class ItemWriterItemProcessor implements ItemProcessor, Restartable, Skip
 	/**
 	 * Setter for {@link ItemWriter}.
 	 */
-	public void setItemWriter(ItemWriter source) {
-		this.source = source;
+	public void setItemWriter(ItemWriter writer) {
+		this.writer = writer;
 	}
 
 	/**
@@ -54,10 +54,10 @@ public class ItemWriterItemProcessor implements ItemProcessor, Restartable, Skip
 	 */
 	public RestartData getRestartData() {
 		
-		Assert.state(source != null, "Source must not be null.");
+		Assert.state(writer != null, "Source must not be null.");
 		
-		if (source instanceof Restartable) {
-			return ((Restartable) source).getRestartData();
+		if (writer instanceof Restartable) {
+			return ((Restartable) writer).getRestartData();
 		}
 		else{
 			return new GenericRestartData(new Properties());
@@ -69,10 +69,10 @@ public class ItemWriterItemProcessor implements ItemProcessor, Restartable, Skip
 	 */
 	public void restoreFrom(RestartData data) {
 		
-		Assert.state(source != null, "Source must not be null.");
+		Assert.state(writer != null, "Source must not be null.");
 		
-		if (source instanceof Restartable) {
-			((Restartable) source).restoreFrom(data);
+		if (writer instanceof Restartable) {
+			((Restartable) writer).restoreFrom(data);
 		}
 		
 	}
@@ -84,21 +84,21 @@ public class ItemWriterItemProcessor implements ItemProcessor, Restartable, Skip
 	 * @see StatisticsProvider#getStatistics()
 	 */
 	public Properties getStatistics() {
-		if (!(source instanceof StatisticsProvider)) {
+		if (!(writer instanceof StatisticsProvider)) {
 			return new Properties();
 		}
-		return ((StatisticsProvider) source).getStatistics();
+		return ((StatisticsProvider) writer).getStatistics();
 	}
 
 	public void skip() {
-		if (source instanceof Skippable) {
-			((Skippable)source).skip();
+		if (writer instanceof Skippable) {
+			((Skippable)writer).skip();
 		}
 	}
 
 	
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(source);
+		Assert.notNull(writer);
 	}
 
 }
