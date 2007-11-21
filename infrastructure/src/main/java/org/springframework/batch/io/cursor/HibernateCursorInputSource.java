@@ -18,6 +18,7 @@ package org.springframework.batch.io.cursor;
 import java.util.Properties;
 
 import org.hibernate.ScrollableResults;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.io.InputSource;
@@ -36,6 +37,17 @@ import org.springframework.util.ClassUtils;
 /**
  * {@link InputSource} for reading database records built on top of Hibernate.
  * 
+ * It executes the HQL {@link #queryString} when initialized and iterates over
+ * the result set as {@link #read()} method is called, returning an object corresponding
+ * to current row.
+ * 
+ * Input source can be configured to use either {@link StatelessSession} sufficient
+ * for simple mappings without the need to cascade to associated objects or standard hibernate
+ * {@link Session} for more advanced mappings or when caching is desired.
+ * 
+ * When stateful session is used it will be cleared after successful commit *without* being flushed
+ * (no inserts or updates are expected).
+ * 
  * @author Robert Kasanicky
  */
 public class HibernateCursorInputSource implements InputSource, Restartable, InitializingBean, DisposableBean,
@@ -44,13 +56,21 @@ public class HibernateCursorInputSource implements InputSource, Restartable, Ini
 	private static final String RESTART_DATA_ROW_NUMBER_KEY = ClassUtils.getShortName(HibernateCursorInputSource.class)+".rowNumber";
 
 	private SessionFactory sessionFactory;
-	private StatelessSession session;
+	
+	private StatelessSession statelessSession;
+	
+	private Session statefulSession;
+	
 	private ScrollableResults cursor;
+	
 	private String queryString;
+	
+	private boolean useStatelessSession = true;
 	
 	private int lastCommitRowNumber = 0;
 	
 	private boolean initialized = false;
+	
 	private TransactionSynchronization synchronization = new HibernateInputSourceTransactionSynchronization();
 	
 	
@@ -66,25 +86,37 @@ public class HibernateCursorInputSource implements InputSource, Restartable, Ini
 	}
 
 	/**
-	 * Close the resultset cursor and hibernate session.
+	 * Closes the result set cursor and hibernate session.
 	 */
 	public void close() {
 		initialized = false;
 		cursor.close();
-		session.close();
+		if (useStatelessSession) {
+			statelessSession.close();
+		} else {
+			statefulSession.close();
+		}
 	}
 
 	/**
-	 * Create cursor for the query
+	 * Creates cursor for the query.
 	 */
 	public void open() {
-		session = sessionFactory.openStatelessSession();
-		cursor = session.createQuery(queryString).scroll();
+		if (useStatelessSession) {
+			statelessSession = sessionFactory.openStatelessSession();
+			cursor = statelessSession.createQuery(queryString).scroll();
+		} else {
+			statefulSession = sessionFactory.openSession();
+			cursor = statefulSession.createQuery(queryString).scroll();
+		}
 		
 		BatchTransactionSynchronizationManager.registerSynchronization(synchronization );
 		initialized = true;
 	}
 
+	/**
+	 * @param sessionFactory hibernate session factory
+	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
@@ -98,8 +130,22 @@ public class HibernateCursorInputSource implements InputSource, Restartable, Ini
 		close();
 	}
 
+	/**
+	 * @param queryString HQL query string
+	 */
 	public void setQueryString(String queryString) {
 		this.queryString = queryString;
+	}
+
+	/**
+	 * Can be set only in uninitialized state.
+	 * @param useStatelessSession 	
+	 * <code>true</code> to use {@link StatelessSession} 
+	 * <code>false</code> to use standard hibernate {@link Session}
+	 */
+	public void setUseStatelessSession(boolean useStatelessSession) {
+		Assert.state(!initialized);
+		this.useStatelessSession = useStatelessSession;
 	}
 
 	/**
@@ -113,7 +159,7 @@ public class HibernateCursorInputSource implements InputSource, Restartable, Ini
 	}
 
 	/**
-	 * Set the cursor to the received row number.
+	 * Sets the cursor to the received row number.
 	 */
 	public void restoreFrom(RestartData data) {
 		Assert.state(!initialized,
@@ -138,6 +184,9 @@ public class HibernateCursorInputSource implements InputSource, Restartable, Ini
 				cursor.setRowNumber(lastCommitRowNumber);
 			} else if (status == TransactionSynchronization.STATUS_COMMITTED) {
 				lastCommitRowNumber = cursor.getRowNumber();
+				if (!useStatelessSession) {
+					statefulSession.clear();
+				}
 			}
 		}
 	}
