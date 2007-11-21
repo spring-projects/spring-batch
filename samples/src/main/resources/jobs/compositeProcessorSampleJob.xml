@@ -32,7 +32,7 @@
 										</bean>
 
 										<bean class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
-											<property name="outputSource" ref="flatFileOutputSource" />
+											<property name="itemWriter" ref="flatFileOutputSource" />
 										</bean>
 									</list>
 								</property>

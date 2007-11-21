@@ -67,7 +67,7 @@
 							<property name="itemProcessor">
 								<bean
 									class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
-									<property name="outputSource">
+									<property name="itemWriter">
 										<bean
 											class="org.springframework.batch.sample.dao.SqlNflGameDao">
 											<property name="dataSource"
@@ -97,7 +97,7 @@
 							<property name="itemProcessor">
 								<bean
 									class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
-									<property name="outputSource">
+									<property name="itemWriter">
 										<bean
 											class="org.springframework.batch.sample.dao.SqlNflPlayerSummaryDao">
 											<property name="dataSource"

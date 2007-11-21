@@ -25,7 +25,7 @@ public class TransformerWriterItemProcessorTests extends TestCase {
 		outputSource = (ItemWriter) outControl.getMock();
 		
 		processor.setItemTransformer(transformer);
-		processor.setOutputSource(outputSource);
+		processor.setItemWriter(outputSource);
 		
 		processor.afterPropertiesSet();
 	}
