@@ -24,9 +24,8 @@ import org.springframework.batch.repeat.RepeatContext;
 
 /**
  * Simple implementation of exception handler which looks for one exception
- * type. If it is found in the Collection of throwables then a counter is
- * incremented and the a limit is checked to determine if it has been exceeded
- * and the Throwable should be re-thrown.
+ * type. If it is found then a counter is incremented and the a limit is checked
+ * to determine if it has been exceeded and the Throwable should be re-thrown.
  * 
  * @author Dave Syer
  */
@@ -48,8 +47,9 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * Set this flag to true if you want to count exceptions for the whole
 	 * (outer) loop in a typical container.
 	 * 
-	 * @param useParent true if the parent context should be used to store the
-	 * counters.
+	 * @param useParent
+	 *            true if the parent context should be used to store the
+	 *            counters.
 	 */
 	public void setUseParent(boolean useParent) {
 		delegate.setUseParent(useParent);
@@ -78,9 +78,10 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * @see #setLimit(int)
 	 * 
 	 * @see org.springframework.batch.repeat.exception.handler.ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
-	 * Throwable)
+	 *      Throwable)
 	 */
-	public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
+	public void handleException(RepeatContext context, Throwable throwable)
+			throws RuntimeException {
 		delegate.handleException(context, throwable);
 	}
 
