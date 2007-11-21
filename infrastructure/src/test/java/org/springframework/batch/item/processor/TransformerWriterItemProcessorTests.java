@@ -15,18 +15,17 @@ public class TransformerWriterItemProcessorTests extends TestCase {
 	private TransformerWriterItemProcessor processor = new TransformerWriterItemProcessor();
 
 	private ItemTransformer transformer;
-	private ItemWriter outputSource;
+	private ItemWriter itemWriter;
 
 	private MockControl tControl = MockControl.createControl(ItemTransformer.class);
 	private MockControl outControl = MockControl.createControl(ItemWriter.class);
 
 	protected void setUp() throws Exception {
 		transformer = (ItemTransformer) tControl.getMock();
-		outputSource = (ItemWriter) outControl.getMock();
+		itemWriter = (ItemWriter) outControl.getMock();
 		
 		processor.setItemTransformer(transformer);
-		processor.setItemWriter(outputSource);
-		
+		processor.setItemWriter(itemWriter);
 		processor.afterPropertiesSet();
 	}
 
@@ -41,7 +40,7 @@ public class TransformerWriterItemProcessorTests extends TestCase {
 		transformer.transform(item);
 		tControl.setReturnValue(itemAfterTransformation);
 		
-		outputSource.write(itemAfterTransformation);
+		itemWriter.write(itemAfterTransformation);
 		outControl.setVoidCallable();
 		
 		tControl.replay();
