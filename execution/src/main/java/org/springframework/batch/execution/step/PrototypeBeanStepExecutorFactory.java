@@ -112,12 +112,14 @@ public class PrototypeBeanStepExecutorFactory implements StepExecutorFactory,
 
 		if (executor instanceof SimpleStepExecutor) {
 			RepeatTemplate template = new RepeatTemplate();
-			RepeatOperations repeatOperations = template;
+			RepeatOperations chunkOperations = template;
+			RepeatOperations stepOperations = null;
 			if (configuration instanceof RepeatOperationsHolder) {
-				repeatOperations = ((RepeatOperationsHolder) configuration)
-						.getChunkOperations();
+				RepeatOperationsHolder holder = (RepeatOperationsHolder) configuration;
+				chunkOperations = holder.getChunkOperations();
+				stepOperations = holder.getStepOperations();
 				Assert
-						.state(repeatOperations != null,
+						.state(chunkOperations != null,
 								"Chunk operations obtained from step configuration must be non-null.");
 			} else if (configuration instanceof SimpleStepConfiguration) {
 				template.setCompletionPolicy(new SimpleCompletionPolicy(
@@ -125,8 +127,11 @@ public class PrototypeBeanStepExecutorFactory implements StepExecutorFactory,
 								.getCommitInterval()));
 				template.setExceptionHandler(((SimpleStepConfiguration)configuration).getExceptionHandler());
 			}
-			((SimpleStepExecutor) executor)
-					.setChunkOperations(repeatOperations);
+			SimpleStepExecutor simpleExecutor = (SimpleStepExecutor) executor;
+			simpleExecutor.setChunkOperations(chunkOperations);
+			if (stepOperations!=null) {
+				simpleExecutor.setStepOperations(stepOperations);
+			}
 		}
 
 		return executor;

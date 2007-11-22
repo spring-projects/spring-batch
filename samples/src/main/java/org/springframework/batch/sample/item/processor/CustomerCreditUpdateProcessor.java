@@ -30,7 +30,7 @@ public class CustomerCreditUpdateProcessor implements ItemProcessor {
         CustomerCredit customerCredit = (CustomerCredit) data;
 
         if (customerCredit.getCredit().doubleValue() > creditFilter) {
-            writer.write(customerCredit);
+            writer.writeCredit(customerCredit);
         }
     }
 

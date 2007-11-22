@@ -36,7 +36,7 @@ public class FlatFileCustomerCreditWriter implements CustomerCreditWriter,
 
 	private volatile boolean opened = false;
 
-	public void write(CustomerCredit customerCredit) {
+	public void writeCredit(CustomerCredit customerCredit) {
 
 		if (!opened) {
 			open();
@@ -79,6 +79,6 @@ public class FlatFileCustomerCreditWriter implements CustomerCreditWriter,
 	}
 
 	public void write(Object output) {
-		write((CustomerCredit)output);
+		writeCredit((CustomerCredit)output);
 	}
 }

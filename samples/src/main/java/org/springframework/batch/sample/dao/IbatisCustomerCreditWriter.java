@@ -31,7 +31,7 @@ public class IbatisCustomerCreditWriter extends SqlMapClientDaoSupport
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.sample.dao.CustomerCreditWriter#write(org.springframework.batch.sample.domain.CustomerCredit)
 	 */
-	public void write(CustomerCredit customerCredit) {
+	public void writeCredit(CustomerCredit customerCredit) {
 
 		getSqlMapClientTemplate().update(statementId, customerCredit);
 	}
@@ -58,6 +58,6 @@ public class IbatisCustomerCreditWriter extends SqlMapClientDaoSupport
 	}
 
 	public void write(Object output) {
-		write((CustomerCredit)output);
+		writeCredit((CustomerCredit)output);
 	}
 }

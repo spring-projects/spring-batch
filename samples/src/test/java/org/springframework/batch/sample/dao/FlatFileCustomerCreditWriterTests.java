@@ -69,7 +69,7 @@ public class FlatFileCustomerCreditWriterTests extends TestCase {
 		outputControl.replay();
 		
 		//call tested method
-		writer.write(credit);
+		writer.writeCredit(credit);
 		
 		//verify method calls
 		outputControl.verify();

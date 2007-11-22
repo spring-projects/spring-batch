@@ -17,7 +17,6 @@
 package org.springframework.batch.execution.step;
 
 import org.springframework.batch.core.configuration.StepConfiguration;
-import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatOperations;
 
 /**
@@ -28,24 +27,12 @@ import org.springframework.batch.repeat.RepeatOperations;
  * @author Dave Syer
  * 
  */
-public class ChunkOperationsStepConfiguration extends AbstractStepConfiguration implements RepeatOperationsHolder {
+public class RepeatOperationsStepConfiguration extends AbstractStepConfiguration implements RepeatOperationsHolder {
 
-	// default StepExecutor is null
+	// default chunkOperations is null
 	private RepeatOperations chunkOperations;
-
-	public ChunkOperationsStepConfiguration() {
-		super();
-	}
-
-	public ChunkOperationsStepConfiguration(RepeatOperations repeatOperations) {
-		this();
-		this.chunkOperations = repeatOperations;
-	}
-
-	public ChunkOperationsStepConfiguration(Tasklet module) {
-		this();
-		setTasklet(module);
-	}
+	// default stepOperations is null
+	private RepeatOperations stepOperations;
 
 	/**
 	 * Public accessor for the chunkOperations property.
@@ -63,6 +50,24 @@ public class ChunkOperationsStepConfiguration extends AbstractStepConfiguration 
 	 */
 	public void setChunkOperations(RepeatOperations chunkOperations) {
 		this.chunkOperations = chunkOperations;
+	}
+
+	/**
+	 * Public accessor for the stepOperations property.
+	 *
+	 * @return the stepOperations
+	 */
+	public RepeatOperations getStepOperations() {
+		return stepOperations;
+	}
+
+	/**
+	 * Public setter for the {@link RepeatOperations} property.
+	 *
+	 * @param stepOperations the stepOperations to set
+	 */
+	public void setStepOperations(RepeatOperations stepOperations) {
+		this.stepOperations = stepOperations;
 	}
 
 }

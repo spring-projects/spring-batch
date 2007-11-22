@@ -16,7 +16,9 @@
 package org.springframework.batch.sample.dao;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
@@ -34,10 +36,12 @@ public class HibernateCreditWriter extends HibernateDaoSupport implements
 	private boolean failOnFlush = false;
 	private boolean first = true;
 	private List errors = new ArrayList();
-	
+	private Set processed = new HashSet();
+	private Set failed = new HashSet();
+
 	/**
 	 * Public accessor for the errors property.
-	 *
+	 * 
 	 * @return the errors - a list of Throwable instances
 	 */
 	public List getErrors() {
@@ -49,7 +53,7 @@ public class HibernateCreditWriter extends HibernateDaoSupport implements
 	 * 
 	 * @see org.springframework.batch.sample.dao.CustomerCreditWriter#write(org.springframework.batch.sample.domain.CustomerCredit)
 	 */
-	public void write(CustomerCredit customerCredit) {
+	public void writeCredit(CustomerCredit customerCredit) {
 		if (!failOnFlush || !first) {
 			getHibernateTemplate().update(customerCredit);
 		} else {
@@ -69,26 +73,30 @@ public class HibernateCreditWriter extends HibernateDaoSupport implements
 	 * @see org.springframework.batch.io.OutputSource#write(java.lang.Object)
 	 */
 	public void write(Object output) {
-		write((CustomerCredit) output);
+		processed.add(output);
+		writeCredit((CustomerCredit) output);
 	}
 
 	/**
 	 * Public setter for the {@link boolean} property.
-	 *
-	 * @param failOnFlush true if you want to fail on flush (for testing)
+	 * 
+	 * @param failOnFlush
+	 *            true if you want to fail on flush (for testing)
 	 */
 	public void setFailOnFlush(boolean failOnFlush) {
 		this.failOnFlush = failOnFlush;
 	}
 
 	public void after(RepeatContext context, ExitStatus result) {
+		// 
 	}
 
 	public void before(RepeatContext context) {
 	}
 
 	/**
-	 * Flush the Hibernate session so that any batch exceptions are within the RepeatContext.
+	 * Flush the Hibernate session so that any batch exceptions are within the
+	 * RepeatContext.
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatInterceptor#close(org.springframework.batch.repeat.RepeatContext)
 	 */
@@ -96,6 +104,9 @@ public class HibernateCreditWriter extends HibernateDaoSupport implements
 		try {
 			getHibernateTemplate().flush();
 		} catch (RuntimeException e) {
+			failed.addAll(processed);
+			// onError will not be called after close() by the framework so we
+			// have to do it here.
 			onError(context, e);
 			throw e;
 		}
@@ -107,7 +118,8 @@ public class HibernateCreditWriter extends HibernateDaoSupport implements
 
 	public void open(RepeatContext context) {
 		errors.clear();
+		processed.clear();
+		System.err.println(failed);
 	}
 
-	
 }

@@ -26,6 +26,6 @@ import org.springframework.batch.sample.domain.CustomerCredit;
  */
 public interface CustomerCreditWriter extends ItemWriter {
 
-	void write(CustomerCredit customerCredit);
+	void writeCredit(CustomerCredit customerCredit);
 
 }

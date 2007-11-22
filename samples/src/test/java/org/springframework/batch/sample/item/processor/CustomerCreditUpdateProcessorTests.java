@@ -44,7 +44,7 @@ public class CustomerCreditUpdateProcessorTests extends TestCase {
 		credit.setCredit(new BigDecimal(CREDIT_FILTER + 1));
 		//reset and set-up writer - write method is expected to be called
 		writerControl.reset();
-		writer.write(credit);
+		writer.writeCredit(credit);
 		writerControl.replay();
 		
 		//call tested method

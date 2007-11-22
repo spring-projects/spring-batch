@@ -65,14 +65,16 @@ public class SimpleStepExecutorFactory implements StepExecutorFactory,
 		executor.setRepository(jobRepository);
 
 		RepeatTemplate template = new RepeatTemplate();
-		RepeatOperations repeatOperations = template;
+		RepeatOperations chunkOperations = template;
+		RepeatOperations stepOperations = null;
 		
 		if (configuration instanceof RepeatOperationsHolder) {
 			
-			repeatOperations = ((RepeatOperationsHolder) configuration)
-					.getChunkOperations();
+			RepeatOperationsHolder holder = (RepeatOperationsHolder) configuration;
+			chunkOperations = holder.getChunkOperations();
+			stepOperations = holder.getStepOperations();
 			Assert
-					.state(repeatOperations != null,
+					.state(chunkOperations != null,
 							"Chunk operations obtained from step configuration must be non-null.");
 
 		} else {
@@ -88,8 +90,11 @@ public class SimpleStepExecutorFactory implements StepExecutorFactory,
 
 		}
 
-		executor.setChunkOperations(repeatOperations);
-
+		executor.setChunkOperations(chunkOperations);
+		if (stepOperations!=null) {
+			executor.setStepOperations(stepOperations);
+		}
+		
 		return executor;
 
 	}

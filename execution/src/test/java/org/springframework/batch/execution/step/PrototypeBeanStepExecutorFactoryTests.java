@@ -15,12 +15,19 @@
  */
 package org.springframework.batch.execution.step;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.configuration.StepConfigurationSupport;
+import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.StepExecutor;
+import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -106,6 +113,40 @@ public class PrototypeBeanStepExecutorFactoryTests extends TestCase {
 		assertEquals(executor, factory.getExecutor(new SimpleHolderStepConfiguration(repeatTemplate)));
 	}
 	
+	public void testSuccessfulStepExecutorHolderStrategyWithStepOperations() throws Exception {
+		final List list = new ArrayList();
+		SimpleStepExecutor executor = new SimpleStepExecutor() {
+			public ExitStatus process(StepConfiguration configuration,
+					StepExecution stepExecution)
+					throws StepInterruptedException, BatchCriticalException {
+				return ExitStatus.FINISHED;
+			}
+			public void setChunkOperations(RepeatOperations chunkOperations) {
+				list.add(chunkOperations);
+				super.setChunkOperations(chunkOperations);
+			}
+			public void setStepOperations(RepeatOperations stepOperations) {
+				list.add(stepOperations);
+				super.setStepOperations(stepOperations);
+			}
+		};
+		applicationContext.getBeanFactory().registerSingleton("foo", executor);
+		factory.setStepExecutorName("foo");
+		RepeatTemplate chunkTemplate = new RepeatTemplate();
+		RepeatTemplate stepTemplate = new RepeatTemplate();
+		SimpleHolderStepConfiguration configuration = new SimpleHolderStepConfiguration(
+				chunkTemplate, stepTemplate);
+		StepExecutor product = factory.getExecutor(new SimpleHolderStepConfiguration(chunkTemplate, stepTemplate));
+		assertEquals(executor, product);
+		StepExecution stepExecution = new StepExecution(new StepInstance(
+				new Long(11)), new JobExecution(new JobInstance(null),
+				new Long(12)));
+		executor.process(configuration, stepExecution);
+		assertEquals(2, list.size());
+		assertEquals(chunkTemplate, list.get(0));
+		assertEquals(stepTemplate, list.get(1));
+	}
+
 	public void testUnsuccessfulStepExecutorHolderStrategy() throws Exception {
 		SimpleStepExecutor executor = new SimpleStepExecutor();
 		applicationContext.getBeanFactory().registerSingleton("foo", executor);
@@ -123,12 +164,21 @@ public class PrototypeBeanStepExecutorFactoryTests extends TestCase {
 	 *
 	 */
 	public class SimpleHolderStepConfiguration extends SimpleStepConfiguration implements RepeatOperationsHolder {
-		private RepeatOperations executor;
+		private RepeatOperations chunkOperations;
+		private RepeatOperations stepOperations;
 		public SimpleHolderStepConfiguration(RepeatOperations executor) {
-			this.executor = executor;
+			this.chunkOperations = executor;
+		}
+		public SimpleHolderStepConfiguration(RepeatOperations chunkOperations,
+				RepeatOperations stepOperations) {
+			this.chunkOperations = chunkOperations;
+			this.stepOperations = stepOperations;
 		}
 		public RepeatOperations getChunkOperations() {
-			return executor;
+			return chunkOperations;
+		}
+		public RepeatOperations getStepOperations() {
+			return stepOperations;
 		}
 	}
 

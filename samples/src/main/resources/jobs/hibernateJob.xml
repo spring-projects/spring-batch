@@ -16,7 +16,7 @@
 
 	<bean id="hibernateJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" class="org.springframework.batch.execution.step.ChunkOperationsStepConfiguration">
+			<bean id="step1" class="org.springframework.batch.execution.step.RepeatOperationsStepConfiguration">
 				<property name="tasklet">
 					<bean
 						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
@@ -43,6 +43,10 @@
 								<property name="chunkSize" value="3"/>
 							</bean>
 						</property>
+					</bean>
+				</property>
+				<property name="stepOperations">
+					<bean class="org.springframework.batch.repeat.support.RepeatTemplate">
 						<property name="exceptionHandler">
 							<bean class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler"
 								p:limit="5" p:useParent="true" p:type="java.lang.Exception"/>

@@ -19,7 +19,7 @@ import org.springframework.jdbc.core.RowMapper;
 public abstract class AbstractCustomerCreditIncreaseTests extends
 		AbstractValidatingBatchLauncherTests {
 
-	private JdbcOperations jdbcTemplate;
+	protected JdbcOperations jdbcTemplate;
 
 	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseProcessor.FIXED_AMOUNT;
 

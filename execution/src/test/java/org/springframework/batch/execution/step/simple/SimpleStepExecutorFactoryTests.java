@@ -25,8 +25,10 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.step.RepeatOperationsHolder;
 import org.springframework.batch.execution.step.SimpleStepConfiguration;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
@@ -99,6 +101,40 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
+	public void testSuccessfulRepeatOperationsHolderWithStepOperations() throws Exception {
+		RepeatTemplate chunkTemplate = new RepeatTemplate();
+		final List list = new ArrayList();
+		chunkTemplate.setInterceptor(new RepeatInterceptorAdapter() {
+			public void before(RepeatContext context) {
+				list.add(context);
+			}
+		});
+		chunkTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
+		RepeatTemplate stepTemplate = new RepeatTemplate();
+		final List steps = new ArrayList();
+		stepTemplate.setInterceptor(new RepeatInterceptorAdapter() {
+			public void before(RepeatContext context) {
+				steps.add(context);
+			}
+		});
+		stepTemplate.setCompletionPolicy(new SimpleCompletionPolicy(1));
+		SimpleHolderStepConfiguration configuration = new SimpleHolderStepConfiguration(
+				chunkTemplate, stepTemplate);
+		configuration.setTasklet(new Tasklet() {
+			public ExitStatus execute() throws Exception {
+				return ExitStatus.CONTINUABLE;
+			}
+		});
+		SimpleStepExecutor executor = (SimpleStepExecutor) factory
+				.getExecutor(configuration);
+		StepExecution stepExecution = new StepExecution(new StepInstance(
+				new Long(11)), new JobExecution(new JobInstance(null),
+				new Long(12)));
+		executor.process(configuration, stepExecution);
+		assertEquals(2, list.size());
+		assertEquals(1, steps.size());
+	}
+
 	public void testUnsuccessfulWrongConfiguration() throws Exception {
 		try {
 			factory.getExecutor(new StepConfigurationSupport());
@@ -141,14 +177,24 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 	 */
 	public class SimpleHolderStepConfiguration extends SimpleStepConfiguration
 			implements RepeatOperationsHolder {
-		private RepeatOperations executor;
+		private RepeatOperations chunkOperations;
+		private RepeatOperations stepOperations;
 
-		public SimpleHolderStepConfiguration(RepeatOperations executor) {
-			this.executor = executor;
+		public SimpleHolderStepConfiguration(RepeatOperations operations) {
+			this.chunkOperations = operations;
+		}
+
+		public SimpleHolderStepConfiguration(RepeatOperations chunkOperations, RepeatOperations stepOperations) {
+			this.chunkOperations = chunkOperations;
+			this.stepOperations = stepOperations;
 		}
 
 		public RepeatOperations getChunkOperations() {
-			return executor;
+			return chunkOperations;
+		}
+
+		public RepeatOperations getStepOperations() {
+			return stepOperations;
 		}
 	}
 
