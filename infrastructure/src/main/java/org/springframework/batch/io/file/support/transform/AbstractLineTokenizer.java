@@ -22,6 +22,11 @@ import java.util.List;
 import org.springframework.batch.io.file.FieldSet;
 
 
+/**
+ * @author Dave Syer
+ * @author Robert Kasanicky
+ *
+ */
 public abstract class AbstractLineTokenizer implements LineTokenizer {
 
 	protected String[] names = new String[0];
@@ -34,6 +39,17 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	 */
 	public void setNames(String[] names) {
 		this.names = names;
+	}
+	
+	/**
+	 * @return <code>true</code> if column names have been specified
+	 * @see #setNames(String[])
+	 */
+	public boolean hasNames() {
+		if (names != null && names.length > 0) {
+			return true;
+		}
+		return false;
 	}
 
 	/**

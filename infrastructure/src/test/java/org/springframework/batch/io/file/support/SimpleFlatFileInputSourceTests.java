@@ -27,6 +27,7 @@ import org.springframework.batch.io.exception.FlatFileParsingException;
 import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.io.file.support.separator.DefaultRecordSeparatorPolicy;
+import org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer;
 import org.springframework.batch.io.file.support.transform.LineTokenizer;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
@@ -70,8 +71,6 @@ public class SimpleFlatFileInputSourceTests extends TestCase {
 		inputSource.setFieldSetMapper(fieldSetMapper);
 		inputSource.afterPropertiesSet();
 
-		// context argument is necessary only for the FileLocator, which
-		// is mocked
 		inputSource.open();
 	}
 
@@ -246,4 +245,49 @@ public class SimpleFlatFileInputSourceTests extends TestCase {
 
 	}
 
+	/**
+	 * Header line is skipped and used to setup fieldSet column names.
+	 */
+	public void testColumnNamesInHeader() throws Exception {
+		final String INPUT = "name1|name2\nvalue1|value2\nvalue3|value4";
+		
+		inputSource = new SimpleFlatFileInputSource();
+		inputSource.setResource(getInputResource(INPUT));
+		inputSource.setTokenizer(new DelimitedLineTokenizer('|'));
+		inputSource.setFieldSetMapper(fieldSetMapper);
+		inputSource.setFirstLineIsHeader(true);
+		inputSource.afterPropertiesSet();
+		inputSource.open();
+		
+		FieldSet fs = (FieldSet) inputSource.read();
+		assertEquals("value1", fs.readString("name1"));
+		assertEquals("value2", fs.readString("name2"));
+		
+		fs = (FieldSet) inputSource.read();
+		assertEquals("value3", fs.readString("name1"));
+		assertEquals("value4", fs.readString("name2"));
+	}
+
+	/**
+	 * Header line is skipped and used to setup fieldSet column names.
+	 */
+	public void testLinesToSkip() throws Exception {
+		final String INPUT = "foo bar spam\none two\nthree four";
+		
+		inputSource = new SimpleFlatFileInputSource();
+		inputSource.setResource(getInputResource(INPUT));
+		inputSource.setTokenizer(new DelimitedLineTokenizer(' '));
+		inputSource.setFieldSetMapper(fieldSetMapper);
+		inputSource.setLinesToSkip(1);
+		inputSource.afterPropertiesSet();
+		inputSource.open();
+		
+		FieldSet fs = (FieldSet) inputSource.read();
+		assertEquals("one", fs.readString(0));
+		assertEquals("two", fs.readString(1));
+		
+		fs = (FieldSet) inputSource.read();
+		assertEquals("three", fs.readString(0));
+		assertEquals("four", fs.readString(1));
+	}
 }

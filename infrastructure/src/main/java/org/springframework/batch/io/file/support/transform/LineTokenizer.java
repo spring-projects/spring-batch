@@ -30,7 +30,7 @@ public interface LineTokenizer {
 	 * Yields the tokens resulting from the splitting of the supplied
 	 * <code>line</code>.
 	 * 
-	 * @param line the line to be tokenised (can be <code>null</code>)
+	 * @param line the line to be tokenized (can be <code>null</code>)
 	 * 
 	 * @return the resulting tokens
 	 */

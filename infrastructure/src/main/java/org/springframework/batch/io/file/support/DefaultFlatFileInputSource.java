@@ -77,7 +77,6 @@ public class DefaultFlatFileInputSource extends SimpleFlatFileInputSource implem
 	 */
 	public void restoreFrom(RestartData data) {
 
-		//TODO this does not look very nice...
 		if (data==null ||
 			data.getProperties() == null ||
 			data.getProperties().getProperty(READ_STATISTICS_NAME) == null ||

@@ -420,4 +420,12 @@ public class FieldSetTests extends TestCase {
 			// expected
 		}
 	}
+
+	public void testGetValues() {
+		String[] values = fieldSet.getValues();
+		assertEquals(tokens.length, values.length);
+		for (int i = 0; i < tokens.length; i++) {
+			assertEquals(tokens[i], values[i]);
+		}
+	}
 }

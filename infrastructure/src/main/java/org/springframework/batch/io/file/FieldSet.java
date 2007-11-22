@@ -75,6 +75,13 @@ public final class FieldSet {
 	}
 
 	/**
+	 * @return fields wrapped by this '<code>FieldSet</code>' instance as String values.
+	 */
+	public String[] getValues() {
+		return tokens;
+	}
+	
+	/**
 	 * Read the {@link String} value at index '<code>index</code>'.
 	 * 
 	 * @param index

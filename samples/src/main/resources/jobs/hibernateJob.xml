@@ -43,6 +43,10 @@
 								<property name="chunkSize" value="3"/>
 							</bean>
 						</property>
+						<property name="exceptionHandler">
+							<bean class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler"
+								p:limit="5" p:useParent="true" p:type="java.lang.Exception"/>
+						</property>
 					</bean>
 				</property>
 			</bean>
