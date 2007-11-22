@@ -44,7 +44,7 @@ public class ItemProviderRetryPolicy extends AbstractStatefulRetryPolicy {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	public static final String EXHAUSTED = ItemProviderRetryPolicy.class + ".EXHAUSTED";
+	public static final String EXHAUSTED = ItemProviderRetryPolicy.class.getName() + ".EXHAUSTED";
 
 	private RetryPolicy delegate;
 

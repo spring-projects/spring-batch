@@ -42,7 +42,7 @@ public class ItemProviderRetryCallback implements RetryCallback {
 
 	private final static Log logger = LogFactory.getLog(ItemProviderRetryCallback.class);
 
-	public static final String ITEM = ItemProviderRetryCallback.class + ".ITEM";
+	public static final String ITEM = ItemProviderRetryCallback.class.getName() + ".ITEM";
 
 	private ItemProvider provider;
 

@@ -64,7 +64,7 @@ public class BatchTransactionSynchronizationManager {
 	/**
 	 * The key in the context attributes for the list of synchronizations.
 	 */
-	private static final String SYNCHS_ATTR_KEY = BatchTransactionSynchronizationManager.class + ".SYNCHRONIZATIONS";
+	private static final String SYNCHS_ATTR_KEY = BatchTransactionSynchronizationManager.class.getName() + ".SYNCHRONIZATIONS";
 
 	/**
 	 * Static method to register synchronizations. A TransactionSyncrhonization

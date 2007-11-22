@@ -59,7 +59,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
-		RepeatContextCounter counter = new RepeatContextCounter(context, RethrowOnThresholdExceptionHandler.class + ".RuntimeException");
+		RepeatContextCounter counter = new RepeatContextCounter(context, RethrowOnThresholdExceptionHandler.class.getName() + ".RuntimeException");
 		assertNotNull(counter);
 		assertEquals(1, counter.getCount());
 	}

@@ -13,8 +13,8 @@ public class SqlNflPlayerSummaryDao extends JdbcDaoSupport implements ItemWriter
 	
 	public void write(Object output) {
 		
-		Assert.isInstanceOf(NflPlayerSummary.class, output, SqlNflPlayerSummaryDao.class + " only " +
-				"supports outputing " + NflPlayerSummary.class + " instances.");
+		Assert.isInstanceOf(NflPlayerSummary.class, output, SqlNflPlayerSummaryDao.class.getName() + " only " +
+				"supports outputing " + NflPlayerSummary.class.getName() + " instances.");
 		
 		NflPlayerSummary summary = (NflPlayerSummary)output;
 		

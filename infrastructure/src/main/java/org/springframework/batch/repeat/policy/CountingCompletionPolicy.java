@@ -35,7 +35,7 @@ public abstract class CountingCompletionPolicy extends DefaultResultCompletionPo
 	/**
 	 * Session key for global counter.
 	 */
-	public static final String COUNT = CountingCompletionPolicy.class + ".COUNT";
+	public static final String COUNT = CountingCompletionPolicy.class.getName() + ".COUNT";
 
 	private boolean useParent = false;
 

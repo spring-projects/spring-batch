@@ -33,11 +33,13 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class HibernateCreditWriter extends HibernateDaoSupport implements
 		CustomerCreditWriter, RepeatInterceptor {
 
-	private boolean failOnFlush = false;
-	private boolean first = true;
+	private int failOnFlush = -1;
 	private List errors = new ArrayList();
-	private Set processed = new HashSet();
 	private Set failed = new HashSet();
+
+	// TODO: these need to be ThreadLocal (or a pure framework concern).
+	private RepeatContext context;
+	private Set processed = new HashSet();
 
 	/**
 	 * Public accessor for the errors property.
@@ -54,16 +56,15 @@ public class HibernateCreditWriter extends HibernateDaoSupport implements
 	 * @see org.springframework.batch.sample.dao.CustomerCreditWriter#write(org.springframework.batch.sample.domain.CustomerCredit)
 	 */
 	public void writeCredit(CustomerCredit customerCredit) {
-		if (!failOnFlush || !first) {
-			getHibernateTemplate().update(customerCredit);
-		} else {
+		if (customerCredit.getId() == failOnFlush) {
 			// try to insert one with a duplicate ID
 			CustomerCredit newCredit = new CustomerCredit();
 			newCredit.setId(customerCredit.getId());
 			newCredit.setName(customerCredit.getName());
 			newCredit.setCredit(customerCredit.getCredit());
 			getHibernateTemplate().save(newCredit);
-			first = false; // fail on the first record only
+		} else {
+			getHibernateTemplate().update(customerCredit);
 		}
 	}
 
@@ -75,23 +76,31 @@ public class HibernateCreditWriter extends HibernateDaoSupport implements
 	public void write(Object output) {
 		processed.add(output);
 		writeCredit((CustomerCredit) output);
+		if (failed.contains(output)) {
+			// Force early completion to commit aggressively if we encounter a
+			// failed item (from a failed chunk but we don't know which one was
+			// the problem).
+			context.setCompleteOnly();
+			// Flush now, so that if there is a failure this record will be
+			// skipped.
+			getHibernateTemplate().flush();
+		}
 	}
 
 	/**
-	 * Public setter for the {@link boolean} property.
+	 * Public setter for the failOnFlush property.
 	 * 
 	 * @param failOnFlush
 	 *            true if you want to fail on flush (for testing)
 	 */
-	public void setFailOnFlush(boolean failOnFlush) {
+	public void setFailOnFlush(int failOnFlush) {
 		this.failOnFlush = failOnFlush;
 	}
 
-	public void after(RepeatContext context, ExitStatus result) {
-		// 
+	public void before(RepeatContext context) {
 	}
 
-	public void before(RepeatContext context) {
+	public void after(RepeatContext context, ExitStatus result) {
 	}
 
 	/**
@@ -117,9 +126,9 @@ public class HibernateCreditWriter extends HibernateDaoSupport implements
 	}
 
 	public void open(RepeatContext context) {
+		this.context = context;
 		errors.clear();
 		processed.clear();
-		System.err.println(failed);
 	}
 
 }

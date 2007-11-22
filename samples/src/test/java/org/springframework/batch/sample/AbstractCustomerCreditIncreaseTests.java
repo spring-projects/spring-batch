@@ -3,6 +3,7 @@ package org.springframework.batch.sample;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.sample.item.processor.CustomerCreditIncreaseProcessor;
@@ -27,6 +28,8 @@ public abstract class AbstractCustomerCreditIncreaseTests extends
 
 	private static final String CREDIT_COLUMN = "CREDIT";
 
+	protected static final String ID_COLUMN = "ID";
+
 	private List creditsBeforeUpdate;
 
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
@@ -49,6 +52,8 @@ public abstract class AbstractCustomerCreditIncreaseTests extends
 	 * Credit was increased by CREDIT_INCREASE
 	 */
 	protected void validatePostConditions() throws Exception {
+		
+		final List matches = new ArrayList();
 
 		jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper() {
 
@@ -56,12 +61,32 @@ public abstract class AbstractCustomerCreditIncreaseTests extends
 				final BigDecimal creditBeforeUpdate = (BigDecimal) creditsBeforeUpdate.get(rowNum);
 				final BigDecimal expectedCredit = creditBeforeUpdate
 						.add(CREDIT_INCREASE);
-				assertEquals(expectedCredit, rs.getBigDecimal(CREDIT_COLUMN));
+				if (expectedCredit.equals(rs.getBigDecimal(CREDIT_COLUMN))) {
+					matches.add(rs.getBigDecimal(ID_COLUMN));
+				}
 				return null;
 			}
 
 		});
+				
 
+		assertEquals(getExpectedMatches(), matches.size());
+		checkMatches(matches);
+
+	}
+
+	/**
+	 * @param matches
+	 */
+	protected void checkMatches(List matches) {
+		// no-op...
+	}
+
+	/**
+	 * @return the expected number of matches in the updated credits.
+	 */
+	protected int getExpectedMatches() {
+		return creditsBeforeUpdate.size();
 	}
 
 }

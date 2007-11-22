@@ -129,7 +129,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	}
 
 	private RepeatContextCounter getCounter(RepeatContext context, Object key) {
-		String attribute = RethrowOnThresholdExceptionHandler.class + "."
+		String attribute = RethrowOnThresholdExceptionHandler.class.getName() + "."
 				+ key.toString();
 		// Creates a new counter and stores it in the correct context:
 		return new RepeatContextCounter(context, attribute, useParent);

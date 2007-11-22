@@ -1,5 +1,8 @@
 package org.springframework.batch.sample;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import org.springframework.batch.sample.dao.HibernateCreditWriter;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.orm.hibernate3.HibernateJdbcException;
@@ -32,7 +35,7 @@ public class HibernateFailureJobFunctionalTests extends
 	 */
 	protected void onTearDown() throws Exception {
 		super.onTearDown();
-		writer.setFailOnFlush(false);
+		writer.setFailOnFlush(-1);
 	}
 
 	protected String[] getConfigLocations() {
@@ -45,7 +48,7 @@ public class HibernateFailureJobFunctionalTests extends
 	 * @see org.springframework.batch.sample.AbstractValidatingBatchLauncherTests#testLaunchJob()
 	 */
 	public void testLaunchJob() throws Exception {
-		writer.setFailOnFlush(true);
+		writer.setFailOnFlush(2);
 		
 		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
 		assertTrue(before>0);
@@ -57,8 +60,9 @@ public class HibernateFailureJobFunctionalTests extends
 		} catch (UncategorizedSQLException e) {
 			// Expected, but check that the exception was registered:
 			assertEquals(1, writer.getErrors().size());
-			throw e;
+			// throw e;
 		}
+		validatePostConditions();
 		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
 		assertEquals(before, after);
 	}
@@ -68,6 +72,21 @@ public class HibernateFailureJobFunctionalTests extends
 	 */
 	protected void validatePostConditions() throws Exception {
 		// TODO: fix so that the postconditions in super class are true
-		// super.validatePostConditions();
+		super.validatePostConditions();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.sample.AbstractCustomerCreditIncreaseTests#checkMatches(java.util.List)
+	 */
+	protected void checkMatches(List matches) {
+		assertFalse(matches.contains(new BigDecimal(2)));
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.sample.AbstractCustomerCreditIncreaseTests#getExpectedMatches()
+	 */
+	protected int getExpectedMatches() {
+		// One record was skipped, so it won't be processed in the final state.
+		return super.getExpectedMatches()-1;
 	}
 }

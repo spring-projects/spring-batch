@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.io.cursor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.hibernate.ScrollableResults;
@@ -22,6 +24,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.io.InputSource;
+import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.GenericRestartData;
@@ -38,47 +41,66 @@ import org.springframework.util.ClassUtils;
  * {@link InputSource} for reading database records built on top of Hibernate.
  * 
  * It executes the HQL {@link #queryString} when initialized and iterates over
- * the result set as {@link #read()} method is called, returning an object corresponding
- * to current row.
+ * the result set as {@link #read()} method is called, returning an object
+ * corresponding to current row.
  * 
- * Input source can be configured to use either {@link StatelessSession} sufficient
- * for simple mappings without the need to cascade to associated objects or standard hibernate
- * {@link Session} for more advanced mappings or when caching is desired.
+ * Input source can be configured to use either {@link StatelessSession}
+ * sufficient for simple mappings without the need to cascade to associated
+ * objects or standard hibernate {@link Session} for more advanced mappings or
+ * when caching is desired.
  * 
- * When stateful session is used it will be cleared after successful commit *without* being flushed
- * (no inserts or updates are expected).
+ * When stateful session is used it will be cleared after successful commit
+ * without being flushed (no inserts or updates are expected).
  * 
  * @author Robert Kasanicky
  */
-public class HibernateCursorInputSource implements InputSource, Restartable, InitializingBean, DisposableBean,
-	ResourceLifecycle {
-	
-	private static final String RESTART_DATA_ROW_NUMBER_KEY = ClassUtils.getShortName(HibernateCursorInputSource.class)+".rowNumber";
+public class HibernateCursorInputSource implements InputSource, Restartable,
+		Skippable, InitializingBean, DisposableBean, ResourceLifecycle {
+
+	private static final String RESTART_DATA_ROW_NUMBER_KEY = ClassUtils
+			.getShortName(HibernateCursorInputSource.class)
+			+ ".rowNumber";
 
 	private SessionFactory sessionFactory;
-	
+
 	private StatelessSession statelessSession;
-	
+
 	private Session statefulSession;
-	
+
 	private ScrollableResults cursor;
-	
+
 	private String queryString;
-	
+
 	private boolean useStatelessSession = true;
-	
+
 	private int lastCommitRowNumber = 0;
-	
+
+	private final List skippedRows = new ArrayList();
+
+	private int skipCount = 0;
+
+	/* Current count of processed records. */
+	private int currentProcessedRow = 0;
+
 	private boolean initialized = false;
-	
+
 	private TransactionSynchronization synchronization = new HibernateInputSourceTransactionSynchronization();
-	
-	
+
 	public Object read() {
 		if (!initialized) {
 			open();
 		}
 		if (cursor.next()) {
+			currentProcessedRow++;
+			if (!skippedRows.isEmpty()) {
+				// while is necessary to handle successive skips.
+				while (skippedRows.contains(new Integer(currentProcessedRow))) {
+					if (!cursor.next()) {
+						return null;
+					}
+					currentProcessedRow++;
+				}
+			}
 			Object data = cursor.get(0);
 			return data;
 		}
@@ -91,6 +113,9 @@ public class HibernateCursorInputSource implements InputSource, Restartable, Ini
 	public void close() {
 		initialized = false;
 		cursor.close();
+		currentProcessedRow = 0;
+		skippedRows.clear();
+		skipCount = 0;
 		if (useStatelessSession) {
 			statelessSession.close();
 		} else {
@@ -109,13 +134,15 @@ public class HibernateCursorInputSource implements InputSource, Restartable, Ini
 			statefulSession = sessionFactory.openSession();
 			cursor = statefulSession.createQuery(queryString).scroll();
 		}
-		
-		BatchTransactionSynchronizationManager.registerSynchronization(synchronization );
+
+		BatchTransactionSynchronizationManager
+				.registerSynchronization(synchronization);
 		initialized = true;
 	}
 
 	/**
-	 * @param sessionFactory hibernate session factory
+	 * @param sessionFactory
+	 *            hibernate session factory
 	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
@@ -131,7 +158,8 @@ public class HibernateCursorInputSource implements InputSource, Restartable, Ini
 	}
 
 	/**
-	 * @param queryString HQL query string
+	 * @param queryString
+	 *            HQL query string
 	 */
 	public void setQueryString(String queryString) {
 		this.queryString = queryString;
@@ -139,9 +167,10 @@ public class HibernateCursorInputSource implements InputSource, Restartable, Ini
 
 	/**
 	 * Can be set only in uninitialized state.
-	 * @param useStatelessSession 	
-	 * <code>true</code> to use {@link StatelessSession} 
-	 * <code>false</code> to use standard hibernate {@link Session}
+	 * 
+	 * @param useStatelessSession
+	 *            <code>true</code> to use {@link StatelessSession}
+	 *            <code>false</code> to use standard hibernate {@link Session}
 	 */
 	public void setUseStatelessSession(boolean useStatelessSession) {
 		Assert.state(!initialized);
@@ -153,8 +182,9 @@ public class HibernateCursorInputSource implements InputSource, Restartable, Ini
 	 */
 	public RestartData getRestartData() {
 		Properties props = new Properties();
-		props.setProperty(RESTART_DATA_ROW_NUMBER_KEY, String.valueOf(cursor.getRowNumber()));
-		
+		props.setProperty(RESTART_DATA_ROW_NUMBER_KEY, String.valueOf(cursor
+				.getRowNumber()));
+
 		return new GenericRestartData(props);
 	}
 
@@ -162,28 +192,49 @@ public class HibernateCursorInputSource implements InputSource, Restartable, Ini
 	 * Sets the cursor to the received row number.
 	 */
 	public void restoreFrom(RestartData data) {
-		Assert.state(!initialized,
-				"Cannot restore when already intialized.  Call close() first before restore()");
-		
+		Assert
+				.state(!initialized,
+						"Cannot restore when already intialized.  Call close() first before restore()");
+
 		Properties props = data.getProperties();
 		if (props.getProperty(RESTART_DATA_ROW_NUMBER_KEY) == null) {
 			return;
 		}
-		int rowNumber = Integer.parseInt(props.getProperty(RESTART_DATA_ROW_NUMBER_KEY));
+		int rowNumber = Integer.parseInt(props
+				.getProperty(RESTART_DATA_ROW_NUMBER_KEY));
 		open();
 		cursor.setRowNumber(rowNumber);
 	}
-	
+
+	/**
+	 * Skip the current row. If the transaction is rolled back, this row will
+	 * not be represented when read() is called. For example, if you read in row
+	 * 2, find the data to be bad, and call skip(), then continue processing and
+	 * find
+	 */
+	public void skip() {
+		skippedRows.add(new Integer(currentProcessedRow));
+		skipCount++;
+	}
+
 	/**
 	 * Encapsulates transaction events handling.
 	 */
-	private class HibernateInputSourceTransactionSynchronization extends TransactionSynchronizationAdapter {
-		
+	private class HibernateInputSourceTransactionSynchronization extends
+			TransactionSynchronizationAdapter {
+
 		public void afterCompletion(int status) {
 			if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-				cursor.setRowNumber(lastCommitRowNumber);
+				currentProcessedRow = lastCommitRowNumber;
+				if (lastCommitRowNumber == 0) {
+					cursor.beforeFirst();
+				} else {
+					// Set the cursor so that next time it is advanced it will
+					// come back to the committed row.
+					cursor.setRowNumber(lastCommitRowNumber - 1);
+				}
 			} else if (status == TransactionSynchronization.STATUS_COMMITTED) {
-				lastCommitRowNumber = cursor.getRowNumber();
+				lastCommitRowNumber = currentProcessedRow;
 				if (!useStatelessSession) {
 					statefulSession.clear();
 				}

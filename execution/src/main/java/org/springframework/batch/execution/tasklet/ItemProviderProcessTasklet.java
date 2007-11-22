@@ -96,7 +96,7 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 	 * item being processed. Needed to provide recoverable behavior if
 	 * {@link RetryOperations} are not provided.
 	 */
-	private static final String ITEM_KEY = ItemProviderProcessTasklet.class + ".ITEM";
+	private static final String ITEM_KEY = ItemProviderProcessTasklet.class.getName() + ".ITEM";
 
 	private RetryPolicy retryPolicy = null;
 

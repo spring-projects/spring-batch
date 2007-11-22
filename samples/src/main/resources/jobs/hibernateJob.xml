@@ -16,7 +16,8 @@
 
 	<bean id="hibernateJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" class="org.springframework.batch.execution.step.RepeatOperationsStepConfiguration">
+			<bean id="step1"
+				class="org.springframework.batch.execution.step.RepeatOperationsStepConfiguration">
 				<property name="tasklet">
 					<bean
 						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
@@ -30,26 +31,32 @@
 						<property name="itemProcessor">
 							<bean
 								class="org.springframework.batch.sample.item.processor.CustomerCreditIncreaseProcessor">
-								<property name="outputSource" ref="hibernateOutputSource"/>
+								<property name="outputSource"
+									ref="hibernateOutputSource" />
 							</bean>
 						</property>
 					</bean>
 				</property>
 				<property name="chunkOperations">
-					<bean class="org.springframework.batch.repeat.support.RepeatTemplate">
-						<property name="interceptor" ref="hibernateOutputSource"/>
+					<bean
+						class="org.springframework.batch.repeat.support.RepeatTemplate">
+						<property name="interceptor"
+							ref="hibernateOutputSource" />
 						<property name="completionPolicy">
-							<bean class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
-								<property name="chunkSize" value="3"/>
+							<bean
+								class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
+								<property name="chunkSize" value="3" />
 							</bean>
 						</property>
 					</bean>
 				</property>
 				<property name="stepOperations">
-					<bean class="org.springframework.batch.repeat.support.RepeatTemplate">
+					<bean
+						class="org.springframework.batch.repeat.support.RepeatTemplate">
 						<property name="exceptionHandler">
-							<bean class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler"
-								p:limit="5" p:useParent="true" p:type="java.lang.Exception"/>
+							<bean
+								class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler"
+								p:limit="2" p:useParent="true" p:type="java.lang.Exception" />
 						</property>
 					</bean>
 				</property>
@@ -80,7 +87,11 @@
 		</property>
 		<property name="hibernateProperties">
 			<value>
-				hibernate.dialect=org.hibernate.dialect.HSQLDialect
+				<![CDATA[
+			hibernate.show_sql=true
+			hibernate.format_sql=true
+			hibernate.dialect=org.hibernate.dialect.HSQLDialect
+			]]>
 			</value>
 		</property>
 	</bean>
