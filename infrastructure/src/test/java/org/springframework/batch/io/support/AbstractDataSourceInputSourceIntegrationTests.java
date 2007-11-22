@@ -3,6 +3,7 @@ package org.springframework.batch.io.support;
 import java.util.Properties;
 
 import org.springframework.batch.io.InputSource;
+import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.sample.domain.Foo;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.GenericRestartData;
@@ -36,16 +37,22 @@ public abstract class AbstractDataSourceInputSourceIntegrationTests extends Abst
 		return new String[] { "org/springframework/batch/io/sql/data-source-context.xml"};
 	}
 	
-	protected void onSetUp()throws Exception{
-		super.onSetUp();
+	/* (non-Javadoc)
+	 * @see org.springframework.test.AbstractTransactionalSpringContextTests#onSetUpInTransaction()
+	 */
+	protected void onSetUpInTransaction() throws Exception {
+		super.onSetUpInTransaction();
 		BatchTransactionSynchronizationManager.clearSynchronizations();
 		source = createInputSource();
 	}
 	
-	protected void onTearDown()throws Exception {
+	/* (non-Javadoc)
+	 * @see org.springframework.test.AbstractTransactionalSpringContextTests#onTearDownAfterTransaction()
+	 */
+	protected void onTearDownAfterTransaction() throws Exception {
 		getAsDisposableBean(source).destroy();
 		BatchTransactionSynchronizationManager.clearSynchronizations();
-		super.onTearDown();
+		super.onTearDownAfterTransaction();
 	}
 
 	/**
@@ -155,6 +162,69 @@ public abstract class AbstractDataSourceInputSourceIntegrationTests extends Abst
 		assertEquals(foo2, source.read());
 	}
 	
+	/**
+	 * Rollback scenario with skip - input source rollbacks to last commit point.
+	 */
+	public void testRollbackAndSkip() {
+		
+		if (!(source instanceof Skippable)) {
+			return;
+		}
+		
+		Foo foo1 = (Foo) source.read();
+		
+		commit();
+		
+		Foo foo2 = (Foo) source.read();
+		Assert.state(!foo2.equals(foo1));
+		
+		Foo foo3 = (Foo) source.read();
+		Assert.state(!foo2.equals(foo3));
+		
+		getAsSkippable(source).skip();
+		
+		rollback();
+		
+		assertEquals(foo2, source.read());
+		Foo foo4 = (Foo) source.read();
+		assertEquals(4, foo4.getValue());
+	}
+
+	/**
+	 * Rollback scenario with skip and restart - input source rollbacks to last commit point.
+	 * @throws Exception 
+	 */
+	public void testRollbackSkipAndRestart() throws Exception {
+
+		if (!(source instanceof Skippable)) {
+			return;
+		}
+
+		Foo foo1 = (Foo) source.read();
+		
+		commit();
+		
+		Foo foo2 = (Foo) source.read();
+		Assert.state(!foo2.equals(foo1));
+		
+		Foo foo3 = (Foo) source.read();
+		Assert.state(!foo2.equals(foo3));
+		
+		getAsSkippable(source).skip();
+		
+		rollback();
+		
+		RestartData restartData = getAsRestartable(source).getRestartData();
+
+		// create new input source
+		source = createInputSource();
+
+		getAsRestartable(source).restoreFrom(restartData);
+
+		assertEquals(foo2, source.read());
+		Foo foo4 = (Foo) source.read();
+		assertEquals(4, foo4.getValue());
+	}
 
 	private void commit() {
 		TransactionSynchronizationUtils.invokeAfterCompletion(
@@ -168,10 +238,14 @@ public abstract class AbstractDataSourceInputSourceIntegrationTests extends Abst
 				TransactionSynchronization.STATUS_ROLLED_BACK);
 	}
 	
+	private Skippable getAsSkippable(InputSource source) {
+		return (Skippable) source;
+	}
+	
 	private Restartable getAsRestartable(InputSource source) {
 		return (Restartable) source;
 	}
-	
+
 	private InitializingBean getAsInitializingBean(InputSource source) {
 		return (InitializingBean) source;
 	}

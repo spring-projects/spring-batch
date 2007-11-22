@@ -36,6 +36,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * {@link InputSource} for reading database records built on top of Hibernate.
@@ -53,6 +54,7 @@ import org.springframework.util.ClassUtils;
  * without being flushed (no inserts or updates are expected).
  * 
  * @author Robert Kasanicky
+ * @author Dave Syer
  */
 public class HibernateCursorInputSource implements InputSource, Restartable,
 		Skippable, InitializingBean, DisposableBean, ResourceLifecycle {
@@ -60,6 +62,10 @@ public class HibernateCursorInputSource implements InputSource, Restartable,
 	private static final String RESTART_DATA_ROW_NUMBER_KEY = ClassUtils
 			.getShortName(HibernateCursorInputSource.class)
 			+ ".rowNumber";
+
+	private static final String SKIPPED_ROWS = ClassUtils
+			.getShortName(HibernateCursorInputSource.class)
+			+ ".skippedRows";;
 
 	private SessionFactory sessionFactory;
 
@@ -182,8 +188,10 @@ public class HibernateCursorInputSource implements InputSource, Restartable,
 	 */
 	public RestartData getRestartData() {
 		Properties props = new Properties();
-		props.setProperty(RESTART_DATA_ROW_NUMBER_KEY, String.valueOf(cursor
-				.getRowNumber()));
+		props.setProperty(RESTART_DATA_ROW_NUMBER_KEY, ""+currentProcessedRow);
+		String skipped = skippedRows.toString();
+		props.setProperty(SKIPPED_ROWS, skipped.substring(1,
+				skipped.length() - 1));
 
 		return new GenericRestartData(props);
 	}
@@ -200,10 +208,20 @@ public class HibernateCursorInputSource implements InputSource, Restartable,
 		if (props.getProperty(RESTART_DATA_ROW_NUMBER_KEY) == null) {
 			return;
 		}
-		int rowNumber = Integer.parseInt(props
+		currentProcessedRow = Integer.parseInt(props
 				.getProperty(RESTART_DATA_ROW_NUMBER_KEY));
 		open();
-		cursor.setRowNumber(rowNumber);
+		cursor.setRowNumber(currentProcessedRow-1);
+
+		if (!props.containsKey(SKIPPED_ROWS)) {
+			return;
+		}
+
+		String[] skipped = StringUtils.commaDelimitedListToStringArray(props
+				.getProperty(SKIPPED_ROWS));
+		for (int i = 0; i < skipped.length; i++) {
+			this.skippedRows.add(new Integer(skipped[i]));
+		}
 	}
 
 	/**
@@ -231,7 +249,7 @@ public class HibernateCursorInputSource implements InputSource, Restartable,
 				} else {
 					// Set the cursor so that next time it is advanced it will
 					// come back to the committed row.
-					cursor.setRowNumber(lastCommitRowNumber - 1);
+					cursor.setRowNumber(lastCommitRowNumber-1);
 				}
 			} else if (status == TransactionSynchronization.STATUS_COMMITTED) {
 				lastCommitRowNumber = currentProcessedRow;

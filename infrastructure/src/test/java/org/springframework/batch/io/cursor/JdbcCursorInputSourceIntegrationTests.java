@@ -1,16 +1,15 @@
 package org.springframework.batch.io.cursor;
 
 import org.springframework.batch.io.InputSource;
-import org.springframework.batch.io.cursor.JdbcCursorInputSource;
 import org.springframework.batch.io.driving.FooRowMapper;
-import org.springframework.batch.io.sql.AbstractJdbcInputSourceIntegrationTests;
+import org.springframework.batch.io.support.AbstractDataSourceInputSourceIntegrationTests;
 
 /**
  * Tests for {@link JdbcCursorInputSource}
  * 
  * @author Robert Kasanicky
  */
-public class JdbcCursorInputSourceIntegrationTests extends AbstractJdbcInputSourceIntegrationTests{
+public class JdbcCursorInputSourceIntegrationTests extends AbstractDataSourceInputSourceIntegrationTests {
 
 	protected InputSource createInputSource() throws Exception {
 		JdbcCursorInputSource result = new JdbcCursorInputSource();

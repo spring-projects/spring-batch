@@ -36,7 +36,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * This class is primarily useful because it allows its subclasses to implement
  * a single method to be notified of a commit or rollback, rather than having an
  * inner class that implements {@link TransactionSyncrhonization} and likely
- * calls another method with similar symantics as commit and rollback.
+ * calls another method with similar semantics as commit and rollback.
  * </p>
  * 
  * <p>

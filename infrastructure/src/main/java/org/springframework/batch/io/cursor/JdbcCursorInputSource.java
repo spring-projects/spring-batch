@@ -48,6 +48,7 @@ import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * <p>
@@ -56,7 +57,7 @@ import org.springframework.util.Assert;
  * JdbcDriver used must be version 3.0 or higher. This is because earlier
  * versions do not support holding a ResultSet open over commits.
  * </p>
- *
+ * 
  * <p>
  * Each call to read() will call the provided RowMapper, (NOTE: Calling read()
  * without setting a RowMapper will result in an IllegalStateException!) passing
@@ -72,19 +73,19 @@ import org.springframework.util.Assert;
  * each call to read() returns the ResultSet at the correct line, regardless of
  * rollbacks, restarts, or skips.
  * </p>
- *
+ * 
  * <p>
  * Restart: This implementation contains basic, simple restart. The current row
  * is returned as restart data, and when restored from that same data, the
  * cursor is opened and the current row set to the value within the restart
  * data.
  * </p>
- *
+ * 
  * <p>
  * Statistics: There are two statistics returned by this input source: the
  * current line being processed and the number of lines that have been skipped.
  * </p>
- *
+ * 
  * <p>
  * Transactions: At first glance, it may appear odd that Spring's
  * TransactionSynchronization abstraction is used for something that is reading
@@ -95,7 +96,7 @@ import org.springframework.util.Assert;
  * current row can be moved back to the same row number as it was on when commit
  * was called.
  * </p>
- *
+ * 
  * <p>
  * Calling skip will indicate to the input source that a record is bad and
  * should not be represented to the user if the transaction is rolled back. For
@@ -105,17 +106,18 @@ import org.springframework.util.Assert;
  * Calling read while on row 1 will move the current row to 3, not 2, because 2
  * has been marked as skipped.
  * </p>
- *
+ * 
  * <p>
  * Calling close on this Input Source will cause all resources it is currently
  * using to be freed. (Connection, resultset, etc). If read() is called on the
  * same instance again, the cursor will simply be reopened starting at row 0.
  * </p>
- *
+ * 
  * @author Lucas Ward
  * @author Peter Zozom
  */
-public class JdbcCursorInputSource extends AbstractTransactionalIoSource implements InputSource, ResourceLifecycle, DisposableBean,
+public class JdbcCursorInputSource extends AbstractTransactionalIoSource
+		implements InputSource, ResourceLifecycle, DisposableBean,
 		InitializingBean, Restartable, StatisticsProvider, Skippable {
 
 	private static Log log = LogFactory.getLog(JdbcCursorInputSource.class);
@@ -123,6 +125,8 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 	public static final int VALUE_NOT_SET = -1;
 
 	private static final String CURRENT_PROCESSED_ROW = "sqlCursorInput.lastProcessedRowNum";
+
+	private static final String SKIPPED_ROWS = "sqlCursorInput.skippedRows";
 
 	private static final String SKIP_COUNT = "sqlCursorInput.skippedRrecordCount";
 
@@ -158,12 +162,12 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 	private int lastCommittedRow = 0;
 
 	private RowMapper mapper;
-	
+
 	private boolean initialized = false;
 
 	/**
 	 * Assert that mandatory properties are set.
-	 *
+	 * 
 	 * @throws IllegalArgumentException
 	 *             if either data source or sql properties not set.
 	 */
@@ -174,7 +178,7 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 
 	/**
 	 * Public setter for the data source for injection purposes.
-	 *
+	 * 
 	 * @param dataSource
 	 */
 	public void setDataSource(DataSource dataSource) {
@@ -187,7 +191,7 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 	 * this instance before, the cursor will be opened. If there are skipped
 	 * records for this commit scope, an internal list of skipped records will
 	 * be checked to ensure that only a valid row is given to the mapper.
-	 *
+	 * 
 	 * @returns Object returned by RowMapper
 	 * @throws DataAccessException
 	 * @throws IllegalStateExceptino
@@ -245,7 +249,7 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 
 	/**
 	 * Set the ResultSet's current row to the last marked position.
-	 *
+	 * 
 	 * @throws DataAccessException
 	 */
 	protected void transactionRolledBack() {
@@ -268,7 +272,7 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 	 * Close this input source. The ResultSet, Statement and Connection created
 	 * will be closed. This must be called or the connection and cursor will be
 	 * held open indefinitely!
-	 *
+	 * 
 	 * @see org.springframework.batch.item.ResourceLifecycle#close()
 	 */
 	public void close() {
@@ -284,7 +288,7 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 	/**
 	 * Calls close to ensure that bean factories can close and always release
 	 * resources.
-	 *
+	 * 
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
@@ -326,8 +330,8 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 			handleWarnings(this.stmt.getWarnings());
 		} catch (SQLException se) {
 			close();
-			throw getExceptionTranslator().translate("Executing query",
-					sql, se);
+			throw getExceptionTranslator()
+					.translate("Executing query", sql, se);
 		}
 
 		super.registerSynchronization();
@@ -338,7 +342,7 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 	 * CallableStatement), applying statement settings such as fetch size, max
 	 * rows, and query timeout. @param stmt the JDBC Statement to prepare
 	 * @throws SQLException
-	 *
+	 * 
 	 * @see #setFetchSize
 	 * @see #setMaxRows
 	 * @see #setQueryTimeout
@@ -376,10 +380,10 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 	/*
 	 * Throw a SQLWarningException if we're not ignoring warnings, else log the
 	 * warnings (at debug level).
-	 *
+	 * 
 	 * @param warning the warnings object from the current statement. May be
 	 * <code>null</code>, in which case this method does nothing.
-	 *
+	 * 
 	 * @see org.springframework.jdbc.SQLWarningException
 	 */
 	private void handleWarnings(SQLWarning warnings) throws SQLWarningException {
@@ -392,35 +396,38 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 						+ warningToLog.getMessage() + "]");
 				warningToLog = warningToLog.getNextWarning();
 			}
-		} else if(warnings != null){
+		} else if (warnings != null) {
 			throw new SQLWarningException("Warning not ignored", warnings);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.springframework.batch.restart.Restartable#getRestartData()
 	 */
 	public RestartData getRestartData() {
-		return new GenericRestartData(getStatistics());
+		String skipped = skippedRows.toString();
+		Properties statistics = getStatistics();
+		statistics.setProperty(SKIPPED_ROWS, skipped.substring(1,skipped.length()-1));
+		return new GenericRestartData(statistics);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.springframework.batch.restart.Restartable#restoreFrom(org.springframework.batch.restart.RestartData)
 	 */
 	public void restoreFrom(RestartData data) {
 		Assert.state(!initialized);
-		
+
 		if (data == null)
 			return;
 
 		open();
 
 		Properties restartProperties = data.getProperties();
-		if(restartProperties.containsKey(CURRENT_PROCESSED_ROW) == false){
+		if (!restartProperties.containsKey(CURRENT_PROCESSED_ROW)) {
 			return;
 		}
 
@@ -433,11 +440,20 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 					"Attempted to move ResultSet to last committed row", sql,
 					se);
 		}
+
+		if (!restartProperties.containsKey(SKIPPED_ROWS)) {
+			return;
+		}
+
+		String[] skipped = StringUtils.commaDelimitedListToStringArray(restartProperties.getProperty(SKIPPED_ROWS));
+		for (int i = 0; i < skipped.length; i++) {
+			this.skippedRows.add(new Integer(skipped[i]));			
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.springframework.batch.statistics.StatisticsProvider#getStatistics()
 	 */
 	public Properties getStatistics() {
@@ -465,7 +481,7 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 	 * fetched from the database when more rows are needed for this
 	 * <code>ResultSet</code> object. If the fetch size specified is zero, the
 	 * JDBC driver ignores the value.
-	 *
+	 * 
 	 * @param fetchSize
 	 *            the number of rows to fetch
 	 * @see ResultSet#setFetchSize(int)
@@ -477,7 +493,7 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 	/**
 	 * Sets the limit for the maximum number of rows that any
 	 * <code>ResultSet</code> object can contain to the given number.
-	 *
+	 * 
 	 * @param maxRows
 	 *            the new max rows limit; zero means there is no limit
 	 * @see Statement#setMaxRows(int)
@@ -491,7 +507,7 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 	 * <code>Statement</code> object to execute to the given number of
 	 * seconds. If the limit is exceeded, an <code>SQLException</code> is
 	 * thrown.
-	 *
+	 * 
 	 * @param queryTimeout
 	 *            seconds the new query timeout limit in seconds; zero means
 	 *            there is no limit
@@ -504,7 +520,7 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 	/**
 	 * Set whether SQLWarnings should be ignored (only logged) or exception
 	 * should be thrown.
-	 *
+	 * 
 	 * @param ignoreWarnings
 	 *            if TRUE, warnings are ignored
 	 */
@@ -515,7 +531,7 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 	/**
 	 * Allow verification of cursor position after current row is processed by
 	 * RowMapper or RowCallbackHandler. Default value is TRUE.
-	 *
+	 * 
 	 * @param verifyCursorPosition
 	 *            if true, cursor position is verified
 	 */
@@ -525,7 +541,7 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 
 	/**
 	 * Set the RowMapper to be used for all calls to read().
-	 *
+	 * 
 	 * @param mapper
 	 */
 	public void setMapper(RowMapper mapper) {
@@ -536,7 +552,7 @@ public class JdbcCursorInputSource extends AbstractTransactionalIoSource impleme
 	 * Set the sql statement to be used when creating the cursor. This statement
 	 * should be a complete and valid Sql statement, as it will be run directly
 	 * without any modification.
-	 *
+	 * 
 	 * @param sql
 	 */
 	public void setSql(String sql) {

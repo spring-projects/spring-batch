@@ -7,7 +7,7 @@ import org.hibernate.Session;
  * 
  * @author Robert Kasanicky
  */
-public class HibernateCursorInputSourceStatefulIntegrationTests extends HibernateCursorInputSourceIntegrationTests{
+public class HibernateCursorInputSourceStatefulIntegrationTests extends HibernateCursorInputSourceIntegrationTests {
 
 	protected boolean isUseStatelessSession() {
 		return false;
