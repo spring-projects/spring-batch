@@ -50,12 +50,12 @@ public class HibernateAwareItemWriter implements
 	/**
 	 * Key for items processed in the current transaction {@link RepeatContext}.
 	 */
-	private static final String ITEMS_PROCESSED = HibernateAwareItemWriterTests.class.getName()+".ITEMS_PROCESSED";
+	private static final String ITEMS_PROCESSED = HibernateAwareItemWriter.class.getName()+".ITEMS_PROCESSED";
 
 	/**
 	 * Key for {@link RepeatContext} in transaction resource context.
 	 */
-	private static final String WRITER_REPEAT_CONTEXT = HibernateAwareItemWriterTests.class.getName()+".WRITER_REPEAT_CONTEXT";
+	private static final String WRITER_REPEAT_CONTEXT = HibernateAwareItemWriter.class.getName()+".WRITER_REPEAT_CONTEXT";
 
 	private Set failed = new HashSet();
 
