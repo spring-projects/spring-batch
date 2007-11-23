@@ -61,7 +61,7 @@ public class DefaultJobExecutorTests extends TestCase {
 
 	private List list = new ArrayList();
 
-	StepExecutor defaultStepLifecycle = new StepExecutor() {
+	StepExecutor defaultStepLifecycle = new StubStepExecutor() {
 		public ExitStatus process(StepConfiguration configuration,
 				StepExecution stepExecution) throws StepInterruptedException,
 				BatchCriticalException {
@@ -70,7 +70,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		}
 	};
 
-	StepExecutor configurationStepLifecycle = new StepExecutor() {
+	StepExecutor configurationStepLifecycle = new StubStepExecutor() {
 		public ExitStatus process(StepConfiguration configuration,
 				StepExecution stepExecution) throws StepInterruptedException,
 				BatchCriticalException {
@@ -209,7 +209,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		stepConfiguration2.setStartLimit(5);
 		final StepInterruptedException exception = new StepInterruptedException(
 				"Interrupt!");
-		defaultStepLifecycle = new StepExecutor() {
+		defaultStepLifecycle = new StubStepExecutor() {
 			public ExitStatus process(StepConfiguration configuration,
 					StepExecution stepExecution)
 					throws StepInterruptedException, BatchCriticalException {
@@ -230,7 +230,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		stepConfiguration1.setStartLimit(5);
 		stepConfiguration2.setStartLimit(5);
 		final RuntimeException exception = new RuntimeException("Foo!");
-		defaultStepLifecycle = new StepExecutor() {
+		defaultStepLifecycle = new StubStepExecutor() {
 			public ExitStatus process(StepConfiguration configuration,
 					StepExecution stepExecution)
 					throws StepInterruptedException, BatchCriticalException {
@@ -299,5 +299,18 @@ public class DefaultJobExecutorTests extends TestCase {
 
 	private void checkRepository(BatchStatus status) {
 		checkRepository(status, null);
+	}
+	
+	private class StubStepExecutor implements StepExecutor {
+
+		public void applyConfiguration(StepConfiguration configuration) {
+		}
+
+		public ExitStatus process(StepConfiguration configuration,
+				StepExecution stepExecution) throws StepInterruptedException,
+				BatchCriticalException {
+			return null;
+		}
+		
 	}
 }
