@@ -40,7 +40,7 @@
 				<property name="chunkOperations">
 					<bean
 						class="org.springframework.batch.repeat.support.RepeatTemplate">
-						<property name="interceptor"
+						<property name="interceptors"
 							ref="hibernateOutputSource" />
 						<property name="completionPolicy">
 							<bean
@@ -64,7 +64,14 @@
 		</property>
 	</bean>
 
+	<!-- This is a framework class that needs a delegate and also needs to be registered as a RepeatInterceptor in the chunk -->
 	<bean id="hibernateOutputSource"
+		class="org.springframework.batch.io.support.HibernateAwareItemWriter">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="delegate" ref="hibernateCreditWriter" />
+	</bean>
+
+	<bean id="hibernateCreditWriter"
 		class="org.springframework.batch.sample.dao.HibernateCreditWriter">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
