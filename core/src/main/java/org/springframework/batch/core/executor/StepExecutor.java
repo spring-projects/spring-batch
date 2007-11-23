@@ -25,8 +25,8 @@ import org.springframework.batch.repeat.ExitStatus;
  * Interface for processing a step. Implementations are free to process the step
  * and return when finished, or to schedule the step for processing
  * concurrently, or in the future. The status of the execution should be
- * trackable with the step execution context ({@see Step#getContext()}). The
- * configuration should be treated as immutable.<br/>
+ * trackable with the step execution. The configuration should be treated as
+ * immutable.<br/>
  * 
  * Because step execution parameters and policies can vary from step to step, a
  * {@link StepExecutor} should be created by the caller using a
@@ -39,17 +39,35 @@ import org.springframework.batch.repeat.ExitStatus;
 public interface StepExecutor {
 
 	/**
-	 * Process the step according to the given configuration.
+	 * Process the step according to the given configuration. Implementations
+	 * can be expected to modify their state when this method is called, to take
+	 * account of any policy information in the configuration. Thus it is not
+	 * safe to re-use an instance of {@link StepExecutor} to process multiple
+	 * concurrent executions.
 	 * 
-	 * @param configuration the configuration to use when running the step.
-	 * Contains a recipe for the business logic of an individual processing
-	 * operation. Also used to determine policies for commit intervals and
-	 * exception handling, for instance.
-	 * @param stepExecution an entity representing the step to be executed
-	 * @throws StepInterruptedException if the step is interrupted externally
-	 * @throws BatchCriticalException if there is a problem that needs to be
-	 * signalled to the caller
+	 * @param configuration
+	 *            the configuration to use when running the step. Contains a
+	 *            recipe for the business logic of an individual processing
+	 *            operation. Also used to determine policies for commit
+	 *            intervals and exception handling, for instance.
+	 * 
+	 * @param stepExecution
+	 *            an entity representing the step to be executed
+	 * @throws StepInterruptedException
+	 *             if the step is interrupted externally
+	 * @throws BatchCriticalException
+	 *             if there is a problem that needs to be signalled to the
+	 *             caller
 	 */
-	ExitStatus process(StepConfiguration configuration, StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException;
+	ExitStatus process(StepConfiguration configuration,
+			StepExecution stepExecution) throws StepInterruptedException,
+			BatchCriticalException;
 
+	/**
+	 * Apply the configuration by inspecting it to see if it has any relevant
+	 * policy information.  Should be called before any calls to process.
+	 * 
+	 * @param configuration
+	 */
+	void applyConfiguration(StepConfiguration configuration);
 }

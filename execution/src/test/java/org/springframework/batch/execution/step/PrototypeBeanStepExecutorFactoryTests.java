@@ -20,17 +20,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.configuration.StepConfigurationSupport;
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.StepExecutor;
-import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
-import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -95,11 +87,7 @@ public class PrototypeBeanStepExecutorFactoryTests extends TestCase {
 	}
 
 	public void testSuccessfulStepExecutorWithSimpleConfigurationAndNotSimpleExecutor() throws Exception {
-		StepExecutor executor = new StepExecutor() {
-			public ExitStatus process(StepConfiguration configuration, StepExecution stepExecution) throws BatchCriticalException {
-				return ExitStatus.FINISHED;
-			}
-		};
+		StepExecutor executor = new SimpleStepExecutor();
 		applicationContext.getBeanFactory().registerSingleton("foo", executor);
 		factory.setStepExecutorName("foo");
 		assertEquals(executor, factory.getExecutor(new SimpleStepConfiguration()));
@@ -116,11 +104,6 @@ public class PrototypeBeanStepExecutorFactoryTests extends TestCase {
 	public void testSuccessfulStepExecutorHolderStrategyWithStepOperations() throws Exception {
 		final List list = new ArrayList();
 		SimpleStepExecutor executor = new SimpleStepExecutor() {
-			public ExitStatus process(StepConfiguration configuration,
-					StepExecution stepExecution)
-					throws StepInterruptedException, BatchCriticalException {
-				return ExitStatus.FINISHED;
-			}
 			public void setChunkOperations(RepeatOperations chunkOperations) {
 				list.add(chunkOperations);
 				super.setChunkOperations(chunkOperations);
@@ -134,14 +117,8 @@ public class PrototypeBeanStepExecutorFactoryTests extends TestCase {
 		factory.setStepExecutorName("foo");
 		RepeatTemplate chunkTemplate = new RepeatTemplate();
 		RepeatTemplate stepTemplate = new RepeatTemplate();
-		SimpleHolderStepConfiguration configuration = new SimpleHolderStepConfiguration(
-				chunkTemplate, stepTemplate);
-		StepExecutor product = factory.getExecutor(new SimpleHolderStepConfiguration(chunkTemplate, stepTemplate));
+		SimpleStepExecutor product = (SimpleStepExecutor) factory.getExecutor(new SimpleHolderStepConfiguration(chunkTemplate, stepTemplate));
 		assertEquals(executor, product);
-		StepExecution stepExecution = new StepExecution(new StepInstance(
-				new Long(11)), new JobExecution(new JobInstance(null),
-				new Long(12)));
-		executor.process(configuration, stepExecution);
 		assertEquals(2, list.size());
 		assertEquals(chunkTemplate, list.get(0));
 		assertEquals(stepTemplate, list.get(1));

@@ -68,9 +68,11 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 				new Long(11)), new JobExecution(new JobInstance(null),
 				new Long(12)));
 		try {
-			executor.processChunk(configuration, stepExecution);
+			executor.process(configuration, stepExecution);
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		} catch (NullPointerException e) {
+			throw e;
+		}catch (RuntimeException e) {
 			assertEquals("Oops", e.getMessage());
 		}
 		assertEquals(1, list.size());
@@ -93,7 +95,7 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 				new Long(11)), new JobExecution(new JobInstance(null),
 				new Long(12)));
 		try {
-			executor.processChunk(configuration, stepExecution);
+			executor.process(configuration, stepExecution);
 			fail("Expected RuntimeException");
 		} catch (NullPointerException e) {
 			// expected

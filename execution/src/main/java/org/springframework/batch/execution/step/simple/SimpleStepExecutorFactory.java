@@ -19,12 +19,7 @@ import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.execution.step.RepeatOperationsHolder;
 import org.springframework.batch.execution.step.SimpleStepConfiguration;
-import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
-import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -63,38 +58,8 @@ public class SimpleStepExecutorFactory implements StepExecutorFactory,
 
 		SimpleStepExecutor executor = new SimpleStepExecutor();
 		executor.setRepository(jobRepository);
+		executor.applyConfiguration(configuration);
 
-		RepeatTemplate template = new RepeatTemplate();
-		RepeatOperations chunkOperations = template;
-		RepeatOperations stepOperations = null;
-		
-		if (configuration instanceof RepeatOperationsHolder) {
-			
-			RepeatOperationsHolder holder = (RepeatOperationsHolder) configuration;
-			chunkOperations = holder.getChunkOperations();
-			stepOperations = holder.getStepOperations();
-			Assert
-					.state(chunkOperations != null,
-							"Chunk operations obtained from step configuration must be non-null.");
-
-		} else {
-
-			SimpleStepConfiguration simpleConfiguration = (SimpleStepConfiguration) configuration;
-			template.setCompletionPolicy(new SimpleCompletionPolicy(
-					simpleConfiguration.getCommitInterval()));
-			ExceptionHandler exceptionHandler = simpleConfiguration
-					.getExceptionHandler();
-			if (exceptionHandler != null) {
-				template.setExceptionHandler(exceptionHandler);
-			}
-
-		}
-
-		executor.setChunkOperations(chunkOperations);
-		if (stepOperations!=null) {
-			executor.setStepOperations(stepOperations);
-		}
-		
 		return executor;
 
 	}

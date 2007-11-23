@@ -32,11 +32,15 @@ import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
+import org.springframework.batch.execution.step.RepeatOperationsHolder;
+import org.springframework.batch.execution.step.SimpleStepConfiguration;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
+import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.RestartData;
@@ -138,7 +142,7 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * is used to store the result. Various reporting information are also added
 	 * to the current context (the {@link RepeatContext} governing the step
 	 * execution, which would normally be available to the caller somehow
-	 * through the step's {@link JobExecutionContext}.
+	 * through the step's {@link JobExecutionContext}.<br/>
 	 * 
 	 * @throws StepInterruptedException
 	 *             if the step or a chunk is interrupted
@@ -153,7 +157,7 @@ public class SimpleStepExecutor implements StepExecutor {
 		final StepInstance step = stepExecution.getStep();
 		boolean isRestart = step.getStepExecutionCount() > 0 ? true : false;
 		Assert.notNull(step);
-
+		
 		final Tasklet module = configuration.getTasklet();
 
 		ExitStatus status = ExitStatus.FAILED;
@@ -367,9 +371,14 @@ public class SimpleStepExecutor implements StepExecutor {
 		return tasklet.execute();
 	}
 
-	private RestartData getRestartData(Tasklet module) {
-		if (module instanceof Restartable) {
-			return ((Restartable) module).getRestartData();
+	/**
+	 * @param tasklet
+	 * @return restart data from the {@link Tasklet} if it is
+	 *         {@link Restartable}
+	 */
+	private RestartData getRestartData(Tasklet tasklet) {
+		if (tasklet instanceof Restartable) {
+			return ((Restartable) tasklet).getRestartData();
 		} else {
 			return null;
 		}
@@ -410,5 +419,58 @@ public class SimpleStepExecutor implements StepExecutor {
 	public void setExceptionClassifier(
 			ExitCodeExceptionClassifier exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
+	}
+
+	/**
+	 * Apply the configuration by inspecting it to see if it has any relevant
+	 * policy information.
+	 * <ul>
+	 * <li> If the configuration is a {@link RepeatOperationsHolder} then we use
+	 * the provided {@link RepeatOperations} instances for chunk and step. </li>
+	 * <li> If the configuration is a {@link SimpleStepConfiguration} then we
+	 * apply the commit interval at the chunk level and the exception handler at
+	 * the step level, provided the existing repeat operations are instances of
+	 * {@link RepeatTemplate}.</li>
+	 * </ul>
+	 * 
+	 * @param configuration
+	 *            a step configuration
+	 */
+	public void applyConfiguration(StepConfiguration configuration) {
+
+		if (configuration instanceof RepeatOperationsHolder) {
+
+			RepeatOperationsHolder holder = (RepeatOperationsHolder) configuration;
+			RepeatOperations chunkOperations = holder.getChunkOperations();
+			RepeatOperations stepOperations = holder.getStepOperations();
+			Assert
+					.state(chunkOperations != null,
+							"Chunk operations obtained from step configuration must be non-null.");
+
+
+			if (chunkOperations != null) {
+				setChunkOperations(chunkOperations);
+			}
+			if (stepOperations != null) {
+				setStepOperations(stepOperations);
+			}
+		
+		} else if (configuration instanceof SimpleStepConfiguration) {
+
+			SimpleStepConfiguration simpleConfiguation = (SimpleStepConfiguration) configuration;
+			if (this.chunkOperations instanceof RepeatTemplate) {
+				RepeatTemplate template = (RepeatTemplate) this.chunkOperations;
+				template.setCompletionPolicy(new SimpleCompletionPolicy(
+						simpleConfiguation.getCommitInterval()));
+			}
+			ExceptionHandler exceptionHandler = simpleConfiguation
+					.getExceptionHandler();
+			if (this.stepOperations instanceof RepeatTemplate && exceptionHandler!=null) {
+				RepeatTemplate template = (RepeatTemplate) this.stepOperations;
+				template.setExceptionHandler(exceptionHandler);
+			}
+
+		}
+
 	}
 }

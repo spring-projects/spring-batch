@@ -217,7 +217,6 @@ public class RepeatTemplate implements RepeatOperations {
 										+ (i + 1) + " of "
 										+ interceptors.length + ")", throwable);
 							}
-
 							exceptionHandler
 									.handleException(context, throwable);
 

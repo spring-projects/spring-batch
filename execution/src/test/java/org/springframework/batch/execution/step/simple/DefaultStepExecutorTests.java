@@ -245,7 +245,7 @@ public class DefaultStepExecutorTests extends TestCase {
 
 	}
 
-	public void testExitCodeDefaultClassification() {
+	public void testExitCodeDefaultClassification() throws Exception {
 
 		Tasklet tasklet = new Tasklet() {
 

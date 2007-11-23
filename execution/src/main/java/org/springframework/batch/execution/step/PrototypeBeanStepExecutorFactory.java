@@ -20,8 +20,6 @@ import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -107,35 +105,9 @@ public class PrototypeBeanStepExecutorFactory implements StepExecutorFactory,
 	 * @see StepExecutorFactory#getExecutor(StepConfiguration)
 	 */
 	public StepExecutor getExecutor(StepConfiguration configuration) {
-
 		StepExecutor executor = getStepExecutor();
-
-		if (executor instanceof SimpleStepExecutor) {
-			RepeatTemplate template = new RepeatTemplate();
-			RepeatOperations chunkOperations = template;
-			RepeatOperations stepOperations = null;
-			if (configuration instanceof RepeatOperationsHolder) {
-				RepeatOperationsHolder holder = (RepeatOperationsHolder) configuration;
-				chunkOperations = holder.getChunkOperations();
-				stepOperations = holder.getStepOperations();
-				Assert
-						.state(chunkOperations != null,
-								"Chunk operations obtained from step configuration must be non-null.");
-			} else if (configuration instanceof SimpleStepConfiguration) {
-				template.setCompletionPolicy(new SimpleCompletionPolicy(
-						((SimpleStepConfiguration) configuration)
-								.getCommitInterval()));
-				template.setExceptionHandler(((SimpleStepConfiguration)configuration).getExceptionHandler());
-			}
-			SimpleStepExecutor simpleExecutor = (SimpleStepExecutor) executor;
-			simpleExecutor.setChunkOperations(chunkOperations);
-			if (stepOperations!=null) {
-				simpleExecutor.setStepOperations(stepOperations);
-			}
-		}
-
+		executor.applyConfiguration(configuration);
 		return executor;
-
 	}
 
 	/**
