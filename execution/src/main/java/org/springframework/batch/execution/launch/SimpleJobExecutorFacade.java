@@ -164,7 +164,7 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 
 		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration,
 				jobIdentifier);
-		JobExecution execution = new JobExecution(job);
+		JobExecution execution = job.createNewJobExecution();
 		
 		// Save the JobExecution so that it picks up an ID (useful for clients
 		// monitoring asynchronous executions):
