@@ -18,6 +18,7 @@ package org.springframework.batch.execution.step.simple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -41,6 +42,8 @@ import org.springframework.batch.item.ItemProvider;
 import org.springframework.batch.item.provider.ListItemProvider;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.exception.handler.DefaultExceptionHandler;
+import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.interceptor.RepeatInterceptorAdapter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -380,6 +383,45 @@ public class DefaultStepExecutorTests extends TestCase {
 		} catch (Throwable t) {
 			fail();
 		}
+	}
+	
+	public void testApplyConfigurationWithExceptionHandler() throws Exception {
+		SimpleStepConfiguration stepConfiguration = new SimpleStepConfiguration("foo");
+		final List list = new ArrayList();
+		stepExecutor.setStepOperations(new RepeatTemplate() {
+			public void setExceptionHandler(ExceptionHandler exceptionHandler) {
+				list.add(exceptionHandler);
+			}
+		});
+		stepConfiguration.setExceptionHandler(new DefaultExceptionHandler());
+		stepExecutor.applyConfiguration(stepConfiguration);
+		assertEquals(1, list.size());
+	}
+
+	public void testApplyConfigurationWithZeroSkipLimit() throws Exception {
+		SimpleStepConfiguration stepConfiguration = new SimpleStepConfiguration("foo");
+		stepConfiguration.setSkipLimit(0);
+		final List list = new ArrayList();
+		stepExecutor.setStepOperations(new RepeatTemplate() {
+			public void setExceptionHandler(ExceptionHandler exceptionHandler) {
+				list.add(exceptionHandler);
+			}
+		});
+		stepExecutor.applyConfiguration(stepConfiguration);
+		assertEquals(0, list.size());
+	}
+
+	public void testApplyConfigurationWithNonZeroSkipLimit() throws Exception {
+		SimpleStepConfiguration stepConfiguration = new SimpleStepConfiguration("foo");
+		stepConfiguration.setSkipLimit(1);
+		final List list = new ArrayList();
+		stepExecutor.setStepOperations(new RepeatTemplate() {
+			public void setExceptionHandler(ExceptionHandler exceptionHandler) {
+				list.add(exceptionHandler);
+			}
+		});
+		stepExecutor.applyConfiguration(stepConfiguration);
+		assertEquals(1, list.size());
 	}
 
 	private class MockRestartableTasklet implements Tasklet, Restartable {

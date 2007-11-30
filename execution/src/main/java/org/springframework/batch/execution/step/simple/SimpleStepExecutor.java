@@ -40,6 +40,7 @@ import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
+import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
@@ -157,7 +158,7 @@ public class SimpleStepExecutor implements StepExecutor {
 		final StepInstance step = stepExecution.getStep();
 		boolean isRestart = step.getStepExecutionCount() > 0 ? true : false;
 		Assert.notNull(step);
-		
+
 		final Tasklet module = configuration.getTasklet();
 
 		ExitStatus status = ExitStatus.FAILED;
@@ -430,7 +431,9 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * <li> If the configuration is a {@link SimpleStepConfiguration} then we
 	 * apply the commit interval at the chunk level and the exception handler at
 	 * the step level, provided the existing repeat operations are instances of
-	 * {@link RepeatTemplate}.</li>
+	 * {@link RepeatTemplate}. In addition if there is a non-zero skip limit
+	 * and no {@link ExceptionHandler} then we inject a
+	 * {@link SimpleLimitExceptionHandler} with that limit.</li>
 	 * </ul>
 	 * 
 	 * @param configuration
@@ -447,14 +450,13 @@ public class SimpleStepExecutor implements StepExecutor {
 					.state(chunkOperations != null,
 							"Chunk operations obtained from step configuration must be non-null.");
 
-
 			if (chunkOperations != null) {
 				setChunkOperations(chunkOperations);
 			}
 			if (stepOperations != null) {
 				setStepOperations(stepOperations);
 			}
-		
+
 		} else if (configuration instanceof SimpleStepConfiguration) {
 
 			SimpleStepConfiguration simpleConfiguation = (SimpleStepConfiguration) configuration;
@@ -463,9 +465,19 @@ public class SimpleStepExecutor implements StepExecutor {
 				template.setCompletionPolicy(new SimpleCompletionPolicy(
 						simpleConfiguation.getCommitInterval()));
 			}
+
 			ExceptionHandler exceptionHandler = simpleConfiguation
 					.getExceptionHandler();
-			if (this.stepOperations instanceof RepeatTemplate && exceptionHandler!=null) {
+
+			if (simpleConfiguation.getSkipLimit() > 0
+					&& exceptionHandler == null) {
+				SimpleLimitExceptionHandler handler = new SimpleLimitExceptionHandler();
+				handler.setLimit(simpleConfiguation.getSkipLimit());
+				exceptionHandler = handler;
+			}
+
+			if (this.stepOperations instanceof RepeatTemplate
+					&& exceptionHandler != null) {
 				RepeatTemplate template = (RepeatTemplate) this.stepOperations;
 				template.setExceptionHandler(exceptionHandler);
 			}

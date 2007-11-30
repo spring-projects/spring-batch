@@ -71,6 +71,15 @@ public class SimpleStepConfigurationTests extends TestCase {
 	}
 
 	/**
+	 * Test method for {@link org.springframework.batch.execution.step.AbstractStepConfiguration#getExceptionHandler()}.
+	 */
+	public void testSkipLimit() {
+		assertEquals(0, configuration.getSkipLimit());
+		configuration.setSkipLimit(2);
+		assertEquals(2, configuration.getSkipLimit());
+	}
+
+	/**
 	 * Test method for {@link org.springframework.batch.execution.step.AbstractStepConfiguration#getSkipLimit()}.
 	 */
 	public void testGetSkipLimit() {
