@@ -42,7 +42,7 @@ public class JobConfigurationTests extends TestCase {
 	 */
 	public void testSetBeanName() {
 		configuration.setBeanName("foo");
-		assertEquals("foo", configuration.getName());
+		assertEquals("job", configuration.getName());
 	}
 
 	/**

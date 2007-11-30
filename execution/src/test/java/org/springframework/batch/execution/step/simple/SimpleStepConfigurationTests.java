@@ -62,23 +62,6 @@ public class SimpleStepConfigurationTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.AbstractStepConfiguration#setBeanName(java.lang.String)}.
-	 */
-	public void testSetBeanName() {
-		configuration.setBeanName("bar");
-		assertEquals("bar", configuration.getName());
-	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.execution.step.AbstractStepConfiguration#setBeanName(java.lang.String)}.
-	 */
-	public void testSetBeanNameOverrideNull() {
-		configuration = new SimpleStepConfiguration();
-		configuration.setBeanName("bar");
-		assertEquals("bar", configuration.getName());
-	}
-
-	/**
 	 * Test method for {@link org.springframework.batch.execution.step.AbstractStepConfiguration#getExceptionHandler()}.
 	 */
 	public void testGetExceptionHandler() {

@@ -47,8 +47,8 @@ public class SpringBeanJobConfigurationTests extends TestCase {
 		JobConfiguration configuration = (JobConfiguration) context
 				.getBean("bean");
 		assertNotNull(configuration.getName());
-		assertEquals("bean", configuration.getName());
-		configuration.setBeanName("foo");
+		assertEquals("foo", configuration.getName());
+		configuration.setBeanName("bar");
 		assertEquals("foo", configuration.getName());
 	}
 
@@ -62,8 +62,10 @@ public class SpringBeanJobConfigurationTests extends TestCase {
 		JobConfiguration configuration = (JobConfiguration) context
 				.getBean("bean");
 		assertNotNull(configuration.getName());
-		assertEquals("bean", configuration.getName());
+		assertEquals("bar", configuration.getName());
 		configuration.setBeanName("foo");
+		assertEquals("bar", configuration.getName());
+		configuration.setName("foo");
 		assertEquals("foo", configuration.getName());
 	}
 }
