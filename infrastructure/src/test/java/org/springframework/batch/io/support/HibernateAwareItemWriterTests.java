@@ -37,6 +37,15 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 public class HibernateAwareItemWriterTests extends TestCase {
 
+	private class HibernateTemplateWrapper extends HibernateTemplate {
+		public void flush() throws DataAccessException {
+			list.add("flush");
+		}
+		public void clear() {
+			list.add("clear");				
+		};
+	}
+
 	private class StubItemWriter implements ItemWriter, RepeatInterceptor {
 		public void write(Object item) {
 			list.add(item);
@@ -78,11 +87,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		writer.setDelegate(new StubItemWriter());
 		context = new RepeatContextSupport(null);
 		writer.open(context);
-		writer.setHibernateTemplate(new HibernateTemplate() {
-			public void flush() throws DataAccessException {
-				list.add("flush");
-			}
-		});
+		writer.setHibernateTemplate(new HibernateTemplateWrapper());
 		list.clear();
 	}
 	
@@ -163,7 +168,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	 */
 	public void testWriteAndCloseWithFailure() {
 		final RuntimeException ex = new RuntimeException("bar");
-		writer.setHibernateTemplate(new HibernateTemplate() {
+		writer.setHibernateTemplate(new HibernateTemplateWrapper() {
 			public void flush() throws DataAccessException {
 				throw ex;
 			}
@@ -178,14 +183,15 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		assertEquals(3, list.size());
 		assertTrue(list.contains(ex));
 		assertTrue(list.contains(context));
-		writer.setHibernateTemplate(new HibernateTemplate() {
+		writer.setHibernateTemplate(new HibernateTemplateWrapper() {
 			public void flush() throws DataAccessException {
 				list.add("flush");
 			}
 		});
 		writer.write("foo");
-		assertEquals(5, list.size());
+		assertEquals(6, list.size());
 		assertTrue(list.contains("flush"));
+		assertTrue(list.contains("clear"));
 	}
 
 	/**
@@ -212,7 +218,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	 */
 	public void testClose() {
 		writer.close(context);
-		assertEquals(2, list.size());
+		assertEquals(3, list.size());
 		assertTrue(list.contains("flush"));
 	}
 
@@ -225,8 +231,9 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		String key = (String) map.keySet().iterator().next();
 		TransactionSynchronizationManager.unbindResource(key);
 		writer.close(context);
-		assertEquals(2, list.size());
+		assertEquals(3, list.size());
 		assertTrue(list.contains("flush"));
+		assertTrue(list.contains("clear"));
 	}
 
 	/**

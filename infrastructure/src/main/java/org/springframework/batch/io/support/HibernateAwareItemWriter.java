@@ -44,23 +44,27 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class HibernateAwareItemWriter implements
-		ItemWriter, RepeatInterceptor, InitializingBean {
+public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
+		InitializingBean {
 
 	/**
 	 * Key for items processed in the current transaction {@link RepeatContext}.
 	 */
-	private static final String ITEMS_PROCESSED = HibernateAwareItemWriter.class.getName()+".ITEMS_PROCESSED";
+	private static final String ITEMS_PROCESSED = HibernateAwareItemWriter.class
+			.getName()
+			+ ".ITEMS_PROCESSED";
 
 	/**
 	 * Key for {@link RepeatContext} in transaction resource context.
 	 */
-	private static final String WRITER_REPEAT_CONTEXT = HibernateAwareItemWriter.class.getName()+".WRITER_REPEAT_CONTEXT";
+	private static final String WRITER_REPEAT_CONTEXT = HibernateAwareItemWriter.class
+			.getName()
+			+ ".WRITER_REPEAT_CONTEXT";
 
 	private Set failed = new HashSet();
 
 	private ItemWriter delegate;
-	
+
 	private HibernateOperations hibernateTemplate;
 
 	/**
@@ -72,23 +76,26 @@ public class HibernateAwareItemWriter implements
 	public void setDelegate(ItemWriter delegate) {
 		this.delegate = delegate;
 	}
-	
+
 	/**
 	 * Public setter for the {@link HibernateOperations} property.
-	 *
-	 * @param hibernateTemplate the hibernateTemplate to set
+	 * 
+	 * @param hibernateTemplate
+	 *            the hibernateTemplate to set
 	 */
 	public void setHibernateTemplate(HibernateOperations hibernateTemplate) {
 		this.hibernateTemplate = hibernateTemplate;
 	}
-	
+
 	/**
-	 * Set the Hibernate SessionFactory to be used internally.
-	 * Will automatically create a HibernateTemplate for the given SessionFactory.
+	 * Set the Hibernate SessionFactory to be used internally. Will
+	 * automatically create a HibernateTemplate for the given SessionFactory.
+	 * 
 	 * @see #setHibernateTemplate
 	 */
 	public final void setSessionFactory(SessionFactory sessionFactory) {
-	  this.hibernateTemplate = new HibernateTemplate(sessionFactory);;
+		this.hibernateTemplate = new HibernateTemplate(sessionFactory);
+		;
 	}
 
 	/**
@@ -100,8 +107,8 @@ public class HibernateAwareItemWriter implements
 		Assert
 				.notNull(delegate,
 						"HibernateAwareItemWriter requires an ItemWriter as a delegate.");
-		Assert
-		.notNull(hibernateTemplate, "HibernateAwareItemWriter requires a HibernateOperations");
+		Assert.notNull(hibernateTemplate,
+				"HibernateAwareItemWriter requires a HibernateOperations");
 	}
 
 	/**
@@ -157,7 +164,7 @@ public class HibernateAwareItemWriter implements
 				RepeatInterceptor interceptor = (RepeatInterceptor) delegate;
 				interceptor.close(context);
 			}
-			hibernateTemplate.flush();
+			flush();
 		} catch (RuntimeException e) {
 			synchronized (failed) {
 				failed.addAll(getProcessed());
@@ -168,6 +175,16 @@ public class HibernateAwareItemWriter implements
 			throw e;
 		}
 		unsetContext();
+	}
+
+	/**
+	 * Wrapper for Hibernate flush.
+	 */
+	private void flush() {
+		hibernateTemplate.flush();
+		// This should happen when the transaction commits anyway, but to be
+		// sure...
+		hibernateTemplate.clear();
 	}
 
 	/**
@@ -264,7 +281,7 @@ public class HibernateAwareItemWriter implements
 			context.setCompleteOnly();
 			// Flush now, so that if there is a failure this record can be
 			// skipped.
-			hibernateTemplate.flush();
+			flush();
 		}
 
 	}
