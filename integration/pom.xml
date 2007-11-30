@@ -12,7 +12,7 @@
 
 	<parent>
 		<groupId>org.springframework.batch</groupId>
-		<version>1.0-m3-SNAPSHOT</version>
+		<version>1.0.0-m3-SNAPSHOT</version>
 		<artifactId>spring-batch</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
@@ -27,10 +27,6 @@
 			<groupId>org.springframework.batch</groupId>
 			<artifactId>spring-batch-infrastructure</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>hsqldb</groupId>
@@ -150,6 +146,16 @@
 			<artifactId>xstream</artifactId>
 			<version>1.2.1</version>
 			<optional>true</optional>
+		</dependency>
+<!-- Spring Dependencies -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

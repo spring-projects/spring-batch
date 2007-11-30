@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch</artifactId>
-		<version>1.0-m3-SNAPSHOT</version>
+		<version>1.0.0-m3-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -37,10 +37,6 @@
 			<groupId>cglib</groupId>
 			<artifactId>cglib-nodep</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>backport-util-concurrent</groupId>
@@ -81,10 +77,6 @@
 			<groupId>hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>easymock</groupId>
@@ -140,6 +132,36 @@
 			<version>2.3.0</version>
 			<optional>true</optional>
 		</dependency>
+<!-- Spring Dependencies -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -148,9 +170,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clover-plugin</artifactId>
 				<configuration>
-					<licenseLocation>
-						${basedir}/src/test/resources/clover.license
-					</licenseLocation>
+					<licenseLocation>${basedir}/src/test/resources/clover.license</licenseLocation>
 				</configuration>
 				<executions>
 					<execution>

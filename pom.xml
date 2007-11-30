@@ -6,14 +6,14 @@
 	<name>Spring Batch</name>
 	<description>
 		<!--  Use CDATA to keep it on a single line in the manifest -->
-		<![CDATA[Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track	their execution, or simply as an optimisation for repetitive processing in a transactional environment. Spring Batch is part of the Spring Portfolio.]]>
+		<![CDATA[Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track	their execution, or simply as an optimization for repetitive processing in a transactional environment. Spring Batch is part of the Spring Portfolio.]]>
 	</description>
-	<version>1.0-m3-SNAPSHOT</version>
+	<version>1.0.0-m3-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<url>http://static.springframework.org/spring-batch</url>
+	<url>http://www.springframework.org/spring-batch</url>
 	<organization>
-		<name>Interface 21</name>
-		<url>http://www.interface21.com</url>
+		<name>SpringSource</name>
+		<url>http://www.springsource.com</url>
 	</organization>
 	<scm>
 		<url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk</url>
@@ -22,38 +22,24 @@
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
-		<url>
-			http://opensource.atlassian.com/projects/spring/browse/BATCH
-		</url>
+		<url>http://opensource.atlassian.com/projects/spring/browse/BATCH</url>
 	</issueManagement>
 	<mailingLists>
 		<mailingList>
 			<name>Spring Batch Forum</name>
-			<post>
-				http://forum.springframework.org/forumdisplay.php?f=41
-			</post>
-			<archive>
-				http://forum.springframework.org/forumdisplay.php?f=41
-			</archive>
+			<post>http://forum.springframework.org/forumdisplay.php?f=41</post>
+			<archive>http://forum.springframework.org/forumdisplay.php?f=41</archive>
 		</mailingList>
 		<mailingList>
-			<subscribe>
-				http://lists.interface21.com/listmanager/listinfo/spring-batch-announce
-			</subscribe>
-			<unsubscribe>
-				http://lists.interface21.com/listmanager/listinfo/spring-batch-announce
-			</unsubscribe>
+			<subscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</subscribe>
+			<unsubscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</unsubscribe>
 			<name>Spring Batch Announce</name>
-			<archive>
-				http://lists.interface21.com/archives/spring-batch-announce
-			</archive>
+			<archive>http://lists.interface21.com/archives/spring-batch-announce</archive>
 		</mailingList>
 	</mailingLists>
 	<ciManagement>
 		<system>Bamboo</system>
-		<url>
-			http://build.springframework.org:8085/bamboo/browse/BATCH
-		</url>
+		<url>https://build.springframework.org/bamboo/browse/BATCH</url>
 	</ciManagement>
 	<licenses>
 		<license>
@@ -64,6 +50,7 @@
 
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
+		<spring.framework.version>2.5</spring.framework.version>
 	</properties>
 
 	<modules>
@@ -87,18 +74,14 @@
 			<distributionManagement>
 				<site>
 					<id>static.springframework.org</id>
-					<url>
-						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch
-					</url>
+					<url>scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch</url>
 				</site>
 			</distributionManagement>
 		</profile>
 		<profile>
 			<id>strict</id>
 			<properties>
-				<maven.test.failure.ignore>
-					false
-				</maven.test.failure.ignore>
+				<maven.test.failure.ignore>false</maven.test.failure.ignore>
 			</properties>
 		</profile>
 		<profile>
@@ -121,16 +104,15 @@
 	</profiles>
 
 	<distributionManagement>
-		<downloadUrl>
-			http://www.springframework.org/spring-batch
-		</downloadUrl>
+		<downloadUrl>http://www.springframework.org/download</downloadUrl>
 		<site>
 			<id>staging</id>
 			<url>file:///${user.dir}/target/staging</url>
 		</site>
 		<repository>
-			<id>local</id>
-			<url>file:///${user.dir}/target/staging</url>
+			<id>spring-milestone</id>
+			<name>Spring Milestone Repository</name>
+			<url>s3://maven.springframework.org/milestone</url>
 		</repository>
 		<snapshotRepository>
 			<id>spring-snapshot</id>
@@ -173,7 +155,6 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.3</version>
 				<configuration>
-					<!--forkMode>pertest</forkMode-->
 					<includes>
 						<include>**/*Tests.java</include>
 					</includes>
@@ -317,11 +298,6 @@
 				<version>2.1_3</version>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring</artifactId>
-				<version>2.5-rc1</version>
-			</dependency>
-			<dependency>
 				<groupId>commons-logging</groupId>
 				<artifactId>commons-logging</artifactId>
 				<version>1.1</version>
@@ -356,12 +332,6 @@
 				<version>1.8.0.7</version>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-test</artifactId>
-				<version>2.1-m4</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
 				<groupId>easymock</groupId>
 				<artifactId>easymock</artifactId>
 				<version>1.1</version>
@@ -390,11 +360,57 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
-			<dependency> 
+			<dependency>
 				<groupId>org.apache.ibatis</groupId>
 				<artifactId>ibatis-sqlmap</artifactId>
 				<version>2.3.0</version>
 				<optional>true</optional>
+			</dependency>
+<!-- Spring Dependencies -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-aop</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context-support</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-jdbc</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-jms</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-orm</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-tx</artifactId>
+				<version>${spring.framework.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -456,52 +472,22 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
 					<links>
-						<link>
-							http://java.sun.com/j2ee/1.4/docs/api
-						</link>
-						<link>
-							http://java.sun.com/j2se/1.5.0/docs/api
-						</link>
-						<link>
-							http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
-						</link>
-						<link>
-							http://jakarta.apache.org/commons/dbcp/apidocs/
-						</link>
-						<link>
-							http://jakarta.apache.org/commons/fileupload/apidocs/
-						</link>
-						<link>
-							http://jakarta.apache.org/commons/httpclient/apidocs/
-						</link>
-						<link>
-							http://jakarta.apache.org/commons/logging/api/
-						</link>
-						<link>
-							http://jakarta.apache.org/commons/pool/apidocs/
-						</link>
+						<link>http://java.sun.com/j2ee/1.4/docs/api</link>
+						<link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+						<link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
+						<link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
+						<link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
+						<link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
+						<link>http://jakarta.apache.org/commons/logging/api/</link>
+						<link>http://jakarta.apache.org/commons/pool/apidocs/</link>
 						<link>http://www.junit.org/junit/javadoc/</link>
-						<link>
-							http://logging.apache.org/log4j/docs/api/
-						</link>
-						<link>
-							http://jakarta.apache.org/regexp/apidocs/
-						</link>
-						<link>
-							http://jakarta.apache.org/velocity/api/
-						</link>
-						<link>
-							http://static.springframework.org/spring/docs/2.1.x/api/
-						</link>
-						<link>
-							http://static.springframework.org/spring-batch/spring-batch-infrastructure/apidocs/
-						</link>
-						<link>
-							http://static.springframework.org/spring-batch/spring-batch-core/apidocs/
-						</link>
-						<link>
-							http://static.springframework.org/spring-batch/spring-batch-execution/apidocs/
-						</link>
+						<link>http://logging.apache.org/log4j/docs/api/</link>
+						<link>http://jakarta.apache.org/regexp/apidocs/</link>
+						<link>http://jakarta.apache.org/velocity/api/</link>
+						<link>http://static.springframework.org/spring/docs/2.1.x/api/</link>
+						<link>http://static.springframework.org/spring-batch/spring-batch-infrastructure/apidocs/</link>
+						<link>http://static.springframework.org/spring-batch/spring-batch-core/apidocs/</link>
+						<link>http://static.springframework.org/spring-batch/spring-batch-execution/apidocs/</link>
 					</links>
 					<aggregate>true</aggregate>
 					<excludePackageNames>org.springframework.batch.sample</excludePackageNames>
@@ -514,12 +500,12 @@
 		<developer>
 			<id>dsyer</id>
 			<name>Dave Syer</name>
-			<email>dsyer@interface21.com</email>
+			<email>david.syer@springsource.com</email>
 		</developer>
 		<developer>
 			<id>nebhale</id>
 			<name>Ben Hale</name>
-			<email>bhale@interface21.com</email>
+			<email>ben.hale@springsource.com</email>
 		</developer>
 		<developer>
 			<id>lward</id>
