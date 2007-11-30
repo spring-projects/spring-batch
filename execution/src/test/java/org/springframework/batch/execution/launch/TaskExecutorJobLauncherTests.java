@@ -19,6 +19,8 @@ package org.springframework.batch.execution.launch;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import junit.framework.TestCase;
 
@@ -30,11 +32,13 @@ import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.scheduling.timer.TimerTaskExecutor;
 
 public class TaskExecutorJobLauncherTests extends TestCase {
 
@@ -54,7 +58,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 		launcher.setJobExecutorFacade(container);
 		launcher.setJobConfigurationName(new JobConfiguration("foo").getName());
 
-		launcher.run();
+		JobExecution execution = launcher.run();
 		// give the thread some time to start up...
 		Thread.sleep(100);
 		assertTrue(launcher.isRunning());
@@ -62,6 +66,47 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 		// ...and to shut down:
 		Thread.sleep(400);
 		assertFalse(launcher.isRunning());
+		assertEquals("COMPLETED_BY_TEST", execution.getExitStatus().getExitCode());
+	}
+
+	public void testStopContainerWhenJobNotRunning() throws Exception {
+
+		final List list = new ArrayList();
+		
+		// Important (otherwise start() does not return!)
+		TimerTaskExecutor taskExecutor = new TimerTaskExecutor(new Timer() {
+			public void schedule(final TimerTask task, long delay) {
+				TimerTask wrapper = new TimerTask() {
+					public void run() {
+						list.add(task);
+						task.run();
+					}
+				};
+				super.schedule(wrapper, 400);
+			}
+		});
+		taskExecutor.afterPropertiesSet();
+		launcher.setTaskExecutor(taskExecutor);
+
+		InterruptibleContainer container = new InterruptibleContainer();
+		launcher.setJobExecutorFacade(container);
+		launcher.setJobConfigurationName("foo");
+
+		JobExecution execution = launcher.run();
+		// give the thread some time to start up...
+		Thread.sleep(100);
+		// The launcher thinks it has started the job...
+		assertTrue(launcher.isRunning());
+		// ...but the task has not been started yet
+		assertEquals(0, list.size());
+		launcher.stop();
+		// ...and to shut down:
+		Thread.sleep(1000);
+		assertFalse(launcher.isRunning());
+		// The timer task has been started...
+		assertEquals(1, list.size());
+		// ...but the job is not executed
+		assertEquals(ExitStatus.UNKNOWN, execution.getExitStatus());
 	}
 
 	public void testRunTwice() throws Exception {
@@ -125,42 +170,6 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 		control.verify();
 	}
 
-	private class InterruptibleContainer implements JobExecutorFacade {
-		private volatile boolean running = true;
-
-		public void start() {
-			while (running) {
-				try {
-					// 1 seconds should be long enough to allow the thread to be
-					// started and
-					// for interrupt to be called;
-					Thread.sleep(300);
-				} catch (InterruptedException ex) {
-					// thread interrupted, allow to exit normally
-				}
-			}
-		}
-
-		public void start(JobExecution execution)
-				throws NoSuchJobConfigurationException {
-			start();
-		}
-
-		public JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
-				throws NoSuchJobConfigurationException {
-			return new JobExecution(new JobInstance(jobIdentifier));
-		}
-
-		public void stop(JobExecution execution) {
-			running = false;
-		}
-
-		public boolean isRunning() {
-			// not needed
-			return false;
-		}
-	}
-
 	public void testPublishApplicationEvent() throws Exception {
 		final List list = new ArrayList();
 		launcher.setApplicationEventPublisher(new ApplicationEventPublisher() {
@@ -186,6 +195,43 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 		launcher.run(jobRuntimeInformation);
 		assertEquals(1, list.size());
 		control.verify();
+	}
+
+	private class InterruptibleContainer implements JobExecutorFacade {
+		private volatile boolean running = true;
+
+		private void start() {
+			while (running) {
+				try {
+					// 1 seconds should be long enough to allow the thread to be
+					// started and
+					// for interrupt to be called;
+					Thread.sleep(300);
+				} catch (InterruptedException ex) {
+					// thread interrupted, allow to exit normally
+				}
+			}
+		}
+
+		public void start(JobExecution execution)
+				throws NoSuchJobConfigurationException {
+			start();
+			execution.setExitStatus(new ExitStatus(false, "COMPLETED_BY_TEST"));
+		}
+
+		public JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
+				throws NoSuchJobConfigurationException {
+			return new JobExecution(new JobInstance(jobIdentifier));
+		}
+
+		public void stop(JobExecution execution) {
+			running = false;
+		}
+
+		public boolean isRunning() {
+			// not needed
+			return false;
+		}
 	}
 
 	private interface JobExecutorFacadeWithStatistics extends

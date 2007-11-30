@@ -237,16 +237,16 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 			throws NoSuchJobConfigurationException {
 
 		JobIdentifier jobIdentifier = execution.getJob().getIdentifier();
-
-		synchronized (monitor) {
-			if (isInternalRunning(jobIdentifier)) {
-				return;
-			}
+		
+		if (getJobExecution(jobIdentifier)==null) {
+			logger.info("Job already stopped (not launching): "+jobIdentifier);
+			return;
 		}
 
-		register(execution);
 		try {
+			logger.info("Launching: "+jobIdentifier);
 			jobExecutorFacade.start(execution);
+			logger.info("Completed successfully: "+jobIdentifier);
 		} finally {
 			unregister(jobIdentifier);
 		}
@@ -266,7 +266,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 			throws NoSuchJobConfigurationException,
 			JobExecutionAlreadyRunningException {
 
-		if (get(jobIdentifier) != null) {
+		if (getJobExecution(jobIdentifier) != null) {
 			throw new JobExecutionAlreadyRunningException(
 					"A job is already executing with this identifier: ["
 							+ jobIdentifier + "]");
@@ -275,11 +275,22 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 				.createExecutionFrom(jobIdentifier);
 		// TODO: throw JobExecutionAlreadyRunningException if it is in a running
 		// state (someone else launched it)
+		final JobExecutionHolder holder = register(execution);
 
 		taskExecutor.execute(new Runnable() {
 			public void run() {
 				try {
+
+					synchronized (monitor) {
+						if (isInternalRunning(jobIdentifier)) {
+							logger.info("This job is already running, so not re-launched: "+jobIdentifier);
+							return;
+						}
+					}
+
+					holder.start();
 					runInternal(execution);
+					
 				} catch (NoSuchJobConfigurationException e) {
 					applicationEventPublisher
 							.publishEvent(new RepeatOperationsApplicationEvent(
@@ -288,6 +299,8 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 					logger.error(
 							"JobConfiguration could not be located inside Runnable for identifier: ["
 									+ jobIdentifier + "]", e);
+				} finally {
+					holder.stop();
 				}
 			}
 		});
@@ -347,10 +360,12 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 */
 	protected void doStop(JobIdentifier jobIdentifier)
 			throws NoSuchJobExecutionException {
-		JobExecution execution = get(jobIdentifier);
+		JobExecution execution = getJobExecution(jobIdentifier);
+		logger.info("Stopping job: "+jobIdentifier);
 		if (execution != null) {
 			jobExecutorFacade.stop(execution);
 		}
+		unregister(jobIdentifier);
 	}
 
 	/**
@@ -420,8 +435,9 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 
 	private boolean isInternalRunning(JobIdentifier jobIdentifier) {
 		synchronized (registry) {
+			JobExecutionHolder jobExecutionHolder = getJobExecutionHolder(jobIdentifier);
 			return isRunning(jobIdentifier)
-					&& registry.containsKey(jobIdentifier);
+					&& jobExecutionHolder!=null && jobExecutionHolder.isRunning();
 		}
 	}
 
@@ -443,11 +459,14 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * Convenient synchronized accessor for the registry.
 	 * 
 	 * @param jobIdentifier
+	 * @return TODO
 	 */
-	private void register(JobExecution execution) {
+	private JobExecutionHolder register(JobExecution execution) {
+		JobExecutionHolder jobExecutionHolder = new JobExecutionHolder(execution);
 		synchronized (registry) {
-			registry.put(execution.getJob().getIdentifier(), execution);
+			registry.put(execution.getJob().getIdentifier(), jobExecutionHolder);
 		}
+		return jobExecutionHolder;
 	}
 
 	/**
@@ -455,10 +474,24 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * 
 	 * @param jobIdentifier
 	 */
-	private JobExecution get(JobIdentifier jobIdentifier) {
+	private JobExecution getJobExecution(JobIdentifier jobIdentifier) {
 		synchronized (registry) {
 			if (registry.containsKey(jobIdentifier)) {
-				return (JobExecution) registry.get(jobIdentifier);
+				return ((JobExecutionHolder) registry.get(jobIdentifier)).getExecution();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Convenient synchronized accessor for the registry.
+	 * 
+	 * @param jobIdentifier
+	 */
+	private JobExecutionHolder getJobExecutionHolder(JobIdentifier jobIdentifier) {
+		synchronized (registry) {
+			if (registry.containsKey(jobIdentifier)) {
+				return (JobExecutionHolder) registry.get(jobIdentifier);
 			}
 		}
 		return null;
@@ -512,6 +545,37 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	public void setApplicationEventPublisher(
 			ApplicationEventPublisher applicationEventPublisher) {
 		this.applicationEventPublisher = applicationEventPublisher;
+	}
+
+	private class JobExecutionHolder {
+
+		private static final int NEW = 0;
+		private static final int STARTED = 1;
+		private static final int STOPPED = 2;
+		
+		private JobExecution execution;
+		private int status = NEW;
+
+		public JobExecutionHolder(JobExecution execution) {
+			this.execution = execution;
+		}
+
+		JobExecution getExecution() {
+			return execution;
+		}
+
+		boolean isRunning() {
+			return status==STARTED;
+		}
+
+		void start() {
+			status = STARTED;
+		}
+
+		void stop() {
+			status = STOPPED;
+		}
+
 	}
 
 }
