@@ -247,6 +247,21 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 		assertTrue(statistics.containsKey("job1.step1"));
 	}
 
+	public void testJobAlreadyExecutingLocally() throws Exception {
+		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier(
+				"TestJob");
+		JobExecution execution = new JobExecution(new JobInstance(
+				runtimeInformation, new Long(0)));
+		registerExecution(runtimeInformation, execution);
+		try {
+			jobExecutorFacade.createExecutionFrom(runtimeInformation);
+			fail("Expected JobExecutionAlreadyRunningException");
+		} catch (JobExecutionAlreadyRunningException e) {
+			// expected
+			assertTrue("Message does not contain TestJob: "+e.getMessage(), e.getMessage().indexOf("TestJob")>=0);
+		}
+	}
+
 	public void testListenersCalledLastOnStop() throws Exception {
 		List listeners = new ArrayList();
 		listeners.add(new JobExecutionListenerSupport() {

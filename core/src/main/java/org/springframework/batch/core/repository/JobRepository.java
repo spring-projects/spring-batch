@@ -47,10 +47,11 @@ import org.springframework.batch.core.domain.StepInstance;
 public interface JobRepository {
 
 	/**
-	 * Find or create a job for a given Job identifier or configuration. If the
-	 * job that is uniquely identified by JobIdentifier already exists, it's
-	 * persisted values (including ID) will be returned in a new Job object. If
-	 * no previous run is found, a new job will be created and returned.
+	 * Find or create a job for a given {@link JobIdentifier} and configuration.
+	 * If the job that is uniquely identified by {@link JobIdentifier} already
+	 * exists, its persisted values (including ID) will be returned in a new
+	 * {@link JobInstance} object. If no previous run is found, a new job will
+	 * be created and returned.
 	 * 
 	 * @param jobConfiguration
 	 *            describes the configuration for this job

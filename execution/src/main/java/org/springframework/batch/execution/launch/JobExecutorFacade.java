@@ -41,9 +41,10 @@ interface JobExecutorFacade {
 	 *            the identifier of the job to start
 	 * 
 	 * @throws NoSuchJobConfigurationException
+	 * @throws JobExecutionAlreadyRunningException 
 	 */
 	JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
-			throws NoSuchJobConfigurationException;
+			throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException;
 
 	/**
 	 * Start a job execution.

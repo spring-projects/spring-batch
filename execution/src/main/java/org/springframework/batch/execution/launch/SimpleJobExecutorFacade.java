@@ -139,7 +139,8 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	 * Locates a {@link JobConfiguration} by using the name of the provided
 	 * {@link JobIdentifier} and the {@link JobConfigurationLocator}.
 	 * 
-	 * @param jobIdentifier the identifier of the job that is being prepared.
+	 * @param jobIdentifier
+	 *            the identifier of the job that is being prepared.
 	 * 
 	 * @throws IllegalArgumentException
 	 *             if the {@link JobIdentifier} is null or its name is null
@@ -150,14 +151,15 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	 * @see org.springframework.batch.execution.launch.JobExecutorFacade#createExecutionFrom(org.springframework.batch.core.domain.JobIdentifier)
 	 */
 	public JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
-			throws NoSuchJobConfigurationException {
+			throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException {
 		Assert.notNull(jobIdentifier, "JobIdentifier must not be null.");
 		Assert.notNull(jobIdentifier.getName(),
 				"JobIdentifier name must not be null.");
 
-		Assert
-				.state(!jobExecutionRegistry.containsKey(jobIdentifier),
-						"A job with this JobRuntimeInformation is already executing in this container");
+		if (jobExecutionRegistry.containsKey(jobIdentifier)) {
+			throw new JobExecutionAlreadyRunningException(
+						"A job with this JobIdentifier is already executing in this container: "+jobIdentifier);
+		};
 
 		JobConfiguration jobConfiguration = jobConfigurationLocator
 				.getJobConfiguration(jobIdentifier.getName());
@@ -270,10 +272,11 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	 * 
 	 * @see org.springframework.batch.container.BatchContainer#onStop(org.springframework.batch.container.common.runtime.JobRuntimeInformation)
 	 */
-	public void stop(JobExecution execution)
-			throws NoSuchJobExecutionException {
+	public void stop(JobExecution execution) throws NoSuchJobExecutionException {
 		if (!jobExecutionRegistry.containsValue(execution)) {
-			throw new NoSuchJobExecutionException("The job is not executing in this executor: ["+execution+"]");
+			throw new NoSuchJobExecutionException(
+					"The job is not executing in this executor: [" + execution
+							+ "]");
 		}
 		for (Iterator iter = execution.getStepContexts().iterator(); iter
 				.hasNext();) {
