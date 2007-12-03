@@ -10,6 +10,7 @@
 	<moduleSets>
 		<moduleSet>
 			<includes>
+				<include>org.springframework.batch:spring-batch-parent</include>
 				<include>org.springframework.batch:spring-batch-core</include>
 				<include>org.springframework.batch:spring-batch-execution</include>
 				<include>org.springframework.batch:spring-batch-infrastructure</include>
@@ -22,6 +23,7 @@
 		</moduleSet>
 		<moduleSet>
 			<includes>
+				<include>org.springframework.batch:spring-batch-parent</include>
 				<include>org.springframework.batch:spring-batch-core</include>
 				<include>org.springframework.batch:spring-batch-execution</include>
 				<include>org.springframework.batch:spring-batch-infrastructure</include>
@@ -38,6 +40,7 @@
 						<outputFileNameMapping>sources/lib/${groupId}/${artifactId}-${version}.${extension}</outputFileNameMapping>
 						<scope>runtime</scope>
 						<excludes>
+							<exclude>org.springframework.batch:spring-batch-parent</exclude>
 							<exclude>org.springframework.batch:spring-batch-core</exclude>
 							<exclude>org.springframework.batch:spring-batch-execution</exclude>
 							<exclude>org.springframework.batch:spring-batch-infrastructure</exclude>
@@ -74,6 +77,7 @@
 						<outputFileNameMapping>samples/lib/${groupId}/${artifactId}-${version}.${extension}</outputFileNameMapping>
 						<scope>runtime</scope>
 						<excludes>
+							<exclude>org.springframework.batch:spring-batch-parent</exclude>
 							<exclude>org.springframework.batch:spring-batch-core</exclude>
 							<exclude>org.springframework.batch:spring-batch-execution</exclude>
 							<exclude>org.springframework.batch:spring-batch-infrastructure</exclude>

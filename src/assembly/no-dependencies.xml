@@ -10,6 +10,7 @@
 	<moduleSets>
 		<moduleSet>
 			<includes>
+				<include>org.springframework.batch:spring-batch-parent</include>
 				<include>org.springframework.batch:spring-batch-core</include>
 				<include>org.springframework.batch:spring-batch-execution</include>
 				<include>org.springframework.batch:spring-batch-infrastructure</include>
@@ -22,6 +23,7 @@
 		</moduleSet>
 		<moduleSet>
 			<includes>
+				<include>org.springframework.batch:spring-batch-parent</include>
 				<include>org.springframework.batch:spring-batch-core</include>
 				<include>org.springframework.batch:spring-batch-execution</include>
 				<include>org.springframework.batch:spring-batch-infrastructure</include>
