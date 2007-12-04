@@ -16,6 +16,8 @@
 
 package org.springframework.batch.execution.bootstrap.support;
 
+import java.util.Properties;
+
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -67,5 +69,12 @@ public interface ExportedJobLauncher {
 	 * @see JobLauncher#isRunning()
 	 */
 	boolean isRunning();
+	
+	/**
+	 * Query statistics of currently executing jobs.
+	 * 
+	 * @return properties representing last known state of currently executing jobs
+	 */
+	public Properties getStatistics();
 
 }
