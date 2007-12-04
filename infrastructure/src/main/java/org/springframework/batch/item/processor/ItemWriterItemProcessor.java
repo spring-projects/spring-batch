@@ -38,7 +38,7 @@ public class ItemWriterItemProcessor implements ItemProcessor, Restartable, Skip
 	 * By default returns the argument. This method is an extension point
 	 * meant to be overridden by subclasses that implement processing logic. 
 	 */
-	protected Object doProcess(Object item) {
+	protected Object doProcess(Object item) throws Exception {
 		return item;
 	}
 
