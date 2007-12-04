@@ -14,7 +14,7 @@
 		<groupId>org.springframework.batch</groupId>
 		<version>1.0.0-m3-SNAPSHOT</version>
 		<artifactId>spring-batch-parent</artifactId>
-		<relativePath>..</relativePath>
+		<relativePath>../parent</relativePath>
 	</parent>
 
 	<!-- Temporary measure while we get to the bottom of the test failures on Bamboo -->

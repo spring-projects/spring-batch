@@ -13,7 +13,7 @@
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch-parent</artifactId>
 		<version>1.0.0-m3-SNAPSHOT</version>
-		<relativePath>..</relativePath>
+		<relativePath>../parent</relativePath>
 	</parent>
 
 	<dependencies>
