@@ -1,3 +1,7 @@
 Changelog: Spring Batch
 
   See the changes report generated from {{{issue-tracking.html}JIRA}}.
+  
+  There is a pre-built {{{http://opensource.atlassian.com/projects/spring/secure/IssueNavigator.jspa?reset=true&mode=hide&pid=10090&status=5&status=6&updated:previous=-1w&sorter/field=updated&sorter/order=DESC}Resolved Recently}} query that might be useful.
+  
+  You can also browse the upcoming releases and look at the {{{http://opensource.atlassian.com/projects/spring/browse/BATCH?report=com.atlassian.jira.plugin.system.project:roadmap-panel}Road Map}} query.

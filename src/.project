@@ -19,5 +19,10 @@
 			<type>1</type>
 			<locationURI>PARENT_DIR/pom.xml</locationURI>
 		</link>
+		<link>
+			<name>parent</name>
+			<type>2</type>
+			<locationURI>PARENT_DIR/parent</locationURI>
+		</link>
 	</linkedResources>
 </projectDescription>

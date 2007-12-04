@@ -12,14 +12,13 @@
 				not soon. You can track the progress and planning in
 				JIRA
 				(http://opensource.atlassian.com/projects/spring/browse/BATCH).
-				But it is already usable at m2 as long as there is an
+				But it is already usable at m3 as long as there is an
 				understanding that upgrading might take a small amount
 				of effort - there are 5 or 6 projects using it, with at
 				least one in production. That project upgraded from m1
-				to m2 (which was distinctly less trivial than m2 to m3
-				is likely to be) in less than a day. We intend to keep
-				changes from here to 1.0 as close to internal as
-				possible, so the client touch points are pretty stable.
+				to m2 in less than a day. We intend to keep changes from
+				here to 1.0 as close to internal as possible, so the
+				client touch points are pretty stable.
 			</answer>
 		</faq>
 		<faq id="stable">
@@ -28,7 +27,7 @@
 			</question>
 			<answer>
 				<p>
-					We are still in the milestone release phase (1.0-m3
+					We are still in the milestone release phase (1.0-m4
 					is in the pipeline). This means that we are still
 					adding functionality that we want to be part of a
 					1.0 release. We do not rule out changes to package
@@ -46,10 +45,12 @@
 					features need to be added to get us to 1.0. When we
 					are feature complete we will move to the "release
 					candidate" phase, and the first release in that
-					phase will be 1.0-rc1. When significant issues are
-					resolved (if there are any) we will promote the
-					release through the "rc" numbers, until we have a
-					clean 1.0 release.
+					phase will be 1.0-rc1. We only expect one release
+					candidate, but if there is enough demand for new
+					features, or significant problems occur in rc1, then
+					we might need an rc2. We aim for 2 weeks elapsed
+					time between release candidates (and between the
+					last milestone and rc1).
 				</p>
 			</answer>
 		</faq>
@@ -63,8 +64,12 @@
 				Multi-threaded execution in a single VM is perfectly
 				possible with 1.0 - but we recommend exercising caution
 				in the analysis of such requirements (is it really
-				necessary?). Several people have tried it and we haven't
-				had any issues yet (except documentation requests).
+				necessary?). Several people have tried it and there are
+				some issues with restartability (plus the usual
+				documentation requests), but otherwise it should work.
+				With a little more effort starting in m4 it should work
+				even better, but we aren't planning to solve the
+				restartability problem until after 1.0.
 			</answer>
 		</faq>
 		<faq id="layers">
@@ -122,21 +127,15 @@
 					collaboration and contributions from the community
 					and from projects in the field. The central
 					interface is
-					<code>JobExecutorFacade</code>
+					<code>JobLauncher</code>
 					with methods for starting and stopping jobs. The
 					vision for this is that there can be multiple
 					implementations of
-					<code>JobExecutorFacade</code>
+					<code>JobLauncher</code>
 					providing different architectural patterns, and
 					delivering different levels of scalability and
 					robustness, without changing either the business
-					logic or the job configuration. The initial 1.0
-					release of Spring Batch will have a single
-					implementation
-					<code>SimpleJobExecutorFacade</code>
-					(formerly known as
-					<code>SimpleBatchContainer</code>
-					.)
+					logic or the job configuration.
 				</p>
 			</answer>
 		</faq>
@@ -224,7 +223,7 @@
 				handling the business processing. We switch off Home
 				caching in the container and then send a specific range
 				of primary keys for the inputs to each of a number of
-				remote calls. THe same basic strategy would work with
+				remote calls. The same basic strategy would work with
 				any of the Spring Remoting protocols (plain RMI,
 				HttpInvoker, JMS, Hessian etc.) with little more than a
 				couple of lines change in the execution layer
@@ -239,7 +238,7 @@
 			<answer>
 				<p>
 					In a nutshell: A JobConfiguration with a list of
-					StepConfigurations is passed to an ExecutionService.
+					StepConfigurations is passed to a JobExecutor.
 					From this a Job is constructed consisting of a
 					series of Steps, each of which is executed by a
 					StepExecutor. The StepExecutor contains all the

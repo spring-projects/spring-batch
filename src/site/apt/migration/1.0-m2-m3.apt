@@ -1,0 +1,67 @@
+                                    ------
+                                    Spring Batch Upgrade
+                                    ------
+                                    Robert Kasanicky
+                                    ------
+                                    December 2007
+
+Updating Spring Batch from 1.0-m2 to 1.0-m3
+
+  This is a description of what needed to be done to migrate the samples from m2 to the new m3 release.
+
+  [Tip:] if you use SpringIDE, make sure it tracks all your configuration files, 
+so that errors are immediately visible.
+
+* VARIOUS
+
+  * OutputSource interface has been renamed to ItemWriter, implementations have been renamed correspondingly
+(e.g. FlatFileOutputSource is now FlatFileItemWriter). ItemWriter no longer extends ResourceLifecycle
+(which declares methods open() and close). Often you don't need to call these methods at all, in case
+you do you should implement InitializingBean and DisposableBean interfaces and declare the bean 
+in step scope.
+
+  * Sql renamed to Jdbc (e.g. SqlInputSource -> JdbcInputSource).
+
+  * Database input sources split into driving and cursor packages (cursor makes a single query and iterates
+over the result set, driving query for keys and then make a new query for each key).
+	
+  * ExceptionHandler interface has been changed to handle single throwable instead of a collection of throwables
+and it has become responsible for deciding about step completion. See javadoc for more details.
+
+  * FlatFileInputSources now include FieldSet mapping logic - you can inject a FieldSetMapper
+into the input source, so you no longer need to handle this in ItemProvider. Therefore
+FieldSetInputSource interface and FlatFileItemProvider have been removed. Where FlatFileItemProvider
+was used you can use the InputSourceItemProvider and inject the mapper into the input source.
+
+  * Validation has been removed from input sources and moved upwards to ValidatingItemProvider.
+	
+  * XML related classes have been moved from io.stax package under io.file
+
+  * Fixed-length tokenizer accept ranges property instead of array of lengths, e.g. "2,3"
+(see javadoc for more details and fixedLengthImportJob.xml for example usage).
+
+
+* CONTAINER CONFIGURATION
+
+  * Use the value of JobConfiguration name property as the bean id.
+
+  * Simplest approach to update is to use the simple-container-definition.xml,
+data-source-context.xml (plus hibernate-context.xml) and batch.properties 
+from M3 samples and replace the post-processor bean in your job xml file with
+"\<bean parent="jobConfigurationRegistryBeanPostProcessor"/\>"
+
+  * JobLauncher has been moved from execution.bootstrap to execution.launch 
+	
+  * JobExecutor facade has been removed, it's properties are now injected directly
+into SimpleJobLauncher intead of the facade itself.
+	
+  * DefaultStepExecutorFactory is now SimpleStepExecutorFactory located in simple subpackage
+and needs a reference to jobRepository instead of value for StepExecutor name.
+
+  * ScheduledJobIdentifier has a new jobKey property replaces jobRun and jobStream.
+
+  * SimpleStepConfiguration has been moved one package up (from execution.step.simple to execution.step).
+
+  * Transaction manager class is specified in batch.properties
+
+
