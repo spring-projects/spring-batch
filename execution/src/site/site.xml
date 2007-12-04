@@ -23,7 +23,6 @@
 		
 		<menu name="Spring Batch Execution">
 			<item name="${project.name}" href="index.html"/>
-			<item name="Changelog" href="changelog.html"/>
 		</menu>
 		<menu ref="reports"/>
 

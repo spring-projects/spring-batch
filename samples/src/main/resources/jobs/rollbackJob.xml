@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       		http://www.springframework.org/schema/aop
+ 			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	<import resource="tradeJobIo.xml" />
+	<!--import resource="tradeJobAop.xml" /-->
+
+	<bean parent="stepScope" />
+	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
+
+	<bean id="tradeJob" parent="simpleJob">
+		<property name="steps">
+			<list>
+				<bean id="step1"
+					class="org.springframework.batch.execution.step.RepeatOperationsStepConfiguration">
+					<property name="chunkOperations">
+						<bean
+							class="org.springframework.batch.repeat.support.RepeatTemplate">
+							<property name="completionPolicy">
+								<bean
+									class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
+									<property name="chunkSize"
+										value="50" />
+								</bean>
+							</property>
+						</bean>
+					</property>
+					<property name="stepOperations">
+						<bean
+							class="org.springframework.batch.repeat.support.RepeatTemplate">
+							<property name="exceptionHandler">
+								<bean
+									class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler"
+									p:limit="5" p:type="java.lang.Exception"/>
+							</property>
+						</bean>
+					</property>
+					<property name="tasklet">
+						<bean
+							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+							<property name="itemProvider">
+								<bean
+									class="org.springframework.batch.item.provider.ValidatingItemProvider">
+									<property name="inputSource"
+										ref="fileInputTemplate" />
+									<property name="validator"
+										ref="tradeValidator" />
+								</bean>
+							</property>
+							<property name="itemProcessor">
+								<bean
+									class="org.springframework.batch.sample.item.processor.TradeProcessor"
+									p:writer-ref="tradeDao" p:failure="3"/>
+							</property>
+						</bean>
+					</property>
+				</bean>
+				<bean id="step2" parent="simpleStep">
+					<property name="tasklet">
+						<bean
+							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+							<property name="itemProvider">
+								<bean
+									class="org.springframework.batch.item.provider.InputSourceItemProvider"
+									p:input-source-ref="tradeSqlInputSource" />
+							</property>
+							<property name="itemProcessor">
+								<bean
+									class="org.springframework.batch.sample.item.processor.DummyProcessor" />
+							</property>
+						</bean>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="tradeSqlInputSource"
+		class="org.springframework.batch.io.cursor.JdbcCursorInputSource"
+		scope="step">
+		<aop:scoped-proxy />
+		<property name="dataSource" ref="dataSource" />
+		<property name="sql"
+			value="SELECT id, quantity, price, customer from TRADE" />
+		<property name="mapper">
+			<bean
+				class="org.springframework.batch.sample.mapping.TradeRowMapper" />
+		</property>
+	</bean>
+
+	<bean id="customerSqlInputSource"
+		class="org.springframework.batch.io.cursor.JdbcCursorInputSource"
+		scope="step">
+		<aop:scoped-proxy />
+		<property name="dataSource" ref="dataSource" />
+		<property name="sql"
+			value="SELECT id, name, credit FROM customer " />
+		<property name="mapper">
+			<bean
+				class="org.springframework.batch.sample.mapping.CustomerCreditRowMapper" />
+		</property>
+	</bean>
+
+	<bean id="fileLocator"
+		class="org.springframework.core.io.ClassPathResource">
+		<constructor-arg type="java.lang.String"
+			value="data/tradeJob/input/20070122.teststream.ImportTradeDataStep.txt" />
+	</bean>
+
+	<bean id="customerFileLocator"
+		class="org.springframework.core.io.FileSystemResource">
+		<constructor-arg type="java.lang.String"
+			value="target/test-outputs/20070122.testStream.CustomerReportStep.TEMP.txt" />
+	</bean>
+
+</beans>

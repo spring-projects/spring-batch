@@ -28,7 +28,6 @@
 		
 		<menu name="Reference Material">
 			<item name="${project.name}" href="index.html"/>
-			<item name="Changelog" href="changelog.html"/>
 		</menu> 
 		
 		<menu ref="reports"/>

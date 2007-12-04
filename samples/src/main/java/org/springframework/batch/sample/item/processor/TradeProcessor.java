@@ -27,6 +27,19 @@ import org.springframework.batch.sample.domain.Trade;
 public class TradeProcessor implements ItemProcessor {
     private static Log log = LogFactory.getLog(TradeProcessor.class);
     private TradeWriter writer;
+    
+    private int failure = -1;
+    
+    private int index = 0;
+    
+    /**
+	 * Public setter for the {@link int} property.
+	 *
+	 * @param failure the failure to set
+	 */
+	public void setFailure(int failure) {
+		this.failure = failure;
+	}
 
     public void process(Object data) {
         if (!(data instanceof Trade)) {
@@ -40,6 +53,12 @@ public class TradeProcessor implements ItemProcessor {
 
         //TODO put some processing of the trade object here
         writer.writeTrade(trade);
+        
+        if(index++ == failure) {
+        	throw new RuntimeException("Something unexpected happened!");
+        }
+        
+        
     }
 
     public void setWriter(TradeWriter dao) {

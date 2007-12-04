@@ -291,6 +291,7 @@ class ResourceLineReader implements ResourceLifecycle, InputSource,
 			try {
 				reader = new BufferedReader(new InputStreamReader(resource
 						.getInputStream(), encoding));
+				mark();
 			} catch (IOException e) {
 				throw new BatchEnvironmentException("Could not open resource",
 						e);

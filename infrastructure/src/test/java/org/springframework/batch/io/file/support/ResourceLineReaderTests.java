@@ -151,7 +151,17 @@ public class ResourceLineReaderTests extends TestCase {
 		reader.read();	
 		assertEquals(2, reader.getCurrentLineCount());
 	}
-	
+
+	public void testMarkOnFirstRead() throws Exception {
+		Resource resource = new ByteArrayResource("1\n# 2\n3".getBytes());
+		ResourceLineReader reader = new ResourceLineReader(resource);
+		reader.read();
+		// The first read should do a mark() so the reset goes back to the beginning.
+		reader.reset();
+		String line = (String) reader.read();
+		assertEquals("1", line);		
+	}
+
 	public void testNonDefaultRecordSeparatorPolicy() throws Exception {
 		Resource resource = new ByteArrayResource("1\n\"4\n5\"; \n6".getBytes());
 		ResourceLineReader reader = new ResourceLineReader(resource);
