@@ -8,7 +8,7 @@
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[Spring Batch Parent POM]]>
 	</description>
-	<version>1.0.0-m3-SNAPSHOT</version>
+	<version>1.0.0-m3</version>
 	<packaging>pom</packaging>
 	<url>http://www.springframework.org/spring-batch</url>
 	<organization>
@@ -16,9 +16,9 @@
 		<url>http://www.springsource.com</url>
 	</organization>
 	<scm>
-		<url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk</url>
-		<connection>scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk</connection>
-		<developerConnection>scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk</developerConnection>
+		<url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/tags/spring-batch-1.0.0-m3</url>
+		<connection>scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/tags/spring-batch-1.0.0-m3</connection>
+		<developerConnection>scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/tags/spring-batch-1.0.0-m3</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
