@@ -100,10 +100,15 @@ public class BatchCommandLineLauncher {
 	 * The default path to the job configuration.
 	 */
 	public static final String DEFAULT_JOB_CONFIGURATION_PATH = "job-configuration.xml";
+	/**
+	 * The default path to the bean reference context.
+	 */
+	public static final String DEFAULT_BEAN_REF_CONTEXT_PATH = "beanRefContext.xml";
 
 	private static final String JOB_CONFIGURATION_PATH_KEY = "job.configuration.path";
 	private static final String JOB_NAME_KEY = "job.name";
 	private static final String BATCH_EXECUTION_ENVIRONMENT_KEY = "batch.execution.environment.key";
+	private static final String BEAN_REF_CONTEXT_KEY = "bean.ref.context";
 
 	private BeanFactoryLocator beanFactoryLocator;
 
@@ -115,8 +120,9 @@ public class BatchCommandLineLauncher {
 
 	private SystemExiter systemExiter = new JvmSystemExiter();
 
-	public BatchCommandLineLauncher() {
-		beanFactoryLocator = ContextSingletonBeanFactoryLocator.getInstance();
+	public BatchCommandLineLauncher(String beanRefContextPath) {
+		beanFactoryLocator = ContextSingletonBeanFactoryLocator
+				.getInstance(beanRefContextPath);
 	}
 
 	/**
@@ -250,6 +256,8 @@ public class BatchCommandLineLauncher {
 	 *            {@link JobLauncher}
 	 *            <li>-Dbatch.execution.environment.key: the key in
 	 *            beanRefContext.xml used to load the execution envrionment.
+	 *            <li>-Dbean.ref.context: an altrernative location for
+	 *            beanRefContext.xml.</li>
 	 *            </ul>
 	 */
 	public static void main(String[] args) {
@@ -257,10 +265,13 @@ public class BatchCommandLineLauncher {
 		String path = System.getProperty(JOB_CONFIGURATION_PATH_KEY,
 				DEFAULT_JOB_CONFIGURATION_PATH);
 		String name = System.getProperty(JOB_NAME_KEY);
+		String beanRefContextPath = System.getProperty(BEAN_REF_CONTEXT_KEY,
+				DEFAULT_BEAN_REF_CONTEXT_PATH);
 		String parentKey = System.getProperty(BATCH_EXECUTION_ENVIRONMENT_KEY,
 				DEFAULT_PARENT_KEY);
-		
-		BatchCommandLineLauncher command = new BatchCommandLineLauncher();
+
+		BatchCommandLineLauncher command = new BatchCommandLineLauncher(
+				beanRefContextPath);
 		int result = command.start(path, name, parentKey);
 		command.exit(result);
 	}
