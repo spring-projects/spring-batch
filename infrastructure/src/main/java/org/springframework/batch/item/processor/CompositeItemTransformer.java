@@ -17,7 +17,7 @@ public class CompositeItemTransformer implements ItemTransformer, InitializingBe
 
 	private List itemTransformers;
 	
-	public Object transform(Object item) {
+	public Object transform(Object item) throws Exception {
 		Object result = item;
 		for (Iterator iterator = itemTransformers.listIterator(); iterator.hasNext();) {
 			result = ((ItemTransformer)iterator.next()).transform(result);	

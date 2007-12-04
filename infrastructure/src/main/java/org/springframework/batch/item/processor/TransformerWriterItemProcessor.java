@@ -16,7 +16,7 @@ public class TransformerWriterItemProcessor extends ItemWriterItemProcessor {
 	/**
 	 * Transform the item using the {@link #itemTransformer}.
 	 */
-	protected Object doProcess(Object item) {
+	protected Object doProcess(Object item) throws Exception {
 		return itemTransformer.transform(item);
 	}
 

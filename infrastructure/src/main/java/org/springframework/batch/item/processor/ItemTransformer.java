@@ -7,5 +7,5 @@ package org.springframework.batch.item.processor;
  */
 public interface ItemTransformer {
 
-	Object transform(Object item);
+	Object transform(Object item) throws Exception;
 }
