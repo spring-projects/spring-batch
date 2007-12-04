@@ -30,7 +30,7 @@
 			<item name="Building" href="building.html"/>
 			<item name="Getting Started" href="getting-started.html"/>
 			<item name="FAQ" href="faq.html"/>
-			<item name="Recent Changes" href="http://opensource.atlassian.com/projects/spring/secure/IssueNavigator.jspa?reset=true&mode=hide&pid=10090&status=5&status=6&updated:previous=-1w&sorter/field=updated&sorter/order=DESC"/>
+			<item name="Recent Changes" href="http://opensource.atlassian.com/projects/spring/browse/BATCH"/>
 			<item name="Downloads" href="downloads.html"/>
 		</menu>
 		<menu ref="modules"/>
