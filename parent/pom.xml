@@ -8,7 +8,7 @@
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[Spring Batch Parent POM]]>
 	</description>
-	<version>1.0.0.m4-SNAPSHOT</version>
+	<version>1.0.0.m3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>http://www.springframework.org/spring-batch</url>
 	<organization>
