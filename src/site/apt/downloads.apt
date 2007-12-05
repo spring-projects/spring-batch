@@ -7,7 +7,13 @@
 
 Milestone Builds
 
-  These builds are provided for evaluation and community feedback.  They will have a release identifier ending in "-mX" where X is the milestone number.  The current release is <<1.0.0.m3>>.
+  These builds are provided for evaluation and community feedback.  They will have a release identifier ending in "mX" where X is the milestone number.  The current release is <<1.0.0.m3>>.
+
+* Zip Downloads
+
+  Starting with Spring Batch 1.0.0.m3 there are ZIP based artifacts that contain the release JARs.  You can find those releases {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.  There are two ZIP files in the release.  The first zip file is called <<<spring-batch-*-no-dependencies.zip>>.  This file contains only the JAR files for the release.  The second zip file is called <<<spring-batch-*-with-dependencies.zip>>>.  This file contains the JAR files for the release as well as all of the third-party dependencies for the release.  In addition, this release contains the Spring Batch source code including the samples and their third-party dependencies as well.
+
+* Maven Artifacts
 
   You can browse the {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}repository}} with a web browser.  You can see the internal and external project dependencies in the <<<spring-batch-*/*.pom>>> files.  You will probably need <<<spring-batch-execution>>>, <<<spring-batch-core>>> and <<<spring-batch-infrastructure>>>.  Source code is packaged in a separate jar file in the same directory, and the samples are also bundled in the same way.
 
@@ -40,8 +46,6 @@ Milestone Builds
     <version>1.0.0.m3</version>
 </dependency>
 +---------------
-
-  Starting with Spring Batch 1.0.0.m3 there are ZIP based artifacts that contain the release JARs.  You can find those releases {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.  There are two ZIP files in the release.  The first zip file is called <<<spring-batch-*-no-dependencies.zip>>.  This file contains only the JAR files for the release.  The second zip file is called <<<spring-batch-*-with-dependencies.zip>>>.  This file contains the JAR files for the release as well as all of the third-party dependencies for the release.  In addition, this release contains the source code for the release as well as the sample applications and their third-party dependencies as well.
 
 Snapshot Builds
 
