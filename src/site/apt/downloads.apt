@@ -11,7 +11,7 @@ Milestone Builds
 
 * Zip Downloads
 
-  Starting with Spring Batch 1.0.0.m3 there are ZIP based artifacts that contain the release JARs.  You can find those releases {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.  There are two ZIP files in the release.  The first zip file is called <<<spring-batch-*-no-dependencies.zip>>.  This file contains only the JAR files for the release.  The second zip file is called <<<spring-batch-*-with-dependencies.zip>>>.  This file contains the JAR files for the release as well as all of the third-party dependencies for the release.  In addition, this release contains the Spring Batch source code including the samples and their third-party dependencies as well.
+  Starting with Spring Batch 1.0.0.m3 there are ZIP based artifacts that contain the release JARs.  You can find those releases {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.  There are two ZIP files in the release.  The first zip file is called <<<spring-batch-*-no-dependencies.zip>>>.  This file contains only the JAR files for the release.  The second zip file is called <<<spring-batch-*-with-dependencies.zip>>>.  This file contains the JAR files for the release as well as all of the third-party dependencies for the release.  In addition, this release contains the Spring Batch source code including the samples and their third-party dependencies as well.
 
 * Maven Artifacts
 
