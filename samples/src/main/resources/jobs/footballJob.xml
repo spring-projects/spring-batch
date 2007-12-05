@@ -12,7 +12,7 @@
 	<bean parent="stepScope" />
 	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
-	<bean id="nflJob"
+	<bean id="footballJob"
 		class="org.springframework.batch.core.configuration.JobConfiguration">
 		<property name="restartable" value="true" />
 		<property name="startLimit" value="100" />
@@ -36,10 +36,10 @@
 							</property>
 							<property name="itemProcessor">
 								<bean
-									class="org.springframework.batch.sample.item.processor.NflPlayerItemProcessor">
-									<property name="nflPlayerDao">
+									class="org.springframework.batch.sample.item.processor.PlayerItemProcessor">
+									<property name="playerDao">
 										<bean
-											class="org.springframework.batch.sample.dao.SqlNflPlayerDao">
+											class="org.springframework.batch.sample.dao.SqlPlayerDao">
 											<property name="dataSource"
 												ref="dataSource" />
 										</bean>
@@ -69,7 +69,7 @@
 									class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
 									<property name="itemWriter">
 										<bean
-											class="org.springframework.batch.sample.dao.SqlNflGameDao">
+											class="org.springframework.batch.sample.dao.SqlGameDao">
 											<property name="dataSource"
 												ref="dataSource" />
 										</bean>
@@ -99,7 +99,7 @@
 									class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
 									<property name="itemWriter">
 										<bean
-											class="org.springframework.batch.sample.dao.SqlNflPlayerSummaryDao">
+											class="org.springframework.batch.sample.dao.SqlPlayerSummaryDao">
 											<property name="dataSource"
 												ref="dataSource" />
 										</bean>
@@ -118,7 +118,7 @@
 		<property name="resource">
 			<bean
 				class="org.springframework.core.io.ClassPathResource">
-				<constructor-arg value="data/nfljob/input/player.csv" />
+				<constructor-arg value="data/footballjob/input/player.csv" />
 			</bean>
 		</property>
 		<property name="tokenizer">
@@ -130,7 +130,7 @@
 		</property>
 		<property name="fieldSetMapper">
 			<bean
-				class="org.springframework.batch.sample.mapping.NflPlayerMapper" />
+				class="org.springframework.batch.sample.mapping.PlayerMapper" />
 		</property>
 	</bean>
 
@@ -139,7 +139,7 @@
 		<property name="resource">
 			<bean
 				class="org.springframework.core.io.ClassPathResource">
-				<constructor-arg value="data/nfljob/input/games.csv" />
+				<constructor-arg value="data/footballjob/input/games.csv" />
 			</bean>
 		</property>
 		<property name="tokenizer">
@@ -151,7 +151,7 @@
 		</property>
 		<property name="fieldSetMapper">
 			<bean
-				class="org.springframework.batch.sample.mapping.NflGameMapper" />
+				class="org.springframework.batch.sample.mapping.GameMapper" />
 		</property>
 	</bean>
 
@@ -160,7 +160,7 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="mapper">
 			<bean
-				class="org.springframework.batch.sample.mapping.NflPlayerSummaryMapper" />
+				class="org.springframework.batch.sample.mapping.PlayerSummaryMapper" />
 		</property>
 		<property name="sql">
 			<value>

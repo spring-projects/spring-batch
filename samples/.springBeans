@@ -23,7 +23,7 @@
 		<config>src/main/resources/jobs/hibernateJob.xml</config>
 		<config>src/main/resources/jobs/ibatisJob.xml</config>
 		<config>src/main/resources/jobs/compositeProcessorSampleJob.xml</config>
-		<config>src/main/resources/jobs/nflJob.xml</config>
+		<config>src/main/resources/jobs/footballJob.xml</config>
 		<config>src/main/resources/jobs/simpleTaskletJob.xml</config>
 		<config>src/main/resources/beanRefContext.xml</config>
 		<config>src/main/resources/jobs/delegatingJob.xml</config>
@@ -143,13 +143,13 @@
 			</configs>
 		</configSet>
 		<configSet>
-			<name><![CDATA[nfl]]></name>
+			<name><![CDATA[football]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/simple-container-definition.xml</config>
-				<config>src/main/resources/jobs/nflJob.xml</config>
+				<config>src/main/resources/jobs/footballJob.xml</config>
 			</configs>
 		</configSet>
 		<configSet>

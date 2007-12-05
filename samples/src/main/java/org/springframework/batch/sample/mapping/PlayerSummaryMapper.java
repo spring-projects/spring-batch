@@ -18,23 +18,23 @@ package org.springframework.batch.sample.mapping;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.batch.sample.domain.NflPlayerSummary;
+import org.springframework.batch.sample.domain.PlayerSummary;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
- * RowMapper used to map a ResultSet to a (@link NflPlayerSummary)
+ * RowMapper used to map a ResultSet to a (@link PlayerSummary)
  * 
  * @author Lucas Ward
  *
  */
-public class NflPlayerSummaryMapper implements RowMapper {
+public class PlayerSummaryMapper implements RowMapper {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.jdbc.core.RowMapper#mapRow(java.sql.ResultSet, int)
 	 */
 	public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 		
-		NflPlayerSummary summary = new NflPlayerSummary();
+		PlayerSummary summary = new PlayerSummary();
 		
 		summary.setId(rs.getString(1));
 		summary.setYear(rs.getInt(2));

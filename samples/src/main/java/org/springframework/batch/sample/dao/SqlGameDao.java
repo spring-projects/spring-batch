@@ -1,21 +1,21 @@
 package org.springframework.batch.sample.dao;
 
 import org.springframework.batch.io.ItemWriter;
-import org.springframework.batch.sample.domain.NflGame;
+import org.springframework.batch.sample.domain.Game;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.util.Assert;
 
-public class SqlNflGameDao extends JdbcDaoSupport implements ItemWriter {
+public class SqlGameDao extends JdbcDaoSupport implements ItemWriter {
 
 	private static final String INSERT_GAME = "INSERT into GAMES(player_id,year,team,week,opponent,"
 			+ "completes,attempts,passing_yards,passing_td,interceptions,rushes,rush_yards,"
 			+ "receptions,receptions_yards,total_td) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 	public void write(Object output) {
-		Assert.isTrue(output instanceof NflGame,
-				"Only NflGame objects can be written out" + "using this Dao");
+		Assert.isTrue(output instanceof Game,
+				"Only Game objects can be written out" + "using this Dao");
 
-		NflGame game = (NflGame) output;
+		Game game = (Game) output;
 
 		Object[] args = new Object[] { game.getId(),
 				new Integer(game.getYear()), game.getTeam(),

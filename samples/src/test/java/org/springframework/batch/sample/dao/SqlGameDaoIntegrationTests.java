@@ -18,7 +18,7 @@ package org.springframework.batch.sample.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.batch.sample.domain.NflGame;
+import org.springframework.batch.sample.domain.Game;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
@@ -26,11 +26,11 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  * @author Lucas Ward
  *
  */
-public class SqlNflGameDaoIntegrationTests extends
+public class SqlGameDaoIntegrationTests extends
 	AbstractTransactionalDataSourceSpringContextTests {
 
-	SqlNflGameDao gameDao;
-	NflGame game = new NflGame();
+	SqlGameDao gameDao;
+	Game game = new Game();
 	
 	protected String[] getConfigLocations() {
 		return new String[]{"data-source-context.xml"};
@@ -39,7 +39,7 @@ public class SqlNflGameDaoIntegrationTests extends
 	protected void onSetUpBeforeTransaction() throws Exception {
 		super.onSetUpBeforeTransaction();
 		
-		gameDao = new SqlNflGameDao();
+		gameDao = new SqlGameDao();
 		gameDao.setJdbcTemplate(getJdbcTemplate());
 		
 		game.setId("AbduKa00");
@@ -63,11 +63,11 @@ public class SqlNflGameDaoIntegrationTests extends
 		
 		gameDao.write(game);
 		
-		NflGame tempGame = (NflGame)getJdbcTemplate().queryForObject("SELECT * FROM GAMES", new NflGameRowMapper());
+		Game tempGame = (Game)getJdbcTemplate().queryForObject("SELECT * FROM GAMES", new GameRowMapper());
 		assertEquals(tempGame, game);
 	}
 	
-	public static class NflGameRowMapper implements RowMapper {
+	public static class GameRowMapper implements RowMapper {
 
 		public Object mapRow(ResultSet rs, int arg1) throws SQLException{
 			
@@ -75,24 +75,24 @@ public class SqlNflGameDaoIntegrationTests extends
 				return null;
 			}
 			
-			NflGame nflGame = new NflGame();
-			nflGame.setId(rs.getString("PLAYER_ID"));
-			nflGame.setYear(rs.getInt("year"));
-			nflGame.setTeam(rs.getString("team"));
-			nflGame.setWeek(rs.getInt("week"));
-			nflGame.setOpponent(rs.getString("opponent"));
-			nflGame.setCompletes(rs.getInt("completes"));
-			nflGame.setAttempts(rs.getInt("attempts"));
-			nflGame.setPassingYards(rs.getInt("passing_Yards"));
-			nflGame.setPassingTd(rs.getInt("passing_Td"));
-			nflGame.setInterceptions(rs.getInt("interceptions"));
-			nflGame.setRushes(rs.getInt("rushes"));
-			nflGame.setRushYards(rs.getInt("rush_Yards"));
-			nflGame.setReceptions(rs.getInt("receptions"));
-			nflGame.setReceptionYards(rs.getInt("receptions_Yards"));
-			nflGame.setTotalTd(rs.getInt("total_Td"));
+			Game game = new Game();
+			game.setId(rs.getString("PLAYER_ID"));
+			game.setYear(rs.getInt("year"));
+			game.setTeam(rs.getString("team"));
+			game.setWeek(rs.getInt("week"));
+			game.setOpponent(rs.getString("opponent"));
+			game.setCompletes(rs.getInt("completes"));
+			game.setAttempts(rs.getInt("attempts"));
+			game.setPassingYards(rs.getInt("passing_Yards"));
+			game.setPassingTd(rs.getInt("passing_Td"));
+			game.setInterceptions(rs.getInt("interceptions"));
+			game.setRushes(rs.getInt("rushes"));
+			game.setRushYards(rs.getInt("rush_Yards"));
+			game.setReceptions(rs.getInt("receptions"));
+			game.setReceptionYards(rs.getInt("receptions_Yards"));
+			game.setTotalTd(rs.getInt("total_Td"));
 			
-			return nflGame;
+			return game;
 		}
 	}
 }

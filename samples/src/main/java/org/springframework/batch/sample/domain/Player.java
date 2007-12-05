@@ -1,6 +1,6 @@
 package org.springframework.batch.sample.domain;
 
-public class NflPlayer {
+public class Player {
 	
 	private String ID; 
 	private String lastName; 
@@ -11,7 +11,7 @@ public class NflPlayer {
 	
 	public String toString() {
 		
-		return "NFL-PLAYER:ID=" + ID + ",Last Name=" + lastName + 
+		return "PLAYER:ID=" + ID + ",Last Name=" + lastName + 
 		",First Name=" + firstName + ",Position=" + position + 
 		",Birth Year=" + birthYear + ",DebutYear=" + 
 		debutYear;

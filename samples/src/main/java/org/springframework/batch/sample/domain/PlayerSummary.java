@@ -3,13 +3,13 @@ package org.springframework.batch.sample.domain;
 import org.apache.commons.lang.builder.EqualsBuilder;
 
 /**
- * Domain object representing the summary of a given Nfl Player's 
+ * Domain object representing the summary of a given Player's 
  * year.
  * 
  * @author Lucas Ward
  *
  */
-public class NflPlayerSummary {
+public class PlayerSummary {
 
 	private String id;
 	private int year;
@@ -99,7 +99,7 @@ public class NflPlayerSummary {
 	
 	
 	public String toString() {
-		return "NFL Player Summary: ID=" + id + " Year=" + year;
+		return "Player Summary: ID=" + id + " Year=" + year;
 	}
 	
 	public boolean equals(Object obj) {

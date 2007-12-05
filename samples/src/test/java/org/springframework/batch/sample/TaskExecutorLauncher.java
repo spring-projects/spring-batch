@@ -29,7 +29,7 @@ public class TaskExecutorLauncher {
 		// Paths to individual job configurations. Each one must include the
 		// step scope and the jobConfigurationRegistryBeanPostProcessor.
 		final String[] paths = new String[] { "jobs/adhocLoopJob.xml",
-				"jobs/nflJob.xml" };
+				"jobs/footballJob.xml" };
 
 		// The simple execution environment will be used as a parent
 		// context for each of the job contexts. The standard version of this

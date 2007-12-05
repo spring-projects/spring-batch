@@ -16,8 +16,8 @@
 package org.springframework.batch.sample.dao;
 
 
-import org.springframework.batch.sample.domain.NflPlayerSummary;
-import org.springframework.batch.sample.mapping.NflPlayerSummaryMapper;
+import org.springframework.batch.sample.domain.PlayerSummary;
+import org.springframework.batch.sample.mapping.PlayerSummaryMapper;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 
@@ -25,11 +25,11 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  * @author Lucas Ward
  * 
  */
-public class SqlNflPlayerSummaryDaoIntegrationTests extends
+public class SqlPlayerSummaryDaoIntegrationTests extends
 		AbstractTransactionalDataSourceSpringContextTests {
 
-	SqlNflPlayerSummaryDao playerSummaryDao;
-	NflPlayerSummary summary;
+	SqlPlayerSummaryDao playerSummaryDao;
+	PlayerSummary summary;
 
 	protected String[] getConfigLocations() {
 		return new String[] { "data-source-context.xml" };
@@ -38,10 +38,10 @@ public class SqlNflPlayerSummaryDaoIntegrationTests extends
 	protected void onSetUpBeforeTransaction() throws Exception {
 		super.onSetUpBeforeTransaction();
 
-		playerSummaryDao = new SqlNflPlayerSummaryDao();
+		playerSummaryDao = new SqlPlayerSummaryDao();
 		playerSummaryDao.setJdbcTemplate(getJdbcTemplate());
 
-		summary = new NflPlayerSummary();
+		summary = new PlayerSummary();
 		summary.setId("AikmTr00");
 		summary.setYear(1997);
 		summary.setCompletes(294);
@@ -60,9 +60,9 @@ public class SqlNflPlayerSummaryDaoIntegrationTests extends
 
 		playerSummaryDao.write(summary);
 
-		NflPlayerSummary testSummary = (NflPlayerSummary) getJdbcTemplate()
+		PlayerSummary testSummary = (PlayerSummary) getJdbcTemplate()
 				.queryForObject("SELECT * FROM PLAYER_SUMMARY",
-						new NflPlayerSummaryMapper());
+						new PlayerSummaryMapper());
 
 		assertEquals(testSummary, summary);
 	}

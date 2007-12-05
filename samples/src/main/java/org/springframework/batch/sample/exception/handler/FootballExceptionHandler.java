@@ -5,10 +5,10 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 
-public class NflExceptionHandler implements ExceptionHandler {
+public class FootballExceptionHandler implements ExceptionHandler {
 
 	private static final Log logger = LogFactory
-			.getLog(NflExceptionHandler.class);
+			.getLog(FootballExceptionHandler.class);
 
 	public void handleException(RepeatContext context, Throwable throwable)
 			throws RuntimeException {

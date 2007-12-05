@@ -2,7 +2,7 @@ package org.springframework.batch.sample.domain;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 
-public class NflGame {
+public class Game {
 	
 	private String id;
 	private int year;
@@ -203,7 +203,7 @@ public class NflGame {
 	
 	public String toString() {
 
-		return "NFL Game: ID=" + id + " " + team + " vs. " + opponent + 
+		return "Game: ID=" + id + " " + team + " vs. " + opponent + 
 		" - " + year;
 	}
 	

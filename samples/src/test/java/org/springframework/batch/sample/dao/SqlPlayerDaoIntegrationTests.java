@@ -6,7 +6,7 @@ package org.springframework.batch.sample.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.batch.sample.domain.NflPlayer;
+import org.springframework.batch.sample.domain.Player;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
@@ -14,10 +14,10 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  * @author Lucas Ward
  *
  */
-public class SqlNflPlayerDaoIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
+public class SqlPlayerDaoIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
 	
-	private SqlNflPlayerDao playerDao;
-	private NflPlayer player;
+	private SqlPlayerDao playerDao;
+	private Player player;
 	private static final String GET_PLAYER = "SELECT * from PLAYERS";
 	
 	protected String[] getConfigLocations() {
@@ -29,10 +29,10 @@ public class SqlNflPlayerDaoIntegrationTests extends AbstractTransactionalDataSo
 		// TODO Auto-generated method stub
 		super.onSetUpBeforeTransaction();
 		
-		playerDao = new SqlNflPlayerDao();
+		playerDao = new SqlPlayerDao();
 		playerDao.setJdbcTemplate(this.jdbcTemplate);
 		
-		player = new NflPlayer();
+		player = new Player();
 		player.setID("AKFJDL00");
 		player.setFirstName("John");
 		player.setLastName("Doe");

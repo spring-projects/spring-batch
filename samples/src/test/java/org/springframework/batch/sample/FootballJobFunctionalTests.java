@@ -1,9 +1,9 @@
 package org.springframework.batch.sample;
 
-public class NflJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
+public class FootballJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	protected String[] getConfigLocations() {
-		return new String[] {"jobs/nfljob.xmlXXX"};
+		return new String[] {"jobs/footballJob.xml"};
 	}
 	
 	protected void validatePostConditions() throws Exception {
