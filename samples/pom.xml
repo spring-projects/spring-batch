@@ -191,6 +191,112 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-sql</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<tasks>
+								<typedef resource="foundrylogic/vpp/typedef.properties" />
+								<taskdef resource="foundrylogic/vpp/taskdef.properties" />
+								<!-- Reference script for HSQLDB - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/hsqldb.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/hsqldb.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-hsqldb.sql" />
+								</vppcopy>
+								<!-- Reference script for DB2 - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/db2.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/db2.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-db2.sql" />
+								</vppcopy>
+								<!-- Reference script for Derby - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/derby.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/derby.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-derby.sql" />
+								</vppcopy>
+								<!-- Reference script for Oracle - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/oracle10g.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/oracle10g.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-oracle10g.sql" />
+								</vppcopy>
+								<!-- Reference script for PostgreSQL - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/postgresql.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/postgresql.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-postgresql.sql" />
+								</vppcopy>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clover-plugin</artifactId>
+				<configuration>
+					<licenseLocation>
+						${basedir}/src/test/resources/clover.license
+					</licenseLocation>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>pre-site</phase>
+						<goals>
+							<goal>instrument</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>

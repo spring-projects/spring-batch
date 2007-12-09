@@ -3,7 +3,7 @@ package org.springframework.batch.sample;
 public class FootballJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	protected String[] getConfigLocations() {
-		return new String[] {"jobs/footballJob.xml"};
+		return new String[] {"jobs/footballJob.xml###"};
 	}
 	
 	protected void validatePostConditions() throws Exception {
