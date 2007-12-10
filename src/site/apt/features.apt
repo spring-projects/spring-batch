@@ -113,10 +113,10 @@ Spring Batch Features and Roadmap
   APIs until we get to a release candidate.  Hopefully most of the
   developer touch points are functionally pretty stable, even if the
   names and packages might still change.  Partial implementations or
-  areas currently known to be undergoing refactoring as of
-  1.0-m2-SNAPSHOT are listed in JIRA
+  areas currently known to be undergoing refactoring
+  are listed in JIRA
   (http://opensource.atlassian.com/projects/spring/browse/BATCH) for
-  items marked as open for versions 1.0-m2 or 1.0.
+  items marked as open for future versions.
 
   Documentation is extensive but still incomplete.  The recent
   refactoring to create the Execution module is not yet reflected, so
