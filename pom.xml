@@ -329,6 +329,11 @@
 				<version>1.2</version>
 			</dependency>
 			<dependency>
+				<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+				<version>3.1</version>
+			</dependency>
+			<dependency>
 				<groupId>hsqldb</groupId>
 				<artifactId>hsqldb</artifactId>
 				<version>1.8.0.7</version>
@@ -517,8 +522,13 @@
 	<pluginRepositories>
 		<pluginRepository>
 			<id>spring-external</id>
-			<name>Spring Portfolio Milestone Repository</name>
+			<name>Spring External Repository</name>
 			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>spring-external-svn</id>
+			<name>Spring External SVN Repository</name>
+			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext</url>
 		</pluginRepository>
 	</pluginRepositories>
 
