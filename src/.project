@@ -10,19 +10,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>trunk.pom.xml</name>
-			<type>1</type>
-			<locationURI>PARENT_TRUNK/pom.xml</locationURI>
-		</link>
-		<link>
 			<name>pom.xml</name>
 			<type>1</type>
-			<locationURI>PARENT_DIR/pom.xml</locationURI>
-		</link>
-		<link>
-			<name>parent</name>
-			<type>2</type>
-			<locationURI>PARENT_DIR/parent</locationURI>
+			<locationURI>PARENT/pom.xml</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
