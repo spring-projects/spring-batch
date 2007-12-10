@@ -15,7 +15,16 @@
  */
 package org.springframework.batch.execution.repository.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestCase;
+
+import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.runtime.SimpleJobIdentifier;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 /**
  * @author Dave Syer
@@ -24,52 +33,43 @@ import junit.framework.TestCase;
 public class SqlJobDaoQueryTests extends TestCase {
 
 	SqlJobDao sqlDao;
+	List list = new ArrayList();
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
 		sqlDao = new SqlJobDao();
+		sqlDao.setJobExecutionIncrementer(new DataFieldMaxValueIncrementer() {
+
+			public int nextIntValue() throws DataAccessException {
+				return 0;
+			}
+
+			public long nextLongValue() throws DataAccessException {
+				return 0;
+			}
+
+			public String nextStringValue() throws DataAccessException {
+				return "bar";
+			}
+			
+		});
 	}
 
 	public void testTablePrefix() throws Exception {
 		sqlDao.setTablePrefix("FOO_");
-		assertTrue("Query did not contain FOO_:"+sqlDao.getFindJobsQuery(), sqlDao.getFindJobsQuery().indexOf("FOO_")>=0);
-	}
-
-	public void testSetSaveJobExecutionQuery() throws Exception {
-		sqlDao.setSaveJobExecutionQuery("foo");
-		assertEquals("foo", sqlDao.getSaveJobExecutionQuery());
-	}
-
-	public void testSetUpdateJobQuery() throws Exception {
-		sqlDao.setUpdateJobQuery("foo");
-		assertEquals("foo", sqlDao.getUpdateJobQuery());
-	}
-
-	public void testSetFindJobsQuery() throws Exception {
-		sqlDao.setFindJobsQuery("foo");
-		assertEquals("foo", sqlDao.getFindJobsQuery());
-	}
-
-	public void testSetUpdateJobExecutionQuery() throws Exception {
-		sqlDao.setUpdateJobExecutionQuery("foo");
-		assertEquals("foo", sqlDao.getUpdateJobExecutionQuery());
-	}
-
-	public void testSetJobExecutionCountQuery() throws Exception {
-		sqlDao.setJobExecutionCountQuery("foo");
-		assertEquals("foo", sqlDao.getJobExecutionCountQuery());
-	}
-
-	public void testSetCheckJobExecutionExistsQuery() throws Exception {
-		sqlDao.setCheckJobExecutionExistsQuery("foo");
-		assertEquals("foo", sqlDao.getCheckJobExecutionExistsQuery());
-	}
-
-	public void testJobExecutionCountQuery() throws Exception {
-		sqlDao.setJobExecutionCountQuery("foo");
-		assertEquals("foo", sqlDao.getJobExecutionCountQuery());
+		sqlDao.setJdbcTemplate(new JdbcTemplate() {
+			public int update(String sql, Object[] args, int[] argTypes)
+					throws DataAccessException {
+				list.add(sql);
+				return 1;
+			}
+		});
+		sqlDao.save(new JobInstance(new SimpleJobIdentifier("foo"), new Long(11)).createNewJobExecution());
+		assertEquals(1, list.size());
+		String query = (String) list.get(0);
+		assertTrue("Query did not contain FOO_:"+query, query.indexOf("FOO_")>=0);
 	}
 
 }

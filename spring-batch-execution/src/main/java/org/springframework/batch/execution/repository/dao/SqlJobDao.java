@@ -32,7 +32,7 @@ import org.springframework.batch.execution.runtime.DefaultJobIdentifier;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
@@ -51,7 +51,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  */
 public class SqlJobDao implements JobDao, InitializingBean {
-	
+
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE ID=?";
 
 	// Job SQL statements
@@ -82,25 +82,13 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ? where ID = ?";
 
-	private String checkJobExecutionExistsQuery;
-
-	private String findJobsQuery;
-
-	private JdbcTemplate jdbcTemplate;
-
-	private String jobExecutionCountQuery;
+	private JdbcOperations jdbcTemplate;
 
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
 	private DataFieldMaxValueIncrementer jobIncrementer;
 
-	private String saveJobExecutionQuery;
-
 	private String tablePrefix = DEFAULT_TABLE_PREFIX;
-
-	private String updateJobExecutionQuery;
-
-	private String updateJobQuery;
 
 	/*
 	 * (non-Javadoc)
@@ -183,21 +171,15 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		return jdbcTemplate.query(getFindJobsQuery(), parameters, rowMapper);
 	}
 
-	public String getCheckJobExecutionExistsQuery() {
-		if (checkJobExecutionExistsQuery != null) {
-			return checkJobExecutionExistsQuery;
-		}
+	private String getCheckJobExecutionExistsQuery() {
 		return getQuery(CHECK_JOB_EXECUTION_EXISTS);
 	}
 
-	public String getCreateJobQuery() {
+	private String getCreateJobQuery() {
 		return getQuery(CREATE_JOB);
 	}
 
-	public String getFindJobsQuery() {
-		if (findJobsQuery != null) {
-			return findJobsQuery;
-		}
+	private String getFindJobsQuery() {
 		return getQuery(FIND_JOBS);
 	}
 
@@ -216,10 +198,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 				.queryForInt(getJobExecutionCountQuery(), parameters);
 	}
 
-	public String getJobExecutionCountQuery() {
-		if (jobExecutionCountQuery != null) {
-			return jobExecutionCountQuery;
-		}
+	private String getJobExecutionCountQuery() {
 		return getQuery(GET_JOB_EXECUTION_COUNT);
 	}
 
@@ -227,10 +206,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
 	}
 
-	public String getSaveJobExecutionQuery() {
-		if (saveJobExecutionQuery != null) {
-			return saveJobExecutionQuery;
-		}
+	private String getSaveJobExecutionQuery() {
 		return getQuery(SAVE_JOB_EXECUTION);
 	}
 
@@ -254,17 +230,11 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		return new ScheduledJobIdentifier(jobIdentifier.getName());
 	}
 
-	public String getUpdateJobExecutionQuery() {
-		if (updateJobExecutionQuery != null) {
-			return updateJobExecutionQuery;
-		}
+	private String getUpdateJobExecutionQuery() {
 		return getQuery(UPDATE_JOB_EXECUTION);
 	}
 
-	public String getUpdateJobQuery() {
-		if (updateJobQuery != null) {
-			return updateJobQuery;
-		}
+	private String getUpdateJobQuery() {
 		return getQuery(UPDATE_JOB);
 	}
 
@@ -295,53 +265,31 @@ public class SqlJobDao implements JobDao, InitializingBean {
 				Types.VARCHAR, Types.CHAR, Types.VARCHAR, Types.VARCHAR });
 	}
 
-	/**
-	 * Public setter for the checkJobExecutionExistsQuery property.
-	 *
-	 * @param checkJobExecutionExistsQuery the checkJobExecutionExistsQuery to set
-	 */
-	public void setCheckJobExecutionExistsQuery(String checkJobExecutionExistsQuery) {
-		this.checkJobExecutionExistsQuery = checkJobExecutionExistsQuery;
-	}
-
-	/**
-	 * Public setter for the findJobsQuery property.
-	 *
-	 * @param findJobsQuery the findJobsQuery to set
-	 */
-	public void setFindJobsQuery(String findJobsQuery) {
-		this.findJobsQuery = findJobsQuery;
-	}
-
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
 	/**
-	 * Public setter for the jobExecutionCountQuery property.
-	 *
-	 * @param jobExecutionCountQuery the jobExecutionCountQuery to set
+	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
+	 * generating primary keys for {@link JobExecution} instances.
+	 * 
+	 * @param jobExecutionIncrementer
+	 *            the {@link DataFieldMaxValueIncrementer}
 	 */
-	public void setJobExecutionCountQuery(String jobExecutionCountQuery) {
-		this.jobExecutionCountQuery = jobExecutionCountQuery;
-	}
-
 	public void setJobExecutionIncrementer(
 			DataFieldMaxValueIncrementer jobExecutionIncrementer) {
 		this.jobExecutionIncrementer = jobExecutionIncrementer;
 	}
 
+	/**
+	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
+	 * generating primary keys for {@link JobInstance} instances.
+	 * 
+	 * @param jobIncrementer
+	 *            the {@link DataFieldMaxValueIncrementer}
+	 */
 	public void setJobIncrementer(DataFieldMaxValueIncrementer jobIncrementer) {
 		this.jobIncrementer = jobIncrementer;
-	}
-
-	/**
-	 * Public setter for the saveJobExecutionQuery property.
-	 *
-	 * @param saveJobExecutionQuery the saveJobExecutionQuery to set
-	 */
-	public void setSaveJobExecutionQuery(String saveJobExecutionQuery) {
-		this.saveJobExecutionQuery = saveJobExecutionQuery;
 	}
 
 	/**
@@ -357,24 +305,6 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	}
 
 	/**
-	 * Public setter for the updateJobExecutionQuery property.
-	 *
-	 * @param updateJobExecutionQuery the updateJobExecutionQuery to set
-	 */
-	public void setUpdateJobExecutionQuery(String updateJobExecutionQuery) {
-		this.updateJobExecutionQuery = updateJobExecutionQuery;
-	}
-
-	/**
-	 * Public setter for the updateJobQuery property.
-	 *
-	 * @param updateJobQuery the updateJobQuery to set
-	 */
-	public void setUpdateJobQuery(String updateJobQuery) {
-		this.updateJobQuery = updateJobQuery;
-	}
-
-	/**
 	 * Update given JobExecution using a SQL UPDATE statement. The JobExecution
 	 * is first checked to ensure all fields are not null, and that it has an
 	 * ID. The database is then queried to ensure that the ID exists, which
@@ -386,16 +316,19 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 		validateJobExecution(jobExecution);
 
-		String exitDescription = jobExecution.getExitStatus().getExitDescription();
-		if (exitDescription!=null && exitDescription.length()>EXIT_MESSAGE_LENGTH) {
+		String exitDescription = jobExecution.getExitStatus()
+				.getExitDescription();
+		if (exitDescription != null
+				&& exitDescription.length() > EXIT_MESSAGE_LENGTH) {
 			exitDescription = exitDescription.substring(0, EXIT_MESSAGE_LENGTH);
-			logger.debug("Truncating long message before update of JobExecution: "+jobExecution);
+			logger
+					.debug("Truncating long message before update of JobExecution: "
+							+ jobExecution);
 		}
 		Object[] parameters = new Object[] { jobExecution.getStartTime(),
 				jobExecution.getEndTime(), jobExecution.getStatus().toString(),
 				jobExecution.getExitStatus().isContinuable() ? "Y" : "N",
-				jobExecution.getExitStatus().getExitCode(),
-				exitDescription,
+				jobExecution.getExitStatus().getExitCode(), exitDescription,
 				jobExecution.getId() };
 
 		if (jobExecution.getId() == null) {

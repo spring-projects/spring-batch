@@ -91,31 +91,15 @@ public class SqlStepDao implements StepDao, InitializingBean {
 			+ "STATUS = ?, COMMIT_COUNT = ?, TASK_COUNT = ?, TASK_STATISTICS = ?, CONTINUABLE = ? , EXIT_CODE = ?, "
 			+ "EXIT_MESSAGE = ? where ID = ?";
 
-	private String createStepQuery;
-
-	private String findStepExecutionsQuery;
-
-	private String findStepQuery;
-
-	private String findStepsQuery;
-
 	private JdbcOperations jdbcTemplate;
 
 	private JobDao jobDao;
-
-	private String saveStepExecutionQuery;
-
-	private String stepExecutionCountQuery;
 
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
 
 	private DataFieldMaxValueIncrementer stepIncrementer;
 
 	private String tablePrefix = SqlJobDao.DEFAULT_TABLE_PREFIX;
-
-	private String updateStepExecutionQuery;
-
-	private String updateStepQuery;
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jdbcTemplate, "JdbcTemplate cannot be null.");
@@ -281,31 +265,19 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		return jdbcTemplate.query(getFindStepsQuery(), parameters, rowMapper);
 	}
 
-	public String getCreateStepQuery() {
-		if (createStepQuery != null) {
-			return createStepQuery;
-		}
+	private String getCreateStepQuery() {
 		return getQuery(CREATE_STEP);
 	}
 
-	public String getFindStepExecutionsQuery() {
-		if (findStepExecutionsQuery != null) {
-			return findStepExecutionsQuery;
-		}
+	private String getFindStepExecutionsQuery() {
 		return getQuery(FIND_STEP_EXECUTIONS);
 	}
 
-	public String getFindStepQuery() {
-		if (findStepQuery != null) {
-			return findStepQuery;
-		}
+	private String getFindStepQuery() {
 		return getQuery(FIND_STEP);
 	}
 
-	public String getFindStepsQuery() {
-		if (findStepsQuery != null) {
-			return findStepsQuery;
-		}
+	private String getFindStepsQuery() {
 		return getQuery(FIND_STEPS);
 	}
 
@@ -313,10 +285,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
 	}
 
-	public String getSaveStepExecutionQuery() {
-		if (saveStepExecutionQuery != null) {
-			return saveStepExecutionQuery;
-		}
+	private String getSaveStepExecutionQuery() {
 		return getQuery(SAVE_STEP_EXECUTION);
 	}
 
@@ -328,24 +297,15 @@ public class SqlStepDao implements StepDao, InitializingBean {
 				parameters);
 	}
 
-	public String getStepExecutionCountQuery() {
-		if (stepExecutionCountQuery != null) {
-			return stepExecutionCountQuery;
-		}
+	private String getStepExecutionCountQuery() {
 		return getQuery(GET_STEP_EXECUTION_COUNT);
 	}
 
-	public String getUpdateStepExecutionQuery() {
-		if (updateStepExecutionQuery != null) {
-			return updateStepExecutionQuery;
-		}
+	private String getUpdateStepExecutionQuery() {
 		return getQuery(UPDATE_STEP_EXECUTION);
 	}
 
-	public String getUpdateStepQuery() {
-		if (updateStepQuery != null) {
-			return updateStepQuery;
-		}
+	private String getUpdateStepQuery() {
 		return getQuery(UPDATE_STEP);
 	}
 
@@ -386,46 +346,6 @@ public class SqlStepDao implements StepDao, InitializingBean {
 
 	}
 
-	/**
-	 * Public setter for the createStepQuery property.
-	 * 
-	 * @param createStepQuery
-	 *            the createStepQuery to set
-	 */
-	public void setCreateStepQuery(String createStepQuery) {
-		this.createStepQuery = createStepQuery;
-	}
-
-	/**
-	 * Public setter for the findStepExecutionsQuery property.
-	 * 
-	 * @param findStepExecutionsQuery
-	 *            the findStepExecutionsQuery to set
-	 */
-	public void setFindStepExecutionsQuery(String findStepExecutionsQuery) {
-		this.findStepExecutionsQuery = findStepExecutionsQuery;
-	}
-
-	/**
-	 * Public setter for the findStepQuery property.
-	 * 
-	 * @param findStepQuery
-	 *            the findStepQuery to set
-	 */
-	public void setFindStepQuery(String findStepQuery) {
-		this.findStepQuery = findStepQuery;
-	}
-
-	/**
-	 * Public setter for the findStepQuery property.
-	 * 
-	 * @param findStepsQuery
-	 *            the findStepsQuery to set
-	 */
-	public void setFindStepsQuery(String findStepsQuery) {
-		this.findStepsQuery = findStepsQuery;
-	}
-
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
@@ -439,26 +359,6 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	 */
 	public void setJobDao(JobDao jobDao) {
 		this.jobDao = jobDao;
-	}
-
-	/**
-	 * Public setter for the findStepQuery property.
-	 * 
-	 * @param saveStepExecutionQuery
-	 *            the saveStepExecutionQuery to set
-	 */
-	public void setSaveStepExecutionQuery(String saveStepExecutionQuery) {
-		this.saveStepExecutionQuery = saveStepExecutionQuery;
-	}
-
-	/**
-	 * Public setter for the stepExecutionCountQuery property.
-	 * 
-	 * @param stepExecutionCountQuery
-	 *            the stepExecutionCountQuery to set
-	 */
-	public void setStepExecutionCountQuery(String stepExecutionCountQuery) {
-		this.stepExecutionCountQuery = stepExecutionCountQuery;
 	}
 
 	/**
@@ -493,26 +393,6 @@ public class SqlStepDao implements StepDao, InitializingBean {
 	 */
 	public void setTablePrefix(String tablePrefix) {
 		this.tablePrefix = tablePrefix;
-	}
-
-	/**
-	 * Public setter for the {@link String} property.
-	 * 
-	 * @param updateStepExecutionQuery
-	 *            the updateStepExecutionQuery to set
-	 */
-	public void setUpdateStepExecutionQuery(String updateStepExecutionQuery) {
-		this.updateStepExecutionQuery = updateStepExecutionQuery;
-	}
-
-	/**
-	 * Public setter for the {@link String} property.
-	 * 
-	 * @param updateStepQuery
-	 *            the updateStepQuery to set
-	 */
-	public void setUpdateStepQuery(String updateStepQuery) {
-		this.updateStepQuery = updateStepQuery;
 	}
 
 	/**

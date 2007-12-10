@@ -94,11 +94,6 @@ public class SqlStepDaoPrefixTests extends TestCase {
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("FOO_STEP") != -1);
 	}
 	
-	public void testStepExecutionCountQuery() throws Exception {
-		stepDao.setStepExecutionCountQuery("foo");
-		assertEquals("foo", stepDao.getStepExecutionCountQuery());
-	}
-
 	public void testModifiedFindStep(){
 		stepDao.setTablePrefix("FOO_");
 		try{
@@ -125,21 +120,11 @@ public class SqlStepDaoPrefixTests extends TestCase {
 		
 	}
 	
-	public void testFindStepQuery() throws Exception {
-		stepDao.setFindStepQuery("foo");
-		assertEquals("foo", stepDao.getFindStepQuery());
-	}
-
 	public void testDefaultFindSteps(){
 		stepDao.findSteps(new JobInstance(null, new Long(1)));
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP") != -1);
 	}
 	
-	public void testFindStepsQuery() throws Exception {
-		stepDao.setFindStepsQuery("foo");
-		assertEquals("foo", stepDao.getFindStepsQuery());
-	}
-
 	public void testDefaultCreateStep(){
 		stepIncrementer.nextLongValue();
 		stepIncrementerControl.setReturnValue(1);
@@ -148,51 +133,27 @@ public class SqlStepDaoPrefixTests extends TestCase {
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP") != -1);
 	}
 	
-	public void testCreateStepQuery() throws Exception {
-		stepDao.setCreateStepQuery("foo");
-		assertEquals("foo", stepDao.getCreateStepQuery());
-	}
-
 	public void testDefaultUpdateStep(){
 		stepDao.update(step);
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP") != -1);
 	}
 	
-	public void testSetUpdateStepQuery() throws Exception {
-		stepDao.setUpdateStepQuery("foo");
-		assertEquals("foo", stepDao.getUpdateStepQuery());
-	}
-
 	public void testDefaultFindStepExecutions(){
 		stepDao.findStepExecutions(step);
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP_EXECUTION") != -1);
 	}
 	
-	public void testSetFindStepExecutionsQuery() throws Exception {
-		stepDao.setFindStepExecutionsQuery("foo");
-		assertEquals("foo", stepDao.getFindStepExecutionsQuery());
-	}
-
 	public void testDefaultSaveStepExecution(){
 		stepExecutionIncrementer.nextLongValue();
 		stepExecutionIncrementerControl.setReturnValue(1);
 		stepExecutionIncrementerControl.replay();
 		stepDao.save(stepExecution);
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP_EXECUTION") != -1);
-	}
-	
-	public void testSetSaveStepExecutionQuery() throws Exception {
-		stepDao.setSaveStepExecutionQuery("foo");
-		assertEquals("foo", stepDao.getSaveStepExecutionQuery());
-	}
+	}	
 
 	public void testDefaultUpdateStepExecution(){
 		stepDao.update(stepExecution);
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP_EXECUTION") != -1);
 	}
 	
-	public void testSetUpdateStepExecutionQuery() throws Exception {
-		stepDao.setUpdateStepExecutionQuery("foo");
-		assertEquals("foo", stepDao.getUpdateStepExecutionQuery());
-	}
 }
