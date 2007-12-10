@@ -39,7 +39,7 @@ Spring Batch Getting Started
 
     * Import the samples project from the samples directory.
 
-    * Add all the jar files in the distribution as library dependencies (except spring-batch-samples-<versionId>.jar).  There are jars in samples/lib and in sources/lib including some duplicates.
+    * Add all the jar files in the distribution as library dependencies (except <<<spring-batch-samples-<versionId>.jar>>>).  There are jars in <<<samples/lib>>> and in <<<sources/lib>>>,  including some duplicates.
 
     * Add the additional jars as a library dependencies
 
@@ -47,9 +47,9 @@ Spring Batch Getting Started
 
     * Run the unit tests in your project under src/test/java.  N.B. the FootbalJobFunctionTests takes quite a long time to run.
 
-  You can get a pretty good idea about how to set up a job by examining the unit tests in the org.springframework.batch.sample package (src/main/java) and the configuration in src/main/resources/jobs.
+  You can get a pretty good idea about how to set up a job by examining the unit tests in the <<<org.springframework.batch.sample>>> package (in <<<src/main/java>>>) and the configuration in <<<src/main/resources/jobs>>>.
 
-  To launch a job from the command line instead of a unit test use the BatchCommandLineLauncher.main method (see Javadocs included in that class).
+  To launch a job from the command line instead of a unit test use the <<<BatchCommandLineLauncher.main()>>> method (see Javadocs included in that class).
 
 ** With Maven on the Command Line
 
