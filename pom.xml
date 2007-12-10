@@ -507,6 +507,11 @@
 			<name>Apache Foundation Snapshot Repository</name>
 			<url>http://people.apache.org/maven-snapshot-repository</url>
 		</repository>
+		<repository>
+			<id>objectstyle</id>
+			<name>ObjectStyle.org Repository</name>
+			<url>http://objectstyle.org/maven2/</url>
+		</repository>
 	</repositories>
 
 	<pluginRepositories>
