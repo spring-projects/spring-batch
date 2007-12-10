@@ -8,9 +8,9 @@
 
 	<parent>
 		<groupId>org.springframework.batch</groupId>
-		<artifactId>spring-batch-parent</artifactId>
+		<artifactId>spring-batch</artifactId>
 		<version>1.0.0.m4-SNAPSHOT</version>
-		<relativePath>../parent</relativePath>
+		<relativePath>..</relativePath>
 	</parent>
 
 	<pluginRepositories>

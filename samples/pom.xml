@@ -4,14 +4,15 @@
 	<packaging>jar</packaging>
 	<name>Samples</name>
 	<description>
-		Example batch jobs using Spring Batch Core and Execution.
+		<!--  Use CDATA to keep it on a single line in the manifest -->
+		<![CDATA[Example batch jobs using Spring Batch Core and Execution.]]>
 	</description>
 
 	<parent>
 		<groupId>org.springframework.batch</groupId>
-		<artifactId>spring-batch-parent</artifactId>
+		<artifactId>spring-batch</artifactId>
 		<version>1.0.0.m4-SNAPSHOT</version>
-		<relativePath>../parent</relativePath>
+		<relativePath>..</relativePath>
 	</parent>
 
 	<dependencies>
