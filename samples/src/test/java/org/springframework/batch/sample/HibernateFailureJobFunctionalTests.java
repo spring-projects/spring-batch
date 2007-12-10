@@ -49,44 +49,52 @@ public class HibernateFailureJobFunctionalTests extends
 	 */
 	public void testLaunchJob() throws Exception {
 		writer.setFailOnFlush(2);
-		
+
 		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
-		assertTrue(before>0);
+		assertTrue(before > 0);
 		try {
 			super.testLaunchJob();
 		} catch (HibernateJdbcException e) {
-			// This is what would happen if the flush happened outside the RepeatContext:
+			// This is what would happen if the flush happened outside the
+			// RepeatContext:
 			throw e;
 		} catch (UncategorizedSQLException e) {
-			// Expected, but check that the exception was registered:
+			// This is what would happen if the job wasn't configured to skip
+			// exceptions at teh step level.
 			assertEquals(1, writer.getErrors().size());
-			// throw e;
+			throw e;
 		}
 		validatePostConditions();
 		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
 		assertEquals(before, after);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.sample.AbstractCustomerCreditIncreaseTests#validatePostConditions()
 	 */
 	protected void validatePostConditions() throws Exception {
 		// TODO: fix so that the postconditions in super class are true
 		super.validatePostConditions();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.sample.AbstractCustomerCreditIncreaseTests#checkMatches(java.util.List)
 	 */
 	protected void checkMatches(List matches) {
 		assertFalse(matches.contains(new BigDecimal(2)));
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.sample.AbstractCustomerCreditIncreaseTests#getExpectedMatches()
 	 */
 	protected int getExpectedMatches() {
 		// One record was skipped, so it won't be processed in the final state.
-		return super.getExpectedMatches()-1;
+		return super.getExpectedMatches() - 1;
 	}
 }
