@@ -38,7 +38,7 @@ CREATE TABLE PLAYERS (
 	PLAYER_ID char(8) NOT NULL PRIMARY KEY,  
 	LAST_NAME varchar(35) not null,
 	FIRST_NAME varchar(25) not null,
-	POSITION varchar(10),
+	POS varchar(10),
 	YEAR_OF_BIRTH NUMBER(38) not null,
 	YEAR_DRAFTED NUMBER(38) not null);
 
