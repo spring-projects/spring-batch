@@ -1,0 +1,6 @@
+#Mon Dec 10 14:44:35 EST 2007
+org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.4
+eclipse.preferences.version=1
+org.eclipse.jdt.core.compiler.source=1.4
+org.eclipse.jdt.core.compiler.compliance=1.4
+instance/org.eclipse.core.net/org.eclipse.core.net.hasMigrated=true
