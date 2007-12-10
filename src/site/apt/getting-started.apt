@@ -7,4 +7,86 @@
 
 Spring Batch Getting Started
 
-* Work in Progress
+  A convenient way to get started quickly with Spring Batch is to run the samples which are packaged in the samples module.  The source code for the samples (and the other modules) is available either from the {{{downloads.html}.Zip assembly}} or from {{{source-repository.html}Subversion}}.
+
+* Using the .Zip Distribution
+
+** With Eclipse and without Maven
+
+  Similar instructions would apply to other IDEs.
+
+    * Download the "with-dependencies" package and unzip to create a directory <<<spring-batch-<versionId>>>>.
+
+    * Get these jar files from somewhere else (they weren't included in the m3 distro):
+
+      * Servlet API (2.3 or better)
+
+      * spring-test-2.5.jar 
+
+      * spring-web-2.5.jar
+
+      * easymock.jar (1.1 or 1.2)
+
+      * commons-io (1.3.1)
+
+      * xmlunit (1.1)
+
+      * aspectjweaver (1.5.3)
+
+      * hsqldb (1.8.0.7)
+
+    * Open Eclipse and make a workspace in the directory you just created.
+
+    * Import the samples project from the samples directory.
+
+    * Add all the jar files in the distribution as library dependencies (except spring-batch-samples-<versionId>.jar).  There are jars in samples/lib and in sources/lib including some duplicates.
+
+    * Add the additional jars as a library dependencies
+
+    * Force the workspace to build (e.g. Project -> Clean...)
+
+    * Run the unit tests in your project under src/test/java.  N.B. the FootbalJobFunctionTests takes quite a long time to run.
+
+  You can get a pretty good idea about how to set up a job by examining the unit tests in the org.springframework.batch.sample package (src/main/java) and the configuration in src/main/resources/jobs.
+
+  To launch a job from the command line instead of a unit test use the BatchCommandLineLauncher.main method (see Javadocs included in that class).
+
+** With Maven on the Command Line
+
+  * Download the distribution as above.
+
+  * Get the parent project pom by downloading it from Subversion (export from {{{https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/tags/spring-batch-1.0.0.m3/parent}here}}):
+
++---
+$ cd samples
+$ svn export https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/tags/spring-batch-1.0.0.m3/parent parent
++---
+
+  * Then run Maven in the spring-batch-samples directory, e.g.
+
++---
+$ cd spring-batch-samples
+$ mvn test
+...
++---
+
+** With Maven and Eclipse
+
+  * Download the distribution as above.
+
+  * Export the parent pom as above.
+ 
+  * Get the M2 Eclipse Plugin from codehaus (update site {http://m2eclipse.codehaus.org/update/}, homepage {http://m2eclipse.codehaus.org/}).  If you can't or don't want to install this plugin, you can use the {{{http://maven.apache.org/plugins/maven-eclipse-plugin/}Maven Eclipse Plugin}} to create the classpath entries you need.
+
+  * Open Eclipse and create a workspace as for the non-Mavenized version.
+
+  * Import the samples project as above.
+
+  * The project should build cleanly without having to fix the dependencies.  If it doesn't, make sure you are online, and maybe try building on the command line first to make sure all the dependencies are downloaded.  See the {{{building.html}building instructions}} if you run into difficulty.
+
+* Using Maven and Subversion
+
+  * Check out the Spring Batch project from Subversion (instructions are available {{{source-repository.html}here}}).
+
+  * Run Maven from the command line in the samples directory.  There are additional building instructions and suggestions about what to do if it goes wrong {{{building.html}here}}.
+
