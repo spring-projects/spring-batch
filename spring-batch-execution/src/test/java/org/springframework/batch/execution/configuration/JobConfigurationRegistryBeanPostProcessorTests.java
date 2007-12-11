@@ -15,14 +15,15 @@
  */
 package org.springframework.batch.execution.configuration;
 
+import java.util.Collection;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.DuplicateJobConfigurationException;
 import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
-import org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor;
-import org.springframework.batch.execution.configuration.MapJobConfigurationRegistry;
 import org.springframework.beans.FatalBeanException;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author Dave Syer
@@ -90,5 +91,17 @@ public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
 		} catch (NoSuchJobConfigurationException e) {
 			// expected
 		}
+	}
+	
+	public void testExecutionWithApplicationContext() throws Exception {
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml", getClass());
+		MapJobConfigurationRegistry registry = (MapJobConfigurationRegistry) context.getBean("registry");
+		Collection configurations = registry.getJobConfigurations();
+		assertEquals(6, configurations.size());
+		assertNotNull(registry.getJobConfiguration("test-job"));
+		assertEquals(context.getBean("test-job-with-name"), registry.getJobConfiguration("foo"));
+		assertEquals(context.getBean("test-job-with-bean-name"), registry.getJobConfiguration("bar"));
+		assertEquals(context.getBean("test-job-with-parent-and-name"), registry.getJobConfiguration("spam"));
+		assertEquals(context.getBean("test-job-with-parent-and-bean-name"), registry.getJobConfiguration("bucket"));
 	}
 }

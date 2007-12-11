@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.2.v200710312100]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.2.v200711172000]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -12,6 +12,8 @@
 		<config>src/test/resources/org/springframework/batch/execution/repository/dao/sql-dao-test.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/bootstrap/support/test-batch-environment.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/bootstrap/support/test-batch-environment-no-launcher.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/test-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/scope/scope-tests.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
