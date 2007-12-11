@@ -33,5 +33,27 @@
 				</fileSets>
 			</sources>
 		</moduleSet>
+		<moduleSet>
+			<includes>
+				<include>
+					org.springframework.batch:spring-batch-samples
+				</include>
+			</includes>
+			<sources>
+				<outputDirectoryMapping>
+					samples/${artifactId}
+				</outputDirectoryMapping>
+				<fileSets>
+					<fileSet>
+						<excludes>
+							<exclude>bin/**</exclude>
+							<exclude>target/**</exclude>
+							<exclude>**/clover.license</exclude>
+							<exclude>*.xml</exclude>
+						</excludes>
+					</fileSet>
+				</fileSets>
+			</sources>
+		</moduleSet>
 	</moduleSets>
 </assembly>
