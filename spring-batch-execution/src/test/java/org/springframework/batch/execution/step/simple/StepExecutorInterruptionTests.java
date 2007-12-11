@@ -56,7 +56,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private SimpleStepExecutor executor;
 
-	public void setUp() {
+	public void setUp() throws Exception {
 
 		jobRepository = new SimpleJobRepository(jobDao, stepDao);
 
@@ -65,7 +65,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		jobConfiguration.addStep(stepConfiguration);
 		JobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
 		jobConfiguration.setBeanName("testJob");
-		job = jobRepository.findOrCreateJob(jobConfiguration, runtimeInformation);
+		job = jobRepository.findOrCreateJob(jobConfiguration, runtimeInformation).getJob();
 		executor = new SimpleStepExecutor();
 	}
 

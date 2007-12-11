@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.launch;
+package org.springframework.batch.core.repository;
 
-import org.springframework.batch.execution.AbstractExceptionTests;
+import org.springframework.batch.core.AbstractExceptionTests;
 
 /**
  * @author Dave Syer

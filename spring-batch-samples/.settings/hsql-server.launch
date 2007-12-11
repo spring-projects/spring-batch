@@ -4,7 +4,7 @@
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/samples"/>
 </listAttribute>
-<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="samples"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="spring-batch-samples"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="4"/>
 </listAttribute>

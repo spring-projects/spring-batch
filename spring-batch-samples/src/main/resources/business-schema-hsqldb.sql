@@ -37,7 +37,6 @@ INSERT INTO customer (id, version, name, credit) VALUES (2, 0, 'customer2', 1000
 INSERT INTO customer (id, version, name, credit) VALUES (3, 0, 'customer3', 100000);
 INSERT INTO customer (id, version, name, credit) VALUES (4, 0, 'customer4', 100000);
 
-
 CREATE TABLE PLAYERS (
 	PLAYER_ID char(8) NOT NULL PRIMARY KEY,  
 	LAST_NAME varchar(35) not null,
@@ -48,7 +47,7 @@ CREATE TABLE PLAYERS (
 );
 
 CREATE TABLE GAMES (
-   PLAYER_ID char(8) not null PRIMARY KEY,
+   PLAYER_ID char(8) not null,
    YEAR      BIGINT not null,
    TEAM      char(3) not null,
    WEEK      BIGINT not null,
@@ -66,7 +65,7 @@ CREATE TABLE GAMES (
 );
 
 CREATE TABLE PLAYER_SUMMARY  (
-		  ID CHAR(8) NOT NULL PRIMARY KEY, 
+		  ID CHAR(8) NOT NULL, 
 		  YEAR BIGINT NOT NULL,
 		  COMPLETES BIGINT NOT NULL , 
 		  ATTEMPTS BIGINT NOT NULL , 

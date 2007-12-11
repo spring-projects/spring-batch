@@ -234,4 +234,12 @@ public class JobExecution extends Entity {
 	public String toString() {
 		return super.toString()+", job=["+job+"]";
 	}
+
+	/**
+	 * Test if this {@link JobExecution} indicates that it is running.
+	 * @return true if the end time is null
+	 */
+	public boolean isRunning() {
+		return endTime==null;
+	}
 }

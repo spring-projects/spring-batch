@@ -19,6 +19,7 @@ package org.springframework.batch.execution.launch;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 
 /**
  * Interface which defines a facade for running jobs. The interface is

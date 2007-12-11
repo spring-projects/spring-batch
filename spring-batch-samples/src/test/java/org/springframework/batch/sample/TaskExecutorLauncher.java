@@ -50,7 +50,9 @@ public class TaskExecutorLauncher {
 			};
 		}).start();
 
-		System.out.println("Started application.  Please connect using JMX.");
+		System.out
+				.println("Started application.  "
+						+ "Please connect using JMX (remember to use -Dcom.sun.management.jmxremote if you can't see anything in Jconsole).");
 		System.in.read();
 
 	}

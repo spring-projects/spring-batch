@@ -29,6 +29,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.BatchRestartException;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
@@ -36,18 +37,18 @@ import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.util.Assert;
 
 /**
- *
+ * 
  * <p>
  * Simple Job Repository that stores Jobs, JobExecutions, Steps, and
  * StepExecutions using the provided JobDao and StepDao.
  * <p>
- *
+ * 
  * @author Lucas Ward
  * @author Dave Syer
  * @see JobRepository
  * @see StepDao
  * @see JobDao
- *
+ * 
  */
 public class SimpleJobRepository implements JobRepository {
 
@@ -71,7 +72,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * either creating a new job or finding an existing one, which will ensure
 	 * that the id field of the job is populated with the correct value.
 	 * </p>
-	 *
+	 * 
 	 * <p>
 	 * There are two ways in which the method determines if a job should be
 	 * created or an existing one should be returned. The first is
@@ -82,20 +83,23 @@ public class SimpleJobRepository implements JobRepository {
 	 * (there must be at least 1) and it will be returned. If no job is found, a
 	 * new one will be created based on the configuration.
 	 * </p>
-	 *
+	 * @throws JobExecutionAlreadyRunningException 
+	 * 
 	 * @see JobRepository#findOrCreateJob(JobConfiguration, JobIdentifier)
-	 * @throws BatchRestartException if more than one JobInstance if found
-	 * 	or if JobInstance.getJobExecutionCount() is greater than JobConfiguration.getStartLimit()
+	 * @throws BatchRestartException
+	 *             if more than one JobInstance if found or if
+	 *             JobInstance.getJobExecutionCount() is greater than
+	 *             JobConfiguration.getStartLimit()
 	 */
-	public JobInstance findOrCreateJob(JobConfiguration jobConfiguration, JobIdentifier runtimeInformation) {
+	public JobExecution findOrCreateJob(JobConfiguration jobConfiguration,
+			JobIdentifier runtimeInformation) throws JobExecutionAlreadyRunningException {
 
 		List jobs;
 
 		// Check if a job is restartable, if not, create and return a new job
 		if (jobConfiguration.isRestartable() == false) {
 			return createJob(jobConfiguration, runtimeInformation);
-		}
-		else {
+		} else {
 			// find all jobs matching the runtime information.
 			jobs = jobDao.findJobs(runtimeInformation);
 		}
@@ -103,22 +107,46 @@ public class SimpleJobRepository implements JobRepository {
 		if (jobs.size() == 1) {
 			// One job was found
 			JobInstance job = (JobInstance) jobs.get(0);
-			job.setSteps(findSteps(jobConfiguration.getStepConfigurations(), job));
+			job.setSteps(findSteps(jobConfiguration.getStepConfigurations(),
+					job));
 			job.setJobExecutionCount(jobDao.getJobExecutionCount(job.getId()));
 			if (job.getJobExecutionCount() > jobConfiguration.getStartLimit()) {
-				throw new BatchRestartException("Restart Max exceeded for Job: " + job.toString());
+				throw new BatchRestartException(
+						"Restart Max exceeded for Job: " + job.toString());
 			}
-			return job;
-		}
-		else if (jobs.size() == 0) {
+			List executions = jobDao.findJobExecutions(job);
+			for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
+				JobExecution execution = (JobExecution) iterator.next();
+				if (execution.isRunning()) {
+					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "+job);
+				}
+			}
+			/*
+			 * Update the job, then if this method is transactional, and the
+			 * isolation level is SERIALIZABLE, another launcher trying to start
+			 * the same job in another thread or process will lose.
+			 */
+			jobDao.update(job);
+
+			return generateJobExecution(job);
+			
+		} else if (jobs.size() == 0) {
 			// no job found, create one
 			return createJob(jobConfiguration, runtimeInformation);
-		}
-		else {
+		} else {
 			// More than one job found, throw exception
-			throw new BatchRestartException("Error restarting job, more than one JobInstance found for: "
-					+ jobConfiguration.toString());
+			throw new BatchRestartException(
+					"Error restarting job, more than one JobInstance found for: "
+							+ jobConfiguration.toString());
 		}
+	}
+
+	private JobExecution generateJobExecution(JobInstance job) {
+		JobExecution execution = job.createNewJobExecution();
+		// Save the JobExecution so that it picks up an ID (useful for clients
+		// monitoring asynchronous executions):
+		saveOrUpdate(execution);
+		return execution;
 	}
 
 	/**
@@ -128,20 +156,22 @@ public class SimpleJobRepository implements JobRepository {
 	 * identifer, because it must be updatable separately. If an id isn't found,
 	 * a new JobExecution is created, if one is found, the current row is
 	 * updated.
-	 *
-	 * @param JobExecution to be stored.
-	 * @throws IllegalArgumentException if jobExecution is null.
+	 * 
+	 * @param JobExecution
+	 *            to be stored.
+	 * @throws IllegalArgumentException
+	 *             if jobExecution is null.
 	 */
 	public void saveOrUpdate(JobExecution jobExecution) {
 
 		Assert.notNull(jobExecution, "JobExecution cannot be null.");
-		Assert.notNull(jobExecution.getJobId(), "JobExecution must have a Job ID set.");
+		Assert.notNull(jobExecution.getJobId(),
+				"JobExecution must have a Job ID set.");
 
 		if (jobExecution.getId() == null) {
 			// existing instance
 			jobDao.save(jobExecution);
-		}
-		else {
+		} else {
 			// new execution
 			jobDao.update(jobExecution);
 		}
@@ -151,15 +181,20 @@ public class SimpleJobRepository implements JobRepository {
 	 * Update an existing job. A job must have been obtained from the
 	 * findOrCreateJob method, otherwise it is likely that the id is incorrect
 	 * or non-existant.
-	 *
-	 * @param job to be updated.
-	 * @throws IllegalArgumentException if Job or it's Id is null.
+	 * 
+	 * @param job
+	 *            to be updated.
+	 * @throws IllegalArgumentException
+	 *             if Job or it's Id is null.
 	 */
 	public void update(JobInstance job) {
 
 		Assert.notNull(job, "Job cannot be null.");
-		Assert.notNull(job.getId(), "Job cannot be updated if it's ID is null.  It must be obtained"
-				+ "from SimpleJobRepository.findOrCreateJob to be considered valid.");
+		Assert
+				.notNull(
+						job.getId(),
+						"Job cannot be updated if it's ID is null.  It must be obtained"
+								+ "from SimpleJobRepository.findOrCreateJob to be considered valid.");
 
 		jobDao.update(job);
 	}
@@ -169,20 +204,22 @@ public class SimpleJobRepository implements JobRepository {
 	 * saved and an id will be set, otherwise it will be updated. It should be
 	 * noted that assigning an ID randomly will likely cause an exception
 	 * depending on the StepDao implementation.
-	 *
-	 * @param StepExecution to be saved.
-	 * @throws IllegalArgumentException if stepExecution is null.
+	 * 
+	 * @param StepExecution
+	 *            to be saved.
+	 * @throws IllegalArgumentException
+	 *             if stepExecution is null.
 	 */
 	public void saveOrUpdate(StepExecution stepExecution) {
 
 		Assert.notNull(stepExecution, "StepExecution cannot be null.");
-		Assert.notNull(stepExecution.getStepId(), "StepExecution's Step Id cannot be null.");
+		Assert.notNull(stepExecution.getStepId(),
+				"StepExecution's Step Id cannot be null.");
 
 		if (stepExecution.getId() == null) {
 			// new execution, obtain id and insert
 			stepDao.save(stepExecution);
-		}
-		else {
+		} else {
 			// existing execution, update
 			stepDao.update(stepExecution);
 		}
@@ -190,15 +227,20 @@ public class SimpleJobRepository implements JobRepository {
 
 	/**
 	 * Update the given step.
-	 *
-	 * @param StepInstance to be updated.
-	 * @throws IllegalArgumentException if step or it's id is null.
+	 * 
+	 * @param StepInstance
+	 *            to be updated.
+	 * @throws IllegalArgumentException
+	 *             if step or it's id is null.
 	 */
 	public void update(StepInstance step) {
 
 		Assert.notNull(step, "Step cannot be null.");
-		Assert.notNull(step.getId(), "Step cannot be updated if it's ID is null.  It must be obtained"
-				+ "from SimpleJobRepository.findOrCreateJob to be considered valid.");
+		Assert
+				.notNull(
+						step.getId(),
+						"Step cannot be updated if it's ID is null.  It must be obtained"
+								+ "from SimpleJobRepository.findOrCreateJob to be considered valid.");
 
 		stepDao.update(step);
 
@@ -209,11 +251,15 @@ public class SimpleJobRepository implements JobRepository {
 	 * calling {@link JobDao#createJob(JobRuntimeInformation)} and then it's
 	 * list of StepConfigurations is passed to the createSteps method.
 	 */
-	private JobInstance createJob(JobConfiguration jobConfiguration, JobIdentifier runtimeInformation) {
+	private JobExecution createJob(JobConfiguration jobConfiguration,
+			JobIdentifier runtimeInformation) {
 
 		JobInstance job = jobDao.createJob(runtimeInformation);
-		job.setSteps(createSteps(job, jobConfiguration.getStepConfigurations()));
-		return job;
+		job
+				.setSteps(createSteps(job, jobConfiguration
+						.getStepConfigurations()));
+		JobExecution execution = generateJobExecution(job);
+		return execution;
 	}
 
 	/*
@@ -225,9 +271,11 @@ public class SimpleJobRepository implements JobRepository {
 		Iterator i = stepConfigurations.iterator();
 		while (i.hasNext()) {
 			StepConfiguration stepConfiguration = (StepConfiguration) i.next();
-			StepInstance step = stepDao.createStep(job, stepConfiguration.getName());
-			//Ensure valid restart data is being returned.
-			if(step.getRestartData() == null || step.getRestartData().getProperties() == null){
+			StepInstance step = stepDao.createStep(job, stepConfiguration
+					.getName());
+			// Ensure valid restart data is being returned.
+			if (step.getRestartData() == null
+					|| step.getRestartData().getProperties() == null) {
 				step.setRestartData(new GenericRestartData(new Properties()));
 			}
 			steps.add(step);
@@ -245,13 +293,18 @@ public class SimpleJobRepository implements JobRepository {
 		while (i.hasNext()) {
 
 			StepConfiguration stepConfiguration = (StepConfiguration) i.next();
-			StepInstance step = stepDao.findStep(job, stepConfiguration.getName());
+			StepInstance step = stepDao.findStep(job, stepConfiguration
+					.getName());
 			if (step != null) {
 
-				step.setStepExecutionCount(stepDao.getStepExecutionCount(step.getId()));
-				//Ensure valid restart data is being returned.
-				if(step.getRestartData() == null || step.getRestartData().getProperties() == null){
-					step.setRestartData(new GenericRestartData(new Properties()));
+				step.setStepExecutionCount(stepDao.getStepExecutionCount(step
+						.getId()));
+				// Ensure valid restart data is being returned.
+				if (step.getRestartData() == null
+						|| step.getRestartData().getProperties() == null) {
+					step
+							.setRestartData(new GenericRestartData(
+									new Properties()));
 				}
 				steps.add(step);
 			}

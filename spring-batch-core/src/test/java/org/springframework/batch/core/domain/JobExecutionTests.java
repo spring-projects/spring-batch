@@ -49,6 +49,15 @@ public class JobExecutionTests extends TestCase {
 	}
 
 	/**
+	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getEndTime()}.
+	 */
+	public void testIsRunning() {
+		assertTrue(execution.isRunning());
+		execution.setEndTime(new Timestamp(100L));
+		assertFalse(execution.isRunning());
+	}
+
+	/**
 	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getStartTime()}.
 	 */
 	public void testGetStartTime() {

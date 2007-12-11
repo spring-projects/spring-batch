@@ -33,6 +33,7 @@ import org.springframework.batch.core.configuration.NoSuchJobConfigurationExcept
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.executor.JobExecutor;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.JobIdentifierFactory;
 import org.springframework.batch.execution.job.DefaultJobExecutor;

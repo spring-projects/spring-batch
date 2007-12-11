@@ -128,9 +128,8 @@ public class DefaultJobExecutorTests extends TestCase {
 
 		jobIdentifer = new SimpleJobIdentifier("TestJob");
 
-		job = jobRepository.findOrCreateJob(jobConfiguration, jobIdentifer);
-
-		jobExecution = new JobExecution(job);
+		jobExecution = jobRepository.findOrCreateJob(jobConfiguration, jobIdentifer);
+		job = jobExecution.getJob();
 
 		List steps = job.getSteps();
 		step1 = (StepInstance) steps.get(0);

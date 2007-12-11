@@ -29,8 +29,8 @@ import org.springframework.batch.core.configuration.JobConfigurationLocator;
 import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
-import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.executor.JobExecutor;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.job.DefaultJobExecutor;
 import org.springframework.batch.repeat.RepeatContext;
@@ -164,15 +164,9 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 		JobConfiguration jobConfiguration = jobConfigurationLocator
 				.getJobConfiguration(jobIdentifier.getName());
 
-		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration,
+		return jobRepository.findOrCreateJob(jobConfiguration,
 				jobIdentifier);
-		JobExecution execution = job.createNewJobExecution();
 		
-		// Save the JobExecution so that it picks up an ID (useful for clients
-		// monitoring asynchronous executions):
-		jobRepository.saveOrUpdate(execution);
-		
-		return execution;
 	}
 
 	/**

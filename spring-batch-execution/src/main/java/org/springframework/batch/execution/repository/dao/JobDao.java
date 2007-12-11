@@ -26,14 +26,15 @@ import org.springframework.batch.core.domain.JobInstance;
  * Data Access Object for jobs.
  * 
  * @author Lucas Ward
- *
+ * 
  */
 public interface JobDao {
 
 	/**
 	 * Create a job using the provided JobIdentifier as the natural key.
 	 * 
-	 * PostConditions: A valid job will be returned which contains an unique Id.
+	 * PostConditions: A valid job will be returned which has been persisted and
+	 * contains an unique Id.
 	 * 
 	 * @param jobIdentifier
 	 * @return Job
@@ -45,7 +46,8 @@ public interface JobDao {
 	 * Identifier are found, then a list of size 0 will be returned.
 	 * 
 	 * @param jobIdentifier
-	 * @return List of {@link JobInstance} objects matching {@link JobIdentifier}
+	 * @return List of {@link JobInstance} objects matching
+	 *         {@link JobIdentifier}
 	 */
 	public List findJobs(JobIdentifier jobIdentifier);
 
@@ -85,7 +87,7 @@ public interface JobDao {
 	 * @param job
 	 */
 	public int getJobExecutionCount(Long jobId);
-	
+
 	/**
 	 * Return list of JobExecutions for given job.
 	 * 

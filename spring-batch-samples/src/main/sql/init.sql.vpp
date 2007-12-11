@@ -34,7 +34,7 @@ CREATE TABLE PLAYERS (
 );
 
 CREATE TABLE GAMES (
-   PLAYER_ID char(8) not null PRIMARY KEY,
+   PLAYER_ID char(8) not null,
    YEAR      ${BIGINT} not null,
    TEAM      char(3) not null,
    WEEK      ${BIGINT} not null,
@@ -52,7 +52,7 @@ CREATE TABLE GAMES (
 );
 
 CREATE TABLE PLAYER_SUMMARY  (
-		  ID CHAR(8) NOT NULL PRIMARY KEY, 
+		  ID CHAR(8) NOT NULL, 
 		  YEAR ${BIGINT} NOT NULL,
 		  COMPLETES ${BIGINT} NOT NULL , 
 		  ATTEMPTS ${BIGINT} NOT NULL , 

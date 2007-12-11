@@ -32,7 +32,7 @@ public class JobRepositorySupport implements JobRepository {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.container.common.repository.JobRepository#findOrCreateJob(org.springframework.batch.container.common.domain.JobConfiguration)
 	 */
-	public JobInstance findOrCreateJob(JobConfiguration jobConfiguration, JobIdentifier runtimeInformation) {
+	public JobExecution findOrCreateJob(JobConfiguration jobConfiguration, JobIdentifier runtimeInformation) {
 		return null;
 	}
 

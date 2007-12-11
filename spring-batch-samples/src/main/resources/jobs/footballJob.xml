@@ -114,13 +114,9 @@
 	</bean>
 
 	<bean id="playerFileInputSource"
-		class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource">
-		<property name="resource">
-			<bean
-				class="org.springframework.core.io.ClassPathResource">
-				<constructor-arg value="data/footballjob/input/player.csv" />
-			</bean>
-		</property>
+		class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource" scope="step">
+		<aop:scoped-proxy/>		
+		<property name="resource" value="classpath:data/footballjob/input/player.csv" />
 		<property name="tokenizer">
 			<bean
 				class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer">
@@ -135,13 +131,9 @@
 	</bean>
 
 	<bean id="gameFileInputSource"
-		class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource">
-		<property name="resource">
-			<bean
-				class="org.springframework.core.io.ClassPathResource">
-				<constructor-arg value="data/footballjob/input/games.csv" />
-			</bean>
-		</property>
+		class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource" scope="step">
+		<aop:scoped-proxy/>
+		<property name="resource" value="classpath:data/footballjob/input/games.csv"/>
 		<property name="tokenizer">
 			<bean
 				class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer">
@@ -156,7 +148,8 @@
 	</bean>
 
 	<bean id="playerSummarizationSource"
-		class="org.springframework.batch.io.cursor.JdbcCursorInputSource">
+		class="org.springframework.batch.io.cursor.JdbcCursorInputSource" scope="step">
+		<aop:scoped-proxy/>
 		<property name="dataSource" ref="dataSource" />
 		<property name="mapper">
 			<bean
