@@ -17,10 +17,10 @@
 	</parent>
 
 	<modules>
-		<module>../infrastructure</module>
-		<module>../core</module>
-		<module>../execution</module>
-		<module>../samples</module>
+		<module>../spring-batch-infrastructure</module>
+		<module>../spring-batch-core</module>
+		<module>../spring-batch-execution</module>
+		<module>../spring-batch-samples</module>
 	</modules>
 
 	<build>
