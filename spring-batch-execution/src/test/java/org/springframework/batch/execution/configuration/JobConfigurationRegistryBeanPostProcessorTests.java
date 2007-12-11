@@ -37,8 +37,7 @@ public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
 		try {
 			processor.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			// expected
 			assertTrue(e.getMessage().indexOf("JobConfigurationRegistry") >= 0);
 		}
@@ -46,12 +45,14 @@ public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
 
 	public void testBeforeInitialization() throws Exception {
 		// should be a no-op
-		assertEquals("foo", processor.postProcessAfterInitialization("foo", "bar"));
+		assertEquals("foo", processor.postProcessAfterInitialization("foo",
+				"bar"));
 	}
 
 	public void testAfterInitializationWithWrongType() throws Exception {
 		// should be a no-op
-		assertEquals("foo", processor.postProcessAfterInitialization("foo", "bar"));
+		assertEquals("foo", processor.postProcessAfterInitialization("foo",
+				"bar"));
 	}
 
 	public void testAfterInitializationWithCorrectType() throws Exception {
@@ -59,7 +60,8 @@ public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
 		processor.setJobConfigurationRegistry(registry);
 		JobConfiguration configuration = new JobConfiguration();
 		configuration.setBeanName("foo");
-		assertEquals(configuration, processor.postProcessAfterInitialization(configuration, "bar"));
+		assertEquals(configuration, processor.postProcessAfterInitialization(
+				configuration, "bar"));
 		assertEquals(configuration, registry.getJobConfiguration("foo"));
 	}
 
@@ -83,7 +85,8 @@ public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
 		processor.setJobConfigurationRegistry(registry);
 		JobConfiguration configuration = new JobConfiguration();
 		configuration.setBeanName("foo");
-		assertEquals(configuration, processor.postProcessAfterInitialization(configuration, "bar"));
+		assertEquals(configuration, processor.postProcessAfterInitialization(
+				configuration, "bar"));
 		processor.destroy();
 		try {
 			assertEquals(null, registry.getJobConfiguration("foo"));
@@ -92,16 +95,37 @@ public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
 			// expected
 		}
 	}
-	
+
 	public void testExecutionWithApplicationContext() throws Exception {
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml", getClass());
-		MapJobConfigurationRegistry registry = (MapJobConfigurationRegistry) context.getBean("registry");
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
+				"test-context.xml", getClass());
+		MapJobConfigurationRegistry registry = (MapJobConfigurationRegistry) context
+				.getBean("registry");
 		Collection configurations = registry.getJobConfigurations();
-		assertEquals(6, configurations.size());
+		// System.err.println(configurations);
+		String[] names = context.getBeanNamesForType(JobConfiguration.class);
+		int count = names.length;
+		// Each concrete bean of type JobConfiguration is registered...
+		assertEquals(count, configurations.size());
+		// N.B. there is a failure / wonky mode where a parent bean is given an
+		// explicit name or beanName (using property setter): in this case then
+		// child beans will have the same name and will be re-registered (and
+		// override, if the registry supports that).
 		assertNotNull(registry.getJobConfiguration("test-job"));
-		assertEquals(context.getBean("test-job-with-name"), registry.getJobConfiguration("foo"));
-		assertEquals(context.getBean("test-job-with-bean-name"), registry.getJobConfiguration("bar"));
-		assertEquals(context.getBean("test-job-with-parent-and-name"), registry.getJobConfiguration("spam"));
-		assertEquals(context.getBean("test-job-with-parent-and-bean-name"), registry.getJobConfiguration("bucket"));
+		assertEquals(context.getBean("test-job-with-name"), registry
+				.getJobConfiguration("foo"));
+		assertEquals(context.getBean("test-job-with-bean-name"), registry
+				.getJobConfiguration("bar"));
+		assertEquals(context.getBean("test-job-with-parent-and-name"), registry
+				.getJobConfiguration("spam"));
+		assertEquals(context.getBean("test-job-with-parent-and-bean-name"),
+				registry.getJobConfiguration("bucket"));
+		assertEquals(context.getBean("test-job-with-concrete-parent"), registry
+				.getJobConfiguration("maps"));
+		assertEquals(context.getBean("test-job-with-concrete-parent-and-name"),
+				registry.getJobConfiguration("oof"));
+		assertEquals(context
+				.getBean("test-job-with-concrete-parent-and-bean-name"),
+				registry.getJobConfiguration("rab"));
 	}
 }

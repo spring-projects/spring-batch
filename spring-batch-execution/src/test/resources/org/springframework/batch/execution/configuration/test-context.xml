@@ -50,4 +50,12 @@
 
 	<bean id="test-job-with-parent-and-bean-name" parent="abstract-job" p:beanName="bucket"/>
 
+	<bean id="parent-job" class="org.springframework.batch.core.configuration.JobConfiguration"/>
+	
+	<bean id="test-job-with-concrete-parent" parent="parent-job" p:name="maps"/>
+
+	<bean id="test-job-with-concrete-parent-and-name" parent="parent-job" p:name="oof"/>
+
+	<bean id="test-job-with-concrete-parent-and-bean-name" parent="parent-job" p:beanName="rab"/>
+
 </beans>
