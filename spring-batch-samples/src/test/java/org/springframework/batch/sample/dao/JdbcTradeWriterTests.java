@@ -33,7 +33,7 @@ public class JdbcTradeWriterTests extends AbstractTransactionalDataSourceSpringC
 		
 		writer.write(trade);
 		
-		jdbcTemplate.query("SELECT * FROM TRADE WHERE ISIN = 5647238492", new RowCallbackHandler() {
+		jdbcTemplate.query("SELECT * FROM TRADE WHERE ISIN = '5647238492'", new RowCallbackHandler() {
 			public void processRow(ResultSet rs) throws SQLException {
 				assertEquals("testCustomer", rs.getString("CUSTOMER"));
 				assertEquals(new BigDecimal(Double.toString(99.69)), rs.getBigDecimal("PRICE"));
