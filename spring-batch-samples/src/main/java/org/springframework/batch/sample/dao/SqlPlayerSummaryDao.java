@@ -7,7 +7,7 @@ import org.springframework.util.Assert;
 
 public class SqlPlayerSummaryDao extends JdbcDaoSupport implements ItemWriter {
 
-	private static final String INSERT_SUMMARY = "INSERT into PLAYER_SUMMARY(ID,YEAR,COMPLETES,ATTEMPTS," +
+	private static final String INSERT_SUMMARY = "INSERT into PLAYER_SUMMARY(ID,YEAR_NO,COMPLETES,ATTEMPTS," +
 			"PASSING_YARDS,PASSING_TD,INTERCEPTIONS,RUSHES,RUSH_YARDS,RECEPTIONS,RECEPTIONS_YARDS," +
 			"TOTAL_TD) values(?,?,?,?,?,?,?,?,?,?,?,?)";
 	
