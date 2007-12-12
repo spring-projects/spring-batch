@@ -124,7 +124,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 		Long jobId = new Long(jobIncrementer.nextLongValue());
 		Object[] parameters = new Object[] { jobId, defaultJobId.getName(),
 				defaultJobId.getJobKey(), defaultJobId.getScheduleDate() };
-		jdbcTemplate.update(getCreateJobQuery(), parameters);
+		jdbcTemplate.update(getCreateJobQuery(), parameters, new int[] {
+			 Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.DATE});
 
 		JobInstance job = new JobInstance(jobIdentifier, jobId);
 		return job;
@@ -367,7 +368,8 @@ public class SqlJobDao implements JobDao, InitializingBean {
 
 		Object[] parameters = new Object[] { job.getStatus().toString(),
 				job.getId() };
-		jdbcTemplate.update(getUpdateJobQuery(), parameters);
+		jdbcTemplate.update(getUpdateJobQuery(), parameters, new int[] {
+			 Types.VARCHAR, Types.INTEGER});
 	}
 
 	/*
