@@ -16,8 +16,8 @@
 
 package org.springframework.batch.execution.repository;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -170,13 +170,17 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.setReturnValue(1);
 		jobDao.findJobExecutions(databaseJob);
 		final List executions = new ArrayList();
+		JobExecution execution =databaseJob.createNewJobExecution();
+		executions.add(execution);
+		// For this test it is important that the execution is finished
+		// and the executions in the list contain one with an end date
+		execution.setEndTime(new Timestamp(System.currentTimeMillis()));
 		jobDaoControl.setReturnValue(executions);
 		jobDao.update(databaseJob);
 		jobDao.save(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher(){
 			public boolean matches(Object[] expected, Object[] actual) {
 				JobExecution execution = (JobExecution) actual[0];
-				executions.add(execution);
 				return execution.getJob().equals(databaseJob);
 			}
 			public String toString(Object[] arguments) {
