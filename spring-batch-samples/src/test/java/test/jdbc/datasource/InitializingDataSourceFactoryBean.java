@@ -26,6 +26,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -112,7 +113,15 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 				for (int i = 0; i < scripts.length; i++) {
 					String script = scripts[i].trim();
 					if (StringUtils.hasText(script)) {
-						jdbcTemplate.execute(script);
+						try {
+							jdbcTemplate.execute(script);
+						} catch (DataAccessException e) {
+							if (script.toLowerCase().startsWith("drop")) {
+								logger.debug("DROP script failed (ignoring): "+script);
+							} else {
+								throw e;
+							}
+						}
 					}
 				}
 				return null;
