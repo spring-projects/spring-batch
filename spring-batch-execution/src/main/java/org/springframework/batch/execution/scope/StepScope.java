@@ -30,10 +30,11 @@ import org.springframework.core.Ordered;
  * @author Dave Syer
  * 
  */
-public class StepScope implements Scope,
-		BeanFactoryPostProcessor, Ordered {
+public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
+
+	private Object mutex = new Object();
 
 	public void setOrder(int order) {
 		this.order = order;
@@ -59,12 +60,16 @@ public class StepScope implements Scope,
 		SimpleStepContext context = getContext();
 		Object scopedObject = context.getAttribute(name);
 		if (scopedObject == null) {
-			scopedObject = objectFactory.getObject();
-			context.setAttribute(name, scopedObject);
-			if (scopedObject instanceof StepContextAware) {
-				((StepContextAware) scopedObject).setStepContext(context);
+			synchronized (mutex) {
+				scopedObject = context.getAttribute(name);
+				if (scopedObject == null) {
+					scopedObject = objectFactory.getObject();
+					context.setAttribute(name, scopedObject);
+					if (scopedObject instanceof StepContextAware) {
+						((StepContextAware) scopedObject).setStepContext(context);
+					}
+				}
 			}
-
 		}
 		return scopedObject;
 	}
@@ -132,7 +137,7 @@ public class StepScope implements Scope,
 
 	/**
 	 * Public setter for the name property. This can then be used as a bean
-	 * definition attribute, e.g. scope="step".  Defaults to "step".
+	 * definition attribute, e.g. scope="step". Defaults to "step".
 	 * 
 	 * @param name
 	 *            the name to set for this scope.

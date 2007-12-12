@@ -21,13 +21,13 @@ package org.springframework.batch.execution.scope;
  */
 public class StepSynchronizationManager {
 
-	private static final ThreadLocal contextHolder = new ThreadLocal();
+	private static final ThreadLocal contextHolder = new InheritableThreadLocal();
 
 	/**
 	 * Getter for the current context..
 	 * 
-	 * @return the current {@link SimpleStepContext} or null if there is none (if
-	 * we are not in a step).
+	 * @return the current {@link SimpleStepContext} or null if there is none
+	 *         (if we are not in a step).
 	 */
 	public static SimpleStepContext getContext() {
 		return (SimpleStepContext) contextHolder.get();
@@ -56,7 +56,7 @@ public class StepSynchronizationManager {
 	 */
 	public static StepContext close() {
 		SimpleStepContext oldSession = getContext();
-		if (oldSession==null) {
+		if (oldSession == null) {
 			return null;
 		}
 		oldSession.close();

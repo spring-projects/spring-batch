@@ -36,4 +36,11 @@
 		<property name="name" value="bar" />
 	</bean>
 
+	<bean id="proxy"
+		class="org.springframework.batch.execution.scope.StepContextAwareStepScopeTests$TestBeanAware"
+		scope="step">
+		<aop:scoped-proxy/>
+		<property name="name" value="spam" />
+	</bean>
+
 </beans>
