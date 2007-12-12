@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.util.ClassUtils;
 
 /**
  * Batch domain object representing a job configuration. JobConfiguration is an
@@ -114,5 +115,9 @@ public class JobConfiguration implements BeanNameAware {
 
 	public boolean isRestartable() {
 		return restartable;
+	}
+	
+	public String toString() {
+		return ClassUtils.getShortName(JobConfiguration.class) + ": [name="+name+"]";
 	}
 }

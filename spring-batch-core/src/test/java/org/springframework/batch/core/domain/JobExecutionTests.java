@@ -155,5 +155,6 @@ public class JobExecutionTests extends TestCase {
 	public void testToStringWithNullJob() throws Exception {
 		context = new JobExecution();
 		assertTrue("JobExecution string does not contain id", context.toString().indexOf("id=")>=0);
+		assertTrue("JobExecution string does not contain job: "+context, context.toString().indexOf("job=")>=0);
 	}
 }

@@ -191,10 +191,14 @@ public class StepExecution extends Entity {
 	}
 		
 	public String toString() {
-		return super.toString() + ", taskCount=" + taskCount + ", commitCount=" + commitCount + ", rollbackCount="
+		return super.toString() + ", name=" + getName() + ", taskCount=" + taskCount + ", commitCount=" + commitCount + ", rollbackCount="
 				+ rollbackCount;
 	}
 
+
+	private String getName() {
+		return step==null ? null : step.getName();
+	}
 
 	/**
 	 * @param exitStatus
