@@ -90,7 +90,7 @@ public class MapJobConfigurationRegistry implements ListableJobConfigurationRegi
 	 */
 	public Collection getJobConfigurations() {
 		synchronized (map) {
-			return Collections.unmodifiableCollection(new HashSet(map.keySet()));
+			return Collections.unmodifiableCollection(new HashSet(map.values()));
 		}
 	}
 

@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.execution.configuration;
 
+import java.util.Collection;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.configuration.DuplicateJobConfigurationException;
@@ -82,9 +84,12 @@ public class MapJobConfigurationRegistryTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testGetJobConfigurations() throws Exception {
-		registry.register(new JobConfiguration("foo"));
+		JobConfiguration configuration = new JobConfiguration("foo");
+		registry.register(configuration);
 		registry.register(new JobConfiguration("bar"));
-		assertEquals(2, registry.getJobConfigurations().size());
+		Collection configurations = registry.getJobConfigurations();
+		assertEquals(2, configurations.size());
+		assertTrue(configurations.contains(configuration));
 	}
 
 }
