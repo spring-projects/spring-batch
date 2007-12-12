@@ -7,8 +7,8 @@
 		<property name="dataSource" ref="dataSource"/>
 		<property name="initScripts">
 			<list>
-				<value>schema-hsqldb.sql</value>
-				<value>business-schema-hsqldb.sql</value>
+				<value>${batch.schema.script}</value>
+				<value>${batch.business.schema.script}</value>
 			</list>
 		</property>
 	</bean>
