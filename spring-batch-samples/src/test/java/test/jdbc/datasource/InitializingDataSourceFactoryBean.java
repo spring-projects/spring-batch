@@ -41,7 +41,9 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 
 	private Resource destroyScript;
 
-	DataSource dataSource;
+	private DataSource dataSource;
+	
+	private boolean ignoreFailedDrop = true;
 
 	private static boolean initialized = false;
 
@@ -116,7 +118,7 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 						try {
 							jdbcTemplate.execute(script);
 						} catch (DataAccessException e) {
-							if (script.toLowerCase().startsWith("drop")) {
+							if (ignoreFailedDrop && script.toLowerCase().startsWith("drop")) {
 								logger.debug("DROP script failed (ignoring): "+script);
 							} else {
 								throw e;
@@ -160,6 +162,10 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
+	}
+	
+	public void setIgnoreFailedDrop(boolean ignoreFailedDrop) {
+		this.ignoreFailedDrop = ignoreFailedDrop;
 	}
 
 }
