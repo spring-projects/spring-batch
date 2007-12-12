@@ -77,7 +77,7 @@ public class SqlGameDaoIntegrationTests extends
 			
 			Game game = new Game();
 			game.setId(rs.getString("PLAYER_ID"));
-			game.setYear(rs.getInt("year"));
+			game.setYear(rs.getInt("year_no"));
 			game.setTeam(rs.getString("team"));
 			game.setWeek(rs.getInt("week"));
 			game.setOpponent(rs.getString("opponent"));
