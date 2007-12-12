@@ -39,7 +39,11 @@ public class IbatisDrivingQueryInputSource extends DrivingQueryInputSource {
 	 * @see org.springframework.batch.io.driving.DrivingQueryInputSource#read()
 	 */
 	public Object read() {
-		return sqlMapClientTemplate.queryForObject(detailsQueryId, super.read());
+		Object key = super.read();
+		if (key==null) {
+			return null;
+		}
+		return sqlMapClientTemplate.queryForObject(detailsQueryId, key);
 	}
 
 	/**
