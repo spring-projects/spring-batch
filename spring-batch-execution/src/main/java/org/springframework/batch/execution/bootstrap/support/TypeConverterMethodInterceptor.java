@@ -16,6 +16,8 @@
 
 package org.springframework.batch.execution.bootstrap.support;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -36,6 +38,21 @@ public class TypeConverterMethodInterceptor implements MethodInterceptor {
 
 	// Get the default PropertyEditorRegistry free.
 	private TypeConverter typeConverter = new SimpleTypeConverter();
+
+	private boolean convertException = false;
+
+	/**
+	 * Set a flag that will cause exceptions during method invocation to be
+	 * caught and treated as a result. This can be useful if used over JConsole,
+	 * where exception reporting is a little weak (and in addition the class of
+	 * the exception might not be available remotely).
+	 * 
+	 * @param convertException
+	 *            the flag to set (default false)
+	 */
+	public void setConvertException(boolean convertException) {
+		this.convertException = convertException;
+	}
 
 	/**
 	 * Public setter for the {@link TypeConverter} property. Defaults to a
@@ -76,8 +93,18 @@ public class TypeConverterMethodInterceptor implements MethodInterceptor {
 		}
 
 		// Invoke the target method
-		Object result = ReflectionUtils.invokeMethod(method, invocation
-				.getThis(), invocation.getArguments());
+		Object result = null;
+
+		try {
+			result = ReflectionUtils.invokeMethod(method, invocation.getThis(),
+					invocation.getArguments());
+		} catch (Throwable e) {
+			if (convertException) {
+				result = e;
+			} else {
+				throw e;
+			}
+		}
 		if (result == null) {
 			return null;
 		}
@@ -91,7 +118,15 @@ public class TypeConverterMethodInterceptor implements MethodInterceptor {
 	}
 
 	private Object convert(Object result, Class returnType) {
+		// Provide some simple conversion algorithms natively for String results
 		if (returnType.isAssignableFrom(String.class)) {
+			if (result instanceof Throwable) {
+				Throwable e = (Throwable) result;
+				e.fillInStackTrace();
+				StringWriter writer = new StringWriter();
+				e.printStackTrace(new PrintWriter(writer));
+				result = writer.toString();
+			}
 			return result.toString();
 		}
 		return typeConverter.convertIfNecessary(result, returnType);
