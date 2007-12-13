@@ -51,7 +51,7 @@
 				</bean>
 				<bean id="gameLoad"
 					class="org.springframework.batch.execution.step.SimpleStepConfiguration">
-					<property name="commitInterval" value="100" />
+					<property name="commitInterval" value="1000" />
 					<property name="startLimit" value="100" />
 					<property name="saveRestartData" value="true" />
 					<property name="tasklet">
@@ -157,12 +157,12 @@
 		</property>
 		<property name="sql">
 			<value>
-				SELECT games.player_id, games.year, SUM(COMPLETES),
+				SELECT games.player_id, games.year_no, SUM(COMPLETES),
 				SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
 				SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),
 				SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)
 				from games, players where players.player_id =
-				games.player_id group by games.player_id, games.year
+				games.player_id group by games.player_id, games.year_no
 			</value>
 		</property>
 	</bean>
