@@ -158,6 +158,12 @@
 			<version>2.3.0</version>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<version>10.2.1.6</version>
+			<scope>test</scope>
+		</dependency>
 <!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
