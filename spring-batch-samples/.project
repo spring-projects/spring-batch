@@ -2,9 +2,9 @@
   <name>spring-batch-samples</name>
   <comment>Example batch jobs using Spring Batch Core and Execution.</comment>
   <projects>
-    <project>spring-batch-execution</project>
-    <project>spring-batch-core</project>
     <project>spring-batch-infrastructure</project>
+    <project>spring-batch-core</project>
+    <project>spring-batch-execution</project>
   </projects>
   <buildSpec>
     <buildCommand>
