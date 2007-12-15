@@ -14,6 +14,7 @@
 		<config>src/test/resources/org/springframework/batch/execution/bootstrap/support/test-batch-environment-no-launcher.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/configuration/test-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/scope/scope-tests.xml</config>
+		<config>src/test/resources/beanRefContext.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

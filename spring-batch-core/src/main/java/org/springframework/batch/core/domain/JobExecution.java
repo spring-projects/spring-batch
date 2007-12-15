@@ -232,7 +232,7 @@ public class JobExecution extends Entity {
 	 * @see org.springframework.batch.core.domain.Entity#toString()
 	 */
 	public String toString() {
-		return super.toString()+", job=["+job+"]";
+		return super.toString()+", startTime="+startTime+", endTime="+endTime+", job=["+job+"]";
 	}
 
 	/**

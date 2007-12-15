@@ -38,7 +38,7 @@
 			advice-ref="txAdvice" />
 	</aop:config>
 
-	<tx:advice id="txAdvice" transaction-manager="${batch.transaction.manager}">
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
 			<tx:method name="*" />
 		</tx:attributes>
@@ -58,17 +58,17 @@
 	<bean id="stepExecutor"
 		class="org.springframework.batch.execution.step.simple.DefaultStepExecutor"
 		scope="prototype">
-		<property name="transactionManager" ref="${batch.transaction.manager}" />
+		<property name="transactionManager" ref="transactionManager" />
 		<property name="repository" ref="simpleJobRepository" />
 	</bean>
 
 	<bean id="simpleJobRepository"
 		class="org.springframework.batch.execution.repository.SimpleJobRepository">
-		<constructor-arg ref="${batch.jobdao}" />
-		<constructor-arg ref="${batch.stepdao}" />
+		<constructor-arg ref="jobDao" />
+		<constructor-arg ref="stepDao" />
 	</bean>
 
-	<bean id="sqlJobDao" lazy-init="true"
+	<bean id="jobDao" lazy-init="true"
 		class="org.springframework.batch.execution.repository.dao.SqlJobDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="jobIncrementer" ref="jobIncrementer" />
@@ -76,13 +76,13 @@
 			ref="jobExecutionIncrementer" />
 	</bean>
 
-	<bean id="sqlStepDao" lazy-init="true"
+	<bean id="stepDao" lazy-init="true"
 		class="org.springframework.batch.execution.repository.dao.SqlStepDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="stepIncrementer" ref="stepIncrementer" />
 		<property name="stepExecutionIncrementer"
 			ref="stepExecutionIncrementer" />
-		<property name="jobDao" ref="sqlJobDao" />
+		<property name="jobDao" ref="jobDao" />
 	</bean>
 
 	<bean id="mapJobDao" lazy-init="true"

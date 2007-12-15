@@ -14,9 +14,8 @@
 		<property name="username" value="${batch.jdbc.user}" />
 		<property name="password" value="${batch.jdbc.password}" />
 	</bean>
-	<!-- bean id="dataSource" class="test.jdbc.datasource.DerbyDataSourceFactoryBean"/-->
 
-	<bean id="sqlTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
@@ -29,11 +28,13 @@
 			<bean class="java.lang.System" factory-method="getProperties"/>
 		</property>
 		<property name="ignoreInvalidKeys" value="true" />
+		<property name="order" value="1"/>
 	</bean>
 
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="location" value="classpath:batch.properties" />
 		<property name="ignoreUnresolvablePlaceholders" value="false" />
+		<property name="order" value="2"/>
 	</bean>
 
 	<bean id="incrementerParent" class="${batch.database.incrementer.class}" abstract="true">

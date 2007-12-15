@@ -34,6 +34,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
 import org.springframework.batch.restart.GenericRestartData;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.Assert;
 
 /**
@@ -64,49 +65,96 @@ public class SimpleJobRepository implements JobRepository {
 
 	/**
 	 * <p>
-	 * Find or Create a JobInstance(@link JobInstance) based on the passed in
-	 * RuntimeInformation and Configuration. JobRuntimeInformation contains the
-	 * following fields which logically identify a job: JobName, JobStream,
-	 * JobRun, and Schedule Date. However, unique identification of a job can
-	 * only come from the database, and therefore must come from JobDao by
-	 * either creating a new job or finding an existing one, which will ensure
-	 * that the id field of the job is populated with the correct value.
+	 * Find or Create a (@link {@link JobExecution}) based on the passed in
+	 * {@link JobIdentifier} and {@link JobConfiguration}. However, unique
+	 * identification of a job can only come from the database, and therefore
+	 * must come from JobDao by either creating a new job or finding an existing
+	 * one, which will ensure that the id of the job is populated with the
+	 * correct value.
 	 * </p>
 	 * 
 	 * <p>
 	 * There are two ways in which the method determines if a job should be
 	 * created or an existing one should be returned. The first is
-	 * restartability. The Job's restartPolicy will be checked first. If it is
-	 * not restartable, a new job will be created, regardless of whether or not
-	 * one exists. If it is restartable, the JobDao will be checked to determine
-	 * if the job already exists, if it does, it's steps will be populated
-	 * (there must be at least 1) and it will be returned. If no job is found, a
-	 * new one will be created based on the configuration.
+	 * restartability. The {@link JobConfiguration} restartable property will be
+	 * checked first. If it is not false, a new job will be created, regardless
+	 * of whether or not one exists. If it is true, the {@link JobDao} will be
+	 * checked to determine if the job already exists, if it does, it's steps
+	 * will be populated (there must be at least 1) and a new
+	 * {@link JobExecution} will be returned. If no job is found, a new one will
+	 * be created based on the configuration.
 	 * </p>
-	 * @throws JobExecutionAlreadyRunningException 
+	 * 
+	 * <p>
+	 * A check is made to see if any job executions are already running, and an
+	 * exception will be thrown if one is detected. To detect a running job
+	 * execution we use the {@link JobDao}:
+	 * <ol>
+	 * <li>First we find all jobs which match the given {@link JobIdentifier}</li>
+	 * <li>What happens then depends on how many existing job instances we
+	 * find:
+	 * <ul>
+	 * <li>If there are none, or the {@link JobConfiguration} is marked
+	 * restartable, then we create a new {@link JobInstance}</li>
+	 * <li>If there is more than one and the {@link JobConfiguration} is not
+	 * marked as restartable, it is an error. This could be caused by a job
+	 * whose restartable flag has changed to be more strict (true not false)
+	 * <em>after</em> it has been executed at least once.</li>
+	 * <li>If there is precisely one existing {@link JobInstance} then we check
+	 * the {@link JobExecution} instances for that job, and if any of them tells
+	 * us it is running (see {@link JobExecution#isRunning()}) then it is an
+	 * error.</li>
+	 * </ul>
+	 * </li>
+	 * </ol>
+	 * If this method is run in a transaction (as it normally would be) with
+	 * isolation level at {@link Isolation#REPEATABLE_READ} or better, then this
+	 * method should block if another transaction is already executing this
+	 * method for the same {@link JobIdentifier}. The first transaction to
+	 * complete in this scenario should obtain a valid {@link JobExecution},
+	 * and others will throw {@link JobExecutionAlreadyRunningException} (or
+	 * timeout). There are no such guarantees if the {@link JobDao} does not
+	 * respect the transaction isolation levels (e.g. if using a non-relational
+	 * data-store, or if the platform does not support the higher isolation
+	 * levels).
+	 * </p>
 	 * 
 	 * @see JobRepository#findOrCreateJob(JobConfiguration, JobIdentifier)
+	 * 
 	 * @throws BatchRestartException
 	 *             if more than one JobInstance if found or if
 	 *             JobInstance.getJobExecutionCount() is greater than
 	 *             JobConfiguration.getStartLimit()
+	 * @throws JobExecutionAlreadyRunningException
+	 *             if a job execution is found for the given
+	 *             {@link JobIdentifier} that is already running
+	 * 
 	 */
 	public JobExecution findOrCreateJob(JobConfiguration jobConfiguration,
-			JobIdentifier runtimeInformation) throws JobExecutionAlreadyRunningException {
+			JobIdentifier runtimeInformation)
+			throws JobExecutionAlreadyRunningException {
 
-		List jobs;
+		List jobs = new ArrayList();
+		JobInstance job;
 
 		// Check if a job is restartable, if not, create and return a new job
-		if (jobConfiguration.isRestartable() == false) {
-			return createJob(jobConfiguration, runtimeInformation);
-		} else {
-			// find all jobs matching the runtime information.
+		if (jobConfiguration.isRestartable()) {
+
+			/*
+			 * Find all jobs matching the runtime information.
+			 * 
+			 * Always do this if the job is restartable, then if this method is
+			 * transactional, and the isolation level is REPEATABLE_READ or
+			 * better, another launcher trying to start the same job in another
+			 * thread or process will block until this transaction has finished.
+			 */
+
 			jobs = jobDao.findJobs(runtimeInformation);
 		}
 
 		if (jobs.size() == 1) {
 			// One job was found
-			JobInstance job = (JobInstance) jobs.get(0);
+			job = (JobInstance) jobs.get(0);
 			job.setSteps(findSteps(jobConfiguration.getStepConfigurations(),
 					job));
 			job.setJobExecutionCount(jobDao.getJobExecutionCount(job.getId()));
@@ -118,27 +166,23 @@ public class SimpleJobRepository implements JobRepository {
 			for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
 				JobExecution execution = (JobExecution) iterator.next();
 				if (execution.isRunning()) {
-					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "+job);
+					throw new JobExecutionAlreadyRunningException(
+							"A job execution for this job is already running: "
+									+ job);
 				}
 			}
-			/*
-			 * Update the job, then if this method is transactional, and the
-			 * isolation level is SERIALIZABLE, another launcher trying to start
-			 * the same job in another thread or process will lose.
-			 */
-			jobDao.update(job);
-
-			return generateJobExecution(job);
-			
 		} else if (jobs.size() == 0) {
 			// no job found, create one
-			return createJob(jobConfiguration, runtimeInformation);
+			job = createJob(jobConfiguration, runtimeInformation);
 		} else {
 			// More than one job found, throw exception
 			throw new BatchRestartException(
 					"Error restarting job, more than one JobInstance found for: "
 							+ jobConfiguration.toString());
 		}
+
+		return generateJobExecution(job);
+
 	}
 
 	private JobExecution generateJobExecution(JobInstance job) {
@@ -251,15 +295,14 @@ public class SimpleJobRepository implements JobRepository {
 	 * calling {@link JobDao#createJob(JobRuntimeInformation)} and then it's
 	 * list of StepConfigurations is passed to the createSteps method.
 	 */
-	private JobExecution createJob(JobConfiguration jobConfiguration,
+	private JobInstance createJob(JobConfiguration jobConfiguration,
 			JobIdentifier runtimeInformation) {
 
 		JobInstance job = jobDao.createJob(runtimeInformation);
 		job
 				.setSteps(createSteps(job, jobConfiguration
 						.getStepConfigurations()));
-		JobExecution execution = generateJobExecution(job);
-		return execution;
+		return job;
 	}
 
 	/*

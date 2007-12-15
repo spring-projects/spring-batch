@@ -16,7 +16,7 @@ public class FootballJobFunctionalTests extends
 	}
 
 	protected String[] getConfigLocations() {
-		return new String[] { "jobs/parallelJob.xml" };
+		return new String[] { "jobs/parallelJob.xml##" };
 	}
 
 	protected void validatePostConditions() throws Exception {
