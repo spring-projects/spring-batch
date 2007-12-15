@@ -5,6 +5,7 @@
 	</formats>
 	<componentDescriptors>
 		<componentDescriptor>src/assembly/docs.xml</componentDescriptor>
+		<componentDescriptor>src/assembly/parent.xml</componentDescriptor>
 	</componentDescriptors>
 	<includeBaseDirectory>true</includeBaseDirectory>
 	<moduleSets>
