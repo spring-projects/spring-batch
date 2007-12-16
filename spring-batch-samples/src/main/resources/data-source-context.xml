@@ -28,13 +28,14 @@
 			<bean class="java.lang.System" factory-method="getProperties"/>
 		</property>
 		<property name="ignoreInvalidKeys" value="true" />
-		<property name="order" value="1"/>
+		<property name="order" value="2"/>
 	</bean>
 
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="location" value="classpath:batch.properties" />
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
 		<property name="ignoreUnresolvablePlaceholders" value="false" />
-		<property name="order" value="2"/>
+		<property name="order" value="1"/>
 	</bean>
 
 	<bean id="incrementerParent" class="${batch.database.incrementer.class}" abstract="true">
