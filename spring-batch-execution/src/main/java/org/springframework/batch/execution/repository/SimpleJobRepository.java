@@ -109,14 +109,13 @@ public class SimpleJobRepository implements JobRepository {
 	 * </ol>
 	 * If this method is run in a transaction (as it normally would be) with
 	 * isolation level at {@link Isolation#REPEATABLE_READ} or better, then this
-	 * method should block if another transaction is already executing this
-	 * method for the same {@link JobIdentifier}. The first transaction to
-	 * complete in this scenario should obtain a valid {@link JobExecution},
-	 * and others will throw {@link JobExecutionAlreadyRunningException} (or
-	 * timeout). There are no such guarantees if the {@link JobDao} does not
-	 * respect the transaction isolation levels (e.g. if using a non-relational
-	 * data-store, or if the platform does not support the higher isolation
-	 * levels).
+	 * method should block if another transaction is already executing it (for
+	 * the same {@link JobIdentifier}). The first transaction to complete in
+	 * this scenario obtains a valid {@link JobExecution}, and others throw
+	 * {@link JobExecutionAlreadyRunningException} (or timeout). There are no
+	 * such guarantees if the {@link JobDao} does not respect the transaction
+	 * isolation levels (e.g. if using a non-relational data-store, or if the
+	 * platform does not support the higher isolation levels).
 	 * </p>
 	 * 
 	 * @see JobRepository#findOrCreateJob(JobConfiguration, JobIdentifier)
