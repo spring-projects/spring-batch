@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.springframework.batch.core.tasklet.Recoverable;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemProcessor;
@@ -58,11 +57,12 @@ import org.springframework.util.Assert;
  * case because a transaction would have rolled back and the item would be
  * represented).<br/>
  * 
- * If a {@link RetryPolicy} is not provided then the {@link Recoverable}
+ * If a {@link RetryPolicy} is not provided then the {@link ItemRecoverer}
  * interface can be used to attempt to recover immediately (with no retry) from
- * a processing error. Clients of this class must call
- * {@link Recoverable#recover(Throwable)} directly, which is simply delegated to
- * {@link ItemProvider#recover(Object, Throwable)}.
+ * a processing error. Clients of this class should ensure that the recovery
+ * takes place in a separate transaction (e.g. with propagation REQUIRES_NEW) if
+ * necessary. This can easily be achieved by injecting an {@link ItemRecoverer}
+ * that has a transactional recover method.
  * 
  * @see ItemProvider
  * @see ItemProcessor
