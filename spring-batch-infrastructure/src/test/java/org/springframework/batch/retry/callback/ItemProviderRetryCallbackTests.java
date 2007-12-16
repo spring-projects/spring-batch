@@ -161,7 +161,7 @@ public class ItemProviderRetryCallbackTests extends TestCase {
 	}
 
 	public void testRecoverWithoutSession() throws Exception {
-		callback.getProvider().recover("foo", null);
+		callback.getRecoverer().recover("foo", null);
 		assertEquals(1, count);
 		assertEquals(1, calls.size());
 	}

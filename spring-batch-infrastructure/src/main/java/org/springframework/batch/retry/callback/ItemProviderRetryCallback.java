@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemProvider;
+import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
@@ -40,18 +41,32 @@ import org.springframework.batch.retry.policy.ItemProviderRetryPolicy;
  */
 public class ItemProviderRetryCallback implements RetryCallback {
 
-	private final static Log logger = LogFactory.getLog(ItemProviderRetryCallback.class);
+	private final static Log logger = LogFactory
+			.getLog(ItemProviderRetryCallback.class);
 
-	public static final String ITEM = ItemProviderRetryCallback.class.getName() + ".ITEM";
+	public static final String ITEM = ItemProviderRetryCallback.class.getName()
+			+ ".ITEM";
 
 	private ItemProvider provider;
 
 	private ItemProcessor processor;
 
-	public ItemProviderRetryCallback(ItemProvider provider, ItemProcessor processor) {
+	private ItemRecoverer recoverer;
+
+	public ItemProviderRetryCallback(ItemProvider provider,
+			ItemProcessor processor) {
 		super();
 		this.provider = provider;
 		this.processor = processor;
+	}
+
+	/**
+	 * Setter for injecting optional recovery handler.
+	 * 
+	 * @param recoveryHandler
+	 */
+	public void setRecoverer(ItemRecoverer recoverer) {
+		this.recoverer = recoverer;
 	}
 
 	public Object doWithRetry(RetryContext context) throws Throwable {
@@ -67,9 +82,9 @@ public class ItemProviderRetryCallback implements RetryCallback {
 		if (item == null) {
 			try {
 				item = provider.next();
-			}
-			catch (Exception e) {
-				throw new ExhaustedRetryException("Unexpected end of item provider", e);
+			} catch (Exception e) {
+				throw new ExhaustedRetryException(
+						"Unexpected end of item provider", e);
 			}
 			if (item == null) {
 				// This is probably not fatal: in a batch we want to
@@ -91,8 +106,26 @@ public class ItemProviderRetryCallback implements RetryCallback {
 	}
 
 	/**
-	 * Accessor for the {@link ItemProvider}.
-	 * @return the provider.
+	 * Accessor for the {@link ItemRecoverer}. If the handler is null but
+	 * the {@link ItemProvider} is an instanceof {@link ItemRecoverer},
+	 * then it will be returned instead.
+	 * 
+	 * @return the {@link ItemRecoverer}.
+	 */
+	public ItemRecoverer getRecoverer() {
+		if (recoverer != null) {
+			return recoverer;
+		}
+		if (provider instanceof ItemRecoverer) {
+			return (ItemRecoverer) provider;
+		}
+		return null;
+	}
+
+	/**
+	 * Public getter for the {@link ItemProvider}.
+	 * 
+	 * @return the {@link ItemProvider} instance.
 	 */
 	public ItemProvider getProvider() {
 		return provider;

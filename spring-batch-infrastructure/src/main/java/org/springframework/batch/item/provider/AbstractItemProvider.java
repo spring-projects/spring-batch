@@ -17,8 +17,9 @@
 package org.springframework.batch.item.provider;
 
 import org.springframework.batch.item.ItemProvider;
+import org.springframework.batch.item.ItemRecoverer;
 
-public abstract class AbstractItemProvider implements ItemProvider {
+public abstract class AbstractItemProvider implements ItemProvider, ItemRecoverer {
 
 	/**
 	 * Do nothing. Subclassses should override to implement recovery behaviour.

@@ -27,6 +27,7 @@ import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemProvider;
+import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
@@ -106,6 +107,8 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 
 	protected ItemProcessor itemProcessor;
 
+	private ItemRecoverer itemRecoverer;
+
 	/**
 	 * Check mandatory properties (provider and processor), and ensure that only
 	 * one (or neither) of {@link RetryPolicy} or {@link RetryOperations} is
@@ -122,6 +125,9 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 			RetryTemplate template = new RetryTemplate();
 			template.setRetryPolicy(new ItemProviderRetryPolicy(retryPolicy));
 			retryOperations = template;
+		}
+		if (itemRecoverer==null && (itemProvider instanceof ItemRecoverer)) {
+			itemRecoverer = (ItemRecoverer) itemProvider;
 		}
 	}
 
@@ -166,7 +172,9 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 
 		try {
 			Object data = context.getAttribute(ITEM_KEY);
-			itemProvider.recover(data, cause);
+			if (itemRecoverer!=null) {
+				itemRecoverer.recover(data, cause);
+			}
 		}
 		finally {
 			context.removeAttribute(ITEM_KEY);
@@ -185,6 +193,15 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 	 */
 	public void setItemProcessor(ItemProcessor moduleProcessor) {
 		this.itemProcessor = moduleProcessor;
+	}
+
+	/**
+	 * Setter for injecting optional recovery handler.
+	 * 
+	 * @param itemRecoverer
+	 */
+	public void setRecoverer(ItemRecoverer itemRecoverer) {
+		this.itemRecoverer = itemRecoverer;
 	}
 
 	/**

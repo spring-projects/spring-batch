@@ -211,6 +211,8 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 			}
 		});
 
+		module.afterPropertiesSet();
+		
 		try {
 			module.execute();
 			fail("Expected RuntimeException");

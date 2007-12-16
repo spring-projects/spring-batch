@@ -16,20 +16,24 @@
 
 package org.springframework.batch.item;
 
-import junit.framework.TestCase;
+/**
+ * Strategy interface for recovery action when processing of an item fails.<br/>
+ * 
+ * @author Dave Syer
+ */
+public interface ItemRecoverer {
 
-import org.springframework.batch.item.provider.AbstractItemProvider;
-
-public class ItemProviderTests extends TestCase {
-
-	ItemProvider provider = new AbstractItemProvider() {
-		public Object next() {
-			return "foo";
-		}
-	};
-
-	public void testNext() throws Exception {
-		assertEquals("foo", provider.next());
-	}
-
+	/**
+	 * Recover gracefully from an error. Clients can call this if processing of
+	 * the item throws an unexpected exception. Caller can use the return value
+	 * to decide whether to try more corrective action or perhaps throw an
+	 * exception.
+	 * 
+	 * @param data
+	 *            the item that failed.
+	 * @param cause
+	 *            the cause of the failure that led to this recovery.
+	 * @return true if recovery was successful.
+	 */
+	boolean recover(Object data, Throwable cause);
 }

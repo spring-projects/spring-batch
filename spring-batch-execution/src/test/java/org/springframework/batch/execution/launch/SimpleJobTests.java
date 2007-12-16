@@ -85,15 +85,15 @@ public class SimpleJobTests extends TestCase {
 		});
 	}
 
-	private Tasklet getTasklet(String arg) {
+	private Tasklet getTasklet(String arg) throws Exception {
 		return getTasklet(new String[] { arg });
 	}
 
-	private Tasklet getTasklet(String arg0, String arg1) {
+	private Tasklet getTasklet(String arg0, String arg1) throws Exception {
 		return getTasklet(new String[] { arg0, arg1 });
 	}
 
-	private Tasklet getTasklet(String[] args) {
+	private Tasklet getTasklet(String[] args) throws Exception {
 		ItemProviderProcessTasklet module = new ItemProviderProcessTasklet();
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
@@ -106,6 +106,7 @@ public class SimpleJobTests extends TestCase {
 		};
 		module.setItemProvider(provider);
 		module.setItemProcessor(processor);
+		module.afterPropertiesSet();
 		return module;
 	}
 

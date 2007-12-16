@@ -49,18 +49,6 @@ public interface ItemProvider {
 	Object next() throws Exception;
 
 	/**
-	 * Recover gracefully from an error. Clients can call this if processing of
-	 * the item throws an unexpected exception. Caller can use the return value
-	 * to decide whether to try more corrective action or perhaps throw an
-	 * exception.
-	 * 
-	 * @param data the item that failed.
-	 * @param cause the cause of the failure that led to this recovery.
-	 * @return true if recovery was successful.
-	 */
-	boolean recover(Object data, Throwable cause);
-
-	/**
 	 * Get a unique identifier for the item that can be used to cache it between
 	 * calls if necessary, and then identify it later.
 	 * 

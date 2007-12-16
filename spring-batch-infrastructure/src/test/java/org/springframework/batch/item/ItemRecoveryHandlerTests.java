@@ -20,16 +20,20 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.item.provider.AbstractItemProvider;
 
-public class ItemProviderTests extends TestCase {
+public class ItemRecoveryHandlerTests extends TestCase {
 
-	ItemProvider provider = new AbstractItemProvider() {
+	ItemRecoverer recoverer = new AbstractItemProvider() {
 		public Object next() {
 			return "foo";
 		}
 	};
 
-	public void testNext() throws Exception {
-		assertEquals("foo", provider.next());
+	public void testRecover() throws Exception {
+		try {
+			recoverer.recover("foo", null);
+		}
+		catch (Exception e) {
+			fail("Unexpected Exception");
+		}
 	}
-
 }
