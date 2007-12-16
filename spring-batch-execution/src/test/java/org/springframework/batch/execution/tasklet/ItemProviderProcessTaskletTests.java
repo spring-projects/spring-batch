@@ -23,15 +23,14 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.execution.tasklet.ItemProviderProcessTasklet;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemProvider;
+import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.provider.AbstractItemProvider;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
-import org.springframework.batch.retry.policy.NeverRetryPolicy;
-import org.springframework.batch.retry.support.RetryTemplate;
+import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.support.PropertiesConverter;
 
@@ -68,7 +67,7 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 
 	private ItemProviderProcessTasklet module;
 
-	public void setUp() {
+	public void setUp() throws Exception {
 
 		// create module
 		module = new ItemProviderProcessTasklet();
@@ -77,12 +76,15 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 		module.setItemProvider(itemProvider);
 		module.setItemProcessor(itemProcessor);
 
+		module.afterPropertiesSet();
+
 		RepeatSynchronizationManager.register(new RepeatContextSupport(null));
 
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	protected void tearDown() throws Exception {
@@ -128,8 +130,7 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 			module.execute();
 			// TODO: should we expect Batch exception?
 			fail("RuntimeException was expected");
-		}
-		catch (RuntimeException bce) {
+		} catch (RuntimeException bce) {
 			// expected
 		}
 	}
@@ -145,6 +146,7 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 
 	public void testSkippableProvider() throws Exception {
 		module.setItemProvider(new SkippableItemProvider());
+		module.setItemRecoverer(null);
 		module.skip();
 		assertEquals(1, list.size());
 	}
@@ -152,17 +154,18 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 	public void testSkippablProviderProcessor() throws Exception {
 		module.setItemProvider(new SkippableItemProvider());
 		module.setItemProcessor(new SkippableItemProcessor());
+		module.setItemRecoverer(null);
 		module.skip();
 		assertEquals(2, list.size());
 	}
-	
+
 	public void testStatisticsProvider() throws Exception {
 		module.setItemProvider(new SkippableItemProvider());
 		Properties stats = module.getStatistics();
 		assertEquals(1, stats.size());
 		assertEquals("bar", stats.getProperty("foo"));
 	}
-	
+
 	public void testStatisticsProcessor() throws Exception {
 		module.setItemProcessor(new SkippableItemProcessor());
 		Properties stats = module.getStatistics();
@@ -179,9 +182,11 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 		assertEquals("bar", stats.getProperty("processor.foo"));
 	}
 
-	public void testStatisticsProviderProcessorMergeDuplicates() throws Exception {
+	public void testStatisticsProviderProcessorMergeDuplicates()
+			throws Exception {
 		module.setItemProvider(new SkippableItemProvider());
-		module.setItemProcessor(new SkippableItemProcessor("foo=bar\nspam=bucket"));
+		module.setItemProcessor(new SkippableItemProcessor(
+				"foo=bar\nspam=bucket"));
 		Properties stats = module.getStatistics();
 		assertEquals(3, stats.size());
 		assertEquals("bar", stats.getProperty("provider.foo"));
@@ -194,17 +199,20 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 		// set up and call execute
 		items = Collections.singletonList("foo");
 
-		module.setItemProvider(new AbstractItemProvider() {
+		module.setItemRecoverer(new ItemRecoverer() {
 			public boolean recover(Object item, Throwable cause) {
-				assertEquals("foo", cause.getMessage());
+				assertEquals("FOO", cause.getMessage());
 				list.add(item);
 				return true;
 			}
+		});
 
+		module.setItemProvider(new AbstractItemProvider() {
 			public Object next() throws Exception {
-				return itemProvider.next();
+				return "bar";
 			}
 		});
+
 		module.setItemProcessor(new ItemProcessor() {
 			public void process(Object data) throws Exception {
 				throw new RuntimeException("FOO");
@@ -212,44 +220,34 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 		});
 
 		module.afterPropertiesSet();
-		
+
 		try {
 			module.execute();
 			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals("FOO", e.getMessage());
 		}
-		list.clear();
 
-		// After a processing exception client has to call recover directly
-		module.recover(new RuntimeException("foo"));
+		// After a processing exception the recovery is done automatically.
 
 		// verify method calls
 		assertEquals(1, list.size());
-		assertEquals("The item was not passed in to recover method", "foo", list.get(0));
+		assertEquals("The item was not passed in to recover method", "bar",
+				list.get(0));
 	}
 
 	public void testRetryPolicy() throws Exception {
-		module.setRetryPolicy(new NeverRetryPolicy());
-		// set up mock objects
-		items = new ArrayList() {
-			{
-				add("foo");
-				add("foo"); // in production use this would be the second
-							// attempt after rollback
-			}
-		};
-
-		module.setItemProvider(new AbstractItemProvider() {
+		module.setRetryPolicy(new SimpleRetryPolicy(1));
+		module.setItemRecoverer(new ItemRecoverer() {
 			public boolean recover(Object item, Throwable cause) {
 				assertEquals("FOO", cause.getMessage());
-				list.add(item + "_recovered");
+				list.add(item+"_recovered");
 				return true;
 			}
-
+		});
+		module.setItemProvider(new AbstractItemProvider() {
 			public Object next() throws Exception {
-				return itemProvider.next();
+				return "foo";
 			}
 		});
 		module.setItemProcessor(new ItemProcessor() {
@@ -264,8 +262,7 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 		try {
 			module.execute();
 			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals("FOO", e.getMessage());
 		}
 
@@ -276,15 +273,15 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 
 		// verify method calls
 		assertEquals(1, list.size());
-		assertEquals("The item was not passed in to recover method", "foo_recovered", list.get(0));
+		assertEquals("The item was not passed in to recover method",
+				"foo_recovered", list.get(0));
 	}
 
 	public void testInitialisationWithNullProvider() throws Exception {
 		module.setItemProvider(null);
 		try {
 			module.afterPropertiesSet();
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			assertTrue(e.getMessage().toLowerCase().indexOf("provider") >= 0);
 		}
 	}
@@ -293,26 +290,18 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 		module.setItemProcessor(null);
 		try {
 			module.afterPropertiesSet();
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			assertTrue(e.getMessage().toLowerCase().indexOf("processor") >= 0);
 		}
 	}
 
-	public void testInitialisationWithNotNullPolicyAndOperations() throws Exception {
-		module.setRetryPolicy(new NeverRetryPolicy());
-		module.setRetryOperations(new RetryTemplate());
-		try {
-			module.afterPropertiesSet();
-		}
-		catch (IllegalStateException e) {
-			assertTrue(e.getMessage().toLowerCase().indexOf("not both") >= 0);
-		}
-	}
-
-	private class SkippableItemProvider extends AbstractItemProvider implements Skippable, StatisticsProvider {
+	private class SkippableItemProvider implements ItemProvider,
+			Skippable, StatisticsProvider {
 		public Object next() throws Exception {
 			return itemProvider.next();
+		}
+		public Object getKey(Object item) {
+			return item;
 		}
 		public void skip() {
 			list.add("provider");
@@ -322,21 +311,27 @@ public class ItemProviderProcessTaskletTests extends TestCase {
 		}
 	}
 
-	private class SkippableItemProcessor implements ItemProcessor, Skippable, StatisticsProvider {
+	private class SkippableItemProcessor implements ItemProcessor, Skippable,
+			StatisticsProvider {
 		String props = "foo=bar";
+
 		public SkippableItemProcessor() {
 			super();
 		}
+
 		public SkippableItemProcessor(String props) {
 			this();
 			this.props = props;
 		}
+
 		public void process(Object data) throws Exception {
 			// no-op
 		}
+
 		public void skip() {
 			list.add("processor");
 		}
+
 		public Properties getStatistics() {
 			return PropertiesConverter.stringToProperties(props);
 		}

@@ -152,7 +152,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		checkRepository(BatchStatus.COMPLETED);
 	}
 
-	public void testRunWithDefaultStepExecutor() throws Exception {
+	public void testRunWithSimpleStepExecutor() throws Exception {
 
 		jobExecutor = new DefaultJobExecutor();
 		jobExecutor.setJobRepository(jobRepository);

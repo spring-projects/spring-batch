@@ -56,7 +56,7 @@
 	</bean>
 
 	<bean id="stepExecutor"
-		class="org.springframework.batch.execution.step.simple.DefaultStepExecutor"
+		class="org.springframework.batch.execution.step.simple.SimpleStepExecutor"
 		scope="prototype">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="repository" ref="simpleJobRepository" />

@@ -60,7 +60,7 @@ public class DefaultStepExecutorTests extends TestCase {
 		}
 	};
 
-	private DefaultStepExecutor stepExecutor;
+	private SimpleStepExecutor stepExecutor;
 
 	private StepConfigurationSupport stepConfiguration;
 
@@ -73,11 +73,13 @@ public class DefaultStepExecutorTests extends TestCase {
 	/**
 	 * @param strings
 	 * @return
+	 * @throws Exception 
 	 */
-	private Tasklet getTasklet(String[] strings) {
+	private Tasklet getTasklet(String[] strings) throws Exception {
 		ItemProviderProcessTasklet module = new ItemProviderProcessTasklet();
 		module.setItemProcessor(processor);
 		module.setItemProvider(getProvider(strings));
+		module.afterPropertiesSet();
 		return module;
 	}
 
@@ -88,7 +90,7 @@ public class DefaultStepExecutorTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		stepExecutor = new DefaultStepExecutor();
+		stepExecutor = new SimpleStepExecutor();
 		stepExecutor.setRepository(new JobRepositorySupport());
 		stepConfiguration = new SimpleStepConfiguration();
 		stepConfiguration.setTasklet(getTasklet(new String[] { "foo", "bar",

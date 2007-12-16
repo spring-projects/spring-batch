@@ -60,7 +60,7 @@ public class HibernateFailureJobFunctionalTests extends
 			throw e;
 		} catch (UncategorizedSQLException e) {
 			// This is what would happen if the job wasn't configured to skip
-			// exceptions at teh step level.
+			// exceptions at the step level.
 			assertEquals(1, writer.getErrors().size());
 			throw e;
 		}

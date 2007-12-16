@@ -38,10 +38,11 @@ import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory;
 import org.springframework.batch.execution.step.SimpleStepConfiguration;
-import org.springframework.batch.execution.step.simple.DefaultStepExecutor;
+import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.execution.tasklet.ItemProviderProcessTasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemProvider;
+import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.provider.ListItemProvider;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
@@ -54,9 +55,7 @@ import org.springframework.util.StringUtils;
 
 public class SimpleJobTests extends TestCase {
 
-	private List list = new ArrayList();
-
-	// private int count;
+	private List recovered = new ArrayList();
 
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobDao(), new MapStepDao());
 
@@ -72,7 +71,7 @@ public class SimpleJobTests extends TestCase {
 
 	private DefaultJobExecutor jobExecutor = new DefaultJobExecutor();;
 
-	private DefaultStepExecutor stepLifecycle = new DefaultStepExecutor();
+	private SimpleStepExecutor stepLifecycle = new SimpleStepExecutor();
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -93,17 +92,18 @@ public class SimpleJobTests extends TestCase {
 		return getTasklet(new String[] { arg0, arg1 });
 	}
 
-	private Tasklet getTasklet(String[] args) throws Exception {
+	private ItemProviderProcessTasklet getTasklet(String[] args) throws Exception {
 		ItemProviderProcessTasklet module = new ItemProviderProcessTasklet();
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
-		provider = new ListItemProvider(items) {
+		provider = new ListItemProvider(items);
+		module.setItemRecoverer(new ItemRecoverer() {
 			public boolean recover(Object item, Throwable cause) {
-				list.add(item);
+				recovered.add(item);
 				assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
 				return true;
 			}
-		};
+		});
 		module.setItemProvider(provider);
 		module.setItemProcessor(processor);
 		module.afterPropertiesSet();
@@ -161,37 +161,38 @@ public class SimpleJobTests extends TestCase {
 		 * is recovered ("skipped") on the second attempt (see retry policy
 		 * definition above)...
 		 */
-		final Tasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
+		final ItemProviderProcessTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
 		StepConfiguration step = new SimpleStepConfiguration(module);
-		((ItemProviderProcessTasklet) module).setItemProcessor(new ItemProcessor() {
+		module.setItemProcessor(new ItemProcessor() {
 			public void process(Object data) throws Exception {
 				throw new RuntimeException("Try again Dummy!");
 			}
 		});
+		module.afterPropertiesSet();
 		jobConfiguration.addStep(step);
 
 		JobExecution jobExecution = repository.findOrCreateJob(jobConfiguration, runtimeInformation);
-		JobInstance job = jobExecution.getJob();
 		jobExecutor.run(jobConfiguration, jobExecution);
 
-		assertEquals(BatchStatus.COMPLETED, job.getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getJob().getStatus());
 		assertEquals(0, processed.size());
 		// provider should be exhausted
 		assertEquals(null, provider.next());
-		assertEquals(3, list.size());
+		assertEquals(3, recovered.size());
 	}
 
 	public void testExceptionTerminates() throws Exception {
 
 		JobConfiguration jobConfiguration = new JobConfiguration();
 		JobIdentifier runtimeInformation = new SimpleJobIdentifier("real.job");
-		final Tasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
+		final ItemProviderProcessTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
 		StepConfiguration step = new SimpleStepConfiguration(module);
-		((ItemProviderProcessTasklet) module).setItemProcessor(new ItemProcessor() {
+		module.setItemProcessor(new ItemProcessor() {
 			public void process(Object data) throws Exception {
 				throw new RuntimeException("Foo");
 			}
 		});
+		module.afterPropertiesSet();
 		jobConfiguration.addStep(step);
 
 		JobExecution jobExecution = repository.findOrCreateJob(jobConfiguration, runtimeInformation);

@@ -29,9 +29,6 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemProvider;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
-import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.callback.ItemProviderRetryCallback;
 import org.springframework.batch.retry.policy.ItemProviderRetryPolicy;
@@ -61,11 +58,11 @@ import org.springframework.util.Assert;
  * case because a transaction would have rolled back and the item would be
  * represented).<br/>
  * 
- * If neither a {@link RetryPolicy} nor a {@link RetryOperations} is provided
- * then the {@link Recoverable} interface can be used to attempt to recover
- * immediately (with no retry) from a processing error. Clients of this class
- * must call {@link Recoverable#recover(Throwable)} directly, which is simply
- * delegated to {@link ItemProvider#recover(Object, Throwable)}.
+ * If a {@link RetryPolicy} is not provided then the {@link Recoverable}
+ * interface can be used to attempt to recover immediately (with no retry) from
+ * a processing error. Clients of this class must call
+ * {@link Recoverable#recover(Throwable)} directly, which is simply delegated to
+ * {@link ItemProvider#recover(Object, Throwable)}.
  * 
  * @see ItemProvider
  * @see ItemProcessor
@@ -77,8 +74,8 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * 
  */
-public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippable, StatisticsProvider,
-		InitializingBean {
+public class ItemProviderProcessTasklet implements Tasklet, Skippable,
+		StatisticsProvider, InitializingBean {
 
 	/**
 	 * Prefix added to statistics keys from processor if needed to avoid
@@ -92,16 +89,7 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 	 */
 	public static final String PROVIDER_STATISTICS_PREFIX = "provider.";
 
-	/**
-	 * Attribute key in the surrounding {@link RepeatContext} for the current
-	 * item being processed. Needed to provide recoverable behavior if
-	 * {@link RetryOperations} are not provided.
-	 */
-	private static final String ITEM_KEY = ItemProviderProcessTasklet.class.getName() + ".ITEM";
-
 	private RetryPolicy retryPolicy = null;
-
-	private RetryOperations retryOperations = null;
 
 	protected ItemProvider itemProvider;
 
@@ -109,76 +97,68 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 
 	private ItemRecoverer itemRecoverer;
 
+	private RetryTemplate template = new RetryTemplate();
+
+	private ItemProviderRetryCallback callback;
+
 	/**
-	 * Check mandatory properties (provider and processor), and ensure that only
-	 * one (or neither) of {@link RetryPolicy} or {@link RetryOperations} is
-	 * provided.
+	 * Check mandatory properties (provider and processor).
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(itemProvider, "ItemProvider must be provided");
 		Assert.notNull(itemProcessor, "ItemProcessor must be provided");
-		Assert.state(!(retryPolicy != null && retryOperations != null),
-				"Either RetryOperations or RetryPolicy can be provided, but not both.");
-		if (retryPolicy != null) {
-			RetryTemplate template = new RetryTemplate();
-			template.setRetryPolicy(new ItemProviderRetryPolicy(retryPolicy));
-			retryOperations = template;
-		}
-		if (itemRecoverer==null && (itemProvider instanceof ItemRecoverer)) {
+
+		if (itemRecoverer == null && (itemProvider instanceof ItemRecoverer)) {
 			itemRecoverer = (ItemRecoverer) itemProvider;
 		}
+
+		ItemProviderRetryPolicy itemProviderRetryPolicy = new ItemProviderRetryPolicy(
+				retryPolicy);
+		template.setRetryPolicy(itemProviderRetryPolicy);
+
+		if (retryPolicy != null) {
+			callback = new ItemProviderRetryCallback(itemProvider,
+					itemProcessor);
+			callback.setRecoverer(itemRecoverer);
+		}
+
 	}
 
 	/**
 	 * Read from the {@link ItemProvider} and process (if not null) with the
 	 * {@link ItemProcessor}. The call to {@link ItemProcessor} is wrapped in a
-	 * retry, if either a {@link RetryPolicy} or a {@link RetryOperations} is
-	 * provided.
+	 * stateful retry, if a {@link RetryPolicy} is provided. The
+	 * {@link ItemRecoverer} is used (if provided) in the case of an exception
+	 * to apply alternate processing to the item. If the stateful retry is in
+	 * place then the recovery will happen in the next transaction
+	 * automatically, otherwise it might be necessary for clients to make the
+	 * recover method transactional with appropriate propagation behaviour
+	 * (probably REQUIRES_NEW because the call will happen in the context of a
+	 * transaction that is about to rollback).
 	 * 
 	 * @see org.springframework.batch.core.tasklet.Tasklet#execute()
 	 */
 	public ExitStatus execute() throws Exception {
-		if (retryOperations != null) {
-			return new ExitStatus(retryOperations.execute(new ItemProviderRetryCallback(itemProvider, itemProcessor)) != null);
-		}
-		else {
-			Object data = itemProvider.next();
-			if (data == null) {
+		if (callback == null) {
+			Object item = itemProvider.next();
+			if (item == null) {
 				return ExitStatus.FINISHED;
 			}
-			RepeatContext context = RepeatSynchronizationManager.getContext();
-			Assert.state(context != null,
-					"No context available: you probably need to use this class inside a batch operation.");
-			context.setAttribute(ITEM_KEY, data);
-			itemProcessor.process(data);
-			// No exception so clear context (we can't recover directly because
-			// the current transaction is going to roll back)
-			context.removeAttribute(ITEM_KEY);
+			try {
+				itemProcessor.process(item);
+			} catch (Exception e) {
+				if (itemRecoverer != null) {
+					itemRecoverer.recover(item, e);
+				}
+				// Re-throw the exception so that the surrounding transaction
+				// rolls back if there is one
+				throw e;
+			}
 			return ExitStatus.CONTINUABLE;
 		}
-	}
-
-	/**
-	 * Call out to the provider for recovery step.
-	 * 
-	 * @see org.springframework.batch.core.tasklet.Recoverable#recover(java.lang.Throwable)
-	 */
-	public void recover(Throwable cause) {
-		RepeatContext context = RepeatSynchronizationManager.getContext();
-		Assert.state(context != null,
-				"No context available: you probably need to use this class inside a batch operation.");
-
-		try {
-			Object data = context.getAttribute(ITEM_KEY);
-			if (itemRecoverer!=null) {
-				itemRecoverer.recover(data, cause);
-			}
-		}
-		finally {
-			context.removeAttribute(ITEM_KEY);
-		}
+		return new ExitStatus(template.execute(callback) != null);
 	}
 
 	/**
@@ -200,7 +180,7 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 	 * 
 	 * @param itemRecoverer
 	 */
-	public void setRecoverer(ItemRecoverer itemRecoverer) {
+	public void setItemRecoverer(ItemRecoverer itemRecoverer) {
 		this.itemRecoverer = itemRecoverer;
 	}
 
@@ -211,6 +191,11 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 	 * @see org.springframework.batch.io.Skippable#skip()
 	 */
 	public void skip() {
+		if (callback != null) {
+			// No need to skip because the recoverer will take any action
+			// necessary.
+			return;
+		}
 		if (this.itemProvider instanceof Skippable) {
 			((Skippable) this.itemProvider).skip();
 		}
@@ -235,9 +220,11 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 			stats = ((StatisticsProvider) this.itemProvider).getStatistics();
 		}
 		if (this.itemProcessor instanceof StatisticsProvider) {
-			Properties props = ((StatisticsProvider) this.itemProcessor).getStatistics();
+			Properties props = ((StatisticsProvider) this.itemProcessor)
+					.getStatistics();
 			if (!stats.isEmpty()) {
-				stats = prependKeys(stats, props, PROVIDER_STATISTICS_PREFIX, PROCESSOR_STATISTICS_PREFIX);
+				stats = prependKeys(stats, props, PROVIDER_STATISTICS_PREFIX,
+						PROCESSOR_STATISTICS_PREFIX);
 			} else {
 				stats.putAll(props);
 			}
@@ -250,10 +237,12 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 	 * @param string
 	 * @return
 	 */
-	private Properties prependKeys(Properties props1, Properties props2, String prefix1, String prefix2) {
+	private Properties prependKeys(Properties props1, Properties props2,
+			String prefix1, String prefix2) {
 		Properties result = new Properties();
 		Set duplicates = new HashSet();
-		for (Iterator iterator = props1.entrySet().iterator(); iterator.hasNext();) {
+		for (Iterator iterator = props1.entrySet().iterator(); iterator
+				.hasNext();) {
 			Map.Entry entry = (Map.Entry) iterator.next();
 			String key = (String) entry.getKey();
 			String value = (String) entry.getValue();
@@ -263,7 +252,8 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 			}
 			result.setProperty(key, value);
 		}
-		for (Iterator iterator = props2.entrySet().iterator(); iterator.hasNext();) {
+		for (Iterator iterator = props2.entrySet().iterator(); iterator
+				.hasNext();) {
 			Map.Entry entry = (Map.Entry) iterator.next();
 			String key = (String) entry.getKey();
 			String value = (String) entry.getValue();
@@ -274,8 +264,8 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 		}
 		for (Iterator iterator = duplicates.iterator(); iterator.hasNext();) {
 			String key = (String) iterator.next();
-			result.setProperty(prefix1+key, props1.getProperty(key));
-			result.setProperty(prefix2+key, props2.getProperty(key));
+			result.setProperty(prefix1 + key, props1.getProperty(key));
+			result.setProperty(prefix2 + key, props2.getProperty(key));
 		}
 		return result;
 	}
@@ -283,18 +273,10 @@ public class ItemProviderProcessTasklet implements Tasklet, Recoverable, Skippab
 	/**
 	 * Public setter for the retryPolicy.
 	 * 
-	 * @param retyPolicy the retryPolicy to set
+	 * @param retyPolicy
+	 *            the retryPolicy to set
 	 */
 	public void setRetryPolicy(RetryPolicy retryPolicy) {
 		this.retryPolicy = retryPolicy;
-	}
-
-	/**
-	 * Public setter for the retryOperations.
-	 * 
-	 * @param retryOperations the retryOperations to set
-	 */
-	public void setRetryOperations(RetryOperations retryOperations) {
-		this.retryOperations = retryOperations;
 	}
 }

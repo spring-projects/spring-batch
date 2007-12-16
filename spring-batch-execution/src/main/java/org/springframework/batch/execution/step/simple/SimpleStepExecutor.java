@@ -34,6 +34,7 @@ import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.RepeatOperationsHolder;
 import org.springframework.batch.execution.step.SimpleStepConfiguration;
+import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
@@ -357,7 +358,10 @@ public class SimpleStepExecutor implements StepExecutor {
 	/**
 	 * Execute the business logic, delegating to the given {@link Tasklet}.
 	 * Subclasses could extend the behaviour as long as they always return the
-	 * value of this method call in their superclass.
+	 * value of this method call in their superclass.<br/>
+	 * 
+	 * If there is an exception and the {@link Tasklet} implements
+	 * {@link Skippable} then the skip method is called.
 	 * 
 	 * @param tasklet
 	 *            the unit of business logic to execute
@@ -369,7 +373,24 @@ public class SimpleStepExecutor implements StepExecutor {
 	 */
 	protected ExitStatus doTaskletProcessing(Tasklet tasklet,
 			StepExecution stepExecution) throws Exception {
-		return tasklet.execute();
+		ExitStatus exitStatus = ExitStatus.CONTINUABLE;
+
+		try {
+
+			exitStatus = tasklet.execute();
+
+		} catch (Exception e) {
+
+			if (tasklet instanceof Skippable) {
+				((Skippable) tasklet).skip();
+			}
+
+			// Rethrow so that outer transaction is rolled back properly
+			throw e;
+
+		}
+
+		return exitStatus;
 	}
 
 	/**
