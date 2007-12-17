@@ -38,31 +38,32 @@ import org.springframework.util.Assert;
 
 /**
  * A concrete implementation of the {@link Tasklet} interface that provides
- * functionality for 'split processing'. This type of processing is
- * characterized by separating the reading and processing of batch data into two
- * separate classes: ItemProvider and ItemProcessor. The ItemProvider class
- * provides a solid means for re-usability and enforces good architecture
- * practices. Because an object *must* be returned by the {@link ItemProvider}
- * to continue processing, (returning null indicates processing should end) a
- * developer is forced to read in all relevant data, place it into a domain
- * object, and return that object. The {@link ItemProcessor} will then use this
- * object for calculations and output.<br/>
+ * 'split processing'. This type of processing is characterized by separating
+ * the reading and processing of batch data into two separate classes:
+ * ItemProvider and ItemProcessor. The ItemProvider class provides a solid means
+ * for re-usability and enforces good architecture practices. Because an object
+ * <em>must</em> be returned by the {@link ItemProvider} to continue
+ * processing, (returning null indicates processing should end) a developer is
+ * forced to read in all relevant data, place it into a domain object, and
+ * return that object. The {@link ItemProcessor} will then use this object for
+ * calculations and output.<br/>
  * 
  * If a {@link RetryPolicy} is provided it will be used to construct a stateful
- * retry around the {@link ItemProcessor}, delegating recover and identity
- * concerns to the {@link ItemProvider}. In this case clients of this class do
- * not need to take any additional action at runtime to take advantage of the
- * retry and recovery, provided the {@link #execute()} method is called again
- * with the {@link ItemProvider} in the same state (normally this would be the
- * case because a transaction would have rolled back and the item would be
- * represented).<br/>
+ * retry around the {@link ItemProcessor}, delegating identity concerns to the
+ * {@link ItemProvider} and recovery concerns to the {@link ItemRecoverer} (if
+ * present). In this case clients of this class do not need to take any
+ * additional action at runtime to take advantage of the retry and recovery,
+ * provided that when the {@link #execute()} method is called again the same
+ * item is eventually re-presented (normally this would be the case because a
+ * transaction would have rolled back and the {@link ItemProvider} would go back
+ * to its previous state).<br/>
  * 
- * If a {@link RetryPolicy} is not provided then the {@link ItemRecoverer}
- * interface can be used to attempt to recover immediately (with no retry) from
- * a processing error. Clients of this class should ensure that the recovery
- * takes place in a separate transaction (e.g. with propagation REQUIRES_NEW) if
- * necessary. This can easily be achieved by injecting an {@link ItemRecoverer}
- * that has a transactional recover method.
+ * If a {@link RetryPolicy} is not provided then the {@link ItemRecoverer} can
+ * be used to attempt to recover immediately (with no retry) from a processing
+ * error. Clients of this class should ensure that the recovery takes place in a
+ * separate transaction (e.g. with propagation REQUIRES_NEW) if necessary. This
+ * can be achieved by injecting an {@link ItemRecoverer} that has a
+ * transactional recover method.
  * 
  * @see ItemProvider
  * @see ItemProcessor
@@ -99,7 +100,7 @@ public class ItemProviderProcessTasklet implements Tasklet, Skippable,
 
 	private RetryTemplate template = new RetryTemplate();
 
-	private ItemProviderRetryCallback callback;
+	private ItemProviderRetryCallback retryCallback;
 
 	/**
 	 * Check mandatory properties (provider and processor).
@@ -119,9 +120,9 @@ public class ItemProviderProcessTasklet implements Tasklet, Skippable,
 		template.setRetryPolicy(itemProviderRetryPolicy);
 
 		if (retryPolicy != null) {
-			callback = new ItemProviderRetryCallback(itemProvider,
+			retryCallback = new ItemProviderRetryCallback(itemProvider,
 					itemProcessor);
-			callback.setRecoverer(itemRecoverer);
+			retryCallback.setRecoverer(itemRecoverer);
 		}
 
 	}
@@ -141,7 +142,8 @@ public class ItemProviderProcessTasklet implements Tasklet, Skippable,
 	 * @see org.springframework.batch.core.tasklet.Tasklet#execute()
 	 */
 	public ExitStatus execute() throws Exception {
-		if (callback == null) {
+
+		if (retryCallback == null) {
 			Object item = itemProvider.next();
 			if (item == null) {
 				return ExitStatus.FINISHED;
@@ -158,7 +160,9 @@ public class ItemProviderProcessTasklet implements Tasklet, Skippable,
 			}
 			return ExitStatus.CONTINUABLE;
 		}
-		return new ExitStatus(template.execute(callback) != null);
+
+		return new ExitStatus(template.execute(retryCallback) != null);
+
 	}
 
 	/**
@@ -185,13 +189,16 @@ public class ItemProviderProcessTasklet implements Tasklet, Skippable,
 	}
 
 	/**
-	 * If the provider and / or processor are {@link Skippable} then delegate to
-	 * them in that order.
+	 * Mark the current item as skipped if possible. If there is a retry policy
+	 * in action there is no need to take any action now because it will be
+	 * covered by the retry in the next transaction. Otherwise if the provider
+	 * and / or processor are {@link Skippable} then delegate to them in that
+	 * order.
 	 * 
 	 * @see org.springframework.batch.io.Skippable#skip()
 	 */
 	public void skip() {
-		if (callback != null) {
+		if (retryCallback != null) {
 			// No need to skip because the recoverer will take any action
 			// necessary.
 			return;

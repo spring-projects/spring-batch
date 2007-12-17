@@ -17,22 +17,13 @@
 package org.springframework.batch.item.provider;
 
 import org.springframework.batch.item.ItemProvider;
-import org.springframework.batch.item.ItemRecoverer;
 
-public abstract class AbstractItemProvider implements ItemProvider, ItemRecoverer {
-
-	/**
-	 * Do nothing. Subclassses should override to implement recovery behaviour.
-	 * 
-	 * @see org.springframework.batch.item.ItemProvider#recover(java.lang.Object,
-	 * Throwable)
-	 * 
-	 * @return false if nothing can be done (the default), or true if the item
-	 * can now safely be ignored or committed.
-	 */
-	public boolean recover(Object item, Throwable cause) {
-		return false;
-	}
+/**
+ * Base class for {@link ItemProvider} implementations.
+ * @author Dave Syer
+ *
+ */
+public abstract class AbstractItemProvider implements ItemProvider {
 
 	/**
 	 * Simply returns the item itself. Will be adequate for many purposes, but

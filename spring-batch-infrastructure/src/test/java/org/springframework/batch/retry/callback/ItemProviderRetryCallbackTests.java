@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.provider.ListItemProvider;
+import org.springframework.batch.retry.ListItemProviderRecoverer;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.context.RetryContextSupport;
 import org.springframework.batch.retry.exception.RetryException;
@@ -46,13 +47,12 @@ public class ItemProviderRetryCallbackTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		template = new RetryTemplate();
-		provider = new ListItemProvider(Arrays.asList(new String[] { "foo", "bar" })) {
+		provider = new ListItemProviderRecoverer(Arrays.asList(new String[] { "foo", "bar" })) {
 			public boolean recover(Object data, Throwable cause) {
 				count++;
 				calls.add(data);
 				return true;
 			}
-
 			public Object getKey(Object item) {
 				return "key" + (count++);
 			}

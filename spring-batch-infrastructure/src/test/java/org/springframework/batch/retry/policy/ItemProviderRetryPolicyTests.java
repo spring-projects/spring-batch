@@ -30,6 +30,7 @@ import org.springframework.batch.item.provider.ListItemProvider;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
+import org.springframework.batch.retry.ListItemProviderRecoverer;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.callback.ItemProviderRetryCallback;
@@ -50,7 +51,7 @@ public class ItemProviderRetryPolicyTests extends TestCase {
 		super.setUp();
 		// The list simulates a failed delivery, redelivery of the same message,
 		// then a new message...
-		provider = new ListItemProvider(Arrays.asList(new String[] { "foo", "foo", "bar" })) {
+		provider = new ListItemProviderRecoverer(Arrays.asList(new String[] { "foo", "foo", "bar" })) {
 			public boolean recover(Object data, Throwable cause) {
 				count++;
 				list.add(data);
