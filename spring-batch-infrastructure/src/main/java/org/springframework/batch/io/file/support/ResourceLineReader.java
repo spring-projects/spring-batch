@@ -25,11 +25,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.file.support.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.io.file.support.separator.RecordSeparatorPolicy;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
+import org.springframework.batch.item.provider.AbstractItemReader;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -57,7 +58,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Rob Harrop
  */
-class ResourceLineReader implements ResourceLifecycle, InputSource,
+class ResourceLineReader extends AbstractItemReader implements ResourceLifecycle, ItemReader,
 		DisposableBean {
 
 	private static final Collection DEFAULT_COMMENTS = Collections
@@ -128,7 +129,7 @@ class ResourceLineReader implements ResourceLifecycle, InputSource,
 	 *             if there is an IOException while accessing the input
 	 *             resource.
 	 * 
-	 * @see org.springframework.batch.item.provider.support.InputSource#read()
+	 * @see org.springframework.batch.item.provider.support.ItemReader#read()
 	 */
 	public synchronized Object read() {
 		// Make a copy of the recordSeparatorPolicy reference, in case it is
@@ -179,7 +180,7 @@ class ResourceLineReader implements ResourceLifecycle, InputSource,
 	/**
 	 * Close the reader associated with this input source.
 	 * 
-	 * @see org.springframework.batch.io.InputSource#close()
+	 * @see org.springframework.batch.io.ItemReader#close()
 	 * @throws BatchEnvironmentException
 	 *             if there is an {@link IOException} during the close
 	 *             operation.

@@ -21,11 +21,11 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.item.AbstractItemReaderRecoverer;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemProvider;
-import org.springframework.batch.item.provider.AbstractItemProvider;
-import org.springframework.batch.retry.callback.ItemProviderRetryCallback;
-import org.springframework.batch.retry.policy.ItemProviderRetryPolicy;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
+import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
@@ -41,7 +41,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 	private RetryTemplate retryTemplate;
 
-	private ItemProvider provider;
+	private ItemReader provider;
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -68,8 +68,8 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		getMessages(); // drain queue
 		jdbcTemplate.execute("delete from T_FOOS");
 		jmsTemplate.convertAndSend("queue", "foo");
-		provider = new AbstractItemProvider() {
-			public Object next() {
+		provider = new AbstractItemReaderRecoverer() {
+			public Object read() {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
 				return text;
@@ -102,9 +102,9 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new ItemProviderRetryPolicy());
+		retryTemplate.setRetryPolicy(new ItemReaderRetryPolicy());
 
-		final ItemProviderRetryCallback callback = new ItemProviderRetryCallback(provider, new ItemProcessor() {
+		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new ItemProcessor() {
 			public void process(final Object text) {
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
 						Integer.valueOf(list.size()), text });
@@ -167,9 +167,9 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new ItemProviderRetryPolicy());
+		retryTemplate.setRetryPolicy(new ItemReaderRetryPolicy());
 
-		final ItemProviderRetryCallback callback = new ItemProviderRetryCallback(provider, new ItemProcessor() {
+		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new ItemProcessor() {
 			public void process(final Object text) {
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
 						Integer.valueOf(list.size()), text });

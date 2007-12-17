@@ -36,10 +36,10 @@ import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.SimpleStepConfiguration;
-import org.springframework.batch.execution.tasklet.ItemProviderProcessTasklet;
+import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemProvider;
-import org.springframework.batch.item.provider.ListItemProvider;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.provider.ListItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.DefaultExceptionHandler;
@@ -66,8 +66,8 @@ public class DefaultStepExecutorTests extends TestCase {
 
 	private RepeatTemplate template;
 
-	private ItemProvider getProvider(String[] args) {
-		return new ListItemProvider(Arrays.asList(args));
+	private ItemReader getProvider(String[] args) {
+		return new ListItemReader(Arrays.asList(args));
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class DefaultStepExecutorTests extends TestCase {
 	 * @throws Exception 
 	 */
 	private Tasklet getTasklet(String[] strings) throws Exception {
-		ItemProviderProcessTasklet module = new ItemProviderProcessTasklet();
+		ItemOrientedTasklet module = new ItemOrientedTasklet();
 		module.setItemProcessor(processor);
 		module.setItemProvider(getProvider(strings));
 		module.afterPropertiesSet();

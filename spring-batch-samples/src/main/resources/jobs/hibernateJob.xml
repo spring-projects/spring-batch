@@ -20,12 +20,12 @@
 				class="org.springframework.batch.execution.step.RepeatOperationsStepConfiguration">
 				<property name="tasklet">
 					<bean
-						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 						<property name="itemProvider">
 							<bean
-								class="org.springframework.batch.item.provider.InputSourceItemProvider">
-								<property name="inputSource"
-									ref="hibernateInputSource" />
+								class="org.springframework.batch.item.provider.DelegatingItemReader">
+								<property name="itemReader"
+									ref="hibernateItemReader" />
 							</bean>
 						</property>
 						<property name="itemProcessor">
@@ -76,8 +76,8 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
-	<bean id="hibernateInputSource"
-		class="org.springframework.batch.io.cursor.HibernateCursorInputSource"
+	<bean id="hibernateItemReader"
+		class="org.springframework.batch.io.cursor.HibernateCursorItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="queryString" value="from CustomerCredit" />

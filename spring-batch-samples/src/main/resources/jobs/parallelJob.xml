@@ -21,12 +21,12 @@
 				<bean id="staging" parent="simpleStep">
 					<property name="tasklet">
 						<bean
-							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.item.provider.InputSourceItemProvider">
-									<property name="inputSource"
-										ref="playerFileInputSource" />
+									class="org.springframework.batch.item.provider.DelegatingItemReader">
+									<property name="itemReader"
+										ref="playerFileItemReader" />
 								</bean>
 							</property>
 							<property name="itemProcessor">
@@ -56,10 +56,10 @@
 					class="org.springframework.batch.execution.step.RepeatOperationsStepConfiguration">
 					<property name="tasklet">
 						<bean
-							class="org.springframework.batch.execution.tasklet.ItemProviderProcessTasklet">
+							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.sample.item.provider.StagingItemProvider"
+									class="org.springframework.batch.sample.item.provider.StagingItemReader"
 									scope="step">
 									<aop:scoped-proxy />
 									<property name="dataSource"
@@ -109,12 +109,12 @@
 					<property name="saveRestartData" value="true" />
 					<property name="tasklet">
 						<bean
-							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.item.provider.InputSourceItemProvider">
-									<property name="inputSource"
-										ref="gameFileInputSource" />
+									class="org.springframework.batch.item.provider.DelegatingItemReader">
+									<property name="itemReader"
+										ref="gameFileItemReader" />
 								</bean>
 							</property>
 							<property name="itemProcessor">
@@ -139,11 +139,11 @@
 					<property name="saveRestartData" value="true" />
 					<property name="tasklet">
 						<bean
-							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.item.provider.InputSourceItemProvider">
-									<property name="inputSource"
+									class="org.springframework.batch.item.provider.DelegatingItemReader">
+									<property name="itemReader"
 										ref="playerSummarizationSource" />
 								</bean>
 							</property>
@@ -166,8 +166,8 @@
 		</property>
 	</bean>
 
-	<bean id="playerFileInputSource"
-		class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
+	<bean id="playerFileItemReader"
+		class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource"
@@ -185,8 +185,8 @@
 		</property>
 	</bean>
 
-	<bean id="gameFileInputSource"
-		class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
+	<bean id="gameFileItemReader"
+		class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource"
@@ -205,7 +205,7 @@
 	</bean>
 
 	<bean id="playerSummarizationSource"
-		class="org.springframework.batch.io.cursor.JdbcCursorInputSource"
+		class="org.springframework.batch.io.cursor.JdbcCursorItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="dataSource" ref="dataSource" />

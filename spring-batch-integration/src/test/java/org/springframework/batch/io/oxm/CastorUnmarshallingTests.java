@@ -4,7 +4,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.castor.CastorMarshaller;
 
-public class CastorUnmarshallingTests extends AbstractStaxEventReaderInputSourceTests {
+public class CastorUnmarshallingTests extends AbstractStaxEventReaderItemReaderTests {
 
 	protected Unmarshaller getUnmarshaller() throws Exception {
 		CastorMarshaller unmarshaller = new CastorMarshaller();

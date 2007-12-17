@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.provider.JmsItemProvider;
+import org.springframework.batch.item.provider.JmsItemReader;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.callback.ItemProviderRetryCallback;
+import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -138,12 +138,12 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 
 		assertInitialState();
 
-		JmsItemProvider provider = new JmsItemProvider();
+		JmsItemReader provider = new JmsItemReader();
 		// provider.setItemType(Message.class);
 		provider.setJmsTemplate(jmsTemplate);
 		jmsTemplate.setDefaultDestinationName("queue");
 
-		retryTemplate.execute(new ItemProviderRetryCallback(provider, new ItemProcessor() {
+		retryTemplate.execute(new ItemReaderRetryCallback(provider, new ItemProcessor() {
 			public void process(final Object text) {
 
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);

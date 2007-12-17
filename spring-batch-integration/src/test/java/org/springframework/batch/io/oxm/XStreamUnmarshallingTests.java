@@ -6,7 +6,7 @@ import org.springframework.batch.io.oxm.domain.Trade;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.xstream.XStreamMarshaller;
 
-public class XStreamUnmarshallingTests extends AbstractStaxEventReaderInputSourceTests {
+public class XStreamUnmarshallingTests extends AbstractStaxEventReaderItemReaderTests {
 
 	protected Unmarshaller getUnmarshaller() throws Exception {
 		XStreamMarshaller unmarshaller = new XStreamMarshaller();

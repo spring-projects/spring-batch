@@ -18,9 +18,8 @@ package org.springframework.batch.repeat;
 
 /**
  * Callback interface for batch operations. Many simple batch processes will be
- * able to use off-the-shelf implementations of this interface, e.g.
- * {@link org.springframework.batch.repeat.callback.ItemProviderRepeatCallback},
- * enabling the batch developer to concentrate on business logic.
+ * able to use off-the-shelf implementations of this interface, enabling the
+ * batch developer to concentrate on business logic.
  * 
  * @see RepeatOperations
  * 

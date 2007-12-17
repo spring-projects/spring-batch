@@ -20,9 +20,9 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.FieldSetMapper;
-import org.springframework.batch.io.file.support.SimpleFlatFileInputSource;
+import org.springframework.batch.io.file.support.SimpleFlatFileItemReader;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.provider.InputSourceItemProvider;
+import org.springframework.batch.item.provider.DelegatingItemReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -40,26 +40,26 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 
 	protected TradeProcessor processor = new TradeProcessor();
 
-	protected TradeItemProvider provider;
+	protected TradeItemReader provider;
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		provider = new TradeItemProvider(resource);
+		provider = new TradeItemReader(resource);
 	}
 
-	protected static class TradeItemProvider extends InputSourceItemProvider {
+	protected static class TradeItemReader extends DelegatingItemReader {
 
-		protected TradeItemProvider(Resource resource) throws Exception {
+		protected TradeItemReader(Resource resource) throws Exception {
 			super();
-			SimpleFlatFileInputSource inputSource = new SimpleFlatFileInputSource();
+			SimpleFlatFileItemReader inputSource = new SimpleFlatFileItemReader();
 			inputSource.setResource(resource);
 			inputSource.setFieldSetMapper(new TradeMapper());
 			inputSource.afterPropertiesSet();
-			setInputSource(inputSource);
+			setItemReader(inputSource);
 		}
 
-		public synchronized Object next() {
-			return super.next();
+		public synchronized Object read() throws Exception {
+			return super.read();
 		}
 	}
 

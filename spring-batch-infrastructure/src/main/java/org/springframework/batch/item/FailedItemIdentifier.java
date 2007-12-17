@@ -17,7 +17,7 @@
 package org.springframework.batch.item;
 
 /**
- * Mixin interface for {@link ItemProvider} implementations if they can
+ * Mixin interface for {@link ItemReader} implementations if they can
  * distinguish a new item from one that has been processed before and failed,
  * e.g. by examining a message flag.
  * 

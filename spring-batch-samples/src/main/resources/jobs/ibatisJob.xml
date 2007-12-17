@@ -19,10 +19,10 @@
 			<bean id="step1" parent="simpleStep">
 				<property name="tasklet">
 					<bean
-						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 						<property name="itemProvider">
-							<bean class="org.springframework.batch.item.provider.InputSourceItemProvider">
-								<property name="inputSource" ref="ibatisInputSource" />
+							<bean class="org.springframework.batch.item.provider.DelegatingItemReader">
+								<property name="itemReader" ref="ibatisItemReader" />
 							</bean>
 						</property>
 						<property name="itemProcessor">
@@ -43,7 +43,7 @@
 		</property>
 	</bean>
 
-	<bean id="ibatisInputSource" class="org.springframework.batch.io.driving.IbatisDrivingQueryInputSource"
+	<bean id="ibatisItemReader" class="org.springframework.batch.io.driving.IbatisDrivingQueryItemReader"
 		scope="step" >
 		<aop:scoped-proxy />
 		<property name="detailsQueryId" value="getCustomerCreditById" />

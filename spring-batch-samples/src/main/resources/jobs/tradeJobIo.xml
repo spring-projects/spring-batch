@@ -36,7 +36,7 @@
 	</bean>
 
 	<bean
-		class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
+		class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader"
 		id="fileInputTemplate" scope="step">
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator" />

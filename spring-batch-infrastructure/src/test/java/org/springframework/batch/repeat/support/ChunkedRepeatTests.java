@@ -16,12 +16,12 @@
 
 package org.springframework.batch.repeat.support;
 
-import org.springframework.batch.item.ItemProvider;
-import org.springframework.batch.item.provider.AbstractItemProvider;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.provider.AbstractItemReader;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.callback.ItemProviderRepeatCallback;
+import org.springframework.batch.repeat.callback.ItemReaderRepeatCallback;
 import org.springframework.batch.repeat.callback.NestedRepeatCallback;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -46,7 +46,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	public void testChunkedBatchWithTerminationPolicy() throws Exception {
 
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
-		final RepeatCallback callback = new ItemProviderRepeatCallback(provider, processor);
+		final RepeatCallback callback = new ItemReaderRepeatCallback(provider, processor);
 
 		final RepeatTemplate chunkTemplate = new RepeatTemplate();
 		// The policy is resettable so we only have to resolve this dependency
@@ -80,7 +80,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	public void testAsynchronousChunkedBatchWithCompletionPolicy() throws Exception {
 
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
-		final RepeatCallback callback = new ItemProviderRepeatCallback(provider, processor);
+		final RepeatCallback callback = new ItemReaderRepeatCallback(provider, processor);
 
 		final TaskExecutorRepeatTemplate chunkTemplate = new TaskExecutorRepeatTemplate();
 		// The policy is resettable so we only have to resolve this dependency
@@ -148,17 +148,17 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 		while (!chunker.ready()) {
 
-			ItemProvider truncated = new AbstractItemProvider() {
+			ItemReader truncated = new AbstractItemReader() {
 				int count = 0;
 
-				public Object next() throws Exception {
+				public Object read() throws Exception {
 					if (count++ < 2)
-						return provider.next();
+						return provider.read();
 					return null;
 				}
 			};
 			chunker.reset();
-			template.iterate(new ItemProviderRepeatCallback(truncated, processor) {
+			template.iterate(new ItemReaderRepeatCallback(truncated, processor) {
 
 				public ExitStatus doInIteration(RepeatContext context) throws Exception {
 					ExitStatus result = super.doInIteration(context);

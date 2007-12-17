@@ -20,12 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemProvider;
+import org.springframework.batch.item.ItemReader;
 
 
 /**
  * Custom class that contains logic that would normally be
- * be contained in {@link ItemProvider} (<code>getData()</code>) and
+ * be contained in {@link ItemReader} (<code>getData()</code>) and
  * {@link ItemProcessor} (<code>processData(..)</code>).
  * 
  * @author tomas.slanina

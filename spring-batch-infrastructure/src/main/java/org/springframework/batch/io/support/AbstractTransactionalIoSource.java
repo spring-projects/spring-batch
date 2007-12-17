@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.io.support;
 
-import org.springframework.batch.io.InputSource;
 import org.springframework.batch.io.ItemWriter;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -26,7 +26,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
  * <p>
  * Abstract class that abstracts away transaction handling from input and
- * output. Any {@link InputSource} or {@link ItemWriter} that wants to be
+ * output. Any {@link ItemReader} or {@link ItemWriter} that wants to be
  * notified of transaction events to maintain the contract that all calls to
  * read or write can extend this base class to ensure that correct ordering is
  * maintained regardless of rollbacks.

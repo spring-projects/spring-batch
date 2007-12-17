@@ -8,16 +8,16 @@ import org.springframework.batch.io.sample.domain.FooService;
 import org.springframework.util.Assert;
 
 /**
- * Tests for {@link AbstractDelegator}
+ * Tests for {@link AbstractMethodInvokingDelegator}
  * 
  * @author Robert Kasanicky
  */
 public class AbstractDelegatorTests extends TestCase {
 
-	private static class ConcreteDelegator extends AbstractDelegator {
+	private static class ConcreteDelegator extends AbstractMethodInvokingDelegator {
 	}
 
-	private AbstractDelegator delegator = new ConcreteDelegator();
+	private AbstractMethodInvokingDelegator delegator = new ConcreteDelegator();
 
 	private Foo foo = new Foo(0, "foo", 1);
 

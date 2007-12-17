@@ -15,11 +15,11 @@
 			<bean id="step1" parent="simpleStep">
 				<property name="tasklet">
 					<bean
-						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 						<property name="itemProvider">
 							<bean
-								class="org.springframework.batch.item.provider.ValidatingItemProvider">
-								<property name="inputSource" ref="fileInputTemplate" />
+								class="org.springframework.batch.item.provider.ValidatingItemReader">
+								<property name="itemReader" ref="fileInputTemplate" />
 								<property name="validator" ref="fixedValidator" />
 							</bean>
 						</property>
@@ -37,7 +37,7 @@
 	<!-- INFRASTRUCTURE SETUP -->
 
 	<!-- This input source is injected into the test case to verify the output - not used by the job at all -->
-	<bean id="testInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource">
+	<bean id="testInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader">
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
 		<property name="fieldSetMapper" ref="fieldSetMapper" />

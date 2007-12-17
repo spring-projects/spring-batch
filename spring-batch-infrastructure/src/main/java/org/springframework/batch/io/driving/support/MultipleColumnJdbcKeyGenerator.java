@@ -18,7 +18,7 @@ package org.springframework.batch.io.driving.support;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.io.driving.DrivingQueryInputSource;
+import org.springframework.batch.io.driving.DrivingQueryItemReader;
 import org.springframework.batch.io.driving.KeyGenerator;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -33,13 +33,13 @@ import org.springframework.util.StringUtils;
  * </p>
  *
  * @author Lucas Ward
- * @see DrivingQueryInputSource
+ * @see DrivingQueryItemReader
  * @since 1.0
  */
 public class MultipleColumnJdbcKeyGenerator implements
 		KeyGenerator {
 
-	public static final String RESTART_KEY = "CompositeKeySqlDrivingQueryInputSource.key";
+	public static final String RESTART_KEY = "CompositeKeySqlDrivingQueryItemReader.key";
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -54,7 +54,7 @@ public class MultipleColumnJdbcKeyGenerator implements
 	}
 
 	/**
-	 * Construct a new InputSource.
+	 * Construct a new ItemReader.
 	 *
 	 * @param jdbcTemplate
 	 * @param sql - Sql statement that returns all keys to process.
@@ -71,14 +71,14 @@ public class MultipleColumnJdbcKeyGenerator implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.sql.scratch.AbstractDrivingQueryInputSource#retrieveKeys()
+	 * @see org.springframework.batch.io.sql.scratch.AbstractDrivingQueryItemReader#retrieveKeys()
 	 */
 	public List retrieveKeys() {
 		return jdbcTemplate.query(sql, keyMapper);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.sql.scratch.AbstractDrivingQueryInputSource#restoreKeys(org.springframework.batch.restart.RestartData)
+	 * @see org.springframework.batch.io.sql.scratch.AbstractDrivingQueryItemReader#restoreKeys(org.springframework.batch.restart.RestartData)
 	 */
 	public List restoreKeys(RestartData restartData) {
 

@@ -17,7 +17,7 @@
 package org.springframework.batch.item.processor;
 
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.support.AbstractDelegator;
+import org.springframework.batch.support.AbstractMethodInvokingDelegator;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.util.Assert;
@@ -26,11 +26,11 @@ import org.springframework.util.Assert;
  * Delegates processing to a custom method -  extracts property values 
  * from item object and uses them as arguments for the delegate method.
  * 
- * @see DelegatingItemProcessor
+ * @see ItemProcessorAdapter
  * 
  * @author Robert Kasanicky
  */
-public class PropertyExtractingDelegatingItemProcessor extends AbstractDelegator implements ItemProcessor {
+public class PropertyExtractingDelegatingItemProcessor extends AbstractMethodInvokingDelegator implements ItemProcessor {
 	
 	private String[] fieldsUsedAsTargetMethodArguments;
 	

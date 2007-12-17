@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.provider.ListItemProvider;
+import org.springframework.batch.item.provider.ListItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.sample.tasklet.ExceptionRestartableTasklet;
@@ -38,7 +38,7 @@ public class ExceptionRestartableTaskletTests extends TestCase {
 		module.setItemProcessor(itemProcessor);
 		module.setThrowExceptionOnRecordNumber(ITER_COUNT + 1);
 		
-		module.setItemProvider(new ListItemProvider(new ArrayList() {{
+		module.setItemProvider(new ListItemReader(new ArrayList() {{
 			add("a");
 			add("b");
 			add("c");

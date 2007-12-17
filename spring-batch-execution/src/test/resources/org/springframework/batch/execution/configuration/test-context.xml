@@ -18,10 +18,10 @@
 			<bean id="step1" class="org.springframework.batch.execution.step.SimpleStepConfiguration">
 				<constructor-arg>
 					<bean
-						class="org.springframework.batch.execution.tasklet.ItemProviderProcessTasklet">
+						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
 						<property name="itemProvider">
 							<bean 
-								class="org.springframework.batch.item.provider.ListItemProvider">
+								class="org.springframework.batch.item.provider.ListItemReader">
 								<constructor-arg value="foo,bar,spam"/>
 							</bean>
 						</property>

@@ -3,7 +3,7 @@ package org.springframework.batch.io.driving.support;
 import java.util.List;
 import java.util.Properties;
 
-import org.springframework.batch.io.driving.DrivingQueryInputSource;
+import org.springframework.batch.io.driving.DrivingQueryItemReader;
 import org.springframework.batch.io.driving.KeyGenerator;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
@@ -19,11 +19,11 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  *
  * @author Robert Kasanicky
  * @author Lucas Ward
- * @see DrivingQueryInputSource
+ * @see DrivingQueryItemReader
  */
 public class IbatisKeyGenerator implements KeyGenerator {
 
-	public static final String RESTART_KEY = "IbatisDrivingQueryInputSource.keyIndex";
+	public static final String RESTART_KEY = "IbatisDrivingQueryItemReader.keyIndex";
 
 	private SqlMapClientTemplate sqlMapClientTemplate;
 
@@ -34,7 +34,7 @@ public class IbatisKeyGenerator implements KeyGenerator {
 	/*
 	 * Retrieve the keys using the provided driving query id.
 	 *
-	 * @see org.springframework.batch.io.support.AbstractDrivingQueryInputSource#retrieveKeys()
+	 * @see org.springframework.batch.io.support.AbstractDrivingQueryItemReader#retrieveKeys()
 	 */
 	public List retrieveKeys() {
 		return sqlMapClientTemplate.queryForList(drivingQuery);
@@ -54,7 +54,7 @@ public class IbatisKeyGenerator implements KeyGenerator {
 	/**
 	 * Restore the keys list given the provided restart data.
 	 *
-	 * @see org.springframework.batch.io.driving.DrivingQueryInputSource#restoreKeys(org.springframework.batch.restart.RestartData)
+	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#restoreKeys(org.springframework.batch.restart.RestartData)
 	 */
 	public List restoreKeys(RestartData data) {
 

@@ -7,13 +7,13 @@ import org.springframework.batch.io.sample.domain.FooService;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
- * Tests for {@link DelegatingItemProcessor}.
+ * Tests for {@link ItemProcessorAdapter}.
  * 
  * @author Robert Kasanicky
  */
 public class DelegatingItemProcessorIntegrationTests extends AbstractDependencyInjectionSpringContextTests {
 
-	private DelegatingItemProcessor processor;
+	private ItemProcessorAdapter processor;
 	
 	private FooService fooService;
 	
@@ -44,7 +44,7 @@ public class DelegatingItemProcessorIntegrationTests extends AbstractDependencyI
 	}
 	
 	//setter for auto-injection
-	public void setProcessor(DelegatingItemProcessor processor) {
+	public void setProcessor(ItemProcessorAdapter processor) {
 		this.processor = processor;
 	}
 

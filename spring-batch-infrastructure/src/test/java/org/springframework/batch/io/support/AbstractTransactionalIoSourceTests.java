@@ -43,7 +43,7 @@ public class AbstractTransactionalIoSourceTests extends TestCase {
 		TransactionSynchronizationManager.initSynchronization();
 	}
 		
-	//AbstractInputSource should synchronize on first call to read.
+	//AbstractItemReader should synchronize on first call to read.
 	public void testSynchronizationRegistration(){
 		
 		source.registerSynchronization();
@@ -97,7 +97,7 @@ public class AbstractTransactionalIoSourceTests extends TestCase {
 		assertFalse(source.rollbackCalled);
 	}
 	
-	private static class MockIoSource extends AbstractTransactionalIoSource{
+	private static class MockIoSource extends AbstractTransactionalIoSource {
 		
 		private boolean commitCalled = false;
 		private boolean rollbackCalled = false;
@@ -110,7 +110,11 @@ public class AbstractTransactionalIoSourceTests extends TestCase {
 		protected void transactionRolledBack() {
 			Assert.isTrue(!rollbackCalled, "Rollback aleady called");
 			rollbackCalled = true;
-		}		
+		}
+
+		public Object read() throws Exception {
+			return null;
+		}
 	}
 	
 	private void commit() {

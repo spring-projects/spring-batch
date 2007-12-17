@@ -1,18 +1,19 @@
 package org.springframework.batch.io.driving;
 
-import org.springframework.batch.io.InputSource;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.provider.AbstractItemReader;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-class FooInputSource implements InputSource, Restartable, DisposableBean, InitializingBean{
+class FooItemReader extends AbstractItemReader implements ItemReader, Restartable, DisposableBean, InitializingBean{
 
-	DrivingQueryInputSource inputSource;
+	DrivingQueryItemReader inputSource;
 	FooDao fooDao = new SingleKeyFooDao();
 
-	public FooInputSource(DrivingQueryInputSource inputSource, JdbcTemplate jdbcTemplate) {
+	public FooItemReader(DrivingQueryItemReader inputSource, JdbcTemplate jdbcTemplate) {
 		this.inputSource = inputSource;
 		fooDao.setJdbcTemplate(jdbcTemplate);
 	}

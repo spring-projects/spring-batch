@@ -39,11 +39,11 @@ import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory;
 import org.springframework.batch.execution.step.SimpleStepConfiguration;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
-import org.springframework.batch.execution.tasklet.ItemProviderProcessTasklet;
+import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemProvider;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
-import org.springframework.batch.item.provider.ListItemProvider;
+import org.springframework.batch.item.provider.ListItemReader;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -67,7 +67,7 @@ public class SimpleJobTests extends TestCase {
 		}
 	};
 
-	private ItemProvider provider;
+	private ItemReader provider;
 
 	private DefaultJobExecutor jobExecutor = new DefaultJobExecutor();;
 
@@ -92,11 +92,11 @@ public class SimpleJobTests extends TestCase {
 		return getTasklet(new String[] { arg0, arg1 });
 	}
 
-	private ItemProviderProcessTasklet getTasklet(String[] args) throws Exception {
-		ItemProviderProcessTasklet module = new ItemProviderProcessTasklet();
+	private ItemOrientedTasklet getTasklet(String[] args) throws Exception {
+		ItemOrientedTasklet module = new ItemOrientedTasklet();
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
-		provider = new ListItemProvider(items);
+		provider = new ListItemReader(items);
 		module.setItemRecoverer(new ItemRecoverer() {
 			public boolean recover(Object item, Throwable cause) {
 				recovered.add(item);
@@ -161,7 +161,7 @@ public class SimpleJobTests extends TestCase {
 		 * is recovered ("skipped") on the second attempt (see retry policy
 		 * definition above)...
 		 */
-		final ItemProviderProcessTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
+		final ItemOrientedTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
 		StepConfiguration step = new SimpleStepConfiguration(module);
 		module.setItemProcessor(new ItemProcessor() {
 			public void process(Object data) throws Exception {
@@ -177,7 +177,7 @@ public class SimpleJobTests extends TestCase {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getJob().getStatus());
 		assertEquals(0, processed.size());
 		// provider should be exhausted
-		assertEquals(null, provider.next());
+		assertEquals(null, provider.read());
 		assertEquals(3, recovered.size());
 	}
 
@@ -185,7 +185,7 @@ public class SimpleJobTests extends TestCase {
 
 		JobConfiguration jobConfiguration = new JobConfiguration();
 		JobIdentifier runtimeInformation = new SimpleJobIdentifier("real.job");
-		final ItemProviderProcessTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
+		final ItemOrientedTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
 		StepConfiguration step = new SimpleStepConfiguration(module);
 		module.setItemProcessor(new ItemProcessor() {
 			public void process(Object data) throws Exception {

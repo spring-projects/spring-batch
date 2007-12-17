@@ -15,12 +15,12 @@
 			<bean id="step1" parent="simpleStep">
 				<property name="tasklet">
 					<bean
-						class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 						<property name="itemProvider">
 							<bean
-								class="org.springframework.batch.item.provider.AggregateItemProvider">
-								<property name="inputSource"
-									ref="fileInputSource" />
+								class="org.springframework.batch.item.provider.AggregateItemReader">
+								<property name="itemReader"
+									ref="fileItemReader" />
 							</bean>
 						</property>
 						<property name="itemProcessor">
@@ -43,8 +43,8 @@
 		</property>
 	</bean>
 
-	<bean id="fileInputSource"
-		class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
+	<bean id="fileItemReader"
+		class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource"

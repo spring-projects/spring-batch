@@ -19,8 +19,8 @@ package org.springframework.batch.sample.tasklet;
 import java.util.Properties;
 
 import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.execution.tasklet.ItemProviderProcessTasklet;
-import org.springframework.batch.io.file.support.DefaultFlatFileInputSource;
+import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
+import org.springframework.batch.io.file.support.DefaultFlatFileItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.sample.dao.TradeWriter;
 import org.springframework.batch.sample.domain.Trade;
@@ -31,7 +31,7 @@ import org.springframework.batch.statistics.StatisticsProvider;
  * and processing of input data. This can be viable in cases, when the input
  * reading and processing logic need not to be reused in different contexts. In
  * general it is recommended to separate these two concerns using an
- * {@link ItemProviderProcessTasklet}.
+ * {@link ItemOrientedTasklet}.
  *
  * Note this class is thread-safe, as per the 'standard' module implementations
  * provided by the framework.
@@ -45,7 +45,7 @@ public class SimpleTradeTasklet implements Tasklet, StatisticsProvider {
 	/*
 	 * reads the data from input file
 	 */
-	private DefaultFlatFileInputSource inputSource;
+	private DefaultFlatFileItemReader inputSource;
 
 	/*
 	 * writes a Trade object to output
@@ -76,7 +76,7 @@ public class SimpleTradeTasklet implements Tasklet, StatisticsProvider {
 		return ExitStatus.CONTINUABLE;
 	}
 
-	public void setInputSource(DefaultFlatFileInputSource inputTemplate) {
+	public void setItemReader(DefaultFlatFileItemReader inputTemplate) {
 		this.inputSource = inputTemplate;
 	}
 

@@ -16,11 +16,11 @@
 				<bean id="step1" parent="simpleStep">
 					<property name="tasklet">
 						<bean
-							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.item.provider.ValidatingItemProvider">
-									<property name="inputSource" ref="fileInputTemplate" />
+									class="org.springframework.batch.item.provider.ValidatingItemReader">
+									<property name="itemReader" ref="fileInputTemplate" />
 									<property name="validator" ref="fixedValidator" />
 								</bean>
 							</property>
@@ -35,11 +35,11 @@
 				<bean id="step2" parent="simpleStep">
 					<property name="tasklet">
 						<bean
-							class="org.springframework.batch.execution.tasklet.RestartableItemProviderTasklet">
+							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemProvider">
 								<bean
-									class="org.springframework.batch.item.provider.InputSourceItemProvider">
-									<property name="inputSource" ref="fileInputTemplate2" />
+									class="org.springframework.batch.item.provider.DelegatingItemReader">
+									<property name="itemReader" ref="fileInputTemplate2" />
 								</bean>
 							</property>
 							<property name="itemProcessor">
@@ -55,7 +55,7 @@
 
 	<!-- INFRASTRUCTURE SETUP -->
 
-	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
+	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader"
 		scope="step" >
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator" />
@@ -63,7 +63,7 @@
 		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 
-	<bean id="fileInputTemplate2" class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"
+	<bean id="fileInputTemplate2" class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator2" />

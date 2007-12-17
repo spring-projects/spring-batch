@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.file.support.DefaultFlatFileInputSource;
+import org.springframework.batch.io.file.support.DefaultFlatFileItemReader;
 import org.springframework.batch.sample.dao.TradeWriter;
 import org.springframework.batch.sample.domain.Trade;
 
@@ -16,7 +16,7 @@ public class SimpleTradeTaskletTests extends TestCase {
 	public void testReadAndProcess() throws Exception {
 
 		//create input
-		DefaultFlatFileInputSource input = new DefaultFlatFileInputSource() {
+		DefaultFlatFileItemReader input = new DefaultFlatFileItemReader() {
 
 			private boolean done = false;
 
@@ -46,7 +46,7 @@ public class SimpleTradeTaskletTests extends TestCase {
 
 		//create module
 		SimpleTradeTasklet module = new SimpleTradeTasklet();
-		module.setInputSource(input);
+		module.setItemReader(input);
 		module.setTradeDao(writer);
 
 		//call tested methods

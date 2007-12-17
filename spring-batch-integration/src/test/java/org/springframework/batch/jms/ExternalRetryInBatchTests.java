@@ -21,16 +21,16 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.item.AbstractItemReaderRecoverer;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemProvider;
-import org.springframework.batch.item.provider.AbstractItemProvider;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.retry.callback.ItemProviderRetryCallback;
-import org.springframework.batch.retry.policy.ItemProviderRetryPolicy;
+import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
+import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -48,7 +48,7 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 
 	private RepeatTemplate repeatTemplate;
 
-	private ItemProvider provider;
+	private ItemReader provider;
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -80,8 +80,8 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 		jdbcTemplate.execute("delete from T_FOOS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
-		provider = new AbstractItemProvider() {
-			public Object next() {
+		provider = new AbstractItemReaderRecoverer() {
+			public Object read() {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
 				return text;
@@ -112,9 +112,9 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 	public void testExternalRetryRecoveryInBatch() throws Exception {
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new ItemProviderRetryPolicy(new SimpleRetryPolicy(1)));
+		retryTemplate.setRetryPolicy(new ItemReaderRetryPolicy(new SimpleRetryPolicy(1)));
 
-		final ItemProviderRetryCallback callback = new ItemProviderRetryCallback(provider, new ItemProcessor() {
+		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new ItemProcessor() {
 			public void process(final Object text) {
 				// No need for transaction here: the whole batch will roll
 				// back. When it comes back for recovery this code is not

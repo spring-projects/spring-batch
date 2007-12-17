@@ -22,7 +22,7 @@ import java.util.Set;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.callback.ItemProviderRepeatCallback;
+import org.springframework.batch.repeat.callback.ItemReaderRepeatCallback;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
@@ -41,7 +41,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		final String threadName = Thread.currentThread().getName();
 		final Set threadNames = new HashSet();
 
-		final RepeatCallback callback = new ItemProviderRepeatCallback(provider, processor) {
+		final RepeatCallback callback = new ItemReaderRepeatCallback(provider, processor) {
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
@@ -72,7 +72,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		final String threadName = Thread.currentThread().getName();
 		final Set threadNames = new HashSet();
 
-		final RepeatCallback stepCallback = new ItemProviderRepeatCallback(provider, processor) {
+		final RepeatCallback stepCallback = new ItemReaderRepeatCallback(provider, processor) {
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());

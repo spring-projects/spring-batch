@@ -21,7 +21,7 @@ import java.io.FileReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.batch.io.file.support.DefaultFlatFileInputSource;
+import org.springframework.batch.io.file.support.DefaultFlatFileItemReader;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -35,7 +35,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	//auto-injected attributes
 	private JdbcOperations jdbcTemplate;
 	private Resource fileLocator;
-	private DefaultFlatFileInputSource inputSource;
+	private DefaultFlatFileItemReader inputSource;
 
 	protected void onSetUp() throws Exception {
 		super.onSetUp();
@@ -89,7 +89,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 		this.fileLocator = fileLocator;
 	}
 
-	public void setDefaultFlatFileInputSource(DefaultFlatFileInputSource inputSource){
+	public void setDefaultFlatFileItemReader(DefaultFlatFileItemReader inputSource){
 		this.inputSource = inputSource;
 	}
 }

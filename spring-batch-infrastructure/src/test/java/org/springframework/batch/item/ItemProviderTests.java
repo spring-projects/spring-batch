@@ -18,18 +18,18 @@ package org.springframework.batch.item;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.provider.AbstractItemProvider;
+import org.springframework.batch.item.provider.AbstractItemReader;
 
 public class ItemProviderTests extends TestCase {
 
-	ItemProvider provider = new AbstractItemProvider() {
-		public Object next() {
+	ItemReader provider = new AbstractItemReader() {
+		public Object read() {
 			return "foo";
 		}
 	};
 
 	public void testNext() throws Exception {
-		assertEquals("foo", provider.next());
+		assertEquals("foo", provider.read());
 	}
 
 }
