@@ -27,7 +27,7 @@
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemProvider">
+							<property name="itemReader">
 								<bean
 									class="org.springframework.batch.item.provider.DelegatingItemReader">
 									<property name="itemReader"
@@ -57,7 +57,7 @@
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemProvider">
+							<property name="itemReader">
 								<bean
 									class="org.springframework.batch.item.provider.DelegatingItemReader">
 									<property name="itemReader"
@@ -87,7 +87,7 @@
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemProvider">
+							<property name="itemReader">
 								<bean
 									class="org.springframework.batch.item.provider.DelegatingItemReader">
 									<property name="itemReader"

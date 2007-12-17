@@ -38,7 +38,7 @@ public class ExceptionRestartableTaskletTests extends TestCase {
 		module.setItemProcessor(itemProcessor);
 		module.setThrowExceptionOnRecordNumber(ITER_COUNT + 1);
 		
-		module.setItemProvider(new ListItemReader(new ArrayList() {{
+		module.setItemReader(new ListItemReader(new ArrayList() {{
 			add("a");
 			add("b");
 			add("c");

@@ -56,7 +56,7 @@ public class StagingItemReaderTests extends
 		getJdbcTemplate().update("DELETE FROM BATCH_STAGING");
 	}
 
-	public void testProviderUpdatesProcessIndicator() throws Exception {
+	public void testReaderUpdatesProcessIndicator() throws Exception {
 
 		long id = getJdbcTemplate().queryForLong(
 				"SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?",
@@ -77,7 +77,7 @@ public class StagingItemReaderTests extends
 	}
 	
 	public void testUpdateProcessIndicatorAfterCommit() throws Exception {
-		testProviderUpdatesProcessIndicator();
+		testReaderUpdatesProcessIndicator();
 		setComplete();
 		endTransaction();
 		startNewTransaction();

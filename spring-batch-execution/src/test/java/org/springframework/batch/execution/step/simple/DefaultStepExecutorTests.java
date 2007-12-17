@@ -66,7 +66,7 @@ public class DefaultStepExecutorTests extends TestCase {
 
 	private RepeatTemplate template;
 
-	private ItemReader getProvider(String[] args) {
+	private ItemReader getReader(String[] args) {
 		return new ListItemReader(Arrays.asList(args));
 	}
 
@@ -78,7 +78,7 @@ public class DefaultStepExecutorTests extends TestCase {
 	private Tasklet getTasklet(String[] strings) throws Exception {
 		ItemOrientedTasklet module = new ItemOrientedTasklet();
 		module.setItemProcessor(processor);
-		module.setItemProvider(getProvider(strings));
+		module.setItemReader(getReader(strings));
 		module.afterPropertiesSet();
 		return module;
 	}

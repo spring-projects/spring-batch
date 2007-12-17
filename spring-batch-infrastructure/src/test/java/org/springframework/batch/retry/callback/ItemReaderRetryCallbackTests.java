@@ -157,7 +157,7 @@ public class ItemReaderRetryCallbackTests extends TestCase {
 	}
 
 	public void testGetKey() throws Exception {
-		assertEquals("key0", callback.getProvider().getKey("foo"));
+		assertEquals("key0", callback.getReader().getKey("foo"));
 	}
 
 	public void testRecoverWithoutSession() throws Exception {

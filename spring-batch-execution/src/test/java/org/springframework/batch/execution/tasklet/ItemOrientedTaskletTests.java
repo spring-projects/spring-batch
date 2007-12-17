@@ -73,7 +73,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 		module = new ItemOrientedTasklet();
 
 		// set up module
-		module.setItemProvider(itemProvider);
+		module.setItemReader(itemProvider);
 		module.setItemProcessor(itemProcessor);
 
 		module.afterPropertiesSet();
@@ -145,14 +145,14 @@ public class ItemOrientedTaskletTests extends TestCase {
 	}
 
 	public void testSkippableReader() throws Exception {
-		module.setItemProvider(new SkippableItemReader());
+		module.setItemReader(new SkippableItemReader());
 		module.setItemRecoverer(null);
 		module.skip();
 		assertEquals(1, list.size());
 	}
 
 	public void testSkippablReaderProcessor() throws Exception {
-		module.setItemProvider(new SkippableItemReader());
+		module.setItemReader(new SkippableItemReader());
 		module.setItemProcessor(new SkippableItemProcessor());
 		module.setItemRecoverer(null);
 		module.skip();
@@ -160,7 +160,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 	}
 
 	public void testStatisticsProvider() throws Exception {
-		module.setItemProvider(new SkippableItemReader());
+		module.setItemReader(new SkippableItemReader());
 		Properties stats = module.getStatistics();
 		assertEquals(1, stats.size());
 		assertEquals("bar", stats.getProperty("foo"));
@@ -174,7 +174,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 	}
 
 	public void testStatisticsProviderProcessor() throws Exception {
-		module.setItemProvider(new SkippableItemReader());
+		module.setItemReader(new SkippableItemReader());
 		module.setItemProcessor(new SkippableItemProcessor());
 		Properties stats = module.getStatistics();
 		assertEquals(2, stats.size());
@@ -184,7 +184,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 
 	public void testStatisticsProviderProcessorMergeDuplicates()
 			throws Exception {
-		module.setItemProvider(new SkippableItemReader());
+		module.setItemReader(new SkippableItemReader());
 		module.setItemProcessor(new SkippableItemProcessor(
 				"foo=bar\nspam=bucket"));
 		Properties stats = module.getStatistics();
@@ -207,7 +207,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 			}
 		});
 
-		module.setItemProvider(new AbstractItemReader() {
+		module.setItemReader(new AbstractItemReader() {
 			public Object read() throws Exception {
 				return "bar";
 			}
@@ -245,7 +245,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 				return true;
 			}
 		});
-		module.setItemProvider(new AbstractItemReader() {
+		module.setItemReader(new AbstractItemReader() {
 			public Object read() throws Exception {
 				return "foo";
 			}
@@ -278,7 +278,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 	}
 
 	public void testInitialisationWithNullProvider() throws Exception {
-		module.setItemProvider(null);
+		module.setItemReader(null);
 		try {
 			module.afterPropertiesSet();
 		} catch (IllegalArgumentException e) {

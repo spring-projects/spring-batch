@@ -152,7 +152,7 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 		public ItemProviderRetryContext(ItemReaderRetryCallback callback) {
 			super(RetrySynchronizationManager.getContext());
 			item = callback.next(this);
-			this.provider = callback.getProvider();
+			this.provider = callback.getReader();
 			this.recoverer = callback.getRecoverer();
 		}
 

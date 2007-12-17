@@ -127,7 +127,7 @@ public class ItemReaderRetryCallback implements RetryCallback {
 	 * 
 	 * @return the {@link ItemReader} instance.
 	 */
-	public ItemReader getProvider() {
+	public ItemReader getReader() {
 		return provider;
 	}
 

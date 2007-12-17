@@ -104,7 +104,7 @@ public class SimpleJobTests extends TestCase {
 				return true;
 			}
 		});
-		module.setItemProvider(provider);
+		module.setItemReader(provider);
 		module.setItemProcessor(processor);
 		module.afterPropertiesSet();
 		return module;

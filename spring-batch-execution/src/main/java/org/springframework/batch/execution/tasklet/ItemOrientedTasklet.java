@@ -168,7 +168,7 @@ public class ItemOrientedTasklet implements Tasklet, Skippable,
 	/**
 	 * @param itemProvider
 	 */
-	public void setItemProvider(ItemReader itemProvider) {
+	public void setItemReader(ItemReader itemProvider) {
 		this.itemProvider = itemProvider;
 	}
 

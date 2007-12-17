@@ -102,7 +102,7 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 
 		// create and set up module
 		module = new RestartableItemOrientedTasklet();
-		module.setItemProvider(itemProvider);
+		module.setItemReader(itemProvider);
 		module.setItemProcessor(itemProcessor);
 
 		// get restart data
@@ -120,7 +120,7 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 
 		// create and set up module
 		module = new RestartableItemOrientedTasklet();
-		module.setItemProvider(itemProvider);
+		module.setItemReader(itemProvider);
 		module.setItemProcessor(itemProcessor);
 
 		// get restart data
@@ -135,7 +135,7 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 
 		// create and set up module
 		module = new RestartableItemOrientedTasklet();
-		module.setItemProvider(null);
+		module.setItemReader(null);
 		module.setItemProcessor(null);
 
 		// get restart data
