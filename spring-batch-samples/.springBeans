@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.2.v200711172000]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.2.v200712142013]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -113,16 +113,6 @@
 			</configs>
 		</configSet>
 		<configSet>
-			<name><![CDATA[compositeProcessor]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>src/main/resources/simple-container-definition.xml</config>
-				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/data-source-context-init.xml</config>
-			</configs>
-		</configSet>
-		<configSet>
 			<name><![CDATA[multilineOrder]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
@@ -168,12 +158,83 @@
 			</configs>
 		</configSet>
 		<configSet>
+			<name><![CDATA[hibernate]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/hibernateJob.xml</config>
+				<config>src/main/resources/simple-container-definition.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[ibatis]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/ibatisJob.xml</config>
+				<config>src/main/resources/simple-container-definition.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[parallel]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/parallelJob.xml</config>
+				<config>src/main/resources/simple-container-definition.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[compositeProcessor]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/simple-container-definition.xml</config>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/compositeProcessorSampleJob.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[delegating]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/delegatingJob.xml</config>
+				<config>src/main/resources/simple-container-definition.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
 			<name><![CDATA[repositoryTest]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/simple-container-definition.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[staging]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/test/resources/org/springframework/batch/sample/item/processor/staging-test-context.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[rollback]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/rollbackJob.xml</config>
+				<config>src/main/resources/simple-container-definition.xml</config>
+				<config>src/main/resources/jobs/tradeJobIo.xml</config>
 			</configs>
 		</configSet>
 	</configSets>
