@@ -19,7 +19,7 @@ package org.springframework.batch.io.exception;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 
-public class BatchEnvironmentExceptionTests extends AbstractBatchCriticalExceptionTests {
+public class BatchEnvironmentExceptionTests extends AbstractExceptionTests {
 
 	public Exception getException(String msg) throws Exception {
 		return new BatchEnvironmentException(msg);

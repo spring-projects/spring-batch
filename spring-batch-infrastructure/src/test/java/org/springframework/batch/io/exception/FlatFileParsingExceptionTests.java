@@ -16,20 +16,26 @@
 
 package org.springframework.batch.io.exception;
 
-import org.springframework.batch.io.exception.BatchConfigurationException;
 
-public class BatchConfigurationExceptionTests extends AbstractExceptionTests {
+public class FlatFileParsingExceptionTests extends AbstractExceptionTests {
 
 	public Exception getException(String msg) throws Exception {
-		return new BatchConfigurationException(msg);
+		return new FlatFileParsingException(msg, "bar");
 	}
 
 	public Exception getException(Throwable t) throws Exception {
-		return new BatchConfigurationException(t);
+		return new FlatFileParsingException(t, "bar");
 	}
 
 	public Exception getException(String msg, Throwable t) throws Exception {
-		return new BatchConfigurationException(msg, t);
+		return new FlatFileParsingException(msg, t, "bar", 100);
+	}
+	
+	public void testMessageInputLineCount() throws Exception {
+		FlatFileParsingException exception = new FlatFileParsingException("foo", "bar", 100);
+		assertEquals("foo", exception.getMessage());
+		assertEquals("bar", exception.getInput());
+		assertEquals(100, exception.getLineNumber());
 	}
 	
 }

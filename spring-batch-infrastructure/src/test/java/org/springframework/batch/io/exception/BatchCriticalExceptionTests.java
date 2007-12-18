@@ -17,7 +17,7 @@
 package org.springframework.batch.io.exception;
 
 
-public class BatchCriticalExceptionTests extends AbstractBatchCriticalExceptionTests {
+public class BatchCriticalExceptionTests extends AbstractExceptionTests {
 
 	public Exception getException(String msg) throws Exception {
 		return new BatchCriticalException(msg);
