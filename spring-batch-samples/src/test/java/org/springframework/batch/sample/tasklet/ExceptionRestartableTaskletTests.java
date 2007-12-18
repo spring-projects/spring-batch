@@ -23,7 +23,7 @@ public class ExceptionRestartableTaskletTests extends TestCase {
 	
 	public void testProcess() throws Exception {
 		
-		//create mock item processor wich will be called by module.process() method
+		//create mock item processor which will be called by module.process() method
 		MockControl processorControl = MockControl.createControl(ItemProcessor.class);
 		ItemProcessor itemProcessor = (ItemProcessor)processorControl.getMock();
 		
