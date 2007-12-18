@@ -77,6 +77,8 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 
 	private int linesToSkip = 0;
 
+	private String path;
+
 	/**
 	 * Setter for resource property. The location of an input stream that can be
 	 * read.
@@ -86,6 +88,10 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 	 */
 	public void setResource(Resource resource) throws IOException {
 		this.resource = resource;
+		path = resource.toString();
+		if (path.length()>50) {
+			path = path.substring(0,20)+"..."+path.substring(path.length());
+		}
 	}
 
 	/**
@@ -196,8 +202,9 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 				return fieldSetMapper.mapLine(tokenizedLine);
 			} catch (RuntimeException ex) {
 				// add current line count to message and re-throw
-				throw new FlatFileParsingException("Parsing error", ex, line,
-						getReader().getCurrentLineCount());
+				int lineCount = getReader().getCurrentLineCount();
+				throw new FlatFileParsingException("Parsing error at line: "+lineCount+" in resource="+path+", input=["+line+"]", ex, line,
+						lineCount);
 			}
 		}
 		return null;
