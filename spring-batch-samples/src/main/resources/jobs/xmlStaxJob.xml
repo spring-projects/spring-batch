@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="
@@ -9,8 +11,8 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-	<bean parent="stepScope"/>
-	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
+	<bean parent="stepScope" />
+	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
 	<bean id="xmlStaxJob" parent="simpleJob">
 		<property name="steps">
@@ -19,29 +21,33 @@
 					<bean
 						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 						<property name="itemReader">
-							<bean class="org.springframework.batch.item.provider.DelegatingItemReader">
-								<property name="itemReader">
-									<bean class="org.springframework.batch.io.file.support.StaxEventReaderItemReader" scope="step">
-										<aop:scoped-proxy/>
-										<property name="fragmentRootElementName" value="trade" />
-										<property name="resource" value="data/staxJob/input/20070918.testStream.xmlFileStep.xml" />
-									    <property name="fragmentDeserializer">
-									    	<bean class="org.springframework.batch.io.file.support.oxm.UnmarshallingFragmentDeserializer">
-									    		<constructor-arg>
-									    			<bean class="org.springframework.oxm.xstream.XStreamMarshaller">
-									    				<property name="aliases" ref="aliases" />
-									    			</bean>
-									    		</constructor-arg>
-									    	</bean>
-									    </property>
+							<bean
+								class="org.springframework.batch.io.file.support.StaxEventReaderItemReader"
+								scope="step">
+								<aop:scoped-proxy />
+								<property name="fragmentRootElementName"
+									value="trade" />
+								<property name="resource"
+									value="data/staxJob/input/20070918.testStream.xmlFileStep.xml" />
+								<property name="fragmentDeserializer">
+									<bean
+										class="org.springframework.batch.io.file.support.oxm.UnmarshallingFragmentDeserializer">
+										<constructor-arg>
+											<bean
+												class="org.springframework.oxm.xstream.XStreamMarshaller">
+												<property name="aliases"
+													ref="aliases" />
+											</bean>
+										</constructor-arg>
 									</bean>
 								</property>
 							</bean>
 						</property>
 
 						<property name="itemProcessor">
-								<bean class="org.springframework.batch.item.processor.ItemWriterItemProcessor"
-									p:itemWriter-ref="tradeStaxWriter" />
+							<bean
+								class="org.springframework.batch.item.processor.ItemWriterItemProcessor"
+								p:itemWriter-ref="tradeStaxWriter" />
 						</property>
 					</bean>
 				</property>
@@ -49,23 +55,30 @@
 		</property>
 	</bean>
 
-	<bean class="org.springframework.batch.io.file.support.StaxEventWriterItemWriter" id="tradeStaxWriter">
-		<property name="resource" value="file:target/test-outputs/20070918.testStream.xmlFileStep.output.xml" />
+	<bean
+		class="org.springframework.batch.io.file.support.StaxEventWriterItemWriter"
+		id="tradeStaxWriter">
+		<property name="resource"
+			value="file:target/test-outputs/20070918.testStream.xmlFileStep.output.xml" />
 		<property name="serializer" ref="tradeMarshallingSerializer" />
 		<property name="rootTagName" value="trades" />
 		<property name="overwriteOutput" value="true" />
 	</bean>
 
-	<bean class="org.springframework.batch.io.file.support.oxm.MarshallingObjectToXmlSerializer" id="tradeMarshallingSerializer">
+	<bean
+		class="org.springframework.batch.io.file.support.oxm.MarshallingObjectToXmlSerializer"
+		id="tradeMarshallingSerializer">
 		<constructor-arg>
-   			<bean class="org.springframework.oxm.xstream.XStreamMarshaller">
-   				<property name="aliases" ref="aliases" />
-   			</bean>
+			<bean
+				class="org.springframework.oxm.xstream.XStreamMarshaller">
+				<property name="aliases" ref="aliases" />
+			</bean>
 		</constructor-arg>
 	</bean>
 
 	<util:map id="aliases">
-	    <entry key="trade" value="org.springframework.batch.sample.domain.Trade" />
+		<entry key="trade"
+			value="org.springframework.batch.sample.domain.Trade" />
 		<entry key="isin" value="java.lang.String" />
 		<entry key="quantity" value="long" />
 		<entry key="price" value="java.math.BigDecimal" />

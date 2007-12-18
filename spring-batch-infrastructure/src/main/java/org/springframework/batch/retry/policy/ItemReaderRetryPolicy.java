@@ -145,14 +145,14 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 		// The delegate context...
 		private RetryContext delegateContext;
 
-		private ItemReader provider;
+		private ItemReader reader;
 
 		private ItemRecoverer recoverer;
 
 		public ItemProviderRetryContext(ItemReaderRetryCallback callback) {
 			super(RetrySynchronizationManager.getContext());
 			item = callback.next(this);
-			this.provider = callback.getReader();
+			this.reader = callback.getReader();
 			this.recoverer = callback.getRecoverer();
 		}
 
@@ -165,8 +165,8 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 		}
 
 		public RetryContext open(RetryCallback callback) {
-			if (hasFailed(provider, item)) {
-				this.delegateContext = retryContextCache.get(provider
+			if (hasFailed(reader, item)) {
+				this.delegateContext = retryContextCache.get(reader
 						.getKey(item));
 			}
 			if (this.delegateContext == null) {
@@ -180,7 +180,7 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 
 		public void registerThrowable(RetryContext context, Throwable throwable)
 				throws TerminatedRetryException {
-			retryContextCache.put(provider.getKey(item), this.delegateContext);
+			retryContextCache.put(reader.getKey(item), this.delegateContext);
 			delegate.registerThrowable(this.delegateContext, throwable);
 		}
 
@@ -199,7 +199,7 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 		public Object handleRetryExhausted(RetryContext context)
 				throws Exception {
 			// If there is no going back, then we can remove the history
-			retryContextCache.remove(provider.getKey(item));
+			retryContextCache.remove(reader.getKey(item));
 			RepeatSynchronizationManager.setCompleteOnly();
 			if (recoverer != null) {
 				boolean success = recoverer.recover(item, context

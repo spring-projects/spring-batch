@@ -27,13 +27,7 @@
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemReader">
-								<bean
-									class="org.springframework.batch.item.provider.DelegatingItemReader">
-									<property name="itemReader"
-										ref="playerFileItemReader" />
-								</bean>
-							</property>
+							<property name="itemReader" ref="playerFileItemReader" />
 							<property name="itemProcessor">
 								<bean
 									class="org.springframework.batch.sample.item.processor.PlayerItemProcessor">
@@ -57,13 +51,7 @@
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemReader">
-								<bean
-									class="org.springframework.batch.item.provider.DelegatingItemReader">
-									<property name="itemReader"
-										ref="gameFileItemReader" />
-								</bean>
-							</property>
+							<property name="itemReader" ref="gameFileItemReader" />
 							<property name="itemProcessor">
 								<bean
 									class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
@@ -87,13 +75,7 @@
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemReader">
-								<bean
-									class="org.springframework.batch.item.provider.DelegatingItemReader">
-									<property name="itemReader"
-										ref="playerSummarizationSource" />
-								</bean>
-							</property>
+							<property name="itemReader" ref="playerSummarizationSource" />
 							<property name="itemProcessor">
 								<bean
 									class="org.springframework.batch.item.processor.ItemWriterItemProcessor">

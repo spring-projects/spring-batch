@@ -21,13 +21,7 @@
 				<property name="tasklet">
 					<bean
 						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-						<property name="itemReader">
-							<bean
-								class="org.springframework.batch.item.provider.DelegatingItemReader">
-								<property name="itemReader"
-									ref="hibernateItemReader" />
-							</bean>
-						</property>
+						<property name="itemReader" ref="hibernateItemReader" />
 						<property name="itemProcessor">
 							<bean
 								class="org.springframework.batch.sample.item.processor.CustomerCreditIncreaseProcessor">

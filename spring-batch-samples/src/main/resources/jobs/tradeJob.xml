@@ -41,13 +41,7 @@
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemReader">
-								<bean
-									class="org.springframework.batch.item.provider.DelegatingItemReader">
-									<property name="itemReader"
-										ref="tradeSqlItemReader" />
-								</bean>
-							</property>
+							<property name="itemReader" ref="tradeSqlItemReader" />
 							<property name="itemProcessor">
 								<bean
 									class="org.springframework.batch.sample.item.processor.CustomerUpdateProcessor"
@@ -60,12 +54,7 @@
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemReader">
-								<bean
-									class="org.springframework.batch.item.provider.DelegatingItemReader">
-									<property name="itemReader" ref="customerSqlItemReader" />
-								</bean>
-							</property>
+							<property name="itemReader" ref="customerSqlItemReader" />
 							<property name="itemProcessor">
 								<bean
 									class="org.springframework.batch.sample.item.processor.CustomerCreditUpdateProcessor"
