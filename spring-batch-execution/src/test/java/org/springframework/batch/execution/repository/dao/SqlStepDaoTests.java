@@ -37,5 +37,5 @@ public class SqlStepDaoTests extends AbstractStepDaoTests {
 		assertEquals(LONG_STRING.substring(0, 250), ((Map) executions.get(0))
 				.get("EXIT_MESSAGE"));
 	}
-
+	
 }

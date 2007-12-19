@@ -75,7 +75,9 @@ public class StagingItemReader extends JdbcDaoSupport implements
 		Assert.state(keys == null || initialized,
 				"Cannot open an already open StagingItemProvider"
 						+ ", call close() first.");
-		keys = retrieveKeys().iterator();
+		synchronized (lock) {
+			keys = retrieveKeys().iterator();			
+		}
 		logger.info("keys: " + keys);
 		registerSynchronization();
 		initialized = true;
@@ -147,7 +149,7 @@ public class StagingItemReader extends JdbcDaoSupport implements
 			throw new OptimisticLockingFailureException(
 					"The staging record with ID="
 							+ id
-							+ " was updated concurrently when trying to mark as complete.");
+							+ " was updated concurrently when trying to mark as complete (updated "+count+" records.");
 		}
 		return result;
 	}

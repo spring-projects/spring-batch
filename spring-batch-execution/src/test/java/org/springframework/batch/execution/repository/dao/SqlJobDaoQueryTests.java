@@ -66,7 +66,7 @@ public class SqlJobDaoQueryTests extends TestCase {
 				return 1;
 			}
 		});
-		sqlDao.save(new JobInstance(new SimpleJobIdentifier("foo"), new Long(11)).createNewJobExecution());
+		sqlDao.save(new JobInstance(new SimpleJobIdentifier("foo"), new Long(11)).createJobExecution());
 		assertEquals(1, list.size());
 		String query = (String) list.get(0);
 		assertTrue("Query did not contain FOO_:"+query, query.indexOf("FOO_")>=0);

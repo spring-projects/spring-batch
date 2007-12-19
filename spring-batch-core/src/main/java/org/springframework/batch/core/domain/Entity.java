@@ -34,7 +34,7 @@ public class Entity implements Serializable {
 
 	private Long id;
 
-	private Integer version;
+	private Integer version = new Integer(0);
 	
 	public Entity() {
 		super();
@@ -58,6 +58,13 @@ public class Entity implements Serializable {
 	 */
 	public Integer getVersion() {
 		return version;
+	}
+	
+	/**
+	 * 
+	 */
+	public void incrementVersion() {
+		version = new Integer(version.intValue()+1);
 	}
 
 	// @Override

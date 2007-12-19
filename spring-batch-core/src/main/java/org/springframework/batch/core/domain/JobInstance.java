@@ -101,7 +101,7 @@ public class JobInstance extends Entity {
 		return identifier==null ? null : identifier.getName();
 	}
 	
-	public JobExecution createNewJobExecution() {
+	public JobExecution createJobExecution() {
 		return new JobExecution(this);
 	}
 	

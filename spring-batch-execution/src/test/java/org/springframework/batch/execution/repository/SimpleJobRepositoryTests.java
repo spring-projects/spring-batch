@@ -102,8 +102,8 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobConfiguration.setSteps(stepConfigurations);
 		
 		databaseJob = new JobInstance(jobRuntimeInformation, new Long(1)) {
-			public JobExecution createNewJobExecution() {
-				jobExecution = super.createNewJobExecution();
+			public JobExecution createJobExecution() {
+				jobExecution = super.createJobExecution();
 				return jobExecution;
 			}
 		};
@@ -170,7 +170,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.setReturnValue(1);
 		jobDao.findJobExecutions(databaseJob);
 		final List executions = new ArrayList();
-		JobExecution execution =databaseJob.createNewJobExecution();
+		JobExecution execution =databaseJob.createJobExecution();
 		executions.add(execution);
 		// For this test it is important that the execution is finished
 		// and the executions in the list contain one with an end date

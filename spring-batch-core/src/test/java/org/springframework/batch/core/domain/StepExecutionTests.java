@@ -111,11 +111,11 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepExecution#incrementRollbackCount()}.
+	 * {@link org.springframework.batch.core.domain.StepExecution#rollback()}.
 	 */
 	public void testIncrementRollbackCount() {
 		int before = execution.getRollbackCount().intValue();
-		execution.incrementRollbackCount();
+		execution.rollback();
 		int after = execution.getRollbackCount().intValue();
 		assertEquals(before + 1, after);
 	}

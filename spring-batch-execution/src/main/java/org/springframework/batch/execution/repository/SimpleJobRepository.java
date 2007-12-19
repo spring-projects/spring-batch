@@ -185,7 +185,7 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	private JobExecution generateJobExecution(JobInstance job) {
-		JobExecution execution = job.createNewJobExecution();
+		JobExecution execution = job.createJobExecution();
 		// Save the JobExecution so that it picks up an ID (useful for clients
 		// monitoring asynchronous executions):
 		saveOrUpdate(execution);

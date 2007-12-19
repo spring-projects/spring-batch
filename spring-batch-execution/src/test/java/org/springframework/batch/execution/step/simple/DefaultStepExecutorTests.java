@@ -25,6 +25,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.configuration.StepConfigurationSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
@@ -115,6 +116,7 @@ public class DefaultStepExecutorTests extends TestCase {
 
 		stepExecutor.process(stepConfiguration, stepExecution);
 		assertEquals(1, processed.size());
+		assertEquals(1, stepExecution.getTaskCount().intValue());
 	}
 
 	public void testChunkExecutor() throws Exception {
@@ -131,8 +133,11 @@ public class DefaultStepExecutorTests extends TestCase {
 				jobIdentifier, new Long(1)));
 
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
-		stepExecutor.processChunk(stepConfiguration, stepExecution);
+		StepContribution contribution = stepExecution.createStepContribution();
+		stepExecutor.processChunk(stepConfiguration, contribution);
 		assertEquals(1, processed.size());
+		assertEquals(0, stepExecution.getTaskCount().intValue());
+		assertEquals(1, contribution.getTaskCount());
 
 	}
 

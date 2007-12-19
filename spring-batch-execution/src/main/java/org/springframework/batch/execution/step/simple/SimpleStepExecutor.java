@@ -22,6 +22,7 @@ import java.util.Properties;
 
 import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
@@ -77,12 +78,6 @@ import org.springframework.util.Assert;
  */
 public class SimpleStepExecutor implements StepExecutor {
 
-	/**
-	 * Context attribute key for step execution. Used by monitoring and managing
-	 * clients to inspect current step execution.
-	 */
-	private static final String STEP_EXECUTION_KEY = "STEP_EXECUTION";
-
 	private RepeatOperations chunkOperations = new RepeatTemplate();
 
 	private RepeatOperations stepOperations = new RepeatTemplate();
@@ -97,8 +92,7 @@ public class SimpleStepExecutor implements StepExecutor {
 	// Not for production use...
 	protected PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-	public void setTransactionManager(
-			PlatformTransactionManager transactionManager) {
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
 
@@ -117,8 +111,7 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * processing. Should be set up by the caller through a factory. Defaults to
 	 * a plain {@link RepeatTemplate}.
 	 * 
-	 * @param stepOperations
-	 *            a {@link RepeatOperations} instance.
+	 * @param stepOperations a {@link RepeatOperations} instance.
 	 */
 	public void setStepOperations(RepeatOperations stepOperations) {
 		this.stepOperations = stepOperations;
@@ -129,8 +122,7 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * processing. Should be set up by the caller through a factory. Defaults to
 	 * a plain {@link RepeatTemplate}.
 	 * 
-	 * @param chunkOperations
-	 *            a {@link RepeatOperations} instance.
+	 * @param chunkOperations a {@link RepeatOperations} instance.
 	 */
 	public void setChunkOperations(RepeatOperations chunkOperations) {
 		this.chunkOperations = chunkOperations;
@@ -146,15 +138,13 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * execution, which would normally be available to the caller somehow
 	 * through the step's {@link JobExecutionContext}.<br/>
 	 * 
-	 * @throws StepInterruptedException
-	 *             if the step or a chunk is interrupted
-	 * @throws RuntimeException
-	 *             if there is an exception during a chunk execution
+	 * @throws StepInterruptedException if the step or a chunk is interrupted
+	 * @throws RuntimeException if there is an exception during a chunk
+	 * execution
 	 * @see StepExecutor#process(StepConfiguration, StepExecution)
 	 */
-	public ExitStatus process(final StepConfiguration configuration,
-			final StepExecution stepExecution) throws BatchCriticalException,
-			StepInterruptedException {
+	public ExitStatus process(final StepConfiguration configuration, final StepExecution stepExecution)
+			throws BatchCriticalException, StepInterruptedException {
 
 		final StepInstance step = stepExecution.getStep();
 		boolean isRestart = step.getStepExecutionCount() > 0 ? true : false;
@@ -164,17 +154,14 @@ public class SimpleStepExecutor implements StepExecutor {
 
 		ExitStatus status = ExitStatus.FAILED;
 
-		final SimpleStepContext stepScopeContext = StepSynchronizationManager
-				.open();
+		final SimpleStepContext stepScopeContext = StepSynchronizationManager.open();
 		stepScopeContext.setStepExecution(stepExecution);
 		// Add the job identifier so that it can be used to identify
 		// the conversation in StepScope
-		stepScopeContext.setAttribute(StepScope.ID_KEY, stepExecution
-				.getJobExecution().getJob().getIdentifier());
+		stepScopeContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getJob().getIdentifier());
 
 		try {
-			stepExecution
-					.setStartTime(new Timestamp(System.currentTimeMillis()));
+			stepExecution.setStartTime(new Timestamp(System.currentTimeMillis()));
 			updateStatus(stepExecution, BatchStatus.STARTED);
 
 			final boolean saveRestartData = configuration.isSaveRestartData();
@@ -185,56 +172,53 @@ public class SimpleStepExecutor implements StepExecutor {
 
 			status = stepOperations.iterate(new RepeatCallback() {
 
-				public ExitStatus doInIteration(final RepeatContext context)
-						throws Exception {
+				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
 
-					stepExecution.getJobExecution()
-							.registerStepContext(context);
-					context.registerDestructionCallback(
-							"STEP_EXECUTION_CONTEXT_CALLBACK", new Runnable() {
-								public void run() {
-									stepExecution.getJobExecution()
-											.unregisterStepContext(context);
-								}
-							});
-					// Add the step execution as an attribute so monitoring
-					// clients can see it.
-					context.setAttribute(STEP_EXECUTION_KEY, stepExecution);
+					final StepContribution contribution = stepExecution.createStepContribution();
+					contribution.registerStepContext(context);
+
 					// Before starting a new transaction, check for
 					// interruption.
 					interruptionPolicy.checkInterrupted(context);
 
 					ExitStatus result;
+
 					try {
-						result = (ExitStatus) new TransactionTemplate(
-								transactionManager)
+
+						result = (ExitStatus) new TransactionTemplate(transactionManager)
 								.execute(new TransactionCallback() {
-									public Object doInTransaction(
-											TransactionStatus status) {
-										// New transaction obtained,
-										// resynchronize
-										// TransactionSyncrhonization objects
-										BatchTransactionSynchronizationManager
-												.resynchronize();
+									public Object doInTransaction(TransactionStatus status) {
+										/*
+										 * New transaction obtained,
+										 * resynchronize
+										 * TransactionSynchronization objects
+										 */
+										BatchTransactionSynchronizationManager.resynchronize();
 										ExitStatus result;
 
-										result = processChunk(configuration,
-												stepExecution);
+										result = processChunk(configuration, contribution);
+
+										// TODO: Statistics are not thread safe
+										// - we cannot guarantee that they are
+										// up to date.  (Maybe we never can?)
+										Properties statistics = getStatistics(module);
+										contribution.setStatistics(statistics);
+										contribution.incrementCommitCount();
+										// Apply the contribution to the step
+										// only if chunk was successful
+										stepExecution.apply(contribution);
 
 										if (saveRestartData) {
-											step
-													.setRestartData(getRestartData(module));
+											step.setRestartData(getRestartData(module));
 											jobRepository.update(step);
 										}
-										Properties statistics = getStatistics(module);
-										stepExecution.setStatistics(statistics);
-										stepExecution.incrementCommitCount();
-										jobRepository
-												.saveOrUpdate(stepExecution);
+										jobRepository.saveOrUpdate(stepExecution);
 										return result;
 									}
 								});
-					} catch (Throwable t) {
+
+					}
+					catch (Throwable t) {
 						/*
 						 * Any exception thrown within the transaction template
 						 * will automatically cause the transaction to rollback.
@@ -242,10 +226,11 @@ public class SimpleStepExecutor implements StepExecutor {
 						 * commit (e.g. Hibernate flush) so this catch block
 						 * comes outside the transaction.
 						 */
-						stepExecution.incrementRollbackCount();
+						stepExecution.rollback();
 						if (t instanceof RuntimeException) {
 							throw (RuntimeException) t;
-						} else {
+						}
+						else {
 							throw new RuntimeException(t);
 						}
 					}
@@ -263,30 +248,34 @@ public class SimpleStepExecutor implements StepExecutor {
 
 			updateStatus(stepExecution, BatchStatus.COMPLETED);
 			return status;
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 
 			// classify exception so an exit code can be stored.
 			status = exceptionClassifier.classifyForExitCode(e);
 			if (e.getCause() instanceof StepInterruptedException) {
 				updateStatus(stepExecution, BatchStatus.STOPPED);
 				throw (StepInterruptedException) e.getCause();
-			} else {
+			}
+			else {
 				updateStatus(stepExecution, BatchStatus.FAILED);
 				throw e;
 			}
 
-		} finally {
+		}
+		finally {
 			stepExecution.setExitStatus(status);
 			stepExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
 			try {
 				jobRepository.saveOrUpdate(stepExecution);
-			} finally {
+			}
+			finally {
 				// clear any registered synchronizations
 				try {
 					StepSynchronizationManager.close();
-				} finally {
-					BatchTransactionSynchronizationManager
-							.clearSynchronizations();
+				}
+				finally {
+					BatchTransactionSynchronizationManager.clearSynchronizations();
 				}
 			}
 		}
@@ -296,12 +285,9 @@ public class SimpleStepExecutor implements StepExecutor {
 	/**
 	 * Convenience method to update the status in all relevant places.
 	 * 
-	 * @param step
-	 *            the current step
-	 * @param stepExecution
-	 *            the current stepExecution
-	 * @param status
-	 *            the status to set
+	 * @param step the current step
+	 * @param stepExecution the current stepExecution
+	 * @param status the status to set
 	 */
 	private void updateStatus(StepExecution stepExecution, BatchStatus status) {
 		StepInstance step = stepExecution.getStep();
@@ -309,8 +295,7 @@ public class SimpleStepExecutor implements StepExecutor {
 		step.setStatus(status);
 		jobRepository.update(step);
 		jobRepository.saveOrUpdate(stepExecution);
-		for (Iterator iter = stepExecution.getJobExecution().getStepContexts()
-				.iterator(); iter.hasNext();) {
+		for (Iterator iter = stepExecution.getJobExecution().getStepContexts().iterator(); iter.hasNext();) {
 			RepeatContext context = (RepeatContext) iter.next();
 			context.setAttribute("JOB_STATUS", status);
 		}
@@ -322,37 +307,25 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * outside this method, so subclasses that override do not need to create a
 	 * transaction.
 	 * 
-	 * @param configuration
-	 *            the current step configuration
-	 * @param stepExecution
-	 *            the current step, containing the {@link Tasklet} with the
-	 *            business logic.
+	 * @param configuration the current step configuration
+	 * @param stepExecution the current step, containing the {@link Tasklet}
+	 * with the business logic.
 	 * @return true if there is more data to process.
 	 */
-	protected final ExitStatus processChunk(
-			final StepConfiguration configuration,
-			final StepExecution stepExecution) {
-		return chunkOperations.iterate(new RepeatCallback() {
-			public ExitStatus doInIteration(final RepeatContext context)
-					throws Exception {
-				stepExecution.getJobExecution().registerChunkContext(context);
-				context.registerDestructionCallback(
-						"CHUNK_EXECUTION_CONTEXT_CALLBACK", new Runnable() {
-							public void run() {
-								stepExecution.getJobExecution()
-										.unregisterStepContext(context);
-							}
-						});
+	protected final ExitStatus processChunk(final StepConfiguration configuration, final StepContribution contribution) {
+		ExitStatus result = chunkOperations.iterate(new RepeatCallback() {
+			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
+				contribution.registerChunkContext(context);
 				// check for interruption before each item as well
 				interruptionPolicy.checkInterrupted(context);
-				ExitStatus exitStatus = doTaskletProcessing(configuration
-						.getTasklet(), stepExecution);
-				stepExecution.incrementTaskCount();
+				ExitStatus exitStatus = doTaskletProcessing(configuration.getTasklet(), contribution);
+				contribution.incrementTaskCount();
 				// check for interruption after each item as well
 				interruptionPolicy.checkInterrupted(context);
 				return exitStatus;
 			}
 		});
+		return result;
 	}
 
 	/**
@@ -363,23 +336,20 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * If there is an exception and the {@link Tasklet} implements
 	 * {@link Skippable} then the skip method is called.
 	 * 
-	 * @param tasklet
-	 *            the unit of business logic to execute
-	 * @param stepExecution
-	 *            the current step
+	 * @param tasklet the unit of business logic to execute
+	 * @param contribution the current step
 	 * @return boolean if there is more processing to do
-	 * @throws Exception
-	 *             if there is an error
+	 * @throws Exception if there is an error
 	 */
-	protected ExitStatus doTaskletProcessing(Tasklet tasklet,
-			StepExecution stepExecution) throws Exception {
+	protected ExitStatus doTaskletProcessing(Tasklet tasklet, StepContribution contribution) throws Exception {
 		ExitStatus exitStatus = ExitStatus.CONTINUABLE;
 
 		try {
 
 			exitStatus = tasklet.execute();
 
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 
 			if (tasklet instanceof Skippable) {
 				((Skippable) tasklet).skip();
@@ -396,12 +366,13 @@ public class SimpleStepExecutor implements StepExecutor {
 	/**
 	 * @param tasklet
 	 * @return restart data from the {@link Tasklet} if it is
-	 *         {@link Restartable}
+	 * {@link Restartable}
 	 */
 	private RestartData getRestartData(Tasklet tasklet) {
 		if (tasklet instanceof Restartable) {
 			return ((Restartable) tasklet).getRestartData();
-		} else {
+		}
+		else {
 			return null;
 		}
 	}
@@ -415,7 +386,8 @@ public class SimpleStepExecutor implements StepExecutor {
 	private Properties getStatistics(Tasklet tasklet) {
 		if (tasklet instanceof StatisticsProvider) {
 			return ((StatisticsProvider) tasklet).getStatistics();
-		} else {
+		}
+		else {
 			return null;
 		}
 	}
@@ -425,8 +397,7 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * check whether an external request has been made to interrupt the job
 	 * execution.
 	 * 
-	 * @param interruptionPolicy
-	 *            a {@link StepInterruptionPolicy}
+	 * @param interruptionPolicy a {@link StepInterruptionPolicy}
 	 */
 	public void setInterruptionPolicy(StepInterruptionPolicy interruptionPolicy) {
 		this.interruptionPolicy = interruptionPolicy;
@@ -438,8 +409,7 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * 
 	 * @param exceptionClassifier
 	 */
-	public void setExceptionClassifier(
-			ExitCodeExceptionClassifier exceptionClassifier) {
+	public void setExceptionClassifier(ExitCodeExceptionClassifier exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 
@@ -457,8 +427,7 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * {@link SimpleLimitExceptionHandler} with that limit.</li>
 	 * </ul>
 	 * 
-	 * @param configuration
-	 *            a step configuration
+	 * @param configuration a step configuration
 	 */
 	public void applyConfiguration(StepConfiguration configuration) {
 
@@ -478,27 +447,24 @@ public class SimpleStepExecutor implements StepExecutor {
 				setStepOperations(stepOperations);
 			}
 
-		} else if (configuration instanceof SimpleStepConfiguration) {
+		}
+		else if (configuration instanceof SimpleStepConfiguration) {
 
 			SimpleStepConfiguration simpleConfiguation = (SimpleStepConfiguration) configuration;
 			if (this.chunkOperations instanceof RepeatTemplate) {
 				RepeatTemplate template = (RepeatTemplate) this.chunkOperations;
-				template.setCompletionPolicy(new SimpleCompletionPolicy(
-						simpleConfiguation.getCommitInterval()));
+				template.setCompletionPolicy(new SimpleCompletionPolicy(simpleConfiguation.getCommitInterval()));
 			}
 
-			ExceptionHandler exceptionHandler = simpleConfiguation
-					.getExceptionHandler();
+			ExceptionHandler exceptionHandler = simpleConfiguation.getExceptionHandler();
 
-			if (simpleConfiguation.getSkipLimit() > 0
-					&& exceptionHandler == null) {
+			if (simpleConfiguation.getSkipLimit() > 0 && exceptionHandler == null) {
 				SimpleLimitExceptionHandler handler = new SimpleLimitExceptionHandler();
 				handler.setLimit(simpleConfiguation.getSkipLimit());
 				exceptionHandler = handler;
 			}
 
-			if (this.stepOperations instanceof RepeatTemplate
-					&& exceptionHandler != null) {
+			if (this.stepOperations instanceof RepeatTemplate && exceptionHandler != null) {
 				RepeatTemplate template = (RepeatTemplate) this.stepOperations;
 				template.setExceptionHandler(exceptionHandler);
 			}

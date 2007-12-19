@@ -54,7 +54,7 @@ public class StepExecution extends Entity {
 	private Properties statistics = new Properties();
 
 	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
-	
+
 	/**
 	 * Package private constructor for Hibernate
 	 */
@@ -66,11 +66,11 @@ public class StepExecution extends Entity {
 	 * Constructor with mandatory properties.
 	 * 
 	 * @param step the step to which this execution belongs
-	 * @param jobExecution the current job execution 
-	 */ 
+	 * @param jobExecution the current job execution
+	 */
 	public StepExecution(StepInstance step, JobExecution jobExecution, Long id) {
 		this();
-		this.step= step;
+		this.step = step;
 		this.jobExecution = jobExecution;
 		setId(id);
 	}
@@ -85,10 +85,6 @@ public class StepExecution extends Entity {
 
 	public void incrementTaskCount() {
 		taskCount++;
-	}
-
-	public void incrementRollbackCount() {
-		rollbackCount++;
 	}
 
 	public Properties getStatistics() {
@@ -148,7 +144,7 @@ public class StepExecution extends Entity {
 	}
 
 	public Long getStepId() {
-		if (step!=null) {
+		if (step != null) {
 			return step.getId();
 		}
 		return null;
@@ -159,45 +155,48 @@ public class StepExecution extends Entity {
 	 * @return the jobExecutionId
 	 */
 	public Long getJobExecutionId() {
-		if (jobExecution!=null) {			
+		if (jobExecution != null) {
 			return jobExecution.getId();
 		}
 		return null;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.container.common.domain.Entity#equals(java.lang.Object)
 	 */
 	public boolean equals(Object obj) {
 		Object stepId = getStepId();
 		Object jobExecutionId = getJobExecutionId();
-		if (stepId==null && jobExecutionId==null || !(obj instanceof StepExecution) || getId()!=null) {			
+		if (stepId == null && jobExecutionId == null || !(obj instanceof StepExecution) || getId() != null) {
 			return super.equals(obj);
 		}
 		StepExecution other = (StepExecution) obj;
-		if (stepId==null) {
+		if (stepId == null) {
 			return jobExecutionId.equals(other.getJobExecutionId());
 		}
-		return stepId.equals(other.getStepId()) && (jobExecutionId==null || jobExecutionId.equals(other.getJobExecutionId())); 
+		return stepId.equals(other.getStepId())
+				&& (jobExecutionId == null || jobExecutionId.equals(other.getJobExecutionId()));
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.container.common.domain.Entity#hashCode()
 	 */
 	public int hashCode() {
 		Object stepId = getStepId();
 		Object jobExecutionId = getJobExecutionId();
-		return super.hashCode() + 31*(stepId!=null ? stepId.hashCode() : 0) + 91*(jobExecutionId!=null ? jobExecutionId.hashCode() : 0);
-	}
-		
-	public String toString() {
-		return super.toString() + ", name=" + getName() + ", taskCount=" + taskCount + ", commitCount=" + commitCount + ", rollbackCount="
-				+ rollbackCount;
+		return super.hashCode() + 31 * (stepId != null ? stepId.hashCode() : 0) + 91
+				* (jobExecutionId != null ? jobExecutionId.hashCode() : 0);
 	}
 
+	public String toString() {
+		return super.toString() + ", name=" + getName() + ", taskCount=" + taskCount + ", commitCount=" + commitCount
+				+ ", rollbackCount=" + rollbackCount;
+	}
 
 	private String getName() {
-		return step==null ? null : step.getName();
+		return step == null ? null : step.getName();
 	}
 
 	/**
@@ -229,6 +228,36 @@ public class StepExecution extends Entity {
 	 */
 	public JobExecution getJobExecution() {
 		return jobExecution;
+	}
+
+	/**
+	 * Factory method for {@link StepContribution}.
+	 * 
+	 * @return a new {@link StepContribution}
+	 */
+	public StepContribution createStepContribution() {
+		return new StepContribution(this);
+	}
+
+	/**
+	 * On successful execution just before a chunk commit, this method should be
+	 * called. Synchronizes access to the {@link StepExecution} so that changes
+	 * are atomic.
+	 * 
+	 * @param contribution
+	 */
+	public synchronized void apply(StepContribution contribution) {
+		taskCount += contribution.getTaskCount();
+		statistics = contribution.getStatistics();
+		commitCount += contribution.getCommitCount();
+	}
+
+	/**
+	 * On unsuccessful execution after a chunk has rolled back. Synchronizes
+	 * access to the {@link StepExecution} so that changes are atomic.
+	 */
+	public synchronized void rollback() {
+		rollbackCount++;
 	}
 
 }

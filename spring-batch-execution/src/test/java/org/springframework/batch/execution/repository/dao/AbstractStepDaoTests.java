@@ -31,6 +31,7 @@ import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
 
@@ -196,7 +197,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		StepExecution stepExecution = new StepExecution(null, null);
 		try{
 			stepDao.update(stepExecution);
-			fail();
+			fail("Expected IllegalArgumentException");
 		}catch(IllegalArgumentException ex){
 			//expected
 		}
@@ -215,4 +216,25 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepDao.save(execution);
 		assertEquals(2, stepDao.getStepExecutionCount(step1.getId()));
 	}
+	
+	public void testUpdateStepExecutionVersion() throws Exception {
+		int before = stepExecution.getVersion().intValue();
+		stepDao.update(stepExecution);
+		int after = stepExecution.getVersion().intValue();
+		assertEquals("StepExecution version not updated", before+1, after);
+	}
+
+	public void testUpdateStepExecutionOptimisticLocking() throws Exception {
+		stepExecution.incrementVersion(); // not really allowed outside dao code
+		try {
+			stepDao.update(stepExecution);
+			fail("Expected OptimisticLockingFailureException");
+		}
+		catch (OptimisticLockingFailureException e) {
+			// expected
+			assertTrue("Exception message should contain step execution id: "+e.getMessage(), e.getMessage().indexOf(""+stepExecution.getId())>=0);
+			assertTrue("Exception message should contain step execution version: "+e.getMessage(), e.getMessage().indexOf(""+stepExecution.getVersion())>=0);
+		}
+	}
+	
 }
