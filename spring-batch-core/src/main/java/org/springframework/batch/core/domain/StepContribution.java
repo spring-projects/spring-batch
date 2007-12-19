@@ -29,6 +29,16 @@ import org.springframework.batch.repeat.RepeatContext;
 public class StepContribution {
 
 	/**
+	 * Key for destruction callback in StepContext for chunk.
+	 */
+	private static final String CHUNK_EXECUTION_CONTEXT_CALLBACK = "CHUNK_EXECUTION_CONTEXT_CALLBACK";
+
+	/**
+	 * Key for destruction callback in StepContext for step.
+	 */
+	private static final String STEP_EXECUTION_CONTEXT_CALLBACK = "STEP_EXECUTION_CONTEXT_CALLBACK";
+
+	/**
 	 * Context attribute key for step execution. Used by monitoring and managing
 	 * clients to inspect current step execution.
 	 */
@@ -70,7 +80,7 @@ public class StepContribution {
 	 */
 	public void registerChunkContext(final RepeatContext context) {
 		execution.getJobExecution().registerChunkContext(context);
-		context.registerDestructionCallback("CHUNK_EXECUTION_CONTEXT_CALLBACK", new Runnable() {
+		context.registerDestructionCallback(CHUNK_EXECUTION_CONTEXT_CALLBACK, new Runnable() {
 			public void run() {
 				execution.getJobExecution().unregisterStepContext(context);
 			}
@@ -83,7 +93,7 @@ public class StepContribution {
 	 */
 	public void registerStepContext(final RepeatContext context) {
 		execution.getJobExecution().registerStepContext(context);
-		context.registerDestructionCallback("STEP_EXECUTION_CONTEXT_CALLBACK", new Runnable() {
+		context.registerDestructionCallback(STEP_EXECUTION_CONTEXT_CALLBACK, new Runnable() {
 			public void run() {
 				execution.getJobExecution().unregisterStepContext(context);
 			}
