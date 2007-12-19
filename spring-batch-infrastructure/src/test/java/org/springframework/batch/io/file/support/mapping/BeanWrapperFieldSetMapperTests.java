@@ -351,6 +351,21 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		assertEquals(9, bean.getVarLong());
 	}
 
+	public void testPaddedLongWithDefaultAndCustomEditor() throws Exception {
+
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
+		mapper.setTargetType(TestObject.class);
+
+		FieldSet fieldSet = new FieldSet(new String[] { "00009", "78" }, new String[] { "varLong", "varInt" });
+
+		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE, new CustomNumberEditor(Long.class, NumberFormat
+				.getNumberInstance(), true)));
+		TestObject bean = (TestObject) mapper.mapLine(fieldSet);
+
+		assertEquals(9, bean.getVarLong());
+		assertEquals(78, bean.getVarInt());
+	}
+
 	private static class BeanWithIntArray {
 		private int[] numbers;
 
