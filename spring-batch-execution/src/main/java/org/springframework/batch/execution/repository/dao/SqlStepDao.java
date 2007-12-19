@@ -310,6 +310,7 @@ public class SqlStepDao implements StepDao, InitializingBean {
 		cascadeJobExecution(stepExecution.getJobExecution());
 
 		stepExecution.setId(new Long(stepExecutionIncrementer.nextLongValue()));
+		stepExecution.incrementVersion(); // should be 0 now
 		Object[] parameters = new Object[] { stepExecution.getId(), new Long(0), stepExecution.getStepId(),
 				stepExecution.getJobExecutionId(), stepExecution.getStartTime(), stepExecution.getEndTime(),
 				stepExecution.getStatus().toString(), stepExecution.getCommitCount(), stepExecution.getTaskCount(),

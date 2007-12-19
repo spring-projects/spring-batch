@@ -34,12 +34,12 @@ public class Entity implements Serializable {
 
 	private Long id;
 
-	private Integer version = new Integer(0);
-	
+	private Integer version;
+
 	public Entity() {
 		super();
 	}
-	
+
 	public Entity(Long id) {
 		super();
 		this.id = id;
@@ -59,12 +59,16 @@ public class Entity implements Serializable {
 	public Integer getVersion() {
 		return version;
 	}
-	
+
 	/**
 	 * 
 	 */
 	public void incrementVersion() {
-		version = new Integer(version.intValue()+1);
+		if (version == null) {
+			version = new Integer(0);
+		} else {
+			version = new Integer(version.intValue() + 1);
+		}
 	}
 
 	// @Override

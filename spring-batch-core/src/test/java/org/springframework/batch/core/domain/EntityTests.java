@@ -50,6 +50,14 @@ public class EntityTests extends TestCase {
 	}
 
 	/**
+	 * Test method for {@link org.springframework.batch.core.domain.Entity#getVersion()}.
+	 */
+	public void testIncrementVersion() {
+		entity.incrementVersion();
+		assertEquals(new Integer(0), entity.getVersion());
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	public void testToString() throws Exception {
