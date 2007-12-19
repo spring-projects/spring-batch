@@ -428,4 +428,11 @@ public class FieldSetTests extends TestCase {
 			assertEquals(tokens[i], values[i]);
 		}
 	}
+	
+	public void testPaddedLong(){
+		FieldSet fs = new FieldSet(new String[]{"00000009"});
+		
+		long value = fs.readLong(0);
+		assertEquals(value, 9);
+	}
 }
