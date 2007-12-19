@@ -50,7 +50,7 @@ import org.springframework.util.StringUtils;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class SqlJobDao implements JobDao, InitializingBean {
+public class JdbcJobDao implements JobDao, InitializingBean {
 
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE ID=?";
 
@@ -71,7 +71,7 @@ public class SqlJobDao implements JobDao, InitializingBean {
 	private static final String GET_JOB_EXECUTION_COUNT = "SELECT count(ID) from %PREFIX%JOB_EXECUTION "
 			+ "where JOB_ID = ?";
 
-	protected static final Log logger = LogFactory.getLog(SqlJobDao.class);
+	protected static final Log logger = LogFactory.getLog(JdbcJobDao.class);
 
 	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(ID, JOB_ID, START_TIME, "
 			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) values (?, ?, ?, ?, ?, ?, ?, ?)";

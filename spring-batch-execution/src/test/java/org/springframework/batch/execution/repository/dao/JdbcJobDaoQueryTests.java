@@ -30,16 +30,16 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
  * @author Dave Syer
  *
  */
-public class SqlJobDaoQueryTests extends TestCase {
+public class JdbcJobDaoQueryTests extends TestCase {
 
-	SqlJobDao sqlDao;
+	JdbcJobDao sqlDao;
 	List list = new ArrayList();
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
-		sqlDao = new SqlJobDao();
+		sqlDao = new JdbcJobDao();
 		sqlDao.setJobExecutionIncrementer(new DataFieldMaxValueIncrementer() {
 
 			public int nextIntValue() throws DataAccessException {
@@ -66,7 +66,7 @@ public class SqlJobDaoQueryTests extends TestCase {
 				return 1;
 			}
 		});
-		sqlDao.save(new JobInstance(new SimpleJobIdentifier("foo"), new Long(11)).createJobExecution());
+		sqlDao.save(new JobInstance(new SimpleJobIdentifier("foo"), new Long(11)).createNewJobExecution());
 		assertEquals(1, list.size());
 		String query = (String) list.get(0);
 		assertTrue("Query did not contain FOO_:"+query, query.indexOf("FOO_")>=0);

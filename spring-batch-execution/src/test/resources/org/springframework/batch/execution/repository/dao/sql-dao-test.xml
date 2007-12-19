@@ -5,13 +5,13 @@
 
 	<import resource="data-source-context.xml" />
 
-	<bean id="jobDao" class="org.springframework.batch.execution.repository.dao.SqlJobDao" >
+	<bean id="jobDao" class="org.springframework.batch.execution.repository.dao.JdbcJobDao" >
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="jobIncrementer" ref="jobIncrementer" />
 		<property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" />
 	</bean>
 
-	<bean id="stepDao" class="org.springframework.batch.execution.repository.dao.SqlStepDao" >
+	<bean id="stepDao" class="org.springframework.batch.execution.repository.dao.JdbcStepDao" >
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="stepIncrementer" ref="stepIncrementer" />
 		<property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" />

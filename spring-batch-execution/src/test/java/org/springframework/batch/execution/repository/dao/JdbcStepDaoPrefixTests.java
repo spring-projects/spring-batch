@@ -1,7 +1,5 @@
 package org.springframework.batch.execution.repository.dao;
 
-import java.util.List;
-
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
@@ -10,9 +8,6 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 /**
@@ -24,9 +19,9 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
  * @author Lucas Ward
  *
  */
-public class SqlStepDaoPrefixTests extends TestCase {
+public class JdbcStepDaoPrefixTests extends TestCase {
 	
-	private SqlStepDao stepDao;
+	private JdbcStepDao stepDao;
 	
 	MockJdbcTemplate jdbcTemplate = new MockJdbcTemplate();
 	
@@ -42,7 +37,7 @@ public class SqlStepDaoPrefixTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		stepDao = new SqlStepDao();
+		stepDao = new JdbcStepDao();
 		stepDao.setJobDao(new MapJobDao());
 		stepExecutionIncrementer = (DataFieldMaxValueIncrementer)stepExecutionIncrementerControl.getMock();
 		stepIncrementer = (DataFieldMaxValueIncrementer)stepIncrementerControl.getMock();
@@ -51,7 +46,6 @@ public class SqlStepDaoPrefixTests extends TestCase {
 		stepDao.setStepExecutionIncrementer(stepExecutionIncrementer);
 		stepDao.setStepIncrementer(stepIncrementer);
 		stepExecution.setId(new Long(1));
-		stepExecution.incrementVersion();
 		step.setStatus(BatchStatus.STARTED);
 		
 		job.addStep(step);
@@ -161,34 +155,5 @@ public class SqlStepDaoPrefixTests extends TestCase {
 		stepDao.update(stepExecution);
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP_EXECUTION") != -1);
 	}
-	
-	private class MockJdbcTemplate extends JdbcTemplate {
-
-		private String sqlStatement = "";
-
-		public String getSqlStatement() {
-			return sqlStatement;
-		}
-
-		public List query(String sql, Object[] args, RowMapper rse) throws DataAccessException {
-			// TODO Auto-generated method stub
-			sqlStatement = sql;
-			return null;
-		}
-
-		public int update(String sql, Object[] args, int[] argTypes) throws DataAccessException {
-			// TODO Auto-generated method stub
-			sqlStatement = sql;
-			return 1;
-		}
-
-		public int update(String sql, Object[] args) throws DataAccessException {
-			// TODO Auto-generated method stub
-			sqlStatement = sql;
-			return 1;
-		}
-
-	}
-
 	
 }

@@ -6,16 +6,16 @@ import java.util.Map;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.dao.DataAccessException;
 
-public class SqlStepDaoTests extends AbstractStepDaoTests {
+public class JdbcStepDaoTests extends AbstractStepDaoTests {
 
-	private static final String LONG_STRING = SqlJobDaoTests.LONG_STRING;
+	private static final String LONG_STRING = JdbcJobDaoTests.LONG_STRING;
 
 	protected void onSetUpBeforeTransaction() throws Exception {
-		((SqlStepDao) stepDao).setTablePrefix(SqlJobDao.DEFAULT_TABLE_PREFIX);
+		((JdbcStepDao) stepDao).setTablePrefix(JdbcJobDao.DEFAULT_TABLE_PREFIX);
 	}
 
 	public void testTablePrefix() throws Exception {
-		((SqlStepDao) stepDao).setTablePrefix("FOO_");
+		((JdbcStepDao) stepDao).setTablePrefix("FOO_");
 		try {
 			testCreateStep();
 			fail("Expected DataAccessException");
@@ -37,5 +37,5 @@ public class SqlStepDaoTests extends AbstractStepDaoTests {
 		assertEquals(LONG_STRING.substring(0, 250), ((Map) executions.get(0))
 				.get("EXIT_MESSAGE"));
 	}
-	
+
 }
