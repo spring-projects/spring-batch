@@ -5,7 +5,7 @@ import org.springframework.batch.sample.domain.PlayerSummary;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.util.Assert;
 
-public class SqlPlayerSummaryDao extends JdbcDaoSupport implements ItemWriter {
+public class JdbcPlayerSummaryDao extends JdbcDaoSupport implements ItemWriter {
 
 	private static final String INSERT_SUMMARY = "INSERT into PLAYER_SUMMARY(ID,YEAR_NO,COMPLETES,ATTEMPTS," +
 			"PASSING_YARDS,PASSING_TD,INTERCEPTIONS,RUSHES,RUSH_YARDS,RECEPTIONS,RECEPTIONS_YARDS," +
@@ -13,7 +13,7 @@ public class SqlPlayerSummaryDao extends JdbcDaoSupport implements ItemWriter {
 	
 	public void write(Object output) {
 		
-		Assert.isInstanceOf(PlayerSummary.class, output, SqlPlayerSummaryDao.class.getName() + " only " +
+		Assert.isInstanceOf(PlayerSummary.class, output, JdbcPlayerSummaryDao.class.getName() + " only " +
 				"supports outputing " + PlayerSummary.class.getName() + " instances.");
 		
 		PlayerSummary summary = (PlayerSummary)output;

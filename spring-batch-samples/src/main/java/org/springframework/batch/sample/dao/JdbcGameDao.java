@@ -5,7 +5,7 @@ import org.springframework.batch.sample.domain.Game;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.util.Assert;
 
-public class SqlGameDao extends JdbcDaoSupport implements ItemWriter {
+public class JdbcGameDao extends JdbcDaoSupport implements ItemWriter {
 
 	private static final String INSERT_GAME = "INSERT into GAMES(player_id,year_no,team,week,opponent,"
 			+ "completes,attempts,passing_yards,passing_td,interceptions,rushes,rush_yards,"

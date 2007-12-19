@@ -19,7 +19,7 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public class SqlJobRepositoryTests extends
+public class JdbcJobRepositoryTests extends
 		AbstractTransactionalDataSourceSpringContextTests {
 
 	private ScheduledJobIdentifier jobIdentifier;

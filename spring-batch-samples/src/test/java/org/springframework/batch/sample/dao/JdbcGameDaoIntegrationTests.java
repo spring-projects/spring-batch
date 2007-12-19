@@ -26,10 +26,10 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  * @author Lucas Ward
  *
  */
-public class SqlGameDaoIntegrationTests extends
+public class JdbcGameDaoIntegrationTests extends
 	AbstractTransactionalDataSourceSpringContextTests {
 
-	SqlGameDao gameDao;
+	JdbcGameDao gameDao;
 	Game game = new Game();
 	
 	protected String[] getConfigLocations() {
@@ -39,7 +39,7 @@ public class SqlGameDaoIntegrationTests extends
 	protected void onSetUpBeforeTransaction() throws Exception {
 		super.onSetUpBeforeTransaction();
 		
-		gameDao = new SqlGameDao();
+		gameDao = new JdbcGameDao();
 		gameDao.setJdbcTemplate(getJdbcTemplate());
 		
 		game.setId("AbduKa00");

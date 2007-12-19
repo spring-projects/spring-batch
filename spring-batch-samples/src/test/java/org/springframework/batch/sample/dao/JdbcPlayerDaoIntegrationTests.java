@@ -14,9 +14,9 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  * @author Lucas Ward
  *
  */
-public class SqlPlayerDaoIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
+public class JdbcPlayerDaoIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
 	
-	private SqlPlayerDao playerDao;
+	private JdbcPlayerDao playerDao;
 	private Player player;
 	private static final String GET_PLAYER = "SELECT * from PLAYERS";
 	
@@ -29,7 +29,7 @@ public class SqlPlayerDaoIntegrationTests extends AbstractTransactionalDataSourc
 		// TODO Auto-generated method stub
 		super.onSetUpBeforeTransaction();
 		
-		playerDao = new SqlPlayerDao();
+		playerDao = new JdbcPlayerDao();
 		playerDao.setJdbcTemplate(this.jdbcTemplate);
 		
 		player = new Player();

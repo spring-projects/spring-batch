@@ -25,10 +25,10 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  * @author Lucas Ward
  * 
  */
-public class SqlPlayerSummaryDaoIntegrationTests extends
+public class JdbcPlayerSummaryDaoIntegrationTests extends
 		AbstractTransactionalDataSourceSpringContextTests {
 
-	SqlPlayerSummaryDao playerSummaryDao;
+	JdbcPlayerSummaryDao playerSummaryDao;
 	PlayerSummary summary;
 
 	protected String[] getConfigLocations() {
@@ -38,7 +38,7 @@ public class SqlPlayerSummaryDaoIntegrationTests extends
 	protected void onSetUpBeforeTransaction() throws Exception {
 		super.onSetUpBeforeTransaction();
 
-		playerSummaryDao = new SqlPlayerSummaryDao();
+		playerSummaryDao = new JdbcPlayerSummaryDao();
 		playerSummaryDao.setJdbcTemplate(getJdbcTemplate());
 
 		summary = new PlayerSummary();
