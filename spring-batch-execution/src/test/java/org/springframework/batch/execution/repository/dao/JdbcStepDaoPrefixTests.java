@@ -1,5 +1,7 @@
 package org.springframework.batch.execution.repository.dao;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
@@ -8,6 +10,9 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 /**
@@ -46,6 +51,7 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 		stepDao.setStepExecutionIncrementer(stepExecutionIncrementer);
 		stepDao.setStepIncrementer(stepIncrementer);
 		stepExecution.setId(new Long(1));
+		stepExecution.incrementVersion();
 		step.setStatus(BatchStatus.STARTED);
 		
 		job.addStep(step);
@@ -154,6 +160,37 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 	public void testDefaultUpdateStepExecution(){
 		stepDao.update(stepExecution);
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP_EXECUTION") != -1);
+	}
+	
+	private class MockJdbcTemplate extends JdbcTemplate {
+
+		private String sql;
+		
+		public int update(String sql, Object[] args) throws DataAccessException {
+			this.sql = sql;
+			return 1;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.springframework.jdbc.core.JdbcTemplate#update(java.lang.String, java.lang.Object[], int[])
+		 */
+		public int update(String sql, Object[] args, int[] argTypes) throws DataAccessException {
+			this.sql = sql;
+			return 1;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.springframework.jdbc.core.JdbcTemplate#query(java.lang.String, java.lang.Object[], int[], org.springframework.jdbc.core.RowMapper)
+		 */
+		public List query(String sql, Object[] args, RowMapper rowMapper) throws DataAccessException {
+			this.sql = sql;
+			return null;
+		}
+		
+		public String getSqlStatement() {
+			return sql;
+		}
+		
 	}
 	
 }
