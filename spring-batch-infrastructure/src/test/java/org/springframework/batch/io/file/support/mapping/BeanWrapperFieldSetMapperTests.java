@@ -16,17 +16,19 @@
 
 package org.springframework.batch.io.file.support.mapping;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.file.FieldSet;
-import org.springframework.batch.io.file.support.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.support.IntArrayPropertyEditor;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.NotWritablePropertyException;
+import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.beans.propertyeditors.PropertiesEditor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -40,16 +42,18 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		mapper.setPrototypeBeanName("foo");
 		try {
 			mapper.afterPropertiesSet();
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			// expected
 		}
 	}
-	
+
 	public void testNameNorTypeSpecified() throws Exception {
 		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		try {
 			mapper.afterPropertiesSet();
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			// expected
 		}
 	}
@@ -161,8 +165,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		context.getBeanFactory().registerSingleton("bean", testNestedC);
 		mapper.setPrototypeBeanName("bean");
 
-		FieldSet fieldSet = new FieldSet(new String[] { "1" }, new String[] { 
-				"foo" });
+		FieldSet fieldSet = new FieldSet(new String[] { "1" }, new String[] { "foo" });
 
 		TestNestedC result = (TestNestedC) mapper.mapLine(fieldSet);
 
@@ -258,31 +261,94 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		wrapper.setPropertyValues(props);
 		assertEquals(4, result.numbers[3]);
 	}
-	
-	//BeanWrapperFieldSetMapper doesn't currently support nesting with collections.
-	public void testNestedList(){
-		
+
+	// BeanWrapperFieldSetMapper doesn't currently support nesting with
+	// collections.
+	public void testNestedList() {
+
 		TestNestedList nestedList = new TestNestedList();
 		List nestedC = new ArrayList();
 		nestedC.add(new TestNestedC());
 		nestedC.add(new TestNestedC());
 		nestedC.add(new TestNestedC());
 		nestedList.setNestedC(nestedC);
-		
+
 		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", nestedList);
 		mapper.setPrototypeBeanName("bean");
-		
-		FieldSet fieldSet = new FieldSet(new String[]{ "1", "2", "3"}, new String[]{"NestedC[0].Value", "NestedC[1].Value", "NestedC[2].Value"});
-		
-		mapper.mapLine(fieldSet);
-		
-		assertEquals(((TestNestedC) nestedList.getNestedC().get(0)).getValue(), 1);
-		assertEquals(((TestNestedC) nestedList.getNestedC().get(1)).getValue(), 2);
-		assertEquals(((TestNestedC) nestedList.getNestedC().get(2)).getValue(), 3);
 
+		FieldSet fieldSet = new FieldSet(new String[] { "1", "2", "3" }, new String[] { "NestedC[0].Value",
+				"NestedC[1].Value", "NestedC[2].Value" });
+
+		mapper.mapLine(fieldSet);
+
+		assertEquals(1, ((TestNestedC) nestedList.getNestedC().get(0)).getValue());
+		assertEquals(2, ((TestNestedC) nestedList.getNestedC().get(1)).getValue());
+		assertEquals(3, ((TestNestedC) nestedList.getNestedC().get(2)).getValue());
+
+	}
+
+	public void testPaddedLongWithNoEditor() throws Exception {
+
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
+		mapper.setTargetType(TestObject.class);
+
+		FieldSet fieldSet = new FieldSet(new String[] { "00009" }, new String[] { "varLong" });
+
+		try {
+			mapper.mapLine(fieldSet);
+			fail("Expected BindingException");
+		}
+		catch (BindingException e) {
+			assertTrue("Message does not contain source value: " + e.getMessage(), e.getMessage().indexOf("0009") >= 0);
+		}
+	}
+
+	public void testSetCustomEditorsWithInvalidTypeName() throws Exception {
+
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
+		try {
+			mapper.setCustomEditors(Collections.singletonMap("FOO", new CustomNumberEditor(Long.class, true)));		
+		} catch (IllegalArgumentException e) {	
+			// expected
+		}
+	}
+
+	public void testSetCustomEditorsWithInvalidType() throws Exception {
+
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
+		try {
+			mapper.setCustomEditors(Collections.singletonMap(new Object(), new CustomNumberEditor(Long.class, true)));		
+		} catch (IllegalArgumentException e) {	
+			// expected
+		}
+	}
+
+
+	public void testSetCustomEditorsWithInvalidEditor() throws Exception {
+
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
+		try {
+			mapper.setCustomEditors(Collections.singletonMap(Long.class, "FOO"));
+		} catch (IllegalArgumentException e) {	
+			// expected
+		}
+	}
+
+	public void testPaddedLongWithEditor() throws Exception {
+
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
+		mapper.setTargetType(TestObject.class);
+
+		FieldSet fieldSet = new FieldSet(new String[] { "00009" }, new String[] { "varLong" });
+
+		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE, new CustomNumberEditor(Long.class, NumberFormat
+				.getNumberInstance(), true)));
+		TestObject bean = (TestObject) mapper.mapLine(fieldSet);
+
+		assertEquals(9, bean.getVarLong());
 	}
 
 	private static class BeanWithIntArray {
@@ -292,7 +358,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 			this.numbers = numbers;
 		}
 	}
-	
+
 	private static class TestNestedList {
 
 		List nestedC;
@@ -304,8 +370,6 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		public void setNestedC(List nestedC) {
 			this.nestedC = nestedC;
 		}
-		
-		
 
 	}
 
@@ -341,7 +405,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		}
 
 	}
-	
+
 	private static class TestNestedB {
 		private String valueA;
 
@@ -364,7 +428,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		}
 
 	}
-	
+
 	private static class TestNestedC {
 		private int value;
 

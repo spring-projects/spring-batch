@@ -16,25 +16,33 @@
 
 package org.springframework.batch.io.file.support.mapping;
 
+import java.beans.PropertyEditor;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.FieldSetMapper;
-import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.NotWritablePropertyException;
 import org.springframework.beans.PropertyAccessor;
 import org.springframework.beans.PropertyAccessorUtils;
+import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.ObjectError;
 
 /**
  * {@link FieldSetMapper} implementation based on bean property paths. The
@@ -72,14 +80,15 @@ import org.springframework.util.ReflectionUtils;
  * @author Dave Syer
  * 
  */
-public class BeanWrapperFieldSetMapper implements FieldSetMapper,
-		BeanFactoryAware, InitializingBean {
+public class BeanWrapperFieldSetMapper implements FieldSetMapper, BeanFactoryAware, InitializingBean {
 
 	private String name;
 
 	private Class type;
 
 	private BeanFactory beanFactory;
+
+	private Map customEditors;
 
 	private static Map propertiesMatched = new HashMap();
 
@@ -103,8 +112,7 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper,
 	 * Either this property or the type property must be specified, but not
 	 * both.
 	 * 
-	 * @param name
-	 *            the name of a prototype bean in the enclosing BeanFactory
+	 * @param name the name of a prototype bean in the enclosing BeanFactory
 	 */
 	public void setPrototypeBeanName(String name) {
 		this.name = name;
@@ -118,8 +126,7 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper,
 	 * Either this property or the prototype bean name must be specified, but
 	 * not both.
 	 * 
-	 * @param type
-	 *            the type to set
+	 * @param type the type to set
 	 */
 	public void setTargetType(Class type) {
 		this.type = type;
@@ -128,33 +135,94 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper,
 	/**
 	 * Check that precisely one of type or prototype bean name is specified.
 	 * 
-	 * @throws IllegalStateException
-	 *             if neither is set or both properties are set.
+	 * @throws IllegalStateException if neither is set or both properties are
+	 * set.
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(name != null || type != null,
-				"Either name or type must be provided.");
-		Assert.state(name == null || type == null,
-				"Both name and type cannot be specified together.");
+		Assert.state(name != null || type != null, "Either name or type must be provided.");
+		Assert.state(name == null || type == null, "Both name and type cannot be specified together.");
 	}
 
 	/**
 	 * Map the {@link FieldSet} to an object retrieved from the enclosing Spring
-	 * context.
+	 * context, or to a new instance of the required type if no prototype is
+	 * available.
 	 * 
-	 * @throws NotWritablePropertyException
-	 *             if the {@link FieldSet} contains a field that cannot be
-	 *             mapped to a bean property.
+	 * @throws NotWritablePropertyException if the {@link FieldSet} contains a
+	 * field that cannot be mapped to a bean property.
+	 * @throws BindingException if there is a type conversion or other error (if
+	 * the {@link DataBinder} from {@link #createBinder(Object)} has errors
+	 * after binding).
 	 * 
 	 * @see org.springframework.batch.io.file.FieldSetMapper#mapLine(org.springframework.batch.io.file.FieldSet)
 	 */
 	public Object mapLine(FieldSet fs) {
 		Object copy = getBean();
-		BeanWrapper wrapper = new BeanWrapperImpl(copy);
-		wrapper.setPropertyValues(getBeanProperties(copy, fs.getProperties()));
+		DataBinder binder = createBinder(copy);
+		binder.bind(new MutablePropertyValues(getBeanProperties(copy, fs.getProperties())));
+		if (binder.getBindingResult().hasErrors()) {
+			List errors = binder.getBindingResult().getAllErrors();
+			List messages = new ArrayList(errors.size());
+			for (Iterator iterator = errors.iterator(); iterator.hasNext();) {
+				ObjectError error = (ObjectError) iterator.next();
+				messages.add(error.getDefaultMessage());
+			}
+			throw new BindingException("" + messages);
+		}
 		return copy;
+	}
+
+	/**
+	 * Create a binder for the target object. The binder will then be used to
+	 * bind the properties form a field set into the target object. This
+	 * implementation creates a new {@link DataBinder} and calls out to
+	 * {@link #initBinder(DataBinder)} and
+	 * {@link #registerPropertyEditors(DataBinder)}.
+	 * 
+	 * @param target
+	 * @return a {@link DataBinder} that can be used to bind properties to the
+	 * target.
+	 */
+	protected DataBinder createBinder(Object target) {
+		DataBinder binder = new DataBinder(target);
+		binder.setIgnoreUnknownFields(false);
+		initBinder(binder);
+		registerPropertyEditors(binder);
+		return binder;
+	}
+
+	/**
+	 * Register property editors with the DataBinder. If any property editors
+	 * have been supplied they are registered for use when binding a field set.
+	 * 
+	 * @param binder new binder instance
+	 */
+	protected void registerPropertyEditors(DataBinder binder) {
+		if (this.customEditors != null) {
+			for (Iterator it = customEditors.entrySet().iterator(); it.hasNext();) {
+				Map.Entry entry = (Map.Entry) it.next();
+				Class key = (Class) entry.getKey();
+				PropertyEditor value = (PropertyEditor) entry.getValue();
+				binder.registerCustomEditor(key, value);
+			}
+		}
+	}
+
+	/**
+	 * Initialize a new binder instance. This hook allows customization of
+	 * binder settings such as the
+	 * {@link DataBinder#initDirectFieldAccess() direct field access}. Called
+	 * by {@link #createBinder(Object)}.
+	 * <p>
+	 * Note that registration of custom property editors should be done in
+	 * {@link #registerPropertyEditors(PropertyEditorRegistry)}, not here! This
+	 * method will only be called when a <b>new</b> data binder is created.
+	 * @param binder new binder instance
+	 * @see #createBinder(RequestContext, Object)
+	 */
+	protected void initBinder(DataBinder binder) {
 	}
 
 	private Object getBean() {
@@ -163,15 +231,15 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper,
 		}
 		try {
 			return type.newInstance();
-		} catch (InstantiationException e) {
-			ReflectionUtils.handleReflectionException(e);
-		} catch (IllegalAccessException e) {
+		}
+		catch (InstantiationException e) {
 			ReflectionUtils.handleReflectionException(e);
 		}
-		throw new IllegalStateException(
-				"Internal error: could not create bean instance for mapping."); // should
-																				// not
-																				// happen
+		catch (IllegalAccessException e) {
+			ReflectionUtils.handleReflectionException(e);
+		}
+		// should not happen
+		throw new IllegalStateException("Internal error: could not create bean instance for mapping.");
 	}
 
 	/**
@@ -214,8 +282,7 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper,
 
 		Class cls = bean.getClass();
 
-		int index = PropertyAccessorUtils
-				.getFirstNestedPropertySeparatorIndex(key);
+		int index = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(key);
 		String prefix;
 		String suffix;
 
@@ -229,9 +296,9 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper,
 				return null;
 			}
 
-			Object nestedValue = new BeanWrapperImpl(bean)
-					.getPropertyValue(nestedName);
-			return nestedName + "." + findPropertyName(nestedValue, suffix);
+			Object nestedValue = new BeanWrapperImpl(bean).getPropertyValue(nestedName);
+			String nestedPropertyName = findPropertyName(nestedValue, suffix);
+			return nestedPropertyName == null ? null : nestedName + "." + nestedPropertyName;
 		}
 
 		String name = null;
@@ -241,21 +308,22 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper,
 		if (index > 0) {
 			prefix = key.substring(0, index);
 			suffix = key.substring(index);
-		} else {
+		}
+		else {
 			prefix = key;
 			suffix = "";
 		}
 
 		while (name == null && distance <= distanceLimit) {
-			String[] candidates = PropertyMatches.forProperty(prefix, cls,
-					distance).getPossibleMatches();
+			String[] candidates = PropertyMatches.forProperty(prefix, cls, distance).getPossibleMatches();
 			// If we find precisely one match, then use that one...
 			if (candidates.length == 1) {
 				String candidate = candidates[0];
 				if (candidate.equals(prefix)) { // if it's the same don't
 					// replace it...
 					name = key;
-				} else {
+				}
+				else {
 					name = candidate + suffix;
 				}
 			}
@@ -264,10 +332,44 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper,
 		return name;
 	}
 
-	private void switchPropertyNames(Properties properties, String oldName,
-			String newName) {
+	private void switchPropertyNames(Properties properties, String oldName, String newName) {
 		String value = properties.getProperty(oldName);
 		properties.remove(oldName);
 		properties.setProperty(newName, value);
+	}
+
+	/**
+	 * Specify the {@link PropertyEditor custom editors} to apply to target
+	 * beans mapped with this {@link FieldSetMapper}.
+	 * 
+	 * 
+	 * @param customEditors a map of Class to PropertyEditor (or class name to
+	 * PropertyEditor).
+	 * @see CustomEditorConfigurer#setCustomEditors(Map)
+	 */
+	public void setCustomEditors(Map customEditors) {
+		this.customEditors = new HashMap();
+		for (Iterator it = customEditors.entrySet().iterator(); it.hasNext();) {
+			Map.Entry entry = (Map.Entry) it.next();
+			Object key = entry.getKey();
+			Class requiredType = null;
+			if (key instanceof Class) {
+				requiredType = (Class) key;
+			}
+			else if (key instanceof String) {
+				String className = (String) key;
+				requiredType = ClassUtils.resolveClassName(className, getClass().getClassLoader());
+			}
+			else {
+				throw new IllegalArgumentException("Invalid key [" + key
+						+ "] for custom editor: needs to be Class or String.");
+			}
+			Object value = entry.getValue();
+			if (!(value instanceof PropertyEditor)) {
+				throw new IllegalArgumentException("Mapped value [" + value + "] for custom editor key [" + key
+						+ "] is not of required type [" + PropertyEditor.class.getName() + "]");
+			}
+			this.customEditors.put(requiredType, value);
+		}
 	}
 }

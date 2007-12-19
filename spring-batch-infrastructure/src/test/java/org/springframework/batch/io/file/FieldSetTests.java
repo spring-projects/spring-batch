@@ -216,6 +216,11 @@ public class FieldSetTests extends TestCase {
 		assertEquals(543, fieldSet.readLong("Long"));
 	}
 
+	public void testReadLongWithPadding() throws Exception {
+		fieldSet = new FieldSet(new String[] {"000009"});
+		assertEquals(9, fieldSet.readLong(0));
+	}
+
 	public void testReadIntWithNullValue() {
 		assertEquals(5, fieldSet.readInt(10, 5));
 		assertEquals(5, fieldSet.readInt("Null", 5));
