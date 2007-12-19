@@ -171,17 +171,11 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 			return 1;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.springframework.jdbc.core.JdbcTemplate#update(java.lang.String, java.lang.Object[], int[])
-		 */
 		public int update(String sql, Object[] args, int[] argTypes) throws DataAccessException {
 			this.sql = sql;
 			return 1;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.springframework.jdbc.core.JdbcTemplate#query(java.lang.String, java.lang.Object[], int[], org.springframework.jdbc.core.RowMapper)
-		 */
 		public List query(String sql, Object[] args, RowMapper rowMapper) throws DataAccessException {
 			this.sql = sql;
 			return null;
