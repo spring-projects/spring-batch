@@ -12,17 +12,22 @@
 	<bean parent="stepScope" />
 	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
-	<bean id="parallelJob"
-		class="org.springframework.batch.core.configuration.JobConfiguration">
-		<property name="restartable" value="true" />
-		<property name="startLimit" value="100" />
+	<bean id="fixedLengthImportJob" parent="simpleJob">
 		<property name="steps">
 			<list>
 				<bean id="staging" parent="simpleStep">
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemReader" ref="playerFileItemReader" />
+							<property name="itemReader">
+								<bean
+									class="org.springframework.batch.item.provider.ValidatingItemReader">
+									<property name="itemReader"
+										ref="fileInputTemplate" />
+									<property name="validator"
+										ref="fixedValidator" />
+								</bean>
+							</property>
 							<property name="itemProcessor">
 								<bean
 									class="org.springframework.batch.sample.item.processor.StagingItemProcessor"
@@ -41,12 +46,12 @@
 							</property>
 						</bean>
 					</property>
-					<property name="commitInterval" value="10000"></property>
+					<property name="commitInterval" value="2"/>
 					<property name="startLimit" value="100" />
 					<property name="saveRestartData" value="true" />
 					<property name="allowStartIfComplete" value="false" />
 				</bean>
-				<bean id="playerload"
+				<bean id="loading"
 					class="org.springframework.batch.execution.step.RepeatOperationsStepConfiguration">
 					<property name="tasklet">
 						<bean
@@ -62,14 +67,9 @@
 							</property>
 							<property name="itemProcessor">
 								<bean
-									class="org.springframework.batch.sample.item.processor.PlayerItemProcessor">
-									<property name="playerDao">
-										<bean
-											class="org.springframework.batch.sample.dao.JdbcPlayerDao">
-											<property name="dataSource"
-												ref="dataSource" />
-										</bean>
-									</property>
+									class="org.springframework.batch.sample.item.processor.TradeProcessor">
+									<property name="writer"
+										ref="tradeDao" />
 								</bean>
 							</property>
 						</bean>
@@ -81,7 +81,7 @@
 								<bean
 									class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
 									<property name="chunkSize"
-										value="10" />
+										value="2" />
 								</bean>
 							</property>
 						</bean>
@@ -96,116 +96,68 @@
 						</bean>
 					</property>
 				</bean>
-				<bean id="gameLoad"
-					class="org.springframework.batch.execution.step.SimpleStepConfiguration">
-					<property name="commitInterval" value="1000" />
-					<property name="startLimit" value="100" />
-					<property name="saveRestartData" value="true" />
-					<property name="tasklet">
-						<bean
-							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemReader" ref="gameFileItemReader" />
-							<property name="itemProcessor">
-								<bean
-									class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
-									<property name="itemWriter">
-										<bean
-											class="org.springframework.batch.sample.dao.JdbcGameDao">
-											<property name="dataSource"
-												ref="dataSource" />
-										</bean>
-									</property>
-								</bean>
-							</property>
-						</bean>
-					</property>
-				</bean>
-				<bean id="playerSummarization"
-					class="org.springframework.batch.execution.step.SimpleStepConfiguration">
-					<property name="commitInterval" value="100" />
-					<property name="startLimit" value="100" />
-					<property name="saveRestartData" value="true" />
-					<property name="tasklet">
-						<bean
-							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemReader" ref="playerSummarizationSource" />
-							<property name="itemProcessor">
-								<bean
-									class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
-									<property name="itemWriter">
-										<bean
-											class="org.springframework.batch.sample.dao.JdbcPlayerSummaryDao">
-											<property name="dataSource"
-												ref="dataSource" />
-										</bean>
-									</property>
-								</bean>
-							</property>
-						</bean>
-					</property>
-				</bean>
 			</list>
 		</property>
 	</bean>
 
-	<bean id="playerFileItemReader"
-		class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader"
-		scope="step">
+	<!-- INFRASTRUCTURE SETUP -->
+
+	<!-- This input source is injected into the test case to verify the output - not used by the job at all -->
+	<bean id="testInputTemplate"
+		class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader">
+		<property name="resource" ref="fileLocator" />
+		<property name="tokenizer" ref="fixedFileDescriptor" />
+		<property name="fieldSetMapper" ref="fieldSetMapper" />
+	</bean>
+
+	<bean id="fileInputTemplate" parent="testInputTemplate"
+		autowire-candidate="false" scope="step">
 		<aop:scoped-proxy />
-		<property name="resource"
-			value="classpath:data/footballjob/input/player.csv" />
-		<property name="tokenizer">
-			<bean
-				class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer">
-				<property name="names"
-					value="ID,lastName,firstName,position,birthYear,debutYear" />
+	</bean>
+
+	<bean id="fixedFileDescriptor"
+		class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
+		<property name="names" value="ISIN, Quantity, Price, Customer" />
+		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
+	</bean>
+
+	<bean id="fixedValidator"
+		class="org.springframework.batch.item.validator.SpringValidator">
+		<property name="validator">
+			<bean id="tradeValidator"
+				class="org.springmodules.validation.valang.ValangValidator">
+				<property name="valang">
+					<value>
+						<![CDATA[
+						{ isin : length(?) < 13 : 'ISIN too long' : 'isin_length' : 12}
+					]]>
+					</value>
+				</property>
 			</bean>
-		</property>
-		<property name="fieldSetMapper">
-			<bean
-				class="org.springframework.batch.sample.mapping.PlayerMapper" />
 		</property>
 	</bean>
 
-	<bean id="gameFileItemReader"
-		class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader"
-		scope="step">
-		<aop:scoped-proxy />
-		<property name="resource"
-			value="classpath:data/footballjob/input/games.csv" />
-		<property name="tokenizer">
-			<bean
-				class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer">
-				<property name="names"
-					value="id,year,team,week,opponent,completes,attempts,passingYards,passingTd,interceptions,rushes,rushYards,receptions,receptionYards,totalTd" />
+	<bean id="tradeDao"
+		class="org.springframework.batch.sample.dao.JdbcTradeWriter">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="incrementer">
+			<bean parent="incrementerParent">
+				<property name="incrementerName" value="TRADE_SEQ" />
 			</bean>
-		</property>
-		<property name="fieldSetMapper">
-			<bean
-				class="org.springframework.batch.sample.mapping.GameMapper" />
+
 		</property>
 	</bean>
 
-	<bean id="playerSummarizationSource"
-		class="org.springframework.batch.io.cursor.JdbcCursorItemReader"
-		scope="step">
-		<aop:scoped-proxy />
-		<property name="dataSource" ref="dataSource" />
-		<property name="mapper">
-			<bean
-				class="org.springframework.batch.sample.mapping.PlayerSummaryMapper" />
-		</property>
-		<property name="sql">
-			<value>
-				SELECT games.player_id, games.year_no, SUM(COMPLETES),
-				SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
-				SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),
-				SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)
-				from games, players where players.player_id =
-				games.player_id group by games.player_id, games.year_no
-			</value>
-		</property>
+	<bean id="fileLocator"
+		class="org.springframework.core.io.ClassPathResource">
+		<constructor-arg type="java.lang.String"
+			value="data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 	</bean>
+
+	<bean id="fieldSetMapper"
+		class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
+
+	<bean parent="customEditorConfigurer" />
 
 	<aop:config>
 		<aop:aspect id="moduleLogging" ref="itemProcessorLogAdvice">

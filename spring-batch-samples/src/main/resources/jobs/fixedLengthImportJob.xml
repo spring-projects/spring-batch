@@ -76,8 +76,6 @@
 		</property>
 	</bean>
 
-
-
 	<bean id="fileLocator" class="org.springframework.core.io.ClassPathResource">
 		<constructor-arg type="java.lang.String"
 			value="data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
@@ -86,8 +84,5 @@
 	<bean id="fieldSetMapper" class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
 
 	<bean parent="customEditorConfigurer"/>
-
-	<!-- register the step scope with the application context -->
-	<bean class="org.springframework.batch.execution.scope.StepScope" />
 
 </beans>

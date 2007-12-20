@@ -26,12 +26,11 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
-public class StagingItemReader extends JdbcDaoSupport implements
-		ItemReader, ResourceLifecycle, DisposableBean,
+public class StagingItemReader extends JdbcDaoSupport implements ItemReader, ResourceLifecycle, DisposableBean,
 		StepContextAware {
 
 	// Key for buffer in transaction synchronization manager
-	private static final String BUFFER_KEY = StagingItemReader.class.getName()+".BUFFER";
+	private static final String BUFFER_KEY = StagingItemReader.class.getName() + ".BUFFER";
 
 	private static Log logger = LogFactory.getLog(StagingItemReader.class);
 
@@ -41,7 +40,7 @@ public class StagingItemReader extends JdbcDaoSupport implements
 
 	private Object lock = new Object();
 
-	private boolean initialized = false;
+	private volatile boolean initialized = false;
 
 	private volatile Iterator keys;
 
@@ -72,13 +71,14 @@ public class StagingItemReader extends JdbcDaoSupport implements
 	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#open()
 	 */
 	public void open() {
-		Assert.state(keys == null || initialized,
-				"Cannot open an already open StagingItemProvider"
-						+ ", call close() first.");
+		Assert.state(keys == null || initialized, "Cannot open an already open StagingItemProvider"
+				+ ", call close() first.");
 		synchronized (lock) {
-			keys = retrieveKeys().iterator();			
+			if (keys == null) {
+				keys = retrieveKeys().iterator();
+				logger.info("Keys obtained for staging.");
+			}
 		}
-		logger.info("keys: " + keys);
 		registerSynchronization();
 		initialized = true;
 	}
@@ -86,8 +86,7 @@ public class StagingItemReader extends JdbcDaoSupport implements
 	/**
 	 * Callback for injection of the step context.
 	 * 
-	 * @param stepContext
-	 *            the stepContext to set
+	 * @param stepContext the stepContext to set
 	 */
 	public void setStepContext(StepContext stepContext) {
 		this.stepContext = stepContext;
@@ -97,24 +96,19 @@ public class StagingItemReader extends JdbcDaoSupport implements
 
 		synchronized (lock) {
 
-			return getJdbcTemplate()
-					.query(
+			return getJdbcTemplate().query(
 
-							"SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID",
+			"SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID",
 
-							new Object[] {
-									stepContext.getStepExecution()
-											.getJobExecution().getJobId(),
-									StagingItemProcessor.NEW },
+			new Object[] { stepContext.getStepExecution().getJobExecution().getJobId(), StagingItemProcessor.NEW },
 
-							new RowMapper() {
-								public Object mapRow(ResultSet rs, int rowNum)
-										throws SQLException {
-									return new Long(rs.getLong(1));
-								}
-							}
+			new RowMapper() {
+				public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+					return new Long(rs.getLong(1));
+				}
+			}
 
-					);
+			);
 
 		}
 
@@ -130,26 +124,19 @@ public class StagingItemReader extends JdbcDaoSupport implements
 		if (id == null) {
 			return null;
 		}
-		Object result = getJdbcTemplate().queryForObject(
-				"SELECT VALUE FROM BATCH_STAGING WHERE ID=?",
+		Object result = getJdbcTemplate().queryForObject("SELECT VALUE FROM BATCH_STAGING WHERE ID=?",
 				new Object[] { id }, new RowMapper() {
-					public Object mapRow(ResultSet rs, int rowNum)
-							throws SQLException {
+					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 						byte[] blob = lobHandler.getBlobAsBytes(rs, 1);
 						return SerializationUtils.deserialize(blob);
 					}
 				});
 		// Update now - changes will rollback if there is a problem later.
-		int count = getJdbcTemplate()
-				.update(
-						"UPDATE BATCH_STAGING SET PROCESSED=? WHERE ID=? AND PROCESSED=?",
-						new Object[] { StagingItemProcessor.DONE, id,
-								StagingItemProcessor.NEW });
+		int count = getJdbcTemplate().update("UPDATE BATCH_STAGING SET PROCESSED=? WHERE ID=? AND PROCESSED=?",
+				new Object[] { StagingItemProcessor.DONE, id, StagingItemProcessor.NEW });
 		if (count != 1) {
-			throw new OptimisticLockingFailureException(
-					"The staging record with ID="
-							+ id
-							+ " was updated concurrently when trying to mark as complete (updated "+count+" records.");
+			throw new OptimisticLockingFailureException("The staging record with ID=" + id
+					+ " was updated concurrently when trying to mark as complete (updated " + count + " records.");
 		}
 		return result;
 	}
@@ -169,7 +156,8 @@ public class StagingItemReader extends JdbcDaoSupport implements
 					logger.debug("Retrieved key from list: " + key);
 				}
 			}
-		} else {
+		}
+		else {
 			logger.debug("Retrieved key from buffer: " + key);
 		}
 		return key;
@@ -178,11 +166,9 @@ public class StagingItemReader extends JdbcDaoSupport implements
 
 	private StagingBuffer getBuffer() {
 		if (!TransactionSynchronizationManager.hasResource(BUFFER_KEY)) {
-			TransactionSynchronizationManager.bindResource(BUFFER_KEY,
-					new StagingBuffer());
+			TransactionSynchronizationManager.bindResource(BUFFER_KEY, new StagingBuffer());
 		}
-		return (StagingBuffer) TransactionSynchronizationManager
-				.getResource(BUFFER_KEY);
+		return (StagingBuffer) TransactionSynchronizationManager.getResource(BUFFER_KEY);
 	}
 
 	public boolean recover(Object data, Throwable cause) {
@@ -196,8 +182,7 @@ public class StagingItemReader extends JdbcDaoSupport implements
 	 * initialized.
 	 */
 	protected void registerSynchronization() {
-		BatchTransactionSynchronizationManager
-				.registerSynchronization(synchronization);
+		BatchTransactionSynchronizationManager.registerSynchronization(synchronization);
 	}
 
 	/*
@@ -221,12 +206,12 @@ public class StagingItemReader extends JdbcDaoSupport implements
 	/**
 	 * Encapsulates transaction events handling.
 	 */
-	private class StagingInputTransactionSynchronization extends
-			TransactionSynchronizationAdapter {
+	private class StagingInputTransactionSynchronization extends TransactionSynchronizationAdapter {
 		public void afterCompletion(int status) {
 			if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
 				transactionRolledBack();
-			} else if (status == TransactionSynchronization.STATUS_COMMITTED) {
+			}
+			else if (status == TransactionSynchronization.STATUS_COMMITTED) {
 				transactionCommitted();
 			}
 		}
@@ -235,6 +220,7 @@ public class StagingItemReader extends JdbcDaoSupport implements
 	private class StagingBuffer {
 
 		private List list = new ArrayList();
+
 		private Iterator iter = new ArrayList().iterator();
 
 		public Long next() {
