@@ -80,6 +80,6 @@
 		<property name="incrementerName" value="BATCH_PARTITION_EXECUTION_SEQ" />
 	</bean>
 
-	<import resource="alt-data-source-context.xml" />
+	<!-- import resource="alt-data-source-context.xml" /-->
 
 </beans>
