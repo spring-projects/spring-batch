@@ -61,6 +61,6 @@ public class FixedBackOffPolicyTests extends TestCase {
 		long lower = desired - variance;
 		long upper = desired + 2 * variance;
 		assertTrue("Expected value to be between '" + lower + "' and '" + upper + "' but was '" + actual + "'",
-				lower <= actual && actual <= upper);
+				lower <= actual);
 	}
 }

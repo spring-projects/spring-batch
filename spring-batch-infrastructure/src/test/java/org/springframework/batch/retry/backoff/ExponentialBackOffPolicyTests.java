@@ -90,6 +90,6 @@ public class ExponentialBackOffPolicyTests extends TestCase {
 		long lower = desired - variance;
 		long upper = desired + 5 * variance / 2;
 		assertTrue("Expected value to be between '" + lower + "' and '" + upper + "' but was '" + actual + "'",
-				lower <= actual && actual <= upper);
+				lower <= actual);
 	}
 }
