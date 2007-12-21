@@ -15,8 +15,22 @@
 		<property name="password" value="${batch.jdbc.password}" />
 	</bean>
 
-	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
+		<property name="mappingLocations" value="classpath*:/*.hbm.xml"/>
+		<property name="hibernateProperties">
+			<value>
+				<![CDATA[
+			hibernate.show_sql=true
+			hibernate.format_sql=true
+			]]>
+			</value>
+		</property>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" lazy-init="true">
+		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
 	<!--  Use this to set additional properties on beans at run time -->
@@ -65,5 +79,7 @@
 	<bean id="partitionInstanceIncrementer" parent="incrementerParent">
 		<property name="incrementerName" value="BATCH_PARTITION_EXECUTION_SEQ" />
 	</bean>
+
+	<import resource="alt-data-source-context.xml" />
 
 </beans>

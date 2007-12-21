@@ -9,6 +9,10 @@ import java.util.List;
 import org.springframework.batch.sample.item.processor.CustomerCreditIncreaseProcessor;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Test case for jobs that are expected to update customer credit value by fixed
@@ -17,10 +21,11 @@ import org.springframework.jdbc.core.RowMapper;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public abstract class AbstractCustomerCreditIncreaseTests extends
-		AbstractValidatingBatchLauncherTests {
+public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValidatingBatchLauncherTests {
 
 	protected JdbcOperations jdbcTemplate;
+
+	protected PlatformTransactionManager transactionManager;
 
 	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseProcessor.FIXED_AMOUNT;
 
@@ -32,8 +37,19 @@ public abstract class AbstractCustomerCreditIncreaseTests extends
 
 	private List creditsBeforeUpdate;
 
+	/**
+	 * @param jdbcTemplate
+	 */
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
+	}
+
+	/**
+	 * Public setter for the PlatformTransactionManager.
+	 * @param transactionManager the transactionManager to set
+	 */
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
 	}
 
 	/**
@@ -41,9 +57,13 @@ public abstract class AbstractCustomerCreditIncreaseTests extends
 	 */
 	protected void validatePreConditions() throws Exception {
 		super.validatePreConditions();
-		creditsBeforeUpdate = jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper() {
-			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-				return rs.getBigDecimal(CREDIT_COLUMN);
+		creditsBeforeUpdate = (List) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				return jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper() {
+					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+						return rs.getBigDecimal(CREDIT_COLUMN);
+					}
+				});
 			}
 		});
 	}
@@ -52,15 +72,14 @@ public abstract class AbstractCustomerCreditIncreaseTests extends
 	 * Credit was increased by CREDIT_INCREASE
 	 */
 	protected void validatePostConditions() throws Exception {
-		
+
 		final List matches = new ArrayList();
 
 		jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper() {
 
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 				final BigDecimal creditBeforeUpdate = (BigDecimal) creditsBeforeUpdate.get(rowNum);
-				final BigDecimal expectedCredit = creditBeforeUpdate
-						.add(CREDIT_INCREASE);
+				final BigDecimal expectedCredit = creditBeforeUpdate.add(CREDIT_INCREASE);
 				if (expectedCredit.equals(rs.getBigDecimal(CREDIT_COLUMN))) {
 					matches.add(rs.getBigDecimal(ID_COLUMN));
 				}
@@ -68,7 +87,6 @@ public abstract class AbstractCustomerCreditIncreaseTests extends
 			}
 
 		});
-				
 
 		assertEquals(getExpectedMatches(), matches.size());
 		checkMatches(matches);

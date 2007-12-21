@@ -54,5 +54,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/springframework/spring-test/2.5/spring-test-2.5.jar" sourcepath="M2_REPO/org/springframework/spring-test/2.5/spring-test-2.5-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.1/commons-lang-2.1.jar" sourcepath="M2_REPO/commons-lang/commons-lang/2.1/commons-lang-2.1-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/derby/derby/10.2.1.6/derby-10.2.1.6.jar"/>
+	<classpathentry kind="lib" path="C:/Dave/Clients/UL/workspace/core/repository/com/oracle/oracle-jdbc/10.2.0.1.0/oracle-jdbc-10.2.0.1.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
