@@ -75,17 +75,22 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 
 		final List matches = new ArrayList();
 
-		jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper() {
 
-			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-				final BigDecimal creditBeforeUpdate = (BigDecimal) creditsBeforeUpdate.get(rowNum);
-				final BigDecimal expectedCredit = creditBeforeUpdate.add(CREDIT_INCREASE);
-				if (expectedCredit.equals(rs.getBigDecimal(CREDIT_COLUMN))) {
-					matches.add(rs.getBigDecimal(ID_COLUMN));
-				}
+					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+						final BigDecimal creditBeforeUpdate = (BigDecimal) creditsBeforeUpdate.get(rowNum);
+						final BigDecimal expectedCredit = creditBeforeUpdate.add(CREDIT_INCREASE);
+						if (expectedCredit.equals(rs.getBigDecimal(CREDIT_COLUMN))) {
+							matches.add(rs.getBigDecimal(ID_COLUMN));
+						}
+						return null;
+					}
+
+				});
 				return null;
 			}
-
 		});
 
 		assertEquals(getExpectedMatches(), matches.size());

@@ -11,7 +11,9 @@
 			<bean
 				class="test.jdbc.datasource.DerbyDataSourceFactoryBean" />
 		</property>
-		<property name="isolationLevelName" value="ISOLATION_SERIALIZABLE"/>
+		<!--  Keep the isolation level low so that a cursor in an ItemReader will not lock the table -->
+		<property name="isolationLevelName"
+			value="ISOLATION_READ_COMMITTED" />
 	</bean>
 
 	<bean

@@ -40,7 +40,8 @@
 
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
-			<tx:method name="*" />
+			<tx:method name="*Create*" propagation="REQUIRES_NEW" isolation="SERIALIZABLE"/>
+			<tx:method name="*"/>
 		</tx:attributes>
 	</tx:advice>
 
