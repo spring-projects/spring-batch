@@ -16,8 +16,8 @@
 
 package org.springframework.batch.execution.repository.dao;
 
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +47,7 @@ public abstract class AbstractJobDaoTests extends
 
 	protected JobExecution jobExecution;
 
-	protected Timestamp jobExecutionStartTime = new Timestamp(System
+	protected Date jobExecutionStartTime = new Date(System
 			.currentTimeMillis());
 
 	protected String[] getConfigLocations() {
@@ -74,7 +74,7 @@ public abstract class AbstractJobDaoTests extends
 		job = jobDao.createJob(jobRuntimeInformation);
 
 		// Create an execution
-		jobExecutionStartTime = new Timestamp(System.currentTimeMillis());
+		jobExecutionStartTime = new Date(System.currentTimeMillis());
 		jobExecution = new JobExecution(job);
 		jobExecution.setStartTime(jobExecutionStartTime);
 		jobExecution.setStatus(BatchStatus.STARTED);
@@ -188,7 +188,7 @@ public abstract class AbstractJobDaoTests extends
 
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		jobExecution.setExitStatus(ExitStatus.FINISHED);
-		jobExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
+		jobExecution.setEndTime(new Date(System.currentTimeMillis()));
 		jobDao.update(jobExecution);
 
 		List executions = jobDao.findJobExecutions(job);

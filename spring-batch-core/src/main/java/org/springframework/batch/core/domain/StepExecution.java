@@ -16,7 +16,7 @@
 
 package org.springframework.batch.core.domain;
 
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Properties;
 
 import org.springframework.batch.repeat.ExitStatus;
@@ -47,9 +47,9 @@ public class StepExecution extends Entity {
 
 	private int rollbackCount = 0;
 
-	private Timestamp startTime = new Timestamp(System.currentTimeMillis());
+	private Date startTime = new Date(System.currentTimeMillis());
 
-	private Timestamp endTime = null;
+	private Date endTime = null;
 
 	private Properties statistics = new Properties();
 
@@ -103,11 +103,11 @@ public class StepExecution extends Entity {
 		this.commitCount = commitCount;
 	}
 
-	public Timestamp getEndTime() {
+	public Date getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(Timestamp endTime) {
+	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
 
@@ -127,11 +127,11 @@ public class StepExecution extends Entity {
 		return new Integer(rollbackCount);
 	}
 
-	public Timestamp getStartTime() {
+	public Date getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(Timestamp startTime) {
+	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
 	}
 

@@ -15,8 +15,7 @@
  */
 package org.springframework.batch.execution.runtime;
 
-import java.sql.Date;
-import java.sql.Timestamp;
+import java.util.Date;
 
 import junit.framework.TestCase;
 
@@ -80,7 +79,7 @@ public class ScheduledJobIdentifierTests extends TestCase {
 	public void testEqualsInstanceWithTimestamp() throws Exception {
 		ScheduledJobIdentifier other = new ScheduledJobIdentifier(instance.getName());
 		other.setJobKey(instance.getJobKey());
-		other.setScheduleDate(new Timestamp(instance.getScheduleDate().getTime()));
+		other.setScheduleDate(new Date(instance.getScheduleDate().getTime()));
 		assertEquals(instance, other);
 		assertEquals(other, instance);
 		assertEquals(instance.hashCode(), other.hashCode());

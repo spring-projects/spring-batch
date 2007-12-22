@@ -19,8 +19,7 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public class JdbcJobRepositoryTests extends
-		AbstractTransactionalDataSourceSpringContextTests {
+public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSpringContextTests {
 
 	private ScheduledJobIdentifier jobIdentifier;
 
@@ -29,6 +28,7 @@ public class JdbcJobRepositoryTests extends
 	private JobConfiguration jobConfiguration;
 
 	private Set jobExecutionIds = new HashSet();
+
 	private Set jobIds = new HashSet();
 
 	private List list = new ArrayList();
@@ -38,19 +38,18 @@ public class JdbcJobRepositoryTests extends
 	}
 
 	protected String[] getConfigLocations() {
-		return new String[] { "simple-container-definition.xml" }; // , "alt-data-source-context.xml" };
+		return new String[] { "simple-container-definition.xml" };
 	}
 
 	protected void onSetUpInTransaction() throws Exception {
 		jobIdentifier = new ScheduledJobIdentifier("Job1");
 		jobIdentifier.setName("Job1");
 		jobIdentifier.setJobKey("TestStream");
-		jobIdentifier.setScheduleDate(new SimpleDateFormat("yyyyMMdd")
-				.parse("20070505"));
+		jobIdentifier.setScheduleDate(new SimpleDateFormat("yyyyMMdd").parse("20070505"));
 		jobConfiguration = new JobConfiguration("test-job");
 		jobConfiguration.setRestartable(true);
 	}
-	
+
 	protected void onSetUpBeforeTransaction() throws Exception {
 		startNewTransaction();
 		getJdbcTemplate().update("DELETE FROM BATCH_JOB_EXECUTION");
@@ -63,30 +62,26 @@ public class JdbcJobRepositoryTests extends
 		startNewTransaction();
 		for (Iterator iterator = jobExecutionIds.iterator(); iterator.hasNext();) {
 			Long id = (Long) iterator.next();
-			getJdbcTemplate().update(
-					"DELETE FROM BATCH_JOB_EXECUTION where ID=?",
-					new Object[] { id });
+			getJdbcTemplate().update("DELETE FROM BATCH_JOB_EXECUTION where ID=?", new Object[] { id });
 		}
 		for (Iterator iterator = jobIds.iterator(); iterator.hasNext();) {
 			Long id = (Long) iterator.next();
-			getJdbcTemplate().update("DELETE FROM BATCH_JOB where ID=?",
-					new Object[] { id });
+			getJdbcTemplate().update("DELETE FROM BATCH_JOB where ID=?", new Object[] { id });
 		}
 		setComplete();
 		endTransaction();
-		int count = getJdbcTemplate().queryForInt(
-				"SELECT COUNT(*) FROM BATCH_JOB");
-		assertEquals(0, count);
+		for (Iterator iterator = jobIds.iterator(); iterator.hasNext();) {
+			Long id = (Long) iterator.next();
+			int count = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB where ID=?", new Object[] { id });
+			assertEquals(0, count);
+		}
 	}
 
 	public void testFindOrCreateJob() throws Exception {
 		jobConfiguration.setName("foo");
-		int before = getJdbcTemplate().queryForInt(
-				"SELECT COUNT(*) FROM BATCH_JOB");
-		JobExecution execution = repository.findOrCreateJob(jobConfiguration,
-				jobIdentifier);
-		int after = getJdbcTemplate().queryForInt(
-				"SELECT COUNT(*) FROM BATCH_JOB");
+		int before = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB");
+		JobExecution execution = repository.findOrCreateJob(jobConfiguration, jobIdentifier);
+		int after = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB");
 		assertEquals(before + 1, after);
 		assertNotNull(execution.getId());
 	}
@@ -95,8 +90,7 @@ public class JdbcJobRepositoryTests extends
 
 		jobConfiguration.setName("bar");
 
-		int before = getJdbcTemplate().queryForInt(
-				"SELECT COUNT(*) FROM BATCH_JOB");
+		int before = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB");
 		assertEquals(0, before);
 
 		endTransaction();
@@ -107,7 +101,8 @@ public class JdbcJobRepositoryTests extends
 		try {
 			execution = doConcurrentStart();
 			fail("Expected JobExecutionAlreadyRunningException");
-		} catch (JobExecutionAlreadyRunningException e) {
+		}
+		catch (JobExecutionAlreadyRunningException e) {
 			// expected
 		}
 		long t1 = System.currentTimeMillis();
@@ -118,24 +113,19 @@ public class JdbcJobRepositoryTests extends
 
 		assertNotNull(execution);
 
-		int after = getJdbcTemplate().queryForInt(
-				"SELECT COUNT(*) FROM BATCH_JOB");
+		int after = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB");
 		assertNotNull(execution.getId());
 		assertEquals(before + 1, after);
 
-		logger
-				.info("Duration: "
-						+ (t1 - t0)
-						+ " - the second transaction did not block if this number is less than about 1000.");
+		logger.info("Duration: " + (t1 - t0)
+				+ " - the second transaction did not block if this number is less than about 1000.");
 	}
 
-	public void testFindOrCreateJobConcurrentlyWhenJobAlreadyExists()
-			throws Exception {
+	public void testFindOrCreateJobConcurrentlyWhenJobAlreadyExists() throws Exception {
 
 		jobConfiguration.setName("spam");
 
-		JobExecution execution = repository.findOrCreateJob(jobConfiguration,
-				jobIdentifier);
+		JobExecution execution = repository.findOrCreateJob(jobConfiguration, jobIdentifier);
 		cacheJobIds(execution);
 		execution.setEndTime(new Timestamp(System.currentTimeMillis()));
 		repository.saveOrUpdate(execution);
@@ -147,8 +137,7 @@ public class JdbcJobRepositoryTests extends
 
 		startNewTransaction();
 
-		int before = getJdbcTemplate().queryForInt(
-				"SELECT COUNT(*) FROM BATCH_JOB");
+		int before = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB");
 		assertEquals(1, before);
 
 		endTransaction();
@@ -158,20 +147,18 @@ public class JdbcJobRepositoryTests extends
 		try {
 			execution = doConcurrentStart();
 			fail("Expected JobExecutionAlreadyRunningException");
-		} catch (JobExecutionAlreadyRunningException e) {
+		}
+		catch (JobExecutionAlreadyRunningException e) {
 			// expected
 		}
 		long t1 = System.currentTimeMillis();
 
-		int after = getJdbcTemplate().queryForInt(
-				"SELECT COUNT(*) FROM BATCH_JOB");
+		int after = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB");
 		assertNotNull(execution.getId());
 		assertEquals(before, after);
 
-		logger
-				.info("Duration: "
-						+ (t1 - t0)
-						+ " - the second transaction did not block if this number is less than about 1000.");
+		logger.info("Duration: " + (t1 - t0)
+				+ " - the second transaction did not block if this number is less than about 1000.");
 	}
 
 	private void cacheJobIds(JobExecution execution) {
@@ -181,30 +168,26 @@ public class JdbcJobRepositoryTests extends
 		jobIds.add(execution.getJobId());
 	}
 
-	private JobExecution doConcurrentStart() throws InterruptedException,
-			JobExecutionAlreadyRunningException {
+	private JobExecution doConcurrentStart() throws InterruptedException, JobExecutionAlreadyRunningException {
 		new Thread(new Runnable() {
 			public void run() {
 				try {
-					new TransactionTemplate(transactionManager)
-							.execute(new TransactionCallback() {
-								public Object doInTransaction(
-										org.springframework.transaction.TransactionStatus status) {
-									try {
-										JobExecution execution = repository
-												.findOrCreateJob(
-														jobConfiguration,
-														jobIdentifier);
-										cacheJobIds(execution);
-										list.add(execution);
-										Thread.sleep(1000);
-									} catch (Exception e) {
-										list.add(e);
-									}
-									return null;
-								}
-							});
-				} catch (RuntimeException e) {
+					new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+						public Object doInTransaction(org.springframework.transaction.TransactionStatus status) {
+							try {
+								JobExecution execution = repository.findOrCreateJob(jobConfiguration, jobIdentifier);
+								cacheJobIds(execution);
+								list.add(execution);
+								Thread.sleep(1000);
+							}
+							catch (Exception e) {
+								list.add(e);
+							}
+							return null;
+						}
+					});
+				}
+				catch (RuntimeException e) {
 					list.add(e);
 				}
 
@@ -212,8 +195,7 @@ public class JdbcJobRepositoryTests extends
 		}).start();
 
 		Thread.sleep(400);
-		JobExecution execution = repository.findOrCreateJob(jobConfiguration,
-				jobIdentifier);
+		JobExecution execution = repository.findOrCreateJob(jobConfiguration, jobIdentifier);
 		cacheJobIds(execution);
 
 		int count = 0;
@@ -221,10 +203,8 @@ public class JdbcJobRepositoryTests extends
 			Thread.sleep(200);
 		}
 
-		assertEquals("Timed out waiting for JobExecution to be created", 1,
-				list.size());
-		assertTrue("JobExecution not created in thread",
-				list.get(0) instanceof JobExecution);
+		assertEquals("Timed out waiting for JobExecution to be created", 1, list.size());
+		assertTrue("JobExecution not created in thread", list.get(0) instanceof JobExecution);
 		return (JobExecution) list.get(0);
 	}
 

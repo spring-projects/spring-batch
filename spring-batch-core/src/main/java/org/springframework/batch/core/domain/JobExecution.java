@@ -16,8 +16,8 @@
 
 package org.springframework.batch.core.domain;
 
-import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 
 import org.springframework.batch.repeat.ExitStatus;
@@ -41,9 +41,9 @@ public class JobExecution extends Entity {
 
 	private BatchStatus status = BatchStatus.STARTING;
 
-	private Timestamp startTime = new Timestamp(System.currentTimeMillis());
+	private Date startTime = new Date(System.currentTimeMillis());
 
-	private Timestamp endTime = null;
+	private Date endTime = null;
 
 	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
@@ -72,19 +72,19 @@ public class JobExecution extends Entity {
 		this(job, null);
 	}
 
-	public Timestamp getEndTime() {
+	public Date getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(Timestamp endTime) {
+	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
 
-	public Timestamp getStartTime() {
+	public Date getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(Timestamp startTime) {
+	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
 	}
 

@@ -16,7 +16,7 @@
 
 package org.springframework.batch.execution.step.simple;
 
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -161,7 +161,7 @@ public class SimpleStepExecutor implements StepExecutor {
 		stepScopeContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getJob().getIdentifier());
 
 		try {
-			stepExecution.setStartTime(new Timestamp(System.currentTimeMillis()));
+			stepExecution.setStartTime(new Date(System.currentTimeMillis()));
 			updateStatus(stepExecution, BatchStatus.STARTED);
 
 			final boolean saveRestartData = configuration.isSaveRestartData();
@@ -265,7 +265,7 @@ public class SimpleStepExecutor implements StepExecutor {
 		}
 		finally {
 			stepExecution.setExitStatus(status);
-			stepExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
+			stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 			try {
 				jobRepository.saveOrUpdate(stepExecution);
 			}

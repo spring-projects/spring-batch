@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.core.domain;
 
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Properties;
 
-import org.springframework.batch.repeat.ExitStatus;
-
 import junit.framework.TestCase;
+
+import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Dave Syer
@@ -45,7 +45,7 @@ public class StepExecutionTests extends TestCase {
 	 */
 	public void testGetEndTime() {
 		assertNull(execution.getEndTime());
-		execution.setEndTime(new Timestamp(0L));
+		execution.setEndTime(new Date(0L));
 		assertEquals(0L, execution.getEndTime().getTime());
 	}
 
@@ -55,7 +55,7 @@ public class StepExecutionTests extends TestCase {
 	 */
 	public void testGetStartTime() {
 		assertNotNull(execution.getStartTime());
-		execution.setStartTime(new Timestamp(10L));
+		execution.setStartTime(new Date(10L));
 		assertEquals(10L, execution.getStartTime().getTime());
 	}
 

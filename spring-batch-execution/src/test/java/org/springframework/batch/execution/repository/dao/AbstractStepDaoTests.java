@@ -16,7 +16,7 @@
 
 package org.springframework.batch.execution.repository.dao;
 
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -88,7 +88,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		
 		stepExecution = new StepExecution(step1, jobExecution);
 		stepExecution.setStatus(BatchStatus.STARTED);
-		stepExecution.setStartTime(new Timestamp(System.currentTimeMillis()));
+		stepExecution.setStartTime(new Date(System.currentTimeMillis()));
 		stepDao.save(stepExecution);
 	}
 	
@@ -162,7 +162,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		
 		StepExecution execution = new StepExecution(step2, jobExecution);
 		execution.setStatus(BatchStatus.STARTED);
-		execution.setStartTime(new Timestamp(System.currentTimeMillis()));
+		execution.setStartTime(new Date(System.currentTimeMillis()));
 		Properties statistics = new Properties();
 		statistics.setProperty("statistic.key1", "0");
 		statistics.setProperty("statistic.key2", "5");
@@ -180,7 +180,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	public void testUpdateStepExecution(){
 		
 		stepExecution.setStatus(BatchStatus.COMPLETED);
-		stepExecution.setEndTime(new Timestamp(System.currentTimeMillis()));
+		stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 		stepExecution.setCommitCount(5);
 		stepExecution.setTaskCount(5);
 		stepExecution.setStatistics(new Properties());

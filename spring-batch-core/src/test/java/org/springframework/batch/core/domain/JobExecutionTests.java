@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.domain;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 import junit.framework.TestCase;
 
@@ -44,7 +44,7 @@ public class JobExecutionTests extends TestCase {
 	 */
 	public void testGetEndTime() {
 		assertNull(execution.getEndTime());
-		execution.setEndTime(new Timestamp(100L));
+		execution.setEndTime(new Date(100L));
 		assertEquals(100L, execution.getEndTime().getTime());
 	}
 
@@ -53,7 +53,7 @@ public class JobExecutionTests extends TestCase {
 	 */
 	public void testIsRunning() {
 		assertTrue(execution.isRunning());
-		execution.setEndTime(new Timestamp(100L));
+		execution.setEndTime(new Date(100L));
 		assertFalse(execution.isRunning());
 	}
 
@@ -62,7 +62,7 @@ public class JobExecutionTests extends TestCase {
 	 */
 	public void testGetStartTime() {
 		assertNotNull(execution.getStartTime());
-		execution.setStartTime(new Timestamp(0L));
+		execution.setStartTime(new Date(0L));
 		assertEquals(0L, execution.getStartTime().getTime());
 	}
 

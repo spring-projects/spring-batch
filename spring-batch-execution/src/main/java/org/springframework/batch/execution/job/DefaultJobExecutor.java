@@ -16,7 +16,7 @@
 
 package org.springframework.batch.execution.job;
 
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -118,7 +118,7 @@ public class DefaultJobExecutor implements JobExecutor {
 			status = exceptionClassifier.classifyForExitCode(t);
 			rethrow(t);
 		} finally {
-			execution.setEndTime(new Timestamp(System.currentTimeMillis()));
+			execution.setEndTime(new Date(System.currentTimeMillis()));
 			execution.setExitStatus(status);
 			jobRepository.saveOrUpdate(execution);
 		}

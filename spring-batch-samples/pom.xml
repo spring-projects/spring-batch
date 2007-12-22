@@ -107,12 +107,6 @@
 		</dependency>
 		<!-- optional dependency from infrastructure -->
 		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib-nodep</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<!-- optional dependency from infrastructure -->
-		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
 			<scope>test</scope>
