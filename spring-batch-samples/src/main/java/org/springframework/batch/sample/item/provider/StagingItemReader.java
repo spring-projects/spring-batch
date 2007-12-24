@@ -24,7 +24,6 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.util.Assert;
 
 public class StagingItemReader extends JdbcDaoSupport implements ItemReader, ResourceLifecycle, DisposableBean,
 		StepContextAware {
@@ -71,16 +70,15 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemReader, Res
 	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#open()
 	 */
 	public void open() {
-		Assert.state(keys == null || initialized, "Cannot open an already open StagingItemProvider"
-				+ ", call close() first.");
+		// Can be called from multiple threads because of lazy initialisation...
 		synchronized (lock) {
 			if (keys == null) {
 				keys = retrieveKeys().iterator();
 				logger.info("Keys obtained for staging.");
+				registerSynchronization();
+				initialized = true;
 			}
 		}
-		registerSynchronization();
-		initialized = true;
 	}
 
 	/**
