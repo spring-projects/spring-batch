@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
@@ -27,25 +29,43 @@
 		<url>http://www.springsource.com</url>
 	</organization>
 	<scm>
-		<url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk</url>
-		<connection>scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk</connection>
-		<developerConnection>scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk</developerConnection>
+		<url>
+			http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk
+		</url>
+		<connection>
+			scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+		</connection>
+		<developerConnection>
+			scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+		</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
-		<url>http://opensource.atlassian.com/projects/spring/browse/BATCH</url>
+		<url>
+			http://opensource.atlassian.com/projects/spring/browse/BATCH
+		</url>
 	</issueManagement>
 	<mailingLists>
 		<mailingList>
 			<name>Spring Batch Forum</name>
-			<post>http://forum.springframework.org/forumdisplay.php?f=41</post>
-			<archive>http://forum.springframework.org/forumdisplay.php?f=41</archive>
+			<post>
+				http://forum.springframework.org/forumdisplay.php?f=41
+			</post>
+			<archive>
+				http://forum.springframework.org/forumdisplay.php?f=41
+			</archive>
 		</mailingList>
 		<mailingList>
-			<subscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</subscribe>
-			<unsubscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</unsubscribe>
+			<subscribe>
+				http://lists.interface21.com/listmanager/listinfo/spring-batch-announce
+			</subscribe>
+			<unsubscribe>
+				http://lists.interface21.com/listmanager/listinfo/spring-batch-announce
+			</unsubscribe>
 			<name>Spring Batch Announce</name>
-			<archive>http://lists.interface21.com/archives/spring-batch-announce</archive>
+			<archive>
+				http://lists.interface21.com/archives/spring-batch-announce
+			</archive>
 		</mailingList>
 	</mailingLists>
 	<ciManagement>
@@ -76,14 +96,18 @@
 			<distributionManagement>
 				<site>
 					<id>static.springframework.org</id>
-					<url>scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch</url>
+					<url>
+						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch
+					</url>
 				</site>
 			</distributionManagement>
 		</profile>
 		<profile>
 			<id>strict</id>
 			<properties>
-				<maven.test.failure.ignore>false</maven.test.failure.ignore>
+				<maven.test.failure.ignore>
+					false
+				</maven.test.failure.ignore>
 			</properties>
 		</profile>
 		<profile>
@@ -106,7 +130,9 @@
 	</profiles>
 
 	<distributionManagement>
-		<downloadUrl>http://www.springframework.org/download</downloadUrl>
+		<downloadUrl>
+			http://www.springframework.org/download
+		</downloadUrl>
 		<site>
 			<id>staging</id>
 			<url>file:///${user.dir}/target/staging</url>
@@ -176,11 +202,14 @@
 							<tasks>
 								<echo>Creating JUnit reports</echo>
 								<mkdir dir="target/surefire-reports" />
-								<junitreport todir="target/surefire-reports">
-									<fileset dir="target/surefire-reports">
-										<include name="TEST-*.xml" />
+								<junitreport
+									todir="target/surefire-reports">
+									<fileset
+										dir=".">
+										<filename name="**/target/surefire-reports/TEST-*.xml" />
 									</fileset>
-									<report todir="target/site/junit-reports" />
+									<report
+										todir="target/site/junit-reports" />
 								</junitreport>
 							</tasks>
 						</configuration>
@@ -373,7 +402,7 @@
 				<version>2.3.0</version>
 				<optional>true</optional>
 			</dependency>
-<!-- Spring Dependencies -->
+			<!-- Spring Dependencies -->
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-aop</artifactId>
@@ -454,25 +483,57 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
 					<links>
-						<link>http://java.sun.com/j2ee/1.4/docs/api</link>
-						<link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-						<link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
-						<link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
-						<link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
-						<link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
-						<link>http://jakarta.apache.org/commons/logging/api/</link>
-						<link>http://jakarta.apache.org/commons/pool/apidocs/</link>
+						<link>
+							http://java.sun.com/j2ee/1.4/docs/api
+						</link>
+						<link>
+							http://java.sun.com/j2se/1.5.0/docs/api
+						</link>
+						<link>
+							http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
+						</link>
+						<link>
+							http://jakarta.apache.org/commons/dbcp/apidocs/
+						</link>
+						<link>
+							http://jakarta.apache.org/commons/fileupload/apidocs/
+						</link>
+						<link>
+							http://jakarta.apache.org/commons/httpclient/apidocs/
+						</link>
+						<link>
+							http://jakarta.apache.org/commons/logging/api/
+						</link>
+						<link>
+							http://jakarta.apache.org/commons/pool/apidocs/
+						</link>
 						<link>http://www.junit.org/junit/javadoc/</link>
-						<link>http://logging.apache.org/log4j/docs/api/</link>
-						<link>http://jakarta.apache.org/regexp/apidocs/</link>
-						<link>http://jakarta.apache.org/velocity/api/</link>
-						<link>http://static.springframework.org/spring/docs/2.1.x/api/</link>
-						<link>http://static.springframework.org/spring-batch/spring-batch-infrastructure/apidocs/</link>
-						<link>http://static.springframework.org/spring-batch/spring-batch-core/apidocs/</link>
-						<link>http://static.springframework.org/spring-batch/spring-batch-execution/apidocs/</link>
+						<link>
+							http://logging.apache.org/log4j/docs/api/
+						</link>
+						<link>
+							http://jakarta.apache.org/regexp/apidocs/
+						</link>
+						<link>
+							http://jakarta.apache.org/velocity/api/
+						</link>
+						<link>
+							http://static.springframework.org/spring/docs/2.1.x/api/
+						</link>
+						<link>
+							http://static.springframework.org/spring-batch/spring-batch-infrastructure/apidocs/
+						</link>
+						<link>
+							http://static.springframework.org/spring-batch/spring-batch-core/apidocs/
+						</link>
+						<link>
+							http://static.springframework.org/spring-batch/spring-batch-execution/apidocs/
+						</link>
 					</links>
 					<aggregate>true</aggregate>
-					<excludePackageNames>org.springframework.batch.sample</excludePackageNames>
+					<excludePackageNames>
+						org.springframework.batch.sample
+					</excludePackageNames>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -500,17 +561,23 @@
 		<repository>
 			<id>spring-milestone</id>
 			<name>Spring Portfolio Milestone Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+			<url>
+				http://s3.amazonaws.com/maven.springframework.org/milestone
+			</url>
 		</repository>
 		<repository>
 			<id>spring-external</id>
 			<name>Spring Portfolio Milestone Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
+			<url>
+				http://s3.amazonaws.com/maven.springframework.org/external
+			</url>
 		</repository>
 		<repository>
 			<id>apache-snapshot</id>
 			<name>Apache Foundation Snapshot Repository</name>
-			<url>http://people.apache.org/maven-snapshot-repository</url>
+			<url>
+				http://people.apache.org/maven-snapshot-repository
+			</url>
 		</repository>
 		<repository>
 			<id>objectstyle</id>
@@ -523,12 +590,16 @@
 		<pluginRepository>
 			<id>spring-external</id>
 			<name>Spring External Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
+			<url>
+				http://s3.amazonaws.com/maven.springframework.org/external
+			</url>
 		</pluginRepository>
 		<pluginRepository>
 			<id>spring-external-svn</id>
 			<name>Spring External SVN Repository</name>
-			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext</url>
+			<url>
+				https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext
+			</url>
 		</pluginRepository>
 	</pluginRepositories>
 
