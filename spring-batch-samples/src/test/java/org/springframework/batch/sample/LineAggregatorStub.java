@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample;
 
-import org.springframework.batch.io.file.support.transform.LineAggregator;
+import org.springframework.batch.io.file.transform.LineAggregator;
 
 
 /**

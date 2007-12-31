@@ -21,7 +21,7 @@ import java.io.FileReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.batch.io.file.support.DefaultFlatFileItemReader;
+import org.springframework.batch.io.file.DefaultFlatFileItemReader;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcOperations;

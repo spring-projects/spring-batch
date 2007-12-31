@@ -16,8 +16,8 @@
 
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.io.ItemWriter;
-import org.springframework.batch.io.file.support.transform.Converter;
+import org.springframework.batch.io.file.transform.Converter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.Order;
 
 

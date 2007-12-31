@@ -28,7 +28,7 @@
 		<aop:scoped-proxy />
 		<property name="outputSource">
 			<bean
-				class="org.springframework.batch.io.file.support.FlatFileItemWriter"
+				class="org.springframework.batch.io.file.FlatFileItemWriter"
 				id="customerFlatFileOutputSource">
 				<property name="resource" ref="customerFileLocator" />
 			</bean>
@@ -36,7 +36,7 @@
 	</bean>
 
 	<bean
-		class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader"
+		class="org.springframework.batch.io.file.DefaultFlatFileItemReader"
 		id="fileInputTemplate" scope="step">
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator" />
@@ -48,7 +48,7 @@
 	</bean>
 
 	<bean id="tradeFileDescriptor"
-		class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer">
+		class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer">
 		<property name="names" value="ISIN, Quantity, Price, Customer" />
 	</bean>
 

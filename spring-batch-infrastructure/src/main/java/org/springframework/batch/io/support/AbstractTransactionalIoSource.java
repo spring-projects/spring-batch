@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.io.support;
 
-import org.springframework.batch.io.ItemWriter;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.support.TransactionSynchronization;

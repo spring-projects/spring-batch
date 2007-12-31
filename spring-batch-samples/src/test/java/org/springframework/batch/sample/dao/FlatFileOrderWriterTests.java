@@ -9,8 +9,8 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.ItemWriter;
-import org.springframework.batch.io.file.support.transform.LineAggregator;
+import org.springframework.batch.io.file.transform.LineAggregator;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.LineAggregatorStub;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;

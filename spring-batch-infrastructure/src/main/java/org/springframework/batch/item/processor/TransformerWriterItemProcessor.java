@@ -1,6 +1,6 @@
 package org.springframework.batch.item.processor;
 
-import org.springframework.batch.io.ItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.util.Assert;
 
 /**

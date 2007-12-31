@@ -3,7 +3,7 @@ package org.springframework.batch.item.processor;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.io.ItemWriter;
+import org.springframework.batch.item.ItemWriter;
 
 /**
  * Tests for {@link TransformerWriterItemProcessor}.

@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.io.file.support.transform.Converter;
-import org.springframework.batch.io.file.support.transform.LineAggregator;
+import org.springframework.batch.io.file.transform.Converter;
+import org.springframework.batch.io.file.transform.LineAggregator;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;
 import org.springframework.batch.sample.domain.Customer;

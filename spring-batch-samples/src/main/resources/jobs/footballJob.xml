@@ -96,12 +96,12 @@
 	</bean>
 
 	<bean id="playerFileItemReader"
-		class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader" scope="step">
+		class="org.springframework.batch.io.file.DefaultFlatFileItemReader" scope="step">
 		<aop:scoped-proxy/>		
 		<property name="resource" value="classpath:data/footballjob/input/player.csv" />
 		<property name="tokenizer">
 			<bean
-				class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer">
+				class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer">
 				<property name="names"
 					value="ID,lastName,firstName,position,birthYear,debutYear" />
 			</bean>
@@ -113,12 +113,12 @@
 	</bean>
 
 	<bean id="gameFileItemReader"
-		class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader" scope="step">
+		class="org.springframework.batch.io.file.DefaultFlatFileItemReader" scope="step">
 		<aop:scoped-proxy/>
 		<property name="resource" value="classpath:data/footballjob/input/games.csv"/>
 		<property name="tokenizer">
 			<bean
-				class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer">
+				class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer">
 				<property name="names"
 					value="id,year,team,week,opponent,completes,attempts,passingYards,passingTd,interceptions,rushes,rushYards,receptions,receptionYards,totalTd" />
 			</bean>

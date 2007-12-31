@@ -2,9 +2,9 @@ package org.springframework.batch.item.processor;
 
 import java.util.Properties;
 
-import org.springframework.batch.io.ItemWriter;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;

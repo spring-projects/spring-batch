@@ -8,7 +8,7 @@
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader"
+	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.DefaultFlatFileItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileInputLocator" />
@@ -18,14 +18,14 @@
 		</property>
 	</bean>
 
-	<bean id="flatFileOutputSource" class="org.springframework.batch.io.file.support.FlatFileItemWriter"
+	<bean id="flatFileOutputSource" class="org.springframework.batch.io.file.FlatFileItemWriter"
 		scope="step" >
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileOutputLocator" />
 	</bean>
 
-	<bean id="delimitedLineAggregator" class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer" />
+	<bean id="delimitedLineAggregator" class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer" />
 
-	<bean id="fixedLineAggregator" class="org.springframework.batch.io.file.support.transform.FixedLengthLineAggregator" />
+	<bean id="fixedLineAggregator" class="org.springframework.batch.io.file.transform.FixedLengthLineAggregator" />
 
 </beans>

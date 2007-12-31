@@ -22,7 +22,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.ItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatInterceptor;

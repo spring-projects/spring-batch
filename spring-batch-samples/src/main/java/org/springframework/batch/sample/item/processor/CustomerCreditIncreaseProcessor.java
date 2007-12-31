@@ -2,8 +2,8 @@ package org.springframework.batch.sample.item.processor;
 
 import java.math.BigDecimal;
 
-import org.springframework.batch.io.ItemWriter;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.CustomerCredit;
 
 /**

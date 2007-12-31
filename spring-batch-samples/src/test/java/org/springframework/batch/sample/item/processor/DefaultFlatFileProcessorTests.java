@@ -2,7 +2,7 @@ package org.springframework.batch.sample.item.processor;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.file.support.FlatFileItemWriter;
+import org.springframework.batch.io.file.FlatFileItemWriter;
 import org.springframework.batch.sample.item.processor.DefaultFlatFileProcessor;
 
 public class DefaultFlatFileProcessorTests extends TestCase {

@@ -1,6 +1,6 @@
 package org.springframework.batch.sample.item.processor;
 
-import org.springframework.batch.io.file.support.FlatFileItemWriter;
+import org.springframework.batch.io.file.FlatFileItemWriter;
 import org.springframework.batch.item.ItemProcessor;
 
 public class DefaultFlatFileProcessor implements ItemProcessor{

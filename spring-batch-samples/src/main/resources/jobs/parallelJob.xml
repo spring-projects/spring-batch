@@ -104,7 +104,7 @@
 
 	<!-- This input source is injected into the test case to verify the output - not used by the job at all -->
 	<bean id="testInputTemplate"
-		class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader">
+		class="org.springframework.batch.io.file.DefaultFlatFileItemReader">
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
 		<property name="fieldSetMapper" ref="fieldSetMapper" />
@@ -116,7 +116,7 @@
 	</bean>
 
 	<bean id="fixedFileDescriptor"
-		class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
+		class="org.springframework.batch.io.file.transform.FixedLengthTokenizer">
 		<property name="names" value="ISIN, Quantity, Price, Customer" />
 		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
 	</bean>

@@ -21,8 +21,8 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.ItemWriter;
 import org.springframework.batch.io.Skippable;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.processor.ItemWriterItemProcessor;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;

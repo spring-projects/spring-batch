@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.SessionFactory;
-import org.springframework.batch.io.ItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatInterceptor;

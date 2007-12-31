@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.io.ItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.sample.domain.CustomerCredit;
 import org.springframework.beans.factory.DisposableBean;

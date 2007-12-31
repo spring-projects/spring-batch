@@ -28,7 +28,7 @@
 								class="org.springframework.batch.sample.item.processor.DefaultFlatFileProcessor">
 								<property name="flatFileOutputSource">
 									<bean
-										class="org.springframework.batch.io.file.support.FlatFileItemWriter"
+										class="org.springframework.batch.io.file.FlatFileItemWriter"
 										scope="step">
 										<aop:scoped-proxy />
 										<property name="resource"
@@ -44,7 +44,7 @@
 	</bean>
 
 	<bean id="fileItemReader"
-		class="org.springframework.batch.io.file.support.DefaultFlatFileItemReader"
+		class="org.springframework.batch.io.file.DefaultFlatFileItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource"
@@ -58,7 +58,7 @@
 		class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
 
 	<bean id="fixedFileDescriptor"
-		class="org.springframework.batch.io.file.support.transform.PrefixMatchingCompositeLineTokenizer">
+		class="org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer">
 		<property name="tokenizers">
 			<map>
 				<entry key="BEGIN" value-ref="beginRecordDescriptor" />
@@ -69,17 +69,17 @@
 	</bean>
 
 	<bean id="beginRecordDescriptor"
-		class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
+		class="org.springframework.batch.io.file.transform.FixedLengthTokenizer">
 		<property name="columns" value="1-5" />
 	</bean>
 
 	<bean id="endRecordDescriptor"
-		class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
+		class="org.springframework.batch.io.file.transform.FixedLengthTokenizer">
 		<property name="columns" value="1-3" />
 	</bean>
 
 	<bean id="tradeRecordDescriptor"
-		class="org.springframework.batch.io.file.support.transform.FixedLengthTokenizer">
+		class="org.springframework.batch.io.file.transform.FixedLengthTokenizer">
 		<property name="names" value="ISIN,Quantity,Price,Customer" />
 		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
 	</bean>

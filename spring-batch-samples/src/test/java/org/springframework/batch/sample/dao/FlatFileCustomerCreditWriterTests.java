@@ -2,7 +2,7 @@ package org.springframework.batch.sample.dao;
 
 import java.math.BigDecimal;
 
-import org.springframework.batch.io.ItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.sample.domain.CustomerCredit;
 

@@ -22,7 +22,7 @@
 						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 						<property name="itemReader">
 							<bean
-								class="org.springframework.batch.io.file.support.StaxEventReaderItemReader"
+								class="org.springframework.batch.io.xml.StaxEventReaderItemReader"
 								scope="step">
 								<aop:scoped-proxy />
 								<property name="fragmentRootElementName"
@@ -31,7 +31,7 @@
 									value="data/staxJob/input/20070918.testStream.xmlFileStep.xml" />
 								<property name="fragmentDeserializer">
 									<bean
-										class="org.springframework.batch.io.file.support.oxm.UnmarshallingFragmentDeserializer">
+										class="org.springframework.batch.io.xml.oxm.UnmarshallingFragmentDeserializer">
 										<constructor-arg>
 											<bean
 												class="org.springframework.oxm.xstream.XStreamMarshaller">
@@ -56,7 +56,7 @@
 	</bean>
 
 	<bean
-		class="org.springframework.batch.io.file.support.StaxEventWriterItemWriter"
+		class="org.springframework.batch.io.xml.StaxEventWriterItemWriter"
 		id="tradeStaxWriter">
 		<property name="resource"
 			value="file:target/test-outputs/20070918.testStream.xmlFileStep.output.xml" />
@@ -66,7 +66,7 @@
 	</bean>
 
 	<bean
-		class="org.springframework.batch.io.file.support.oxm.MarshallingObjectToXmlSerializer"
+		class="org.springframework.batch.io.xml.oxm.MarshallingObjectToXmlSerializer"
 		id="tradeMarshallingSerializer">
 		<constructor-arg>
 			<bean
