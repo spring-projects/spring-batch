@@ -16,7 +16,6 @@ import javax.xml.stream.XMLStreamException;
 
 import org.springframework.batch.io.support.FileUtils;
 import org.springframework.batch.io.xml.stax.NoStartEndDocumentStreamWriter;
-import org.springframework.batch.io.xml.stax.ObjectToXmlSerializer;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
@@ -43,7 +42,7 @@ import org.springframework.util.CollectionUtils;
  * @author Peter Zozom
  *
  */
-public class StaxEventWriterItemWriter implements ItemWriter, ResourceLifecycle, Restartable,
+public class StaxEventItemWriter implements ItemWriter, ResourceLifecycle, Restartable,
 		StatisticsProvider, InitializingBean, DisposableBean {
 
 	// default encoding

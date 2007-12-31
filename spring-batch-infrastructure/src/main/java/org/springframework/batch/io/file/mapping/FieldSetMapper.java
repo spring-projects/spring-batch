@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.io.file;
+package org.springframework.batch.io.file.mapping;
 
 
 /**
@@ -26,16 +26,6 @@ package org.springframework.batch.io.file;
  */
 public interface FieldSetMapper {
 	
-	/**
-	 * Marker for the beginning of a multi-object record.
-	 */
-	static Object BEGIN_RECORD = new Object();
-
-	/**
-	 * Marker for the end of a multi-object record.
-	 */
-	static Object END_RECORD = new Object();
-
 	/**
 	 * Method used to map data obtained from a file into an object.
 	 */

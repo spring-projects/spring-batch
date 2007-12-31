@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import javax.xml.stream.XMLEventReader;
 
-import org.springframework.batch.io.xml.stax.FragmentDeserializer;
+import org.springframework.batch.io.xml.FragmentDeserializer;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;

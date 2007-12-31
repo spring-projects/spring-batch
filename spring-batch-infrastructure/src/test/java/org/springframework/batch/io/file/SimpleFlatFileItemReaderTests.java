@@ -25,9 +25,9 @@ import junit.framework.TestCase;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.exception.FlatFileParsingException;
 import org.springframework.batch.io.file.DefaultFlatFileItemReader;
-import org.springframework.batch.io.file.FieldSet;
-import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.io.file.SimpleFlatFileItemReader;
+import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.io.file.transform.LineTokenizer;
@@ -90,14 +90,14 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	/**
 	 * Regular usage of <code>read</code> method
 	 */
-	public void testRead() throws IOException {
+	public void testRead() throws Exception {
 		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
 	}
 
 	/**
 	 * Regular usage of <code>read</code> method
 	 */
-	public void testReadExhausted() throws IOException {
+	public void testReadExhausted() throws Exception {
 		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
 		assertEquals(null, inputSource.read());
 	}
@@ -105,7 +105,7 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	/**
 	 * Regular usage of <code>read</code> method
 	 */
-	public void testReadWithTokenizerError() throws IOException {
+	public void testReadWithTokenizerError() throws Exception {
 		inputSource.setTokenizer(new LineTokenizer() {
 			public FieldSet tokenize(String line) {
 				throw new RuntimeException("foo");
@@ -120,7 +120,7 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 		}
 	}
 
-	public void testReadWithMapperError() throws IOException {
+	public void testReadWithMapperError() throws Exception {
 		inputSource.setFieldSetMapper(new FieldSetMapper(){
 			public Object mapLine(FieldSet fs) {
 				throw new RuntimeException("foo");

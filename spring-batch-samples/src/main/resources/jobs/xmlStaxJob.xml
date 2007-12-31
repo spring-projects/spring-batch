@@ -22,7 +22,7 @@
 						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 						<property name="itemReader">
 							<bean
-								class="org.springframework.batch.io.xml.StaxEventReaderItemReader"
+								class="org.springframework.batch.io.xml.StaxEventItemReader"
 								scope="step">
 								<aop:scoped-proxy />
 								<property name="fragmentRootElementName"
@@ -56,7 +56,7 @@
 	</bean>
 
 	<bean
-		class="org.springframework.batch.io.xml.StaxEventWriterItemWriter"
+		class="org.springframework.batch.io.xml.StaxEventItemWriter"
 		id="tradeStaxWriter">
 		<property name="resource"
 			value="file:target/test-outputs/20070918.testStream.xmlFileStep.output.xml" />

@@ -21,7 +21,7 @@ import java.text.ParseException;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.file.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSet;
 
 public class FieldSetTests extends TestCase {
 	FieldSet fieldSet;

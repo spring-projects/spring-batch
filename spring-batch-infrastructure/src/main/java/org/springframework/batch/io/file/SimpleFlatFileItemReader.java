@@ -19,7 +19,11 @@ package org.springframework.batch.io.file;
 import java.io.IOException;
 
 import org.springframework.batch.io.exception.FlatFileParsingException;
+import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSetMapper;
+import org.springframework.batch.io.file.separator.LineReader;
 import org.springframework.batch.io.file.separator.RecordSeparatorPolicy;
+import org.springframework.batch.io.file.separator.ResourceLineReader;
 import org.springframework.batch.io.file.transform.AbstractLineTokenizer;
 import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.io.file.transform.LineTokenizer;
@@ -59,7 +63,7 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 	 * Encapsulates the state of the input source. If it is null then we are
 	 * uninitialized.
 	 */
-	private ResourceLineReader reader;
+	private LineReader reader;
 
 	private RecordSeparatorPolicy recordSeparatorPolicy;
 
@@ -126,10 +130,11 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 
 	/**
 	 * Initialize the reader if necessary.
+	 * @throws IllegalStateException if the resource cannot be opened 
 	 */
-	public void open() {
-		if (reader == null) {
-			reader = new ResourceLineReader(resource, encoding);
+	public void open() throws IllegalStateException {
+		if (this.reader == null) {
+			ResourceLineReader reader = new ResourceLineReader(resource, encoding);
 			if (recordSeparatorPolicy != null) {
 				reader.setRecordSeparatorPolicy(recordSeparatorPolicy);
 			}
@@ -137,6 +142,7 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 				reader.setComments(comments);
 			}
 			reader.open();
+			this.reader = reader;
 		}
 		
 		for (int i = 0; i < linesToSkip; i++) {
@@ -182,16 +188,22 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 
 	// Reads first valid line.
 	protected String readLine() {
-		return (String) getReader().read();
+		try {
+			return (String) getReader().read();
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	/**
 	 * A wrapper for {@link #readFieldSet()} to make this into a real
 	 * {@link ItemReader}.
+	 * @throws Exception 
 	 * 
 	 * @see org.springframework.batch.io.ItemReader#read()
 	 */
-	public Object read() {
+	public Object read() throws Exception {
 		String line = readLine();
 
 		if (line != null) {
@@ -237,7 +249,7 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 	}
 
 	// Returns object representing state of the input template.
-	protected ResourceLineReader getReader() {
+	protected LineReader getReader() {
 		if (reader == null) {
 			open();
 			// reader is now not null, or else an exception is thrown

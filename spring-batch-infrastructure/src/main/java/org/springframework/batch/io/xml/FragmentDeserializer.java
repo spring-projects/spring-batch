@@ -1,4 +1,4 @@
-package org.springframework.batch.io.xml.stax;
+package org.springframework.batch.io.xml;
 
 import javax.xml.stream.XMLEventReader;
 

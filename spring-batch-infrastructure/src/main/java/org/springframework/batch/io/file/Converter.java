@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.io.file.transform;
+package org.springframework.batch.io.file;
 
 /**
  * Generic converter interface for transforming an object into another form for

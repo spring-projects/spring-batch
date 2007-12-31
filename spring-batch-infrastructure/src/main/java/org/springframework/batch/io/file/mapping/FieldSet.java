@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.io.file;
+package org.springframework.batch.io.file.mapping;
 
 import java.math.BigDecimal;
 import java.text.ParseException;

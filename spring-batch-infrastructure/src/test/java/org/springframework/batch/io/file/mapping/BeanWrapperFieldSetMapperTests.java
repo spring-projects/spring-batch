@@ -24,7 +24,6 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.file.FieldSet;
 import org.springframework.batch.io.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.io.file.mapping.BindingException;
 import org.springframework.batch.support.IntArrayPropertyEditor;

@@ -2,8 +2,8 @@ package org.springframework.batch.sample.mapping;
 
 import java.math.BigDecimal;
 
-import org.springframework.batch.io.file.FieldSet;
-import org.springframework.batch.io.file.FieldSetMapper;
+import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.LineItem;
 import org.springframework.batch.sample.mapping.OrderItemFieldSetMapper;
 

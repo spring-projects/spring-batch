@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.springframework.batch.io.file.FieldSet;
-import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.NotWritablePropertyException;
@@ -156,7 +154,7 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper, BeanFactoryAwa
 	 * the {@link DataBinder} from {@link #createBinder(Object)} has errors
 	 * after binding).
 	 * 
-	 * @see org.springframework.batch.io.file.FieldSetMapper#mapLine(org.springframework.batch.io.file.FieldSet)
+	 * @see org.springframework.batch.io.file.mapping.FieldSetMapper#mapLine(org.springframework.batch.io.file.mapping.FieldSet)
 	 */
 	public Object mapLine(FieldSet fs) {
 		Object copy = getBean();

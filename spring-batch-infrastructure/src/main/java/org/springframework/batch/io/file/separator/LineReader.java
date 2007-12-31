@@ -13,27 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.batch.io.file.separator;
 
-package org.springframework.batch.io.file.transform;
-
-import org.springframework.batch.io.file.mapping.FieldSet;
-
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ResourceLifecycle;
 
 /**
- * Interface that is used by framework to split string obtained typically from a
- * file into tokens.
- * 
- * @author tomas.slanina
- * 
+ * @author Dave Syer
+ *
  */
-public interface LineTokenizer {
+public interface LineReader extends ResourceLifecycle, ItemReader {
+
 	/**
-	 * Yields the tokens resulting from the splitting of the supplied
-	 * <code>line</code>.
-	 * 
-	 * @param line the line to be tokenized (can be <code>null</code>)
-	 * 
-	 * @return the resulting tokens
+	 * @return
 	 */
-	FieldSet tokenize(String line);
+	int getCurrentLineCount();
+
+	/**
+	 * 
+	 */
+	void mark();
+
+	/**
+	 * 
+	 */
+	void reset();
+
 }

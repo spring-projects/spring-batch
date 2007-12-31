@@ -1,7 +1,7 @@
 package org.springframework.batch.sample.mapping;
 
-import org.springframework.batch.io.file.FieldSet;
-import org.springframework.batch.io.file.FieldSetMapper;
+import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.mapping.AddressFieldSetMapper;
 

@@ -19,7 +19,7 @@ package org.springframework.batch.io.file.transform;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.io.file.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSet;
 
 
 /**

@@ -12,7 +12,6 @@ import junit.framework.TestCase;
 import org.springframework.batch.io.xml.EventHelper;
 import org.springframework.batch.io.xml.stax.DefaultFragmentEventReader;
 import org.springframework.batch.io.xml.stax.DefaultTransactionalEventReader;
-import org.springframework.batch.io.xml.stax.FragmentEventReader;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 

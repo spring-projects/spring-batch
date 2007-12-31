@@ -16,8 +16,9 @@
 
 package org.springframework.batch.sample.mapping;
 
-import org.springframework.batch.io.file.FieldSet;
-import org.springframework.batch.io.file.FieldSetMapper;
+import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.provider.AggregateItemReader;
 import org.springframework.batch.sample.domain.Trade;
 
 
@@ -32,11 +33,11 @@ public class TradeFieldSetMapper implements FieldSetMapper {
     public Object mapLine(FieldSet fieldSet) {
     	
     	if ("BEGIN".equals(fieldSet.readString(0))) {
-    		return FieldSetMapper.BEGIN_RECORD;
+    		return AggregateItemReader.BEGIN_RECORD;
     	}
     	
     	if ("END".equals(fieldSet.readString(0))) {
-    		return FieldSetMapper.END_RECORD;
+    		return AggregateItemReader.END_RECORD;
     	}
 
     	Trade trade = new Trade();

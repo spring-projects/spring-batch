@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.io.file;
+package org.springframework.batch.io.file.separator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,8 +26,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.springframework.batch.io.exception.BatchEnvironmentException;
-import org.springframework.batch.io.file.separator.DefaultRecordSeparatorPolicy;
-import org.springframework.batch.io.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.item.provider.AbstractItemReader;
@@ -58,7 +56,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Rob Harrop
  */
-class ResourceLineReader extends AbstractItemReader implements ResourceLifecycle, ItemReader,
+public class ResourceLineReader extends AbstractItemReader implements LineReader, ResourceLifecycle, ItemReader,
 		DisposableBean {
 
 	private static final Collection DEFAULT_COMMENTS = Collections

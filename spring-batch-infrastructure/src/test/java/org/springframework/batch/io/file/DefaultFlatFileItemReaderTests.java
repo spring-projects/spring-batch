@@ -21,8 +21,8 @@ import java.io.IOException;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.file.DefaultFlatFileItemReader;
-import org.springframework.batch.io.file.FieldSet;
-import org.springframework.batch.io.file.FieldSetMapper;
+import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.transform.LineTokenizer;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.core.io.ByteArrayResource;
@@ -87,7 +87,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 	 * Test skip and skipRollback functionality
 	 * @throws IOException
 	 */
-	public void testSkip() throws IOException {
+	public void testSkip() throws Exception {
 
 		inputSource.close();
 		inputSource.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
@@ -122,7 +122,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 	 * Test skip and skipRollback functionality
 	 * @throws IOException
 	 */
-	public void testTransactionSynchronizationUnknown() throws IOException {
+	public void testTransactionSynchronizationUnknown() throws Exception {
 
 		inputSource.close();
 		inputSource.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
@@ -164,7 +164,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
 	}
 
-	public void testRestart() throws IOException {
+	public void testRestart() throws Exception {
 
 		inputSource.close();
 		inputSource.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));

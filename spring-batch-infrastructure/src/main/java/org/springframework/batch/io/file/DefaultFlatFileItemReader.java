@@ -23,6 +23,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.Skippable;
+import org.springframework.batch.io.file.separator.LineReader;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
@@ -56,7 +57,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	private Properties statistics = new Properties();
 
 	/**
-	 * Initialize the input source.
+	 * Initialize the input source. 
 	 */
 	public void open() {
 		registerSynchronization();
@@ -88,11 +89,11 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 
 		int lineCount = Integer.parseInt(data.getProperties().getProperty(READ_STATISTICS_NAME));
 
-		ResourceLineReader reader = getReader();
+		LineReader reader = getReader();
 
 		Object record = "";
 		while (reader.getCurrentLineCount() < lineCount && record != null) {
-			record = reader.read();
+			record = readLine();
 		}
 
 	}
@@ -111,7 +112,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * @see org.springframework.batch.statistics.StatisticsProvider#getStatistics()
 	 */
 	public Properties getStatistics() {
-		ResourceLineReader is = getReader();
+		LineReader is = getReader();
 		statistics.setProperty(READ_STATISTICS_NAME, String.valueOf(is.getCurrentLineCount()));
 		return statistics;
 	}

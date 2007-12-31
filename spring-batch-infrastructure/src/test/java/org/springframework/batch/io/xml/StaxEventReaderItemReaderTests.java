@@ -15,8 +15,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.xml.StaxEventReaderItemReader;
-import org.springframework.batch.io.xml.stax.FragmentDeserializer;
+import org.springframework.batch.io.xml.StaxEventItemReader;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.core.io.AbstractResource;
@@ -26,14 +25,14 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.support.TransactionSynchronization;
 
 /**
- * Tests for {@link StaxEventReaderItemReader}.
+ * Tests for {@link StaxEventItemReader}.
  *
  * @author Robert Kasanicky
  */
 public class StaxEventReaderItemReaderTests extends TestCase {
 
 	// object under test
-	private StaxEventReaderItemReader source;
+	private StaxEventItemReader source;
 
 	// test xml input
 	private String xml = "<root> <fragment> <misc1/> </fragment> <misc2/> <fragment> testString </fragment> </root>";
@@ -258,13 +257,13 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 
 	private int extractRecordCountFrom(Properties statistics) {
 		return Integer.valueOf(
-				source.getStatistics().getProperty(StaxEventReaderItemReader.READ_COUNT_STATISTICS_NAME)).intValue();
+				source.getStatistics().getProperty(StaxEventItemReader.READ_COUNT_STATISTICS_NAME)).intValue();
 	}
 
-	private StaxEventReaderItemReader createNewInputSouce() {
+	private StaxEventItemReader createNewInputSouce() {
 		Resource resource = new ByteArrayResource(xml.getBytes());
 
-		StaxEventReaderItemReader newSource = new StaxEventReaderItemReader();
+		StaxEventItemReader newSource = new StaxEventItemReader();
 		newSource.setResource(resource);
 
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
@@ -349,7 +348,7 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 
 	}
 
-	private static class MockStaxEventReaderItemReader extends StaxEventReaderItemReader {
+	private static class MockStaxEventReaderItemReader extends StaxEventItemReader {
 
 		private boolean openCalled = false;
 

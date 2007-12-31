@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.transform.Result;
 
-import org.springframework.batch.io.xml.stax.ObjectToXmlSerializer;
+import org.springframework.batch.io.xml.ObjectToXmlSerializer;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.oxm.Marshaller;
 import org.springframework.xml.transform.StaxResult;

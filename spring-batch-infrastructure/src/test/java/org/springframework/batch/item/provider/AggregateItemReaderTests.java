@@ -6,7 +6,6 @@ import java.util.Iterator;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.io.file.FieldSetMapper;
 import org.springframework.batch.item.ItemReader;
 
 public class AggregateItemReaderTests extends TestCase {
@@ -30,11 +29,11 @@ public class AggregateItemReaderTests extends TestCase {
 
 		//set-up mock input
 		input.read();
-		inputControl.setReturnValue(FieldSetMapper.BEGIN_RECORD);
+		inputControl.setReturnValue(AggregateItemReader.BEGIN_RECORD);
 		input.read();
 		inputControl.setReturnValue("line",3);
 		input.read();
-		inputControl.setReturnValue(FieldSetMapper.END_RECORD);
+		inputControl.setReturnValue(AggregateItemReader.END_RECORD);
 		input.read();
 		inputControl.setReturnValue(null);
 		inputControl.replay();

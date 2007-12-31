@@ -2,8 +2,9 @@ package org.springframework.batch.sample.mapping;
 
 import java.math.BigDecimal;
 
-import org.springframework.batch.io.file.FieldSet;
-import org.springframework.batch.io.file.FieldSetMapper;
+import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.provider.AggregateItemReader;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.batch.sample.mapping.TradeFieldSetMapper;
 
@@ -38,11 +39,11 @@ public class TradeFieldSetMapperTests extends AbstractFieldSetMapperTests{
 	}
 	
 	public void testBeginRecord() throws Exception {
-		assertEquals(FieldSetMapper.BEGIN_RECORD, fieldSetMapper().mapLine(new FieldSet(new String[] {"BEGIN"})));
+		assertEquals(AggregateItemReader.BEGIN_RECORD, fieldSetMapper().mapLine(new FieldSet(new String[] {"BEGIN"})));
 	}
 
 	public void testEndRecord() throws Exception {
-		assertEquals(FieldSetMapper.END_RECORD, fieldSetMapper().mapLine(new FieldSet(new String[] {"END"})));
+		assertEquals(AggregateItemReader.END_RECORD, fieldSetMapper().mapLine(new FieldSet(new String[] {"END"})));
 	}
 
 }

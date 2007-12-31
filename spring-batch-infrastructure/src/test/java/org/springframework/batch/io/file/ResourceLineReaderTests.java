@@ -22,7 +22,7 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.exception.BatchEnvironmentException;
-import org.springframework.batch.io.file.ResourceLineReader;
+import org.springframework.batch.io.file.separator.ResourceLineReader;
 import org.springframework.batch.io.file.separator.SuffixRecordSeparatorPolicy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;

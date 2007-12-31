@@ -48,15 +48,22 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 
 	/**
 	 * check that records have been correctly written to database
+	 * @throws Exception 
 	 */
-	protected void validatePostConditions() {
+	protected void validatePostConditions() throws Exception {
 
 		inputSource.open();
 
 		jdbcTemplate.query("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", new RowCallbackHandler() {
 
 			public void processRow(ResultSet rs) throws SQLException {
-				Trade trade = (Trade)inputSource.read();
+				Trade trade;
+				try {
+					trade = (Trade)inputSource.read();
+				}
+				catch (Exception e) {
+					throw new IllegalStateException(e);
+				}
 				assertEquals(trade.getIsin(), rs.getString(2));
 				assertEquals(trade.getQuantity(),rs.getLong(3));
 				assertEquals(trade.getPrice(), rs.getBigDecimal(4));

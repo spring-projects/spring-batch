@@ -7,7 +7,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.oxm.domain.Trade;
-import org.springframework.batch.io.xml.StaxEventReaderItemReader;
+import org.springframework.batch.io.xml.StaxEventItemReader;
 import org.springframework.batch.io.xml.oxm.UnmarshallingFragmentDeserializer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -15,7 +15,7 @@ import org.springframework.oxm.Unmarshaller;
 
 public abstract class AbstractStaxEventReaderItemReaderTests extends TestCase {
 
-	private StaxEventReaderItemReader source = new StaxEventReaderItemReader();
+	private StaxEventItemReader source = new StaxEventItemReader();
 
 	protected Resource resource = new ClassPathResource(
 	"org/springframework/batch/io/oxm/input.xml");

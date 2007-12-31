@@ -30,7 +30,6 @@ import java.util.Properties;
 
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
-import org.springframework.batch.io.file.transform.Converter;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.ResourceLifecycle;
