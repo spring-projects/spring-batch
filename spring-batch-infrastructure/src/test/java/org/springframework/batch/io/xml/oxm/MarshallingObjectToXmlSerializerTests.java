@@ -26,7 +26,7 @@ import javax.xml.transform.Result;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.xml.oxm.MarshallingObjectToXmlSerializer;
+import org.springframework.batch.io.xml.oxm.MarshallingEventWriterSerializer;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
@@ -39,21 +39,23 @@ import org.springframework.oxm.XmlMappingException;
  */
 public class MarshallingObjectToXmlSerializerTests extends TestCase {
 
-	MarshallingObjectToXmlSerializer xmlSerializer;
+	MarshallingEventWriterSerializer xmlSerializer;
 
 	MockMarshaller mockMarshaller = new MockMarshaller();
+
+	private StubXmlEventWriter writer;
 
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		xmlSerializer = new MarshallingObjectToXmlSerializer(mockMarshaller);
-		xmlSerializer.setEventWriter(new StubXmlEventWriter());
+		xmlSerializer = new MarshallingEventWriterSerializer(mockMarshaller);
+		writer = new StubXmlEventWriter();
 	}
 
 	public void testSuccessfulWrite(){
 
 		Object objectToOutput = new Object();
-		xmlSerializer.serializeObject(objectToOutput);
+		xmlSerializer.serializeObject(writer, objectToOutput);
 		assertEquals(objectToOutput, mockMarshaller.getMarshalledObject());
 	}
 
@@ -61,7 +63,7 @@ public class MarshallingObjectToXmlSerializerTests extends TestCase {
 
 		mockMarshaller.setThrowException(true);
 		try{
-			xmlSerializer.serializeObject(new Object());
+			xmlSerializer.serializeObject(writer, new Object());
 			fail("Exception expected");
 		}catch(DataAccessResourceFailureException ex){
 			//expected

@@ -37,7 +37,7 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 	// test xml input
 	private String xml = "<root> <fragment> <misc1/> </fragment> <misc2/> <fragment> testString </fragment> </root>";
 
-	private FragmentDeserializer deserializer = new MockFragmentDeserializer();
+	private EventReaderDeserializer deserializer = new MockFragmentDeserializer();
 
 	private static final String FRAGMENT_ROOT_ELEMENT = "fragment";
 
@@ -277,7 +277,7 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 	 * document events for the fragment root & end tags + skips the fragment
 	 * contents.
 	 */
-	private static class MockFragmentDeserializer implements FragmentDeserializer {
+	private static class MockFragmentDeserializer implements EventReaderDeserializer {
 
 		/**
 		 * A simple mapFragment implementation checking the
@@ -339,7 +339,7 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 	/**
 	 * Moves cursor inside the fragment body and causes rollback.
 	 */
-	private static class ExceptionFragmentDeserializer implements FragmentDeserializer {
+	private static class ExceptionFragmentDeserializer implements EventReaderDeserializer {
 
 		public Object deserializeFragment(XMLEventReader eventReader) {
 			eventReader.next();

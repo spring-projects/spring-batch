@@ -8,7 +8,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.io.oxm.domain.Trade;
 import org.springframework.batch.io.xml.StaxEventItemReader;
-import org.springframework.batch.io.xml.oxm.UnmarshallingFragmentDeserializer;
+import org.springframework.batch.io.xml.oxm.UnmarshallingEventReaderDeserializer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
@@ -26,7 +26,7 @@ public abstract class AbstractStaxEventReaderItemReaderTests extends TestCase {
 		source.setResource(resource);
 
 		source.setFragmentRootElementName("trade");
-		UnmarshallingFragmentDeserializer deserializer = new UnmarshallingFragmentDeserializer(getUnmarshaller());
+		UnmarshallingEventReaderDeserializer deserializer = new UnmarshallingEventReaderDeserializer(getUnmarshaller());
 		source.setFragmentDeserializer(deserializer);
 	}
 

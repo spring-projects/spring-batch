@@ -10,19 +10,12 @@ import javax.xml.stream.XMLEventWriter;
  * @author Lucas Ward
  *
  */
-public interface ObjectToXmlSerializer {
-
-	/**
-	 * Set event writer objects should be serialized to.
-	 *
-	 * @param writer
-	 */
-	void setEventWriter(XMLEventWriter writer);
+public interface EventWriterSerializer {
 
 	/**
 	 * Serialize an Object.
 	 *
 	 * @param output
 	 */
-	void serializeObject(Object output);
+	void serializeObject(XMLEventWriter writer, Object output);
 }

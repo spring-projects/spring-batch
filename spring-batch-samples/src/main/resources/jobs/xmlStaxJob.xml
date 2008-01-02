@@ -31,7 +31,7 @@
 									value="data/staxJob/input/20070918.testStream.xmlFileStep.xml" />
 								<property name="fragmentDeserializer">
 									<bean
-										class="org.springframework.batch.io.xml.oxm.UnmarshallingFragmentDeserializer">
+										class="org.springframework.batch.io.xml.oxm.UnmarshallingEventReaderDeserializer">
 										<constructor-arg>
 											<bean
 												class="org.springframework.oxm.xstream.XStreamMarshaller">
@@ -66,7 +66,7 @@
 	</bean>
 
 	<bean
-		class="org.springframework.batch.io.xml.oxm.MarshallingObjectToXmlSerializer"
+		class="org.springframework.batch.io.xml.oxm.MarshallingEventWriterSerializer"
 		id="tradeMarshallingSerializer">
 		<constructor-arg>
 			<bean

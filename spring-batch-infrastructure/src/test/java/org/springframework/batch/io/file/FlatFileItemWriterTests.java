@@ -25,6 +25,7 @@ import java.util.Collections;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.file.FlatFileItemWriter;
+import org.springframework.batch.io.file.transform.Converter;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.support.TransactionSynchronization;

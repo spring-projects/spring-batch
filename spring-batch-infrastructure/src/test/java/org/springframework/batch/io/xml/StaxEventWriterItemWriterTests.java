@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.batch.io.xml.StaxEventItemWriter;
-import org.springframework.batch.io.xml.oxm.MarshallingObjectToXmlSerializer;
+import org.springframework.batch.io.xml.oxm.MarshallingEventWriterSerializer;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -55,7 +55,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	 */
 	public void testWrite() throws Exception {
 		Marshaller marshaller = new InputCheckMarshaller();
-		MarshallingObjectToXmlSerializer serializer = new MarshallingObjectToXmlSerializer(marshaller);
+		MarshallingEventWriterSerializer serializer = new MarshallingEventWriterSerializer(marshaller);
 		writer.setSerializer(serializer);
 
 		// see asserts in the marshaller
@@ -193,7 +193,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 		source.setResource(resource);
 
 		Marshaller marshaller = new SimpleMarshaller();
-		MarshallingObjectToXmlSerializer serializer = new MarshallingObjectToXmlSerializer(marshaller);
+		MarshallingEventWriterSerializer serializer = new MarshallingEventWriterSerializer(marshaller);
 		source.setSerializer(serializer);
 		
 		source.setEncoding("UTF-8");

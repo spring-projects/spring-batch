@@ -54,7 +54,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 
 	private TransactionalEventReader txReader;
 
-	private FragmentDeserializer fragmentDeserializer;
+	private EventReaderDeserializer eventReaderDeserializer;
 
 	private Resource resource;
 
@@ -88,7 +88,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 			currentRecordCount++;
 			if (moveCursorToNextFragment(fragmentReader)) {
 				fragmentReader.markStartFragment();
-				item = fragmentDeserializer.deserializeFragment(fragmentReader);
+				item = eventReaderDeserializer.deserializeFragment(fragmentReader);
 				fragmentReader.markFragmentProcessed();
 			}
 		} while (skipRecords.contains(new Long(currentRecordCount)));
@@ -139,11 +139,11 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	}
 
 	/**
-	 * @param fragmentDeserializer maps xml fragments corresponding to records
+	 * @param eventReaderDeserializer maps xml fragments corresponding to records
 	 * to objects
 	 */
-	public void setFragmentDeserializer(FragmentDeserializer fragmentDeserializer) {
-		this.fragmentDeserializer = fragmentDeserializer;
+	public void setFragmentDeserializer(EventReaderDeserializer eventReaderDeserializer) {
+		this.eventReaderDeserializer = eventReaderDeserializer;
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource, "The Resource must not be null.");
 		Assert.state(resource.exists(), "Input resource does not exist: [" + resource + "]");
-		Assert.notNull(fragmentDeserializer, "The FragmentDeserializer must not be null.");
+		Assert.notNull(eventReaderDeserializer, "The FragmentDeserializer must not be null.");
 		Assert.hasLength(fragmentRootElementName, "The FragmentRootElementName must not be null");
 	}
 

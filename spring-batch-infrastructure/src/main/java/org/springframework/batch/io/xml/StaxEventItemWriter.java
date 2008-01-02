@@ -34,7 +34,7 @@ import org.springframework.util.CollectionUtils;
 
 /**
  * An implementation of {@link ItemWriter} which uses
- * StAX and {@link ObjectToXmlSerializer} for serializing object to XML.
+ * StAX and {@link EventWriterSerializer} for serializing object to XML.
  *
  * This output source also provides restart, statistics and transaction
  * features by implementing corresponding interfaces.
@@ -64,7 +64,7 @@ public class StaxEventItemWriter implements ItemWriter, ResourceLifecycle, Resta
 	private Resource resource;
 
 	// xml serializer
-	private ObjectToXmlSerializer serializer;
+	private EventWriterSerializer serializer;
 
 	// encoding to be used while reading from the resource
 	private String encoding = DEFAULT_ENCODING;
@@ -123,7 +123,7 @@ public class StaxEventItemWriter implements ItemWriter, ResourceLifecycle, Resta
 	 *
 	 * @param serializer the Object to XML serializer
 	 */
-	public void setSerializer(ObjectToXmlSerializer serializer) {
+	public void setSerializer(EventWriterSerializer serializer) {
 		this.serializer = serializer;
 	}
 
@@ -271,7 +271,6 @@ public class StaxEventItemWriter implements ItemWriter, ResourceLifecycle, Resta
 		try {
 			delegateEventWriter = outputFactory.createXMLEventWriter(os, encoding);
 			eventWriter = new NoStartEndDocumentStreamWriter(delegateEventWriter);
-			serializer.setEventWriter(eventWriter);
 			if (!restarted) {
 				startDocument(delegateEventWriter);
 			}
@@ -375,7 +374,7 @@ public class StaxEventItemWriter implements ItemWriter, ResourceLifecycle, Resta
 		}
 
 		currentRecordCount++;
-		serializer.serializeObject(output);
+		serializer.serializeObject(eventWriter, output);
 	}
 
 	/**

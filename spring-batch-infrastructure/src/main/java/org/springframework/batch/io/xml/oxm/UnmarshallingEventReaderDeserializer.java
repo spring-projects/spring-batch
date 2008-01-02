@@ -4,23 +4,23 @@ import java.io.IOException;
 
 import javax.xml.stream.XMLEventReader;
 
-import org.springframework.batch.io.xml.FragmentDeserializer;
+import org.springframework.batch.io.xml.EventReaderDeserializer;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
 import org.springframework.xml.transform.StaxSource;
 
 /**
- * Delegates deserializing to Spring-WS {@link Unmarshaller}.
+ * Delegates deserializing to Spring OXM {@link Unmarshaller}.
  *
  * @author Robert Kasanicky
  * @author Lucas Ward
  */
-public class UnmarshallingFragmentDeserializer implements FragmentDeserializer {
+public class UnmarshallingEventReaderDeserializer implements EventReaderDeserializer {
 
 	private Unmarshaller unmarshaller;
 
-	public UnmarshallingFragmentDeserializer(Unmarshaller unmarshaller){
+	public UnmarshallingEventReaderDeserializer(Unmarshaller unmarshaller){
 		Assert.notNull(unmarshaller);
 		this.unmarshaller = unmarshaller;
 	}
