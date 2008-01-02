@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.provider.JmsItemReader;
+import org.springframework.batch.item.reader.JmsItemReader;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;

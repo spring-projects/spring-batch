@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.item.provider;
+package org.springframework.batch.sample.item.reader;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

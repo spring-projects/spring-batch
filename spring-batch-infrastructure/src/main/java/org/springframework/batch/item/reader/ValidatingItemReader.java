@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.provider;
+package org.springframework.batch.item.reader;
 
 import org.springframework.batch.item.validator.Validator;
 import org.springframework.util.Assert;

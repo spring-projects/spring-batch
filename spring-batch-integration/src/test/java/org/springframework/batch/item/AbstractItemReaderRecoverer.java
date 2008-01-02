@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item;
 
-import org.springframework.batch.item.provider.AbstractItemReader;
+import org.springframework.batch.item.reader.AbstractItemReader;
 
 /**
  * @author Dave Syer

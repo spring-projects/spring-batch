@@ -18,7 +18,7 @@ package org.springframework.batch.item;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.provider.AbstractItemReader;
+import org.springframework.batch.item.reader.AbstractItemReader;
 
 public class ItemProviderTests extends TestCase {
 

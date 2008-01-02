@@ -22,7 +22,7 @@ import org.springframework.batch.io.file.SimpleFlatFileItemReader;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.provider.DelegatingItemReader;
+import org.springframework.batch.item.reader.DelegatingItemReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 

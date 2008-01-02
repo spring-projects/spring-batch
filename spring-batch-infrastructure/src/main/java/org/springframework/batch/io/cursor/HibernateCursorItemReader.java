@@ -26,7 +26,7 @@ import org.hibernate.StatelessSession;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
-import org.springframework.batch.item.provider.AbstractItemReader;
+import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;

@@ -18,7 +18,7 @@
 						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 						<property name="itemReader">
 							<bean
-								class="org.springframework.batch.item.provider.AggregateItemReader">
+								class="org.springframework.batch.item.reader.AggregateItemReader">
 								<property name="itemReader"
 									ref="fileItemReader" />
 							</bean>

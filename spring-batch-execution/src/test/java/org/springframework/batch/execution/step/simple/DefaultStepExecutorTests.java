@@ -40,7 +40,7 @@ import org.springframework.batch.execution.step.SimpleStepConfiguration;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.provider.ListItemReader;
+import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.DefaultExceptionHandler;

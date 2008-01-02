@@ -23,7 +23,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.provider.ListItemReader;
+import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.retry.ListItemReaderRecoverer;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.context.RetryContextSupport;

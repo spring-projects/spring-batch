@@ -1,7 +1,7 @@
 package org.springframework.batch.io.driving;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.provider.AbstractItemReader;
+import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
 import org.springframework.beans.factory.DisposableBean;

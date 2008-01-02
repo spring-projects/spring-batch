@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.provider;
+package org.springframework.batch.item.reader;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.support.AbstractMethodInvokingDelegator;

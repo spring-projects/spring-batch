@@ -21,7 +21,7 @@
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemReader">
 								<bean
-									class="org.springframework.batch.item.provider.ValidatingItemReader">
+									class="org.springframework.batch.item.reader.ValidatingItemReader">
 									<property name="itemReader"
 										ref="fileInputTemplate" />
 									<property name="validator"
@@ -58,7 +58,7 @@
 							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
 							<property name="itemReader">
 								<bean
-									class="org.springframework.batch.sample.item.provider.StagingItemReader"
+									class="org.springframework.batch.sample.item.reader.StagingItemReader"
 									scope="step">
 									<aop:scoped-proxy />
 									<property name="dataSource"

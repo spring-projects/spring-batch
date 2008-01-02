@@ -1,9 +1,10 @@
-package org.springframework.batch.item.provider;
+package org.springframework.batch.item.reader;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.io.sample.domain.FooService;
+import org.springframework.batch.item.reader.ItemReaderAdapter;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**

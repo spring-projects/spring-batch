@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
-import org.springframework.batch.item.provider.ListItemReader;
+import org.springframework.batch.item.reader.ListItemReader;
 
 public class ListItemReaderRecoverer extends ListItemReader implements ItemReader, ItemRecoverer {
 

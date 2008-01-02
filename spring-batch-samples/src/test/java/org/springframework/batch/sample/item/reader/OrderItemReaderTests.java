@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.item.provider;
+package org.springframework.batch.sample.item.reader;
 
 import java.util.Iterator;
 
@@ -15,6 +15,7 @@ import org.springframework.batch.sample.domain.Customer;
 import org.springframework.batch.sample.domain.LineItem;
 import org.springframework.batch.sample.domain.Order;
 import org.springframework.batch.sample.domain.ShippingInfo;
+import org.springframework.batch.sample.item.reader.OrderItemReader;
 
 public class OrderItemReaderTests extends TestCase {
 

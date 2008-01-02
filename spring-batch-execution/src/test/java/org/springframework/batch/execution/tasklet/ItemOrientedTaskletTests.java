@@ -27,7 +27,7 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
-import org.springframework.batch.item.provider.AbstractItemReader;
+import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;

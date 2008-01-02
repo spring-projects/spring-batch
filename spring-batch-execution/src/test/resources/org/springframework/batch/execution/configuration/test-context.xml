@@ -21,7 +21,7 @@
 						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
 						<property name="itemReader">
 							<bean 
-								class="org.springframework.batch.item.provider.ListItemReader">
+								class="org.springframework.batch.item.reader.ListItemReader">
 								<constructor-arg value="foo,bar,spam"/>
 							</bean>
 						</property>

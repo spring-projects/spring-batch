@@ -28,7 +28,7 @@ import java.util.Iterator;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
-import org.springframework.batch.item.provider.AbstractItemReader;
+import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -127,7 +127,7 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 	 *             if there is an IOException while accessing the input
 	 *             resource.
 	 * 
-	 * @see org.springframework.batch.item.provider.support.ItemReader#read()
+	 * @see org.springframework.batch.item.reader.support.ItemReader#read()
 	 */
 	public synchronized Object read() {
 		// Make a copy of the recordSeparatorPolicy reference, in case it is

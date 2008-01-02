@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.provider;
+package org.springframework.batch.item.reader;
 
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.io.exception.ValidationException;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.reader.AbstractItemReader;
+import org.springframework.batch.item.reader.ValidatingItemReader;
 import org.springframework.batch.item.validator.Validator;
 
 /**

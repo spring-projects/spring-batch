@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.provider.AggregateItemReader;
+import org.springframework.batch.item.reader.AggregateItemReader;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.batch.sample.mapping.TradeFieldSetMapper;
 

@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.item.provider;
+package org.springframework.batch.sample.item.reader;
 
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
@@ -11,6 +11,7 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.sample.item.processor.StagingItemProcessor;
+import org.springframework.batch.sample.item.reader.StagingItemReader;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
 

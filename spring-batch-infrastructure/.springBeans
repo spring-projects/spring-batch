@@ -9,7 +9,6 @@
 		<config>src/test/resources/org/springframework/batch/io/sql/data-source-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/item/processor/delegating-item-processor.xml</config>
 		<config>src/test/resources/org/springframework/batch/item/processor/pe-delegating-item-processor.xml</config>
-		<config>src/test/resources/org/springframework/batch/item/provider/delegating-item-provider.xml</config>
 		<config>src/test/resources/org/springframework/batch/retry/aop/retry-transaction-test.xml</config>
 	</configs>
 	<configSets>

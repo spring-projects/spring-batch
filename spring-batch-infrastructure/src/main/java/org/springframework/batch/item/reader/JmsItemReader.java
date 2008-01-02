@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.provider;
+package org.springframework.batch.item.reader;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -108,7 +108,7 @@ public class JmsItemReader extends AbstractItemReader implements FailedItemIdent
 	 * Send the message back to the proovider using the specified error
 	 * destination property of this provider.
 	 * 
-	 * @see org.springframework.batch.item.provider.AbstractItemReader#recover(java.lang.Object,
+	 * @see org.springframework.batch.item.reader.AbstractItemReader#recover(java.lang.Object,
 	 * Throwable)
 	 */
 	public boolean recover(Object item, Throwable cause) {
@@ -137,7 +137,7 @@ public class JmsItemReader extends AbstractItemReader implements FailedItemIdent
 	 * If the message is a {@link Message} then returns the JMS message ID.
 	 * Otherwise just delegate to parent class.
 	 * 
-	 * @see org.springframework.batch.item.provider.AbstractItemReader#getKey(java.lang.Object)
+	 * @see org.springframework.batch.item.reader.AbstractItemReader#getKey(java.lang.Object)
 	 * 
 	 * @throws UnexpectedInputException if the JMS id cannot be determined from
 	 * a JMS Message

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.provider;
+package org.springframework.batch.item.reader;
 
 import java.util.Properties;
 
@@ -22,6 +22,8 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.reader.AbstractItemReader;
+import org.springframework.batch.item.reader.DelegatingItemReader;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;

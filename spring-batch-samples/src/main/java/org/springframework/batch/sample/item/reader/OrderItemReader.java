@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.item.provider;
+package org.springframework.batch.sample.item.reader;
 
 import java.util.ArrayList;
 
@@ -25,7 +25,7 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.provider.AbstractItemReader;
+import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.validator.Validator;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;

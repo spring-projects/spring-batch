@@ -24,7 +24,7 @@
 					<bean
 						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
 						<property name="itemReader">
-							<bean class="org.springframework.batch.item.provider.ItemReaderAdapter">
+							<bean class="org.springframework.batch.item.reader.ItemReaderAdapter">
 								<property name="targetObject" ref="delegatingObject" />
 								<property name="targetMethod" value="getData" />
 							</bean>

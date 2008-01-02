@@ -24,7 +24,7 @@
 	</bean>
 
 	<bean id="provider"
-		class="org.springframework.batch.sample.item.provider.StagingItemReader"
+		class="org.springframework.batch.sample.item.reader.StagingItemReader"
 		scope="step">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
