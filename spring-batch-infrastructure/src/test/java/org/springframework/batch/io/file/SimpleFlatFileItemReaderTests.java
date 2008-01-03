@@ -17,6 +17,7 @@
 package org.springframework.batch.io.file;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.io.file.transform.LineTokenizer;
+import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -44,10 +46,11 @@ import org.springframework.core.io.Resource;
 public class SimpleFlatFileItemReaderTests extends TestCase {
 
 	// object under test
-	private SimpleFlatFileItemReader inputSource = new SimpleFlatFileItemReader();
+	private SimpleFlatFileItemReader itemReader = new SimpleFlatFileItemReader();
 
 	// common value used for writing to a file
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
+	private String TEST_OUTPUT = "[FlatFileInputTemplate-TestData]";
 
 	// simple stub instead of a realistic tokenizer
 	private LineTokenizer tokenizer = new LineTokenizer() {
@@ -68,19 +71,19 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 
-		inputSource.setResource(getInputResource(TEST_STRING));
-		inputSource.setTokenizer(tokenizer);
-		inputSource.setFieldSetMapper(fieldSetMapper);
-		inputSource.afterPropertiesSet();
+		itemReader.setResource(getInputResource(TEST_STRING));
+		itemReader.setTokenizer(tokenizer);
+		itemReader.setFieldSetMapper(fieldSetMapper);
+		itemReader.afterPropertiesSet();
 
-		inputSource.open();
+		itemReader.open();
 	}
 
 	/**
 	 * Release resources.
 	 */
 	protected void tearDown() throws Exception {
-		inputSource.close();
+		itemReader.close();
 	}
 
 	private Resource getInputResource(String input) {
@@ -91,28 +94,28 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	 * Regular usage of <code>read</code> method
 	 */
 	public void testRead() throws Exception {
-		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
+		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
 	}
 
 	/**
 	 * Regular usage of <code>read</code> method
 	 */
 	public void testReadExhausted() throws Exception {
-		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
-		assertEquals(null, inputSource.read());
+		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
+		assertEquals(null, itemReader.read());
 	}
 
 	/**
 	 * Regular usage of <code>read</code> method
 	 */
 	public void testReadWithTokenizerError() throws Exception {
-		inputSource.setTokenizer(new LineTokenizer() {
+		itemReader.setTokenizer(new LineTokenizer() {
 			public FieldSet tokenize(String line) {
 				throw new RuntimeException("foo");
 			}
 		});
 		try {
-			inputSource.read();
+			itemReader.read();
 			fail("Expected ParsingException");
 		} catch (FlatFileParsingException e) {
 			assertEquals(e.getInput(), TEST_STRING);
@@ -121,14 +124,14 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	}
 
 	public void testReadWithMapperError() throws Exception {
-		inputSource.setFieldSetMapper(new FieldSetMapper(){
+		itemReader.setFieldSetMapper(new FieldSetMapper(){
 			public Object mapLine(FieldSet fs) {
 				throw new RuntimeException("foo");
 			}
 		});
 
 		try {
-			inputSource.read();
+			itemReader.read();
 			fail("Expected ParsingException");
 		} catch (FlatFileParsingException e) {
 			assertEquals(e.getInput(), TEST_STRING);
@@ -137,36 +140,36 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	}
 
 	public void testReadBeforeOpen() throws Exception {
-		inputSource = new SimpleFlatFileItemReader();
-		inputSource.setResource(getInputResource(TEST_STRING));
-		inputSource.setFieldSetMapper(fieldSetMapper);
-		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
+		itemReader = new SimpleFlatFileItemReader();
+		itemReader.setResource(getInputResource(TEST_STRING));
+		itemReader.setFieldSetMapper(fieldSetMapper);
+		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
 	}
 
 	public void testCloseBeforeOpen() throws Exception {
-		inputSource = new SimpleFlatFileItemReader();
-		inputSource.setResource(getInputResource(TEST_STRING));
-		inputSource.setFieldSetMapper(fieldSetMapper);
-		inputSource.close();
+		itemReader = new SimpleFlatFileItemReader();
+		itemReader.setResource(getInputResource(TEST_STRING));
+		itemReader.setFieldSetMapper(fieldSetMapper);
+		itemReader.close();
 		// The open still happens automatically on a read...
-		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
+		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
 	}
 
 	public void testCloseOnDestroy() throws Exception {
 		final List list = new ArrayList();
-		inputSource = new SimpleFlatFileItemReader() {
+		itemReader = new SimpleFlatFileItemReader() {
 			public void close() {
 				list.add("close");
 			}
 		};
-		inputSource.destroy();
+		itemReader.destroy();
 		assertEquals(1, list.size());
 	}
 
 	public void testInitializationWithNullResource() throws Exception {
-		inputSource = new SimpleFlatFileItemReader();
+		itemReader = new SimpleFlatFileItemReader();
 		try {
-			inputSource.afterPropertiesSet();
+			itemReader.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
@@ -175,24 +178,24 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	}
 
 	public void testOpenTwiceHasNoEffect() throws Exception {
-		inputSource.open();
+		itemReader.open();
 		testRead();
 	}
 
 	public void testSetValidEncoding() throws Exception {
-		inputSource = new SimpleFlatFileItemReader();
-		inputSource.setEncoding("UTF-8");
-		inputSource.setResource(getInputResource(TEST_STRING));
-		inputSource.setFieldSetMapper(fieldSetMapper);
+		itemReader = new SimpleFlatFileItemReader();
+		itemReader.setEncoding("UTF-8");
+		itemReader.setResource(getInputResource(TEST_STRING));
+		itemReader.setFieldSetMapper(fieldSetMapper);
 		testRead();
 	}
 
 	public void testSetNullEncoding() throws Exception {
-		inputSource = new SimpleFlatFileItemReader();
-		inputSource.setEncoding(null);
-		inputSource.setResource(getInputResource(TEST_STRING));
+		itemReader = new SimpleFlatFileItemReader();
+		itemReader.setEncoding(null);
+		itemReader.setResource(getInputResource(TEST_STRING));
 		try {
-			inputSource.open();
+			itemReader.open();
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
@@ -201,11 +204,11 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	}
 
 	public void testSetInvalidEncoding() throws Exception {
-		inputSource = new SimpleFlatFileItemReader();
-		inputSource.setEncoding("foo");
-		inputSource.setResource(getInputResource(TEST_STRING));
+		itemReader = new SimpleFlatFileItemReader();
+		itemReader.setEncoding("foo");
+		itemReader.setResource(getInputResource(TEST_STRING));
 		try {
-			inputSource.open();
+			itemReader.open();
 			fail("Expected BatchEnvironmentException");
 		}
 		catch (BatchEnvironmentException e) {
@@ -215,36 +218,19 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	}
 
 	public void testEncoding() throws Exception {
-		inputSource.setEncoding("UTF-8");
+		itemReader.setEncoding("UTF-8");
 		testRead();
 	}
 
 	public void testRecordSeparator() throws Exception {
-		inputSource.setRecordSeparatorPolicy(new DefaultRecordSeparatorPolicy());
+		itemReader.setRecordSeparatorPolicy(new DefaultRecordSeparatorPolicy());
 		testRead();
 	}
 
 	public void testComments() throws Exception {
-		inputSource.setResource(getInputResource("% Comment\n"+TEST_STRING));
-		inputSource.setComments(new String[] {"%"});
+		itemReader.setResource(getInputResource("% Comment\n"+TEST_STRING));
+		itemReader.setComments(new String[] {"%"});
 		testRead();
-	}
-
-	public void testInvalidFile() throws IOException {
-		DefaultFlatFileItemReader ffit = new DefaultFlatFileItemReader();
-
-		FileSystemResource resource = new FileSystemResource("FooDummy.txt");
-		assertTrue(!resource.exists());
-		ffit.setResource(resource);
-
-		try {
-			ffit.open();
-			fail("File is not existing but exception was not thrown.");
-		}
-		catch (BatchEnvironmentException e) {
-			assertEquals("FooDummy", e.getCause().getMessage().substring(0,8));
-		}
-
 	}
 
 	/**
@@ -253,19 +239,19 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	public void testColumnNamesInHeader() throws Exception {
 		final String INPUT = "name1|name2\nvalue1|value2\nvalue3|value4";
 		
-		inputSource = new SimpleFlatFileItemReader();
-		inputSource.setResource(getInputResource(INPUT));
-		inputSource.setTokenizer(new DelimitedLineTokenizer('|'));
-		inputSource.setFieldSetMapper(fieldSetMapper);
-		inputSource.setFirstLineIsHeader(true);
-		inputSource.afterPropertiesSet();
-		inputSource.open();
+		itemReader = new SimpleFlatFileItemReader();
+		itemReader.setResource(getInputResource(INPUT));
+		itemReader.setTokenizer(new DelimitedLineTokenizer('|'));
+		itemReader.setFieldSetMapper(fieldSetMapper);
+		itemReader.setFirstLineIsHeader(true);
+		itemReader.afterPropertiesSet();
+		itemReader.open();
 		
-		FieldSet fs = (FieldSet) inputSource.read();
+		FieldSet fs = (FieldSet) itemReader.read();
 		assertEquals("value1", fs.readString("name1"));
 		assertEquals("value2", fs.readString("name2"));
 		
-		fs = (FieldSet) inputSource.read();
+		fs = (FieldSet) itemReader.read();
 		assertEquals("value3", fs.readString("name1"));
 		assertEquals("value4", fs.readString("name2"));
 	}
@@ -276,20 +262,78 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	public void testLinesToSkip() throws Exception {
 		final String INPUT = "foo bar spam\none two\nthree four";
 		
-		inputSource = new SimpleFlatFileItemReader();
-		inputSource.setResource(getInputResource(INPUT));
-		inputSource.setTokenizer(new DelimitedLineTokenizer(' '));
-		inputSource.setFieldSetMapper(fieldSetMapper);
-		inputSource.setLinesToSkip(1);
-		inputSource.afterPropertiesSet();
-		inputSource.open();
+		itemReader = new SimpleFlatFileItemReader();
+		itemReader.setResource(getInputResource(INPUT));
+		itemReader.setTokenizer(new DelimitedLineTokenizer(' '));
+		itemReader.setFieldSetMapper(fieldSetMapper);
+		itemReader.setLinesToSkip(1);
+		itemReader.afterPropertiesSet();
+		itemReader.open();
 		
-		FieldSet fs = (FieldSet) inputSource.read();
+		FieldSet fs = (FieldSet) itemReader.read();
 		assertEquals("one", fs.readString(0));
 		assertEquals("two", fs.readString(1));
 		
-		fs = (FieldSet) inputSource.read();
+		fs = (FieldSet) itemReader.read();
 		assertEquals("three", fs.readString(0));
 		assertEquals("four", fs.readString(1));
+	}
+	
+	public void testNonExistantResource() throws Exception{
+		
+		Resource resource = new NonExistentResource();
+		
+		SimpleFlatFileItemReader testReader = new SimpleFlatFileItemReader();
+		testReader.setResource(resource);
+		testReader.setTokenizer(tokenizer);
+		testReader.setFieldSetMapper(fieldSetMapper);
+		testReader.setResource(resource);
+		
+		//afterPropertiesSet should only throw an exception if the Resource is null
+		testReader.afterPropertiesSet();
+		
+		try{
+			testReader.open();
+			fail();
+		}catch(IllegalStateException ex){
+			//expected
+		}
+		
+	}
+	
+	public void testRuntimeFileCreation() throws Exception{
+		
+		Resource resource = new NonExistentResource();
+		
+		SimpleFlatFileItemReader testReader = new SimpleFlatFileItemReader();
+		testReader.setResource(resource);
+		testReader.setTokenizer(tokenizer);
+		testReader.setFieldSetMapper(fieldSetMapper);
+		testReader.setResource(resource);
+		
+		//afterPropertiesSet should only throw an exception if the Resource is null
+		testReader.afterPropertiesSet();
+		
+		//replace the resource to simulate runtime resource creation
+		testReader.setResource(getInputResource(TEST_STRING));
+		assertEquals(TEST_OUTPUT, testReader.read().toString());
+	}
+		
+	private class NonExistentResource extends AbstractResource{
+
+		public NonExistentResource() {
+		}
+		
+		public boolean exists() {
+			return false;
+		}
+
+		public String getDescription() {
+			return "NonExistantResource";
+		}
+
+		public InputStream getInputStream() throws IOException {
+			return null;
+		}
 	}
 }

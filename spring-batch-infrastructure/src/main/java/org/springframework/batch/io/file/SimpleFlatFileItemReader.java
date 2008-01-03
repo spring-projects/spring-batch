@@ -123,8 +123,6 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource);
-		Assert.state(resource.exists(), "Resource must exist: [" + resource
-				+ "]");
 		Assert.notNull(fieldSetMapper, "FieldSetMapper must not be null.");
 	}
 
@@ -133,6 +131,10 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 	 * @throws IllegalStateException if the resource cannot be opened 
 	 */
 	public void open() throws IllegalStateException {
+		
+		Assert.state(resource.exists(), "Resource must exist: [" + resource
+				+ "]");
+		
 		if (this.reader == null) {
 			ResourceLineReader reader = new ResourceLineReader(resource, encoding);
 			if (recordSeparatorPolicy != null) {

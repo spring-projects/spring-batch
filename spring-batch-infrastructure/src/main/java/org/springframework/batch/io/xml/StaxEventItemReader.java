@@ -118,6 +118,8 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	}
 
 	public void open() {
+		Assert.state(resource.exists(), "Input resource does not exist: [" + resource + "]");
+		
 		registerSynchronization();
 		try {
 			inputStream = resource.getInputStream();
@@ -184,7 +186,6 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource, "The Resource must not be null.");
-		Assert.state(resource.exists(), "Input resource does not exist: [" + resource + "]");
 		Assert.notNull(eventReaderDeserializer, "The FragmentDeserializer must not be null.");
 		Assert.hasLength(fragmentRootElementName, "The FragmentRootElementName must not be null");
 	}

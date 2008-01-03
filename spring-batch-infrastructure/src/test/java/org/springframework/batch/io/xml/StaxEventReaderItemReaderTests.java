@@ -245,6 +245,10 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 			public InputStream getInputStream() throws IOException {
 				throw new IOException();
 			}
+			
+			public boolean exists() {
+				return true;
+			}
 		});
 
 		try{
@@ -253,6 +257,29 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 			assertTrue(ex.getCause() instanceof IOException);
 		}
 
+	}
+	
+	public void testNonExistentResource() throws Exception{
+		
+		source.setResource(new NonExistentResource());
+		source.afterPropertiesSet();
+		
+		try{
+			source.open();
+			fail();
+		}
+		catch(IllegalStateException ex){
+			//expected
+		}
+	}
+	
+	public void testRuntimeFileCreation() throws Exception{
+		
+		source.setResource(new NonExistentResource());
+		source.afterPropertiesSet();
+		
+		source.setResource(new ByteArrayResource(xml.getBytes()));
+		source.read();
 	}
 
 	private int extractRecordCountFrom(Properties statistics) {
@@ -363,6 +390,24 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 
 		public void setOpenCalled(boolean openCalled) {
 			this.openCalled = openCalled;
+		}
+	}
+	
+	private class NonExistentResource extends AbstractResource{
+
+		public NonExistentResource() {
+		}
+		
+		public boolean exists() {
+			return false;
+		}
+
+		public String getDescription() {
+			return "NonExistantResource";
+		}
+
+		public InputStream getInputStream() throws IOException {
+			return null;
 		}
 	}
 }
