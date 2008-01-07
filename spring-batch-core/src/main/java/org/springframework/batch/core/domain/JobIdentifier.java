@@ -16,15 +16,15 @@
 
 package org.springframework.batch.core.domain;
 
+
 /**
  * Identifier strategy for {@link JobInstance}. Different batch projects can
  * have different approaches and requirements regarding the identity of a job.
- * The minimum requirement is to provide a unique name to identify a job. Other
- * applications or projects might add other properties like a schedule date, or
- * an additional label (code).
+ * The minimum requirement is to provide a unique name to identify a job and JobRuntimeParameters.
  * 
  * @author Dave Syer
- * 
+ * @author Lucas Ward
+ * @since 1.0
  */
 public interface JobIdentifier {
 
@@ -34,5 +34,13 @@ public interface JobIdentifier {
 	 * @return the name of the job
 	 */
 	public String getName();
+	
+	/**
+	 * A simple getter for the {@link JobRuntimeParameters} that also identify
+	 * this job.
+	 * 
+	 * @return JobRuntimeParameters
+	 */
+	public JobRuntimeParameters getRuntimeParameters();
 
 }

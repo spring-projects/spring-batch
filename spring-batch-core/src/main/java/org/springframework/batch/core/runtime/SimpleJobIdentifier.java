@@ -18,22 +18,27 @@ package org.springframework.batch.core.runtime;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.JobRuntimeParameters;
 import org.springframework.util.ClassUtils;
 
 
 /**
+ * Simple, immutable, implementation of the JobIdentifier interface.  
+ * 
  * @author Dave Syer
+ * @author Lucas Ward
  *
  */
 public class SimpleJobIdentifier implements JobIdentifier {
 
 	private String name;
-	
+	private JobRuntimeParameters runtimeParameters;
 	
 	/**
-	 * Default constructor.
+	 * Default constructor.  Since there it is required that the Identifier at least have a name,
+	 * the default constructor should not be called.
 	 */
-	public SimpleJobIdentifier() {
+	private SimpleJobIdentifier() {
 		super();
 	}
 	
@@ -42,8 +47,12 @@ public class SimpleJobIdentifier implements JobIdentifier {
 	 * @param name
 	 */
 	public SimpleJobIdentifier(String name) {
-		super();
+		this(name, new JobRuntimeParameters());
+	}
+	
+	public SimpleJobIdentifier(String name, JobRuntimeParameters runtimeParameters){
 		this.name = name;
+		this.runtimeParameters = runtimeParameters;
 	}
 
 	/* (non-Javadoc)
@@ -53,24 +62,33 @@ public class SimpleJobIdentifier implements JobIdentifier {
 		return this.name;
 	}
 	
-	/**
-	 * Public setter for the name.
-	 *
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
+	public JobRuntimeParameters getRuntimeParameters() {
+		return runtimeParameters;
 	}
 	
 	public String toString() {
-		return ClassUtils.getShortName(getClass())+": name=" + name;
+		return ClassUtils.getShortName(getClass())+": name=" + name + "parameters=" + runtimeParameters;
 	}
 
 	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
+		
+		if(obj instanceof SimpleJobIdentifier == false){
+			return false;
+		}
+		
+		if(this == obj){
+			return true;
+		}
+		
+		SimpleJobIdentifier rhs = (SimpleJobIdentifier)obj;
+		return new EqualsBuilder().
+								append(runtimeParameters,rhs.getRuntimeParameters()).
+								append(name, rhs.getName()).
+								isEquals();
 	}
 	
 	public int hashCode() {
 		return HashCodeBuilder.reflectionHashCode(this);
 	}
+
 }

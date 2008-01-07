@@ -25,13 +25,6 @@ public class SimpleJobIdentifierTests extends TestCase {
 
 	private SimpleJobIdentifier identifier = new SimpleJobIdentifier("foo");
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.runtime.SimpleJobIdentifier#SimpleJobIdentifier()}.
-	 */
-	public void testSimpleJobIdentifier() {
-		assertNull(new SimpleJobIdentifier().getName());
-	}
 
 	/**
 	 * Test method for
@@ -39,8 +32,6 @@ public class SimpleJobIdentifierTests extends TestCase {
 	 */
 	public void testGetName() {
 		assertEquals("foo", identifier.getName());
-		identifier.setName("bar");
-		assertEquals("bar", identifier.getName());
 	}
 
 	/**
