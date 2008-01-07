@@ -1,5 +1,6 @@
 package org.springframework.batch.execution.resource;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import junit.framework.TestCase;
@@ -11,6 +12,8 @@ import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 public class DefaultJobIdentifierLabelGeneratorTests extends TestCase {
 
 	DefaultJobIdentifierLabelGenerator instance = new DefaultJobIdentifierLabelGenerator();
+	
+	DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 	
 	/**
 	 * Test method for {@link org.springframework.batch.execution.resource.DefaultJobIdentifierLabelGenerator#getLabel()}.
@@ -30,7 +33,8 @@ public class DefaultJobIdentifierLabelGeneratorTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.execution.resource.DefaultJobIdentifierLabelGenerator#getLabel()}.
 	 */
 	public void testDefaultGetLabel() throws Exception {
-		assertEquals("null--19700101", instance.getLabel(new ScheduledJobIdentifier(null)));
+		System.out.println(instance.getLabel(new ScheduledJobIdentifier(null, dateFormat.parse("19700101"))));
+		assertEquals("null-null-19700101", instance.getLabel(new ScheduledJobIdentifier(null, dateFormat.parse("19700101"))));
 	}
 
 	/**
