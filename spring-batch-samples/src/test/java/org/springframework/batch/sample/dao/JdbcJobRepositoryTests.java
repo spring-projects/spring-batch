@@ -42,10 +42,8 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 	}
 
 	protected void onSetUpInTransaction() throws Exception {
-		jobIdentifier = new ScheduledJobIdentifier("Job1");
-		jobIdentifier.setName("Job1");
-		jobIdentifier.setJobKey("TestStream");
-		jobIdentifier.setScheduleDate(new SimpleDateFormat("yyyyMMdd").parse("20070505"));
+		jobIdentifier = new ScheduledJobIdentifier("Job1", "TestStream", 
+				new SimpleDateFormat("yyyyMMdd").parse("20070505"));
 		jobConfiguration = new JobConfiguration("test-job");
 		jobConfiguration.setRestartable(true);
 	}
