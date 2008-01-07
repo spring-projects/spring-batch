@@ -65,11 +65,8 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 		resourceFactory.setRootDirectory(rootDir);
 
-		identifier = new ScheduledJobIdentifier("testJob");
-		// define mock behaviour
-		identifier.setScheduleDate(new SimpleDateFormat("yyyyMMdd")
-		.parse("20070730"));
-		identifier.setJobKey("testStream");
+		identifier = new ScheduledJobIdentifier("testJob", "testStream", new SimpleDateFormat("yyyyMMdd")
+			.parse("20070730"));
 		
 		SimpleStepContext context = new SimpleStepContext();
 		JobInstance job = new JobInstance(identifier);

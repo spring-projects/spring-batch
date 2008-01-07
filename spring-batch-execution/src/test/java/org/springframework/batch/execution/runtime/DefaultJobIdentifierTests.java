@@ -28,29 +28,17 @@ public class DefaultJobIdentifierTests extends TestCase {
 	/**
 	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getName()}.
 	 */
-	public void testDefaultConstructor() {
-		instance = new DefaultJobIdentifier();
-		assertEquals(null, instance.getName());
-		instance.setName("foo");
-		assertEquals("foo", instance.getName());
-	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getName()}.
-	 */
 	public void testGetName() {
-		assertEquals(null, instance.getName());
-		instance.setName("foo");
-		assertEquals("foo", instance.getName());
+		DefaultJobIdentifier identifier = new DefaultJobIdentifier("foo");
+		assertEquals("foo", identifier.getName());
 	}
 
 	/**
 	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getJobKey()}.
 	 */
 	public void testGetJobStream() {
-		assertEquals("", instance.getJobKey());
-		instance.setJobKey("foo");
-		assertEquals("foo", instance.getJobKey());
+		DefaultJobIdentifier identifier = new DefaultJobIdentifier("bar", "foo");
+		assertEquals("foo", identifier.getJobKey());
 	}
 
 	
@@ -59,25 +47,17 @@ public class DefaultJobIdentifierTests extends TestCase {
 	}
 
 	public void testEqualsInstanceWithSameProperties() throws Exception {
-		DefaultJobIdentifier other = new DefaultJobIdentifier(instance.getName());
-		other.setJobKey(instance.getJobKey());
-		assertEquals(instance, other);
-		assertEquals(instance.hashCode(), other.hashCode());
+		
+		DefaultJobIdentifier identifier = new DefaultJobIdentifier("foo", "bar");
+		DefaultJobIdentifier other = new DefaultJobIdentifier("foo", "bar");
+		
+		assertEquals(identifier, other);
+		assertEquals(identifier.hashCode(), other.hashCode());
 	}
 
-	public void testEqualsInstanceWithTimestamp() throws Exception {
-		DefaultJobIdentifier other = new DefaultJobIdentifier(instance.getName());
-		other.setJobKey(instance.getJobKey());
-		assertEquals(instance, other);
-		assertEquals(other, instance);
-		assertEquals(instance.hashCode(), other.hashCode());
-	}
 
 	public void testEqualsNull() throws Exception {
 		assertNotSame(null, instance);
 	}
 	
-	public void testToString() throws Exception {
-		assertTrue("String does not contain key: "+instance, instance.toString().indexOf("key=")>=0);
-	}
 }

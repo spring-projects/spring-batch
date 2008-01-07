@@ -32,8 +32,7 @@ public class DefaultJobIdentifierFactory implements JobIdentifierFactory {
 
 	public JobIdentifier getJobIdentifier(String name) {
 
-		DefaultJobIdentifier runtimeInformation = new DefaultJobIdentifier(name);
-		runtimeInformation.setJobKey(key);
+		DefaultJobIdentifier runtimeInformation = new DefaultJobIdentifier(name, key);
 		return runtimeInformation;
 	}
 

@@ -37,10 +37,8 @@ public class DefaultJobIdentifierLabelGeneratorTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.execution.resource.DefaultJobIdentifierLabelGenerator#getLabel()}.
 	 */
 	public void testGetLabelWithAllProperties() throws Exception {
-		ScheduledJobIdentifier identifier = new ScheduledJobIdentifier(null);
-		identifier.setName("foo");
-		identifier.setJobKey("bar");
-		identifier.setScheduleDate(new SimpleDateFormat("yyyyMMdd").parse("20070730"));
+		ScheduledJobIdentifier identifier = new ScheduledJobIdentifier("foo", "bar", 
+				new SimpleDateFormat("yyyyMMdd").parse("20070730"));
 		assertEquals("foo-bar-20070730", instance.getLabel(identifier));
 	}
 

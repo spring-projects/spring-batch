@@ -80,7 +80,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	 * @see org.springframework.test.AbstractTransactionalSpringContextTests#onSetUpInTransaction()
 	 */
 	protected void onSetUpInTransaction() throws Exception {
-		JobIdentifier jobIdentifier = new ScheduledJobIdentifier("TestJob");
+		JobIdentifier jobIdentifier = new ScheduledJobIdentifier("TestJob", "TestStream", new Date());
 		job = jobDao.createJob(jobIdentifier);
 		step1 = stepDao.createStep(job, "TestStep1");
 		step2 = stepDao.createStep(job, "TestStep2");

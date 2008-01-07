@@ -16,20 +16,14 @@
 
 package org.springframework.batch.execution.runtime;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.JobRuntimeParametersBuilder;
 
 public class ScheduledJobIdentifier extends DefaultJobIdentifier implements JobIdentifier {
-
-	private static final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
-	private Date scheduleDate;
+	
+	public static final String SCHEDULE_DATE = "schedule.date";
 	
 	ScheduledJobIdentifier() {
 		this(null);
@@ -37,7 +31,6 @@ public class ScheduledJobIdentifier extends DefaultJobIdentifier implements JobI
 	
 	public ScheduledJobIdentifier(String name) {
 		super(name);
-		initDate();
 	}
 
 	/**
@@ -46,41 +39,18 @@ public class ScheduledJobIdentifier extends DefaultJobIdentifier implements JobI
 	 */
 	public ScheduledJobIdentifier(String name, String key) {
 		super(name, key);
-		initDate();
 	}
-
-	private void initDate() {
-		try {
-			scheduleDate = dateFormat.parse("19700101");
-		} catch (ParseException e) {
-			throw new IllegalStateException("Could not parse trivial date 19700101");
-		}
+	
+	public ScheduledJobIdentifier(String name, Date scheduleDate){
+		super(name, new JobRuntimeParametersBuilder().addDate(SCHEDULE_DATE, scheduleDate).toJobRuntimeParameters());
+	}
+	
+	public ScheduledJobIdentifier(String name, String jobKey, Date scheduleDate){
+		super(name, new JobRuntimeParametersBuilder().addString(ScheduledJobIdentifier.JOB_KEY, jobKey).
+				addDate(SCHEDULE_DATE, scheduleDate).toJobRuntimeParameters());
 	}
 
 	public Date getScheduleDate() {
-		return scheduleDate;
+		return getRuntimeParameters().getDate(SCHEDULE_DATE);
 	}
-
-	public void setScheduleDate(Date scheduleDate) {
-		this.scheduleDate = scheduleDate;
-	}
-	
-	public String toString() {
-		return super.toString() + ",scheduleDate="
-				+ scheduleDate;
-	}
-
-	/**
-	 * Returns true if the provided JobIdentifier equals this JobIdentifier. Two
-	 * Identifiers are considered to be equal if they have the same name,
-	 * stream, run, and schedule date.
-	 */
-	public boolean equals(Object other) {
-		return EqualsBuilder.reflectionEquals(this, other) || EqualsBuilder.reflectionEquals(other, this);
-	}
-	
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
-	}
-
 }

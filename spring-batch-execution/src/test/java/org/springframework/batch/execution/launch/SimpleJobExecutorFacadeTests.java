@@ -60,7 +60,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 
 	private volatile boolean running = false;
 
-	private SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier();
+	private SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("TestJob");
 
 	private JobExecution jobExecution = new JobExecution(new JobInstance(
 			jobIdentifier));

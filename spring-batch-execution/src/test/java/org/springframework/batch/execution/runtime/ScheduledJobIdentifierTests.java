@@ -25,15 +25,14 @@ import junit.framework.TestCase;
  */
 public class ScheduledJobIdentifierTests extends TestCase {
 
-	private ScheduledJobIdentifier instance = new ScheduledJobIdentifier(null);
+	private ScheduledJobIdentifier instance = new ScheduledJobIdentifier(null, "");
 
 	/**
 	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getName()}.
 	 */
 	public void testDefaultConstructor() {
-		instance = new ScheduledJobIdentifier();
 		assertEquals(null, instance.getName());
-		instance.setName("foo");
+		instance = new ScheduledJobIdentifier("foo", "bar", new Date());
 		assertEquals("foo", instance.getName());
 	}
 
@@ -41,8 +40,9 @@ public class ScheduledJobIdentifierTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getName()}.
 	 */
 	public void testGetName() {
+		
 		assertEquals(null, instance.getName());
-		instance.setName("foo");
+		instance = new ScheduledJobIdentifier("foo");
 		assertEquals("foo", instance.getName());
 	}
 
@@ -51,7 +51,7 @@ public class ScheduledJobIdentifierTests extends TestCase {
 	 */
 	public void testGetJobStream() {
 		assertEquals("", instance.getJobKey());
-		instance.setJobKey("foo");
+		instance = new ScheduledJobIdentifier("bar", "foo");
 		assertEquals("foo", instance.getJobKey());
 	}
 
@@ -59,8 +59,7 @@ public class ScheduledJobIdentifierTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getScheduleDate()}.
 	 */
 	public void testGetScheduleDate() {
-		assertNotNull(instance.getScheduleDate());
-		instance.setScheduleDate(new Date(100L));
+		instance = new ScheduledJobIdentifier("foo", "bar", new Date(100L));
 		assertEquals(100L, instance.getScheduleDate().getTime());
 	}
 	
@@ -69,17 +68,15 @@ public class ScheduledJobIdentifierTests extends TestCase {
 	}
 
 	public void testEqualsInstanceWithSameProperties() throws Exception {
-		ScheduledJobIdentifier other = new ScheduledJobIdentifier(instance.getName());
-		other.setJobKey(instance.getJobKey());
-		other.setScheduleDate(instance.getScheduleDate());
+		instance = new ScheduledJobIdentifier("foo", "bar", new Date(100L));
+		ScheduledJobIdentifier other = new ScheduledJobIdentifier("foo", "bar", new Date(100L));
 		assertEquals(instance, other);
 		assertEquals(instance.hashCode(), other.hashCode());
 	}
 
 	public void testEqualsInstanceWithTimestamp() throws Exception {
-		ScheduledJobIdentifier other = new ScheduledJobIdentifier(instance.getName());
-		other.setJobKey(instance.getJobKey());
-		other.setScheduleDate(new Date(instance.getScheduleDate().getTime()));
+		instance = new ScheduledJobIdentifier("foo", "bar", new Date(100L));
+		ScheduledJobIdentifier other = new ScheduledJobIdentifier("foo", "bar", new Date(100L));
 		assertEquals(instance, other);
 		assertEquals(other, instance);
 		assertEquals(instance.hashCode(), other.hashCode());
@@ -87,10 +84,5 @@ public class ScheduledJobIdentifierTests extends TestCase {
 
 	public void testEqualsNull() throws Exception {
 		assertNotSame(null, instance);
-	}
-	
-	public void testToString() throws Exception {
-		assertTrue("String does not contain key: "+instance, instance.toString().indexOf("key=")>=0);
-		assertTrue("String does not contain date: "+instance, instance.toString().indexOf("scheduleDate=")>=0);
 	}
 }

@@ -64,11 +64,8 @@ public abstract class AbstractJobDaoTests extends
 	}
 
 	protected void onSetUpInTransaction() throws Exception {
-		jobRuntimeInformation = new ScheduledJobIdentifier("Job1");
-		jobRuntimeInformation.setName("Job1");
-		jobRuntimeInformation.setJobKey("TestStream");
-		jobRuntimeInformation.setScheduleDate(new SimpleDateFormat("yyyyMMdd")
-				.parse("20070505"));
+		jobRuntimeInformation = new ScheduledJobIdentifier("Job1", "TestStream",
+				new SimpleDateFormat("yyyyMMdd").parse("20070505"));
 
 		// Create job.
 		job = jobDao.createJob(jobRuntimeInformation);
@@ -97,7 +94,7 @@ public abstract class AbstractJobDaoTests extends
 
 	public void testFindNonExistentJob() {
 		// No job should be found since it hasn't been created.
-		List jobs = jobDao.findJobs(new ScheduledJobIdentifier("Job2"));
+		List jobs = jobDao.findJobs(new ScheduledJobIdentifier("Job2", "TestStream", new Date()));
 		assertTrue(jobs.size() == 0);
 	}
 
@@ -129,15 +126,14 @@ public abstract class AbstractJobDaoTests extends
 	 */
 	public void testCreateJobWithExistingName() {
 		ScheduledJobIdentifier scheduledIdentifier = new ScheduledJobIdentifier(
-				"ScheduledJob");
+				"ScheduledJob", "key", new Date());
 
 		jobDao.createJob(scheduledIdentifier);
 
 		// Modifying the key should bring back a completely different
 		// JobInstance
 		ScheduledJobIdentifier newIdentifier = new ScheduledJobIdentifier(
-				"ScheduledJob");
-		newIdentifier.setJobKey("different key");
+				"ScheduledJob", "different key", new Date());
 
 		List jobs;
 		jobs = jobDao.findJobs(scheduledIdentifier);
@@ -242,7 +238,7 @@ public abstract class AbstractJobDaoTests extends
 	public void testZeroExecutionCount() {
 
 		JobInstance testJob = jobDao.createJob(new ScheduledJobIdentifier(
-				"TestJob"));
+				"TestJob", "key", new Date()));
 		// no jobExecutions saved for new job, count should be 0
 		assertEquals(jobDao.getJobExecutionCount(testJob.getId()), 0);
 	}

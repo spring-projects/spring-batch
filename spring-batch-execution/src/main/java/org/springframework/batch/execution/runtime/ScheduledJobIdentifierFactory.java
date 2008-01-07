@@ -16,6 +16,9 @@
 
 package org.springframework.batch.execution.runtime;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.batch.core.domain.JobIdentifier;
@@ -30,13 +33,14 @@ import org.springframework.batch.core.runtime.JobIdentifierFactory;
  */
 public class ScheduledJobIdentifierFactory extends DefaultJobIdentifierFactory implements JobIdentifierFactory {
 
-	private Date scheduleDate = new Date();
+	private Date scheduleDate;
+	
+	private DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
 	public JobIdentifier getJobIdentifier(String name) {
 
-		ScheduledJobIdentifier identifier = new ScheduledJobIdentifier(name);
-		identifier.setJobKey(key);
-		identifier.setScheduleDate(scheduleDate);
+		initDate();
+		ScheduledJobIdentifier identifier = new ScheduledJobIdentifier(name, key, scheduleDate);
 		return identifier;
 	}
 
@@ -44,4 +48,15 @@ public class ScheduledJobIdentifierFactory extends DefaultJobIdentifierFactory i
 		this.scheduleDate = scheduleDate;
 	}
 
+	public void setDateFormat(DateFormat dateFormat){
+		this.dateFormat = dateFormat;
+	}
+	
+	private void initDate() {
+		try {
+			scheduleDate = dateFormat.parse("19700101");
+		} catch (ParseException e) {
+			throw new IllegalStateException("Could not parse trivial date 19700101");
+		}
+	}
 }

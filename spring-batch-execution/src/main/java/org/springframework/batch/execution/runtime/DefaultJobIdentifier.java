@@ -15,19 +15,20 @@
  */
 package org.springframework.batch.execution.runtime;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.JobRuntimeParameters;
+import org.springframework.batch.core.domain.JobRuntimeParametersBuilder;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 
 /**
  * @author Dave Syer
+ * @author Lucas Ward
  *
  */
 public class DefaultJobIdentifier extends SimpleJobIdentifier implements
 		JobIdentifier {
 
-	private String key = "";
+	public static final String JOB_KEY = "job.key";
 
 	/**
 	 * Default constructor package access only.
@@ -47,39 +48,15 @@ public class DefaultJobIdentifier extends SimpleJobIdentifier implements
 	 * @param name the name for the job
 	 */
 	public DefaultJobIdentifier(String name, String key) {
-		this(name);
-		this.key = key;
+		this(name, new JobRuntimeParametersBuilder().addString(JOB_KEY, key).toJobRuntimeParameters());
+	}
+	
+	public DefaultJobIdentifier(String name, JobRuntimeParameters parameters){
+		super(name, parameters);
 	}
 
 	public String getJobKey() {
-		return key;
-	}
-
-	public void setJobKey(String key) {
-		this.key = key;
-	}
-
-	
-	/**
-	 * Adds the key data to the base class.
-	 * 
-	 * @see org.springframework.batch.core.runtime.SimpleJobIdentifier#toString()
-	 */
-	public String toString() {
-		return super.toString() + ",key=" + key;
-	}
-	
-	/**
-	 * Returns true if the provided JobIdentifier equals this JobIdentifier. Two
-	 * Identifiers are considered to be equal if they have the same name,
-	 * stream, run, and schedule date.
-	 */
-	public boolean equals(Object other) {
-		return EqualsBuilder.reflectionEquals(this, other) || EqualsBuilder.reflectionEquals(other, this);
-	}
-	
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		return getRuntimeParameters().getString(JOB_KEY);
 	}
 	
 }
