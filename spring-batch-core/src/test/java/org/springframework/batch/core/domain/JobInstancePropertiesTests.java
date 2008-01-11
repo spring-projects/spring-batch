@@ -13,9 +13,9 @@ import junit.framework.TestCase;
  * @author Lucas Ward
  *
  */
-public class JobRuntimeParametersTests extends TestCase {
+public class JobInstancePropertiesTests extends TestCase {
 
-	JobRuntimeParameters parameters;
+	JobInstanceProperties parameters;
 	
 	Map stringMap;
 	
@@ -31,7 +31,7 @@ public class JobRuntimeParametersTests extends TestCase {
 		parameters = getNewParameters();
 	}
 	
-	private JobRuntimeParameters getNewParameters(){
+	private JobInstanceProperties getNewParameters(){
 		
 		stringMap = new HashMap();
 		stringMap.put("string.key1", "value1");
@@ -45,7 +45,7 @@ public class JobRuntimeParametersTests extends TestCase {
 		dateMap.put("date.key1", date1 );
 		dateMap.put("date.key2", date2 );
 		
-		return new JobRuntimeParameters(stringMap, longMap, dateMap);
+		return new JobInstanceProperties(stringMap, longMap, dateMap);
 	}
 	
 	public void testBadLongConstructorException() throws Exception{
@@ -54,7 +54,7 @@ public class JobRuntimeParametersTests extends TestCase {
 		badLongMap.put("key", "bad long");
 		
 		try{
-			JobRuntimeParameters testParameters = new JobRuntimeParameters(stringMap, badLongMap, dateMap);
+			JobInstanceProperties testParameters = new JobInstanceProperties(stringMap, badLongMap, dateMap);
 			fail();
 		}
 		catch(IllegalArgumentException ex){
@@ -68,7 +68,7 @@ public class JobRuntimeParametersTests extends TestCase {
 		badMap.put("key", new Integer(2));
 		
 		try{
-			JobRuntimeParameters testParameters = new JobRuntimeParameters(badMap, longMap, dateMap);
+			JobInstanceProperties testParameters = new JobInstanceProperties(badMap, longMap, dateMap);
 			fail();
 		}
 		catch(IllegalArgumentException ex){
@@ -82,7 +82,7 @@ public class JobRuntimeParametersTests extends TestCase {
 		badMap.put("key", new java.sql.Date(System.currentTimeMillis()));
 		
 		try{
-			JobRuntimeParameters testParameters = new JobRuntimeParameters(stringMap, longMap, badMap);
+			JobInstanceProperties testParameters = new JobInstanceProperties(stringMap, longMap, badMap);
 			fail();
 		}
 		catch(IllegalArgumentException ex){
@@ -110,7 +110,7 @@ public class JobRuntimeParametersTests extends TestCase {
 	
 	public void testEquals(){
 		
-		JobRuntimeParameters testParameters = getNewParameters();	
+		JobInstanceProperties testParameters = getNewParameters();	
 		assertTrue(testParameters.equals(parameters));
 	}
 

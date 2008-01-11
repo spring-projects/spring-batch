@@ -36,11 +36,11 @@ public interface JobIdentifier {
 	public String getName();
 	
 	/**
-	 * A simple getter for the {@link JobRuntimeParameters} that also identify
+	 * A simple getter for the {@link JobInstanceProperties} that also identify
 	 * this job.
 	 * 
 	 * @return JobRuntimeParameters
 	 */
-	public JobRuntimeParameters getRuntimeParameters();
+	public JobInstanceProperties getRuntimeParameters();
 
 }

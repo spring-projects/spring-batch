@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @since 1.0
  */
-public class JobRuntimeParameters {
+public class JobInstanceProperties {
 
 	private final Map stringMap;
 	
@@ -38,7 +38,7 @@ public class JobRuntimeParameters {
 	 * that this constructor should only be used if an empty parameters is needed, since
 	 * JobRuntimeParameters is immutable.
 	 */
-	public JobRuntimeParameters(){
+	public JobInstanceProperties(){
 		this.stringMap = new HashMap();
 		this.longMap = new HashMap();
 		this.dateMap = new HashMap();
@@ -46,14 +46,14 @@ public class JobRuntimeParameters {
 	
 	/**
 	 * Create a new parameters object based upon three maps for each of the three
-	 * data types.  See {@link JobRuntimeParametersBuilder} for an easier way to
+	 * data types.  See {@link JobInstancePropertiesBuilder} for an easier way to
 	 * create paramters.
 	 * 
 	 * @param stringMap
 	 * @param longMap
 	 * @param dateMap
 	 */
-	public JobRuntimeParameters(Map stringMap, Map longMap, Map dateMap){
+	public JobInstanceProperties(Map stringMap, Map longMap, Map dateMap){
 		super();
 		
 		validateMap(stringMap, String.class);
@@ -107,6 +107,33 @@ public class JobRuntimeParameters {
 		return Collections.unmodifiableMap(tempMap);
 	}
 	
+	/**
+	 * Get a map of only string parameters.
+	 * 
+	 * @return String parameters.
+	 */
+	public Map getStringParameters(){
+		return Collections.unmodifiableMap(stringMap);
+	}
+	
+	/**
+	 * Get a map of only Long parameters
+	 * 
+	 * @return long parameters.
+	 */
+	public Map getLongParameters(){
+		return Collections.unmodifiableMap(longMap);
+	}
+	
+	/**
+	 * Get a map of only Date parameters
+	 * 
+	 * @return date parameters.
+	 */
+	public Map getDateParameters(){
+		return Collections.unmodifiableMap(dateMap);
+	}
+	
 	/* 
 	 * Convenience method for validating that a the provided map only contains a particular
 	 * type as a value, with only a String as a key.
@@ -143,7 +170,7 @@ public class JobRuntimeParameters {
 	
 	public boolean equals(Object obj) {
 	
-		if(obj instanceof JobRuntimeParameters == false){
+		if(obj instanceof JobInstanceProperties == false){
 			return false;
 		}
 		
@@ -151,7 +178,7 @@ public class JobRuntimeParameters {
 			return true;
 		}
 		
-		JobRuntimeParameters parameters = (JobRuntimeParameters)obj;
+		JobInstanceProperties parameters = (JobInstanceProperties)obj;
 		
 		//Since the type contained by each map is known, it's safe to call Map.equals()
 		if(getParameters().equals(parameters.getParameters())){

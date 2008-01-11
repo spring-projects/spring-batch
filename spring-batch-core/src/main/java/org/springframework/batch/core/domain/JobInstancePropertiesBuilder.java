@@ -17,9 +17,9 @@ import org.springframework.util.Assert;
  * 
  * @author Lucas Ward
  * @since 1.0
- * @see JobRuntimeParameters
+ * @see JobInstanceProperties
  */
-public class JobRuntimeParametersBuilder {
+public class JobInstancePropertiesBuilder {
 
 	private final Map stringMap;
 	
@@ -30,7 +30,7 @@ public class JobRuntimeParametersBuilder {
 	/**
 	 * Default constructor.  Initializes the builder
 	 */
-	public JobRuntimeParametersBuilder() {
+	public JobInstancePropertiesBuilder() {
 		
 		this.stringMap = new HashMap();
 		this.longMap = new HashMap();
@@ -44,7 +44,7 @@ public class JobRuntimeParametersBuilder {
 	 * @param parameter - runtime parameter
 	 * @return a refernece to this object.
 	 */
-	public JobRuntimeParametersBuilder addString(String key, String parameter){
+	public JobInstancePropertiesBuilder addString(String key, String parameter){
 		Assert.notNull(parameter, "Parameter must not be null.");
 		stringMap.put(key, parameter);
 		return this;
@@ -57,7 +57,7 @@ public class JobRuntimeParametersBuilder {
 	 * @param parameter - runtime parameter
 	 * @return a refernece to this object.
 	 */
-	public JobRuntimeParametersBuilder addDate(String key, Date parameter){
+	public JobInstancePropertiesBuilder addDate(String key, Date parameter){
 		Assert.notNull(parameter, "Parameter must not be null.");
 		dateMap.put(key, new Date(parameter.getTime()));
 		return this;
@@ -70,7 +70,7 @@ public class JobRuntimeParametersBuilder {
 	 * @param parameter - runtime parameter
 	 * @return a refernece to this object.
 	 */
-	public JobRuntimeParametersBuilder addLong(String key, Long parameter){
+	public JobInstancePropertiesBuilder addLong(String key, Long parameter){
 		Assert.notNull(parameter, "Parameter must not be null.");
 		longMap.put(key, parameter);
 		return this;
@@ -82,7 +82,7 @@ public class JobRuntimeParametersBuilder {
 	 * 
 	 * @return a valid JobRuntimeParameters object.
 	 */
-	public JobRuntimeParameters toJobRuntimeParameters(){
-		return new JobRuntimeParameters(stringMap, longMap, dateMap);
+	public JobInstanceProperties toJobParameters(){
+		return new JobInstanceProperties(stringMap, longMap, dateMap);
 	}
 }

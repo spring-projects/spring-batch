@@ -39,7 +39,7 @@ public class JobInstance extends Entity {
 	private BatchStatus status;
 
 	private int jobExecutionCount;
-
+	
 	/**
 	 * Package private constructor for Hibernate use only
 	 */
