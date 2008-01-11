@@ -130,7 +130,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * 
 	 */
 	public JobExecution findOrCreateJob(JobConfiguration jobConfiguration,
-			JobIdentifier runtimeInformation)
+			JobIdentifier jobIdentifier)
 			throws JobExecutionAlreadyRunningException {
 
 		List jobs = new ArrayList();
@@ -148,7 +148,7 @@ public class SimpleJobRepository implements JobRepository {
 			 * thread or process will block until this transaction has finished.
 			 */
 
-			jobs = jobDao.findJobs(runtimeInformation);
+			jobs = jobDao.findJobs(jobIdentifier);
 		}
 
 		if (jobs.size() == 1) {
@@ -172,7 +172,7 @@ public class SimpleJobRepository implements JobRepository {
 			}
 		} else if (jobs.size() == 0) {
 			// no job found, create one
-			job = createJob(jobConfiguration, runtimeInformation);
+			job = createJob(jobConfiguration, jobIdentifier);
 		} else {
 			// More than one job found, throw exception
 			throw new BatchRestartException(

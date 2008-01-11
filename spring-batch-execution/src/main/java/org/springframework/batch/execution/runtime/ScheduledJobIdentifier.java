@@ -19,7 +19,7 @@ package org.springframework.batch.execution.runtime;
 import java.util.Date;
 
 import org.springframework.batch.core.domain.JobIdentifier;
-import org.springframework.batch.core.domain.JobRuntimeParametersBuilder;
+import org.springframework.batch.core.domain.JobInstancePropertiesBuilder;
 
 public class ScheduledJobIdentifier extends DefaultJobIdentifier implements JobIdentifier {
 	
@@ -42,12 +42,12 @@ public class ScheduledJobIdentifier extends DefaultJobIdentifier implements JobI
 	}
 	
 	public ScheduledJobIdentifier(String name, Date scheduleDate){
-		super(name, new JobRuntimeParametersBuilder().addDate(SCHEDULE_DATE, scheduleDate).toJobRuntimeParameters());
+		super(name, new JobInstancePropertiesBuilder().addDate(SCHEDULE_DATE, scheduleDate).toJobParameters());
 	}
 	
 	public ScheduledJobIdentifier(String name, String jobKey, Date scheduleDate){
-		super(name, new JobRuntimeParametersBuilder().addString(ScheduledJobIdentifier.JOB_KEY, jobKey).
-				addDate(SCHEDULE_DATE, scheduleDate).toJobRuntimeParameters());
+		super(name, new JobInstancePropertiesBuilder().addString(ScheduledJobIdentifier.JOB_KEY, jobKey).
+				addDate(SCHEDULE_DATE, scheduleDate).toJobParameters());
 	}
 
 	public Date getScheduleDate() {

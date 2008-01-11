@@ -51,11 +51,11 @@ public class MapJobDao implements JobDao {
 		return job;
 	}
 
-	public List findJobs(JobIdentifier jobRuntimeInformation) {
+	public List findJobs(JobIdentifier jobIdentifier) {
 		List list = new ArrayList();
 		for (Iterator iter = jobsById.values().iterator(); iter.hasNext();) {
 			JobInstance job = (JobInstance) iter.next();
-			if (job.getName().equals(jobRuntimeInformation.getName())) {
+			if (job.getName().equals(jobIdentifier.getName())) {
 				list.add(job);
 			}
 		}

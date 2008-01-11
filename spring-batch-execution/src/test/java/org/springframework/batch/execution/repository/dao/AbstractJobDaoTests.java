@@ -263,12 +263,12 @@ public abstract class AbstractJobDaoTests extends
 		// Create job.
 		job = jobDao.createJob(jobIdentifier);
 
-		List jobs = jdbcTemplate.queryForList(
-				"SELECT * FROM BATCH_JOB where ID=?", new Object[] { job
-						.getId() });
+		List jobs = jobDao.findJobs(jobIdentifier); 
+			
 		assertEquals(1, jobs.size());
-		assertEquals(job.getName(), ((Map) jobs.get(0)).get("JOB_NAME"));
-		assertEquals(jobIdentifier.getJobKey(), ((Map) jobs.get(0)).get("JOB_KEY"));
+		assertEquals(job.getName(), ((JobInstance) jobs.get(0)).getName());
+		assertEquals(jobIdentifier.getJobKey(), ((JobInstance) jobs.get(0)).
+				getIdentifier().getRuntimeParameters().getString(DefaultJobIdentifier.JOB_KEY));
 
 	}
 

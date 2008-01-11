@@ -16,8 +16,8 @@
 package org.springframework.batch.execution.runtime;
 
 import org.springframework.batch.core.domain.JobIdentifier;
-import org.springframework.batch.core.domain.JobRuntimeParameters;
-import org.springframework.batch.core.domain.JobRuntimeParametersBuilder;
+import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobInstancePropertiesBuilder;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 
 /**
@@ -48,10 +48,10 @@ public class DefaultJobIdentifier extends SimpleJobIdentifier implements
 	 * @param name the name for the job
 	 */
 	public DefaultJobIdentifier(String name, String key) {
-		this(name, new JobRuntimeParametersBuilder().addString(JOB_KEY, key).toJobRuntimeParameters());
+		this(name, new JobInstancePropertiesBuilder().addString(JOB_KEY, key).toJobParameters());
 	}
 	
-	public DefaultJobIdentifier(String name, JobRuntimeParameters parameters){
+	public DefaultJobIdentifier(String name, JobInstanceProperties parameters){
 		super(name, parameters);
 	}
 
