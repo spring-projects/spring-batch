@@ -51,7 +51,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 	protected void onSetUpBeforeTransaction() throws Exception {
 		startNewTransaction();
 		getJdbcTemplate().update("DELETE FROM BATCH_JOB_EXECUTION");
-		getJdbcTemplate().update("DELETE FROM BATCH_JOB");
+		getJdbcTemplate().update("DELETE FROM BATCH_JOB_INSTANCE");
 		setComplete();
 		endTransaction();
 	}
@@ -64,22 +64,22 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 		}
 		for (Iterator iterator = jobIds.iterator(); iterator.hasNext();) {
 			Long id = (Long) iterator.next();
-			getJdbcTemplate().update("DELETE FROM BATCH_JOB where ID=?", new Object[] { id });
+			getJdbcTemplate().update("DELETE FROM BATCH_JOB_INSTANCE where ID=?", new Object[] { id });
 		}
 		setComplete();
 		endTransaction();
 		for (Iterator iterator = jobIds.iterator(); iterator.hasNext();) {
 			Long id = (Long) iterator.next();
-			int count = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB where ID=?", new Object[] { id });
+			int count = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE where ID=?", new Object[] { id });
 			assertEquals(0, count);
 		}
 	}
 
 	public void testFindOrCreateJob() throws Exception {
 		jobConfiguration.setName("foo");
-		int before = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB");
+		int before = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		JobExecution execution = repository.findOrCreateJob(jobConfiguration, jobIdentifier);
-		int after = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB");
+		int after = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertEquals(before + 1, after);
 		assertNotNull(execution.getId());
 	}
@@ -88,7 +88,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 
 		jobConfiguration.setName("bar");
 
-		int before = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB");
+		int before = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertEquals(0, before);
 
 		endTransaction();
@@ -111,7 +111,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 
 		assertNotNull(execution);
 
-		int after = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB");
+		int after = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertNotNull(execution.getId());
 		assertEquals(before + 1, after);
 
@@ -135,7 +135,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 
 		startNewTransaction();
 
-		int before = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB");
+		int before = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertEquals(1, before);
 
 		endTransaction();
@@ -151,7 +151,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 		}
 		long t1 = System.currentTimeMillis();
 
-		int after = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB");
+		int after = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertNotNull(execution.getId());
 		assertEquals(before, after);
 
