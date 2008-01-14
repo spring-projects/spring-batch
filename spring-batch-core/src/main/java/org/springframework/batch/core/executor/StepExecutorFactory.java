@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.executor;
 
-import org.springframework.batch.core.configuration.StepConfiguration;
+import org.springframework.batch.core.domain.Step;
 
 /**
  * Factory interface for creating or locating {@link StepExecutor} instances.
  * Because step execution parameters and policies can vary from step to step, a
  * {@link StepExecutor} should be created by the caller using a
  * {@link StepExecutorFactory}. The factory is responsible for ensuring that
- * the returned instance is appropriate for the configuration supplied. If the
+ * the returned instance is appropriate for the step supplied. If the
  * {@link StepExecutor} instance is stateful (which is normal) the factory
  * should return a different instance for each call.
  * 
@@ -32,13 +32,13 @@ import org.springframework.batch.core.configuration.StepConfiguration;
 public interface StepExecutorFactory {
 
 	/**
-	 * Use the configuration given to create or locate a suitable
+	 * Use the step given to create or locate a suitable
 	 * {@link StepExecutor}.
 	 * 
-	 * @param configuration a {@link StepConfiguration} instance.
+	 * @param step a {@link Step} instance.
 	 * @return a {@link StepExecutor} that can be used to execute a step with
-	 * the given configuration
+	 * the given step
 	 */
-	StepExecutor getExecutor(StepConfiguration configuration);
+	StepExecutor getExecutor(Step step);
 
 }

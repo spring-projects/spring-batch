@@ -18,17 +18,18 @@ package org.springframework.batch.core.configuration;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.Job;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.ChildBeanDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
 
-public class SpringBeanJobConfigurationTests extends TestCase {
+public class SpringBeanJobTests extends TestCase {
 
 	public void testBeanName() throws Exception {
 		StaticApplicationContext context = new StaticApplicationContext();
-		JobConfiguration configuration = new JobConfiguration();
+		Job configuration = new Job();
 		context.getAutowireCapableBeanFactory().initializeBean(configuration,
 				"bean");
 		assertNotNull(configuration.getName());
@@ -43,8 +44,8 @@ public class SpringBeanJobConfigurationTests extends TestCase {
 		ConstructorArgumentValues args = new ConstructorArgumentValues();
 		args.addGenericArgumentValue("foo");
 		context.registerBeanDefinition("bean", new RootBeanDefinition(
-				JobConfiguration.class, args, null));
-		JobConfiguration configuration = (JobConfiguration) context
+				Job.class, args, null));
+		Job configuration = (Job) context
 				.getBean("bean");
 		assertNotNull(configuration.getName());
 		assertEquals("foo", configuration.getName());
@@ -57,9 +58,9 @@ public class SpringBeanJobConfigurationTests extends TestCase {
 		ConstructorArgumentValues args = new ConstructorArgumentValues();
 		args.addGenericArgumentValue("bar");
 		context.registerBeanDefinition("parent", new RootBeanDefinition(
-				JobConfiguration.class, args, null));
+				Job.class, args, null));
 		context.registerBeanDefinition("bean", new ChildBeanDefinition("parent"));
-		JobConfiguration configuration = (JobConfiguration) context
+		Job configuration = (Job) context
 				.getBean("bean");
 		assertNotNull(configuration.getName());
 		assertEquals("bar", configuration.getName());

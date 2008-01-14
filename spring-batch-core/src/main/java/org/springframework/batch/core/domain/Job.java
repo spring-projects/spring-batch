@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.configuration;
+package org.springframework.batch.core.domain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +23,17 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.ClassUtils;
 
 /**
- * Batch domain object representing a job configuration. JobConfiguration is an
- * explicit abstraction representing the configuration of a job specified by a
- * developer. It should be noted that restart policy is applied to the job as a
- * whole and not to a step.
+ * Batch domain object representing a job. Job is an explicit abstraction
+ * representing the configuration of a job specified by a developer. It should
+ * be noted that restart policy is applied to the job as a whole and not to a
+ * step.
  * 
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class JobConfiguration implements BeanNameAware {
+public class Job implements BeanNameAware {
 
-	private List stepConfigurations = new ArrayList();
+	private List steps = new ArrayList();
 
 	private String name;
 
@@ -44,7 +44,7 @@ public class JobConfiguration implements BeanNameAware {
 	/**
 	 * Default constructor.
 	 */
-	public JobConfiguration() {
+	public Job() {
 		super();
 	}
 
@@ -54,7 +54,7 @@ public class JobConfiguration implements BeanNameAware {
 	 * 
 	 * @param name
 	 */
-	public JobConfiguration(String name) {
+	public Job(String name) {
 		super();
 		this.name = name;
 	}
@@ -69,7 +69,7 @@ public class JobConfiguration implements BeanNameAware {
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
 	public void setBeanName(String name) {
-		if (this.name==null) {
+		if (this.name == null) {
 			this.name = name;
 		}
 	}
@@ -88,17 +88,17 @@ public class JobConfiguration implements BeanNameAware {
 		return name;
 	}
 
-	public List getStepConfigurations() {
-		return stepConfigurations;
+	public List getSteps() {
+		return steps;
 	}
 
-	public void setSteps(List stepConfigurations) {
-		this.stepConfigurations.clear();
-		this.stepConfigurations.addAll(stepConfigurations);
+	public void setSteps(List steps) {
+		this.steps.clear();
+		this.steps.addAll(steps);
 	}
 
-	public void addStep(StepConfiguration stepConfiguration) {
-		this.stepConfigurations.add(stepConfiguration);
+	public void addStep(Step step) {
+		this.steps.add(step);
 	}
 
 	public int getStartLimit() {
@@ -116,8 +116,8 @@ public class JobConfiguration implements BeanNameAware {
 	public boolean isRestartable() {
 		return restartable;
 	}
-	
+
 	public String toString() {
-		return ClassUtils.getShortName(JobConfiguration.class) + ": [name="+name+"]";
+		return ClassUtils.getShortName(Job.class) + ": [name=" + name + "]";
 	}
 }

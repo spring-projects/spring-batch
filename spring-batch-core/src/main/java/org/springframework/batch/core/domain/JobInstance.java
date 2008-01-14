@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class JobInstance extends Entity {
 
-	private List steps = new ArrayList();
+	private List stepInstances = new ArrayList();
 
 	private JobIdentifier identifier;
 
@@ -65,16 +65,16 @@ public class JobInstance extends Entity {
 		this.status = status;
 	}
 
-	public List getSteps() {
-		return steps;
+	public List getStepInstances() {
+		return stepInstances;
 	}
 
-	public void setSteps(List steps) {
-		this.steps = steps;
+	public void setStepInstances(List stepInstances) {
+		this.stepInstances = stepInstances;
 	}
 
-	public void addStep(StepInstance step) {
-		this.steps.add(step);
+	public void addStepInstance(StepInstance stepInstance) {
+		this.stepInstances.add(stepInstance);
 	}
 
 	public int getJobExecutionCount() {

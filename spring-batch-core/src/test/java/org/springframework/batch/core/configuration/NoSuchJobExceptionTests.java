@@ -15,28 +15,30 @@
  */
 package org.springframework.batch.core.configuration;
 
+import org.springframework.batch.core.AbstractExceptionTests;
+import org.springframework.batch.core.domain.NoSuchJobException;
 
 /**
- * Checked exception to indicate that a required {@link JobConfiguration} is not
- * available.
- * 
  * @author Dave Syer
  * 
  */
-public class NoSuchJobConfigurationException extends JobConfigurationException {
+public class NoSuchJobExceptionTests extends AbstractExceptionTests {
 
-	/**
-	 * Create an exception with the given message.
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
-	public NoSuchJobConfigurationException(String msg) {
-		super(msg);
+	public Exception getException(String msg) throws Exception {
+		return new NoSuchJobException(msg);
 	}
 
-	/**
-	 * @param msg The message to send to caller
-	 * @param e the cause of the exception
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String,
+	 * java.lang.Throwable)
 	 */
-	public NoSuchJobConfigurationException(String msg, Throwable e) {
-		super(msg, e);
+	public Exception getException(String msg, Throwable t) throws Exception {
+		return new NoSuchJobException(msg, t);
 	}
+
 }

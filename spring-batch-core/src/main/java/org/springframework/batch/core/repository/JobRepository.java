@@ -16,7 +16,7 @@
 
 package org.springframework.batch.core.repository;
 
-import org.springframework.batch.core.configuration.JobConfiguration;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
@@ -65,7 +65,7 @@ public interface JobRepository {
 	 *             job instance that would otherwise be returned
 	 * 
 	 */
-	public JobExecution findOrCreateJob(JobConfiguration jobConfiguration,
+	public JobExecution findOrCreateJob(Job job,
 			JobIdentifier jobIdentifier)
 			throws JobExecutionAlreadyRunningException;
 
@@ -78,7 +78,7 @@ public interface JobRepository {
 	 * @param job
 	 * @see JobInstance
 	 */
-	public void update(JobInstance job);
+	public void update(JobInstance jobInstance);
 
 	/**
 	 * Save or Update a {@link JobExecution}. If no ID is found a new instance
@@ -104,7 +104,7 @@ public interface JobRepository {
 	 * @param step
 	 * @see StepInstance
 	 */
-	public void update(StepInstance step);
+	public void update(StepInstance stepInstance);
 
 	/**
 	 * Save or Update a StepExecution. If no ID is found a new instance will be

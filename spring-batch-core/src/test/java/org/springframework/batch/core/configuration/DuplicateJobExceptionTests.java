@@ -16,20 +16,20 @@
 package org.springframework.batch.core.configuration;
 
 import org.springframework.batch.core.AbstractExceptionTests;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.DuplicateJobException;
 
 /**
  * @author Dave Syer
  * 
  */
-public class NoSuchJobConfigurationExceptionTests extends AbstractExceptionTests {
+public class DuplicateJobExceptionTests extends AbstractExceptionTests {
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
 	public Exception getException(String msg) throws Exception {
-		return new NoSuchJobConfigurationException(msg);
+		return new DuplicateJobException(msg);
 	}
 
 	/*
@@ -38,7 +38,7 @@ public class NoSuchJobConfigurationExceptionTests extends AbstractExceptionTests
 	 * java.lang.Throwable)
 	 */
 	public Exception getException(String msg, Throwable t) throws Exception {
-		return new NoSuchJobConfigurationException(msg, t);
+		return new DuplicateJobException(msg, t);
 	}
 
 }

@@ -16,20 +16,20 @@
 package org.springframework.batch.core.configuration;
 
 import org.springframework.batch.core.AbstractExceptionTests;
-import org.springframework.batch.core.configuration.JobConfigurationException;
+import org.springframework.batch.core.domain.JobException;
 
 /**
  * @author Dave Syer
  * 
  */
-public class JobConfigurationExceptionTests extends AbstractExceptionTests {
+public class JobExceptionTests extends AbstractExceptionTests {
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
 	public Exception getException(String msg) throws Exception {
-		return new JobConfigurationException(msg);
+		return new JobException(msg);
 	}
 
 	/*
@@ -38,7 +38,7 @@ public class JobConfigurationExceptionTests extends AbstractExceptionTests {
 	 * java.lang.Throwable)
 	 */
 	public Exception getException(String msg, Throwable t) throws Exception {
-		return new JobConfigurationException(msg, t);
+		return new JobException(msg, t);
 	}
 
 }

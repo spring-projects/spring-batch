@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.configuration;
+package org.springframework.batch.core.domain;
 
 import org.springframework.batch.core.tasklet.Tasklet;
 
 /**
  * Batch domain interface representing the configuration of a step. As with the
- * (@link JobConfiguration), step configuration is meant to explicitly represent
+ * (@link Job), step configuration is meant to explicitly represent
  * a the configuration of a step by a developer. This allows for the separation
  * of what a developer configures from the myriad of concerns required for
  * executing a job.
@@ -27,7 +27,7 @@ import org.springframework.batch.core.tasklet.Tasklet;
  * @author Dave Syer
  * 
  */
-public interface StepConfiguration {
+public interface Step {
 
 	/**
 	 * @return the name of this step configuration.

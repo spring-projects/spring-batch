@@ -16,7 +16,7 @@
 
 package org.springframework.batch.core.tasklet;
 
-import org.springframework.batch.core.configuration.StepConfiguration;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -32,7 +32,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * of this interface useful for differentiating different batch job types, or
  * for creating more flexibility within their batch jobs.
  * 
- * @see StepConfiguration
+ * @see Step
  * @author Lucas Ward
  * @author Dave Syer
  * 

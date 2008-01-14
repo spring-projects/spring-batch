@@ -17,6 +17,7 @@ package org.springframework.batch.core.configuration;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -24,27 +25,27 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  *
  */
-public class StepConfigurationSupportTests extends TestCase {
+public class StepSupportTests extends TestCase {
 
-	private StepConfigurationSupport configuration = new StepConfigurationSupport("step");
+	private StepSupport configuration = new StepSupport("step");
 	
 	/**
-	 * Test method for {@link org.springframework.batch.core.configuration.StepConfigurationSupport#StepConfigurationSupport()}.
+	 * Test method for {@link org.springframework.batch.core.domain.StepSupport#StepConfigurationSupport()}.
 	 */
 	public void testStepConfigurationSupport() {
-		configuration = new StepConfigurationSupport();
+		configuration = new StepSupport();
 		assertNull(configuration.getName());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.configuration.StepConfigurationSupport#getName()}.
+	 * Test method for {@link org.springframework.batch.core.domain.StepSupport#getName()}.
 	 */
 	public void testGetName() {
 		assertEquals("step", configuration.getName());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.configuration.StepConfigurationSupport#getStartLimit()}.
+	 * Test method for {@link org.springframework.batch.core.domain.StepSupport#getStartLimit()}.
 	 */
 	public void testGetStartLimit() {
 		assertEquals(Integer.MAX_VALUE, configuration.getStartLimit());
@@ -53,7 +54,7 @@ public class StepConfigurationSupportTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.configuration.StepConfigurationSupport#getTasklet()}.
+	 * Test method for {@link org.springframework.batch.core.domain.StepSupport#getTasklet()}.
 	 */
 	public void testGetTasklet() {
 		assertEquals(null, configuration.getTasklet());
@@ -67,7 +68,7 @@ public class StepConfigurationSupportTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.configuration.StepConfigurationSupport#isAllowStartIfComplete()}.
+	 * Test method for {@link org.springframework.batch.core.domain.StepSupport#isAllowStartIfComplete()}.
 	 */
 	public void testShouldAllowStartIfComplete() {
 		assertEquals(false, configuration.isAllowStartIfComplete());

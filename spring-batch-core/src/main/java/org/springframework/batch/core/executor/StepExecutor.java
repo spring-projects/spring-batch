@@ -16,7 +16,7 @@
 
 package org.springframework.batch.core.executor;
 
-import org.springframework.batch.core.configuration.StepConfiguration;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -25,7 +25,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * Interface for processing a step. Implementations are free to process the step
  * and return when finished, or to schedule the step for processing
  * concurrently, or in the future. The status of the execution should be
- * trackable with the step execution. The configuration should be treated as
+ * trackable with the step execution. The step should be treated as
  * immutable.<br/>
  * 
  * Because step execution parameters and policies can vary from step to step, a
@@ -39,13 +39,13 @@ import org.springframework.batch.repeat.ExitStatus;
 public interface StepExecutor {
 
 	/**
-	 * Process the step according to the given configuration. Implementations
+	 * Process the step according to the given step. Implementations
 	 * can be expected to modify their state when this method is called, to take
-	 * account of any policy information in the configuration. Thus it is not
+	 * account of any policy information in the step. Thus it is not
 	 * safe to re-use an instance of {@link StepExecutor} to process multiple
 	 * concurrent executions.
 	 * 
-	 * @param configuration
+	 * @param step
 	 *            the configuration to use when running the step. Contains a
 	 *            recipe for the business logic of an individual processing
 	 *            operation. Also used to determine policies for commit
@@ -59,7 +59,7 @@ public interface StepExecutor {
 	 *             if there is a problem that needs to be signalled to the
 	 *             caller
 	 */
-	ExitStatus process(StepConfiguration configuration,
+	ExitStatus process(Step step,
 			StepExecution stepExecution) throws StepInterruptedException,
 			BatchCriticalException;
 
@@ -69,5 +69,5 @@ public interface StepExecutor {
 	 * 
 	 * @param configuration
 	 */
-	void applyConfiguration(StepConfiguration configuration);
+	void applyConfiguration(Step configuration);
 }

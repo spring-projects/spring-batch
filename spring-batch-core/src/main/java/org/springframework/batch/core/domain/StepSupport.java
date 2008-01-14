@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.configuration;
+package org.springframework.batch.core.domain;
 
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**
  * Basic no-op support implementation for use as base class for
- * {@link StepConfiguration}.
+ * {@link Step}.
  * 
  * @author Dave Syer
  * 
  */
-public class StepConfigurationSupport implements StepConfiguration,
+public class StepSupport implements Step,
 		BeanNameAware {
 
 	private String name;
@@ -35,16 +35,16 @@ public class StepConfigurationSupport implements StepConfiguration,
 	private boolean saveRestartData = false;
 
 	/**
-	 * Default constructor for {@link StepConfigurationSupport}.
+	 * Default constructor for {@link StepSupport}.
 	 */
-	public StepConfigurationSupport() {
+	public StepSupport() {
 		super();
 	}
 
 	/**
 	 * @param string
 	 */
-	public StepConfigurationSupport(String string) {
+	public StepSupport(String string) {
 		super();
 		this.name = string;
 	}

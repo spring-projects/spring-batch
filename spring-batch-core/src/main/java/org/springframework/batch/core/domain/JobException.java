@@ -13,26 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.configuration;
+package org.springframework.batch.core.domain;
 
 /**
- * A runtime service locator interface for retrieving job configurations by
- * <code>name</code>.
+ * Base class for checked exceptions related to {@link Job}
+ * creation, registration or use.
  * 
  * @author Dave Syer
  * 
  */
-public interface JobConfigurationLocator {
+public class JobException extends Exception {
 
 	/**
-	 * Locates a {@link JobConfiguration} at runtime.
-	 * 
-	 * @param name the name of the {@link JobConfiguration} which should be
-	 * unique
-	 * @return a {@link JobConfiguration} identified by the given name
-	 * 
-	 * @throws NoSuchJobConfigurationException if the required configuratio can
-	 * not be found.
+	 * Create an exception with the given message.
 	 */
-	JobConfiguration getJobConfiguration(String name) throws NoSuchJobConfigurationException;
+	public JobException(String msg) {
+		super(msg);
+	}
+
+	/**
+	 * @param msg The message to send to caller
+	 * @param e the cause of the exception
+	 */
+	public JobException(String msg, Throwable e) {
+		super(msg, e);
+	}
+
 }

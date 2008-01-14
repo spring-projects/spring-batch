@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.configuration;
+package org.springframework.batch.core.domain;
 
 import java.util.Collection;
 
 /**
- * A listable extension of {@link JobConfigurationRegistry}.
+ * A listable extension of {@link JobRegistry}.
  * 
  * @author Dave Syer
  * 
  */
-public interface ListableJobConfigurationRegistry extends JobConfigurationRegistry {
+public interface ListableJobRegistry extends JobRegistry {
 
 	/**
 	 * Provides the currently registered configurations. The return value is
 	 * unmodifiable and disconnected from the underlying registry storage.
 	 * 
-	 * @return a collection of {@link JobConfiguration} instances. Empty if none
+	 * @return a collection of {@link Job} instances. Empty if none
 	 * are registered.
 	 */
 	Collection getJobConfigurations();

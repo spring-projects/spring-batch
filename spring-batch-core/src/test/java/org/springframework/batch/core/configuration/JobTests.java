@@ -17,28 +17,31 @@ package org.springframework.batch.core.configuration;
 
 import java.util.Collections;
 
+import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.StepSupport;
+
 import junit.framework.TestCase;
 
 /**
  * @author Dave Syer
  * 
  */
-public class JobConfigurationTests extends TestCase {
+public class JobTests extends TestCase {
 
-	JobConfiguration configuration = new JobConfiguration("job");
+	Job configuration = new Job("job");
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.JobConfiguration#JobConfiguration()}.
+	 * {@link org.springframework.batch.core.domain.Job#JobConfiguration()}.
 	 */
 	public void testJobConfiguration() {
-		configuration = new JobConfiguration();
+		configuration = new Job();
 		assertNull(configuration.getName());
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.JobConfiguration#setBeanName(java.lang.String)}.
+	 * {@link org.springframework.batch.core.domain.Job#setBeanName(java.lang.String)}.
 	 */
 	public void testSetBeanName() {
 		configuration.setBeanName("foo");
@@ -47,10 +50,10 @@ public class JobConfigurationTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.JobConfiguration#setBeanName(java.lang.String)}.
+	 * {@link org.springframework.batch.core.domain.Job#setBeanName(java.lang.String)}.
 	 */
 	public void testSetBeanNameWithNullName() {
-		configuration = new JobConfiguration(null);
+		configuration = new Job(null);
 		assertEquals(null, configuration.getName());
 		configuration.setBeanName("foo");
 		assertEquals("foo", configuration.getName());
@@ -58,25 +61,25 @@ public class JobConfigurationTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.JobConfiguration#setSteps(java.util.List)}.
+	 * {@link org.springframework.batch.core.domain.Job#setSteps(java.util.List)}.
 	 */
 	public void testSetSteps() {
-		configuration.setSteps(Collections.singletonList(new StepConfigurationSupport("step")));
-		assertEquals(1, configuration.getStepConfigurations().size());
+		configuration.setSteps(Collections.singletonList(new StepSupport("step")));
+		assertEquals(1, configuration.getSteps().size());
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.JobConfiguration#addStep(org.springframework.batch.core.configuration.StepConfiguration)}.
+	 * {@link org.springframework.batch.core.domain.Job#addStepInstance(org.springframework.batch.core.configuration.StepConfiguration)}.
 	 */
 	public void testAddStep() {
-		configuration.addStep(new StepConfigurationSupport("step"));
-		assertEquals(1, configuration.getStepConfigurations().size());
+		configuration.addStep(new StepSupport("step"));
+		assertEquals(1, configuration.getSteps().size());
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.JobConfiguration#setStartLimit(int)}.
+	 * {@link org.springframework.batch.core.domain.Job#setStartLimit(int)}.
 	 */
 	public void testSetStartLimit() {
 		assertEquals(Integer.MAX_VALUE, configuration.getStartLimit());
@@ -86,7 +89,7 @@ public class JobConfigurationTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.configuration.JobConfiguration#setRestartable(boolean)}.
+	 * {@link org.springframework.batch.core.domain.Job#setRestartable(boolean)}.
 	 */
 	public void testSetRestartable() {
 		assertFalse(configuration.isRestartable());

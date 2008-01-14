@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.configuration;
+package org.springframework.batch.core.domain;
+
 
 /**
- * Base class for checked exceptions related to {@link JobConfiguration}
- * creation, registration or use.
+ * Checked exception to indicate that a required {@link Job} is not
+ * available.
  * 
  * @author Dave Syer
  * 
  */
-public class JobConfigurationException extends Exception {
+public class NoSuchJobException extends JobException {
 
 	/**
 	 * Create an exception with the given message.
 	 */
-	public JobConfigurationException(String msg) {
+	public NoSuchJobException(String msg) {
 		super(msg);
 	}
 
@@ -35,8 +36,7 @@ public class JobConfigurationException extends Exception {
 	 * @param msg The message to send to caller
 	 * @param e the cause of the exception
 	 */
-	public JobConfigurationException(String msg, Throwable e) {
+	public NoSuchJobException(String msg, Throwable e) {
 		super(msg, e);
 	}
-
 }

@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.configuration;
+package org.springframework.batch.core.domain;
 
 /**
  * Checked exception that indicates a name clash when registering
- * {@link JobConfiguration} instances.
+ * {@link Job} instances.
  * 
  * @author Dave Syer
  * 
  */
-public class DuplicateJobConfigurationException extends JobConfigurationException {
+public class DuplicateJobException extends JobException {
 
 	/**
 	 * Create an exception with the given message.
 	 */
-	public DuplicateJobConfigurationException(String msg) {
+	public DuplicateJobException(String msg) {
 		super(msg);
 	}
 
@@ -35,7 +35,7 @@ public class DuplicateJobConfigurationException extends JobConfigurationExceptio
 	 * @param msg The message to send to caller
 	 * @param e the cause of the exception
 	 */
-	public DuplicateJobConfigurationException(String msg, Throwable e) {
+	public DuplicateJobException(String msg, Throwable e) {
 		super(msg, e);
 	}
 

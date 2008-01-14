@@ -19,7 +19,7 @@ package org.springframework.batch.core.runtime;
 import org.springframework.batch.core.domain.JobIdentifier;
 
 /**
- * A factory for {@link JobIdentifier} instances. A job configuration can be
+ * A factory for {@link JobIdentifier} instances. A job can be
  * executed with many possible runtime parameters, which identify the instance
  * of the job. This factory allows job identifiers to be created with different
  * properties according to the {@link JobIdentifier} strategy required. For
@@ -37,7 +37,7 @@ public interface JobIdentifierFactory {
 	 * Get a new {@link JobIdentifier} instance.
 	 * 
 	 * @param name
-	 *            the name of the job configuration.
+	 *            the name of the job.
 	 * @return a {@link JobIdentifier} with the same name.
 	 */
 	public JobIdentifier getJobIdentifier(String name);
