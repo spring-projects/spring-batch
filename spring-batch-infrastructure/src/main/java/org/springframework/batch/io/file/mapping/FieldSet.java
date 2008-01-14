@@ -31,7 +31,7 @@ import org.springframework.util.StringUtils;
  * @author Rob Harrop
  * @author Dave Syer
  */
-public final class FieldSet {
+public class FieldSet {
 
 	private final static String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
 
