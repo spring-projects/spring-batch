@@ -16,7 +16,7 @@
 		class="org.springframework.batch.execution.scope.StepScope" />
 
 	<bean id="jobConfigurationRegistryBeanPostProcessor"
-		class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
+		class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
 		<property name="jobConfigurationRegistry"
 			ref="jobConfigurationRegistry" />
 	</bean>
@@ -24,13 +24,13 @@
 	<bean id="jobLauncher"
 		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="simpleJobRepository" />
-		<property name="jobConfigurationLocator"
+		<property name="jobLocator"
 			ref="jobConfigurationRegistry" />
 		<property name="jobExecutor" ref="jobExecutor" />
 	</bean>
 
 	<bean id="jobConfigurationRegistry"
-		class="org.springframework.batch.execution.configuration.MapJobConfigurationRegistry" />
+		class="org.springframework.batch.execution.configuration.MapJobRegistry" />
 
 	<aop:config>
 		<aop:advisor
@@ -104,13 +104,13 @@
 	</bean>
 
 	<bean id="simpleJob"
-		class="org.springframework.batch.core.configuration.JobConfiguration"
+		class="org.springframework.batch.core.domain.Job"
 		abstract="true">
 		<property name="restartable" value="true" />
 	</bean>
 
 	<bean id="simpleStep"
-		class="org.springframework.batch.execution.step.SimpleStepConfiguration"
+		class="org.springframework.batch.execution.step.SimpleStep"
 		abstract="true">
 		<property name="allowStartIfComplete" value="true" />
 		<property name="saveRestartData" value="false" />

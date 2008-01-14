@@ -22,15 +22,15 @@ import java.util.Map;
  * @author Dave Syer
  * 
  */
-public interface JobConfigurationLoader {
+public interface ExportedJobLoader {
 	
 	void loadResource(String path);
 	
 	Map getConfigurations();
 	
-	Object getJobConfiguration(String path);
+	String getJob(String path);
 	
-	Object getProperty(String path);
+	String getProperty(String path);
 
 	void setProperty(String path, String value);
 

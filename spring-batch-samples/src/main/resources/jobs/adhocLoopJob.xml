@@ -121,7 +121,7 @@
 	<bean id="jobLauncher"
 		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="simpleJobRepository" />
-		<property name="jobConfigurationLocator"
+		<property name="jobLocator"
 			ref="jobConfigurationRegistry" />
 		<property name="jobExecutor">
 			<bean parent="jobExecutor">
@@ -139,11 +139,11 @@
 				class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
 		</property>
 		<property name="autoStart" value="false" />
-		<property name="jobConfigurationName" value="loopJob" />
+		<property name="jobName" value="loopJob" />
 	</bean>
 
 	<bean id="loader"
-		class="org.springframework.batch.sample.DefaultJobConfigurationLoader">
+		class="org.springframework.batch.sample.DefaultJobLoader">
 		<property name="registry" ref="jobConfigurationRegistry" />
 	</bean>
 

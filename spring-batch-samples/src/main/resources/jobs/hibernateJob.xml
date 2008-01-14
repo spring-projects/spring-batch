@@ -17,7 +17,7 @@
 	<bean id="hibernateJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1"
-				class="org.springframework.batch.execution.step.RepeatOperationsStepConfiguration">
+				class="org.springframework.batch.execution.step.RepeatOperationsStep">
 				<property name="tasklet">
 					<bean
 						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">

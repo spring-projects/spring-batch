@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.batch.core.configuration.JobConfiguration;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -25,7 +25,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 
 	private JobRepository repository;
 
-	private JobConfiguration jobConfiguration;
+	private Job jobConfiguration;
 
 	private Set jobExecutionIds = new HashSet();
 
@@ -44,7 +44,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 	protected void onSetUpInTransaction() throws Exception {
 		jobIdentifier = new ScheduledJobIdentifier("Job1", "TestStream", 
 				new SimpleDateFormat("yyyyMMdd").parse("20070505"));
-		jobConfiguration = new JobConfiguration("test-job");
+		jobConfiguration = new Job("test-job");
 		jobConfiguration.setRestartable(true);
 	}
 

@@ -13,7 +13,7 @@
 	can be integrated into a batch job.
 </description>
 
-	<bean class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
+	<bean class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
 		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
 	</bean>
 

@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample;
 
-import org.springframework.batch.core.configuration.JobConfiguration;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.execution.runtime.DefaultJobIdentifier;
 import org.springframework.context.ApplicationContext;
@@ -41,7 +41,7 @@ public abstract class AbstractBatchLauncherTests extends
 	private static final String CONTAINER_DEFINITION_LOCATION = "simple-container-definition.xml";
 
 	JobLauncher launcher;
-	private JobConfiguration jobConfiguration;
+	private Job job;
 
 	/*
 	 * (non-Javadoc)
@@ -60,26 +60,27 @@ public abstract class AbstractBatchLauncherTests extends
 	}
 
 	/**
-	 * Public setter for the {@link JobConfiguration} property.
+	 * Public setter for the {@link Job} property.
 	 * 
-	 * @param jobConfiguration
-	 *            the jobConfiguration to set
+	 * @param job the job to set
 	 */
-	public void setJobConfiguration(JobConfiguration jobConfiguration) {
-		this.jobConfiguration = jobConfiguration;
+	public void setJob(Job job) {
+		this.job = job;
 	}
 
 	protected String getJobName() {
-		return jobConfiguration.getName();
+		return job.getName();
 	}
 
 	/**
-	 * @throws Exception 
+	 * @throws Exception
 	 * 
 	 */
 	public void testLaunchJob() throws Exception {
-		// Make sure the job is unique by the test case that runs it, not just its name:
-		launcher.run(new DefaultJobIdentifier(getJobName(), this.getClass().getName()));
+		// Make sure the job is unique by the test case that runs it, not just
+		// its name:
+		launcher.run(new DefaultJobIdentifier(getJobName(), this.getClass()
+				.getName()));
 		launcher.stop();
 	}
 }

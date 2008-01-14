@@ -13,13 +13,13 @@
 	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
 	<bean id="footballJob"
-		class="org.springframework.batch.core.configuration.JobConfiguration">
+		class="org.springframework.batch.core.domain.Job">
 		<property name="restartable" value="true" />
 		<property name="startLimit" value="100" />
 		<property name="steps">
 			<list>
 				<bean id="playerload"
-					class="org.springframework.batch.execution.step.SimpleStepConfiguration">
+					class="org.springframework.batch.execution.step.SimpleStep">
 					<property name="commitInterval" value="100"></property>
 					<property name="startLimit" value="100" />
 					<property name="saveRestartData" value="true" />
@@ -44,7 +44,7 @@
 					</property>
 				</bean>
 				<bean id="gameLoad"
-					class="org.springframework.batch.execution.step.SimpleStepConfiguration">
+					class="org.springframework.batch.execution.step.SimpleStep">
 					<property name="commitInterval" value="1000" />
 					<property name="startLimit" value="100" />
 					<property name="saveRestartData" value="true" />
@@ -68,7 +68,7 @@
 					</property>
 				</bean>
 				<bean id="playerSummarization"
-					class="org.springframework.batch.execution.step.SimpleStepConfiguration">
+					class="org.springframework.batch.execution.step.SimpleStep">
 					<property name="commitInterval" value="100" />
 					<property name="startLimit" value="100" />
 					<property name="saveRestartData" value="true" />

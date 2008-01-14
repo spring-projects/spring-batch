@@ -52,7 +52,7 @@
 					<property name="allowStartIfComplete" value="false" />
 				</bean>
 				<bean id="loading"
-					class="org.springframework.batch.execution.step.RepeatOperationsStepConfiguration">
+					class="org.springframework.batch.execution.step.RepeatOperationsStep">
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">

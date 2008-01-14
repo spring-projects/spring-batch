@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.ListableJobConfigurationRegistry;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.ListableJobRegistry;
+import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyAccessorUtils;
@@ -18,10 +18,10 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 
-public class DefaultJobConfigurationLoader implements JobConfigurationLoader,
+public class DefaultJobLoader implements JobLoader,
 		ApplicationContextAware {
 
-	private ListableJobConfigurationRegistry registry;
+	private ListableJobRegistry registry;
 	private ApplicationContext applicationContext;
 	private Map configurations = new HashMap();
 
@@ -30,7 +30,7 @@ public class DefaultJobConfigurationLoader implements JobConfigurationLoader,
 		this.applicationContext = applicationContext;
 	}
 
-	public void setRegistry(ListableJobConfigurationRegistry registry) {
+	public void setRegistry(ListableJobRegistry registry) {
 		this.registry = registry;
 	}
 
@@ -38,7 +38,7 @@ public class DefaultJobConfigurationLoader implements JobConfigurationLoader,
 		Map result = new HashMap(configurations);
 		for (Iterator iterator = registry.getJobConfigurations().iterator(); iterator
 				.hasNext();) {
-			JobConfiguration configuration = (JobConfiguration) iterator.next();
+			Job configuration = (Job) iterator.next();
 			String name = configuration.getName();
 			if (!configurations.containsKey(name)) {
 				result.put(name, "<unknown path>: " + configuration);
@@ -50,7 +50,7 @@ public class DefaultJobConfigurationLoader implements JobConfigurationLoader,
 	public void loadResource(String path) {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
 				new String[] { path }, applicationContext);
-		String[] names = context.getBeanNamesForType(JobConfiguration.class);
+		String[] names = context.getBeanNamesForType(Job.class);
 		for (int i = 0; i < names.length; i++) {
 			String name = names[i];
 			configurations.put(name, path);
@@ -59,8 +59,8 @@ public class DefaultJobConfigurationLoader implements JobConfigurationLoader,
 	
 	public Object getJobConfiguration(String name) {
 		try {
-			return registry.getJobConfiguration(name);
-		} catch (NoSuchJobConfigurationException e) {
+			return registry.getJob(name);
+		} catch (NoSuchJobException e) {
 			return null;
 		}
 	}

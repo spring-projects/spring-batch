@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.configuration.StepConfiguration;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
@@ -76,7 +76,7 @@ public class OrderItemReader extends AbstractItemReader {
     }
 
     /**
-     * @see org.springframework.batch.execution.io.FieldSetCallback#process(StepConfiguration, StepExecution)
+     * @see org.springframework.batch.execution.io.FieldSetCallback#process(Step, StepExecution)
      */
     private void process(FieldSet fieldSet) {
         //finish processing if we hit the end of file
