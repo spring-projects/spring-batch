@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.JobConfigurationLocator;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.JobLocator;
+import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -66,7 +66,7 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	private JobRepository jobRepository;
 
 	// there is no sensible default for this
-	private JobConfigurationLocator jobConfigurationLocator;
+	private JobLocator jobLocator;
 
 	private List listeners = new ArrayList();
 
@@ -85,14 +85,14 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	}
 
 	/**
-	 * Check mandatory properties (jobConfigurationLocator, jobRepository).
+	 * Check mandatory properties (jobLocator, jobRepository).
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jobRepository, "JobRepository must be provided.");
-		Assert.notNull(jobConfigurationLocator,
-				"JobConfigurationLocator must be provided.");
+		Assert.notNull(jobLocator,
+				"JobLocator must be provided.");
 	}
 
 	/**
@@ -107,14 +107,14 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	}
 
 	/**
-	 * Setter for injection of {@link JobConfigurationLocator}.
+	 * Setter for injection of {@link JobLocator}.
 	 * 
-	 * @param jobConfigurationLocator
+	 * @param jobLocator
 	 *            the jobConfigurationLocator to set
 	 */
-	public void setJobConfigurationLocator(
-			JobConfigurationLocator jobConfigurationLocator) {
-		this.jobConfigurationLocator = jobConfigurationLocator;
+	public void setJobLocator(
+			JobLocator jobLocator) {
+		this.jobLocator = jobLocator;
 	}
 
 	/**
@@ -136,22 +136,22 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	}
 
 	/**
-	 * Locates a {@link JobConfiguration} by using the name of the provided
-	 * {@link JobIdentifier} and the {@link JobConfigurationLocator}.
+	 * Locates a {@link Job} by using the name of the provided
+	 * {@link JobIdentifier} and the {@link JobLocator}.
 	 * 
 	 * @param jobIdentifier
 	 *            the identifier of the job that is being prepared.
 	 * 
 	 * @throws IllegalArgumentException
 	 *             if the {@link JobIdentifier} is null or its name is null
-	 * @throws NoSuchJobConfigurationException
-	 *             if the {@link JobConfigurationLocator} does not contain a
-	 *             {@link JobConfiguration} with the name provided.
+	 * @throws NoSuchJobException
+	 *             if the {@link JobLocator} does not contain a
+	 *             {@link Job} with the name provided.
 	 * 
 	 * @see org.springframework.batch.execution.launch.JobExecutorFacade#createExecutionFrom(org.springframework.batch.core.domain.JobIdentifier)
 	 */
 	public JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
-			throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException {
+			throws NoSuchJobException, JobExecutionAlreadyRunningException {
 		Assert.notNull(jobIdentifier, "JobIdentifier must not be null.");
 		Assert.notNull(jobIdentifier.getName(),
 				"JobIdentifier name must not be null.");
@@ -161,10 +161,10 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 						"A job with this JobIdentifier is already executing in this container: "+jobIdentifier);
 		};
 
-		JobConfiguration jobConfiguration = jobConfigurationLocator
-				.getJobConfiguration(jobIdentifier.getName());
+		Job job = jobLocator
+				.getJob(jobIdentifier.getName());
 
-		return jobRepository.findOrCreateJob(jobConfiguration,
+		return jobRepository.findOrCreateJob(job,
 				jobIdentifier);
 		
 	}
@@ -175,22 +175,22 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	 * 
 	 * @see org.springframework.batch.execution.launch.JobExecutorFacade#start(JobExecution)
 	 * 
-	 * @throws NoSuchJobConfigurationException
-	 *             if the {@link JobConfigurationLocator} does not contain a
-	 *             {@link JobConfiguration} with the name provided by the
+	 * @throws NoSuchJobException
+	 *             if the {@link JobLocator} does not contain a
+	 *             {@link Job} with the name provided by the
 	 *             enclosed {@link JobIdentifier}.
 	 * 
 	 */
 	public void start(JobExecution execution)
-			throws NoSuchJobConfigurationException {
+			throws NoSuchJobException {
 
-		JobConfiguration jobConfiguration = jobConfigurationLocator
-				.getJobConfiguration(execution.getJob().getIdentifier()
+		Job job = jobLocator
+				.getJob(execution.getJob().getIdentifier()
 						.getName());
 
 		this.before(execution);
 		try {
-			jobExecutor.run(jobConfiguration, execution);
+			jobExecutor.run(job, execution);
 		} finally {
 			this.after(execution);
 		}

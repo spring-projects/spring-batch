@@ -25,11 +25,11 @@ import java.util.TimerTask;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
@@ -57,7 +57,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 
 		InterruptibleContainer container = new InterruptibleContainer();
 		launcher.setJobExecutorFacade(container);
-		launcher.setJobConfigurationName(new JobConfiguration("foo").getName());
+		launcher.setJobName(new Job("foo").getName());
 
 		JobExecution execution = launcher.run();
 		// give the thread some time to start up...
@@ -91,7 +91,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 
 		InterruptibleContainer container = new InterruptibleContainer();
 		launcher.setJobExecutorFacade(container);
-		launcher.setJobConfigurationName("foo");
+		launcher.setJobName("foo");
 
 		JobExecution execution = launcher.run();
 		// give the thread some time to start up...
@@ -117,7 +117,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 
 		InterruptibleContainer container = new InterruptibleContainer();
 		launcher.setJobExecutorFacade(container);
-		launcher.setJobConfigurationName(new JobConfiguration("foo").getName());
+		launcher.setJobName(new Job("foo").getName());
 
 		launcher.run();
 		// give the thread some time to start up:
@@ -190,7 +190,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 		control.expectAndReturn(facade
 				.createExecutionFrom(jobRuntimeInformation), execution);
 		facade.start(execution);
-		control.setThrowable(new NoSuchJobConfigurationException("SPAM"));
+		control.setThrowable(new NoSuchJobException("SPAM"));
 
 		control.replay();
 		launcher.run(jobRuntimeInformation);
@@ -215,13 +215,13 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 		}
 
 		public void start(JobExecution execution)
-				throws NoSuchJobConfigurationException {
+				throws NoSuchJobException {
 			start();
 			execution.setExitStatus(new ExitStatus(false, "COMPLETED_BY_TEST"));
 		}
 
 		public JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
-				throws NoSuchJobConfigurationException {
+				throws NoSuchJobException {
 			return new JobExecution(new JobInstance(jobIdentifier));
 		}
 

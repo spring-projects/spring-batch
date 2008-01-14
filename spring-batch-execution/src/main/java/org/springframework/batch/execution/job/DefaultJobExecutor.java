@@ -21,11 +21,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.common.ExceptionClassifier;
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
@@ -61,16 +61,16 @@ public class DefaultJobExecutor implements JobExecutor {
 	 * Run the specified job by looping through the steps and delegating to the
 	 * {@link StepExecutor}.
 	 * 
-	 * @see org.springframework.batch.core.executor.JobExecutor#run(org.springframework.batch.core.configuration.JobConfiguration,
+	 * @see org.springframework.batch.core.executor.JobExecutor#run(org.springframework.batch.core.domain.Job,
 	 *      org.springframework.batch.core.domain.JobExecution)
 	 */
-	public ExitStatus run(JobConfiguration configuration, JobExecution execution)
+	public ExitStatus run(Job job, JobExecution execution)
 			throws BatchCriticalException {
 
-		JobInstance job = execution.getJob();
+		JobInstance jobInstance = execution.getJob();
 		updateStatus(execution, BatchStatus.STARTING);
 
-		List steps = job.getSteps();
+		List stepInstances = jobInstance.getStepInstances();
 
 		ExitStatus status = ExitStatus.FAILED;
 
@@ -78,29 +78,29 @@ public class DefaultJobExecutor implements JobExecutor {
 
 			int startedCount = 0;
 
-			List stepConfigurations = configuration
-					.getStepConfigurations();
-			for (Iterator i = steps.iterator(), j = stepConfigurations.iterator(); i.hasNext()
+			List steps = job
+					.getSteps();
+			for (Iterator i = stepInstances.iterator(), j = steps.iterator(); i.hasNext()
 					&& j.hasNext();) {
 
-				StepInstance step = (StepInstance) i.next();
-				StepConfiguration stepConfiguration = (StepConfiguration) j
+				StepInstance stepInstance = (StepInstance) i.next();
+				Step step = (Step) j
 						.next();
 				
-				if (shouldStart(step, stepConfiguration)) {
+				if (shouldStart(stepInstance, step)) {
 					startedCount++;
 					updateStatus(execution, BatchStatus.STARTED);
 					StepExecutor stepExecutor = stepExecutorFactory
-							.getExecutor(stepConfiguration);
-					StepExecution stepExecution = new StepExecution(step,
+							.getExecutor(step);
+					StepExecution stepExecution = new StepExecution(stepInstance,
 							execution);
-					status = stepExecutor.process(stepConfiguration,
+					status = stepExecutor.process(step,
 							stepExecution);
 				}
 			}
 			
 			if (startedCount==0) {
-				if (stepConfigurations.size()>0) {
+				if (steps.size()>0) {
 					status = ExitStatus.NOOP.addExitDescription("All steps already completed.  No processing was done.");
 				} else {
 					status = ExitStatus.NOOP.addExitDescription("No steps configured for this job.");
@@ -143,25 +143,25 @@ public class DefaultJobExecutor implements JobExecutor {
 	 * Given a step and configuration, return true if the step should start,
 	 * false if it should not, and throw an exception if the job should finish.
 	 */
-	private boolean shouldStart(StepInstance step,
-			StepConfiguration stepConfiguration) {
+	private boolean shouldStart(StepInstance stepInstance,
+			Step step) {
 
-		if (step.getStatus() == BatchStatus.COMPLETED
-				&& stepConfiguration.isAllowStartIfComplete() == false) {
+		if (stepInstance.getStatus() == BatchStatus.COMPLETED
+				&& step.isAllowStartIfComplete() == false) {
 			// step is complete, false should be returned, indicated that the
 			// step should
 			// not be started
 			return false;
 		}
 
-		if (step.getStepExecutionCount() < stepConfiguration.getStartLimit()) {
+		if (stepInstance.getStepExecutionCount() < step.getStartLimit()) {
 			// step start count is less than start max, return true
 			return true;
 		} else {
 			// start max has been exceeded, throw an exception.
 			throw new BatchCriticalException(
-					"Maximum start limit exceeded for step: " + step.getName()
-							+ "StartMax: " + stepConfiguration.getStartLimit());
+					"Maximum start limit exceeded for step: " + stepInstance.getName()
+							+ "StartMax: " + step.getStartLimit());
 		}
 	}
 

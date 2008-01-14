@@ -18,7 +18,7 @@ package org.springframework.batch.execution.step.simple;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.execution.step.SimpleStepConfiguration;
+import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.exception.handler.DefaultExceptionHandler;
 
@@ -28,19 +28,19 @@ import org.springframework.batch.repeat.exception.handler.DefaultExceptionHandle
  */
 public class SimpleStepConfigurationTests extends TestCase {
 
-	SimpleStepConfiguration configuration = new SimpleStepConfiguration("foo");
+	SimpleStep configuration = new SimpleStep("foo");
 	
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.SimpleStepConfiguration#SimpleStepConfiguration()}.
+	 * Test method for {@link org.springframework.batch.execution.step.SimpleStep#SimpleStepConfiguration()}.
 	 */
 	public void testSimpleStepConfiguration() {
 		assertNotNull(configuration.getName());
-		configuration = new SimpleStepConfiguration();
+		configuration = new SimpleStep();
 		assertNull(configuration.getName());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.SimpleStepConfiguration#SimpleStepConfiguration(org.springframework.batch.core.tasklet.Tasklet)}.
+	 * Test method for {@link org.springframework.batch.execution.step.SimpleStep#SimpleStepConfiguration(org.springframework.batch.core.tasklet.Tasklet)}.
 	 */
 	public void testSimpleStepConfigurationTasklet() {
 		Tasklet tasklet = new Tasklet() {
@@ -48,12 +48,12 @@ public class SimpleStepConfigurationTests extends TestCase {
 				return ExitStatus.FINISHED;
 			}
 		};
-		configuration = new SimpleStepConfiguration(tasklet);
+		configuration = new SimpleStep(tasklet);
 		assertEquals(tasklet, configuration.getTasklet());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.SimpleStepConfiguration#getCommitInterval()}.
+	 * Test method for {@link org.springframework.batch.execution.step.SimpleStep#getCommitInterval()}.
 	 */
 	public void testGetCommitInterval() {
 		assertEquals(1, configuration.getCommitInterval());
@@ -62,7 +62,7 @@ public class SimpleStepConfigurationTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.AbstractStepConfiguration#getExceptionHandler()}.
+	 * Test method for {@link org.springframework.batch.execution.step.AbstractStep#getExceptionHandler()}.
 	 */
 	public void testGetExceptionHandler() {
 		assertNull(configuration.getExceptionHandler());
@@ -71,7 +71,7 @@ public class SimpleStepConfigurationTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.AbstractStepConfiguration#getExceptionHandler()}.
+	 * Test method for {@link org.springframework.batch.execution.step.AbstractStep#getExceptionHandler()}.
 	 */
 	public void testSkipLimit() {
 		assertEquals(0, configuration.getSkipLimit());
@@ -80,7 +80,7 @@ public class SimpleStepConfigurationTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.AbstractStepConfiguration#getSkipLimit()}.
+	 * Test method for {@link org.springframework.batch.execution.step.AbstractStep#getSkipLimit()}.
 	 */
 	public void testGetSkipLimit() {
 		assertEquals(0, configuration.getSkipLimit());
@@ -89,7 +89,7 @@ public class SimpleStepConfigurationTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.AbstractStepConfiguration#isSaveRestartData()}.
+	 * Test method for {@link org.springframework.batch.execution.step.AbstractStep#isSaveRestartData()}.
 	 */
 	public void testIsSaveRestartData() {
 		assertEquals(false, configuration.isSaveRestartData());

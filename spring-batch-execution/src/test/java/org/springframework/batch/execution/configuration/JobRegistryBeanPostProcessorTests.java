@@ -19,9 +19,9 @@ import java.util.Collection;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.configuration.DuplicateJobConfigurationException;
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.DuplicateJobException;
+import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -29,9 +29,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Dave Syer
  * 
  */
-public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
+public class JobRegistryBeanPostProcessorTests extends TestCase {
 
-	private JobConfigurationRegistryBeanPostProcessor processor = new JobConfigurationRegistryBeanPostProcessor();
+	private JobRegistryBeanPostProcessor processor = new JobRegistryBeanPostProcessor();
 
 	public void testInitialization() throws Exception {
 		try {
@@ -56,19 +56,19 @@ public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
 	}
 
 	public void testAfterInitializationWithCorrectType() throws Exception {
-		MapJobConfigurationRegistry registry = new MapJobConfigurationRegistry();
+		MapJobRegistry registry = new MapJobRegistry();
 		processor.setJobConfigurationRegistry(registry);
-		JobConfiguration configuration = new JobConfiguration();
+		Job configuration = new Job();
 		configuration.setBeanName("foo");
 		assertEquals(configuration, processor.postProcessAfterInitialization(
 				configuration, "bar"));
-		assertEquals(configuration, registry.getJobConfiguration("foo"));
+		assertEquals(configuration, registry.getJob("foo"));
 	}
 
 	public void testAfterInitializationWithDuplicate() throws Exception {
-		MapJobConfigurationRegistry registry = new MapJobConfigurationRegistry();
+		MapJobRegistry registry = new MapJobRegistry();
 		processor.setJobConfigurationRegistry(registry);
-		JobConfiguration configuration = new JobConfiguration();
+		Job configuration = new Job();
 		configuration.setBeanName("foo");
 		processor.postProcessAfterInitialization(configuration, "bar");
 		try {
@@ -76,22 +76,22 @@ public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
 			fail("Expected FatalBeanException");
 		} catch (FatalBeanException e) {
 			// Expected
-			assertTrue(e.getCause() instanceof DuplicateJobConfigurationException);
+			assertTrue(e.getCause() instanceof DuplicateJobException);
 		}
 	}
 
 	public void testUnregisterOnDestroy() throws Exception {
-		MapJobConfigurationRegistry registry = new MapJobConfigurationRegistry();
+		MapJobRegistry registry = new MapJobRegistry();
 		processor.setJobConfigurationRegistry(registry);
-		JobConfiguration configuration = new JobConfiguration();
+		Job configuration = new Job();
 		configuration.setBeanName("foo");
 		assertEquals(configuration, processor.postProcessAfterInitialization(
 				configuration, "bar"));
 		processor.destroy();
 		try {
-			assertEquals(null, registry.getJobConfiguration("foo"));
+			assertEquals(null, registry.getJob("foo"));
 			fail("Expected NoSuchJobConfigurationException");
-		} catch (NoSuchJobConfigurationException e) {
+		} catch (NoSuchJobException e) {
 			// expected
 		}
 	}
@@ -99,11 +99,11 @@ public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
 	public void testExecutionWithApplicationContext() throws Exception {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
 				"test-context.xml", getClass());
-		MapJobConfigurationRegistry registry = (MapJobConfigurationRegistry) context
+		MapJobRegistry registry = (MapJobRegistry) context
 				.getBean("registry");
 		Collection configurations = registry.getJobConfigurations();
 		// System.err.println(configurations);
-		String[] names = context.getBeanNamesForType(JobConfiguration.class);
+		String[] names = context.getBeanNamesForType(Job.class);
 		int count = names.length;
 		// Each concrete bean of type JobConfiguration is registered...
 		assertEquals(count, configurations.size());
@@ -111,21 +111,21 @@ public class JobConfigurationRegistryBeanPostProcessorTests extends TestCase {
 		// explicit name or beanName (using property setter): in this case then
 		// child beans will have the same name and will be re-registered (and
 		// override, if the registry supports that).
-		assertNotNull(registry.getJobConfiguration("test-job"));
+		assertNotNull(registry.getJob("test-job"));
 		assertEquals(context.getBean("test-job-with-name"), registry
-				.getJobConfiguration("foo"));
+				.getJob("foo"));
 		assertEquals(context.getBean("test-job-with-bean-name"), registry
-				.getJobConfiguration("bar"));
+				.getJob("bar"));
 		assertEquals(context.getBean("test-job-with-parent-and-name"), registry
-				.getJobConfiguration("spam"));
+				.getJob("spam"));
 		assertEquals(context.getBean("test-job-with-parent-and-bean-name"),
-				registry.getJobConfiguration("bucket"));
+				registry.getJob("bucket"));
 		assertEquals(context.getBean("test-job-with-concrete-parent"), registry
-				.getJobConfiguration("maps"));
+				.getJob("maps"));
 		assertEquals(context.getBean("test-job-with-concrete-parent-and-name"),
-				registry.getJobConfiguration("oof"));
+				registry.getJob("oof"));
 		assertEquals(context
 				.getBean("test-job-with-concrete-parent-and-bean-name"),
-				registry.getJobConfiguration("rab"));
+				registry.getJob("rab"));
 	}
 }

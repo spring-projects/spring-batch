@@ -20,14 +20,14 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.configuration.StepConfigurationSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.step.RepeatOperationsHolder;
-import org.springframework.batch.execution.step.SimpleStepConfiguration;
+import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
@@ -49,11 +49,11 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 	}
 
 	public void testSuccessfulStepExecutor() throws Exception {
-		assertNotNull(factory.getExecutor(new SimpleStepConfiguration()));
+		assertNotNull(factory.getExecutor(new SimpleStep()));
 	}
 
 	public void testSuccessfulExceptionHandler() throws Exception {
-		SimpleStepConfiguration configuration = new SimpleStepConfiguration();
+		SimpleStep configuration = new SimpleStep();
 		final List list = new ArrayList();
 		configuration.setExceptionHandler(new ExceptionHandler() {
 			public void handleException(RepeatContext context,
@@ -139,7 +139,7 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 
 	public void testUnsuccessfulWrongConfiguration() throws Exception {
 		try {
-			factory.getExecutor(new StepConfigurationSupport());
+			factory.getExecutor(new StepSupport());
 			fail("Expected IllegalStateException");
 		} catch (IllegalStateException e) {
 			// expected
@@ -153,7 +153,7 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 	public void testUnsuccessfulNoJobRepository() throws Exception {
 		try {
 			factory = new SimpleStepExecutorFactory();
-			factory.getExecutor(new SimpleStepConfiguration());
+			factory.getExecutor(new SimpleStep());
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException e) {
 			// expected
@@ -177,7 +177,7 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 	 * @author Dave Syer
 	 * 
 	 */
-	public class SimpleHolderStepConfiguration extends SimpleStepConfiguration
+	public class SimpleHolderStepConfiguration extends SimpleStep
 			implements RepeatOperationsHolder {
 		private RepeatOperations chunkOperations;
 		private RepeatOperations stepOperations;

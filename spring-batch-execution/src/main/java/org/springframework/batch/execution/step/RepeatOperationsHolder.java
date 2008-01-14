@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.execution.step;
 
-import org.springframework.batch.core.configuration.StepConfiguration;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.repeat.RepeatOperations;
 
@@ -24,7 +24,7 @@ import org.springframework.batch.repeat.RepeatOperations;
  * available for the inner loop (chunk operations) and outer loop (step
  * operations) in a {@link StepExecutor}. The inner loop is normally going to
  * be in-process and thread-bound so it makes sense for
- * {@link StepConfiguration} implementations to be able to override the
+ * {@link Step} implementations to be able to override the
  * strategies that control that loop.
  * 
  * @author Dave Syer

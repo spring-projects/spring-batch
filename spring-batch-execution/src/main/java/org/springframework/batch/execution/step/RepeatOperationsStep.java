@@ -16,18 +16,18 @@
 
 package org.springframework.batch.execution.step;
 
-import org.springframework.batch.core.configuration.StepConfiguration;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.repeat.RepeatOperations;
 
 /**
- * {@link StepConfiguration} implementation that allows full configuration of
+ * {@link Step} implementation that allows full step of
  * the {@link RepeatOperations} that will be used in the chunk (inner loop).
  * 
  * @author Lucas Ward
  * @author Dave Syer
  * 
  */
-public class RepeatOperationsStepConfiguration extends AbstractStepConfiguration implements RepeatOperationsHolder {
+public class RepeatOperationsStep extends AbstractStep implements RepeatOperationsHolder {
 
 	// default chunkOperations is null
 	private RepeatOperations chunkOperations;

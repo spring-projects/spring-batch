@@ -25,13 +25,13 @@ import junit.framework.TestCase;
 
 import org.easymock.ArgumentsMatcher;
 import org.easymock.MockControl;
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.StepConfiguration;
-import org.springframework.batch.core.configuration.StepConfigurationSupport;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.execution.repository.dao.JobDao;
@@ -50,13 +50,13 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	SimpleJobRepository jobRepository;
 
-	JobConfiguration jobConfiguration;
+	Job jobConfiguration;
 
 	SimpleJobIdentifier jobRuntimeInformation;
 
-	StepConfiguration stepConfiguration1;
+	Step stepConfiguration1;
 
-	StepConfiguration stepConfiguration2;
+	Step stepConfiguration2;
 
 	MockControl jobDaoControl = MockControl.createControl(JobDao.class);
 
@@ -87,13 +87,13 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 		jobRuntimeInformation = new SimpleJobIdentifier("RepositoryTest");
 
-		jobConfiguration = new JobConfiguration();
+		jobConfiguration = new Job();
 		jobConfiguration.setBeanName("RepositoryTest");
 		jobConfiguration.setRestartable(true);
 
-		stepConfiguration1 = new StepConfigurationSupport("TestStep1");
+		stepConfiguration1 = new StepSupport("TestStep1");
 
-		stepConfiguration2 = new StepConfigurationSupport("TestStep2");
+		stepConfiguration2 = new StepSupport("TestStep2");
 
 		List stepConfigurations = new ArrayList();
 		stepConfigurations.add(stepConfiguration1);
@@ -144,7 +144,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.replay();
 		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJob();
 		assertTrue(job.equals(databaseJob));
-		List jobSteps = job.getSteps();
+		List jobSteps = job.getStepInstances();
 		Iterator it = jobSteps.iterator();
 		StepInstance step = (StepInstance) it.next();
 		assertTrue(step.equals(databaseStep1));
@@ -191,7 +191,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.replay();
 		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJob();
 		assertTrue(job.equals(databaseJob));
-		List jobSteps = job.getSteps();
+		List jobSteps = job.getStepInstances();
 		Iterator it = jobSteps.iterator();
 		StepInstance step = (StepInstance) it.next();
 		assertTrue(step.equals(databaseStep1));
@@ -280,7 +280,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.replay();
 		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJob();
 		assertTrue(job.equals(databaseJob));
-		List jobSteps = job.getSteps();
+		List jobSteps = job.getStepInstances();
 		Iterator it = jobSteps.iterator();
 		StepInstance step = (StepInstance) it.next();
 		assertTrue(step.equals(databaseStep1));
@@ -420,7 +420,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		stepDaoControl.replay();
 		jobDaoControl.replay();
 		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJob();
-		List jobSteps = job.getSteps();
+		List jobSteps = job.getStepInstances();
 		Iterator it = jobSteps.iterator();
 		StepInstance step = (StepInstance) it.next();
 		assertTrue(step.equals(databaseStep1));
@@ -464,7 +464,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.replay();
 		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJob();
 		assertTrue(job.equals(databaseJob));
-		List jobSteps = job.getSteps();
+		List jobSteps = job.getStepInstances();
 		Iterator it = jobSteps.iterator();
 		StepInstance step = (StepInstance) it.next();
 		assertTrue(step.equals(databaseStep1));

@@ -9,7 +9,7 @@
 
 	<bean id="simpleContainerLauncher" class="org.springframework.batch.execution.bootstrap.support.StubJobLauncher" />
 
-	<bean id="jobConfigurationRegistry" class="org.springframework.batch.execution.configuration.MapJobConfigurationRegistry"/>
+	<bean id="jobConfigurationRegistry" class="org.springframework.batch.execution.configuration.MapJobRegistry"/>
 
 	<bean class="org.springframework.batch.execution.bootstrap.support.SimpleJvmExitCodeMapper" />
 

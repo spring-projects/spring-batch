@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.execution.step.simple;
 
-import org.springframework.batch.core.configuration.JobConfiguration;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
@@ -32,7 +32,7 @@ public class JobRepositorySupport implements JobRepository {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.container.common.repository.JobRepository#findOrCreateJob(org.springframework.batch.container.common.domain.JobConfiguration)
 	 */
-	public JobExecution findOrCreateJob(JobConfiguration jobConfiguration, JobIdentifier runtimeInformation) {
+	public JobExecution findOrCreateJob(Job jobConfiguration, JobIdentifier runtimeInformation) {
 		return null;
 	}
 

@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.execution.launch;
 
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 
 /**
@@ -39,7 +39,7 @@ public interface JobLauncher {
 	 * @throws JobExecutionAlreadyRunningException 
 	 * 
 	 */
-	public JobExecution run() throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException;
+	public JobExecution run() throws NoSuchJobException, JobExecutionAlreadyRunningException;
 
 	/**
 	 * Start a job execution with the given name and other runtime information
@@ -51,11 +51,11 @@ public interface JobLauncher {
 	 * @return the exit code from the job if it returns synchronously. If the
 	 *         implementation is asynchronous, the status might well be unknown.
 	 * 
-	 * @throws NoSuchJobConfigurationException
+	 * @throws NoSuchJobException
 	 * @throws JobExecutionAlreadyRunningException 
 	 */
 	public JobExecution run(String jobName)
-			throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException;
+			throws NoSuchJobException, JobExecutionAlreadyRunningException;
 
 	/**
 	 * Start a job execution with the given runtime information.
@@ -63,10 +63,10 @@ public interface JobLauncher {
 	 * @return the exit code from the job if it returns synchronously. If the
 	 *         implementation is asynchronous, the status might well be unknown.
 	 * 
-	 * @throws NoSuchJobConfigurationException
+	 * @throws NoSuchJobException
 	 */
 	public JobExecution run(JobIdentifier jobIdentifier)
-			throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException;
+			throws NoSuchJobException, JobExecutionAlreadyRunningException;
 
 	/**
 	 * Stop the current job executions if there are any. If not, no action will

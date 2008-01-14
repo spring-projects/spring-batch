@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.execution.step;
 
-import org.springframework.batch.core.configuration.StepConfiguration;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
@@ -29,12 +29,12 @@ import org.springframework.util.Assert;
 /**
  * A {@link StepExecutorFactory} that uses a prototype bean in the application
  * context to satisfy the factory contract. If the prototype bean and
- * {@link StepConfiguration} are of known (simple) type, they can be combined to
- * add the commit interval information from the configuration.<br/>
+ * {@link Step} are of known (simple) type, they can be combined to
+ * add the commit interval information from the step.<br/>
  * 
  * The nominated bean has to be a prototype because its state may be changed
  * before it is used, applying values for things like commit interval from the
- * {@link StepConfiguration}.
+ * {@link Step}.
  * 
  * @author Dave Syer
  * 
@@ -81,7 +81,7 @@ public class PrototypeBeanStepExecutorFactory implements StepExecutorFactory,
 	 * <ul>
 	 * 
 	 * <li>If the {@link StepExecutor} refers to a {@link SimpleStepExecutor},
-	 * and {@link StepConfiguration} is an instance of
+	 * and {@link Step} is an instance of
 	 * {@link RepeatOperationsHolder}, then the {@link RepeatOperations} for
 	 * the chunk will be pulled from there directly. This gives maximum
 	 * flexibility for clients to control the properties of the iteration. For
@@ -89,7 +89,7 @@ public class PrototypeBeanStepExecutorFactory implements StepExecutorFactory,
 	 * execution, like the commit interval, this is not necessary.</li>
 	 * 
 	 * <li>If the {@link StepExecutor} is a {@link SimpleStepExecutor} and the
-	 * configuration is a {@link SimpleStepConfiguration} then this
+	 * step is a {@link SimpleStep} then this
 	 * implementation modifies the state of the {@link StepExecutor} to set the
 	 * completion policy of the chunk operations. In this case the chunk
 	 * operations cannot be set by the client of this factory.</li>
@@ -102,18 +102,18 @@ public class PrototypeBeanStepExecutorFactory implements StepExecutorFactory,
 	 * @throws IllegalStateException
 	 *             if no {@link StepExecutor} can be located.
 	 * 
-	 * @see StepExecutorFactory#getExecutor(StepConfiguration)
+	 * @see StepExecutorFactory#getExecutor(Step)
 	 */
-	public StepExecutor getExecutor(StepConfiguration configuration) {
+	public StepExecutor getExecutor(Step step) {
 		StepExecutor executor = getStepExecutor();
-		executor.applyConfiguration(configuration);
+		executor.applyConfiguration(step);
 		return executor;
 	}
 
 	/**
 	 * Setter for the bean name of the {@link StepExecutor} to use. The
 	 * corresponding bean must be prototype scoped, so that its properties can
-	 * be overridden per execution by the {@link StepConfiguration}.
+	 * be overridden per execution by the {@link Step}.
 	 * 
 	 * @param stepExecutor
 	 *            the stepExecutor to set

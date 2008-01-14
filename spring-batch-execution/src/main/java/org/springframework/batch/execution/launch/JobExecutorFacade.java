@@ -16,9 +16,9 @@
 
 package org.springframework.batch.execution.launch;
 
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 
 /**
@@ -34,27 +34,27 @@ interface JobExecutorFacade {
 	/**
 	 * Prepare a job execution identifiable by the {@link JobIdentifier}. THis
 	 * can then be used to run the job with the {@link #start(JobExecution)}
-	 * method. Implementations normally require a job configuration to be
+	 * method. Implementations normally require a job to be
 	 * locatable corresponding to the {@link JobIdentifier}, matching them at
 	 * least by name.
 	 * 
 	 * @param jobIdentifier
 	 *            the identifier of the job to start
 	 * 
-	 * @throws NoSuchJobConfigurationException
+	 * @throws NoSuchJobException
 	 * @throws JobExecutionAlreadyRunningException 
 	 */
 	JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
-			throws NoSuchJobConfigurationException, JobExecutionAlreadyRunningException;
+			throws NoSuchJobException, JobExecutionAlreadyRunningException;
 
 	/**
 	 * Start a job execution.
 	 * 
 	 * @param execution
 	 *            the execution of the job to start
-	 * @throws NoSuchJobConfigurationException 
+	 * @throws NoSuchJobException 
 	 */
-	void start(JobExecution execution) throws NoSuchJobConfigurationException;
+	void start(JobExecution execution) throws NoSuchJobException;
 
 	/**
 	 * Stop the job execution that was started with this runtime information.

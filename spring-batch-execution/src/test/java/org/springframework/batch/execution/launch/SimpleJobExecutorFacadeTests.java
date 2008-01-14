@@ -25,11 +25,11 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.JobConfigurationLocator;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobLocator;
+import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -56,7 +56,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	private MockControl jobRepositoryControl = MockControl
 			.createControl(JobRepository.class);
 
-	private JobConfiguration jobConfiguration = new JobConfiguration();
+	private Job jobConfiguration = new Job();
 
 	private volatile boolean running = false;
 
@@ -100,7 +100,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 			throws Exception {
 		jobIdentifier = new SimpleJobIdentifier("bar");
 		jobExecutor = new JobExecutor() {
-			public ExitStatus run(JobConfiguration configuration,
+			public ExitStatus run(Job configuration,
 					JobExecution execution) throws BatchCriticalException {
 				jobExecution = execution;
 				return ExitStatus.FINISHED;
@@ -113,9 +113,9 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 		jobRepositoryControl.setReturnValue(jobExecution);
 		jobRepositoryControl.replay();
 		jobExecutorFacade
-				.setJobConfigurationLocator(new JobConfigurationLocator() {
-					public JobConfiguration getJobConfiguration(String name)
-							throws NoSuchJobConfigurationException {
+				.setJobLocator(new JobLocator() {
+					public Job getJob(String name)
+							throws NoSuchJobException {
 						return jobConfiguration;
 					}
 				});
@@ -124,7 +124,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 
 	public void testIsRunning() throws Exception {
 		jobExecutorFacade.setJobExecutor(new JobExecutor() {
-			public ExitStatus run(JobConfiguration configuration,
+			public ExitStatus run(Job configuration,
 					JobExecution execution) throws BatchCriticalException {
 				while (running) {
 					try {
@@ -138,9 +138,9 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 			}
 		});
 		jobExecutorFacade
-				.setJobConfigurationLocator(new JobConfigurationLocator() {
-					public JobConfiguration getJobConfiguration(String name)
-							throws NoSuchJobConfigurationException {
+				.setJobLocator(new JobLocator() {
+					public Job getJob(String name)
+							throws NoSuchJobException {
 						return jobConfiguration;
 					}
 				});
@@ -150,7 +150,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 			public void run() {
 				try {
 					jobExecutorFacade.start(jobExecution);
-				} catch (NoSuchJobConfigurationException e) {
+				} catch (NoSuchJobException e) {
 					throw new IllegalStateException("Shouldn't happen");
 				}
 			}

@@ -44,7 +44,7 @@ public interface ExportedJobLauncher {
 	String run();
 
 	/**
-	 * Launch a job configuration with the given name.
+	 * Launch a job with the given name.
 	 * 
 	 * @param name the name of the job to launch
 	 * @return a representation of the {@link ExitStatus} returned by a

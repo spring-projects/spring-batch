@@ -7,13 +7,13 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean class="org.springframework.batch.execution.configuration.JobConfigurationRegistryBeanPostProcessor">
+	<bean class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
 		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
 	</bean>
 
-	<bean id="test-job" class="org.springframework.batch.core.configuration.JobConfiguration">
+	<bean id="test-job" class="org.springframework.batch.core.domain.Job">
 		<property name="steps">
-			<bean id="step1" class="org.springframework.batch.execution.step.SimpleStepConfiguration">
+			<bean id="step1" class="org.springframework.batch.execution.step.SimpleStep">
 				<constructor-arg>
 					<bean
 						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">

@@ -27,11 +27,11 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.JobConfigurationLocator;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.JobLocator;
+import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -70,7 +70,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	private JobRepository jobRepository;
 
 	// there is no sensible default for this
-	private JobConfigurationLocator jobConfigurationLocator;
+	private JobLocator jobLocator;
 
 	// this can be defaulted from some other properties (see
 	// afterPropertiesSet())
@@ -80,9 +80,9 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 
 	private List listeners = new ArrayList();
 
-	private String jobConfigurationName;
+	private String jobName;
 
-	// Do not autostart by default - allow user to set job configuration
+	// Do not autostart by default - allow user to set a job 
 	// later and then manually start:
 	private volatile boolean autoStart = false;
 
@@ -107,13 +107,13 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	}
 
 	/**
-	 * Setter for the {@link JobConfiguration} that this launcher will run.
+	 * Setter for the {@link Job} that this launcher will run.
 	 * 
-	 * @param jobConfiguration
-	 *            the jobConfiguration to set
+	 * @param jobName
+	 *            the job name to set
 	 */
-	public void setJobConfigurationName(String jobConfiguration) {
-		this.jobConfigurationName = jobConfiguration;
+	public void setJobName(String jobName) {
+		this.jobName = jobName;
 	}
 
 	/**
@@ -137,15 +137,15 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	}
 
 	/**
-	 * Setter for injection of {@link JobConfigurationLocator}. Mandatory with
+	 * Setter for injection of {@link JobLocator}. Mandatory with
 	 * no default.
 	 * 
-	 * @param jobConfigurationLocator
-	 *            the jobConfigurationLocator to set
+	 * @param jobLocator
+	 *            the jobLocator to set
 	 */
-	public void setJobConfigurationLocator(
-			JobConfigurationLocator jobConfigurationLocator) {
-		this.jobConfigurationLocator = jobConfigurationLocator;
+	public void setJobLocator(
+			JobLocator jobLocator) {
+		this.jobLocator = jobLocator;
 	}
 
 	/**
@@ -184,12 +184,12 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	public void afterPropertiesSet() throws Exception {
 		if (jobExecutorFacade == null) {
 			logger.debug("Using SimpleJobExecutorFacade");
-			Assert.notNull(jobConfigurationLocator);
+			Assert.notNull(jobLocator);
 			Assert.notNull(jobExecutor);
 			Assert.notNull(jobRepository);
 			SimpleJobExecutorFacade jobExecutorFacade = new SimpleJobExecutorFacade();
 			jobExecutorFacade
-					.setJobConfigurationLocator(jobConfigurationLocator);
+					.setJobLocator(jobLocator);
 			jobExecutorFacade.setJobExecutionListeners(listeners);
 			jobExecutorFacade.setJobExecutor(jobExecutor);
 			jobExecutorFacade.setJobRepository(jobRepository);
@@ -203,7 +203,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * 
 	 * @throws BatchConfigurationException
 	 *             if the job tries to but cannot start because of a
-	 *             {@link NoSuchJobConfigurationException}.
+	 *             {@link NoSuchJobException}.
 	 * 
 	 * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
 	 * 
@@ -213,7 +213,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 				&& !isRunning()) {
 			try {
 				run();
-			} catch (NoSuchJobConfigurationException e) {
+			} catch (NoSuchJobException e) {
 				throw new BatchConfigurationException(
 						"Cannot start job on context refresh because it does not exist",
 						e);
@@ -232,10 +232,10 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * 
 	 * @param jobIdentifier
 	 * @return
-	 * @throws NoSuchJobConfigurationException
+	 * @throws NoSuchJobException
 	 */
 	protected final void runInternal(JobExecution execution)
-			throws NoSuchJobConfigurationException {
+			throws NoSuchJobException {
 
 		JobIdentifier jobIdentifier = execution.getJob().getIdentifier();
 		
@@ -257,14 +257,14 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	/**
 	 * Start the job using the task executor provided.
 	 * 
-	 * @throws NoSuchJobConfigurationException
+	 * @throws NoSuchJobException
 	 *             if the identifier cannot be used to locate a
-	 *             {@link JobConfiguration}.
+	 *             {@link Job}.
 	 * 
 	 * @see org.springframework.batch.execution.launch.SimpleJobLauncher#run(org.springframework.batch.core.domain.JobIdentifier)
 	 */
 	public JobExecution run(final JobIdentifier jobIdentifier)
-			throws NoSuchJobConfigurationException,
+			throws NoSuchJobException,
 			JobExecutionAlreadyRunningException {
 
 		if (getJobExecution(jobIdentifier) != null) {
@@ -292,13 +292,13 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 					holder.start();
 					runInternal(execution);
 					
-				} catch (NoSuchJobConfigurationException e) {
+				} catch (NoSuchJobException e) {
 					applicationEventPublisher
 							.publishEvent(new RepeatOperationsApplicationEvent(
 									jobIdentifier, "No such job",
 									RepeatOperationsApplicationEvent.ERROR));
 					logger.error(
-							"JobConfiguration could not be located inside Runnable for identifier: ["
+							"Job could not be located inside Runnable for identifier: ["
 									+ jobIdentifier + "]", e);
 				} finally {
 					holder.stop();
@@ -316,14 +316,14 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * 
 	 * @param name
 	 *            the name to assign to the job
-	 * @throws NoSuchJobConfigurationException
+	 * @throws NoSuchJobException
 	 * @throws JobExecutionAlreadyRunningException
 	 */
 	public JobExecution run(String name)
-			throws NoSuchJobConfigurationException,
+			throws NoSuchJobException,
 			JobExecutionAlreadyRunningException {
 		if (name == null) {
-			throw new NoSuchJobConfigurationException(
+			throw new NoSuchJobException(
 					"Null job name cannot be located.");
 		}
 		JobIdentifier runtimeInformation = jobIdentifierFactory
@@ -334,23 +334,23 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	/**
 	 * Start a job execution with default name and other runtime information
 	 * provided by the factory. If a job is already running has no effect. The
-	 * default name is taken from the enclosed {@link JobConfiguration}.
+	 * default name is taken from the enclosed {@link Job}.
 	 * 
-	 * @throws NoSuchJobConfigurationException
+	 * @throws NoSuchJobException
 	 * 
-	 * @throws NoSuchJobConfigurationException
-	 *             if the job configuration cannot be located
+	 * @throws NoSuchJobException
+	 *             if the job cannot be located
 	 * @throws JobExecutionAlreadyRunningException
 	 * 
 	 * @see #setJobIdentifierFactory(JobIdentifierFactory)
 	 * @see org.springframework.context.Lifecycle#start()
 	 */
-	public JobExecution run() throws NoSuchJobConfigurationException,
+	public JobExecution run() throws NoSuchJobException,
 			JobExecutionAlreadyRunningException {
-		if (jobConfigurationName != null) {
-			return this.run(jobConfigurationName);
+		if (jobName != null) {
+			return this.run(jobName);
 		}
-		throw new NoSuchJobConfigurationException(
+		throw new NoSuchJobException(
 				"Null default job name cannot be located.");
 	}
 

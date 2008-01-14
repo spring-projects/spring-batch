@@ -45,10 +45,10 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 				new Integer(JVM_EXITCODE_COMPLETED));
 		mapping.put(ExitStatus.FAILED.getExitCode(), 
 				new Integer(JVM_EXITCODE_GENERIC_ERROR));
-		mapping.put(ExitCodeMapper.JOB_CONFIGURATION_NOT_PROVIDED, 
-				new Integer(JVM_EXITCODE_JOB_CONFIGURATION_ERROR));
-		mapping.put(ExitCodeMapper.NO_SUCH_JOB_CONFIGURATION, 
-				new Integer(JVM_EXITCODE_JOB_CONFIGURATION_ERROR));
+		mapping.put(ExitCodeMapper.JOB_NOT_PROVIDED, 
+				new Integer(JVM_EXITCODE_JOB_ERROR));
+		mapping.put(ExitCodeMapper.NO_SUCH_JOB, 
+				new Integer(JVM_EXITCODE_JOB_ERROR));
 	}
 
 	public Map getMapping() {

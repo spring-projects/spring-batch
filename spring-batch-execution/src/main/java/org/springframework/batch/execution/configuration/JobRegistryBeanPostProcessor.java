@@ -19,10 +19,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.springframework.batch.core.configuration.DuplicateJobConfigurationException;
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.JobConfigurationLocator;
-import org.springframework.batch.core.configuration.JobConfigurationRegistry;
+import org.springframework.batch.core.domain.DuplicateJobException;
+import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobLocator;
+import org.springframework.batch.core.domain.JobRegistry;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.DisposableBean;
@@ -31,28 +31,28 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.util.Assert;
 
 /**
- * A {@link BeanPostProcessor} that registers {@link JobConfiguration} beans
- * with a {@link JobConfigurationRegistry}. Include a bean of this type along
+ * A {@link BeanPostProcessor} that registers {@link Job} beans
+ * with a {@link JobRegistry}. Include a bean of this type along
  * with your job configuration, and use the same
- * {@link JobConfigurationRegistry} as a {@link JobConfigurationLocator} when
- * you need to locate a {@link JobConfigurationLocator} to launch.
+ * {@link JobRegistry} as a {@link JobLocator} when
+ * you need to locate a {@link JobLocator} to launch.
  * 
  * @author Dave Syer
  * 
  */
-public class JobConfigurationRegistryBeanPostProcessor implements BeanPostProcessor, InitializingBean, DisposableBean {
+public class JobRegistryBeanPostProcessor implements BeanPostProcessor, InitializingBean, DisposableBean {
 
 	// It doesn't make sense for this to have a default value...
-	private JobConfigurationRegistry jobConfigurationRegistry = null;
+	private JobRegistry jobConfigurationRegistry = null;
 
 	private Collection jobConfigurations = new HashSet();
 
 	/**
-	 * Injection setter for {@link JobConfigurationRegistry}.
+	 * Injection setter for {@link JobRegistry}.
 	 * 
 	 * @param jobConfigurationRegistry the jobConfigurationRegistry to set
 	 */
-	public void setJobConfigurationRegistry(JobConfigurationRegistry jobConfigurationRegistry) {
+	public void setJobConfigurationRegistry(JobRegistry jobConfigurationRegistry) {
 		this.jobConfigurationRegistry = jobConfigurationRegistry;
 	}
 
@@ -66,34 +66,34 @@ public class JobConfigurationRegistryBeanPostProcessor implements BeanPostProces
 	}
 
 	/**
-	 * De-register all the {@link JobConfiguration} instances that were
+	 * De-register all the {@link Job} instances that were
 	 * regsistered by this post processor.
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
 		for (Iterator iter = jobConfigurations.iterator(); iter.hasNext();) {
-			JobConfiguration jobConfiguration = (JobConfiguration) iter.next();
+			Job jobConfiguration = (Job) iter.next();
 			jobConfigurationRegistry.unregister(jobConfiguration);
 		}
 		jobConfigurations.clear();
 	}
 
 	/**
-	 * If the bean is an instance of {@link JobConfiguration} then register it.
+	 * If the bean is an instance of {@link Job} then register it.
 	 * @throws FatalBeanException if there is a
-	 * {@link DuplicateJobConfigurationException}.
+	 * {@link DuplicateJobException}.
 	 * 
 	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization(java.lang.Object,
 	 * java.lang.String)
 	 */
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		if (bean instanceof JobConfiguration) {
-			JobConfiguration jobConfiguration = (JobConfiguration) bean;
+		if (bean instanceof Job) {
+			Job jobConfiguration = (Job) bean;
 			try {
 				jobConfigurationRegistry.register(jobConfiguration);
 				jobConfigurations.add(jobConfiguration);
 			}
-			catch (DuplicateJobConfigurationException e) {
+			catch (DuplicateJobException e) {
 				throw new FatalBeanException("Cannot register job configuration", e);
 			}
 		}

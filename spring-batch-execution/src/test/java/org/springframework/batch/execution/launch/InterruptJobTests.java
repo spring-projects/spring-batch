@@ -19,13 +19,13 @@ import java.util.Collections;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.execution.bootstrap.support.ThreadInterruptJobExecutionListener;
-import org.springframework.batch.execution.configuration.MapJobConfigurationRegistry;
+import org.springframework.batch.execution.configuration.MapJobRegistry;
 import org.springframework.batch.execution.launch.JobExecutorFacade;
 import org.springframework.batch.execution.launch.SimpleJobExecutorFacade;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
@@ -55,10 +55,10 @@ public class InterruptJobTests extends TestCase {
 		facade.setJobExecutionListeners(Collections
 				.singletonList(new ThreadInterruptJobExecutionListener()));
 
-		MapJobConfigurationRegistry registry = new MapJobConfigurationRegistry();
-		facade.setJobConfigurationLocator(registry);
+		MapJobRegistry registry = new MapJobRegistry();
+		facade.setJobLocator(registry);
 
-		registry.register(new JobConfiguration("foo"));
+		registry.register(new Job("foo"));
 		final SimpleJobIdentifier identifier = new SimpleJobIdentifier("foo");
 		final JobExecution execution = facade.createExecutionFrom(identifier);
 
@@ -67,7 +67,7 @@ public class InterruptJobTests extends TestCase {
 			public void run() {
 				try {
 					facade.start(execution);
-				} catch (NoSuchJobConfigurationException e) {
+				} catch (NoSuchJobException e) {
 					fail("Unexpected NoSuchJobConfigurationException");
 				}
 			}
@@ -100,7 +100,7 @@ public class InterruptJobTests extends TestCase {
 		 * @see org.springframework.batch.core.executor.JobExecutor#run(org.springframework.batch.core.configuration.JobConfiguration,
 		 *      org.springframework.batch.core.domain.JobExecution)
 		 */
-		public ExitStatus run(JobConfiguration configuration,
+		public ExitStatus run(Job configuration,
 				JobExecution execution) throws BatchCriticalException {
 			try {
 				// 1 seconds should be long enough to allow the thread to be

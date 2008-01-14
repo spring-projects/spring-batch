@@ -22,12 +22,12 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.configuration.StepConfigurationSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.tasklet.Tasklet;
@@ -36,7 +36,7 @@ import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
-import org.springframework.batch.execution.step.SimpleStepConfiguration;
+import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -63,7 +63,7 @@ public class DefaultStepExecutorTests extends TestCase {
 
 	private SimpleStepExecutor stepExecutor;
 
-	private StepConfigurationSupport stepConfiguration;
+	private StepSupport stepConfiguration;
 
 	private RepeatTemplate template;
 
@@ -93,7 +93,7 @@ public class DefaultStepExecutorTests extends TestCase {
 		super.setUp();
 		stepExecutor = new SimpleStepExecutor();
 		stepExecutor.setRepository(new JobRepositorySupport());
-		stepConfiguration = new SimpleStepConfiguration();
+		stepConfiguration = new SimpleStep();
 		stepConfiguration.setTasklet(getTasklet(new String[] { "foo", "bar",
 				"spam" }));
 		template = new RepeatTemplate();
@@ -393,7 +393,7 @@ public class DefaultStepExecutorTests extends TestCase {
 	}
 	
 	public void testApplyConfigurationWithExceptionHandler() throws Exception {
-		SimpleStepConfiguration stepConfiguration = new SimpleStepConfiguration("foo");
+		SimpleStep stepConfiguration = new SimpleStep("foo");
 		final List list = new ArrayList();
 		stepExecutor.setStepOperations(new RepeatTemplate() {
 			public void setExceptionHandler(ExceptionHandler exceptionHandler) {
@@ -406,7 +406,7 @@ public class DefaultStepExecutorTests extends TestCase {
 	}
 
 	public void testApplyConfigurationWithZeroSkipLimit() throws Exception {
-		SimpleStepConfiguration stepConfiguration = new SimpleStepConfiguration("foo");
+		SimpleStep stepConfiguration = new SimpleStep("foo");
 		stepConfiguration.setSkipLimit(0);
 		final List list = new ArrayList();
 		stepExecutor.setStepOperations(new RepeatTemplate() {
@@ -419,7 +419,7 @@ public class DefaultStepExecutorTests extends TestCase {
 	}
 
 	public void testApplyConfigurationWithNonZeroSkipLimit() throws Exception {
-		SimpleStepConfiguration stepConfiguration = new SimpleStepConfiguration("foo");
+		SimpleStep stepConfiguration = new SimpleStep("foo");
 		stepConfiguration.setSkipLimit(1);
 		final List list = new ArrayList();
 		stepExecutor.setStepOperations(new RepeatTemplate() {

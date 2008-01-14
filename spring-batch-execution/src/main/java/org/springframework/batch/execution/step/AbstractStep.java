@@ -15,13 +15,13 @@
  */
 package org.springframework.batch.execution.step;
 
-import org.springframework.batch.core.configuration.StepConfiguration;
-import org.springframework.batch.core.configuration.StepConfigurationSupport;
+import org.springframework.batch.core.domain.Step;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**
- * A {@link StepConfiguration} implementation that provides common behaviour to
+ * A {@link Step} implementation that provides common behaviour to
  * subclasses. Implements {@link BeanNameAware} so that if no name is provided
  * explicitly it will be inferred from the bean definition in Spring
  * configuration.
@@ -29,7 +29,7 @@ import org.springframework.beans.factory.BeanNameAware;
  * @author Dave Syer
  * 
  */
-public class AbstractStepConfiguration extends StepConfigurationSupport {
+public class AbstractStep extends StepSupport {
 
 	private int skipLimit = 0;
 
@@ -38,7 +38,7 @@ public class AbstractStepConfiguration extends StepConfigurationSupport {
 	/**
 	 * Default constructor.
 	 */
-	public AbstractStepConfiguration() {
+	public AbstractStep() {
 		super();
 	}
 
@@ -46,7 +46,7 @@ public class AbstractStepConfiguration extends StepConfigurationSupport {
 	 * Convenient constructor for setting only the name property.
 	 * @param name
 	 */
-	public AbstractStepConfiguration(String name) {
+	public AbstractStep(String name) {
 		super(name);
 	}
 

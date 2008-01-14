@@ -1,8 +1,8 @@
 package org.springframework.batch.execution.bootstrap.support;
 
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.execution.launch.JobLauncher;
 
 /**
@@ -29,19 +29,19 @@ public class StubJobLauncher implements JobLauncher {
 		return isRunning;
 	}
 
-	public JobExecution run() throws NoSuchJobConfigurationException {
+	public JobExecution run() throws NoSuchJobException {
 		lastRunCalled = RUN_NO_ARGS;
 		return returnValue;
 	}
 
 	public JobExecution run(String jobName)
-			throws NoSuchJobConfigurationException {
+			throws NoSuchJobException {
 		lastRunCalled = RUN_JOB_NAME;
 		return returnValue;
 	}
 
 	public JobExecution run(JobIdentifier jobIdentifier)
-			throws NoSuchJobConfigurationException {
+			throws NoSuchJobException {
 		lastRunCalled = RUN_JOB_IDENTIFIER;
 		return returnValue;
 	}

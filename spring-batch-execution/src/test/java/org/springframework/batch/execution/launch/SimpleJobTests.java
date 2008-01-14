@@ -22,12 +22,12 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
@@ -37,7 +37,7 @@ import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory;
-import org.springframework.batch.execution.step.SimpleStepConfiguration;
+import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.item.ItemProcessor;
@@ -78,7 +78,7 @@ public class SimpleJobTests extends TestCase {
 		jobExecutor.setJobRepository(repository);
 		stepLifecycle.setRepository(repository);
 		jobExecutor.setStepExecutorFactory(new StepExecutorFactory() {
-			public StepExecutor getExecutor(StepConfiguration configuration) {
+			public StepExecutor getExecutor(Step configuration) {
 				return stepLifecycle;
 			}
 		});
@@ -112,12 +112,12 @@ public class SimpleJobTests extends TestCase {
 
 	public void testSimpleJob() throws Exception {
 
-		JobConfiguration jobConfiguration = new JobConfiguration();
+		Job jobConfiguration = new Job();
 		JobIdentifier runtimeInformation = new ScheduledJobIdentifierFactory()
 						.getJobIdentifier("real.job");
 
-		jobConfiguration.addStep(new SimpleStepConfiguration(getTasklet("foo", "bar")));
-		jobConfiguration.addStep(new SimpleStepConfiguration(getTasklet("spam")));
+		jobConfiguration.addStep(new SimpleStep(getTasklet("foo", "bar")));
+		jobConfiguration.addStep(new SimpleStep(getTasklet("spam")));
 
 		JobInstance job = repository.findOrCreateJob(jobConfiguration, runtimeInformation).getJob();
 
@@ -134,7 +134,7 @@ public class SimpleJobTests extends TestCase {
 
 	public void testSimpleJobWithRecovery() throws Exception {
 
-		JobConfiguration jobConfiguration = new JobConfiguration();
+		Job jobConfiguration = new Job();
 		JobIdentifier runtimeInformation = new SimpleJobIdentifier("real.job");
 		final List throwables = new ArrayList();
 
@@ -162,7 +162,7 @@ public class SimpleJobTests extends TestCase {
 		 * definition above)...
 		 */
 		final ItemOrientedTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
-		StepConfiguration step = new SimpleStepConfiguration(module);
+		Step step = new SimpleStep(module);
 		module.setItemProcessor(new ItemProcessor() {
 			public void process(Object data) throws Exception {
 				throw new RuntimeException("Try again Dummy!");
@@ -183,10 +183,10 @@ public class SimpleJobTests extends TestCase {
 
 	public void testExceptionTerminates() throws Exception {
 
-		JobConfiguration jobConfiguration = new JobConfiguration();
+		Job jobConfiguration = new Job();
 		JobIdentifier runtimeInformation = new SimpleJobIdentifier("real.job");
 		final ItemOrientedTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
-		StepConfiguration step = new SimpleStepConfiguration(module);
+		Step step = new SimpleStep(module);
 		module.setItemProcessor(new ItemProcessor() {
 			public void process(Object data) throws Exception {
 				throw new RuntimeException("Foo");

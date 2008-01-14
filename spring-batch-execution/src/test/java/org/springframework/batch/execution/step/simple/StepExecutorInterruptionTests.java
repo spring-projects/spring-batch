@@ -20,14 +20,14 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.StepConfigurationSupport;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
@@ -37,7 +37,7 @@ import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.execution.step.SimpleStepConfiguration;
+import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -52,7 +52,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private JobInstance job;
 
-	private StepConfigurationSupport stepConfiguration;
+	private StepSupport stepConfiguration;
 
 	private SimpleStepExecutor executor;
 
@@ -60,8 +60,8 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 		jobRepository = new SimpleJobRepository(jobDao, stepDao);
 
-		JobConfiguration jobConfiguration = new JobConfiguration();
-		stepConfiguration = new SimpleStepConfiguration();
+		Job jobConfiguration = new Job();
+		stepConfiguration = new SimpleStep();
 		jobConfiguration.addStep(stepConfiguration);
 		JobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
 		jobConfiguration.setBeanName("testJob");
@@ -73,7 +73,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 		executor.setRepository(jobRepository);
 
-		List steps = job.getSteps();
+		List steps = job.getStepInstances();
 		final StepInstance step = (StepInstance) steps.get(0);
 		JobExecution jobExecutionContext = new JobExecution(new JobInstance(null, new Long(0)));
 		final StepExecution stepExecution = new StepExecution(step, jobExecutionContext);

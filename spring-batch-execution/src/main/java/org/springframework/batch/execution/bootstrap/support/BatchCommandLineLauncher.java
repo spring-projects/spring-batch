@@ -18,7 +18,7 @@ package org.springframework.batch.execution.bootstrap.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
@@ -45,14 +45,14 @@ import org.springframework.util.Assert;
  * 
  * <p>
  * With any launch of a batch job within Spring Batch, a minimum of two contexts
- * must be loaded. One is the context containing the JobConfiguration, the other
+ * must be loaded. One is the context containing the Job, the other
  * contains the 'Execution Environment'. That is, the JobExecutorFacade (which
  * contains all the executors, plus the repository), the JobIdentifierFactory,
  * and a normal JobLauncher. This command line launcher loads these application
  * contexts by first loading the execution environment context via a
  * {@link ContextSingletonBeanFactoryLocator}, which will search for the
  * default key from classpath*:beanRefContext.xml to return the context. This
- * will then be used as the parent to the JobConfiguration context. All required
+ * will then be used as the parent to the Job context. All required
  * dependencies of the launcher will then be satisfied by autowiring by type
  * from the combined application context. Default values are provided for all
  * fields except the JobLauncher. Therefore, if autowiring fails to set it (it
@@ -76,7 +76,7 @@ import org.springframework.util.Assert;
  * method are optional, VM arguments are used:
  * 
  * <ul>
- * <li>-Djob.configuration.path: the classpath location of the JobConfiguration
+ * <li>-Djob.configuration.path: the classpath location of the Job
  * to use
  * <li>-Djob.name: job name to be passed to the {@link JobLauncher}
  * <li>-Dbatch.execution.environment.key: the key in beanRefContext.xml used to
@@ -180,7 +180,7 @@ public class BatchCommandLineLauncher {
 	 *            the name of the job execution to use
 	 * @parm parentKey the key to be loaded by
 	 *       ContextSingletonBeanFactoryLocator and used as the parent context.
-	 * @throws NoSuchJobConfigurationException
+	 * @throws NoSuchJobException
 	 * @throws IllegalStateException
 	 *             if JobLauncher is not autowired by the ApplicationContext
 	 */
@@ -220,11 +220,11 @@ public class BatchCommandLineLauncher {
 					status = launcher.run(jobName).getExitStatus();
 				}
 			}
-		} catch (NoSuchJobConfigurationException e) {
+		} catch (NoSuchJobException e) {
 			logger.fatal("Could not locate JobConfiguration \"" + jobName
 					+ "\"", e);
 			status = new ExitStatus(false,
-					ExitCodeMapper.NO_SUCH_JOB_CONFIGURATION);
+					ExitCodeMapper.NO_SUCH_JOB);
 		} catch (Throwable t) {
 			logger.fatal(t);
 			status = exceptionClassifier.classifyForExitCode(t);

@@ -15,11 +15,11 @@
  */
 package org.springframework.batch.execution.step.simple;
 
-import org.springframework.batch.core.configuration.StepConfiguration;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.execution.step.SimpleStepConfiguration;
+import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -37,28 +37,28 @@ public class SimpleStepExecutorFactory implements StepExecutorFactory,
 
 	/**
 	 * Create a {@link SimpleStepExecutor} for this configuration. If the
-	 * configuration is a {@link SimpleStepConfiguration} then a
+	 * configuration is a {@link SimpleStep} then a
 	 * {@link StepExecutor} is created with policies matching the commit
 	 * interval of the configuration. <br/>
 	 * 
 	 * @throws IllegalStateException
-	 *             if the configuration is not a {@link SimpleStepConfiguration}.
+	 *             if the configuration is not a {@link SimpleStep}.
 	 * @throws IllegalStateException
 	 *             if the {@link JobRepository} is null.
 	 * 
-	 * @see StepExecutorFactory#getExecutor(StepConfiguration)
+	 * @see StepExecutorFactory#getExecutor(Step)
 	 */
-	public StepExecutor getExecutor(StepConfiguration configuration) {
+	public StepExecutor getExecutor(Step step) {
 
 		Assert.notNull(jobRepository, "JobRepository cannot be null");
-		Assert.state(configuration instanceof SimpleStepConfiguration,
-				"StepConfiguration must be instance of SimpleStepConfiguration - found: ["
-						+ (configuration == null ? null : configuration
+		Assert.state(step instanceof SimpleStep,
+				"Step must be instance of SimpleStep - found: ["
+						+ (step == null ? null : step
 								.getClass()) + "]");
 
 		SimpleStepExecutor executor = new SimpleStepExecutor();
 		executor.setRepository(jobRepository);
-		executor.applyConfiguration(configuration);
+		executor.applyConfiguration(step);
 
 		return executor;
 

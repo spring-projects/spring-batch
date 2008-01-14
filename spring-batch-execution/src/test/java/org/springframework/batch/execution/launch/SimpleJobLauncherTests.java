@@ -18,11 +18,11 @@ package org.springframework.batch.execution.launch;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
 
 public class SimpleJobLauncherTests extends TestCase {
@@ -44,7 +44,7 @@ public class SimpleJobLauncherTests extends TestCase {
 			launcher.run();
 			// should do nothing
 			fail("Expected NoSuchJobConfigurationException");
-		} catch (NoSuchJobConfigurationException e) {
+		} catch (NoSuchJobException e) {
 			assertTrue("Message should mention null job name: "
 					+ e.getMessage(), e.getMessage().toLowerCase().indexOf(
 					"null") >= 0);
@@ -56,7 +56,7 @@ public class SimpleJobLauncherTests extends TestCase {
 		launcher.setJobIdentifierFactory(new SimpleJobIdentifierFactory());
 		InterruptibleFacade jobExecutorFacade = new InterruptibleFacade();
 		launcher.setJobExecutorFacade(jobExecutorFacade);
-		launcher.setJobConfigurationName(new JobConfiguration("foo").getName());
+		launcher.setJobName(new Job("foo").getName());
 		launcher.run();
 		assertFalse(launcher.isRunning());
 		launcher.run();
@@ -96,12 +96,12 @@ public class SimpleJobLauncherTests extends TestCase {
 		}
 
 		public void start(JobExecution execution)
-				throws NoSuchJobConfigurationException {
+				throws NoSuchJobException {
 			run();
 		}
 
 		public JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
-				throws NoSuchJobConfigurationException {
+				throws NoSuchJobException {
 			return new JobExecution(new JobInstance(jobIdentifier));
 		}
 

@@ -21,21 +21,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.springframework.batch.core.configuration.DuplicateJobConfigurationException;
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.JobConfigurationRegistry;
-import org.springframework.batch.core.configuration.ListableJobConfigurationRegistry;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
+import org.springframework.batch.core.domain.DuplicateJobException;
+import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobRegistry;
+import org.springframework.batch.core.domain.ListableJobRegistry;
+import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.util.Assert;
 
 /**
- * Simple map-based implementation of {@link JobConfigurationRegistry}. Access
+ * Simple map-based implementation of {@link JobRegistry}. Access
  * to the map is synchronized, guarded by an internal lock.
  * 
  * @author Dave Syer
  * 
  */
-public class MapJobConfigurationRegistry implements ListableJobConfigurationRegistry {
+public class MapJobRegistry implements ListableJobRegistry {
 
 	private Map map = new HashMap();
 
@@ -43,13 +43,13 @@ public class MapJobConfigurationRegistry implements ListableJobConfigurationRegi
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.container.common.configuration.JobConfigurationRegistry#registerJobConfiguration(org.springframework.batch.container.common.configuration.JobConfiguration)
 	 */
-	public void register(JobConfiguration jobConfiguration) throws DuplicateJobConfigurationException {
+	public void register(Job jobConfiguration) throws DuplicateJobException {
 		Assert.notNull(jobConfiguration);
 		String name = jobConfiguration.getName();
 		Assert.notNull(name, "Job configuration must have a name.");
 		synchronized (map) {
 			if (map.containsKey(name) && jobConfiguration.equals(map.get(name))) {
-				throw new DuplicateJobConfigurationException("A job configuration with this name [" + name
+				throw new DuplicateJobException("A job configuration with this name [" + name
 						+ "] was already registered");
 			}
 			// allow replacing job configuration with new instance
@@ -61,7 +61,7 @@ public class MapJobConfigurationRegistry implements ListableJobConfigurationRegi
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.container.common.configuration.JobConfigurationRegistry#unregister(org.springframework.batch.container.common.configuration.JobConfiguration)
 	 */
-	public void unregister(JobConfiguration jobConfiguration) {
+	public void unregister(Job jobConfiguration) {
 		String name = jobConfiguration.getName();
 		Assert.notNull(name, "Job configuration must have a name.");
 		synchronized (map) {
@@ -74,13 +74,13 @@ public class MapJobConfigurationRegistry implements ListableJobConfigurationRegi
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.container.common.configuration.JobConfigurationLocator#getJobConfiguration(java.lang.String)
 	 */
-	public JobConfiguration getJobConfiguration(String name) throws NoSuchJobConfigurationException {
+	public Job getJob(String name) throws NoSuchJobException {
 		synchronized (map) {
 			if (!map.containsKey(name)) {
-				throw new NoSuchJobConfigurationException("No job configuration with the name [" + name
+				throw new NoSuchJobException("No job configuration with the name [" + name
 						+ "] was registered");
 			}
-			return (JobConfiguration) map.get(name);
+			return (Job) map.get(name);
 		}
 	}
 

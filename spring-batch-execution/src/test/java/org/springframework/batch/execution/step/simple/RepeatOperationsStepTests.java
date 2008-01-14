@@ -17,19 +17,19 @@ package org.springframework.batch.execution.step.simple;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.execution.step.RepeatOperationsStepConfiguration;
+import org.springframework.batch.execution.step.RepeatOperationsStep;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
 /**
  * @author Dave Syer
  *
  */
-public class RepeatOperationsStepConfigurationTests extends TestCase {
+public class RepeatOperationsStepTests extends TestCase {
 
-	RepeatOperationsStepConfiguration configuration = new RepeatOperationsStepConfiguration();
+	RepeatOperationsStep configuration = new RepeatOperationsStep();
 	
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.RepeatOperationsStepConfiguration#getChunkOperations()}.
+	 * Test method for {@link org.springframework.batch.execution.step.RepeatOperationsStep#getChunkOperations()}.
 	 */
 	public void testSetChunkOperations() {
 		assertNull(configuration.getChunkOperations());
@@ -40,7 +40,7 @@ public class RepeatOperationsStepConfigurationTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.RepeatOperationsStepConfiguration#getChunkOperations()}.
+	 * Test method for {@link org.springframework.batch.execution.step.RepeatOperationsStep#getChunkOperations()}.
 	 */
 	public void testSetStepOperations() {
 		assertNull(configuration.getChunkOperations());

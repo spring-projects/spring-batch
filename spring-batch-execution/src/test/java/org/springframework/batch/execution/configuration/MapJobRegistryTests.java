@@ -19,45 +19,45 @@ import java.util.Collection;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.configuration.DuplicateJobConfigurationException;
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.NoSuchJobConfigurationException;
-import org.springframework.batch.execution.configuration.MapJobConfigurationRegistry;
+import org.springframework.batch.core.domain.DuplicateJobException;
+import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.NoSuchJobException;
+import org.springframework.batch.execution.configuration.MapJobRegistry;
 
 /**
  * @author Dave Syer
  *
  */
-public class MapJobConfigurationRegistryTests extends TestCase {
+public class MapJobRegistryTests extends TestCase {
 	
-	private MapJobConfigurationRegistry registry = new MapJobConfigurationRegistry();
+	private MapJobRegistry registry = new MapJobRegistry();
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobConfigurationRegistry#unregister(org.springframework.batch.core.configuration.JobConfiguration)}.
+	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobRegistry#unregister(org.springframework.batch.core.domain.Job)}.
 	 * @throws Exception 
 	 */
 	public void testUnregister() throws Exception {
-		registry.register(new JobConfiguration("foo"));
-		assertNotNull(registry.getJobConfiguration("foo"));
-		registry.unregister(new JobConfiguration("foo"));
+		registry.register(new Job("foo"));
+		assertNotNull(registry.getJob("foo"));
+		registry.unregister(new Job("foo"));
 		try {
-			assertNull(registry.getJobConfiguration("foo"));
+			assertNull(registry.getJob("foo"));
 			fail("Expected NoSuchJobConfigurationException");
 		}
-		catch (NoSuchJobConfigurationException e) {
+		catch (NoSuchJobException e) {
 			// expected
 			assertTrue(e.getMessage().indexOf("foo")>=0);
 		}
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobConfigurationRegistry#getJobConfiguration(java.lang.String)}.
+	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobRegistry#getJob(java.lang.String)}.
 	 */
 	public void testReplaceDuplicateConfiguration() throws Exception {
-		registry.register(new JobConfiguration("foo"));
+		registry.register(new Job("foo"));
 		try {
-			registry.register(new JobConfiguration("foo"));
-		} catch (DuplicateJobConfigurationException e) {
+			registry.register(new Job("foo"));
+		} catch (DuplicateJobException e) {
 			fail("Unexpected DuplicateJobConfigurationException");
 			// expected
 			assertTrue(e.getMessage().indexOf("foo")>=0);
@@ -65,28 +65,28 @@ public class MapJobConfigurationRegistryTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobConfigurationRegistry#getJobConfiguration(java.lang.String)}.
+	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobRegistry#getJob(java.lang.String)}.
 	 */
 	public void testRealDuplicateConfiguration() throws Exception {
-		JobConfiguration jobConfiguration = new JobConfiguration("foo");
+		Job jobConfiguration = new Job("foo");
 		registry.register(jobConfiguration);
 		try {
 			registry.register(jobConfiguration);
 			fail("Unexpected DuplicateJobConfigurationException");
-		} catch (DuplicateJobConfigurationException e) {
+		} catch (DuplicateJobException e) {
 			// expected
 			assertTrue(e.getMessage().indexOf("foo")>=0);
 		}
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobConfigurationRegistry#getJobConfigurations()}.
+	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobRegistry#getJobConfigurations()}.
 	 * @throws Exception 
 	 */
 	public void testGetJobConfigurations() throws Exception {
-		JobConfiguration configuration = new JobConfiguration("foo");
+		Job configuration = new Job("foo");
 		registry.register(configuration);
-		registry.register(new JobConfiguration("bar"));
+		registry.register(new Job("bar"));
 		Collection configurations = registry.getJobConfigurations();
 		assertEquals(2, configurations.size());
 		assertTrue(configurations.contains(configuration));

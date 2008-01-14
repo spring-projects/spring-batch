@@ -54,7 +54,7 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 		stepExecution.incrementVersion();
 		step.setStatus(BatchStatus.STARTED);
 		
-		job.addStep(step);
+		job.addStepInstance(step);
 		
 	}
 	

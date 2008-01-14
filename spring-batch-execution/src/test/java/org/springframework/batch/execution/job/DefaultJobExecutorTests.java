@@ -21,14 +21,14 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.StepConfiguration;
-import org.springframework.batch.core.configuration.StepConfigurationSupport;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
@@ -41,7 +41,7 @@ import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.execution.step.SimpleStepConfiguration;
+import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -62,7 +62,7 @@ public class DefaultJobExecutorTests extends TestCase {
 	private List list = new ArrayList();
 
 	StepExecutor defaultStepLifecycle = new StubStepExecutor() {
-		public ExitStatus process(StepConfiguration configuration,
+		public ExitStatus process(Step configuration,
 				StepExecution stepExecution) throws StepInterruptedException,
 				BatchCriticalException {
 			list.add("default");
@@ -71,7 +71,7 @@ public class DefaultJobExecutorTests extends TestCase {
 	};
 
 	StepExecutor configurationStepLifecycle = new StubStepExecutor() {
-		public ExitStatus process(StepConfiguration configuration,
+		public ExitStatus process(Step configuration,
 				StepExecution stepExecution) throws StepInterruptedException,
 				BatchCriticalException {
 			list.add("special");
@@ -91,11 +91,11 @@ public class DefaultJobExecutorTests extends TestCase {
 
 	private StepExecution stepExecution2;
 
-	private StepConfigurationSupport stepConfiguration1;
+	private StepSupport stepConfiguration1;
 
-	private StepConfigurationSupport stepConfiguration2;
+	private StepSupport stepConfiguration2;
 
-	private JobConfiguration jobConfiguration;
+	private Job jobConfiguration;
 
 	private SimpleJobIdentifier jobIdentifer;
 
@@ -113,17 +113,17 @@ public class DefaultJobExecutorTests extends TestCase {
 		jobExecutor.setJobRepository(jobRepository);
 
 		jobExecutor.setStepExecutorFactory(new StepExecutorFactory() {
-			public StepExecutor getExecutor(StepConfiguration configuration) {
+			public StepExecutor getExecutor(Step configuration) {
 				return defaultStepLifecycle;
 			}
 		});
 
-		stepConfiguration1 = new SimpleStepConfiguration("TestStep1");
-		stepConfiguration2 = new SimpleStepConfiguration("TestStep2");
+		stepConfiguration1 = new SimpleStep("TestStep1");
+		stepConfiguration2 = new SimpleStep("TestStep2");
 		List stepConfigurations = new ArrayList();
 		stepConfigurations.add(stepConfiguration1);
 		stepConfigurations.add(stepConfiguration2);
-		jobConfiguration = new JobConfiguration();
+		jobConfiguration = new Job();
 		jobConfiguration.setSteps(stepConfigurations);
 
 		jobIdentifer = new SimpleJobIdentifier("TestJob");
@@ -131,7 +131,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		jobExecution = jobRepository.findOrCreateJob(jobConfiguration, jobIdentifer);
 		job = jobExecution.getJob();
 
-		List steps = job.getSteps();
+		List steps = job.getStepInstances();
 		step1 = (StepInstance) steps.get(0);
 		step2 = (StepInstance) steps.get(1);
 		stepExecution1 = new StepExecution(step1, jobExecution);
@@ -187,7 +187,7 @@ public class DefaultJobExecutorTests extends TestCase {
 	public void testRunWithNonDefaultExecutor() throws Exception {
 
 		jobExecutor.setStepExecutorFactory(new StepExecutorFactory() {
-			public StepExecutor getExecutor(StepConfiguration configuration) {
+			public StepExecutor getExecutor(Step configuration) {
 				return configuration == stepConfiguration2 ? defaultStepLifecycle
 						: configurationStepLifecycle;
 			}
@@ -209,7 +209,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		final StepInterruptedException exception = new StepInterruptedException(
 				"Interrupt!");
 		defaultStepLifecycle = new StubStepExecutor() {
-			public ExitStatus process(StepConfiguration configuration,
+			public ExitStatus process(Step configuration,
 					StepExecution stepExecution)
 					throws StepInterruptedException, BatchCriticalException {
 				throw exception;
@@ -230,7 +230,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		stepConfiguration2.setStartLimit(5);
 		final RuntimeException exception = new RuntimeException("Foo!");
 		defaultStepLifecycle = new StubStepExecutor() {
-			public ExitStatus process(StepConfiguration configuration,
+			public ExitStatus process(Step configuration,
 					StepExecution stepExecution)
 					throws StepInterruptedException, BatchCriticalException {
 				throw exception;
@@ -302,10 +302,10 @@ public class DefaultJobExecutorTests extends TestCase {
 	
 	private class StubStepExecutor implements StepExecutor {
 
-		public void applyConfiguration(StepConfiguration configuration) {
+		public void applyConfiguration(Step configuration) {
 		}
 
-		public ExitStatus process(StepConfiguration configuration,
+		public ExitStatus process(Step configuration,
 				StepExecution stepExecution) throws StepInterruptedException,
 				BatchCriticalException {
 			return null;

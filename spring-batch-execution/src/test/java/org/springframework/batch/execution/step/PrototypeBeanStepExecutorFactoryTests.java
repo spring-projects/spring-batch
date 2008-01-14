@@ -20,7 +20,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.configuration.StepConfigurationSupport;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.repeat.RepeatOperations;
@@ -76,21 +76,21 @@ public class PrototypeBeanStepExecutorFactoryTests extends TestCase {
 		SimpleStepExecutor executor = new SimpleStepExecutor();
 		applicationContext.getBeanFactory().registerSingleton("foo", executor);
 		factory.setStepExecutorName("foo");
-		assertEquals(executor, factory.getExecutor(new SimpleStepConfiguration()));
+		assertEquals(executor, factory.getExecutor(new SimpleStep()));
 	}
 
 	public void testSuccessfulStepExecutorWithNonSimpleConfigugration() throws Exception {
 		SimpleStepExecutor executor = new SimpleStepExecutor();
 		applicationContext.getBeanFactory().registerSingleton("foo", executor);
 		factory.setStepExecutorName("foo");
-		assertEquals(executor, factory.getExecutor(new StepConfigurationSupport()));
+		assertEquals(executor, factory.getExecutor(new StepSupport()));
 	}
 
 	public void testSuccessfulStepExecutorWithSimpleConfigurationAndNotSimpleExecutor() throws Exception {
 		StepExecutor executor = new SimpleStepExecutor();
 		applicationContext.getBeanFactory().registerSingleton("foo", executor);
 		factory.setStepExecutorName("foo");
-		assertEquals(executor, factory.getExecutor(new SimpleStepConfiguration()));
+		assertEquals(executor, factory.getExecutor(new SimpleStep()));
 	}
 
 	public void testSuccessfulStepExecutorHolderStrategy() throws Exception {
@@ -140,7 +140,7 @@ public class PrototypeBeanStepExecutorFactoryTests extends TestCase {
 	 * @author Dave Syer
 	 *
 	 */
-	public class SimpleHolderStepConfiguration extends SimpleStepConfiguration implements RepeatOperationsHolder {
+	public class SimpleHolderStepConfiguration extends SimpleStep implements RepeatOperationsHolder {
 		private RepeatOperations chunkOperations;
 		private RepeatOperations stepOperations;
 		public SimpleHolderStepConfiguration(RepeatOperations executor) {

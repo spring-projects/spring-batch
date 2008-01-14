@@ -21,11 +21,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import org.springframework.batch.core.configuration.JobConfiguration;
-import org.springframework.batch.core.configuration.StepConfiguration;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.BatchRestartException;
@@ -66,7 +66,7 @@ public class SimpleJobRepository implements JobRepository {
 	/**
 	 * <p>
 	 * Find or Create a (@link {@link JobExecution}) based on the passed in
-	 * {@link JobIdentifier} and {@link JobConfiguration}. However, unique
+	 * {@link JobIdentifier} and {@link Job}. However, unique
 	 * identification of a job can only come from the database, and therefore
 	 * must come from JobDao by either creating a new job or finding an existing
 	 * one, which will ensure that the id of the job is populated with the
@@ -76,13 +76,13 @@ public class SimpleJobRepository implements JobRepository {
 	 * <p>
 	 * There are two ways in which the method determines if a job should be
 	 * created or an existing one should be returned. The first is
-	 * restartability. The {@link JobConfiguration} restartable property will be
+	 * restartability. The {@link Job} restartable property will be
 	 * checked first. If it is not false, a new job will be created, regardless
 	 * of whether or not one exists. If it is true, the {@link JobDao} will be
 	 * checked to determine if the job already exists, if it does, it's steps
 	 * will be populated (there must be at least 1) and a new
 	 * {@link JobExecution} will be returned. If no job is found, a new one will
-	 * be created based on the configuration.
+	 * be created based on the job.
 	 * </p>
 	 * 
 	 * <p>
@@ -94,9 +94,9 @@ public class SimpleJobRepository implements JobRepository {
 	 * <li>What happens then depends on how many existing job instances we
 	 * find:
 	 * <ul>
-	 * <li>If there are none, or the {@link JobConfiguration} is marked
+	 * <li>If there are none, or the {@link Job} is marked
 	 * restartable, then we create a new {@link JobInstance}</li>
-	 * <li>If there is more than one and the {@link JobConfiguration} is not
+	 * <li>If there is more than one and the {@link Job} is not
 	 * marked as restartable, it is an error. This could be caused by a job
 	 * whose restartable flag has changed to be more strict (true not false)
 	 * <em>after</em> it has been executed at least once.</li>
@@ -118,26 +118,26 @@ public class SimpleJobRepository implements JobRepository {
 	 * platform does not support the higher isolation levels).
 	 * </p>
 	 * 
-	 * @see JobRepository#findOrCreateJob(JobConfiguration, JobIdentifier)
+	 * @see JobRepository#findOrCreateJob(Job, JobIdentifier)
 	 * 
 	 * @throws BatchRestartException
 	 *             if more than one JobInstance if found or if
 	 *             JobInstance.getJobExecutionCount() is greater than
-	 *             JobConfiguration.getStartLimit()
+	 *             Job.getStartLimit()
 	 * @throws JobExecutionAlreadyRunningException
 	 *             if a job execution is found for the given
 	 *             {@link JobIdentifier} that is already running
 	 * 
 	 */
-	public JobExecution findOrCreateJob(JobConfiguration jobConfiguration,
+	public JobExecution findOrCreateJob(Job job,
 			JobIdentifier jobIdentifier)
 			throws JobExecutionAlreadyRunningException {
 
 		List jobs = new ArrayList();
-		JobInstance job;
+		JobInstance jobInstance;
 
 		// Check if a job is restartable, if not, create and return a new job
-		if (jobConfiguration.isRestartable()) {
+		if (job.isRestartable()) {
 
 			/*
 			 * Find all jobs matching the runtime information.
@@ -153,34 +153,34 @@ public class SimpleJobRepository implements JobRepository {
 
 		if (jobs.size() == 1) {
 			// One job was found
-			job = (JobInstance) jobs.get(0);
-			job.setSteps(findSteps(jobConfiguration.getStepConfigurations(),
-					job));
-			job.setJobExecutionCount(jobDao.getJobExecutionCount(job.getId()));
-			if (job.getJobExecutionCount() > jobConfiguration.getStartLimit()) {
+			jobInstance = (JobInstance) jobs.get(0);
+			jobInstance.setStepInstances(findStepInstances(job.getSteps(),
+					jobInstance));
+			jobInstance.setJobExecutionCount(jobDao.getJobExecutionCount(jobInstance.getId()));
+			if (jobInstance.getJobExecutionCount() > job.getStartLimit()) {
 				throw new BatchRestartException(
-						"Restart Max exceeded for Job: " + job.toString());
+						"Restart Max exceeded for Job: " + jobInstance.toString());
 			}
-			List executions = jobDao.findJobExecutions(job);
+			List executions = jobDao.findJobExecutions(jobInstance);
 			for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
 				JobExecution execution = (JobExecution) iterator.next();
 				if (execution.isRunning()) {
 					throw new JobExecutionAlreadyRunningException(
 							"A job execution for this job is already running: "
-									+ job);
+									+ jobInstance);
 				}
 			}
 		} else if (jobs.size() == 0) {
 			// no job found, create one
-			job = createJob(jobConfiguration, jobIdentifier);
+			jobInstance = createJob(job, jobIdentifier);
 		} else {
 			// More than one job found, throw exception
 			throw new BatchRestartException(
 					"Error restarting job, more than one JobInstance found for: "
-							+ jobConfiguration.toString());
+							+ job.toString());
 		}
 
-		return generateJobExecution(job);
+		return generateJobExecution(jobInstance);
 
 	}
 
@@ -294,47 +294,47 @@ public class SimpleJobRepository implements JobRepository {
 	 * calling {@link JobDao#createJob(JobRuntimeInformation)} and then it's
 	 * list of StepConfigurations is passed to the createSteps method.
 	 */
-	private JobInstance createJob(JobConfiguration jobConfiguration,
+	private JobInstance createJob(Job job,
 			JobIdentifier runtimeInformation) {
 
-		JobInstance job = jobDao.createJob(runtimeInformation);
-		job
-				.setSteps(createSteps(job, jobConfiguration
-						.getStepConfigurations()));
-		return job;
+		JobInstance jobInstance = jobDao.createJob(runtimeInformation);
+		jobInstance
+				.setStepInstances(createStepInstances(jobInstance, job
+						.getSteps()));
+		return jobInstance;
 	}
 
 	/*
-	 * Create steps based on the given Job and list of StepConfigurations.
+	 * Create steps based on the given Job and list of Steps.
 	 */
-	private List createSteps(JobInstance job, List stepConfigurations) {
+	private List createStepInstances(JobInstance job, List steps) {
 
-		List steps = new ArrayList();
-		Iterator i = stepConfigurations.iterator();
+		List stepInstances = new ArrayList();
+		Iterator i = steps.iterator();
 		while (i.hasNext()) {
-			StepConfiguration stepConfiguration = (StepConfiguration) i.next();
-			StepInstance step = stepDao.createStep(job, stepConfiguration
+			Step step = (Step) i.next();
+			StepInstance stepInstance = stepDao.createStep(job, step
 					.getName());
 			// Ensure valid restart data is being returned.
-			if (step.getRestartData() == null
-					|| step.getRestartData().getProperties() == null) {
-				step.setRestartData(new GenericRestartData(new Properties()));
+			if (stepInstance.getRestartData() == null
+					|| stepInstance.getRestartData().getProperties() == null) {
+				stepInstance.setRestartData(new GenericRestartData(new Properties()));
 			}
-			steps.add(step);
+			stepInstances.add(stepInstance);
 		}
 
-		return steps;
+		return stepInstances;
 	}
 
 	/*
-	 * Find Steps for the given list of StepConfiguration's with a given JobId
+	 * Find Steps for the given list of Steps with a given JobId
 	 */
-	protected List findSteps(List stepConfigurations, JobInstance job) {
-		List steps = new ArrayList();
-		Iterator i = stepConfigurations.iterator();
+	protected List findStepInstances(List steps, JobInstance job) {
+		List stepInstances = new ArrayList();
+		Iterator i = steps.iterator();
 		while (i.hasNext()) {
 
-			StepConfiguration stepConfiguration = (StepConfiguration) i.next();
+			Step stepConfiguration = (Step) i.next();
 			StepInstance step = stepDao.findStep(job, stepConfiguration
 					.getName());
 			if (step != null) {
@@ -348,10 +348,10 @@ public class SimpleJobRepository implements JobRepository {
 							.setRestartData(new GenericRestartData(
 									new Properties()));
 				}
-				steps.add(step);
+				stepInstances.add(step);
 			}
 		}
-		return steps;
+		return stepInstances;
 	}
 
 }

@@ -20,8 +20,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
 
-import org.springframework.batch.core.configuration.StepConfiguration;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
@@ -34,7 +34,7 @@ import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.RepeatOperationsHolder;
-import org.springframework.batch.execution.step.SimpleStepConfiguration;
+import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -141,16 +141,16 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * @throws StepInterruptedException if the step or a chunk is interrupted
 	 * @throws RuntimeException if there is an exception during a chunk
 	 * execution
-	 * @see StepExecutor#process(StepConfiguration, StepExecution)
+	 * @see StepExecutor#process(Step, StepExecution)
 	 */
-	public ExitStatus process(final StepConfiguration configuration, final StepExecution stepExecution)
+	public ExitStatus process(final Step step, final StepExecution stepExecution)
 			throws BatchCriticalException, StepInterruptedException {
 
-		final StepInstance step = stepExecution.getStep();
-		boolean isRestart = step.getStepExecutionCount() > 0 ? true : false;
-		Assert.notNull(step);
+		final StepInstance stepInstance = stepExecution.getStep();
+		boolean isRestart = stepInstance.getStepExecutionCount() > 0 ? true : false;
+		Assert.notNull(stepInstance);
 
-		final Tasklet module = configuration.getTasklet();
+		final Tasklet module = step.getTasklet();
 
 		ExitStatus status = ExitStatus.FAILED;
 
@@ -164,10 +164,10 @@ public class SimpleStepExecutor implements StepExecutor {
 			stepExecution.setStartTime(new Date(System.currentTimeMillis()));
 			updateStatus(stepExecution, BatchStatus.STARTED);
 
-			final boolean saveRestartData = configuration.isSaveRestartData();
+			final boolean saveRestartData = step.isSaveRestartData();
 
 			if (saveRestartData && isRestart) {
-				restoreFromRestartData(module, step.getRestartData());
+				restoreFromRestartData(module, stepInstance.getRestartData());
 			}
 
 			status = stepOperations.iterate(new RepeatCallback() {
@@ -196,7 +196,7 @@ public class SimpleStepExecutor implements StepExecutor {
 										BatchTransactionSynchronizationManager.resynchronize();
 										ExitStatus result;
 
-										result = processChunk(configuration, contribution);
+										result = processChunk(step, contribution);
 
 										// TODO: Statistics are not thread safe
 										// - we cannot guarantee that they are
@@ -209,8 +209,8 @@ public class SimpleStepExecutor implements StepExecutor {
 										stepExecution.apply(contribution);
 
 										if (saveRestartData) {
-											step.setRestartData(getRestartData(module));
-											jobRepository.update(step);
+											stepInstance.setRestartData(getRestartData(module));
+											jobRepository.update(stepInstance);
 										}
 										jobRepository.saveOrUpdate(stepExecution);
 										return result;
@@ -307,18 +307,18 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * outside this method, so subclasses that override do not need to create a
 	 * transaction.
 	 * 
-	 * @param configuration the current step configuration
+	 * @param step the current step
 	 * @param stepExecution the current step, containing the {@link Tasklet}
 	 * with the business logic.
 	 * @return true if there is more data to process.
 	 */
-	protected final ExitStatus processChunk(final StepConfiguration configuration, final StepContribution contribution) {
+	protected final ExitStatus processChunk(final Step step, final StepContribution contribution) {
 		ExitStatus result = chunkOperations.iterate(new RepeatCallback() {
 			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
 				contribution.registerChunkContext(context);
 				// check for interruption before each item as well
 				interruptionPolicy.checkInterrupted(context);
-				ExitStatus exitStatus = doTaskletProcessing(configuration.getTasklet(), contribution);
+				ExitStatus exitStatus = doTaskletProcessing(step.getTasklet(), contribution);
 				contribution.incrementTaskCount();
 				// check for interruption after each item as well
 				interruptionPolicy.checkInterrupted(context);
@@ -419,7 +419,7 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * <ul>
 	 * <li> If the configuration is a {@link RepeatOperationsHolder} then we use
 	 * the provided {@link RepeatOperations} instances for chunk and step. </li>
-	 * <li> If the configuration is a {@link SimpleStepConfiguration} then we
+	 * <li> If the configuration is a {@link SimpleStep} then we
 	 * apply the commit interval at the chunk level and the exception handler at
 	 * the step level, provided the existing repeat operations are instances of
 	 * {@link RepeatTemplate}. In addition if there is a non-zero skip limit
@@ -427,18 +427,18 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * {@link SimpleLimitExceptionHandler} with that limit.</li>
 	 * </ul>
 	 * 
-	 * @param configuration a step configuration
+	 * @param step a step
 	 */
-	public void applyConfiguration(StepConfiguration configuration) {
+	public void applyConfiguration(Step step) {
 
-		if (configuration instanceof RepeatOperationsHolder) {
+		if (step instanceof RepeatOperationsHolder) {
 
-			RepeatOperationsHolder holder = (RepeatOperationsHolder) configuration;
+			RepeatOperationsHolder holder = (RepeatOperationsHolder) step;
 			RepeatOperations chunkOperations = holder.getChunkOperations();
 			RepeatOperations stepOperations = holder.getStepOperations();
 			Assert
 					.state(chunkOperations != null,
-							"Chunk operations obtained from step configuration must be non-null.");
+							"Chunk operations obtained from step must be non-null.");
 
 			if (chunkOperations != null) {
 				setChunkOperations(chunkOperations);
@@ -448,9 +448,9 @@ public class SimpleStepExecutor implements StepExecutor {
 			}
 
 		}
-		else if (configuration instanceof SimpleStepConfiguration) {
+		else if (step instanceof SimpleStep) {
 
-			SimpleStepConfiguration simpleConfiguation = (SimpleStepConfiguration) configuration;
+			SimpleStep simpleConfiguation = (SimpleStep) step;
 			if (this.chunkOperations instanceof RepeatTemplate) {
 				RepeatTemplate template = (RepeatTemplate) this.chunkOperations;
 				template.setCompletionPolicy(new SimpleCompletionPolicy(simpleConfiguation.getCommitInterval()));

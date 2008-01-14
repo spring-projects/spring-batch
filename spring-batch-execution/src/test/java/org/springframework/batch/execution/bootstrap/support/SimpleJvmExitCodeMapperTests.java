@@ -38,8 +38,8 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 		Map ecm2Map = new HashMap();
 		ecm2Map.put(ExitStatus.FINISHED.getExitCode(), new Integer(-1));
 		ecm2Map.put(ExitStatus.FAILED.getExitCode(), new Integer(-2));
-		ecm2Map.put(ExitCodeMapper.JOB_CONFIGURATION_NOT_PROVIDED, new Integer(-3));
-		ecm2Map.put(ExitCodeMapper.NO_SUCH_JOB_CONFIGURATION, new Integer(-3));
+		ecm2Map.put(ExitCodeMapper.JOB_NOT_PROVIDED, new Integer(-3));
+		ecm2Map.put(ExitCodeMapper.NO_SUCH_JOB, new Integer(-3));
 		ecm2.setMapping(ecm2Map);
 	}
 
@@ -55,11 +55,11 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 				ecm.getExitCode(ExitStatus.FAILED.getExitCode()),
 				ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR);
 		assertEquals(
-				ecm.getExitCode(ExitCodeMapper.JOB_CONFIGURATION_NOT_PROVIDED),
-				ExitCodeMapper.JVM_EXITCODE_JOB_CONFIGURATION_ERROR);		
+				ecm.getExitCode(ExitCodeMapper.JOB_NOT_PROVIDED),
+				ExitCodeMapper.JVM_EXITCODE_JOB_ERROR);		
 		assertEquals(
-				ecm.getExitCode(ExitCodeMapper.NO_SUCH_JOB_CONFIGURATION),
-				ExitCodeMapper.JVM_EXITCODE_JOB_CONFIGURATION_ERROR);		
+				ecm.getExitCode(ExitCodeMapper.NO_SUCH_JOB),
+				ExitCodeMapper.JVM_EXITCODE_JOB_ERROR);		
 	}
 	
 	public void testGetExitCodeWithPredefinedCodesOverridden() {
@@ -69,9 +69,9 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 		assertEquals(
 				ecm2.getExitCode(ExitStatus.FAILED.getExitCode()), -2);
 		assertEquals(
-				ecm2.getExitCode(ExitCodeMapper.JOB_CONFIGURATION_NOT_PROVIDED), -3);		
+				ecm2.getExitCode(ExitCodeMapper.JOB_NOT_PROVIDED), -3);		
 		assertEquals(
-				ecm2.getExitCode(ExitCodeMapper.NO_SUCH_JOB_CONFIGURATION), -3);		
+				ecm2.getExitCode(ExitCodeMapper.NO_SUCH_JOB), -3);		
 	}
 
 	public void testGetExitCodeWithCustomCode() {
