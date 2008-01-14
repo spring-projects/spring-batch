@@ -144,9 +144,9 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 		} catch (IllegalStateException e) {
 			// expected
 			assertTrue(
-					"Error message does not contain SimpleStepConfiguration: "
+					"Error message does not contain SimpleStep: "
 							+ e.getMessage(), e.getMessage().indexOf(
-							"SimpleStepConfiguration") >= 0);
+							"SimpleStep") >= 0);
 		}
 	}
 
