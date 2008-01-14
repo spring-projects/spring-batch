@@ -80,7 +80,7 @@ public abstract class AbstractJobDaoTests extends
 
 	public void testVersionIsNotNullForJob() throws Exception {
 		int version = jdbcTemplate
-				.queryForInt("select version from BATCH_JOB where ID="
+				.queryForInt("select version from BATCH_JOB_INSTANCE where ID="
 						+ job.getId());
 		assertEquals(0, version);
 	}
@@ -250,7 +250,7 @@ public abstract class AbstractJobDaoTests extends
 		job = jobDao.createJob(jobIdentifier);
 
 		List jobs = jdbcTemplate.queryForList(
-				"SELECT * FROM BATCH_JOB where ID=?", new Object[] { job
+				"SELECT * FROM BATCH_JOB_INSTANCE where ID=?", new Object[] { job
 						.getId() });
 		assertEquals(1, jobs.size());
 		assertEquals(job.getName(), ((Map) jobs.get(0)).get("JOB_NAME"));
@@ -277,6 +277,11 @@ public abstract class AbstractJobDaoTests extends
 		List results = jobDao.findJobExecutions(job);
 		assertEquals(results.size(), 1);
 		validateJobExecution(jobExecution, (JobExecution)results.get(0));
+	}
+	
+	public void testFindJobsWithProperties() throws Exception{
+		
+		
 	}
 
 	private void validateJobExecution(JobExecution lhs, JobExecution rhs){

@@ -93,7 +93,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	}
 	
 	public void testVersionIsNotNullForStep() throws Exception {
-		int version = jdbcTemplate.queryForInt("select version from BATCH_STEP where ID="+step1.getId());
+		int version = jdbcTemplate.queryForInt("select version from BATCH_STEP_INSTANCE where ID="+step1.getId());
 		assertEquals(0, version);
 	}
 	

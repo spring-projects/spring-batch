@@ -66,7 +66,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE ID=?";
 
 	// Job SQL statements
-	private static final String CREATE_JOB = "INSERT into %PREFIX%JOB(ID, JOB_NAME, JOB_KEY)"
+	private static final String CREATE_JOB = "INSERT into %PREFIX%JOB_INSTANCE(ID, JOB_NAME, JOB_KEY)"
 			+ " values (?, ?, ?)";
 	
 	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_INSTANCE_PROPERTIES(JOB_ID, KEY, TYPE_CD, " +
@@ -79,7 +79,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 
 	private static final int EXIT_MESSAGE_LENGTH = 250;
 
-	private static final String FIND_JOBS = "SELECT ID, STATUS from %PREFIX%JOB where JOB_NAME = ? and JOB_KEY = ?";
+	private static final String FIND_JOBS = "SELECT ID, STATUS from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?";
 
 	private static final String GET_JOB_EXECUTION_COUNT = "SELECT count(ID) from %PREFIX%JOB_EXECUTION "
 			+ "where JOB_ID = ?";
@@ -89,7 +89,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(ID, JOB_ID, START_TIME, "
 			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) values (?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String UPDATE_JOB = "UPDATE %PREFIX%JOB set STATUS = ? where ID = ?";
+	private static final String UPDATE_JOB = "UPDATE %PREFIX%JOB_INSTANCE set STATUS = ? where ID = ?";
 
 	// Job Execution SqlStatements
 	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
@@ -288,10 +288,10 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 		int[] argTypes = new int[]{Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.TIMESTAMP, Types.INTEGER};
 		
 		if(type == ParameterType.STRING){
-			args = new Object[]{jobId, key, type, value, new Timestamp(System.currentTimeMillis()), new Long(0)};
+			args = new Object[]{jobId, key, type, value, new Timestamp(0L), new Long(0)};
 		}
 		else if(type == ParameterType.LONG){
-			args = new Object[]{jobId, key, type, "", new Timestamp(System.currentTimeMillis()), value};
+			args = new Object[]{jobId, key, type, "", new Timestamp(0L), value};
 		}
 		else if(type == ParameterType.DATE){
 			args = new Object[]{jobId, key, type, "", value, new Long(0)};

@@ -63,18 +63,18 @@ import org.springframework.util.StringUtils;
  */
 public class JdbcStepDao implements StepDao, InitializingBean {
 
-	private static final String CREATE_STEP = "INSERT into %PREFIX%STEP(ID, JOB_ID, STEP_NAME) values (?, ?, ?)";
+	private static final String CREATE_STEP = "INSERT into %PREFIX%STEP_INSTANCE(ID, JOB_ID, STEP_NAME) values (?, ?, ?)";
 
 	private static final int EXIT_MESSAGE_LENGTH = 250;
 
-	private static final String FIND_STEP = "SELECT ID, STATUS, RESTART_DATA from %PREFIX%STEP where JOB_ID = ? "
+	private static final String FIND_STEP = "SELECT ID, STATUS, RESTART_DATA from %PREFIX%STEP_INSTANCE where JOB_ID = ? "
 			+ "and STEP_NAME = ?";
 
 	private static final String FIND_STEP_EXECUTIONS = "SELECT ID, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
 			+ " TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%STEP_EXECUTION where STEP_ID = ?";
 
 	// Step SQL statements
-	private static final String FIND_STEPS = "SELECT ID, STEP_NAME, STATUS, RESTART_DATA from %PREFIX%STEP where JOB_ID = ?";
+	private static final String FIND_STEPS = "SELECT ID, STEP_NAME, STATUS, RESTART_DATA from %PREFIX%STEP_INSTANCE where JOB_ID = ?";
 
 	private static final String GET_STEP_EXECUTION_COUNT = "SELECT count(ID) from %PREFIX%STEP_EXECUTION where "
 			+ "STEP_ID = ?";
@@ -86,7 +86,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 			+ "END_TIME, STATUS, COMMIT_COUNT, TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) "
 			+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String UPDATE_STEP = "UPDATE %PREFIX%STEP set STATUS = ?, RESTART_DATA = ? where ID = ?";
+	private static final String UPDATE_STEP = "UPDATE %PREFIX%STEP_INSTANCE set STATUS = ?, RESTART_DATA = ? where ID = ?";
 
 	private static final String UPDATE_STEP_EXECUTION = "UPDATE %PREFIX%STEP_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ "STATUS = ?, COMMIT_COUNT = ?, TASK_COUNT = ?, TASK_STATISTICS = ?, CONTINUABLE = ? , EXIT_CODE = ?, "
