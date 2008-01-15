@@ -38,7 +38,7 @@ public class SimpleJobIdentifier implements JobIdentifier {
 	 * Default constructor.  Since there it is required that the Identifier at least have a name,
 	 * the default constructor should not be called.
 	 */
-	private SimpleJobIdentifier() {
+	SimpleJobIdentifier() {
 		super();
 	}
 	

@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.springframework.util.Assert;
 
 /**
  * Value object representing runtime parameters to a batch job.  Because

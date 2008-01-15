@@ -54,7 +54,7 @@ public class JobInstancePropertiesTests extends TestCase {
 		badLongMap.put("key", "bad long");
 		
 		try{
-			JobInstanceProperties testParameters = new JobInstanceProperties(stringMap, badLongMap, dateMap);
+			new JobInstanceProperties(stringMap, badLongMap, dateMap);
 			fail();
 		}
 		catch(IllegalArgumentException ex){
@@ -68,7 +68,7 @@ public class JobInstancePropertiesTests extends TestCase {
 		badMap.put("key", new Integer(2));
 		
 		try{
-			JobInstanceProperties testParameters = new JobInstanceProperties(badMap, longMap, dateMap);
+			new JobInstanceProperties(badMap, longMap, dateMap);
 			fail();
 		}
 		catch(IllegalArgumentException ex){
@@ -82,7 +82,7 @@ public class JobInstancePropertiesTests extends TestCase {
 		badMap.put("key", new java.sql.Date(System.currentTimeMillis()));
 		
 		try{
-			JobInstanceProperties testParameters = new JobInstanceProperties(stringMap, longMap, badMap);
+			new JobInstanceProperties(stringMap, longMap, badMap);
 			fail();
 		}
 		catch(IllegalArgumentException ex){
