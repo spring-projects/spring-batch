@@ -154,7 +154,7 @@
 			<extension>
 				<groupId>org.springframework.aws</groupId>
 				<artifactId>spring-aws-maven</artifactId>
-				<version>1.2</version>
+				<version>1.2.2</version>
 			</extension>
 		</extensions>
 		<plugins>
@@ -561,23 +561,17 @@
 		<repository>
 			<id>spring-milestone</id>
 			<name>Spring Portfolio Milestone Repository</name>
-			<url>
-				http://s3.amazonaws.com/maven.springframework.org/milestone
-			</url>
+			<url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
 		</repository>
 		<repository>
 			<id>spring-external</id>
 			<name>Spring Portfolio Milestone Repository</name>
-			<url>
-				http://s3.amazonaws.com/maven.springframework.org/external
-			</url>
+			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
 		</repository>
 		<repository>
 			<id>apache-snapshot</id>
 			<name>Apache Foundation Snapshot Repository</name>
-			<url>
-				http://people.apache.org/maven-snapshot-repository
-			</url>
+			<url>http://people.apache.org/maven-snapshot-repository</url>
 		</repository>
 		<repository>
 			<id>objectstyle</id>
@@ -590,16 +584,12 @@
 		<pluginRepository>
 			<id>spring-external</id>
 			<name>Spring External Repository</name>
-			<url>
-				http://s3.amazonaws.com/maven.springframework.org/external
-			</url>
+			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
 		</pluginRepository>
 		<pluginRepository>
 			<id>spring-external-svn</id>
 			<name>Spring External SVN Repository</name>
-			<url>
-				https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext
-			</url>
+			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext</url>
 		</pluginRepository>
 	</pluginRepositories>
 
