@@ -25,8 +25,9 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.exception.FlatFileParsingException;
-import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
+import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.io.file.transform.LineTokenizer;
@@ -52,7 +53,7 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	// simple stub instead of a realistic tokenizer
 	private LineTokenizer tokenizer = new LineTokenizer() {
 		public FieldSet tokenize(String line) {
-			return new FieldSet(new String[] { line });
+			return new DefaultFieldSet(new String[] { line });
 		}
 	};
 

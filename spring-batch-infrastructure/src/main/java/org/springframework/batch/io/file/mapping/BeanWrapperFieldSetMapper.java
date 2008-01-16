@@ -44,15 +44,15 @@ import org.springframework.validation.ObjectError;
 
 /**
  * {@link FieldSetMapper} implementation based on bean property paths. The
- * {@link FieldSet} to be mapped should have field name meta data corresponding
+ * {@link DefaultFieldSet} to be mapped should have field name meta data corresponding
  * to bean property paths in a prototype instance of the desired type. The
  * prototype instance is initialized either by referring to to object by bean
  * name in the enclosing BeanFactory, or by providing a class to instantiate
  * reflectively.<br/>
  * 
  * Nested property paths, including indexed properties in maps and collections,
- * can be referenced by the {@link FieldSet} names. They will be converted to
- * nested bean properties inside the prototype. The {@link FieldSet} and the
+ * can be referenced by the {@link DefaultFieldSet} names. They will be converted to
+ * nested bean properties inside the prototype. The {@link DefaultFieldSet} and the
  * prototype are thus tightly coupled by the fields that are available and those
  * that can be initialized. If some of the nested properties are optional (e.g.
  * collection members) they need to be removed by a post processor.<br/>
@@ -103,7 +103,7 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper, BeanFactoryAwa
 
 	/**
 	 * The bean name (id) for an object that can be populated from the field set
-	 * that will be passed into {@link #mapLine(FieldSet)}. Typically a
+	 * that will be passed into {@link #mapLine(DefaultFieldSet)}. Typically a
 	 * prototype scoped bean so that a new instance is returned for each field
 	 * set mapped.
 	 * 
@@ -119,7 +119,7 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper, BeanFactoryAwa
 	/**
 	 * Public setter for the type of bean to create instead of using a prototype
 	 * bean. An object of this type will be created from its default constructor
-	 * for every call to {@link #mapLine(FieldSet)}.<br/>
+	 * for every call to {@link #mapLine(DefaultFieldSet)}.<br/>
 	 * 
 	 * Either this property or the prototype bean name must be specified, but
 	 * not both.
@@ -144,17 +144,17 @@ public class BeanWrapperFieldSetMapper implements FieldSetMapper, BeanFactoryAwa
 	}
 
 	/**
-	 * Map the {@link FieldSet} to an object retrieved from the enclosing Spring
+	 * Map the {@link DefaultFieldSet} to an object retrieved from the enclosing Spring
 	 * context, or to a new instance of the required type if no prototype is
 	 * available.
 	 * 
-	 * @throws NotWritablePropertyException if the {@link FieldSet} contains a
+	 * @throws NotWritablePropertyException if the {@link DefaultFieldSet} contains a
 	 * field that cannot be mapped to a bean property.
 	 * @throws BindingException if there is a type conversion or other error (if
 	 * the {@link DataBinder} from {@link #createBinder(Object)} has errors
 	 * after binding).
 	 * 
-	 * @see org.springframework.batch.io.file.mapping.FieldSetMapper#mapLine(org.springframework.batch.io.file.mapping.FieldSet)
+	 * @see org.springframework.batch.io.file.mapping.FieldSetMapper#mapLine(org.springframework.batch.io.file.mapping.DefaultFieldSet)
 	 */
 	public Object mapLine(FieldSet fs) {
 		Object copy = getBean();

@@ -21,8 +21,9 @@ import java.io.IOException;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.file.DefaultFlatFileItemReader;
-import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
+import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.transform.LineTokenizer;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.core.io.ByteArrayResource;
@@ -48,7 +49,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 	// simple stub instead of a realistic tokenizer
 	private LineTokenizer tokenizer = new LineTokenizer() {
 		public FieldSet tokenize(String line) {
-			return new FieldSet(new String[]{line});
+			return new DefaultFieldSet(new String[]{line});
 		}
 	};
 

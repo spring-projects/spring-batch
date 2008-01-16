@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 
 public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer {
@@ -34,7 +35,7 @@ public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer {
 	public FieldSet tokenize(String line) {
 
 		if (line==null) {
-			return new FieldSet(new String[0]);
+			return new DefaultFieldSet(new String[0]);
 		}
 
 		LineTokenizer tokenizer = null;

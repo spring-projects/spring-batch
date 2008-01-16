@@ -21,6 +21,7 @@ import java.text.ParseException;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 
 public class FieldSetTests extends TestCase {
@@ -38,7 +39,7 @@ public class FieldSetTests extends TestCase {
 		names = new String[] { "String", "Boolean", "Char", "Byte", "Short", "Integer", "Long", "Float", "Double",
 				"BigDecimal", "Null", "Date", "DatePattern", "BlankInput" };
 
-		fieldSet = new FieldSet(tokens, names);
+		fieldSet = new DefaultFieldSet(tokens, names);
 		assertEquals(14, fieldSet.getFieldCount());
 
 	}
@@ -48,7 +49,7 @@ public class FieldSetTests extends TestCase {
 	}
 
 	public void testNamesNotKnown() throws Exception {
-		fieldSet = new FieldSet(new String[]{"foo"});
+		fieldSet = new DefaultFieldSet(new String[]{"foo"});
 		try {
 			fieldSet.getNames();
 			fail("Expected IllegalStateException");
@@ -162,7 +163,7 @@ public class FieldSetTests extends TestCase {
 	}
 
 	public void testReadBooleanFalse() {
-		fieldSet = new FieldSet(new String[] { "false" });
+		fieldSet = new DefaultFieldSet(new String[] { "false" });
 		assertFalse(fieldSet.readBoolean(0));
 	}
 
@@ -217,7 +218,7 @@ public class FieldSetTests extends TestCase {
 	}
 
 	public void testReadLongWithPadding() throws Exception {
-		fieldSet = new FieldSet(new String[] {"000009"});
+		fieldSet = new DefaultFieldSet(new String[] {"000009"});
 		assertEquals(9, fieldSet.readLong(0));
 	}
 
@@ -325,12 +326,12 @@ public class FieldSetTests extends TestCase {
 	public void testEquals() {
 
 		assertEquals(fieldSet, fieldSet);
-		assertEquals(fieldSet, new FieldSet(tokens));
+		assertEquals(fieldSet, new DefaultFieldSet(tokens));
 
 		String[] tokens1 = new String[] { "token1" };
 		String[] tokens2 = new String[] { "token1" };
-		FieldSet fs1 = new FieldSet(tokens1);
-		FieldSet fs2 = new FieldSet(tokens2);
+		FieldSet fs1 = new DefaultFieldSet(tokens1);
+		FieldSet fs2 = new DefaultFieldSet(tokens2);
 		assertEquals(fs1, fs2);
 	}
 
@@ -343,30 +344,30 @@ public class FieldSetTests extends TestCase {
 	}
 
 	public void testEqualsNullTokens() {
-		assertFalse(new FieldSet(null).equals(fieldSet));
+		assertFalse(new DefaultFieldSet(null).equals(fieldSet));
 	}
 
 	public void testEqualsNotEqual() throws Exception {
 
 		String[] tokens1 = new String[] { "token1" };
 		String[] tokens2 = new String[] { "token1", "token2" };
-		FieldSet fs1 = new FieldSet(tokens1);
-		FieldSet fs2 = new FieldSet(tokens2);
+		FieldSet fs1 = new DefaultFieldSet(tokens1);
+		FieldSet fs2 = new DefaultFieldSet(tokens2);
 		assertFalse(fs1.equals(fs2));
 
 	}
 
 	public void testHashCode() throws Exception {
-		assertEquals(fieldSet.hashCode(), new FieldSet(tokens).hashCode());
+		assertEquals(fieldSet.hashCode(), new DefaultFieldSet(tokens).hashCode());
 	}
 
 	public void testHashCodeWithNullTokens() throws Exception {
-		assertEquals(0, new FieldSet(null).hashCode());
+		assertEquals(0, new DefaultFieldSet(null).hashCode());
 	}
 
 	public void testConstructor() throws Exception {
 		try {
-			new FieldSet(new String[] { "1", "2" }, new String[] { "a" });
+			new DefaultFieldSet(new String[] { "1", "2" }, new String[] { "a" });
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
@@ -375,28 +376,28 @@ public class FieldSetTests extends TestCase {
 	}
 
 	public void testToStringWithNames() throws Exception {
-		fieldSet = new FieldSet(new String[] { "foo", "bar" }, new String[] { "Foo", "Bar" });
+		fieldSet = new DefaultFieldSet(new String[] { "foo", "bar" }, new String[] { "Foo", "Bar" });
 		assertTrue(fieldSet.toString().indexOf("Foo=foo") >= 0);
 	}
 
 	public void testToStringWithoutNames() throws Exception {
-		fieldSet = new FieldSet(new String[] { "foo", "bar" });
+		fieldSet = new DefaultFieldSet(new String[] { "foo", "bar" });
 		assertTrue(fieldSet.toString().indexOf("foo") >= 0);
 	}
 
 	public void testToStringNullTokens() throws Exception {
-		fieldSet = new FieldSet(null);
+		fieldSet = new DefaultFieldSet(null);
 		assertEquals("", fieldSet.toString());
 	}
 
 	public void testProperties() throws Exception {
-		assertEquals("foo", new FieldSet(new String[] { "foo", "bar" }, new String[] { "Foo", "Bar" }).getProperties()
+		assertEquals("foo", new DefaultFieldSet(new String[] { "foo", "bar" }, new String[] { "Foo", "Bar" }).getProperties()
 				.getProperty("Foo"));
 	}
 
 	public void testPropertiesWithNoNames() throws Exception {
 		try {
-			new FieldSet(new String[] { "foo", "bar" }).getProperties();
+			new DefaultFieldSet(new String[] { "foo", "bar" }).getProperties();
 			fail("Expected IllegalStateException");
 		}
 		catch (IllegalStateException e) {
@@ -406,19 +407,19 @@ public class FieldSetTests extends TestCase {
 
 	public void testPropertiesWithWhiteSpace() throws Exception{
 
-		assertEquals("bar", new FieldSet(new String[] { "foo", "bar   " }, new String[] { "Foo", "Bar"}).getProperties().getProperty("Bar"));
+		assertEquals("bar", new DefaultFieldSet(new String[] { "foo", "bar   " }, new String[] { "Foo", "Bar"}).getProperties().getProperty("Bar"));
 	}
 
 	public void testPropertiesWithNullValues() throws Exception{
 
-		fieldSet = new FieldSet(new String[] { null, "bar" }, new String[] { "Foo", "Bar"});
+		fieldSet = new DefaultFieldSet(new String[] { null, "bar" }, new String[] { "Foo", "Bar"});
 		assertEquals("bar", fieldSet.getProperties().getProperty("Bar"));
 		assertEquals(null, fieldSet.getProperties().getProperty("Foo"));
 	}
 
 	public void testAccessByNameWhenNamesMissing() throws Exception {
 		try {
-			new FieldSet(new String[] { "1", "2" }).readInt("a");
+			new DefaultFieldSet(new String[] { "1", "2" }).readInt("a");
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
@@ -435,7 +436,7 @@ public class FieldSetTests extends TestCase {
 	}
 	
 	public void testPaddedLong(){
-		FieldSet fs = new FieldSet(new String[]{"00000009"});
+		FieldSet fs = new DefaultFieldSet(new String[]{"00000009"});
 		
 		long value = fs.readLong(0);
 		assertEquals(value, 9);

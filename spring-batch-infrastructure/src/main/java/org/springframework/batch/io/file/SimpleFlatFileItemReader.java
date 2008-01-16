@@ -19,8 +19,9 @@ package org.springframework.batch.io.file;
 import java.io.IOException;
 
 import org.springframework.batch.io.exception.FlatFileParsingException;
-import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
+import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.separator.LineReader;
 import org.springframework.batch.io.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.io.file.separator.ResourceLineReader;
@@ -37,7 +38,7 @@ import org.springframework.util.Assert;
 
 /**
  * This class represents a basic input source, that reads data from the file and
- * returns it as structured tuples in the form of{@link FieldSet} instances.
+ * returns it as structured tuples in the form of{@link DefaultFieldSet} instances.
  * The location of the file is defined by the resource property. To separate the
  * structure of the file, {@link LineTokenizer} is used to parse data obtained
  * from the file. <br/>

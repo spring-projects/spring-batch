@@ -19,6 +19,7 @@ package org.springframework.batch.io.file.transform;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 
 
@@ -63,7 +64,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	public FieldSet tokenize(String line) {
 
 		if (line == null || line.length()==0) {
-			return new FieldSet(new String[0]);
+			return new DefaultFieldSet(new String[0]);
 		}
 
 		List tokens = new ArrayList(doTokenize(line));
@@ -73,9 +74,9 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 
 		String[] values = (String[]) tokens.toArray(new String[tokens.size()]);
 		if (names.length==0) {
-			return new FieldSet(values);
+			return new DefaultFieldSet(values);
 		}
-		return new FieldSet(values, names);
+		return new DefaultFieldSet(values, names);
 	}
 	
 	protected abstract List doTokenize(String line);

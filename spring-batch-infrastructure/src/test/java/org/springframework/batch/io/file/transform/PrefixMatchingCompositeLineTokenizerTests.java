@@ -23,6 +23,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer;
@@ -86,7 +87,7 @@ public class PrefixMatchingCompositeLineTokenizerTests extends TestCase {
 	public void testMatchWithPrefix() throws Exception {
 		tokenizer.setTokenizers(Collections.singletonMap("foo", new LineTokenizer() {
 			public FieldSet tokenize(String line) {
-				return new FieldSet(new String[] {line});
+				return new DefaultFieldSet(new String[] {line});
 			}
 		}));
 		FieldSet fields = tokenizer.tokenize("foo bar");
