@@ -119,6 +119,24 @@ public class DelimitedLineTokenizerTests extends TestCase {
 		assertEquals("c", line.readString(2));
 	}
 
+	public void testTokenizeWithSpaceAtEnd() {
+		FieldSet line = tokenizer.tokenize("a,b,c ");
+		assertEquals(3, line.getFieldCount());
+		assertEquals("c", line.readString(2));
+	}
+
+	public void testTokenizeWithQuoteAndSpaceAtEnd() {
+		FieldSet line = tokenizer.tokenize("a,b,\"c\" ");
+		assertEquals(3, line.getFieldCount());
+		assertEquals("c", line.readString(2));
+	}
+
+	public void testTokenizeWithQuoteAndSpaceBeforeDelimiter() {
+		FieldSet line = tokenizer.tokenize("a,\"b\" ,c");
+		assertEquals(3, line.getFieldCount());
+		assertEquals("b", line.readString(1));
+	}
+
 	public void testTokenizeWithDelimiterAtEnd() {
 		FieldSet line = tokenizer.tokenize("a,b,c,");
 		assertEquals(4, line.getFieldCount());

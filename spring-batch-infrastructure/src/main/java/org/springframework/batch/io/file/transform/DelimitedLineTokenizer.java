@@ -50,6 +50,8 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 
 	private char quoteCharacter = DEFAULT_QUOTE_CHARACTER;
 
+	private String quoteString;
+
 	/**
 	 * Create a new instance of the {@link DelimitedLineTokenizer} class for the
 	 * common case where the delimiter is a {@link #DELIMITER_COMMA comma}.
@@ -73,6 +75,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 		}
 
 		this.delimiter = delimiter;
+		setQuoteCharacter(DEFAULT_QUOTE_CHARACTER);
 	}
 
 	/**
@@ -95,6 +98,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 */
 	public void setQuoteCharacter(char quoteCharacter) {
 		this.quoteCharacter = quoteCharacter;
+		this.quoteString = "" + quoteCharacter;
 	}
 
 	/**
@@ -109,52 +113,73 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 
 		List tokens = new ArrayList();
 
-		//line is never null in current implementation
-		//line is checked in parent: AbstractLineTokenizer.tokenize()
+		// line is never null in current implementation
+		// line is checked in parent: AbstractLineTokenizer.tokenize()
 		char[] chars = line.toCharArray();
 		boolean inQuoted = false;
-		char lastChar = 0;
 		int lastCut = 0;
 		int length = chars.length;
 
 		for (int i = 0; i < length; i++) {
-	
+
 			char currentChar = chars[i];
 			boolean isEnd = (i == (length - 1));
-	
+
 			if ((isDelimiterCharacter(currentChar) && !inQuoted) || isEnd) {
 				int endPosition = (isEnd ? (length - lastCut) : (i - lastCut));
-	
+
 				if (isEnd && isDelimiterCharacter(currentChar)) {
 					endPosition--;
 				}
-	
+
 				String value = null;
-	
-				if (isQuoteCharacter(lastChar) || isQuoteCharacter(currentChar)) {
-					value = new String(chars, lastCut + 1, endPosition - 2);
-					value = StringUtils.replace(value, "" + quoteCharacter + quoteCharacter, "" + quoteCharacter);
-				}
-				else {
-					value = new String(chars, lastCut, endPosition);
-				}
-	
+
+				value = maybeStripQuotes(new String(chars, lastCut, endPosition));
+
 				tokens.add(value);
-	
+
 				if (isEnd && (isDelimiterCharacter(currentChar))) {
 					tokens.add("");
 				}
-	
+
 				lastCut = i + 1;
 			}
 			else if (isQuoteCharacter(currentChar)) {
 				inQuoted = !inQuoted;
 			}
-	
-			lastChar = currentChar;
+
 		}
 
 		return tokens;
+	}
+
+	/**
+	 * If the string is quoted strip (possibly with whitespace outside the
+	 * quotes (which will be stripped), replace escaped quotes inside the
+	 * string.  Quotes are escaped with double instances of the quote character.
+	 * @param string
+	 * @return the same string but stripped and unescaped if necessary
+	 */
+	private String maybeStripQuotes(String string) {
+		String value = string.trim();
+		if (isQuoted(value)) {
+			value = StringUtils.replace(value, "" + quoteCharacter + quoteCharacter, "" + quoteCharacter);
+			string = value.substring(1, value.length() - 1);
+		}
+		return string;
+	}
+
+	/**
+	 * Is this string surrounded by quite characters?
+	 * @param value
+	 * @return true if the value starts and ends with the
+	 * {@link #quoteCharacter}
+	 */
+	private boolean isQuoted(String value) {
+		if (value.startsWith(quoteString) && value.endsWith(quoteString)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
