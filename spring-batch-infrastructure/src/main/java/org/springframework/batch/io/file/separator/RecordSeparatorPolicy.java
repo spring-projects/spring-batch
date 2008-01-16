@@ -40,7 +40,8 @@ public interface RecordSeparatorPolicy {
 	boolean isEndOfRecord(String line);
 
 	/**
-	 * Give the policy a chance to postprocess a record, e.g. remove a suffix.
+	 * Give the policy a chance to post-process a complete record, e.g. remove a
+	 * suffix.
 	 * 
 	 * @param record the complete record.
 	 * @return a modified version of the record if desired.
@@ -48,12 +49,14 @@ public interface RecordSeparatorPolicy {
 	String postProcess(String record);
 
 	/**
-	 * Preprocess a line before it is appended to a record. Can be used to
-	 * remove a prefix or line-continuation marker.
+	 * Pre-process a record before another line is appended, in the case of a
+	 * multi-line record. Can be used to remove a prefix or line-continuation
+	 * marker. If a record is a single line this callback is not used (but
+	 * {@link #postProcess(String)} will be).
 	 * 
-	 * @param line the current line.
+	 * @param record the current record.
 	 * @return the line as it should be appended to a record.
 	 */
-	String preProcess(String line);
+	String preProcess(String record);
 
 }

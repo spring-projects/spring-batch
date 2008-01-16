@@ -94,8 +94,23 @@ public class ResourceLineReaderTests extends TestCase {
 		reader.read();	
 		assertEquals(2, reader.getCurrentLineCount());
 	}
-	
-	public void testLineEndings() throws Exception {
+
+  public void testLineContent() throws Exception {
+    Resource resource = new ByteArrayResource("1,2,3\n4\n5,6,7".getBytes());
+    ResourceLineReader reader = new ResourceLineReader(resource);
+    assertEquals("1,2,3", reader.read());
+    assertEquals("4", reader.read());
+    assertEquals("5,6,7", reader.read());
+  }
+
+  public void testLineContentWhenLineContainsQuotedNewline() throws Exception {
+	    Resource resource = new ByteArrayResource("1,2,\"3\n4\"\n5,6,7".getBytes());
+	    ResourceLineReader reader = new ResourceLineReader(resource);
+	    assertEquals("1,2,\"3\n4\"", reader.read());
+	    assertEquals("5,6,7", reader.read());
+	  }
+
+  public void testLineEndings() throws Exception {
 		Resource resource = new ByteArrayResource("1\n2\r\n3".getBytes());
 		ResourceLineReader reader = new ResourceLineReader(resource);
 		reader.read();

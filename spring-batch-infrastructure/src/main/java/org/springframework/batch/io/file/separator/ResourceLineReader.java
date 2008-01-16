@@ -59,8 +59,7 @@ import org.springframework.util.Assert;
 public class ResourceLineReader extends AbstractItemReader implements LineReader, ResourceLifecycle, ItemReader,
 		DisposableBean {
 
-	private static final Collection DEFAULT_COMMENTS = Collections
-			.singleton("#");
+	private static final Collection DEFAULT_COMMENTS = Collections.singleton("#");
 
 	private static final String DEFAULT_ENCODING = "ISO-8859-1";
 
@@ -93,11 +92,9 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 	 * {@link DefaultRecordSeparatorPolicy}. Ideally should not be changed once
 	 * a reader is in use, but it would not be fatal if it was.
 	 * 
-	 * @param recordSeparatorPolicy
-	 *            the new {@link RecordSeparatorPolicy}
+	 * @param recordSeparatorPolicy the new {@link RecordSeparatorPolicy}
 	 */
-	public void setRecordSeparatorPolicy(
-			RecordSeparatorPolicy recordSeparatorPolicy) {
+	public void setRecordSeparatorPolicy(RecordSeparatorPolicy recordSeparatorPolicy) {
 		/*
 		 * The rest of the code accesses the policy in synchronized blocks,
 		 * copying the reference before using it. So in principle it can be
@@ -110,8 +107,7 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 	 * Setter for comment prefixes. Can be used to ignore header lines as well
 	 * by using e.g. the first couple of column names as a prefix.
 	 * 
-	 * @param comments
-	 *            an array of comment line prefixes.
+	 * @param comments an array of comment line prefixes.
 	 */
 	public void setComments(String[] comments) {
 		this.comments = new HashSet(Arrays.asList(comments));
@@ -123,9 +119,8 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 	 * 
 	 * @return a String.
 	 * 
-	 * @throws BatchEnvironmentException
-	 *             if there is an IOException while accessing the input
-	 *             resource.
+	 * @throws BatchEnvironmentException if there is an IOException while
+	 * accessing the input resource.
 	 * 
 	 * @see org.springframework.batch.item.reader.support.ItemReader#read()
 	 */
@@ -136,11 +131,9 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 		String line = readLine();
 		String record = line;
 		if (line != null) {
-			StringBuffer buffer = new StringBuffer(record);
 			while (line != null && !recordSeparatorPolicy.isEndOfRecord(record)) {
-				buffer.append(recordSeparatorPolicy
-						.preProcess(line = readLine()));
-				record = buffer.toString();
+				record = recordSeparatorPolicy.preProcess(record) + (line = readLine());
+				// record = new StringBuilder(recordSeparatorPolicy.preProcess(record)).append(line = readLine()).toString();
 			}
 		}
 		return recordSeparatorPolicy.postProcess(record);
@@ -179,9 +172,8 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 	 * Close the reader associated with this input source.
 	 * 
 	 * @see org.springframework.batch.io.ItemReader#close()
-	 * @throws BatchEnvironmentException
-	 *             if there is an {@link IOException} during the close
-	 *             operation.
+	 * @throws BatchEnvironmentException if there is an {@link IOException}
+	 * during the close operation.
 	 */
 	public synchronized void close() {
 		if (state == null) {
@@ -189,7 +181,8 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 		}
 		try {
 			state.close();
-		} finally {
+		}
+		finally {
 			state = null;
 		}
 	}
@@ -219,8 +212,7 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 	 * 
 	 * @see #reset()
 	 * 
-	 * @throws BatchEnvironmentException
-	 *             if the mark could not be set.
+	 * @throws BatchEnvironmentException if the mark could not be set.
 	 */
 	public synchronized void mark() {
 		getState().mark();
@@ -231,9 +223,8 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 	 * 
 	 * @see #mark()
 	 * 
-	 * @throws BatchEnvironmentException
-	 *             if the reset is unsuccessful, e.g. if the read-ahead limit
-	 *             was breached.
+	 * @throws BatchEnvironmentException if the reset is unsuccessful, e.g. if
+	 * the read-ahead limit was breached.
 	 */
 	public synchronized void reset() {
 		getState().reset();
@@ -275,10 +266,10 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 					}
 					currentLineCount++;
 				}
-			} catch (IOException e) {
-				throw new BatchEnvironmentException(
-						"Unable to read from resource '" + resource
-								+ "' at line " + currentLineCount, e);
+			}
+			catch (IOException e) {
+				throw new BatchEnvironmentException("Unable to read from resource '" + resource + "' at line "
+						+ currentLineCount, e);
 			}
 			return line;
 		}
@@ -288,12 +279,11 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 		 */
 		public void open() {
 			try {
-				reader = new BufferedReader(new InputStreamReader(resource
-						.getInputStream(), encoding));
+				reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), encoding));
 				mark();
-			} catch (IOException e) {
-				throw new BatchEnvironmentException("Could not open resource",
-						e);
+			}
+			catch (IOException e) {
+				throw new BatchEnvironmentException("Could not open resource", e);
 			}
 		}
 
@@ -307,9 +297,11 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 			}
 			try {
 				reader.close();
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new BatchEnvironmentException("Could not close reader", e);
-			} finally {
+			}
+			finally {
 				currentLineCount = 0;
 				markedLineCount = -1;
 			}
@@ -330,7 +322,8 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 			try {
 				reader.mark(READ_AHEAD_LIMIT);
 				markedLineCount = currentLineCount;
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new BatchEnvironmentException("Could not mark reader", e);
 			}
 		}
@@ -347,7 +340,8 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 			try {
 				this.reader.reset();
 				currentLineCount = markedLineCount;
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new BatchEnvironmentException("Could not reset reader", e);
 			}
 
