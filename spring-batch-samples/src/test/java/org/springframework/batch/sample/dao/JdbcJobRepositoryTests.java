@@ -127,7 +127,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 		cacheJobIds(execution);
 		execution.setEndTime(new Timestamp(System.currentTimeMillis()));
 		repository.saveOrUpdate(execution);
-		JobInstance job = execution.getJob();
+		JobInstance job = execution.getJobInstance();
 		job.setStatus(BatchStatus.FAILED);
 		repository.update(job);
 		setComplete();

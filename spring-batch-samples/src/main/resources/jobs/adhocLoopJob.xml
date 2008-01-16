@@ -70,7 +70,7 @@
 						<property name="interfaces">
 							<list>
 								<value>
-									org.springframework.batch.sample.ExportedJobConfigurationLoader
+									org.springframework.batch.sample.ExportedJobLoader
 								</value>
 							</list>
 						</property>
@@ -89,8 +89,8 @@
 							key="spring:service=batch,bean=jobLauncher"
 							value="org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher" />
 						<entry
-							key="spring:service=batch,bean=configurationLoader"
-							value="org.springframework.batch.sample.JobConfigurationLoader" />
+							key="spring:service=batch,bean=jobLoader"
+							value="org.springframework.batch.sample.JobLoader" />
 					</map>
 				</property>
 			</bean>
