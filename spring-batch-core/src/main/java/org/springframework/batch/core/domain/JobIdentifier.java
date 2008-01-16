@@ -41,6 +41,6 @@ public interface JobIdentifier {
 	 * 
 	 * @return JobRuntimeParameters
 	 */
-	public JobInstanceProperties getRuntimeParameters();
+	public JobInstanceProperties getJobInstanceProperties();
 
 }

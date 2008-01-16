@@ -96,7 +96,7 @@ public class JobExecutionTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
 	 */
 	public void testGetJob() {
-		assertNotNull(execution.getJob());
+		assertNotNull(execution.getJobInstance());
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class JobExecutionTests extends TestCase {
 	}
 
 	public void testContextContainsInfo() throws Exception {
-		assertEquals("foo", context.getJob().getIdentifier().getName());
+		assertEquals("foo", context.getJobInstance().getIdentifier().getName());
 	}
 
 	public void testNullContexts() throws Exception {

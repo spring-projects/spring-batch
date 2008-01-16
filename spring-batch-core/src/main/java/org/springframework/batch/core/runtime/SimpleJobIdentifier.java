@@ -62,7 +62,7 @@ public class SimpleJobIdentifier implements JobIdentifier {
 		return this.name;
 	}
 	
-	public JobInstanceProperties getRuntimeParameters() {
+	public JobInstanceProperties getJobInstanceProperties() {
 		return runtimeParameters;
 	}
 	
@@ -82,7 +82,7 @@ public class SimpleJobIdentifier implements JobIdentifier {
 		
 		SimpleJobIdentifier rhs = (SimpleJobIdentifier)obj;
 		return new EqualsBuilder().
-								append(runtimeParameters,rhs.getRuntimeParameters()).
+								append(runtimeParameters,rhs.getJobInstanceProperties()).
 								append(name, rhs.getName()).
 								isEquals();
 	}
