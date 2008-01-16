@@ -56,7 +56,7 @@ public class DefaultJobIdentifier extends SimpleJobIdentifier implements
 	}
 
 	public String getJobKey() {
-		return getRuntimeParameters().getString(JOB_KEY);
+		return getJobInstanceProperties().getString(JOB_KEY);
 	}
 	
 }

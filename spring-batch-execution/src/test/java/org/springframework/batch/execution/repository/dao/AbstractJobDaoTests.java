@@ -268,7 +268,7 @@ public abstract class AbstractJobDaoTests extends
 		assertEquals(1, jobs.size());
 		assertEquals(job.getName(), ((JobInstance) jobs.get(0)).getName());
 		assertEquals(jobIdentifier.getJobKey(), ((JobInstance) jobs.get(0)).
-				getIdentifier().getRuntimeParameters().getString(DefaultJobIdentifier.JOB_KEY));
+				getIdentifier().getJobInstanceProperties().getString(DefaultJobIdentifier.JOB_KEY));
 
 	}
 

@@ -129,7 +129,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		jobIdentifer = new SimpleJobIdentifier("TestJob");
 
 		jobExecution = jobRepository.findOrCreateJob(jobConfiguration, jobIdentifer);
-		job = jobExecution.getJob();
+		job = jobExecution.getJobInstance();
 
 		List steps = job.getStepInstances();
 		step1 = (StepInstance) steps.get(0);
@@ -179,7 +179,7 @@ public class DefaultJobExecutorTests extends TestCase {
 	public void testExecutionContextIsSet() throws Exception {
 
 		testRunNormally();
-		assertEquals(job, jobExecution.getJob());
+		assertEquals(job, jobExecution.getJobInstance());
 		assertEquals(step1, stepExecution1.getStep());
 		assertEquals(step2, stepExecution2.getStep());
 	}

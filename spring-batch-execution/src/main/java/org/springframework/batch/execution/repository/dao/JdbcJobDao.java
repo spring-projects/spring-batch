@@ -129,11 +129,11 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 		validateJobIdentifier(jobIdentifier);
 
 		Long jobId = new Long(jobIncrementer.nextLongValue());
-		Object[] parameters = new Object[] { jobId, jobIdentifier.getName(), createJobKey(jobIdentifier.getRuntimeParameters()) };
+		Object[] parameters = new Object[] { jobId, jobIdentifier.getName(), createJobKey(jobIdentifier.getJobInstanceProperties()) };
 		jdbcTemplate.update(getCreateJobQuery(), parameters, new int[] {
 			 Types.INTEGER, Types.VARCHAR, Types.VARCHAR});
 
-		insertJobParameters(jobId, jobIdentifier.getRuntimeParameters());
+		insertJobParameters(jobId, jobIdentifier.getJobInstanceProperties());
 		
 		JobInstance job = new JobInstance(jobIdentifier, jobId);
 		return job;
@@ -174,7 +174,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 		validateJobIdentifier(jobIdentifier);
 
 		Object[] parameters = new Object[] { jobIdentifier.getName(),
-				createJobKey(jobIdentifier.getRuntimeParameters()) };
+				createJobKey(jobIdentifier.getJobInstanceProperties()) };
 
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -456,7 +456,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 		Assert.notNull(jobIdentifier, "JobIdentifier cannot be null.");
 		Assert.notNull(jobIdentifier.getName(),
 				"JobIdentifier name cannot be null.");
-		Assert.notNull(jobIdentifier.getRuntimeParameters(), "JobIdentifier runtime parameters must not be null.");
+		Assert.notNull(jobIdentifier.getJobInstanceProperties(), "JobIdentifier runtime parameters must not be null.");
 	}
 
 	/**

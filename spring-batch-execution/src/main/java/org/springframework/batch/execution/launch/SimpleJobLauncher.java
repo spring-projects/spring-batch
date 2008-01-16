@@ -237,7 +237,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	protected final void runInternal(JobExecution execution)
 			throws NoSuchJobException {
 
-		JobIdentifier jobIdentifier = execution.getJob().getIdentifier();
+		JobIdentifier jobIdentifier = execution.getJobInstance().getIdentifier();
 		
 		if (getJobExecution(jobIdentifier)==null) {
 			logger.info("Job already stopped (not launching): "+jobIdentifier);
@@ -465,7 +465,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	private JobExecutionHolder register(JobExecution execution) {
 		JobExecutionHolder jobExecutionHolder = new JobExecutionHolder(execution);
 		synchronized (registry) {
-			registry.put(execution.getJob().getIdentifier(), jobExecutionHolder);
+			registry.put(execution.getJobInstance().getIdentifier(), jobExecutionHolder);
 		}
 		return jobExecutionHolder;
 	}

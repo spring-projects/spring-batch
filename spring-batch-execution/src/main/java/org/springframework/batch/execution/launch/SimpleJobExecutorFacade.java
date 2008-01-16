@@ -185,7 +185,7 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 			throws NoSuchJobException {
 
 		Job job = jobLocator
-				.getJob(execution.getJob().getIdentifier()
+				.getJob(execution.getJobInstance().getIdentifier()
 						.getName());
 
 		this.before(execution);
@@ -209,7 +209,7 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 	public void before(JobExecution execution) {
 		synchronized (mutex) {
 			running++;
-			jobExecutionRegistry.put(execution.getJob().getIdentifier(),
+			jobExecutionRegistry.put(execution.getJobInstance().getIdentifier(),
 					execution);
 		}
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
@@ -254,7 +254,7 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 		synchronized (mutex) {
 			// assume execution is synchronous so when we get to here we are
 			// not running any more
-			jobExecutionRegistry.remove(execution.getJob().getIdentifier());
+			jobExecutionRegistry.remove(execution.getJobInstance().getIdentifier());
 			running--;
 		}
 	}
@@ -299,7 +299,7 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 			JobExecution element = (JobExecution) iter.next();
 			i++;
 			String runtime = "job" + i;
-			props.setProperty(runtime, "" + element.getJob().getIdentifier());
+			props.setProperty(runtime, "" + element.getJobInstance().getIdentifier());
 			int j = 0;
 			for (Iterator iterator = element.getStepContexts().iterator(); iterator
 					.hasNext();) {

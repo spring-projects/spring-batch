@@ -119,7 +119,7 @@ public class SimpleJobTests extends TestCase {
 		jobConfiguration.addStep(new SimpleStep(getTasklet("foo", "bar")));
 		jobConfiguration.addStep(new SimpleStep(getTasklet("spam")));
 
-		JobInstance job = repository.findOrCreateJob(jobConfiguration, runtimeInformation).getJob();
+		JobInstance job = repository.findOrCreateJob(jobConfiguration, runtimeInformation).getJobInstance();
 
 		assertEquals(job.getName(), "real.job");
 
@@ -174,7 +174,7 @@ public class SimpleJobTests extends TestCase {
 		JobExecution jobExecution = repository.findOrCreateJob(jobConfiguration, runtimeInformation);
 		jobExecutor.run(jobConfiguration, jobExecution);
 
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getJob().getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getJobInstance().getStatus());
 		assertEquals(0, processed.size());
 		// provider should be exhausted
 		assertEquals(null, provider.read());
@@ -196,7 +196,7 @@ public class SimpleJobTests extends TestCase {
 		jobConfiguration.addStep(step);
 
 		JobExecution jobExecution = repository.findOrCreateJob(jobConfiguration, runtimeInformation);
-		JobInstance job = jobExecution.getJob();
+		JobInstance job = jobExecution.getJobInstance();
 		try {
 			jobExecutor.run(jobConfiguration, jobExecution);
 			fail("Expected RuntimeException");

@@ -134,7 +134,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDao.save(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher(){
 			public boolean matches(Object[] expected, Object[] actual) {
-				return ((JobExecution) actual[0]).getJob().equals(databaseJob);
+				return ((JobExecution) actual[0]).getJobInstance().equals(databaseJob);
 			}
 			public String toString(Object[] arguments) {
 				return ""+arguments[0];
@@ -142,7 +142,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		});
 		stepDaoControl.replay();
 		jobDaoControl.replay();
-		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJob();
+		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJobInstance();
 		assertTrue(job.equals(databaseJob));
 		List jobSteps = job.getStepInstances();
 		Iterator it = jobSteps.iterator();
@@ -181,7 +181,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.setMatcher(new ArgumentsMatcher(){
 			public boolean matches(Object[] expected, Object[] actual) {
 				JobExecution execution = (JobExecution) actual[0];
-				return execution.getJob().equals(databaseJob);
+				return execution.getJobInstance().equals(databaseJob);
 			}
 			public String toString(Object[] arguments) {
 				return ""+arguments[0];
@@ -189,7 +189,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		});
 		jobDaoControl.setVoidCallable();
 		jobDaoControl.replay();
-		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJob();
+		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJobInstance();
 		assertTrue(job.equals(databaseJob));
 		List jobSteps = job.getStepInstances();
 		Iterator it = jobSteps.iterator();
@@ -270,7 +270,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDao.save(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher(){
 			public boolean matches(Object[] expected, Object[] actual) {
-				return ((JobExecution) actual[0]).getJob().equals(databaseJob);
+				return ((JobExecution) actual[0]).getJobInstance().equals(databaseJob);
 			}
 			public String toString(Object[] arguments) {
 				return ""+arguments[0];
@@ -278,7 +278,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		});
 		stepDaoControl.replay();
 		jobDaoControl.replay();
-		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJob();
+		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJobInstance();
 		assertTrue(job.equals(databaseJob));
 		List jobSteps = job.getStepInstances();
 		Iterator it = jobSteps.iterator();
@@ -411,7 +411,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDao.save(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher(){
 			public boolean matches(Object[] expected, Object[] actual) {
-				return ((JobExecution) actual[0]).getJob().equals(databaseJob);
+				return ((JobExecution) actual[0]).getJobInstance().equals(databaseJob);
 			}
 			public String toString(Object[] arguments) {
 				return ""+arguments[0];
@@ -419,7 +419,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		});
 		stepDaoControl.replay();
 		jobDaoControl.replay();
-		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJob();
+		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJobInstance();
 		List jobSteps = job.getStepInstances();
 		Iterator it = jobSteps.iterator();
 		StepInstance step = (StepInstance) it.next();
@@ -455,14 +455,14 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDao.save(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher(){
 			public boolean matches(Object[] expected, Object[] actual) {
-				return ((JobExecution) actual[0]).getJob().equals(databaseJob);
+				return ((JobExecution) actual[0]).getJobInstance().equals(databaseJob);
 			}
 			public String toString(Object[] arguments) {
 				return ""+arguments[0];
 			}
 		});
 		jobDaoControl.replay();
-		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJob();
+		JobInstance job = jobRepository.findOrCreateJob(jobConfiguration, jobRuntimeInformation).getJobInstance();
 		assertTrue(job.equals(databaseJob));
 		List jobSteps = job.getStepInstances();
 		Iterator it = jobSteps.iterator();

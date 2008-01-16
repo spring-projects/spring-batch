@@ -67,7 +67,7 @@ public class DefaultJobExecutor implements JobExecutor {
 	public ExitStatus run(Job job, JobExecution execution)
 			throws BatchCriticalException {
 
-		JobInstance jobInstance = execution.getJob();
+		JobInstance jobInstance = execution.getJobInstance();
 		updateStatus(execution, BatchStatus.STARTING);
 
 		List stepInstances = jobInstance.getStepInstances();
@@ -127,7 +127,7 @@ public class DefaultJobExecutor implements JobExecutor {
 	}
 
 	private void updateStatus(JobExecution jobExecution, BatchStatus status) {
-		JobInstance job = jobExecution.getJob();
+		JobInstance job = jobExecution.getJobInstance();
 		jobExecution.setStatus(status);
 		job.setStatus(status);
 		jobRepository.update(job);

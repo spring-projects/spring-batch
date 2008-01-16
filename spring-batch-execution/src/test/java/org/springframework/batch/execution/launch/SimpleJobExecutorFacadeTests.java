@@ -80,7 +80,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 
 		JobInstance job = setUpFacadeForNormalStart();
 		jobExecution = jobExecutorFacade.createExecutionFrom(jobIdentifier);
-		assertEquals(job, jobExecution.getJob());
+		assertEquals(job, jobExecution.getJobInstance());
 		jobRepositoryControl.verify();
 
 	}
@@ -90,7 +90,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 		JobInstance job = setUpFacadeForNormalStart();
 		jobExecution = jobExecutorFacade.createExecutionFrom(jobIdentifier);
 		jobExecutorFacade.start(jobExecution);
-		assertEquals(job, jobExecution.getJob());
+		assertEquals(job, jobExecution.getJobInstance());
 		assertEquals("bar", job.getName());
 		jobRepositoryControl.verify();
 

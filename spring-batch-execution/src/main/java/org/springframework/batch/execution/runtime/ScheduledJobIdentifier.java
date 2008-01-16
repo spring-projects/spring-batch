@@ -51,6 +51,6 @@ public class ScheduledJobIdentifier extends DefaultJobIdentifier implements JobI
 	}
 
 	public Date getScheduleDate() {
-		return getRuntimeParameters().getDate(SCHEDULE_DATE);
+		return getJobInstanceProperties().getDate(SCHEDULE_DATE);
 	}
 }
