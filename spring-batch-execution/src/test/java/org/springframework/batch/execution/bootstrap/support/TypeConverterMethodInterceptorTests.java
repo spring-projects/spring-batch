@@ -82,7 +82,7 @@ public class TypeConverterMethodInterceptorTests extends TestCase {
 		}
 	}
 	
-	public void testTyepConverter() throws Exception {
+	public void testTypeConverter() throws Exception {
 		final TestCase testCase = this;
 		interceptor.setTypeConverter(new SimpleTypeConverter() {
 			public Object convertIfNecessary(Object value, Class requiredType) {
