@@ -1,5 +1,6 @@
 package org.springframework.batch.sample.mapping;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.Address;
@@ -43,7 +44,7 @@ public class AddressFieldSetMapperTests extends AbstractFieldSetMapperTests {
 				AddressFieldSetMapper.COUNTRY_COLUMN, 
 				AddressFieldSetMapper.ZIP_CODE_COLUMN };
 		
-		return  new FieldSet(tokens, columnNames);
+		return  new DefaultFieldSet(tokens, columnNames);
 	}
 
 	protected FieldSetMapper fieldSetMapper() {

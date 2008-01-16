@@ -2,10 +2,10 @@ package org.springframework.batch.sample.mapping;
 
 import java.util.Calendar;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.Order;
-import org.springframework.batch.sample.mapping.HeaderFieldSetMapper;
 
 public class HeaderFieldSetMapperTests extends AbstractFieldSetMapperTests {
 
@@ -31,7 +31,7 @@ public class HeaderFieldSetMapperTests extends AbstractFieldSetMapperTests {
 				HeaderFieldSetMapper.ORDER_ID_COLUMN,
 				HeaderFieldSetMapper.ORDER_DATE_COLUMN
 		};
-		return new FieldSet(tokens, columnNames);
+		return new DefaultFieldSet(tokens, columnNames);
 	}
 
 	protected FieldSetMapper fieldSetMapper() {

@@ -2,6 +2,7 @@ package org.springframework.batch.sample.mapping;
 
 import java.math.BigDecimal;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.reader.AggregateItemReader;
@@ -31,7 +32,7 @@ public class TradeFieldSetMapperTests extends AbstractFieldSetMapperTests{
 		tokens[TradeFieldSetMapper.PRICE_COLUMN] = String.valueOf(PRICE);
 		tokens[TradeFieldSetMapper.CUSTOMER_COLUMN] = CUSTOMER;
 		
-		return new FieldSet(tokens);
+		return new DefaultFieldSet(tokens);
 	}
 
 	protected FieldSetMapper fieldSetMapper() {
@@ -39,11 +40,11 @@ public class TradeFieldSetMapperTests extends AbstractFieldSetMapperTests{
 	}
 	
 	public void testBeginRecord() throws Exception {
-		assertEquals(AggregateItemReader.BEGIN_RECORD, fieldSetMapper().mapLine(new FieldSet(new String[] {"BEGIN"})));
+		assertEquals(AggregateItemReader.BEGIN_RECORD, fieldSetMapper().mapLine(new DefaultFieldSet(new String[] {"BEGIN"})));
 	}
 
 	public void testEndRecord() throws Exception {
-		assertEquals(AggregateItemReader.END_RECORD, fieldSetMapper().mapLine(new FieldSet(new String[] {"END"})));
+		assertEquals(AggregateItemReader.END_RECORD, fieldSetMapper().mapLine(new DefaultFieldSet(new String[] {"END"})));
 	}
 
 }

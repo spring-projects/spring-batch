@@ -1,5 +1,6 @@
 package org.springframework.batch.sample.mapping;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.ShippingInfo;
@@ -26,7 +27,7 @@ public class ShippingFieldSetMapperTests extends AbstractFieldSetMapperTests{
 				ShippingFieldSetMapper.ADDITIONAL_SHIPPING_INFO_COLUMN,
 				ShippingFieldSetMapper.SHIPPING_TYPE_ID_COLUMN
 		};
-		return new FieldSet(tokens, columnNames);
+		return new DefaultFieldSet(tokens, columnNames);
 	}
 
 	protected FieldSetMapper fieldSetMapper() {

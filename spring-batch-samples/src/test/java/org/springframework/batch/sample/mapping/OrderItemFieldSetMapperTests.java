@@ -2,10 +2,10 @@ package org.springframework.batch.sample.mapping;
 
 import java.math.BigDecimal;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.LineItem;
-import org.springframework.batch.sample.mapping.OrderItemFieldSetMapper;
 
 public class OrderItemFieldSetMapperTests extends AbstractFieldSetMapperTests{
 
@@ -52,7 +52,7 @@ public class OrderItemFieldSetMapperTests extends AbstractFieldSetMapperTests{
 				OrderItemFieldSetMapper.SHIPPING_PRICE_COLUMN,
 				OrderItemFieldSetMapper.TOTAL_PRICE_COLUMN
 		};
-		return new FieldSet(tokens, columnNames);
+		return new DefaultFieldSet(tokens, columnNames);
 	}
 
 	protected FieldSetMapper fieldSetMapper() {

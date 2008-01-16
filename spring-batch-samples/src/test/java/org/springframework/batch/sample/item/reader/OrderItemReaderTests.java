@@ -5,6 +5,7 @@ import java.util.Iterator;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.ItemReader;
@@ -50,14 +51,14 @@ public class OrderItemReaderTests extends TestCase {
 	public void testNext() throws Exception {
 
 		//create fieldsets and set return values for input source
-		FieldSet headerFS = new FieldSet(new String[] {Order.LINE_ID_HEADER});
-		FieldSet customerFS = new FieldSet(new String[] {Customer.LINE_ID_NON_BUSINESS_CUST});
-		FieldSet billingFS = new FieldSet(new String[] {Address.LINE_ID_BILLING_ADDR});
-		FieldSet shippingFS = new FieldSet(new String[] {Address.LINE_ID_SHIPPING_ADDR});
-		FieldSet billingInfoFS = new FieldSet(new String[] {BillingInfo.LINE_ID_BILLING_INFO});
-		FieldSet shippingInfoFS = new FieldSet(new String[] {ShippingInfo.LINE_ID_SHIPPING_INFO});
-		FieldSet itemFS = new FieldSet(new String[] {LineItem.LINE_ID_ITEM});
-		FieldSet footerFS = new FieldSet(new String[] {Order.LINE_ID_FOOTER, "100","3","3"},
+		FieldSet headerFS = new DefaultFieldSet(new String[] {Order.LINE_ID_HEADER});
+		FieldSet customerFS = new DefaultFieldSet(new String[] {Customer.LINE_ID_NON_BUSINESS_CUST});
+		FieldSet billingFS = new DefaultFieldSet(new String[] {Address.LINE_ID_BILLING_ADDR});
+		FieldSet shippingFS = new DefaultFieldSet(new String[] {Address.LINE_ID_SHIPPING_ADDR});
+		FieldSet billingInfoFS = new DefaultFieldSet(new String[] {BillingInfo.LINE_ID_BILLING_INFO});
+		FieldSet shippingInfoFS = new DefaultFieldSet(new String[] {ShippingInfo.LINE_ID_SHIPPING_INFO});
+		FieldSet itemFS = new DefaultFieldSet(new String[] {LineItem.LINE_ID_ITEM});
+		FieldSet footerFS = new DefaultFieldSet(new String[] {Order.LINE_ID_FOOTER, "100","3","3"},
 										 new String[] {"ID","TOTAL_PRICE","TOTAL_LINE_ITEMS","TOTAL_ITEMS"});
 
 		input.read();

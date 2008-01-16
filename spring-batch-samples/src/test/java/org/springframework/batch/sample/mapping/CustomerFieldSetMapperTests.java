@@ -1,5 +1,6 @@
 package org.springframework.batch.sample.mapping;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.Customer;
@@ -46,7 +47,7 @@ public class CustomerFieldSetMapperTests extends AbstractFieldSetMapperTests {
 				CustomerFieldSetMapper.REG_ID_COLUMN,
 				CustomerFieldSetMapper.VIP_COLUMN};
 		
-		return new FieldSet(tokens, columnNames);
+		return new DefaultFieldSet(tokens, columnNames);
 	}
 
 	protected FieldSetMapper fieldSetMapper() {

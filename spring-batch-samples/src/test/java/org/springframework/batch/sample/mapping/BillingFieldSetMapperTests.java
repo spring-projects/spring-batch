@@ -1,9 +1,9 @@
 package org.springframework.batch.sample.mapping;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.BillingInfo;
-import org.springframework.batch.sample.mapping.BillingFieldSetMapper;
 
 public class BillingFieldSetMapperTests extends AbstractFieldSetMapperTests{
 
@@ -24,7 +24,7 @@ public class BillingFieldSetMapperTests extends AbstractFieldSetMapperTests{
 		String[] columnNames = new String[]{
 				BillingFieldSetMapper.PAYMENT_TYPE_ID_COLUMN,
 				BillingFieldSetMapper.PAYMENT_DESC_COLUMN};
-		return new FieldSet(tokens, columnNames);
+		return new DefaultFieldSet(tokens, columnNames);
 	}
 
 	protected FieldSetMapper fieldSetMapper() {

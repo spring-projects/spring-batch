@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 
 /**
@@ -56,7 +57,7 @@ public final class FieldSetResultSetExtractor {
             names.add(metaData.getColumnName(i));
         }
 
-        fs = new FieldSet((String[])tokens.toArray(new String[0]), (String[])names.toArray(new String[0]));
+        fs = new DefaultFieldSet((String[])tokens.toArray(new String[0]), (String[])names.toArray(new String[0]));
 
         return fs;	
 	}
