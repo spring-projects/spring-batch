@@ -98,7 +98,7 @@
 	<bean id="playerFileItemReader"
 		class="org.springframework.batch.io.file.DefaultFlatFileItemReader" scope="step">
 		<aop:scoped-proxy/>		
-		<property name="resource" value="classpath:data/footballjob/input/player.csv" />
+		<property name="resource" value="classpath:data/footballjob/input/${player.file.name}" />
 		<property name="tokenizer">
 			<bean
 				class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer">
@@ -115,7 +115,7 @@
 	<bean id="gameFileItemReader"
 		class="org.springframework.batch.io.file.DefaultFlatFileItemReader" scope="step">
 		<aop:scoped-proxy/>
-		<property name="resource" value="classpath:data/footballjob/input/games.csv"/>
+		<property name="resource" value="classpath:data/footballjob/input/${games.file.name}"/>
 		<property name="tokenizer">
 			<bean
 				class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer">
@@ -158,5 +158,14 @@
 
 		</aop:aspect>
 	</aop:config>
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:data/footballJob/input/input.properties" />
+		<property name="systemPropertiesModeName"
+			value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreUnresolvablePlaceholders" value="false" />
+		<property name="order" value="1" />
+	</bean>
 
 </beans>

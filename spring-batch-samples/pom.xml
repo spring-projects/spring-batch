@@ -188,7 +188,6 @@
 					</includes>
 					<excludes>
 						<exclude>**/Abstract*.java</exclude>
-						<exclude>**/FootballJobFunctionalTests.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
