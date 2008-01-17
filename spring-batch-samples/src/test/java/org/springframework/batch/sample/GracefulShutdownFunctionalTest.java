@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.core.executor.StepInterruptedException;
+import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 
 /**
  * Functional test for graceful shutdown.  A batch container is started in a new thread,
@@ -40,7 +41,7 @@ public class GracefulShutdownFunctionalTest extends AbstractBatchLauncherTests {
 		Thread jobThread = new Thread(){
 			public void run(){
 				try {
-					launcher.run(getJobName());
+					launcher.run(new SimpleJobIdentifier(getJobName()));
 				}
 				catch (RuntimeException e) {
 					if (!(e.getCause() instanceof StepInterruptedException)) {

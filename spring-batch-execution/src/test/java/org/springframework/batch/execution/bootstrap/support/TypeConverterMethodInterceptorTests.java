@@ -1,7 +1,9 @@
 package org.springframework.batch.execution.bootstrap.support;
 
+import java.beans.PropertyEditorSupport;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
@@ -70,6 +72,21 @@ public class TypeConverterMethodInterceptorTests extends TestCase {
 		assertEquals("FOO:true", proxy.getBean());
 	}
 
+	public void testInvokeWithMethodParameterConversionToBoolean() throws Exception {
+		ProxyFactory factory = new ProxyFactory(Test.class, interceptor);
+		factory.setTarget(new TestBean(true));
+		Test proxy = (Test) factory.getProxy();
+		assertEquals("flag:true", proxy.grab("true"));
+	}
+
+	public void testInvokeWithMethodParameterConversionToPattern() throws Exception {
+		ProxyFactory factory = new ProxyFactory(Test.class, interceptor);
+		factory.setTarget(new TestBean(true));
+		Test proxy = (Test) factory.getProxy();
+		Pattern pattern = Pattern.compile("[a-z]*");
+		assertEquals(pattern.toString(), proxy.relayPattern("[a-z]*"));
+	}
+
 	public void testInvalidConversion() throws Exception {
 		ProxyFactory factory = new ProxyFactory(Test.class, interceptor);
 		factory.setTarget(new TestBean(true));
@@ -95,16 +112,37 @@ public class TypeConverterMethodInterceptorTests extends TestCase {
 		assertEquals(testCase, proxy.getInvalid());
 	}
 
+	public void testInvokeWithMethodParameterConversionWithPropertyEditor() throws Exception {
+		final TestBean bean = new TestBean(false);
+		SimpleTypeConverter converter = new SimpleTypeConverter();
+		converter.registerCustomEditor(TestBean.class, new PropertyEditorSupport() {
+			public void setAsText(String text) throws IllegalArgumentException {
+				setValue(bean);
+			}
+		});
+		interceptor.setTypeConverter(converter);
+		ProxyFactory factory = new ProxyFactory(Test.class, interceptor);
+		factory.setTarget(new TestBean(true));
+		Test proxy = (Test) factory.getProxy();
+		assertEquals(bean.toString(), proxy.relayBean("foo"));
+	}
+
 	public interface Test {
 		boolean isTest();
 
 		String getBean();
+
+		String relayPattern(String pattern);
 
 		TestCase getInvalid();
 		
 		int getValue();
 
 		void operate();
+		
+		String grab(String value);
+		
+		String relayBean(String value);
 	}
 
 	// N.B. TestBean intentionally  does not implement Test!
@@ -124,6 +162,14 @@ public class TypeConverterMethodInterceptorTests extends TestCase {
 			return this;
 		}
 
+		public TestBean relayBean(TestBean bean) {
+			return bean;
+		}
+
+		public Pattern relayPattern(Pattern pattern) {
+			return pattern;
+		}
+
 		public TestBean getInvalid() {
 			return this;
 		}
@@ -134,6 +180,10 @@ public class TypeConverterMethodInterceptorTests extends TestCase {
 
 		public void operate() {
 			list.add("FOO");
+		}
+		
+		public String grab(boolean flag) {
+			return "flag:"+flag;
 		}
 
 		public String toString() {

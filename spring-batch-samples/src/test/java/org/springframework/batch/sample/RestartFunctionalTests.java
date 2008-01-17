@@ -16,6 +16,7 @@
 
 package org.springframework.batch.sample;
 
+import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.jdbc.core.JdbcOperations;
 
@@ -81,7 +82,7 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 
 	// load the application context and launch the job
 	private void runJob() throws Exception, Exception {
-		launcher.run(getJobName());
+		launcher.run(new SimpleJobIdentifier(getJobName()));
 	}
 
 }

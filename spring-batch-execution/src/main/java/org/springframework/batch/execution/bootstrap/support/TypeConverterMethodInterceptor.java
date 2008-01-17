@@ -19,11 +19,14 @@ package org.springframework.batch.execution.bootstrap.support;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.beans.TypeConverter;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
@@ -47,8 +50,7 @@ public class TypeConverterMethodInterceptor implements MethodInterceptor {
 	 * where exception reporting is a little weak (and in addition the class of
 	 * the exception might not be available remotely).
 	 * 
-	 * @param convertException
-	 *            the flag to set (default false)
+	 * @param convertException the flag to set (default false)
 	 */
 	public void setConvertException(boolean convertException) {
 		this.convertException = convertException;
@@ -58,8 +60,7 @@ public class TypeConverterMethodInterceptor implements MethodInterceptor {
 	 * Public setter for the {@link TypeConverter} property. Defaults to a
 	 * {@link SimpleTypeConverter}.
 	 * 
-	 * @param typeConverter
-	 *            the typeConverter to set
+	 * @param typeConverter the typeConverter to set
 	 */
 	public void setTypeConverter(TypeConverter typeConverter) {
 		this.typeConverter = typeConverter;
@@ -72,20 +73,48 @@ public class TypeConverterMethodInterceptor implements MethodInterceptor {
 	 * 
 	 * @return an object that satisfies the signature of the proxy method.
 	 * 
-	 * @throws TypeMismatchException
-	 *             if the target method returns an object that cannot be
-	 *             converted to the desired type.
+	 * @throws TypeMismatchException if the target method returns an object that
+	 * cannot be converted to the desired type.
 	 * 
 	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
 	 */
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 
 		// The method called on the proxy
-		Method invoked = invocation.getMethod();
+		final Method invoked = invocation.getMethod();
 
 		// The corresponding method on the target if there is one...
-		Method method = ReflectionUtils.findMethod(invocation.getThis()
-				.getClass(), invoked.getName(), invoked.getParameterTypes());
+		Method method = ReflectionUtils.findMethod(invocation.getThis().getClass(), invoked.getName(), invoked
+				.getParameterTypes());
+
+		Object[] arguments = invocation.getArguments();
+
+		// If there was no such method look for one with String args
+		if (method == null) {
+			final List methods = new ArrayList();
+			ReflectionUtils.doWithMethods(invocation.getThis().getClass(), new ReflectionUtils.MethodCallback() {
+				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+					methods.add(method);
+				}
+
+			}, new ReflectionUtils.MethodFilter() {
+				public boolean matches(Method method) {
+					if (method.getName().equals(invoked.getName())
+							&& method.getParameterTypes().length == invoked.getParameterTypes().length) {
+						return true;
+					}
+					return false;
+				}
+
+			});
+			if (methods.size()==1) {
+				method = (Method) methods.get(0);
+				for (int i = 0; i < arguments.length; i++) {
+					Object arg = arguments[i];
+					arguments[i] = convert(arg, method.getParameterTypes()[i]);
+				}
+			}
+		}
 
 		// If there was no such method do nothing... TODO: throw Exception?
 		if (method == null) {
@@ -96,12 +125,13 @@ public class TypeConverterMethodInterceptor implements MethodInterceptor {
 		Object result = null;
 
 		try {
-			result = ReflectionUtils.invokeMethod(method, invocation.getThis(),
-					invocation.getArguments());
-		} catch (Throwable e) {
+			result = ReflectionUtils.invokeMethod(method, invocation.getThis(), arguments);
+		}
+		catch (Throwable e) {
 			if (convertException) {
 				result = e;
-			} else {
+			}
+			else {
 				throw e;
 			}
 		}

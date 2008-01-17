@@ -29,17 +29,6 @@ public class StubJobLauncher implements JobLauncher {
 		return isRunning;
 	}
 
-	public JobExecution run() throws NoSuchJobException {
-		lastRunCalled = RUN_NO_ARGS;
-		return returnValue;
-	}
-
-	public JobExecution run(String jobName)
-			throws NoSuchJobException {
-		lastRunCalled = RUN_JOB_NAME;
-		return returnValue;
-	}
-
 	public JobExecution run(JobIdentifier jobIdentifier)
 			throws NoSuchJobException {
 		lastRunCalled = RUN_JOB_IDENTIFIER;

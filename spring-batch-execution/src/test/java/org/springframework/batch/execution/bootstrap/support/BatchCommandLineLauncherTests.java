@@ -91,7 +91,7 @@ public class BatchCommandLineLauncherTests extends TestCase {
 		assertEquals(ExitCodeMapper.JVM_EXITCODE_COMPLETED, systemExiter
 				.getStatus());
 		assertEquals(jobLauncher.getLastRunCalled(),
-				StubJobLauncher.RUN_NO_ARGS);
+				StubJobLauncher.RUN_JOB_IDENTIFIER);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class BatchCommandLineLauncherTests extends TestCase {
 		assertEquals(ExitCodeMapper.JVM_EXITCODE_COMPLETED, systemExiter
 				.getStatus());
 		assertEquals(jobLauncher.getLastRunCalled(),
-				StubJobLauncher.RUN_JOB_NAME);
+				StubJobLauncher.RUN_JOB_IDENTIFIER);
 	}
 
 	private void setReturnValue(ExitStatus status) {

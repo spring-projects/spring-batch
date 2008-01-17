@@ -31,33 +31,6 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 public interface JobLauncher {
 
 	/**
-	 * Start a job execution with default name and other runtime information
-	 * generated on the fly.<br/>
-	 * 
-	 * @return the exit code from the job if it returns synchronously. If the
-	 *         implementation is asynchronous, the status might well be unknown.
-	 * @throws JobExecutionAlreadyRunningException 
-	 * 
-	 */
-	public JobExecution run() throws NoSuchJobException, JobExecutionAlreadyRunningException;
-
-	/**
-	 * Start a job execution with the given name and other runtime information
-	 * generated on the fly. The name is used to locate a job configuration, and
-	 * the other runtime information is used to identify the job instance.
-	 * 
-	 * @param name
-	 *            the name to assign to the job configuration
-	 * @return the exit code from the job if it returns synchronously. If the
-	 *         implementation is asynchronous, the status might well be unknown.
-	 * 
-	 * @throws NoSuchJobException
-	 * @throws JobExecutionAlreadyRunningException 
-	 */
-	public JobExecution run(String jobName)
-			throws NoSuchJobException, JobExecutionAlreadyRunningException;
-
-	/**
 	 * Start a job execution with the given runtime information.
 	 * 
 	 * @return the exit code from the job if it returns synchronously. If the

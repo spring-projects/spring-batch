@@ -25,7 +25,6 @@ import java.util.TimerTask;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
@@ -57,9 +56,8 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 
 		InterruptibleContainer container = new InterruptibleContainer();
 		launcher.setJobExecutorFacade(container);
-		launcher.setJobName(new Job("foo").getName());
 
-		JobExecution execution = launcher.run();
+		JobExecution execution = launcher.run(new SimpleJobIdentifier("foo"));
 		// give the thread some time to start up...
 		Thread.sleep(100);
 		assertTrue(launcher.isRunning());
@@ -91,9 +89,8 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 
 		InterruptibleContainer container = new InterruptibleContainer();
 		launcher.setJobExecutorFacade(container);
-		launcher.setJobName("foo");
 
-		JobExecution execution = launcher.run();
+		JobExecution execution = launcher.run(new SimpleJobIdentifier("foo"));
 		// give the thread some time to start up...
 		Thread.sleep(100);
 		// The launcher thinks it has started the job...
@@ -117,14 +114,13 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 
 		InterruptibleContainer container = new InterruptibleContainer();
 		launcher.setJobExecutorFacade(container);
-		launcher.setJobName(new Job("foo").getName());
 
-		launcher.run();
+		launcher.run(new SimpleJobIdentifier("foo"));
 		// give the thread some time to start up:
 		Thread.sleep(100);
 		assertTrue(launcher.isRunning());
 		try {
-			launcher.run();
+			launcher.run(new SimpleJobIdentifier("foo"));
 			fail("Expected JobExecutionAlreadyRunningException");
 		} catch (JobExecutionAlreadyRunningException e) {
 			// expected
@@ -135,12 +131,6 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 		// ...and to shut down:
 		Thread.sleep(400);
 		assertFalse(launcher.isRunning());
-	}
-
-	public void testNormalApplicationEventNotRecognized() throws Exception {
-		launcher.onApplicationEvent(new ApplicationEvent("foo") {
-		});
-		// nothing happens
 	}
 
 	public void testStatisticsRetrieved() throws Exception {

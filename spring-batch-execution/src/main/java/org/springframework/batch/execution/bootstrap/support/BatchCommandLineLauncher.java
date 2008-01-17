@@ -18,9 +18,13 @@ package org.springframework.batch.execution.bootstrap.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
+import org.springframework.batch.core.runtime.JobIdentifierFactory;
 import org.springframework.batch.execution.launch.JobLauncher;
+import org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory;
 import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
@@ -45,22 +49,22 @@ import org.springframework.util.Assert;
  * 
  * <p>
  * With any launch of a batch job within Spring Batch, a minimum of two contexts
- * must be loaded. One is the context containing the Job, the other
- * contains the 'Execution Environment'. That is, the JobExecutorFacade (which
- * contains all the executors, plus the repository), the JobIdentifierFactory,
- * and a normal JobLauncher. This command line launcher loads these application
- * contexts by first loading the execution environment context via a
+ * must be loaded. One is the context containing the Job, the other contains the
+ * 'Execution Environment'. That is, the JobExecutorFacade (which contains all
+ * the executors, plus the repository), the JobIdentifierFactory, and a normal
+ * JobLauncher. This command line launcher loads these application contexts by
+ * first loading the execution environment context via a
  * {@link ContextSingletonBeanFactoryLocator}, which will search for the
  * default key from classpath*:beanRefContext.xml to return the context. This
- * will then be used as the parent to the Job context. All required
- * dependencies of the launcher will then be satisfied by autowiring by type
- * from the combined application context. Default values are provided for all
- * fields except the JobLauncher. Therefore, if autowiring fails to set it (it
- * should be noted that dependency checking is disabled because most of the
- * fields have default values and thus don't require dependencies to be
- * fulfilled via autowiring) then an exception will be thrown. It should also be
- * noted that even if an exception is thrown by this class, it will be mapped to
- * an integer and returned.
+ * will then be used as the parent to the Job context. All required dependencies
+ * of the launcher will then be satisfied by autowiring by type from the
+ * combined application context. Default values are provided for all fields
+ * except the JobLauncher. Therefore, if autowiring fails to set it (it should
+ * be noted that dependency checking is disabled because most of the fields have
+ * default values and thus don't require dependencies to be fulfilled via
+ * autowiring) then an exception will be thrown. It should also be noted that
+ * even if an exception is thrown by this class, it will be mapped to an integer
+ * and returned.
  * </p>
  * 
  * <p>
@@ -76,8 +80,7 @@ import org.springframework.util.Assert;
  * method are optional, VM arguments are used:
  * 
  * <ul>
- * <li>-Djob.configuration.path: the classpath location of the Job
- * to use
+ * <li>-Djob.configuration.path: the classpath location of the Job to use
  * <li>-Djob.name: job name to be passed to the {@link JobLauncher}
  * <li>-Dbatch.execution.environment.key: the key in beanRefContext.xml used to
  * load the execution envrionement.
@@ -89,26 +92,32 @@ import org.springframework.util.Assert;
  */
 public class BatchCommandLineLauncher {
 
-	protected static final Log logger = LogFactory
-			.getLog(BatchCommandLineLauncher.class);
+	protected static final Log logger = LogFactory.getLog(BatchCommandLineLauncher.class);
 
 	/**
 	 * The default key for the parent context.
 	 */
 	public static final String DEFAULT_PARENT_KEY = "batchExecutionEnvironment";
+
 	/**
 	 * The default path to the job configuration.
 	 */
 	public static final String DEFAULT_JOB_CONFIGURATION_PATH = "job-configuration.xml";
+
 	/**
 	 * The default path to the bean reference context.
 	 */
 	public static final String DEFAULT_BEAN_REF_CONTEXT_PATH = "beanRefContext.xml";
 
 	private static final String JOB_CONFIGURATION_PATH_KEY = "job.configuration.path";
+
 	private static final String JOB_NAME_KEY = "job.name";
+
 	private static final String BATCH_EXECUTION_ENVIRONMENT_KEY = "batch.execution.environment.key";
+
 	private static final String BEAN_REF_CONTEXT_KEY = "bean.ref.context";
+
+	private JobIdentifierFactory jobIdentifierFactory = new ScheduledJobIdentifierFactory();
 
 	private BeanFactoryLocator beanFactoryLocator;
 
@@ -120,16 +129,34 @@ public class BatchCommandLineLauncher {
 
 	private SystemExiter systemExiter = new JvmSystemExiter();
 
+	private String defaultJobName;
+
 	public BatchCommandLineLauncher(String beanRefContextPath) {
-		beanFactoryLocator = ContextSingletonBeanFactoryLocator
-				.getInstance(beanRefContextPath);
+		beanFactoryLocator = ContextSingletonBeanFactoryLocator.getInstance(beanRefContextPath);
+	}
+	
+	/**
+	 * Setter for the name of the {@link Job} that this launcher will run.
+	 * 
+	 * @param jobName the job name to set
+	 */
+	public void setDefaultJobName(String defaultJobName) {
+		this.defaultJobName = defaultJobName;
+	}
+
+	/**
+	 * Setter for {@link JobIdentifierFactory}.
+	 * 
+	 * @param jobIdentifierFactory the {@link JobIdentifierFactory} to set
+	 */
+	public void setJobIdentifierFactory(JobIdentifierFactory jobIdentifierFactory) {
+		this.jobIdentifierFactory = jobIdentifierFactory;
 	}
 
 	/**
 	 * Injection setter for the {@link JobLauncher}.
 	 * 
-	 * @param launcher
-	 *            the launcher to set
+	 * @param launcher the launcher to set
 	 */
 	public void setLauncher(JobLauncher launcher) {
 		this.launcher = launcher;
@@ -140,16 +167,14 @@ public class BatchCommandLineLauncher {
 	 * 
 	 * @param exceptionClassifier
 	 */
-	public void setExceptionClassifier(
-			ExitCodeExceptionClassifier exceptionClassifier) {
+	public void setExceptionClassifier(ExitCodeExceptionClassifier exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 
 	/**
 	 * Injection setter for the {@link JvmExitCodeMapper}.
 	 * 
-	 * @param exitCodeMapper
-	 *            the exitCodeMapper to set
+	 * @param exitCodeMapper the exitCodeMapper to set
 	 */
 	public void setExitCodeMapper(ExitCodeMapper exitCodeMapper) {
 		this.exitCodeMapper = exitCodeMapper;
@@ -174,15 +199,13 @@ public class BatchCommandLineLauncher {
 	}
 
 	/**
-	 * @param path
-	 *            the path to a Spring context configuration for this job
-	 * @param jobName
-	 *            the name of the job execution to use
+	 * @param path the path to a Spring context configuration for this job
+	 * @param jobName the name of the job execution to use
 	 * @parm parentKey the key to be loaded by
-	 *       ContextSingletonBeanFactoryLocator and used as the parent context.
+	 * ContextSingletonBeanFactoryLocator and used as the parent context.
 	 * @throws NoSuchJobException
-	 * @throws IllegalStateException
-	 *             if JobLauncher is not autowired by the ApplicationContext
+	 * @throws IllegalStateException if JobLauncher is not autowired by the
+	 * ApplicationContext
 	 */
 	int start(String path, String jobName, String parentKey) {
 
@@ -190,8 +213,8 @@ public class BatchCommandLineLauncher {
 		ClassPathXmlApplicationContext context = null;
 
 		try {
-			ConfigurableApplicationContext parent = (ConfigurableApplicationContext) beanFactoryLocator
-					.useBeanFactory(parentKey).getFactory();
+			ConfigurableApplicationContext parent = (ConfigurableApplicationContext) beanFactoryLocator.useBeanFactory(
+					parentKey).getFactory();
 
 			parent.getAutowireCapableBeanFactory().autowireBeanProperties(this,
 					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
@@ -200,39 +223,50 @@ public class BatchCommandLineLauncher {
 				path = path + ".xml";
 			}
 
-			context = new ClassPathXmlApplicationContext(new String[] { path },
-					parent);
+			context = new ClassPathXmlApplicationContext(new String[] { path }, parent);
 
-			context.getAutowireCapableBeanFactory().autowireBeanProperties(
-					this, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+			context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
+					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 
-			Assert
-					.state(
-							launcher != null,
-							"JobLauncher must be provided in the parent ApplicationContext"
-									+ ", check the context created within classpath*:beanRefContext.xml to ensure a JobLauncher"
-									+ " is declared");
+			Assert.state(launcher != null, "JobLauncher must be provided in the parent ApplicationContext"
+					+ ", check the context created within classpath*:beanRefContext.xml to ensure a JobLauncher"
+					+ " is declared");
 
-			if (!launcher.isRunning()) {
-				if (jobName == null) {
-					status = launcher.run().getExitStatus();
-				} else {
-					status = launcher.run(jobName).getExitStatus();
+			if (jobName == null) {
+				String[] names = context.getBeanNamesForType(Job.class);
+				if (names.length==1) {
+					Job job = (Job) context.getBean(names[0]);
+					jobName = job.getName();
 				}
 			}
-		} catch (NoSuchJobException e) {
-			logger.fatal("Could not locate JobConfiguration \"" + jobName
-					+ "\"", e);
-			status = new ExitStatus(false,
-					ExitCodeMapper.NO_SUCH_JOB);
-		} catch (Throwable t) {
+			
+			if (jobName == null) {
+				jobName = defaultJobName;
+			}
+
+			if (jobName == null) {
+				throw new NoSuchJobException("Null job name cannot be located.");
+			}
+			JobIdentifier runtimeInformation = jobIdentifierFactory.getJobIdentifier(jobName);
+
+			if (!launcher.isRunning()) {
+				status = launcher.run(runtimeInformation).getExitStatus();
+			}
+		}
+		catch (NoSuchJobException e) {
+			logger.fatal("Could not locate JobConfiguration \"" + jobName + "\"", e);
+			status = new ExitStatus(false, ExitCodeMapper.NO_SUCH_JOB);
+		}
+		catch (Throwable t) {
 			logger.fatal(t);
 			status = exceptionClassifier.classifyForExitCode(t);
-		} finally {
+		}
+		finally {
 			if (context != null) {
 				try {
 					context.stop();
-				} finally {
+				}
+				finally {
 					context.close();
 				}
 			}
@@ -249,29 +283,23 @@ public class BatchCommandLineLauncher {
 	 * Spring context).
 	 * 
 	 * @param args
-	 *            <ul>
-	 *            <li>-Djob.configuration.path: the classpath location of the
-	 *            JobConfiguration to use
-	 *            <li>-Djob.name: job name to be passed to the
-	 *            {@link JobLauncher}
-	 *            <li>-Dbatch.execution.environment.key: the key in
-	 *            beanRefContext.xml used to load the execution envrionment.
-	 *            <li>-Dbean.ref.context: an altrernative location for
-	 *            beanRefContext.xml.</li>
-	 *            </ul>
+	 * <ul>
+	 * <li>-Djob.configuration.path: the classpath location of the
+	 * JobConfiguration to use
+	 * <li>-Djob.name: job name to be passed to the {@link JobLauncher}
+	 * <li>-Dbatch.execution.environment.key: the key in beanRefContext.xml
+	 * used to load the execution envrionment.
+	 * <li>-Dbean.ref.context: an altrernative location for beanRefContext.xml.</li>
+	 * </ul>
 	 */
 	public static void main(String[] args) {
 
-		String path = System.getProperty(JOB_CONFIGURATION_PATH_KEY,
-				DEFAULT_JOB_CONFIGURATION_PATH);
+		String path = System.getProperty(JOB_CONFIGURATION_PATH_KEY, DEFAULT_JOB_CONFIGURATION_PATH);
 		String name = System.getProperty(JOB_NAME_KEY);
-		String beanRefContextPath = System.getProperty(BEAN_REF_CONTEXT_KEY,
-				DEFAULT_BEAN_REF_CONTEXT_PATH);
-		String parentKey = System.getProperty(BATCH_EXECUTION_ENVIRONMENT_KEY,
-				DEFAULT_PARENT_KEY);
+		String beanRefContextPath = System.getProperty(BEAN_REF_CONTEXT_KEY, DEFAULT_BEAN_REF_CONTEXT_PATH);
+		String parentKey = System.getProperty(BATCH_EXECUTION_ENVIRONMENT_KEY, DEFAULT_PARENT_KEY);
 
-		BatchCommandLineLauncher command = new BatchCommandLineLauncher(
-				beanRefContextPath);
+		BatchCommandLineLauncher command = new BatchCommandLineLauncher(beanRefContextPath);
 		int result = command.start(path, name, parentKey);
 		command.exit(result);
 	}

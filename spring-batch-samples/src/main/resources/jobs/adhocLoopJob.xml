@@ -138,8 +138,6 @@
 			<bean
 				class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
 		</property>
-		<property name="autoStart" value="false" />
-		<property name="jobName" value="loopJob" />
 	</bean>
 
 	<bean id="loader"

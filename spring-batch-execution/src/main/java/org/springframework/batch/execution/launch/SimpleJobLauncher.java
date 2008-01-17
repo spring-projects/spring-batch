@@ -38,15 +38,11 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.JobIdentifierFactory;
 import org.springframework.batch.execution.job.DefaultJobExecutor;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory;
-import org.springframework.batch.io.exception.BatchConfigurationException;
 import org.springframework.batch.repeat.interceptor.RepeatOperationsApplicationEvent;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
@@ -58,11 +54,10 @@ import org.springframework.util.Assert;
  * @see JobLauncher
  * @author Dave Syer
  */
-public class SimpleJobLauncher implements JobLauncher, InitializingBean,
-		ApplicationListener, ApplicationEventPublisherAware, StatisticsProvider {
+public class SimpleJobLauncher implements JobLauncher, InitializingBean, ApplicationEventPublisherAware,
+		StatisticsProvider {
 
-	protected static final Log logger = LogFactory
-			.getLog(SimpleJobLauncher.class);
+	protected static final Log logger = LogFactory.getLog(SimpleJobLauncher.class);
 
 	private JobExecutor jobExecutor = new DefaultJobExecutor();
 
@@ -80,12 +75,6 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 
 	private List listeners = new ArrayList();
 
-	private String jobName;
-
-	// Do not autostart by default - allow user to set a job 
-	// later and then manually start:
-	private volatile boolean autoStart = false;
-
 	private JobIdentifierFactory jobIdentifierFactory = new ScheduledJobIdentifierFactory();
 
 	private final Object monitor = new Object();
@@ -98,53 +87,28 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	/**
 	 * Setter for {@link JobIdentifierFactory}.
 	 * 
-	 * @param jobIdentifierFactory
-	 *            the {@link JobIdentifierFactory} to set
+	 * @param jobIdentifierFactory the {@link JobIdentifierFactory} to set
 	 */
-	public void setJobIdentifierFactory(
-			JobIdentifierFactory jobIdentifierFactory) {
+	public void setJobIdentifierFactory(JobIdentifierFactory jobIdentifierFactory) {
 		this.jobIdentifierFactory = jobIdentifierFactory;
-	}
-
-	/**
-	 * Setter for the {@link Job} that this launcher will run.
-	 * 
-	 * @param jobName
-	 *            the job name to set
-	 */
-	public void setJobName(String jobName) {
-		this.jobName = jobName;
-	}
-
-	/**
-	 * Setter for autostart flag. If this is true then the container will be
-	 * started when the Spring context is refreshed. Defaults to false.
-	 * 
-	 * @param autoStart
-	 */
-	public void setAutoStart(boolean autoStart) {
-		this.autoStart = autoStart;
 	}
 
 	/**
 	 * Public setter for the listeners property.
 	 * 
-	 * @param listeners
-	 *            the listeners to set - a list of {@link JobExecutionListener}.
+	 * @param listeners the listeners to set - a list of
+	 * {@link JobExecutionListener}.
 	 */
 	public void setJobExecutionListeners(List listeners) {
 		this.listeners = listeners;
 	}
 
 	/**
-	 * Setter for injection of {@link JobLocator}. Mandatory with
-	 * no default.
+	 * Setter for injection of {@link JobLocator}. Mandatory with no default.
 	 * 
-	 * @param jobLocator
-	 *            the jobLocator to set
+	 * @param jobLocator the jobLocator to set
 	 */
-	public void setJobLocator(
-			JobLocator jobLocator) {
+	public void setJobLocator(JobLocator jobLocator) {
 		this.jobLocator = jobLocator;
 	}
 
@@ -188,40 +152,11 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 			Assert.notNull(jobExecutor);
 			Assert.notNull(jobRepository);
 			SimpleJobExecutorFacade jobExecutorFacade = new SimpleJobExecutorFacade();
-			jobExecutorFacade
-					.setJobLocator(jobLocator);
+			jobExecutorFacade.setJobLocator(jobLocator);
 			jobExecutorFacade.setJobExecutionListeners(listeners);
 			jobExecutorFacade.setJobExecutor(jobExecutor);
 			jobExecutorFacade.setJobRepository(jobRepository);
 			this.jobExecutorFacade = jobExecutorFacade;
-		}
-	}
-
-	/**
-	 * If autostart flag is on, initialise on context start-up and call
-	 * {@link #run()}.
-	 * 
-	 * @throws BatchConfigurationException
-	 *             if the job tries to but cannot start because of a
-	 *             {@link NoSuchJobException}.
-	 * 
-	 * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
-	 * 
-	 */
-	public void onApplicationEvent(ApplicationEvent event) {
-		if ((event instanceof ContextRefreshedEvent) && this.autoStart
-				&& !isRunning()) {
-			try {
-				run();
-			} catch (NoSuchJobException e) {
-				throw new BatchConfigurationException(
-						"Cannot start job on context refresh because it does not exist",
-						e);
-			} catch (JobExecutionAlreadyRunningException e) {
-				throw new BatchConfigurationException(
-						"Cannot start job on context refresh because it is already running",
-						e);
-			}
 		}
 	}
 
@@ -234,21 +169,21 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * @return
 	 * @throws NoSuchJobException
 	 */
-	protected final void runInternal(JobExecution execution)
-			throws NoSuchJobException {
+	protected final void runInternal(JobExecution execution) throws NoSuchJobException {
 
 		JobIdentifier jobIdentifier = execution.getJobInstance().getIdentifier();
-		
-		if (getJobExecution(jobIdentifier)==null) {
-			logger.info("Job already stopped (not launching): "+jobIdentifier);
+
+		if (getJobExecution(jobIdentifier) == null) {
+			logger.info("Job already stopped (not launching): " + jobIdentifier);
 			return;
 		}
 
 		try {
-			logger.info("Launching: "+jobIdentifier);
+			logger.info("Launching: " + jobIdentifier);
 			jobExecutorFacade.start(execution);
-			logger.info("Completed successfully: "+jobIdentifier);
-		} finally {
+			logger.info("Completed successfully: " + jobIdentifier);
+		}
+		finally {
 			unregister(jobIdentifier);
 		}
 
@@ -257,23 +192,19 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	/**
 	 * Start the job using the task executor provided.
 	 * 
-	 * @throws NoSuchJobException
-	 *             if the identifier cannot be used to locate a
-	 *             {@link Job}.
+	 * @throws NoSuchJobException if the identifier cannot be used to locate a
+	 * {@link Job}.
 	 * 
 	 * @see org.springframework.batch.execution.launch.SimpleJobLauncher#run(org.springframework.batch.core.domain.JobIdentifier)
 	 */
-	public JobExecution run(final JobIdentifier jobIdentifier)
-			throws NoSuchJobException,
+	public JobExecution run(final JobIdentifier jobIdentifier) throws NoSuchJobException,
 			JobExecutionAlreadyRunningException {
 
 		if (getJobExecution(jobIdentifier) != null) {
-			throw new JobExecutionAlreadyRunningException(
-					"A job is already executing with this identifier: ["
-							+ jobIdentifier + "]");
+			throw new JobExecutionAlreadyRunningException("A job is already executing with this identifier: ["
+					+ jobIdentifier + "]");
 		}
-		final JobExecution execution = jobExecutorFacade
-				.createExecutionFrom(jobIdentifier);
+		final JobExecution execution = jobExecutorFacade.createExecutionFrom(jobIdentifier);
 		// TODO: throw JobExecutionAlreadyRunningException if it is in a running
 		// state (someone else launched it)
 		final JobExecutionHolder holder = register(execution);
@@ -284,23 +215,21 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 
 					synchronized (monitor) {
 						if (isInternalRunning(jobIdentifier)) {
-							logger.info("This job is already running, so not re-launched: "+jobIdentifier);
+							logger.info("This job is already running, so not re-launched: " + jobIdentifier);
 							return;
 						}
 					}
 
 					holder.start();
 					runInternal(execution);
-					
-				} catch (NoSuchJobException e) {
-					applicationEventPublisher
-							.publishEvent(new RepeatOperationsApplicationEvent(
-									jobIdentifier, "No such job",
-									RepeatOperationsApplicationEvent.ERROR));
-					logger.error(
-							"Job could not be located inside Runnable for identifier: ["
-									+ jobIdentifier + "]", e);
-				} finally {
+
+				}
+				catch (NoSuchJobException e) {
+					applicationEventPublisher.publishEvent(new RepeatOperationsApplicationEvent(jobIdentifier,
+							"No such job", RepeatOperationsApplicationEvent.ERROR));
+					logger.error("Job could not be located inside Runnable for identifier: [" + jobIdentifier + "]", e);
+				}
+				finally {
 					holder.stop();
 				}
 			}
@@ -311,58 +240,13 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	}
 
 	/**
-	 * Start a job execution with the given name. If a job is already running
-	 * has no effect.
-	 * 
-	 * @param name
-	 *            the name to assign to the job
-	 * @throws NoSuchJobException
-	 * @throws JobExecutionAlreadyRunningException
-	 */
-	public JobExecution run(String name)
-			throws NoSuchJobException,
-			JobExecutionAlreadyRunningException {
-		if (name == null) {
-			throw new NoSuchJobException(
-					"Null job name cannot be located.");
-		}
-		JobIdentifier runtimeInformation = jobIdentifierFactory
-				.getJobIdentifier(name);
-		return this.run(runtimeInformation);
-	}
-
-	/**
-	 * Start a job execution with default name and other runtime information
-	 * provided by the factory. If a job is already running has no effect. The
-	 * default name is taken from the enclosed {@link Job}.
-	 * 
-	 * @throws NoSuchJobException
-	 * 
-	 * @throws NoSuchJobException
-	 *             if the job cannot be located
-	 * @throws JobExecutionAlreadyRunningException
-	 * 
-	 * @see #setJobIdentifierFactory(JobIdentifierFactory)
-	 * @see org.springframework.context.Lifecycle#start()
-	 */
-	public JobExecution run() throws NoSuchJobException,
-			JobExecutionAlreadyRunningException {
-		if (jobName != null) {
-			return this.run(jobName);
-		}
-		throw new NoSuchJobException(
-				"Null default job name cannot be located.");
-	}
-
-	/**
 	 * Extension point for subclasses to stop a specific job.
 	 * 
 	 * @throws NoSuchJobExecutionException
 	 */
-	protected void doStop(JobIdentifier jobIdentifier)
-			throws NoSuchJobExecutionException {
+	protected void doStop(JobIdentifier jobIdentifier) throws NoSuchJobExecutionException {
 		JobExecution execution = getJobExecution(jobIdentifier);
-		logger.info("Stopping job: "+jobIdentifier);
+		logger.info("Stopping job: " + jobIdentifier);
 		if (execution != null) {
 			jobExecutorFacade.stop(execution);
 		}
@@ -378,12 +262,12 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * @see org.springframework.batch.execution.launch.JobLauncher#stop()
 	 */
 	final public void stop() {
-		for (Iterator iter = new HashSet(registry.keySet()).iterator(); iter
-				.hasNext();) {
+		for (Iterator iter = new HashSet(registry.keySet()).iterator(); iter.hasNext();) {
 			JobIdentifier context = (JobIdentifier) iter.next();
 			try {
 				stop(context);
-			} catch (NoSuchJobExecutionException e) {
+			}
+			catch (NoSuchJobExecutionException e) {
 				logger.error(e);
 			}
 		}
@@ -398,8 +282,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * @see org.springframework.batch.execution.launch.JobLauncher#stop(org.springframework.batch.core.domain.JobIdentifier)
 	 * @see BatchContainer#stop(JobRuntimeInformation))
 	 */
-	final public void stop(JobIdentifier runtimeInformation)
-			throws NoSuchJobExecutionException {
+	final public void stop(JobIdentifier runtimeInformation) throws NoSuchJobExecutionException {
 		synchronized (monitor) {
 			doStop(runtimeInformation);
 		}
@@ -437,8 +320,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	private boolean isInternalRunning(JobIdentifier jobIdentifier) {
 		synchronized (registry) {
 			JobExecutionHolder jobExecutionHolder = getJobExecutionHolder(jobIdentifier);
-			return isRunning(jobIdentifier)
-					&& jobExecutionHolder!=null && jobExecutionHolder.isRunning();
+			return isRunning(jobIdentifier) && jobExecutionHolder != null && jobExecutionHolder.isRunning();
 		}
 	}
 
@@ -447,10 +329,9 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * {@link JobIdentifier} to see if it is running. As long as at least one
 	 * job is running the launcher is deemed to be running.
 	 * 
-	 * @param jobIdentifier
-	 *            a {@link JobIdentifier}
+	 * @param jobIdentifier a {@link JobIdentifier}
 	 * @return always true. Subclasses can override and provide more accurate
-	 *         information.
+	 * information.
 	 */
 	protected boolean isRunning(JobIdentifier jobIdentifier) {
 		return true;
@@ -515,8 +396,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * Setter for the {@link TaskExecutor}. Defaults to a
 	 * {@link SyncTaskExecutor}.
 	 * 
-	 * @param taskExecutor
-	 *            the taskExecutor to set
+	 * @param taskExecutor the taskExecutor to set
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
@@ -532,29 +412,32 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 	 * only.
 	 * 
 	 * @return Properties representing the {@link JobExecution} objects passed
-	 *         up from the underlying execution. If there are no jobs running it
-	 *         will be empty.
+	 * up from the underlying execution. If there are no jobs running it will be
+	 * empty.
 	 */
 	public Properties getStatistics() {
 		if (jobExecutorFacade instanceof StatisticsProvider) {
 			return ((StatisticsProvider) jobExecutorFacade).getStatistics();
-		} else {
+		}
+		else {
 			return new Properties();
 		}
 	}
 
-	public void setApplicationEventPublisher(
-			ApplicationEventPublisher applicationEventPublisher) {
+	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
 		this.applicationEventPublisher = applicationEventPublisher;
 	}
 
 	private class JobExecutionHolder {
 
 		private static final int NEW = 0;
+
 		private static final int STARTED = 1;
+
 		private static final int STOPPED = 2;
-		
+
 		private JobExecution execution;
+
 		private int status = NEW;
 
 		public JobExecutionHolder(JobExecution execution) {
@@ -566,7 +449,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean,
 		}
 
 		boolean isRunning() {
-			return status==STARTED;
+			return status == STARTED;
 		}
 
 		void start() {

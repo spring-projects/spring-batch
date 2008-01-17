@@ -18,11 +18,12 @@ package org.springframework.batch.execution.launch;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.NoSuchJobException;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
 
 public class SimpleJobLauncherTests extends TestCase {
@@ -40,8 +41,14 @@ public class SimpleJobLauncherTests extends TestCase {
 
 	public void testInitializeWithNoConfiguration() throws Exception {
 		final SimpleJobLauncher launcher = new SimpleJobLauncher();
+		launcher.setJobExecutorFacade(new SimpleJobExecutorFacade() {
+			public JobExecution createExecutionFrom(JobIdentifier jobIdentifier) throws NoSuchJobException,
+					JobExecutionAlreadyRunningException {
+				throw new NoSuchJobException("No null job, stupid!");
+			}
+		});
 		try {
-			launcher.run();
+			launcher.run(new SimpleJobIdentifier(null));
 			// should do nothing
 			fail("Expected NoSuchJobConfigurationException");
 		} catch (NoSuchJobException e) {
@@ -56,10 +63,9 @@ public class SimpleJobLauncherTests extends TestCase {
 		launcher.setJobIdentifierFactory(new SimpleJobIdentifierFactory());
 		InterruptibleFacade jobExecutorFacade = new InterruptibleFacade();
 		launcher.setJobExecutorFacade(jobExecutorFacade);
-		launcher.setJobName(new Job("foo").getName());
-		launcher.run();
+		launcher.run(new SimpleJobIdentifier("foo"));
 		assertFalse(launcher.isRunning());
-		launcher.run();
+		launcher.run(new SimpleJobIdentifier("foo"));
 		// Both jobs finished running because they were not launched in a new
 		// Thread
 		assertFalse(launcher.isRunning());
