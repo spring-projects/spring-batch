@@ -495,7 +495,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	
 	/*
 	 * Private inner class for mapping values from the JOB_PARAMETERS table into the java
-	 * JobParameters class. 
+	 * JobParameters class. TODO: is this going to be used?  If not can we delete it?
 	 */
 	private static class JobParameterCallbackHandler implements RowCallbackHandler{
 
