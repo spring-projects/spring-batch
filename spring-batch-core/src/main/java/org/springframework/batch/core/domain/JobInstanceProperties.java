@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -38,9 +39,9 @@ public class JobInstanceProperties {
 	 * JobRuntimeParameters is immutable.
 	 */
 	public JobInstanceProperties(){
-		this.stringMap = new HashMap();
-		this.longMap = new HashMap();
-		this.dateMap = new HashMap();
+		this.stringMap = new LinkedHashMap();
+		this.longMap = new LinkedHashMap();
+		this.dateMap = new LinkedHashMap();
 	}
 	
 	/**
@@ -58,8 +59,8 @@ public class JobInstanceProperties {
 		validateMap(stringMap, String.class);
 		validateMap(longMap, Long.class);
 		validateMap(dateMap, Date.class);
-		this.stringMap = stringMap;
-		this.longMap = longMap;
+		this.stringMap = new LinkedHashMap(stringMap);
+		this.longMap = new LinkedHashMap(longMap);
 		this.dateMap = copyDateMap(dateMap);
 	}
 	
@@ -156,7 +157,7 @@ public class JobInstanceProperties {
 	 * Convenience method for copying Date values to ensure immutability.
 	 */
 	private Map copyDateMap(Map dateMap){
-		Map tempMap = new HashMap();
+		Map tempMap = new LinkedHashMap();
 		
 		for(Iterator it = dateMap.entrySet().iterator();it.hasNext();){
 			Entry entry = (Entry)it.next();
