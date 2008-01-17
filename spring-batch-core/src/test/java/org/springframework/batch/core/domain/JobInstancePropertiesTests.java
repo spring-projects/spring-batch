@@ -5,7 +5,9 @@ package org.springframework.batch.core.domain;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import junit.framework.TestCase;
 
@@ -112,6 +114,43 @@ public class JobInstancePropertiesTests extends TestCase {
 		
 		JobInstanceProperties testParameters = getNewParameters();	
 		assertTrue(testParameters.equals(parameters));
+	}
+	
+	public void testToStringOrder(){
+		
+		Map props = parameters.getParameters();
+		StringBuilder stringBuilder = new StringBuilder();
+		for(Iterator it = props.entrySet().iterator();it.hasNext();){
+			Entry entry = (Entry)it.next();
+			stringBuilder.append(entry.toString() + ";");
+		}
+		
+		String string1 = stringBuilder.toString();
+		
+		stringMap = new HashMap();
+		stringMap.put("string.key2", "value2");
+		stringMap.put("string.key1", "value1");
+		
+		longMap = new HashMap();
+		longMap.put("long.key2", new Long(2));
+		longMap.put("long.key1", new Long(1));
+		
+		
+		dateMap = new HashMap();
+		dateMap.put("date.key2", date2 );
+		dateMap.put("date.key1", date1 );
+		
+		JobInstanceProperties testProps = new JobInstanceProperties(stringMap, longMap, dateMap);
+		
+		props = testProps.getParameters();
+		stringBuilder = new StringBuilder();
+		for(Iterator it = props.entrySet().iterator();it.hasNext();){
+			Entry entry = (Entry)it.next();
+			stringBuilder.append(entry.toString() + ";");
+		}
+		String string2 = stringBuilder.toString();
+		
+		assertEquals(string1, string2);
 	}
 
 // Not sure how to properly test this since there is no order garuntee, commenting out for now.	
