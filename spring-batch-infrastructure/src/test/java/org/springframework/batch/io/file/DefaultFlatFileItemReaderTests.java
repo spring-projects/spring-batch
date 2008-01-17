@@ -118,6 +118,34 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		// statistics.get(FlatFileInputTemplate.SKIPPED_STATISTICS_NAME));
 
 	}
+	
+	/**
+	 * Test skip and skipRollback functionality
+	 * @throws IOException
+	 */
+	public void testSkipFirstChunk() throws Exception {
+
+		inputSource.close();
+		inputSource.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		inputSource.open();
+
+		// read some records
+		inputSource.read(); // #1
+		inputSource.read(); // #2
+		inputSource.read(); // #3
+		// mark record as skipped
+		inputSource.skip();
+		// rollback 
+		inputSource.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
+		// read next record
+		inputSource.read(); // should be #1
+		
+		// we should now process all records after first commit point, that are
+		// not marked as skipped
+		assertEquals("[testLine2]", inputSource.read().toString());
+
+	}
+	
 
 	/**
 	 * Test skip and skipRollback functionality
