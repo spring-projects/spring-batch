@@ -48,7 +48,7 @@ import org.springframework.batch.restart.RestartData;
  */
 public class StepInstance extends Entity {
 
-	private JobInstance job;
+	private JobInstance jobInstance;
 
 	// TODO declare transient or make serializable
 	private BatchStatus status;
@@ -76,7 +76,7 @@ public class StepInstance extends Entity {
 	
 	public StepInstance(JobInstance job, String name, Long stepId) {
 		setId(stepId);
-		this.job = job;
+		this.jobInstance = job;
 		this.name = name;
 	}
 
@@ -104,8 +104,8 @@ public class StepInstance extends Entity {
 		this.status = status;
 	}
 
-	public JobInstance getJob() {
-		return job;
+	public JobInstance getJobInstance() {
+		return jobInstance;
 	}
 
 	public String getName() {
@@ -113,12 +113,12 @@ public class StepInstance extends Entity {
 	}
 
 	public Long getJobId() {
-		return job==null ? null : job.getId();
+		return jobInstance==null ? null : jobInstance.getId();
 	}
 
 	// @Override
 	public String toString() {
-		return super.toString() + ", name=" + name + ", status=" + getStatus() + " in " + job;
+		return super.toString() + ", name=" + name + ", status=" + getStatus() + " in " + jobInstance;
 	}
 
 }

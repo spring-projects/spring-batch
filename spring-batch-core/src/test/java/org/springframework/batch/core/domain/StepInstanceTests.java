@@ -17,6 +17,7 @@ package org.springframework.batch.core.domain;
 
 import java.util.Properties;
 
+import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.restart.GenericRestartData;
 
 import junit.framework.TestCase;
@@ -67,13 +68,21 @@ public class StepInstanceTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepInstance#getJob()}.
+	 * Test method for {@link org.springframework.batch.core.domain.StepInstance#getJobInstance()}.
 	 */
-	public void testGetJob() {
-		assertEquals(null, instance.getJob());
-		JobInstance job = new JobInstance(null);
-		instance = new StepInstance(job, null);
-		assertEquals(job, instance.getJob());
+	public void testGetJobInstance() {
+		assertEquals(null, instance.getJobInstance());
+		JobInstance jobInstance = new JobInstance(null, null);
+		instance = new StepInstance(jobInstance, null);
+		assertEquals(jobInstance, instance.getJobInstance());
+	}
+	
+	public void testGetJob(){
+		
+		Job job = new Job("job");
+		JobInstance jobInstance = new JobInstance(null, null, job);
+		instance = new StepInstance(jobInstance, null);
+		assertEquals(job, instance.getJobInstance().getJob());
 	}
 
 	/**
@@ -90,12 +99,12 @@ public class StepInstanceTests extends TestCase {
 	 */
 	public void testGetJobId() {
 		assertEquals(null, instance.getJobId());
-		instance = new StepInstance(new JobInstance(null, new Long(23)), null);
+		instance = new StepInstance(new JobInstance(null, new Long(23), null), null);
 		assertEquals(23, instance.getJobId().longValue());
 	}
 
 	public void testEqualsWithSameIdentifier() throws Exception {
-		JobInstance job = new JobInstance(null, new Long(100));
+		JobInstance job = new JobInstance(null, new Long(100), null);
 		StepInstance step1 = new StepInstance(job, "foo", new Long(0));
 		StepInstance step2 = new StepInstance(job, "foo", new Long(0));
 		assertEquals(step1, step2);

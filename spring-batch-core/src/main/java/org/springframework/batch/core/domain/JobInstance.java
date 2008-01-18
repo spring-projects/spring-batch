@@ -34,27 +34,27 @@ public class JobInstance extends Entity {
 	private List stepInstances = new ArrayList();
 
 	private JobIdentifier identifier;
+	
+	private Job job;
 
 	// TODO declare transient or make the class serializable
 	private BatchStatus status;
 
 	private int jobExecutionCount;
 	
-	/**
-	 * Package private constructor for Hibernate use only
-	 */
-	JobInstance() {
-		this(null);
+	public JobInstance(JobIdentifier jobIdentifier){
+		this.identifier = jobIdentifier;
 	}
 
-	public JobInstance(JobIdentifier identifier, Long id) {
+	public JobInstance(JobIdentifier identifier, Long id, Job job) {
 		super();
 		setId(id);
 		this.identifier = identifier;
+		this.job = job;
 	}
-
-	public JobInstance(JobIdentifier identifier) {
-		this(identifier, null);
+	
+	public JobInstance(JobIdentifier jobIdentifier, Long id){
+		this(jobIdentifier, id, null);
 	}
 
 	public BatchStatus getStatus() {
@@ -108,5 +108,12 @@ public class JobInstance extends Entity {
 	public String toString() {
 		return super.toString()+", identifier=["+identifier+"]";
 	}
+	
+	public Job getJob() {
+		return job;
+	}
 
+	public void setJob(Job job) {
+		this.job = job;
+	}
 }

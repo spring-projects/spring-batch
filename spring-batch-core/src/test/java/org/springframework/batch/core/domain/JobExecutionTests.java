@@ -29,8 +29,8 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
  */
 public class JobExecutionTests extends TestCase {
 
-	private JobExecution execution = new JobExecution(new JobInstance(null, new Long(11)));
-	private JobExecution context = new JobExecution(new JobInstance(new SimpleJobIdentifier("foo"), new Long(11)));
+	private JobExecution execution = new JobExecution(new JobInstance(null, new Long(11), null));
+	private JobExecution context = new JobExecution(new JobInstance(new SimpleJobIdentifier("foo"), new Long(11), null));
 	
 	/**
 	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#JobExecution()}.
@@ -80,7 +80,7 @@ public class JobExecutionTests extends TestCase {
 	 */
 	public void testGetJobId() {
 		assertEquals(11, execution.getJobId().longValue());
-		execution = new JobExecution(new JobInstance(null, new Long(23)));
+		execution = new JobExecution(new JobInstance(null, new Long(23), null));
 		assertEquals(23, execution.getJobId().longValue());
 	}
 

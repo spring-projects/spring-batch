@@ -212,7 +212,7 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	private StepExecution newStepExecution(Long long1, Long long2) {
-		JobInstance job = new JobInstance(null);
+		JobInstance job = new JobInstance(null, null);
 		StepInstance step = new StepInstance(job, "foo", long1);
 		StepExecution execution = new StepExecution(step, new JobExecution(job, long2));
 		return execution;

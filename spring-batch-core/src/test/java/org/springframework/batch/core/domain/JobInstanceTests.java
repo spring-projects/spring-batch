@@ -28,13 +28,13 @@ import junit.framework.TestCase;
  */
 public class JobInstanceTests extends TestCase {
 
-	private JobInstance instance = new JobInstance(null, new Long(11));
+	private JobInstance instance = new JobInstance(null, new Long(11), new Job("job"));
 	
 	/**
 	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#JobInstance()}.
 	 */
 	public void testJobInstance() {
-		assertNull(new JobInstance(null).getId());
+		assertNull(new JobInstance(null, null, null).getId());
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class JobInstanceTests extends TestCase {
 	 */
 	public void testGetIdentifier() {
 		assertEquals(null, instance.getIdentifier());
-		instance = new JobInstance(new SimpleJobIdentifier("foo"));
+		instance = new JobInstance(new SimpleJobIdentifier("foo"), new Long(1));
 		assertEquals("foo", instance.getIdentifier().getName());
 	}
 	
@@ -86,8 +86,12 @@ public class JobInstanceTests extends TestCase {
 	 */
 	public void testGetName() {
 		assertEquals(null, instance.getName());
-		instance = new JobInstance(new SimpleJobIdentifier("foo"));
+		instance = new JobInstance(new SimpleJobIdentifier("foo"), new Long(1));
 		assertEquals("foo", instance.getName());
 	}
 	
+	public void testGetJob(){
+		
+		assertEquals("job", instance.getJob().getName());
+	}
 }
