@@ -60,5 +60,5 @@ public class FlatFileParsingException extends ParsingException {
 
 	public int getLineNumber() {
 		return lineNumber;
-	}
+	}	
 }
