@@ -94,7 +94,7 @@ public class DefaultJobLauncherTests extends TestCase {
 		
 		assertTrue(jobLauncher.isRunning(jobIdentifier));
 		
-		Thread.sleep(100);
+		Thread.sleep(250);
 		assertFalse(jobLauncher.isRunning(jobIdentifier));
 		assertEquals(ExitStatus.FINISHED, jobExecution.getExitStatus());
 	}
