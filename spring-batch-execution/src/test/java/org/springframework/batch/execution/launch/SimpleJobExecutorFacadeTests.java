@@ -63,7 +63,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	private SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("TestJob");
 
 	private JobExecution jobExecution = new JobExecution(new JobInstance(
-			jobIdentifier));
+			jobIdentifier, null));
 
 	private List list = new ArrayList();
 
@@ -107,7 +107,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 			}
 		};
 		jobExecutorFacade.setJobExecutor(jobExecutor);
-		JobInstance job = new JobInstance(jobIdentifier);
+		JobInstance job = new JobInstance(jobIdentifier, null);
 		jobExecution = new JobExecution(job);
 		jobRepository.findOrCreateJob(jobConfiguration, jobIdentifier);
 		jobRepositoryControl.setReturnValue(jobExecution);

@@ -279,9 +279,7 @@ public class SimpleJobRepository implements JobRepository {
 	public void update(StepInstance step) {
 
 		Assert.notNull(step, "Step cannot be null.");
-		Assert
-				.notNull(
-						step.getId(),
+		Assert.notNull(step.getId(),
 						"Step cannot be updated if it's ID is null.  It must be obtained"
 								+ "from SimpleJobRepository.findOrCreateJob to be considered valid.");
 
@@ -294,13 +292,10 @@ public class SimpleJobRepository implements JobRepository {
 	 * calling {@link JobDao#createJob(JobRuntimeInformation)} and then it's
 	 * list of StepConfigurations is passed to the createSteps method.
 	 */
-	private JobInstance createJob(Job job,
-			JobIdentifier runtimeInformation) {
+	private JobInstance createJob(Job job, JobIdentifier jobIdentifier) {
 
-		JobInstance jobInstance = jobDao.createJob(runtimeInformation);
-		jobInstance
-				.setStepInstances(createStepInstances(jobInstance, job
-						.getSteps()));
+		JobInstance jobInstance = jobDao.createJob(jobIdentifier);
+		jobInstance.setStepInstances(createStepInstances(jobInstance, job.getSteps()));
 		return jobInstance;
 	}
 

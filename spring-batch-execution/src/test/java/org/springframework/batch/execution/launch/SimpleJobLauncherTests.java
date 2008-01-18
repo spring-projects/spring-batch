@@ -108,7 +108,7 @@ public class SimpleJobLauncherTests extends TestCase {
 
 		public JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
 				throws NoSuchJobException {
-			return new JobExecution(new JobInstance(jobIdentifier));
+			return new JobExecution(new JobInstance(jobIdentifier, null));
 		}
 
 		public void stop(JobExecution execution) {

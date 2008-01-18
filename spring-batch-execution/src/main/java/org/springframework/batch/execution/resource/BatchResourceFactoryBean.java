@@ -128,7 +128,7 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 				"The StepContext does not have an execution.");
 		StepExecution execution = context.getStepExecution();
 		stepName = execution.getStep().getName();
-		jobName = execution.getStep().getJob().getName();
+		jobName = execution.getStep().getJobInstance().getName();
 		jobIdentifier = execution.getJobExecution().getJobInstance().getIdentifier();
 	}
 

@@ -176,7 +176,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 		SimpleJobIdentifier jobRuntimeInformation = new SimpleJobIdentifier(
 				"spam");
 		JobExecution execution = new JobExecution(new JobInstance(
-				jobRuntimeInformation));
+				jobRuntimeInformation, null));
 		control.expectAndReturn(facade
 				.createExecutionFrom(jobRuntimeInformation), execution);
 		facade.start(execution);
@@ -212,7 +212,7 @@ public class TaskExecutorJobLauncherTests extends TestCase {
 
 		public JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
 				throws NoSuchJobException {
-			return new JobExecution(new JobInstance(jobIdentifier));
+			return new JobExecution(new JobInstance(jobIdentifier, null));
 		}
 
 		public void stop(JobExecution execution) {

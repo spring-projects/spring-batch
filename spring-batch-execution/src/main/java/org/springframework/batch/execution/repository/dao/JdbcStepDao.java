@@ -205,7 +205,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 
 				JobExecution jobExecution = (JobExecution) jdbcTemplate.queryForObject(
 						getQuery(JobExecutionRowMapper.GET_JOB_EXECUTION), new Object[] { new Long(rs.getLong(2)) },
-						new JobExecutionRowMapper(step.getJob()));
+						new JobExecutionRowMapper(step.getJobInstance()));
 				StepExecution stepExecution = new StepExecution(step, jobExecution, new Long(rs.getLong(1)));
 				stepExecution.setStartTime(rs.getTimestamp(3));
 				stepExecution.setEndTime(rs.getTimestamp(4));

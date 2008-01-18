@@ -84,7 +84,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		job = jobDao.createJob(jobIdentifier);
 		step1 = stepDao.createStep(job, "TestStep1");
 		step2 = stepDao.createStep(job, "TestStep2");
-		jobExecution = new JobExecution(step2.getJob());
+		jobExecution = new JobExecution(step2.getJobInstance());
 		
 		stepExecution = new StepExecution(step1, jobExecution);
 		stepExecution.setStatus(BatchStatus.STARTED);
@@ -212,7 +212,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	public void testIncrementStepExecutionCount(){
 		
 		assertEquals(1, stepDao.getStepExecutionCount(step1.getId()));
-		StepExecution execution = new StepExecution(step1, new JobExecution(step1.getJob(), new Long(123)));
+		StepExecution execution = new StepExecution(step1, new JobExecution(step1.getJobInstance(), new Long(123)));
 		stepDao.save(execution);
 		assertEquals(2, stepDao.getStepExecutionCount(step1.getId()));
 	}
