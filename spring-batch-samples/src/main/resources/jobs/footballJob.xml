@@ -27,7 +27,8 @@
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemReader" ref="playerFileItemReader" />
+							<property name="itemReader"
+								ref="playerFileItemReader" />
 							<property name="itemProcessor">
 								<bean
 									class="org.springframework.batch.sample.item.processor.PlayerItemProcessor">
@@ -51,7 +52,8 @@
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemReader" ref="gameFileItemReader" />
+							<property name="itemReader"
+								ref="gameFileItemReader" />
 							<property name="itemProcessor">
 								<bean
 									class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
@@ -75,7 +77,8 @@
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
-							<property name="itemReader" ref="playerSummarizationSource" />
+							<property name="itemReader"
+								ref="playerSummarizationSource" />
 							<property name="itemProcessor">
 								<bean
 									class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
@@ -96,9 +99,11 @@
 	</bean>
 
 	<bean id="playerFileItemReader"
-		class="org.springframework.batch.io.file.DefaultFlatFileItemReader" scope="step">
-		<aop:scoped-proxy/>		
-		<property name="resource" value="classpath:data/footballjob/input/${player.file.name}" />
+		class="org.springframework.batch.io.file.DefaultFlatFileItemReader"
+		scope="step">
+		<aop:scoped-proxy />
+		<property name="resource"
+			value="classpath:data/footballjob/input/${player.file.name}" />
 		<property name="tokenizer">
 			<bean
 				class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer">
@@ -113,9 +118,11 @@
 	</bean>
 
 	<bean id="gameFileItemReader"
-		class="org.springframework.batch.io.file.DefaultFlatFileItemReader" scope="step">
-		<aop:scoped-proxy/>
-		<property name="resource" value="classpath:data/footballjob/input/${games.file.name}"/>
+		class="org.springframework.batch.io.file.DefaultFlatFileItemReader"
+		scope="step">
+		<aop:scoped-proxy />
+		<property name="resource"
+			value="classpath:data/footballjob/input/${games.file.name}" />
 		<property name="tokenizer">
 			<bean
 				class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer">
@@ -130,8 +137,9 @@
 	</bean>
 
 	<bean id="playerSummarizationSource"
-		class="org.springframework.batch.io.cursor.JdbcCursorItemReader" scope="step">
-		<aop:scoped-proxy/>
+		class="org.springframework.batch.io.cursor.JdbcCursorItemReader"
+		scope="step">
+		<aop:scoped-proxy />
 		<property name="dataSource" ref="dataSource" />
 		<property name="mapper">
 			<bean
@@ -161,7 +169,12 @@
 
 	<bean
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="classpath:data/footballJob/input/input.properties" />
+		<property name="properties">
+			<value>
+				games.file.name=games-small.csv
+				player.file.name=player-small.csv
+			</value>
+		</property>
 		<property name="systemPropertiesModeName"
 			value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 		<property name="ignoreUnresolvablePlaceholders" value="false" />
