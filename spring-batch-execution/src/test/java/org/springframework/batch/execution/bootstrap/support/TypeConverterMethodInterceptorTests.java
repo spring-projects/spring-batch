@@ -17,6 +17,15 @@ public class TypeConverterMethodInterceptorTests extends TestCase {
 
 	private List list = new ArrayList();
 
+	/*
+	 * (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	protected void setUp() throws Exception {
+		super.setUp();
+		interceptor.afterPropertiesSet();
+	}
+
 	/**
 	 * Even though TestBean does not implement Test, the proxy will invoke a
 	 * method is called with the same signature.
@@ -72,6 +81,36 @@ public class TypeConverterMethodInterceptorTests extends TestCase {
 		assertEquals("FOO:true", proxy.getBean());
 	}
 
+	public void testInvokeWithNoMethodMatch() throws Exception {
+		ProxyFactory factory = new ProxyFactory(Test.class, interceptor);
+		factory.setTarget(this);
+		Test proxy = (Test) factory.getProxy();
+		assertNull(proxy.getBean());
+	}
+
+	public void testInvokeWithError() throws Exception {
+		ProxyFactory factory = new ProxyFactory(Test.class, interceptor);
+		factory.setTarget(new TestBean(true));
+		Test proxy = (Test) factory.getProxy();
+		try {
+			assertNull(proxy.error());
+			fail("Expected RuntimeException");
+		}
+		catch (RuntimeException e) {
+			// expected
+			assertEquals("Foo", e.getMessage());
+		}
+	}
+
+	public void testInvokeWithErrorAndConvert() throws Exception {
+		ProxyFactory factory = new ProxyFactory(Test.class, interceptor);
+		factory.setTarget(new TestBean(true));
+		Test proxy = (Test) factory.getProxy();
+		interceptor.setConvertException(true);
+		String msg = proxy.error();
+		assertTrue("Message is not a stacktrace: "+msg, msg.indexOf("RuntimeException: Foo")>=0);
+	}
+
 	public void testInvokeWithMethodParameterConversionToBoolean() throws Exception {
 		ProxyFactory factory = new ProxyFactory(Test.class, interceptor);
 		factory.setTarget(new TestBean(true));
@@ -94,11 +133,12 @@ public class TypeConverterMethodInterceptorTests extends TestCase {
 		try {
 			proxy.getInvalid();
 			fail("Expected TypeMismatchException");
-		} catch (TypeMismatchException e) {
+		}
+		catch (TypeMismatchException e) {
 			// expected
 		}
 	}
-	
+
 	public void testTypeConverter() throws Exception {
 		final TestCase testCase = this;
 		interceptor.setTypeConverter(new SimpleTypeConverter() {
@@ -110,6 +150,12 @@ public class TypeConverterMethodInterceptorTests extends TestCase {
 		factory.setTarget(new TestBean(true));
 		Test proxy = (Test) factory.getProxy();
 		assertEquals(testCase, proxy.getInvalid());
+	}
+
+	public void testTypeConverterAfterPropertiesSet() throws Exception {
+		testTypeConverter();
+		interceptor.afterPropertiesSet();
+		testTypeConverter();
 	}
 
 	public void testInvokeWithMethodParameterConversionWithPropertyEditor() throws Exception {
@@ -135,17 +181,19 @@ public class TypeConverterMethodInterceptorTests extends TestCase {
 		String relayPattern(String pattern);
 
 		TestCase getInvalid();
-		
+
 		int getValue();
 
 		void operate();
-		
+
 		String grab(String value);
-		
+
 		String relayBean(String value);
+
+		String error();
 	}
 
-	// N.B. TestBean intentionally  does not implement Test!
+	// N.B. TestBean intentionally does not implement Test!
 	public class TestBean {
 		private boolean test;
 
@@ -173,7 +221,7 @@ public class TypeConverterMethodInterceptorTests extends TestCase {
 		public TestBean getInvalid() {
 			return this;
 		}
-		
+
 		public String getValue() {
 			return "123";
 		}
@@ -181,13 +229,17 @@ public class TypeConverterMethodInterceptorTests extends TestCase {
 		public void operate() {
 			list.add("FOO");
 		}
-		
+
 		public String grab(boolean flag) {
-			return "flag:"+flag;
+			return "flag:" + flag;
 		}
 
 		public String toString() {
 			return "FOO:" + test;
+		}
+
+		public String error() {
+			throw new RuntimeException("Foo");
 		}
 	}
 

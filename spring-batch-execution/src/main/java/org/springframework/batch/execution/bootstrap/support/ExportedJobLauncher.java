@@ -18,14 +18,16 @@ package org.springframework.batch.execution.bootstrap.support;
 
 import java.util.Properties;
 
+import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.execution.launch.JobLauncher;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Interface to expose for remote management of jobs. Similar to
- * {@link JobLauncher}, but replaces {@link ExitStatus} with String in return
- * types, so it can be inspected by remote clients like the jconsole from the
- * JRE without any links to Spring Batch.
+ * {@link JobLauncher}, but replaces {@link JobExecution} and
+ * {@link JobIdentifier} with Strings in return types and method parameters, so
+ * it can be inspected by remote clients like the jconsole from the JRE without
+ * any links to Spring Batch.
  * 
  * @author Dave Syer
  * 
@@ -33,23 +35,12 @@ import org.springframework.batch.repeat.ExitStatus;
 public interface ExportedJobLauncher {
 
 	/**
-	 * Launch a job and get back a representation of the {@link ExitStatus}
-	 * returned by a {@link JobLauncher}. Normally the launch will be
-	 * asynchronous, so the possible values of the return type are constrained
-	 * (it will never be {@link ExitStatus#CONTINUABLE}).
-	 * 
-	 * @return a representation of the {@link ExitStatus} returned by a
-	 *         {@link JobLauncher}.
-	 */
-	String run();
-
-	/**
 	 * Launch a job with the given name.
 	 * 
 	 * @param name the name of the job to launch
-	 * @return a representation of the {@link ExitStatus} returned by a
-	 *         {@link JobLauncher}.
-	 *         
+	 * @return a representation of the {@link JobExecution} returned by a
+	 * {@link JobLauncher}.
+	 * 
 	 * @see #run()
 	 */
 	String run(String name);
@@ -69,11 +60,12 @@ public interface ExportedJobLauncher {
 	 * @see JobLauncher#isRunning()
 	 */
 	boolean isRunning();
-	
+
 	/**
 	 * Query statistics of currently executing jobs.
 	 * 
-	 * @return properties representing last known state of currently executing jobs
+	 * @return properties representing last known state of currently executing
+	 * jobs
 	 */
 	public Properties getStatistics();
 

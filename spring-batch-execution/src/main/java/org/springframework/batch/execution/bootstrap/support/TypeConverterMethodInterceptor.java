@@ -24,9 +24,12 @@ import java.util.List;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.batch.support.DefaultPropertyEditorRegistrar;
+import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.beans.TypeConverter;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
@@ -37,12 +40,31 @@ import org.springframework.util.ReflectionUtils;
  * @author Dave Syer
  * 
  */
-public class TypeConverterMethodInterceptor implements MethodInterceptor {
+public class TypeConverterMethodInterceptor extends DefaultPropertyEditorRegistrar implements MethodInterceptor,
+		InitializingBean {
 
 	// Get the default PropertyEditorRegistry free.
-	private TypeConverter typeConverter = new SimpleTypeConverter();
+	private TypeConverter typeConverter;
 
 	private boolean convertException = false;
+
+	/**
+	 * Ensure that the {@link TypeConverter} is set up, creating one if
+	 * necessary, and if it is a {@link PropertyEditorRegistry}, register the
+	 * custom editors. (If it is not a {@link PropertyEditorRegistry} then the
+	 * custom editors are ignored).
+	 * 
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
+	public void afterPropertiesSet() throws Exception {
+		if (typeConverter == null) {
+			SimpleTypeConverter converter = new SimpleTypeConverter();
+			typeConverter = converter;
+		}
+		if (typeConverter instanceof PropertyEditorRegistry) {
+			registerCustomEditors((PropertyEditorRegistry) typeConverter);
+		}
+	}
 
 	/**
 	 * Set a flag that will cause exceptions during method invocation to be
@@ -107,7 +129,7 @@ public class TypeConverterMethodInterceptor implements MethodInterceptor {
 				}
 
 			});
-			if (methods.size()==1) {
+			if (methods.size() == 1) {
 				method = (Method) methods.get(0);
 				for (int i = 0; i < arguments.length; i++) {
 					Object arg = arguments[i];

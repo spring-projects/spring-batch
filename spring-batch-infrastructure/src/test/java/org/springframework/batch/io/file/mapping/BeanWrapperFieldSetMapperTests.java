@@ -24,9 +24,6 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.file.mapping.BeanWrapperFieldSetMapper;
-import org.springframework.batch.io.file.mapping.BindingException;
-import org.springframework.batch.support.IntArrayPropertyEditor;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.NotWritablePropertyException;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
@@ -252,17 +249,6 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		assertEquals('C', result.getVarChar());
 	}
 
-	public void testIntArray() throws Exception {
-		BeanWithIntArray result = new BeanWithIntArray();
-		BeanWrapperImpl wrapper = new BeanWrapperImpl(result);
-		wrapper.registerCustomEditor(int[].class, new IntArrayPropertyEditor());
-		PropertiesEditor editor = new PropertiesEditor();
-		editor.setAsText("numbers=1,2,3, 4");
-		Properties props = (Properties) editor.getValue();
-		wrapper.setPropertyValues(props);
-		assertEquals(4, result.numbers[3]);
-	}
-
 	// BeanWrapperFieldSetMapper doesn't currently support nesting with
 	// collections.
 	public void testNestedList() {
@@ -307,37 +293,6 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		}
 	}
 
-	public void testSetCustomEditorsWithInvalidTypeName() throws Exception {
-
-		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
-		try {
-			mapper.setCustomEditors(Collections.singletonMap("FOO", new CustomNumberEditor(Long.class, true)));		
-		} catch (IllegalArgumentException e) {	
-			// expected
-		}
-	}
-
-	public void testSetCustomEditorsWithInvalidType() throws Exception {
-
-		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
-		try {
-			mapper.setCustomEditors(Collections.singletonMap(new Object(), new CustomNumberEditor(Long.class, true)));		
-		} catch (IllegalArgumentException e) {	
-			// expected
-		}
-	}
-
-
-	public void testSetCustomEditorsWithInvalidEditor() throws Exception {
-
-		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
-		try {
-			mapper.setCustomEditors(Collections.singletonMap(Long.class, "FOO"));
-		} catch (IllegalArgumentException e) {	
-			// expected
-		}
-	}
-
 	public void testPaddedLongWithEditor() throws Exception {
 
 		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
@@ -365,14 +320,6 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 		assertEquals(9, bean.getVarLong());
 		assertEquals(78, bean.getVarInt());
-	}
-
-	private static class BeanWithIntArray {
-		private int[] numbers;
-
-		public void setNumbers(int[] numbers) {
-			this.numbers = numbers;
-		}
 	}
 
 	private static class TestNestedList {

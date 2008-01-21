@@ -103,6 +103,13 @@
 	<bean id="convertingMethodInterceptor"
 		class="org.springframework.batch.execution.bootstrap.support.TypeConverterMethodInterceptor">
 		<property name="convertException" value="true" />
+		<property name="customEditors">
+			<map>
+				<entry key="org.springframework.batch.core.domain.JobIdentifier">
+					<bean class="org.springframework.batch.execution.bootstrap.support.JobIdentifierPropertyEditor"/>
+				</entry>
+			</map>
+		</property>
 	</bean>
 
 	<bean id="logAdvice"
