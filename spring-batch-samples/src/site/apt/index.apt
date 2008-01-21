@@ -1,0 +1,37 @@
+Spring Batch Samples
+
+  Here is a list of samples with checks to indicate which features each one demonstrates:
+
+*----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
+|<<Job / Feature>> | <<delimited input>> | <<fixed-length input>> | <<xml input>> | <<multiline input>> | <<db driving query input>> | <<db cursor input>> | <<delimited output>> | <<fixed-length output>> | <<xml output>> | <<multiline output>> | <<db output>> | <<skip>> | <<restart>> | <<automatic mapping>> | <<JMX>> | <<validation>> | <<delegation>>
+*----
+adhocLoopJob             |  |  |  |  |  |  |  |  |  |  |  |  |  |  | x |  | 
+*----
+beanWrapperMapperSample  |  | x |  |  |  |  |  |  |  |  | x |  |  | x |  | x | 
+*----
+compositeProcessorSample |  |  |  |  |  |  |  | x |  |  | x |  |  |  |  | x | 
+*----
+delegatingJob            |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | x
+*----
+fixedLengthImportJob     |  | x |  |  |  |  |  |  |  |  | x |  |  |  |  | x | 
+*----
+hibernateJob             |  |  |  |  |  | x |  |  |  |  | x |  |  |  |  |  | 
+*----
+ibatisJob                |  |  |  |  | x |  |  |  |  |  | x |  |  |  |  |  | 
+*----
+infiniteLoopJob          |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+*----
+multilineJob             |  | x |  | x |  |  |  |  |  |  |  |  |  |  |  |  | 
+*----
+multilineOrderJob        | x |  |  | x |  |  |  | x |  | x |  |  |  |  |  |  | 
+*----
+fotballlJob              | x |  |  |  |  | x |  |  |  |  | x |  |  |  |  |  | 
+*----
+restartSample            |  | x |  |  |  |  |  |  |  |  | x |  | x |  |  | x | 
+*----
+simpleTaskletJob         |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+*----
+tradeJob                 | x |  |  |  | x |  | x |  |  |  | x |  |  |  |  | x | 
+*----
+xmlStaxJob               |  |  | x |  |  |  |  |  | x |  |  |  |  |  |  |  | 
+*----
