@@ -272,6 +272,39 @@ public abstract class AbstractJobDaoTests extends
 
 	}
 
+	public void testJobWithScheduledJobIdentifier() throws Exception {
+		Date date = new Date();
+		ScheduledJobIdentifier jobIdentifier = new ScheduledJobIdentifier("Job1", "testKey", date);
+
+		// Create job.
+		job = jobDao.createJob(jobIdentifier);
+
+		List jobs = jobDao.findJobs(jobIdentifier); 
+			
+		assertEquals(1, jobs.size());
+		assertEquals(job.getName(), ((JobInstance) jobs.get(0)).getName());
+		assertEquals(jobIdentifier.getJobKey(), ((JobInstance) jobs.get(0)).
+				getIdentifier().getJobInstanceProperties().getString(DefaultJobIdentifier.JOB_KEY));
+
+	}
+
+	public void testJobWithScheduledJobIdentifierAndDifferentTime() throws Exception {
+		Date date = new Date();
+		ScheduledJobIdentifier jobIdentifier = new ScheduledJobIdentifier("Job1", "testKey", date);
+
+		// Create job.
+		job = jobDao.createJob(jobIdentifier);
+		
+		Date later = new Date(date.getTime()+3600000);
+		ScheduledJobIdentifier laterIdentifier = new ScheduledJobIdentifier("Job1", "testKey", later);
+
+		List jobs = jobDao.findJobs(laterIdentifier); 
+
+		// Different timestamp is different identifier...
+		assertEquals(0, jobs.size());
+
+	}
+
 	public void testFindJobExecutions(){
 
 		List results = jobDao.findJobExecutions(job);

@@ -21,33 +21,57 @@ import java.util.Date;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstancePropertiesBuilder;
 
+/**
+ * Convenient {@link JobIdentifier} implementation that identifies itself by a
+ * {@link Date} as well as an optional String key. The time portion of the
+ * schedule date is significant, and clients are responsible for truncating it
+ * if it represents a date rather than a timestamp.
+ * 
+ * @author Dave Syer
+ * 
+ */
 public class ScheduledJobIdentifier extends DefaultJobIdentifier implements JobIdentifier {
-	
+
 	public static final String SCHEDULE_DATE = "schedule.date";
-	
+
 	ScheduledJobIdentifier() {
 		this(null);
 	}
-	
+
 	public ScheduledJobIdentifier(String name) {
 		super(name);
 	}
 
 	/**
-	 * @param name
-	 * @param key
+	 * Convenience constructor that leaves the schedule date null.
+	 * 
+	 * @param name the name of the job
+	 * @param key a unique key for this execution
 	 */
 	public ScheduledJobIdentifier(String name, String key) {
 		super(name, key);
 	}
-	
-	public ScheduledJobIdentifier(String name, Date scheduleDate){
+
+	/**
+	 * Convenience constructor that leaves the key null.
+	 * 
+	 * @param name the name of the job
+	 * @param scheduleDate a timestamp
+	 */
+	public ScheduledJobIdentifier(String name, Date scheduleDate) {
 		super(name, new JobInstancePropertiesBuilder().addDate(SCHEDULE_DATE, scheduleDate).toJobParameters());
 	}
-	
-	public ScheduledJobIdentifier(String name, String jobKey, Date scheduleDate){
-		super(name, new JobInstancePropertiesBuilder().addString(ScheduledJobIdentifier.JOB_KEY, jobKey).
-				addDate(SCHEDULE_DATE, scheduleDate).toJobParameters());
+
+	/**
+	 * Convenience constructor with all properties.
+	 * 
+	 * @param name the name of the job
+	 * @param key a unique key for this execution
+	 * @param scheduleDate a timestamp
+	 */
+	public ScheduledJobIdentifier(String name, String key, Date scheduleDate) {
+		super(name, new JobInstancePropertiesBuilder().addString(ScheduledJobIdentifier.JOB_KEY, key).addDate(
+				SCHEDULE_DATE, scheduleDate).toJobParameters());
 	}
 
 	public Date getScheduleDate() {
