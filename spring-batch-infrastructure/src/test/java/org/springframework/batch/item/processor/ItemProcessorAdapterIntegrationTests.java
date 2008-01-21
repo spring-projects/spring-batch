@@ -11,7 +11,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
  * 
  * @author Robert Kasanicky
  */
-public class DelegatingItemProcessorIntegrationTests extends AbstractDependencyInjectionSpringContextTests {
+public class ItemProcessorAdapterIntegrationTests extends AbstractDependencyInjectionSpringContextTests {
 
 	private ItemProcessorAdapter processor;
 	
