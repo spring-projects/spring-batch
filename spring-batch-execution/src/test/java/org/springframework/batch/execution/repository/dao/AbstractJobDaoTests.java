@@ -16,6 +16,7 @@
 
 package org.springframework.batch.execution.repository.dao;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -302,6 +303,26 @@ public abstract class AbstractJobDaoTests extends
 
 		// Different timestamp is different identifier...
 		assertEquals(0, jobs.size());
+
+	}
+
+	public void testJobWithScheduledJobIdentifierAndDifferentDateImplementation() throws Exception {
+		Date date = new Date();
+		ScheduledJobIdentifier jobIdentifier = new ScheduledJobIdentifier("Job1", "testKey", date);
+
+		// Create job.
+		job = jobDao.createJob(jobIdentifier);
+		
+		Timestamp later = new Timestamp(date.getTime());
+		ScheduledJobIdentifier laterIdentifier = new ScheduledJobIdentifier("Job1", "testKey", later);
+
+		List jobs = jobDao.findJobs(laterIdentifier); 
+
+		// Different timestamp is different identifier...
+		assertEquals(1, jobs.size());
+		assertEquals(job.getName(), ((JobInstance) jobs.get(0)).getName());
+		assertEquals(jobIdentifier.getJobKey(), ((JobInstance) jobs.get(0)).
+				getIdentifier().getJobInstanceProperties().getString(DefaultJobIdentifier.JOB_KEY));
 
 	}
 
