@@ -17,10 +17,9 @@ package org.springframework.batch.core.domain;
 
 import java.util.Properties;
 
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
-import org.springframework.batch.restart.GenericRestartData;
-
 import junit.framework.TestCase;
+
+import org.springframework.batch.restart.GenericRestartData;
 
 /**
  * @author Dave Syer
