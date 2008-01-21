@@ -24,25 +24,25 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
 
 /**
  * @author Lucas Ward
- *
+ * 
  */
-public class JdbcGameDaoIntegrationTests extends
-	AbstractTransactionalDataSourceSpringContextTests {
+public class JdbcGameDaoIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	JdbcGameDao gameDao;
-	Game game = new Game();
-	
+	private JdbcGameDao gameDao;
+
+	private Game game = new Game();
+
 	protected String[] getConfigLocations() {
-		return new String[]{"data-source-context.xml"};
+		return new String[] { "data-source-context.xml" };
 	}
-	
+
 	protected void onSetUpBeforeTransaction() throws Exception {
 		super.onSetUpBeforeTransaction();
-		
+
 		gameDao = new JdbcGameDao();
 		gameDao.setJdbcTemplate(getJdbcTemplate());
-		
-		game.setId("AbduKa00");
+
+		game.setId("XXXXX00");
 		game.setYear(1996);
 		game.setTeam("mia");
 		game.setWeek(10);
@@ -58,25 +58,26 @@ public class JdbcGameDaoIntegrationTests extends
 		game.setReceptionYards(16);
 		game.setTotalTd(2);
 	}
-	
-	public void testWrite(){
-		
+
+	public void testWrite() {
+
 		gameDao.write(game);
-		
-		Game tempGame = (Game)getJdbcTemplate().queryForObject("SELECT * FROM GAMES", new GameRowMapper());
+
+		Game tempGame = (Game) getJdbcTemplate().queryForObject("SELECT * FROM GAMES where PLAYER_ID=? AND YEAR_NO=?",
+				new Object[] { game.getId(), Integer.valueOf(game.getYear()) }, new GameRowMapper());
 		assertEquals(tempGame, game);
 	}
-	
+
 	public static class GameRowMapper implements RowMapper {
 
-		public Object mapRow(ResultSet rs, int arg1) throws SQLException{
-			
-			if(rs == null){
+		public Object mapRow(ResultSet rs, int arg1) throws SQLException {
+
+			if (rs == null) {
 				return null;
 			}
-			
+
 			Game game = new Game();
-			game.setId(rs.getString("PLAYER_ID"));
+			game.setId(rs.getString("PLAYER_ID").trim());
 			game.setYear(rs.getInt("year_no"));
 			game.setTeam(rs.getString("team"));
 			game.setWeek(rs.getInt("week"));
@@ -91,7 +92,7 @@ public class JdbcGameDaoIntegrationTests extends
 			game.setReceptions(rs.getInt("receptions"));
 			game.setReceptionYards(rs.getInt("receptions_Yards"));
 			game.setTotalTd(rs.getInt("total_Td"));
-			
+
 			return game;
 		}
 	}
