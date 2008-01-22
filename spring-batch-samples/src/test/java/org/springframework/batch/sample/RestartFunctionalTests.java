@@ -16,6 +16,7 @@
 
 package org.springframework.batch.sample;
 
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -69,7 +70,7 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 			runJob();
 			fail("First run of the job is expected to fail.");
 		}
-		catch (BatchCriticalException expected) {
+		catch (Exception expected) {
 			//expected
 		}
 
@@ -81,8 +82,8 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 	}
 
 	// load the application context and launch the job
-	private void runJob() throws Exception, Exception {
-		launcher.run(new SimpleJobIdentifier(getJobName()));
+	private void runJob() throws Exception {
+		launcher.run(getJob(), new JobInstanceProperties());
 	}
 
 }

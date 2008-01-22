@@ -24,8 +24,6 @@
 	<bean id="jobLauncher"
 		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="simpleJobRepository" />
-		<property name="jobLocator"
-			ref="jobConfigurationRegistry" />
 		<property name="jobExecutor" ref="jobExecutor" />
 	</bean>
 

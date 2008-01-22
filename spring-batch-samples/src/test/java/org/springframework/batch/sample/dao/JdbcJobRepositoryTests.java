@@ -12,6 +12,7 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
@@ -78,7 +79,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 	public void testFindOrCreateJob() throws Exception {
 		jobConfiguration.setName("foo");
 		int before = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
-		JobExecution execution = repository.findOrCreateJob(jobConfiguration, jobIdentifier);
+		JobExecution execution = repository.createJobExecution(jobConfiguration, new JobInstanceProperties());
 		int after = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertEquals(before + 1, after);
 		assertNotNull(execution.getId());
@@ -123,7 +124,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 
 		jobConfiguration.setName("spam");
 
-		JobExecution execution = repository.findOrCreateJob(jobConfiguration, jobIdentifier);
+		JobExecution execution = repository.createJobExecution(jobConfiguration, new JobInstanceProperties());
 		cacheJobIds(execution);
 		execution.setEndTime(new Timestamp(System.currentTimeMillis()));
 		repository.saveOrUpdate(execution);
@@ -173,7 +174,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 					new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 						public Object doInTransaction(org.springframework.transaction.TransactionStatus status) {
 							try {
-								JobExecution execution = repository.findOrCreateJob(jobConfiguration, jobIdentifier);
+								JobExecution execution = repository.createJobExecution(jobConfiguration, new JobInstanceProperties());
 								cacheJobIds(execution);
 								list.add(execution);
 								Thread.sleep(1000);
@@ -193,7 +194,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 		}).start();
 
 		Thread.sleep(400);
-		JobExecution execution = repository.findOrCreateJob(jobConfiguration, jobIdentifier);
+		JobExecution execution = repository.createJobExecution(jobConfiguration, new JobInstanceProperties());
 		cacheJobIds(execution);
 
 		int count = 0;

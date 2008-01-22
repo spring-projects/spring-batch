@@ -1,7 +1,9 @@
 package org.springframework.batch.sample.item.processor;
 
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
@@ -28,8 +30,8 @@ public class StagingItemProcessorTests extends
 		SimpleStepContext stepScopeContext = StepSynchronizationManager
 				.open();
 		stepScopeContext.setStepExecution(new StepExecution(new StepInstance(
-				new Long(11)), new JobExecution(new JobInstance(
-				new SimpleJobIdentifier("job"), new Long(12)))));
+				new Long(11)), new JobExecution(new JobInstance(new Long(12),
+				new JobInstanceProperties(), new Job("job")))));
 		super.prepareTestInstance();
 	}
 

@@ -24,6 +24,10 @@
 		</property>
 	</bean>
 	
+	<bean id="jobLauncher" class="org.springframework.batch.execution.launch.SimpleJobLauncher">
+		<property name="jobExecutor" ref="jobExecutor" />
+		<property name="jobRepository" ref="simpleJobRepository" />
+	</bean>
 
 	<bean id="infiniteLoopJob" parent="simpleJob">
 		<property name="steps">

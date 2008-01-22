@@ -17,6 +17,7 @@
 package org.springframework.batch.sample;
 
 import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.execution.runtime.DefaultJobIdentifier;
 import org.springframework.context.ApplicationContext;
@@ -67,6 +68,10 @@ public abstract class AbstractBatchLauncherTests extends
 	public void setJob(Job job) {
 		this.job = job;
 	}
+	
+	public Job getJob() {
+		return job;
+	}
 
 	protected String getJobName() {
 		return job.getName();
@@ -79,8 +84,6 @@ public abstract class AbstractBatchLauncherTests extends
 	public void testLaunchJob() throws Exception {
 		// Make sure the job is unique by the test case that runs it, not just
 		// its name:
-		launcher.run(new DefaultJobIdentifier(getJobName(), this.getClass()
-				.getName()));
-		launcher.stop();
+		launcher.run(job, new JobInstanceProperties());
 	}
 }

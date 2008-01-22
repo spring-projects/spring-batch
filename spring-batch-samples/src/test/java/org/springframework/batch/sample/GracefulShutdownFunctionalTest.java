@@ -19,6 +19,9 @@ package org.springframework.batch.sample;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 
@@ -37,46 +40,61 @@ public class GracefulShutdownFunctionalTest extends AbstractBatchLauncherTests {
 
 	public void testLaunchJob() throws Exception {
 		final List errors = new ArrayList();
+		final JobInstanceProperties jobInstanceProperties = new JobInstanceProperties();
 		
-		Thread jobThread = new Thread(){
-			public void run(){
-				try {
-					launcher.run(new SimpleJobIdentifier(getJobName()));
-				}
-				catch (RuntimeException e) {
-					if (!(e.getCause() instanceof StepInterruptedException)) {
-						errors.add(e);						
-					}
-				}
-				catch (Exception e) {
-					errors.add(e);
-				}
-			}
-		};
 		
-		jobThread.start();
+//		Thread jobThread = new Thread(){
+//			public void run(){
+//				try {
+//					launcher.run(getJob(), jobInstanceProperties);
+//				}
+//				catch (RuntimeException e) {
+//					if (!(e.getCause() instanceof StepInterruptedException)) {
+//						errors.add(e);						
+//					}
+//				}
+//				catch (Exception e) {
+//					errors.add(e);
+//				}
+//			}
+//		};
+//		
+//		jobThread.start();
+//		
+//		//give the thread a second to start up
+//		Thread.sleep(200);
+//		
+//		assertTrue(launcher.isRunning());
+//		assertTrue(jobThread.isAlive());
+//		
+//		//stop the job
+//		
+//		launcher.stop();
+//		
+//		//it takes a little while for it to shut down.
+//		Thread.sleep(1000);
+//		
+//		assertFalse(launcher.isRunning());
+//		assertFalse(jobThread.isAlive());
+//		
+//		if (!errors.isEmpty()) {
+//			Exception e = (Exception) errors.get(0);
+//			e.printStackTrace();
+//			fail("Unexpected Exception: "+e);
+//		}
 		
-		//give the thread a second to start up
-		Thread.sleep(200);
+		JobExecution jobExecution = launcher.run(getJob(), jobInstanceProperties);
 		
-		assertTrue(launcher.isRunning());
-		assertTrue(jobThread.isAlive());
+		assertEquals(BatchStatus.STARTED, jobExecution.getExitStatus());
 		
-		//stop the job
+		jobExecution.stop();
 		
-		launcher.stop();
-		
-		//it takes a little while for it to shut down.
-		Thread.sleep(1000);
-		
-		assertFalse(launcher.isRunning());
-		assertFalse(jobThread.isAlive());
-		
-		if (!errors.isEmpty()) {
-			Exception e = (Exception) errors.get(0);
-			e.printStackTrace();
-			fail("Unexpected Exception: "+e);
+		int count = 0;
+		while(jobExecution.isRunning() && count <= 10){
+			Thread.sleep(10);
 		}
+		
+		assertFalse(jobExecution.isRunning());
 	}
 	
 }

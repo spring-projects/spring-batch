@@ -20,7 +20,7 @@
 			<list>
 				<bean id="playerload"
 					class="org.springframework.batch.execution.step.SimpleStep">
-					<property name="commitInterval" value="100"></property>
+					<property name="commitInterval" value="1"></property>
 					<property name="startLimit" value="100" />
 					<property name="saveRestartData" value="true" />
 					<property name="allowStartIfComplete" value="false" />
@@ -46,7 +46,7 @@
 				</bean>
 				<bean id="gameLoad"
 					class="org.springframework.batch.execution.step.SimpleStep">
-					<property name="commitInterval" value="1000" />
+					<property name="commitInterval" value="1" />
 					<property name="startLimit" value="100" />
 					<property name="saveRestartData" value="true" />
 					<property name="tasklet">
@@ -71,7 +71,7 @@
 				</bean>
 				<bean id="playerSummarization"
 					class="org.springframework.batch.execution.step.SimpleStep">
-					<property name="commitInterval" value="100" />
+					<property name="commitInterval" value="1" />
 					<property name="startLimit" value="100" />
 					<property name="saveRestartData" value="true" />
 					<property name="tasklet">
