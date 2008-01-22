@@ -91,8 +91,7 @@ public class DefaultJobExecutor implements JobExecutor {
 					updateStatus(execution, BatchStatus.STARTED);
 					StepExecutor stepExecutor = stepExecutorFactory
 							.getExecutor(step);
-					StepExecution stepExecution = new StepExecution(stepInstance,
-							execution);
+					StepExecution stepExecution = execution.createStepExecution(stepInstance);
 					status = stepExecutor.process(step,
 							stepExecution);
 				}
