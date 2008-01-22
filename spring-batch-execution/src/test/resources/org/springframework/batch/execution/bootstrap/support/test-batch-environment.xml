@@ -14,6 +14,6 @@
 	<bean class="org.springframework.batch.execution.bootstrap.support.SimpleJvmExitCodeMapper" />
 
 	<bean
-		class="org.springframework.batch.execution.bootstrap.support.SimpleCommandLineJobDispatcherTests$StubSystemExiter" />
+		class="org.springframework.batch.execution.bootstrap.support.SimpleCommandLineJobRunnerTests$StubSystemExiter" />
 
 </beans>

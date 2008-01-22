@@ -83,9 +83,9 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @since 2.1
  */
-public class SimpleCommandLineJobDispatcher {
+public class SimpleCommandLineJobRunner {
 
-	protected static final Log logger = LogFactory.getLog(SimpleCommandLineJobDispatcher.class);
+	protected static final Log logger = LogFactory.getLog(SimpleCommandLineJobRunner.class);
 
 	/**
 	 * The default path to the job configuration.
@@ -114,7 +114,7 @@ public class SimpleCommandLineJobDispatcher {
 
 	private String defaultJobName;
 
-	public SimpleCommandLineJobDispatcher(String beanRefContextPath) {
+	public SimpleCommandLineJobRunner(String beanRefContextPath) {
 		if (beanRefContextPath == null) {
 			return;
 		}
@@ -264,7 +264,7 @@ public class SimpleCommandLineJobDispatcher {
 	}
 
 	/**
-	 * Launch a batch job using a {@link SimpleCommandLineJobDispatcher}.
+	 * Launch a batch job using a {@link SimpleCommandLineJobRunner}.
 	 * Creates a new Spring context for the job execution, and uses a common
 	 * parent for all such contexts. No exception are thrown from this method,
 	 * rather exceptions are logged and an integer returned through the exit
@@ -294,7 +294,7 @@ public class SimpleCommandLineJobDispatcher {
 		Assert.state(!(beanRefContextPath == null && parentKey != null), "If you specify the "
 				+ BATCH_EXECUTION_ENVIRONMENT_KEY + " you must also specify a path for the " + BEAN_REF_CONTEXT_KEY);
 
-		SimpleCommandLineJobDispatcher command = new SimpleCommandLineJobDispatcher(beanRefContextPath);
+		SimpleCommandLineJobRunner command = new SimpleCommandLineJobRunner(beanRefContextPath);
 		int result = command.start(path, name, parentKey);
 		command.exit(result);
 	}
