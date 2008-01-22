@@ -21,26 +21,28 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class JobExecutionTests extends TestCase {
 
 	private JobExecution execution = new JobExecution(new JobInstance(null, new Long(11), null));
+
 	private JobExecution context = new JobExecution(new JobInstance(new SimpleJobIdentifier("foo"), new Long(11), null));
-	
+
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#JobExecution()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#JobExecution()}.
 	 */
 	public void testJobExecution() {
 		assertNull(new JobExecution().getId());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getEndTime()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#getEndTime()}.
 	 */
 	public void testGetEndTime() {
 		assertNull(execution.getEndTime());
@@ -49,7 +51,8 @@ public class JobExecutionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getEndTime()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#getEndTime()}.
 	 */
 	public void testIsRunning() {
 		assertTrue(execution.isRunning());
@@ -58,7 +61,8 @@ public class JobExecutionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getStartTime()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#getStartTime()}.
 	 */
 	public void testGetStartTime() {
 		assertNotNull(execution.getStartTime());
@@ -67,7 +71,8 @@ public class JobExecutionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getStatus()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#getStatus()}.
 	 */
 	public void testGetStatus() {
 		assertEquals(BatchStatus.STARTING, execution.getStatus());
@@ -76,7 +81,8 @@ public class JobExecutionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
 	 */
 	public void testGetJobId() {
 		assertEquals(11, execution.getJobId().longValue());
@@ -85,7 +91,8 @@ public class JobExecutionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
 	 */
 	public void testGetJobIdForNullJob() {
 		execution = new JobExecution(null);
@@ -93,14 +100,16 @@ public class JobExecutionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
 	 */
 	public void testGetJob() {
 		assertNotNull(execution.getJobInstance());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobExecution#getExitStatus()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#getExitStatus()}.
 	 */
 	public void testGetExitCode() {
 		assertEquals(ExitStatus.UNKNOWN, execution.getExitStatus());
@@ -112,49 +121,20 @@ public class JobExecutionTests extends TestCase {
 		assertEquals("foo", context.getJobInstance().getIdentifier().getName());
 	}
 
-	public void testNullContexts() throws Exception {
-		assertEquals(0, context.getStepContexts().size());
-		assertEquals(0, context.getChunkContexts().size());
-	}
-	
-	public void testStepContext() throws Exception {
-		context.registerStepContext(new RepeatContextSupport(null));
-		assertEquals(1, context.getStepContexts().size());
-	}
-
-	public void testAddAndRemoveStepContext() throws Exception {
-		context.registerStepContext(new RepeatContextSupport(null));
-		assertEquals(1, context.getStepContexts().size());
-		context.unregisterStepContext(new RepeatContextSupport(null));
-		assertEquals(0, context.getStepContexts().size());
-	}
-
 	public void testAddAndRemoveStepExecution() throws Exception {
 		assertEquals(0, context.getStepExecutions().size());
-		context.registerStepExecution(new StepExecution(null, null));
+		context.createStepExecution(new StepInstance(null, null));
 		assertEquals(1, context.getStepExecutions().size());
 	}
 
-	public void testAddAndRemoveChunkContext() throws Exception {
-		context.registerChunkContext(new RepeatContextSupport(null));
-		assertEquals(1, context.getChunkContexts().size());
-		context.unregisterChunkContext(new RepeatContextSupport(null));
-		assertEquals(0, context.getChunkContexts().size());
+	public void testToString() throws Exception {
+		assertTrue("JobExecution string does not contain id", context.toString().indexOf("id=") >= 0);
+		assertTrue("JobExecution string does not contain name: " + context, context.toString().indexOf("foo") >= 0);
 	}
 
-	public void testRemoveChunkContext() throws Exception {
-		context.unregisterChunkContext(new RepeatContextSupport(null));
-		assertEquals(0, context.getChunkContexts().size());
-	}
-	
-	public void testToString() throws Exception {
-		assertTrue("JobExecution string does not contain id", context.toString().indexOf("id=")>=0);
-		assertTrue("JobExecution string does not contain name: "+context, context.toString().indexOf("foo")>=0);
-	}
-	
 	public void testToStringWithNullJob() throws Exception {
 		context = new JobExecution();
-		assertTrue("JobExecution string does not contain id", context.toString().indexOf("id=")>=0);
-		assertTrue("JobExecution string does not contain job: "+context, context.toString().indexOf("job=")>=0);
+		assertTrue("JobExecution string does not contain id", context.toString().indexOf("id=") >= 0);
+		assertTrue("JobExecution string does not contain job: " + context, context.toString().indexOf("job=") >= 0);
 	}
 }

@@ -38,7 +38,6 @@ import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionCl
 import org.springframework.batch.execution.step.simple.SimpleStepExecutorFactory;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.RepeatContext;
 
 /**
  * Default implementation of (@link JobExecutor} interface. Sequentially
@@ -132,11 +131,6 @@ public class DefaultJobExecutor implements JobExecutor {
 		job.setStatus(status);
 		jobRepository.update(job);
 		jobRepository.saveOrUpdate(jobExecution);
-		for (Iterator iter = jobExecution.getStepContexts().iterator(); iter
-				.hasNext();) {
-			RepeatContext context = (RepeatContext) iter.next();
-			context.setAttribute("JOB_STATUS", status);
-		}
 	}
 
 	/*

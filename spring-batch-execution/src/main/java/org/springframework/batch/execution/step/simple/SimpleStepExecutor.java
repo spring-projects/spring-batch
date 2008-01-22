@@ -17,7 +17,6 @@
 package org.springframework.batch.execution.step.simple;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Properties;
 
 import org.springframework.batch.core.domain.BatchStatus;
@@ -175,7 +174,6 @@ public class SimpleStepExecutor implements StepExecutor {
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
 
 					final StepContribution contribution = stepExecution.createStepContribution();
-					contribution.registerStepContext(context);
 
 					// Before starting a new transaction, check for
 					// interruption.
@@ -295,10 +293,6 @@ public class SimpleStepExecutor implements StepExecutor {
 		step.setStatus(status);
 		jobRepository.update(step);
 		jobRepository.saveOrUpdate(stepExecution);
-		for (Iterator iter = stepExecution.getJobExecution().getStepContexts().iterator(); iter.hasNext();) {
-			RepeatContext context = (RepeatContext) iter.next();
-			context.setAttribute("JOB_STATUS", status);
-		}
 	}
 
 	/**
@@ -307,15 +301,16 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * outside this method, so subclasses that override do not need to create a
 	 * transaction.
 	 * 
-	 * @param step the current step
-	 * @param stepExecution the current step, containing the {@link Tasklet}
+	 * @param step the current step containing the {@link Tasklet}
 	 * with the business logic.
 	 * @return true if there is more data to process.
 	 */
 	protected final ExitStatus processChunk(final Step step, final StepContribution contribution) {
 		ExitStatus result = chunkOperations.iterate(new RepeatCallback() {
 			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
-				contribution.registerChunkContext(context);
+				if (contribution.isTerminateOnly()) {
+					context.setTerminateOnly();
+				}
 				// check for interruption before each item as well
 				interruptionPolicy.checkInterrupted(context);
 				ExitStatus exitStatus = doTaskletProcessing(step.getTasklet(), contribution);

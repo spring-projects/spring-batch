@@ -24,27 +24,27 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobLocator;
 import org.springframework.batch.core.domain.NoSuchJobException;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 
 /**
- * A test implementation of the JobLauncher interface.  It exists
- * solely to work through interface design issues for the JobLauncher,
- * JobRepository, JobLocator, and JobExecutor interfaces.  It is designed
- * for simplicity, and despite unit testing may not be completely threadsafe,
- * and therefore should not be used.
+ * A test implementation of the JobLauncher interface. It exists solely to work
+ * through interface design issues for the JobLauncher, JobRepository,
+ * JobLocator, and JobExecutor interfaces. It is designed for simplicity, and
+ * despite unit testing may not be completely threadsafe, and therefore should
+ * not be used.
  * 
  * Rather than using a JobExecutorFacade, a JobExecutor is worked with directly.
- * Not every method of the JobLauncher interface is used.  Instead, new versions
- * that take JobIdentifier as an argument were added.  A JobExecution is considered
- * to be running if it's JobIdentifier (the one it was ran with) exists in the
- * HashMap execution registry.  When a JobExecutor is finished processing it removes
- * it's identifier from the map.
+ * Not every method of the JobLauncher interface is used. Instead, new versions
+ * that take JobIdentifier as an argument were added. A JobExecution is
+ * considered to be running if it's JobIdentifier (the one it was ran with)
+ * exists in the HashMap execution registry. When a JobExecutor is finished
+ * processing it removes it's identifier from the map.
  * 
  * @author Lucas Ward
  * 
@@ -77,15 +77,13 @@ public class DefaultJobLauncher implements JobLauncher {
 	 * 
 	 * @see org.springframework.batch.execution.launch.JobLauncher#run(org.springframework.batch.core.domain.JobIdentifier)
 	 */
-	public JobExecution run(JobIdentifier jobIdentifier)
-			throws NoSuchJobException, JobExecutionAlreadyRunningException {
+	public JobExecution run(JobIdentifier jobIdentifier) throws NoSuchJobException, JobExecutionAlreadyRunningException {
 
 		JobExecution jobExecution;
 
 		synchronized (monitor) {
 			if (jobExecutionRegistry.containsKey(jobIdentifier)) {
-				throw new JobExecutionAlreadyRunningException("Job: "
-						+ jobIdentifier + "is already running.");
+				throw new JobExecutionAlreadyRunningException("Job: " + jobIdentifier + "is already running.");
 			}
 
 			Job job = jobLocator.getJob(jobIdentifier.getName());
@@ -105,7 +103,7 @@ public class DefaultJobLauncher implements JobLauncher {
 			public void run() {
 				ExitStatus status = jobExecutor.run(job, jobExecution);
 				jobExecution.setExitStatus(status);
-				synchronized(monitor){
+				synchronized (monitor) {
 					jobExecutionRegistry.remove(jobIdentifier);
 				}
 			}
@@ -131,26 +129,22 @@ public class DefaultJobLauncher implements JobLauncher {
 			
 			JobExecution jobExecution = (JobExecution)jobExecutionRegistry.get(jobIdentifier);
 			
-			for (Iterator iter = jobExecution.getStepContexts().iterator(); iter
+			for (Iterator iter = jobExecution.getStepExecutions().iterator(); iter
 					.hasNext();) {
-				RepeatContext context = (RepeatContext) iter.next();
+				StepExecution context = (StepExecution) iter.next();
 				context.setTerminateOnly();
 			}
-			for (Iterator iter = jobExecution.getChunkContexts().iterator(); iter
-					.hasNext();) {
-				RepeatContext context = (RepeatContext) iter.next();
-				context.setTerminateOnly();
-			}	
+
 		}
 	}
-	
-	public boolean isRunning(JobIdentifier jobIdentifier){
-		
-		synchronized(monitor){
-			if(jobExecutionRegistry.containsKey(jobIdentifier)){
+
+	public boolean isRunning(JobIdentifier jobIdentifier) {
+
+		synchronized (monitor) {
+			if (jobExecutionRegistry.containsKey(jobIdentifier)) {
 				return true;
 			}
-			else{
+			else {
 				return false;
 			}
 		}

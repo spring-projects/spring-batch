@@ -29,6 +29,7 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobLocator;
 import org.springframework.batch.core.domain.NoSuchJobException;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -272,14 +273,9 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 					"The job is not executing in this executor: [" + execution
 							+ "]");
 		}
-		for (Iterator iter = execution.getStepContexts().iterator(); iter
+		for (Iterator iter = execution.getStepExecutions().iterator(); iter
 				.hasNext();) {
-			RepeatContext context = (RepeatContext) iter.next();
-			context.setTerminateOnly();
-		}
-		for (Iterator iter = execution.getChunkContexts().iterator(); iter
-				.hasNext();) {
-			RepeatContext context = (RepeatContext) iter.next();
+			StepExecution context = (StepExecution) iter.next();
 			context.setTerminateOnly();
 		}
 		this.onStop(execution);
@@ -301,20 +297,11 @@ class SimpleJobExecutorFacade implements JobExecutorFacade,
 			String runtime = "job" + i;
 			props.setProperty(runtime, "" + element.getJobInstance().getIdentifier());
 			int j = 0;
-			for (Iterator iterator = element.getStepContexts().iterator(); iterator
+			for (Iterator iterator = element.getStepExecutions().iterator(); iterator
 					.hasNext();) {
-				RepeatContext context = (RepeatContext) iterator.next();
+				StepExecution context = (StepExecution) iterator.next();
 				j++;
 				props.setProperty(runtime + ".step" + j, "" + context);
-
-			}
-			j = 0;
-			for (Iterator iterator = element.getChunkContexts().iterator(); iterator
-					.hasNext();) {
-				RepeatContext context = (RepeatContext) iterator.next();
-				j++;
-				props.setProperty(runtime + ".chunk" + j, "" + context);
-
 			}
 		}
 		return props;

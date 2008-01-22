@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.HashSet;
 
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.RepeatContext;
 
 /**
  * Batch domain object representing the execution of a job.
@@ -34,10 +33,6 @@ public class JobExecution extends Entity {
 	private JobInstance jobInstance;
 
 	private transient Collection stepExecutions = new HashSet();
-
-	private transient Collection stepContexts = new HashSet();
-
-	private transient Collection chunkContexts = new HashSet();
 
 	private BatchStatus status = BatchStatus.STARTING;
 
@@ -124,86 +119,6 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Accessor for the potentially multiple chunk contexts that are in
-	 * progress. In a single-threaded, sequential execution there would normally
-	 * be only one current chunk, but in more complicated scenarios there might
-	 * be multiple active contexts.
-	 * 
-	 * @return all the chunk contexts that have been registered and not
-	 *         unregistered. A collection of {@link RepeatContext} objects.
-	 */
-	public Collection getChunkContexts() {
-		synchronized (chunkContexts) {
-			return new HashSet(chunkContexts);
-		}
-	}
-
-	/**
-	 * Accessor for the potentially multiple step contexts that are in progress.
-	 * In a single-threaded, sequential execution there would normally be only
-	 * one current step, but in more complicated scenarios there might be
-	 * multiple active contexts.
-	 * 
-	 * @return all the step contexts that have been registered and not
-	 *         unregistered. A collection of {@link RepeatContext} objects.
-	 */
-	public Collection getStepContexts() {
-		synchronized (stepContexts) {
-			return new HashSet(stepContexts);
-		}
-	}
-
-	/**
-	 * Called at the start of a step, before any business logic is processed.
-	 * 
-	 * @param context
-	 *            the current step context.
-	 */
-	public void registerStepContext(RepeatContext stepContext) {
-		synchronized (stepContexts) {
-			this.stepContexts.add(stepContext);
-		}
-	}
-
-	/**
-	 * Called at the end of a step, after all business logic is processed, or in
-	 * the case of a failure.
-	 * 
-	 * @param context
-	 *            the current step context.
-	 */
-	public void unregisterStepContext(RepeatContext stepContext) {
-		synchronized (stepContexts) {
-			this.stepContexts.remove(stepContext);
-		}
-	}
-
-	/**
-	 * Called at the start of a chunk, before any business logic is processed.
-	 * 
-	 * @param context
-	 *            the current chunk context.
-	 */
-	public void registerChunkContext(RepeatContext chunkContext) {
-		synchronized (chunkContexts) {
-			this.chunkContexts.add(chunkContext);
-		}
-	}
-
-	/**
-	 * Called at the end of a chunk, after all business logic is processed, or
-	 * in the case of a failure.
-	 * 
-	 * @param context
-	 *            the current chunk context.
-	 */
-	public void unregisterChunkContext(RepeatContext chunkContext) {
-		synchronized (chunkContexts) {
-			this.chunkContexts.remove(chunkContext);
-		}
-	}
-
-	/**
 	 * @return the Job that is executing.
 	 */
 	public JobInstance getJobInstance() {
@@ -224,8 +139,10 @@ public class JobExecution extends Entity {
 	 * 
 	 * @param stepExecution
 	 */
-	public void registerStepExecution(StepExecution stepExecution) {
+	public StepExecution createStepExecution(StepInstance stepInstance) {
+		StepExecution stepExecution = new StepExecution(stepInstance, this);
 		this.stepExecutions.add(stepExecution);
+		return stepExecution;
 	}
 	
 	/* (non-Javadoc)

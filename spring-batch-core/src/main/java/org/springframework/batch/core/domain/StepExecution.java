@@ -55,6 +55,8 @@ public class StepExecution extends Entity {
 
 	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
+	private boolean terminateOnly;
+
 	/**
 	 * Package private constructor for Hibernate
 	 */
@@ -258,6 +260,21 @@ public class StepExecution extends Entity {
 	 */
 	public synchronized void rollback() {
 		rollbackCount++;
+	}
+
+	/**
+	 * @return flag to indicate that an execution should halt
+	 */
+	public boolean isTerminateOnly() {
+		return this.terminateOnly;
+	}
+
+	/**
+	 * Set a flag that will signal to an execution environment that this
+	 * execution (and its surrounding job) wishes to exit.
+	 */
+	public void setTerminateOnly() {
+		this.terminateOnly = true;
 	}
 
 }

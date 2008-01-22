@@ -13,14 +13,14 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobLocator;
+import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
  * @author Lucas Ward
@@ -124,8 +124,7 @@ public class DefaultJobLauncherTests extends TestCase {
 	
 	public void testStop() throws Exception{
 		jobLauncher.setJobExecutor(blockingExecutor);
-		RepeatContext stepContext = new RepeatContextSupport(null);
-		jobExecution.registerStepContext(stepContext);
+		jobExecution.createStepExecution(new StepInstance(null, "step"));
 		
 		jobLocator.getJob("job");
 		locatorControl.setDefaultReturnValue(job);
@@ -141,10 +140,9 @@ public class DefaultJobLauncherTests extends TestCase {
 		
 		jobLauncher.stop(jobIdentifier);
 		
-		Collection contexts = jobExecution.getStepContexts();
+		Collection contexts = jobExecution.getStepExecutions();
 		for(Iterator it = contexts.iterator();it.hasNext();){
-			RepeatContext context = (RepeatContext)it.next();
-			assertEquals(stepContext, context);
+			StepExecution context = (StepExecution)it.next();
 			assertTrue(context.isTerminateOnly());
 		}
 	}

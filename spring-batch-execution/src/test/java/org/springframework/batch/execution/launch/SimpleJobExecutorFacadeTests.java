@@ -30,13 +30,14 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobLocator;
 import org.springframework.batch.core.domain.NoSuchJobException;
+import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -53,8 +54,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 
 	private JobRepository jobRepository;
 
-	private MockControl jobRepositoryControl = MockControl
-			.createControl(JobRepository.class);
+	private MockControl jobRepositoryControl = MockControl.createControl(JobRepository.class);
 
 	private Job jobConfiguration = new Job();
 
@@ -62,8 +62,7 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 
 	private SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("TestJob");
 
-	private JobExecution jobExecution = new JobExecution(new JobInstance(
-			jobIdentifier, null));
+	private JobExecution jobExecution = new JobExecution(new JobInstance(jobIdentifier, null));
 
 	private List list = new ArrayList();
 
@@ -96,12 +95,10 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 
 	}
 
-	private JobInstance setUpFacadeForNormalStart()
-			throws Exception {
+	private JobInstance setUpFacadeForNormalStart() throws Exception {
 		jobIdentifier = new SimpleJobIdentifier("bar");
 		jobExecutor = new JobExecutor() {
-			public ExitStatus run(Job configuration,
-					JobExecution execution) throws BatchCriticalException {
+			public ExitStatus run(Job configuration, JobExecution execution) throws BatchCriticalException {
 				jobExecution = execution;
 				return ExitStatus.FINISHED;
 			}
@@ -112,45 +109,41 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 		jobRepository.findOrCreateJob(jobConfiguration, jobIdentifier);
 		jobRepositoryControl.setReturnValue(jobExecution);
 		jobRepositoryControl.replay();
-		jobExecutorFacade
-				.setJobLocator(new JobLocator() {
-					public Job getJob(String name)
-							throws NoSuchJobException {
-						return jobConfiguration;
-					}
-				});
+		jobExecutorFacade.setJobLocator(new JobLocator() {
+			public Job getJob(String name) throws NoSuchJobException {
+				return jobConfiguration;
+			}
+		});
 		return job;
 	}
 
 	public void testIsRunning() throws Exception {
 		jobExecutorFacade.setJobExecutor(new JobExecutor() {
-			public ExitStatus run(Job configuration,
-					JobExecution execution) throws BatchCriticalException {
+			public ExitStatus run(Job configuration, JobExecution execution) throws BatchCriticalException {
 				while (running) {
 					try {
 						Thread.sleep(100L);
-					} catch (InterruptedException e) {
-						throw new BatchCriticalException(
-								"Interrupted unexpectedly!");
+					}
+					catch (InterruptedException e) {
+						throw new BatchCriticalException("Interrupted unexpectedly!");
 					}
 				}
 				return ExitStatus.FINISHED;
 			}
 		});
-		jobExecutorFacade
-				.setJobLocator(new JobLocator() {
-					public Job getJob(String name)
-							throws NoSuchJobException {
-						return jobConfiguration;
-					}
-				});
+		jobExecutorFacade.setJobLocator(new JobLocator() {
+			public Job getJob(String name) throws NoSuchJobException {
+				return jobConfiguration;
+			}
+		});
 
 		running = true;
 		new Thread(new Runnable() {
 			public void run() {
 				try {
 					jobExecutorFacade.start(jobExecution);
-				} catch (NoSuchJobException e) {
+				}
+				catch (NoSuchJobException e) {
 					throw new IllegalStateException("Shouldn't happen");
 				}
 			}
@@ -173,30 +166,31 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 		try {
 			jobExecutorFacade.afterPropertiesSet();
 			fail("Expected IllegalStateException");
-		} catch (IllegalArgumentException ex) {
+		}
+		catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
 
 	public void testStopWithNoJob() throws Exception {
-		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier(
-				"TestJob");
-		JobExecution execution = new JobExecution(new JobInstance(
-				runtimeInformation, new Long(0)));
+		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
+		JobExecution execution = new JobExecution(new JobInstance(runtimeInformation, new Long(0)));
 		try {
 			jobExecutorFacade.stop(execution);
 			fail("Expected NoSuchJobExecutionException");
-		} catch (NoSuchJobExecutionException e) {
+		}
+		catch (NoSuchJobExecutionException e) {
 			// expected
-			assertTrue("Wrong message in exception: "+e.getMessage(), e.getMessage().indexOf("TestJob") >= 0);
+			assertTrue("Wrong message in exception: " + e.getMessage(), e.getMessage().indexOf("TestJob") >= 0);
 		}
 	}
 
 	public void testStop() throws Exception {
-		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier(
-				"TestJob");
-		JobExecution execution = new JobExecution(new JobInstance(
-				runtimeInformation, new Long(0)));
+		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
+		JobInstance jobInstance = new JobInstance(runtimeInformation, new Long(0));
+		JobExecution execution = new JobExecution(jobInstance);
+
+		StepExecution stepExecution = execution.createStepExecution(new StepInstance(jobInstance, "step"));
 
 		List listeners = new ArrayList();
 		listeners.add(new JobExecutionListenerSupport() {
@@ -208,15 +202,9 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 
 		registerExecution(runtimeInformation, execution);
 
-		RepeatContextSupport stepContext = new RepeatContextSupport(null);
-		RepeatContextSupport chunkContext = new RepeatContextSupport(
-				stepContext);
-		execution.registerStepContext(stepContext);
-		execution.registerChunkContext(chunkContext);
 		jobExecutorFacade.stop(execution);
 
-		assertTrue(stepContext.isCompleteOnly());
-		assertTrue(chunkContext.isCompleteOnly());
+		assertTrue(stepExecution.isTerminateOnly());
 		assertEquals(1, list.size());
 	}
 
@@ -225,29 +213,27 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 	}
 
 	public void testStatisticsWithContext() throws Exception {
-		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier(
-				"TestJob");
-		JobExecution execution = new JobExecution(new JobInstance(
-				runtimeInformation, new Long(0)));
+		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
+		JobInstance jobInstance = new JobInstance(runtimeInformation, new Long(0));
+		JobExecution execution = new JobExecution(jobInstance);
 		registerExecution(runtimeInformation, execution);
-		execution.registerStepContext(new RepeatContextSupport(null));
+		execution.createStepExecution(new StepInstance(jobInstance, "step"));
 		Properties statistics = jobExecutorFacade.getStatistics();
 		assertNotNull(statistics);
 		assertTrue(statistics.containsKey("job1.step1"));
 	}
 
 	public void testJobAlreadyExecutingLocally() throws Exception {
-		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier(
-				"TestJob");
-		JobExecution execution = new JobExecution(new JobInstance(
-				runtimeInformation, new Long(0)));
+		SimpleJobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
+		JobExecution execution = new JobExecution(new JobInstance(runtimeInformation, new Long(0)));
 		registerExecution(runtimeInformation, execution);
 		try {
 			jobExecutorFacade.createExecutionFrom(runtimeInformation);
 			fail("Expected JobExecutionAlreadyRunningException");
-		} catch (JobExecutionAlreadyRunningException e) {
+		}
+		catch (JobExecutionAlreadyRunningException e) {
 			// expected
-			assertTrue("Message does not contain TestJob: "+e.getMessage(), e.getMessage().indexOf("TestJob")>=0);
+			assertTrue("Message does not contain TestJob: " + e.getMessage(), e.getMessage().indexOf("TestJob") >= 0);
 		}
 	}
 
@@ -305,11 +291,9 @@ public class SimpleJobExecutorFacadeTests extends TestCase {
 		assertEquals("two", list.get(1));
 	}
 
-	private void registerExecution(SimpleJobIdentifier runtimeInformation,
-			JobExecution execution) throws NoSuchFieldException,
-			IllegalAccessException {
-		Field field = SimpleJobExecutorFacade.class
-				.getDeclaredField("jobExecutionRegistry");
+	private void registerExecution(SimpleJobIdentifier runtimeInformation, JobExecution execution)
+			throws NoSuchFieldException, IllegalAccessException {
+		Field field = SimpleJobExecutorFacade.class.getDeclaredField("jobExecutionRegistry");
 		ReflectionUtils.makeAccessible(field);
 		Map map = (Map) field.get(jobExecutorFacade);
 		map.put(runtimeInformation, execution);

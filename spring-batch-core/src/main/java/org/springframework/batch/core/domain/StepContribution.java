@@ -17,8 +17,6 @@ package org.springframework.batch.core.domain;
 
 import java.util.Properties;
 
-import org.springframework.batch.repeat.RepeatContext;
-
 /**
  * Represents a contribution to a {@link StepExecution}, buffering changes
  * until they can be applied at a chunk boundary.
@@ -27,22 +25,6 @@ import org.springframework.batch.repeat.RepeatContext;
  * 
  */
 public class StepContribution {
-
-	/**
-	 * Key for destruction callback in StepContext for chunk.
-	 */
-	private static final String CHUNK_EXECUTION_CONTEXT_CALLBACK = "CHUNK_EXECUTION_CONTEXT_CALLBACK";
-
-	/**
-	 * Key for destruction callback in StepContext for step.
-	 */
-	private static final String STEP_EXECUTION_CONTEXT_CALLBACK = "STEP_EXECUTION_CONTEXT_CALLBACK";
-
-	/**
-	 * Context attribute key for step execution. Used by monitoring and managing
-	 * clients to inspect current step execution.
-	 */
-	private static final String STEP_EXECUTION_KEY = "STEP_EXECUTION";
 
 	private int taskCount = 0;
 
@@ -76,34 +58,6 @@ public class StepContribution {
 	}
 
 	/**
-	 * @param context
-	 */
-	public void registerChunkContext(final RepeatContext context) {
-		execution.getJobExecution().registerChunkContext(context);
-		context.registerDestructionCallback(CHUNK_EXECUTION_CONTEXT_CALLBACK, new Runnable() {
-			public void run() {
-				execution.getJobExecution().unregisterStepContext(context);
-			}
-		});
-
-	}
-
-	/**
-	 * @param context
-	 */
-	public void registerStepContext(final RepeatContext context) {
-		execution.getJobExecution().registerStepContext(context);
-		context.registerDestructionCallback(STEP_EXECUTION_CONTEXT_CALLBACK, new Runnable() {
-			public void run() {
-				execution.getJobExecution().unregisterStepContext(context);
-			}
-		});
-		// Add the step execution as an attribute so monitoring
-		// clients can see it.
-		context.setAttribute(STEP_EXECUTION_KEY, execution);
-	}
-
-	/**
 	 * Set the statistics properties.
 	 * 
 	 * @param statistics
@@ -133,6 +87,14 @@ public class StepContribution {
 	 */
 	public int getCommitCount() {
 		return commitCount;
+	}
+
+	/**
+	 * Delegate call to the {@link StepExecution}.
+	 * @return the flag from the underlying execution
+	 */
+	public boolean isTerminateOnly() {
+		return execution.isTerminateOnly();
 	}
 
 }

@@ -159,8 +159,6 @@ public class DefaultStepExecutorTests extends TestCase {
 		stepConfiguration.setTasklet(new Tasklet() {
 			public ExitStatus execute() throws Exception {
 				assertEquals(step, stepExecution.getStep());
-				assertEquals(1, jobExecution.getChunkContexts().size());
-				assertEquals(1, jobExecution.getStepContexts().size());
 				assertNotNull(StepSynchronizationManager.getContext()
 						.getStepExecution());
 				processed.add("foo");
