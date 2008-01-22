@@ -71,13 +71,12 @@ public class StepExecution extends Entity {
 	 * @param jobExecution the current job execution
 	 */
 	public StepExecution(StepInstance step, JobExecution jobExecution, Long id) {
-		this();
+		super(id);
 		this.step = step;
 		this.jobExecution = jobExecution;
-		setId(id);
 	}
-
-	public StepExecution(StepInstance step, JobExecution jobExecution) {
+	
+	public StepExecution(StepInstance step, JobExecution jobExecution){
 		this(step, jobExecution, null);
 	}
 

@@ -19,6 +19,7 @@ package org.springframework.batch.core.domain;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -54,8 +55,8 @@ public class JobExecution extends Entity {
 	 *            the job of which this execution is a part
 	 */
 	public JobExecution(JobInstance job, Long id) {
+		super(id);
 		this.jobInstance = job;
-		setId(id);
 	}
 	
 	/**
@@ -140,7 +141,7 @@ public class JobExecution extends Entity {
 	 * @param stepExecution
 	 */
 	public StepExecution createStepExecution(StepInstance stepInstance) {
-		StepExecution stepExecution = new StepExecution(stepInstance, this);
+		StepExecution stepExecution = new StepExecution(stepInstance, this, null);
 		this.stepExecutions.add(stepExecution);
 		return stepExecution;
 	}
@@ -153,10 +154,26 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Test if this {@link JobExecution} indicates that it is running.
+	 * Test if this {@link JobExecution} indicates that it is running.  It should
+	 * be noted that this does not necessarily mean that it has been
+	 * persisted as such yet.
 	 * @return true if the end time is null
 	 */
 	public boolean isRunning() {
 		return endTime==null;
+	}
+	
+	/**
+	 * Stop the JobExecution, each StepExecution will be iterated through, calling
+	 * setTermianteOnly, signaling to the StepExecutor currently running that it should
+	 * be terminated.
+	 * 
+	 */
+	public void stop(){
+		
+		for(Iterator it = stepExecutions.iterator();it.hasNext();){
+			StepExecution stepExecution = (StepExecution)it.next();
+			stepExecution.setTerminateOnly();
+		}
 	}
 }

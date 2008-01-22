@@ -20,6 +20,7 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 
@@ -52,12 +53,9 @@ public interface JobRepository {
 	 * exists, its persisted values (including ID) will be returned in a new
 	 * {@link JobInstance} object. If no previous run is found, a new job will
 	 * be created and returned.
-	 * 
+	 * @param jobInstanceProperties TODO
 	 * @param jobConfiguration
 	 *            describes the configuration for this job
-	 * @param jobIdentifier
-	 *            identifies this particular run of the configuration across
-	 *            possible restarts
 	 * 
 	 * @return a valid job execution for the identifier provided
 	 * @throws JobExecutionAlreadyRunningException
@@ -65,8 +63,8 @@ public interface JobRepository {
 	 *             job instance that would otherwise be returned
 	 * 
 	 */
-	public JobExecution findOrCreateJob(Job job,
-			JobIdentifier jobIdentifier)
+	public JobExecution createJobExecution(Job job,
+			JobInstanceProperties jobInstanceProperties)
 			throws JobExecutionAlreadyRunningException;
 
 	/**

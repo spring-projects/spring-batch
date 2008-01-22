@@ -18,6 +18,7 @@ package org.springframework.batch.core.domain;
 
 import java.io.Serializable;
 
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -42,6 +43,10 @@ public class Entity implements Serializable {
 
 	public Entity(Long id) {
 		super();
+		
+		//Commented out because StepExecutions are still created in a disconnected
+		//manner.  The Repository should create them, then this can be uncommented.
+		//Assert.notNull(id, "Entity id must not be null.");
 		this.id = id;
 	}
 

@@ -28,15 +28,8 @@ import junit.framework.TestCase;
  */
 public class JobInstanceTests extends TestCase {
 
-	private JobInstance instance = new JobInstance(null, new Long(11), new Job("job"));
+	private JobInstance instance = new JobInstance(new Long(11), new JobInstanceProperties(), new Job("job"));
 	
-	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#JobInstance()}.
-	 */
-	public void testJobInstance() {
-		assertNull(new JobInstance(null, null, null).getId());
-	}
-
 	/**
 	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getStatus()}.
 	 */
@@ -71,23 +64,13 @@ public class JobInstanceTests extends TestCase {
 		instance.setJobExecutionCount(22);
 		assertEquals(22, instance.getJobExecutionCount());
 	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getIdentifier()}.
-	 */
-	public void testGetIdentifier() {
-		assertEquals(null, instance.getIdentifier());
-		instance = new JobInstance(new SimpleJobIdentifier("foo"), new Long(1));
-		assertEquals("foo", instance.getIdentifier().getName());
-	}
 	
 	/**
 	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getIdentifier()}.
 	 */
 	public void testGetName() {
-		assertEquals(null, instance.getName());
-		instance = new JobInstance(new SimpleJobIdentifier("foo"), new Long(1));
-		assertEquals("foo", instance.getName());
+		instance = new JobInstance(new Long(1), new JobInstanceProperties(), new Job("foo"));
+		assertEquals("foo", instance.getJobName());
 	}
 	
 	public void testGetJob(){

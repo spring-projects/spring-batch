@@ -19,6 +19,8 @@ package org.springframework.batch.core.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.util.Assert;
+
 
 /**
  * Batch domain object representing a job instance. A job instance is defined as
@@ -33,7 +35,7 @@ public class JobInstance extends Entity {
 
 	private List stepInstances = new ArrayList();
 
-	private JobIdentifier identifier;
+	private JobInstanceProperties jobInstanceProperties;
 	
 	private Job job;
 
@@ -42,21 +44,17 @@ public class JobInstance extends Entity {
 
 	private int jobExecutionCount;
 	
-	public JobInstance(JobIdentifier jobIdentifier){
-		this.identifier = jobIdentifier;
+	public JobInstance(Long id, JobInstanceProperties jobInstanceProperties) {
+		super(id);
+		Assert.notNull(jobInstanceProperties, "JobInstanceProperties must not be null.");
+		this.jobInstanceProperties = jobInstanceProperties;
 	}
 
-	public JobInstance(JobIdentifier identifier, Long id, Job job) {
-		super();
-		setId(id);
-		this.identifier = identifier;
+	public JobInstance(Long id, JobInstanceProperties jobInstanceProperties, Job job){
+		this(id, jobInstanceProperties);
 		this.job = job;
 	}
 	
-	public JobInstance(JobIdentifier jobIdentifier, Long id){
-		this(jobIdentifier, id, null);
-	}
-
 	public BatchStatus getStatus() {
 		return status;
 	}
@@ -64,7 +62,7 @@ public class JobInstance extends Entity {
 	public void setStatus(BatchStatus status) {
 		this.status = status;
 	}
-
+	
 	public List getStepInstances() {
 		return stepInstances;
 	}
@@ -86,19 +84,17 @@ public class JobInstance extends Entity {
 	}
 
 	/**
-	 * Public accessor for the identifier property.
-	 *
-	 * @return the identifier
+	 * @return JobInstanceProperties
 	 */
-	public JobIdentifier getIdentifier() {
-		return identifier;
+	public JobInstanceProperties getJobInstanceProperties() {
+		return jobInstanceProperties;
 	}
 
 	/**
-	 * @return the identifier name if there is one
+	 * @return the job name. (Equivalent to getJob().getName())
 	 */
-	public String getName() {
-		return identifier==null ? null : identifier.getName();
+	public String getJobName() {
+		return getJob().getName();
 	}
 	
 	public JobExecution createJobExecution() {
@@ -106,7 +102,8 @@ public class JobInstance extends Entity {
 	}
 	
 	public String toString() {
-		return super.toString()+", identifier=["+identifier+"]";
+		return super.toString()+", JobInstanceProperties=["+ jobInstanceProperties +"]" +
+			", Job=[" + job + "]";
 	}
 	
 	public Job getJob() {
