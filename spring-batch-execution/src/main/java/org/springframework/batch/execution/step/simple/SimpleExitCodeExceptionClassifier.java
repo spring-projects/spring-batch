@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.execution.step.simple;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -33,18 +36,14 @@ import org.springframework.batch.repeat.ExitStatus;
 public class SimpleExitCodeExceptionClassifier implements
 		ExitCodeExceptionClassifier {
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.executor.ExitCodeExceptionClassifier#classifyForExitCode(java.lang.Throwable)
 	 */
 	public ExitStatus classifyForExitCode(Throwable throwable) {
 		return (ExitStatus) classify(throwable);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see org.springframework.batch.common.ExceptionClassifier#classify(java.lang.Throwable)
 	 */
 	public Object classify(Throwable throwable) {
@@ -57,10 +56,9 @@ public class SimpleExitCodeExceptionClassifier implements
 		} else {
 			String message = "";
 			if (throwable!=null) {
-				message = throwable.getClass().getName();
-				if (throwable.getMessage()!=null) {
-					message += ": " + throwable.getMessage();
-				}
+				StringWriter writer = new StringWriter();
+				throwable.printStackTrace(new PrintWriter(writer));
+				message = writer.toString();
 			}
 			exitStatus = new ExitStatus(false, FATAL_EXCEPTION, message);
 		}

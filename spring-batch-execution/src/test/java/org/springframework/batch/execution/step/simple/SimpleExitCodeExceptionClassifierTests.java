@@ -38,17 +38,18 @@ public class SimpleExitCodeExceptionClassifierTests extends TestCase {
 		exception = new NullPointerException();
 	}
 	
-	public void testClassifyForExitCode() {
-		
+	public void testClassifyForExitCode() {		
 		ExitStatus exitStatus = classifier.classifyForExitCode(exception);
 		assertEquals(exitStatus.getExitCode(), "FATAL_EXCEPTION");
-		assertEquals(exitStatus.getExitDescription(), "java.lang.NullPointerException");
+		String description = exitStatus.getExitDescription();
+		assertTrue("Description does not contain NullPointerException: "+description, description.indexOf("java.lang.NullPointerException")>=0);
 	}
 
 	public void testClassify() {
 		ExitStatus exitStatus = (ExitStatus)classifier.classify(exception);
 		assertEquals(exitStatus.getExitCode(), "FATAL_EXCEPTION");
-		assertEquals(exitStatus.getExitDescription(), "java.lang.NullPointerException");
+		String description = exitStatus.getExitDescription();
+		assertTrue("Description does not contain NullPointerException: "+description, description.indexOf("java.lang.NullPointerException")>=0);
 	}
 
 	public void testGetDefault() {
