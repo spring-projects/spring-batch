@@ -217,23 +217,6 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
-					<execution>
-						<id>cleandata</id>
-						<phase>pre-site</phase>
-						<configuration>
-							<tasks>
-								<echo>Removing test data</echo>
-								<delete failonerror="false">
-									<fileset dir="amqstore" />
-									<fileset dir="activemq-data" />
-									<fileset dir="derby-home" />
-								</delete>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
 				</executions>
 				<dependencies>
 					<dependency>

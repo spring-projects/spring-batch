@@ -54,15 +54,14 @@ import org.springframework.util.Assert;
  * command line launcher can be used to load that context from a single
  * location. It can also be used to first load the execution environment context
  * via a {@link ContextSingletonBeanFactoryLocator}. This will then be used as
- * the parent to the Job context. All required dependencies of the launcher will
- * then be satisfied by autowiring by type from the combined application
- * context. Default values are provided for all fields except the
- * {@link JobLauncher}. Therefore, if autowiring fails to set it (it should be
- * noted that dependency checking is disabled because most of the fields have
- * default values and thus don't require dependencies to be fulfilled via
- * autowiring) then an exception will be thrown. It should also be noted that
- * even if an exception is thrown by this class, it will be mapped to an integer
- * and returned.
+ * the parent to the Job context. All dependencies of the launcher will then be
+ * satisfied by autowiring by type from the combined application context.
+ * Default values are provided for all fields except the {@link JobLauncher}.
+ * Therefore, if autowiring fails to set it (it should be noted that dependency
+ * checking is disabled because most of the fields have default values and thus
+ * don't require dependencies to be fulfilled via autowiring) then an exception
+ * will be thrown. It should also be noted that even if an exception is thrown
+ * by this class, it will be mapped to an integer and returned.
  * </p>
  * 
  * <p>
@@ -264,12 +263,12 @@ public class SimpleCommandLineJobRunner {
 	}
 
 	/**
-	 * Launch a batch job using a {@link SimpleCommandLineJobRunner}.
-	 * Creates a new Spring context for the job execution, and uses a common
-	 * parent for all such contexts. No exception are thrown from this method,
-	 * rather exceptions are logged and an integer returned through the exit
-	 * status in a {@link JvmSystemExiter} (which can be overridden by defining
-	 * one in the Spring context).
+	 * Launch a batch job using a {@link SimpleCommandLineJobRunner}. Creates a
+	 * new Spring context for the job execution, and uses a common parent for
+	 * all such contexts. No exception are thrown from this method, rather
+	 * exceptions are logged and an integer returned through the exit status in
+	 * a {@link JvmSystemExiter} (which can be overridden by defining one in the
+	 * Spring context).
 	 * 
 	 * @param args
 	 * <ul>
