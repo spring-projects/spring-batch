@@ -26,19 +26,22 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.util.ClassUtils;
 
 /**
  * @author Dave Syer
  * 
  */
-public class BatchCommandLineLauncherTests extends TestCase {
+public class SimpleCommandLineJobDispatcherTests extends TestCase {
 
-	private static final String JOB_CONFIGURATION_PATH_KEY = "job.configuration.path";
-	private static final String JOB_NAME_KEY = "job.name";
-	private static final String BATCH_EXECUTION_ENVIRONMENT_KEY = "batch.execution.environment.key";
+	private static final String JOB_CONFIGURATION_PATH_KEY = SimpleCommandLineJobDispatcher.JOB_CONFIGURATION_PATH_KEY;
+	private static final String JOB_NAME_KEY = SimpleCommandLineJobDispatcher.JOB_NAME_KEY;
+	private static final String BATCH_EXECUTION_ENVIRONMENT_KEY = SimpleCommandLineJobDispatcher.BATCH_EXECUTION_ENVIRONMENT_KEY;
+	private static final String BEAN_REF_CONTEXT_KEY = SimpleCommandLineJobDispatcher.BEAN_REF_CONTEXT_KEY;
 
 	private static final String TEST_BATCH_ENVIRONMENT_KEY = "testBatchEnvironment";
 	private static final String TEST_BATCH_ENVIRONMENT_NO_LAUNCHER_KEY = "testBatchEnvironmentNoLauncher";
+	private static final String TEST_JOB_CONFIGURATION_WITH_ENVIRONMENT = ClassUtils.addResourcePathToPackagePath(SimpleCommandLineJobDispatcherTests.class, "test-batch-environment-with-job.xml");
 
 	BeanFactoryLocator beanFactoryLocator = ContextSingletonBeanFactoryLocator
 			.getInstance();
@@ -50,6 +53,8 @@ public class BatchCommandLineLauncherTests extends TestCase {
 		super.setUp();
 		System.setProperty(BATCH_EXECUTION_ENVIRONMENT_KEY,
 				TEST_BATCH_ENVIRONMENT_KEY);
+		System.setProperty(BEAN_REF_CONTEXT_KEY,
+				"beanRefContext.xml");
 	}
 
 	protected void tearDown() throws Exception {
@@ -57,6 +62,7 @@ public class BatchCommandLineLauncherTests extends TestCase {
 		System.clearProperty(JOB_CONFIGURATION_PATH_KEY);
 		System.clearProperty(JOB_NAME_KEY);
 		System.clearProperty(BATCH_EXECUTION_ENVIRONMENT_KEY);
+		System.clearProperty(BEAN_REF_CONTEXT_KEY);
 	}
 
 	public void testParentWithNoLauncher() {
@@ -66,7 +72,7 @@ public class BatchCommandLineLauncherTests extends TestCase {
 		System.setProperty(BATCH_EXECUTION_ENVIRONMENT_KEY,
 				TEST_BATCH_ENVIRONMENT_NO_LAUNCHER_KEY);
 
-		BatchCommandLineLauncher.main(new String[0]);
+		SimpleCommandLineJobDispatcher.main(new String[0]);
 
 		assertEquals(ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR, systemExiter
 				.getStatus());
@@ -74,7 +80,41 @@ public class BatchCommandLineLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.bootstrap.support.BatchCommandLineLauncher#main(java.lang.String[])}.
+	 * {@link org.springframework.batch.execution.bootstrap.support.SimpleCommandLineJobDispatcher#main(java.lang.String[])}.
+	 * 
+	 * @throws Exception
+	 */
+	public void testNoBeanRefContext() throws Exception {
+		// No error, so we assume it has worked!
+		System.clearProperty(BATCH_EXECUTION_ENVIRONMENT_KEY);
+		System.clearProperty(BEAN_REF_CONTEXT_KEY);
+		System.setProperty(JOB_CONFIGURATION_PATH_KEY, TEST_JOB_CONFIGURATION_WITH_ENVIRONMENT);
+		SimpleCommandLineJobDispatcher.main(new String[0]);
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.execution.bootstrap.support.SimpleCommandLineJobDispatcher#main(java.lang.String[])}.
+	 * 
+	 * @throws Exception
+	 */
+	public void testBeanRefContextButNoEnvironment() throws Exception {
+		// No error, so we assume it has worked!
+		System.clearProperty(BEAN_REF_CONTEXT_KEY);
+		System.setProperty(JOB_CONFIGURATION_PATH_KEY, TEST_JOB_CONFIGURATION_WITH_ENVIRONMENT);
+		try {
+			SimpleCommandLineJobDispatcher.main(new String[0]);
+		} catch (IllegalStateException e) {
+			// expected
+			String message = e.getMessage();
+			assertTrue("Message should contain invalid property names:"+message, message.indexOf(SimpleCommandLineJobDispatcher.BATCH_EXECUTION_ENVIRONMENT_KEY)>=0);
+			assertTrue("Message should contain invalid property names:"+message, message.indexOf(SimpleCommandLineJobDispatcher.BEAN_REF_CONTEXT_KEY)>=0);
+		}
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.execution.bootstrap.support.SimpleCommandLineJobDispatcher#main(java.lang.String[])}.
 	 * 
 	 * @throws Exception
 	 */
@@ -86,7 +126,7 @@ public class BatchCommandLineLauncherTests extends TestCase {
 
 		setReturnValue(ExitStatus.FINISHED);
 
-		BatchCommandLineLauncher.main(new String[0]);
+		SimpleCommandLineJobDispatcher.main(new String[0]);
 
 		assertEquals(ExitCodeMapper.JVM_EXITCODE_COMPLETED, systemExiter
 				.getStatus());
@@ -96,7 +136,7 @@ public class BatchCommandLineLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.bootstrap.support.BatchCommandLineLauncher#main(java.lang.String[])}.
+	 * {@link org.springframework.batch.execution.bootstrap.support.SimpleCommandLineJobDispatcher#main(java.lang.String[])}.
 	 * 
 	 * @throws Exception
 	 */
@@ -108,7 +148,7 @@ public class BatchCommandLineLauncherTests extends TestCase {
 		setReturnValue(ExitStatus.FINISHED);
 
 		System.setProperty(JOB_NAME_KEY, "foo");
-		BatchCommandLineLauncher.main(new String[0]);
+		SimpleCommandLineJobDispatcher.main(new String[0]);
 
 		assertEquals(ExitCodeMapper.JVM_EXITCODE_COMPLETED, systemExiter
 				.getStatus());
@@ -124,7 +164,7 @@ public class BatchCommandLineLauncherTests extends TestCase {
 	
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.bootstrap.support.BatchCommandLineLauncher#main(java.lang.String[])}.
+	 * {@link org.springframework.batch.execution.bootstrap.support.SimpleCommandLineJobDispatcher#main(java.lang.String[])}.
 	 * 
 	 * @throws Exception
 	 */
@@ -132,17 +172,17 @@ public class BatchCommandLineLauncherTests extends TestCase {
 		// We can only test this without running the whole test in another jvm
 		// by using a special SystemExiter in the default configuration because
 		// otherwise it calls System.exit() by default.
-		BatchCommandLineLauncher.main(new String[0]);
+		SimpleCommandLineJobDispatcher.main(new String[0]);
 	}
 
 	public void testInvalidJobConfig() {
 		// To test this without kicking off in a new jvm, we have to autowire
 		// the launcher (in BatchCommandLineLauncher.start) from the parent,
 		// *then* the child context.
-		buildContext(BatchCommandLineLauncher.DEFAULT_PARENT_KEY);
+		buildContext("batchExecutionEnvironment");
 		assertNotNull(systemExiter);
 		System.setProperty(JOB_CONFIGURATION_PATH_KEY, "foo");
-		BatchCommandLineLauncher.main(new String[0]);
+		SimpleCommandLineJobDispatcher.main(new String[0]);
 	}
 
 	private void buildContext(String key) {

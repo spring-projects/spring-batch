@@ -14,6 +14,27 @@
 	<bean class="org.springframework.batch.execution.bootstrap.support.SimpleJvmExitCodeMapper" />
 
 	<bean
-		class="org.springframework.batch.execution.bootstrap.support.SimpleCommandLineJobDispatcherTests$StubSystemExiter" />
+		class="org.springframework.batch.execution.bootstrap.support.BatchCommandLineLauncherTests$StubSystemExiter" />
+
+	<bean id="test-job" class="org.springframework.batch.core.domain.Job">
+		<property name="steps">
+			<bean id="step1" class="org.springframework.batch.execution.step.SimpleStep">
+				<constructor-arg>
+					<bean
+						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
+						<property name="itemReader">
+							<bean 
+								class="org.springframework.batch.item.reader.ListItemReader">
+								<constructor-arg value="foo,bar,spam"/>
+							</bean>
+						</property>
+						<property name="itemProcessor">
+							<bean class="org.springframework.batch.execution.launch.EmptyItemProcessor"/>
+						</property>
+					</bean>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
 
 </beans>
