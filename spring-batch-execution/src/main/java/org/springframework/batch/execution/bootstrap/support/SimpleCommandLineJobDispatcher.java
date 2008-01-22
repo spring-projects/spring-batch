@@ -28,6 +28,7 @@ import org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory
 import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
+import org.springframework.beans.factory.access.SingletonBeanFactoryLocator;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
@@ -276,11 +277,11 @@ public class SimpleCommandLineJobDispatcher {
 	 * JobConfiguration to use
 	 * <li>-Djob.name: job name to be passed to the {@link JobLauncher}
 	 * <li>-Dbatch.execution.environment.key: the key in beanRefContext.xml
-	 * used to load the execution environment (mandatory if bean.ref.context is
-	 * specified).
-	 * <li>-Dbean.ref.context: an alternative location for beanRefContext.xml
-	 * (optional, default is to only use the context specified in the
-	 * job.configuration.path).</li>
+	 * used to load the execution environment which will be the parent context
+	 * for the job execution (mandatory if -Dbean.ref.context is specified).
+	 * <li>-Dbean.ref.context: the location for beanRefContext.xml (optional,
+	 * default is to only use the context specified in the
+	 * job.configuration.path) (@see {@link SingletonBeanFactoryLocator}).</li>
 	 * </ul>
 	 */
 	public static void main(String[] args) {
