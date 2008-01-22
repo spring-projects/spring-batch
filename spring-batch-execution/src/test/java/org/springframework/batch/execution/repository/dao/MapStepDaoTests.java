@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
@@ -40,7 +41,7 @@ public class MapStepDaoTests extends TestCase {
 	
 	protected void setUp() throws Exception {
 		MapStepDao.clear();
-		job = new JobInstance(null, new Long(jobId++));
+		job = new JobInstance(new Long(jobId++), new JobInstanceProperties());
 		step = dao.createStep(job, "foo");	
 	}
 	
@@ -74,12 +75,12 @@ public class MapStepDaoTests extends TestCase {
 	}
 	
 	public void testFindWithEmptyResults() throws Exception {
-		List result = dao.findSteps(new JobInstance(null, new Long(22)));
+		List result = dao.findSteps(new JobInstance(new Long(22), new JobInstanceProperties()));
 		assertEquals(0, result.size());		
 	}
 	
 	public void testFindSingleWithEmptyResults() throws Exception {
-		StepInstance result = dao.findStep(new JobInstance(null, new Long(22)), "bar");
+		StepInstance result = dao.findStep(new JobInstance(new Long(22), new JobInstanceProperties()), "bar");
 		assertEquals(null, result);		
 	}
 
@@ -88,20 +89,20 @@ public class MapStepDaoTests extends TestCase {
 	}
 
 	public void testSaveExecutionUpdatesId() throws Exception {
-		StepExecution execution = new StepExecution(step, null);
+		StepExecution execution = new StepExecution(step, null, null);
 		assertNull(execution.getId());
 		dao.save(execution);
 		assertNotNull(execution.getId());
 	}
 
 	public void testCorrectExecutionCountForExisting() throws Exception {
-		dao.save(new StepExecution(step, null));
+		dao.save(new StepExecution(step, null, null));
 		assertEquals(1, dao.getStepExecutionCount(step.getId()));
 	}
 	
 	public void testOnlyOneExecutionPerStep() throws Exception {
-		dao.save(new StepExecution(step, null));
-		dao.save(new StepExecution(step, null));
+		dao.save(new StepExecution(step, null, null));
+		dao.save(new StepExecution(step, null, null));
 		assertEquals(2, dao.getStepExecutionCount(step.getId()));
 	}
 

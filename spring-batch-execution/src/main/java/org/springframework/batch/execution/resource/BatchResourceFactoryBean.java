@@ -65,14 +65,12 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 
 	private static final String BATCH_ROOT_PATTERN = "%BATCH_ROOT%";
 
-	private static final String JOB_IDENTIFIER_PATTERN = "%JOB_IDENTIFIER%";
-
 	private static final String JOB_NAME_PATTERN = "%JOB_NAME%";
 
 	private static final String STEP_NAME_PATTERN = "%STEP_NAME%";
 
 	private static final String DEFAULT_PATTERN = "/%BATCH_ROOT%/data/%JOB_NAME%/"
-			+ "%JOB_IDENTIFIER%-%STEP_NAME%.txt";
+			+ "%STEP_NAME%.txt";
 
 	private String filePattern = DEFAULT_PATTERN;
 
@@ -83,10 +81,6 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 	private String stepName = "";
 
 	private ResourceLoader resourceLoader = new FileSystemResourceLoader();
-
-	private JobIdentifier jobIdentifier;
-
-	private JobIdentifierLabelGenerator jobIdentifierLabelGenerator = new DefaultJobIdentifierLabelGenerator();
 
 	/**
 	 * Always false because we are expecting to be step scoped.
@@ -107,17 +101,6 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 	}
 
 	/**
-	 * Public setter for the {@link JobIdentifierLabelGenerator} property.
-	 * 
-	 * @param jobIdentifierLabelGenerator
-	 *            the {@link JobIdentifierLabelGenerator} to set
-	 */
-	public void setJobIdentifierLabelGenerator(
-			JobIdentifierLabelGenerator jobIdentifierLabelGenerator) {
-		this.jobIdentifierLabelGenerator = jobIdentifierLabelGenerator;
-	}
-
-	/**
 	 * Collect the properties of the enclosing {@link StepExecution} that will
 	 * be needed to create a file name.
 	 * 
@@ -128,8 +111,7 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 				"The StepContext does not have an execution.");
 		StepExecution execution = context.getStepExecution();
 		stepName = execution.getStep().getName();
-		jobName = execution.getStep().getJobInstance().getName();
-		jobIdentifier = execution.getJobExecution().getJobInstance().getIdentifier();
+		jobName = execution.getStep().getJobInstance().getJobName();
 	}
 
 	/**
@@ -180,8 +162,6 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 		fileName = replacePattern(fileName, JOB_NAME_PATTERN,
 				jobName == null ? "job" : jobName);
 		fileName = replacePattern(fileName, STEP_NAME_PATTERN, stepName);
-		fileName = replacePattern(fileName, JOB_IDENTIFIER_PATTERN,
-				jobIdentifierLabelGenerator.getLabel(jobIdentifier));
 
 		return fileName;
 	}

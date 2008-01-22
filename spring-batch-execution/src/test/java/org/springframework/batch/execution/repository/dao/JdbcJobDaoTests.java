@@ -3,7 +3,6 @@ package org.springframework.batch.execution.repository.dao;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.repeat.ExitStatus;
 
 public class JdbcJobDaoTests extends AbstractJobDaoTests {
@@ -17,21 +16,16 @@ public class JdbcJobDaoTests extends AbstractJobDaoTests {
 	public void testUpdateJobExecutionWithLongExitCode() {
 
 		assertTrue(LONG_STRING.length() > 250);
-		jobExecution.setExitStatus(ExitStatus.FINISHED.addExitDescription(LONG_STRING));
+		jobExecution.setExitStatus(ExitStatus.FINISHED
+				.addExitDescription(LONG_STRING));
 		jobDao.update(jobExecution);
 
-		List executions = jdbcTemplate.queryForList("SELECT * FROM BATCH_JOB_EXECUTION where JOB_ID=?",
-				new Object[] { job.getId() });
+		List executions = jdbcTemplate.queryForList(
+				"SELECT * FROM BATCH_JOB_EXECUTION where JOB_ID=?",
+				new Object[] { jobInstance.getId() });
 		assertEquals(1, executions.size());
-		assertEquals(LONG_STRING.substring(0, 250), ((Map) executions.get(0)).get("EXIT_MESSAGE"));
-	}
-
-	public void testJobInstanceParametersNotNullOrEmptyWithSimpleJobIdentifier() {
-		job = jobDao.createJob(new SimpleJobIdentifier("foo"));
-		Map map = jdbcTemplate.queryForMap("SELECT * FROM BATCH_JOB_INSTANCE where ID=?",
-				new Object[] { job.getId() });
-		String key = (String) map.get("JOB_KEY");
-		assertTrue("Key should be non-zero length (otherwise Oracle will treat as null)", key.length()>0);
+		assertEquals(LONG_STRING.substring(0, 250), ((Map) executions.get(0))
+				.get("EXIT_MESSAGE"));
 	}
 
 }

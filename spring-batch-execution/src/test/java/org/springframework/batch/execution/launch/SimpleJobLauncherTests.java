@@ -18,107 +18,62 @@ package org.springframework.batch.execution.launch;
 
 import junit.framework.TestCase;
 
+import org.easymock.MockControl;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobIdentifier;
-import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.NoSuchJobException;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
-import org.springframework.batch.core.runtime.SimpleJobIdentifierFactory;
+import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.executor.JobExecutor;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.repeat.ExitStatus;
 
+/**
+ * @author Lucas Ward
+ *
+ */
 public class SimpleJobLauncherTests extends TestCase {
 
-	public void testStartWithNoConfiguration() throws Exception {
-		final SimpleJobLauncher launcher = new SimpleJobLauncher();
-		try {
-			launcher.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
-			// expected
-			assertTrue(e.getMessage().indexOf("required") >= 0);
-		}
+	private SimpleJobLauncher jobLauncher;
+	
+	private JobExecutor jobExecutor;
+	private JobRepository jobRepository;
+	
+	private MockControl executorControl = MockControl.createControl(JobExecutor.class);
+	private MockControl repositoryControl = MockControl.createControl(JobRepository.class);
+	
+	private Job job = new Job("foo");
+	private JobInstanceProperties jobInstanceProperties = new JobInstanceProperties();
+	
+	protected void setUp() throws Exception {
+		super.setUp();
+		
+		jobLauncher = new SimpleJobLauncher();
+		
+		jobExecutor = (JobExecutor)executorControl.getMock();
+		jobRepository = (JobRepository)repositoryControl.getMock();
+		
+		jobLauncher.setJobExecutor(jobExecutor);
+		jobLauncher.setJobRepository(jobRepository);
+		
+		
 	}
 
-	public void testInitializeWithNoConfiguration() throws Exception {
-		final SimpleJobLauncher launcher = new SimpleJobLauncher();
-		launcher.setJobExecutorFacade(new SimpleJobExecutorFacade() {
-			public JobExecution createExecutionFrom(JobIdentifier jobIdentifier) throws NoSuchJobException,
-					JobExecutionAlreadyRunningException {
-				throw new NoSuchJobException("No null job, stupid!");
-			}
-		});
-		try {
-			launcher.run(new SimpleJobIdentifier(null));
-			// should do nothing
-			fail("Expected NoSuchJobConfigurationException");
-		} catch (NoSuchJobException e) {
-			assertTrue("Message should mention null job name: "
-					+ e.getMessage(), e.getMessage().toLowerCase().indexOf(
-					"null") >= 0);
-		}
+
+	public void testRun() throws Exception{
+		
+		JobExecution jobExecution = new JobExecution(null);
+		
+		jobRepository.createJobExecution(job, jobInstanceProperties);
+		repositoryControl.setReturnValue(jobExecution);
+		jobExecutor.run(job, jobExecution);
+		executorControl.setDefaultReturnValue(ExitStatus.FINISHED);
+		
+		repositoryControl.replay();
+		executorControl.replay();
+		
+		jobLauncher.run(job, jobInstanceProperties);
+		assertEquals(ExitStatus.FINISHED, jobExecution.getExitStatus());
+		
+		repositoryControl.verify();
+		executorControl.verify();
 	}
-
-	public void testRunTwiceNotFatal() throws Exception {
-		SimpleJobLauncher launcher = new SimpleJobLauncher();
-		launcher.setJobIdentifierFactory(new SimpleJobIdentifierFactory());
-		InterruptibleFacade jobExecutorFacade = new InterruptibleFacade();
-		launcher.setJobExecutorFacade(jobExecutorFacade);
-		launcher.run(new SimpleJobIdentifier("foo"));
-		assertFalse(launcher.isRunning());
-		launcher.run(new SimpleJobIdentifier("foo"));
-		// Both jobs finished running because they were not launched in a new
-		// Thread
-		assertFalse(launcher.isRunning());
-	}
-
-	public void testStopOnNotRunningLauncher() {
-
-		SimpleJobLauncher launcher = new SimpleJobLauncher();
-
-		assertFalse(launcher.isRunning());
-		// no exception should be thrown if stop is called on
-		// a launcher that is not running.
-		launcher.stop();
-	}
-
-	private class InterruptibleFacade implements JobExecutorFacade {
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.springframework.batch.container.BatchContainer#run()
-		 */
-		public void run() {
-			try {
-				// 1 seconds should be long enough to allow the thread to be
-				// run and for interrupt to be called;
-				Thread.sleep(300);
-				// return ExitStatus.FAILED;
-
-			} catch (InterruptedException ex) {
-				// thread interrupted, allow to exit normally
-				// return ExitStatus.FAILED;
-			}
-		}
-
-		public void start(JobExecution execution)
-				throws NoSuchJobException {
-			run();
-		}
-
-		public JobExecution createExecutionFrom(JobIdentifier jobIdentifier)
-				throws NoSuchJobException {
-			return new JobExecution(new JobInstance(jobIdentifier, null));
-		}
-
-		public void stop(JobExecution execution) {
-			// not needed
-		}
-
-		public boolean isRunning() {
-			// not needed
-			return false;
-		}
-	}
-
 }

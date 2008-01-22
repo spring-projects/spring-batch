@@ -27,6 +27,7 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
@@ -119,9 +120,7 @@ public class SimpleJobTests extends TestCase {
 		jobConfiguration.addStep(new SimpleStep(getTasklet("foo", "bar")));
 		jobConfiguration.addStep(new SimpleStep(getTasklet("spam")));
 
-		JobInstance job = repository.findOrCreateJob(jobConfiguration, runtimeInformation).getJobInstance();
-
-		assertEquals(job.getName(), "real.job");
+		JobInstance job = repository.createJobExecution(jobConfiguration, new JobInstanceProperties()).getJobInstance();
 
 		JobExecution jobExecutionContext = new JobExecution(job);
 
@@ -171,7 +170,7 @@ public class SimpleJobTests extends TestCase {
 		module.afterPropertiesSet();
 		jobConfiguration.addStep(step);
 
-		JobExecution jobExecution = repository.findOrCreateJob(jobConfiguration, runtimeInformation);
+		JobExecution jobExecution = repository.createJobExecution(jobConfiguration, new JobInstanceProperties());
 		jobExecutor.run(jobConfiguration, jobExecution);
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getJobInstance().getStatus());
@@ -195,7 +194,7 @@ public class SimpleJobTests extends TestCase {
 		module.afterPropertiesSet();
 		jobConfiguration.addStep(step);
 
-		JobExecution jobExecution = repository.findOrCreateJob(jobConfiguration, runtimeInformation);
+		JobExecution jobExecution = repository.createJobExecution(jobConfiguration, new JobInstanceProperties());
 		JobInstance job = jobExecution.getJobInstance();
 		try {
 			jobExecutor.run(jobConfiguration, jobExecution);

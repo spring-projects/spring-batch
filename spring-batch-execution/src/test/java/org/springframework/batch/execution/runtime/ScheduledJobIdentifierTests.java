@@ -28,7 +28,7 @@ public class ScheduledJobIdentifierTests extends TestCase {
 	private ScheduledJobIdentifier instance = new ScheduledJobIdentifier(null, "");
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getName()}.
+	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getJobName()}.
 	 */
 	public void testDefaultConstructor() {
 		assertEquals(null, instance.getName());
@@ -37,7 +37,7 @@ public class ScheduledJobIdentifierTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getName()}.
+	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getJobName()}.
 	 */
 	public void testGetName() {
 		

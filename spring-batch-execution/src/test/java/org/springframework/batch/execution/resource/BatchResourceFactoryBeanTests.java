@@ -22,9 +22,11 @@ import java.text.SimpleDateFormat;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.resource.BatchResourceFactoryBean;
@@ -55,7 +57,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 	private String path = "data" + pathsep;
 
-	private ScheduledJobIdentifier identifier;
+	private JobInstance jobInstance;
 
 	/**
 	 * mock step context
@@ -64,15 +66,13 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	protected void setUp() throws Exception {
 
 		resourceFactory.setRootDirectory(rootDir);
-
-		identifier = new ScheduledJobIdentifier("testJob", "testStream", new SimpleDateFormat("yyyyMMdd")
-			.parse("20070730"));
 		
 		SimpleStepContext context = new SimpleStepContext();
-		JobInstance job = new JobInstance(identifier);
-		JobExecution jobExecution = new JobExecution(job);
-		StepInstance step = new StepInstance(job, "bar");
-		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		jobInstance = new JobInstance(new Long(0), new JobInstanceProperties());
+		jobInstance.setJob(new Job("testJob"));
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		StepInstance step = new StepInstance(jobInstance, "bar");
+		StepExecution stepExecution = new StepExecution(step, jobExecution, null);
 		context.setStepExecution(stepExecution);
 		resourceFactory.setStepContext(context);
 
@@ -93,19 +93,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	 * regular use with valid context and pattern provided
 	 */
 	public void testCreateFileName() throws Exception {
-		doTestPathName("testJob-testStream-20070730-bar.txt", path);
-	}
-
-	/**
-	 * regular use with valid context and pattern provided
-	 */
-	public void testSetLabelGenerator() throws Exception {
-		resourceFactory.setJobIdentifierLabelGenerator(new JobIdentifierLabelGenerator() {
-			public String getLabel(JobIdentifier jobIdentifier) {
-				return "foo";
-			}
-		});
-		doTestPathName("foo-bar.txt", path);
+		doTestPathName("bar.txt", path);
 	}
 
 	public void testObjectType() throws Exception {
@@ -125,8 +113,8 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 	public void testNonStandardFilePattern() throws Exception {
 		resourceFactory.setFilePattern("/%BATCH_ROOT%/data/%JOB_NAME%/"
-				+ "%STEP_NAME%+%JOB_IDENTIFIER%");
-		doTestPathName("bar+testJob-testStream-20070730", path);
+				+ "%STEP_NAME%-job");
+		doTestPathName("bar-job", path);
 	}
 
 	public void testResoureLoaderAware() throws Exception {
@@ -146,14 +134,14 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		String rootDir = getRootDir();
 		rootDir = StringUtils.replace(rootDir, File.separator, "/") + "/";
 		resourceFactory.setRootDirectory(rootDir);
-		doTestPathName("testJob-testStream-20070730-bar.txt", path);
+		doTestPathName("bar.txt", path);
 	}
 
 	public void testRootDirectoryEndsWithBackSlash() throws Exception {
 		String rootDir = getRootDir();
 		rootDir = "/"+StringUtils.replace(rootDir, File.separator, "\\") + "\\";
 		resourceFactory.setRootDirectory(rootDir);
-		doTestPathName("testJob-testStream-20070730-bar.txt", path);
+		doTestPathName("bar.txt", path);
 	}
 
 	private void doTestPathName(String filename, String path) throws Exception, IOException {
@@ -161,7 +149,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		
 		String returnedPath = resource.getFile().getAbsolutePath();
 		
-		String absolutePath = new File("/" + rootDir + pathsep + path + identifier.getName() + pathsep + filename).getAbsolutePath();
+		String absolutePath = new File("/" + rootDir + pathsep + path + jobInstance.getJobName() + pathsep + filename).getAbsolutePath();
 		
 		// System.err.println(absolutePath);
 		// System.err.println(returnedPath);

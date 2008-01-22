@@ -25,6 +25,7 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
@@ -96,8 +97,8 @@ public class DefaultJobExecutorTests extends TestCase {
 	private StepSupport stepConfiguration2;
 
 	private Job jobConfiguration;
-
-	private SimpleJobIdentifier jobIdentifer;
+	
+	private JobInstanceProperties jobInstanceProperties = new JobInstanceProperties();
 
 	private DefaultJobExecutor jobExecutor;
 
@@ -124,18 +125,17 @@ public class DefaultJobExecutorTests extends TestCase {
 		stepConfigurations.add(stepConfiguration1);
 		stepConfigurations.add(stepConfiguration2);
 		jobConfiguration = new Job();
+		jobConfiguration.setName("testJob");
 		jobConfiguration.setSteps(stepConfigurations);
 
-		jobIdentifer = new SimpleJobIdentifier("TestJob");
-
-		jobExecution = jobRepository.findOrCreateJob(jobConfiguration, jobIdentifer);
+		jobExecution = jobRepository.createJobExecution(jobConfiguration, jobInstanceProperties);
 		job = jobExecution.getJobInstance();
 
 		List steps = job.getStepInstances();
 		step1 = (StepInstance) steps.get(0);
 		step2 = (StepInstance) steps.get(1);
-		stepExecution1 = new StepExecution(step1, jobExecution);
-		stepExecution2 = new StepExecution(step2, jobExecution);
+		stepExecution1 = new StepExecution(step1, jobExecution, null);
+		stepExecution2 = new StepExecution(step2, jobExecution, null);
 
 	}
 
@@ -283,7 +283,7 @@ public class DefaultJobExecutorTests extends TestCase {
 	 * Check JobRepository to ensure status is being saved.
 	 */
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
-		assertEquals(job, jobDao.findJobs(jobIdentifer).get(0));
+		assertEquals(job, jobDao.findJobInstances(job.getJobName(), jobInstanceProperties).get(0));
 		// because map dao stores in memory, it can be checked directly
 		assertEquals(status, job.getStatus());
 		JobExecution jobExecution = (JobExecution) jobDao

@@ -16,15 +16,17 @@
 
 package org.springframework.batch.execution.repository.dao;
 
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobInstancePropertiesBuilder;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
 import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.execution.runtime.DefaultJobIdentifier;
@@ -42,9 +44,11 @@ public abstract class AbstractJobDaoTests extends
 
 	protected JobDao jobDao;
 
-	protected ScheduledJobIdentifier jobRuntimeInformation;
-
-	protected JobInstance job;
+	protected JobInstanceProperties jobInstanceProperties = new JobInstancePropertiesBuilder().addString("job.key", "jobKey").toJobParameters();
+	
+	protected JobInstance jobInstance;
+	
+	protected Job job;
 
 	protected JobExecution jobExecution;
 
@@ -65,15 +69,17 @@ public abstract class AbstractJobDaoTests extends
 	}
 
 	protected void onSetUpInTransaction() throws Exception {
-		jobRuntimeInformation = new ScheduledJobIdentifier("Job1", "TestStream",
-				new SimpleDateFormat("yyyyMMdd").parse("20070505"));
+//		jobRuntimeInformation = new ScheduledJobIdentifier("Job1", "TestStream",
+//				new SimpleDateFormat("yyyyMMdd").parse("20070505"));
 
+		job = new Job("Job1");
+		
 		// Create job.
-		job = jobDao.createJob(jobRuntimeInformation);
+		jobInstance = jobDao.createJobInstance(job.getName(), jobInstanceProperties);
 
 		// Create an execution
 		jobExecutionStartTime = new Date(System.currentTimeMillis());
-		jobExecution = new JobExecution(job);
+		jobExecution = new JobExecution(jobInstance);
 		jobExecution.setStartTime(jobExecutionStartTime);
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobDao.save(jobExecution);
@@ -82,7 +88,7 @@ public abstract class AbstractJobDaoTests extends
 	public void testVersionIsNotNullForJob() throws Exception {
 		int version = jdbcTemplate
 				.queryForInt("select version from BATCH_JOB_INSTANCE where ID="
-						+ job.getId());
+						+ jobInstance.getId());
 		assertEquals(0, version);
 	}
 
@@ -95,25 +101,23 @@ public abstract class AbstractJobDaoTests extends
 
 	public void testFindNonExistentJob() {
 		// No job should be found since it hasn't been created.
-		List jobs = jobDao.findJobs(new ScheduledJobIdentifier("Job2", "TestStream", new Date()));
+		List jobs = jobDao.findJobInstances("nonexistentJob", jobInstanceProperties);
 		assertTrue(jobs.size() == 0);
 	}
 
 	public void testFindJob() {
 
-		List jobs = jobDao.findJobs(jobRuntimeInformation);
+		List jobs = jobDao.findJobInstances(job.getName(), jobInstanceProperties);
 		assertTrue(jobs.size() == 1);
 		JobInstance tempJob = (JobInstance) jobs.get(0);
-		assertTrue(job.equals(tempJob));
-		assertEquals(jobRuntimeInformation, tempJob.getIdentifier());
+		assertTrue(jobInstance.equals(tempJob));
+		assertEquals(jobInstanceProperties, tempJob.getJobInstanceProperties());
 	}
 
 	public void testFindJobWithNullRuntime() {
 
-		ScheduledJobIdentifier runtimeInformation = null;
-
 		try {
-			jobDao.findJobs(runtimeInformation);
+			jobDao.findJobInstances(null, null);
 			fail();
 		} catch (IllegalArgumentException ex) {
 			// expected
@@ -126,44 +130,43 @@ public abstract class AbstractJobDaoTests extends
 	 * get no result, not the existing one.
 	 */
 	public void testCreateJobWithExistingName() {
-		ScheduledJobIdentifier scheduledIdentifier = new ScheduledJobIdentifier(
-				"ScheduledJob", "key", new Date());
-
-		jobDao.createJob(scheduledIdentifier);
+		
+		jobDao.createJobInstance("ScheduledJob", jobInstanceProperties);
 
 		// Modifying the key should bring back a completely different
 		// JobInstance
-		ScheduledJobIdentifier newIdentifier = new ScheduledJobIdentifier(
-				"ScheduledJob", "different key", new Date());
+		JobInstanceProperties tempProps = new JobInstancePropertiesBuilder().addString("job.key", "testKey1")
+			.toJobParameters();
 
 		List jobs;
-		jobs = jobDao.findJobs(scheduledIdentifier);
+		jobs = jobDao.findJobInstances("ScheduledJob", jobInstanceProperties);
 		assertEquals(1, jobs.size());
-		JobInstance job = (JobInstance) jobs.get(0);
-		assertEquals(scheduledIdentifier, job.getIdentifier());
+		JobInstance jobInstance = (JobInstance) jobs.get(0);
+		assertEquals(jobInstanceProperties, jobInstance.getJobInstanceProperties());
 
-		jobs = jobDao.findJobs(newIdentifier);
+		jobs = jobDao.findJobInstances("ScheduledJob", tempProps);
 		assertEquals(0, jobs.size());
 
 	}
 
 	public void testUpdateJob() {
 		// Update the returned job with a new status
-		job.setStatus(BatchStatus.COMPLETED);
-		jobDao.update(job);
+		jobInstance.setStatus(BatchStatus.COMPLETED);
+		jobDao.update(jobInstance);
 
 		// The job just updated should be found, with the saved status.
-		List jobs = jobDao.findJobs(jobRuntimeInformation);
+		List jobs = jobDao.findJobInstances(job.getName(), jobInstanceProperties);
 		assertTrue(jobs.size() == 1);
 		JobInstance tempJob = (JobInstance) jobs.get(0);
-		assertTrue(job.equals(tempJob));
+		assertTrue(jobInstance.equals(tempJob));
 		assertEquals(tempJob.getStatus(), BatchStatus.COMPLETED);
 	}
 
 	public void testUpdateJobWithNullId() {
 
-		JobInstance testJob = new JobInstance(null);
+		
 		try {
+			JobInstance testJob = new JobInstance(null, null);
 			jobDao.update(testJob);
 			fail();
 		} catch (IllegalArgumentException ex) {
@@ -188,7 +191,7 @@ public abstract class AbstractJobDaoTests extends
 		jobExecution.setEndTime(new Date(System.currentTimeMillis()));
 		jobDao.update(jobExecution);
 
-		List executions = jobDao.findJobExecutions(job);
+		List executions = jobDao.findJobExecutions(jobInstance);
 		assertEquals(executions.size(), 1);
 		validateJobExecution(jobExecution, (JobExecution) executions.get(0));
 
@@ -196,7 +199,7 @@ public abstract class AbstractJobDaoTests extends
 
 	public void testSaveJobExecution(){
 
-		List executions = jobDao.findJobExecutions(job);
+		List executions = jobDao.findJobExecutions(jobInstance);
 		assertEquals(executions.size(), 1);
 		validateJobExecution(jobExecution, (JobExecution) executions.get(0));
 	}
@@ -204,7 +207,7 @@ public abstract class AbstractJobDaoTests extends
 	public void testUpdateInvalidJobExecution() {
 
 		// id is invalid
-		JobExecution execution = new JobExecution(job, new Long(29432));
+		JobExecution execution = new JobExecution(jobInstance, new Long(29432));
 		try {
 			jobDao.update(execution);
 			fail("Expected NoSuchBatchDomainObjectException");
@@ -215,7 +218,7 @@ public abstract class AbstractJobDaoTests extends
 
 	public void testUpdateNullIdJobExection() {
 
-		JobExecution execution = new JobExecution(job);
+		JobExecution execution = new JobExecution(jobInstance);
 		try {
 			jobDao.update(execution);
 			fail();
@@ -227,19 +230,18 @@ public abstract class AbstractJobDaoTests extends
 	public void testIncrementExecutionCount() {
 
 		// 1 JobExection already added in setup
-		assertEquals(jobDao.getJobExecutionCount(job.getId()), 1);
+		assertEquals(jobDao.getJobExecutionCount(jobInstance.getId()), 1);
 
 		// Save new JobExecution for same job
-		JobExecution testJobExecution = new JobExecution(job);
+		JobExecution testJobExecution = new JobExecution(jobInstance);
 		jobDao.save(testJobExecution);
 		// JobExecutionCount should be incremented by 1
-		assertEquals(jobDao.getJobExecutionCount(job.getId()), 2);
+		assertEquals(jobDao.getJobExecutionCount(jobInstance.getId()), 2);
 	}
 
 	public void testZeroExecutionCount() {
 
-		JobInstance testJob = jobDao.createJob(new ScheduledJobIdentifier(
-				"TestJob", "key", new Date()));
+		JobInstance testJob = jobDao.createJobInstance("test", new JobInstanceProperties());
 		// no jobExecutions saved for new job, count should be 0
 		assertEquals(jobDao.getJobExecutionCount(testJob.getId()), 0);
 	}
@@ -248,87 +250,31 @@ public abstract class AbstractJobDaoTests extends
 		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("Job1");
 
 		// Create job.
-		job = jobDao.createJob(jobIdentifier);
+		jobInstance = jobDao.createJobInstance("test", jobInstanceProperties);
 
 		List jobs = jdbcTemplate.queryForList(
-				"SELECT * FROM BATCH_JOB_INSTANCE where ID=?", new Object[] { job
+				"SELECT * FROM BATCH_JOB_INSTANCE where ID=?", new Object[] { jobInstance
 						.getId() });
 		assertEquals(1, jobs.size());
-		assertEquals(job.getName(), ((Map) jobs.get(0)).get("JOB_NAME"));
+		assertEquals("test", ((Map) jobs.get(0)).get("JOB_NAME"));
 
 	}
 
 	public void testJobWithDefaultJobIdentifier() throws Exception {
-		DefaultJobIdentifier jobIdentifier = new DefaultJobIdentifier("Job1", "testKey");
-
 		// Create job.
-		job = jobDao.createJob(jobIdentifier);
-
-		List jobs = jobDao.findJobs(jobIdentifier); 
+		jobInstance = jobDao.createJobInstance("testDefault", jobInstanceProperties);
+		
+		List jobs = jobDao.findJobInstances("testDefault", jobInstanceProperties); 
 			
 		assertEquals(1, jobs.size());
-		assertEquals(job.getName(), ((JobInstance) jobs.get(0)).getName());
-		assertEquals(jobIdentifier.getJobKey(), ((JobInstance) jobs.get(0)).
-				getIdentifier().getJobInstanceProperties().getString(DefaultJobIdentifier.JOB_KEY));
-
-	}
-
-	public void testJobWithScheduledJobIdentifier() throws Exception {
-		Date date = new Date();
-		ScheduledJobIdentifier jobIdentifier = new ScheduledJobIdentifier("Job1", "testKey", date);
-
-		// Create job.
-		job = jobDao.createJob(jobIdentifier);
-
-		List jobs = jobDao.findJobs(jobIdentifier); 
-			
-		assertEquals(1, jobs.size());
-		assertEquals(job.getName(), ((JobInstance) jobs.get(0)).getName());
-		assertEquals(jobIdentifier.getJobKey(), ((JobInstance) jobs.get(0)).
-				getIdentifier().getJobInstanceProperties().getString(DefaultJobIdentifier.JOB_KEY));
-
-	}
-
-	public void testJobWithScheduledJobIdentifierAndDifferentTime() throws Exception {
-		Date date = new Date();
-		ScheduledJobIdentifier jobIdentifier = new ScheduledJobIdentifier("Job1", "testKey", date);
-
-		// Create job.
-		job = jobDao.createJob(jobIdentifier);
-		
-		Date later = new Date(date.getTime()+3600000);
-		ScheduledJobIdentifier laterIdentifier = new ScheduledJobIdentifier("Job1", "testKey", later);
-
-		List jobs = jobDao.findJobs(laterIdentifier); 
-
-		// Different timestamp is different identifier...
-		assertEquals(0, jobs.size());
-
-	}
-
-	public void testJobWithScheduledJobIdentifierAndDifferentDateImplementation() throws Exception {
-		Date date = new Date();
-		ScheduledJobIdentifier jobIdentifier = new ScheduledJobIdentifier("Job1", "testKey", date);
-
-		// Create job.
-		job = jobDao.createJob(jobIdentifier);
-		
-		Timestamp later = new Timestamp(date.getTime());
-		ScheduledJobIdentifier laterIdentifier = new ScheduledJobIdentifier("Job1", "testKey", later);
-
-		List jobs = jobDao.findJobs(laterIdentifier); 
-
-		// Different timestamp is different identifier...
-		assertEquals(1, jobs.size());
-		assertEquals(job.getName(), ((JobInstance) jobs.get(0)).getName());
-		assertEquals(jobIdentifier.getJobKey(), ((JobInstance) jobs.get(0)).
-				getIdentifier().getJobInstanceProperties().getString(DefaultJobIdentifier.JOB_KEY));
+		assertEquals(jobInstanceProperties.getString("job.key"), ((JobInstance) jobs.get(0))
+				.getJobInstanceProperties().getString("job.key"));
 
 	}
 
 	public void testFindJobExecutions(){
 
-		List results = jobDao.findJobExecutions(job);
+		List results = jobDao.findJobExecutions(jobInstance);
 		assertEquals(results.size(), 1);
 		validateJobExecution(jobExecution, (JobExecution)results.get(0));
 	}

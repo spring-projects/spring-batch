@@ -26,7 +26,7 @@ public class DefaultJobIdentifierTests extends TestCase {
 	private DefaultJobIdentifier instance = new DefaultJobIdentifier(null);
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getName()}.
+	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getJobName()}.
 	 */
 	public void testGetName() {
 		DefaultJobIdentifier identifier = new DefaultJobIdentifier("foo");

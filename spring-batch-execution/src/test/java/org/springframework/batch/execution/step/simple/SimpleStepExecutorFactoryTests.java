@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.domain.StepSupport;
@@ -65,7 +66,7 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 		SimpleStepExecutor executor = (SimpleStepExecutor) factory
 				.getExecutor(configuration);
 		StepExecution stepExecution = new StepExecution(new StepInstance(
-				new Long(11)), new JobExecution(new JobInstance(null),
+				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobInstanceProperties()),
 				new Long(12)));
 		try {
 			executor.process(configuration, stepExecution);
@@ -92,7 +93,7 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 		SimpleStepExecutor executor = (SimpleStepExecutor) factory
 				.getExecutor(configuration);
 		StepExecution stepExecution = new StepExecution(new StepInstance(
-				new Long(11)), new JobExecution(new JobInstance(null),
+				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobInstanceProperties()),
 				new Long(12)));
 		try {
 			executor.process(configuration, stepExecution);
@@ -130,7 +131,7 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 		SimpleStepExecutor executor = (SimpleStepExecutor) factory
 				.getExecutor(configuration);
 		StepExecution stepExecution = new StepExecution(new StepInstance(
-				new Long(11)), new JobExecution(new JobInstance(null),
+				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobInstanceProperties()),
 				new Long(12)));
 		executor.process(configuration, stepExecution);
 		assertEquals(2, list.size());

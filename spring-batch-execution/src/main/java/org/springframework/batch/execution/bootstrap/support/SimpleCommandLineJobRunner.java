@@ -20,6 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobLocator;
 import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.runtime.JobIdentifierFactory;
@@ -108,6 +110,8 @@ public class SimpleCommandLineJobRunner {
 	private ExitCodeExceptionClassifier exceptionClassifier = new SimpleExitCodeExceptionClassifier();
 
 	private JobLauncher launcher;
+	
+	private JobLocator jobLocator;
 
 	private SystemExiter systemExiter = new JvmSystemExiter();
 
@@ -173,7 +177,11 @@ public class SimpleCommandLineJobRunner {
 	public void setSystemExiter(SystemExiter systemExitor) {
 		this.systemExiter = systemExitor;
 	}
-
+	
+	public void setJobLocator(JobLocator jobLocator) {
+		this.jobLocator = jobLocator;
+	}
+	
 	/**
 	 * Delegate to the exiter to (possibly) exit the VM gracefully.
 	 * 
@@ -235,10 +243,7 @@ public class SimpleCommandLineJobRunner {
 				throw new NoSuchJobException("Null job name cannot be located.");
 			}
 			JobIdentifier runtimeInformation = jobIdentifierFactory.getJobIdentifier(jobName);
-
-			if (!launcher.isRunning()) {
-				status = launcher.run(runtimeInformation).getExitStatus();
-			}
+			status = launcher.run(jobLocator.getJob(runtimeInformation.getName()), new JobInstanceProperties()).getExitStatus();
 		}
 		catch (NoSuchJobException e) {
 			logger.fatal("Could not locate JobConfiguration \"" + jobName + "\"", e);

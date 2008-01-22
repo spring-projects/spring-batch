@@ -15,8 +15,10 @@
  */
 package org.springframework.batch.execution.launch;
 
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 
@@ -38,23 +40,7 @@ public interface JobLauncher {
 	 * 
 	 * @throws NoSuchJobException
 	 */
-	public JobExecution run(JobIdentifier jobIdentifier)
-			throws NoSuchJobException, JobExecutionAlreadyRunningException;
-
-	/**
-	 * Stop the current job executions if there are any. If not, no action will
-	 * be taken.
-	 * 
-	 * @see org.springframework.context.Lifecycle#stop()
-	 */
-	public void stop();
-
-	/**
-	 * Check whether or not any job execution is currently running.
-	 * 
-	 * @return true if this launcher started a job or jobs and one can be
-	 *         determined to be in an active state.
-	 */
-	public boolean isRunning();
+	public JobExecution run(Job job, JobInstanceProperties jobInstanceProperties)
+			throws JobExecutionAlreadyRunningException;
 
 }

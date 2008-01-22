@@ -22,9 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
 public class MapJobDao implements JobDao {
@@ -44,19 +46,20 @@ public class MapJobDao implements JobDao {
 		executionsById.clear();
 	}
 
-	public JobInstance createJob(JobIdentifier jobIdentifier) {
-		JobInstance job = new JobInstance(jobIdentifier, new Long(currentId++));
-
-		jobsById.put(job.getId(), job);
-		return job;
+	public JobInstance createJobInstance(String jobName, JobInstanceProperties jobInstanceProperties) {
+		JobInstance jobInstance = new JobInstance(new Long(currentId++), jobInstanceProperties);
+		jobInstance.setJob(new Job(jobName));
+		
+		jobsById.put(jobInstance.getId(), jobInstance);
+		return jobInstance;
 	}
 
-	public List findJobs(JobIdentifier jobIdentifier) {
+	public List findJobInstances(String jobName, JobInstanceProperties jobInstanceProperties) {
 		List list = new ArrayList();
 		for (Iterator iter = jobsById.values().iterator(); iter.hasNext();) {
-			JobInstance job = (JobInstance) iter.next();
-			if (job.getName().equals(jobIdentifier.getName())) {
-				list.add(job);
+			JobInstance jobInstance = (JobInstance) iter.next();
+			if (jobInstance.getJobName().equals(jobName) && jobInstance.getJobInstanceProperties().equals(jobInstanceProperties)) {
+				list.add(jobInstance);
 			}
 		}
 		return list;

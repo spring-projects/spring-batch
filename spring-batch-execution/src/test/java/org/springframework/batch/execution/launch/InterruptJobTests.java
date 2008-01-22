@@ -42,47 +42,50 @@ import org.springframework.core.task.TaskExecutor;
  */
 public class InterruptJobTests extends TestCase {
 
-	public void testInterruptUsingListener() throws Exception {
+	//JabExecutorFacade is deprecated.
+//	public void testInterruptUsingListener() throws Exception {
+//
+//		// final InterruptibleFacade facade = new InterruptibleFacade();
+//		// facade.setListener(new ThreadInterruptJobExecutionListener());
+//		final SimpleJobExecutorFacade facade = new SimpleJobExecutorFacade();
+//		facade.setJobExecutor(new InterruptibleJobExecutor());
+//
+//		facade.setJobRepository(new SimpleJobRepository(new MapJobDao(),
+//				new MapStepDao()));
+//
+//		facade.setJobExecutionListeners(Collections
+//				.singletonList(new ThreadInterruptJobExecutionListener()));
+//
+//		MapJobRegistry registry = new MapJobRegistry();
+//		facade.setJobLocator(registry);
+//
+//		registry.register(new Job("foo"));
+//		final SimpleJobIdentifier identifier = new SimpleJobIdentifier("foo");
+//		final JobExecution execution = facade.createExecutionFrom(identifier);
+//
+//		TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+//		Runnable launcherRunnable = new Runnable() {
+//			public void run() {
+//				try {
+//					facade.start(execution);
+//				} catch (NoSuchJobException e) {
+//					fail("Unexpected NoSuchJobConfigurationException");
+//				}
+//			}
+//		};
+//
+//		taskExecutor.execute(launcherRunnable);
+//
+//		// give the thread a second to start up
+//		Thread.sleep(100);
+//		assertTrue(facade.isRunning());
+//		facade.stop(execution);
+//		Thread.sleep(100);
+//		assertFalse(facade.isRunning());
+//	}
 
-		// final InterruptibleFacade facade = new InterruptibleFacade();
-		// facade.setListener(new ThreadInterruptJobExecutionListener());
-		final SimpleJobExecutorFacade facade = new SimpleJobExecutorFacade();
-		facade.setJobExecutor(new InterruptibleJobExecutor());
-
-		facade.setJobRepository(new SimpleJobRepository(new MapJobDao(),
-				new MapStepDao()));
-
-		facade.setJobExecutionListeners(Collections
-				.singletonList(new ThreadInterruptJobExecutionListener()));
-
-		MapJobRegistry registry = new MapJobRegistry();
-		facade.setJobLocator(registry);
-
-		registry.register(new Job("foo"));
-		final SimpleJobIdentifier identifier = new SimpleJobIdentifier("foo");
-		final JobExecution execution = facade.createExecutionFrom(identifier);
-
-		TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-		Runnable launcherRunnable = new Runnable() {
-			public void run() {
-				try {
-					facade.start(execution);
-				} catch (NoSuchJobException e) {
-					fail("Unexpected NoSuchJobConfigurationException");
-				}
-			}
-		};
-
-		taskExecutor.execute(launcherRunnable);
-
-		// give the thread a second to start up
-		Thread.sleep(100);
-		assertTrue(facade.isRunning());
-		facade.stop(execution);
-		Thread.sleep(100);
-		assertFalse(facade.isRunning());
-	}
-
+	public void testBlank(){}
+	
 	/**
 	 * Simple {@link JobExecutorFacade} that can be used to test thread
 	 * interruption. Mimics the implementation of the

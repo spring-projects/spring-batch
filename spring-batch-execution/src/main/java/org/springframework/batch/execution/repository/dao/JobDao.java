@@ -21,6 +21,7 @@ import java.util.List;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 
 /**
  * Data Access Object for jobs.
@@ -39,7 +40,7 @@ public interface JobDao {
 	 * @param jobIdentifier
 	 * @return Job
 	 */
-	public JobInstance createJob(JobIdentifier jobIdentifier);
+	public JobInstance createJobInstance(String jobName, JobInstanceProperties jobInstanceProperties);
 
 	/**
 	 * Find all jobs that match the given JobIdentifier. If no jobs matching the
@@ -49,7 +50,7 @@ public interface JobDao {
 	 * @return List of {@link JobInstance} objects matching
 	 *         {@link JobIdentifier}
 	 */
-	public List findJobs(JobIdentifier jobIdentifier);
+	public List findJobInstances(String jobName, JobInstanceProperties jobInstanceProperties);
 
 	/**
 	 * Update an existing Job.

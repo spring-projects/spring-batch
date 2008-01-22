@@ -12,11 +12,7 @@
 	<bean id="simpleContainerLauncher"
 		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="simpleJobRepository" />
-		<property name="jobLocator"
-			ref="jobConfigurationRegistry" />
 		<property name="jobExecutor" ref="jobLifecycle" />
-		<property name="jobIdentifierFactory"
-			ref="jobRuntimeInformationFactory" />
 	</bean>
 
 	<bean id="jobConfigurationRegistry"

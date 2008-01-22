@@ -25,6 +25,7 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.domain.StepSupport;
@@ -65,7 +66,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		jobConfiguration.addStep(stepConfiguration);
 		JobIdentifier runtimeInformation = new SimpleJobIdentifier("TestJob");
 		jobConfiguration.setBeanName("testJob");
-		job = jobRepository.findOrCreateJob(jobConfiguration, runtimeInformation).getJobInstance();
+		job = jobRepository.createJobExecution(jobConfiguration, new JobInstanceProperties()).getJobInstance();
 		executor = new SimpleStepExecutor();
 	}
 
@@ -75,7 +76,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 		List steps = job.getStepInstances();
 		final StepInstance step = (StepInstance) steps.get(0);
-		JobExecution jobExecutionContext = new JobExecution(new JobInstance(null, new Long(0)));
+		JobExecution jobExecutionContext = new JobExecution(new JobInstance(new Long(0L), new JobInstanceProperties()));
 		final StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 		stepConfiguration.setTasklet(new Tasklet() {
 			public ExitStatus execute() throws Exception {

@@ -49,7 +49,7 @@ public class SimpleStepContextTests extends TestCase {
 	 */
 	public void testGetJobIdentifier() {
 		assertNull(context.getStepExecution());
-		context.setStepExecution(new StepExecution(null, null));
+		context.setStepExecution(new StepExecution(null, null, null));
 		assertNotNull(context.getStepExecution());
 	}
 

@@ -157,7 +157,7 @@ public class SimpleStepExecutor implements StepExecutor {
 		stepScopeContext.setStepExecution(stepExecution);
 		// Add the job identifier so that it can be used to identify
 		// the conversation in StepScope
-		stepScopeContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getJobInstance().getIdentifier());
+		stepScopeContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
 
 		try {
 			stepExecution.setStartTime(new Date(System.currentTimeMillis()));

@@ -1,8 +1,11 @@
 package org.springframework.batch.execution.bootstrap.support;
 
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.NoSuchJobException;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.execution.launch.JobLauncher;
 
 /**
@@ -29,8 +32,8 @@ public class StubJobLauncher implements JobLauncher {
 		return isRunning;
 	}
 
-	public JobExecution run(JobIdentifier jobIdentifier)
-			throws NoSuchJobException {
+	public JobExecution run(Job job, JobInstanceProperties jobInstanceProperties)
+			throws JobExecutionAlreadyRunningException {
 		lastRunCalled = RUN_JOB_IDENTIFIER;
 		return returnValue;
 	}
