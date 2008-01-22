@@ -217,8 +217,7 @@ public class SimpleCommandLineJobRunner {
 					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 
 			Assert.state(launcher != null, "JobLauncher must be provided in the parent ApplicationContext"
-					+ ", check the context created within classpath*:beanRefContext.xml to ensure a JobLauncher"
-					+ " is declared");
+					+ ", check the context to ensure a JobLauncher is declared");
 
 			if (jobName == null) {
 				String[] names = context.getBeanNamesForType(Job.class);
