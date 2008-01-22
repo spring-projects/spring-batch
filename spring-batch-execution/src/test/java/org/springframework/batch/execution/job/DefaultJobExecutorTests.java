@@ -177,9 +177,9 @@ public class DefaultJobExecutorTests extends TestCase {
 	}
 
 	public void testExecutionContextIsSet() throws Exception {
-
 		testRunNormally();
 		assertEquals(job, jobExecution.getJobInstance());
+		assertEquals(2, jobExecution.getStepExecutions().size());
 		assertEquals(step1, stepExecution1.getStep());
 		assertEquals(step2, stepExecution2.getStep());
 	}
