@@ -17,8 +17,7 @@ package org.springframework.batch.execution.launch;
 
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInstanceProperties;
-import org.springframework.batch.core.domain.NoSuchJobException;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 
 /**
@@ -45,7 +44,7 @@ public interface JobLauncher {
 	 * by the properties already has an execution running.  Throws 
 	 * IllegalArgumentException if the job or jobInstanceProperties are null.
 	 */
-	public JobExecution run(Job job, JobInstanceProperties jobInstanceProperties)
+	public JobExecution run(Job job, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException;
 
 }
