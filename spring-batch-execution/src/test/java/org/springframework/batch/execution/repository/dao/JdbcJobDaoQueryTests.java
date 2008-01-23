@@ -22,7 +22,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInstanceProperties;
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;

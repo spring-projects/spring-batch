@@ -20,7 +20,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,13 +32,10 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInstanceProperties;
-import org.springframework.batch.core.domain.JobInstancePropertiesBuilder;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
@@ -448,19 +444,6 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	}
 
 	/**
-	 * Validate {@link JobIdentifier}. Due to differing requirements, it is
-	 * acceptable for any field to be blank, however null fields may cause odd
-	 * and vague exception reports from the database driver.
-	 */
-	private void validateJobIdentifier(JobIdentifier jobIdentifier) {
-
-		Assert.notNull(jobIdentifier, "JobIdentifier cannot be null.");
-		Assert.notNull(jobIdentifier.getName(),
-				"JobIdentifier name cannot be null.");
-		Assert.notNull(jobIdentifier.getJobInstanceProperties(), "JobIdentifier runtime parameters must not be null.");
-	}
-
-	/**
 	 * Re-usable mapper for {@link JobExecution} instances.
 	 * 
 	 * @author Dave Syer
@@ -493,49 +476,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 		}
 
 	}
-	
-	/*
-	 * Private inner class for mapping values from the JOB_PARAMETERS table into the java
-	 * JobParameters class. TODO: is this going to be used?  If not can we delete it?
-	 */
-	private static class JobParameterCallbackHandler implements RowCallbackHandler{
-
-		private JobInstancePropertiesBuilder parametersBuilder;
 		
-		public JobParameterCallbackHandler() {
-			parametersBuilder = new JobInstancePropertiesBuilder();
-		}
-
-		public void processRow(ResultSet rs) throws SQLException {
-			
-			ParameterType parameterType = ParameterType.getType(rs.getString("TYPE_CD"));
-			
-			String key = rs.getString("KEY");
-			
-			if(parameterType == ParameterType.STRING){
-				parametersBuilder.addString(key, rs.getString("STRING_VAL"));
-			}
-			else if(parameterType == ParameterType.LONG){
-				parametersBuilder.addLong(key, new Long(rs.getLong("LONG_VAL")));
-			}
-			else if(parameterType == ParameterType.DATE){
-				//I debated about just passing the Timestamp in, however, I didn't want there to be any equality
-				//issues when comparing a java.util.Date to a timestamp.
-				Timestamp ts = rs.getTimestamp("DATE_VAL");
-				parametersBuilder.addDate(key, new Date(ts.getTime()));
-			}
-			else{
-				//invalid type code, error out.
-				throw new DataRetrievalFailureException("Invalid JobParameter type");
-			}
-		}
-		
-		public JobInstanceProperties getJobParmeters(){
-			return parametersBuilder.toJobParameters();
-		}
-		
-	}
-	
 	private static class ParameterType {
 		
 		private final String type;

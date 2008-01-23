@@ -23,7 +23,6 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInstanceProperties;
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 
 public class MapJobDaoTests extends TestCase {
 

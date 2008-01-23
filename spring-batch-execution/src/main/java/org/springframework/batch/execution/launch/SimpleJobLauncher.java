@@ -73,8 +73,15 @@ public class SimpleJobLauncher implements JobLauncher {
 				catch(Throwable t){
 					logger.info("Job: [" + job + "] failed with the following parameters: [" 
 							+ jobInstanceProperties + "]", t);
-					throw new RuntimeException(t);
+					rethrow(t);
 				}
+			}
+
+			private void rethrow(Throwable t) {
+				if (t instanceof RuntimeException) {
+					throw (RuntimeException) t;
+				}
+				throw new RuntimeException(t);
 			}});
 		
 		return jobExecution;

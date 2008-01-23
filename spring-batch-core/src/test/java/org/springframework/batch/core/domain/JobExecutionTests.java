@@ -19,7 +19,6 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**

@@ -16,7 +16,6 @@
 
 package org.springframework.batch.execution.repository.dao;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +27,6 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.JobInstancePropertiesBuilder;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
-import org.springframework.batch.execution.runtime.DefaultJobIdentifier;
-import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
@@ -247,7 +243,6 @@ public abstract class AbstractJobDaoTests extends
 	}
 
 	public void testJobWithSimpleJobIdentifier() throws Exception {
-		SimpleJobIdentifier jobIdentifier = new SimpleJobIdentifier("Job1");
 
 		// Create job.
 		jobInstance = jobDao.createJobInstance("test", jobInstanceProperties);

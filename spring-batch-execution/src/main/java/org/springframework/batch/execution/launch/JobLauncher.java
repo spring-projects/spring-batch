@@ -17,7 +17,6 @@ package org.springframework.batch.execution.launch;
 
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;

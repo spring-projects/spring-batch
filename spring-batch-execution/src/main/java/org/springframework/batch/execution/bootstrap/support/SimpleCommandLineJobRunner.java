@@ -110,7 +110,6 @@ public class SimpleCommandLineJobRunner {
 	private ExitCodeExceptionClassifier exceptionClassifier = new SimpleExitCodeExceptionClassifier();
 
 	private JobLauncher launcher;
-	
 	private JobLocator jobLocator;
 
 	private SystemExiter systemExiter = new JvmSystemExiter();

@@ -25,19 +25,16 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.job.DefaultJobExecutor;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
-import org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory;
 import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
@@ -114,9 +111,6 @@ public class SimpleJobTests extends TestCase {
 	public void testSimpleJob() throws Exception {
 
 		Job jobConfiguration = new Job();
-		JobIdentifier runtimeInformation = new ScheduledJobIdentifierFactory()
-						.getJobIdentifier("real.job");
-
 		jobConfiguration.addStep(new SimpleStep(getTasklet("foo", "bar")));
 		jobConfiguration.addStep(new SimpleStep(getTasklet("spam")));
 
@@ -134,7 +128,6 @@ public class SimpleJobTests extends TestCase {
 	public void testSimpleJobWithRecovery() throws Exception {
 
 		Job jobConfiguration = new Job();
-		JobIdentifier runtimeInformation = new SimpleJobIdentifier("real.job");
 		final List throwables = new ArrayList();
 
 		RepeatTemplate chunkOperations = new RepeatTemplate();
@@ -183,7 +176,6 @@ public class SimpleJobTests extends TestCase {
 	public void testExceptionTerminates() throws Exception {
 
 		Job jobConfiguration = new Job();
-		JobIdentifier runtimeInformation = new SimpleJobIdentifier("real.job");
 		final ItemOrientedTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
 		Step step = new SimpleStep(module);
 		module.setItemProcessor(new ItemProcessor() {

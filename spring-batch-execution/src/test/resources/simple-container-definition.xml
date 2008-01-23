@@ -30,8 +30,7 @@
 	</bean>
 
 	<bean id="simpleJob"
-		class="org.springframework.batch.core.domain.Job"
-		abstract="true">
+		class="org.springframework.batch.core.domain.Job" abstract="true">
 		<property name="restartable" value="true" />
 	</bean>
 
@@ -90,10 +89,12 @@
 					<bean
 						class="org.springframework.batch.support.IntArrayPropertyEditor" />
 				</entry>
-				<entry key="org.springframework.batch.io.file.transform.Range[]">
-					<bean class="org.springframework.batch.io.file.transform.RangeArrayPropertyEditor" />
+				<entry
+					key="org.springframework.batch.io.file.transform.Range[]">
+					<bean
+						class="org.springframework.batch.io.file.transform.RangeArrayPropertyEditor" />
 				</entry>
-        <entry key="java.util.Date">
+				<entry key="java.util.Date">
 					<bean
 						class="org.springframework.beans.propertyeditors.CustomDateEditor">
 						<constructor-arg>

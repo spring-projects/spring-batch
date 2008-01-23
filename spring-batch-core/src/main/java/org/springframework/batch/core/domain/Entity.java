@@ -18,7 +18,6 @@ package org.springframework.batch.core.domain;
 
 import java.io.Serializable;
 
-import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**

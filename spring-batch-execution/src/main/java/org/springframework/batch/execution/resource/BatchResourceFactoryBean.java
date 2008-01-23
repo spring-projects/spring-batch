@@ -18,7 +18,6 @@ package org.springframework.batch.execution.resource;
 
 import java.io.File;
 
-import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;

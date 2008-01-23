@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
