@@ -129,14 +129,6 @@ public class SimpleCommandLineJobRunner {
 	}
 
 	/**
-	 * Setter for {@link JobIdentifierFactory}.
-	 * 
-	 * @param jobIdentifierFactory the {@link JobIdentifierFactory} to set
-	 */
-	public void setJobIdentifierFactory(JobIdentifierFactory jobIdentifierFactory) {
-	}
-
-	/**
 	 * Injection setter for the {@link JobLauncher}.
 	 * 
 	 * @param launcher the launcher to set
