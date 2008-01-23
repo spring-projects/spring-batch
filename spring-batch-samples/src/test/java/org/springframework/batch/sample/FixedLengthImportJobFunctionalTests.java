@@ -52,8 +52,6 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	 */
 	protected void validatePostConditions() throws Exception {
 
-		System.err.println(jdbcTemplate.queryForList("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id"));
-
 		jdbcTemplate.query("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", new RowCallbackHandler() {
 
 			public void processRow(ResultSet rs) throws SQLException {
@@ -72,7 +70,6 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 
 		});
 
-		System.err.println(inputSource.read());
 		assertNull(inputSource.read());
 	}
 
