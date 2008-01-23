@@ -23,7 +23,11 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 
 /**
  * Simple interface for controlling jobs, including possible ad-hoc executions,
- * based on different runtime identifiers.
+ * based on different runtime identifiers.  It is extremely important to note 
+ * that this interface makes absolutely no guarantees about whether or not 
+ * calls to it are executed synchronously or asynchronously.  The javadocs
+ * for specific implementations should be checked to ensure callers fully 
+ * understand how the job will be run.
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -32,12 +36,14 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 public interface JobLauncher {
 
 	/**
-	 * Start a job execution with the given runtime information.
+	 * Start a job execution for the given Job and JobInstanceProperties.
 	 * 
 	 * @return the exit code from the job if it returns synchronously. If the
 	 *         implementation is asynchronous, the status might well be unknown.
 	 * 
-	 * @throws NoSuchJobException
+	 * @throws JobExecutionAlreadyRunningException if the JobInstance identified
+	 * by the properties already has an execution running.  Throws 
+	 * IllegalArgumentException if the job or jobInstanceProperties are null.
 	 */
 	public JobExecution run(Job job, JobInstanceProperties jobInstanceProperties)
 			throws JobExecutionAlreadyRunningException;
