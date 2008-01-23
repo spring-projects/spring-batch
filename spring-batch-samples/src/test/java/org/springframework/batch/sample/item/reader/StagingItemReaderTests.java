@@ -5,7 +5,6 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
 import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.repeat.context.RepeatContextSupport;

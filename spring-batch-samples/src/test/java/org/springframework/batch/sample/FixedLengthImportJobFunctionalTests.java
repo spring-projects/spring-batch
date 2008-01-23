@@ -47,12 +47,14 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	}
 
 	/**
-	 * check that records have been correctly written to database
+	 * Check that records have been correctly written to database
 	 * @throws Exception 
 	 */
 	protected void validatePostConditions() throws Exception {
 
 		inputSource.open();
+		
+		System.err.println(jdbcTemplate.queryForList("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id"));
 
 		jdbcTemplate.query("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", new RowCallbackHandler() {
 
@@ -72,6 +74,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 
 		});
 
+		System.err.println(inputSource.read());
 		assertNull(inputSource.read());
 	}
 

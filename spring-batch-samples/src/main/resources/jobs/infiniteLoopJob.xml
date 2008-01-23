@@ -27,6 +27,9 @@
 	<bean id="jobLauncher" class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobExecutor" ref="jobExecutor" />
 		<property name="jobRepository" ref="simpleJobRepository" />
+		<property name="taskExecutor">
+			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
+		</property>
 	</bean>
 
 	<bean id="infiniteLoopJob" parent="simpleJob">

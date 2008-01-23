@@ -19,7 +19,6 @@ package org.springframework.batch.sample;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobInstanceProperties;
 import org.springframework.batch.execution.launch.JobLauncher;
-import org.springframework.batch.execution.runtime.DefaultJobIdentifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

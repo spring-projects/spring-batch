@@ -17,8 +17,6 @@
 package org.springframework.batch.sample;
 
 import org.springframework.batch.core.domain.JobInstanceProperties;
-import org.springframework.batch.core.runtime.SimpleJobIdentifier;
-import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.jdbc.core.JdbcOperations;
 
 /**

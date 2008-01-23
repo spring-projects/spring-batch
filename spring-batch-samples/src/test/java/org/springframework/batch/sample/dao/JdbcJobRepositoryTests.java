@@ -22,8 +22,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	private ScheduledJobIdentifier jobIdentifier;
-
 	private JobRepository repository;
 
 	private Job jobConfiguration;
@@ -43,7 +41,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 	}
 
 	protected void onSetUpInTransaction() throws Exception {
-		jobIdentifier = new ScheduledJobIdentifier("Job1", "TestStream", 
+		new ScheduledJobIdentifier("Job1", "TestStream", 
 				new SimpleDateFormat("yyyyMMdd").parse("20070505"));
 		jobConfiguration = new Job("test-job");
 		jobConfiguration.setRestartable(true);
