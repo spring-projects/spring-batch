@@ -133,7 +133,6 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 		if (line != null) {
 			while (line != null && !recordSeparatorPolicy.isEndOfRecord(record)) {
 				record = recordSeparatorPolicy.preProcess(record) + (line = readLine());
-				// record = new StringBuilder(recordSeparatorPolicy.preProcess(record)).append(line = readLine()).toString();
 			}
 		}
 		return recordSeparatorPolicy.postProcess(record);

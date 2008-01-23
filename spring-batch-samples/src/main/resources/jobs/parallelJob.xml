@@ -12,7 +12,7 @@
 	<bean parent="stepScope" />
 	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
-	<bean id="fixedLengthImportJob" parent="simpleJob">
+	<bean id="parallelJob" parent="simpleJob">
 		<property name="steps">
 			<list>
 				<bean id="staging" parent="simpleStep">

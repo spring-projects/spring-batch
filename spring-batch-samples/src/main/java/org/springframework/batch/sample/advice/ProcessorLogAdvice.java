@@ -38,11 +38,15 @@ public class ProcessorLogAdvice {
     	Object[] args = pjp.getArgs();
     	StringBuffer output = new StringBuffer();
     	
+    	output.append(pjp.getTarget().getClass().getName()+": ");
+    	output.append(pjp.toShortString()+": ");
+
     	for(int i = 0; i < args.length; i++){
     		output.append(args[i] + " ");
     	}
     	
-        log.info("Processed: " + output.toString());
+    	
+        log.info("Basic: " + output.toString());
     }
     
     public void doStronglyTypedLogging(Object item){

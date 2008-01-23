@@ -18,6 +18,8 @@ package org.springframework.batch.io.file;
 
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.exception.FlatFileParsingException;
 import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
@@ -54,6 +56,8 @@ import org.springframework.util.Assert;
  */
 public class SimpleFlatFileItemReader extends AbstractItemReader implements ItemReader,
 		InitializingBean, DisposableBean {
+
+	private static Log log = LogFactory.getLog(SimpleFlatFileItemReader.class);
 
 	// default encoding for input files - set to ISO-8859-1
 	public static final String DEFAULT_CHARSET = "ISO-8859-1";
@@ -136,6 +140,8 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 		Assert.state(resource.exists(), "Resource must exist: [" + resource
 				+ "]");
 		
+		log.debug("Opening flat file for reading: "+resource);
+
 		if (this.reader == null) {
 			ResourceLineReader reader = new ResourceLineReader(resource, encoding);
 			if (recordSeparatorPolicy != null) {
@@ -172,6 +178,7 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 	public void close() {
 		try {
 			if (reader != null) {
+				log.debug("Closing flat file for reading: "+resource);
 				reader.close();
 			}
 		} finally {

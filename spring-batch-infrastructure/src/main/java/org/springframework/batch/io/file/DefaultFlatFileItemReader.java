@@ -44,6 +44,7 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
  */
 public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implements Skippable, Restartable,
 		StatisticsProvider {
+
 	private static Log log = LogFactory.getLog(DefaultFlatFileItemReader.class);
 
 	public static final String READ_STATISTICS_NAME = "lines.read.count";
