@@ -101,8 +101,6 @@ public class SimpleCommandLineJobRunner {
 
 	public static final String BEAN_REF_CONTEXT_KEY = "bean.ref.context";
 
-	private JobIdentifierFactory jobIdentifierFactory = new ScheduledJobIdentifierFactory();
-
 	private BeanFactoryLocator beanFactoryLocator;
 
 	private ExitCodeMapper exitCodeMapper = new SimpleJvmExitCodeMapper();
@@ -138,7 +136,6 @@ public class SimpleCommandLineJobRunner {
 	 * @param jobIdentifierFactory the {@link JobIdentifierFactory} to set
 	 */
 	public void setJobIdentifierFactory(JobIdentifierFactory jobIdentifierFactory) {
-		this.jobIdentifierFactory = jobIdentifierFactory;
 	}
 
 	/**
@@ -238,11 +235,7 @@ public class SimpleCommandLineJobRunner {
 				jobName = defaultJobName;
 			}
 
-			if (jobName == null) {
-				throw new NoSuchJobException("Null job name cannot be located.");
-			}
-			JobIdentifier runtimeInformation = jobIdentifierFactory.getJobIdentifier(jobName);
-			status = launcher.run(jobLocator.getJob(runtimeInformation.getName()), new JobInstanceProperties()).getExitStatus();
+			status = launcher.run(jobLocator.getJob(jobName), new JobInstanceProperties()).getExitStatus();
 		}
 		catch (NoSuchJobException e) {
 			logger.fatal("Could not locate JobConfiguration \"" + jobName + "\"", e);
