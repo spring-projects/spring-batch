@@ -152,6 +152,15 @@ public class JobInstancePropertiesTests extends TestCase {
 		
 		assertEquals(string1, string2);
 	}
+	
+	public void testIsEmpty(){
+		
+		JobInstanceProperties props = new JobInstanceProperties();
+		assertTrue(props.isEmtpy());
+		
+		props = new JobInstancePropertiesBuilder().addString("test", "test").toJobParameters();
+		assertFalse(props.isEmtpy());
+	}
 
 // Not sure how to properly test this since there is no order garuntee, commenting out for now.	
 //	

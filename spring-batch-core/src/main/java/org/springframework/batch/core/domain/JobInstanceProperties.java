@@ -168,6 +168,10 @@ public class JobInstanceProperties {
 		return tempMap;
 	}
 	
+	public boolean isEmtpy(){
+		return dateMap.isEmpty() && longMap.isEmpty() && stringMap.isEmpty();
+	}
+	
 	public boolean equals(Object obj) {
 	
 		if(obj instanceof JobInstanceProperties == false){
