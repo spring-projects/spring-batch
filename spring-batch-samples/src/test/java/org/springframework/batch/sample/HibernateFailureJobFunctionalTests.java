@@ -48,6 +48,7 @@ public class HibernateFailureJobFunctionalTests extends
 	 * @see org.springframework.batch.sample.AbstractValidatingBatchLauncherTests#testLaunchJob()
 	 */
 	public void testLaunchJob() throws Exception {
+		validatePreConditions();
 		writer.setFailOnFlush(2);
 
 		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");

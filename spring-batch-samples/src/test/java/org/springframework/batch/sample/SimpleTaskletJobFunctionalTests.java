@@ -22,7 +22,6 @@ package org.springframework.batch.sample;
  */
 public class SimpleTaskletJobFunctionalTests extends FixedLengthImportJobFunctionalTests {
 	
-//	@Override
 	protected String[] getConfigLocations() {
 		return new String[]{"jobs/simpleTaskletJob.xml"};
 	}

@@ -81,8 +81,6 @@ public abstract class AbstractBatchLauncherTests extends
 	 * 
 	 */
 	public void testLaunchJob() throws Exception {
-		// Make sure the job is unique by the test case that runs it, not just
-		// its name:
 		launcher.run(job, new JobInstanceProperties());
 	}
 }
