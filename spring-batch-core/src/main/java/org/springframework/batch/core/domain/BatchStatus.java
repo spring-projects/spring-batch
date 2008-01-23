@@ -16,27 +16,39 @@
 
 package org.springframework.batch.core.domain;
 
+import java.io.Serializable;
+
 /**
- * Typesafe enumeration representating the status of an artifact within
- * the batch container.  See Effective Java Programming by Joshua Bloch 
- * for more details on the pattern used.
+ * Typesafe enumeration representing the status of an artifact within the
+ * batch environment. See Effective Java Programming by Joshua Bloch for more
+ * details on the pattern used.
+ * 
+ * A BatchStatus can be safely serialized, however, it should be noted
+ * that the pattern can break down if different class loaders load
+ * the enumeration.
  * 
  * @author Lucas Ward
- *
+ * @author Greg Kick
  */
 
-public class BatchStatus {
-	
+public class BatchStatus implements Serializable{
+
+	private static final long serialVersionUID = 1634960297477743037L;
+
 	private final String name;
 	
 	private BatchStatus(String name) {
 		this.name = name;
 	}
 
-	public String toString(){
+	private Object readResolve() throws java.io.ObjectStreamException {
+		return getStatus(name);
+	}
+
+	public String toString() {
 		return name;
 	}
-	
+
 	public static final BatchStatus COMPLETED = new BatchStatus("COMPLETED");
 
 	public static final BatchStatus STARTED = new BatchStatus("STARTED");
@@ -44,19 +56,25 @@ public class BatchStatus {
 	public static final BatchStatus STARTING = new BatchStatus("STARTING");
 
 	public static final BatchStatus FAILED = new BatchStatus("FAILED");
-	
-	public static final BatchStatus STOPPED = new BatchStatus("STOPPED");
-	
-	private static final BatchStatus[] VALUES = {STARTING, STARTED, COMPLETED, FAILED, STOPPED};
 
-	public static BatchStatus getStatus(String statusAsString){
-		
-		for(int i = 0; i < VALUES.length; i++){
-			if(VALUES[i].toString().equals(statusAsString)){
-				return (BatchStatus)VALUES[i];
+	public static final BatchStatus STOPPED = new BatchStatus("STOPPED");
+
+	private static final BatchStatus[] VALUES = { STARTING, STARTED, COMPLETED, FAILED, STOPPED };
+
+	/**
+	 * Given a string representation of a status, return the appropriate BatchStatus.
+	 * 
+	 * @param statusAsString: string representation of a status
+	 * @return Valid BatchStatus
+	 * @throws IllegalArgumentException if no status matches provided string.
+	 */
+	public static BatchStatus getStatus(String statusAsString) {
+		final String upperCaseStatusAsString = statusAsString.toUpperCase();
+		for (int i = 0; i < VALUES.length; i++) {
+			if (VALUES[i].toString().equals(upperCaseStatusAsString)) {
+				return VALUES[i];
 			}
 		}
-		
-		return null;
+		throw new IllegalArgumentException("The string did not match a valid status.");
 	}
 }

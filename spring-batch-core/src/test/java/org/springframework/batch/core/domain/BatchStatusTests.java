@@ -15,6 +15,11 @@
  */
 package org.springframework.batch.core.domain;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import junit.framework.TestCase;
 
 /**
@@ -41,6 +46,27 @@ public class BatchStatusTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.core.domain.BatchStatus#getStatus(java.lang.String)}.
 	 */
 	public void testGetStatusWrongCode() {
-		assertEquals(null, BatchStatus.getStatus("foo"));
+		try{
+			BatchStatus.getStatus("foo");
+			fail();
+		}
+		catch(IllegalArgumentException ex){
+			//expected
+		}
+	}
+	
+	public void testSerialization() throws Exception{
+		
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+	    ObjectOutputStream out = new ObjectOutputStream (bout);
+
+	    out.writeObject (BatchStatus.COMPLETED);
+	    out.flush ();
+
+	    ByteArrayInputStream bin = new ByteArrayInputStream (bout.toByteArray());
+	    ObjectInputStream in = new ObjectInputStream(bin);
+
+	    BatchStatus status = (BatchStatus) in.readObject ();
+	    assertEquals(BatchStatus.COMPLETED, status);
 	}
 }
