@@ -160,10 +160,6 @@
 				pointcut="execution( * org.springframework.batch.item.ItemProcessor+.process(Object)) and args(item)"
 				method="doStronglyTypedLogging" />
 
-			<aop:before
-				pointcut="execution( * org.springframework.batch..*ItemReader.*(..))"
-				method="doBasicLogging" />
-
 		</aop:aspect>
 	</aop:config>
 
