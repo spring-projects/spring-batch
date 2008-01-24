@@ -73,14 +73,6 @@ public class DelegatingItemReaderTests extends TestCase {
 	}
 
 	/**
-	 * Gets statistics from the input template
-	 */
-	public void testGetStatistics() {
-		Properties props = itemProvider.getStatistics();
-		assertEquals("b", props.getProperty("a"));
-	}
-
-	/**
 	 * Gets restart data from the input template
 	 */
 	public void testGetRestartData() {

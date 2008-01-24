@@ -86,7 +86,7 @@ public class SimpleTradeTasklet implements Tasklet, StatisticsProvider {
 
 	public Properties getStatistics() {
 		Properties statistics = new Properties();
-		statistics.setProperty("Trade.Count", String.valueOf(tradeCount));
+		statistics.setProperty("trade.count", String.valueOf(tradeCount));
 		statistics.putAll(inputSource.getStatistics());
 		return statistics;
 	}

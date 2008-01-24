@@ -16,6 +16,7 @@
 package org.springframework.batch.execution.scope;
 
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.core.AttributeAccessor;
 
 /**
@@ -24,7 +25,7 @@ import org.springframework.core.AttributeAccessor;
  * @author Dave Syer
  * 
  */
-public interface StepContext extends AttributeAccessor {
+public interface StepContext extends AttributeAccessor, StatisticsProvider {
 
 	/**
 	 * Accessor for the {@link StepExecution} associated with the currently
@@ -45,4 +46,9 @@ public interface StepContext extends AttributeAccessor {
 	 * Register a destruction callback for the end of life of the scope.
 	 */
 	void registerDestructionCallback(String name, Runnable callback);
+
+	/**
+	 * Clean up any resources held during the context of the step.
+	 */
+	void close();
 }

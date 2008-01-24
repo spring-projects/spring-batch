@@ -23,7 +23,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.processor.ItemWriterItemProcessor;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -56,14 +55,6 @@ public class ItemWriterItemProcessorTests extends TestCase {
 		assertEquals("test:foo", list.get(0));
 	}
 	
-	/**
-	 * Gets statistics from the input template
-	 */
-	public void testGetStatistics() {
-		Properties props = processor.getStatistics();
-		assertEquals("b", props.getProperty("a"));
-	}
-
 	/**
 	 * Gets restart data from the input template
 	 */
@@ -110,15 +101,6 @@ public class ItemWriterItemProcessorTests extends TestCase {
 		catch (IllegalStateException e) {
 			// expected
 		}
-	}
-
-	/**
-	 * Gets statistics from the input template
-	 */
-	public void testGetStatisticsWithoutStatisticsProvider() {
-		processor.setItemWriter(null);
-		Properties props = processor.getStatistics();
-		assertEquals(null, props.getProperty("a"));
 	}
 	
 	public void testSkip() {

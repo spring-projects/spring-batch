@@ -59,24 +59,6 @@ public class CompositeItemProcessorTests extends TestCase {
 	}
 	
 	/**
-	 * Statistics of injected ItemProcessors should be returned under keys prefixed with their list index.
-	 */
-	public void testStatistics() {
-		final ItemProcessor p1 = new ItemProcessorStub();
-		final ItemProcessor p2 = new ItemProcessorStub();
-		
-		List itemProcessors = new ArrayList(){{
-			add(p1); 
-			add(p2);
-		}};
-		
-		itemProcessor.setItemProcessors(itemProcessors);
-		Properties stats = itemProcessor.getStatistics();
-		assertEquals(String.valueOf(p1.hashCode()), stats.getProperty("0#" + ItemProcessorStub.STATS_KEY));
-		assertEquals(String.valueOf(p2.hashCode()), stats.getProperty("1#" + ItemProcessorStub.STATS_KEY));
-	}
-	
-	/**
 	 * All Restartable processors should be restarted, not-Restartable processors should be ignored.
 	 */
 	public void testRestart() {

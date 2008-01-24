@@ -16,12 +16,6 @@
 
 package org.springframework.batch.execution.tasklet;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemProcessor;
@@ -32,7 +26,6 @@ import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
 import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
-import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -40,13 +33,13 @@ import org.springframework.util.Assert;
  * A concrete implementation of the {@link Tasklet} interface that provides
  * 'split processing'. This type of processing is characterized by separating
  * the reading and processing of batch data into two separate classes:
- * {@link ItemReader} and {@link ItemProcessor}. The {@link ItemReader} class provides a solid means
- * for re-usability and enforces good architecture practices. Because an object
- * <em>must</em> be returned by the {@link ItemReader} to continue
- * processing, (returning null indicates processing should end) a developer is
- * forced to read in all relevant data, place it into a domain object, and
- * return that object. The {@link ItemProcessor} will then use this object for
- * calculations and output.<br/>
+ * {@link ItemReader} and {@link ItemProcessor}. The {@link ItemReader} class
+ * provides a solid means for re-usability and enforces good architecture
+ * practices. Because an object <em>must</em> be returned by the
+ * {@link ItemReader} to continue processing, (returning null indicates
+ * processing should end) a developer is forced to read in all relevant data,
+ * place it into a domain object, and return that object. The
+ * {@link ItemProcessor} will then use this object for calculations and output.<br/>
  * 
  * If a {@link RetryPolicy} is provided it will be used to construct a stateful
  * retry around the {@link ItemProcessor}, delegating identity concerns to the
@@ -75,8 +68,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * 
  */
-public class ItemOrientedTasklet implements Tasklet, Skippable,
-		StatisticsProvider, InitializingBean {
+public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean {
 
 	/**
 	 * Prefix added to statistics keys from processor if needed to avoid
@@ -115,13 +107,11 @@ public class ItemOrientedTasklet implements Tasklet, Skippable,
 			itemRecoverer = (ItemRecoverer) itemProvider;
 		}
 
-		ItemReaderRetryPolicy itemProviderRetryPolicy = new ItemReaderRetryPolicy(
-				retryPolicy);
+		ItemReaderRetryPolicy itemProviderRetryPolicy = new ItemReaderRetryPolicy(retryPolicy);
 		template.setRetryPolicy(itemProviderRetryPolicy);
 
 		if (retryPolicy != null) {
-			retryCallback = new ItemReaderRetryCallback(itemProvider,
-					itemProcessor);
+			retryCallback = new ItemReaderRetryCallback(itemProvider, itemProcessor);
 			retryCallback.setRecoverer(itemRecoverer);
 		}
 
@@ -150,7 +140,8 @@ public class ItemOrientedTasklet implements Tasklet, Skippable,
 			}
 			try {
 				itemProcessor.process(item);
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				if (itemRecoverer != null) {
 					itemRecoverer.recover(item, e);
 				}
@@ -212,76 +203,9 @@ public class ItemOrientedTasklet implements Tasklet, Skippable,
 	}
 
 	/**
-	 * If the provider and / or processor are {@link StatisticsProvider} then
-	 * delegate to them in that order. If they both implement
-	 * {@link StatisticsProvider} then the property keys are prepended with
-	 * special prefixes to avoid potential ambiguity. The prefixes are only
-	 * prepended in the case of a duplicate key shared between provider and
-	 * processor.
-	 * 
-	 * @see org.springframework.batch.io.Skippable#skip()
-	 */
-	public Properties getStatistics() {
-		Properties stats = new Properties();
-		if (this.itemProvider instanceof StatisticsProvider) {
-			stats = ((StatisticsProvider) this.itemProvider).getStatistics();
-		}
-		if (this.itemProcessor instanceof StatisticsProvider) {
-			Properties props = ((StatisticsProvider) this.itemProcessor)
-					.getStatistics();
-			if (!stats.isEmpty()) {
-				stats = prependKeys(stats, props, PROVIDER_STATISTICS_PREFIX,
-						PROCESSOR_STATISTICS_PREFIX);
-			} else {
-				stats.putAll(props);
-			}
-		}
-		return stats;
-	}
-
-	/**
-	 * @param props1
-	 * @param string
-	 * @return
-	 */
-	private Properties prependKeys(Properties props1, Properties props2,
-			String prefix1, String prefix2) {
-		Properties result = new Properties();
-		Set duplicates = new HashSet();
-		for (Iterator iterator = props1.entrySet().iterator(); iterator
-				.hasNext();) {
-			Map.Entry entry = (Map.Entry) iterator.next();
-			String key = (String) entry.getKey();
-			String value = (String) entry.getValue();
-			if (props2.containsKey(key)) {
-				duplicates.add(key);
-				continue;
-			}
-			result.setProperty(key, value);
-		}
-		for (Iterator iterator = props2.entrySet().iterator(); iterator
-				.hasNext();) {
-			Map.Entry entry = (Map.Entry) iterator.next();
-			String key = (String) entry.getKey();
-			String value = (String) entry.getValue();
-			if (duplicates.contains(key)) {
-				continue;
-			}
-			result.setProperty(key, value);
-		}
-		for (Iterator iterator = duplicates.iterator(); iterator.hasNext();) {
-			String key = (String) iterator.next();
-			result.setProperty(prefix1 + key, props1.getProperty(key));
-			result.setProperty(prefix2 + key, props2.getProperty(key));
-		}
-		return result;
-	}
-
-	/**
 	 * Public setter for the retryPolicy.
 	 * 
-	 * @param retyPolicy
-	 *            the retryPolicy to set
+	 * @param retyPolicy the retryPolicy to set
 	 */
 	public void setRetryPolicy(RetryPolicy retryPolicy) {
 		this.retryPolicy = retryPolicy;

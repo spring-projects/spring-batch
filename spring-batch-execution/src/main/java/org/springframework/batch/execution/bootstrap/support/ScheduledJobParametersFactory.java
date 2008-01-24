@@ -27,7 +27,6 @@ import java.util.Map.Entry;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
 import org.springframework.batch.core.runtime.JobParametersFactory;
-import org.springframework.util.Assert;
 
 /**
  * @author Lucas Ward

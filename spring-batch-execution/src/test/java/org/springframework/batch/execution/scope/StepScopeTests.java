@@ -41,7 +41,8 @@ public class StepScopeTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		context = StepSynchronizationManager.open();
+		context = new SimpleStepContext(null);
+		StepSynchronizationManager.register(context);
 	}
 	
 	/* (non-Javadoc)
@@ -104,7 +105,8 @@ public class StepScopeTests extends TestCase {
 	 * {@link org.springframework.batch.execution.scope.StepScope#get(java.lang.String, org.springframework.beans.factory.ObjectFactory)}.
 	 */
 	public void testGetWithSomethingAlreadyInParentContext() {
-		SimpleStepContext context = StepSynchronizationManager.open();
+		StepContext context = new SimpleStepContext(null);
+		StepSynchronizationManager.register(context);
 		context.setAttribute("foo", "bar");
 		Object value = scope.get("foo", new ObjectFactory() {
 			public Object getObject() throws BeansException {

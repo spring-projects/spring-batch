@@ -159,41 +159,6 @@ public class ItemOrientedTaskletTests extends TestCase {
 		assertEquals(2, list.size());
 	}
 
-	public void testStatisticsProvider() throws Exception {
-		module.setItemReader(new SkippableItemReader());
-		Properties stats = module.getStatistics();
-		assertEquals(1, stats.size());
-		assertEquals("bar", stats.getProperty("foo"));
-	}
-
-	public void testStatisticsProcessor() throws Exception {
-		module.setItemProcessor(new SkippableItemProcessor());
-		Properties stats = module.getStatistics();
-		assertEquals(1, stats.size());
-		assertEquals("bar", stats.getProperty("foo"));
-	}
-
-	public void testStatisticsProviderProcessor() throws Exception {
-		module.setItemReader(new SkippableItemReader());
-		module.setItemProcessor(new SkippableItemProcessor());
-		Properties stats = module.getStatistics();
-		assertEquals(2, stats.size());
-		assertEquals("bar", stats.getProperty("provider.foo"));
-		assertEquals("bar", stats.getProperty("processor.foo"));
-	}
-
-	public void testStatisticsProviderProcessorMergeDuplicates()
-			throws Exception {
-		module.setItemReader(new SkippableItemReader());
-		module.setItemProcessor(new SkippableItemProcessor(
-				"foo=bar\nspam=bucket"));
-		Properties stats = module.getStatistics();
-		assertEquals(3, stats.size());
-		assertEquals("bar", stats.getProperty("provider.foo"));
-		assertEquals("bar", stats.getProperty("processor.foo"));
-		assertEquals("bucket", stats.getProperty("spam"));
-	}
-
 	public void testRecoverable() throws Exception {
 
 		// set up and call execute

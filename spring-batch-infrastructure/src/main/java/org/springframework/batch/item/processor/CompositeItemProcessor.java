@@ -11,14 +11,13 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
-import org.springframework.batch.statistics.StatisticsProvider;
 
 /**
  * Runs a collection of ItemProcessors in fixed-order sequence.
  * 
  * @author Robert Kasanicky
  */
-public class CompositeItemProcessor implements ItemProcessor, Restartable, StatisticsProvider {
+public class CompositeItemProcessor implements ItemProcessor, Restartable {
 
 	private static final String SEPARATOR = "#";
 
@@ -70,23 +69,6 @@ public class CompositeItemProcessor implements ItemProcessor, Restartable, Stati
 			}
 		}
 
-	}
-
-	/**
-	 * @return Properties containing statistics of all injected ItemProcessors,
-	 * property keys are prefixed with the list index of the ItemProcessor.
-	 */
-	public Properties getStatistics() {
-		return createCompoundProperties(new PropertiesExtractor() {
-			public Properties extractProperties(Object o) {
-				if (o instanceof StatisticsProvider) {
-					return ((StatisticsProvider) o).getStatistics();
-				}
-				else {
-					return null;
-				}
-			}
-		});
 	}
 
 	public void setItemProcessors(List itemProcessors) {

@@ -20,7 +20,7 @@ import java.util.Properties;
 
 /**
  * Provides statistics for a given module run.  Any class that implements
- * this interface is garunteeing that it will provide Statistics.
+ * this interface is guaranteeing that it will provide Statistics.
  * 
  * @author Lucas Ward
  *

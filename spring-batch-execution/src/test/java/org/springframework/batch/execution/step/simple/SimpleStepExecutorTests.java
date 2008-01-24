@@ -18,7 +18,10 @@ package org.springframework.batch.execution.step.simple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -50,8 +53,11 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
+import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.batch.statistics.StatisticsService;
+import org.springframework.batch.support.PropertiesConverter;
 
-public class DefaultStepExecutorTests extends TestCase {
+public class SimpleStepExecutorTests extends TestCase {
 
 	ArrayList processed = new ArrayList();
 
@@ -409,6 +415,43 @@ public class DefaultStepExecutorTests extends TestCase {
 		});
 		stepExecutor.applyConfiguration(stepConfiguration);
 		assertEquals(1, list.size());
+	}
+
+	public void testStatisticsService() throws Exception {
+		StepInstance step = new StepInstance(new Long(1));
+		step.setStepExecutionCount(1);
+		stepConfiguration.setTasklet(new Tasklet() {
+			public ExitStatus execute() throws Exception {
+				return ExitStatus.FINISHED;
+			}
+		});
+		stepConfiguration.setSaveRestartData(true);
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		
+		assertEquals(null, stepExecution.getStatistics().getProperty("foo"));
+
+		final Map map = new HashMap();
+		stepExecutor.setStatisticsService(new StatisticsService() {
+			public Properties getStatistics(Object key) {
+				return PropertiesConverter.stringToProperties("foo=bar");
+			}
+			public void register(Object key, StatisticsProvider provider) {
+				map.put(key, provider);
+			}
+		});
+
+		try {
+			stepExecutor.process(stepConfiguration, stepExecution);
+		}
+		catch (Throwable t) {
+			fail();
+		}
+		
+		// At least once in that process the statistics service was asked for statistics...
+		assertEquals("bar", stepExecution.getStatistics().getProperty("foo"));
+		// ...but nothing was registered because nothing with step scoped.
+		assertEquals(0, map.size());
 	}
 
 	private class MockRestartableTasklet implements Tasklet, Restartable {

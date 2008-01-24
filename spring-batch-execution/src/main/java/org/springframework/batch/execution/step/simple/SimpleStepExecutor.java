@@ -30,6 +30,7 @@ import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.scope.SimpleStepContext;
+import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.RepeatOperationsHolder;
@@ -47,7 +48,9 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
+import org.springframework.batch.statistics.SimpleStatisticsService;
 import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.batch.statistics.StatisticsService;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -91,6 +94,26 @@ public class SimpleStepExecutor implements StepExecutor {
 	// Not for production use...
 	protected PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
+	private StatisticsService statisticsService = new SimpleStatisticsService();
+
+	/**
+	 * Public setter for the {@link StatisticsService}. This will be used to
+	 * create the {@link StepContext}, and hence any component that is a
+	 * {@link StatisticsProvider} and in step scope will be registered with the
+	 * service. The {@link StepContext} is then a source of aggregate statistics
+	 * for the step.
+	 * 
+	 * @param statisticsService the {@link StatisticsService} to set. Default is
+	 * a {@link SimpleStatisticsService}.
+	 */
+	public void setStatisticsService(StatisticsService statisticsService) {
+		this.statisticsService = statisticsService;
+	}
+
+	/**
+	 * Injected strategy for transaction management
+	 * @param transactionManager
+	 */
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
@@ -142,8 +165,8 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * execution
 	 * @see StepExecutor#process(Step, StepExecution)
 	 */
-	public ExitStatus process(final Step step, final StepExecution stepExecution)
-			throws BatchCriticalException, StepInterruptedException {
+	public ExitStatus process(final Step step, final StepExecution stepExecution) throws BatchCriticalException,
+			StepInterruptedException {
 
 		final StepInstance stepInstance = stepExecution.getStep();
 		boolean isRestart = stepInstance.getStepExecutionCount() > 0 ? true : false;
@@ -153,8 +176,10 @@ public class SimpleStepExecutor implements StepExecutor {
 
 		ExitStatus status = ExitStatus.FAILED;
 
-		final SimpleStepContext stepScopeContext = StepSynchronizationManager.open();
-		stepScopeContext.setStepExecution(stepExecution);
+		StepContext parentStepScopeContext = StepSynchronizationManager.getContext();
+		final StepContext stepScopeContext = new SimpleStepContext(stepExecution, parentStepScopeContext,
+				statisticsService);
+		StepSynchronizationManager.register(stepScopeContext);
 		// Add the job identifier so that it can be used to identify
 		// the conversation in StepScope
 		stepScopeContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
@@ -198,8 +223,8 @@ public class SimpleStepExecutor implements StepExecutor {
 
 										// TODO: Statistics are not thread safe
 										// - we cannot guarantee that they are
-										// up to date.  (Maybe we never can?)
-										Properties statistics = getStatistics(module);
+										// up to date. (Maybe we never can?)
+										Properties statistics = stepScopeContext.getStatistics();
 										contribution.setStatistics(statistics);
 										contribution.incrementCommitCount();
 										// Apply the contribution to the step
@@ -301,8 +326,8 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * outside this method, so subclasses that override do not need to create a
 	 * transaction.
 	 * 
-	 * @param step the current step containing the {@link Tasklet}
-	 * with the business logic.
+	 * @param step the current step containing the {@link Tasklet} with the
+	 * business logic.
 	 * @return true if there is more data to process.
 	 */
 	protected final ExitStatus processChunk(final Step step, final StepContribution contribution) {
@@ -378,15 +403,6 @@ public class SimpleStepExecutor implements StepExecutor {
 		}
 	}
 
-	private Properties getStatistics(Tasklet tasklet) {
-		if (tasklet instanceof StatisticsProvider) {
-			return ((StatisticsProvider) tasklet).getStatistics();
-		}
-		else {
-			return null;
-		}
-	}
-
 	/**
 	 * Setter for the {@link StepInterruptionPolicy}. The policy is used to
 	 * check whether an external request has been made to interrupt the job
@@ -414,9 +430,9 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * <ul>
 	 * <li> If the configuration is a {@link RepeatOperationsHolder} then we use
 	 * the provided {@link RepeatOperations} instances for chunk and step. </li>
-	 * <li> If the configuration is a {@link SimpleStep} then we
-	 * apply the commit interval at the chunk level and the exception handler at
-	 * the step level, provided the existing repeat operations are instances of
+	 * <li> If the configuration is a {@link SimpleStep} then we apply the
+	 * commit interval at the chunk level and the exception handler at the step
+	 * level, provided the existing repeat operations are instances of
 	 * {@link RepeatTemplate}. In addition if there is a non-zero skip limit
 	 * and no {@link ExceptionHandler} then we inject a
 	 * {@link SimpleLimitExceptionHandler} with that limit.</li>
@@ -431,9 +447,7 @@ public class SimpleStepExecutor implements StepExecutor {
 			RepeatOperationsHolder holder = (RepeatOperationsHolder) step;
 			RepeatOperations chunkOperations = holder.getChunkOperations();
 			RepeatOperations stepOperations = holder.getStepOperations();
-			Assert
-					.state(chunkOperations != null,
-							"Chunk operations obtained from step must be non-null.");
+			Assert.state(chunkOperations != null, "Chunk operations obtained from step must be non-null.");
 
 			if (chunkOperations != null) {
 				setChunkOperations(chunkOperations);

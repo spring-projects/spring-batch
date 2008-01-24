@@ -63,13 +63,12 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 		resourceFactory.setRootDirectory(rootDir);
 		
-		SimpleStepContext context = new SimpleStepContext();
 		jobInstance = new JobInstance(new Long(0), new JobParameters());
 		jobInstance.setJob(new Job("testJob"));
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepInstance step = new StepInstance(jobInstance, "bar");
 		StepExecution stepExecution = new StepExecution(step, jobExecution, null);
-		context.setStepExecution(stepExecution);
+		SimpleStepContext context = new SimpleStepContext(stepExecution);
 		resourceFactory.setStepContext(context);
 
 		resourceFactory.afterPropertiesSet();

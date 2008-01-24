@@ -36,10 +36,17 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 	private Object mutex = new Object();
 
+	/**
+	 * @param order the order value to set priority of callback execution for
+	 * the {@link BeanFactoryPostProcessor} part of this scope bean.
+	 */
 	public void setOrder(int order) {
 		this.order = order;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.core.Ordered#getOrder()
+	 */
 	public int getOrder() {
 		return order;
 	}
@@ -48,16 +55,17 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 * Context key for clients to use for conversation identifier.
 	 */
 	public static final String ID_KEY = "JOB_IDENTIFIER";
+
 	private String name = "step";
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.springframework.beans.factory.config.Scope#get(java.lang.String,
-	 *      org.springframework.beans.factory.ObjectFactory)
+	 * org.springframework.beans.factory.ObjectFactory)
 	 */
 	public Object get(String name, ObjectFactory objectFactory) {
-		SimpleStepContext context = getContext();
+		StepContext context = getContext();
 		Object scopedObject = context.getAttribute(name);
 		if (scopedObject == null) {
 			synchronized (mutex) {
@@ -80,7 +88,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 * @see org.springframework.beans.factory.config.Scope#getConversationId()
 	 */
 	public String getConversationId() {
-		SimpleStepContext context = getContext();
+		StepContext context = getContext();
 		Object id = context.getAttribute(ID_KEY);
 		return "" + id;
 	}
@@ -89,7 +97,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.springframework.beans.factory.config.Scope#registerDestructionCallback(java.lang.String,
-	 *      java.lang.Runnable)
+	 * java.lang.Runnable)
 	 */
 	public void registerDestructionCallback(String name, Runnable callback) {
 		StepContext context = getContext();
@@ -102,7 +110,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 * @see org.springframework.beans.factory.config.Scope#remove(java.lang.String)
 	 */
 	public Object remove(String name) {
-		SimpleStepContext context = getContext();
+		StepContext context = getContext();
 		return context.removeAttribute(name);
 	}
 
@@ -111,13 +119,12 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 * can be used to store scoped bean instances.
 	 * 
 	 * @return the current step context which we can use as a scope storage
-	 *         medium
+	 * medium
 	 */
-	private SimpleStepContext getContext() {
-		SimpleStepContext context = StepSynchronizationManager.getContext();
+	private StepContext getContext() {
+		StepContext context = StepSynchronizationManager.getContext();
 		if (context == null) {
-			throw new IllegalStateException(
-					"No context holder available for step scope");
+			throw new IllegalStateException("No context holder available for step scope");
 		}
 		return context;
 	}
@@ -125,13 +132,10 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	/**
 	 * Register this scope with the enclosing BeanFactory.
 	 * 
-	 * @param beanFactory
-	 *            the BeanFactory to register with
-	 * @throws BeansException
-	 *             if there is a problem.
+	 * @param beanFactory the BeanFactory to register with
+	 * @throws BeansException if there is a problem.
 	 */
-	public void postProcessBeanFactory(
-			ConfigurableListableBeanFactory beanFactory) throws BeansException {
+	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		beanFactory.registerScope(name, this);
 	}
 
@@ -139,8 +143,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 * Public setter for the name property. This can then be used as a bean
 	 * definition attribute, e.g. scope="step". Defaults to "step".
 	 * 
-	 * @param name
-	 *            the name to set for this scope.
+	 * @param name the name to set for this scope.
 	 */
 	public void setName(String name) {
 		this.name = name;

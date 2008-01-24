@@ -16,47 +16,57 @@
 package org.springframework.batch.execution.scope;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.batch.statistics.StatisticsService;
+import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class SimpleStepContextTests extends TestCase {
 
-	private SimpleStepContext context = new SimpleStepContext(new SimpleStepContext());
-	
+	private SimpleStepContext context = new SimpleStepContext(null, new SimpleStepContext(null));
+
 	/**
-	 * Test method for {@link org.springframework.batch.execution.scope.SimpleStepContext#StepScopeContext()}.
+	 * Test method for
+	 * {@link org.springframework.batch.execution.scope.SimpleStepContext#StepScopeContext()}.
 	 */
 	public void testStepScopeContext() {
-		assertNull(new SimpleStepContext().getParent());
+		assertNull(new SimpleStepContext(null).getParent());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.scope.SimpleStepContext#getParent()}.
+	 * Test method for
+	 * {@link org.springframework.batch.execution.scope.SimpleStepContext#getParent()}.
 	 */
 	public void testGetParent() {
 		assertNotNull(context.getParent());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.scope.SimpleStepContext#getStepExecution()}.
+	 * Test method for
+	 * {@link org.springframework.batch.execution.scope.SimpleStepContext#getStepExecution()}.
 	 */
-	public void testGetJobIdentifier() {
+	public void testGetStepExecution() {
 		assertNull(context.getStepExecution());
-		context.setStepExecution(new StepExecution(null, null, null));
+		context = new SimpleStepContext(new StepExecution(null, null, null));
 		assertNotNull(context.getStepExecution());
 	}
 
 	private List list = new ArrayList();
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.context.SimpleStepContext#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.context.SimpleStepContext#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
 	 */
 	public void testDestructionCallbackSunnyDay() throws Exception {
 		SimpleStepContext context = new SimpleStepContext(null);
@@ -72,7 +82,8 @@ public class SimpleStepContextTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.context.SimpleStepContext#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.context.SimpleStepContext#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
 	 */
 	public void testDestructionCallbackMissingAttribute() throws Exception {
 		SimpleStepContext context = new SimpleStepContext(null);
@@ -82,12 +93,14 @@ public class SimpleStepContextTests extends TestCase {
 			}
 		});
 		context.close();
-		// Yes the callback should be called even if the attribute is missing - for inner beans
+		// Yes the callback should be called even if the attribute is missing -
+		// for inner beans
 		assertEquals(1, list.size());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.context.SimpleStepContext#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.context.SimpleStepContext#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.
 	 */
 	public void testDestructionCallbackWithException() throws Exception {
 		SimpleStepContext context = new SimpleStepContext(null);
@@ -108,7 +121,8 @@ public class SimpleStepContextTests extends TestCase {
 		try {
 			context.close();
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			// We don't care which one was thrown...
 			assertEquals("fail!", e.getMessage());
 		}
@@ -116,6 +130,57 @@ public class SimpleStepContextTests extends TestCase {
 		assertEquals(2, list.size());
 		assertTrue(list.contains("bar"));
 		assertTrue(list.contains("spam"));
+	}
+	
+	public void testStatisticsWithNullService() throws Exception {
+		assertEquals(0, context.getStatistics().size());
+	}
+
+	public void testStatisticsWithNotNullService() throws Exception {
+		Map map = new HashMap();
+		context = new SimpleStepContext(null, null, new StubStatisticsService(map));
+		assertEquals(1, context.getStatistics().size());
+		assertEquals("bar", context.getStatistics().getProperty("foo"));
+	}
+
+	public void testStatisticsServiceRegistration() throws Exception {
+		Map map = new HashMap();
+		context = new SimpleStepContext(null, null, new StubStatisticsService(map));
+		StubStatisticsProvider provider = new StubStatisticsProvider();
+		context.setAttribute("foo", provider);
+		assertEquals(1, map.size());
+		assertEquals(context, map.keySet().iterator().next());
+		assertEquals(provider, map.values().iterator().next());
+	}
+
+	/**
+	 * @author Dave Syer
+	 *
+	 */
+	private class StubStatisticsService implements StatisticsService {
+		private final Map map;
+
+		private StubStatisticsService(Map map) {
+			this.map = map;
+		}
+
+		public Properties getStatistics(Object key) {
+			return PropertiesConverter.stringToProperties("foo=bar");
+		}
+
+		public void register(Object key, StatisticsProvider provider) {
+			map.put(key, provider);
+		}
+	}
+
+	/**
+	 * @author Dave Syer
+	 * 
+	 */
+	private class StubStatisticsProvider implements StatisticsProvider {
+		public Properties getStatistics() {
+			return null;
+		}
 	}
 
 }

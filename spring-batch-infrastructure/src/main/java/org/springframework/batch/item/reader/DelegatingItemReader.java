@@ -16,13 +16,10 @@
 
 package org.springframework.batch.item.reader;
 
-import java.util.Properties;
-
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
-import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -33,7 +30,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  */
-public class DelegatingItemReader extends AbstractItemReader implements Restartable, StatisticsProvider, Skippable, InitializingBean{
+public class DelegatingItemReader extends AbstractItemReader implements Restartable, Skippable, InitializingBean{
 
 	private ItemReader inputSource;
 
@@ -71,19 +68,6 @@ public class DelegatingItemReader extends AbstractItemReader implements Restarta
 			throw new IllegalStateException("Input Template is not Restartable");
 		}
 		((Restartable) inputSource).restoreFrom(data);
-	}
-
-	/**
-	 * @return delegates to the parent template of it is a
-	 * {@link StatisticsProvider}, otherwise returns an empty
-	 * {@link Properties} instance.
-	 * @see StatisticsProvider#getStatistics()
-	 */
-	public Properties getStatistics() {
-		if (!(inputSource instanceof StatisticsProvider)) {
-			return new Properties();
-		}
-		return ((StatisticsProvider) inputSource).getStatistics();
 	}
 
 	/**

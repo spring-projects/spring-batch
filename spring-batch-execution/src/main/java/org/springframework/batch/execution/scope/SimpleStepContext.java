@@ -21,10 +21,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
+import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.batch.statistics.StatisticsService;
 
 /**
  * Simple implementation of {@link StepContext}.
@@ -33,25 +36,55 @@ import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
  * 
  */
 public class SimpleStepContext extends SynchronizedAttributeAccessor implements
-		StepContext {
+		StepContext, StatisticsProvider {
 
 	private Map callbacks = new HashMap();
 	private StepContext parent;
 	private StepExecution stepExecution;
+	private StatisticsService statisticsService;
 
 	/**
 	 * Default constructor.
 	 */
-	public SimpleStepContext() {
-		this(null);
+	public SimpleStepContext(StepExecution stepExecution) {
+		this(stepExecution, null, null);
+	}
+
+	/**
+	 * Default constructor.
+	 */
+	public SimpleStepContext(StepExecution stepExecution, StepContext parent) {
+		this(stepExecution, parent, null);
 	}
 
 	/**
 	 * @param object
 	 */
-	public SimpleStepContext(StepContext parent) {
+	public SimpleStepContext(StepExecution stepExecution, StepContext parent, StatisticsService statisticsService) {
 		super();
 		this.parent = parent;
+		this.statisticsService = statisticsService;
+		this.stepExecution = stepExecution;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.repeat.context.SynchronizedAttributeAccessor#setAttribute(java.lang.String, java.lang.Object)
+	 */
+	public void setAttribute(String name, Object value) {
+		super.setAttribute(name, value);
+		if (statisticsService!=null && (value instanceof StatisticsProvider)) {
+			statisticsService.register(this, (StatisticsProvider) value);
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.statistics.StatisticsProvider#getStatistics()
+	 */
+	public Properties getStatistics() {
+		if (statisticsService==null) {
+			return new Properties();
+		}
+		return statisticsService.getStatistics(this);
 	}
 
 	/*
@@ -86,10 +119,10 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements
 		}
 	}
 
-	/*
-	 * Package access because only needed internally.
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.execution.scope.StepContext#close()
 	 */
-	void close() {
+	public void close() {
 
 		List errors = new ArrayList();
 
@@ -131,13 +164,6 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements
 		}
 
 		throw (RuntimeException) errors.get(0);
-	}
-
-	/**
-	 * @param stepExecution
-	 */
-	public void setStepExecution(StepExecution stepExecution) {
-		this.stepExecution = stepExecution;
 	}
 
 	/*

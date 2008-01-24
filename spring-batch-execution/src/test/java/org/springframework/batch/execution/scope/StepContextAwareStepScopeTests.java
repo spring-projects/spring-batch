@@ -40,7 +40,7 @@ public class StepContextAwareStepScopeTests extends TestCase {
 	}
 	
 	public void testScopedBean() throws Exception {
-		StepSynchronizationManager.open();
+		StepSynchronizationManager.register(new SimpleStepContext(null));
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("scope-tests.xml", getClass());
 		TestBean bean = (TestBean) applicationContext.getBean("bean");
 		assertNotNull(bean);
@@ -49,7 +49,7 @@ public class StepContextAwareStepScopeTests extends TestCase {
 	
 	public void testScopedBeanWithDestroyCallback() throws Exception {
 		assertEquals(0, list.size());
-		StepSynchronizationManager.open();
+		StepSynchronizationManager.register(new SimpleStepContext(null));
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("scope-tests.xml", getClass());
 		TestBean bean = (TestBean) applicationContext.getBean("bean");
 		assertNotNull(bean);
@@ -58,7 +58,8 @@ public class StepContextAwareStepScopeTests extends TestCase {
 	}
 
 	public void testScopedBeanWithAware() throws Exception {
-		StepContext context = StepSynchronizationManager.open();
+		StepContext context = new SimpleStepContext(null);
+		StepSynchronizationManager.register(context);
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("scope-tests.xml", getClass());
 		TestBeanAware bean = (TestBeanAware) applicationContext.getBean("aware");
 		assertNotNull(bean);
@@ -67,7 +68,7 @@ public class StepContextAwareStepScopeTests extends TestCase {
 	}
 
 	public void testScopedBeanWithInner() throws Exception {
-		StepSynchronizationManager.open();
+		StepSynchronizationManager.register(new SimpleStepContext(null));
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(
 				"scope-tests.xml", getClass());
 		TestBean bean = ((TestBean) applicationContext.getBean("inner")).child;
@@ -78,7 +79,8 @@ public class StepContextAwareStepScopeTests extends TestCase {
 	}
 
 	public void testScopedBeanWithProxy() throws Exception {
-		StepContext context = StepSynchronizationManager.open();
+		StepContext context = new SimpleStepContext(null);
+		StepSynchronizationManager.register(context);
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("scope-tests.xml", getClass());
 		TestBeanAware bean = (TestBeanAware) applicationContext.getBean("proxy");
 		assertNotNull(bean);
@@ -89,7 +91,7 @@ public class StepContextAwareStepScopeTests extends TestCase {
 	}
 
 	public void testScopedBeanWithProxyInThread() throws Exception {
-		StepSynchronizationManager.open();
+		StepSynchronizationManager.register(new SimpleStepContext(null));
 		final ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("scope-tests.xml", getClass());
 		new Thread(new Runnable() {
 			public void run() {
@@ -109,7 +111,7 @@ public class StepContextAwareStepScopeTests extends TestCase {
 	}
 
 	public void testScopedBeanWithTwoProxiesInThreads() throws Exception {
-		StepSynchronizationManager.open();
+		StepSynchronizationManager.register(new SimpleStepContext(null));
 		final ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("scope-tests.xml", getClass());
 		new Thread(new Runnable() {
 			public void run() {
