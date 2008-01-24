@@ -46,17 +46,10 @@
 			<map>
 				<entry key="spring:service=batch,bean=jobLauncher">
 					<bean
-						class="org.springframework.aop.framework.ProxyFactoryBean">
-						<property name="target" ref="jobLauncher" />
-						<property name="interfaces">
-							<list>
-								<value>
-									org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
-								</value>
-							</list>
-						</property>
-						<property name="interceptorNames"
-							value="convertingMethodInterceptor" />
+						class="org.springframework.batch.execution.bootstrap.support.SimpleExportedJobLauncher">
+						<property name="launcher" ref="jobLauncher" />
+						<property name="jobLocator"
+							ref="jobConfigurationRegistry" />
 					</bean>
 				</entry>
 				<entry
@@ -88,8 +81,7 @@
 						<entry
 							key="spring:service=batch,bean=jobLauncher"
 							value="org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher" />
-						<entry
-							key="spring:service=batch,bean=jobLoader"
+						<entry key="spring:service=batch,bean=jobLoader"
 							value="org.springframework.batch.sample.JobLoader" />
 					</map>
 				</property>
@@ -105,8 +97,18 @@
 		<property name="convertException" value="true" />
 		<property name="customEditors">
 			<map>
-				<entry key="org.springframework.batch.core.domain.JobIdentifier">
-					<bean class="org.springframework.batch.execution.bootstrap.support.JobParametersPropertyEditor"/>
+				<entry
+					key="org.springframework.batch.core.domain.JobParameters">
+					<bean
+						class="org.springframework.batch.execution.bootstrap.support.JobParametersPropertyEditor" />
+				</entry>
+				<entry
+					key="org.springframework.batch.core.domain.Job">
+					<bean
+						class="org.springframework.batch.execution.bootstrap.support.JobPropertyEditor">
+						<property name="jobLocator"
+							ref="jobConfigurationRegistry" />
+					</bean>
 				</entry>
 			</map>
 		</property>

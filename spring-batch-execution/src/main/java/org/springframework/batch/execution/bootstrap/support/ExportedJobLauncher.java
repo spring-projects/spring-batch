@@ -39,24 +39,27 @@ public interface ExportedJobLauncher {
 	 * @param name the name of the job to launch
 	 * @return a representation of the {@link JobExecution} returned by a
 	 * {@link JobLauncher}.
-	 * 
-	 * @see #run()
 	 */
 	String run(String name);
 
 	/**
-	 * Stop all running jobs.
+	 * Launch a job with the given name and parameters.
 	 * 
-	 * @see JobLauncher#stop()
+	 * @param name the name of the job to launch
+	 * @return a representation of the {@link JobExecution} returned by a
+	 * {@link JobLauncher}.
+	 */
+	String run(String name, String params);
+
+	/**
+	 * Stop all running jobs.
 	 */
 	void stop();
 
 	/**
-	 * Enquire if any jobs are still running.
+	 * Enquire if any jobs launched here are still running.
 	 * 
 	 * @return true if any jobs are running.
-	 * 
-	 * @see JobLauncher#isRunning()
 	 */
 	boolean isRunning();
 
