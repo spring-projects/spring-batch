@@ -15,9 +15,12 @@
  */
 package org.springframework.batch.execution.bootstrap.support;
 
+import java.util.Properties;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
@@ -43,7 +46,9 @@ public class JobParametersPropertyEditorTests extends TestCase {
 	 */
 	public void testGetAsText() {
 		editor.setAsText("foo=bar,spam=bucket");
-		assertEquals("foo=bar,spam=bucket", editor.getAsText());
+		Properties properties = PropertiesConverter.stringToProperties(editor.getAsText());
+		assertEquals("bar", properties.getProperty("foo"));
+		assertEquals("bucket", properties.getProperty("spam"));
 	}
 
 }

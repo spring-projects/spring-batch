@@ -35,7 +35,7 @@ public class DefaultJobInstanceLabelGeneratorTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.execution.resource.DefaultJobInstanceLabelGenerator#getLabel()}.
 	 */
 	public void testDefaultGetLabel() throws Exception {
-		JobParameters jobParameters = new JobParametersBuilder().addDate("schedule.date", new Date(0)).addString("key", "bar").toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder().addDate("schedule.date", new Date(1)).addString("key", "bar").toJobParameters();
 		JobInstance job = new JobInstance(null, jobParameters, new Job(null));
 		assertEquals("null-bar-19700101", instance.getLabel(job));
 	}
@@ -44,7 +44,7 @@ public class DefaultJobInstanceLabelGeneratorTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.execution.resource.DefaultJobInstanceLabelGenerator#getLabel()}.
 	 */
 	public void testGetLabelWithAllProperties() throws Exception {
-		JobParameters jobParameters = new JobParametersBuilder().addDate("schedule.date", new Date(0)).addString("key", "bar").toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder().addDate("schedule.date", new Date(1)).addString("key", "bar").toJobParameters();
 		JobInstance job = new JobInstance(null, jobParameters, new Job("foo"));
 		assertEquals("foo-bar-19700101", instance.getLabel(job));
 	}

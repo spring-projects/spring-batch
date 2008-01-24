@@ -19,6 +19,7 @@ package org.springframework.batch.core.runtime;
 import java.util.Properties;
 
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobParametersBuilder;
 
 /**
  * A factory for {@link JobParameters} instances. A job can be
@@ -29,8 +30,9 @@ import org.springframework.batch.core.domain.JobParameters;
  * {@link JobParameters} and some do not (e.g. for an ad-hoc execution a simple
  * label might be enough).
  * 
- * 
  * @author Dave Syer
+ * 
+ * @see JobParametersBuilder
  * 
  */
 public interface JobParametersFactory {
