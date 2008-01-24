@@ -24,62 +24,60 @@ import junit.framework.TestCase;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class BatchStatusTests extends TestCase {
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.BatchStatus#toString()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.BatchStatus#toString()}.
 	 */
 	public void testToString() {
 		assertEquals("FAILED", BatchStatus.FAILED.toString());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.BatchStatus#getStatus(java.lang.String)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.BatchStatus#getStatus(java.lang.String)}.
 	 */
 	public void testGetStatus() {
 		assertEquals(BatchStatus.FAILED, BatchStatus.getStatus(BatchStatus.FAILED.toString()));
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.BatchStatus#getStatus(java.lang.String)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.BatchStatus#getStatus(java.lang.String)}.
 	 */
 	public void testGetStatusWrongCode() {
-		try{
+		try {
 			BatchStatus.getStatus("foo");
 			fail();
 		}
-		catch(IllegalArgumentException ex){
-			//expected
+		catch (IllegalArgumentException ex) {
+			// expected
 		}
 	}
-	
+
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.BatchStatus#getStatus(java.lang.String)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.BatchStatus#getStatus(java.lang.String)}.
 	 */
 	public void testGetStatusNullCode() {
-		try{
-			BatchStatus.getStatus(null);
-			fail();
-		}
-		catch(IllegalArgumentException ex){
-			//expected
-		}
+		assertNull(BatchStatus.getStatus(null));
 	}
 
-	public void testSerialization() throws Exception{
-		
+	public void testSerialization() throws Exception {
+
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
-	    ObjectOutputStream out = new ObjectOutputStream (bout);
+		ObjectOutputStream out = new ObjectOutputStream(bout);
 
-	    out.writeObject (BatchStatus.COMPLETED);
-	    out.flush ();
+		out.writeObject(BatchStatus.COMPLETED);
+		out.flush();
 
-	    ByteArrayInputStream bin = new ByteArrayInputStream (bout.toByteArray());
-	    ObjectInputStream in = new ObjectInputStream(bin);
+		ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
+		ObjectInputStream in = new ObjectInputStream(bin);
 
-	    BatchStatus status = (BatchStatus) in.readObject ();
-	    assertEquals(BatchStatus.COMPLETED, status);
+		BatchStatus status = (BatchStatus) in.readObject();
+		assertEquals(BatchStatus.COMPLETED, status);
 	}
 }
