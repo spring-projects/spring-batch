@@ -49,7 +49,7 @@ public class DefaultJobInstanceLabelGenerator implements JobInstanceLabelGenerat
 			return null;
 		}
 		StringBuilder builder = new StringBuilder(""+jobInstance.getJobName());
-		Map map = jobInstance.getJobInstanceProperties().getParameters();
+		Map map = jobInstance.getJobParameters().getParameters();
 		for (Iterator iterator = map.values().iterator(); iterator.hasNext();) {
 			Object value = iterator.next();
 			builder.append("-" + ((value instanceof Date) ? dateFormat.format(value) : ""+value));

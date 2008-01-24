@@ -57,7 +57,7 @@ public class MapJobDao implements JobDao {
 		List list = new ArrayList();
 		for (Iterator iter = jobsById.values().iterator(); iter.hasNext();) {
 			JobInstance jobInstance = (JobInstance) iter.next();
-			if (jobInstance.getJobName().equals(jobName) && jobInstance.getJobInstanceProperties().equals(jobParameters)) {
+			if (jobInstance.getJobName().equals(jobName) && jobInstance.getJobParameters().equals(jobParameters)) {
 				list.add(jobInstance);
 			}
 		}

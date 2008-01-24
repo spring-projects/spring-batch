@@ -107,7 +107,7 @@ public abstract class AbstractJobDaoTests extends
 		assertTrue(jobs.size() == 1);
 		JobInstance tempJob = (JobInstance) jobs.get(0);
 		assertTrue(jobInstance.equals(tempJob));
-		assertEquals(jobParameters, tempJob.getJobInstanceProperties());
+		assertEquals(jobParameters, tempJob.getJobParameters());
 	}
 
 	public void testFindJobWithNullRuntime() {
@@ -138,7 +138,7 @@ public abstract class AbstractJobDaoTests extends
 		jobs = jobDao.findJobInstances("ScheduledJob", jobParameters);
 		assertEquals(1, jobs.size());
 		JobInstance jobInstance = (JobInstance) jobs.get(0);
-		assertEquals(jobParameters, jobInstance.getJobInstanceProperties());
+		assertEquals(jobParameters, jobInstance.getJobParameters());
 
 		jobs = jobDao.findJobInstances("ScheduledJob", tempProps);
 		assertEquals(0, jobs.size());
@@ -263,7 +263,7 @@ public abstract class AbstractJobDaoTests extends
 			
 		assertEquals(1, jobs.size());
 		assertEquals(jobParameters.getString("job.key"), ((JobInstance) jobs.get(0))
-				.getJobInstanceProperties().getString("job.key"));
+				.getJobParameters().getString("job.key"));
 
 	}
 

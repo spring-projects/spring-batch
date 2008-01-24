@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -63,12 +64,12 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean{
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
 	
 	/**
-	 * Run the provided job with the given JobInstanceProperties.  The JobInstanceProperties will
+	 * Run the provided job with the given {@link JobParameters}.  The {@link JobParameters} will
 	 * be used to determine if this is an execution of an existing job instance, or if a new
 	 * one should be created.
 	 * 
-	 * @param Job, the job to be run.
-	 * @param JobInstanceProperties, the JobInstanceProperties for this particular execution.
+	 * @param job, the job to be run.
+	 * @param jobParameters, the {@link JobParameters} for this particular execution.
 	 * @return JobExecutionAlreadyRunningException if the JobInstance already exists and has
 	 * an execution already running.
 	 */
@@ -76,7 +77,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean{
 		throws JobExecutionAlreadyRunningException {
 		
 		Assert.notNull(job, "The Job must not be null.");
-		Assert.notNull(jobParameters, "The JobInstanceProperties must not be null.");
+		Assert.notNull(jobParameters, "The JobParameters must not be null.");
 
 		final JobExecution jobExecution = jobRepository.createJobExecution(job, jobParameters);
 		

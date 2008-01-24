@@ -122,7 +122,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job Name must not be null.");
-		Assert.notNull(jobParameters, "JobInstanceProperties must not be null.");
+		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
 		Long jobId = new Long(jobIncrementer.nextLongValue());
 		Object[] parameters = new Object[] { jobId, jobName, createJobKey(jobParameters) };
@@ -168,7 +168,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	public List findJobInstances(final String jobName, final JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job Name must not be null.");
-		Assert.notNull(jobParameters, "JobInstanceProperties must not be null.");
+		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
 		Object[] parameters = new Object[] { jobName,
 				createJobKey(jobParameters) };

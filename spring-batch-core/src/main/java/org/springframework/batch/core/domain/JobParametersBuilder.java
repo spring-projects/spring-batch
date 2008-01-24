@@ -4,7 +4,7 @@
 package org.springframework.batch.core.domain;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.util.Assert;
@@ -34,9 +34,9 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder() {
 
-		this.stringMap = new HashMap();
-		this.longMap = new HashMap();
-		this.dateMap = new HashMap();
+		this.stringMap = new LinkedHashMap();
+		this.longMap = new LinkedHashMap();
+		this.dateMap = new LinkedHashMap();
 	}
 
 	/**

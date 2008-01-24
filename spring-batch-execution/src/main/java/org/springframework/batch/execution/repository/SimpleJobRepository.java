@@ -136,7 +136,7 @@ public class SimpleJobRepository implements JobRepository {
 			throws JobExecutionAlreadyRunningException {
 
 		Assert.notNull(job, "Job must not be null.");
-		Assert.notNull(jobParameters, "JobInstanceProperties must not be null.");
+		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
 		List jobs = new ArrayList();
 		JobInstance jobInstance;

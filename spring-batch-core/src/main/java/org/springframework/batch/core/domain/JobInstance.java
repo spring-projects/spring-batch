@@ -46,7 +46,7 @@ public class JobInstance extends Entity {
 	
 	public JobInstance(Long id, JobParameters jobParameters) {
 		super(id);
-		Assert.notNull(jobParameters, "JobInstanceProperties must not be null.");
+		Assert.notNull(jobParameters, "JobParameters must not be null.");
 		this.jobParameters = jobParameters;
 	}
 
@@ -84,9 +84,9 @@ public class JobInstance extends Entity {
 	}
 
 	/**
-	 * @return JobInstanceProperties
+	 * @return {@link JobParameters}
 	 */
-	public JobParameters getJobInstanceProperties() {
+	public JobParameters getJobParameters() {
 		return jobParameters;
 	}
 
@@ -102,7 +102,7 @@ public class JobInstance extends Entity {
 	}
 	
 	public String toString() {
-		return super.toString()+", JobInstanceProperties=["+ jobParameters +"]" +
+		return super.toString()+", JobParameters=["+ jobParameters +"]" +
 			", Job=[" + job + "]";
 	}
 	
