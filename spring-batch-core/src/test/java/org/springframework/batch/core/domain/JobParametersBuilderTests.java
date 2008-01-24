@@ -4,6 +4,7 @@
 package org.springframework.batch.core.domain;
 
 import java.util.Date;
+import java.util.Iterator;
 
 import junit.framework.TestCase;
 
@@ -13,24 +14,37 @@ import junit.framework.TestCase;
  */
 public class JobParametersBuilderTests extends TestCase {
 
-	JobParametersBuilder parametersBuilder;
+	JobParametersBuilder parametersBuilder = new JobParametersBuilder();
 	
 	Date date = new Date(System.currentTimeMillis());
 	
-	protected void setUp() throws Exception {
-		super.setUp();
-		
-		parametersBuilder = new JobParametersBuilder();
+	public void testToJobRuntimeParamters(){	
 		parametersBuilder.addDate("SCHEDULE_DATE", date);
 		parametersBuilder.addLong("LONG", new Long(1));
 		parametersBuilder.addString("STRING", "string value");
-	}
-	
-	public void testToJobRuntimeParamters(){
-		
 		JobParameters parameters = parametersBuilder.toJobParameters();
-		assertEquals(parameters.getDate("SCHEDULE_DATE"), date);
-		assertEquals(parameters.getLong("LONG"), new Long(1));
-		assertEquals(parameters.getString("STRING"), "string value");
+		assertEquals(date, parameters.getDate("SCHEDULE_DATE"));
+		assertEquals(new Long(1), parameters.getLong("LONG"));
+		assertEquals("string value", parameters.getString("STRING"));
+	}
+
+	public void testOrderedTypes(){	
+		parametersBuilder.addDate("SCHEDULE_DATE", date);
+		parametersBuilder.addLong("LONG", new Long(1));
+		parametersBuilder.addString("STRING", "string value");
+		Iterator parameters = parametersBuilder.toJobParameters().getParameters().keySet().iterator();
+		assertEquals("STRING", parameters.next());
+		assertEquals("LONG", parameters.next());
+		assertEquals("SCHEDULE_DATE", parameters.next());
+	}
+
+	public void testOrderedStrings(){	
+		parametersBuilder.addString("foo", "value foo");
+		parametersBuilder.addString("bar", "value bar");
+		parametersBuilder.addString("spam", "value spam");
+		Iterator parameters = parametersBuilder.toJobParameters().getParameters().keySet().iterator();
+		assertEquals("foo", parameters.next());
+		assertEquals("bar", parameters.next());
+		assertEquals("spam", parameters.next());
 	}
 }

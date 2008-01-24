@@ -43,4 +43,12 @@ public interface JobParametersFactory {
 	 * @return a {@link JobParameters} properties converted to the correct types.
 	 */
 	public JobParameters getJobParameters(Properties properties);
+
+	/**
+	 * The inverse operation: get a {@link Properties} instance.
+	 * 
+	 * @param params
+	 * @return a representation of the parameters as properties
+	 */
+	public Properties getProperties(JobParameters params);
 }
