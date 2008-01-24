@@ -133,6 +133,13 @@ public class JobParameters {
 		return Collections.unmodifiableMap(dateMap);
 	}
 	
+	/**
+	 * @return true if the prameters is empty, false otherwise.
+	 */
+	public boolean isEmpty(){
+		return (dateMap.isEmpty() && longMap.isEmpty() && stringMap.isEmpty());
+	}
+	
 	/* 
 	 * Convenience method for validating that a the provided map only contains a particular
 	 * type as a value, with only a String as a key.
