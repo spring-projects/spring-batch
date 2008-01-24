@@ -12,18 +12,6 @@
 	<bean parent="stepScope"/>
 	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
 	
-	<!-- Override the default jobExecutorFacade to provide a listener that can interrupt the job -->
-	<bean id="jobExecutorFacade" class="org.springframework.batch.execution.launch.SimpleJobExecutorFacade">
-		<property name="jobRepository" ref="simpleJobRepository" />
-		<property name="jobLocator" ref="jobConfigurationRegistry"/>
-		<property name="jobExecutor" ref="jobExecutor" />
-		<property name="jobExecutionListeners">
-			<list>
-				<bean class="org.springframework.batch.execution.bootstrap.support.ThreadInterruptJobExecutionListener"/>
-			</list>
-		</property>
-	</bean>
-	
 	<bean id="jobLauncher" class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobExecutor" ref="jobExecutor" />
 		<property name="jobRepository" ref="simpleJobRepository" />

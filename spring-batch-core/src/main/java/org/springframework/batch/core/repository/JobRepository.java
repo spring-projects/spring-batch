@@ -18,7 +18,6 @@ package org.springframework.batch.core.repository;
 
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;

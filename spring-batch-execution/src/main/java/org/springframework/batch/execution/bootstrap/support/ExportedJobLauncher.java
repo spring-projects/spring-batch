@@ -19,7 +19,6 @@ package org.springframework.batch.execution.bootstrap.support;
 import java.util.Properties;
 
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.execution.launch.JobLauncher;
 
 /**

@@ -1,7 +1,6 @@
 package org.springframework.batch.sample.dao;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,7 +14,6 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.execution.runtime.ScheduledJobIdentifier;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -41,8 +39,6 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 	}
 
 	protected void onSetUpInTransaction() throws Exception {
-		new ScheduledJobIdentifier("Job1", "TestStream", 
-				new SimpleDateFormat("yyyyMMdd").parse("20070505"));
 		jobConfiguration = new Job("test-job");
 		jobConfiguration.setRestartable(true);
 	}

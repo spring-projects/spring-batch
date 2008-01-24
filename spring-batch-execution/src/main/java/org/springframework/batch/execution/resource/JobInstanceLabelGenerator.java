@@ -16,7 +16,7 @@
 
 package org.springframework.batch.execution.resource;
 
-import org.springframework.batch.core.domain.JobIdentifier;
+import org.springframework.batch.core.domain.JobInstance;
 
 /**
  * Strategy for generating a label (e.g. for a file name) from a
@@ -26,16 +26,16 @@ import org.springframework.batch.core.domain.JobIdentifier;
  * @author Dave Syer
  * 
  */
-public interface JobIdentifierLabelGenerator {
+public interface JobInstanceLabelGenerator {
 
 	/**
 	 * Create a label from the {@link JobIdentifier}.
 	 * 
-	 * @param jobIdentifier
-	 *            a {@link JobIdentifier}
-	 * @return a short string describing the identifier with no whitespace or
+	 * @param jobInstance
+	 *            a {@link JobInstance}
+	 * @return a short string describing the job instance with no whitespace or
 	 *         special characters.  Return null if the identifier is null.
 	 */
-	String getLabel(JobIdentifier jobIdentifier);
+	String getLabel(JobInstance jobInstance);
 
 }

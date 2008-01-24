@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
 import org.springframework.util.StringUtils;

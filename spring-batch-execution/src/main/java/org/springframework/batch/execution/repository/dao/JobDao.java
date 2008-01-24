@@ -19,7 +19,6 @@ package org.springframework.batch.execution.repository.dao;
 import java.util.List;
 
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 

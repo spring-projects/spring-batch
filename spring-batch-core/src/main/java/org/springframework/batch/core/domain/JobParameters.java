@@ -5,7 +5,6 @@ package org.springframework.batch.core.domain;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -101,7 +100,7 @@ public class JobParameters {
 	 * @return an unmodifiable map containing all parameters.
 	 */
 	public Map getParameters(){
-		Map tempMap = new HashMap(stringMap);
+		Map tempMap = new LinkedHashMap(stringMap);
 		tempMap.putAll(longMap);
 		tempMap.putAll(dateMap);
 		return Collections.unmodifiableMap(tempMap);
