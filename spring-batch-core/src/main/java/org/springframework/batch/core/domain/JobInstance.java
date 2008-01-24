@@ -19,8 +19,6 @@ package org.springframework.batch.core.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.util.Assert;
-
 
 /**
  * Batch domain object representing a job instance. A job instance is defined as
@@ -46,8 +44,7 @@ public class JobInstance extends Entity {
 	
 	public JobInstance(Long id, JobParameters jobParameters) {
 		super(id);
-		Assert.notNull(jobParameters, "JobParameters must not be null.");
-		this.jobParameters = jobParameters;
+		this.jobParameters = jobParameters==null ? new JobParameters() : jobParameters;
 	}
 
 	public JobInstance(Long id, JobParameters jobParameters, Job job){
@@ -94,7 +91,7 @@ public class JobInstance extends Entity {
 	 * @return the job name. (Equivalent to getJob().getName())
 	 */
 	public String getJobName() {
-		return getJob().getName();
+		return job==null ? null : job.getName();
 	}
 	
 	public JobExecution createJobExecution() {
