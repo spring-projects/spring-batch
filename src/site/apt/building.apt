@@ -42,11 +42,17 @@ mvn -o install -P fast
 
 * Eclipse IDE
 
-  Each of the reactor modules at the top level also builds on its own
-  if you use the (excellent) Eclipse-plugin for m2
-  (http://m2eclipse.codehaus.org/update/).  Get version 0.0.10 or
-  better, because it supports dependencies on Eclipse projects that
-  are themselves Maven parents of the current project.
+  Our policy is to commit Eclipse (and only Eclipse) meta data to
+  source control.  This will work out of the box for you if you use
+  the (excellent) Q4 Eclipse-plugin
+  (http://q4e.googlecode.com/svn/trunk/updatesite).  With this plugin,
+  each of the reactor modules at the top level builds independently
+  and feeds changes into other projects in your workspace.  It is not
+  recommended to use the Maven Eclipse plugin (<<<mvn
+  eclipse:eclipse>>>) because it cannot track dependencies across the
+  Eclipse workspace.  It will also create conflicting Eclipse
+  meta-data every time you run it, which will interfere with the meta
+  data under source control.
 
 * Dependencies
 
