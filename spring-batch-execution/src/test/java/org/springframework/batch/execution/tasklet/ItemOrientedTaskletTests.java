@@ -282,7 +282,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 		try {
 			module.afterPropertiesSet();
 		} catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().toLowerCase().indexOf("provider") >= 0);
+			assertTrue(e.getMessage().toLowerCase().indexOf("reader") >= 0);
 		}
 	}
 

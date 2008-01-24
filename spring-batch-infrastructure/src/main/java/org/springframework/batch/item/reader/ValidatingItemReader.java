@@ -30,7 +30,7 @@ public class ValidatingItemReader extends DelegatingItemReader {
 	private Validator validator;
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.provider.ItemReaderItemProvider#afterPropertiesSet()
+	 * @see org.springframework.batch.item.reader.DelegatingItemReader#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
@@ -38,7 +38,7 @@ public class ValidatingItemReader extends DelegatingItemReader {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.provider.ItemReaderItemProvider#next()
+	 * @see org.springframework.batch.item.reader.DelegatingItemReader#read()
 	 */
 	public Object read() throws Exception {
 		Object input = super.read();

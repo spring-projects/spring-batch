@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  * A concrete implementation of the {@link Tasklet} interface that provides
  * 'split processing'. This type of processing is characterized by separating
  * the reading and processing of batch data into two separate classes:
- * ItemProvider and ItemProcessor. The ItemProvider class provides a solid means
+ * {@link ItemReader} and {@link ItemProcessor}. The {@link ItemReader} class provides a solid means
  * for re-usability and enforces good architecture practices. Because an object
  * <em>must</em> be returned by the {@link ItemReader} to continue
  * processing, (returning null indicates processing should end) a developer is
@@ -108,7 +108,7 @@ public class ItemOrientedTasklet implements Tasklet, Skippable,
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(itemProvider, "ItemProvider must be provided");
+		Assert.notNull(itemProvider, "ItemReader must be provided");
 		Assert.notNull(itemProcessor, "ItemProcessor must be provided");
 
 		if (itemRecoverer == null && (itemProvider instanceof ItemRecoverer)) {

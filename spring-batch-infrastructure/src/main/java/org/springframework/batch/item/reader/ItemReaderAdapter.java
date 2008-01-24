@@ -33,14 +33,9 @@ public class ItemReaderAdapter extends AbstractMethodInvokingDelegator implement
 		return invokeDelegateMethod();
     }
 
-    //harmless implementation of method required by ItemProvider interface
+    //harmless implementation of method required by ItemReader interface
 	public Object getKey(Object item) {
 		return item;
-	}
-
-	//harmless implementation of method required by ItemProvider interface
-	public boolean recover(Object data, Throwable cause) {
-		return false;
 	}
 
 }
