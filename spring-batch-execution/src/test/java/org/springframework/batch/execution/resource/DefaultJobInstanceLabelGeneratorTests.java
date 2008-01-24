@@ -13,6 +13,11 @@ import org.springframework.batch.core.domain.JobParametersBuilder;
 
 public class DefaultJobInstanceLabelGeneratorTests extends TestCase {
 
+	/**
+	 * 
+	 */
+	private static final Date DATE = new Date(0);
+
 	DefaultJobInstanceLabelGenerator instance = new DefaultJobInstanceLabelGenerator();
 	
 	DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -35,18 +40,18 @@ public class DefaultJobInstanceLabelGeneratorTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.execution.resource.DefaultJobInstanceLabelGenerator#getLabel()}.
 	 */
 	public void testDefaultGetLabel() throws Exception {
-		JobParameters jobParameters = new JobParametersBuilder().addDate("schedule.date", new Date(1)).addString("key", "bar").toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder().addDate("schedule.date", DATE).addString("key", "bar").toJobParameters();
 		JobInstance job = new JobInstance(null, jobParameters, new Job(null));
-		assertEquals("null-bar-19700101", instance.getLabel(job));
+		assertEquals("null-bar-"+dateFormat.format(DATE), instance.getLabel(job));
 	}
 
 	/**
 	 * Test method for {@link org.springframework.batch.execution.resource.DefaultJobInstanceLabelGenerator#getLabel()}.
 	 */
 	public void testGetLabelWithAllProperties() throws Exception {
-		JobParameters jobParameters = new JobParametersBuilder().addDate("schedule.date", new Date(1)).addString("key", "bar").toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder().addDate("schedule.date", DATE).addString("key", "bar").toJobParameters();
 		JobInstance job = new JobInstance(null, jobParameters, new Job("foo"));
-		assertEquals("foo-bar-19700101", instance.getLabel(job));
+		assertEquals("foo-bar-"+dateFormat.format(DATE), instance.getLabel(job));
 	}
 
 }
