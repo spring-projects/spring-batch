@@ -8,7 +8,7 @@ import org.easymock.MockControl;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.dao.DataAccessException;
@@ -31,7 +31,7 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 	
 	MockJdbcTemplate jdbcTemplate = new MockJdbcTemplate();
 	
-	JobInstance job = new JobInstance(new Long(1), new JobInstanceProperties());
+	JobInstance job = new JobInstance(new Long(1), new JobParameters());
 	StepInstance step = new StepInstance(job, "foo", new Long(1));
 	StepExecution stepExecution = new StepExecution(step, new JobExecution(job), null);
 	
@@ -97,7 +97,7 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 	
 	public void testModifiedFindSteps(){
 		stepDao.setTablePrefix("FOO_");
-		stepDao.findSteps(new JobInstance(new Long(1), new JobInstanceProperties()));
+		stepDao.findSteps(new JobInstance(new Long(1), new JobParameters()));
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("FOO_STEP") != -1);
 	}
 	
@@ -128,7 +128,7 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 	}
 	
 	public void testDefaultFindSteps(){
-		stepDao.findSteps(new JobInstance(new Long(1), new JobInstanceProperties()));
+		stepDao.findSteps(new JobInstance(new Long(1), new JobParameters()));
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP") != -1);
 	}
 	

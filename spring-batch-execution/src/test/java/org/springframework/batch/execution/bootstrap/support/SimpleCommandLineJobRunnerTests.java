@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -158,7 +158,7 @@ public class SimpleCommandLineJobRunnerTests extends TestCase {
 	}
 
 	private void setReturnValue(ExitStatus status) {
-		JobExecution execution = new JobExecution(new JobInstance(new Long(1), new JobInstanceProperties(), new Job("foo")));
+		JobExecution execution = new JobExecution(new JobInstance(new Long(1), new JobParameters(), new Job("foo")));
 		
 		execution.setExitStatus(status);
 		jobLauncher.setReturnValue(execution);

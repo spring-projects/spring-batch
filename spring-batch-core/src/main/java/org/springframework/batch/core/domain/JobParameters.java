@@ -25,7 +25,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @author Lucas Ward
  * @since 1.0
  */
-public class JobInstanceProperties {
+public class JobParameters {
 
 	private final Map stringMap;
 	
@@ -38,7 +38,7 @@ public class JobInstanceProperties {
 	 * that this constructor should only be used if an empty parameters is needed, since
 	 * JobRuntimeParameters is immutable.
 	 */
-	public JobInstanceProperties(){
+	public JobParameters(){
 		this.stringMap = new LinkedHashMap();
 		this.longMap = new LinkedHashMap();
 		this.dateMap = new LinkedHashMap();
@@ -46,14 +46,14 @@ public class JobInstanceProperties {
 	
 	/**
 	 * Create a new parameters object based upon three maps for each of the three
-	 * data types.  See {@link JobInstancePropertiesBuilder} for an easier way to
+	 * data types.  See {@link JobParametersBuilder} for an easier way to
 	 * create paramters.
 	 * 
 	 * @param stringMap
 	 * @param longMap
 	 * @param dateMap
 	 */
-	public JobInstanceProperties(Map stringMap, Map longMap, Map dateMap){
+	public JobParameters(Map stringMap, Map longMap, Map dateMap){
 		super();
 		
 		validateMap(stringMap, String.class);
@@ -168,13 +168,9 @@ public class JobInstanceProperties {
 		return tempMap;
 	}
 	
-	public boolean isEmtpy(){
-		return dateMap.isEmpty() && longMap.isEmpty() && stringMap.isEmpty();
-	}
-	
 	public boolean equals(Object obj) {
 	
-		if(obj instanceof JobInstanceProperties == false){
+		if(obj instanceof JobParameters == false){
 			return false;
 		}
 		
@@ -182,7 +178,7 @@ public class JobInstanceProperties {
 			return true;
 		}
 		
-		JobInstanceProperties parameters = (JobInstanceProperties)obj;
+		JobParameters parameters = (JobParameters)obj;
 		
 		//Since the type contained by each map is known, it's safe to call Map.equals()
 		if(getParameters().equals(parameters.getParameters())){

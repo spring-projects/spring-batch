@@ -19,11 +19,10 @@ package org.springframework.batch.execution.bootstrap.support;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobLocator;
 import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
-import org.springframework.batch.core.runtime.JobIdentifierFactory;
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
@@ -225,7 +224,7 @@ public class SimpleCommandLineJobRunner {
 				jobName = defaultJobName;
 			}
 
-			status = launcher.run(jobLocator.getJob(jobName), new JobInstanceProperties()).getExitStatus();
+			status = launcher.run(jobLocator.getJob(jobName), new JobParameters()).getExitStatus();
 		}
 		catch (NoSuchJobException e) {
 			logger.fatal("Could not locate JobConfiguration \"" + jobName + "\"", e);

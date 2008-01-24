@@ -55,6 +55,19 @@ public class BatchStatusTests extends TestCase {
 		}
 	}
 	
+	/**
+	 * Test method for {@link org.springframework.batch.core.domain.BatchStatus#getStatus(java.lang.String)}.
+	 */
+	public void testGetStatusNullCode() {
+		try{
+			BatchStatus.getStatus(null);
+			fail();
+		}
+		catch(IllegalArgumentException ex){
+			//expected
+		}
+	}
+
 	public void testSerialization() throws Exception{
 		
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();

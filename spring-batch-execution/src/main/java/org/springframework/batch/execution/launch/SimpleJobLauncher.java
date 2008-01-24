@@ -19,7 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -72,28 +72,28 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean{
 	 * @return JobExecutionAlreadyRunningException if the JobInstance already exists and has
 	 * an execution already running.
 	 */
-	public JobExecution run(final Job job, final JobInstanceProperties jobInstanceProperties)
+	public JobExecution run(final Job job, final JobParameters jobParameters)
 		throws JobExecutionAlreadyRunningException {
 		
 		Assert.notNull(job, "The Job must not be null.");
-		Assert.notNull(jobInstanceProperties, "The JobInstanceProperties must not be null.");
+		Assert.notNull(jobParameters, "The JobInstanceProperties must not be null.");
 
-		final JobExecution jobExecution = jobRepository.createJobExecution(job, jobInstanceProperties);
+		final JobExecution jobExecution = jobRepository.createJobExecution(job, jobParameters);
 		
 		taskExecutor.execute(new Runnable(){
 
 			public void run() {
 				try{
-					logger.info("Job: [" + job + "] launched with the following parameters: [" + jobInstanceProperties + "]");
+					logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters + "]");
 					ExitStatus exitStatus = jobExecutor.run(job, jobExecution);
 					//shouldn't need to set the exit status like this, I'm leaving it to make the latest change easier
 					jobExecution.setExitStatus(exitStatus);
 					logger.info("Job: [" + job + "] completed successfully with the following parameters: [" 
-							+ jobInstanceProperties + "]");
+							+ jobParameters + "]");
 				}
 				catch(Throwable t){
 					logger.info("Job: [" + job + "] failed with the following parameters: [" 
-							+ jobInstanceProperties + "]", t);
+							+ jobParameters + "]", t);
 					rethrow(t);
 				}
 			}

@@ -3,7 +3,7 @@ package org.springframework.batch.sample.item.processor;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.scope.SimpleStepContext;
@@ -30,7 +30,7 @@ public class StagingItemProcessorTests extends
 				.open();
 		stepScopeContext.setStepExecution(new StepExecution(new StepInstance(
 				new Long(11)), new JobExecution(new JobInstance(new Long(12),
-				new JobInstanceProperties(), new Job("job")))));
+				new JobParameters(), new Job("job")))));
 		super.prepareTestInstance();
 	}
 

@@ -18,6 +18,8 @@ package org.springframework.batch.core.domain;
 
 import java.io.Serializable;
 
+import org.springframework.util.Assert;
+
 /**
  * Typesafe enumeration representing the status of an artifact within the
  * batch environment. See Effective Java Programming by Joshua Bloch for more
@@ -69,6 +71,7 @@ public class BatchStatus implements Serializable{
 	 * @throws IllegalArgumentException if no status matches provided string.
 	 */
 	public static BatchStatus getStatus(String statusAsString) {
+		Assert.notNull(statusAsString, "Cannot match null to valid status.");
 		final String upperCaseStatusAsString = statusAsString.toUpperCase();
 		for (int i = 0; i < VALUES.length; i++) {
 			if (VALUES[i].toString().equals(upperCaseStatusAsString)) {

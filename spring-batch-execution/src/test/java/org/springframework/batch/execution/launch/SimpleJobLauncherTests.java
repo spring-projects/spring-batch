@@ -21,7 +21,7 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.repeat.ExitStatus;
@@ -41,7 +41,7 @@ public class SimpleJobLauncherTests extends TestCase {
 	private MockControl repositoryControl = MockControl.createControl(JobRepository.class);
 	
 	private Job job = new Job("foo");
-	private JobInstanceProperties jobInstanceProperties = new JobInstanceProperties();
+	private JobParameters jobParameters = new JobParameters();
 	
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -62,7 +62,7 @@ public class SimpleJobLauncherTests extends TestCase {
 		
 		JobExecution jobExecution = new JobExecution(null);
 		
-		jobRepository.createJobExecution(job, jobInstanceProperties);
+		jobRepository.createJobExecution(job, jobParameters);
 		repositoryControl.setReturnValue(jobExecution);
 		jobExecutor.run(job, jobExecution);
 		executorControl.setDefaultReturnValue(ExitStatus.FINISHED);
@@ -70,7 +70,7 @@ public class SimpleJobLauncherTests extends TestCase {
 		repositoryControl.replay();
 		executorControl.replay();
 		
-		jobLauncher.run(job, jobInstanceProperties);
+		jobLauncher.run(job, jobParameters);
 		assertEquals(ExitStatus.FINISHED, jobExecution.getExitStatus());
 		
 		repositoryControl.verify();

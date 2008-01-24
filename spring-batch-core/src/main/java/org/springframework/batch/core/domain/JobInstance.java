@@ -35,7 +35,7 @@ public class JobInstance extends Entity {
 
 	private List stepInstances = new ArrayList();
 
-	private JobInstanceProperties jobInstanceProperties;
+	private JobParameters jobParameters;
 	
 	private Job job;
 
@@ -44,14 +44,14 @@ public class JobInstance extends Entity {
 
 	private int jobExecutionCount;
 	
-	public JobInstance(Long id, JobInstanceProperties jobInstanceProperties) {
+	public JobInstance(Long id, JobParameters jobParameters) {
 		super(id);
-		Assert.notNull(jobInstanceProperties, "JobInstanceProperties must not be null.");
-		this.jobInstanceProperties = jobInstanceProperties;
+		Assert.notNull(jobParameters, "JobInstanceProperties must not be null.");
+		this.jobParameters = jobParameters;
 	}
 
-	public JobInstance(Long id, JobInstanceProperties jobInstanceProperties, Job job){
-		this(id, jobInstanceProperties);
+	public JobInstance(Long id, JobParameters jobParameters, Job job){
+		this(id, jobParameters);
 		this.job = job;
 	}
 	
@@ -86,8 +86,8 @@ public class JobInstance extends Entity {
 	/**
 	 * @return JobInstanceProperties
 	 */
-	public JobInstanceProperties getJobInstanceProperties() {
-		return jobInstanceProperties;
+	public JobParameters getJobInstanceProperties() {
+		return jobParameters;
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class JobInstance extends Entity {
 	}
 	
 	public String toString() {
-		return super.toString()+", JobInstanceProperties=["+ jobInstanceProperties +"]" +
+		return super.toString()+", JobInstanceProperties=["+ jobParameters +"]" +
 			", Job=[" + job + "]";
 	}
 	

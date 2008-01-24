@@ -18,7 +18,7 @@ package org.springframework.batch.sample;
 
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 
 /**
  * Functional test for graceful shutdown.  A batch container is started in a new thread,
@@ -35,9 +35,9 @@ public class GracefulShutdownFunctionalTest extends AbstractBatchLauncherTests {
 
 	public void testLaunchJob() throws Exception {
 
-		final JobInstanceProperties jobInstanceProperties = new JobInstanceProperties();
+		final JobParameters jobParameters = new JobParameters();
 		
-		JobExecution jobExecution = launcher.run(getJob(), jobInstanceProperties);
+		JobExecution jobExecution = launcher.run(getJob(), jobParameters);
 		
 		Thread.sleep(200);
 

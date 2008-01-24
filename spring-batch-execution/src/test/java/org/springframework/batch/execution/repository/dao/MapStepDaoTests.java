@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
@@ -41,7 +41,7 @@ public class MapStepDaoTests extends TestCase {
 	
 	protected void setUp() throws Exception {
 		MapStepDao.clear();
-		job = new JobInstance(new Long(jobId++), new JobInstanceProperties());
+		job = new JobInstance(new Long(jobId++), new JobParameters());
 		step = dao.createStep(job, "foo");	
 	}
 	
@@ -75,12 +75,12 @@ public class MapStepDaoTests extends TestCase {
 	}
 	
 	public void testFindWithEmptyResults() throws Exception {
-		List result = dao.findSteps(new JobInstance(new Long(22), new JobInstanceProperties()));
+		List result = dao.findSteps(new JobInstance(new Long(22), new JobParameters()));
 		assertEquals(0, result.size());		
 	}
 	
 	public void testFindSingleWithEmptyResults() throws Exception {
-		StepInstance result = dao.findStep(new JobInstance(new Long(22), new JobInstanceProperties()), "bar");
+		StepInstance result = dao.findStep(new JobInstance(new Long(22), new JobParameters()), "bar");
 		assertEquals(null, result);		
 	}
 

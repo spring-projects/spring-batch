@@ -31,7 +31,7 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
@@ -120,25 +120,25 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	 * @throws IllegalArgumentException
 	 *             if any {@link JobIdentifier} fields are null.
 	 */
-	public JobInstance createJobInstance(String jobName, JobInstanceProperties jobInstanceProperties) {
+	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job Name must not be null.");
-		Assert.notNull(jobInstanceProperties, "JobInstanceProperties must not be null.");
+		Assert.notNull(jobParameters, "JobInstanceProperties must not be null.");
 
 		Long jobId = new Long(jobIncrementer.nextLongValue());
-		Object[] parameters = new Object[] { jobId, jobName, createJobKey(jobInstanceProperties) };
+		Object[] parameters = new Object[] { jobId, jobName, createJobKey(jobParameters) };
 		jdbcTemplate.update(getCreateJobQuery(), parameters, new int[] {
 			 Types.INTEGER, Types.VARCHAR, Types.VARCHAR});
 
-		insertJobParameters(jobId, jobInstanceProperties);
+		insertJobParameters(jobId, jobParameters);
 		
-		JobInstance jobInstance = new JobInstance(jobId, jobInstanceProperties);
+		JobInstance jobInstance = new JobInstance(jobId, jobParameters);
 		return jobInstance;
 	}
 	
-	private String createJobKey(JobInstanceProperties jobInstanceProperties){
+	private String createJobKey(JobParameters jobParameters){
 		
-		Map props = jobInstanceProperties.getParameters();
+		Map props = jobParameters.getParameters();
 		StringBuilder stringBuilder = new StringBuilder();
 		for(Iterator it = props.entrySet().iterator();it.hasNext();){
 			Entry entry = (Entry)it.next();
@@ -166,18 +166,18 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	 * @throws IllegalArgumentException
 	 *             if any {@link JobIdentifier} fields are null.
 	 */
-	public List findJobInstances(final String jobName, final JobInstanceProperties jobInstanceProperties) {
+	public List findJobInstances(final String jobName, final JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job Name must not be null.");
-		Assert.notNull(jobInstanceProperties, "JobInstanceProperties must not be null.");
+		Assert.notNull(jobParameters, "JobInstanceProperties must not be null.");
 
 		Object[] parameters = new Object[] { jobName,
-				createJobKey(jobInstanceProperties) };
+				createJobKey(jobParameters) };
 
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-				JobInstance job = new JobInstance(new Long(rs.getLong(1)), jobInstanceProperties);
+				JobInstance job = new JobInstance(new Long(rs.getLong(1)), jobParameters);
 				job.setStatus(BatchStatus.getStatus(rs.getString(2)));
 
 				return job;
@@ -242,7 +242,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	 * Convenience method that inserts all parameters from the provided JobParameters.
 	 * 
 	 */
-	private void insertJobParameters(Long jobId, JobInstanceProperties jobParameters){
+	private void insertJobParameters(Long jobId, JobParameters jobParameters){
 		
 		Map parameters = jobParameters.getStringParameters();
 		

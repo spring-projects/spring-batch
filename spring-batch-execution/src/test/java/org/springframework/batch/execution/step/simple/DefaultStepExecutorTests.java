@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
@@ -105,7 +105,7 @@ public class DefaultStepExecutorTests extends TestCase {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		stepExecutor.setChunkOperations(template);
 		
-		jobInstance = new JobInstance(new Long(0), new JobInstanceProperties());
+		jobInstance = new JobInstance(new Long(0), new JobParameters());
 		jobInstance.setJob(new Job("FOO"));
 	}
 

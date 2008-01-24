@@ -17,7 +17,7 @@
 package org.springframework.batch.sample;
 
 import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -81,6 +81,6 @@ public abstract class AbstractBatchLauncherTests extends
 	 * 
 	 */
 	public void testLaunchJob() throws Exception {
-		launcher.run(job, new JobInstanceProperties());
+		launcher.run(job, new JobParameters());
 	}
 }

@@ -72,12 +72,6 @@
 		class="org.springframework.batch.execution.repository.dao.MapStepDao" />
 	<!-- init-method="clear"/-->
 
-	<bean id="jobRuntimeInformationFactory"
-		class="org.springframework.batch.execution.runtime.ScheduledJobIdentifierFactory">
-		<property name="jobKey" value="TestStream" />
-		<property name="scheduleDate" value="20070505" />
-	</bean>
-
 	<bean
 		class="org.springframework.batch.execution.bootstrap.support.SimpleJvmExitCodeMapper" />
 

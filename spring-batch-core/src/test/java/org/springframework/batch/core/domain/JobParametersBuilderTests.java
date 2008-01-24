@@ -11,16 +11,16 @@ import junit.framework.TestCase;
  * @author Lucas Ward
  *
  */
-public class JobInstancePropertiesBuilderTests extends TestCase {
+public class JobParametersBuilderTests extends TestCase {
 
-	JobInstancePropertiesBuilder parametersBuilder;
+	JobParametersBuilder parametersBuilder;
 	
 	Date date = new Date(System.currentTimeMillis());
 	
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		parametersBuilder = new JobInstancePropertiesBuilder();
+		parametersBuilder = new JobParametersBuilder();
 		parametersBuilder.addDate("SCHEDULE_DATE", date);
 		parametersBuilder.addLong("LONG", new Long(1));
 		parametersBuilder.addString("STRING", "string value");
@@ -28,7 +28,7 @@ public class JobInstancePropertiesBuilderTests extends TestCase {
 	
 	public void testToJobRuntimeParamters(){
 		
-		JobInstanceProperties parameters = parametersBuilder.toJobParameters();
+		JobParameters parameters = parametersBuilder.toJobParameters();
 		assertEquals(parameters.getDate("SCHEDULE_DATE"), date);
 		assertEquals(parameters.getLong("LONG"), new Long(1));
 		assertEquals(parameters.getString("STRING"), "string value");

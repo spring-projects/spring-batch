@@ -15,9 +15,9 @@ import junit.framework.TestCase;
  * @author Lucas Ward
  *
  */
-public class JobInstancePropertiesTests extends TestCase {
+public class JobParametersTests extends TestCase {
 
-	JobInstanceProperties parameters;
+	JobParameters parameters;
 	
 	Map stringMap;
 	
@@ -33,7 +33,7 @@ public class JobInstancePropertiesTests extends TestCase {
 		parameters = getNewParameters();
 	}
 	
-	private JobInstanceProperties getNewParameters(){
+	private JobParameters getNewParameters(){
 		
 		stringMap = new HashMap();
 		stringMap.put("string.key1", "value1");
@@ -47,7 +47,7 @@ public class JobInstancePropertiesTests extends TestCase {
 		dateMap.put("date.key1", date1 );
 		dateMap.put("date.key2", date2 );
 		
-		return new JobInstanceProperties(stringMap, longMap, dateMap);
+		return new JobParameters(stringMap, longMap, dateMap);
 	}
 	
 	public void testBadLongConstructorException() throws Exception{
@@ -56,7 +56,7 @@ public class JobInstancePropertiesTests extends TestCase {
 		badLongMap.put("key", "bad long");
 		
 		try{
-			new JobInstanceProperties(stringMap, badLongMap, dateMap);
+			new JobParameters(stringMap, badLongMap, dateMap);
 			fail();
 		}
 		catch(IllegalArgumentException ex){
@@ -70,7 +70,7 @@ public class JobInstancePropertiesTests extends TestCase {
 		badMap.put("key", new Integer(2));
 		
 		try{
-			new JobInstanceProperties(badMap, longMap, dateMap);
+			new JobParameters(badMap, longMap, dateMap);
 			fail();
 		}
 		catch(IllegalArgumentException ex){
@@ -84,7 +84,7 @@ public class JobInstancePropertiesTests extends TestCase {
 		badMap.put("key", new java.sql.Date(System.currentTimeMillis()));
 		
 		try{
-			new JobInstanceProperties(stringMap, longMap, badMap);
+			new JobParameters(stringMap, longMap, badMap);
 			fail();
 		}
 		catch(IllegalArgumentException ex){
@@ -112,7 +112,7 @@ public class JobInstancePropertiesTests extends TestCase {
 	
 	public void testEquals(){
 		
-		JobInstanceProperties testParameters = getNewParameters();	
+		JobParameters testParameters = getNewParameters();	
 		assertTrue(testParameters.equals(parameters));
 	}
 	
@@ -140,7 +140,7 @@ public class JobInstancePropertiesTests extends TestCase {
 		dateMap.put("date.key2", date2 );
 		dateMap.put("date.key1", date1 );
 		
-		JobInstanceProperties testProps = new JobInstanceProperties(stringMap, longMap, dateMap);
+		JobParameters testProps = new JobParameters(stringMap, longMap, dateMap);
 		
 		props = testProps.getParameters();
 		stringBuilder = new StringBuilder();
@@ -151,15 +151,6 @@ public class JobInstancePropertiesTests extends TestCase {
 		String string2 = stringBuilder.toString();
 		
 		assertEquals(string1, string2);
-	}
-	
-	public void testIsEmpty(){
-		
-		JobInstanceProperties props = new JobInstanceProperties();
-		assertTrue(props.isEmtpy());
-		
-		props = new JobInstancePropertiesBuilder().addString("test", "test").toJobParameters();
-		assertFalse(props.isEmtpy());
 	}
 
 // Not sure how to properly test this since there is no order garuntee, commenting out for now.	

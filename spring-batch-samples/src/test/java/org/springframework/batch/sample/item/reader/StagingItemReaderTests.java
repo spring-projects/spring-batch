@@ -2,7 +2,7 @@ package org.springframework.batch.sample.item.reader;
 
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.scope.SimpleStepContext;
@@ -40,7 +40,7 @@ public class StagingItemReaderTests extends
 		jobId = new Long(11);
 		stepScopeContext.setStepExecution(new StepExecution(new StepInstance(
 				new Long(12)), new JobExecution(new JobInstance(jobId,
-				new JobInstanceProperties()))));
+				new JobParameters()))));
 		RepeatSynchronizationManager.register(new RepeatContextSupport(null));
 		super.prepareTestInstance();
 	}

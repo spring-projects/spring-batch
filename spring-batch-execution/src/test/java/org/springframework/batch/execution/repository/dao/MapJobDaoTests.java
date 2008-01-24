@@ -22,52 +22,52 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 
 public class MapJobDaoTests extends TestCase {
 
 	MapJobDao dao = new MapJobDao();
 	
-	JobInstanceProperties jobInstanceProperties = new JobInstanceProperties();
+	JobParameters jobParameters = new JobParameters();
 	
 	protected void setUp() throws Exception {
 		MapJobDao.clear();
 	}
 	
 	public void testCreateAndRetrieveSingle() throws Exception {
-		JobInstance job = dao.createJobInstance("foo", jobInstanceProperties);
-		List result = dao.findJobInstances("foo", jobInstanceProperties);
+		JobInstance job = dao.createJobInstance("foo", jobParameters);
+		List result = dao.findJobInstances("foo", jobParameters);
 		assertTrue(result.contains(job));
 	}
 	
 	public void testCreateAndRetrieveMultiple() throws Exception {
-		JobInstance job = dao.createJobInstance("foo", jobInstanceProperties);
-		job = dao.createJobInstance("bar", jobInstanceProperties);
-		List result = dao.findJobInstances("bar", jobInstanceProperties);
+		JobInstance job = dao.createJobInstance("foo", jobParameters);
+		job = dao.createJobInstance("bar", jobParameters);
+		List result = dao.findJobInstances("bar", jobParameters);
 		assertEquals(1, result.size());
 		assertTrue(result.contains(job));		
 	}
 	
 	public void testNoExecutionsForNewJob() throws Exception {
-		JobInstance job = dao.createJobInstance("foo", jobInstanceProperties);
+		JobInstance job = dao.createJobInstance("foo", jobParameters);
 		assertEquals(0, dao.getJobExecutionCount(job.getId()));
 	}
 
 	public void testSaveExecutionUpdatesId() throws Exception {
-		JobInstance job = dao.createJobInstance("foo", jobInstanceProperties);
+		JobInstance job = dao.createJobInstance("foo", jobParameters);
 		JobExecution execution = new JobExecution(job);
 		assertNull(execution.getId());
 		dao.save(execution);
 		assertNotNull(execution.getId());
 	}
 	public void testCorrectExecutionCountForExistingJob() throws Exception {
-		JobInstance job = dao.createJobInstance("foo", jobInstanceProperties);
+		JobInstance job = dao.createJobInstance("foo", jobParameters);
 		dao.save(new JobExecution(job));
 		assertEquals(1, dao.getJobExecutionCount(job.getId()));
 	}
 
 	public void testMultipleExecutionsPerExisting() throws Exception {
-		JobInstance job = dao.createJobInstance("foo", jobInstanceProperties);
+		JobInstance job = dao.createJobInstance("foo", jobParameters);
 		dao.save(new JobExecution(job));
 		Thread.sleep(50L); // Hack, hack, hackety, hack - job executions are not unique if created too close together!
 		dao.save(new JobExecution(job));

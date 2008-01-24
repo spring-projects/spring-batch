@@ -24,7 +24,7 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
@@ -59,7 +59,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 
 	protected JobExecution jobExecution;
 	
-	protected JobInstanceProperties jobInstanceProperties = new JobInstanceProperties();
+	protected JobParameters jobParameters = new JobParameters();
 
 	public void setJobDao(JobDao jobDao) {
 		this.jobDao = jobDao;
@@ -83,7 +83,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	 */
 	protected void onSetUpInTransaction() throws Exception {
 		Job job = new Job("TestJob");
-		jobInstance = jobDao.createJobInstance(job.getName(), jobInstanceProperties);
+		jobInstance = jobDao.createJobInstance(job.getName(), jobParameters);
 		step1 = stepDao.createStep(jobInstance, "TestStep1");
 		step2 = stepDao.createStep(jobInstance, "TestStep2");
 		jobExecution = new JobExecution(step2.getJobInstance());
@@ -127,7 +127,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	public void testFindStepsNotSaved(){
 		
 		//no steps are saved for given id, empty list should be returned
-		List steps = stepDao.findSteps(new JobInstance(new Long(38922), jobInstanceProperties));
+		List steps = stepDao.findSteps(new JobInstance(new Long(38922), jobParameters));
 		assertEquals(steps.size(), 0);
 	}
 	

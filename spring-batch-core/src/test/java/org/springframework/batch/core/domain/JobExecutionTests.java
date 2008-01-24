@@ -27,9 +27,9 @@ import org.springframework.batch.repeat.ExitStatus;
  */
 public class JobExecutionTests extends TestCase {
 
-	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), new JobInstanceProperties()), new Long(12));
+	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), new JobParameters()), new Long(12));
 
-	private JobExecution context = new JobExecution(new JobInstance(new Long(11), new JobInstanceProperties(), new Job("foo")), new Long(12));
+	private JobExecution context = new JobExecution(new JobInstance(new Long(11), new JobParameters(), new Job("foo")), new Long(12));
 
 	/**
 	 * Test method for
@@ -85,7 +85,7 @@ public class JobExecutionTests extends TestCase {
 	 */
 	public void testGetJobId() {
 		assertEquals(11, execution.getJobId().longValue());
-		execution = new JobExecution(new JobInstance(new Long(23), new JobInstanceProperties()), null);
+		execution = new JobExecution(new JobInstance(new Long(23), new JobParameters()), null);
 		assertEquals(23, execution.getJobId().longValue());
 	}
 

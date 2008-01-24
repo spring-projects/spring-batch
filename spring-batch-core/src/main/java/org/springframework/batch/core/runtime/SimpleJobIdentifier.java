@@ -18,7 +18,7 @@ package org.springframework.batch.core.runtime;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.batch.core.domain.JobIdentifier;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.util.ClassUtils;
 
 
@@ -32,7 +32,7 @@ import org.springframework.util.ClassUtils;
 public class SimpleJobIdentifier implements JobIdentifier {
 
 	private String name;
-	private JobInstanceProperties runtimeParameters;
+	private JobParameters runtimeParameters;
 	
 	/**
 	 * Default constructor.  Since there it is required that the Identifier at least have a name,
@@ -47,10 +47,10 @@ public class SimpleJobIdentifier implements JobIdentifier {
 	 * @param name
 	 */
 	public SimpleJobIdentifier(String name) {
-		this(name, new JobInstanceProperties());
+		this(name, new JobParameters());
 	}
 	
-	public SimpleJobIdentifier(String name, JobInstanceProperties runtimeParameters){
+	public SimpleJobIdentifier(String name, JobParameters runtimeParameters){
 		this.name = name;
 		this.runtimeParameters = runtimeParameters;
 	}
@@ -62,7 +62,7 @@ public class SimpleJobIdentifier implements JobIdentifier {
 		return this.name;
 	}
 	
-	public JobInstanceProperties getJobInstanceProperties() {
+	public JobParameters getJobInstanceProperties() {
 		return runtimeParameters;
 	}
 	

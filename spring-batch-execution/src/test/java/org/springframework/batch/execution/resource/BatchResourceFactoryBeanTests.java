@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.scope.SimpleStepContext;
@@ -64,7 +64,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		resourceFactory.setRootDirectory(rootDir);
 		
 		SimpleStepContext context = new SimpleStepContext();
-		jobInstance = new JobInstance(new Long(0), new JobInstanceProperties());
+		jobInstance = new JobInstance(new Long(0), new JobParameters());
 		jobInstance.setJob(new Job("testJob"));
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepInstance step = new StepInstance(jobInstance, "bar");

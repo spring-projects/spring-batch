@@ -25,7 +25,7 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobIdentifier;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
@@ -125,7 +125,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * platform does not support the higher isolation levels).
 	 * </p>
 	 * 
-	 * @see JobRepository#createJobExecution(Job, JobInstanceProperties)
+	 * @see JobRepository#createJobExecution(Job, JobParameters)
 	 * 
 	 * @throws BatchRestartException if more than one JobInstance if found or if
 	 * JobInstance.getJobExecutionCount() is greater than Job.getStartLimit()
@@ -133,11 +133,11 @@ public class SimpleJobRepository implements JobRepository {
 	 * for the given {@link JobIdentifier} that is already running
 	 * 
 	 */
-	public JobExecution createJobExecution(Job job, JobInstanceProperties jobInstanceProperties)
+	public JobExecution createJobExecution(Job job, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException {
 
 		Assert.notNull(job, "Job must not be null.");
-		Assert.notNull(jobInstanceProperties, "JobInstanceProperties must not be null.");
+		Assert.notNull(jobParameters, "JobInstanceProperties must not be null.");
 
 		List jobs = new ArrayList();
 		JobInstance jobInstance;
@@ -154,7 +154,7 @@ public class SimpleJobRepository implements JobRepository {
 			 * thread or process will block until this transaction has finished.
 			 */
 
-			jobs = jobDao.findJobInstances(job.getName(), jobInstanceProperties);
+			jobs = jobDao.findJobInstances(job.getName(), jobParameters);
 		}
 
 		if (jobs.size() == 1) {
@@ -176,7 +176,7 @@ public class SimpleJobRepository implements JobRepository {
 		}
 		else if (jobs.size() == 0) {
 			// no job found, create one
-			jobInstance = createJobInstance(job, jobInstanceProperties);
+			jobInstance = createJobInstance(job, jobParameters);
 		}
 		else {
 			// More than one job found, throw exception
@@ -284,9 +284,9 @@ public class SimpleJobRepository implements JobRepository {
 	 * calling {@link JobDao#createJob(JobRuntimeInformation)} and then it's
 	 * list of StepConfigurations is passed to the createSteps method.
 	 */
-	private JobInstance createJobInstance(Job job, JobInstanceProperties jobInstanceProperties) {
+	private JobInstance createJobInstance(Job job, JobParameters jobParameters) {
 
-		JobInstance jobInstance = jobDao.createJobInstance(job.getName(), jobInstanceProperties);
+		JobInstance jobInstance = jobDao.createJobInstance(job.getName(), jobParameters);
 		jobInstance.setStepInstances(createStepInstances(jobInstance, job.getSteps()));
 		return jobInstance;
 	}

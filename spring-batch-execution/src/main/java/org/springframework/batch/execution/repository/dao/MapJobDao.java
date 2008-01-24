@@ -25,7 +25,7 @@ import java.util.Set;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
 public class MapJobDao implements JobDao {
@@ -45,19 +45,19 @@ public class MapJobDao implements JobDao {
 		executionsById.clear();
 	}
 
-	public JobInstance createJobInstance(String jobName, JobInstanceProperties jobInstanceProperties) {
-		JobInstance jobInstance = new JobInstance(new Long(currentId++), jobInstanceProperties);
+	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
+		JobInstance jobInstance = new JobInstance(new Long(currentId++), jobParameters);
 		jobInstance.setJob(new Job(jobName));
 		
 		jobsById.put(jobInstance.getId(), jobInstance);
 		return jobInstance;
 	}
 
-	public List findJobInstances(String jobName, JobInstanceProperties jobInstanceProperties) {
+	public List findJobInstances(String jobName, JobParameters jobParameters) {
 		List list = new ArrayList();
 		for (Iterator iter = jobsById.values().iterator(); iter.hasNext();) {
 			JobInstance jobInstance = (JobInstance) iter.next();
-			if (jobInstance.getJobName().equals(jobName) && jobInstance.getJobInstanceProperties().equals(jobInstanceProperties)) {
+			if (jobInstance.getJobName().equals(jobName) && jobInstance.getJobInstanceProperties().equals(jobParameters)) {
 				list.add(jobInstance);
 			}
 		}

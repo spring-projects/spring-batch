@@ -16,29 +16,31 @@
 
 package org.springframework.batch.core.runtime;
 
-import org.springframework.batch.core.domain.JobIdentifier;
+import java.util.Properties;
+
+import org.springframework.batch.core.domain.JobParameters;
 
 /**
- * A factory for {@link JobIdentifier} instances. A job can be
+ * A factory for {@link JobParameters} instances. A job can be
  * executed with many possible runtime parameters, which identify the instance
  * of the job. This factory allows job identifiers to be created with different
- * properties according to the {@link JobIdentifier} strategy required. For
+ * properties according to the {@link JobParameters} strategy required. For
  * example some projects or jobs need a schedule date as part of the
- * {@link JobIdentifier} and some do not (e.g. for an ad-hoc execution a simple
+ * {@link JobParameters} and some do not (e.g. for an ad-hoc execution a simple
  * label might be enough).
  * 
  * 
  * @author Dave Syer
  * 
  */
-public interface JobIdentifierFactory {
+public interface JobParametersFactory {
 
 	/**
-	 * Get a new {@link JobIdentifier} instance.
+	 * Get a new {@link JobParameters} instance.
 	 * 
-	 * @param name
-	 *            the name of the job.
-	 * @return a {@link JobIdentifier} with the same name.
+	 * @param properties
+	 *            the runtime parameters in the form of String literals.
+	 * @return a {@link JobParameters} properties converted to the correct types.
 	 */
-	public JobIdentifier getJobIdentifier(String name);
+	public JobParameters getJobParameters(Properties properties);
 }

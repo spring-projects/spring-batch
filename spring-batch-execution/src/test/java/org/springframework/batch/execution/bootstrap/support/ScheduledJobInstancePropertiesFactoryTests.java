@@ -18,10 +18,12 @@ package org.springframework.batch.execution.bootstrap.support;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import java.util.Properties;
 
 import junit.framework.TestCase;
+
+import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Lucas Ward
@@ -29,51 +31,35 @@ import junit.framework.TestCase;
  */
 public class ScheduledJobInstancePropertiesFactoryTests extends TestCase {
 
-	ScheduledJobInstancePropertiesFactory factory;
+	ScheduledJobParametersFactory factory;
 	
 	DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 	
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		factory = new ScheduledJobInstancePropertiesFactory();
+		factory = new ScheduledJobParametersFactory();
 	}
 	
 	public void testGetProperties() throws Exception{
 		
 		String jobKey = "job.key=myKey";
-		String scheduleDate = "schedule.date=01/23/2008";
+		String scheduleDate = "schedule.date=2008/01/23";
 		String vendorId = "vendor.id=33243243";
 		
 		String[] args = new String[]{jobKey, scheduleDate, vendorId};
 
-		JobInstanceProperties props = factory.getProperties(args);
+		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
 		assertEquals("myKey", props.getString("job.key"));
 		assertEquals("33243243", props.getString("vendor.id"));
 		Date date = dateFormat.parse("01/23/2008");
 		assertEquals(date, props.getDate("schedule.date"));
 	}
-	
-	public void testInvalidFormat(){
 		
-		String jobKey = "job.key-myKey";
-		
-		String[] args = new String[]{jobKey};
-		
-		try{
-			factory.getProperties(args);
-			fail();
-		}
-		catch(IllegalArgumentException ex){
-			//expected
-		}
-	}
-	
 	public void testEmptyArgs(){
 		
-		String[] args = new String[]{};
-		JobInstanceProperties props = factory.getProperties(args);
-		assertTrue(props.isEmtpy());
+		JobParameters props = factory.getJobParameters(new Properties());
+		assertTrue(props.getParameters().isEmpty());
 	}
 }

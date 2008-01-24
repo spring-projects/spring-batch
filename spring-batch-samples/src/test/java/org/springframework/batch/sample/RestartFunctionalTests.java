@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample;
 
-import org.springframework.batch.core.domain.JobInstanceProperties;
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.jdbc.core.JdbcOperations;
 
 /**
@@ -81,7 +81,7 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 
 	// load the application context and launch the job
 	private void runJob() throws Exception {
-		launcher.run(getJob(), new JobInstanceProperties());
+		launcher.run(getJob(), new JobParameters());
 	}
 
 }

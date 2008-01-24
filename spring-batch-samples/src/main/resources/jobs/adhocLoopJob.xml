@@ -106,7 +106,7 @@
 		<property name="customEditors">
 			<map>
 				<entry key="org.springframework.batch.core.domain.JobIdentifier">
-					<bean class="org.springframework.batch.execution.bootstrap.support.JobIdentifierPropertyEditor"/>
+					<bean class="org.springframework.batch.execution.bootstrap.support.JobParametersPropertyEditor"/>
 				</entry>
 			</map>
 		</property>

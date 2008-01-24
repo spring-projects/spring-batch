@@ -19,7 +19,7 @@ package org.springframework.batch.execution.runtime;
 import java.util.Date;
 
 import org.springframework.batch.core.domain.JobIdentifier;
-import org.springframework.batch.core.domain.JobInstancePropertiesBuilder;
+import org.springframework.batch.core.domain.JobParametersBuilder;
 
 /**
  * Convenient {@link JobIdentifier} implementation that identifies itself by a
@@ -59,7 +59,7 @@ public class ScheduledJobIdentifier extends DefaultJobIdentifier implements JobI
 	 * @param scheduleDate a timestamp
 	 */
 	public ScheduledJobIdentifier(String name, Date scheduleDate) {
-		super(name, new JobInstancePropertiesBuilder().addDate(SCHEDULE_DATE, scheduleDate).toJobParameters());
+		super(name, new JobParametersBuilder().addDate(SCHEDULE_DATE, scheduleDate).toJobParameters());
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class ScheduledJobIdentifier extends DefaultJobIdentifier implements JobI
 	 * @param scheduleDate a timestamp
 	 */
 	public ScheduledJobIdentifier(String name, String key, Date scheduleDate) {
-		super(name, new JobInstancePropertiesBuilder().addString(ScheduledJobIdentifier.JOB_KEY, key).addDate(
+		super(name, new JobParametersBuilder().addString(ScheduledJobIdentifier.JOB_KEY, key).addDate(
 				SCHEDULE_DATE, scheduleDate).toJobParameters());
 	}
 
