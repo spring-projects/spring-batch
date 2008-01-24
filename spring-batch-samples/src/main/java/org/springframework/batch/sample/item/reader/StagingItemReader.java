@@ -24,6 +24,7 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.Assert;
 
 public class StagingItemReader extends JdbcDaoSupport implements ItemReader, ResourceLifecycle, DisposableBean,
 		StepContextAware {
@@ -75,7 +76,6 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemReader, Res
 			if (keys == null) {
 				keys = retrieveKeys().iterator();
 				logger.info("Keys obtained for staging.");
-				registerSynchronization();
 				initialized = true;
 			}
 		}
@@ -152,6 +152,8 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemReader, Res
 					getBuffer().add(next);
 					key = next;
 					logger.debug("Retrieved key from list: " + key);
+					Assert.state(TransactionSynchronizationManager.getSynchronizations().contains(synchronization),
+							"Appropriate transaction synchronization not registered for this thread.");
 				}
 			}
 		}
@@ -165,6 +167,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemReader, Res
 	private StagingBuffer getBuffer() {
 		if (!TransactionSynchronizationManager.hasResource(BUFFER_KEY)) {
 			TransactionSynchronizationManager.bindResource(BUFFER_KEY, new StagingBuffer());
+			registerSynchronization();
 		}
 		return (StagingBuffer) TransactionSynchronizationManager.getResource(BUFFER_KEY);
 	}
@@ -233,10 +236,12 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemReader, Res
 		}
 
 		public void rollback() {
+			logger.debug("Resetting buffer on rollback: " + list);
 			iter = new ArrayList(list).iterator();
 		}
 
 		public void commit() {
+			logger.debug("Clearing buffer on commit: " + list);
 			list.clear();
 			iter = new ArrayList().iterator();
 		}
