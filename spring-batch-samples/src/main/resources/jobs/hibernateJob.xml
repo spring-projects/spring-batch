@@ -5,9 +5,9 @@
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
-		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
 	<description>Example for Hibernate integration.</description>
 
@@ -15,6 +15,7 @@
 	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
 	<bean id="hibernateJob" parent="simpleJob">
+		<property name="restartable" value="false" />
 		<property name="steps">
 			<bean id="step1"
 				class="org.springframework.batch.execution.step.RepeatOperationsStep">
@@ -72,8 +73,9 @@
 	</bean>
 
 	<bean id="hibernateItemReader"
-		class="org.springframework.batch.io.cursor.HibernateCursorItemReader" scope="step">
-		<aop:scoped-proxy/>
+		class="org.springframework.batch.io.cursor.HibernateCursorItemReader"
+		scope="step">
+		<aop:scoped-proxy />
 		<property name="queryString" value="from CustomerCredit" />
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>

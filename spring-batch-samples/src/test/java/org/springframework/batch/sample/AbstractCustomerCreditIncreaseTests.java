@@ -66,7 +66,6 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 				});
 			}
 		});
-		System.err.println(creditsBeforeUpdate);
 	}
 
 	/**
@@ -75,8 +74,6 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 	protected void validatePostConditions() throws Exception {
 
 		final List matches = new ArrayList();
-
-		System.err.println(jdbcTemplate.queryForList(ALL_CUSTOMERS));
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
