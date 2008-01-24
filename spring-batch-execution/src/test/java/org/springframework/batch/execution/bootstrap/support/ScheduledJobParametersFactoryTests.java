@@ -29,7 +29,7 @@ import org.springframework.util.StringUtils;
  * @author Lucas Ward
  *
  */
-public class ScheduledJobInstancePropertiesFactoryTests extends TestCase {
+public class ScheduledJobParametersFactoryTests extends TestCase {
 
 	ScheduledJobParametersFactory factory;
 	
