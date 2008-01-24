@@ -72,7 +72,9 @@ public class DefaultJobParametersFactory implements JobParametersFactory {
 	 */
 	public JobParameters getJobParameters(Properties props) {
 
-		Assert.notNull(props, "Factory arguments must not be null.");
+		if(props == null || props.isEmpty()){
+			return new JobParameters();
+		}
 
 		JobParametersBuilder propertiesBuilder = new JobParametersBuilder();
 
@@ -123,6 +125,11 @@ public class DefaultJobParametersFactory implements JobParametersFactory {
 	 * @see org.springframework.batch.core.runtime.JobParametersFactory#getProperties(org.springframework.batch.core.domain.JobParameters)
 	 */
 	public Properties getProperties(JobParameters params) {
+		
+		if(params == null || params.isEmpty()){
+			return new Properties();
+		}
+		
 		Map parameters = params.getParameters();
 		Properties result = new Properties();
 		for (Iterator iterator = parameters.keySet().iterator(); iterator.hasNext();) {

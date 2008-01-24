@@ -69,4 +69,9 @@ public class DefaultJobParametersFactoryTests extends TestCase {
 		JobParameters props = factory.getJobParameters(new Properties());
 		assertTrue(props.getParameters().isEmpty());
 	}
+	
+	public void testNullArgs(){
+		assertEquals(new JobParameters(), factory.getJobParameters(null));
+		assertEquals(new Properties(), factory.getProperties(null));
+	}
 }

@@ -15,28 +15,104 @@
  */
 package org.springframework.batch.execution.bootstrap.support;
 
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.domain.IncorrectJobCountException;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobLocator;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
-import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.beans.factory.access.SingletonBeanFactoryLocator;
+import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.StringUtils;
 
 /**
- * @author Lucas Ward
+ * <p>
+ * Basic launcher for starting jobs from the command line. In general, it is
+ * assumed that this launcher will primarily be used to start a job via a script
+ * from an Enterprise Scheduler. Therefore, exit codes are mapped to integers so
+ * that schedulers can use the returned values to determine the next course of
+ * action. The returned values can also be useful to operations teams in
+ * determining what should happen upon failure. For example, a returned code of
+ * 5 might mean that some resource wasn't available and the job should be
+ * restarted. However, a code of 10 might mean that something critical has
+ * happened and the issue should be escalated.
+ * </p>
  * 
+ * <p>
+ * With any launch of a batch job within Spring Batch, a Spring context
+ * containing the Job and the 'Execution Environment' has to be created. This
+ * command line launcher can be used to load that context from a single
+ * location. It can also load the job as well All dependencies of the launcher
+ * will then be satisfied by autowiring by type from the combined application
+ * context. Default values are provided for all fields except the
+ * {@link JobLauncher} and {@link JobLocator}. Therefore, if autowiring fails
+ * to set it (it should be noted that dependency checking is disabled because
+ * most of the fields have default values and thus don't require dependencies to
+ * be fulfilled via autowiring) then an exception will be thrown. It should also
+ * be noted that even if an exception is thrown by this class, it will be mapped
+ * to an integer and returned.
+ * </p>
+ * 
+ * <p>
+ * Notice a property is available to set the {@link SystemExiter}. This class
+ * is used to exit from the main method, rather than calling System.exit()
+ * directly. This is because unit testing a class the calls System.exit() is
+ * impossible without kicking off the test within a new Jvm, which it is
+ * possible to do, however it is a complex solution, much more so than
+ * strategizing the exiter.
+ * </p>
+ * 
+ * <p>
+ * The arguments to this class are roughly as follows:
+ * </p>
+ * 
+ * <code>
+ * java jobPath jobName jobLauncherPath jobParameters...
+ * </code>
+ * 
+ * <p>
+ * <ul>
+ * <li>jobPath: the xml application context containing a {@link Job}
+ * <li>jobName: the bean id of the job.
+ * <li>jobLauncherPath: the xml application context containing a
+ * {@link JobLauncher}
+ * <li>jobParameters: 0 to many parameters that will be used to launch a job.
+ * </ul>
+ * </p>
+ * 
+ * <p>
+ * The combined application context must only contain one instance of a
+ * {@link JobLauncher}. The job parameters passed in to the command line will
+ * be converted to {@link Properties} by assuming that each individual element
+ * is one parameter that is separated by an equals sign. For example,
+ * "vendor.id=290232". Below is an example arguments list: "
+ * 
+ * <p>
+ * <code>
+ * java org.springframework.batch.execution.bootstrap.support.CommandLineJobRunner testJob.xml 
+ * testJob standard-job-launcher.xml schedule.date=2008/01/24 vendor.id=3902483920 
+ * <code></p>
+ * 
+ * <p>Once arguments have been successfully parsed, autowiring will be used to set 
+ * various dependencies.  The {@JobLauncher} for example, will be loaded this way.  If
+ * none is contained in the bean factory (it searches by type) then a 
+ * {@link BeanDefinitionStoreException} will be thrown.  The same exception will also
+ * be thrown if there is more than one present.  Assuming the JobLauncher has been
+ * set correctly, the jobName argument will be used to obtain an actual {@link Job}.
+ * If a {@link JobLocator} has been set, then it will be used, if not the beanFactory
+ * will be asked, using the jobName as the bean id.</p>
+ * 
+ * @author Dave Syer
+ * @author Lucas Ward
+ * @since 1.0
  */
 public class CommandLineJobRunner {
 
@@ -49,9 +125,11 @@ public class CommandLineJobRunner {
 
 	private JobLauncher launcher;
 
+	private JobLocator jobLocator;
+
 	private SystemExiter systemExiter = new JvmSystemExiter();
 
-	private JobParametersFactory jobParametersFactory = new ScheduledJobParametersFactory();
+	private JobParametersFactory jobParametersFactory = new DefaultJobParametersFactory();
 
 	/**
 	 * Injection setter for the {@link JobLauncher}.
@@ -101,17 +179,34 @@ public class CommandLineJobRunner {
 		systemExiter.exit(status);
 	}
 
-	int start(String jobPath, String environmentPath, String[] parameters) {
+	public void setJobLocator(JobLocator jobLocator) {
+		this.jobLocator = jobLocator;
+	}
+
+	/*
+	 * Start a job by obtaining a combined classpath using the job launcher and
+	 * job paths.  If a JobLocator has been set, then use it to obtain an actual
+	 * job, if not ask the context for it. 
+	 */
+	int start(String jobPath, String jobLauncherPath, String jobName,
+			String[] parameters) {
 
 		try {
-			ApplicationContext context = new ClassPathXmlApplicationContext(new String[] {
-					jobPath, environmentPath });
-			context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
-					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-			Job job = getJob(context);
+			ApplicationContext context = new ClassPathXmlApplicationContext(
+					new String[] { jobPath, jobLauncherPath });
+			context.getAutowireCapableBeanFactory().autowireBeanProperties(
+					this, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 
-			JobParameters jobParameters = jobParametersFactory.getJobParameters(StringUtils
-					.splitArrayElementsIntoProperties(parameters, "="));
+			Job job;
+			if (jobLocator != null) {
+				job = jobLocator.getJob(jobName);
+			} else {
+				job = (Job) context.getBean(jobName);
+			}
+
+			JobParameters jobParameters = jobParametersFactory
+					.getJobParameters(StringUtils
+							.splitArrayElementsIntoProperties(parameters, "="));
 
 			JobExecution jobExecution = launcher.run(job, jobParameters);
 			return exitCodeMapper.getExitCode(jobExecution.getExitStatus()
@@ -123,25 +218,8 @@ public class CommandLineJobRunner {
 		}
 	}
 
-	private Job getJob(ApplicationContext context)
-			throws IncorrectJobCountException, NoSuchJobException {
-
-		String[] jobs = context.getBeanNamesForType(Job.class);
-
-		if (jobs.length > 1) {
-			logger.error("More than one job exists in the provided context: [" + "jobPath" + "]");
-			throw new IncorrectJobCountException(
-					"More than one job exists in the provided context. Bean Names: ["
-							+ jobs + "]");
-		} else if (jobs.length == 0) {
-			throw new NoSuchJobException("No jobs found in the provided context.");
-		}
-
-		return (Job) context.getBean(jobs[0]);
-	}
-
 	/**
-	 * Launch a batch job using a {@link SimpleCommandLineJobRunner}. Creates a
+	 * Launch a batch job using a {@link CommandLineJobRunner}. Creates a
 	 * new Spring context for the job execution, and uses a common parent for
 	 * all such contexts. No exception are thrown from this method, rather
 	 * exceptions are logged and an integer returned through the exit status in
@@ -149,30 +227,36 @@ public class CommandLineJobRunner {
 	 * Spring context).
 	 * 
 	 * @param args
+	 *            <p>
 	 *            <ul>
-	 *            <li>-Djob.configuration.path: the classpath location of the
-	 *            JobConfiguration to use
-	 *            <li>-Djob.name: job name to be passed to the
+	 *            <li>jobPath: the xml application context containing a
+	 *            {@link Job}
+	 *            <li>jobName: the bean id of the job.
+	 *            <li>jobLauncherPath: the xml application context containing a
 	 *            {@link JobLauncher}
-	 *            <li>-Dbatch.execution.environment.key: the key in
-	 *            beanRefContext.xml used to load the execution environment
-	 *            which will be the parent context for the job execution
-	 *            (mandatory if -Dbean.ref.context is specified).
-	 *            <li>-Dbean.ref.context: the location for beanRefContext.xml
-	 *            (optional, default is to only use the context specified in the
-	 *            job.configuration.path) (@see
-	 *            {@link SingletonBeanFactoryLocator}).</li>
+	 *            <li>jobParameters: 0 to many parameters that will be used to
+	 *            launch a job.
 	 *            </ul>
+	 *            </p>
 	 */
 	public static void main(String[] args) {
 
-		String jobPath = args[0];
-		String executionPath = args[1];
-		String[] parameters = new String[args.length - 2];
-		System.arraycopy(args, 2, parameters, 0, args.length - 2);
-
 		CommandLineJobRunner command = new CommandLineJobRunner();
-		int result = command.start(jobPath, executionPath, parameters);
+
+		if (args.length < 3) {
+			logger
+					.error("At least 3 arguments are required: JobPath, JobName, and ExecutionPath.");
+			command.exit(1);
+		}
+
+		String jobPath = args[0];
+		String jobName = args[1];
+		String jobLauncherPath = args[2];
+		String[] parameters = new String[args.length - 3];
+		System.arraycopy(args, 2, parameters, 0, args.length - 3);
+
+		int result = command.start(jobPath, jobLauncherPath, jobName,
+				parameters);
 		command.exit(result);
 	}
 

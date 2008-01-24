@@ -9,11 +9,12 @@
 
 	<bean id="simpleContainerLauncher" class="org.springframework.batch.execution.bootstrap.support.CommandLineJobRunnerTests$StubJobLauncher" />
 
-	<bean id="jobConfigurationRegistry" class="org.springframework.batch.execution.configuration.MapJobRegistry"/>
-
 	<bean class="org.springframework.batch.execution.bootstrap.support.SimpleJvmExitCodeMapper" />
 
 	<bean
 		class="org.springframework.batch.execution.bootstrap.support.CommandLineJobRunnerTests$StubSystemExiter" />
+		
+	<bean
+		class="org.springframework.batch.execution.bootstrap.support.CommandLineJobRunnerTests$StubExceptionClassifier" />
 
 </beans>

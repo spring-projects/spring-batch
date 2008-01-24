@@ -18,7 +18,6 @@ public interface ExitCodeMapper {
 	static int JVM_EXITCODE_JOB_ERROR = 2;
 	public static final String NO_SUCH_JOB = "NO_SUCH_JOB";
 	public static final String JOB_NOT_PROVIDED = "JOB_NOT_PROVIDED";
-	public static final String MULTIPLE_JOBS_FOUND = "MULTIPLE_JOBS_FOUND";
 
 	/**
 	 * Transform the exitcode known by the batchframework into an exitcode in the
