@@ -15,37 +15,23 @@
  */
 package org.springframework.batch.execution.bootstrap.support;
 
+import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.JobParametersBuilder;
+import org.springframework.batch.core.runtime.JobParametersFactory;
+import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.util.StringUtils;
 
 /**
- * Factory for {@link JobParameters} instances using a simple naming convention
- * for property keys. Key names ending with "(&lt;type&gt;)" where type is one
- * of string, date, long are converted to the corresponding type. The default
- * type is string. E.g.
- * 
- * <pre>
- * schedule.date(date)=2007/12/11
- * department.id(long)=2345
- * </pre>
- * 
- * The literal values are converted to the correct type using the default Spring
- * strategies, augmented if necessary by the custom editors provided. 
- * 
- * TODO: finish this (only supports Strings so far).
- * 
+ * A {@link PropertyEditor} that delegates to a {@link JobParametersFactory}.
  * @author Dave Syer
  * 
  */
 public class JobParametersPropertyEditor extends PropertyEditorSupport {
+
+	private JobParametersFactory factory = new DefaultJobParametersFactory();
 
 	/**
 	 * Accept properties in the form of name=value pairs, delimited by either
@@ -54,15 +40,9 @@ public class JobParametersPropertyEditor extends PropertyEditorSupport {
 	 * @see java.beans.PropertyEditorSupport#setAsText(java.lang.String)
 	 */
 	public void setAsText(String text) throws IllegalArgumentException {
-		JobParametersBuilder builder = new JobParametersBuilder();
 		Properties properties = StringUtils.splitArrayElementsIntoProperties(StringUtils.tokenizeToStringArray(text,
 				",\n"), "=");
-		for (Iterator iterator = properties.keySet().iterator(); iterator.hasNext();) {
-			String key = (String) iterator.next();
-			key = StringUtils.tokenizeToStringArray(key, "(")[0];
-			builder.addString(key, properties.getProperty(key));
-		}
-		setValue(builder.toJobParameters());
+		setValue(factory.getJobParameters(properties));
 	}
 
 	/**
@@ -75,12 +55,15 @@ public class JobParametersPropertyEditor extends PropertyEditorSupport {
 		if (params == null) {
 			return null;
 		}
-		List builder = new ArrayList();
-		Map map = params.getStringParameters();
-		for (Iterator iterator = map.keySet().iterator(); iterator.hasNext();) {
-			String key = (String) iterator.next();
-			builder.add(key+"="+map.get(key));
-		}
-		return StringUtils.collectionToCommaDelimitedString(builder);
+		Properties properties = factory.getProperties(params);
+		return PropertiesConverter.propertiesToString(properties);
+	}
+	
+	/**
+	 * Public setter for the {@link JobParametersFactory}.
+	 * @param factory the factory to set
+	 */
+	public void setFactory(JobParametersFactory factory) {
+		this.factory = factory;
 	}
 }
