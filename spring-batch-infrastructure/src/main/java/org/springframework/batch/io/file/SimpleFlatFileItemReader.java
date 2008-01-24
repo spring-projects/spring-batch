@@ -100,6 +100,15 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 			path = path.substring(0,20)+"..."+path.substring(path.length());
 		}
 	}
+	
+	/**
+	 * Getter for the resource property.
+	 * 
+	 * @return the {@link Resource} used by this ItemReader.
+	 */
+	public Resource getResource(){
+		return resource;
+	}
 
 	/**
 	 * Public setter for the recordSeparatorPolicy. Used to determine where the
