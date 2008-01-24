@@ -25,6 +25,8 @@ package org.springframework.batch.core.domain;
  */
 public class NoSuchJobException extends JobException {
 
+	private static final long serialVersionUID = -8044082897778706564L;
+
 	/**
 	 * Create an exception with the given message.
 	 */
