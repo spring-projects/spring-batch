@@ -5,20 +5,20 @@ import java.math.BigDecimal;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.sample.dao.CustomerCreditDao;
 import org.springframework.batch.sample.domain.CustomerCredit;
 
 /**
- * Tests for {@link CustomerCreditIncreaseProcessor}.
+ * Tests for {@link CustomerCreditIncreaseWriter}.
  * 
  * @author Robert Kasanicky
  */
 public class CustomerCreditIncreaseProcessorTests extends TestCase{
 
-	private CustomerCreditIncreaseProcessor processor = new CustomerCreditIncreaseProcessor();
+	private CustomerCreditIncreaseWriter writer = new CustomerCreditIncreaseWriter();
 	
-	private ItemWriter outputSource;
-	private MockControl outputSourceControl = MockControl.createStrictControl(ItemWriter.class);
+	private CustomerCreditDao outputSource;
+	private MockControl outputSourceControl = MockControl.createStrictControl(CustomerCreditDao.class);
 	
 	private CustomerCredit customerCredit = new CustomerCredit();
 	
@@ -27,8 +27,8 @@ public class CustomerCreditIncreaseProcessorTests extends TestCase{
 		customerCredit.setId(1);
 		customerCredit.setName("testCustomer");
 		
-		outputSource = (ItemWriter) outputSourceControl.getMock();
-		processor.setOutputSource(outputSource);
+		outputSource = (CustomerCreditDao) outputSourceControl.getMock();
+		writer.setCustomerCreditDao(outputSource);
 	}
 
 	/**
@@ -38,14 +38,14 @@ public class CustomerCreditIncreaseProcessorTests extends TestCase{
 		BigDecimal oldCredit = new BigDecimal(10.54);
 		customerCredit.setCredit(oldCredit);
 		
-		outputSource.write(customerCredit);
+		outputSource.writeCredit(customerCredit);
 		outputSourceControl.setVoidCallable();
 		outputSourceControl.replay();
 		
-		processor.process(customerCredit);
+		writer.write(customerCredit);
 		
 		BigDecimal newCredit = customerCredit.getCredit();
-		BigDecimal expectedCredit = oldCredit.add(CustomerCreditIncreaseProcessor.FIXED_AMOUNT);
+		BigDecimal expectedCredit = oldCredit.add(CustomerCreditIncreaseWriter.FIXED_AMOUNT);
 		assertTrue(newCredit.compareTo(expectedCredit) == 0);
 		outputSourceControl.verify();
 	}

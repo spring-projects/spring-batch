@@ -22,7 +22,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
 
 public class ItemReaderRepeatCallbackTests extends TestCase {
@@ -33,8 +33,8 @@ public class ItemReaderRepeatCallbackTests extends TestCase {
 
 	public void testDoWithRepeat() throws Exception {
 		callback = new ItemReaderRepeatCallback(new ListItemReader(Arrays.asList(new String[] { "foo", "bar" })),
-				new ItemProcessor() {
-					public void process(Object data) {
+				new ItemWriter() {
+					public void write(Object data) {
 						list.add(data);
 					}
 				});

@@ -16,16 +16,20 @@
 
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.sample.domain.CustomerCredit;
+import org.springframework.batch.sample.domain.Trade;
+
 
 /**
- * Interface for writing customer's credit information to output.
+ * Simple interface for writing a Trade object
+ * to an arbitraty output
  *
  * @author Robert Kasanicky
  */
-public interface CustomerCreditWriter extends ItemWriter {
-
-	void writeCredit(CustomerCredit customerCredit);
+public interface TradeDao {
+    /**
+     * Write a trade object to some kind of output,
+     * different implementations can write to file, database etc.
+     */
+    void writeTrade(Trade trade);
 
 }

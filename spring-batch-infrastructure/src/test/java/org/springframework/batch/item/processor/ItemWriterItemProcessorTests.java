@@ -35,7 +35,7 @@ import org.springframework.batch.support.PropertiesConverter;
  */
 public class ItemWriterItemProcessorTests extends TestCase {
 
-	private ItemWriterItemProcessor processor = new ItemWriterItemProcessor();
+	private DelegatingItemWriter processor = new DelegatingItemWriter();
 
 	private ItemWriter writer;
 
@@ -45,12 +45,12 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		writer = new MockOutputSource("test");
-		processor.setItemWriter(writer);
+		processor.setDelegate(writer);
 		processor.afterPropertiesSet();
 	}
 
 	public void testProcess() throws Exception {
-		processor.process("foo");
+		processor.write("foo");
 		assertEquals(1, list.size());
 		assertEquals("test:foo", list.get(0));
 	}
@@ -69,7 +69,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 */
 	public void testRestoreFrom() throws Exception {
 		processor.restoreFrom(new GenericRestartData(PropertiesConverter.stringToProperties("value=bar")));
-		processor.process("foo");
+		processor.write("foo");
 		assertEquals("bar:foo", list.get(0));
 	}
 
@@ -78,7 +78,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testGetRestartDataWithoutRestartable() throws Exception {
-		processor.setItemWriter(null);
+		processor.setDelegate(null);
 		try {
 			processor.getRestartData();
 			fail("Expected IllegalStateException");
@@ -93,7 +93,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testRestoreFromWithoutRestartable() throws Exception {
-		processor.setItemWriter(null);
+		processor.setDelegate(null);
 		try {
 			processor.restoreFrom(new GenericRestartData(PropertiesConverter.stringToProperties("value=bar")));
 			fail("Expected IllegalStateException");
@@ -113,7 +113,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 * ItemWriter property must be set.
 	 */
 	public void testAfterPropertiesSet() throws Exception {
-		processor.setItemWriter(null);
+		processor.setDelegate(null);
 		try {
 			processor.afterPropertiesSet();
 			fail();

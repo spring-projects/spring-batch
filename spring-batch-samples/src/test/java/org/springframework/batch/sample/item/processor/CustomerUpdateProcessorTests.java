@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.sample.dao.JdbcCustomerDebitWriter;
 import org.springframework.batch.sample.domain.CustomerDebit;
 import org.springframework.batch.sample.domain.Trade;
-import org.springframework.batch.sample.item.processor.CustomerUpdateProcessor;
+import org.springframework.batch.sample.item.processor.CustomerUpdateWriter;
 
 public class CustomerUpdateProcessorTests extends TestCase {
 
@@ -27,10 +27,10 @@ public class CustomerUpdateProcessorTests extends TestCase {
 		};
 		
 		//create processor and set dao
-		CustomerUpdateProcessor processor = new CustomerUpdateProcessor();
+		CustomerUpdateWriter processor = new CustomerUpdateWriter();
 		processor.setDao(dao);
 		
 		//call tested method - see asserts in dao.write() method
-		processor.process(trade);
+		processor.write(trade);
 	}
 }

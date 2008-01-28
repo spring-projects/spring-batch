@@ -30,7 +30,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * 
  */
 public class HibernateCreditWriter extends HibernateDaoSupport implements
-		CustomerCreditWriter, RepeatInterceptor {
+		CustomerCreditDao, RepeatInterceptor {
 
 	private int failOnFlush = -1;
 	private List errors = new ArrayList();

@@ -29,10 +29,10 @@
 										ref="tradeValidator" />
 								</bean>
 							</property>
-							<property name="itemProcessor">
+							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.sample.item.processor.TradeProcessor"
-									p:writer-ref="tradeDao" />
+									class="org.springframework.batch.sample.item.processor.TradeWriter"
+									p:dao-ref="tradeDao" />
 							</property>
 						</bean>
 					</property>
@@ -42,9 +42,9 @@
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemReader" ref="tradeSqlItemReader" />
-							<property name="itemProcessor">
+							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.sample.item.processor.CustomerUpdateProcessor"
+									class="org.springframework.batch.sample.item.processor.CustomerUpdateWriter"
 									p:dao-ref="customerDao" />
 							</property>
 						</bean>
@@ -55,9 +55,9 @@
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemReader" ref="customerSqlItemReader" />
-							<property name="itemProcessor">
+							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.sample.item.processor.CustomerCreditUpdateProcessor"
+									class="org.springframework.batch.sample.item.processor.CustomerCreditUpdateWriter"
 									p:writer-ref="customerReportOutputSource" />
 							</property>
 						</bean>

@@ -28,8 +28,8 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
  *
  * @author Robert Kasanicky
  */
-public class JdbcTradeWriter implements TradeWriter {
-	private Log log = LogFactory.getLog(JdbcTradeWriter.class);
+public class JdbcTradeDao implements TradeDao {
+	private Log log = LogFactory.getLog(JdbcTradeDao.class);
     /**
      * template for inserting a row
      */
@@ -46,7 +46,7 @@ public class JdbcTradeWriter implements TradeWriter {
     private DataFieldMaxValueIncrementer incrementer;
 
     /**
-     * @see TradeWriter
+     * @see TradeDao
      */
     public void writeTrade(Trade trade) {
         Long id = new Long(incrementer.nextLongValue());
@@ -65,9 +65,5 @@ public class JdbcTradeWriter implements TradeWriter {
     public void setIncrementer(DataFieldMaxValueIncrementer incrementer) {
         this.incrementer = incrementer;
     }
-
-	public void write(Object output) {
-		this.writeTrade((Trade)output);
-	}
 
 }

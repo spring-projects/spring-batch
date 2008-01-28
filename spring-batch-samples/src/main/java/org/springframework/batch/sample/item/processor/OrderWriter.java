@@ -17,27 +17,16 @@
 package org.springframework.batch.sample.item.processor;
 
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.sample.dao.OrderWriter;
+import org.springframework.batch.item.processor.DelegatingItemWriter;
 import org.springframework.batch.sample.domain.Order;
 
 
 
-public class OrderProcessor implements ItemProcessor {
-    private OrderWriter writer;
-    private Order order;
-
-    public void process(Object data) {
+public class OrderWriter extends DelegatingItemWriter {
+    public Object doProcess(Object data) {
         if (!(data instanceof Order)) {
             throw new BatchCriticalException("OrderProcessor can process only Order objects");
         }
-
-        order = (Order) data;
-        writer.write(order);
+        return data;
     }
-
-    public void setWriter(OrderWriter reportService) {
-        this.writer = reportService;
-    }
-
 }

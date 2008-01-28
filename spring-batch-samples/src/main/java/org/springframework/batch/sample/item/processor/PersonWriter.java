@@ -18,19 +18,22 @@ package org.springframework.batch.sample.item.processor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.sample.domain.Person;
 
-/**
- * Dummy processor useful for development and testing.
- * 
- * @author Robert Kasanicky
- */
-public class DummyProcessor implements ItemProcessor {
-	
-	private static final Log log = LogFactory.getLog(DummyProcessor.class);
-	
-    public void process(Object object) {
-        log.debug("PROCESSING: " + object);
+
+
+public class PersonWriter implements ItemWriter {
+    private static Log log = LogFactory.getLog(PersonWriter.class);
+ 
+    public void write(Object data) {
+        if (!(data instanceof Person)) {
+            log.warn("PersonProcessor can process only Person objects, skipping record");
+
+            return;
+        }
+
+        log.debug("Processing: " + data);
     }
 
 	public void close() {

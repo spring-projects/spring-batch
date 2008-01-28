@@ -19,9 +19,9 @@ package org.springframework.batch.repeat.support;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.file.SimpleFlatFileItemReader;
-import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.mapping.FieldSet;
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.io.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.DelegatingItemReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -38,7 +38,7 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 
 	Resource resource = new ClassPathResource("trades.csv", getClass());
 
-	protected TradeProcessor processor = new TradeProcessor();
+	protected TradeWriter processor = new TradeWriter();
 
 	protected TradeItemReader provider;
 
@@ -69,12 +69,12 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 		}
 	}
 
-	protected static class TradeProcessor implements ItemProcessor {
+	protected static class TradeWriter implements ItemWriter {
 		int count = 0;
 
 		// This has to be synchronized because we are going to test the state
 		// (count) at the end of a concurrent batch run.
-		public synchronized void process(Object data) {
+		public synchronized void write(Object data) {
 			count++;
 			System.out.println("Executing trade '" + data + "'");
 		}

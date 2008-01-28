@@ -6,13 +6,13 @@ import org.easymock.MockControl;
 import org.springframework.batch.item.ItemWriter;
 
 /**
- * Tests for {@link TransformerWriterItemProcessor}.
+ * Tests for {@link ItemTransformerItemWriterr}.
  * 
  * @author Robert Kasanicky
  */
 public class TransformerWriterItemProcessorTests extends TestCase {
 
-	private TransformerWriterItemProcessor processor = new TransformerWriterItemProcessor();
+	private ItemTransformerItemWriterr processor = new ItemTransformerItemWriterr();
 
 	private ItemTransformer transformer;
 	private ItemWriter itemWriter;
@@ -25,7 +25,7 @@ public class TransformerWriterItemProcessorTests extends TestCase {
 		itemWriter = (ItemWriter) outControl.getMock();
 		
 		processor.setItemTransformer(transformer);
-		processor.setItemWriter(itemWriter);
+		processor.setDelegate(itemWriter);
 		processor.afterPropertiesSet();
 	}
 
@@ -46,7 +46,7 @@ public class TransformerWriterItemProcessorTests extends TestCase {
 		tControl.replay();
 		outControl.replay();
 
-		processor.process(item);
+		processor.write(item);
 
 		tControl.verify();
 		outControl.verify();

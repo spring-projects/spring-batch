@@ -11,19 +11,19 @@ import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
-import org.springframework.batch.sample.item.processor.StagingItemProcessor;
+import org.springframework.batch.sample.item.processor.StagingItemWriter;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
 
 public class StagingItemReaderTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	private StagingItemProcessor processor;
+	private StagingItemWriter processor;
 
 	private StagingItemReader provider;
 
 	private Long jobId = new Long(11);
 
-	public void setProcessor(StagingItemProcessor processor) {
+	public void setProcessor(StagingItemWriter processor) {
 		this.processor = processor;
 	}
 
@@ -32,7 +32,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 	}
 
 	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(StagingItemProcessor.class,
+		return new String[] { ClassUtils.addResourcePathToPackagePath(StagingItemWriter.class,
 				"staging-test-context.xml") };
 	}
 
@@ -45,10 +45,10 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 	}
 
 	protected void onSetUpInTransaction() throws Exception {
-		processor.process("FOO");
-		processor.process("BAR");
-		processor.process("SPAM");
-		processor.process("BUCKET");
+		processor.write("FOO");
+		processor.write("BAR");
+		processor.write("SPAM");
+		processor.write("BUCKET");
 	}
 
 	protected void onTearDownAfterTransaction() throws Exception {
@@ -62,14 +62,14 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 				new Object[] { jobId });
 		String before = (String) getJdbcTemplate().queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				new Object[] { new Long(id) }, String.class);
-		assertEquals(StagingItemProcessor.NEW, before);
+		assertEquals(StagingItemWriter.NEW, before);
 
 		Object item = provider.read();
 		assertEquals("FOO", item);
 
 		String after = (String) getJdbcTemplate().queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				new Object[] { new Long(id) }, String.class);
-		assertEquals(StagingItemProcessor.DONE, after);
+		assertEquals(StagingItemWriter.DONE, after);
 
 	}
 
@@ -82,7 +82,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 				new Object[] { jobId });
 		String before = (String) getJdbcTemplate().queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				new Object[] { new Long(id) }, String.class);
-		assertEquals(StagingItemProcessor.DONE, before);
+		assertEquals(StagingItemWriter.DONE, before);
 	}
 
 	public void testProviderRollsBackMultipleTimes() throws Exception {
@@ -95,7 +95,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 		BatchTransactionSynchronizationManager.resynchronize();
 
 		int count = getJdbcTemplate().queryForInt("SELECT COUNT(*) from BATCH_STAGING where JOB_ID=? AND PROCESSED=?",
-				new Object[] { jobId, StagingItemProcessor.NEW });
+				new Object[] { jobId, StagingItemWriter.NEW });
 		assertEquals(4, count);
 
 		Object item = provider.read();
@@ -136,7 +136,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 				new Object[] { jobId });
 		String before = (String) getJdbcTemplate().queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				new Object[] { new Long(id) }, String.class);
-		assertEquals(StagingItemProcessor.NEW, before);
+		assertEquals(StagingItemWriter.NEW, before);
 
 		Object item = provider.read();
 		assertEquals("FOO", item);
@@ -149,7 +149,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 
 		String after = (String) getJdbcTemplate().queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				new Object[] { new Long(id) }, String.class);
-		assertEquals(StagingItemProcessor.NEW, after);
+		assertEquals(StagingItemWriter.NEW, after);
 
 		item = provider.read();
 		assertEquals("FOO", item);

@@ -18,15 +18,15 @@ package org.springframework.batch.sample.item.processor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.sample.dao.TradeWriter;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
 
 
 
-public class TradeProcessor implements ItemProcessor {
-    private static Log log = LogFactory.getLog(TradeProcessor.class);
-    private TradeWriter writer;
+public class TradeWriter implements ItemWriter {
+    private static Log log = LogFactory.getLog(TradeWriter.class);
+    private TradeDao dao;
     
     private int failure = -1;
     
@@ -41,7 +41,7 @@ public class TradeProcessor implements ItemProcessor {
 		this.failure = failure;
 	}
 
-    public void process(Object data) {
+    public void write(Object data) {
         if (!(data instanceof Trade)) {
             log.warn("TradeProcessor can process only Trade objects, skipping record");
 
@@ -52,7 +52,7 @@ public class TradeProcessor implements ItemProcessor {
         log.debug(data);
 
         //TODO put some processing of the trade object here
-        writer.writeTrade(trade);
+        dao.writeTrade(trade);
         
         if(index++ == failure) {
         	throw new RuntimeException("Something unexpected happened!");
@@ -61,8 +61,8 @@ public class TradeProcessor implements ItemProcessor {
         
     }
 
-    public void setWriter(TradeWriter dao) {
-        this.writer = dao;
+    public void setDao(TradeDao dao) {
+        this.dao = dao;
     }
 
 	public void close() {

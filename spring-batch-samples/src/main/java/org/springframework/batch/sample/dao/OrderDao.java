@@ -16,21 +16,13 @@
 
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.sample.domain.Trade;
-
+import org.springframework.batch.sample.domain.Order;
 
 /**
- * Simple interface for writing a Trade object
- * to an arbitraty output
- *
- * @author Robert Kasanicky
+ * Interface for writing <code>Order</code> objects.
  */
-public interface TradeWriter extends ItemWriter{
-    /**
-     * Write a trade object to some kind of output,
-     * different implementations can write to file, database etc.
-     */
-    void writeTrade(Trade trade);
+public interface OrderDao {
 
+    public void write(Order order);
+    
 }

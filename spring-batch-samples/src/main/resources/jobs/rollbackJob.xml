@@ -53,10 +53,10 @@
 										ref="tradeValidator" />
 								</bean>
 							</property>
-							<property name="itemProcessor">
+							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.sample.item.processor.TradeProcessor"
-									p:writer-ref="tradeDao" p:failure="3"/>
+									class="org.springframework.batch.sample.item.processor.TradeWriter"
+									p:dao-ref="tradeDao" p:failure="3"/>
 							</property>
 						</bean>
 					</property>
@@ -66,9 +66,9 @@
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemReader" ref="tradeSqlItemReader" />
-							<property name="itemProcessor">
+							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.sample.item.processor.DummyProcessor" />
+									class="org.springframework.batch.execution.launch.EmptyItemWriter" />
 							</property>
 						</bean>
 					</property>

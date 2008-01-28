@@ -16,13 +16,15 @@
 
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.sample.domain.Order;
+import org.springframework.batch.sample.domain.CustomerCredit;
 
 /**
- * Interface for writing <code>Order</code> objects.
+ * Interface for writing customer's credit information to output.
+ *
+ * @author Robert Kasanicky
  */
-public interface OrderWriter {
+public interface CustomerCreditDao {
 
-    public void write(Order order);
-    
+	void writeCredit(CustomerCredit customerCredit) throws Exception;
+
 }

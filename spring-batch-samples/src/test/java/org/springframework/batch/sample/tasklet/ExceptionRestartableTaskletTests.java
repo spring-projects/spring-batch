@@ -6,11 +6,10 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
-import org.springframework.batch.sample.tasklet.ExceptionRestartableTasklet;
 
 public class ExceptionRestartableTaskletTests extends TestCase {
 
@@ -24,18 +23,18 @@ public class ExceptionRestartableTaskletTests extends TestCase {
 	public void testProcess() throws Exception {
 		
 		//create mock item processor which will be called by module.process() method
-		MockControl processorControl = MockControl.createControl(ItemProcessor.class);
-		ItemProcessor itemProcessor = (ItemProcessor)processorControl.getMock();
+		MockControl processorControl = MockControl.createControl(ItemWriter.class);
+		ItemWriter itemProcessor = (ItemWriter)processorControl.getMock();
 		
 		//set expected call count and argument matcher 
-		itemProcessor.process(null);
+		itemProcessor.write(null);
 		processorControl.setMatcher(MockControl.ALWAYS_MATCHER);
 		processorControl.setVoidCallable(ITER_COUNT);
 		processorControl.replay();
 		
 		//create module and set item processor and iteration count
 		ExceptionRestartableTasklet module = new ExceptionRestartableTasklet();
-		module.setItemProcessor(itemProcessor);
+		module.setItemWriter(itemProcessor);
 		module.setThrowExceptionOnRecordNumber(ITER_COUNT + 1);
 		
 		module.setItemReader(new ListItemReader(new ArrayList() {{

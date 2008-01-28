@@ -6,8 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
-import org.springframework.batch.sample.item.processor.CustomerCreditIncreaseProcessor;
+import org.springframework.batch.sample.item.processor.CustomerCreditIncreaseWriter;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -28,7 +27,7 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 
 	protected PlatformTransactionManager transactionManager;
 
-	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseProcessor.FIXED_AMOUNT;
+	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseWriter.FIXED_AMOUNT;
 	
 	private static String[] customers = { "INSERT INTO customer (id, version, name, credit) VALUES (1, 0, 'customer1', 100000)",
 		"INSERT INTO customer (id, version, name, credit) VALUES (2, 0, 'customer2', 100000)",
@@ -44,18 +43,12 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 	protected static final String ID_COLUMN = "ID";
 
 	private List creditsBeforeUpdate;
-	
-	private SessionFactory sessionFactory;
 
 	/**
 	 * @param jdbcTemplate
 	 */
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
-	}
-
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
 	}
 	
 	/**

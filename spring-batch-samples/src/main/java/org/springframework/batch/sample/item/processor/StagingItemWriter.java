@@ -6,14 +6,14 @@ import java.sql.Types;
 import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
-public class StagingItemProcessor extends JdbcDaoSupport implements
-		StepContextAware, ItemProcessor {
+public class StagingItemWriter extends JdbcDaoSupport implements
+		StepContextAware, ItemWriter {
 
 	public static final String NEW = "N";
 	public static final String DONE = "Y";
@@ -34,7 +34,7 @@ public class StagingItemProcessor extends JdbcDaoSupport implements
 						incrementer,
 						"DataFieldMaxValueIncrementer is required - set the incrementer property in the "
 								+ ClassUtils
-										.getShortName(StagingItemProcessor.class));
+										.getShortName(StagingItemWriter.class));
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class StagingItemProcessor extends JdbcDaoSupport implements
 	 * 
 	 * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
 	 */
-	public void process(Object data) throws Exception {
+	public void write(Object data) {
 		Long id = new Long(incrementer.nextLongValue());
 		Long jobId = stepContext.getStepExecution().getJobExecution().getJobId();
 		byte[] blob = SerializationUtils.serialize((Serializable) data);

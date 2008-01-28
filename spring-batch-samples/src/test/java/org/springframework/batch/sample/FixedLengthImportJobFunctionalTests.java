@@ -22,12 +22,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.batch.io.file.DefaultFlatFileItemReader;
-import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.transform.LineTokenizer;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.batch.sample.mapping.TradeFieldSetMapper;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcOperations;

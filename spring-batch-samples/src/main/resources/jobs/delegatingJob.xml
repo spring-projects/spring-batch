@@ -29,8 +29,8 @@
 								<property name="targetMethod" value="getData" />
 							</bean>
 						</property>
-						<property name="itemProcessor">
-							<bean class="org.springframework.batch.item.processor.PropertyExtractingDelegatingItemProcessor">
+						<property name="itemWriter">
+							<bean class="org.springframework.batch.item.processor.PropertyExtractingDelegatingItemWriter">
 								<property name="targetObject" ref="delegatingObject" />
 								<property name="targetMethod" value="processPerson" />
 								<property name="fieldsUsedAsTargetMethodArguments">

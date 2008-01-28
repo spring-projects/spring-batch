@@ -51,8 +51,8 @@ public class RestartableItemOrientedTasklet extends ItemOrientedTasklet implemen
 			itemProviderRestartData = ((Restartable) itemProvider).getRestartData();
 		}
 
-		if (itemProcessor instanceof Restartable) {
-			itemProcessorRestartData = ((Restartable) itemProcessor).getRestartData();
+		if (itemWriter instanceof Restartable) {
+			itemProcessorRestartData = ((Restartable) itemWriter).getRestartData();
 		}
 
 		RestartableItemOrientedTaskletRestartData restartData = new RestartableItemOrientedTaskletRestartData(itemProviderRestartData, itemProcessorRestartData);
@@ -79,8 +79,8 @@ public class RestartableItemOrientedTasklet extends ItemOrientedTasklet implemen
 		if (itemProvider instanceof Restartable) {
 			((Restartable) itemProvider).restoreFrom(moduleRestartData.providerData);
 		}
-		if (itemProcessor instanceof Restartable) {
-			((Restartable) itemProcessor).restoreFrom(moduleRestartData.processorData);
+		if (itemWriter instanceof Restartable) {
+			((Restartable) itemWriter).restoreFrom(moduleRestartData.processorData);
 		}
 	}
 

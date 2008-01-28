@@ -21,6 +21,7 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
@@ -86,7 +87,7 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 
 	protected ItemReader itemProvider;
 
-	protected ItemProcessor itemProcessor;
+	protected ItemWriter itemWriter;
 
 	private ItemRecoverer itemRecoverer;
 
@@ -101,7 +102,7 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(itemProvider, "ItemReader must be provided");
-		Assert.notNull(itemProcessor, "ItemProcessor must be provided");
+		Assert.notNull(itemWriter, "ItemProcessor must be provided");
 
 		if (itemRecoverer == null && (itemProvider instanceof ItemRecoverer)) {
 			itemRecoverer = (ItemRecoverer) itemProvider;
@@ -111,7 +112,7 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 		template.setRetryPolicy(itemProviderRetryPolicy);
 
 		if (retryPolicy != null) {
-			retryCallback = new ItemReaderRetryCallback(itemProvider, itemProcessor);
+			retryCallback = new ItemReaderRetryCallback(itemProvider, itemWriter);
 			retryCallback.setRecoverer(itemRecoverer);
 		}
 
@@ -139,7 +140,7 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 				return ExitStatus.FINISHED;
 			}
 			try {
-				itemProcessor.process(item);
+				itemWriter.write(item);
 			}
 			catch (Exception e) {
 				if (itemRecoverer != null) {
@@ -164,10 +165,10 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 	}
 
 	/**
-	 * @param moduleProcessor
+	 * @param writer
 	 */
-	public void setItemProcessor(ItemProcessor moduleProcessor) {
-		this.itemProcessor = moduleProcessor;
+	public void setItemWriter(ItemWriter writer) {
+		this.itemWriter = writer;
 	}
 
 	/**
@@ -197,8 +198,8 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 		if (this.itemProvider instanceof Skippable) {
 			((Skippable) this.itemProvider).skip();
 		}
-		if (this.itemProcessor instanceof Skippable) {
-			((Skippable) this.itemProcessor).skip();
+		if (this.itemWriter instanceof Skippable) {
+			((Skippable) this.itemWriter).skip();
 		}
 	}
 

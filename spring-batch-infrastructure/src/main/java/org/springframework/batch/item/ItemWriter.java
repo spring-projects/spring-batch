@@ -31,6 +31,7 @@ public interface ItemWriter {
 	 * 
 	 * @param item
 	 *            the object to write.
+	 * @throws Exception if something goes wrong
 	 */
-	public void write(Object item);
+	public void write(Object item) throws Exception;
 }

@@ -41,8 +41,8 @@ import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
@@ -61,8 +61,8 @@ public class SimpleStepExecutorTests extends TestCase {
 
 	ArrayList processed = new ArrayList();
 
-	ItemProcessor processor = new ItemProcessor() {
-		public void process(Object data) throws Exception {
+	ItemWriter processor = new ItemWriter() {
+		public void write(Object data) throws Exception {
 			processed.add((String) data);
 		}
 	};
@@ -86,7 +86,7 @@ public class SimpleStepExecutorTests extends TestCase {
 	 */
 	private Tasklet getTasklet(String[] strings) throws Exception {
 		ItemOrientedTasklet module = new ItemOrientedTasklet();
-		module.setItemProcessor(processor);
+		module.setItemWriter(processor);
 		module.setItemReader(getReader(strings));
 		module.afterPropertiesSet();
 		return module;

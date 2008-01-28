@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -17,18 +18,18 @@ import org.springframework.batch.restart.Restartable;
  * 
  * @author Robert Kasanicky
  */
-public class CompositeItemProcessor implements ItemProcessor, Restartable {
+public class CompositeItemWriter implements ItemWriter, Restartable {
 
 	private static final String SEPARATOR = "#";
 
-	private List itemProcessors;
+	private List delegates;
 
 	/**
 	 * Calls injected ItemProcessors in order.
 	 */
-	public void process(Object data) throws Exception {
-		for (Iterator iterator = itemProcessors.listIterator(); iterator.hasNext();) {
-			((ItemProcessor) iterator.next()).process(data);
+	public void write(Object data) throws Exception {
+		for (Iterator iterator = delegates.listIterator(); iterator.hasNext();) {
+			((ItemWriter) iterator.next()).write(data);
 		}
 	}
 
@@ -63,24 +64,24 @@ public class CompositeItemProcessor implements ItemProcessor, Restartable {
 		List restartDataList = parseProperties(data.getProperties());
 
 		// iterators would make the loop below less readable
-		for (int i = 0; i < itemProcessors.size(); i++) {
-			if (itemProcessors.get(i) instanceof Restartable) {
-				((Restartable) itemProcessors.get(i)).restoreFrom((RestartData) restartDataList.get(i));
+		for (int i = 0; i < delegates.size(); i++) {
+			if (delegates.get(i) instanceof Restartable) {
+				((Restartable) delegates.get(i)).restoreFrom((RestartData) restartDataList.get(i));
 			}
 		}
 
 	}
 
-	public void setItemProcessors(List itemProcessors) {
-		this.itemProcessors = itemProcessors;
+	public void setItemWriters(List itemProcessors) {
+		this.delegates = itemProcessors;
 	}
 
 	/**
 	 * Parses compound properties into a list of RestartData.
 	 */
 	private List parseProperties(Properties props) {
-		List restartDataList = new ArrayList(itemProcessors.size());
-		for (int i = 0; i < itemProcessors.size(); i++) {
+		List restartDataList = new ArrayList(delegates.size());
+		for (int i = 0; i < delegates.size(); i++) {
 			restartDataList.add(new GenericRestartData(new Properties()));
 		}
 
@@ -104,7 +105,7 @@ public class CompositeItemProcessor implements ItemProcessor, Restartable {
 	private Properties createCompoundProperties(PropertiesExtractor extractor) {
 		Properties stats = new Properties();
 		int index = 0;
-		for (Iterator iterator = itemProcessors.listIterator(); iterator.hasNext();) {
+		for (Iterator iterator = delegates.listIterator(); iterator.hasNext();) {
 			ItemProcessor processor = (ItemProcessor) iterator.next();
 			Properties processorStats = extractor.extractProperties(processor);
 			if (processorStats != null) {

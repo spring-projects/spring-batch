@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item.processor;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.AbstractMethodInvokingDelegator;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public class PropertyExtractingDelegatingItemProcessor extends AbstractMethodInvokingDelegator implements ItemProcessor {
+public class PropertyExtractingDelegatingItemWriter extends AbstractMethodInvokingDelegator implements ItemWriter {
 	
 	private String[] fieldsUsedAsTargetMethodArguments;
 	
@@ -38,7 +38,7 @@ public class PropertyExtractingDelegatingItemProcessor extends AbstractMethodInv
 	 * Extracts values from item's fields named in fieldsUsedAsTargetMethodArguments
 	 * and passes them as arguments to the delegate method.
 	 */
-	public void process(Object item) throws Exception {
+	public void write(Object item) throws Exception {
 		// helper for extracting property values from a bean
 		BeanWrapper beanWrapper = new BeanWrapperImpl();
 		beanWrapper.setWrappedInstance(item);

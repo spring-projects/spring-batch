@@ -23,16 +23,16 @@
 								<property name="validator" ref="fixedValidator" />
 							</bean>
 						</property>
-						<property name="itemProcessor">
-							<bean class="org.springframework.batch.item.processor.CompositeItemProcessor" >
-								<property name="itemProcessors" >
+						<property name="itemWriter">
+							<bean class="org.springframework.batch.item.processor.CompositeItemWriter" >
+								<property name="itemWriters" >
 									<list>
-										<bean class="org.springframework.batch.sample.item.processor.TradeProcessor">
-											<property name="writer" ref="tradeDao" />
+										<bean class="org.springframework.batch.sample.item.processor.TradeWriter">
+											<property name="dao" ref="tradeDao" />
 										</bean>
 
-										<bean class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
-											<property name="itemWriter" ref="flatFileOutputSource" />
+										<bean class="org.springframework.batch.item.processor.DelegatingItemWriter">
+											<property name="delegate" ref="flatFileOutputSource" />
 										</bean>
 									</list>
 								</property>
@@ -73,7 +73,7 @@
 		</property>
 	</bean>
 
-	<bean id="tradeDao" class="org.springframework.batch.sample.dao.JdbcTradeWriter">
+	<bean id="tradeDao" class="org.springframework.batch.sample.dao.JdbcTradeDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="incrementer">
 			<bean parent="incrementerParent">

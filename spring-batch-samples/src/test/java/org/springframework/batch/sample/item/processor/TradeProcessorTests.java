@@ -3,25 +3,24 @@ package org.springframework.batch.sample.item.processor;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.sample.dao.TradeWriter;
+import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
-import org.springframework.batch.sample.item.processor.TradeProcessor;
 
 public class TradeProcessorTests extends TestCase {
 
 	private MockControl writerControl;
-	private TradeWriter writer;
-	private TradeProcessor processor;
+	private TradeDao writer;
+	private TradeWriter processor;
 	
 	public void setUp() {
 		
 		//create mock writer
-		writerControl = MockControl.createControl(TradeWriter.class);
-		writer = (TradeWriter)writerControl.getMock();
+		writerControl = MockControl.createControl(TradeDao.class);
+		writer = (TradeDao)writerControl.getMock();
 		
 		//create processor
-		processor = new TradeProcessor();
-		processor.setWriter(writer);
+		processor = new TradeWriter();
+		processor.setDao(writer);
 	}
 		
 	public void testProcess() {
@@ -32,7 +31,7 @@ public class TradeProcessorTests extends TestCase {
 		writerControl.replay();
 		
 		//call tested method
-		processor.process(trade);
+		processor.write(trade);
 		
 		//verify method calls
 		writerControl.verify();
@@ -42,7 +41,7 @@ public class TradeProcessorTests extends TestCase {
 		
 		writerControl.replay();
 		//call tested method
-		processor.process(this);
+		processor.write(this);
 		writerControl.verify();
 	}
 }

@@ -133,8 +133,9 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.io.support.HibernateAwareItemWriter#write(java.lang.Object)}.
+	 * @throws Exception 
 	 */
-	public void testWrite() {
+	public void testWrite() throws Exception {
 		writer.write("foo");
 		assertEquals(1, list.size());
 		assertTrue(list.contains("foo"));
@@ -165,8 +166,9 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.io.support.HibernateAwareItemWriter#write(java.lang.Object)}.
+	 * @throws Exception 
 	 */
-	public void testWriteAndCloseWithFailure() {
+	public void testWriteAndCloseWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("bar");
 		writer.setHibernateTemplate(new HibernateTemplateWrapper() {
 			public void flush() throws DataAccessException {

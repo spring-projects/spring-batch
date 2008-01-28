@@ -24,10 +24,10 @@ import org.springframework.beans.factory.DisposableBean;
 /**
  * Writes customer's credit information in a file.
  *
- * @see CustomerCreditWriter
+ * @see CustomerCreditDao
  * @author Robert Kasanicky
  */
-public class FlatFileCustomerCreditWriter implements CustomerCreditWriter,
+public class FlatFileCustomerCreditWriter implements CustomerCreditDao,
 		DisposableBean {
 
 	private ItemWriter outputSource;
@@ -36,7 +36,7 @@ public class FlatFileCustomerCreditWriter implements CustomerCreditWriter,
 
 	private volatile boolean opened = false;
 
-	public void writeCredit(CustomerCredit customerCredit) {
+	public void writeCredit(CustomerCredit customerCredit) throws Exception {
 
 		if (!opened) {
 			open();
@@ -78,7 +78,4 @@ public class FlatFileCustomerCreditWriter implements CustomerCreditWriter,
 		close();
 	}
 
-	public void write(Object output) {
-		writeCredit((CustomerCredit)output);
-	}
 }

@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.CustomerCredit;
 import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 
@@ -24,7 +23,7 @@ import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
  *
  */
 public class IbatisCustomerCreditWriter extends SqlMapClientDaoSupport
-		implements CustomerCreditWriter, ItemWriter {
+		implements CustomerCreditDao {
 
 	String statementId;
 
@@ -53,7 +52,4 @@ public class IbatisCustomerCreditWriter extends SqlMapClientDaoSupport
 		this.statementId = statementId;
 	}
 
-	public void write(Object output) {
-		writeCredit((CustomerCredit)output);
-	}
 }

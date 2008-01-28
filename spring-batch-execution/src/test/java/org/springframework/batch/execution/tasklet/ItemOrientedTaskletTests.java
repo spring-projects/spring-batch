@@ -24,9 +24,9 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
@@ -59,8 +59,8 @@ public class ItemOrientedTaskletTests extends TestCase {
 		}
 	};
 
-	private ItemProcessor itemProcessor = new ItemProcessor() {
-		public void process(Object data) throws Exception {
+	private ItemWriter itemWriter = new ItemWriter() {
+		public void write(Object data) throws Exception {
 			list.add(data);
 		}
 	};
@@ -74,7 +74,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 
 		// set up module
 		module.setItemReader(itemProvider);
-		module.setItemProcessor(itemProcessor);
+		module.setItemWriter(itemWriter);
 
 		module.afterPropertiesSet();
 
@@ -153,7 +153,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 
 	public void testSkippablReaderProcessor() throws Exception {
 		module.setItemReader(new SkippableItemReader());
-		module.setItemProcessor(new SkippableItemProcessor());
+		module.setItemWriter(new SkippableItemWriter());
 		module.setItemRecoverer(null);
 		module.skip();
 		assertEquals(2, list.size());
@@ -178,8 +178,8 @@ public class ItemOrientedTaskletTests extends TestCase {
 			}
 		});
 
-		module.setItemProcessor(new ItemProcessor() {
-			public void process(Object data) throws Exception {
+		module.setItemWriter(new ItemWriter() {
+			public void write(Object data) throws Exception {
 				throw new RuntimeException("FOO");
 			}
 		});
@@ -215,8 +215,8 @@ public class ItemOrientedTaskletTests extends TestCase {
 				return "foo";
 			}
 		});
-		module.setItemProcessor(new ItemProcessor() {
-			public void process(Object data) throws Exception {
+		module.setItemWriter(new ItemWriter() {
+			public void write(Object data) throws Exception {
 				throw new RuntimeException("FOO");
 			}
 		});
@@ -252,7 +252,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 	}
 
 	public void testInitialisationWithNullProcessor() throws Exception {
-		module.setItemProcessor(null);
+		module.setItemWriter(null);
 		try {
 			module.afterPropertiesSet();
 		} catch (IllegalArgumentException e) {
@@ -276,20 +276,20 @@ public class ItemOrientedTaskletTests extends TestCase {
 		}
 	}
 
-	private class SkippableItemProcessor implements ItemProcessor, Skippable,
+	private class SkippableItemWriter implements ItemWriter, Skippable,
 			StatisticsProvider {
 		String props = "foo=bar";
 
-		public SkippableItemProcessor() {
+		public SkippableItemWriter() {
 			super();
 		}
 
-		public SkippableItemProcessor(String props) {
+		public SkippableItemWriter(String props) {
 			this();
 			this.props = props;
 		}
 
-		public void process(Object data) throws Exception {
+		public void write(Object data) throws Exception {
 			// no-op
 		}
 

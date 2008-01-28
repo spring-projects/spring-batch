@@ -2,7 +2,7 @@ package org.springframework.batch.sample;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.sample.item.processor.StagingItemProcessor;
+import org.springframework.batch.sample.item.processor.StagingItemWriter;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -23,13 +23,13 @@ public class ParallelJobFunctionalTests extends
 		int count;
 		count = jdbcTemplate.queryForInt(
 				"SELECT COUNT(*) from BATCH_STAGING where PROCESSED=?",
-				new Object[] {StagingItemProcessor.NEW});
+				new Object[] {StagingItemWriter.NEW});
 		assertEquals(0, count);
 		int total = jdbcTemplate.queryForInt(
 				"SELECT COUNT(*) from BATCH_STAGING");
 		count = jdbcTemplate.queryForInt(
 				"SELECT COUNT(*) from BATCH_STAGING where PROCESSED=?",
-				new Object[] {StagingItemProcessor.DONE});
+				new Object[] {StagingItemWriter.DONE});
 		assertEquals(total, count);
 	}
 

@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.file.DefaultFlatFileItemReader;
-import org.springframework.batch.sample.dao.TradeWriter;
+import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
 
 public class SimpleTradeTaskletTests extends TestCase {
@@ -33,7 +33,7 @@ public class SimpleTradeTaskletTests extends TestCase {
 		};
 
 		//create writer
-		TradeWriter writer = new TradeWriter() {
+		TradeDao dao = new TradeDao() {
 			public void writeTrade(Trade trade) {
 				assertEquals("1234",trade.getIsin());
 				assertEquals(5, trade.getQuantity());
@@ -41,13 +41,12 @@ public class SimpleTradeTaskletTests extends TestCase {
 				assertEquals("testName", trade.getCustomer());
 				writerCalled = true;
 			}
-			public void write(Object output) {}
 		};
 
 		//create module
 		SimpleTradeTasklet module = new SimpleTradeTasklet();
 		module.setItemReader(input);
-		module.setTradeDao(writer);
+		module.setTradeDao(dao);
 
 		//call tested methods
 		//read method should return true, because input returned fieldset

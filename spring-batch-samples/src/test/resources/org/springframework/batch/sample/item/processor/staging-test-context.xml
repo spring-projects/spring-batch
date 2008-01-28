@@ -12,7 +12,7 @@
 		class="org.springframework.batch.execution.scope.StepScope" />
 
 	<bean id="processor"
-		class="org.springframework.batch.sample.item.processor.StagingItemProcessor"
+		class="org.springframework.batch.sample.item.processor.StagingItemWriter"
 		scope="step">
 		<property name="incrementer">
 			<bean id="jobIncrementer" parent="incrementerParent">

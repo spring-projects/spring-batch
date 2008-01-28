@@ -28,9 +28,9 @@
 										ref="fixedValidator" />
 								</bean>
 							</property>
-							<property name="itemProcessor">
+							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.sample.item.processor.StagingItemProcessor"
+									class="org.springframework.batch.sample.item.processor.StagingItemWriter"
 									scope="step">
 									<aop:scoped-proxy />
 									<property name="dataSource"
@@ -65,10 +65,10 @@
 										ref="dataSource" />
 								</bean>
 							</property>
-							<property name="itemProcessor">
+							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.sample.item.processor.TradeProcessor">
-									<property name="writer"
+									class="org.springframework.batch.sample.item.processor.TradeWriter">
+									<property name="dao"
 										ref="tradeDao" />
 								</bean>
 							</property>
@@ -138,7 +138,7 @@
 	</bean>
 
 	<bean id="tradeDao"
-		class="org.springframework.batch.sample.dao.JdbcTradeWriter">
+		class="org.springframework.batch.sample.dao.JdbcTradeDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="incrementer">
 			<bean parent="incrementerParent">

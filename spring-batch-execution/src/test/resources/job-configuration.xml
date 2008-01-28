@@ -23,8 +23,8 @@
 								<constructor-arg value="foo,bar,spam"/>
 							</bean>
 						</property>
-						<property name="itemProcessor">
-							<bean class="org.springframework.batch.execution.launch.EmptyItemProcessor"/>
+						<property name="itemWriter">
+							<bean class="org.springframework.batch.execution.launch.EmptyItemWriter"/>
 						</property>
 					</bean>
 				</constructor-arg>

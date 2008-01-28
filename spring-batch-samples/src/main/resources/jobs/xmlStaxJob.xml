@@ -43,20 +43,15 @@
 								</property>
 							</bean>
 						</property>
-
-						<property name="itemProcessor">
-							<bean
-								class="org.springframework.batch.item.processor.ItemWriterItemProcessor"
-								p:itemWriter-ref="tradeStaxWriter" />
-						</property>
+						<property name="itemWriter"
+							ref="tradeStaxWriter" />
 					</bean>
 				</property>
 			</bean>
 		</property>
 	</bean>
 
-	<bean
-		class="org.springframework.batch.io.xml.StaxEventItemWriter"
+	<bean class="org.springframework.batch.io.xml.StaxEventItemWriter"
 		id="tradeStaxWriter">
 		<property name="resource"
 			value="file:target/test-outputs/20070918.testStream.xmlFileStep.output.xml" />

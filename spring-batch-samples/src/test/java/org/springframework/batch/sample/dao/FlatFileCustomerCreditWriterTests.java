@@ -53,7 +53,7 @@ public class FlatFileCustomerCreditWriterTests extends TestCase {
 		outputControl.verify();
 	}
 	
-	public void testWrite() {
+	public void testWrite() throws Exception {
 		
 		//Create and set-up CustomerCredit
 		CustomerCredit credit = new CustomerCredit();

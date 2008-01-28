@@ -4,28 +4,27 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.sample.dao.OrderWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.Order;
-import org.springframework.batch.sample.item.processor.OrderProcessor;
 
-public class OrderProcessorTests extends TestCase {
+public class OrderWriterTests extends TestCase {
 
 	private MockControl writerControl;
-	private OrderWriter writer;
-	private OrderProcessor processor;
+	private OrderWriter processor;
+	private ItemWriter writer;
 	
 	public void setUp() {
 		
 		//create mock writer
-		writerControl = MockControl.createControl(OrderWriter.class);
-		writer = (OrderWriter)writerControl.getMock();
+		writerControl = MockControl.createControl(ItemWriter.class);
+		writer = (ItemWriter)writerControl.getMock();
 		
 		//create processor
-		processor = new OrderProcessor();
-		processor.setWriter(writer);
+		processor = new OrderWriter();
+		processor.setDelegate(writer);
 	}
 	
-	public void testProcess() {
+	public void testProcess() throws Exception {
 		
 		Order order = new Order();
 		//set-up mock writer
@@ -33,18 +32,18 @@ public class OrderProcessorTests extends TestCase {
 		writerControl.replay();
 		
 		//call tested method
-		processor.process(order);
+		processor.write(order);
 		
 		//verify method calls
 		writerControl.verify();
 	}
 	
-	public void testProcessWithException() {
+	public void testProcessWithException() throws Exception {
 		
 		writerControl.replay();
 		//call tested method
 		try {
-			processor.process(this);
+			processor.write(this);
 			fail("Batch critical exception was expected");
 		} catch (BatchCriticalException bce) {
 			assertTrue(true);

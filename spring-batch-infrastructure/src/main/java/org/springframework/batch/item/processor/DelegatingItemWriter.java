@@ -3,7 +3,6 @@ package org.springframework.batch.item.processor;
 import java.util.Properties;
 
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
@@ -18,17 +17,18 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class ItemWriterItemProcessor implements ItemProcessor, Restartable, Skippable, InitializingBean {
+public class DelegatingItemWriter implements ItemWriter, Restartable, Skippable, InitializingBean {
 
 	private ItemWriter writer;
 
 	/**
 	 * Calls {@link #doProcess(Object)} and then writes the result to the
-	 * {@link ItemWriter}.
+	 * delegate {@link ItemWriter}.
+	 * @throws Exception 
 	 * 
 	 * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
 	 */
-	final public void process(Object item) throws Exception {
+	final public void write(Object item) throws Exception {
 		Object result = doProcess(item);
 		writer.write(result);
 	}
@@ -36,6 +36,7 @@ public class ItemWriterItemProcessor implements ItemProcessor, Restartable, Skip
 	/**
 	 * By default returns the argument. This method is an extension point meant
 	 * to be overridden by subclasses that implement processing logic.
+	 * @throws Exception 
 	 */
 	protected Object doProcess(Object item) throws Exception {
 		return item;
@@ -44,7 +45,7 @@ public class ItemWriterItemProcessor implements ItemProcessor, Restartable, Skip
 	/**
 	 * Setter for {@link ItemWriter}.
 	 */
-	public void setItemWriter(ItemWriter writer) {
+	public void setDelegate(ItemWriter writer) {
 		this.writer = writer;
 	}
 

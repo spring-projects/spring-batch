@@ -29,9 +29,9 @@
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemReader"
 								ref="playerFileItemReader" />
-							<property name="itemProcessor">
+							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.sample.item.processor.PlayerItemProcessor">
+									class="org.springframework.batch.sample.item.processor.PlayerItemWriter">
 									<property name="playerDao">
 										<bean
 											class="org.springframework.batch.sample.dao.JdbcPlayerDao">
@@ -54,16 +54,11 @@
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemReader"
 								ref="gameFileItemReader" />
-							<property name="itemProcessor">
+							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
-									<property name="itemWriter">
-										<bean
-											class="org.springframework.batch.sample.dao.JdbcGameDao">
-											<property name="dataSource"
-												ref="dataSource" />
-										</bean>
-									</property>
+									class="org.springframework.batch.sample.dao.JdbcGameDao">
+									<property name="dataSource"
+										ref="dataSource" />
 								</bean>
 							</property>
 						</bean>
@@ -79,16 +74,11 @@
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemReader"
 								ref="playerSummarizationSource" />
-							<property name="itemProcessor">
+							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.item.processor.ItemWriterItemProcessor">
-									<property name="itemWriter">
-										<bean
-											class="org.springframework.batch.sample.dao.JdbcPlayerSummaryDao">
-											<property name="dataSource"
-												ref="dataSource" />
-										</bean>
-									</property>
+									class="org.springframework.batch.sample.dao.JdbcPlayerSummaryDao">
+									<property name="dataSource"
+										ref="dataSource" />
 								</bean>
 							</property>
 						</bean>

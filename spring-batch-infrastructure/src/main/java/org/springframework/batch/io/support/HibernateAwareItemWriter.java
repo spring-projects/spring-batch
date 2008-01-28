@@ -114,10 +114,11 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
 	/**
 	 * Use the delegate to actually do the writing, but flush aggressively if
 	 * the item was previously part of a failed chunk.
+	 * @throws Exception 
 	 * 
 	 * @see org.springframework.batch.io.OutputSource#write(java.lang.Object)
 	 */
-	public void write(Object output) {
+	public void write(Object output) throws Exception {
 		getProcessed().add(output);
 		delegate.write(output);
 		flushIfNecessary(output);

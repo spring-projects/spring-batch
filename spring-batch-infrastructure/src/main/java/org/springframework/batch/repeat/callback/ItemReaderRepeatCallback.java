@@ -16,15 +16,15 @@
 
 package org.springframework.batch.repeat.callback;
 
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Simple wrapper for two business interfaces: get the next item from a
- * ItemProvider and apply the given processor to the result (if not null).
+ * reader and apply the given writer to the result (if not null).
  * 
  * @author Dave Syer
  * 
@@ -33,12 +33,12 @@ public class ItemReaderRepeatCallback implements RepeatCallback {
 
 	ItemReader provider;
 
-	ItemProcessor processor;
+	ItemWriter writer;
 
-	public ItemReaderRepeatCallback(ItemReader provider, ItemProcessor processor) {
+	public ItemReaderRepeatCallback(ItemReader provider, ItemWriter writer) {
 		super();
 		this.provider = provider;
-		this.processor = processor;
+		this.writer = writer;
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class ItemReaderRepeatCallback implements RepeatCallback {
 	}
 
 	/**
-	 * Use the processor to process the next item if there is one. Return the
+	 * Use the writer to process the next item if there is one. Return the
 	 * item processed, or null if nothing was available.
 	 * @see org.springframework.batch.repeat.RepeatCallback#doInIteration(org.springframework.batch.item.BatchContextAdapter)
 	 * @param context the current context.
@@ -63,9 +63,9 @@ public class ItemReaderRepeatCallback implements RepeatCallback {
 		ExitStatus result = ExitStatus.FINISHED;
 		Object item = provider.read();
 
-		if (processor != null) {
+		if (writer != null) {
 			if (item != null) {
-				processor.process(item);
+				writer.write(item);
 				result = ExitStatus.CONTINUABLE;
 			}
 			item = null;

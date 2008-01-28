@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample.item.processor;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.dao.JdbcCustomerDebitWriter;
 import org.springframework.batch.sample.domain.CustomerDebit;
 import org.springframework.batch.sample.domain.Trade;
@@ -27,10 +27,10 @@ import org.springframework.batch.sample.domain.Trade;
  * 
  * @author Robert Kasanicky
  */
-public class CustomerUpdateProcessor implements ItemProcessor {
+public class CustomerUpdateWriter implements ItemWriter {
     private JdbcCustomerDebitWriter dao;
 
-    public void process(Object data) {
+    public void write(Object data) {
         Trade trade = (Trade) data;
         CustomerDebit customerDebit = new CustomerDebit();
         customerDebit.setName(trade.getCustomer());

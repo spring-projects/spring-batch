@@ -7,14 +7,14 @@ import org.springframework.batch.io.sample.domain.FooService;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
- * Tests for {@link PropertyExtractingDelegatingItemProcessor}
+ * Tests for {@link PropertyExtractingDelegatingItemWriter}
  * 
  * @author Robert Kasanicky
  */
 public class PropertyExtractingDelegatingItemProccessorIntegrationTests 
 	extends AbstractDependencyInjectionSpringContextTests {
 	
-	private PropertyExtractingDelegatingItemProcessor processor;
+	private PropertyExtractingDelegatingItemWriter processor;
 	
 	private FooService fooService;
 	
@@ -29,7 +29,7 @@ public class PropertyExtractingDelegatingItemProccessorIntegrationTests
 	public void testProcess() throws Exception {
 		Foo foo;
 		while ((foo = fooService.generateFoo()) != null) {
-			processor.process(foo);
+			processor.write(foo);
 		}
 		
 		List input = fooService.getGeneratedFoos();
@@ -47,7 +47,7 @@ public class PropertyExtractingDelegatingItemProccessorIntegrationTests
 		
 	}
 
-	public void setProcessor(PropertyExtractingDelegatingItemProcessor processor) {
+	public void setProcessor(PropertyExtractingDelegatingItemWriter processor) {
 		this.processor = processor;
 	}
 

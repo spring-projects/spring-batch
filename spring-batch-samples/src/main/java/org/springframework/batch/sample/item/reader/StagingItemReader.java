@@ -14,7 +14,7 @@ import org.springframework.batch.execution.scope.StepContextAware;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.batch.sample.item.processor.StagingItemProcessor;
+import org.springframework.batch.sample.item.processor.StagingItemWriter;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowMapper;
@@ -98,7 +98,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemReader, Res
 
 			"SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID",
 
-			new Object[] { stepContext.getStepExecution().getJobExecution().getJobId(), StagingItemProcessor.NEW },
+			new Object[] { stepContext.getStepExecution().getJobExecution().getJobId(), StagingItemWriter.NEW },
 
 			new RowMapper() {
 				public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -131,7 +131,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemReader, Res
 				});
 		// Update now - changes will rollback if there is a problem later.
 		int count = getJdbcTemplate().update("UPDATE BATCH_STAGING SET PROCESSED=? WHERE ID=? AND PROCESSED=?",
-				new Object[] { StagingItemProcessor.DONE, id, StagingItemProcessor.NEW });
+				new Object[] { StagingItemWriter.DONE, id, StagingItemWriter.NEW });
 		if (count != 1) {
 			throw new OptimisticLockingFailureException("The staging record with ID=" + id
 					+ " was updated concurrently when trying to mark as complete (updated " + count + " records.");

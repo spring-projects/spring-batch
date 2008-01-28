@@ -22,7 +22,7 @@ import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.io.file.DefaultFlatFileItemReader;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.sample.dao.TradeWriter;
+import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.batch.statistics.StatisticsProvider;
 
@@ -50,7 +50,7 @@ public class SimpleTradeTasklet implements Tasklet, StatisticsProvider {
 	/*
 	 * writes a Trade object to output
 	 */
-	private TradeWriter tradeWriter;
+	private TradeDao tradeDao;
 
 	/**
 	 * number of trade objects processed
@@ -72,7 +72,7 @@ public class SimpleTradeTasklet implements Tasklet, StatisticsProvider {
 		}
 
 		tradeCount++;
-		tradeWriter.writeTrade(trade);
+		tradeDao.writeTrade(trade);
 		return ExitStatus.CONTINUABLE;
 	}
 
@@ -80,8 +80,8 @@ public class SimpleTradeTasklet implements Tasklet, StatisticsProvider {
 		this.inputSource = inputTemplate;
 	}
 
-	public void setTradeDao(TradeWriter tradeWriter) {
-		this.tradeWriter = tradeWriter;
+	public void setTradeDao(TradeDao tradeDao) {
+		this.tradeDao = tradeDao;
 	}
 
 	public Properties getStatistics() {

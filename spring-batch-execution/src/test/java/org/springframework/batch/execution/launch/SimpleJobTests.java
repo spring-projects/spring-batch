@@ -38,9 +38,9 @@ import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
@@ -59,8 +59,8 @@ public class SimpleJobTests extends TestCase {
 
 	private List processed = new ArrayList();
 
-	private ItemProcessor processor = new ItemProcessor() {
-		public void process(Object data) throws Exception {
+	private ItemWriter processor = new ItemWriter() {
+		public void write(Object data) throws Exception {
 			processed.add((String) data);
 		}
 	};
@@ -103,7 +103,7 @@ public class SimpleJobTests extends TestCase {
 			}
 		});
 		module.setItemReader(provider);
-		module.setItemProcessor(processor);
+		module.setItemWriter(processor);
 		module.afterPropertiesSet();
 		return module;
 	}
@@ -155,8 +155,8 @@ public class SimpleJobTests extends TestCase {
 		 */
 		final ItemOrientedTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
 		Step step = new SimpleStep(module);
-		module.setItemProcessor(new ItemProcessor() {
-			public void process(Object data) throws Exception {
+		module.setItemWriter(new ItemWriter() {
+			public void write(Object data) throws Exception {
 				throw new RuntimeException("Try again Dummy!");
 			}
 		});
@@ -178,8 +178,8 @@ public class SimpleJobTests extends TestCase {
 		Job jobConfiguration = new Job();
 		final ItemOrientedTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
 		Step step = new SimpleStep(module);
-		module.setItemProcessor(new ItemProcessor() {
-			public void process(Object data) throws Exception {
+		module.setItemWriter(new ItemWriter() {
+			public void write(Object data) throws Exception {
 				throw new RuntimeException("Foo");
 			}
 		});

@@ -24,7 +24,7 @@ import org.springframework.batch.support.AbstractMethodInvokingDelegator;
  * Delegates item processing to a custom method - 
  * passes the item as an argument for the delegate method.
  * 
- * @see PropertyExtractingDelegatingItemProcessor
+ * @see PropertyExtractingDelegatingItemWriter
  * 
  * @author Robert Kasanicky
  */

@@ -29,7 +29,7 @@
 	</bean>
 
 	<bean id="tradeDao"
-		class="org.springframework.batch.sample.dao.JdbcTradeWriter">
+		class="org.springframework.batch.sample.dao.JdbcTradeDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="incrementer">
 			<bean parent="incrementerParent">
@@ -72,7 +72,7 @@
 		<aop:aspect id="tradeWriterLogging" ref="tradeLogAdvice">
 
 			<aop:after
-				pointcut="execution( * org.springframework.batch.sample.dao.TradeWriter+.writeTrade(org.springframework.batch.sample.domain.Trade)) and args(trade)"
+				pointcut="execution( * org.springframework.batch.sample.dao.TradeDao+.writeTrade(org.springframework.batch.sample.domain.Trade)) and args(trade)"
 				method="doBasicLogging" />
 
 		</aop:aspect>

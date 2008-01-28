@@ -9,21 +9,22 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.processor.CompositeItemProcessor;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.processor.CompositeItemWriter;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
 
 /**
- * Tests for {@link CompositeItemProcessor}
+ * Tests for {@link CompositeItemWriter}
  * 
  * @author Robert Kasanicky
  */
 public class CompositeItemProcessorTests extends TestCase {
 
 	// object under test
-	private CompositeItemProcessor itemProcessor = new CompositeItemProcessor();
+	private CompositeItemWriter itemProcessor = new CompositeItemWriter();
 	
 	/**
 	 * Regular usage scenario.
@@ -38,10 +39,10 @@ public class CompositeItemProcessorTests extends TestCase {
 		List processors = new ArrayList(NUMBER_OF_PROCESSORS);
 		
 		for (int i = 0; i < NUMBER_OF_PROCESSORS; i++) {
-			MockControl control = MockControl.createStrictControl(ItemProcessor.class);
-			ItemProcessor processor = (ItemProcessor) control.getMock();
+			MockControl control = MockControl.createStrictControl(ItemWriter.class);
+			ItemWriter processor = (ItemWriter) control.getMock();
 			
-			processor.process(data);
+			processor.write(data);
 			control.setVoidCallable();
 			control.replay();
 			
@@ -49,8 +50,8 @@ public class CompositeItemProcessorTests extends TestCase {
 			controls.add(control);
 		}
 		
-		itemProcessor.setItemProcessors(processors);
-		itemProcessor.process(data);
+		itemProcessor.setItemWriters(processors);
+		itemProcessor.write(data);
 		
 		for (Iterator iterator = controls.iterator(); iterator.hasNext();) {
 			MockControl control = (MockControl) iterator.next();
@@ -73,7 +74,7 @@ public class CompositeItemProcessorTests extends TestCase {
 			add(p2);
 			add(p3);
 		}};
-		itemProcessor.setItemProcessors(itemProcessors);
+		itemProcessor.setItemWriters(itemProcessors);
 		
 		RestartData rd = itemProcessor.getRestartData();
 		itemProcessor.restoreFrom(rd);

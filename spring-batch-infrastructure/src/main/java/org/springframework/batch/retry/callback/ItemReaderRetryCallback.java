@@ -18,9 +18,9 @@ package org.springframework.batch.retry.callback;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
@@ -49,15 +49,15 @@ public class ItemReaderRetryCallback implements RetryCallback {
 
 	private ItemReader provider;
 
-	private ItemProcessor processor;
+	private ItemWriter writer;
 
 	private ItemRecoverer recoverer;
 
 	public ItemReaderRetryCallback(ItemReader provider,
-			ItemProcessor processor) {
+			ItemWriter writer) {
 		super();
 		this.provider = provider;
-		this.processor = processor;
+		this.writer = writer;
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class ItemReaderRetryCallback implements RetryCallback {
 	private Object process(RetryContext context) throws Exception {
 		Object item = next(context);
 		if (item != null) {
-			processor.process(item);
+			writer.write(item);
 		}
 		context.removeAttribute(ITEM); // if successful
 		return item;

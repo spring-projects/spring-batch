@@ -17,7 +17,7 @@ public class JdbcTradeWriterTests extends AbstractTransactionalDataSourceSpringC
 
 	public void testWrite() {
 		
-		JdbcTradeWriter writer = new JdbcTradeWriter();
+		JdbcTradeDao writer = new JdbcTradeDao();
 		
 		AbstractDataFieldMaxValueIncrementer incrementer = (AbstractDataFieldMaxValueIncrementer)applicationContext.getBean("jobIncrementer");
 		incrementer.setIncrementerName("TRADE_SEQ");
@@ -31,7 +31,7 @@ public class JdbcTradeWriterTests extends AbstractTransactionalDataSourceSpringC
 		trade.setPrice(new BigDecimal(Double.toString(99.69)));
 		trade.setQuantity(5);
 		
-		writer.write(trade);
+		writer.writeTrade(trade);
 		
 		jdbcTemplate.query("SELECT * FROM TRADE WHERE ISIN = '5647238492'", new RowCallbackHandler() {
 			public void processRow(ResultSet rs) throws SQLException {

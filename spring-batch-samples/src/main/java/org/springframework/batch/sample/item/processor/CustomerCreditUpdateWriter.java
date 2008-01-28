@@ -16,21 +16,21 @@
 
 package org.springframework.batch.sample.item.processor;
 
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.sample.dao.CustomerCreditWriter;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.sample.dao.CustomerCreditDao;
 import org.springframework.batch.sample.domain.CustomerCredit;
 
 
 
-public class CustomerCreditUpdateProcessor implements ItemProcessor {
+public class CustomerCreditUpdateWriter implements ItemWriter {
     private double creditFilter = 800;
-    private CustomerCreditWriter writer;
+    private CustomerCreditDao dao;
 
-    public void process(Object data) {
+    public void write(Object data) throws Exception {
         CustomerCredit customerCredit = (CustomerCredit) data;
 
         if (customerCredit.getCredit().doubleValue() > creditFilter) {
-            writer.writeCredit(customerCredit);
+            dao.writeCredit(customerCredit);
         }
     }
 
@@ -38,8 +38,8 @@ public class CustomerCreditUpdateProcessor implements ItemProcessor {
         this.creditFilter = creditFilter;
     }
 
-    public void setWriter(CustomerCreditWriter writer) {
-        this.writer = writer;
+    public void setWriter(CustomerCreditDao writer) {
+        this.dao = writer;
     }
 
 }

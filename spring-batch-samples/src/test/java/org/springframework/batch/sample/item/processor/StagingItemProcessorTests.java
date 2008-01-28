@@ -13,14 +13,14 @@ import org.springframework.util.ClassUtils;
 
 public class StagingItemProcessorTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	private StagingItemProcessor processor;
+	private StagingItemWriter writer;
 
-	public void setProcessor(StagingItemProcessor processor) {
-		this.processor = processor;
+	public void setProcessor(StagingItemWriter processor) {
+		this.writer = processor;
 	}
 
 	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(StagingItemProcessor.class,
+		return new String[] { ClassUtils.addResourcePathToPackagePath(StagingItemWriter.class,
 				"staging-test-context.xml") };
 	}
 
@@ -33,7 +33,7 @@ public class StagingItemProcessorTests extends AbstractTransactionalDataSourceSp
 
 	public void testProcessInsertsNewItem() throws Exception {
 		int before = getJdbcTemplate().queryForInt("SELECT COUNT(*) from BATCH_STAGING");
-		processor.process("FOO");
+		writer.write("FOO");
 		int after = getJdbcTemplate().queryForInt("SELECT COUNT(*) from BATCH_STAGING");
 		assertEquals(before + 1, after);
 	}

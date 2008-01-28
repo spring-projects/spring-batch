@@ -17,8 +17,8 @@
 package org.springframework.batch.sample.dao;
 
 import org.springframework.batch.io.file.transform.Converter;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.sample.domain.Order;
+import org.springframework.batch.item.processor.DelegatingItemWriter;
+import org.springframework.batch.sample.item.processor.OrderWriter;
 
 
 /**
@@ -28,11 +28,7 @@ import org.springframework.batch.sample.domain.Order;
  * 
  * @author Dave Syer
  */
-public class FlatFileOrderWriter implements OrderWriter {
-    /**
-     * Takes care of writing to a file
-     */
-    private ItemWriter outputSource;
+public class FlatFileOrderWriter extends DelegatingItemWriter {
 
     /**
      * Converter for order
@@ -48,15 +44,11 @@ public class FlatFileOrderWriter implements OrderWriter {
 		this.converter = converter;
 	}
 
-    /**
-     * Writes information from an Order object to a file
-     */
-    public void write(Order data) {
-        outputSource.write(converter.convert(data));
-    }
-    
-	public void setOutputSource(ItemWriter outputSource) {
-        this.outputSource = outputSource;
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.processor.DelegatingItemWriter#doProcess(java.lang.Object)
+	 */
+	protected Object doProcess(Object item) throws Exception {
+        return converter.convert(item);
     }
 
 }

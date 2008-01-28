@@ -21,18 +21,18 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-public class EmptyItemProcessor implements ItemProcessor, InitializingBean {
+public class EmptyItemWriter implements ItemWriter, InitializingBean {
 
 	private boolean failed = false;
 
 	// point at which to fail...
 	private int failurePoint = Integer.MAX_VALUE;
 
-	protected Log logger = LogFactory.getLog(EmptyItemProcessor.class);
+	protected Log logger = LogFactory.getLog(EmptyItemWriter.class);
 
 	List list;
 
@@ -45,7 +45,7 @@ public class EmptyItemProcessor implements ItemProcessor, InitializingBean {
 		this.failurePoint = failurePoint;
 	}
 
-	public void process(Object data) {
+	public void write(Object data) {
 		if (!failed && list.size() == failurePoint) {
 			failed = true;
 			throw new RuntimeException("Failed processing: [" + data + "]");

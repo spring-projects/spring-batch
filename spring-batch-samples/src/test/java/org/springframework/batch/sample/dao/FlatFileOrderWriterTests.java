@@ -23,11 +23,9 @@ public class FlatFileOrderWriterTests extends TestCase {
 	List list = new ArrayList();
 	
 	private ItemWriter output = new ItemWriter() {
-		
 		public void write(Object output) {
 			list.add(output);
 		}
-
 	};
 
 	private FlatFileOrderWriter writer;
@@ -36,10 +34,10 @@ public class FlatFileOrderWriterTests extends TestCase {
 		super.setUp();		
 		//create new writer
 		writer = new FlatFileOrderWriter();
-		writer.setOutputSource(output);
+		writer.setDelegate(output);
 	}
 
-	public void testWrite() {
+	public void testWrite() throws Exception {
 		
 		//Create and set-up Order
 		Order order = new Order();

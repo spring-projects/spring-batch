@@ -22,7 +22,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.retry.ListItemReaderRecoverer;
 import org.springframework.batch.retry.RetryContext;
@@ -57,8 +57,8 @@ public class ItemReaderRetryCallbackTests extends TestCase {
 				return "key" + (count++);
 			}
 		};
-		callback = new ItemReaderRetryCallback(provider, new ItemProcessor() {
-			public void process(Object data) {
+		callback = new ItemReaderRetryCallback(provider, new ItemWriter() {
+			public void write(Object data) {
 				count++;
 				if (data.equals("bar")) {
 					throw new IllegalStateException("Bar detected");

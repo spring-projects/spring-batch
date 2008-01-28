@@ -20,9 +20,8 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -66,7 +65,7 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 
 	}
 
-	private static class MockProcessor implements ItemProcessor, Restartable {
+	private static class MockWriter implements ItemWriter, Restartable {
 
 		RestartData data = new RestartData() {
 			public Properties getProperties() {
@@ -74,7 +73,7 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 			}
 		};
 
-		public void process(Object data) {
+		public void write(Object data) {
 		}
 
 		public RestartData getRestartData() {
@@ -90,7 +89,7 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 
 	private ItemReader itemProvider;
 
-	private ItemProcessor itemProcessor;
+	private ItemWriter itemWriter;
 
 	private RestartableItemOrientedTasklet module;
 
@@ -98,12 +97,12 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 
 		// create data provider and data processor
 		itemProvider = new MockProvider();
-		itemProcessor = new MockProcessor();
+		itemWriter = new MockWriter();
 
 		// create and set up module
 		module = new RestartableItemOrientedTasklet();
 		module.setItemReader(itemProvider);
-		module.setItemProcessor(itemProcessor);
+		module.setItemWriter(itemWriter);
 
 		// get restart data
 		RestartData data = module.getRestartData();
@@ -116,12 +115,12 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 
 		// create data provider and data processor
 		itemProvider = new MockProvider();
-		itemProcessor = new MockProcessor();
+		itemWriter = new MockWriter();
 
 		// create and set up module
 		module = new RestartableItemOrientedTasklet();
 		module.setItemReader(itemProvider);
-		module.setItemProcessor(itemProcessor);
+		module.setItemWriter(itemWriter);
 
 		// get restart data
 		RestartData data = module.getRestartData();
@@ -136,7 +135,7 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 		// create and set up module
 		module = new RestartableItemOrientedTasklet();
 		module.setItemReader(null);
-		module.setItemProcessor(null);
+		module.setItemWriter(null);
 
 		// get restart data
 		RestartData data = module.getRestartData();

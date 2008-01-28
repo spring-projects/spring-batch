@@ -9,7 +9,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public class TransformerWriterItemProcessor extends ItemWriterItemProcessor {
+public class ItemTransformerItemWriterr extends DelegatingItemWriter {
 
 	private ItemTransformer itemTransformer;
 

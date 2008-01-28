@@ -31,11 +31,11 @@
 								<property name="validator" ref="validator" />
 							</bean>
 						</property>
-						<property name="itemProcessor">
-							<bean class="org.springframework.batch.sample.item.processor.OrderProcessor">
-								<property name="writer">
+						<property name="itemWriter">
+							<bean class="org.springframework.batch.sample.item.processor.OrderWriter">
+								<property name="delegate">
 									<bean class="org.springframework.batch.sample.dao.FlatFileOrderWriter">
-										<property name="outputSource" ref="flatFileOutputSource" />
+										<property name="delegate" ref="flatFileOutputSource" />
 										<property name="converter">
 											<bean class="org.springframework.batch.sample.dao.OrderConverter">
 												<property name="aggregators" ref="outputDescriptors" />
