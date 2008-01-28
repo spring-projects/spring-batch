@@ -37,7 +37,7 @@
 	</bean>
 
 	<!--  Use this to set additional properties on beans at run time -->
-	<bean
+	<bean id="batchProperties"
 		class="org.springframework.beans.factory.config.PropertyOverrideConfigurer">
 		<property name="location" value="classpath:batch.properties" />
 		<!-- Allow system properties (-D) to override those from file -->
@@ -50,7 +50,7 @@
 		<property name="order" value="2" />
 	</bean>
 
-	<bean
+	<bean id="overrideProperties"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="location" value="classpath:batch.properties" />
 		<property name="systemPropertiesModeName"

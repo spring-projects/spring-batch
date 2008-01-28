@@ -15,7 +15,7 @@
 	<bean id="stepScope"
 		class="org.springframework.batch.execution.scope.StepScope" />
 
-	<bean id="jobConfigurationRegistryBeanPostProcessor"
+	<bean id="jobConfigurationRegistryBeanPostProcessor" abstract="true"
 		class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
 		<property name="jobConfigurationRegistry"
 			ref="jobConfigurationRegistry" />

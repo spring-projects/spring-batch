@@ -167,7 +167,7 @@
 		</aop:aspect>
 	</aop:config>
 
-	<bean
+	<bean id="footbalProperties"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="properties">
 			<value>
@@ -177,7 +177,7 @@
 		</property>
 		<property name="systemPropertiesModeName"
 			value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
-		<property name="ignoreUnresolvablePlaceholders" value="false" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
 		<property name="order" value="1" />
 	</bean>
 

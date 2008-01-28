@@ -21,8 +21,14 @@ import java.io.FileReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.springframework.batch.io.file.DefaultFlatFileItemReader;
+import org.springframework.batch.io.file.mapping.FieldSetMapper;
+import org.springframework.batch.io.file.transform.LineTokenizer;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.sample.domain.Trade;
+import org.springframework.batch.sample.mapping.TradeFieldSetMapper;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -35,11 +41,17 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	//auto-injected attributes
 	private JdbcOperations jdbcTemplate;
 	private Resource fileLocator;
-	private ItemReader inputSource;
+	private DefaultFlatFileItemReader inputSource;
+	private LineTokenizer lineTokenizer;
 
 	protected void onSetUp() throws Exception {
 		super.onSetUp();
 		jdbcTemplate.update("delete from TRADE");
+		fileLocator = new ClassPathResource("data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt");
+		inputSource = new DefaultFlatFileItemReader();
+		inputSource.setFieldSetMapper(new TradeFieldSetMapper());
+		inputSource.setTokenizer(lineTokenizer);
+		inputSource.setResource(fileLocator);
 	}
 
 	protected String[] getConfigLocations() {
@@ -89,12 +101,9 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
-
-	public void setFileLocator(Resource fileLocator) {
-		this.fileLocator = fileLocator;
+	
+	public void setLineTokenizer(LineTokenizer lineTokenizer) {
+		this.lineTokenizer = lineTokenizer;
 	}
 
-	public void setItemReader(ItemReader inputSource){
-		this.inputSource = inputSource;
-	}
 }
