@@ -286,6 +286,7 @@ public class SimpleJobRepository implements JobRepository {
 	private JobInstance createJobInstance(Job job, JobParameters jobParameters) {
 
 		JobInstance jobInstance = jobDao.createJobInstance(job.getName(), jobParameters);
+		jobInstance.setJob(job);
 		jobInstance.setStepInstances(createStepInstances(jobInstance, job.getSteps()));
 		return jobInstance;
 	}
