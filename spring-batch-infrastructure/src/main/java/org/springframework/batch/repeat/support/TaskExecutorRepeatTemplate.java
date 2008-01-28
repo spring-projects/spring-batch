@@ -160,7 +160,6 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			try {
 				value = future.getResult();
 			} catch (InterruptedException e) {
-				// TODO: cancel batch?
 				Thread.currentThread().interrupt();
 				value = e;
 			}

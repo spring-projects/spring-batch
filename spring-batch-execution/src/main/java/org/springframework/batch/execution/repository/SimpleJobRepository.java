@@ -322,7 +322,7 @@ public class SimpleJobRepository implements JobRepository {
 			StepInstance step = stepDao.findStep(job, stepConfiguration.getName());
 			if (step != null) {
 
-				step.setStepExecutionCount(stepDao.getStepExecutionCount(step.getId()));
+				step.setStepExecutionCount(stepDao.getStepExecutionCount(step));
 				// Ensure valid restart data is being returned.
 				if (step.getRestartData() == null || step.getRestartData().getProperties() == null) {
 					step.setRestartData(new GenericRestartData(new Properties()));

@@ -50,7 +50,7 @@ public class MockStepDao implements StepDao {
 		return null;
 	}
 
-	public int getStepExecutionCount(Long stepId) {
+	public int getStepExecutionCount(StepInstance step) {
 		return 1;
 	}
 

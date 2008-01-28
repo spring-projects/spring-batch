@@ -90,11 +90,10 @@ public interface StepDao {
 	/**
 	 * Return the count of StepExecutions with the given StepId.
 	 * 
-	 * @param stepId
-	 * @return the number of step executions for this step TODO: change
-	 *         signature to search by {@link StepInstance}
+	 * @param step
+	 * @return the number of step executions for this step
 	 */
-	public int getStepExecutionCount(Long stepId);
+	public int getStepExecutionCount(StepInstance step);
 
 	/**
 	 * Return all StepExecutions for the given step.

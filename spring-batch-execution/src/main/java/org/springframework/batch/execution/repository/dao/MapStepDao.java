@@ -84,8 +84,8 @@ public class MapStepDao implements StepDao {
 		return (RestartData) restartsById.get(stepId);
 	}
 
-	public int getStepExecutionCount(Long jobId) {
-		Set executions = (Set) executionsById.get(jobId);
+	public int getStepExecutionCount(StepInstance stepInstance) {
+		Set executions = (Set) executionsById.get(stepInstance.getId());
 		if (executions==null) return 0;
 		return executions.size();	}
 

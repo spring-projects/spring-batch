@@ -207,16 +207,16 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	
 	public void testGetStepExecutionCountForNoExecutions(){
 		
-		int executionCount = stepDao.getStepExecutionCount(step2.getId());
+		int executionCount = stepDao.getStepExecutionCount(step2);
 		assertEquals(executionCount, 0);
 	}
 
 	public void testIncrementStepExecutionCount(){
 		
-		assertEquals(1, stepDao.getStepExecutionCount(step1.getId()));
+		assertEquals(1, stepDao.getStepExecutionCount(step1));
 		StepExecution execution = new StepExecution(step1, new JobExecution(step1.getJobInstance(), new Long(123)), null);
 		stepDao.save(execution);
-		assertEquals(2, stepDao.getStepExecutionCount(step1.getId()));
+		assertEquals(2, stepDao.getStepExecutionCount(step1));
 	}
 		
 	public void testUpdateStepExecutionVersion() throws Exception {

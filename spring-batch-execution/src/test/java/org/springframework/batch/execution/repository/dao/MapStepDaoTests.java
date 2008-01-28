@@ -85,7 +85,7 @@ public class MapStepDaoTests extends TestCase {
 	}
 
 	public void testNoExecutionsForNew() throws Exception {
-		assertEquals(0, dao.getStepExecutionCount(step.getId()));
+		assertEquals(0, dao.getStepExecutionCount(step));
 	}
 
 	public void testSaveExecutionUpdatesId() throws Exception {
@@ -97,13 +97,13 @@ public class MapStepDaoTests extends TestCase {
 
 	public void testCorrectExecutionCountForExisting() throws Exception {
 		dao.save(new StepExecution(step, null, null));
-		assertEquals(1, dao.getStepExecutionCount(step.getId()));
+		assertEquals(1, dao.getStepExecutionCount(step));
 	}
 	
 	public void testOnlyOneExecutionPerStep() throws Exception {
 		dao.save(new StepExecution(step, null, null));
 		dao.save(new StepExecution(step, null, null));
-		assertEquals(2, dao.getStepExecutionCount(step.getId()));
+		assertEquals(2, dao.getStepExecutionCount(step));
 	}
 
 	public void testSaveRestartData() throws Exception {

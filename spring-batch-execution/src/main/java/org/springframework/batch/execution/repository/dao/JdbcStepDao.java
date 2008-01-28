@@ -276,9 +276,9 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 		return getQuery(SAVE_STEP_EXECUTION);
 	}
 
-	public int getStepExecutionCount(Long stepId) {
+	public int getStepExecutionCount(StepInstance step) {
 
-		Object[] parameters = new Object[] { stepId };
+		Object[] parameters = new Object[] { step.getId() };
 
 		return jdbcTemplate.queryForInt(getStepExecutionCountQuery(), parameters);
 	}
