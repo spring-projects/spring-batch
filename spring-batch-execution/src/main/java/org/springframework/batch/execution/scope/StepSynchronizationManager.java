@@ -37,7 +37,7 @@ public class StepSynchronizationManager {
 	 * Method for registering a context - should only be used by
 	 * {@link StepExecutor} implementations to ensure that {@link #getContext()}
 	 * always returns the correct value.
-	 * @param context TODO
+	 * @param context the step context to register
 	 */
 	public static void register(StepContext context) {
 		StepSynchronizationManager.contextHolder.set(context);

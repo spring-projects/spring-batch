@@ -17,6 +17,7 @@
 package org.springframework.batch.io.file;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -32,9 +33,9 @@ import org.springframework.transaction.support.TransactionSynchronization;
 
 /**
  * Tests for {@link DefaultFlatFileItemReader}
- *
+ * 
  * @author robert.kasanicky
- *
+ * 
  * TODO only regular reading is tested currently, add exception cases, restart,
  * skip, validation...
  */
@@ -49,11 +50,11 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 	// simple stub instead of a realistic tokenizer
 	private LineTokenizer tokenizer = new LineTokenizer() {
 		public FieldSet tokenize(String line) {
-			return new DefaultFieldSet(new String[]{line});
+			return new DefaultFieldSet(new String[] { line });
 		}
 	};
 
-	private FieldSetMapper fieldSetMapper = new FieldSetMapper(){
+	private FieldSetMapper fieldSetMapper = new FieldSetMapper() {
 		public Object mapLine(FieldSet fs) {
 			return fs;
 		}
@@ -118,7 +119,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		// statistics.get(FlatFileInputTemplate.SKIPPED_STATISTICS_NAME));
 
 	}
-	
+
 	/**
 	 * Test skip and skipRollback functionality
 	 * @throws IOException
@@ -135,17 +136,16 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		inputSource.read(); // #3
 		// mark record as skipped
 		inputSource.skip();
-		// rollback 
+		// rollback
 		inputSource.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
 		// read next record
 		inputSource.read(); // should be #1
-		
+
 		// we should now process all records after first commit point, that are
 		// not marked as skipped
 		assertEquals("[testLine2]", inputSource.read().toString());
 
 	}
-	
 
 	/**
 	 * Test skip and skipRollback functionality
@@ -161,22 +161,17 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		inputSource.read();
 		inputSource.skip();
 		inputSource.read();
-		// TODO
-		// statistics = template.getStatistics();
-		// skipped = (String)
-		// statistics.get(FlatFileInputTemplate.SKIPPED_STATISTICS_NAME);
-		// read = (String)
-		// statistics.get(FlatFileInputTemplate.READ_STATISTICS_NAME);
+
+		Properties statistics = inputSource.getStatistics();
+		String skipped = statistics.getProperty(DefaultFlatFileItemReader.SKIPPED_STATISTICS_NAME);
+		String read = statistics.getProperty(DefaultFlatFileItemReader.READ_STATISTICS_NAME);
 
 		// call unknown, which has no influence and therefore statistics should
 		// be the same
 		inputSource.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_UNKNOWN);
-		// TODO
-		// statistics = template.getStatistics();
-		// assertEquals(skipped, (String)
-		// statistics.get(FlatFileInputTemplate.SKIPPED_STATISTICS_NAME));
-		// assertEquals(read, (String)
-		// statistics.get(FlatFileInputTemplate.READ_STATISTICS_NAME));
+		statistics = inputSource.getStatistics();
+		assertEquals(skipped, statistics.getProperty(DefaultFlatFileItemReader.SKIPPED_STATISTICS_NAME));
+		assertEquals(read, statistics.getProperty(DefaultFlatFileItemReader.READ_STATISTICS_NAME));
 	}
 
 	public void testRestartFromNullData() throws Exception {
@@ -210,8 +205,8 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 
 		// get restart data
 		RestartData restartData = inputSource.getRestartData();
-		// TODO
-		// assertEquals("4", (String) restartData);
+		assertEquals("4", (String) restartData.getProperties().getProperty(
+				DefaultFlatFileItemReader.READ_STATISTICS_NAME));
 		// close input
 		inputSource.close();
 
@@ -225,10 +220,8 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		assertEquals("[testLine5]", inputSource.read().toString());
 		assertEquals("[testLine6]", inputSource.read().toString());
 
-		// TODO
-		// Map statistics = template.getStatistics();
-		// assertEquals("6",
-		// statistics.get(FlatFileInputTemplate.READ_STATISTICS_NAME));
+		Properties statistics = inputSource.getStatistics();
+		assertEquals("6", statistics.getProperty(DefaultFlatFileItemReader.READ_STATISTICS_NAME));
 	}
 
 }

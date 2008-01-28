@@ -69,7 +69,6 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 
 		policy.setExceptionClassifier(new ExceptionClassifierSupport() {
 			public Object classify(Throwable throwable) {
-				//TODO probably (==null) and (!=null) branches are interchanged?
 				if (throwable != null) {
 					return "foo";
 				}

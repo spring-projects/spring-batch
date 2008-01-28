@@ -41,7 +41,6 @@ public class ThreadStepInterruptionPolicy implements StepInterruptionPolicy {
 	}
 
 	/**
-	 * TODO: add more interruption policies: they should all check context.isTerminateOnly() 
 	 * @param context the current context
 	 * @return true if the job has been interrupted
 	 */

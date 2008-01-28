@@ -76,11 +76,11 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-	public static final String WRITTEN_STATISTICS_NAME = "Written";
+	public static final String WRITTEN_STATISTICS_NAME = "written";
 
-	public static final String RESTART_COUNT_STATISTICS_NAME = "Restart count";
+	public static final String RESTART_COUNT_STATISTICS_NAME = "restart.count";
 
-	public static final String RESTART_DATA_NAME = "flatfileoutputtemplate.currentLine";
+	public static final String RESTART_DATA_NAME = "flatfileoutput.current.line";
 
 	private Resource resource;
 

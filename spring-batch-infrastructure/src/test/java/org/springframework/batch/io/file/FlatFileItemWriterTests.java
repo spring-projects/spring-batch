@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -33,8 +34,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.transaction.support.TransactionSynchronizationUtils;
 
 /**
- * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will
- * be in separate TestCase classes with different <code>setUp</code> and
+ * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be
+ * in separate TestCase classes with different <code>setUp</code> and
  * <code>tearDown</code> methods
  * 
  * @author robert.kasanicky
@@ -56,16 +57,16 @@ public class FlatFileItemWriterTests extends TestCase {
 	private BufferedReader reader;
 
 	/**
-	 * Create temporary output file, define mock behaviour, set dependencies
-	 * and initialize the object under test
+	 * Create temporary output file, define mock behaviour, set dependencies and
+	 * initialize the object under test
 	 */
 	protected void setUp() throws Exception {
-		
-		if(TransactionSynchronizationManager.isSynchronizationActive()){
+
+		if (TransactionSynchronizationManager.isSynchronizationActive()) {
 			TransactionSynchronizationManager.clearSynchronization();
 		}
 		TransactionSynchronizationManager.initSynchronization();
-		
+
 		outputFile = File.createTempFile("flatfile-output-", ".tmp");
 
 		inputSource.setResource(new FileSystemResource(outputFile));
@@ -79,25 +80,24 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * Release resources and delete the temporary output file
 	 */
 	protected void tearDown() throws Exception {
-		if( reader != null){
+		if (reader != null) {
 			reader.close();
 		}
 		inputSource.close();
 		outputFile.delete();
 	}
-	
+
 	/*
-	 * Read a line from the output file, if the reader has not been
-	 * created, recreate.  This method is only necessary because
-	 * running the tests in a UNIX environment locks the file
-	 * if it's open for writing.
+	 * Read a line from the output file, if the reader has not been created,
+	 * recreate. This method is only necessary because running the tests in a
+	 * UNIX environment locks the file if it's open for writing.
 	 */
-	private String readLine() throws IOException{
-		
-		if(reader == null){
+	private String readLine() throws IOException {
+
+		if (reader == null) {
 			reader = new BufferedReader(new FileReader(outputFile));
 		}
-		
+
 		return reader.readLine();
 	}
 
@@ -108,7 +108,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.write(TEST_STRING);
 		inputSource.close();
 		String lineFromFile = readLine();
-		
+
 		assertEquals(TEST_STRING, lineFromFile);
 	}
 
@@ -166,7 +166,7 @@ public class FlatFileItemWriterTests extends TestCase {
 			}
 		});
 		Object data = new Object();
-		inputSource.write(new Object[] {data, data});
+		inputSource.write(new Object[] { data, data });
 		inputSource.close();
 		String lineFromFile = readLine();
 		assertEquals("FOO:" + data.toString(), lineFromFile);
@@ -180,6 +180,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	public void testWriteWithConverterAndInfiniteLoopInConvertedCollection() throws IOException {
 		inputSource.setConverter(new Converter() {
 			boolean converted = false;
+
 			public Object convert(Object input) {
 				if (converted) {
 					return input;
@@ -192,9 +193,10 @@ public class FlatFileItemWriterTests extends TestCase {
 		try {
 			inputSource.write(data);
 			fail("Expected IllegalStateException");
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			// expected
-			assertTrue("Wrong message: "+e, e.getMessage().toLowerCase().indexOf("infinite")>=0);
+			assertTrue("Wrong message: " + e, e.getMessage().toLowerCase().indexOf("infinite") >= 0);
 		}
 		inputSource.close();
 		String lineFromFile = readLine();
@@ -294,20 +296,20 @@ public class FlatFileItemWriterTests extends TestCase {
 
 		// commit
 		commit();
-		
+
 		// this will be rolled back...
 		inputSource.write("this will be rolled back");
 
 		// rollback
 		rollback();
-		
+
 		// write more lines
 		inputSource.write("testLine4");
 		inputSource.write("testLine5");
 
 		// commit
 		commit();
-		
+
 		// get restart data
 		RestartData restartData = inputSource.getRestartData();
 		// close template
@@ -343,11 +345,9 @@ public class FlatFileItemWriterTests extends TestCase {
 		}
 
 		// get statistics
-		// Statistics statistics = template.getStatistics();
+		Properties statistics = inputSource.getStatistics();
 		// 3 lines were written to the file after restart
-		// TODO
-		// assertEquals("3",
-		// statistics.get(FlatFileOutputTemplate.WRITTEN_STATISTICS_NAME));
+		assertEquals("3", statistics.getProperty(FlatFileItemWriter.WRITTEN_STATISTICS_NAME));
 
 	}
 
@@ -366,25 +366,22 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource = new FlatFileItemWriter();
 		RestartData restartData = inputSource.getRestartData();
 		assertNotNull(restartData);
-		// TODO: assert the properties of the default restart data
 		assertEquals(1, restartData.getProperties().size());
+		assertEquals("0", restartData.getProperties().getProperty(FlatFileItemWriter.RESTART_DATA_NAME));
 	}
-	
+
 	private void commit() {
-		TransactionSynchronizationUtils.invokeAfterCompletion(
-				TransactionSynchronizationManager.getSynchronizations(),
+		TransactionSynchronizationUtils.invokeAfterCompletion(TransactionSynchronizationManager.getSynchronizations(),
 				TransactionSynchronization.STATUS_COMMITTED);
 	}
 
 	private void rollback() {
-		TransactionSynchronizationUtils.invokeAfterCompletion(
-				TransactionSynchronizationManager.getSynchronizations(),
+		TransactionSynchronizationUtils.invokeAfterCompletion(TransactionSynchronizationManager.getSynchronizations(),
 				TransactionSynchronization.STATUS_ROLLED_BACK);
 	}
-	
+
 	private void unknown() {
-		TransactionSynchronizationUtils.invokeAfterCompletion(
-				TransactionSynchronizationManager.getSynchronizations(),
+		TransactionSynchronizationUtils.invokeAfterCompletion(TransactionSynchronizationManager.getSynchronizations(),
 				TransactionSynchronization.STATUS_UNKNOWN);
 	}
 }

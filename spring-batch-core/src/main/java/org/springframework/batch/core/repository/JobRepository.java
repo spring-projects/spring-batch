@@ -52,7 +52,7 @@ public interface JobRepository {
 	 * exists, its persisted values (including ID) will be returned in a new
 	 * {@link JobInstance} object. If no previous run is found, a new job will
 	 * be created and returned.
-	 * @param jobParameters TODO
+	 * @param jobParameters the runtime parameters for the job
 	 * @param jobConfiguration
 	 *            describes the configuration for this job
 	 * 
