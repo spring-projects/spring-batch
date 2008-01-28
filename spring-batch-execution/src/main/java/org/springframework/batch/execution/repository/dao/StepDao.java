@@ -43,8 +43,7 @@ public interface StepDao {
 	/**
 	 * Find all steps with the given Job.
 	 * 
-	 * @param job
-	 *            the job to use as a search key
+	 * @param job the job to use as a search key
 	 * @return list of {@link StepInstance}
 	 */
 	public List findSteps(JobInstance job);
@@ -88,9 +87,9 @@ public interface StepDao {
 	public void update(StepExecution stepExecution);
 
 	/**
-	 * Return the count of StepExecutions with the given StepId.
+	 * Return the count of StepExecutions with the given {@link StepInstance}.
 	 * 
-	 * @param step
+	 * @param step the {@link StepInstance} to check for executions
 	 * @return the number of step executions for this step
 	 */
 	public int getStepExecutionCount(StepInstance step);
@@ -98,9 +97,8 @@ public interface StepDao {
 	/**
 	 * Return all StepExecutions for the given step.
 	 * 
-	 * @param step
-	 *            the step to use as a search key
-	 * @return list of stepExecutions 
+	 * @param step the step to use as a search key
+	 * @return list of stepExecutions
 	 */
 	public List findStepExecutions(StepInstance step);
 }
