@@ -92,28 +92,6 @@
 	<bean id="notificationPublisher"
 		class="org.springframework.batch.execution.bootstrap.JobExecutionNotificationPublisher" />
 
-	<bean id="convertingMethodInterceptor"
-		class="org.springframework.batch.execution.bootstrap.support.TypeConverterMethodInterceptor">
-		<property name="convertException" value="true" />
-		<property name="customEditors">
-			<map>
-				<entry
-					key="org.springframework.batch.core.domain.JobParameters">
-					<bean
-						class="org.springframework.batch.execution.bootstrap.support.JobParametersPropertyEditor" />
-				</entry>
-				<entry
-					key="org.springframework.batch.core.domain.Job">
-					<bean
-						class="org.springframework.batch.execution.bootstrap.support.JobPropertyEditor">
-						<property name="jobLocator"
-							ref="jobConfigurationRegistry" />
-					</bean>
-				</entry>
-			</map>
-		</property>
-	</bean>
-
 	<bean id="logAdvice"
 		class="org.springframework.batch.sample.advice.MethodExecutionLogAdvice" />
 

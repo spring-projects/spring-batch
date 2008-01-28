@@ -70,8 +70,8 @@ public class SynchronizedAttributeAccessorTests extends TestCase {
 	public void testEqualsWrongType() {
 		accessor.setAttribute("foo", "bar");
 		Map another = Collections.singletonMap("foo", "bar");
-		
-		//TODO accessor and another are instances of unrelated classes, they can never be equal
+		// Accessor and another are instances of unrelated classes, they should
+		// never be equal...
 		assertFalse(accessor.equals(another));
 	}
 

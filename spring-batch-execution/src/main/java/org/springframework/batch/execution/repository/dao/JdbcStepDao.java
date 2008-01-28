@@ -44,18 +44,17 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Sql implementation of {@link StepDao}. Uses Sequences (via Spring's
+ * Jdbc implementation of {@link StepDao}.<br/>
  * 
- * @link DataFieldMaxValueIncrementer abstraction) to create all Step and
- * StepExecution primary keys before inserting a new row. All objects are
- * checked to ensure all fields to be stored are not null. If any are found to
- * be null, an IllegalArgumentException will be thrown. This could be left to
- * JdbcTemplate, however, the exception will be fairly vague, and fails to
- * highlight which field caused the exception.
+ * Allows customisation of the tables names used by Spring Batch for step meta
+ * data via a prefix property.<br/>
  * 
- * TODO: JavaDoc should be geared more towards usability, the comments above are
- * useful information, and should be there, but needs usability stuff. Depends
- * on the step dao java docs as well.
+ * Uses sequences or tables (via Spring's {@link DataFieldMaxValueIncrementer}
+ * abstraction) to create all primary keys before inserting a new row. All
+ * objects are checked to ensure all fields to be stored are not null. If any
+ * are found to be null, an IllegalArgumentException will be thrown. This could
+ * be left to JdbcTemplate, however, the exception will be fairly vague, and
+ * fails to highlight which field caused the exception.<br/>
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -310,10 +309,10 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 
 		stepExecution.setId(new Long(stepExecutionIncrementer.nextLongValue()));
 		stepExecution.incrementVersion(); // should be 0 now
-		Object[] parameters = new Object[] { stepExecution.getId(), stepExecution.getVersion(), stepExecution.getStepId(),
-				stepExecution.getJobExecutionId(), stepExecution.getStartTime(), stepExecution.getEndTime(),
-				stepExecution.getStatus().toString(), stepExecution.getCommitCount(), stepExecution.getTaskCount(),
-				PropertiesConverter.propertiesToString(stepExecution.getStatistics()),
+		Object[] parameters = new Object[] { stepExecution.getId(), stepExecution.getVersion(),
+				stepExecution.getStepId(), stepExecution.getJobExecutionId(), stepExecution.getStartTime(),
+				stepExecution.getEndTime(), stepExecution.getStatus().toString(), stepExecution.getCommitCount(),
+				stepExecution.getTaskCount(), PropertiesConverter.propertiesToString(stepExecution.getStatistics()),
 				stepExecution.getExitStatus().isContinuable() ? "Y" : "N", stepExecution.getExitStatus().getExitCode(),
 				stepExecution.getExitStatus().getExitDescription() };
 		jdbcTemplate.update(getSaveStepExecutionQuery(), parameters, new int[] { Types.INTEGER, Types.INTEGER,
@@ -377,13 +376,8 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 		Assert.notNull(stepExecution.getId(), "StepExecution Id cannot be null. StepExecution must saved"
 				+ " before it can be updated.");
 
-		// TODO: Not sure if this is a good idea on step execution considering
-		// it is saved at every commit
-		// point.
-		// if (jdbcTemplate.queryForInt(CHECK_STEP_EXECUTION_EXISTS, new
-		// Object[] { stepExecution.getId() }) != 1) {
-		// return; // throw exception?
-		// }
+		// Do not check for existence of step execution considering
+		// it is saved at every commit point.
 
 		String exitDescription = stepExecution.getExitStatus().getExitDescription();
 		if (exitDescription != null && exitDescription.length() > EXIT_MESSAGE_LENGTH) {

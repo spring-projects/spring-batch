@@ -64,7 +64,8 @@ public class BatchTransactionSynchronizationManager {
 	/**
 	 * The key in the context attributes for the list of synchronizations.
 	 */
-	private static final String SYNCHS_ATTR_KEY = BatchTransactionSynchronizationManager.class.getName() + ".SYNCHRONIZATIONS";
+	private static final String SYNCHS_ATTR_KEY = BatchTransactionSynchronizationManager.class.getName()
+			+ ".SYNCHRONIZATIONS";
 
 	/**
 	 * Static method to register synchronizations. A TransactionSyncrhonization
@@ -144,8 +145,9 @@ public class BatchTransactionSynchronizationManager {
 
 		AttributeAccessor context = getContext();
 		if (context == null) {
-			// TODO: this should return null or unmodifiable - there is no
-			// context for it
+			// N.B. this returns a modifiable list on purpose - it is used
+			// internally to set up the list if there is no context available
+			// (useful in testing).
 			return new ArrayList();
 		}
 		List synchs = (List) context.getAttribute(SYNCHS_ATTR_KEY);

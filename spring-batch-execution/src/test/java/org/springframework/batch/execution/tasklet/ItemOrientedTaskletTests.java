@@ -128,10 +128,10 @@ public class ItemOrientedTaskletTests extends TestCase {
 		// call read
 		try {
 			module.execute();
-			// TODO: should we expect Batch exception?
 			fail("RuntimeException was expected");
 		} catch (RuntimeException bce) {
 			// expected
+			assertEquals("foo", bce.getMessage());
 		}
 	}
 

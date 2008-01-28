@@ -52,7 +52,7 @@ public class RetryOperationsInterceptor implements MethodInterceptor {
 	}
 
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
-		// TODO: use the method name to initialise a statistics context
+
 		return this.retryOperations.execute(new RetryCallback() {
 
 			public Object doWithRetry(RetryContext context) throws Throwable {

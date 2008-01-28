@@ -120,8 +120,10 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 
 	/**
 	 * Used to provide a recovery path - delegates to
-	 * {@link #recover(Session, Message, Throwable)}. TODO: Could be merged
-	 * into base class?
+	 * {@link #recover(Session, Message, Throwable)}. 
+	 * 
+	 * TODO: Could be merged into base class?
+	 * 
 	 * @param session the JMS session
 	 * @param message the last message
 	 * @param ex the exception thrown by listener

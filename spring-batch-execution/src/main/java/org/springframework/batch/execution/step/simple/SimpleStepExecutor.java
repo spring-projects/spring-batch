@@ -221,9 +221,9 @@ public class SimpleStepExecutor implements StepExecutor {
 
 										result = processChunk(step, contribution);
 
-										// TODO: Statistics are not thread safe
-										// - we cannot guarantee that they are
-										// up to date. (Maybe we never can?)
+										// TODO: check that stepExecution can
+										// aggregate these contributions if they
+										// come in asnchronously.
 										Properties statistics = stepScopeContext.getStatistics();
 										contribution.setStatistics(statistics);
 										contribution.incrementCommitCount();

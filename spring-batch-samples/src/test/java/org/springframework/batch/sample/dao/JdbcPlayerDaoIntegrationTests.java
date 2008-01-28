@@ -21,12 +21,10 @@ public class JdbcPlayerDaoIntegrationTests extends AbstractTransactionalDataSour
 	private static final String GET_PLAYER = "SELECT * from PLAYERS";
 	
 	protected String[] getConfigLocations() {
-		// TODO Auto-generated method stub
 		return new String[] {"data-source-context.xml"};
 	}
 
 	protected void onSetUpBeforeTransaction() throws Exception {
-		// TODO Auto-generated method stub
 		super.onSetUpBeforeTransaction();
 		
 		playerDao = new JdbcPlayerDao();

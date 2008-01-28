@@ -370,13 +370,12 @@ public class SimpleJobRepositoryTests extends TestCase {
 		stepDaoControl.verify();
 	}
 
-	public void testSaveStepExecution(){
-		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(10L)), null, new Long(2));
-		//TODO: Not sure why, but calling save on the EasyMock stepDao causes a NullPointerException
-//		stepDao.save(stepExecution);
-//		stepDaoControl.replay();
+	public void testSaveExistingStepExecution(){
+		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(10L)), null, null);
+		stepDao.save(stepExecution);
+		stepDaoControl.replay();
 		jobRepository.saveOrUpdate(stepExecution);
-//		stepDaoControl.verify();
+		stepDaoControl.verify();
 	}
 
 	public void testSaveOrUpdateStepExecutionException() {

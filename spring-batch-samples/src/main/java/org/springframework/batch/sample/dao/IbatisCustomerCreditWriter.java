@@ -40,16 +40,12 @@ public class IbatisCustomerCreditWriter extends SqlMapClientDaoSupport
 	 * @see org.springframework.batch.item.ResourceLifecycle#close()
 	 */
 	public void close() {
-		// TODO Auto-generated method stub
-
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ResourceLifecycle#open()
 	 */
 	public void open() {
-		// TODO Auto-generated method stub
-
 	}
 
 

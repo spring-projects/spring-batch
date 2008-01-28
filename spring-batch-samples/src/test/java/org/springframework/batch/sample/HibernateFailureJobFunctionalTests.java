@@ -71,16 +71,6 @@ public class HibernateFailureJobFunctionalTests extends
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.sample.AbstractCustomerCreditIncreaseTests#validatePostConditions()
-	 */
-	protected void validatePostConditions() throws Exception {
-		// TODO: fix so that the postconditions in super class are true
-		super.validatePostConditions();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.springframework.batch.sample.AbstractCustomerCreditIncreaseTests#checkMatches(java.util.List)
 	 */
 	protected void checkMatches(List matches) {

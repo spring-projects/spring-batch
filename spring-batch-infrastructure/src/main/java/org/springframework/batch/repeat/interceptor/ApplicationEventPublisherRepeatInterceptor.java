@@ -60,8 +60,6 @@ public class ApplicationEventPublisherRepeatInterceptor implements ApplicationEv
 	 */
 	public void close(RepeatContext context) {
 		publish(context, "Closed repeat context with batch complete", RepeatOperationsApplicationEvent.CLOSE);
-		//TODO: why is this returning continuable?
-		//return ExitStatus.CONTINUABLE;
 	}
 
 	/*
