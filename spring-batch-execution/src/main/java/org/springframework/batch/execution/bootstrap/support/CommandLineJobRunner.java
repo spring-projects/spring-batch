@@ -244,8 +244,7 @@ public class CommandLineJobRunner {
 		CommandLineJobRunner command = new CommandLineJobRunner();
 
 		if (args.length < 3) {
-			logger
-					.error("At least 3 arguments are required: JobPath, JobName, and ExecutionPath.");
+			logger.error("At least 3 arguments are required: JobPath, JobName, and JobLauncherPath.");
 			command.exit(1);
 		}
 

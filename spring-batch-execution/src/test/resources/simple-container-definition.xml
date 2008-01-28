@@ -104,6 +104,6 @@
 	</bean>
 
 	<bean
-		class="org.springframework.batch.execution.bootstrap.support.SimpleCommandLineJobRunnerTests$StubSystemExiter" />
+		class="org.springframework.batch.execution.bootstrap.support.CommandLineJobRunnerTests$StubSystemExiter" />
 
 </beans>
