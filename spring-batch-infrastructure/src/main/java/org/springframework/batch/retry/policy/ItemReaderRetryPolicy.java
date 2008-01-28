@@ -205,14 +205,10 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 				boolean success = recoverer.recover(item, context
 						.getLastThrowable());
 				if (!success) {
-					// TODO if context was null, there would be exception while
-					// getting success value
-					String count = context != null ? ""
-							+ context.getRetryCount() : "unknown";
+					int count = context.getRetryCount();
 					logger.error(
 							"Could not recover from error after retry exhausted after ["
-									+ count + "] attempts.", context
-									.getLastThrowable());
+							+ count + "] attempts.", context.getLastThrowable());
 				}
 			}
 			return item;

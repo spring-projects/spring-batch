@@ -50,7 +50,6 @@ public class StepInstance extends Entity {
 
 	private JobInstance jobInstance;
 
-	// TODO declare transient or make serializable
 	private BatchStatus status;
 
 	private RestartData restartData = new GenericRestartData(new Properties());

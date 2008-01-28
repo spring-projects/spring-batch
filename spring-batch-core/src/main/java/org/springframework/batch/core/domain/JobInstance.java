@@ -37,7 +37,6 @@ public class JobInstance extends Entity {
 	
 	private Job job;
 
-	// TODO declare transient or make the class serializable
 	private BatchStatus status;
 
 	private int jobExecutionCount;

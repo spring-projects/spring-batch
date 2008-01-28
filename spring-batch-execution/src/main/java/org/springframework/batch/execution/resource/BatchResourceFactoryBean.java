@@ -155,8 +155,6 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 
 		String fileName = filePattern;
 
-		// TODO consider refactoring to void replacePattern() method and
-		// collecting variable fileName
 		fileName = replacePattern(fileName, BATCH_ROOT_PATTERN, rootDirectory);
 		fileName = replacePattern(fileName, JOB_NAME_PATTERN,
 				jobName == null ? "job" : jobName);
