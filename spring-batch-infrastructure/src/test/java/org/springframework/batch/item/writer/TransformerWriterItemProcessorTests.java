@@ -5,16 +5,16 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.writer.ItemTransformer;
-import org.springframework.batch.item.writer.ItemTransformerItemWriterr;
+import org.springframework.batch.item.writer.ItemTransformerItemWriter;
 
 /**
- * Tests for {@link ItemTransformerItemWriterr}.
+ * Tests for {@link ItemTransformerItemWriter}.
  * 
  * @author Robert Kasanicky
  */
 public class TransformerWriterItemProcessorTests extends TestCase {
 
-	private ItemTransformerItemWriterr processor = new ItemTransformerItemWriterr();
+	private ItemTransformerItemWriter processor = new ItemTransformerItemWriter();
 
 	private ItemTransformer transformer;
 	private ItemWriter itemWriter;

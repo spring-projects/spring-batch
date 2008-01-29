@@ -67,8 +67,7 @@
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemReader" ref="tradeSqlItemReader" />
 							<property name="itemWriter">
-								<bean
-									class="org.springframework.batch.execution.launch.EmptyItemWriter" />
+								<bean class="org.springframework.batch.sample.item.writer.DummyItemWriter" />
 							</property>
 						</bean>
 					</property>
