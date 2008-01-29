@@ -31,7 +31,6 @@
 		<config>src/main/resources/jobs/delegatingJob.xml</config>
 		<config>src/main/resources/jobs/parallelJob.xml</config>
 		<config>src/main/resources/jobs/rollbackJob.xml</config>
-		<config>src/test/resources/org/springframework/batch/sample/item/processor/staging-test-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -223,7 +222,6 @@
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/test/resources/org/springframework/batch/sample/item/processor/staging-test-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>

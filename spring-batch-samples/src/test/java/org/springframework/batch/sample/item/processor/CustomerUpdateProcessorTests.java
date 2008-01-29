@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.sample.dao.JdbcCustomerDebitWriter;
 import org.springframework.batch.sample.domain.CustomerDebit;
 import org.springframework.batch.sample.domain.Trade;
-import org.springframework.batch.sample.item.processor.CustomerUpdateWriter;
+import org.springframework.batch.sample.item.writer.CustomerUpdateWriter;
 
 public class CustomerUpdateProcessorTests extends TestCase {
 

@@ -6,6 +6,7 @@ import org.easymock.MockControl;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.Order;
+import org.springframework.batch.sample.item.writer.OrderWriter;
 
 public class OrderWriterTests extends TestCase {
 

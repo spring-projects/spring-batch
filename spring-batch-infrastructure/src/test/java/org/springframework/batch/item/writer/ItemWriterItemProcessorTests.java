@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.processor;
+package org.springframework.batch.item.writer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.DelegatingItemWriter;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;

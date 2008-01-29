@@ -18,20 +18,22 @@ package org.springframework.batch.item;
 
 /**
  * Basic interface for generic output operations. Class implementing this
- * interface will be responsible for serializing objects. Generally, it is
- * responsibility of implementing class to decide which technology to use for
- * mapping and how it should be configured.
+ * interface will be responsible for serializing objects ias necessary.
+ * Generally, it is responsibility of implementing class to decide which
+ * technology to use for mapping and how it should be configured.
  * 
  * @author Dave Syer
  */
 public interface ItemWriter {
 
 	/**
-	 * Writes provided object to an output stream or similar.
+	 * Process the supplied data element. Will be called multiple times during a
+	 * larger batch operation. Will not be called with null data in normal
+	 * operation.
 	 * 
-	 * @param item
-	 *            the object to write.
-	 * @throws Exception if something goes wrong
+	 * @throws Exception if there are errors. If the processor is used inside a
+	 * retry or a batch the framework will catch the exception and convert or
+	 * rethrow it as appropriate.
 	 */
 	public void write(Object item) throws Exception;
 }

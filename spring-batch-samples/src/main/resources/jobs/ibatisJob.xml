@@ -22,7 +22,7 @@
 						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 						<property name="itemReader" ref="ibatisItemReader" />
 						<property name="itemWriter">
-							<bean class="org.springframework.batch.sample.item.processor.CustomerCreditIncreaseWriter">
+							<bean class="org.springframework.batch.sample.item.writer.CustomerCreditIncreaseWriter">
 								<property name="customerCreditDao">
 									<bean class="org.springframework.batch.sample.dao.IbatisCustomerCreditWriter"
 										scope="step">

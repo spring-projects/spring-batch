@@ -14,7 +14,7 @@ import org.springframework.batch.execution.scope.StepContextAware;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.batch.sample.item.processor.StagingItemWriter;
+import org.springframework.batch.sample.item.writer.StagingItemWriter;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowMapper;

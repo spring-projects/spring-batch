@@ -1,4 +1,4 @@
-package org.springframework.batch.item.processor;
+package org.springframework.batch.item.writer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -8,9 +8,8 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.processor.CompositeItemWriter;
+import org.springframework.batch.item.writer.CompositeItemWriter;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -21,7 +20,7 @@ import org.springframework.batch.statistics.StatisticsProvider;
  * 
  * @author Robert Kasanicky
  */
-public class CompositeItemProcessorTests extends TestCase {
+public class CompositeItemWriterTests extends TestCase {
 
 	// object under test
 	private CompositeItemWriter itemProcessor = new CompositeItemWriter();
@@ -64,11 +63,11 @@ public class CompositeItemProcessorTests extends TestCase {
 	 */
 	public void testRestart() {
 		//this mock with undefined behavior makes sure not-Restartable processor is ignored
-		MockControl p1c = MockControl.createStrictControl(ItemProcessor.class);
-		final ItemProcessor p1 = (ItemProcessor) p1c.getMock();
+		MockControl p1c = MockControl.createStrictControl(ItemWriter.class);
+		final ItemWriter p1 = (ItemWriter) p1c.getMock();
 		
-		final ItemProcessor p2 = new ItemProcessorStub();
-		final ItemProcessor p3 = new ItemProcessorStub();
+		final ItemWriter p2 = new ItemWriterStub();
+		final ItemWriter p3 = new ItemWriterStub();
 		List itemProcessors = new ArrayList(){{
 			add(p1);
 			add(p2);
@@ -80,10 +79,10 @@ public class CompositeItemProcessorTests extends TestCase {
 		itemProcessor.restoreFrom(rd);
 		
 		for (Iterator iterator = itemProcessors.iterator(); iterator.hasNext();) {
-			ItemProcessor processor = (ItemProcessor) iterator.next();
-			if (processor instanceof ItemProcessorStub) {
+			ItemWriter processor = (ItemWriter) iterator.next();
+			if (processor instanceof ItemWriterStub) {
 				assertTrue("Injected processors are restarted", 
-						((ItemProcessorStub)processor).restarted);
+						((ItemWriterStub)processor).restarted);
 			}
 		}
 		
@@ -93,7 +92,7 @@ public class CompositeItemProcessorTests extends TestCase {
 	 * Stub for testing restart. Checks the restart data received is the same that was returned by
 	 * <code>getRestartData()</code>
 	 */
-	private static class ItemProcessorStub implements ItemProcessor, Restartable, StatisticsProvider {
+	private static class ItemWriterStub implements ItemWriter, Restartable, StatisticsProvider {
 		
 		private static final String RESTART_KEY = "restartData";
 		private static final String STATS_KEY = "stats";
@@ -117,7 +116,7 @@ public class CompositeItemProcessorTests extends TestCase {
 			restarted = true;
 		}
 
-		public void process(Object data) throws Exception {
+		public void write(Object data) throws Exception {
 			// do nothing
 		}
 		

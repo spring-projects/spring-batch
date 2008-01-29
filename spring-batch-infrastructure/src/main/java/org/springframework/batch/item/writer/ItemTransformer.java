@@ -1,4 +1,4 @@
-package org.springframework.batch.item.processor;
+package org.springframework.batch.item.writer;
 
 /**
  * Interface for item transformations during processing phase.

@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.item.processor;
+package org.springframework.batch.sample.item.writer;
 
 import java.io.Serializable;
 import java.sql.Types;
@@ -60,7 +60,7 @@ public class StagingItemWriter extends JdbcDaoSupport implements
 	/**
 	 * Serialize the item to the staging table, and add a NEW processed flag.
 	 * 
-	 * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
+	 * @see ItemWriter#write(java.lang.Object)
 	 */
 	public void write(Object data) {
 		Long id = new Long(incrementer.nextLongValue());

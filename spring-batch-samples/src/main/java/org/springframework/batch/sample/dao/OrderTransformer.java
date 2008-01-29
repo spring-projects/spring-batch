@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.io.file.transform.Converter;
 import org.springframework.batch.io.file.transform.LineAggregator;
+import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;
 import org.springframework.batch.sample.domain.Customer;
@@ -34,7 +34,7 @@ import org.springframework.batch.sample.domain.Order;
  * Converts <code>Order</code> object to a String.
  * @author Dave Syer
  */
-public class OrderConverter implements Converter {
+public class OrderTransformer implements ItemTransformer {
 
     /**
      * Aggregators for all types of lines in the output file
@@ -44,7 +44,7 @@ public class OrderConverter implements Converter {
     /**
      * Converts information from an Order object to a collection of Strings for output.
      */
-    public Object convert(Object data) {
+    public Object transform(Object data) {
         Order order = (Order) data;
         
         List result = new ArrayList();

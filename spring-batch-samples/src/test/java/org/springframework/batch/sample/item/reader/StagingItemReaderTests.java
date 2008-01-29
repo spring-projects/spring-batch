@@ -11,7 +11,7 @@ import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
-import org.springframework.batch.sample.item.processor.StagingItemWriter;
+import org.springframework.batch.sample.item.writer.StagingItemWriter;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
 

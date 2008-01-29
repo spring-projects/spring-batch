@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.item.processor;
+package org.springframework.batch.sample.item.writer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

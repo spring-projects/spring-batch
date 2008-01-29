@@ -19,48 +19,48 @@ package org.springframework.batch.sample.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
-
+import org.springframework.batch.item.ItemWriter;
 
 /**
- * Custom class that contains logic that would normally be
- * be contained in {@link ItemReader} (<code>getData()</code>) and
- * {@link ItemProcessor} (<code>processData(..)</code>).
+ * Custom class that contains logic that would normally be be contained in
+ * {@link ItemReader} and {@link ItemWriter}.
  * 
  * @author tomas.slanina
  * @author Robert Kasanicky
  */
 public class PersonService {
-    
+
 	private static final int GENERATION_LIMIT = 10;
-	
+
 	private int generatedCounter = 0;
+
 	private int processedCounter = 0;
- 
+
 	public Person getData() {
-		if (generatedCounter >= GENERATION_LIMIT) return null;
-		
+		if (generatedCounter >= GENERATION_LIMIT)
+			return null;
+
 		Person person = new Person();
 		Address address = new Address();
 		Child child = new Child();
 		List children = new ArrayList(1);
-		
+
 		children.add(child);
-		
+
 		person.setFirstName("John" + generatedCounter);
 		person.setAge(20 + generatedCounter);
 		address.setCity("Johnsville" + generatedCounter);
 		child.setName("Little Johny" + generatedCounter);
-		
+
 		person.setAddress(address);
 		person.setChildren(children);
-		
+
 		generatedCounter++;
-		
+
 		return person;
 	}
-	
+
 	/**
 	 * Badly designed method signature which accepts multiple implicitly related
 	 * arguments instead of a single Person argument.
@@ -68,11 +68,11 @@ public class PersonService {
 	public void processPerson(String name, String city) {
 		processedCounter++;
 	}
-	
+
 	public int getReturnedCount() {
 		return generatedCounter;
 	}
-	
+
 	public int getReceivedCount() {
 		return processedCounter;
 	}

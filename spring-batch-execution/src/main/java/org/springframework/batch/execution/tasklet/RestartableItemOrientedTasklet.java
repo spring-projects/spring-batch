@@ -18,8 +18,8 @@ package org.springframework.batch.execution.tasklet;
 
 import java.util.Properties;
 
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -30,7 +30,7 @@ import org.springframework.batch.support.PropertiesConverter;
  * {@link Restartable} to the provider and processor.
  * 
  * @see ItemReader
- * @see ItemProcessor
+ * @see ItemWriter
  * @see Restartable
  * 
  * @author Lucas Ward

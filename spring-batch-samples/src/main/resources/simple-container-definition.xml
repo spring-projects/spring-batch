@@ -151,7 +151,7 @@
 		<aop:aspect id="moduleLogging" ref="itemProcessorLogAdvice">
 
 			<aop:after
-				pointcut="execution( * org.springframework.batch.item.ItemProcessor+.process(Object)) and args(item)"
+				pointcut="execution( * org.springframework.batch.item.ItemWriter+.write(Object)) and args(item)"
 				method="doStronglyTypedLogging" />
 
 		</aop:aspect>

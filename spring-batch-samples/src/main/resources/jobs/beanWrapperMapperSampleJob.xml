@@ -25,7 +25,7 @@
 								</bean>
 							</property>
 							<property name="itemWriter">
-								<bean class="org.springframework.batch.sample.item.processor.TradeWriter">
+								<bean class="org.springframework.batch.sample.item.writer.TradeWriter">
 									<property name="dao" ref="tradeDao" />
 								</bean>
 							</property>
@@ -38,7 +38,7 @@
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
 							<property name="itemReader" ref="fileInputTemplate2" />
 							<property name="itemWriter">
-								<bean class="org.springframework.batch.sample.item.processor.PersonWriter" />
+								<bean class="org.springframework.batch.sample.item.writer.PersonWriter" />
 							</property>
 						</bean>
 					</property>

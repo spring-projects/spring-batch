@@ -32,12 +32,12 @@
 							</bean>
 						</property>
 						<property name="itemWriter">
-							<bean class="org.springframework.batch.sample.item.processor.OrderWriter">
+							<bean class="org.springframework.batch.sample.item.writer.OrderWriter">
 								<property name="delegate">
 									<bean class="org.springframework.batch.sample.dao.FlatFileOrderWriter">
 										<property name="delegate" ref="flatFileOutputSource" />
-										<property name="converter">
-											<bean class="org.springframework.batch.sample.dao.OrderConverter">
+										<property name="transformer">
+											<bean class="org.springframework.batch.sample.dao.OrderTransformer">
 												<property name="aggregators" ref="outputDescriptors" />
 											</bean>
 										</property>

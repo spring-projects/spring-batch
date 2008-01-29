@@ -33,9 +33,9 @@ import org.springframework.batch.sample.domain.Order;
  * @author Dave Syer
  * 
  */
-public class OrderConverterTests extends TestCase {
+public class OrderTransformerTests extends TestCase {
 
-	private OrderConverter converter = new OrderConverter();
+	private OrderTransformer converter = new OrderTransformer();
 
 	public void testConvert() throws Exception {
 		converter.setAggregators(new HashMap() {
@@ -55,7 +55,7 @@ public class OrderConverterTests extends TestCase {
 		order.setBilling(new BillingInfo());
 		order.setLineItems(Collections.EMPTY_LIST);
 		order.setTotalPrice(BigDecimal.TEN);
-		Object result = converter.convert(order);
+		Object result = converter.transform(order);
 		assertTrue(result instanceof Collection);
 	}
 

@@ -30,7 +30,7 @@
 							</property>
 							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.sample.item.processor.StagingItemWriter"
+									class="org.springframework.batch.sample.item.writer.StagingItemWriter"
 									scope="step">
 									<aop:scoped-proxy />
 									<property name="dataSource"
@@ -67,7 +67,7 @@
 							</property>
 							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.sample.item.processor.TradeWriter">
+									class="org.springframework.batch.sample.item.writer.TradeWriter">
 									<property name="dao"
 										ref="tradeDao" />
 								</bean>
@@ -163,7 +163,7 @@
 		<aop:aspect id="moduleLogging" ref="itemProcessorLogAdvice">
 
 			<aop:after
-				pointcut="execution( * org.springframework.batch.item.ItemProcessor+.process(Object)) and args(item)"
+				pointcut="execution( * org.springframework.batch.item.ItemWriter+.write(Object)) and args(item)"
 				method="doStronglyTypedLogging" />
 
 		</aop:aspect>

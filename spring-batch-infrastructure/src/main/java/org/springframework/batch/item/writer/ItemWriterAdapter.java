@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.processor;
+package org.springframework.batch.item.writer;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.AbstractMethodInvokingDelegator;
 
 
@@ -28,9 +28,9 @@ import org.springframework.batch.support.AbstractMethodInvokingDelegator;
  * 
  * @author Robert Kasanicky
  */
-public class ItemProcessorAdapter extends AbstractMethodInvokingDelegator implements ItemProcessor {
+public class ItemWriterAdapter extends AbstractMethodInvokingDelegator implements ItemWriter {
 	
-    public void process(Object item) throws Exception {
+    public void write(Object item) throws Exception {
     	invokeDelegateMethodWithArgument(item);
     }
 	

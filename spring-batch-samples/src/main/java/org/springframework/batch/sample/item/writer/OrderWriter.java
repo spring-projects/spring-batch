@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item;
+package org.springframework.batch.sample.item.writer;
 
-/**
- * @author Dave Syer
- * 
- */
-public interface ItemProcessor {
+import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.item.writer.DelegatingItemWriter;
+import org.springframework.batch.sample.domain.Order;
 
-	/**
-	 * Process the supplied data element. Will be called multiple times during a
-	 * larger batch operation. Will not be called with null data in normal
-	 * operation.
-	 * 
-	 * @throws Exception if there are errors. If the processor is used inside a
-	 * retry or a batch the framework will catch the exception and convert or
-	 * rethrow it as appropriate.
-	 */
-	void process(Object data) throws Exception;
 
+
+public class OrderWriter extends DelegatingItemWriter {
+    public Object doProcess(Object data) {
+        if (!(data instanceof Order)) {
+            throw new BatchCriticalException("OrderProcessor can process only Order objects");
+        }
+        return data;
+    }
 }

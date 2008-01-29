@@ -55,7 +55,7 @@
 							</property>
 							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.sample.item.processor.TradeWriter"
+									class="org.springframework.batch.sample.item.writer.TradeWriter"
 									p:dao-ref="tradeDao" p:failure="3"/>
 							</property>
 						</bean>

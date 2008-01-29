@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.batch.sample.dao.CustomerCreditDao;
 import org.springframework.batch.sample.domain.CustomerCredit;
+import org.springframework.batch.sample.item.writer.CustomerCreditIncreaseWriter;
 
 /**
  * Tests for {@link CustomerCreditIncreaseWriter}.

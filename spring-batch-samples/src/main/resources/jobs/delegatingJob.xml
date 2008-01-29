@@ -30,7 +30,7 @@
 							</bean>
 						</property>
 						<property name="itemWriter">
-							<bean class="org.springframework.batch.item.processor.PropertyExtractingDelegatingItemWriter">
+							<bean class="org.springframework.batch.item.writer.PropertyExtractingDelegatingItemWriter">
 								<property name="targetObject" ref="delegatingObject" />
 								<property name="targetMethod" value="processPerson" />
 								<property name="fieldsUsedAsTargetMethodArguments">

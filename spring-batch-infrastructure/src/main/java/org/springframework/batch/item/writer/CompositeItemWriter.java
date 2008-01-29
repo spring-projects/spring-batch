@@ -1,4 +1,4 @@
-package org.springframework.batch.item.processor;
+package org.springframework.batch.item.writer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.restart.GenericRestartData;
@@ -100,14 +99,13 @@ public class CompositeItemWriter implements ItemWriter, Restartable {
 	/**
 	 * @param extractor used to extract Properties from {@link ItemReader}s
 	 * @return compound Properties containing all the Properties from injected
-	 * {@link ItemProcessor}s with property keys prefixed by list index.
+	 * {@link ItemWriter}s with property keys prefixed by list index.
 	 */
 	private Properties createCompoundProperties(PropertiesExtractor extractor) {
 		Properties stats = new Properties();
 		int index = 0;
 		for (Iterator iterator = delegates.listIterator(); iterator.hasNext();) {
-			ItemProcessor processor = (ItemProcessor) iterator.next();
-			Properties processorStats = extractor.extractProperties(processor);
+			Properties processorStats = extractor.extractProperties(iterator.next());
 			if (processorStats != null) {
 				for (Iterator iterator2 = processorStats.entrySet().iterator(); iterator2.hasNext();) {
 					Map.Entry entry = (Map.Entry) iterator2.next();

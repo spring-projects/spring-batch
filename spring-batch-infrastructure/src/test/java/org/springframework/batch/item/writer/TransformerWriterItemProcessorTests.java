@@ -1,9 +1,11 @@
-package org.springframework.batch.item.processor;
+package org.springframework.batch.item.writer;
 
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.ItemTransformer;
+import org.springframework.batch.item.writer.ItemTransformerItemWriterr;
 
 /**
  * Tests for {@link ItemTransformerItemWriterr}.

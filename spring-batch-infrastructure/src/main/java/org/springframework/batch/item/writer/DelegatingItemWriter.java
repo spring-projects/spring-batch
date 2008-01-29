@@ -1,4 +1,4 @@
-package org.springframework.batch.item.processor;
+package org.springframework.batch.item.writer;
 
 import java.util.Properties;
 
@@ -26,7 +26,7 @@ public class DelegatingItemWriter implements ItemWriter, Restartable, Skippable,
 	 * delegate {@link ItemWriter}.
 	 * @throws Exception 
 	 * 
-	 * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
+	 * @see ItemWriter#process(java.lang.Object)
 	 */
 	final public void write(Object item) throws Exception {
 		Object result = doProcess(item);

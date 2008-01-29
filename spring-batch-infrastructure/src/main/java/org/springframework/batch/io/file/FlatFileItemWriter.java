@@ -30,10 +30,10 @@ import java.util.Properties;
 
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
-import org.springframework.batch.io.file.transform.Converter;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.ResourceLifecycle;
+import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.batch.restart.Restartable;
@@ -64,16 +64,6 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	ItemWriter, ResourceLifecycle, Restartable, StatisticsProvider, InitializingBean,
 	DisposableBean {
 
-	/**
-	 * @author dsyer
-	 * 
-	 */
-	public static class BooleanHolder {
-
-		public boolean value;
-
-	}
-
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
 	public static final String WRITTEN_STATISTICS_NAME = "written";
@@ -90,12 +80,20 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	private OutputState state = new OutputState();
 
-	private Converter converter = new Converter() {
-		public Object convert(Object input) {
+	private ItemTransformer transformer = new ItemTransformer() {
+		public Object transform(Object input) {
 			return "" + input;
 		}
 	};
 
+	private static class BooleanHolder {
+		public boolean value;
+	}
+	
+	/**
+	 * Assert that mandatory properties (resource) are set.
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource);
 		File file = resource.getFile();
@@ -106,10 +104,10 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 * Public setter for the converter. If not-null this will be used to convert
 	 * the input data before it is output.
 	 * 
-	 * @param converter the converter to set
+	 * @param transformer the converter to set
 	 */
-	public void setConverter(Converter converter) {
-		this.converter = converter;
+	public void setTransformer(ItemTransformer transformer) {
+		this.transformer = transformer;
 	}
 
 	/**
@@ -152,17 +150,19 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 * 
 	 * @param data Object (a String or Object that can be converted) to be
 	 * written to output stream
+	 * @throws Exception if the transformer or file output fail
 	 */
-	public void write(Object data) {
-		convertAndWrite(data, new BooleanHolder());
+	public void write(Object data) throws Exception {
+		transformAndWrite(data, new BooleanHolder());
 	}
 
 	/**
 	 * Convert the date to a format that can be output and then write it out.
 	 * @param data
 	 * @param converted
+	 * @throws Exception 
 	 */
-	private void convertAndWrite(Object data, BooleanHolder converted) {
+	private void transformAndWrite(Object data, BooleanHolder converted) throws Exception {
 
 		if (data instanceof Collection) {
 			converted.value = false;
@@ -190,7 +190,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 		else if (!converted.value) {
 			// (recursive)
 			converted.value = true;
-			convertAndWrite(converter.convert(data), converted);
+			transformAndWrite(transformer.transform(data), converted);
 			return;
 		}
 		else {

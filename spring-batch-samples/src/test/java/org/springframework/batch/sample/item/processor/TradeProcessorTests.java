@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
+import org.springframework.batch.sample.item.writer.TradeWriter;
 
 public class TradeProcessorTests extends TestCase {
 

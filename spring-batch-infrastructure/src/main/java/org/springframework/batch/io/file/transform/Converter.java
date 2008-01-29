@@ -19,6 +19,8 @@ package org.springframework.batch.io.file.transform;
  * Generic converter interface for transforming an object into another form for
  * output or after input.
  * 
+ * TODO: replace with ItemTransformer
+ * 
  * @author Dave Syer
  * 
  */

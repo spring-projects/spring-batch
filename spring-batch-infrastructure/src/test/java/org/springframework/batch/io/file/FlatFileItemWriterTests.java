@@ -25,8 +25,7 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.file.FlatFileItemWriter;
-import org.springframework.batch.io.file.transform.Converter;
+import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.batch.restart.RestartData;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -103,8 +102,9 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
+	 * @throws Exception 
 	 */
-	public void testWriteString() throws IOException {
+	public void testWriteString() throws Exception {
 		inputSource.write(TEST_STRING);
 		inputSource.close();
 		String lineFromFile = readLine();
@@ -114,8 +114,9 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
+	 * @throws Exception 
 	 */
-	public void testWriteCollection() throws IOException {
+	public void testWriteCollection() throws Exception {
 		inputSource.write(Collections.singleton(TEST_STRING));
 		inputSource.close();
 		String lineFromFile = readLine();
@@ -124,10 +125,11 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
+	 * @throws Exception 
 	 */
-	public void testWriteWithConverter() throws IOException {
-		inputSource.setConverter(new Converter() {
-			public Object convert(Object input) {
+	public void testWriteWithConverter() throws Exception {
+		inputSource.setTransformer(new ItemTransformer() {
+			public Object transform(Object input) {
 				return "FOO:" + input;
 			}
 		});
@@ -141,10 +143,11 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
+	 * @throws Exception 
 	 */
-	public void testWriteWithConverterAndInfiniteLoop() throws IOException {
-		inputSource.setConverter(new Converter() {
-			public Object convert(Object input) {
+	public void testWriteWithConverterAndInfiniteLoop() throws Exception {
+		inputSource.setTransformer(new ItemTransformer() {
+			public Object transform(Object input) {
 				return "FOO:" + input;
 			}
 		});
@@ -158,10 +161,11 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
+	 * @throws Exception 
 	 */
-	public void testWriteWithConverterAndInfiniteLoopInCollection() throws IOException {
-		inputSource.setConverter(new Converter() {
-			public Object convert(Object input) {
+	public void testWriteWithConverterAndInfiniteLoopInCollection() throws Exception {
+		inputSource.setTransformer(new ItemTransformer() {
+			public Object transform(Object input) {
 				return "FOO:" + input;
 			}
 		});
@@ -176,12 +180,13 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
+	 * @throws Exception 
 	 */
-	public void testWriteWithConverterAndInfiniteLoopInConvertedCollection() throws IOException {
-		inputSource.setConverter(new Converter() {
+	public void testWriteWithConverterAndInfiniteLoopInConvertedCollection() throws Exception {
+		inputSource.setTransformer(new ItemTransformer() {
 			boolean converted = false;
 
-			public Object convert(Object input) {
+			public Object transform(Object input) {
 				if (converted) {
 					return input;
 				}
@@ -205,10 +210,11 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
+	 * @throws Exception 
 	 */
-	public void testWriteWithConverterAndString() throws IOException {
-		inputSource.setConverter(new Converter() {
-			public Object convert(Object input) {
+	public void testWriteWithConverterAndString() throws Exception {
+		inputSource.setTransformer(new ItemTransformer() {
+			public Object transform(Object input) {
 				return "FOO:" + input;
 			}
 		});
@@ -221,10 +227,11 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
+	 * @throws Exception 
 	 */
-	public void testWriteWithConverterAndCollectionOfString() throws IOException {
-		inputSource.setConverter(new Converter() {
-			public Object convert(Object input) {
+	public void testWriteWithConverterAndCollectionOfString() throws Exception {
+		inputSource.setTransformer(new ItemTransformer() {
+			public Object transform(Object input) {
 				return "FOO:" + input;
 			}
 		});
@@ -237,8 +244,9 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
+	 * @throws Exception 
 	 */
-	public void testWriteArray() throws IOException {
+	public void testWriteArray() throws Exception {
 		inputSource.write(new String[] { TEST_STRING, TEST_STRING });
 		inputSource.close();
 		String lineFromFile = readLine();
@@ -249,8 +257,9 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String[], LineDescriptor)</code> method
+	 * @throws Exception 
 	 */
-	public void testWriteRecord() throws IOException {
+	public void testWriteRecord() throws Exception {
 		String args = "1";
 
 		// AggregatorStub ignores the LineDescriptor, so we pass null
@@ -287,7 +296,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals("testLine1", lineFromFile);
 	}
 
-	public void testRestart() throws IOException {
+	public void testRestart() throws Exception {
 
 		// write some lines
 		inputSource.write("testLine1");

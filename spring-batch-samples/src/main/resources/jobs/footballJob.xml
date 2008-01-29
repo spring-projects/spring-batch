@@ -31,7 +31,7 @@
 								ref="playerFileItemReader" />
 							<property name="itemWriter">
 								<bean
-									class="org.springframework.batch.sample.item.processor.PlayerItemWriter">
+									class="org.springframework.batch.sample.item.writer.PlayerItemWriter">
 									<property name="playerDao">
 										<bean
 											class="org.springframework.batch.sample.dao.JdbcPlayerDao">
@@ -151,7 +151,7 @@
 		<aop:aspect id="moduleLogging" ref="itemProcessorLogAdvice">
 
 			<aop:after
-				pointcut="execution( * org.springframework.batch.item.ItemProcessor+.process(Object)) and args(item)"
+				pointcut="execution( * org.springframework.batch.item.ItemWriter+.write(Object)) and args(item)"
 				method="doStronglyTypedLogging" />
 
 		</aop:aspect>

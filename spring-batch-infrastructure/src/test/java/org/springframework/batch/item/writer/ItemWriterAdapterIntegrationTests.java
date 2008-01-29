@@ -1,19 +1,20 @@
-package org.springframework.batch.item.processor;
+package org.springframework.batch.item.writer;
 
 import java.util.List;
 
 import org.springframework.batch.io.sample.domain.Foo;
 import org.springframework.batch.io.sample.domain.FooService;
+import org.springframework.batch.item.writer.ItemWriterAdapter;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
- * Tests for {@link ItemProcessorAdapter}.
+ * Tests for {@link ItemWriterAdapter}.
  * 
  * @author Robert Kasanicky
  */
-public class ItemProcessorAdapterIntegrationTests extends AbstractDependencyInjectionSpringContextTests {
+public class ItemWriterAdapterIntegrationTests extends AbstractDependencyInjectionSpringContextTests {
 
-	private ItemProcessorAdapter processor;
+	private ItemWriterAdapter processor;
 	
 	private FooService fooService;
 	
@@ -29,7 +30,7 @@ public class ItemProcessorAdapterIntegrationTests extends AbstractDependencyInje
 	public void testProcess() throws Exception {
 		Foo foo;
 		while ((foo = fooService.generateFoo()) != null) {
-			processor.process(foo);
+			processor.write(foo);
 		}
 		
 		List input = fooService.getGeneratedFoos();
@@ -44,7 +45,7 @@ public class ItemProcessorAdapterIntegrationTests extends AbstractDependencyInje
 	}
 	
 	//setter for auto-injection
-	public void setProcessor(ItemProcessorAdapter processor) {
+	public void setProcessor(ItemWriterAdapter processor) {
 		this.processor = processor;
 	}
 

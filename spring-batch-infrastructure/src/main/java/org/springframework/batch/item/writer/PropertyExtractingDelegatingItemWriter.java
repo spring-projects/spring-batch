@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.processor;
+package org.springframework.batch.item.writer;
 
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.AbstractMethodInvokingDelegator;
@@ -26,7 +26,7 @@ import org.springframework.util.Assert;
  * Delegates processing to a custom method -  extracts property values 
  * from item object and uses them as arguments for the delegate method.
  * 
- * @see ItemProcessorAdapter
+ * @see ItemWriterAdapter
  * 
  * @author Robert Kasanicky
  */

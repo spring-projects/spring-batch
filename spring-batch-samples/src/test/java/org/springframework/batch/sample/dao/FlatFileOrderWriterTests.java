@@ -60,7 +60,7 @@ public class FlatFileOrderWriterTests extends TestCase {
 		//create map of aggregators and set it to writer
 		Map aggregators = new HashMap();
 		
-		OrderConverter converter = new OrderConverter();
+		OrderTransformer converter = new OrderTransformer();
 		aggregators.put("header", aggregator);
 		aggregators.put("customer", aggregator);
 		aggregators.put("address", aggregator);
@@ -68,7 +68,7 @@ public class FlatFileOrderWriterTests extends TestCase {
 		aggregators.put("item", aggregator);
 		aggregators.put("footer", aggregator);
 		converter.setAggregators(aggregators);
-		writer.setConverter(converter);
+		writer.setTransformer(converter);
 				
 		//call tested method
 		writer.write(order);

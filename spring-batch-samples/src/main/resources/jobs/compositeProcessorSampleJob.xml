@@ -24,14 +24,14 @@
 							</bean>
 						</property>
 						<property name="itemWriter">
-							<bean class="org.springframework.batch.item.processor.CompositeItemWriter" >
+							<bean class="org.springframework.batch.item.writer.CompositeItemWriter" >
 								<property name="itemWriters" >
 									<list>
-										<bean class="org.springframework.batch.sample.item.processor.TradeWriter">
+										<bean class="org.springframework.batch.sample.item.writer.TradeWriter">
 											<property name="dao" ref="tradeDao" />
 										</bean>
 
-										<bean class="org.springframework.batch.item.processor.DelegatingItemWriter">
+										<bean class="org.springframework.batch.item.writer.DelegatingItemWriter">
 											<property name="delegate" ref="flatFileOutputSource" />
 										</bean>
 									</list>

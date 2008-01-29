@@ -1,4 +1,4 @@
-package org.springframework.batch.item.processor;
+package org.springframework.batch.item.writer;
 
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.util.Assert;

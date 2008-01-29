@@ -2,7 +2,7 @@ package org.springframework.batch.sample;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.sample.item.processor.StagingItemWriter;
+import org.springframework.batch.sample.item.writer.StagingItemWriter;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
