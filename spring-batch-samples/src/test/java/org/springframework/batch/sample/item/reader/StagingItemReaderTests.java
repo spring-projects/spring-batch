@@ -17,14 +17,14 @@ import org.springframework.util.ClassUtils;
 
 public class StagingItemReaderTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	private StagingItemWriter processor;
+	private StagingItemWriter writer;
 
 	private StagingItemReader provider;
 
 	private Long jobId = new Long(11);
 
-	public void setProcessor(StagingItemWriter processor) {
-		this.processor = processor;
+	public void setProcessor(StagingItemWriter writer) {
+		this.writer = writer;
 	}
 
 	public void setProvider(StagingItemReader provider) {
@@ -45,10 +45,10 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 	}
 
 	protected void onSetUpInTransaction() throws Exception {
-		processor.write("FOO");
-		processor.write("BAR");
-		processor.write("SPAM");
-		processor.write("BUCKET");
+		writer.write("FOO");
+		writer.write("BAR");
+		writer.write("SPAM");
+		writer.write("BUCKET");
 	}
 
 	protected void onTearDownAfterTransaction() throws Exception {

@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.item.processor;
+package org.springframework.batch.sample.item.writer;
 
 import junit.framework.TestCase;
 
