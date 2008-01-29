@@ -34,6 +34,8 @@ package org.springframework.batch.item;
  * 
  * @author Rob Harrop
  * @author Dave Syer
+ * @author Lucas Ward
+ * @since 1.0
  */
 public interface ItemReader {
 
@@ -56,4 +58,10 @@ public interface ItemReader {
 	 * @return a unique identifier.
 	 */
 	Object getKey(Object item);
+	
+	/**
+	 * Close the reader, freeing any resources that may have been allocated
+	 * since the first call to read().
+	 */
+	void close() throws Exception;
 }

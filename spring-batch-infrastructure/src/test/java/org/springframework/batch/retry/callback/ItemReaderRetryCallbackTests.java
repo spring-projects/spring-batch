@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.retry.ListItemReaderRecoverer;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.context.RetryContextSupport;
@@ -57,7 +58,7 @@ public class ItemReaderRetryCallbackTests extends TestCase {
 				return "key" + (count++);
 			}
 		};
-		callback = new ItemReaderRetryCallback(provider, new ItemWriter() {
+		callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(Object data) {
 				count++;
 				if (data.equals("bar")) {

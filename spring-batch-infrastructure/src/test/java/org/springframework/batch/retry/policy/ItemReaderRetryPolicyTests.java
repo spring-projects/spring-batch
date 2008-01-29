@@ -27,6 +27,7 @@ import org.springframework.batch.item.FailedItemIdentifier;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
@@ -61,7 +62,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 	}
 
 	public void testOpenSunnyDay() throws Exception {
-		RetryContext context = policy.open(new ItemReaderRetryCallback(provider, new ItemWriter() {
+		RetryContext context = policy.open(new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(Object data) {
 				count++;
 				list.add(data);
@@ -92,7 +93,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 	public void testCanRetry() {
 		policy.setDelegate(new AlwaysRetryPolicy());
 
-		RetryContext context = policy.open(new ItemReaderRetryCallback(provider, new ItemWriter() {
+		RetryContext context = policy.open(new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(Object data) {
 				count++;
 			}
@@ -105,7 +106,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 
 	public void testRegisterThrowable() {
 		policy.setDelegate(new NeverRetryPolicy());
-		RetryContext context = policy.open(new ItemReaderRetryCallback(provider, new ItemWriter() {
+		RetryContext context = policy.open(new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(Object data) {
 				count++;
 				list.add(data);
@@ -118,7 +119,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 
 	public void testClose() throws Exception {
 		policy.setDelegate(new NeverRetryPolicy());
-		RetryContext context = policy.open(new ItemReaderRetryCallback(provider, new ItemWriter() {
+		RetryContext context = policy.open(new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(Object data) {
 				count++;
 				list.add(data);
@@ -137,7 +138,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 	}
 
 	public void testOpenTwice() throws Exception {
-		ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new ItemWriter() {
+		ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(Object data) {
 				count++;
 				list.add(data);
@@ -168,7 +169,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 	public void testRecover() throws Exception {
 		policy = new ItemReaderRetryPolicy();
 		policy.setDelegate(new SimpleRetryPolicy(1));
-		ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new ItemWriter() {
+		ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(Object data) {
 			}
 		});
@@ -207,7 +208,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 	public void testRecoverWithTemplate() throws Exception {
 		policy = new ItemReaderRetryPolicy();
 		policy.setDelegate(new SimpleRetryPolicy(1));
-		ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new ItemWriter() {
+		ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(Object data) {
 				throw new RuntimeException("Barf!");
 			}
@@ -230,7 +231,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 	}
 
 	public void testExhaustedClearsHistoryAfterLastAttempt() throws Exception {
-		ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new ItemWriter() {
+		ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(Object data) {
 				count++;
 				list.add(data);
@@ -258,7 +259,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 	public void testRetryCount() throws Exception {
 		policy = new ItemReaderRetryPolicy();
 		policy.setDelegate(new SimpleRetryPolicy(1));
-		RetryContext context = policy.open(new ItemReaderRetryCallback(provider, new ItemWriter() {
+		RetryContext context = policy.open(new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(Object data) {
 				count++;
 				list.add(data);
@@ -273,7 +274,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 	}
 
 	public void testRetryCountPreservedBetweenRetries() throws Exception {
-		ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new ItemWriter() {
+		ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(Object data) {
 				count++;
 				list.add(data);

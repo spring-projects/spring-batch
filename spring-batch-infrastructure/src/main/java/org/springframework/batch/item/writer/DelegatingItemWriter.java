@@ -87,4 +87,8 @@ public class DelegatingItemWriter implements ItemWriter, Restartable, Skippable,
 		Assert.notNull(writer);
 	}
 
+	public void close() throws Exception {
+		writer.close();
+	}
+
 }

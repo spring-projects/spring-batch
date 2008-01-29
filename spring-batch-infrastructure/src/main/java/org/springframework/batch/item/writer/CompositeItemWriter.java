@@ -125,5 +125,11 @@ public class CompositeItemWriter implements ItemWriter, Restartable {
 	private interface PropertiesExtractor {
 		Properties extractProperties(Object o);
 	}
+	
+	public void close() throws Exception {
+		for (Iterator iterator = delegates.listIterator(); iterator.hasNext();) {
+			((ItemWriter) iterator.next()).close();
+		}
+	}
 
 }

@@ -38,5 +38,9 @@ public class ItemReaderAdapter extends AbstractMethodInvokingDelegator implement
 		return item;
 	}
 
+	public void close() throws Exception {
+		
+	}
+
 }
 

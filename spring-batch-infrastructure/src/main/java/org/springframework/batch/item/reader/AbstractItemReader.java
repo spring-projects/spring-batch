@@ -35,5 +35,8 @@ public abstract class AbstractItemReader implements ItemReader {
 	public Object getKey(Object item) {
 		return item;
 	}
+	
+	public void close() throws Exception {		
+	}
 
 }

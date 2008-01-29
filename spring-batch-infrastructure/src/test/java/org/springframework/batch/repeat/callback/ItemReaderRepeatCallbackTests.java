@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 
 public class ItemReaderRepeatCallbackTests extends TestCase {
 
@@ -33,7 +34,7 @@ public class ItemReaderRepeatCallbackTests extends TestCase {
 
 	public void testDoWithRepeat() throws Exception {
 		callback = new ItemReaderRepeatCallback(new ListItemReader(Arrays.asList(new String[] { "foo", "bar" })),
-				new ItemWriter() {
+				new AbstractItemWriter() {
 					public void write(Object data) {
 						list.add(data);
 					}

@@ -23,6 +23,7 @@ import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.DelegatingItemReader;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -69,7 +70,7 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 		}
 	}
 
-	protected static class TradeWriter implements ItemWriter {
+	protected static class TradeWriter extends AbstractItemWriter {
 		int count = 0;
 
 		// This has to be synchronized because we are going to test the state

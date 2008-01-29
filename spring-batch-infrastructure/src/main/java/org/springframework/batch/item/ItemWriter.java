@@ -23,6 +23,7 @@ package org.springframework.batch.item;
  * technology to use for mapping and how it should be configured.
  * 
  * @author Dave Syer
+ * @author Lucas Ward
  */
 public interface ItemWriter {
 
@@ -36,4 +37,11 @@ public interface ItemWriter {
 	 * rethrow it as appropriate.
 	 */
 	public void write(Object item) throws Exception;
+	
+	/**
+	 * Close the writer, allowing all allocated resources to be cleaned up.
+	 * 
+	 * @throws Exception
+	 */
+	void close() throws Exception;
 }

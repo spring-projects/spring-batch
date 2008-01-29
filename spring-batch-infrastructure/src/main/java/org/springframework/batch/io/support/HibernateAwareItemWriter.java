@@ -287,4 +287,8 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
 
 	}
 
+	public void close() throws Exception {
+		delegate.close();
+	}
+
 }

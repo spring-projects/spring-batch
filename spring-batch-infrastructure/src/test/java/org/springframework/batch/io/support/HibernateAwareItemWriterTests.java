@@ -70,6 +70,9 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		public void open(RepeatContext context) {
 			list.add(context);
 		}
+
+		public void close() throws Exception {
+		}
 	}
 
 	HibernateAwareItemWriter writer = new HibernateAwareItemWriter();

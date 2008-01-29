@@ -65,4 +65,8 @@ public class PropertyExtractingDelegatingItemWriter extends AbstractMethodInvoki
 	public void setFieldsUsedAsTargetMethodArguments(String[] fieldsUsedAsMethodArguments) {
 		this.fieldsUsedAsTargetMethodArguments = fieldsUsedAsMethodArguments;
 	}
+
+
+	public void close() throws Exception {
+	}
 }

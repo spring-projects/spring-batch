@@ -88,6 +88,35 @@ public class CompositeItemWriterTests extends TestCase {
 		
 	}
 	
+	public void testClose() throws Exception {
+		
+		final int NUMBER_OF_PROCESSORS = 10;
+		Object data = new Object();
+		
+		List controls = new ArrayList(NUMBER_OF_PROCESSORS);
+		List processors = new ArrayList(NUMBER_OF_PROCESSORS);
+		
+		for (int i = 0; i < NUMBER_OF_PROCESSORS; i++) {
+			MockControl control = MockControl.createStrictControl(ItemWriter.class);
+			ItemWriter processor = (ItemWriter) control.getMock();
+			
+			processor.close();
+			control.setVoidCallable();
+			control.replay();
+			
+			processors.add(processor);
+			controls.add(control);
+		}
+		
+		itemProcessor.setItemWriters(processors);
+		itemProcessor.close();
+		
+		for (Iterator iterator = controls.iterator(); iterator.hasNext();) {
+			MockControl control = (MockControl) iterator.next();
+			control.verify();
+		}
+	}
+	
 	/**
 	 * Stub for testing restart. Checks the restart data received is the same that was returned by
 	 * <code>getRestartData()</code>
@@ -124,6 +153,10 @@ public class CompositeItemWriterTests extends TestCase {
 			return new Properties() {{
 				setProperty(STATS_KEY, String.valueOf(hashCode));
 			}};
+		}
+
+		public void close() throws Exception {
+			
 		}
 		
 	}
