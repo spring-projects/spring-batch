@@ -15,4 +15,7 @@ public class PlayerItemWriter implements ItemWriter {
 	public void setPlayerDao(PlayerDao playerDao) {
 		this.playerDao = playerDao;
 	}
+
+	public void close() throws Exception {
+	}
 }

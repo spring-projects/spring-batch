@@ -42,4 +42,7 @@ public class CustomerCreditUpdateWriter implements ItemWriter {
         this.dao = writer;
     }
 
+	public void close() throws Exception {
+	}
+
 }

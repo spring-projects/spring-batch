@@ -73,4 +73,7 @@ public class StagingItemWriter extends JdbcDaoSupport implements
 						new int[] { Types.BIGINT, Types.BIGINT, Types.BLOB, Types.CHAR});
 	}
 
+	public void close() throws Exception {
+	}
+
 }

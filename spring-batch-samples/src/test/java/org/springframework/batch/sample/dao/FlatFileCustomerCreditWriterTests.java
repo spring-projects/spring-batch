@@ -40,7 +40,7 @@ public class FlatFileCustomerCreditWriterTests extends TestCase {
 		outputControl.verify();
 	}
 	
-	public void testClose() {
+	public void testClose() throws Exception{
 		
 		//set-up outputSource mock
 		output.close();

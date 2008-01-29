@@ -27,4 +27,7 @@ public class DummyItemWriter implements ItemWriter {
 		// NO-OP
 	}
 
+	public void close() throws Exception {
+	}
+
 }

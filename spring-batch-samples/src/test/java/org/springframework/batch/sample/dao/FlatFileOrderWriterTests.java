@@ -11,6 +11,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.io.file.transform.LineAggregator;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.sample.LineAggregatorStub;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;
@@ -22,7 +23,7 @@ public class FlatFileOrderWriterTests extends TestCase {
 
 	List list = new ArrayList();
 	
-	private ItemWriter output = new ItemWriter() {
+	private ItemWriter output = new AbstractItemWriter() {
 		public void write(Object output) {
 			list.add(output);
 		}

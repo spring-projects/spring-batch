@@ -28,4 +28,7 @@ public class JdbcPlayerSummaryDao extends JdbcDaoSupport implements ItemWriter {
 		getJdbcTemplate().update(INSERT_SUMMARY, args);
 	}
 
+	public void close() throws Exception {
+	}
+
 }

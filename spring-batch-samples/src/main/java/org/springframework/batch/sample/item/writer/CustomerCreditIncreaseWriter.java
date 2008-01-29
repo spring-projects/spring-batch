@@ -34,4 +34,7 @@ public class CustomerCreditIncreaseWriter implements ItemWriter {
 		customerCreditDao.writeCredit(customerCredit);
 	}
 
+	public void close() throws Exception {
+	}
+
 }
