@@ -18,7 +18,7 @@ package org.springframework.batch.core.domain;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.ChildBeanDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -29,7 +29,7 @@ public class SpringBeanJobTests extends TestCase {
 
 	public void testBeanName() throws Exception {
 		StaticApplicationContext context = new StaticApplicationContext();
-		Job configuration = new Job();
+		JobSupport configuration = new JobSupport();
 		context.getAutowireCapableBeanFactory().initializeBean(configuration,
 				"bean");
 		assertNotNull(configuration.getName());
@@ -44,8 +44,8 @@ public class SpringBeanJobTests extends TestCase {
 		ConstructorArgumentValues args = new ConstructorArgumentValues();
 		args.addGenericArgumentValue("foo");
 		context.registerBeanDefinition("bean", new RootBeanDefinition(
-				Job.class, args, null));
-		Job configuration = (Job) context
+				JobSupport.class, args, null));
+		JobSupport configuration = (JobSupport) context
 				.getBean("bean");
 		assertNotNull(configuration.getName());
 		assertEquals("foo", configuration.getName());
@@ -58,9 +58,9 @@ public class SpringBeanJobTests extends TestCase {
 		ConstructorArgumentValues args = new ConstructorArgumentValues();
 		args.addGenericArgumentValue("bar");
 		context.registerBeanDefinition("parent", new RootBeanDefinition(
-				Job.class, args, null));
+				JobSupport.class, args, null));
 		context.registerBeanDefinition("bean", new ChildBeanDefinition("parent"));
-		Job configuration = (Job) context
+		JobSupport configuration = (JobSupport) context
 				.getBean("bean");
 		assertNotNull(configuration.getName());
 		assertEquals("bar", configuration.getName());

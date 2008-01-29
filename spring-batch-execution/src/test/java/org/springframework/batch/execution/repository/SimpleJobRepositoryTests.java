@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 
 import org.easymock.ArgumentsMatcher;
 import org.easymock.MockControl;
-import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -51,7 +51,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	SimpleJobRepository jobRepository;
 
-	Job jobConfiguration;
+	JobSupport jobConfiguration;
 
 	JobParameters jobParameters;
 
@@ -89,7 +89,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobParameters = new JobParametersBuilder().toJobParameters();
 		
 
-		jobConfiguration = new Job();
+		jobConfiguration = new JobSupport();
 		jobConfiguration.setBeanName("RepositoryTest");
 		jobConfiguration.setRestartable(true);
 

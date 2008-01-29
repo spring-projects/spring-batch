@@ -115,7 +115,6 @@
 	<bean id="jobLauncher"
 		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
-		<property name="jobExecutor" ref="jobExecutor" />
 		<property name="taskExecutor">
 			<bean
 				class="org.springframework.core.task.SimpleAsyncTaskExecutor" />

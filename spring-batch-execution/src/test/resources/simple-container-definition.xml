@@ -12,20 +12,15 @@
 	<bean id="simpleContainerLauncher"
 		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="simpleJobRepository" />
-		<property name="jobExecutor" ref="jobLifecycle" />
 	</bean>
 
 	<bean id="jobRegistry"
 		class="org.springframework.batch.execution.configuration.MapJobRegistry" />
 
-	<bean id="jobLifecycle"
-		class="org.springframework.batch.execution.job.DefaultJobExecutor">
-		<property name="jobRepository" ref="simpleJobRepository" />
-	</bean>
-
 	<bean id="simpleJob"
-		class="org.springframework.batch.core.domain.Job" abstract="true">
+		class="org.springframework.batch.execution.job.simple.SimpleJob" abstract="true">
 		<property name="restartable" value="true" />
+		<property name="jobRepository" ref="simpleJobRepository" />
 	</bean>
 
 	<bean id="simpleStep"

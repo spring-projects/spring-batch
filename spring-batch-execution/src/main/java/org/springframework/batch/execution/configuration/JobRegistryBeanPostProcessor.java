@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.repository.DuplicateJobException;
 import org.springframework.batch.core.repository.JobLocator;
 import org.springframework.batch.core.repository.JobRegistry;
@@ -31,7 +32,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.util.Assert;
 
 /**
- * A {@link BeanPostProcessor} that registers {@link Job} beans
+ * A {@link BeanPostProcessor} that registers {@link JobSupport} beans
  * with a {@link JobRegistry}. Include a bean of this type along
  * with your job configuration, and use the same
  * {@link JobRegistry} as a {@link JobLocator} when
@@ -66,7 +67,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 	}
 
 	/**
-	 * De-register all the {@link Job} instances that were
+	 * De-register all the {@link JobSupport} instances that were
 	 * regsistered by this post processor.
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
@@ -79,7 +80,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 	}
 
 	/**
-	 * If the bean is an instance of {@link Job} then register it.
+	 * If the bean is an instance of {@link JobSupport} then register it.
 	 * @throws FatalBeanException if there is a
 	 * {@link DuplicateJobException}.
 	 * 

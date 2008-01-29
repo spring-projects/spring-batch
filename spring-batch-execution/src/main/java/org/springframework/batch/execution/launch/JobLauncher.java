@@ -16,6 +16,7 @@
 package org.springframework.batch.execution.launch;
 
 import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -35,7 +36,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 public interface JobLauncher {
 
 	/**
-	 * Start a job execution for the given {@link Job} and {@link JobParameters}.
+	 * Start a job execution for the given {@link JobSupport} and {@link JobParameters}.
 	 * 
 	 * @return the exit code from the job if it returns synchronously. If the
 	 *         implementation is asynchronous, the status might well be unknown.

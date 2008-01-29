@@ -7,7 +7,7 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean id="test-job" class="org.springframework.batch.core.domain.Job">
+	<bean id="test-job" class="org.springframework.batch.core.domain.JobSupport">
 		<property name="steps">
 			<bean id="step1" class="org.springframework.batch.execution.step.simple.SimpleStep">
 				<constructor-arg>

@@ -76,13 +76,11 @@ public class RepeatOperationsStepTests extends TestCase {
 		configuration.setChunkOperations(repeatTemplate);
 		configuration.setJobRepository(new JobRepositorySupport());
 		configuration.setTransactionManager(new ResourcelessTransactionManager());
-		SimpleStepExecutor executor = (SimpleStepExecutor) configuration
-				.createStepExecutor();
 		StepExecution stepExecution = new StepExecution(new StepInstance(
 				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
 				new Long(12)));
 		try {
-			executor.process(stepExecution);
+			configuration.process(stepExecution);
 			fail("Expected RuntimeException");
 		} catch (NullPointerException e) {
 			// expected
@@ -117,12 +115,10 @@ public class RepeatOperationsStepTests extends TestCase {
 				return ExitStatus.CONTINUABLE;
 			}
 		});
-		SimpleStepExecutor executor = (SimpleStepExecutor) configuration
-				.createStepExecutor();
 		StepExecution stepExecution = new StepExecution(new StepInstance(
 				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
 				new Long(12)));
-		executor.process(stepExecution);
+		configuration.process(stepExecution);
 		assertEquals(2, list.size());
 		assertEquals(1, steps.size());
 	}

@@ -19,6 +19,8 @@ package org.springframework.batch.core.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.ClassUtils;
 
@@ -31,7 +33,7 @@ import org.springframework.util.ClassUtils;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class Job implements BeanNameAware {
+public class JobSupport implements BeanNameAware, Job {
 
 	private List steps = new ArrayList();
 
@@ -44,7 +46,7 @@ public class Job implements BeanNameAware {
 	/**
 	 * Default constructor.
 	 */
-	public Job() {
+	public JobSupport() {
 		super();
 	}
 
@@ -54,7 +56,7 @@ public class Job implements BeanNameAware {
 	 * 
 	 * @param name
 	 */
-	public Job(String name) {
+	public JobSupport(String name) {
 		super();
 		this.name = name;
 	}
@@ -84,10 +86,16 @@ public class Job implements BeanNameAware {
 		this.name = name;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.IJob#getName()
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.IJob#getSteps()
+	 */
 	public List getSteps() {
 		return steps;
 	}
@@ -101,6 +109,9 @@ public class Job implements BeanNameAware {
 		this.steps.add(step);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.IJob#getStartLimit()
+	 */
 	public int getStartLimit() {
 		return startLimit;
 	}
@@ -113,11 +124,21 @@ public class Job implements BeanNameAware {
 		this.restartable = restartable;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.IJob#isRestartable()
+	 */
 	public boolean isRestartable() {
 		return restartable;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.Job#run(org.springframework.batch.core.domain.JobExecution)
+	 */
+	public ExitStatus run(JobExecution execution) throws BatchCriticalException {
+		throw new UnsupportedOperationException("JobSupport does not provide an implementation of run().  Use a smarter subclass.");
+	}
 
 	public String toString() {
-		return ClassUtils.getShortName(Job.class) + ": [name=" + name + "]";
+		return ClassUtils.getShortName(JobSupport.class) + ": [name=" + name + "]";
 	}
 }

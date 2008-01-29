@@ -19,7 +19,7 @@ import java.util.Collection;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.repository.DuplicateJobException;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.beans.FatalBeanException;
@@ -58,7 +58,7 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 	public void testAfterInitializationWithCorrectType() throws Exception {
 		MapJobRegistry registry = new MapJobRegistry();
 		processor.setJobConfigurationRegistry(registry);
-		Job configuration = new Job();
+		JobSupport configuration = new JobSupport();
 		configuration.setBeanName("foo");
 		assertEquals(configuration, processor.postProcessAfterInitialization(
 				configuration, "bar"));
@@ -68,7 +68,7 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 	public void testAfterInitializationWithDuplicate() throws Exception {
 		MapJobRegistry registry = new MapJobRegistry();
 		processor.setJobConfigurationRegistry(registry);
-		Job configuration = new Job();
+		JobSupport configuration = new JobSupport();
 		configuration.setBeanName("foo");
 		processor.postProcessAfterInitialization(configuration, "bar");
 		try {
@@ -83,7 +83,7 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 	public void testUnregisterOnDestroy() throws Exception {
 		MapJobRegistry registry = new MapJobRegistry();
 		processor.setJobConfigurationRegistry(registry);
-		Job configuration = new Job();
+		JobSupport configuration = new JobSupport();
 		configuration.setBeanName("foo");
 		assertEquals(configuration, processor.postProcessAfterInitialization(
 				configuration, "bar"));
@@ -103,7 +103,7 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 				.getBean("registry");
 		Collection configurations = registry.getJobConfigurations();
 		// System.err.println(configurations);
-		String[] names = context.getBeanNamesForType(Job.class);
+		String[] names = context.getBeanNamesForType(JobSupport.class);
 		int count = names.length;
 		// Each concrete bean of type JobConfiguration is registered...
 		assertEquals(count, configurations.size());

@@ -21,12 +21,11 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepExecutor;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -53,13 +52,11 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private RepeatOperationsStep stepConfiguration;
 
-	private StepExecutor executor;
-
 	public void setUp() throws Exception {
 
 		jobRepository = new SimpleJobRepository(jobDao, stepDao);
 
-		Job jobConfiguration = new Job();
+		JobSupport jobConfiguration = new JobSupport();
 		stepConfiguration = new RepeatOperationsStep();
 		jobConfiguration.addStep(stepConfiguration);
 		jobConfiguration.setBeanName("testJob");
@@ -85,12 +82,11 @@ public class StepExecutorInterruptionTests extends TestCase {
 				return new ExitStatus(foo != 1);
 			}
 		});
-		executor = stepConfiguration.createStepExecutor();
 
 		Thread processingThread = new Thread() {
 			public void run() {
 				try {
-					executor.process(stepExecution);
+					stepConfiguration.process(stepExecution);
 				}
 				catch (StepInterruptedException e) {
 					// do nothing...

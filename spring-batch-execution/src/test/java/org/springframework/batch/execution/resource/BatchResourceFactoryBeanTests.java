@@ -21,7 +21,7 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -64,7 +64,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		resourceFactory.setRootDirectory(rootDir);
 		
 		jobInstance = new JobInstance(new Long(0), new JobParameters());
-		jobInstance.setJob(new Job("testJob"));
+		jobInstance.setJob(new JobSupport("testJob"));
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepInstance step = new StepInstance(jobInstance, "bar");
 		StepExecution stepExecution = new StepExecution(step, jobExecution, null);

@@ -20,6 +20,7 @@ import java.util.Collection;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.repository.DuplicateJobException;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.execution.configuration.MapJobRegistry;
@@ -33,13 +34,13 @@ public class MapJobRegistryTests extends TestCase {
 	private MapJobRegistry registry = new MapJobRegistry();
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobRegistry#unregister(org.springframework.batch.core.domain.Job)}.
+	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobRegistry#unregister(org.springframework.batch.core.domain.JobSupport)}.
 	 * @throws Exception 
 	 */
 	public void testUnregister() throws Exception {
-		registry.register(new Job("foo"));
+		registry.register(new JobSupport("foo"));
 		assertNotNull(registry.getJob("foo"));
-		registry.unregister(new Job("foo"));
+		registry.unregister(new JobSupport("foo"));
 		try {
 			assertNull(registry.getJob("foo"));
 			fail("Expected NoSuchJobConfigurationException");
@@ -54,9 +55,9 @@ public class MapJobRegistryTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobRegistry#getJob(java.lang.String)}.
 	 */
 	public void testReplaceDuplicateConfiguration() throws Exception {
-		registry.register(new Job("foo"));
+		registry.register(new JobSupport("foo"));
 		try {
-			registry.register(new Job("foo"));
+			registry.register(new JobSupport("foo"));
 		} catch (DuplicateJobException e) {
 			fail("Unexpected DuplicateJobConfigurationException");
 			// expected
@@ -68,7 +69,7 @@ public class MapJobRegistryTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobRegistry#getJob(java.lang.String)}.
 	 */
 	public void testRealDuplicateConfiguration() throws Exception {
-		Job jobConfiguration = new Job("foo");
+		Job jobConfiguration = new JobSupport("foo");
 		registry.register(jobConfiguration);
 		try {
 			registry.register(jobConfiguration);
@@ -84,9 +85,9 @@ public class MapJobRegistryTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testGetJobConfigurations() throws Exception {
-		Job configuration = new Job("foo");
+		Job configuration = new JobSupport("foo");
 		registry.register(configuration);
-		registry.register(new Job("bar"));
+		registry.register(new JobSupport("bar"));
 		Collection configurations = registry.getJobConfigurations();
 		assertEquals(2, configurations.size());
 		assertTrue(configurations.contains(configuration));

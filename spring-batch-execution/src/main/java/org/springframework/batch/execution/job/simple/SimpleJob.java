@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.job;
+package org.springframework.batch.execution.job.simple;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -22,13 +22,11 @@ import java.util.List;
 
 import org.springframework.batch.common.ExceptionClassifier;
 import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobExecutor;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepExecutor;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -38,13 +36,14 @@ import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * Default implementation of (@link JobExecutor} interface. Sequentially
- * executes a job by iterating it's life of steps.
+ * Simple implementation of (@link Job} interface providing the ability to run a
+ * {@link JobExecution}. Sequentially executes a job by iterating it's life of
+ * steps.
  * 
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class DefaultJobExecutor implements JobExecutor {
+public class SimpleJob extends JobSupport {
 
 	private JobRepository jobRepository;
 
@@ -52,13 +51,11 @@ public class DefaultJobExecutor implements JobExecutor {
 
 	/**
 	 * Run the specified job by looping through the steps and delegating to the
-	 * {@link StepExecutor}.
+	 * {@link Step}.
 	 * 
-	 * @see org.springframework.batch.core.domain.JobExecutor#run(org.springframework.batch.core.domain.Job,
-	 *      org.springframework.batch.core.domain.JobExecution)
+	 * @see org.springframework.batch.core.domain.Job#run(org.springframework.batch.core.domain.JobExecution)
 	 */
-	public ExitStatus run(Job job, JobExecution execution)
-			throws BatchCriticalException {
+	public ExitStatus run(JobExecution execution) throws BatchCriticalException {
 
 		JobInstance jobInstance = execution.getJobInstance();
 		updateStatus(execution, BatchStatus.STARTING);
@@ -71,43 +68,44 @@ public class DefaultJobExecutor implements JobExecutor {
 
 			int startedCount = 0;
 
-			List steps = job
-					.getSteps();
-			for (Iterator i = stepInstances.iterator(), j = steps.iterator(); i.hasNext()
-					&& j.hasNext();) {
+			List steps = getSteps();
+			for (Iterator i = stepInstances.iterator(), j = steps.iterator(); i.hasNext() && j.hasNext();) {
 
 				StepInstance stepInstance = (StepInstance) i.next();
-				Step step = (Step) j
-						.next();
-				
+				Step step = (Step) j.next();
+
 				if (shouldStart(stepInstance, step)) {
 					startedCount++;
 					updateStatus(execution, BatchStatus.STARTED);
-					StepExecutor stepExecutor = step.createStepExecutor();
 					StepExecution stepExecution = execution.createStepExecution(stepInstance);
-					status = stepExecutor.process(stepExecution);
+					status = step.process(stepExecution);
 				}
 			}
-			
-			if (startedCount==0) {
-				if (steps.size()>0) {
-					status = ExitStatus.NOOP.addExitDescription("All steps already completed.  No processing was done.");
-				} else {
+
+			if (startedCount == 0) {
+				if (steps.size() > 0) {
+					status = ExitStatus.NOOP
+							.addExitDescription("All steps already completed.  No processing was done.");
+				}
+				else {
 					status = ExitStatus.NOOP.addExitDescription("No steps configured for this job.");
 				}
 			}
 
 			updateStatus(execution, BatchStatus.COMPLETED);
 
-		} catch (StepInterruptedException e) {
+		}
+		catch (StepInterruptedException e) {
 			updateStatus(execution, BatchStatus.STOPPED);
 			status = exceptionClassifier.classifyForExitCode(e);
 			rethrow(e);
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			updateStatus(execution, BatchStatus.FAILED);
 			status = exceptionClassifier.classifyForExitCode(t);
 			rethrow(t);
-		} finally {
+		}
+		finally {
 			execution.setEndTime(new Date(System.currentTimeMillis()));
 			execution.setExitStatus(status);
 			jobRepository.saveOrUpdate(execution);
@@ -128,11 +126,9 @@ public class DefaultJobExecutor implements JobExecutor {
 	 * Given a step and configuration, return true if the step should start,
 	 * false if it should not, and throw an exception if the job should finish.
 	 */
-	private boolean shouldStart(StepInstance stepInstance,
-			Step step) {
+	private boolean shouldStart(StepInstance stepInstance, Step step) {
 
-		if (stepInstance.getStatus() == BatchStatus.COMPLETED
-				&& step.isAllowStartIfComplete() == false) {
+		if (stepInstance.getStatus() == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) {
 			// step is complete, false should be returned, indicated that the
 			// step should
 			// not be started
@@ -142,11 +138,11 @@ public class DefaultJobExecutor implements JobExecutor {
 		if (stepInstance.getStepExecutionCount() < step.getStartLimit()) {
 			// step start count is less than start max, return true
 			return true;
-		} else {
+		}
+		else {
 			// start max has been exceeded, throw an exception.
-			throw new BatchCriticalException(
-					"Maximum start limit exceeded for step: " + stepInstance.getName()
-							+ "StartMax: " + step.getStartLimit());
+			throw new BatchCriticalException("Maximum start limit exceeded for step: " + stepInstance.getName()
+					+ "StartMax: " + step.getStartLimit());
 		}
 	}
 
@@ -156,7 +152,8 @@ public class DefaultJobExecutor implements JobExecutor {
 	private static void rethrow(Throwable t) throws RuntimeException {
 		if (t instanceof RuntimeException) {
 			throw (RuntimeException) t;
-		} else {
+		}
+		else {
 			throw new BatchCriticalException(t);
 		}
 	}
@@ -178,8 +175,7 @@ public class DefaultJobExecutor implements JobExecutor {
 	 * 
 	 * @param exceptionClassifier
 	 */
-	public void setExceptionClassifier(
-			ExitCodeExceptionClassifier exceptionClassifier) {
+	public void setExceptionClassifier(ExitCodeExceptionClassifier exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 }

@@ -6,7 +6,7 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
@@ -33,7 +33,7 @@ public class DefaultJobInstanceLabelGeneratorTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.execution.resource.DefaultJobInstanceLabelGenerator#getLabel()}.
 	 */
 	public void testGetLabel() {
-		assertEquals("foo", instance.getLabel(new JobInstance(null, new JobParameters(), new Job("foo"))));
+		assertEquals("foo", instance.getLabel(new JobInstance(null, new JobParameters(), new JobSupport("foo"))));
 	}
 	
 	/**
@@ -41,7 +41,7 @@ public class DefaultJobInstanceLabelGeneratorTests extends TestCase {
 	 */
 	public void testDefaultGetLabel() throws Exception {
 		JobParameters jobParameters = new JobParametersBuilder().addDate("schedule.date", DATE).addString("key", "bar").toJobParameters();
-		JobInstance job = new JobInstance(null, jobParameters, new Job(null));
+		JobInstance job = new JobInstance(null, jobParameters, new JobSupport(null));
 		assertEquals("null-bar-"+dateFormat.format(DATE), instance.getLabel(job));
 	}
 
@@ -50,7 +50,7 @@ public class DefaultJobInstanceLabelGeneratorTests extends TestCase {
 	 */
 	public void testGetLabelWithAllProperties() throws Exception {
 		JobParameters jobParameters = new JobParametersBuilder().addDate("schedule.date", DATE).addString("key", "bar").toJobParameters();
-		JobInstance job = new JobInstance(null, jobParameters, new Job("foo"));
+		JobInstance job = new JobInstance(null, jobParameters, new JobSupport("foo"));
 		assertEquals("foo-bar-"+dateFormat.format(DATE), instance.getLabel(job));
 	}
 

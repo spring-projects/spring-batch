@@ -29,7 +29,7 @@ public class JobExecutionTests extends TestCase {
 
 	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), new JobParameters()), new Long(12));
 
-	private JobExecution context = new JobExecution(new JobInstance(new Long(11), new JobParameters(), new Job("foo")), new Long(12));
+	private JobExecution context = new JobExecution(new JobInstance(new Long(11), new JobParameters(), new JobSupport("foo")), new Long(12));
 
 	/**
 	 * Test method for

@@ -91,7 +91,6 @@ public class CompositeItemWriterTests extends TestCase {
 	public void testClose() throws Exception {
 		
 		final int NUMBER_OF_PROCESSORS = 10;
-		Object data = new Object();
 		
 		List controls = new ArrayList(NUMBER_OF_PROCESSORS);
 		List processors = new ArrayList(NUMBER_OF_PROCESSORS);

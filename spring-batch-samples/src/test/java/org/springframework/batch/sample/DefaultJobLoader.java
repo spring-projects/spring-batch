@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.repository.ListableJobRegistry;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.beans.BeanWrapperImpl;
@@ -50,7 +51,7 @@ public class DefaultJobLoader implements JobLoader,
 	public void loadResource(String path) {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
 				new String[] { path }, applicationContext);
-		String[] names = context.getBeanNamesForType(Job.class);
+		String[] names = context.getBeanNamesForType(JobSupport.class);
 		for (int i = 0; i < names.length; i++) {
 			String name = names[i];
 			configurations.put(name, path);

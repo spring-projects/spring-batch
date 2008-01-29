@@ -12,9 +12,7 @@
 	<bean parent="stepScope" />
 	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
-	<bean id="footballJob"
-		class="org.springframework.batch.core.domain.Job">
-		<property name="restartable" value="true" />
+	<bean id="footballJob" parent="simpleJob">
 		<property name="startLimit" value="100" />
 		<property name="steps">
 			<list>

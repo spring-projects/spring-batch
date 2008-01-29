@@ -24,7 +24,6 @@
 	<bean id="jobLauncher"
 		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
-		<property name="jobExecutor" ref="jobExecutor" />
 	</bean>
 
 	<bean id="jobConfigurationRegistry"
@@ -43,11 +42,6 @@
 			<tx:method name="*" />
 		</tx:attributes>
 	</tx:advice>
-
-	<bean id="jobExecutor"
-		class="org.springframework.batch.execution.job.DefaultJobExecutor">
-		<property name="jobRepository" ref="jobRepository" />
-	</bean>
 
 	<bean id="jobRepository"
 		class="org.springframework.batch.execution.repository.SimpleJobRepository">
@@ -84,7 +78,8 @@
 	</bean>
 
 	<bean id="simpleJob"
-		class="org.springframework.batch.core.domain.Job" abstract="true">
+		class="org.springframework.batch.execution.job.simple.SimpleJob" abstract="true">
+		<property name="jobRepository" ref="jobRepository" />
 		<property name="restartable" value="true" />
 	</bean>
 

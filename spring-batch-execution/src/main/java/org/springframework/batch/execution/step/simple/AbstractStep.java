@@ -16,10 +16,13 @@
 package org.springframework.batch.execution.step.simple;
 
 import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.domain.StepExecutor;
+import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
@@ -105,20 +108,13 @@ public abstract class AbstractStep extends StepSupport {
 		Assert.notNull(jobRepository, "JobRepository is mandatory");
 		Assert.notNull(transactionManager, "TransactionManager is mandatory");
 	}
-
-	/**
-	 * Create a {@link SimpleStepExecutor}.
-	 * 
-	 * @see org.springframework.batch.core.domain.Step#createStepExecutor()
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.StepSupport#process(org.springframework.batch.core.domain.StepExecution)
 	 */
-	public StepExecutor createStepExecutor() {
-		assertMandatoryProperties();
-		SimpleStepExecutor executor = new SimpleStepExecutor(this);
-		executor.setRepository(jobRepository);
-		executor.applyConfiguration(this);
-		executor.setTasklet(tasklet);
-		executor.setTransactionManager(transactionManager);
-		return executor;
+	public ExitStatus process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
+		SimpleStepExecutor executor = createStepExecutor();
+		return executor.process(stepExecution);
 	}
 
 	/**
@@ -128,6 +124,19 @@ public abstract class AbstractStep extends StepSupport {
 	 */
 	public void setTasklet(Tasklet tasklet) {
 		this.tasklet = tasklet;
+	}
+
+	/**
+	 * @return
+	 */
+	protected SimpleStepExecutor createStepExecutor() {
+		assertMandatoryProperties();
+		SimpleStepExecutor executor = new SimpleStepExecutor(this);
+		executor.setRepository(jobRepository);
+		executor.applyConfiguration(this);
+		executor.setTasklet(tasklet);
+		executor.setTransactionManager(transactionManager);
+		return executor;
 	}
 
 }

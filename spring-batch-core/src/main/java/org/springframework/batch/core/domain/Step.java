@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.domain;
 
+import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.repeat.ExitStatus;
+
 
 /**
  * Batch domain interface representing the configuration of a step. As with the
@@ -52,8 +55,16 @@ public interface Step {
 	int getStartLimit();
 	
 	/**
-	 * @return a {@link StepExecutor} that could be used to execute this step
+	 * It is not safe to re-use an instance of {@link StepExecutor} to process
+	 * multiple concurrent executions. Use the factory method in {@link Step} to
+	 * create a new instance and execute that.
+	 * 
+	 * @param stepExecution an entity representing the step to be executed
+	 * 
+	 * @throws StepInterruptedException if the step is interrupted externally
+	 * @throws BatchCriticalException if there is a problem that needs to be
+	 * signalled to the caller
 	 */
-	StepExecutor createStepExecutor();
+	ExitStatus process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException;
 
 }

@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.domain;
 
+import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**
@@ -133,10 +134,11 @@ public class StepSupport implements Step, BeanNameAware {
 	 * 
 	 * @throws UnsupportedOperationException always
 	 * 
-	 * @see org.springframework.batch.core.domain.Step#createStepExecutor()
+	 * @see org.springframework.batch.core.domain.Step#process(org.springframework.batch.core.domain.StepExecution)
 	 */
-	public StepExecutor createStepExecutor() {
+	public org.springframework.batch.repeat.ExitStatus process(StepExecution stepExecution)
+			throws StepInterruptedException, BatchCriticalException {
 		throw new UnsupportedOperationException(
-				"Cannot create a StepExecutor.  Use a smarter subclass of StepSupport like a SimpleStep.");
+				"Cannot process a StepExecution.  Use a smarter subclass of StepSupport.");
 	}
 }

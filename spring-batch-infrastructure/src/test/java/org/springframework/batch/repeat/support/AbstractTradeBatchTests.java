@@ -21,7 +21,6 @@ import junit.framework.TestCase;
 import org.springframework.batch.io.file.SimpleFlatFileItemReader;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.DelegatingItemReader;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.core.io.ClassPathResource;

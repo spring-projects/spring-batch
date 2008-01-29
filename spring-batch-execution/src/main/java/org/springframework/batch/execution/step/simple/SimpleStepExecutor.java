@@ -23,7 +23,6 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepExecutor;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -57,10 +56,10 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of {@link StepExecutor} executing the step as a set of
- * chunks, each chunk surrounded by a transaction. The structure is therefore
- * that of two nested loops, with transaction boundary around the whole inner
- * loop. The outer loop is controlled by the step operations ({@link #setStepOperations(RepeatOperations)}),
+ * Simple implementation of executing the step as a set of chunks, each chunk
+ * surrounded by a transaction. The structure is therefore that of two nested
+ * loops, with transaction boundary around the whole inner loop. The outer loop
+ * is controlled by the step operations ({@link #setStepOperations(RepeatOperations)}),
  * and the inner loop by the chunk operations ({@link #setChunkOperations(RepeatOperations)}).
  * The inner loop should always be executed in a single thread, so the chunk
  * operations should not do any concurrent execution. N.B. usually that means
@@ -76,7 +75,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * 
  */
-public class SimpleStepExecutor implements StepExecutor {
+public class SimpleStepExecutor {
 
 	private RepeatOperations chunkOperations = new RepeatTemplate();
 

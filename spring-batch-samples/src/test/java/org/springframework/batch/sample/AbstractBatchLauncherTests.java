@@ -17,6 +17,7 @@
 package org.springframework.batch.sample;
 
 import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.context.ApplicationContext;
@@ -60,7 +61,7 @@ public abstract class AbstractBatchLauncherTests extends
 	}
 
 	/**
-	 * Public setter for the {@link Job} property.
+	 * Public setter for the {@link JobSupport} property.
 	 * 
 	 * @param job the job to set
 	 */

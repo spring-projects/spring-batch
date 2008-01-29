@@ -16,16 +16,14 @@
 package org.springframework.batch.execution.step.simple;
 
 import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.domain.StepExecutor;
 import org.springframework.batch.repeat.RepeatOperations;
 
 /**
  * Marker interface for indicating that a {@link RepeatOperations} instance is
  * available for the inner loop (chunk operations) and outer loop (step
- * operations) in a {@link StepExecutor}. The inner loop is normally going to
- * be in-process and thread-bound so it makes sense for
- * {@link Step} implementations to be able to override the
- * strategies that control that loop.
+ * operations) in a {@link Step}. The inner loop is normally going to be
+ * in-process and thread-bound so it makes sense for {@link Step}
+ * implementations to be able to override the strategies that control that loop.
  * 
  * @author Dave Syer
  * 
@@ -36,7 +34,7 @@ public interface RepeatOperationsHolder {
 	 * Principal method in the {@link RepeatOperationsHolder} interface.
 	 * 
 	 * @return a {@link RepeatOperations} which can be used to iterate over an
-	 *         inner loop (chunk).
+	 * inner loop (chunk).
 	 */
 	RepeatOperations getChunkOperations();
 
@@ -44,7 +42,7 @@ public interface RepeatOperationsHolder {
 	 * Additional method in the {@link RepeatOperationsHolder} interface.
 	 * 
 	 * @return a {@link RepeatOperations} which can be used to iterate over an
-	 *         outer loop (step).
+	 * outer loop (step).
 	 */
 	RepeatOperations getStepOperations();
 }

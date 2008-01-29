@@ -19,9 +19,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobExecutor;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.repeat.ExitStatus;
@@ -31,70 +31,67 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of the {@link JobLauncher} interface.  The Spring
- * Core {@link TaskExecutor} interface is used to launch a {@link Job}.  This means
- * that the type of executor set is very important.  If a {@link SyncTaskExecutor} 
- * is used, then the job will be processed <strong>within the same thread that
- * called the launcher.</strong> Care should be taken to ensure any users of this
- * class understand fully whether or not the implementation of TaskExecutor used
- * will start tasks synchronously or asynchronously.  The default setting uses
- * a synchronous task executor.
+ * Simple implementation of the {@link JobLauncher} interface. The Spring Core
+ * {@link TaskExecutor} interface is used to launch a {@link JobSupport}. This
+ * means that the type of executor set is very important. If a
+ * {@link SyncTaskExecutor} is used, then the job will be processed
+ * <strong>within the same thread that called the launcher.</strong> Care
+ * should be taken to ensure any users of this class understand fully whether or
+ * not the implementation of TaskExecutor used will start tasks synchronously or
+ * asynchronously. The default setting uses a synchronous task executor.
  * 
- * There are only two required dependencies of this Launcher, a {@link JobExecutor} 
- * and a {@link JobRepository}.  The JobRepository is used to obtain a valid 
- * JobExecution.  The Repository must be used because the provided {@link Job} could
- * be a restart of an existing {@link JobInstance}, and only the Repository can 
- * reliably recreate it.  Once the execution is obtained, it can be run by
- * passing it to the JobExecutor.
+ * There is only one required dependency of this Launcher, a
+ * {@link JobRepository}. The JobRepository is used to obtain a valid
+ * JobExecution. The Repository must be used because the provided
+ * {@link JobSupport} could be a restart of an existing {@link JobInstance},
+ * and only the Repository can reliably recreate it.
  * 
  * @author Lucas Ward
  * @since 1.0
- * @see JobExecutor
  * @see JobRepository
  * @see TaskExecutor
  */
-public class SimpleJobLauncher implements JobLauncher, InitializingBean{
-	
+public class SimpleJobLauncher implements JobLauncher, InitializingBean {
+
 	protected static final Log logger = LogFactory.getLog(SimpleJobLauncher.class);
 
 	private JobRepository jobRepository;
 
-	private JobExecutor jobExecutor;
-	
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
-	
+
 	/**
-	 * Run the provided job with the given {@link JobParameters}.  The {@link JobParameters} will
-	 * be used to determine if this is an execution of an existing job instance, or if a new
-	 * one should be created.
+	 * Run the provided job with the given {@link JobParameters}. The
+	 * {@link JobParameters} will be used to determine if this is an execution
+	 * of an existing job instance, or if a new one should be created.
 	 * 
 	 * @param job, the job to be run.
-	 * @param jobParameters, the {@link JobParameters} for this particular execution.
-	 * @return JobExecutionAlreadyRunningException if the JobInstance already exists and has
-	 * an execution already running.
+	 * @param jobParameters, the {@link JobParameters} for this particular
+	 * execution.
+	 * @return JobExecutionAlreadyRunningException if the JobInstance already
+	 * exists and has an execution already running.
 	 */
 	public JobExecution run(final Job job, final JobParameters jobParameters)
-		throws JobExecutionAlreadyRunningException {
-		
+			throws JobExecutionAlreadyRunningException {
+
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
 
 		final JobExecution jobExecution = jobRepository.createJobExecution(job, jobParameters);
-		
-		taskExecutor.execute(new Runnable(){
+
+		taskExecutor.execute(new Runnable() {
 
 			public void run() {
-				try{
+				try {
 					logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters + "]");
-					ExitStatus exitStatus = jobExecutor.run(job, jobExecution);
-					//shouldn't need to set the exit status like this, I'm leaving it to make the latest change easier
+					ExitStatus exitStatus = job.run(jobExecution);
+					// shouldn't need to set the exit status like this, I'm
+					// leaving it to make the latest change easier
 					jobExecution.setExitStatus(exitStatus);
-					logger.info("Job: [" + job + "] completed successfully with the following parameters: [" 
+					logger.info("Job: [" + job + "] completed successfully with the following parameters: ["
 							+ jobParameters + "]");
 				}
-				catch(Throwable t){
-					logger.info("Job: [" + job + "] failed with the following parameters: [" 
-							+ jobParameters + "]", t);
+				catch (Throwable t) {
+					logger.info("Job: [" + job + "] failed with the following parameters: [" + jobParameters + "]", t);
 					rethrow(t);
 				}
 			}
@@ -104,8 +101,9 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean{
 					throw (RuntimeException) t;
 				}
 				throw new RuntimeException(t);
-			}});
-		
+			}
+		});
+
 		return jobExecution;
 	}
 
@@ -119,15 +117,6 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean{
 	}
 
 	/**
-	 * Set the JobExecutor.
-	 * 
-	 * @param jobExecutor
-	 */
-	public void setJobExecutor(JobExecutor jobExecutor) {
-		this.jobExecutor = jobExecutor;
-	}
-	
-	/**
 	 * Set the TaskExecutor. (Optional)
 	 * 
 	 * @param taskExecutor
@@ -136,12 +125,10 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean{
 		this.taskExecutor = taskExecutor;
 	}
 
-	/*
-	 * Ensure the required dependencies of a JobExecutor and 
-	 * JobRepository have been set.
+	/**
+	 * Ensure the required dependencies of a {@link JobRepository} have been set.
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(jobExecutor != null, "A JobExecutor has not been set.");
 		Assert.state(jobRepository != null, "A JobRepository has not been set.");
 		logger.info("No TaskExecutor has been set, defaulting to synchronous executor.");
 	}

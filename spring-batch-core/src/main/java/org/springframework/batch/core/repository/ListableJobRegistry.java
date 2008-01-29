@@ -17,7 +17,7 @@ package org.springframework.batch.core.repository;
 
 import java.util.Collection;
 
-import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 
 /**
  * A listable extension of {@link JobRegistry}.
@@ -31,7 +31,7 @@ public interface ListableJobRegistry extends JobRegistry {
 	 * Provides the currently registered configurations. The return value is
 	 * unmodifiable and disconnected from the underlying registry storage.
 	 * 
-	 * @return a collection of {@link Job} instances. Empty if none
+	 * @return a collection of {@link JobSupport} instances. Empty if none
 	 * are registered.
 	 */
 	Collection getJobConfigurations();

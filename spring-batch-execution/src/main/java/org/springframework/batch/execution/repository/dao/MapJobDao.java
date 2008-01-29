@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -47,7 +47,7 @@ public class MapJobDao implements JobDao {
 
 	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 		JobInstance jobInstance = new JobInstance(new Long(currentId++), jobParameters);
-		jobInstance.setJob(new Job(jobName));
+		jobInstance.setJob(new JobSupport(jobName));
 		
 		jobsById.put(jobInstance.getId(), jobInstance);
 		return jobInstance;

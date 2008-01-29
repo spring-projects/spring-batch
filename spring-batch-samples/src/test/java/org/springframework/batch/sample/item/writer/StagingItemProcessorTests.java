@@ -1,6 +1,6 @@
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -27,7 +27,7 @@ public class StagingItemProcessorTests extends AbstractTransactionalDataSourceSp
 
 	protected void prepareTestInstance() throws Exception {
 		SimpleStepContext stepScopeContext = new SimpleStepContext(new StepExecution(new StepInstance(new Long(11)),
-				new JobExecution(new JobInstance(new Long(12), new JobParameters(), new Job("job")))));
+				new JobExecution(new JobInstance(new Long(12), new JobParameters(), new JobSupport("job")))));
 		StepSynchronizationManager.register(stepScopeContext);
 		super.prepareTestInstance();
 	}

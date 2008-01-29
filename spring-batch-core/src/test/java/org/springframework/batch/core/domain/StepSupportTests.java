@@ -62,14 +62,14 @@ public class StepSupportTests extends TestCase {
 
 	public void testUnsuccessfulWrongConfiguration() throws Exception {
 		try {
-			new StepSupport().createStepExecutor();
+			new StepSupport().process(null);
 			fail("Expected UnsupportedOperationException");
 		} catch (UnsupportedOperationException e) {
 			// expected
 			assertTrue(
-					"Error message does not contain SimpleStep: "
+					"Error message does not contain StepExecution: "
 							+ e.getMessage(), e.getMessage().indexOf(
-							"SimpleStep") >= 0);
+							"StepExecution") >= 0);
 		}
 	}
 

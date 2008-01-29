@@ -78,7 +78,7 @@ public class StepInstanceTests extends TestCase {
 	
 	public void testGetJob(){
 		
-		Job job = new Job("job");
+		Job job = new JobSupport("job");
 		JobInstance jobInstance = new JobInstance(new Long(2), new JobParameters(), job);
 		instance = new StepInstance(jobInstance, null);
 		assertEquals(job, instance.getJobInstance().getJob());

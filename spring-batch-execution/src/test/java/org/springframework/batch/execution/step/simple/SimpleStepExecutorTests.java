@@ -25,7 +25,7 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -113,7 +113,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		stepExecutor.setChunkOperations(template);
 		
 		jobInstance = new JobInstance(new Long(0), new JobParameters());
-		jobInstance.setJob(new Job("FOO"));
+		jobInstance.setJob(new JobSupport("FOO"));
 	}
 
 	public void testStepExecutor() throws Exception {

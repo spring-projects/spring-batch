@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -22,7 +22,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 
 	private JobRepository repository;
 
-	private Job jobConfiguration;
+	private JobSupport jobConfiguration;
 
 	private Set jobExecutionIds = new HashSet();
 
@@ -39,7 +39,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 	}
 
 	protected void onSetUpInTransaction() throws Exception {
-		jobConfiguration = new Job("test-job");
+		jobConfiguration = new JobSupport("test-job");
 		jobConfiguration.setRestartable(true);
 	}
 

@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -68,7 +69,7 @@ public abstract class AbstractJobDaoTests extends
 //		jobRuntimeInformation = new ScheduledJobIdentifier("Job1", "TestStream",
 //				new SimpleDateFormat("yyyyMMdd").parse("20070505"));
 
-		job = new Job("Job1");
+		job = new JobSupport("Job1");
 		
 		// Create job.
 		jobInstance = jobDao.createJobInstance(job.getName(), jobParameters);

@@ -22,7 +22,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.retry.ListItemReaderRecoverer;

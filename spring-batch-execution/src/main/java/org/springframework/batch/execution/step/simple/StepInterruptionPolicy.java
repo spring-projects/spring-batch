@@ -16,13 +16,13 @@
 
 package org.springframework.batch.execution.step.simple;
 
-import org.springframework.batch.core.domain.StepExecutor;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**
  * Strategy interface for an interruption policy. This policy allows
- * {@link StepExecutor} implementations to check if a job has been interrupted.
+ * {@link Step} implementations to check if a job has been interrupted.
  * 
  * @author Lucas Ward
  * 

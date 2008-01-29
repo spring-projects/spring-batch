@@ -11,7 +11,7 @@
 		<property name="jobConfigurationRegistry" ref="jobRegistry"/>
 	</bean>
 
-	<bean id="test-job" class="org.springframework.batch.core.domain.Job">
+	<bean id="test-job" class="org.springframework.batch.core.domain.JobSupport">
 		<property name="steps">
 			<bean id="step1" class="org.springframework.batch.execution.step.simple.SimpleStep">
 				<constructor-arg>

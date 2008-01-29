@@ -21,9 +21,10 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobExecutor;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -34,26 +35,23 @@ public class SimpleJobLauncherTests extends TestCase {
 
 	private SimpleJobLauncher jobLauncher;
 	
-	private JobExecutor jobExecutor;
-	private JobRepository jobRepository;
-	
-	private MockControl executorControl = MockControl.createControl(JobExecutor.class);
 	private MockControl repositoryControl = MockControl.createControl(JobRepository.class);
 	
-	private Job job = new Job("foo");
+	private Job job = new JobSupport("foo") {
+		public ExitStatus run(JobExecution execution) throws BatchCriticalException {
+			return ExitStatus.FINISHED;
+		}
+	};
 	private JobParameters jobParameters = new JobParameters();
+
+	private JobRepository jobRepository;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		jobLauncher = new SimpleJobLauncher();
-		
-		jobExecutor = (JobExecutor)executorControl.getMock();
-		jobRepository = (JobRepository)repositoryControl.getMock();
-		
-		jobLauncher.setJobExecutor(jobExecutor);
+		jobLauncher = new SimpleJobLauncher();	
+		jobRepository = (JobRepository) repositoryControl.getMock();
 		jobLauncher.setJobRepository(jobRepository);
-		
 		
 	}
 
@@ -64,16 +62,12 @@ public class SimpleJobLauncherTests extends TestCase {
 		
 		jobRepository.createJobExecution(job, jobParameters);
 		repositoryControl.setReturnValue(jobExecution);
-		jobExecutor.run(job, jobExecution);
-		executorControl.setDefaultReturnValue(ExitStatus.FINISHED);
 		
 		repositoryControl.replay();
-		executorControl.replay();
 		
 		jobLauncher.run(job, jobParameters);
 		assertEquals(ExitStatus.FINISHED, jobExecution.getExitStatus());
 		
 		repositoryControl.verify();
-		executorControl.verify();
 	}
 }

@@ -16,6 +16,7 @@
 package org.springframework.batch.core.repository;
 
 import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 
 /**
  * A runtime service locator interface for retrieving job configurations by
@@ -27,11 +28,11 @@ import org.springframework.batch.core.domain.Job;
 public interface JobLocator {
 
 	/**
-	 * Locates a {@link Job} at runtime.
+	 * Locates a {@link JobSupport} at runtime.
 	 * 
-	 * @param name the name of the {@link Job} which should be
+	 * @param name the name of the {@link JobSupport} which should be
 	 * unique
-	 * @return a {@link Job} identified by the given name
+	 * @return a {@link JobSupport} identified by the given name
 	 * 
 	 * @throws NoSuchJobException if the required configuratio can
 	 * not be found.

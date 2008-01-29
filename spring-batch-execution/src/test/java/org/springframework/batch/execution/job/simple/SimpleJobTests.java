@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.job;
+package org.springframework.batch.execution.job.simple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +22,10 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepExecutor;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -39,7 +36,6 @@ import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.execution.step.simple.AbstractStep;
 import org.springframework.batch.execution.step.simple.SimpleStep;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -50,7 +46,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * 
  * @author Lucas Ward
  */
-public class DefaultJobExecutorTests extends TestCase {
+public class SimpleJobTests extends TestCase {
 
 	private JobRepository jobRepository;
 
@@ -60,23 +56,7 @@ public class DefaultJobExecutorTests extends TestCase {
 
 	private List list = new ArrayList();
 
-	StepExecutor defaultStepLifecycle = new StubStepExecutor() {
-		public ExitStatus process(StepExecution stepExecution) throws StepInterruptedException,
-				BatchCriticalException {
-			list.add("default");
-			return ExitStatus.FINISHED;
-		}
-	};
-
-	StepExecutor configurationStepLifecycle = new StubStepExecutor() {
-		public ExitStatus process(StepExecution stepExecution) throws StepInterruptedException,
-				BatchCriticalException {
-			list.add("special");
-			return ExitStatus.FINISHED;
-		}
-	};
-
-	private JobInstance job;
+	private JobInstance jobInstance;
 
 	private JobExecution jobExecution;
 
@@ -88,15 +68,13 @@ public class DefaultJobExecutorTests extends TestCase {
 
 	private StepExecution stepExecution2;
 
-	private AbstractStep stepConfiguration1;
+	private StubStep stepConfiguration1;
 
-	private AbstractStep stepConfiguration2;
+	private StubStep stepConfiguration2;
 
-	private Job jobConfiguration;
-	
 	private JobParameters jobParameters = new JobParameters();
 
-	private DefaultJobExecutor jobExecutor;
+	private SimpleJob job;
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -106,33 +84,34 @@ public class DefaultJobExecutorTests extends TestCase {
 		jobDao = new MapJobDao();
 		stepDao = new MapStepDao();
 		jobRepository = new SimpleJobRepository(jobDao, stepDao);
-		jobExecutor = new DefaultJobExecutor();
-		jobExecutor.setJobRepository(jobRepository);
+		job = new SimpleJob();
+		job.setJobRepository(jobRepository);
 
-		stepConfiguration1 = new SimpleStep("TestStep1") {
-			public StepExecutor createStepExecutor() {
-				return defaultStepLifecycle;
+		stepConfiguration1 = new StubStep("TestStep1");
+		stepConfiguration1.setCallback(new Runnable() {
+			public void run() {
+				list.add("default");
 			}
-		};
-		stepConfiguration2 = new SimpleStep("TestStep2") {
-			public StepExecutor createStepExecutor() {
-				return defaultStepLifecycle;
+		});
+		stepConfiguration2 = new StubStep("TestStep2");
+		stepConfiguration2.setCallback(new Runnable() {
+			public void run() {
+				list.add("default");
 			}
-		};
+		});
 		stepConfiguration1.setJobRepository(jobRepository);
 		stepConfiguration2.setJobRepository(jobRepository);
 
 		List stepConfigurations = new ArrayList();
 		stepConfigurations.add(stepConfiguration1);
 		stepConfigurations.add(stepConfiguration2);
-		jobConfiguration = new Job();
-		jobConfiguration.setName("testJob");
-		jobConfiguration.setSteps(stepConfigurations);
+		job.setName("testJob");
+		job.setSteps(stepConfigurations);
 
-		jobExecution = jobRepository.createJobExecution(jobConfiguration, jobParameters);
-		job = jobExecution.getJobInstance();
+		jobExecution = jobRepository.createJobExecution(job, jobParameters);
+		jobInstance = jobExecution.getJobInstance();
 
-		List steps = job.getStepInstances();
+		List steps = jobInstance.getStepInstances();
 		step1 = (StepInstance) steps.get(0);
 		step2 = (StepInstance) steps.get(1);
 		stepExecution1 = new StepExecution(step1, jobExecution, null);
@@ -145,18 +124,16 @@ public class DefaultJobExecutorTests extends TestCase {
 	}
 
 	public void testRunNormally() throws Exception {
-
 		stepConfiguration1.setStartLimit(5);
 		stepConfiguration2.setStartLimit(5);
-		jobExecutor.run(jobConfiguration, jobExecution);
+		job.run(jobExecution);
 		assertEquals(2, list.size());
 		checkRepository(BatchStatus.COMPLETED);
 	}
 
 	public void testRunWithSimpleStepExecutor() throws Exception {
 
-		jobExecutor = new DefaultJobExecutor();
-		jobExecutor.setJobRepository(jobRepository);
+		job.setJobRepository(jobRepository);
 		// do not set StepExecutorFactory...
 		stepConfiguration1.setStartLimit(5);
 		stepConfiguration1.setTasklet(new Tasklet() {
@@ -172,14 +149,15 @@ public class DefaultJobExecutorTests extends TestCase {
 				return ExitStatus.FINISHED;
 			}
 		});
-		jobExecutor.run(jobConfiguration, jobExecution);
+		job.run(jobExecution);
 		assertEquals(2, list.size());
 		checkRepository(BatchStatus.COMPLETED, ExitStatus.FINISHED);
+
 	}
 
 	public void testExecutionContextIsSet() throws Exception {
 		testRunNormally();
-		assertEquals(job, jobExecution.getJobInstance());
+		assertEquals(jobInstance, jobExecution.getJobInstance());
 		assertEquals(2, jobExecution.getStepExecutions().size());
 		assertEquals(step1, stepExecution1.getStep());
 		assertEquals(step2, stepExecution2.getStep());
@@ -188,42 +166,31 @@ public class DefaultJobExecutorTests extends TestCase {
 	public void testInterrupted() throws Exception {
 		stepConfiguration1.setStartLimit(5);
 		stepConfiguration2.setStartLimit(5);
-		final StepInterruptedException exception = new StepInterruptedException(
-				"Interrupt!");
-		defaultStepLifecycle = new StubStepExecutor() {
-			public ExitStatus process(StepExecution stepExecution)
-					throws StepInterruptedException, BatchCriticalException {
-				throw exception;
-			}
-		};
+		final StepInterruptedException exception = new StepInterruptedException("Interrupt!");
+		stepConfiguration1.setProcessException(exception);
 		try {
-			jobExecutor.run(jobConfiguration, jobExecution);
-		} catch (BatchCriticalException e) {
+			job.run(jobExecution);
+		}
+		catch (BatchCriticalException e) {
 			assertEquals(exception, e.getCause());
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.STOPPED, new ExitStatus(false,
-				ExitCodeExceptionClassifier.STEP_INTERRUPTED));
+		checkRepository(BatchStatus.STOPPED, new ExitStatus(false, ExitCodeExceptionClassifier.STEP_INTERRUPTED));
 	}
 
 	public void testFailed() throws Exception {
 		stepConfiguration1.setStartLimit(5);
 		stepConfiguration2.setStartLimit(5);
 		final RuntimeException exception = new RuntimeException("Foo!");
-		defaultStepLifecycle = new StubStepExecutor() {
-			public ExitStatus process(StepExecution stepExecution)
-					throws StepInterruptedException, BatchCriticalException {
-				throw exception;
-			}
-		};
+		stepConfiguration1.setProcessException(exception);
 		try {
-			jobExecutor.run(jobConfiguration, jobExecution);
-		} catch (RuntimeException e) {
+			job.run(jobExecution);
+		}
+		catch (RuntimeException e) {
 			assertEquals(exception, e);
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.FAILED, new ExitStatus(false,
-				ExitCodeExceptionClassifier.FATAL_EXCEPTION));
+		checkRepository(BatchStatus.FAILED, new ExitStatus(false, ExitCodeExceptionClassifier.FATAL_EXCEPTION));
 	}
 
 	public void testStepShouldNotStart() throws Exception {
@@ -231,64 +198,92 @@ public class DefaultJobExecutorTests extends TestCase {
 		stepConfiguration1.setStartLimit(0);
 
 		try {
-			jobExecutor.run(jobConfiguration, jobExecution);
+			job.run(jobExecution);
 			fail("Expected BatchCriticalException");
-		} catch (BatchCriticalException ex) {
+		}
+		catch (BatchCriticalException ex) {
 			// expected
-			assertTrue("Wrong message in exception: " + ex.getMessage(), ex
-					.getMessage().indexOf("start limit exceeded") >= 0);
+			assertTrue("Wrong message in exception: " + ex.getMessage(), ex.getMessage()
+					.indexOf("start limit exceeded") >= 0);
 		}
 	}
 
 	public void testNoSteps() throws Exception {
-		jobConfiguration.setSteps(new ArrayList());
+		job.setSteps(new ArrayList());
 
-		jobExecutor.run(jobConfiguration, jobExecution);
+		job.run(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
-		assertTrue("Wrong message in execution: " + exitStatus, exitStatus
-				.getExitDescription().indexOf("No steps configured") >= 0);
+		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().indexOf(
+				"No steps configured") >= 0);
 	}
 
 	public void testNoStepsExecuted() throws Exception {
 		step1.setStatus(BatchStatus.COMPLETED);
 		step2.setStatus(BatchStatus.COMPLETED);
 
-		jobExecutor.run(jobConfiguration, jobExecution);
+		job.run(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
-		assertTrue("Wrong message in execution: " + exitStatus, exitStatus
-				.getExitDescription().indexOf("steps already completed") >= 0);
+		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().indexOf(
+				"steps already completed") >= 0);
 	}
 
 	/*
 	 * Check JobRepository to ensure status is being saved.
 	 */
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
-		assertEquals(job, jobDao.findJobInstances(job.getJobName(), jobParameters).get(0));
+		assertEquals(jobInstance, jobDao.findJobInstances(jobInstance.getJobName(), jobParameters).get(0));
 		// because map dao stores in memory, it can be checked directly
-		assertEquals(status, job.getStatus());
-		JobExecution jobExecution = (JobExecution) jobDao
-				.findJobExecutions(job).get(0);
-		assertEquals(job.getId(), jobExecution.getJobId());
+		assertEquals(status, jobInstance.getStatus());
+		JobExecution jobExecution = (JobExecution) jobDao.findJobExecutions(jobInstance).get(0);
+		assertEquals(jobInstance.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());
 		if (exitStatus != null) {
-			assertEquals(jobExecution.getExitStatus().getExitCode(), exitStatus
-					.getExitCode());
+			assertEquals(jobExecution.getExitStatus().getExitCode(), exitStatus.getExitCode());
 		}
 	}
 
 	private void checkRepository(BatchStatus status) {
 		checkRepository(status, null);
 	}
-	
-	private class StubStepExecutor implements StepExecutor {
 
-		public void applyConfiguration(Step configuration) {
+	private class StubStep extends SimpleStep {
+
+		private Runnable runnable;
+		private Exception exception;
+
+		/**
+		 * @param string
+		 */
+		public StubStep(String string) {
+			super(string);
 		}
 
-		public ExitStatus process(StepExecution stepExecution) throws StepInterruptedException,
-				BatchCriticalException {
-			return null;
+		/**
+		 * @param exception
+		 */
+		public void setProcessException(Exception exception) {
+			this.exception = exception;
 		}
-		
+
+		/**
+		 * @param runnable
+		 */
+		public void setCallback(Runnable runnable) {
+			this.runnable = runnable;
+		}
+
+		public ExitStatus process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
+			if (exception instanceof RuntimeException) {
+				throw (RuntimeException)exception;
+			}
+			if (exception instanceof StepInterruptedException) {
+				throw (StepInterruptedException)exception;
+			}
+			if (runnable!=null) {
+				runnable.run();
+			}
+			return ExitStatus.FINISHED;
+		}
+
 	}
 }

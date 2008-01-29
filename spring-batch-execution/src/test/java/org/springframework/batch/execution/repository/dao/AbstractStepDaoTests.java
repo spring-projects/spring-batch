@@ -22,6 +22,7 @@ import java.util.Properties;
 
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -82,7 +83,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	 * @see org.springframework.test.AbstractTransactionalSpringContextTests#onSetUpInTransaction()
 	 */
 	protected void onSetUpInTransaction() throws Exception {
-		Job job = new Job("TestJob");
+		Job job = new JobSupport("TestJob");
 		jobInstance = jobDao.createJobInstance(job.getName(), jobParameters);
 		step1 = stepDao.createStep(jobInstance, "TestStep1");
 		step2 = stepDao.createStep(jobInstance, "TestStep2");

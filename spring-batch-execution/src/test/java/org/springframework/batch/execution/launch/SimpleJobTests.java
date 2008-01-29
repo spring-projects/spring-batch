@@ -18,17 +18,17 @@ package org.springframework.batch.execution.launch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.execution.job.DefaultJobExecutor;
+import org.springframework.batch.execution.job.simple.SimpleJob;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
@@ -64,11 +64,11 @@ public class SimpleJobTests extends TestCase {
 
 	private ItemReader provider;
 
-	private DefaultJobExecutor jobExecutor = new DefaultJobExecutor();;
+	private SimpleJob job = new SimpleJob();;
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		jobExecutor.setJobRepository(repository);
+		job.setJobRepository(repository);
 	}
 
 	private Tasklet getTasklet(String arg) throws Exception {
@@ -99,22 +99,22 @@ public class SimpleJobTests extends TestCase {
 
 	public void testSimpleJob() throws Exception {
 
-		Job jobConfiguration = new Job();
+		job.setSteps(new ArrayList());
 		AbstractStep step = new SimpleStep(getTasklet("foo", "bar"));
 		step.setJobRepository(repository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
-		jobConfiguration.addStep(step);
+		job.addStep(step);
 		step = new SimpleStep(getTasklet("spam"));
 		step.setJobRepository(repository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
-		jobConfiguration.addStep(step);
+		job.addStep(step);
 
-		JobInstance job = repository.createJobExecution(jobConfiguration, new JobParameters()).getJobInstance();
+		JobInstance jobInstance = repository.createJobExecution(job, new JobParameters()).getJobInstance();
 
-		JobExecution jobExecutionContext = new JobExecution(job);
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 
-		jobExecutor.run(jobConfiguration, jobExecutionContext);
-		assertEquals(BatchStatus.COMPLETED, job.getStatus());
+		job.run(jobExecutionContext);
+		assertEquals(BatchStatus.COMPLETED, jobInstance.getStatus());
 		assertEquals(3, processed.size());
 		assertTrue(processed.contains("foo"));
 
@@ -122,7 +122,6 @@ public class SimpleJobTests extends TestCase {
 
 	public void testSimpleJobWithRecovery() throws Exception {
 
-		Job jobConfiguration = new Job();
 		final List throwables = new ArrayList();
 
 		RepeatTemplate chunkOperations = new RepeatTemplate();
@@ -151,10 +150,10 @@ public class SimpleJobTests extends TestCase {
 			}
 		});
 		module.afterPropertiesSet();
-		jobConfiguration.addStep(step);
+		job.setSteps(Collections.singletonList(step));
 
-		JobExecution jobExecution = repository.createJobExecution(jobConfiguration, new JobParameters());
-		jobExecutor.run(jobConfiguration, jobExecution);
+		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
+		job.run(jobExecution);
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getJobInstance().getStatus());
 		assertEquals(0, processed.size());
@@ -165,7 +164,6 @@ public class SimpleJobTests extends TestCase {
 
 	public void testExceptionTerminates() throws Exception {
 
-		Job jobConfiguration = new Job();
 		final ItemOrientedTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
 		AbstractStep step = new SimpleStep(module);
 		step.setJobRepository(repository);
@@ -176,18 +174,17 @@ public class SimpleJobTests extends TestCase {
 			}
 		});
 		module.afterPropertiesSet();
-		jobConfiguration.addStep(step);
+		job.setSteps(Collections.singletonList(step));
 
-		JobExecution jobExecution = repository.createJobExecution(jobConfiguration, new JobParameters());
-		JobInstance job = jobExecution.getJobInstance();
+		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
 		try {
-			jobExecutor.run(jobConfiguration, jobExecution);
+			job.run(jobExecution);
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {
 			assertEquals("Foo", e.getMessage());
 			// expected
 		}
-		assertEquals(BatchStatus.FAILED, job.getStatus());
+		assertEquals(BatchStatus.FAILED, jobExecution.getJobInstance().getStatus());
 	}
 }

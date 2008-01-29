@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -73,7 +74,7 @@ public class SimpleJobRepository implements JobRepository {
 	/**
 	 * <p>
 	 * Create a (@link {@link JobExecution}) based on the passed in
-	 * {@link JobIdentifier} and {@link Job}. However, unique identification of
+	 * {@link JobIdentifier} and {@link JobSupport}. However, unique identification of
 	 * a job can only come from the database, and therefore must come from
 	 * JobDao by either creating a new job or finding an existing one, which
 	 * will ensure that the id of the job is populated with the correct value.
@@ -82,7 +83,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * <p>
 	 * There are two ways in which the method determines if a job should be
 	 * created or an existing one should be returned. The first is
-	 * restartability. The {@link Job} restartable property will be checked
+	 * restartability. The {@link JobSupport} restartable property will be checked
 	 * first. If it is not false, a new job will be created, regardless of
 	 * whether or not one exists. If it is true, the {@link JobDao} will be
 	 * checked to determine if the job already exists, if it does, it's steps
@@ -100,9 +101,9 @@ public class SimpleJobRepository implements JobRepository {
 	 * <li>What happens then depends on how many existing job instances we
 	 * find:
 	 * <ul>
-	 * <li>If there are none, or the {@link Job} is marked restartable, then we
+	 * <li>If there are none, or the {@link JobSupport} is marked restartable, then we
 	 * create a new {@link JobInstance}</li>
-	 * <li>If there is more than one and the {@link Job} is not marked as
+	 * <li>If there is more than one and the {@link JobSupport} is not marked as
 	 * restartable, it is an error. This could be caused by a job whose
 	 * restartable flag has changed to be more strict (true not false)
 	 * <em>after</em> it has been executed at least once.</li>
@@ -124,7 +125,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * platform does not support the higher isolation levels).
 	 * </p>
 	 * 
-	 * @see JobRepository#createJobExecution(Job, JobParameters)
+	 * @see JobRepository#createJobExecution(JobSupport, JobParameters)
 	 * 
 	 * @throws BatchRestartException if more than one JobInstance if found or if
 	 * JobInstance.getJobExecutionCount() is greater than Job.getStartLimit()
