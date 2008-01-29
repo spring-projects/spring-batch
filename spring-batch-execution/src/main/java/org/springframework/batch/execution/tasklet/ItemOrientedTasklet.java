@@ -101,7 +101,7 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(itemProvider, "ItemReader must be provided");
-		Assert.notNull(itemWriter, "ItemProcessor must be provided");
+		Assert.notNull(itemWriter, "ItemWriter must be provided");
 
 		if (itemRecoverer == null && (itemProvider instanceof ItemRecoverer)) {
 			itemRecoverer = (ItemRecoverer) itemProvider;
