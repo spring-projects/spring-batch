@@ -42,7 +42,7 @@ public class ItemReaderRepeatCallback implements RepeatCallback {
 	}
 
 	/**
-	 * Default processor is null, in which case we do nothing - subclasses can
+	 * Default writer is null, in which case we do nothing - subclasses can
 	 * extend this behaviour, but must be careful to actually exhaust the
 	 * provider by calling next().
 	 * @param provider

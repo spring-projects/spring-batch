@@ -105,9 +105,9 @@ public class CompositeItemWriter implements ItemWriter, Restartable {
 		Properties stats = new Properties();
 		int index = 0;
 		for (Iterator iterator = delegates.listIterator(); iterator.hasNext();) {
-			Properties processorStats = extractor.extractProperties(iterator.next());
-			if (processorStats != null) {
-				for (Iterator iterator2 = processorStats.entrySet().iterator(); iterator2.hasNext();) {
+			Properties writerStats = extractor.extractProperties(iterator.next());
+			if (writerStats != null) {
+				for (Iterator iterator2 = writerStats.entrySet().iterator(); iterator2.hasNext();) {
 					Map.Entry entry = (Map.Entry) iterator2.next();
 					stats.setProperty("" + index + SEPARATOR + entry.getKey(), (String) entry.getValue());
 				}

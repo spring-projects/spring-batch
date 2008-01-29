@@ -45,7 +45,7 @@ public class FlatFileOrderWriter extends DelegatingItemWriter {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.processor.DelegatingItemWriter#doProcess(java.lang.Object)
+	 * @see org.springframework.batch.item.writer.DelegatingItemWriter#doProcess(java.lang.Object)
 	 */
 	protected Object doProcess(Object item) throws Exception {
         return transformer.transform(item);

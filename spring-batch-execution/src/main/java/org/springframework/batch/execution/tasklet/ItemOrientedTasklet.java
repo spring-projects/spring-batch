@@ -71,14 +71,14 @@ import org.springframework.util.Assert;
 public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean {
 
 	/**
-	 * Prefix added to statistics keys from processor if needed to avoid
-	 * ambiguity between provider and processor.
+	 * Prefix added to statistics keys from writer if needed to avoid
+	 * ambiguity between reader and writer.
 	 */
-	public static final String PROCESSOR_STATISTICS_PREFIX = "processor.";
+	public static final String PROCESSOR_STATISTICS_PREFIX = "writer.";
 
 	/**
-	 * Prefix added to statistics keys from provider if needed to avoid
-	 * ambiguity between provider and processor.
+	 * Prefix added to statistics keys from reader if needed to avoid
+	 * ambiguity between provider and writer.
 	 */
 	public static final String PROVIDER_STATISTICS_PREFIX = "provider.";
 
@@ -95,7 +95,7 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 	private ItemReaderRetryCallback retryCallback;
 
 	/**
-	 * Check mandatory properties (provider and processor).
+	 * Check mandatory properties (reader and writer).
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
@@ -182,8 +182,8 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 	/**
 	 * Mark the current item as skipped if possible. If there is a retry policy
 	 * in action there is no need to take any action now because it will be
-	 * covered by the retry in the next transaction. Otherwise if the provider
-	 * and / or processor are {@link Skippable} then delegate to them in that
+	 * covered by the retry in the next transaction. Otherwise if the reader
+	 * and / or writer are {@link Skippable} then delegate to them in that
 	 * order.
 	 * 
 	 * @see org.springframework.batch.io.Skippable#skip()

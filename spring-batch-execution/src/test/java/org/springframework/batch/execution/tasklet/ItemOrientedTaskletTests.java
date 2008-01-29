@@ -256,7 +256,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 		try {
 			module.afterPropertiesSet();
 		} catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().toLowerCase().indexOf("processor") >= 0);
+			assertTrue(e.getMessage().toLowerCase().indexOf("writer") >= 0);
 		}
 	}
 
@@ -294,7 +294,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 		}
 
 		public void skip() {
-			list.add("processor");
+			list.add("writer");
 		}
 
 		public Properties getStatistics() {

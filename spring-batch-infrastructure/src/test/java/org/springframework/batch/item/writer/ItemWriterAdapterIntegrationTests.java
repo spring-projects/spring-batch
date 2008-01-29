@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.batch.io.sample.domain.Foo;
 import org.springframework.batch.io.sample.domain.FooService;
-import org.springframework.batch.item.writer.ItemWriterAdapter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
@@ -14,13 +14,13 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
  */
 public class ItemWriterAdapterIntegrationTests extends AbstractDependencyInjectionSpringContextTests {
 
-	private ItemWriterAdapter processor;
+	private ItemWriter processor;
 	
 	private FooService fooService;
 	
 
 	protected String getConfigPath() {
-		return "delegating-item-processor.xml";
+		return "delegating-item-writer.xml";
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class ItemWriterAdapterIntegrationTests extends AbstractDependencyInjecti
 	}
 	
 	//setter for auto-injection
-	public void setProcessor(ItemWriterAdapter processor) {
+	public void setProcessor(ItemWriter processor) {
 		this.processor = processor;
 	}
 

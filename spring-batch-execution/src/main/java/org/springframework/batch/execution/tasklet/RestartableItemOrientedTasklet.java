@@ -27,7 +27,7 @@ import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * An extension of {@link ItemOrientedTasklet} that delegates calls to
- * {@link Restartable} to the provider and processor.
+ * {@link Restartable} to the reader and writer.
  * 
  * @see ItemReader
  * @see ItemWriter
@@ -77,42 +77,42 @@ public class RestartableItemOrientedTasklet extends ItemOrientedTasklet implemen
 		}
 
 		if (itemProvider instanceof Restartable) {
-			((Restartable) itemProvider).restoreFrom(moduleRestartData.providerData);
+			((Restartable) itemProvider).restoreFrom(moduleRestartData.readerData);
 		}
 		if (itemWriter instanceof Restartable) {
-			((Restartable) itemWriter).restoreFrom(moduleRestartData.processorData);
+			((Restartable) itemWriter).restoreFrom(moduleRestartData.writerData);
 		}
 	}
 
 	private class RestartableItemOrientedTaskletRestartData implements RestartData {
 
-		private static final String PROVIDER_KEY = "DATA_PROVIDER";
+		private static final String READER_KEY = "DATA_PROVIDER";
 
-		private static final String PROCESSOR_KEY = "DATA_PROCESSOR";
+		private static final String WRITER_KEY = "DATA_PROCESSOR";
 
-		RestartData providerData;
+		private RestartData readerData;
 
-		RestartData processorData;
+		private RestartData writerData;
 
-		public RestartableItemOrientedTaskletRestartData(RestartData providerData, RestartData processorData) {
-			this.providerData = providerData;
-			this.processorData = processorData;
+		public RestartableItemOrientedTaskletRestartData(RestartData providerData, RestartData writerData) {
+			this.readerData = providerData;
+			this.writerData = writerData;
 		}
 
 		public RestartableItemOrientedTaskletRestartData(Properties data) {
-			providerData = new GenericRestartData(PropertiesConverter
-					.stringToProperties(data.getProperty(PROVIDER_KEY)));
-			processorData = new GenericRestartData(PropertiesConverter.stringToProperties(data
-					.getProperty(PROCESSOR_KEY)));
+			readerData = new GenericRestartData(PropertiesConverter
+					.stringToProperties(data.getProperty(READER_KEY)));
+			writerData = new GenericRestartData(PropertiesConverter.stringToProperties(data
+					.getProperty(WRITER_KEY)));
 		}
 
 		public Properties getProperties() {
 			Properties props = new Properties();
-			if (providerData != null) {
-				props.setProperty(PROVIDER_KEY, PropertiesConverter.propertiesToString(providerData.getProperties()));
+			if (readerData != null) {
+				props.setProperty(READER_KEY, PropertiesConverter.propertiesToString(readerData.getProperties()));
 			}
-			if (processorData != null) {
-				props.setProperty(PROCESSOR_KEY, PropertiesConverter.propertiesToString(processorData.getProperties()));
+			if (writerData != null) {
+				props.setProperty(WRITER_KEY, PropertiesConverter.propertiesToString(writerData.getProperties()));
 			}
 			return props;
 		}

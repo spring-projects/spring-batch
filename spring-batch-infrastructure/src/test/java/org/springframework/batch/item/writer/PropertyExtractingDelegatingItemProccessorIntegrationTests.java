@@ -20,7 +20,7 @@ public class PropertyExtractingDelegatingItemProccessorIntegrationTests
 	private FooService fooService;
 	
 	protected String getConfigPath() {
-		return "pe-delegating-item-processor.xml";
+		return "pe-delegating-item-writer.xml";
 	}
 	
 	/**

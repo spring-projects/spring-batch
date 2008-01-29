@@ -31,7 +31,7 @@ public interface ItemWriter {
 	 * larger batch operation. Will not be called with null data in normal
 	 * operation.
 	 * 
-	 * @throws Exception if there are errors. If the processor is used inside a
+	 * @throws Exception if there are errors. If the writer is used inside a
 	 * retry or a batch the framework will catch the exception and convert or
 	 * rethrow it as appropriate.
 	 */
