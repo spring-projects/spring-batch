@@ -60,7 +60,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	private static final String CREATE_JOB = "INSERT into %PREFIX%JOB_INSTANCE(ID, JOB_NAME, JOB_KEY)"
 			+ " values (?, ?, ?)";
 	
-	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_INSTANCE_PROPERTIES(JOB_ID, KEY, TYPE_CD, " +
+	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_INSTANCE_PARAMS(JOB_ID, KEY_NAME, TYPE_CD, " +
 			"STRING_VAL, DATE_VAL, LONG_VAL) values (?, ?, ?, ?, ?, ?)";
 	
 	/**	
