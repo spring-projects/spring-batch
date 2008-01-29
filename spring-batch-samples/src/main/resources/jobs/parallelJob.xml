@@ -46,13 +46,12 @@
 							</property>
 						</bean>
 					</property>
-					<property name="commitInterval" value="2"/>
+					<property name="commitInterval" value="2" />
 					<property name="startLimit" value="100" />
 					<property name="saveRestartData" value="true" />
 					<property name="allowStartIfComplete" value="false" />
 				</bean>
-				<bean id="loading"
-					class="org.springframework.batch.execution.step.RepeatOperationsStep">
+				<bean id="loading" parent="repeatOperationsStep">
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
@@ -68,8 +67,7 @@
 							<property name="itemWriter">
 								<bean
 									class="org.springframework.batch.sample.item.writer.TradeWriter">
-									<property name="dao"
-										ref="tradeDao" />
+									<property name="dao" ref="tradeDao" />
 								</bean>
 							</property>
 						</bean>

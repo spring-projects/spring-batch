@@ -27,7 +27,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.domain.StepSupport;
+import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
@@ -36,10 +36,10 @@ import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 public class StepExecutorInterruptionTests extends TestCase {
 
@@ -51,25 +51,24 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private JobInstance job;
 
-	private StepSupport stepConfiguration;
+	private RepeatOperationsStep stepConfiguration;
 
-	private SimpleStepExecutor executor;
+	private StepExecutor executor;
 
 	public void setUp() throws Exception {
 
 		jobRepository = new SimpleJobRepository(jobDao, stepDao);
 
 		Job jobConfiguration = new Job();
-		stepConfiguration = new SimpleStep();
+		stepConfiguration = new RepeatOperationsStep();
 		jobConfiguration.addStep(stepConfiguration);
 		jobConfiguration.setBeanName("testJob");
 		job = jobRepository.createJobExecution(jobConfiguration, new JobParameters()).getJobInstance();
-		executor = new SimpleStepExecutor();
+		stepConfiguration.setJobRepository(jobRepository);
+		stepConfiguration.setTransactionManager(new ResourcelessTransactionManager());
 	}
 
 	public void testInterruptChunk() throws Exception {
-
-		executor.setRepository(jobRepository);
 
 		List steps = job.getStepInstances();
 		final StepInstance step = (StepInstance) steps.get(0);
@@ -86,6 +85,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 				return new ExitStatus(foo != 1);
 			}
 		});
+		executor = stepConfiguration.createStepExecutor();
 
 		Thread processingThread = new Thread() {
 			public void run() {
@@ -118,7 +118,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		// N.B, If we don't set the completion policy it might run forever
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		executor.setChunkOperations(template);
+		stepConfiguration.setChunkOperations(template);
 		testInterruptChunk();
 	}
 

@@ -18,8 +18,7 @@
 		<!-- set restartable=false so that this job can be used by more than one test -->
 		<property name="restartable" value="false" />
 		<property name="steps">
-			<bean id="step1"
-				class="org.springframework.batch.execution.step.RepeatOperationsStep">
+			<bean id="step1" parent="repeatOperationsStep">
 				<property name="tasklet">
 					<bean
 						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">

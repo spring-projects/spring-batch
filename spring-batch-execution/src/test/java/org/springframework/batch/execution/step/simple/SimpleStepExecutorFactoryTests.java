@@ -27,8 +27,6 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.execution.step.RepeatOperationsHolder;
-import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
@@ -36,6 +34,7 @@ import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.interceptor.RepeatInterceptorAdapter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 /**
  * @author Dave Syer
@@ -43,18 +42,17 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
  */
 public class SimpleStepExecutorFactoryTests extends TestCase {
 
-	private SimpleStepExecutorFactory factory = new SimpleStepExecutorFactory();
-
-	protected void setUp() throws Exception {
-		factory.setJobRepository(new JobRepositorySupport());
-	}
-
 	public void testSuccessfulStepExecutor() throws Exception {
-		assertNotNull(factory.getExecutor(new SimpleStep()));
+		AbstractStep step = new SimpleStep();
+		step.setJobRepository(new JobRepositorySupport());
+		step.setTransactionManager(new ResourcelessTransactionManager());
+		assertNotNull(step.createStepExecutor());
 	}
 
 	public void testSuccessfulExceptionHandler() throws Exception {
-		SimpleStep configuration = new SimpleStep();
+		AbstractStep configuration = new SimpleStep("foo");
+		configuration.setJobRepository(new JobRepositorySupport());
+		configuration.setTransactionManager(new ResourcelessTransactionManager());
 		final List list = new ArrayList();
 		configuration.setExceptionHandler(new ExceptionHandler() {
 			public void handleException(RepeatContext context,
@@ -63,8 +61,8 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 				throw new RuntimeException("Oops");
 			}
 		});
-		SimpleStepExecutor executor = (SimpleStepExecutor) factory
-				.getExecutor(configuration);
+		SimpleStepExecutor executor = (SimpleStepExecutor) configuration
+				.createStepExecutor();
 		StepExecution stepExecution = new StepExecution(new StepInstance(
 				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
 				new Long(12)));
@@ -90,8 +88,10 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		SimpleHolderStepConfiguration configuration = new SimpleHolderStepConfiguration(
 				repeatTemplate);
-		SimpleStepExecutor executor = (SimpleStepExecutor) factory
-				.getExecutor(configuration);
+		configuration.setJobRepository(new JobRepositorySupport());
+		configuration.setTransactionManager(new ResourcelessTransactionManager());
+		SimpleStepExecutor executor = (SimpleStepExecutor) configuration
+				.createStepExecutor();
 		StepExecution stepExecution = new StepExecution(new StepInstance(
 				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
 				new Long(12)));
@@ -123,13 +123,15 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 		stepTemplate.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		SimpleHolderStepConfiguration configuration = new SimpleHolderStepConfiguration(
 				chunkTemplate, stepTemplate);
+		configuration.setJobRepository(new JobRepositorySupport());
+		configuration.setTransactionManager(new ResourcelessTransactionManager());
 		configuration.setTasklet(new Tasklet() {
 			public ExitStatus execute() throws Exception {
 				return ExitStatus.CONTINUABLE;
 			}
 		});
-		SimpleStepExecutor executor = (SimpleStepExecutor) factory
-				.getExecutor(configuration);
+		SimpleStepExecutor executor = (SimpleStepExecutor) configuration
+				.createStepExecutor();
 		StepExecution stepExecution = new StepExecution(new StepInstance(
 				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
 				new Long(12)));
@@ -140,9 +142,9 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 
 	public void testUnsuccessfulWrongConfiguration() throws Exception {
 		try {
-			factory.getExecutor(new StepSupport());
-			fail("Expected IllegalStateException");
-		} catch (IllegalStateException e) {
+			new StepSupport().createStepExecutor();
+			fail("Expected UnsupportedOperationException");
+		} catch (UnsupportedOperationException e) {
 			// expected
 			assertTrue(
 					"Error message does not contain SimpleStep: "
@@ -153,8 +155,7 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 
 	public void testUnsuccessfulNoJobRepository() throws Exception {
 		try {
-			factory = new SimpleStepExecutorFactory();
-			factory.getExecutor(new SimpleStep());
+			new SimpleStep().createStepExecutor();
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException e) {
 			// expected
@@ -165,9 +166,8 @@ public class SimpleStepExecutorFactoryTests extends TestCase {
 	}
 
 	public void testMandatoryProperties() throws Exception {
-		factory = new SimpleStepExecutorFactory();
 		try {
-			factory.afterPropertiesSet();
+			new SimpleStep().afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException e) {
 			// expected

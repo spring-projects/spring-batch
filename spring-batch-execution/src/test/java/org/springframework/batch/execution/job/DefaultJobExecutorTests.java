@@ -29,10 +29,8 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.executor.StepExecutor;
-import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
@@ -41,7 +39,8 @@ import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.execution.step.SimpleStep;
+import org.springframework.batch.execution.step.simple.AbstractStep;
+import org.springframework.batch.execution.step.simple.SimpleStep;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -91,9 +90,9 @@ public class DefaultJobExecutorTests extends TestCase {
 
 	private StepExecution stepExecution2;
 
-	private StepSupport stepConfiguration1;
+	private AbstractStep stepConfiguration1;
 
-	private StepSupport stepConfiguration2;
+	private AbstractStep stepConfiguration2;
 
 	private Job jobConfiguration;
 	
@@ -112,14 +111,19 @@ public class DefaultJobExecutorTests extends TestCase {
 		jobExecutor = new DefaultJobExecutor();
 		jobExecutor.setJobRepository(jobRepository);
 
-		jobExecutor.setStepExecutorFactory(new StepExecutorFactory() {
-			public StepExecutor getExecutor(Step configuration) {
+		stepConfiguration1 = new SimpleStep("TestStep1") {
+			public StepExecutor createStepExecutor() {
 				return defaultStepLifecycle;
 			}
-		});
+		};
+		stepConfiguration2 = new SimpleStep("TestStep2") {
+			public StepExecutor createStepExecutor() {
+				return defaultStepLifecycle;
+			}
+		};
+		stepConfiguration1.setJobRepository(jobRepository);
+		stepConfiguration2.setJobRepository(jobRepository);
 
-		stepConfiguration1 = new SimpleStep("TestStep1");
-		stepConfiguration2 = new SimpleStep("TestStep2");
 		List stepConfigurations = new ArrayList();
 		stepConfigurations.add(stepConfiguration1);
 		stepConfigurations.add(stepConfiguration2);
@@ -181,25 +185,6 @@ public class DefaultJobExecutorTests extends TestCase {
 		assertEquals(2, jobExecution.getStepExecutions().size());
 		assertEquals(step1, stepExecution1.getStep());
 		assertEquals(step2, stepExecution2.getStep());
-	}
-
-	public void testRunWithNonDefaultExecutor() throws Exception {
-
-		jobExecutor.setStepExecutorFactory(new StepExecutorFactory() {
-			public StepExecutor getExecutor(Step configuration) {
-				return configuration == stepConfiguration2 ? defaultStepLifecycle
-						: configurationStepLifecycle;
-			}
-		});
-		stepConfiguration1.setStartLimit(5);
-		stepConfiguration2.setStartLimit(5);
-
-		jobExecutor.run(jobConfiguration, jobExecution);
-
-		assertEquals(2, list.size());
-		assertEquals("special", list.get(0));
-		assertEquals("default", list.get(1));
-		checkRepository(BatchStatus.COMPLETED);
 	}
 
 	public void testInterrupted() throws Exception {

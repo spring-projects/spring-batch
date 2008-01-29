@@ -33,8 +33,6 @@ import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
-import org.springframework.batch.execution.step.RepeatOperationsHolder;
-import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -95,6 +93,8 @@ public class SimpleStepExecutor implements StepExecutor {
 	protected PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 	private StatisticsService statisticsService = new SimpleStatisticsService();
+
+	private Tasklet tasklet;
 
 	/**
 	 * Public setter for the {@link StatisticsService}. This will be used to
@@ -172,8 +172,6 @@ public class SimpleStepExecutor implements StepExecutor {
 		boolean isRestart = stepInstance.getStepExecutionCount() > 0 ? true : false;
 		Assert.notNull(stepInstance);
 
-		final Tasklet module = step.getTasklet();
-
 		ExitStatus status = ExitStatus.FAILED;
 
 		StepContext parentStepScopeContext = StepSynchronizationManager.getContext();
@@ -191,7 +189,7 @@ public class SimpleStepExecutor implements StepExecutor {
 			final boolean saveRestartData = step.isSaveRestartData();
 
 			if (saveRestartData && isRestart) {
-				restoreFromRestartData(module, stepInstance.getRestartData());
+				restoreFromRestartData(tasklet, stepInstance.getRestartData());
 			}
 
 			status = stepOperations.iterate(new RepeatCallback() {
@@ -232,7 +230,7 @@ public class SimpleStepExecutor implements StepExecutor {
 										stepExecution.apply(contribution);
 
 										if (saveRestartData) {
-											stepInstance.setRestartData(getRestartData(module));
+											stepInstance.setRestartData(getRestartData(tasklet));
 											jobRepository.update(stepInstance);
 										}
 										jobRepository.saveOrUpdate(stepExecution);
@@ -338,7 +336,7 @@ public class SimpleStepExecutor implements StepExecutor {
 				}
 				// check for interruption before each item as well
 				interruptionPolicy.checkInterrupted(context);
-				ExitStatus exitStatus = doTaskletProcessing(step.getTasklet(), contribution);
+				ExitStatus exitStatus = doTaskletProcessing(tasklet, contribution);
 				contribution.incrementTaskCount();
 				// check for interruption after each item as well
 				interruptionPolicy.checkInterrupted(context);
@@ -447,7 +445,6 @@ public class SimpleStepExecutor implements StepExecutor {
 			RepeatOperationsHolder holder = (RepeatOperationsHolder) step;
 			RepeatOperations chunkOperations = holder.getChunkOperations();
 			RepeatOperations stepOperations = holder.getStepOperations();
-			Assert.state(chunkOperations != null, "Chunk operations obtained from step must be non-null.");
 
 			if (chunkOperations != null) {
 				setChunkOperations(chunkOperations);
@@ -457,7 +454,7 @@ public class SimpleStepExecutor implements StepExecutor {
 			}
 
 		}
-		else if (step instanceof SimpleStep) {
+		else if (step instanceof AbstractStep) {
 
 			SimpleStep simpleConfiguation = (SimpleStep) step;
 			if (this.chunkOperations instanceof RepeatTemplate) {
@@ -480,5 +477,12 @@ public class SimpleStepExecutor implements StepExecutor {
 
 		}
 
+	}
+
+	/**
+	 * @param tasklet a {@link Tasklet} to execute when a step is processed
+	 */
+	public void setTasklet(Tasklet tasklet) {
+		this.tasklet = tasklet;
 	}
 }

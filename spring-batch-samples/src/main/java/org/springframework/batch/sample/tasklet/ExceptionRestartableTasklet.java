@@ -41,7 +41,7 @@ public class ExceptionRestartableTasklet extends RestartableItemOrientedTasklet 
 		
 		counter++;
 		if (counter == throwExceptionOnRecordNumber) {
-			throw new BatchCriticalException();
+			throw new BatchCriticalException("Planned failure on count="+counter);
 		}
 		
 		return super.execute();

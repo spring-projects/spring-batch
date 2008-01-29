@@ -23,7 +23,7 @@
 
 	<bean id="jobLauncher"
 		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
-		<property name="jobRepository" ref="simpleJobRepository" />
+		<property name="jobRepository" ref="jobRepository" />
 		<property name="jobExecutor" ref="jobExecutor" />
 	</bean>
 
@@ -45,23 +45,17 @@
 
 	<bean id="jobExecutor"
 		class="org.springframework.batch.execution.job.DefaultJobExecutor">
-		<property name="jobRepository" ref="simpleJobRepository" />
-		<property name="stepExecutorFactory">
-			<bean
-				class="org.springframework.batch.execution.step.PrototypeBeanStepExecutorFactory">
-				<property name="stepExecutorName" value="stepExecutor" />
-			</bean>
-		</property>
+		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
 	<bean id="stepExecutor"
 		class="org.springframework.batch.execution.step.simple.SimpleStepExecutor"
 		scope="prototype">
 		<property name="transactionManager" ref="transactionManager" />
-		<property name="repository" ref="simpleJobRepository" />
+		<property name="repository" ref="jobRepository" />
 	</bean>
 
-	<bean id="simpleJobRepository"
+	<bean id="jobRepository"
 		class="org.springframework.batch.execution.repository.SimpleJobRepository">
 		<constructor-arg ref="jobDao" />
 		<constructor-arg ref="stepDao" />
@@ -102,10 +96,12 @@
 	</bean>
 
 	<bean id="simpleStep"
-		class="org.springframework.batch.execution.step.SimpleStep"
+		class="org.springframework.batch.execution.step.simple.SimpleStep"
 		abstract="true">
 		<property name="allowStartIfComplete" value="true" />
 		<property name="saveRestartData" value="false" />
+		<property name="jobRepository" ref="jobRepository"/>
+		<property name="transactionManager" ref="transactionManager"/>
 		<property name="exceptionHandler">
 			<bean
 				class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler">
@@ -114,6 +110,15 @@
 			</bean>
 		</property>
 		<property name="commitInterval" value="1" />
+	</bean>
+
+	<bean id="repeatOperationsStep"
+		class="org.springframework.batch.execution.step.simple.RepeatOperationsStep"
+		abstract="true">
+		<property name="allowStartIfComplete" value="true" />
+		<property name="saveRestartData" value="false" />
+		<property name="jobRepository" ref="jobRepository"/>
+		<property name="transactionManager" ref="transactionManager"/>
 	</bean>
 
 	<bean id="customEditorConfigurer"

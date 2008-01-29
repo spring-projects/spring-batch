@@ -15,7 +15,7 @@
 
 	<bean id="test-job" class="org.springframework.batch.core.domain.Job">
 		<property name="steps">
-			<bean id="step1" class="org.springframework.batch.execution.step.SimpleStep">
+			<bean id="step1" class="org.springframework.batch.execution.step.simple.SimpleStep">
 				<constructor-arg>
 					<bean
 						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">

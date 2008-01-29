@@ -15,23 +15,28 @@
  */
 package org.springframework.batch.core.domain;
 
+import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**
- * Basic no-op support implementation for use as base class for
- * {@link Step}.
+ * Basic no-op support implementation for use as base class for {@link Step}.
+ * Implements {@link BeanNameAware} so that if no name is provided explicitly it
+ * will be inferred from the bean definition in Spring configuration.
  * 
  * @author Dave Syer
  * 
  */
-public class StepSupport implements Step,
-		BeanNameAware {
+public class StepSupport implements Step, BeanNameAware {
 
 	private String name;
+
 	private int startLimit = Integer.MAX_VALUE;
+
 	private Tasklet tasklet;
+
 	private boolean allowStartIfComplete;
+
 	private boolean saveRestartData = false;
 
 	/**
@@ -68,7 +73,7 @@ public class StepSupport implements Step,
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
 	public void setBeanName(String name) {
-		if (this.name==null) {
+		if (this.name == null) {
 			this.name = name;
 		}
 	}
@@ -95,8 +100,7 @@ public class StepSupport implements Step,
 	/**
 	 * Public setter for the startLimit.
 	 * 
-	 * @param startLimit
-	 *            the startLimit to set
+	 * @param startLimit the startLimit to set
 	 */
 	public void setStartLimit(int startLimit) {
 		this.startLimit = startLimit;
@@ -114,8 +118,7 @@ public class StepSupport implements Step,
 	/**
 	 * Public setter for the tasklet.
 	 * 
-	 * @param tasklet
-	 *            the tasklet to set
+	 * @param tasklet the tasklet to set
 	 */
 	public void setTasklet(Tasklet tasklet) {
 		this.tasklet = tasklet;
@@ -133,8 +136,7 @@ public class StepSupport implements Step,
 	/**
 	 * Public setter for the shouldAllowStartIfComplete.
 	 * 
-	 * @param allowStartIfComplete
-	 *            the shouldAllowStartIfComplete to set
+	 * @param allowStartIfComplete the shouldAllowStartIfComplete to set
 	 */
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
 		this.allowStartIfComplete = allowStartIfComplete;
@@ -148,4 +150,15 @@ public class StepSupport implements Step,
 		return saveRestartData;
 	}
 
+	/**
+	 * Not supported but provided so that tests can easily create a step.
+	 * 
+	 * @throws UnsupportedOperationException always
+	 * 
+	 * @see org.springframework.batch.core.domain.Step#createStepExecutor()
+	 */
+	public StepExecutor createStepExecutor() {
+		throw new UnsupportedOperationException(
+				"Cannot create a StepExecutor.  Use a smarter subclass of StepSupport like a SimpleStep.");
+	}
 }

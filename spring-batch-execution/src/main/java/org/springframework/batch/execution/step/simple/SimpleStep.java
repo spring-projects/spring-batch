@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.step;
+package org.springframework.batch.execution.step.simple;
 
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.tasklet.Tasklet;
@@ -28,10 +28,9 @@ import org.springframework.batch.core.tasklet.Tasklet;
  * 
  */
 public class SimpleStep extends AbstractStep {
-
+	
 	// default commit interval is one
 	private int commitInterval = 1;
-
 	public SimpleStep() {
 		super();
 	}

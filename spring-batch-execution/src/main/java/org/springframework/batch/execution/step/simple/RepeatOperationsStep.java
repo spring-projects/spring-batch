@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.step;
+package org.springframework.batch.execution.step.simple;
 
 import org.springframework.batch.core.domain.Step;
+import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.util.Assert;
 
 /**
- * {@link Step} implementation that allows full step of
- * the {@link RepeatOperations} that will be used in the chunk (inner loop).
+ * {@link Step} implementation that allows full step of the
+ * {@link RepeatOperations} that will be used in the chunk (inner loop).
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -31,6 +33,7 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 
 	// default chunkOperations is null
 	private RepeatOperations chunkOperations;
+
 	// default stepOperations is null
 	private RepeatOperations stepOperations;
 
@@ -54,7 +57,7 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 
 	/**
 	 * Public accessor for the stepOperations property.
-	 *
+	 * 
 	 * @return the stepOperations
 	 */
 	public RepeatOperations getStepOperations() {
@@ -63,11 +66,28 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 
 	/**
 	 * Public setter for the {@link RepeatOperations} property.
-	 *
+	 * 
 	 * @param stepOperations the stepOperations to set
 	 */
 	public void setStepOperations(RepeatOperations stepOperations) {
 		this.stepOperations = stepOperations;
 	}
 
+	/**
+	 * Create a new {@link SimpleStepExecutor} with the step and chunk
+	 * operations.
+	 * 
+	 * @see org.springframework.batch.core.domain.StepSupport#createStepExecutor()
+	 */
+	public StepExecutor createStepExecutor() {
+		Assert.notNull(jobRepository, "JobRepository is mandatory");
+		SimpleStepExecutor executor = (SimpleStepExecutor) super.createStepExecutor();
+		if (stepOperations != null) {
+			executor.setStepOperations(stepOperations);
+		}
+		if (chunkOperations != null) {
+			executor.setChunkOperations(chunkOperations);
+		}
+		return executor;
+	}
 }

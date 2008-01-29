@@ -32,14 +32,12 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
-import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -56,6 +54,7 @@ import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.statistics.StatisticsService;
 import org.springframework.batch.support.PropertiesConverter;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 public class SimpleStepExecutorTests extends TestCase {
 
@@ -69,7 +68,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 	private SimpleStepExecutor stepExecutor;
 
-	private StepSupport stepConfiguration;
+	private AbstractStep stepConfiguration;
 
 	private RepeatTemplate template;
 	
@@ -99,10 +98,11 @@ public class SimpleStepExecutorTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		stepExecutor = new SimpleStepExecutor();
-		stepExecutor.setRepository(new JobRepositorySupport());
 		stepConfiguration = new SimpleStep();
 		stepConfiguration.setTasklet(getTasklet(new String[] { "foo", "bar", "spam" }));
+		stepConfiguration.setJobRepository(new JobRepositorySupport());
+		stepConfiguration.setTransactionManager(new ResourcelessTransactionManager());
+		stepExecutor = (SimpleStepExecutor) stepConfiguration.createStepExecutor();
 		template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		stepExecutor.setStepOperations(template);
@@ -287,7 +287,7 @@ public class SimpleStepExecutorTests extends TestCase {
 	public void testNonRestartedJob() {
 		StepInstance step = new StepInstance(new Long(1));
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
-		stepConfiguration.setTasklet(tasklet);
+		stepExecutor.setTasklet(tasklet);
 		stepConfiguration.setSaveRestartData(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step,
@@ -312,7 +312,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
-		stepConfiguration.setTasklet(tasklet);
+		stepExecutor.setTasklet(tasklet);
 		stepConfiguration.setSaveRestartData(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step,
@@ -379,7 +379,7 @@ public class SimpleStepExecutorTests extends TestCase {
 	}
 
 	public void testApplyConfigurationWithExceptionHandler() throws Exception {
-		SimpleStep stepConfiguration = new SimpleStep("foo");
+		AbstractStep stepConfiguration = new SimpleStep("foo");
 		final List list = new ArrayList();
 		stepExecutor.setStepOperations(new RepeatTemplate() {
 			public void setExceptionHandler(ExceptionHandler exceptionHandler) {
@@ -392,7 +392,7 @@ public class SimpleStepExecutorTests extends TestCase {
 	}
 
 	public void testApplyConfigurationWithZeroSkipLimit() throws Exception {
-		SimpleStep stepConfiguration = new SimpleStep("foo");
+		AbstractStep stepConfiguration = new SimpleStep("foo");
 		stepConfiguration.setSkipLimit(0);
 		final List list = new ArrayList();
 		stepExecutor.setStepOperations(new RepeatTemplate() {
@@ -405,7 +405,7 @@ public class SimpleStepExecutorTests extends TestCase {
 	}
 
 	public void testApplyConfigurationWithNonZeroSkipLimit() throws Exception {
-		SimpleStep stepConfiguration = new SimpleStep("foo");
+		AbstractStep stepConfiguration = new SimpleStep("foo");
 		stepConfiguration.setSkipLimit(1);
 		final List list = new ArrayList();
 		stepExecutor.setStepOperations(new RepeatTemplate() {

@@ -107,18 +107,8 @@
 
 	<bean id="jobLauncher"
 		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
-		<property name="jobRepository" ref="simpleJobRepository" />
-		<property name="jobExecutor">
-			<bean parent="jobExecutor">
-				<property name="stepExecutorFactory">
-					<bean
-						class="org.springframework.batch.execution.step.PrototypeBeanStepExecutorFactory">
-						<property name="stepExecutorName"
-							value="notifyingStepExecutor" />
-					</bean>
-				</property>
-			</bean>
-		</property>
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="jobExecutor" ref="jobExecutor"/>
 		<property name="taskExecutor">
 			<bean
 				class="org.springframework.core.task.SimpleAsyncTaskExecutor" />

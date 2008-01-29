@@ -31,7 +31,6 @@ import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.executor.JobExecutor;
 import org.springframework.batch.core.executor.StepExecutor;
-import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
@@ -51,8 +50,6 @@ public class DefaultJobExecutor implements JobExecutor {
 	private static final SimpleStepExecutorFactory DEFAULT_STEP_EXECUTOR_FACTORY = new SimpleStepExecutorFactory();
 
 	private JobRepository jobRepository;
-
-	private StepExecutorFactory stepExecutorFactory = DEFAULT_STEP_EXECUTOR_FACTORY;
 
 	private ExitCodeExceptionClassifier exceptionClassifier = new SimpleExitCodeExceptionClassifier();
 
@@ -89,8 +86,7 @@ public class DefaultJobExecutor implements JobExecutor {
 				if (shouldStart(stepInstance, step)) {
 					startedCount++;
 					updateStatus(execution, BatchStatus.STARTED);
-					StepExecutor stepExecutor = stepExecutorFactory
-							.getExecutor(step);
+					StepExecutor stepExecutor = step.createStepExecutor();
 					StepExecution stepExecution = execution.createStepExecution(stepInstance);
 					status = stepExecutor.process(step,
 							stepExecution);
@@ -179,18 +175,6 @@ public class DefaultJobExecutor implements JobExecutor {
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 		DEFAULT_STEP_EXECUTOR_FACTORY.setJobRepository(jobRepository);
-	}
-
-	/**
-	 * Setter for injecting a {@link StepExecutorFactory}. The factory is
-	 * responsible for providing a {@link StepExecutor} to execute each step in
-	 * turn. The values returned from the factory are not cached or re-used by
-	 * this implementation.
-	 * 
-	 * @param stepExecutorFactory
-	 */
-	public void setStepExecutorFactory(StepExecutorFactory stepExecutorFactory) {
-		this.stepExecutorFactory = stepExecutorFactory;
 	}
 
 	/**

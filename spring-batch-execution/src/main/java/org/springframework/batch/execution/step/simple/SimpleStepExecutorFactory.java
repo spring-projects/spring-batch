@@ -19,7 +19,6 @@ import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.execution.step.SimpleStep;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -51,7 +50,7 @@ public class SimpleStepExecutorFactory implements StepExecutorFactory,
 	public StepExecutor getExecutor(Step step) {
 
 		Assert.notNull(jobRepository, "JobRepository cannot be null");
-		Assert.state(step instanceof SimpleStep,
+		Assert.state(step instanceof AbstractStep,
 				"Step must be instance of SimpleStep - found: ["
 						+ (step == null ? null : step
 								.getClass()) + "]");

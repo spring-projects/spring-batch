@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.domain;
 
+import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.tasklet.Tasklet;
 
 /**
@@ -56,5 +57,10 @@ public interface Step {
 	 * identifier.
 	 */
 	int getStartLimit();
+	
+	/**
+	 * @return a {@link StepExecutor} that could be used to execute this step
+	 */
+	StepExecutor createStepExecutor();
 
 }

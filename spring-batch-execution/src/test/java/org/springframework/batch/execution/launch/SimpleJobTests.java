@@ -27,15 +27,14 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.executor.StepExecutor;
-import org.springframework.batch.core.executor.StepExecutorFactory;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.job.DefaultJobExecutor;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
-import org.springframework.batch.execution.step.SimpleStep;
+import org.springframework.batch.execution.step.simple.AbstractStep;
+import org.springframework.batch.execution.step.simple.RepeatOperationsStep;
+import org.springframework.batch.execution.step.simple.SimpleStep;
 import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.item.ItemReader;
@@ -47,9 +46,7 @@ import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
-import org.springframework.transaction.interceptor.TransactionProxyFactoryBean;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.util.StringUtils;
 
 public class SimpleJobTests extends TestCase {
 
@@ -75,11 +72,6 @@ public class SimpleJobTests extends TestCase {
 		super.setUp();
 		jobExecutor.setJobRepository(repository);
 		stepLifecycle.setRepository(repository);
-		jobExecutor.setStepExecutorFactory(new StepExecutorFactory() {
-			public StepExecutor getExecutor(Step configuration) {
-				return stepLifecycle;
-			}
-		});
 	}
 
 	private Tasklet getTasklet(String arg) throws Exception {
@@ -111,8 +103,14 @@ public class SimpleJobTests extends TestCase {
 	public void testSimpleJob() throws Exception {
 
 		Job jobConfiguration = new Job();
-		jobConfiguration.addStep(new SimpleStep(getTasklet("foo", "bar")));
-		jobConfiguration.addStep(new SimpleStep(getTasklet("spam")));
+		AbstractStep step = new SimpleStep(getTasklet("foo", "bar"));
+		step.setJobRepository(repository);
+		step.setTransactionManager(new ResourcelessTransactionManager());
+		jobConfiguration.addStep(step);
+		step = new SimpleStep(getTasklet("spam"));
+		step.setJobRepository(repository);
+		step.setTransactionManager(new ResourcelessTransactionManager());
+		jobConfiguration.addStep(step);
 
 		JobInstance job = repository.createJobExecution(jobConfiguration, new JobParameters()).getJobInstance();
 
@@ -138,15 +136,6 @@ public class SimpleJobTests extends TestCase {
 				assertEquals("Try again Dummy!", throwable.getMessage());
 			}
 		});
-		stepLifecycle.setChunkOperations(chunkOperations);
-
-		TransactionProxyFactoryBean proxyFactoryBean = new TransactionProxyFactoryBean();
-		proxyFactoryBean.setTransactionManager(new ResourcelessTransactionManager());
-		proxyFactoryBean.setTarget(stepLifecycle);
-		proxyFactoryBean.setTransactionAttributes(StringUtils.splitArrayElementsIntoProperties(
-				new String[] { "processChunk=PROPAGATION_REQUIRED" }, "="));
-		proxyFactoryBean.setExposeProxy(true);
-		proxyFactoryBean.afterPropertiesSet();
 
 		/*
 		 * Each message fails once and the chunk (size=1) "rolls back"; then it
@@ -154,7 +143,11 @@ public class SimpleJobTests extends TestCase {
 		 * definition above)...
 		 */
 		final ItemOrientedTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
-		Step step = new SimpleStep(module);
+		RepeatOperationsStep step = new RepeatOperationsStep();
+		step.setTasklet(module);
+		step.setChunkOperations(chunkOperations);
+		step.setJobRepository(repository);
+		step.setTransactionManager(new ResourcelessTransactionManager());
 		module.setItemWriter(new ItemWriter() {
 			public void write(Object data) throws Exception {
 				throw new RuntimeException("Try again Dummy!");
@@ -177,7 +170,9 @@ public class SimpleJobTests extends TestCase {
 
 		Job jobConfiguration = new Job();
 		final ItemOrientedTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
-		Step step = new SimpleStep(module);
+		AbstractStep step = new SimpleStep(module);
+		step.setJobRepository(repository);
+		step.setTransactionManager(new ResourcelessTransactionManager());
 		module.setItemWriter(new ItemWriter() {
 			public void write(Object data) throws Exception {
 				throw new RuntimeException("Foo");
