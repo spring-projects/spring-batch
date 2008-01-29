@@ -63,6 +63,9 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 			return false;
 		}
 
+		public void close() throws Exception {			
+		}
+
 	}
 
 	private static class MockWriter implements ItemWriter, Restartable {
@@ -83,6 +86,9 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 		public void restoreFrom(RestartData data) {
 			// restart data should be same as returned by getRestartData
 			assertEquals(this.data.getProperties(), data.getProperties());
+		}
+
+		public void close() throws Exception {
 		}
 
 	}

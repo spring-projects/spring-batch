@@ -58,4 +58,7 @@ public class EmptyItemWriter implements ItemWriter, InitializingBean {
 		return list;
 	}
 
+	public void close() throws Exception {
+	}
+
 }

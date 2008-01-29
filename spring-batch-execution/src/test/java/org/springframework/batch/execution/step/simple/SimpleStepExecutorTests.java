@@ -42,6 +42,7 @@ import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.DefaultExceptionHandler;
@@ -60,7 +61,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 	ArrayList processed = new ArrayList();
 
-	ItemWriter processor = new ItemWriter() {
+	ItemWriter processor = new AbstractItemWriter() {
 		public void write(Object data) throws Exception {
 			processed.add((String) data);
 		}

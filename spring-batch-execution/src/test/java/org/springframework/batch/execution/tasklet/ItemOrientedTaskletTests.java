@@ -28,6 +28,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.AbstractItemReader;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
@@ -57,9 +58,12 @@ public class ItemOrientedTaskletTests extends TestCase {
 			}
 			return null;
 		}
+
+		public void close() throws Exception {
+		}
 	};
 
-	private ItemWriter itemWriter = new ItemWriter() {
+	private ItemWriter itemWriter = new AbstractItemWriter() {
 		public void write(Object data) throws Exception {
 			list.add(data);
 		}
@@ -176,9 +180,12 @@ public class ItemOrientedTaskletTests extends TestCase {
 			public Object read() throws Exception {
 				return "bar";
 			}
+
+			public void close() throws Exception {				
+			}
 		});
 
-		module.setItemWriter(new ItemWriter() {
+		module.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
 				throw new RuntimeException("FOO");
 			}
@@ -215,7 +222,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 				return "foo";
 			}
 		});
-		module.setItemWriter(new ItemWriter() {
+		module.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
 				throw new RuntimeException("FOO");
 			}
@@ -274,6 +281,8 @@ public class ItemOrientedTaskletTests extends TestCase {
 		public Properties getStatistics() {
 			return PropertiesConverter.stringToProperties("foo=bar");
 		}
+		public void close() throws Exception {			
+		}
 	}
 
 	private class SkippableItemWriter implements ItemWriter, Skippable,
@@ -299,6 +308,9 @@ public class ItemOrientedTaskletTests extends TestCase {
 
 		public Properties getStatistics() {
 			return PropertiesConverter.stringToProperties(props);
+		}
+
+		public void close() throws Exception {
 		}
 	}
 }

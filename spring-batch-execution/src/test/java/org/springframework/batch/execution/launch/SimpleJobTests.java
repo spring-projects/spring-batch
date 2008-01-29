@@ -40,6 +40,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -55,7 +56,7 @@ public class SimpleJobTests extends TestCase {
 
 	private List processed = new ArrayList();
 
-	private ItemWriter processor = new ItemWriter() {
+	private ItemWriter processor = new AbstractItemWriter() {
 		public void write(Object data) throws Exception {
 			processed.add((String) data);
 		}
@@ -144,7 +145,7 @@ public class SimpleJobTests extends TestCase {
 		step.setChunkOperations(chunkOperations);
 		step.setJobRepository(repository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
-		module.setItemWriter(new ItemWriter() {
+		module.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
 				throw new RuntimeException("Try again Dummy!");
 			}
@@ -169,7 +170,7 @@ public class SimpleJobTests extends TestCase {
 		AbstractStep step = new SimpleStep(module);
 		step.setJobRepository(repository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
-		module.setItemWriter(new ItemWriter() {
+		module.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
 				throw new RuntimeException("Foo");
 			}
