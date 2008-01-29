@@ -34,7 +34,6 @@ import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.executor.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
-import org.springframework.batch.execution.step.simple.SimpleStepExecutorFactory;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -46,8 +45,6 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  */
 public class DefaultJobExecutor implements JobExecutor {
-
-	private static final SimpleStepExecutorFactory DEFAULT_STEP_EXECUTOR_FACTORY = new SimpleStepExecutorFactory();
 
 	private JobRepository jobRepository;
 
@@ -174,7 +171,6 @@ public class DefaultJobExecutor implements JobExecutor {
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
-		DEFAULT_STEP_EXECUTOR_FACTORY.setJobRepository(jobRepository);
 	}
 
 	/**
