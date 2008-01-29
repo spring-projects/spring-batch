@@ -18,7 +18,7 @@ package org.springframework.batch.item;
 
 /**
  * Basic interface for generic output operations. Class implementing this
- * interface will be responsible for serializing objects ias necessary.
+ * interface will be responsible for serializing objects as necessary.
  * Generally, it is responsibility of implementing class to decide which
  * technology to use for mapping and how it should be configured.
  * 
