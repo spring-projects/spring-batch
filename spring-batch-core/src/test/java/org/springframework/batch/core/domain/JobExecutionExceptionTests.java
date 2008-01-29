@@ -15,22 +15,27 @@
  */
 package org.springframework.batch.core.domain;
 
-import java.util.Collection;
+import org.springframework.batch.core.AbstractExceptionTests;
+import org.springframework.batch.core.domain.JobExecutionException;
 
 /**
- * A listable extension of {@link JobRegistry}.
- * 
  * @author Dave Syer
- * 
+ *
  */
-public interface ListableJobRegistry extends JobRegistry {
+public class JobExecutionExceptionTests extends AbstractExceptionTests {
 
-	/**
-	 * Provides the currently registered configurations. The return value is
-	 * unmodifiable and disconnected from the underlying registry storage.
-	 * 
-	 * @return a collection of {@link Job} instances. Empty if none
-	 * are registered.
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
-	Collection getJobConfigurations();
+	public Exception getException(String msg) throws Exception {
+		return new JobExecutionException(msg);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String, java.lang.Throwable)
+	 */
+	public Exception getException(String msg, Throwable t) throws Exception {
+		return new JobExecutionException(msg, t);
+	}
+
 }

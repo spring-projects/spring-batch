@@ -13,28 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.executor;
+package org.springframework.batch.core.repository;
 
-import org.springframework.batch.core.AbstractExceptionTests;
+import org.springframework.batch.core.domain.Job;
 
 /**
+ * Base class for checked exceptions related to {@link Job}
+ * creation, registration or use.
+ * 
  * @author Dave Syer
- *
+ * 
  */
-public class StepInterruptedExceptionTests extends AbstractExceptionTests {
+public class JobException extends Exception {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
+	/**
+	 * Create an exception with the given message.
 	 */
-	public Exception getException(String msg) throws Exception {
-		return new StepInterruptedException(msg);
+	public JobException(String msg) {
+		super(msg);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String, java.lang.Throwable)
+	/**
+	 * @param msg The message to send to caller
+	 * @param e the cause of the exception
 	 */
-	public Exception getException(String msg, Throwable t) throws Exception {
-		return new RuntimeException(msg, t);
+	public JobException(String msg, Throwable e) {
+		super(msg, e);
 	}
 
 }

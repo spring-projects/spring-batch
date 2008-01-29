@@ -16,23 +16,16 @@
 package org.springframework.batch.core.domain;
 
 /**
- * A runtime service locator interface for retrieving job configurations by
- * <code>name</code>.
- * 
  * @author Dave Syer
- * 
+ *
  */
-public interface JobLocator {
+public class JobExecutionException extends Exception {
 
-	/**
-	 * Locates a {@link Job} at runtime.
-	 * 
-	 * @param name the name of the {@link Job} which should be
-	 * unique
-	 * @return a {@link Job} identified by the given name
-	 * 
-	 * @throws NoSuchJobException if the required configuratio can
-	 * not be found.
-	 */
-	Job getJob(String name) throws NoSuchJobException;
+	public JobExecutionException(String msg) {
+		super(msg);
+	}
+
+	public JobExecutionException(String msg, Throwable cause) {
+		super(msg, cause);
+	}
 }

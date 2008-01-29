@@ -15,7 +15,7 @@
 
 	<bean id="loopJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="simpleStep">
+			<bean id="step1" parent="repeatOperationsStep">
 				<property name="tasklet">
 					<bean id="module"
 						class="org.springframework.batch.sample.tasklet.InfiniteLoopTasklet"
@@ -23,20 +23,27 @@
 						<aop:scoped-proxy />
 					</bean>
 				</property>
-				<property name="commitInterval" value="2" />
-			</bean>
-		</property>
-	</bean>
-
-	<bean id="notifyingStepExecutor" parent="stepExecutor"
-		scope="prototype">
-		<property name="stepOperations">
-			<bean
-				class="org.springframework.batch.repeat.support.RepeatTemplate">
-				<property name="interceptor">
+				<property name="chunkOperations">
 					<bean
-						class="org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatInterceptor" />
+						class="org.springframework.batch.repeat.support.RepeatTemplate">
+						<property name="completionPolicy">
+							<bean
+								class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
+								<property name="chunkSize" value="2"/>
+							</bean>
+						</property>
+					</bean>
 				</property>
+				<property name="stepOperations">
+					<bean
+						class="org.springframework.batch.repeat.support.RepeatTemplate">
+						<property name="interceptor">
+							<bean
+								class="org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatInterceptor" />
+						</property>
+					</bean>
+				</property>
+
 			</bean>
 		</property>
 	</bean>
@@ -108,7 +115,7 @@
 	<bean id="jobLauncher"
 		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
-		<property name="jobExecutor" ref="jobExecutor"/>
+		<property name="jobExecutor" ref="jobExecutor" />
 		<property name="taskExecutor">
 			<bean
 				class="org.springframework.core.task.SimpleAsyncTaskExecutor" />

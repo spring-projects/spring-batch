@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.configuration;
+package org.springframework.batch.core.repository;
 
 import org.springframework.batch.core.AbstractExceptionTests;
-import org.springframework.batch.core.domain.JobException;
+import org.springframework.batch.core.repository.DuplicateJobException;
 
 /**
  * @author Dave Syer
  * 
  */
-public class JobExceptionTests extends AbstractExceptionTests {
+public class DuplicateJobExceptionTests extends AbstractExceptionTests {
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
 	public Exception getException(String msg) throws Exception {
-		return new JobException(msg);
+		return new DuplicateJobException(msg);
 	}
 
 	/*
@@ -38,7 +38,7 @@ public class JobExceptionTests extends AbstractExceptionTests {
 	 * java.lang.Throwable)
 	 */
 	public Exception getException(String msg, Throwable t) throws Exception {
-		return new JobException(msg, t);
+		return new DuplicateJobException(msg, t);
 	}
 
 }

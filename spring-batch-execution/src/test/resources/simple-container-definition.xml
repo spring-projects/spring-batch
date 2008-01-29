@@ -15,7 +15,7 @@
 		<property name="jobExecutor" ref="jobLifecycle" />
 	</bean>
 
-	<bean id="jobConfigurationRegistry"
+	<bean id="jobRegistry"
 		class="org.springframework.batch.execution.configuration.MapJobRegistry" />
 
 	<bean id="jobLifecycle"
@@ -40,13 +40,8 @@
 				<property name="useParent" value="true" />
 			</bean>
 		</property>
-	</bean>
-
-	<bean id="stepLifecycle"
-		class="org.springframework.batch.execution.step.simple.SimpleStepExecutor"
-		scope="prototype">
-		<property name="transactionManager" ref="transactionManager" />
-		<property name="repository" ref="simpleJobRepository" />
+		<property name="jobRepository" ref="jobRegistry"/>
+		<property name="transactionManager" ref="transactionManager"/>
 	</bean>
 
 	<bean id="transactionManager"

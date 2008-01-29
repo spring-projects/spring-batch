@@ -13,21 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core.repository;
+
+import org.springframework.batch.core.domain.Job;
+
 
 /**
- * Checked exception that indicates a name clash when registering
- * {@link Job} instances.
+ * Checked exception to indicate that a required {@link Job} is not
+ * available.
  * 
  * @author Dave Syer
  * 
  */
-public class DuplicateJobException extends JobException {
+public class NoSuchJobException extends JobException {
+
+	private static final long serialVersionUID = -8044082897778706564L;
 
 	/**
 	 * Create an exception with the given message.
 	 */
-	public DuplicateJobException(String msg) {
+	public NoSuchJobException(String msg) {
 		super(msg);
 	}
 
@@ -35,8 +40,7 @@ public class DuplicateJobException extends JobException {
 	 * @param msg The message to send to caller
 	 * @param e the cause of the exception
 	 */
-	public DuplicateJobException(String msg, Throwable e) {
+	public NoSuchJobException(String msg, Throwable e) {
 		super(msg, e);
 	}
-
 }

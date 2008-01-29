@@ -20,8 +20,8 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.repeat.ExitStatus;
 

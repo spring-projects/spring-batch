@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.executor;
+package org.springframework.batch.core.repository;
+
+import java.util.Collection;
+
+import org.springframework.batch.core.domain.Job;
 
 /**
+ * A listable extension of {@link JobRegistry}.
+ * 
  * @author Dave Syer
- *
+ * 
  */
-public class JobExecutionException extends Exception {
+public interface ListableJobRegistry extends JobRegistry {
 
-	public JobExecutionException(String msg) {
-		super(msg);
-	}
-
-	public JobExecutionException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
+	/**
+	 * Provides the currently registered configurations. The return value is
+	 * unmodifiable and disconnected from the underlying registry storage.
+	 * 
+	 * @return a collection of {@link Job} instances. Empty if none
+	 * are registered.
+	 */
+	Collection getJobConfigurations();
 }

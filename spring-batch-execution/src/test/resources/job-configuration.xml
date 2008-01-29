@@ -8,7 +8,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<bean class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
-		<property name="jobConfigurationRegistry" ref="jobConfigurationRegistry"/>
+		<property name="jobConfigurationRegistry" ref="jobRegistry"/>
 	</bean>
 
 	<bean id="test-job" class="org.springframework.batch.core.domain.Job">

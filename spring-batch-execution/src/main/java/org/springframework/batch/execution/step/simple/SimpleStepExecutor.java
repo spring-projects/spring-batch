@@ -23,11 +23,11 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepExecutor;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
-import org.springframework.batch.core.executor.StepExecutor;
-import org.springframework.batch.core.executor.StepInterruptedException;
+import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepContext;
@@ -96,6 +96,15 @@ public class SimpleStepExecutor implements StepExecutor {
 
 	private Tasklet tasklet;
 
+	private AbstractStep step;
+
+	/**
+	 * Package private constructor so the factory can create a the executor.
+	 */
+	SimpleStepExecutor(AbstractStep abstractStep) {
+		this.step = abstractStep;
+	}
+
 	/**
 	 * Public setter for the {@link StatisticsService}. This will be used to
 	 * create the {@link StepContext}, and hence any component that is a
@@ -163,9 +172,9 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * @throws StepInterruptedException if the step or a chunk is interrupted
 	 * @throws RuntimeException if there is an exception during a chunk
 	 * execution
-	 * @see StepExecutor#process(Step, StepExecution)
+	 * @see StepExecutor#process(StepExecution)
 	 */
-	public ExitStatus process(final Step step, final StepExecution stepExecution) throws BatchCriticalException,
+	public ExitStatus process(final StepExecution stepExecution) throws BatchCriticalException,
 			StepInterruptedException {
 
 		final StepInstance stepInstance = stepExecution.getStep();

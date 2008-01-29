@@ -27,7 +27,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
+import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;

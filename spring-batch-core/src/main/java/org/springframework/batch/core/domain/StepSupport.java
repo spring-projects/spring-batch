@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.domain;
 
-import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**

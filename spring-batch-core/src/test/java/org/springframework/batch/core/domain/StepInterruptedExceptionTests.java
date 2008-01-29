@@ -13,32 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.configuration;
+package org.springframework.batch.core.domain;
 
 import org.springframework.batch.core.AbstractExceptionTests;
-import org.springframework.batch.core.domain.NoSuchJobException;
+import org.springframework.batch.core.domain.StepInterruptedException;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
-public class NoSuchJobExceptionTests extends AbstractExceptionTests {
+public class StepInterruptedExceptionTests extends AbstractExceptionTests {
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
 	public Exception getException(String msg) throws Exception {
-		return new NoSuchJobException(msg);
+		return new StepInterruptedException(msg);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String,
-	 * java.lang.Throwable)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String, java.lang.Throwable)
 	 */
 	public Exception getException(String msg, Throwable t) throws Exception {
-		return new NoSuchJobException(msg, t);
+		return new RuntimeException(msg, t);
 	}
 
 }

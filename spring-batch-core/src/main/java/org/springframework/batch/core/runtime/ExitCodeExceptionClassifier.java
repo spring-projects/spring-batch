@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.executor;
+package org.springframework.batch.core.runtime;
 
 import org.springframework.batch.common.ExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;

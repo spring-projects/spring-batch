@@ -122,7 +122,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		StepExecution stepExecution = new StepExecution(step,
 				jobExecutionContext);
 
-		stepExecutor.process(stepConfiguration, stepExecution);
+		stepExecutor.process(stepExecution);
 		assertEquals(1, processed.size());
 		assertEquals(1, stepExecution.getTaskCount().intValue());
 	}
@@ -169,7 +169,7 @@ public class SimpleStepExecutorTests extends TestCase {
 			}
 		});
 
-		stepExecutor.process(stepConfiguration, stepExecution);
+		stepExecutor.process(stepExecution);
 		assertEquals(1, processed.size());
 
 	}
@@ -197,7 +197,7 @@ public class SimpleStepExecutorTests extends TestCase {
 			}
 		});
 
-		stepExecutor.process(stepConfiguration, stepExecution);
+		stepExecutor.process(stepExecution);
 		assertEquals(1, processed.size());
 
 	}
@@ -212,7 +212,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		StepExecution stepExecution = new StepExecution(step,
 				jobExecutionContext);
 
-		stepExecutor.process(stepConfiguration, stepExecution);
+		stepExecutor.process(stepExecution);
 		assertEquals(1, processed.size());
 	}
 
@@ -240,7 +240,7 @@ public class SimpleStepExecutorTests extends TestCase {
 				jobExecutionContext);
 
 		try {
-			stepExecutor.process(stepConfiguration, stepExecution);
+			stepExecutor.process(stepExecution);
 		}
 		catch (Exception ex) {
 			assertEquals(stepExecution.getRollbackCount(), new Integer(1));
@@ -272,7 +272,7 @@ public class SimpleStepExecutorTests extends TestCase {
 				jobExecutionContext);
 
 		try {
-			stepExecutor.process(stepConfiguration, stepExecution);
+			stepExecutor.process(stepExecution);
 		}
 		catch (Exception ex) {
 			ExitStatus status = stepExecution.getExitStatus();
@@ -294,7 +294,7 @@ public class SimpleStepExecutorTests extends TestCase {
 				jobExecutionContext);
 
 		try {
-			stepExecutor.process(stepConfiguration, stepExecution);
+			stepExecutor.process(stepExecution);
 		}
 		catch (Throwable t) {
 			fail();
@@ -319,7 +319,7 @@ public class SimpleStepExecutorTests extends TestCase {
 				jobExecutionContext);
 
 		try {
-			stepExecutor.process(stepConfiguration, stepExecution);
+			stepExecutor.process(stepExecution);
 		}
 		catch (Throwable t) {
 			fail();
@@ -344,7 +344,7 @@ public class SimpleStepExecutorTests extends TestCase {
 				jobExecutionContext);
 
 		try {
-			stepExecutor.process(stepConfiguration, stepExecution);
+			stepExecutor.process(stepExecution);
 		}
 		catch (Throwable t) {
 			fail();
@@ -371,7 +371,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
 		try {
-			stepExecutor.process(stepConfiguration, stepExecution);
+			stepExecutor.process(stepExecution);
 		}
 		catch (Throwable t) {
 			fail();
@@ -442,7 +442,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		});
 
 		try {
-			stepExecutor.process(stepConfiguration, stepExecution);
+			stepExecutor.process(stepExecution);
 		}
 		catch (Throwable t) {
 			fail();

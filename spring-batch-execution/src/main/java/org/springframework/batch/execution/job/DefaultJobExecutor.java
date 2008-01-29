@@ -24,15 +24,15 @@ import org.springframework.batch.common.ExceptionClassifier;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobExecutor;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepExecutor;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
-import org.springframework.batch.core.executor.JobExecutor;
-import org.springframework.batch.core.executor.StepExecutor;
-import org.springframework.batch.core.executor.StepInterruptedException;
+import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
 import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -54,7 +54,7 @@ public class DefaultJobExecutor implements JobExecutor {
 	 * Run the specified job by looping through the steps and delegating to the
 	 * {@link StepExecutor}.
 	 * 
-	 * @see org.springframework.batch.core.executor.JobExecutor#run(org.springframework.batch.core.domain.Job,
+	 * @see org.springframework.batch.core.domain.JobExecutor#run(org.springframework.batch.core.domain.Job,
 	 *      org.springframework.batch.core.domain.JobExecution)
 	 */
 	public ExitStatus run(Job job, JobExecution execution)
@@ -85,8 +85,7 @@ public class DefaultJobExecutor implements JobExecutor {
 					updateStatus(execution, BatchStatus.STARTED);
 					StepExecutor stepExecutor = step.createStepExecutor();
 					StepExecution stepExecution = execution.createStepExecution(stepInstance);
-					status = stepExecutor.process(step,
-							stepExecution);
+					status = stepExecutor.process(stepExecution);
 				}
 			}
 			

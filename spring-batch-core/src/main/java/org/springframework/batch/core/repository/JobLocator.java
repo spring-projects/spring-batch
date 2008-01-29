@@ -13,30 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core.repository;
+
+import org.springframework.batch.core.domain.Job;
 
 /**
- * Base class for checked exceptions related to {@link Job}
- * creation, registration or use.
+ * A runtime service locator interface for retrieving job configurations by
+ * <code>name</code>.
  * 
  * @author Dave Syer
  * 
  */
-public class JobException extends Exception {
+public interface JobLocator {
 
 	/**
-	 * Create an exception with the given message.
+	 * Locates a {@link Job} at runtime.
+	 * 
+	 * @param name the name of the {@link Job} which should be
+	 * unique
+	 * @return a {@link Job} identified by the given name
+	 * 
+	 * @throws NoSuchJobException if the required configuratio can
+	 * not be found.
 	 */
-	public JobException(String msg) {
-		super(msg);
-	}
-
-	/**
-	 * @param msg The message to send to caller
-	 * @param e the cause of the exception
-	 */
-	public JobException(String msg, Throwable e) {
-		super(msg, e);
-	}
-
+	Job getJob(String name) throws NoSuchJobException;
 }

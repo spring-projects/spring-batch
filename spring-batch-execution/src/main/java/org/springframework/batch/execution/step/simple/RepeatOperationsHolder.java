@@ -16,7 +16,7 @@
 package org.springframework.batch.execution.step.simple;
 
 import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.executor.StepExecutor;
+import org.springframework.batch.core.domain.StepExecutor;
 import org.springframework.batch.repeat.RepeatOperations;
 
 /**

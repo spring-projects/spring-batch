@@ -22,11 +22,11 @@ import java.util.Properties;
 
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobLocator;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.NoSuchJobException;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobLocator;
+import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.support.PropertiesConverter;

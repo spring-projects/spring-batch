@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.ListableJobRegistry;
-import org.springframework.batch.core.domain.NoSuchJobException;
+import org.springframework.batch.core.repository.ListableJobRegistry;
+import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyAccessorUtils;

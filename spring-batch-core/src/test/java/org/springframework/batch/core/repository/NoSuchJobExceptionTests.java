@@ -15,27 +15,30 @@
  */
 package org.springframework.batch.core.repository;
 
-import org.springframework.batch.core.domain.JobExecutionException;
+import org.springframework.batch.core.AbstractExceptionTests;
+import org.springframework.batch.core.repository.NoSuchJobException;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
-public class JobExecutionAlreadyRunningException extends JobExecutionException {
+public class NoSuchJobExceptionTests extends AbstractExceptionTests {
 
-	/**
-	 * @param msg
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
-	public JobExecutionAlreadyRunningException(String msg) {
-		super(msg);
+	public Exception getException(String msg) throws Exception {
+		return new NoSuchJobException(msg);
 	}
 
-	/**
-	 * @param msg
-	 * @param cause
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String,
+	 * java.lang.Throwable)
 	 */
-	public JobExecutionAlreadyRunningException(String msg, Throwable cause) {
-		super(msg, cause);
+	public Exception getException(String msg, Throwable t) throws Exception {
+		return new NoSuchJobException(msg, t);
 	}
 
 }

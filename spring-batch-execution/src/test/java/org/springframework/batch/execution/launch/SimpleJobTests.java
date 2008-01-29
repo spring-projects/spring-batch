@@ -35,7 +35,6 @@ import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.step.simple.AbstractStep;
 import org.springframework.batch.execution.step.simple.RepeatOperationsStep;
 import org.springframework.batch.execution.step.simple.SimpleStep;
-import org.springframework.batch.execution.step.simple.SimpleStepExecutor;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
@@ -66,12 +65,9 @@ public class SimpleJobTests extends TestCase {
 
 	private DefaultJobExecutor jobExecutor = new DefaultJobExecutor();;
 
-	private SimpleStepExecutor stepLifecycle = new SimpleStepExecutor();
-
 	protected void setUp() throws Exception {
 		super.setUp();
 		jobExecutor.setJobRepository(repository);
-		stepLifecycle.setRepository(repository);
 	}
 
 	private Tasklet getTasklet(String arg) throws Exception {

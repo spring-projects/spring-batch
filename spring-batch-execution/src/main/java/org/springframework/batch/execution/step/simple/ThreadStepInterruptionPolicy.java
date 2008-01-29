@@ -16,7 +16,7 @@
 
 package org.springframework.batch.execution.step.simple;
 
-import org.springframework.batch.core.executor.StepInterruptedException;
+import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**

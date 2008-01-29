@@ -26,9 +26,9 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepExecutor;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.executor.StepExecutor;
-import org.springframework.batch.core.executor.StepInterruptedException;
+import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
@@ -90,7 +90,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		Thread processingThread = new Thread() {
 			public void run() {
 				try {
-					executor.process(stepConfiguration, stepExecution);
+					executor.process(stepExecution);
 				}
 				catch (StepInterruptedException e) {
 					// do nothing...

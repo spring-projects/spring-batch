@@ -28,11 +28,11 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepExecutor;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
-import org.springframework.batch.core.executor.StepExecutor;
-import org.springframework.batch.core.executor.StepInterruptedException;
+import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
@@ -61,8 +61,7 @@ public class DefaultJobExecutorTests extends TestCase {
 	private List list = new ArrayList();
 
 	StepExecutor defaultStepLifecycle = new StubStepExecutor() {
-		public ExitStatus process(Step configuration,
-				StepExecution stepExecution) throws StepInterruptedException,
+		public ExitStatus process(StepExecution stepExecution) throws StepInterruptedException,
 				BatchCriticalException {
 			list.add("default");
 			return ExitStatus.FINISHED;
@@ -70,8 +69,7 @@ public class DefaultJobExecutorTests extends TestCase {
 	};
 
 	StepExecutor configurationStepLifecycle = new StubStepExecutor() {
-		public ExitStatus process(Step configuration,
-				StepExecution stepExecution) throws StepInterruptedException,
+		public ExitStatus process(StepExecution stepExecution) throws StepInterruptedException,
 				BatchCriticalException {
 			list.add("special");
 			return ExitStatus.FINISHED;
@@ -193,8 +191,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		final StepInterruptedException exception = new StepInterruptedException(
 				"Interrupt!");
 		defaultStepLifecycle = new StubStepExecutor() {
-			public ExitStatus process(Step configuration,
-					StepExecution stepExecution)
+			public ExitStatus process(StepExecution stepExecution)
 					throws StepInterruptedException, BatchCriticalException {
 				throw exception;
 			}
@@ -214,8 +211,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		stepConfiguration2.setStartLimit(5);
 		final RuntimeException exception = new RuntimeException("Foo!");
 		defaultStepLifecycle = new StubStepExecutor() {
-			public ExitStatus process(Step configuration,
-					StepExecution stepExecution)
+			public ExitStatus process(StepExecution stepExecution)
 					throws StepInterruptedException, BatchCriticalException {
 				throw exception;
 			}
@@ -289,8 +285,7 @@ public class DefaultJobExecutorTests extends TestCase {
 		public void applyConfiguration(Step configuration) {
 		}
 
-		public ExitStatus process(Step configuration,
-				StepExecution stepExecution) throws StepInterruptedException,
+		public ExitStatus process(StepExecution stepExecution) throws StepInterruptedException,
 				BatchCriticalException {
 			return null;
 		}

@@ -82,7 +82,7 @@ public class RepeatOperationsStepTests extends TestCase {
 				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
 				new Long(12)));
 		try {
-			executor.process(configuration, stepExecution);
+			executor.process(stepExecution);
 			fail("Expected RuntimeException");
 		} catch (NullPointerException e) {
 			// expected
@@ -122,7 +122,7 @@ public class RepeatOperationsStepTests extends TestCase {
 		StepExecution stepExecution = new StepExecution(new StepInstance(
 				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
 				new Long(12)));
-		executor.process(configuration, stepExecution);
+		executor.process(stepExecution);
 		assertEquals(2, list.size());
 		assertEquals(1, steps.size());
 	}

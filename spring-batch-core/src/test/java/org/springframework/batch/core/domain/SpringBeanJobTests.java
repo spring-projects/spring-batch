@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.configuration;
+package org.springframework.batch.core.domain;
 
 import junit.framework.TestCase;
 

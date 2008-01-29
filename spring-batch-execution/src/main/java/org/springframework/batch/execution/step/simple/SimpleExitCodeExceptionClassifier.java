@@ -18,8 +18,8 @@ package org.springframework.batch.execution.step.simple;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.springframework.batch.core.executor.ExitCodeExceptionClassifier;
-import org.springframework.batch.core.executor.StepInterruptedException;
+import org.springframework.batch.core.domain.StepInterruptedException;
+import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**

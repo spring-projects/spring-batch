@@ -19,10 +19,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.springframework.batch.core.domain.DuplicateJobException;
 import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobLocator;
-import org.springframework.batch.core.domain.JobRegistry;
+import org.springframework.batch.core.repository.DuplicateJobException;
+import org.springframework.batch.core.repository.JobLocator;
+import org.springframework.batch.core.repository.JobRegistry;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.DisposableBean;

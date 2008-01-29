@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.domain;
 
-import org.springframework.batch.core.executor.StepExecutor;
 
 /**
  * Batch domain interface representing the configuration of a step. As with the

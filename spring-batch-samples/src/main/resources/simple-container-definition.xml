@@ -38,21 +38,15 @@
 
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
-			<tx:method name="*Create*" propagation="REQUIRES_NEW" isolation="SERIALIZABLE"/>
-			<tx:method name="*"/>
+			<tx:method name="*Create*" propagation="REQUIRES_NEW"
+				isolation="SERIALIZABLE" />
+			<tx:method name="*" />
 		</tx:attributes>
 	</tx:advice>
 
 	<bean id="jobExecutor"
 		class="org.springframework.batch.execution.job.DefaultJobExecutor">
 		<property name="jobRepository" ref="jobRepository" />
-	</bean>
-
-	<bean id="stepExecutor"
-		class="org.springframework.batch.execution.step.simple.SimpleStepExecutor"
-		scope="prototype">
-		<property name="transactionManager" ref="transactionManager" />
-		<property name="repository" ref="jobRepository" />
 	</bean>
 
 	<bean id="jobRepository"
@@ -79,10 +73,10 @@
 	</bean>
 
 	<bean id="mapJobDao" lazy-init="true"
-		class="org.springframework.batch.execution.repository.dao.MapJobDao"/>
+		class="org.springframework.batch.execution.repository.dao.MapJobDao" />
 
 	<bean id="mapStepDao" lazy-init="true"
-		class="org.springframework.batch.execution.repository.dao.MapStepDao"/>
+		class="org.springframework.batch.execution.repository.dao.MapStepDao" />
 
 	<bean id="jdbcTemplate"
 		class="org.springframework.jdbc.core.JdbcTemplate">
@@ -90,18 +84,20 @@
 	</bean>
 
 	<bean id="simpleJob"
-		class="org.springframework.batch.core.domain.Job"
-		abstract="true">
+		class="org.springframework.batch.core.domain.Job" abstract="true">
 		<property name="restartable" value="true" />
 	</bean>
 
-	<bean id="simpleStep"
-		class="org.springframework.batch.execution.step.simple.SimpleStep"
-		abstract="true">
+	<bean id="abstractStep" abstract="true">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="transactionManager" ref="transactionManager" />
 		<property name="allowStartIfComplete" value="true" />
 		<property name="saveRestartData" value="false" />
-		<property name="jobRepository" ref="jobRepository"/>
-		<property name="transactionManager" ref="transactionManager"/>
+	</bean>
+
+	<bean id="simpleStep" parent="abstractStep"
+		class="org.springframework.batch.execution.step.simple.SimpleStep"
+		abstract="true">
 		<property name="exceptionHandler">
 			<bean
 				class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler">
@@ -112,13 +108,13 @@
 		<property name="commitInterval" value="1" />
 	</bean>
 
-	<bean id="repeatOperationsStep"
+	<bean id="repeatOperationsStep" parent="abstractStep"
 		class="org.springframework.batch.execution.step.simple.RepeatOperationsStep"
 		abstract="true">
 		<property name="allowStartIfComplete" value="true" />
 		<property name="saveRestartData" value="false" />
-		<property name="jobRepository" ref="jobRepository"/>
-		<property name="transactionManager" ref="transactionManager"/>
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="transactionManager" ref="transactionManager" />
 	</bean>
 
 	<bean id="customEditorConfigurer"

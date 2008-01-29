@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.executor;
+package org.springframework.batch.core.domain;
 
 import org.springframework.batch.io.exception.BatchCriticalException;
 

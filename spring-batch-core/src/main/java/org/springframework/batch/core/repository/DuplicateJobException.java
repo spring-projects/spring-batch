@@ -13,28 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.executor;
+package org.springframework.batch.core.repository;
 
-import org.springframework.batch.core.AbstractExceptionTests;
+import org.springframework.batch.core.domain.Job;
 
 /**
+ * Checked exception that indicates a name clash when registering
+ * {@link Job} instances.
+ * 
  * @author Dave Syer
- *
+ * 
  */
-public class JobExecutionExceptionTests extends AbstractExceptionTests {
+public class DuplicateJobException extends JobException {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
+	/**
+	 * Create an exception with the given message.
 	 */
-	public Exception getException(String msg) throws Exception {
-		return new JobExecutionException(msg);
+	public DuplicateJobException(String msg) {
+		super(msg);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String, java.lang.Throwable)
+	/**
+	 * @param msg The message to send to caller
+	 * @param e the cause of the exception
 	 */
-	public Exception getException(String msg, Throwable t) throws Exception {
-		return new JobExecutionException(msg, t);
+	public DuplicateJobException(String msg, Throwable e) {
+		super(msg, e);
 	}
 
 }

@@ -16,8 +16,8 @@
 package org.springframework.batch.execution.step.simple;
 
 import org.springframework.batch.core.domain.Step;
+import org.springframework.batch.core.domain.StepExecutor;
 import org.springframework.batch.core.domain.StepSupport;
-import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
@@ -113,7 +113,7 @@ public abstract class AbstractStep extends StepSupport {
 	 */
 	public StepExecutor createStepExecutor() {
 		assertMandatoryProperties();
-		SimpleStepExecutor executor = new SimpleStepExecutor();
+		SimpleStepExecutor executor = new SimpleStepExecutor(this);
 		executor.setRepository(jobRepository);
 		executor.applyConfiguration(this);
 		executor.setTasklet(tasklet);

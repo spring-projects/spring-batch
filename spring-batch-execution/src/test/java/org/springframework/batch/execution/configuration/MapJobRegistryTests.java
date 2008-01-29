@@ -19,9 +19,9 @@ import java.util.Collection;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.DuplicateJobException;
 import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.NoSuchJobException;
+import org.springframework.batch.core.repository.DuplicateJobException;
+import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.execution.configuration.MapJobRegistry;
 
 /**
