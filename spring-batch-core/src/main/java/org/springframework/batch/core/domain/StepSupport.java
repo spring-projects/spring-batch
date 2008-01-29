@@ -16,7 +16,6 @@
 package org.springframework.batch.core.domain;
 
 import org.springframework.batch.core.executor.StepExecutor;
-import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**
@@ -32,8 +31,6 @@ public class StepSupport implements Step, BeanNameAware {
 	private String name;
 
 	private int startLimit = Integer.MAX_VALUE;
-
-	private Tasklet tasklet;
 
 	private boolean allowStartIfComplete;
 
@@ -104,24 +101,6 @@ public class StepSupport implements Step, BeanNameAware {
 	 */
 	public void setStartLimit(int startLimit) {
 		this.startLimit = startLimit;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.core.configuration.StepConfiguration#getTasklet()
-	 */
-	public Tasklet getTasklet() {
-		return this.tasklet;
-	}
-
-	/**
-	 * Public setter for the tasklet.
-	 * 
-	 * @param tasklet the tasklet to set
-	 */
-	public void setTasklet(Tasklet tasklet) {
-		this.tasklet = tasklet;
 	}
 
 	/*

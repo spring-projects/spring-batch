@@ -16,7 +16,6 @@
 package org.springframework.batch.core.domain;
 
 import org.springframework.batch.core.executor.StepExecutor;
-import org.springframework.batch.core.tasklet.Tasklet;
 
 /**
  * Batch domain interface representing the configuration of a step. As with the
@@ -34,11 +33,6 @@ public interface Step {
 	 * @return the name of this step configuration.
 	 */
 	String getName();
-
-	/**
-	 * @return the {@link Tasklet} instance to execute for each item processed.
-	 */
-	Tasklet getTasklet();
 
 	/**
 	 * @return true if a step that is already marked as complete can be started

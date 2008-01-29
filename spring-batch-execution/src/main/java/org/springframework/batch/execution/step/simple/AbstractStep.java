@@ -19,6 +19,7 @@ import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
@@ -36,9 +37,11 @@ public abstract class AbstractStep extends StepSupport {
 
 	private ExceptionHandler exceptionHandler;
 
-	protected JobRepository jobRepository;
+	private JobRepository jobRepository;
 
-	protected PlatformTransactionManager transactionManager;
+	private PlatformTransactionManager transactionManager;
+
+	private Tasklet tasklet;
 
 	/**
 	 * Default constructor.
@@ -113,9 +116,18 @@ public abstract class AbstractStep extends StepSupport {
 		SimpleStepExecutor executor = new SimpleStepExecutor();
 		executor.setRepository(jobRepository);
 		executor.applyConfiguration(this);
-		executor.setTasklet(getTasklet());
+		executor.setTasklet(tasklet);
 		executor.setTransactionManager(transactionManager);
 		return executor;
+	}
+
+	/**
+	 * Public setter for the tasklet.
+	 * 
+	 * @param tasklet the tasklet to set
+	 */
+	public void setTasklet(Tasklet tasklet) {
+		this.tasklet = tasklet;
 	}
 
 }

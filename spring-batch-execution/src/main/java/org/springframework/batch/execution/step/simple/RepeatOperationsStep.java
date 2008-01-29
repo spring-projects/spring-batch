@@ -19,7 +19,6 @@ package org.springframework.batch.execution.step.simple;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.executor.StepExecutor;
 import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.util.Assert;
 
 /**
  * {@link Step} implementation that allows full step of the
@@ -80,7 +79,7 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 	 * @see org.springframework.batch.core.domain.StepSupport#createStepExecutor()
 	 */
 	public StepExecutor createStepExecutor() {
-		Assert.notNull(jobRepository, "JobRepository is mandatory");
+		assertMandatoryProperties();
 		SimpleStepExecutor executor = (SimpleStepExecutor) super.createStepExecutor();
 		if (stepOperations != null) {
 			executor.setStepOperations(stepOperations);

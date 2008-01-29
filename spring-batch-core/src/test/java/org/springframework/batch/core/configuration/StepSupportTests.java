@@ -18,8 +18,6 @@ package org.springframework.batch.core.configuration;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.StepSupport;
-import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Dave Syer
@@ -54,26 +52,25 @@ public class StepSupportTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepSupport#getTasklet()}.
-	 */
-	public void testGetTasklet() {
-		assertEquals(null, configuration.getTasklet());
-		Tasklet tasklet = new Tasklet() {
-			public ExitStatus execute() throws Exception {
-				return ExitStatus.FINISHED;
-			}
-		};
-		configuration.setTasklet(tasklet);
-		assertEquals(tasklet, configuration.getTasklet());
-	}
-
-	/**
 	 * Test method for {@link org.springframework.batch.core.domain.StepSupport#isAllowStartIfComplete()}.
 	 */
 	public void testShouldAllowStartIfComplete() {
 		assertEquals(false, configuration.isAllowStartIfComplete());
 		configuration.setAllowStartIfComplete(true);
 		assertEquals(true, configuration.isAllowStartIfComplete());
+	}
+
+	public void testUnsuccessfulWrongConfiguration() throws Exception {
+		try {
+			new StepSupport().createStepExecutor();
+			fail("Expected UnsupportedOperationException");
+		} catch (UnsupportedOperationException e) {
+			// expected
+			assertTrue(
+					"Error message does not contain SimpleStep: "
+							+ e.getMessage(), e.getMessage().indexOf(
+							"SimpleStep") >= 0);
+		}
 	}
 
 }

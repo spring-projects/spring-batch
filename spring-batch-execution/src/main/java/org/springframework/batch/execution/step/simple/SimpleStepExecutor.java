@@ -438,43 +438,27 @@ public class SimpleStepExecutor implements StepExecutor {
 	 * 
 	 * @param step a step
 	 */
-	public void applyConfiguration(Step step) {
+	void applyConfiguration(AbstractStep step) {
 
-		if (step instanceof RepeatOperationsHolder) {
-
-			RepeatOperationsHolder holder = (RepeatOperationsHolder) step;
-			RepeatOperations chunkOperations = holder.getChunkOperations();
-			RepeatOperations stepOperations = holder.getStepOperations();
-
-			if (chunkOperations != null) {
-				setChunkOperations(chunkOperations);
-			}
-			if (stepOperations != null) {
-				setStepOperations(stepOperations);
-			}
-
-		}
-		else if (step instanceof AbstractStep) {
-
-			SimpleStep simpleConfiguation = (SimpleStep) step;
+		if (step instanceof SimpleStep) {
+			SimpleStep simple = (SimpleStep) step;
 			if (this.chunkOperations instanceof RepeatTemplate) {
 				RepeatTemplate template = (RepeatTemplate) this.chunkOperations;
-				template.setCompletionPolicy(new SimpleCompletionPolicy(simpleConfiguation.getCommitInterval()));
+				template.setCompletionPolicy(new SimpleCompletionPolicy(simple.getCommitInterval()));
 			}
+		}
 
-			ExceptionHandler exceptionHandler = simpleConfiguation.getExceptionHandler();
+		ExceptionHandler exceptionHandler = step.getExceptionHandler();
 
-			if (simpleConfiguation.getSkipLimit() > 0 && exceptionHandler == null) {
-				SimpleLimitExceptionHandler handler = new SimpleLimitExceptionHandler();
-				handler.setLimit(simpleConfiguation.getSkipLimit());
-				exceptionHandler = handler;
-			}
+		if (step.getSkipLimit() > 0 && exceptionHandler == null) {
+			SimpleLimitExceptionHandler handler = new SimpleLimitExceptionHandler();
+			handler.setLimit(step.getSkipLimit());
+			exceptionHandler = handler;
+		}
 
-			if (this.stepOperations instanceof RepeatTemplate && exceptionHandler != null) {
-				RepeatTemplate template = (RepeatTemplate) this.stepOperations;
-				template.setExceptionHandler(exceptionHandler);
-			}
-
+		if (this.stepOperations instanceof RepeatTemplate && exceptionHandler != null) {
+			RepeatTemplate template = (RepeatTemplate) this.stepOperations;
+			template.setExceptionHandler(exceptionHandler);
 		}
 
 	}

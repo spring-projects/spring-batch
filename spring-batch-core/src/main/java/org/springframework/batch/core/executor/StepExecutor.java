@@ -63,11 +63,4 @@ public interface StepExecutor {
 			StepExecution stepExecution) throws StepInterruptedException,
 			BatchCriticalException;
 
-	/**
-	 * Apply the configuration by inspecting it to see if it has any relevant
-	 * policy information.  Should be called before any calls to process.
-	 * 
-	 * @param configuration
-	 */
-	void applyConfiguration(Step configuration);
 }
