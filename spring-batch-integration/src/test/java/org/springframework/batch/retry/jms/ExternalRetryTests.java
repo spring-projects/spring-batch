@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.springframework.batch.item.AbstractItemReaderRecoverer;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
 import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
@@ -104,7 +105,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 		retryTemplate.setRetryPolicy(new ItemReaderRetryPolicy());
 
-		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new ItemWriter() {
+		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(final Object text) {
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
 						Integer.valueOf(list.size()), text });
@@ -169,7 +170,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 		retryTemplate.setRetryPolicy(new ItemReaderRetryPolicy());
 
-		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new ItemWriter() {
+		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(final Object text) {
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
 						Integer.valueOf(list.size()), text });

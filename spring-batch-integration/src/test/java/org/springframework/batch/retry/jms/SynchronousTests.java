@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.JmsItemReader;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
@@ -147,7 +148,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		provider.setJmsTemplate(jmsTemplate);
 		jmsTemplate.setDefaultDestinationName("queue");
 
-		retryTemplate.execute(new ItemReaderRetryCallback(provider, new ItemWriter() {
+		retryTemplate.execute(new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(final Object text) {
 
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);

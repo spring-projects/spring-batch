@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.springframework.batch.item.AbstractItemReaderRecoverer;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -114,7 +115,7 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 
 		retryTemplate.setRetryPolicy(new ItemReaderRetryPolicy(new SimpleRetryPolicy(1)));
 
-		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new ItemWriter() {
+		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(final Object text) {
 				// No need for transaction here: the whole batch will roll
 				// back. When it comes back for recovery this code is not
