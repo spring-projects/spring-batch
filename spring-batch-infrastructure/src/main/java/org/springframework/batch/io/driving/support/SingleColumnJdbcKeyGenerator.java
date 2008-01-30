@@ -21,8 +21,8 @@ import java.util.Properties;
 
 import org.apache.commons.lang.ClassUtils;
 import org.springframework.batch.io.driving.KeyGenerator;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
@@ -94,34 +94,34 @@ public class SingleColumnJdbcKeyGenerator implements KeyGenerator {
 	 * @see KeyGenerator#getKeyAsRestartData()
 	 * @throws IllegalArgumentException if key is null.
 	 */
-	public RestartData getKeyAsRestartData(Object key) {
+	public StreamContext getKeyAsRestartData(Object key) {
 		
 		Assert.notNull(key, "The key must not be null.");
 		
 		Properties props = new Properties();
 		props.setProperty(RESTART_KEY, key.toString());
-		return new GenericRestartData(props);
+		return new GenericStreamContext(props);
 	}
 
 	/**
-	 * Return the remaining to be processed for the provided {@link RestartData}.  
+	 * Return the remaining to be processed for the provided {@link StreamContext}.  
 	 * The RestartData attempting to be restored from must have been obtained from the 
 	 * <strong>same KeyGenerationStrategy as the one
 	 * being restored from</strong> otherwise it is invalid.
 	 *
-	 * @param RestartData obtained by calling getRestartData during a previous
+	 * @param StreamContext obtained by calling getRestartData during a previous
 	 * run.
 	 * @throws IllegalStateException if restart sql statement is null.
 	 * @throws IllegalArgumentException if restart data is null.
-	 * @see KeyGenerator#restoreKeys(org.springframework.batch.restart.RestartData)
+	 * @see KeyGenerator#restoreKeys(org.springframework.batch.stream.StreamContext)
 	 */
-	public List restoreKeys(RestartData restartData) {
+	public List restoreKeys(StreamContext streamContext) {
 
-		Assert.notNull(restartData, "The restart data must not be null.");
+		Assert.notNull(streamContext, "The restart data must not be null.");
 		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty" +
 		" in order to restart.");
 
-		String lastProcessedKey = restartData.getProperties().getProperty(RESTART_KEY);
+		String lastProcessedKey = streamContext.getProperties().getProperty(RESTART_KEY);
 
 		if (lastProcessedKey != null) {
 			return jdbcTemplate.query(restartSql, new Object[] { lastProcessedKey }, keyMapper);

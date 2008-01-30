@@ -4,20 +4,20 @@ import java.util.Properties;
 
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Simple wrapper around {@link ItemWriter} providing {@link Restartable} where
+ * Simple wrapper around {@link ItemWriter} providing {@link ItemStream} where
  * the {@link ItemWriter} does.  To make sure 
  * 
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class DelegatingItemWriter implements ItemWriter, Restartable, Skippable, InitializingBean {
+public class DelegatingItemWriter implements ItemWriter, ItemStream, Skippable, InitializingBean {
 
 	private ItemWriter writer;
 
@@ -50,29 +50,29 @@ public class DelegatingItemWriter implements ItemWriter, Restartable, Skippable,
 	}
 
 	/**
-	 * @see Restartable#getRestartData()
+	 * @see ItemStream#getRestartData()
 	 */
-	public RestartData getRestartData() {
+	public StreamContext getRestartData() {
 
 		Assert.state(writer != null, "Source must not be null.");
 
-		if (writer instanceof Restartable) {
-			return ((Restartable) writer).getRestartData();
+		if (writer instanceof ItemStream) {
+			return ((ItemStream) writer).getRestartData();
 		}
 		else {
-			return new GenericRestartData(new Properties());
+			return new GenericStreamContext(new Properties());
 		}
 	}
 
 	/**
-	 * @see Restartable#restoreFrom(RestartData)
+	 * @see ItemStream#restoreFrom(StreamContext)
 	 */
-	public void restoreFrom(RestartData data) {
+	public void restoreFrom(StreamContext data) {
 
 		Assert.state(writer != null, "Source must not be null.");
 
-		if (writer instanceof Restartable) {
-			((Restartable) writer).restoreFrom(data);
+		if (writer instanceof ItemStream) {
+			((ItemStream) writer).restoreFrom(data);
 		}
 
 	}

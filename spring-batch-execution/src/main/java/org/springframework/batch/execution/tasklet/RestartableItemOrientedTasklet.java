@@ -20,39 +20,39 @@ import java.util.Properties;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * An extension of {@link ItemOrientedTasklet} that delegates calls to
- * {@link Restartable} to the reader and writer.
+ * {@link ItemStream} to the reader and writer.
  * 
  * @see ItemReader
  * @see ItemWriter
- * @see Restartable
+ * @see ItemStream
  * 
  * @author Lucas Ward
  * @author Dave Syer
  * 
  */
-public class RestartableItemOrientedTasklet extends ItemOrientedTasklet implements Restartable {
+public class RestartableItemOrientedTasklet extends ItemOrientedTasklet implements ItemStream {
 
 	/**
-	 * @see Restartable#getRestartData()
+	 * @see ItemStream#getRestartData()
 	 */
-	public RestartData getRestartData() {
+	public StreamContext getRestartData() {
 
-		RestartData itemProviderRestartData = null;
-		RestartData itemProcessorRestartData = null;
+		StreamContext itemProviderRestartData = null;
+		StreamContext itemProcessorRestartData = null;
 
-		if (itemProvider instanceof Restartable) {
-			itemProviderRestartData = ((Restartable) itemProvider).getRestartData();
+		if (itemProvider instanceof ItemStream) {
+			itemProviderRestartData = ((ItemStream) itemProvider).getRestartData();
 		}
 
-		if (itemWriter instanceof Restartable) {
-			itemProcessorRestartData = ((Restartable) itemWriter).getRestartData();
+		if (itemWriter instanceof ItemStream) {
+			itemProcessorRestartData = ((ItemStream) itemWriter).getRestartData();
 		}
 
 		RestartableItemOrientedTaskletRestartData restartData = new RestartableItemOrientedTaskletRestartData(itemProviderRestartData, itemProcessorRestartData);
@@ -61,9 +61,9 @@ public class RestartableItemOrientedTasklet extends ItemOrientedTasklet implemen
 	}
 
 	/**
-	 * @see Restartable#restoreFrom(RestartData)
+	 * @see ItemStream#restoreFrom(StreamContext)
 	 */
-	public void restoreFrom(RestartData data) {
+	public void restoreFrom(StreamContext data) {
 		if (data == null || data.getProperties() == null)
 			return;
 
@@ -76,33 +76,33 @@ public class RestartableItemOrientedTasklet extends ItemOrientedTasklet implemen
 			moduleRestartData = new RestartableItemOrientedTaskletRestartData(data.getProperties());
 		}
 
-		if (itemProvider instanceof Restartable) {
-			((Restartable) itemProvider).restoreFrom(moduleRestartData.readerData);
+		if (itemProvider instanceof ItemStream) {
+			((ItemStream) itemProvider).restoreFrom(moduleRestartData.readerData);
 		}
-		if (itemWriter instanceof Restartable) {
-			((Restartable) itemWriter).restoreFrom(moduleRestartData.writerData);
+		if (itemWriter instanceof ItemStream) {
+			((ItemStream) itemWriter).restoreFrom(moduleRestartData.writerData);
 		}
 	}
 
-	private class RestartableItemOrientedTaskletRestartData implements RestartData {
+	private class RestartableItemOrientedTaskletRestartData implements StreamContext {
 
 		private static final String READER_KEY = "DATA_PROVIDER";
 
 		private static final String WRITER_KEY = "DATA_PROCESSOR";
 
-		private RestartData readerData;
+		private StreamContext readerData;
 
-		private RestartData writerData;
+		private StreamContext writerData;
 
-		public RestartableItemOrientedTaskletRestartData(RestartData providerData, RestartData writerData) {
+		public RestartableItemOrientedTaskletRestartData(StreamContext providerData, StreamContext writerData) {
 			this.readerData = providerData;
 			this.writerData = writerData;
 		}
 
 		public RestartableItemOrientedTaskletRestartData(Properties data) {
-			readerData = new GenericRestartData(PropertiesConverter
+			readerData = new GenericStreamContext(PropertiesConverter
 					.stringToProperties(data.getProperty(READER_KEY)));
-			writerData = new GenericRestartData(PropertiesConverter.stringToProperties(data
+			writerData = new GenericStreamContext(PropertiesConverter.stringToProperties(data
 					.getProperty(WRITER_KEY)));
 		}
 

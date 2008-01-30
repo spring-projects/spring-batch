@@ -31,8 +31,8 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.repository.dao.JdbcJobDao.JobExecutionRowMapper;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -161,7 +161,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 
 				StepInstance step = new StepInstance(new Long(rs.getLong(1)));
 				step.setStatus(BatchStatus.getStatus(rs.getString(2)));
-				step.setRestartData(new GenericRestartData(PropertiesConverter.stringToProperties(rs.getString(3))));
+				step.setRestartData(new GenericStreamContext(PropertiesConverter.stringToProperties(rs.getString(3))));
 				return step;
 			}
 
@@ -243,7 +243,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 				StepInstance step = new StepInstance(job, rs.getString(2), new Long(rs.getLong(1)));
 				String status = rs.getString(3);
 				step.setStatus(BatchStatus.getStatus(status));
-				step.setRestartData(new GenericRestartData(PropertiesConverter.stringToProperties(rs.getString(3))));
+				step.setRestartData(new GenericStreamContext(PropertiesConverter.stringToProperties(rs.getString(3))));
 				return step;
 			}
 		};
@@ -422,9 +422,9 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 		Assert.notNull(step.getId(), "Step Id cannot be null.");
 
 		Properties restartProps = null;
-		RestartData restartData = step.getRestartData();
-		if (restartData != null) {
-			restartProps = restartData.getProperties();
+		StreamContext streamContext = step.getRestartData();
+		if (streamContext != null) {
+			restartProps = streamContext.getProperties();
 		}
 
 		Object[] parameters = new Object[] { step.getStatus().toString(),

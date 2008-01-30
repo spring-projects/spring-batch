@@ -19,7 +19,7 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.restart.GenericRestartData;
+import org.springframework.batch.stream.GenericStreamContext;
 
 /**
  * @author Dave Syer
@@ -51,7 +51,7 @@ public class StepInstanceTests extends TestCase {
 	public void testGetRestartData() {
 		assertNotNull(instance.getRestartData());
 		assertTrue(instance.getRestartData().getProperties().isEmpty());
-		instance.setRestartData(new GenericRestartData(new Properties() {{
+		instance.setRestartData(new GenericStreamContext(new Properties() {{
 			setProperty("foo", "bar");
 		}}));
 		assertEquals("bar", instance.getRestartData().getProperties().getProperty("foo"));

@@ -37,7 +37,7 @@ import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.restart.GenericRestartData;
+import org.springframework.batch.stream.GenericStreamContext;
 
 /*
  * Test SimpleJobRepository.  The majority of test cases are tested using EasyMock,
@@ -408,7 +408,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		databaseStep1.setRestartData(null);
 		stepDaoControl.setReturnValue(databaseStep1);
 		stepDao.createStep(databaseJob, "TestStep2");
-		databaseStep2.setRestartData(new GenericRestartData(null));
+		databaseStep2.setRestartData(new GenericStreamContext(null));
 		stepDaoControl.setReturnValue(databaseStep2);
 		jobDao.save(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher(){
@@ -443,7 +443,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		stepDao.getStepExecutionCount(databaseStep1);
 		stepDaoControl.setReturnValue(1);
 		stepDao.findStep(databaseJob, "TestStep2");
-		databaseStep2.setRestartData(new GenericRestartData(null));
+		databaseStep2.setRestartData(new GenericStreamContext(null));
 		stepDaoControl.setReturnValue(databaseStep2);
 		stepDao.getStepExecutionCount(databaseStep2);
 		stepDaoControl.setReturnValue(1);

@@ -25,10 +25,10 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.file.separator.LineReader;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 
@@ -42,7 +42,7 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
  * @author Tomas Slanina
  * @author Robert Kasanicky
  */
-public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implements Skippable, Restartable,
+public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implements Skippable, ItemStream,
 		StatisticsProvider {
 
 	private static Log log = LogFactory.getLog(DefaultFlatFileItemReader.class);
@@ -77,7 +77,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 *
 	 * @param restartData restartData information
 	 */
-	public void restoreFrom(RestartData data) {
+	public void restoreFrom(StreamContext data) {
 
 		if (data==null ||
 			data.getProperties() == null ||
@@ -104,8 +104,8 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * current Line Count which can be used to re initialise the batch job in
 	 * case of restart.
 	 */
-	public RestartData getRestartData() {
-		return new GenericRestartData(getStatistics());
+	public StreamContext getRestartData() {
+		return new GenericStreamContext(getStatistics());
 	}
 
 	/**

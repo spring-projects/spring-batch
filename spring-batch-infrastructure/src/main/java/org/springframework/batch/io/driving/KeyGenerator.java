@@ -2,7 +2,7 @@ package org.springframework.batch.io.driving;
 
 import java.util.List;
 
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.StreamContext;
 
 /**
  * Strategy interface used to generate keys in driving query input.
@@ -24,7 +24,7 @@ public interface KeyGenerator {
 	 * @return a list of keys.
 	 * @throws IllegalArgumentException is restartData is null.
 	 */
-	List restoreKeys(RestartData restartData);
+	List restoreKeys(StreamContext streamContext);
 	
 	/**
 	 * Return the provided key as restart data.
@@ -34,5 +34,5 @@ public interface KeyGenerator {
 	 * @throws IllegalArgumentException if key is null.
 	 * @throws IllegalArgumentException if key is an incompatible type.
 	 */
-	RestartData getKeyAsRestartData(Object key);
+	StreamContext getKeyAsRestartData(Object key);
 }

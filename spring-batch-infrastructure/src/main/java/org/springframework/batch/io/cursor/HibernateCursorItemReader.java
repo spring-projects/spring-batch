@@ -28,9 +28,9 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -57,7 +57,7 @@ import org.springframework.util.StringUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader extends AbstractItemReader implements ItemReader, Restartable,
+public class HibernateCursorItemReader extends AbstractItemReader implements ItemReader, ItemStream,
 		Skippable, InitializingBean, DisposableBean, ResourceLifecycle {
 
 	private static final String RESTART_DATA_ROW_NUMBER_KEY = ClassUtils
@@ -187,20 +187,20 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 	/**
 	 * @return the current row number wrapped as <code>RestartData</code>
 	 */
-	public RestartData getRestartData() {
+	public StreamContext getRestartData() {
 		Properties props = new Properties();
 		props.setProperty(RESTART_DATA_ROW_NUMBER_KEY, ""+currentProcessedRow);
 		String skipped = skippedRows.toString();
 		props.setProperty(SKIPPED_ROWS, skipped.substring(1,
 				skipped.length() - 1));
 
-		return new GenericRestartData(props);
+		return new GenericStreamContext(props);
 	}
 
 	/**
 	 * Sets the cursor to the received row number.
 	 */
-	public void restoreFrom(RestartData data) {
+	public void restoreFrom(StreamContext data) {
 		Assert
 				.state(!initialized,
 						"Cannot restore when already intialized.  Call close() first before restore()");

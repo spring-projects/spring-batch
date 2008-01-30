@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.core.CollectionFactory;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -38,9 +38,9 @@ public class ColumnMapRestartDataRowMapper extends ColumnMapRowMapper implements
 	
 	static final String KEY = ClassUtils.getQualifiedName(ColumnMapRestartDataRowMapper.class) + ".KEY.";
 	
-	public PreparedStatementSetter createSetter(RestartData restartData) {
+	public PreparedStatementSetter createSetter(StreamContext streamContext) {
 		
-		ColumnMapRestartData columnData = new ColumnMapRestartData(restartData.getProperties());
+		ColumnMapRestartData columnData = new ColumnMapRestartData(streamContext.getProperties());
 		
 		List columns = new ArrayList();
 		for (Iterator iterator = columnData.keys.values().iterator(); iterator.hasNext();) {
@@ -51,7 +51,7 @@ public class ColumnMapRestartDataRowMapper extends ColumnMapRowMapper implements
 		return new ArgPreparedStatementSetter(columns.toArray());
 	}
 
-	public RestartData createRestartData(Object key) {
+	public StreamContext createRestartData(Object key) {
 		
 		Assert.isInstanceOf(Map.class, key, "Key must be of type Map.");
 		Map keys = (Map)key;
@@ -60,7 +60,7 @@ public class ColumnMapRestartDataRowMapper extends ColumnMapRowMapper implements
 	}
 	
 	
-	private static class ColumnMapRestartData implements RestartData{
+	private static class ColumnMapRestartData implements StreamContext{
 
 		private final Map keys;
 		

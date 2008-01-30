@@ -6,9 +6,9 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.sample.domain.Foo;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -92,12 +92,12 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		RestartData restartData = getAsRestartable(source).getRestartData();
+		StreamContext streamContext = getAsRestartable(source).getRestartData();
 
 		// create new input source
 		source = createItemReader();
 
-		getAsRestartable(source).restoreFrom(restartData);
+		getAsRestartable(source).restoreFrom(streamContext);
 
 		Foo fooAfterRestart = (Foo) source.read();
 		assertEquals(3, fooAfterRestart.getValue());
@@ -114,7 +114,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		RestartData restartData = getAsRestartable(source).getRestartData();
+		StreamContext streamContext = getAsRestartable(source).getRestartData();
 
 		// create new input source
 		source = createItemReader();
@@ -123,7 +123,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 		assertEquals(1, foo.getValue());
 
 		try {
-			getAsRestartable(source).restoreFrom(restartData);
+			getAsRestartable(source).restoreFrom(streamContext);
 			fail();
 		}
 		catch (IllegalStateException ex) {
@@ -136,9 +136,9 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 	 * @throws Exception 
 	 */
 	public void testRestoreFromEmptyData() throws Exception {
-		RestartData restartData = new GenericRestartData(new Properties());
+		StreamContext streamContext = new GenericStreamContext(new Properties());
 		
-		getAsRestartable(source).restoreFrom(restartData);
+		getAsRestartable(source).restoreFrom(streamContext);
 		
 		Foo foo = (Foo) source.read();
 		assertEquals(1, foo.getValue());
@@ -217,12 +217,12 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 		
 		rollback();
 		
-		RestartData restartData = getAsRestartable(source).getRestartData();
+		StreamContext streamContext = getAsRestartable(source).getRestartData();
 
 		// create new input source
 		source = createItemReader();
 
-		getAsRestartable(source).restoreFrom(restartData);
+		getAsRestartable(source).restoreFrom(streamContext);
 
 		assertEquals(foo2, source.read());
 		Foo foo4 = (Foo) source.read();
@@ -245,8 +245,8 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 		return (Skippable) source;
 	}
 	
-	private Restartable getAsRestartable(ItemReader source) {
-		return (Restartable) source;
+	private ItemStream getAsRestartable(ItemReader source) {
+		return (ItemStream) source;
 	}
 
 	private InitializingBean getAsInitializingBean(ItemReader source) {

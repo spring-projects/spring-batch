@@ -5,8 +5,8 @@ import java.util.Properties;
 
 import org.springframework.batch.io.driving.DrivingQueryItemReader;
 import org.springframework.batch.io.driving.KeyGenerator;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 import org.springframework.util.Assert;
 
@@ -44,19 +44,19 @@ public class IbatisKeyGenerator implements KeyGenerator {
 	 *
 	 * @see org.springframework.batch.restart.Restartable#getRestartData()
 	 */
-	public RestartData getKeyAsRestartData(Object key) {
+	public StreamContext getKeyAsRestartData(Object key) {
 		Properties props = new Properties();
 		props.setProperty(RESTART_KEY, key.toString());
 
-		return new GenericRestartData(props);
+		return new GenericStreamContext(props);
 	}
 
 	/**
 	 * Restore the keys list given the provided restart data.
 	 *
-	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#restoreKeys(org.springframework.batch.restart.RestartData)
+	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#restoreKeys(org.springframework.batch.stream.StreamContext)
 	 */
-	public List restoreKeys(RestartData data) {
+	public List restoreKeys(StreamContext data) {
 
 		Properties props = data.getProperties();
 		Object key = props.getProperty(RESTART_KEY);

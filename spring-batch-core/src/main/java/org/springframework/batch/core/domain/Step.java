@@ -19,10 +19,9 @@ import org.springframework.batch.io.exception.BatchCriticalException;
 
 /**
  * Batch domain interface representing the configuration of a step. As with the
- * (@link Job), step configuration is meant to explicitly represent a the
- * configuration of a step by a developer. This allows for the separation of
- * what a developer configures from the myriad of concerns required for
- * executing a job.
+ * (@link Job), a {@link Step} is meant to explicitly represent a the
+ * configuration of a step by a developer, but also the ability to execute the
+ * step.
  * 
  * @author Dave Syer
  * 
@@ -30,7 +29,7 @@ import org.springframework.batch.io.exception.BatchCriticalException;
 public interface Step {
 
 	/**
-	 * @return the name of this step configuration.
+	 * @return the name of this step.
 	 */
 	String getName();
 

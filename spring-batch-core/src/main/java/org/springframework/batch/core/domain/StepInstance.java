@@ -18,8 +18,8 @@ package org.springframework.batch.core.domain;
 
 import java.util.Properties;
 
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.StreamContext;
 
 /**
  * <p>
@@ -52,7 +52,7 @@ public class StepInstance extends Entity {
 
 	private BatchStatus status;
 
-	private RestartData restartData = new GenericRestartData(new Properties());
+	private StreamContext streamContext = new GenericStreamContext(new Properties());
 
 	private int stepExecutionCount = 0;
 
@@ -87,12 +87,12 @@ public class StepInstance extends Entity {
 		this.stepExecutionCount = stepExecutionCount;
 	}
 
-	public RestartData getRestartData() {
-		return restartData;
+	public StreamContext getRestartData() {
+		return streamContext;
 	}
 
-	public void setRestartData(RestartData restartData) {
-		this.restartData = restartData;
+	public void setRestartData(StreamContext streamContext) {
+		this.streamContext = streamContext;
 	}
 
 	public BatchStatus getStatus() {

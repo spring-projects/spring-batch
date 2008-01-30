@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.restart;
+package org.springframework.batch.stream;
 
 import java.util.Properties;
 
-/**
- * Interface for representing data necessary to recover state after restart.
- */
-public interface RestartData {
+public class GenericStreamContext implements StreamContext {
 
-	Properties getProperties();
+	private Properties data;
+
+	public GenericStreamContext(Properties data){
+		this.data = data;
+	}
+
+	public Properties getProperties(){
+		return data;
+	}
+
 }

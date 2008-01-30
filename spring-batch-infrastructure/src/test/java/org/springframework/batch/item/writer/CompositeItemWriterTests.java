@@ -10,10 +10,10 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.writer.CompositeItemWriter;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 
 /**
  * Tests for {@link CompositeItemWriter}
@@ -75,7 +75,7 @@ public class CompositeItemWriterTests extends TestCase {
 		}};
 		itemProcessor.setItemWriters(itemProcessors);
 		
-		RestartData rd = itemProcessor.getRestartData();
+		StreamContext rd = itemProcessor.getRestartData();
 		itemProcessor.restoreFrom(rd);
 		
 		for (Iterator iterator = itemProcessors.iterator(); iterator.hasNext();) {
@@ -120,7 +120,7 @@ public class CompositeItemWriterTests extends TestCase {
 	 * Stub for testing restart. Checks the restart data received is the same that was returned by
 	 * <code>getRestartData()</code>
 	 */
-	private static class ItemWriterStub implements ItemWriter, Restartable, StatisticsProvider {
+	private static class ItemWriterStub implements ItemWriter, ItemStream, StatisticsProvider {
 		
 		private static final String RESTART_KEY = "restartData";
 		private static final String STATS_KEY = "stats";
@@ -130,14 +130,14 @@ public class CompositeItemWriterTests extends TestCase {
 		private final int hashCode = this.hashCode();
 		
 		
-		public RestartData getRestartData() {
+		public StreamContext getRestartData() {
 			Properties props = new Properties(){{
 				setProperty(RESTART_KEY, String.valueOf(hashCode));
 			}};
-			return new GenericRestartData(props);
+			return new GenericStreamContext(props);
 		}
 
-		public void restoreFrom(RestartData data) {
+		public void restoreFrom(StreamContext data) {
 			if (Integer.valueOf(data.getProperties().getProperty(RESTART_KEY)).intValue() != hashCode()) {
 				fail("received restart data is not the same which was saved");
 			}

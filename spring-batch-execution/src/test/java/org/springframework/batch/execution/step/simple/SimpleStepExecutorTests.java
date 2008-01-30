@@ -50,10 +50,10 @@ import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.interceptor.RepeatInterceptorAdapter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.statistics.StatisticsService;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
@@ -455,7 +455,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		assertEquals(0, map.size());
 	}
 
-	private class MockRestartableTasklet implements Tasklet, Restartable {
+	private class MockRestartableTasklet implements Tasklet, ItemStream {
 
 		private boolean getRestartDataCalled = false;
 
@@ -465,12 +465,12 @@ public class SimpleStepExecutorTests extends TestCase {
 			return ExitStatus.FINISHED;
 		}
 
-		public RestartData getRestartData() {
+		public StreamContext getRestartData() {
 			getRestartDataCalled = true;
 			return null;
 		}
 
-		public void restoreFrom(RestartData data) {
+		public void restoreFrom(StreamContext data) {
 			restoreFromCalled = true;
 		}
 

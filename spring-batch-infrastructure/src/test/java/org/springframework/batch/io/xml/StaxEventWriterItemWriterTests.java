@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.springframework.batch.io.xml.StaxEventItemWriter;
 import org.springframework.batch.io.xml.oxm.MarshallingEventWriterSerializer;
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;
@@ -92,11 +92,11 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 		// write records
 		writer.write(record);
 		writer.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
-		RestartData restartData = writer.getRestartData();
+		StreamContext streamContext = writer.getRestartData();
 
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();
-		writer.restoreFrom(restartData);
+		writer.restoreFrom(streamContext);
 		writer.write(record);
 		writer.destroy();
 

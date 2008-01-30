@@ -27,8 +27,8 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.StreamContext;
 
 public class MapStepDaoTests extends TestCase {
 
@@ -111,13 +111,13 @@ public class MapStepDaoTests extends TestCase {
 		step.setStatus(BatchStatus.COMPLETED);
 		Properties data = new Properties();
 		data.setProperty("restart.key1", "restartData");
-		RestartData restartData = new GenericRestartData(data);
-		step.setRestartData(restartData);
+		StreamContext streamContext = new GenericStreamContext(data);
+		step.setRestartData(streamContext);
 		dao.update(step);
 		StepInstance tempStep = dao.findStep(job, step.getName());
 		assertEquals(tempStep, step);
 		assertEquals(tempStep.getRestartData().getProperties().toString(), 
-				restartData.getProperties().toString());
+				streamContext.getProperties().toString());
 	}
 
 }

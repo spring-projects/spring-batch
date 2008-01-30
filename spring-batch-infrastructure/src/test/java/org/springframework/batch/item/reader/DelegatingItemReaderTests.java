@@ -24,10 +24,10 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.reader.DelegatingItemReader;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -85,7 +85,7 @@ public class DelegatingItemReaderTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testRestoreFrom() throws Exception {
-		itemProvider.restoreFrom(new GenericRestartData(PropertiesConverter.stringToProperties("value=bar")));
+		itemProvider.restoreFrom(new GenericStreamContext(PropertiesConverter.stringToProperties("value=bar")));
 		assertEquals("bar", itemProvider.read());
 	}
 
@@ -94,7 +94,7 @@ public class DelegatingItemReaderTests extends TestCase {
 		assertEquals("after skip", itemProvider.read());
 	}
 
-	private static class MockItemReader extends AbstractItemReader implements ItemReader, StatisticsProvider, Restartable, Skippable {
+	private static class MockItemReader extends AbstractItemReader implements ItemReader, StatisticsProvider, ItemStream, Skippable {
 
 		private Object value;
 
@@ -102,11 +102,11 @@ public class DelegatingItemReaderTests extends TestCase {
 			return PropertiesConverter.stringToProperties("a=b");
 		}
 
-		public RestartData getRestartData() {
-			return new GenericRestartData(PropertiesConverter.stringToProperties("value=foo"));
+		public StreamContext getRestartData() {
+			return new GenericStreamContext(PropertiesConverter.stringToProperties("value=foo"));
 		}
 
-		public void restoreFrom(RestartData data) {
+		public void restoreFrom(StreamContext data) {
 			value = data.getProperties().getProperty("value");
 		}
 

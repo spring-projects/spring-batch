@@ -24,10 +24,10 @@ import junit.framework.TestCase;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.writer.DelegatingItemWriter;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -69,7 +69,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testRestoreFrom() throws Exception {
-		processor.restoreFrom(new GenericRestartData(PropertiesConverter.stringToProperties("value=bar")));
+		processor.restoreFrom(new GenericStreamContext(PropertiesConverter.stringToProperties("value=bar")));
 		processor.write("foo");
 		assertEquals("bar:foo", list.get(0));
 	}
@@ -96,7 +96,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	public void testRestoreFromWithoutRestartable() throws Exception {
 		processor.setDelegate(null);
 		try {
-			processor.restoreFrom(new GenericRestartData(PropertiesConverter.stringToProperties("value=bar")));
+			processor.restoreFrom(new GenericStreamContext(PropertiesConverter.stringToProperties("value=bar")));
 			fail("Expected IllegalStateException");
 		}
 		catch (IllegalStateException e) {
@@ -130,7 +130,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 * @author Dave Syer
 	 * 
 	 */
-	public class MockOutputSource implements ItemWriter, StatisticsProvider, Restartable, Skippable {
+	public class MockOutputSource implements ItemWriter, StatisticsProvider, ItemStream, Skippable {
 
 		private String value;
 
@@ -152,11 +152,11 @@ public class ItemWriterItemProcessorTests extends TestCase {
 			return PropertiesConverter.stringToProperties("a=b");
 		}
 
-		public RestartData getRestartData() {
-			return new GenericRestartData(PropertiesConverter.stringToProperties("value=foo"));
+		public StreamContext getRestartData() {
+			return new GenericStreamContext(PropertiesConverter.stringToProperties("value=foo"));
 		}
 
-		public void restoreFrom(RestartData data) {
+		public void restoreFrom(StreamContext data) {
 			value = data.getProperties().getProperty("value");
 		}
 

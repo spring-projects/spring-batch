@@ -34,7 +34,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.restart.GenericRestartData;
+import org.springframework.batch.stream.GenericStreamContext;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.Assert;
 
@@ -304,7 +304,7 @@ public class SimpleJobRepository implements JobRepository {
 			StepInstance stepInstance = stepDao.createStep(job, step.getName());
 			// Ensure valid restart data is being returned.
 			if (stepInstance.getRestartData() == null || stepInstance.getRestartData().getProperties() == null) {
-				stepInstance.setRestartData(new GenericRestartData(new Properties()));
+				stepInstance.setRestartData(new GenericStreamContext(new Properties()));
 			}
 			stepInstances.add(stepInstance);
 		}
@@ -327,7 +327,7 @@ public class SimpleJobRepository implements JobRepository {
 				step.setStepExecutionCount(stepDao.getStepExecutionCount(step));
 				// Ensure valid restart data is being returned.
 				if (step.getRestartData() == null || step.getRestartData().getProperties() == null) {
-					step.setRestartData(new GenericRestartData(new Properties()));
+					step.setRestartData(new GenericStreamContext(new Properties()));
 				}
 				stepInstances.add(step);
 			}

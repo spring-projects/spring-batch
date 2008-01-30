@@ -22,8 +22,8 @@ import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -52,7 +52,7 @@ import org.springframework.util.Assert;
  */
 public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 		implements KeyedItemReader, ResourceLifecycle, InitializingBean,
-		DisposableBean, Restartable {
+		DisposableBean, ItemStream {
 
 	private boolean initialized = false;
 
@@ -171,7 +171,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	 * @throws IllegalStateException
 	 *             if the input source has already been initialized.
 	 */
-	public final void restoreFrom(RestartData data) {
+	public final void restoreFrom(StreamContext data) {
 
 		Assert.notNull(data, "RestartData must not be null.");
 		Assert.notNull(data.getProperties(),
@@ -192,7 +192,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 		}
 	}
 
-	public RestartData getRestartData() {
+	public StreamContext getRestartData() {
 		return keyGenerator.getKeyAsRestartData(getCurrentKey());
 	}
 

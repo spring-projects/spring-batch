@@ -2,13 +2,13 @@ package org.springframework.batch.io.driving;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.reader.AbstractItemReader;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-class FooItemReader extends AbstractItemReader implements ItemReader, Restartable, DisposableBean, InitializingBean{
+class FooItemReader extends AbstractItemReader implements ItemReader, ItemStream, DisposableBean, InitializingBean{
 
 	DrivingQueryItemReader inputSource;
 	FooDao fooDao = new SingleKeyFooDao();
@@ -27,11 +27,11 @@ class FooItemReader extends AbstractItemReader implements ItemReader, Restartabl
 		}
 	}
 
-	public RestartData getRestartData() {
+	public StreamContext getRestartData() {
 		return inputSource.getRestartData();
 	}
 
-	public void restoreFrom(RestartData data) {
+	public void restoreFrom(StreamContext data) {
 		inputSource.restoreFrom(data);
 	}
 

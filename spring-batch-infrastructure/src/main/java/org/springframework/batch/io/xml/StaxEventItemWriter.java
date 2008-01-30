@@ -19,10 +19,10 @@ import org.springframework.batch.io.xml.stax.NoStartEndDocumentStreamWriter;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -42,7 +42,7 @@ import org.springframework.util.CollectionUtils;
  * @author Peter Zozom
  *
  */
-public class StaxEventItemWriter implements ItemWriter, ResourceLifecycle, Restartable,
+public class StaxEventItemWriter implements ItemWriter, ResourceLifecycle, ItemStream,
 		StatisticsProvider, InitializingBean, DisposableBean {
 
 	// default encoding
@@ -380,23 +380,23 @@ public class StaxEventItemWriter implements ItemWriter, ResourceLifecycle, Resta
 	/**
 	 * Get the restart data.
 	 * @return the restart data
-	 * @see org.springframework.batch.restart.Restartable#getRestartData()
+	 * @see org.springframework.batch.stream.ItemStream#getRestartData()
 	 */
-	public RestartData getRestartData() {
+	public StreamContext getRestartData() {
 
 		Properties properties = new Properties();
 
 		properties.setProperty(RESTART_DATA_NAME, String.valueOf(getPosition()));
 
-		return new GenericRestartData(properties);
+		return new GenericStreamContext(properties);
 	}
 
 	/**
 	 * Restore processing from provided restart data.
 	 * @param data the restart data
-	 * @see org.springframework.batch.restart.Restartable#restoreFrom(org.springframework.batch.restart.RestartData)
+	 * @see org.springframework.batch.stream.ItemStream#restoreFrom(org.springframework.batch.stream.StreamContext)
 	 */
-	public void restoreFrom(RestartData data) {
+	public void restoreFrom(StreamContext data) {
 
 		long startAtPosition = 0;
 

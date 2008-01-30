@@ -16,8 +16,8 @@ import javax.xml.stream.events.XMLEvent;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.xml.StaxEventItemReader;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -117,13 +117,13 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 	 */
 	public void testRestart() {
 		source.read();
-		RestartData restartData = source.getRestartData();
-		assertEquals("1", restartData.getProperties().
+		StreamContext streamContext = source.getRestartData();
+		assertEquals("1", streamContext.getProperties().
 				getProperty("StaxEventReaderItemReader.recordcount"));
 		List expectedAfterRestart = (List) source.read();
 
 		source = createNewInputSouce();
-		source.restoreFrom(restartData);
+		source.restoreFrom(streamContext);
 		List afterRestart = (List) source.read();
 		assertEquals(expectedAfterRestart.size(), afterRestart.size());
 	}
@@ -138,7 +138,7 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 			setProperty("StaxEventReaderItemReader.recordcount", MORE_RECORDS_THAN_INPUT_CONTAINS);
 		}};
 		try {
-			source.restoreFrom(new GenericRestartData(props));
+			source.restoreFrom(new GenericStreamContext(props));
 			fail();
 		}
 		catch (IllegalStateException e) {
@@ -148,7 +148,7 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 		source = createNewInputSouce();
 		source.open();
 		try {
-			source.restoreFrom(new GenericRestartData(new Properties()));
+			source.restoreFrom(new GenericStreamContext(new Properties()));
 			fail();
 		}
 		catch (IllegalStateException e) {

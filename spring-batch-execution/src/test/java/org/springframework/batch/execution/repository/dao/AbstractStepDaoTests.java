@@ -30,8 +30,8 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
@@ -152,13 +152,13 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		step1.setStatus(BatchStatus.COMPLETED);
 		Properties data = new Properties();
 		data.setProperty("restart.key1", "restartData");
-		RestartData restartData = new GenericRestartData(data);
-		step1.setRestartData(restartData);
+		StreamContext streamContext = new GenericStreamContext(data);
+		step1.setRestartData(streamContext);
 		stepDao.update(step1);
 		StepInstance tempStep = stepDao.findStep(jobInstance, step1.getName());
 		assertEquals(tempStep, step1);
 		assertEquals(tempStep.getRestartData().getProperties().toString(), 
-				restartData.getProperties().toString());
+				streamContext.getProperties().toString());
 	}
 	
 	public void testSaveStepExecution(){

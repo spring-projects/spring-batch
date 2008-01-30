@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.core.CollectionFactory;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
@@ -49,9 +49,9 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 		Properties props = new Properties();
 		props.setProperty(ColumnMapRestartDataRowMapper.KEY + "0", "3");
 		props.setProperty(ColumnMapRestartDataRowMapper.KEY + "1", "3");
-		RestartData restartData = new GenericRestartData(props);
+		StreamContext streamContext = new GenericStreamContext(props);
 		
-		List keys = keyStrategy.restoreKeys(restartData);
+		List keys = keyStrategy.restoreKeys(streamContext);
 		
 		assertEquals(2, keys.size());
 		Map key = (Map)keys.get(0);
@@ -68,8 +68,8 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 		key.put("ID", new Long(3));
 		key.put("VALUE", new Integer(3));
 		
-		RestartData restartData = keyStrategy.getKeyAsRestartData(key);
-		Properties props = restartData.getProperties();
+		StreamContext streamContext = keyStrategy.getKeyAsRestartData(key);
+		Properties props = streamContext.getProperties();
 		
 		assertEquals(2, props.size());
 		assertEquals("3", props.get(ColumnMapRestartDataRowMapper.KEY + "0"));

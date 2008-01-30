@@ -8,16 +8,16 @@ import java.util.Properties;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 
 /**
  * Runs a collection of ItemProcessors in fixed-order sequence.
  * 
  * @author Robert Kasanicky
  */
-public class CompositeItemWriter implements ItemWriter, Restartable {
+public class CompositeItemWriter implements ItemWriter, ItemStream {
 
 	private static final String SEPARATOR = "#";
 
@@ -36,25 +36,25 @@ public class CompositeItemWriter implements ItemWriter, Restartable {
 	 * Compound restart data of all injected (Restartable) ItemProcessors,
 	 * property keys are prefixed with list index of the ItemProcessor.
 	 */
-	public RestartData getRestartData() {
+	public StreamContext getRestartData() {
 		Properties props = createCompoundProperties(new PropertiesExtractor() {
 			public Properties extractProperties(Object o) {
-				if (o instanceof Restartable) {
-					return ((Restartable) o).getRestartData().getProperties();
+				if (o instanceof ItemStream) {
+					return ((ItemStream) o).getRestartData().getProperties();
 				}
 				else {
 					return null;
 				}
 			}
 		});
-		return new GenericRestartData(props);
+		return new GenericStreamContext(props);
 	}
 
 	/**
 	 * @param data contains values of restart data, property keys are expected
 	 * to be prefixed with list index of the ItemProcessor.
 	 */
-	public void restoreFrom(RestartData data) {
+	public void restoreFrom(StreamContext data) {
 		if (data == null || data.getProperties() == null) {
 			// do nothing
 			return;
@@ -64,8 +64,8 @@ public class CompositeItemWriter implements ItemWriter, Restartable {
 
 		// iterators would make the loop below less readable
 		for (int i = 0; i < delegates.size(); i++) {
-			if (delegates.get(i) instanceof Restartable) {
-				((Restartable) delegates.get(i)).restoreFrom((RestartData) restartDataList.get(i));
+			if (delegates.get(i) instanceof ItemStream) {
+				((ItemStream) delegates.get(i)).restoreFrom((StreamContext) restartDataList.get(i));
 			}
 		}
 
@@ -81,7 +81,7 @@ public class CompositeItemWriter implements ItemWriter, Restartable {
 	private List parseProperties(Properties props) {
 		List restartDataList = new ArrayList(delegates.size());
 		for (int i = 0; i < delegates.size(); i++) {
-			restartDataList.add(new GenericRestartData(new Properties()));
+			restartDataList.add(new GenericStreamContext(new Properties()));
 		}
 
 		for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
@@ -90,7 +90,7 @@ public class CompositeItemWriter implements ItemWriter, Restartable {
 			String value = (String) entry.getValue();
 			int separatorIndex = key.indexOf(SEPARATOR);
 			int i = Integer.valueOf(key.substring(0, separatorIndex)).intValue();
-			((RestartData) restartDataList.get(i)).getProperties()
+			((StreamContext) restartDataList.get(i)).getProperties()
 					.setProperty(key.substring(separatorIndex + 1), value);
 		}
 		return restartDataList;

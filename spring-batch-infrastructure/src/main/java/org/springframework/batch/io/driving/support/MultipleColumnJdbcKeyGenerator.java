@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.springframework.batch.io.driving.DrivingQueryItemReader;
 import org.springframework.batch.io.driving.KeyGenerator;
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -80,14 +80,14 @@ public class MultipleColumnJdbcKeyGenerator implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.sql.scratch.AbstractDrivingQueryItemReader#restoreKeys(org.springframework.batch.restart.RestartData)
 	 */
-	public List restoreKeys(RestartData restartData) {
+	public List restoreKeys(StreamContext streamContext) {
 
 		Assert.state(keyMapper != null, "KeyMapper must not be null.");
 		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty" +
 		" in order to restart.");
 
-		if (restartData.getProperties() != null) {
-			return jdbcTemplate.query(restartSql, keyMapper.createSetter(restartData), keyMapper);
+		if (streamContext.getProperties() != null) {
+			return jdbcTemplate.query(restartSql, keyMapper.createSetter(streamContext), keyMapper);
 		}
 
 		return new ArrayList();
@@ -96,7 +96,7 @@ public class MultipleColumnJdbcKeyGenerator implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.restart.Restartable#getRestartData()
 	 */
-	public RestartData getKeyAsRestartData(Object key) {
+	public StreamContext getKeyAsRestartData(Object key) {
 		Assert.state(keyMapper != null, "RestartDataConverter must not be null.");
 		return keyMapper.createRestartData(key);
 	}

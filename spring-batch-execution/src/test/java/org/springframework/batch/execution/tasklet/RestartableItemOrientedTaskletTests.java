@@ -22,9 +22,9 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -32,9 +32,9 @@ import org.springframework.batch.support.PropertiesConverter;
  */
 public class RestartableItemOrientedTaskletTests extends TestCase {
 
-	private static class MockProvider implements ItemReader, Restartable {
+	private static class MockProvider implements ItemReader, ItemStream {
 
-		RestartData data = new RestartData() {
+		StreamContext data = new StreamContext() {
 
 			public Properties getProperties() {
 				return PropertiesConverter.stringToProperties("a=b");
@@ -46,11 +46,11 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 			return null;
 		}
 
-		public RestartData getRestartData() {
+		public StreamContext getRestartData() {
 			return data;
 		}
 
-		public void restoreFrom(RestartData data) {
+		public void restoreFrom(StreamContext data) {
 			// restart data should be same as returned by getRestartData
 			assertEquals(this.data.getProperties(), data.getProperties());
 		}
@@ -64,9 +64,9 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 
 	}
 
-	private static class MockWriter implements ItemWriter, Restartable {
+	private static class MockWriter implements ItemWriter, ItemStream {
 
-		RestartData data = new RestartData() {
+		StreamContext data = new StreamContext() {
 			public Properties getProperties() {
 				return PropertiesConverter.stringToProperties("x=y");
 			}
@@ -75,11 +75,11 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 		public void write(Object data) {
 		}
 
-		public RestartData getRestartData() {
+		public StreamContext getRestartData() {
 			return data;
 		}
 
-		public void restoreFrom(RestartData data) {
+		public void restoreFrom(StreamContext data) {
 			// restart data should be same as returned by getRestartData
 			assertEquals(this.data.getProperties(), data.getProperties());
 		}
@@ -107,7 +107,7 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 		module.setItemWriter(itemWriter);
 
 		// get restart data
-		RestartData data = module.getRestartData();
+		StreamContext data = module.getRestartData();
 		assertNotNull(data);
 		// restore from restart data (see asserts in mock classes)
 		module.restoreFrom(data);
@@ -125,9 +125,9 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 		module.setItemWriter(itemWriter);
 
 		// get restart data
-		RestartData data = module.getRestartData();
+		StreamContext data = module.getRestartData();
 		assertNotNull(data);
-		data = new GenericRestartData(data.getProperties());
+		data = new GenericStreamContext(data.getProperties());
 		// restore from restart data (see asserts in mock classes)
 		module.restoreFrom(data);
 	}
@@ -140,7 +140,7 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 		module.setItemWriter(null);
 
 		// get restart data
-		RestartData data = module.getRestartData();
+		StreamContext data = module.getRestartData();
 		assertNotNull(data);
 		// restore from restart data (see asserts in mock classes)
 		module.restoreFrom(data);

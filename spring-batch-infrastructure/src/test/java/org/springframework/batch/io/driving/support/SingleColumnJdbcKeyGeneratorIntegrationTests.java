@@ -3,8 +3,8 @@ package org.springframework.batch.io.driving.support;
 import java.util.List;
 import java.util.Properties;
 
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 /**
@@ -44,9 +44,9 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 		
 		Properties props = new Properties();
 		props.setProperty(SingleColumnJdbcKeyGenerator.RESTART_KEY, "3");
-		RestartData restartData = new GenericRestartData(props);
+		StreamContext streamContext = new GenericStreamContext(props);
 		
-		List keys = keyStrategy.restoreKeys(restartData);
+		List keys = keyStrategy.restoreKeys(streamContext);
 		
 		assertEquals(2, keys.size());
 		assertEquals(new Long(4), keys.get(0));
@@ -55,8 +55,8 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	
 	public void testGetKeyAsRestartData(){
 		
-		RestartData restartData = keyStrategy.getKeyAsRestartData(new Long(3));
-		Properties props = restartData.getProperties();
+		StreamContext streamContext = keyStrategy.getKeyAsRestartData(new Long(3));
+		Properties props = streamContext.getProperties();
 		
 		assertEquals(1, props.size());
 		assertEquals("3", props.get(SingleColumnJdbcKeyGenerator.RESTART_KEY));

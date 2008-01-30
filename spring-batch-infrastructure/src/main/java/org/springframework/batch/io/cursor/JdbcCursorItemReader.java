@@ -33,10 +33,10 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
@@ -118,7 +118,7 @@ import org.springframework.util.StringUtils;
  */
 public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 		implements KeyedItemReader, ResourceLifecycle, DisposableBean,
-		InitializingBean, Restartable, StatisticsProvider, Skippable {
+		InitializingBean, ItemStream, StatisticsProvider, Skippable {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);
 
@@ -406,11 +406,11 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	 * 
 	 * @see org.springframework.batch.restart.Restartable#getRestartData()
 	 */
-	public RestartData getRestartData() {
+	public StreamContext getRestartData() {
 		String skipped = skippedRows.toString();
 		Properties statistics = getStatistics();
 		statistics.setProperty(SKIPPED_ROWS, skipped.substring(1,skipped.length()-1));
-		return new GenericRestartData(statistics);
+		return new GenericStreamContext(statistics);
 	}
 
 	/*
@@ -418,7 +418,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	 * 
 	 * @see org.springframework.batch.restart.Restartable#restoreFrom(org.springframework.batch.restart.RestartData)
 	 */
-	public void restoreFrom(RestartData data) {
+	public void restoreFrom(StreamContext data) {
 		Assert.state(!initialized);
 
 		if (data == null)

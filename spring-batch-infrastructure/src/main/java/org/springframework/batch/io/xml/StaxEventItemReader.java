@@ -21,10 +21,10 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  */
 public class StaxEventItemReader extends AbstractItemReader implements ItemReader, ResourceLifecycle,
-		Skippable, Restartable, StatisticsProvider, InitializingBean, DisposableBean {
+		Skippable, ItemStream, StatisticsProvider, InitializingBean, DisposableBean {
 
 	public static final String READ_COUNT_STATISTICS_NAME = "StaxEventReaderItemReader.readCount";
 
@@ -192,26 +192,26 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 
 	/**
 	 * @return wrapped count of records read so far.
-	 * @see Restartable#getRestartData()
+	 * @see ItemStream#getRestartData()
 	 */
-	public RestartData getRestartData() {
+	public StreamContext getRestartData() {
 		Properties restartData = new Properties();
 
 		restartData.setProperty(RESTART_DATA_NAME, String.valueOf(currentRecordCount));
 
-		return new GenericRestartData(restartData);
+		return new GenericStreamContext(restartData);
 	}
 
 	/**
 	 * Restores the input source for the given restart data by rereading and
 	 * skipping the number of records stored in the RestartData.
 	 * 
-	 * @param RestartData that holds the line count from the last commit.
+	 * @param StreamContext that holds the line count from the last commit.
 	 * @throws IllegalStateException if the ItemReader has already been
 	 * initialized or if the number of records to read and skip exceeds the
 	 * available records.
 	 */
-	public void restoreFrom(RestartData data) {
+	public void restoreFrom(StreamContext data) {
 		Assert.state(!initialized);
 		if (data == null || data.getProperties() == null || data.getProperties().getProperty(RESTART_DATA_NAME) == null) {
 			return;

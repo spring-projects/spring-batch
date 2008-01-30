@@ -11,8 +11,8 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.core.CollectionFactory;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.util.ClassUtils;
@@ -63,16 +63,16 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 	
 	public void testCreateRestartData() throws Exception {
 		
-		RestartData restartData = mapper.createRestartData(key);
-		Properties props = restartData.getProperties();
+		StreamContext streamContext = mapper.createRestartData(key);
+		Properties props = streamContext.getProperties();
 		assertEquals("1", props.getProperty(KEY + "0"));
 		assertEquals("2", props.getProperty(KEY + "1"));
 	}
 	
 	public void testCreateRestartDataFromEmptyKeys() throws Exception {
 		
-		RestartData restartData = mapper.createRestartData(new HashMap());
-		assertEquals(0, restartData.getProperties().size());
+		StreamContext streamContext = mapper.createRestartData(new HashMap());
+		assertEquals(0, streamContext.getProperties().size());
 	}
 	
 	public void testCreateSetter() throws Exception {
@@ -80,8 +80,8 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 		Properties props = new Properties();
 		props.setProperty(KEY + "0", "1");
 		props.setProperty(KEY + "1", "2");
-		RestartData restartData = new GenericRestartData(props);
-		PreparedStatementSetter setter = mapper.createSetter(restartData);
+		StreamContext streamContext = new GenericStreamContext(props);
+		PreparedStatementSetter setter = mapper.createSetter(streamContext);
 		ps = (PreparedStatement)psControl.getMock();
 		
 		ps.setString(1, "1");

@@ -8,9 +8,9 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.io.sample.domain.Foo;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -76,12 +76,12 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		RestartData restartData = getAsRestartable(source).getRestartData();
+		StreamContext streamContext = getAsRestartable(source).getRestartData();
 
 		// create new input source
 		source = createItemReader();
 
-		getAsRestartable(source).restoreFrom(restartData);
+		getAsRestartable(source).restoreFrom(streamContext);
 
 		Foo fooAfterRestart = (Foo) source.read();
 		assertEquals(3, fooAfterRestart.getValue());
@@ -98,7 +98,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		RestartData restartData = getAsRestartable(source).getRestartData();
+		StreamContext streamContext = getAsRestartable(source).getRestartData();
 
 		// create new input source
 		source = createItemReader();
@@ -107,7 +107,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		assertEquals(1, foo.getValue());
 
 		try {
-			getAsRestartable(source).restoreFrom(restartData);
+			getAsRestartable(source).restoreFrom(streamContext);
 			fail();
 		}
 		catch (IllegalStateException ex) {
@@ -120,9 +120,9 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testRestoreFromEmptyData() throws Exception {
-		RestartData restartData = new GenericRestartData(new Properties());
+		StreamContext streamContext = new GenericStreamContext(new Properties());
 
-		getAsRestartable(source).restoreFrom(restartData);
+		getAsRestartable(source).restoreFrom(streamContext);
 
 		Foo foo = (Foo) source.read();
 		assertEquals(1, foo.getValue());
@@ -165,13 +165,13 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		return (InitializingBean) source;
 	}
 
-	private Restartable getAsRestartable(ItemReader source) {
-		return (Restartable) source;
+	private ItemStream getAsRestartable(ItemReader source) {
+		return (ItemStream) source;
 	}
 	
 	private static class MockKeyGenerator implements KeyGenerator{
 
-		static RestartData restartData;
+		static StreamContext streamContext;
 		List keys;
 		List restartKeys;
 		
@@ -180,7 +180,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 			//restart data properties cannot be empty.
 			props.setProperty("", "");
 			
-			restartData = new GenericRestartData(props);
+			streamContext = new GenericStreamContext(props);
 		}
 		
 		public MockKeyGenerator() {
@@ -198,13 +198,13 @@ public class DrivingQueryItemReaderTests extends TestCase {
 			restartKeys.add(new Foo(5, "5", 5));
 		}
 		
-		public RestartData getKeyAsRestartData(Object key) {
-			return restartData;
+		public StreamContext getKeyAsRestartData(Object key) {
+			return streamContext;
 		}
 
-		public List restoreKeys(RestartData restartData) {
+		public List restoreKeys(StreamContext streamContext) {
 			
-			assertEquals(MockKeyGenerator.restartData, restartData);
+			assertEquals(MockKeyGenerator.streamContext, streamContext);
 			return restartKeys;
 		}
 

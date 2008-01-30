@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.io.driving.support;
 
-import org.springframework.batch.restart.RestartData;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -40,14 +40,14 @@ public interface RestartDataRowMapper extends RowMapper {
 	 * @return ResartData representing the composite key.
 	 * @throws IllegalArgumentException if key is null or of an unsupported type.
 	 */
-	public RestartData createRestartData(Object key);
+	public StreamContext createRestartData(Object key);
 
 	/**
 	 * Given the provided restart data, return a PreparedStatementSeter that can
 	 * be used as parameters to a JdbcTemplate.
 	 *
-	 * @param restartData
+	 * @param streamContext
 	 * @return an array of objects that can be used as arguments to a JdbcTemplate.
 	 */
-	public PreparedStatementSetter createSetter(RestartData restartData);
+	public PreparedStatementSetter createSetter(StreamContext streamContext);
 }

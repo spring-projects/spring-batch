@@ -18,8 +18,8 @@ package org.springframework.batch.item.reader;
 
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  */
-public class DelegatingItemReader extends AbstractItemReader implements Restartable, Skippable, InitializingBean{
+public class DelegatingItemReader extends AbstractItemReader implements ItemStream, Skippable, InitializingBean{
 
 	private ItemReader inputSource;
 
@@ -47,27 +47,27 @@ public class DelegatingItemReader extends AbstractItemReader implements Restarta
 	}
 
 	/**
-	 * @see Restartable#getRestartData()
+	 * @see ItemStream#getRestartData()
 	 * @throws IllegalStateException if the parent template is not itself
-	 * {@link Restartable}.
+	 * {@link ItemStream}.
 	 */
-	public RestartData getRestartData() {
-		if (!(inputSource instanceof Restartable)) {
+	public StreamContext getRestartData() {
+		if (!(inputSource instanceof ItemStream)) {
 			throw new IllegalStateException("Input Template is not Restartable");
 		}
-		return ((Restartable) inputSource).getRestartData();
+		return ((ItemStream) inputSource).getRestartData();
 	}
 
 	/**
-	 * @see Restartable#restoreFrom(RestartData)
+	 * @see ItemStream#restoreFrom(StreamContext)
 	 * @throws IllegalStateException if the parent template is not itself
-	 * {@link Restartable}.
+	 * {@link ItemStream}.
 	 */
-	public void restoreFrom(RestartData data) {
-		if (!(inputSource instanceof Restartable)) {
+	public void restoreFrom(StreamContext data) {
+		if (!(inputSource instanceof ItemStream)) {
 			throw new IllegalStateException("Input Template is not Restartable");
 		}
-		((Restartable) inputSource).restoreFrom(data);
+		((ItemStream) inputSource).restoreFrom(data);
 	}
 
 	/**

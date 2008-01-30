@@ -34,10 +34,10 @@ import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.item.writer.ItemTransformer;
-import org.springframework.batch.restart.GenericRestartData;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.StatisticsProvider;
+import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -61,7 +61,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  */
 public class FlatFileItemWriter extends AbstractTransactionalIoSource implements 
-	ItemWriter, ResourceLifecycle, Restartable, StatisticsProvider, InitializingBean,
+	ItemWriter, ResourceLifecycle, ItemStream, StatisticsProvider, InitializingBean,
 	DisposableBean {
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -76,7 +76,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	private Properties statistics = new Properties();
 
-	private RestartData restartData = new GenericRestartData(new Properties());
+	private StreamContext streamContext = new GenericStreamContext(new Properties());
 
 	private OutputState state = new OutputState();
 
@@ -258,19 +258,19 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	}
 
 	/**
-	 * @see Restartable#getRestartData()
+	 * @see ItemStream#getRestartData()
 	 */
-	public RestartData getRestartData() {
+	public StreamContext getRestartData() {
 		final OutputState os = getOutputState();
 
-		restartData.getProperties().setProperty(RESTART_DATA_NAME, String.valueOf(os.position()));
-		return restartData;
+		streamContext.getProperties().setProperty(RESTART_DATA_NAME, String.valueOf(os.position()));
+		return streamContext;
 	}
 
 	/**
-	 * @see Restartable#restoreFrom(RestartData)
+	 * @see ItemStream#restoreFrom(StreamContext)
 	 */
-	public void restoreFrom(RestartData data) {
+	public void restoreFrom(StreamContext data) {
 		if (data == null)
 			return;
 

@@ -43,11 +43,11 @@ import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHa
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.batch.restart.RestartData;
-import org.springframework.batch.restart.Restartable;
 import org.springframework.batch.statistics.SimpleStatisticsService;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.statistics.StatisticsService;
+import org.springframework.batch.stream.ItemStream;
+import org.springframework.batch.stream.StreamContext;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -391,20 +391,20 @@ public class SimpleStepExecutor {
 	/**
 	 * @param tasklet
 	 * @return restart data from the {@link Tasklet} if it is
-	 * {@link Restartable}
+	 * {@link ItemStream}
 	 */
-	private RestartData getRestartData(Tasklet tasklet) {
-		if (tasklet instanceof Restartable) {
-			return ((Restartable) tasklet).getRestartData();
+	private StreamContext getRestartData(Tasklet tasklet) {
+		if (tasklet instanceof ItemStream) {
+			return ((ItemStream) tasklet).getRestartData();
 		}
 		else {
 			return null;
 		}
 	}
 
-	private void restoreFromRestartData(Tasklet tasklet, RestartData restartData) {
-		if (tasklet instanceof Restartable && restartData != null) {
-			((Restartable) tasklet).restoreFrom(restartData);
+	private void restoreFromRestartData(Tasklet tasklet, StreamContext streamContext) {
+		if (tasklet instanceof ItemStream && streamContext != null) {
+			((ItemStream) tasklet).restoreFrom(streamContext);
 		}
 	}
 

@@ -129,9 +129,8 @@ public class SimpleJob extends JobSupport {
 	private boolean shouldStart(StepInstance stepInstance, Step step) {
 
 		if (stepInstance.getStatus() == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) {
-			// step is complete, false should be returned, indicated that the
-			// step should
-			// not be started
+			// step is complete, false should be returned, indicating that the
+			// step should not be started
 			return false;
 		}
 
