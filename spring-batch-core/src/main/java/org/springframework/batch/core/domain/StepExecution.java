@@ -169,7 +169,7 @@ public class StepExecution extends Entity {
 	public boolean equals(Object obj) {
 		Object stepId = getStepId();
 		Object jobExecutionId = getJobExecutionId();
-		if (stepId == null && jobExecutionId == null || !(obj instanceof StepExecution) || getId() != null) {
+		if (stepId == null && jobExecutionId == null || !(obj instanceof StepExecution) || getId() == null) {
 			return super.equals(obj);
 		}
 		StepExecution other = (StepExecution) obj;

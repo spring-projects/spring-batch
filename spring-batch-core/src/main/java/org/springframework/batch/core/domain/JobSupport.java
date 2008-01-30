@@ -139,6 +139,6 @@ public class JobSupport implements BeanNameAware, Job {
 	}
 
 	public String toString() {
-		return ClassUtils.getShortName(JobSupport.class) + ": [name=" + name + "]";
+		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
 	}
 }

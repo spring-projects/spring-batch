@@ -23,6 +23,7 @@ import java.util.Properties;
 
 import org.springframework.util.DefaultPropertiesPersister;
 import org.springframework.util.PropertiesPersister;
+import org.springframework.util.StringUtils;
 
 /**
  * Utility to convert a Properties object to a String and back. Ideally this
@@ -48,7 +49,10 @@ public final class PropertiesConverter {
 
 	/**
 	 * Parse a String to a Properties object. If string is null, an empty
-	 * Properties object will be returned.
+	 * Properties object will be returned. The input String is a set of
+	 * name=value pairs, delimited by either newline or comma (for brevity). If
+	 * the input String contains a newline it is assumed that the separator is
+	 * newline, otherwise comma.
 	 * 
 	 * @param stringToParse String to parse.
 	 * @return Properties parsed from each string.
@@ -59,6 +63,11 @@ public final class PropertiesConverter {
 
 		if (stringToParse == null) {
 			return new Properties();
+		}
+
+		if (!stringToParse.contains("\n")) {
+			return StringUtils.splitArrayElementsIntoProperties(StringUtils
+					.commaDelimitedListToStringArray(stringToParse), "=");
 		}
 
 		StringReader stringReader = new StringReader(stringToParse);

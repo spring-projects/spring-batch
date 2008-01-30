@@ -41,6 +41,14 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
+	 * {@link org.springframework.batch.core.domain.JobExecution#JobExecution()}.
+	 */
+	public void testStepExecutionWithNullId() {
+		assertNull(new StepExecution(null, null).getId());
+	}
+
+	/**
+	 * Test method for
 	 * {@link org.springframework.batch.core.domain.JobExecution#getEndTime()}.
 	 */
 	public void testGetEndTime() {
@@ -154,6 +162,32 @@ public class StepExecutionTests extends TestCase {
 	public void testGetStepId() {
 		assertEquals(11, execution.getStepId().longValue());
 	}
+	
+	public void testGetStep() throws Exception {
+		assertNotNull(execution.getStep());
+	}
+	
+	public void testGetJobExecution() throws Exception {
+		assertNotNull(execution.getJobExecution());
+	}
+	
+	public void testApplyContribution() throws Exception {
+		StepContribution contribution = execution.createStepContribution();
+		contribution.incrementCommitCount();
+		execution.apply(contribution);
+		assertEquals(new Integer(1), execution.getCommitCount());
+	}
+	
+	public void testTerminateOnly() throws Exception {
+		assertFalse(execution.isTerminateOnly());
+		execution.setTerminateOnly();
+		assertTrue(execution.isTerminateOnly());
+	}
+
+	public void testToStringWithNullName() throws Exception {
+		String value = new StepExecution().toString();
+		assertTrue("Should contain name=null: "+value, value.indexOf("name=null")>=0);
+	}
 
 	public void testToString() throws Exception {
 		assertTrue("Should contain task count: " + execution.toString(),
@@ -200,6 +234,23 @@ public class StepExecutionTests extends TestCase {
 		assertFalse(step.equals(new StepExecution()));
 	}
 
+	public void testEqualsWithSelf() throws Exception {
+		assertTrue(execution.equals(execution));
+	}
+
+	public void testEqualsWithDifferent() throws Exception {
+		StepExecution step = newStepExecution(new Long(43), new Long(13));
+		assertFalse(execution.equals(step));
+	}
+
+	public void testEqualsWithNullStepId() throws Exception {
+		execution = newStepExecution(null, new Long(31));
+		assertEquals(null, execution.getStepId());
+		StepExecution step = newStepExecution(null, new Long(31));
+		assertEquals(step.getJobExecutionId(), execution.getJobExecutionId());
+		assertTrue(execution.equals(step));
+	}
+
 	public void testHashCode() throws Exception {
 		assertTrue("Hash code same as parent", new Entity(execution.getId())
 				.hashCode() != execution.hashCode());
@@ -217,4 +268,5 @@ public class StepExecutionTests extends TestCase {
 		StepExecution execution = new StepExecution(step, new JobExecution(job, long2), new Long(4));
 		return execution;
 	}
+
 }

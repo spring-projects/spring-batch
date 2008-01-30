@@ -40,6 +40,33 @@ public class StepSupportTests extends TestCase {
 	 */
 	public void testGetName() {
 		assertEquals("step", configuration.getName());
+		configuration.setName("bar");
+		assertEquals("bar", configuration.getName());
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.domain.StepSupport#getName()}.
+	 */
+	public void testBeanNameAlreadySet() {
+		assertEquals("step", configuration.getName());
+		configuration.setBeanName("bar");
+		assertEquals("step", configuration.getName());
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.domain.StepSupport#getName()}.
+	 */
+	public void testBeanNameOnNew() {
+		configuration = new StepSupport();
+		assertEquals(null, configuration.getName());
+		configuration.setBeanName("bar");
+		assertEquals("bar", configuration.getName());
+	}
+	
+	public void testSaveRestartFlag() throws Exception {
+		assertEquals(false, configuration.isSaveRestartData());
+		configuration.setSaveRestartData(true);
+		assertEquals(true, configuration.isSaveRestartData());
 	}
 
 	/**

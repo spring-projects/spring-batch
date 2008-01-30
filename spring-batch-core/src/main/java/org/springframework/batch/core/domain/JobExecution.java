@@ -51,14 +51,13 @@ public class JobExecution extends Entity {
 	 * Because a JobExecution isn't valid unless the job is set, this
 	 * constructor is the only valid one from a modelling point of view.
 	 * 
-	 * @param job
-	 *            the job of which this execution is a part
+	 * @param job the job of which this execution is a part
 	 */
 	public JobExecution(JobInstance job, Long id) {
 		super(id);
 		this.jobInstance = job;
 	}
-	
+
 	/**
 	 * Constructor for transient (unsaved) instances.
 	 * 
@@ -145,34 +144,33 @@ public class JobExecution extends Entity {
 		this.stepExecutions.add(stepExecution);
 		return stepExecution;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.Entity#toString()
 	 */
 	public String toString() {
-		return super.toString()+", startTime="+startTime+", endTime="+endTime+", job=["+jobInstance+"]";
+		return super.toString() + ", startTime=" + startTime + ", endTime=" + endTime + ", job=[" + jobInstance + "]";
 	}
 
 	/**
-	 * Test if this {@link JobExecution} indicates that it is running.  It should
-	 * be noted that this does not necessarily mean that it has been
-	 * persisted as such yet.
+	 * Test if this {@link JobExecution} indicates that it is running. It should
+	 * be noted that this does not necessarily mean that it has been persisted
+	 * as such yet.
 	 * @return true if the end time is null
 	 */
 	public boolean isRunning() {
-		return endTime==null;
+		return endTime == null;
 	}
-	
+
 	/**
-	 * Stop the JobExecution, each StepExecution will be iterated through, calling
-	 * setTermianteOnly, signaling to the StepExecutor currently running that it should
-	 * be terminated.
+	 * Signal the {@link JobExecution} to stop. Iterates through the associated
+	 * {@link StepExecution}s, calling {@link StepExecution#setTerminateOnly()}.
 	 * 
 	 */
-	public void stop(){
-		
-		for(Iterator it = stepExecutions.iterator();it.hasNext();){
-			StepExecution stepExecution = (StepExecution)it.next();
+	public void stop() {
+		for (Iterator it = stepExecutions.iterator(); it.hasNext();) {
+			StepExecution stepExecution = (StepExecution) it.next();
 			stepExecution.setTerminateOnly();
 		}
 	}

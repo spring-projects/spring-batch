@@ -96,5 +96,20 @@ public class JobSupportTests extends TestCase {
 		job.setRestartable(true);
 		assertTrue(job.isRestartable());
 	}
+	
+	public void testToString() throws Exception {
+		String value = job.toString();
+		assertTrue("Should contain name: "+value, value.indexOf("name=")>=0);
+	}
+	
+	public void testRunNotSupported() throws Exception {
+		try {
+			job.run(null);
+		} catch (UnsupportedOperationException e) {
+			// expected
+			String message = e.getMessage();
+			assertTrue("Message should contain JobSupport: "+message, message.contains("JobSupport"));
+		}
+	}
 
 }

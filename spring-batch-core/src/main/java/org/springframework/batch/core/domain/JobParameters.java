@@ -196,7 +196,6 @@ public class JobParameters {
 	}
 	
 	public int hashCode() {
-	
 		return new HashCodeBuilder(7, 21).
 			append(stringMap).
 			append(longMap).

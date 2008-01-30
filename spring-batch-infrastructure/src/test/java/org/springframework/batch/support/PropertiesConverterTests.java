@@ -36,7 +36,7 @@ public class PropertiesConverterTests extends TestCase {
 	/**
 	 * Check that Properties can be converted to String and back correctly.
 	 */
-	public void testRegularConversion() {
+	public void testTwoWayRegularConversion() {
 		
 		Properties storedProps = new Properties();
 		storedProps.setProperty("key1", "value1");
@@ -47,6 +47,48 @@ public class PropertiesConverterTests extends TestCase {
 		assertEquals(storedProps, props);
 	}
 	
+	/**
+	 * Check that Properties can be comma delimited.
+	 */
+	public void testRegularConversionWithComma() {
+		
+		Properties storedProps = new Properties();
+		storedProps.setProperty("key1", "value1");
+		storedProps.setProperty("key2", "value2");
+		
+		props = PropertiesConverter.stringToProperties("key1=value1,key2=value2");
+		
+		assertEquals(storedProps, props);
+	}
+
+	/**
+	 * Check that Properties can be comma delimited with extra whitespace.
+	 */
+	public void testRegularConversionWithCommaAndWhitespace() {
+		
+		Properties storedProps = new Properties();
+		storedProps.setProperty("key1", "value1");
+		storedProps.setProperty("key2", "value2");
+		
+		props = PropertiesConverter.stringToProperties("key1=value1, key2=value2");
+		
+		assertEquals(storedProps, props);
+	}
+
+	/**
+	 * Check that Properties can be newline delimited.
+	 */
+	public void testRegularConversionWithCommaAndNewline() {
+		
+		Properties storedProps = new Properties();
+		storedProps.setProperty("key1", "value1");
+		storedProps.setProperty("key2", "value2");
+		
+		props = PropertiesConverter.stringToProperties("key1=value1\n key2=value2");
+		
+		assertEquals(storedProps, props);
+	}
+
 	/**
 	 * Converting a String to Properties and back does not return equal String!
 	 * See {@link PropertiesConverter} javadoc for more details.

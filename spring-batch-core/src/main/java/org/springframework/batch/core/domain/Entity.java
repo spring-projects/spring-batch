@@ -98,7 +98,7 @@ public class Entity implements Serializable {
 		}
 		Entity entity = (Entity) other;
 		if (id == null || entity.getId() == null) {
-			return entity == this;
+			return false;
 		}
 		return id.equals(entity.getId());
 	}

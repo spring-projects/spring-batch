@@ -27,9 +27,7 @@ import org.springframework.batch.repeat.ExitStatus;
  */
 public class JobExecutionTests extends TestCase {
 
-	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), new JobParameters()), new Long(12));
-
-	private JobExecution context = new JobExecution(new JobInstance(new Long(11), new JobParameters(), new JobSupport("foo")), new Long(12));
+	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), new JobSupport("foo")), new Long(12));
 
 	/**
 	 * Test method for
@@ -117,23 +115,30 @@ public class JobExecutionTests extends TestCase {
 	}
 
 	public void testContextContainsInfo() throws Exception {
-		assertEquals("foo", context.getJobInstance().getJobName());
+		assertEquals("foo", execution.getJobInstance().getJobName());
 	}
 
 	public void testAddAndRemoveStepExecution() throws Exception {
-		assertEquals(0, context.getStepExecutions().size());
-		context.createStepExecution(new StepInstance(null, null));
-		assertEquals(1, context.getStepExecutions().size());
+		assertEquals(0, execution.getStepExecutions().size());
+		execution.createStepExecution(new StepInstance(null, null));
+		assertEquals(1, execution.getStepExecutions().size());
+	}
+	
+	public void testStop() throws Exception {
+		StepExecution stepExecution = execution.createStepExecution(null);
+		assertFalse(stepExecution.isTerminateOnly());
+		execution.stop();
+		assertTrue(stepExecution.isTerminateOnly());
 	}
 
 	public void testToString() throws Exception {
-		assertTrue("JobExecution string does not contain id", context.toString().indexOf("id=") >= 0);
-		assertTrue("JobExecution string does not contain name: " + context, context.toString().indexOf("foo") >= 0);
+		assertTrue("JobExecution string does not contain id", execution.toString().indexOf("id=") >= 0);
+		assertTrue("JobExecution string does not contain name: " + execution, execution.toString().indexOf("foo") >= 0);
 	}
 
 	public void testToStringWithNullJob() throws Exception {
-		context = new JobExecution();
-		assertTrue("JobExecution string does not contain id", context.toString().indexOf("id=") >= 0);
-		assertTrue("JobExecution string does not contain job: " + context, context.toString().indexOf("job=") >= 0);
+		execution = new JobExecution();
+		assertTrue("JobExecution string does not contain id", execution.toString().indexOf("id=") >= 0);
+		assertTrue("JobExecution string does not contain job: " + execution, execution.toString().indexOf("job=") >= 0);
 	}
 }

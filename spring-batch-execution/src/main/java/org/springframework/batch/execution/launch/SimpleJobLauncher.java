@@ -84,8 +84,8 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 				try {
 					logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters + "]");
 					ExitStatus exitStatus = job.run(jobExecution);
-					// shouldn't need to set the exit status like this, I'm
-					// leaving it to make the latest change easier
+					// The exit status should be set by the Job. TODO: remove
+					// this line...
 					jobExecution.setExitStatus(exitStatus);
 					logger.info("Job: [" + job + "] completed successfully with the following parameters: ["
 							+ jobParameters + "]");
@@ -126,7 +126,8 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	}
 
 	/**
-	 * Ensure the required dependencies of a {@link JobRepository} have been set.
+	 * Ensure the required dependencies of a {@link JobRepository} have been
+	 * set.
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "A JobRepository has not been set.");

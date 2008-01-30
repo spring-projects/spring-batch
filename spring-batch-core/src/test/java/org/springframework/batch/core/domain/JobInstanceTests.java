@@ -72,6 +72,12 @@ public class JobInstanceTests extends TestCase {
 	
 	public void testGetJob(){
 		assertEquals("job", instance.getJob().getName());
+		instance.setJob(null);
+		assertEquals(null, instance.getJob());
+	}
+
+	public void testCreateJobExecution(){
+		assertNotNull(instance.createJobExecution());
 	}
 
 	public void testCreateWithNulls(){
