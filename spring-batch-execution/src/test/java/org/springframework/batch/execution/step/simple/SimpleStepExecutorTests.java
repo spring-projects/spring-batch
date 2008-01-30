@@ -25,10 +25,10 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
@@ -40,10 +40,10 @@ import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.reader.ListItemReader;
+import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
@@ -455,7 +455,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		assertEquals(0, map.size());
 	}
 
-	private class MockRestartableTasklet implements Tasklet, ItemStream {
+	private class MockRestartableTasklet extends ItemStreamAdapter implements Tasklet {
 
 		private boolean getRestartDataCalled = false;
 

@@ -8,11 +8,10 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
-import org.springframework.batch.item.writer.CompositeItemWriter;
+import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.batch.statistics.StatisticsProvider;
 
 /**
@@ -62,14 +61,9 @@ public class CompositeItemWriterTests extends TestCase {
 	 * All Restartable processors should be restarted, not-Restartable processors should be ignored.
 	 */
 	public void testRestart() {
-		//this mock with undefined behavior makes sure not-Restartable processor is ignored
-		MockControl p1c = MockControl.createStrictControl(ItemWriter.class);
-		final ItemWriter p1 = (ItemWriter) p1c.getMock();
-		
 		final ItemWriter p2 = new ItemWriterStub();
 		final ItemWriter p3 = new ItemWriterStub();
 		List itemProcessors = new ArrayList(){{
-			add(p1);
 			add(p2);
 			add(p3);
 		}};
@@ -120,7 +114,7 @@ public class CompositeItemWriterTests extends TestCase {
 	 * Stub for testing restart. Checks the restart data received is the same that was returned by
 	 * <code>getRestartData()</code>
 	 */
-	private static class ItemWriterStub implements ItemWriter, ItemStream, StatisticsProvider {
+	private static class ItemWriterStub extends ItemStreamAdapter implements ItemWriter, StatisticsProvider {
 		
 		private static final String RESTART_KEY = "restartData";
 		private static final String STATS_KEY = "stats";

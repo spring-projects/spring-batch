@@ -26,7 +26,6 @@ import org.hibernate.StatelessSession;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.stream.GenericStreamContext;
@@ -58,7 +57,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  */
 public class HibernateCursorItemReader extends AbstractItemReader implements ItemReader, ItemStream,
-		Skippable, InitializingBean, DisposableBean, ResourceLifecycle {
+		Skippable, InitializingBean, DisposableBean {
 
 	private static final String RESTART_DATA_ROW_NUMBER_KEY = ClassUtils
 			.getShortName(HibernateCursorItemReader.class)

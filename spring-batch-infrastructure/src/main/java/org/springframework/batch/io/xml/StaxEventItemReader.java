@@ -19,7 +19,6 @@ import org.springframework.batch.io.xml.stax.FragmentEventReader;
 import org.springframework.batch.io.xml.stax.TransactionalEventReader;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.stream.GenericStreamContext;
@@ -43,7 +42,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReader extends AbstractItemReader implements ItemReader, ResourceLifecycle,
+public class StaxEventItemReader extends AbstractItemReader implements ItemReader,
 		Skippable, ItemStream, StatisticsProvider, InitializingBean, DisposableBean {
 
 	public static final String READ_COUNT_STATISTICS_NAME = "StaxEventReaderItemReader.readCount";

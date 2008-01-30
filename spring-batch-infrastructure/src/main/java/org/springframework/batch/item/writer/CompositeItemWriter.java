@@ -11,13 +11,14 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
+import org.springframework.batch.item.stream.ItemStreamAdapter;
 
 /**
  * Runs a collection of ItemProcessors in fixed-order sequence.
  * 
  * @author Robert Kasanicky
  */
-public class CompositeItemWriter implements ItemWriter, ItemStream {
+public class CompositeItemWriter extends ItemStreamAdapter implements ItemWriter, ItemStream {
 
 	private static final String SEPARATOR = "#";
 
@@ -38,13 +39,8 @@ public class CompositeItemWriter implements ItemWriter, ItemStream {
 	 */
 	public StreamContext getRestartData() {
 		Properties props = createCompoundProperties(new PropertiesExtractor() {
-			public Properties extractProperties(Object o) {
-				if (o instanceof ItemStream) {
-					return ((ItemStream) o).getRestartData().getProperties();
-				}
-				else {
-					return null;
-				}
+			public Properties extractProperties(ItemStream o) {
+					return o.getRestartData().getProperties();
 			}
 		});
 		return new GenericStreamContext(props);
@@ -105,7 +101,7 @@ public class CompositeItemWriter implements ItemWriter, ItemStream {
 		Properties stats = new Properties();
 		int index = 0;
 		for (Iterator iterator = delegates.listIterator(); iterator.hasNext();) {
-			Properties writerStats = extractor.extractProperties(iterator.next());
+			Properties writerStats = extractor.extractProperties((ItemStream) iterator.next());
 			if (writerStats != null) {
 				for (Iterator iterator2 = writerStats.entrySet().iterator(); iterator2.hasNext();) {
 					Map.Entry entry = (Map.Entry) iterator2.next();
@@ -123,7 +119,7 @@ public class CompositeItemWriter implements ItemWriter, ItemStream {
 	 * null.
 	 */
 	private interface PropertiesExtractor {
-		Properties extractProperties(Object o);
+		Properties extractProperties(ItemStream o);
 	}
 	
 	public void close() throws Exception {

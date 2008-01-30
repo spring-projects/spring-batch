@@ -33,7 +33,6 @@ import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.item.writer.ItemTransformer;
@@ -61,7 +60,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  */
 public class FlatFileItemWriter extends AbstractTransactionalIoSource implements 
-	ItemWriter, ResourceLifecycle, ItemStream, StatisticsProvider, InitializingBean,
+	ItemWriter, ItemStream, StatisticsProvider, InitializingBean,
 	DisposableBean {
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");

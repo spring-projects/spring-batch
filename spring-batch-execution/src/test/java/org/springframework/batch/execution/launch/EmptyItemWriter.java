@@ -21,11 +21,11 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-public class EmptyItemWriter implements ItemWriter, InitializingBean {
+public class EmptyItemWriter extends AbstractItemWriter implements InitializingBean {
 
 	private boolean failed = false;
 

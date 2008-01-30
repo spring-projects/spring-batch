@@ -16,13 +16,12 @@
 package org.springframework.batch.io.file.separator;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ResourceLifecycle;
 
 /**
  * @author Dave Syer
  *
  */
-public interface LineReader extends ResourceLifecycle, ItemReader {
+public interface LineReader extends ItemReader {
 
 	/**
 	 * @return

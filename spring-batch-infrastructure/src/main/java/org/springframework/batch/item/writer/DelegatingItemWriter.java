@@ -7,6 +7,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
+import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -17,7 +18,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class DelegatingItemWriter implements ItemWriter, ItemStream, Skippable, InitializingBean {
+public class DelegatingItemWriter extends ItemStreamAdapter implements ItemWriter, Skippable, InitializingBean {
 
 	private ItemWriter writer;
 

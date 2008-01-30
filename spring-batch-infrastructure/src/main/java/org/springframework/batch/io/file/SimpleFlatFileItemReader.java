@@ -31,7 +31,6 @@ import org.springframework.batch.io.file.transform.AbstractLineTokenizer;
 import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.io.file.transform.LineTokenizer;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -171,11 +170,10 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 	}
 
 	/**
-	 * Close and null out the reader.
-	 * 
-	 * @see ResourceLifecycle
+	 * Close and null out the delegate line reader.
+	 * @throws Exception 
 	 */
-	public void close() {
+	public void close() throws Exception {
 		try {
 			if (reader != null) {
 				log.debug("Closing flat file for reading: "+resource);

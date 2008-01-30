@@ -2,12 +2,11 @@ package org.springframework.batch.sample.dao;
 
 import java.math.BigDecimal;
 
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ResourceLifecycle;
-import org.springframework.batch.sample.domain.CustomerCredit;
+import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import junit.framework.TestCase;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.sample.domain.CustomerCredit;
 
 public class FlatFileCustomerCreditWriterTests extends TestCase {
 
@@ -27,7 +26,7 @@ public class FlatFileCustomerCreditWriterTests extends TestCase {
 		writer.setOutputSource(output);
 	}
 
-	public void testOpen() {
+	public void testOpen() throws Exception {
 		
 		//set-up outputSource mock
 		output.open();
@@ -75,7 +74,7 @@ public class FlatFileCustomerCreditWriterTests extends TestCase {
 		outputControl.verify();
 	}
 	
-	private interface ResourceLifecycleItemWriter extends ItemWriter, ResourceLifecycle {
+	private interface ResourceLifecycleItemWriter extends ItemWriter {
 		
 	}
 }

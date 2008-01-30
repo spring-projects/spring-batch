@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.hibernate.SessionFactory;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatInterceptor;
@@ -44,7 +45,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
+public class HibernateAwareItemWriter extends ItemStreamAdapter implements ItemWriter, RepeatInterceptor,
 		InitializingBean {
 
 	/**

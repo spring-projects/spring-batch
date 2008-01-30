@@ -17,19 +17,13 @@
 package org.springframework.batch.item.reader;
 
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.stream.ItemStreamAdapter;
 
 /**
  * Base class for {@link ItemReader} implementations.
  * @author Dave Syer
  *
  */
-public abstract class AbstractItemReader implements ItemReader {
-	
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemReader#close()
-	 */
-	public void close() throws Exception {		
-	}
+public abstract class AbstractItemReader extends ItemStreamAdapter implements ItemReader {
 
 }

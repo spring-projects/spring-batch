@@ -27,7 +27,6 @@ import java.util.Iterator;
 
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.Resource;
@@ -56,7 +55,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Rob Harrop
  */
-public class ResourceLineReader extends AbstractItemReader implements LineReader, ResourceLifecycle, ItemReader,
+public class ResourceLineReader extends AbstractItemReader implements LineReader, ItemReader,
 		DisposableBean {
 
 	private static final Collection DEFAULT_COMMENTS = Collections.singleton("#");

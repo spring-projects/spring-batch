@@ -22,7 +22,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatInterceptor;
@@ -41,12 +41,13 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		public void flush() throws DataAccessException {
 			list.add("flush");
 		}
+
 		public void clear() {
-			list.add("clear");				
+			list.add("clear");
 		};
 	}
 
-	private class StubItemWriter implements ItemWriter, RepeatInterceptor {
+	private class StubItemWriter extends AbstractItemWriter implements RepeatInterceptor {
 		public void write(Object item) {
 			list.add(item);
 		}
@@ -70,13 +71,10 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		public void open(RepeatContext context) {
 			list.add(context);
 		}
-
-		public void close() throws Exception {
-		}
 	}
 
 	HibernateAwareItemWriter writer = new HibernateAwareItemWriter();
-	
+
 	final List list = new ArrayList();
 
 	private RepeatContextSupport context;
@@ -93,15 +91,16 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		writer.setHibernateTemplate(new HibernateTemplateWrapper());
 		list.clear();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	protected void tearDown() throws Exception {
 		Map map = TransactionSynchronizationManager.getResourceMap();
 		for (Iterator iterator = map.keySet().iterator(); iterator.hasNext();) {
 			String key = (String) iterator.next();
-			TransactionSynchronizationManager.unbindResource(key);			
+			TransactionSynchronizationManager.unbindResource(key);
 		}
 	}
 
@@ -116,10 +115,10 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// expected
-			assertTrue("Wrong message for exception: " + e.getMessage(), e
-					.getMessage().indexOf("delegate") >= 0);
+			assertTrue("Wrong message for exception: " + e.getMessage(), e.getMessage().indexOf("delegate") >= 0);
 		}
 	}
 
@@ -136,7 +135,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.io.support.HibernateAwareItemWriter#write(java.lang.Object)}.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testWrite() throws Exception {
 		writer.write("foo");
@@ -158,7 +157,8 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		try {
 			writer.close(context);
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("bar", e.getMessage());
 		}
 		assertEquals(2, list.size());
@@ -169,7 +169,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.io.support.HibernateAwareItemWriter#write(java.lang.Object)}.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testWriteAndCloseWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("bar");
@@ -182,7 +182,8 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		try {
 			writer.close(context);
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("bar", e.getMessage());
 		}
 		assertEquals(3, list.size());

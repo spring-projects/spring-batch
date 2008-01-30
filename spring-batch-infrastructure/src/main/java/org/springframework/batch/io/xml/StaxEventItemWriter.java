@@ -18,7 +18,6 @@ import org.springframework.batch.io.support.FileUtils;
 import org.springframework.batch.io.xml.stax.NoStartEndDocumentStreamWriter;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
@@ -42,7 +41,7 @@ import org.springframework.util.CollectionUtils;
  * @author Peter Zozom
  *
  */
-public class StaxEventItemWriter implements ItemWriter, ResourceLifecycle, ItemStream,
+public class StaxEventItemWriter implements ItemWriter, ItemStream,
 		StatisticsProvider, InitializingBean, DisposableBean {
 
 	// default encoding

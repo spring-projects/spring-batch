@@ -38,7 +38,7 @@ import org.springframework.batch.item.reader.AbstractItemReader;
  * @author Lucas Ward
  * @since 1.0
  */
-public interface ItemReader {
+public interface ItemReader extends ItemStream {
 
 	/**
 	 * Reads a piece of input data and advance to the next one. Implementations
@@ -51,9 +51,4 @@ public interface ItemReader {
 	 */
 	Object read() throws Exception;
 
-	/**
-	 * Close the reader, freeing any resources that may have been allocated
-	 * since the first call to read().
-	 */
-	void close() throws Exception;
 }
