@@ -272,7 +272,7 @@ public class SimpleJobTests extends TestCase {
 			this.runnable = runnable;
 		}
 
-		public ExitStatus process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
+		public void process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
 			if (exception instanceof RuntimeException) {
 				throw (RuntimeException)exception;
 			}
@@ -282,7 +282,7 @@ public class SimpleJobTests extends TestCase {
 			if (runnable!=null) {
 				runnable.run();
 			}
-			return ExitStatus.FINISHED;
+			stepExecution.setExitStatus(ExitStatus.FINISHED);
 		}
 
 	}

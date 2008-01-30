@@ -21,6 +21,7 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
@@ -111,7 +112,8 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 		template.setRetryPolicy(itemProviderRetryPolicy);
 
 		if (retryPolicy != null) {
-			retryCallback = new ItemReaderRetryCallback(itemProvider, itemWriter);
+			Assert.state(itemProvider instanceof KeyedItemReader, "ItemReader must be instance of KeyedItemReader to use the retry policy");
+			retryCallback = new ItemReaderRetryCallback((KeyedItemReader) itemProvider, itemWriter);
 			retryCallback.setRecoverer(itemRecoverer);
 		}
 

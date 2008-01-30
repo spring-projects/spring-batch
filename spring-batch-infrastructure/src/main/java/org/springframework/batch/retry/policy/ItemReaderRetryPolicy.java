@@ -19,8 +19,8 @@ package org.springframework.batch.retry.policy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.FailedItemIdentifier;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
@@ -109,7 +109,7 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 	public RetryContext open(RetryCallback callback) {
 		Assert.state(callback instanceof ItemReaderRetryCallback,
 				"Callback must be ItemProviderRetryCallback");
-		ItemProviderRetryContext context = new ItemProviderRetryContext(
+		ItemReaderRetryContext context = new ItemReaderRetryContext(
 				(ItemReaderRetryCallback) callback);
 		context.open(callback);
 		return context;
@@ -137,7 +137,7 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 		return ((RetryPolicy) context).handleRetryExhausted(context);
 	}
 
-	private class ItemProviderRetryContext extends RetryContextSupport
+	private class ItemReaderRetryContext extends RetryContextSupport
 			implements RetryPolicy {
 
 		private Object item;
@@ -145,11 +145,11 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 		// The delegate context...
 		private RetryContext delegateContext;
 
-		private ItemReader reader;
+		private KeyedItemReader reader;
 
 		private ItemRecoverer recoverer;
 
-		public ItemProviderRetryContext(ItemReaderRetryCallback callback) {
+		public ItemReaderRetryContext(ItemReaderRetryCallback callback) {
 			super(RetrySynchronizationManager.getContext());
 			item = callback.next(this);
 			this.reader = callback.getReader();
@@ -239,7 +239,7 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * @param item
 	 * @return
 	 */
-	protected boolean hasFailed(ItemReader provider, Object item) {
+	protected boolean hasFailed(KeyedItemReader provider, Object item) {
 		if (provider instanceof FailedItemIdentifier) {
 			return ((FailedItemIdentifier) provider).hasFailed(item);
 		}

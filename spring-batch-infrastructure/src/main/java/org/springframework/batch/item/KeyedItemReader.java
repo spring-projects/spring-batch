@@ -13,31 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.domain;
-
-import java.util.List;
-
-import org.springframework.batch.io.exception.BatchCriticalException;
+package org.springframework.batch.item;
 
 /**
- * Batch domain object representing a job. Job is an explicit abstraction
- * representing the configuration of a job specified by a developer. It should
- * be noted that restart policy is applied to the job as a whole and not to a
- * step.
+ * Extension of the {@link ItemReader} interface that allows items to be
+ * identified and tagged by a unique key.
  * 
  * @author Dave Syer
- *
+ * 
  */
-public interface Job {
+public interface KeyedItemReader extends ItemReader {
 
-	String getName();
-
-	List getSteps();
-
-	int getStartLimit();
-
-	boolean isRestartable();
-
-	void run(JobExecution execution) throws BatchCriticalException;
+	/**
+	 * Get a unique identifier for the item that can be used to cache it between
+	 * calls if necessary, and then identify it later.
+	 * 
+	 * @param item the current item.
+	 * @return a unique identifier.
+	 */
+	Object getKey(Object item);
 
 }

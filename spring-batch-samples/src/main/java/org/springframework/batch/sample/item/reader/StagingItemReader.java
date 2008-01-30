@@ -11,7 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.sample.item.writer.StagingItemWriter;
@@ -26,7 +26,7 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
-public class StagingItemReader extends JdbcDaoSupport implements ItemReader, ResourceLifecycle, DisposableBean,
+public class StagingItemReader extends JdbcDaoSupport implements KeyedItemReader, ResourceLifecycle, DisposableBean,
 		StepContextAware {
 
 	// Key for buffer in transaction synchronization manager

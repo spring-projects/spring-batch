@@ -16,14 +16,12 @@
 package org.springframework.batch.core.domain;
 
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.repeat.ExitStatus;
-
 
 /**
  * Batch domain interface representing the configuration of a step. As with the
- * (@link Job), step configuration is meant to explicitly represent
- * a the configuration of a step by a developer. This allows for the separation
- * of what a developer configures from the myriad of concerns required for
+ * (@link Job), step configuration is meant to explicitly represent a the
+ * configuration of a step by a developer. This allows for the separation of
+ * what a developer configures from the myriad of concerns required for
  * executing a job.
  * 
  * @author Dave Syer
@@ -41,7 +39,7 @@ public interface Step {
 	 * again.
 	 */
 	boolean isAllowStartIfComplete();
-	
+
 	/**
 	 * Flag to indicate if restart data needs to be saved for this step.
 	 * @return true if restart data should be saved
@@ -53,11 +51,15 @@ public interface Step {
 	 * identifier.
 	 */
 	int getStartLimit();
-	
+
 	/**
-	 * It is not safe to re-use an instance of {@link StepExecutor} to process
-	 * multiple concurrent executions. Use the factory method in {@link Step} to
-	 * create a new instance and execute that.
+	 * Process the step and assign progress and status meta information to the
+	 * {@link StepExecution} provided. The {@link Step} is responsible for
+	 * setting the meta information and also saving it if required by the
+	 * implementation.<br/>
+	 * 
+	 * It is not safe to re-use an instance of {@link Step} to process multiple
+	 * concurrent executions.
 	 * 
 	 * @param stepExecution an entity representing the step to be executed
 	 * 
@@ -65,6 +67,6 @@ public interface Step {
 	 * @throws BatchCriticalException if there is a problem that needs to be
 	 * signalled to the caller
 	 */
-	ExitStatus process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException;
+	void process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException;
 
 }

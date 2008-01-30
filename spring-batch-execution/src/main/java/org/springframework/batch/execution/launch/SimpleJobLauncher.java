@@ -24,7 +24,6 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -83,10 +82,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 			public void run() {
 				try {
 					logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters + "]");
-					ExitStatus exitStatus = job.run(jobExecution);
-					// The exit status should be set by the Job. TODO: remove
-					// this line...
-					jobExecution.setExitStatus(exitStatus);
+					job.run(jobExecution);
 					logger.info("Job: [" + job + "] completed successfully with the following parameters: ["
 							+ jobParameters + "]");
 				}

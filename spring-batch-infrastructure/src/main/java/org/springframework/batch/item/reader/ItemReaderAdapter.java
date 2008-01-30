@@ -33,11 +33,11 @@ public class ItemReaderAdapter extends AbstractMethodInvokingDelegator implement
 		return invokeDelegateMethod();
     }
 
-    //harmless implementation of method required by ItemReader interface
-	public Object getKey(Object item) {
-		return item;
-	}
-
+	/**
+	 * Do nothing.
+	 * 
+	 * @see org.springframework.batch.item.ItemReader#close()
+	 */
 	public void close() throws Exception {
 		
 	}

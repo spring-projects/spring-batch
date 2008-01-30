@@ -22,7 +22,6 @@ import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
@@ -112,9 +111,9 @@ public abstract class AbstractStep extends StepSupport {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepSupport#process(org.springframework.batch.core.domain.StepExecution)
 	 */
-	public ExitStatus process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
+	public void process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
 		SimpleStepExecutor executor = createStepExecutor();
-		return executor.process(stepExecution);
+		executor.process(stepExecution);
 	}
 
 	/**

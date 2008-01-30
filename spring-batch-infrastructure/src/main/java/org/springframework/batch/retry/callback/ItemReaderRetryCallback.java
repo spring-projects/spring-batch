@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
@@ -47,13 +48,13 @@ public class ItemReaderRetryCallback implements RetryCallback {
 	public static final String ITEM = ItemReaderRetryCallback.class.getName()
 			+ ".ITEM";
 
-	private ItemReader provider;
+	private KeyedItemReader provider;
 
 	private ItemWriter writer;
 
 	private ItemRecoverer recoverer;
 
-	public ItemReaderRetryCallback(ItemReader provider,
+	public ItemReaderRetryCallback(KeyedItemReader provider,
 			ItemWriter writer) {
 		super();
 		this.provider = provider;
@@ -127,7 +128,7 @@ public class ItemReaderRetryCallback implements RetryCallback {
 	 * 
 	 * @return the {@link ItemReader} instance.
 	 */
-	public ItemReader getReader() {
+	public KeyedItemReader getReader() {
 		return provider;
 	}
 

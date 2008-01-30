@@ -21,5 +21,8 @@ import org.springframework.batch.item.reader.AbstractItemReader;
  * @author Dave Syer
  *
  */
-public abstract class AbstractItemReaderRecoverer extends AbstractItemReader implements ItemRecoverer {
+public abstract class AbstractItemReaderRecoverer extends AbstractItemReader implements KeyedItemReader, ItemRecoverer {
+	public Object getKey(Object item) {
+		return item;
+	}
 }

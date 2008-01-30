@@ -173,7 +173,7 @@ public class SimpleStepExecutor {
 	 * execution
 	 * @see StepExecutor#process(StepExecution)
 	 */
-	public ExitStatus process(final StepExecution stepExecution) throws BatchCriticalException,
+	public void process(final StepExecution stepExecution) throws BatchCriticalException,
 			StepInterruptedException {
 
 		final StepInstance stepInstance = stepExecution.getStep();
@@ -276,7 +276,6 @@ public class SimpleStepExecutor {
 			});
 
 			updateStatus(stepExecution, BatchStatus.COMPLETED);
-			return status;
 		}
 		catch (RuntimeException e) {
 

@@ -24,7 +24,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.FailedItemIdentifier;
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.RepeatContext;
@@ -41,7 +41,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 
 	private ItemReaderRetryPolicy policy = new ItemReaderRetryPolicy();
 
-	private ItemReader provider;
+	private org.springframework.batch.item.KeyedItemReader provider;
 
 	private int count = 0;
 
@@ -299,7 +299,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 		assertTrue(policy.hasFailed(provider, "foo"));
 	}
 
-	private static class MockFailedItemProvider extends ListItemReader implements FailedItemIdentifier {
+	private static class MockFailedItemProvider extends ListItemReader implements KeyedItemReader, FailedItemIdentifier {
 
 		private int hasFailedCount = 0;
 

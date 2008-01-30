@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.restart.RestartData;
@@ -51,7 +51,7 @@ import org.springframework.util.Assert;
  * @since 1.0
  */
 public class DrivingQueryItemReader extends AbstractTransactionalIoSource
-		implements ItemReader, ResourceLifecycle, InitializingBean,
+		implements KeyedItemReader, ResourceLifecycle, InitializingBean,
 		DisposableBean, Restartable {
 
 	private boolean initialized = false;

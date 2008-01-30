@@ -20,7 +20,6 @@ import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatOperations;
 
 /**
@@ -78,7 +77,7 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.execution.step.simple.AbstractStep#process(org.springframework.batch.core.domain.StepExecution)
 	 */
-	public ExitStatus process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
+	public void process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
 		assertMandatoryProperties();
 		SimpleStepExecutor executor = (SimpleStepExecutor) super.createStepExecutor();
 		if (stepOperations != null) {
@@ -87,6 +86,6 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 		if (chunkOperations != null) {
 			executor.setChunkOperations(chunkOperations);
 		}
-		return executor.process(stepExecution);
+		executor.process(stepExecution);
 	}
 }

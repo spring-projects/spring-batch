@@ -55,7 +55,7 @@ public class SimpleJob extends JobSupport {
 	 * 
 	 * @see org.springframework.batch.core.domain.Job#run(org.springframework.batch.core.domain.JobExecution)
 	 */
-	public ExitStatus run(JobExecution execution) throws BatchCriticalException {
+	public void run(JobExecution execution) throws BatchCriticalException {
 
 		JobInstance jobInstance = execution.getJobInstance();
 		updateStatus(execution, BatchStatus.STARTING);
@@ -78,7 +78,8 @@ public class SimpleJob extends JobSupport {
 					startedCount++;
 					updateStatus(execution, BatchStatus.STARTED);
 					StepExecution stepExecution = execution.createStepExecution(stepInstance);
-					status = step.process(stepExecution);
+					step.process(stepExecution);
+					status = stepExecution.getExitStatus();
 				}
 			}
 
@@ -111,7 +112,6 @@ public class SimpleJob extends JobSupport {
 			jobRepository.saveOrUpdate(execution);
 		}
 
-		return status;
 	}
 
 	private void updateStatus(JobExecution jobExecution, BatchStatus status) {

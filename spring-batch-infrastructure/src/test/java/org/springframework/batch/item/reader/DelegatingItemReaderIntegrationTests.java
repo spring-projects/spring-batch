@@ -41,14 +41,6 @@ public class DelegatingItemReaderIntegrationTests extends AbstractDependencyInje
 		}
 	}
 
-	/**
-	 * getKey(..) is implemented trivially.
-	 */
-	public void testGetKey() {
-		Object item = new Object();
-		assertSame(item, provider.getKey(item));
-	}
-
 	public void setProvider(ItemReaderAdapter provider) {
 		this.provider = provider;
 	}

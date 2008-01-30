@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.ClassUtils;
 
@@ -134,7 +133,7 @@ public class JobSupport implements BeanNameAware, Job {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.Job#run(org.springframework.batch.core.domain.JobExecution)
 	 */
-	public ExitStatus run(JobExecution execution) throws BatchCriticalException {
+	public void run(JobExecution execution) throws BatchCriticalException {
 		throw new UnsupportedOperationException("JobSupport does not provide an implementation of run().  Use a smarter subclass.");
 	}
 

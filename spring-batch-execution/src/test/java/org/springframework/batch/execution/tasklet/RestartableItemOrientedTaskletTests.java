@@ -55,10 +55,6 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 			assertEquals(this.data.getProperties(), data.getProperties());
 		}
 
-		public Object getKey(Object item) {
-			return null;
-		}
-
 		public boolean recover(Object data, Throwable cause) {
 			return false;
 		}

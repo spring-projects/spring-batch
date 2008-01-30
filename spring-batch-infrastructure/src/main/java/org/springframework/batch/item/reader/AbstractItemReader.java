@@ -24,18 +24,11 @@ import org.springframework.batch.item.ItemReader;
  *
  */
 public abstract class AbstractItemReader implements ItemReader {
-
-	/**
-	 * Simply returns the item itself. Will be adequate for many purposes, but
-	 * not (for example) if the item is a message - in which case the identifier
-	 * should be used.
-	 * 
-	 * @see org.springframework.batch.item.ItemReader#getKey(java.lang.Object)
-	 */
-	public Object getKey(Object item) {
-		return item;
-	}
 	
+	/**
+	 * Do nothing.
+	 * @see org.springframework.batch.item.ItemReader#close()
+	 */
 	public void close() throws Exception {		
 	}
 

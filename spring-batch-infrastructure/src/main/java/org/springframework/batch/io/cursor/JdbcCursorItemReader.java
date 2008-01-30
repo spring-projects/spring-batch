@@ -31,7 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
 import org.springframework.batch.restart.GenericRestartData;
 import org.springframework.batch.restart.RestartData;
@@ -117,7 +117,7 @@ import org.springframework.util.StringUtils;
  * @author Peter Zozom
  */
 public class JdbcCursorItemReader extends AbstractTransactionalIoSource
-		implements ItemReader, ResourceLifecycle, DisposableBean,
+		implements KeyedItemReader, ResourceLifecycle, DisposableBean,
 		InitializingBean, Restartable, StatisticsProvider, Skippable {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);

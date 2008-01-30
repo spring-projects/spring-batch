@@ -27,6 +27,7 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
@@ -217,11 +218,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 				return true;
 			}
 		});
-		module.setItemReader(new AbstractItemReader() {
-			public Object read() throws Exception {
-				return "foo";
-			}
-		});
+		module.setItemReader(new MockItemReader());
 		module.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
 				throw new RuntimeException("FOO");
@@ -267,7 +264,16 @@ public class ItemOrientedTaskletTests extends TestCase {
 		}
 	}
 
-	private class SkippableItemReader implements ItemReader,
+	private class MockItemReader extends AbstractItemReader implements KeyedItemReader {
+		public Object read() throws Exception {
+			return "foo";
+		}
+		public Object getKey(Object item) {
+			return item;
+		}
+	}
+
+	private class SkippableItemReader implements KeyedItemReader,
 			Skippable, StatisticsProvider {
 		public Object read() throws Exception {
 			return itemProvider.read();

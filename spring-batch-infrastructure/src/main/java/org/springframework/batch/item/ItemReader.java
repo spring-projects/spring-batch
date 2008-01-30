@@ -16,9 +16,10 @@
 
 package org.springframework.batch.item;
 
+import org.springframework.batch.item.reader.AbstractItemReader;
+
 /**
- * Strategy interface for providing the data for a given batch stage execution.
- * <br/>
+ * Strategy interface for providing the data. <br/>
  * 
  * Implementations are expected to be stateful and will be called multiple times
  * for each batch, with each call to {@link #next} returning a different value
@@ -26,8 +27,8 @@ package org.springframework.batch.item;
  * 
  * Implementations need to be thread safe and clients of a {@link ItemReader}
  * need to be aware that this is the case. Clients can code to this interface
- * without worrying about thread safety by using the AbstractItemProvider base
- * class.<br/>
+ * without worrying about thread safety by using the {@link AbstractItemReader}
+ * base class.<br/>
  * 
  * A richer interface (e.g. with a look ahead or peek) is not feasible because
  * we need to support transactions in an asynchronous batch.
@@ -50,15 +51,6 @@ public interface ItemReader {
 	 */
 	Object read() throws Exception;
 
-	/**
-	 * Get a unique identifier for the item that can be used to cache it between
-	 * calls if necessary, and then identify it later.
-	 * 
-	 * @param item the current item.
-	 * @return a unique identifier.
-	 */
-	Object getKey(Object item);
-	
 	/**
 	 * Close the reader, freeing any resources that may have been allocated
 	 * since the first call to read().

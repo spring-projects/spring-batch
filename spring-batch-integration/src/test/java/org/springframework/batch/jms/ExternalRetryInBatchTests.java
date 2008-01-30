@@ -22,7 +22,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.batch.item.AbstractItemReaderRecoverer;
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
@@ -48,7 +48,7 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 
 	private RepeatTemplate repeatTemplate;
 
-	private ItemReader provider;
+	private KeyedItemReader provider;
 
 	private JdbcTemplate jdbcTemplate;
 

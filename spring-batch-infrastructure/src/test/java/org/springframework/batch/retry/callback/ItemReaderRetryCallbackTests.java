@@ -22,7 +22,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.retry.ListItemReaderRecoverer;
 import org.springframework.batch.retry.RetryContext;
@@ -40,7 +39,7 @@ public class ItemReaderRetryCallbackTests extends TestCase {
 
 	RetryTemplate template;
 
-	ListItemReader provider;
+	ListItemReaderRecoverer provider;
 
 	ItemReaderRetryCallback callback;
 

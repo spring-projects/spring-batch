@@ -18,11 +18,11 @@ package org.springframework.batch.retry;
 
 import java.util.List;
 
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.reader.ListItemReader;
 
-public class ListItemReaderRecoverer extends ListItemReader implements ItemReader, ItemRecoverer {
+public class ListItemReaderRecoverer extends ListItemReader implements KeyedItemReader, ItemRecoverer {
 
 	/**
 	 * Delegate to super class constructor.
@@ -42,6 +42,15 @@ public class ListItemReaderRecoverer extends ListItemReader implements ItemReade
 	 */
 	public boolean recover(Object item, Throwable cause) {
 		return false;
+	}
+	
+	/** 
+	 * Return the item (assume it is its own key).
+	 * 
+	 * @see org.springframework.batch.item.KeyedItemReader#getKey(java.lang.Object)
+	 */
+	public Object getKey(Object item) {
+		return item;
 	}
 
 }
