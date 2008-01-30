@@ -43,7 +43,7 @@ public class JobExecution extends Entity {
 
 	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
-	// Package private constructor for Hibernate
+	// Package private constructor for testing
 	JobExecution() {
 	}
 

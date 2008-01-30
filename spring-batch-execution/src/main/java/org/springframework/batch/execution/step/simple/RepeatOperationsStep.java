@@ -77,7 +77,7 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.execution.step.simple.AbstractStep#process(org.springframework.batch.core.domain.StepExecution)
 	 */
-	public void process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
+	public void execute(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
 		assertMandatoryProperties();
 		SimpleStepExecutor executor = (SimpleStepExecutor) super.createStepExecutor();
 		if (stepOperations != null) {
@@ -86,6 +86,6 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 		if (chunkOperations != null) {
 			executor.setChunkOperations(chunkOperations);
 		}
-		executor.process(stepExecution);
+		executor.execute(stepExecution);
 	}
 }

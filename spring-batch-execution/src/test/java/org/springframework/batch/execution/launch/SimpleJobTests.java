@@ -113,7 +113,7 @@ public class SimpleJobTests extends TestCase {
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 
-		job.run(jobExecutionContext);
+		job.execute(jobExecutionContext);
 		assertEquals(BatchStatus.COMPLETED, jobInstance.getStatus());
 		assertEquals(3, processed.size());
 		assertTrue(processed.contains("foo"));
@@ -153,7 +153,7 @@ public class SimpleJobTests extends TestCase {
 		job.setSteps(Collections.singletonList(step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
-		job.run(jobExecution);
+		job.execute(jobExecution);
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getJobInstance().getStatus());
 		assertEquals(0, processed.size());
@@ -178,7 +178,7 @@ public class SimpleJobTests extends TestCase {
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
 		try {
-			job.run(jobExecution);
+			job.execute(jobExecution);
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {

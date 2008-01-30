@@ -67,6 +67,6 @@ public interface Step {
 	 * @throws BatchCriticalException if there is a problem that needs to be
 	 * signalled to the caller
 	 */
-	void process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException;
+	void execute(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException;
 
 }

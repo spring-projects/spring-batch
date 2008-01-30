@@ -104,7 +104,7 @@ public class JobSupportTests extends TestCase {
 	
 	public void testRunNotSupported() throws Exception {
 		try {
-			job.run(null);
+			job.execute(null);
 		} catch (UnsupportedOperationException e) {
 			// expected
 			String message = e.getMessage();

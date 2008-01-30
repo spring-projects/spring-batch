@@ -86,7 +86,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		Thread processingThread = new Thread() {
 			public void run() {
 				try {
-					stepConfiguration.process(stepExecution);
+					stepConfiguration.execute(stepExecution);
 				}
 				catch (StepInterruptedException e) {
 					// do nothing...

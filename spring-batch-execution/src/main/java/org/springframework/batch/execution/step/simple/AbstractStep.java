@@ -111,9 +111,9 @@ public abstract class AbstractStep extends StepSupport {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepSupport#process(org.springframework.batch.core.domain.StepExecution)
 	 */
-	public void process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
+	public void execute(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
 		SimpleStepExecutor executor = createStepExecutor();
-		executor.process(stepExecution);
+		executor.execute(stepExecution);
 	}
 
 	/**

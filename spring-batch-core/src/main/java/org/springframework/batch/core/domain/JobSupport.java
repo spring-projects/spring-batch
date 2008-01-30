@@ -133,7 +133,7 @@ public class JobSupport implements BeanNameAware, Job {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.Job#run(org.springframework.batch.core.domain.JobExecution)
 	 */
-	public void run(JobExecution execution) throws BatchCriticalException {
+	public void execute(JobExecution execution) throws BatchCriticalException {
 		throw new UnsupportedOperationException("JobSupport does not provide an implementation of run().  Use a smarter subclass.");
 	}
 

@@ -126,7 +126,7 @@ public class SimpleJobTests extends TestCase {
 	public void testRunNormally() throws Exception {
 		stepConfiguration1.setStartLimit(5);
 		stepConfiguration2.setStartLimit(5);
-		job.run(jobExecution);
+		job.execute(jobExecution);
 		assertEquals(2, list.size());
 		checkRepository(BatchStatus.COMPLETED);
 	}
@@ -149,7 +149,7 @@ public class SimpleJobTests extends TestCase {
 				return ExitStatus.FINISHED;
 			}
 		});
-		job.run(jobExecution);
+		job.execute(jobExecution);
 		assertEquals(2, list.size());
 		checkRepository(BatchStatus.COMPLETED, ExitStatus.FINISHED);
 
@@ -169,7 +169,7 @@ public class SimpleJobTests extends TestCase {
 		final StepInterruptedException exception = new StepInterruptedException("Interrupt!");
 		stepConfiguration1.setProcessException(exception);
 		try {
-			job.run(jobExecution);
+			job.execute(jobExecution);
 		}
 		catch (BatchCriticalException e) {
 			assertEquals(exception, e.getCause());
@@ -184,7 +184,7 @@ public class SimpleJobTests extends TestCase {
 		final RuntimeException exception = new RuntimeException("Foo!");
 		stepConfiguration1.setProcessException(exception);
 		try {
-			job.run(jobExecution);
+			job.execute(jobExecution);
 		}
 		catch (RuntimeException e) {
 			assertEquals(exception, e);
@@ -198,7 +198,7 @@ public class SimpleJobTests extends TestCase {
 		stepConfiguration1.setStartLimit(0);
 
 		try {
-			job.run(jobExecution);
+			job.execute(jobExecution);
 			fail("Expected BatchCriticalException");
 		}
 		catch (BatchCriticalException ex) {
@@ -211,7 +211,7 @@ public class SimpleJobTests extends TestCase {
 	public void testNoSteps() throws Exception {
 		job.setSteps(new ArrayList());
 
-		job.run(jobExecution);
+		job.execute(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
 		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().indexOf(
 				"No steps configured") >= 0);
@@ -221,7 +221,7 @@ public class SimpleJobTests extends TestCase {
 		step1.setStatus(BatchStatus.COMPLETED);
 		step2.setStatus(BatchStatus.COMPLETED);
 
-		job.run(jobExecution);
+		job.execute(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
 		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().indexOf(
 				"steps already completed") >= 0);
@@ -272,7 +272,7 @@ public class SimpleJobTests extends TestCase {
 			this.runnable = runnable;
 		}
 
-		public void process(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
+		public void execute(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
 			if (exception instanceof RuntimeException) {
 				throw (RuntimeException)exception;
 			}

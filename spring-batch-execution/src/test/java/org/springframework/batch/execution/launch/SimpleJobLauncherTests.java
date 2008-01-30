@@ -41,7 +41,7 @@ public class SimpleJobLauncherTests extends TestCase {
 	private MockControl repositoryControl = MockControl.createControl(JobRepository.class);
 
 	private Job job = new JobSupport("foo") {
-		public void run(JobExecution execution) {
+		public void execute(JobExecution execution) {
 			execution.setExitStatus(ExitStatus.FINISHED);
 			return;
 		}
@@ -89,7 +89,7 @@ public class SimpleJobLauncherTests extends TestCase {
 
 	public void testRunWithException() throws Exception {
 		job = new JobSupport() {
-			public void run(JobExecution execution) {
+			public void execute(JobExecution execution) {
 				execution.setExitStatus(ExitStatus.FAILED);
 				throw new RuntimeException("foo");
 			}
@@ -105,7 +105,7 @@ public class SimpleJobLauncherTests extends TestCase {
 
 	public void testRunWithError() throws Exception {
 		job = new JobSupport() {
-			public void run(JobExecution execution) {
+			public void execute(JobExecution execution) {
 				execution.setExitStatus(ExitStatus.FAILED);
 				throw new Error("foo");
 			}

@@ -53,9 +53,9 @@ public class SimpleJob extends JobSupport {
 	 * Run the specified job by looping through the steps and delegating to the
 	 * {@link Step}.
 	 * 
-	 * @see org.springframework.batch.core.domain.Job#run(org.springframework.batch.core.domain.JobExecution)
+	 * @see org.springframework.batch.core.domain.Job#execute(org.springframework.batch.core.domain.JobExecution)
 	 */
-	public void run(JobExecution execution) throws BatchCriticalException {
+	public void execute(JobExecution execution) throws BatchCriticalException {
 
 		JobInstance jobInstance = execution.getJobInstance();
 		updateStatus(execution, BatchStatus.STARTING);
@@ -78,7 +78,7 @@ public class SimpleJob extends JobSupport {
 					startedCount++;
 					updateStatus(execution, BatchStatus.STARTED);
 					StepExecution stepExecution = execution.createStepExecution(stepInstance);
-					step.process(stepExecution);
+					step.execute(stepExecution);
 					status = stepExecution.getExitStatus();
 				}
 			}

@@ -171,9 +171,9 @@ public class SimpleStepExecutor {
 	 * @throws StepInterruptedException if the step or a chunk is interrupted
 	 * @throws RuntimeException if there is an exception during a chunk
 	 * execution
-	 * @see StepExecutor#process(StepExecution)
+	 * @see StepExecutor#execute(StepExecution)
 	 */
-	public void process(final StepExecution stepExecution) throws BatchCriticalException,
+	public void execute(final StepExecution stepExecution) throws BatchCriticalException,
 			StepInterruptedException {
 
 		final StepInstance stepInstance = stepExecution.getStep();

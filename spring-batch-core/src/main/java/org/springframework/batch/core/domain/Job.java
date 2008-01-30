@@ -26,7 +26,7 @@ import org.springframework.batch.io.exception.BatchCriticalException;
  * step.
  * 
  * @author Dave Syer
- *
+ * 
  */
 public interface Job {
 
@@ -38,6 +38,13 @@ public interface Job {
 
 	boolean isRestartable();
 
-	void run(JobExecution execution) throws BatchCriticalException;
+	/**
+	 * Run the {@link JobExecution} and update the meta information like status
+	 * and statistics as necessary.
+	 * 
+	 * @param execution a {@link JobExecution}
+	 * @throws BatchCriticalException
+	 */
+	void execute(JobExecution execution) throws BatchCriticalException;
 
 }

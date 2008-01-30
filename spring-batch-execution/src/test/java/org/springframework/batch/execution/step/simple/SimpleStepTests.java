@@ -60,7 +60,7 @@ public class SimpleStepTests extends TestCase {
 				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
 				new Long(12)));
 		try {
-			executor.process(stepExecution);
+			executor.execute(stepExecution);
 			fail("Expected RuntimeException");
 		} catch (NullPointerException e) {
 			throw e;

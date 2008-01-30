@@ -89,7 +89,7 @@ public class StepSupportTests extends TestCase {
 
 	public void testUnsuccessfulWrongConfiguration() throws Exception {
 		try {
-			new StepSupport().process(null);
+			new StepSupport().execute(null);
 			fail("Expected UnsupportedOperationException");
 		} catch (UnsupportedOperationException e) {
 			// expected
