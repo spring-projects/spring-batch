@@ -8,9 +8,9 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.io.sample.domain.Foo;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.stream.GenericStreamContext;
-import org.springframework.batch.stream.ItemStream;
-import org.springframework.batch.stream.StreamContext;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;

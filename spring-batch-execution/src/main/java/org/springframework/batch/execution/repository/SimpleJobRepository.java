@@ -34,7 +34,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.Assert;
 

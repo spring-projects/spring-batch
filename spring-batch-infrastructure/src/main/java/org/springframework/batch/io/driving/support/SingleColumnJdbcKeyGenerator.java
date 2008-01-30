@@ -21,8 +21,8 @@ import java.util.Properties;
 
 import org.apache.commons.lang.ClassUtils;
 import org.springframework.batch.io.driving.KeyGenerator;
-import org.springframework.batch.stream.GenericStreamContext;
-import org.springframework.batch.stream.StreamContext;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
@@ -113,7 +113,7 @@ public class SingleColumnJdbcKeyGenerator implements KeyGenerator {
 	 * run.
 	 * @throws IllegalStateException if restart sql statement is null.
 	 * @throws IllegalArgumentException if restart data is null.
-	 * @see KeyGenerator#restoreKeys(org.springframework.batch.stream.StreamContext)
+	 * @see KeyGenerator#restoreKeys(org.springframework.batch.item.StreamContext)
 	 */
 	public List restoreKeys(StreamContext streamContext) {
 

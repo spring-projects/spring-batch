@@ -16,13 +16,13 @@ import javax.xml.stream.XMLStreamException;
 
 import org.springframework.batch.io.support.FileUtils;
 import org.springframework.batch.io.xml.stax.NoStartEndDocumentStreamWriter;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.ResourceLifecycle;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.statistics.StatisticsProvider;
-import org.springframework.batch.stream.GenericStreamContext;
-import org.springframework.batch.stream.ItemStream;
-import org.springframework.batch.stream.StreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -380,7 +380,7 @@ public class StaxEventItemWriter implements ItemWriter, ResourceLifecycle, ItemS
 	/**
 	 * Get the restart data.
 	 * @return the restart data
-	 * @see org.springframework.batch.stream.ItemStream#getRestartData()
+	 * @see org.springframework.batch.item.ItemStream#getRestartData()
 	 */
 	public StreamContext getRestartData() {
 
@@ -394,7 +394,7 @@ public class StaxEventItemWriter implements ItemWriter, ResourceLifecycle, ItemS
 	/**
 	 * Restore processing from provided restart data.
 	 * @param data the restart data
-	 * @see org.springframework.batch.stream.ItemStream#restoreFrom(org.springframework.batch.stream.StreamContext)
+	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.StreamContext)
 	 */
 	public void restoreFrom(StreamContext data) {
 

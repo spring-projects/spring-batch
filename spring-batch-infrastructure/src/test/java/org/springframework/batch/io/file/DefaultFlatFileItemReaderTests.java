@@ -26,7 +26,7 @@ import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.transform.LineTokenizer;
-import org.springframework.batch.stream.StreamContext;
+import org.springframework.batch.item.StreamContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.support.TransactionSynchronization;

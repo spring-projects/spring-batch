@@ -2,7 +2,7 @@ package org.springframework.batch.io.driving;
 
 import java.util.List;
 
-import org.springframework.batch.stream.StreamContext;
+import org.springframework.batch.item.StreamContext;
 
 /**
  * Strategy interface used to generate keys in driving query input.

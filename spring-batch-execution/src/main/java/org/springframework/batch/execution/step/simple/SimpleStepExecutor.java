@@ -34,6 +34,8 @@ import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -46,8 +48,6 @@ import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationMan
 import org.springframework.batch.statistics.SimpleStatisticsService;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.statistics.StatisticsService;
-import org.springframework.batch.stream.ItemStream;
-import org.springframework.batch.stream.StreamContext;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;

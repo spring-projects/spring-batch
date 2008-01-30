@@ -3,10 +3,10 @@ package org.springframework.batch.item.writer;
 import java.util.Properties;
 
 import org.springframework.batch.io.Skippable;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.stream.GenericStreamContext;
-import org.springframework.batch.stream.ItemStream;
-import org.springframework.batch.stream.StreamContext;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 

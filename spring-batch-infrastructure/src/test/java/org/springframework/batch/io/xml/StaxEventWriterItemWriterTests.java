@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.springframework.batch.io.xml.StaxEventItemWriter;
 import org.springframework.batch.io.xml.oxm.MarshallingEventWriterSerializer;
-import org.springframework.batch.stream.StreamContext;
+import org.springframework.batch.item.StreamContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;

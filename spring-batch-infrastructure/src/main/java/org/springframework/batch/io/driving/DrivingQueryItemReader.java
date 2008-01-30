@@ -19,11 +19,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.ResourceLifecycle;
+import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.batch.stream.ItemStream;
-import org.springframework.batch.stream.StreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;

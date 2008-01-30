@@ -25,8 +25,8 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.writer.ItemTransformer;
-import org.springframework.batch.stream.StreamContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;

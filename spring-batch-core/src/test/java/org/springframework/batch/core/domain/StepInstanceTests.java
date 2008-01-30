@@ -19,7 +19,7 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 
 /**
  * @author Dave Syer

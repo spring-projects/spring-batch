@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.io.driving.support;
 
-import org.springframework.batch.stream.StreamContext;
+import org.springframework.batch.item.StreamContext;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 

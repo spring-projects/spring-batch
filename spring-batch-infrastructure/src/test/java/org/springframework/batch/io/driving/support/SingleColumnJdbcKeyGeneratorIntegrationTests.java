@@ -3,8 +3,8 @@ package org.springframework.batch.io.driving.support;
 import java.util.List;
 import java.util.Properties;
 
-import org.springframework.batch.stream.GenericStreamContext;
-import org.springframework.batch.stream.StreamContext;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 /**

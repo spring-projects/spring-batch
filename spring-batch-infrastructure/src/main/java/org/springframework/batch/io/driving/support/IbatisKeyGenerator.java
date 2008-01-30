@@ -5,8 +5,8 @@ import java.util.Properties;
 
 import org.springframework.batch.io.driving.DrivingQueryItemReader;
 import org.springframework.batch.io.driving.KeyGenerator;
-import org.springframework.batch.stream.GenericStreamContext;
-import org.springframework.batch.stream.StreamContext;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 import org.springframework.util.Assert;
 
@@ -54,7 +54,7 @@ public class IbatisKeyGenerator implements KeyGenerator {
 	/**
 	 * Restore the keys list given the provided restart data.
 	 *
-	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#restoreKeys(org.springframework.batch.stream.StreamContext)
+	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#restoreKeys(org.springframework.batch.item.StreamContext)
 	 */
 	public List restoreKeys(StreamContext data) {
 

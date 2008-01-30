@@ -22,12 +22,12 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.Skippable;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.item.writer.DelegatingItemWriter;
 import org.springframework.batch.statistics.StatisticsProvider;
-import org.springframework.batch.stream.GenericStreamContext;
-import org.springframework.batch.stream.ItemStream;
-import org.springframework.batch.stream.StreamContext;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**

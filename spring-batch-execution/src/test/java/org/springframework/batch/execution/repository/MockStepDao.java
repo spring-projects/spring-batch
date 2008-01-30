@@ -22,7 +22,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.stream.StreamContext;
+import org.springframework.batch.item.StreamContext;
 
 public class MockStepDao implements StepDao {
 

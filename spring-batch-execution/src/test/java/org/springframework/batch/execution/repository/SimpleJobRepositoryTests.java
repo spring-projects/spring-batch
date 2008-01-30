@@ -37,7 +37,7 @@ import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.stream.GenericStreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 
 /*
  * Test SimpleJobRepository.  The majority of test cases are tested using EasyMock,

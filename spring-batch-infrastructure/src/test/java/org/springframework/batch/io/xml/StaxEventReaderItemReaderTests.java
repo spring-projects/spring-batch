@@ -16,8 +16,8 @@ import javax.xml.stream.events.XMLEvent;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.xml.StaxEventItemReader;
-import org.springframework.batch.stream.GenericStreamContext;
-import org.springframework.batch.stream.StreamContext;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;

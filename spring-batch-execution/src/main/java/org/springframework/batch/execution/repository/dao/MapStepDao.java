@@ -25,7 +25,7 @@ import java.util.Set;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.stream.StreamContext;
+import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
 public class MapStepDao implements StepDao {

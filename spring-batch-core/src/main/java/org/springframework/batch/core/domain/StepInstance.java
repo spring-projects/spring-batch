@@ -18,8 +18,8 @@ package org.springframework.batch.core.domain;
 
 import java.util.Properties;
 
-import org.springframework.batch.stream.GenericStreamContext;
-import org.springframework.batch.stream.StreamContext;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 
 /**
  * <p>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.stream;
+package org.springframework.batch.item;
 
 /**
  * <p>
