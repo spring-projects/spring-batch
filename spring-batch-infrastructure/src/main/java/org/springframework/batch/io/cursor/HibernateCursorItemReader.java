@@ -56,15 +56,13 @@ import org.springframework.util.StringUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader extends AbstractItemReader implements ItemReader, ItemStream,
-		Skippable, InitializingBean, DisposableBean {
+public class HibernateCursorItemReader extends AbstractItemReader implements ItemReader, ItemStream, Skippable,
+		InitializingBean, DisposableBean {
 
-	private static final String RESTART_DATA_ROW_NUMBER_KEY = ClassUtils
-			.getShortName(HibernateCursorItemReader.class)
+	private static final String RESTART_DATA_ROW_NUMBER_KEY = ClassUtils.getShortName(HibernateCursorItemReader.class)
 			+ ".rowNumber";
 
-	private static final String SKIPPED_ROWS = ClassUtils
-			.getShortName(HibernateCursorItemReader.class)
+	private static final String SKIPPED_ROWS = ClassUtils.getShortName(HibernateCursorItemReader.class)
 			+ ".skippedRows";;
 
 	private SessionFactory sessionFactory;
@@ -124,7 +122,8 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 		skipCount = 0;
 		if (useStatelessSession) {
 			statelessSession.close();
-		} else {
+		}
+		else {
 			statefulSession.close();
 		}
 	}
@@ -136,19 +135,18 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 		if (useStatelessSession) {
 			statelessSession = sessionFactory.openStatelessSession();
 			cursor = statelessSession.createQuery(queryString).scroll();
-		} else {
+		}
+		else {
 			statefulSession = sessionFactory.openSession();
 			cursor = statefulSession.createQuery(queryString).scroll();
 		}
 
-		BatchTransactionSynchronizationManager
-				.registerSynchronization(synchronization);
+		BatchTransactionSynchronizationManager.registerSynchronization(synchronization);
 		initialized = true;
 	}
 
 	/**
-	 * @param sessionFactory
-	 *            hibernate session factory
+	 * @param sessionFactory hibernate session factory
 	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
@@ -164,8 +162,7 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 	}
 
 	/**
-	 * @param queryString
-	 *            HQL query string
+	 * @param queryString HQL query string
 	 */
 	public void setQueryString(String queryString) {
 		this.queryString = queryString;
@@ -174,9 +171,9 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 	/**
 	 * Can be set only in uninitialized state.
 	 * 
-	 * @param useStatelessSession
-	 *            <code>true</code> to use {@link StatelessSession}
-	 *            <code>false</code> to use standard hibernate {@link Session}
+	 * @param useStatelessSession <code>true</code> to use
+	 * {@link StatelessSession} <code>false</code> to use standard hibernate
+	 * {@link Session}
 	 */
 	public void setUseStatelessSession(boolean useStatelessSession) {
 		Assert.state(!initialized);
@@ -188,10 +185,9 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 	 */
 	public StreamContext getStreamContext() {
 		Properties props = new Properties();
-		props.setProperty(RESTART_DATA_ROW_NUMBER_KEY, ""+currentProcessedRow);
+		props.setProperty(RESTART_DATA_ROW_NUMBER_KEY, "" + currentProcessedRow);
 		String skipped = skippedRows.toString();
-		props.setProperty(SKIPPED_ROWS, skipped.substring(1,
-				skipped.length() - 1));
+		props.setProperty(SKIPPED_ROWS, skipped.substring(1, skipped.length() - 1));
 
 		return new GenericStreamContext(props);
 	}
@@ -200,25 +196,21 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 	 * Sets the cursor to the received row number.
 	 */
 	public void restoreFrom(StreamContext data) {
-		Assert
-				.state(!initialized,
-						"Cannot restore when already intialized.  Call close() first before restore()");
+		Assert.state(!initialized, "Cannot restore when already intialized.  Call close() first before restore()");
 
 		Properties props = data.getProperties();
 		if (props.getProperty(RESTART_DATA_ROW_NUMBER_KEY) == null) {
 			return;
 		}
-		currentProcessedRow = Integer.parseInt(props
-				.getProperty(RESTART_DATA_ROW_NUMBER_KEY));
+		currentProcessedRow = Integer.parseInt(props.getProperty(RESTART_DATA_ROW_NUMBER_KEY));
 		open();
-		cursor.setRowNumber(currentProcessedRow-1);
+		cursor.setRowNumber(currentProcessedRow - 1);
 
 		if (!props.containsKey(SKIPPED_ROWS)) {
 			return;
 		}
 
-		String[] skipped = StringUtils.commaDelimitedListToStringArray(props
-				.getProperty(SKIPPED_ROWS));
+		String[] skipped = StringUtils.commaDelimitedListToStringArray(props.getProperty(SKIPPED_ROWS));
 		for (int i = 0; i < skipped.length; i++) {
 			this.skippedRows.add(new Integer(skipped[i]));
 		}
@@ -238,25 +230,52 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 	/**
 	 * Encapsulates transaction events handling.
 	 */
-	private class HibernateItemReaderTransactionSynchronization extends
-			TransactionSynchronizationAdapter {
+	private class HibernateItemReaderTransactionSynchronization extends TransactionSynchronizationAdapter {
 
 		public void afterCompletion(int status) {
 			if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-				currentProcessedRow = lastCommitRowNumber;
-				if (lastCommitRowNumber == 0) {
-					cursor.beforeFirst();
-				} else {
-					// Set the cursor so that next time it is advanced it will
-					// come back to the committed row.
-					cursor.setRowNumber(lastCommitRowNumber-1);
-				}
-			} else if (status == TransactionSynchronization.STATUS_COMMITTED) {
-				lastCommitRowNumber = currentProcessedRow;
-				if (!useStatelessSession) {
-					statefulSession.clear();
-				}
+				mark(null);
 			}
+			else if (status == TransactionSynchronization.STATUS_COMMITTED) {
+				reset(null);
+			}
+		}
+	}
+
+	/**
+	 * Always true, but only supported through a single processed row count, so
+	 * do not use in an asynchronous setting.
+	 * 
+	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
+	 */
+	public boolean isMarkSupported() {
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	 */
+	public void mark(StreamContext streamContext) {
+		currentProcessedRow = lastCommitRowNumber;
+		if (lastCommitRowNumber == 0) {
+			cursor.beforeFirst();
+		}
+		else {
+			// Set the cursor so that next time it is advanced it will
+			// come back to the committed row.
+			cursor.setRowNumber(lastCommitRowNumber - 1);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	 */
+	public void reset(StreamContext streamContext) {
+		lastCommitRowNumber = currentProcessedRow;
+		if (!useStatelessSession) {
+			statefulSession.clear();
 		}
 	}
 

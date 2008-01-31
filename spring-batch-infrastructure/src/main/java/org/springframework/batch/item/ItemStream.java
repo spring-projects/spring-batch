@@ -31,7 +31,7 @@ package org.springframework.batch.item;
  * provided.
  * </p>
  * 
- * @author Lucas Ward
+ * @author Dave Syer
  * 
  */
 public interface ItemStream extends StreamContextProvider {
@@ -55,4 +55,34 @@ public interface ItemStream extends StreamContextProvider {
 	 * (except open) may throw an exception.
 	 */
 	void close() throws StreamException;
+
+	/**
+	 * Clients are expected to check this flag before calling mark or reset.
+	 * 
+	 * @return true if mark and reset are supported by the {@link ItemStream}
+	 */
+	boolean isMarkSupported();
+
+	/**
+	 * Mark the stream so that it can be reset later and the items backed out.
+	 * Implementations may use the information in the provided context to make
+	 * calculations that account for things like multiple open cursors. The
+	 * context should also be updated with any information of this nature that
+	 * might be needed by a reset or by future calls to mark.
+	 * 
+	 * @param the context which might contain information needed to determine
+	 * what action to take, and into which the current mark information can go.
+	 * 
+	 * @throws UnsupportedOperationException if the operation is not supported
+	 */
+	void mark(StreamContext streamContext);
+
+	/**
+	 * Reset the stream to the last mark. After a reset the stream state will be
+	 * such that changes (items read or written) since the last call to mark
+	 * with the same context will not be visible after a call to close.
+	 * 
+	 * @throws UnsupportedOperationException if the operation is not supported
+	 */
+	void reset(StreamContext streamContext);
 }

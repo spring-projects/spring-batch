@@ -126,6 +126,16 @@ public class DelegatingItemReaderTests extends TestCase {
 			value = "after skip";
 		}
 
+		public boolean isMarkSupported() {
+			return false;
+		}
+
+		public void mark(StreamContext streamContext) {
+		}
+
+		public void reset(StreamContext streamContext) {
+		}
+
 	}
 
 }

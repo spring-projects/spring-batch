@@ -269,14 +269,10 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 		 */
 		public void afterCompletion(int status) {
 			if (status == TransactionSynchronization.STATUS_COMMITTED) {
-				lastCommitPointRecordCount = currentRecordCount;
-				txReader.onCommit();
-				skipRecords = new ArrayList();
+				mark(null);
 			}
 			else if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-				currentRecordCount = lastCommitPointRecordCount;
-				txReader.onRollback();
-				fragmentReader.reset();
+				reset(null);
 			}
 		}
 
@@ -290,4 +286,30 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 		BatchTransactionSynchronizationManager.registerSynchronization(synchronization);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
+	 */
+	public boolean isMarkSupported() {
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	 */
+	public void mark(StreamContext streamContext) {
+		lastCommitPointRecordCount = currentRecordCount;
+		txReader.onCommit();
+		skipRecords = new ArrayList();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	 */
+	public void reset(StreamContext streamContext) {
+		currentRecordCount = lastCommitPointRecordCount;
+		txReader.onRollback();
+		fragmentReader.reset();
+	}
+
+	
 }

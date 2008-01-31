@@ -50,5 +50,27 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 	};
 
 	public void close() {
+	}
+
+	/**
+	 * True.
+	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
+	 */
+	public boolean isMarkSupported() {
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	 */
+	public void mark(StreamContext streamContext) {
+		inputSource.mark(streamContext);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	 */
+	public void reset(StreamContext streamContext) {
+		inputSource.reset(streamContext);
 	};
 }

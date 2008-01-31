@@ -22,7 +22,6 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
@@ -128,7 +127,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 * @author Dave Syer
 	 * 
 	 */
-	public class MockOutputSource implements ItemWriter, ItemStream, Skippable {
+	public class MockOutputSource extends AbstractItemStreamItemWriter implements Skippable {
 
 		private String value;
 

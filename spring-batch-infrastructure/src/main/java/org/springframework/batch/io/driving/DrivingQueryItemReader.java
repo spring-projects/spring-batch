@@ -209,11 +209,11 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	}
 
 	protected void transactionCommitted() {
-		lastCommitIndex = currentIndex;
+		mark(null);
 	}
 
 	protected void transactionRolledBack() {
-		keysIterator = keys.listIterator(lastCommitIndex);
+		reset(null);
 	}
 
 	/**
@@ -222,6 +222,29 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	 */
 	public Object getKey(Object item) {
 		return item;
+	}
+
+	/**
+	 * Returns true.
+	 * 
+	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
+	 */
+	public boolean isMarkSupported() {
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	 */
+	public void mark(StreamContext streamContext) {
+		lastCommitIndex = currentIndex;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	 */
+	public void reset(StreamContext streamContext) {
+		keysIterator = keys.listIterator(lastCommitIndex);
 	}
 
 }

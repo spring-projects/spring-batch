@@ -56,4 +56,25 @@ public class ItemStreamAdapter implements ItemStream {
 		return new GenericStreamContext(new Properties());
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
+	 */
+	public boolean isMarkSupported() {
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	 */
+	public void mark(StreamContext streamContext) {
+		throw new UnsupportedOperationException("Mark operation not supported.");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	 */
+	public void reset(StreamContext streamContext) {
+		throw new UnsupportedOperationException("Reset operation not supported.");
+	}
+
 }

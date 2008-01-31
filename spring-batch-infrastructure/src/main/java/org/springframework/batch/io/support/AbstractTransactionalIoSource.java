@@ -17,6 +17,8 @@ package org.springframework.batch.io.support;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -54,7 +56,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @see TransactionSynchronization
  * @see TransactionSynchronizationManager
  */
-public abstract class AbstractTransactionalIoSource {
+public abstract class AbstractTransactionalIoSource extends ItemStreamAdapter {
 
 	private final TransactionSynchronization synchronization = new AbstractTransactionalIoSourceTransactionSynchronization();
 
@@ -74,14 +76,14 @@ public abstract class AbstractTransactionalIoSource {
 	 * 
 	 * @see TransactionSynchronization#afterCompletion
 	 */
-	protected abstract void transactionCommitted();
+	public abstract void mark(StreamContext streamContext);
 
 	/*
 	 * Called when a transaction has been rolled back.
 	 * 
 	 * @see TransactionSynchronization#afterCompletion
 	 */
-	protected abstract void transactionRolledBack();
+	public abstract void reset(StreamContext streamContext);
 
 	/**
 	 * Encapsulates transaction events handling.
@@ -90,10 +92,18 @@ public abstract class AbstractTransactionalIoSource {
 			TransactionSynchronizationAdapter {
 		public void afterCompletion(int status) {
 			if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-				transactionRolledBack();
+				reset(null);
 			} else if (status == TransactionSynchronization.STATUS_COMMITTED) {
-				transactionCommitted();
+				mark(null);
 			}
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#isMarkSupported()
+	 */
+	public boolean isMarkSupported() {
+		return true;
+	}
+	
 }

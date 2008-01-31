@@ -20,6 +20,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.item.StreamContext;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionSynchronizationUtils;
@@ -102,12 +103,12 @@ public class AbstractTransactionalIoSourceTests extends TestCase {
 		private boolean commitCalled = false;
 		private boolean rollbackCalled = false;
 		
-		protected void transactionCommitted() {
+		public void mark(StreamContext streamContext) {
 			Assert.isTrue(!commitCalled, "Commit aleady called");
 			commitCalled = true;
 		}
 
-		protected void transactionRolledBack() {
+		public void reset(StreamContext streamContext) {
 			Assert.isTrue(!rollbackCalled, "Rollback aleady called");
 			rollbackCalled = true;
 		}

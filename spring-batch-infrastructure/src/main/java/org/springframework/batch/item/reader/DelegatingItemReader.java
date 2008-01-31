@@ -103,4 +103,32 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 			((ItemStream) inputSource).close();
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
+	 */
+	public boolean isMarkSupported() {
+		if (inputSource instanceof ItemStream) {
+			return ((ItemStream) inputSource).isMarkSupported();
+		}
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	 */
+	public void mark(StreamContext streamContext) {
+		if (inputSource instanceof ItemStream) {
+			((ItemStream) inputSource).mark(streamContext);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	 */
+	public void reset(StreamContext streamContext) {
+		if (inputSource instanceof ItemStream) {
+			((ItemStream) inputSource).reset(streamContext);
+		}
+	}
 }

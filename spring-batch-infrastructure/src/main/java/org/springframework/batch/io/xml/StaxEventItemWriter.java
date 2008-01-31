@@ -464,26 +464,46 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 		}
 
 		private void transactionComitted() {
-			lastCommitPointPosition = getPosition();
-			lastCommitPointRecordCount = currentRecordCount;
+			mark(null);
 		}
 
 		private void transactionRolledback() {
-			currentRecordCount = lastCommitPointRecordCount;
-
-			// close output
-			close();
-			// and reopen it - we do this because we need to reopen stream
-			// reader at specified position - calling setPosition() is not
-			// enough!
-			restarted = true;
-			open(lastCommitPointPosition);
+			reset(null);
 		}
 
 	}
 
 	TransactionSynchronization getSynchronization() {
 		return synchronization;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
+	 */
+	public boolean isMarkSupported() {
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	 */
+	public void mark(StreamContext streamContext) {
+		lastCommitPointPosition = getPosition();
+		lastCommitPointRecordCount = currentRecordCount;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	 */
+	public void reset(StreamContext streamContext) {
+		currentRecordCount = lastCommitPointRecordCount;
+		// close output
+		close();
+		// and reopen it - we do this because we need to reopen stream
+		// reader at specified position - calling setPosition() is not
+		// enough!
+		restarted = true;
+		open(lastCommitPointPosition);
 	}
 
 }

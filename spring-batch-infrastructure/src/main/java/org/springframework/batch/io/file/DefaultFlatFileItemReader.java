@@ -39,6 +39,7 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
  * @author Waseem Malik
  * @author Tomas Slanina
  * @author Robert Kasanicky
+ * @author Dave Syer
  */
 public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implements Skippable, ItemStream {
 
@@ -109,13 +110,34 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 		return streamContext;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
+	 */
+	public boolean isMarkSupported() {
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	 */
+	public void mark(StreamContext streamContext) {
+		getReader().mark();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	 */
+	public void reset(StreamContext streamContext) {
+		getReader().reset();
+	}
+
 	/**
 	 * This method marks the start of a transaction. It marks the InputBuffer
 	 * Reader, so that in case of rollback it can position the file to start of
 	 * the transaction.
 	 */
 	private void transactionStarted() {
-		getReader().mark();
+		mark(null);
 	}
 
 	/**
@@ -130,7 +152,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * Rollback the transaction.
 	 */
 	private void transactionRolledback() {
-		getReader().reset();
+		reset(null);
 	}
 
 	/**
