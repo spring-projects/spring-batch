@@ -406,6 +406,8 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	 * @see org.springframework.batch.restart.Restartable#getRestartData()
 	 */
 	public StreamContext getStreamContext() {
+		StreamContext streamContext = new StreamContext();
+		
 		String skipped = skippedRows.toString();
 		Properties statistics = getStatistics();
 		statistics.setProperty(SKIPPED_ROWS, skipped.substring(1,skipped.length()-1));
@@ -425,14 +427,13 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 
 		open();
 
-		Properties restartProperties = data.getProperties();
-		if (!restartProperties.containsKey(CURRENT_PROCESSED_ROW)) {
+	//	Properties restartProperties = data.getProperties();
+		if (!data.containsKey(CURRENT_PROCESSED_ROW)) {
 			return;
 		}
 
 		try {
-			this.currentProcessedRow = Integer.parseInt(restartProperties
-					.getProperty(CURRENT_PROCESSED_ROW));
+			this.currentProcessedRow = new Long(data.getLong(CURRENT_PROCESSED_ROW)).intValue();
 			rs.absolute(currentProcessedRow);
 		} catch (SQLException se) {
 			throw getExceptionTranslator().translate(
@@ -440,11 +441,11 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 					se);
 		}
 
-		if (!restartProperties.containsKey(SKIPPED_ROWS)) {
+		if (!data.containsKey(SKIPPED_ROWS)) {
 			return;
 		}
 
-		String[] skipped = StringUtils.commaDelimitedListToStringArray(restartProperties.getProperty(SKIPPED_ROWS));
+		String[] skipped = StringUtils.commaDelimitedListToStringArray(data.getString(SKIPPED_ROWS));
 		for (int i = 0; i < skipped.length; i++) {
 			this.skippedRows.add(new Integer(skipped[i]));			
 		}

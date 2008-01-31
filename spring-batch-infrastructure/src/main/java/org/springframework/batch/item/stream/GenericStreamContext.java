@@ -16,20 +16,23 @@
 
 package org.springframework.batch.item.stream;
 
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import org.springframework.batch.item.StreamContext;
 
-public class GenericStreamContext implements StreamContext {
+public class GenericStreamContext extends StreamContext {
 
-	private Properties data;
+	public GenericStreamContext() {
+		super();
+	}
 
 	public GenericStreamContext(Properties data){
-		this.data = data;
+		super();
+		for(Iterator it = data.entrySet().iterator();it.hasNext();){
+			Entry entry = (Entry)it.next();
+			putString(entry.getKey().toString(), entry.getValue().toString());
+		}
 	}
-
-	public Properties getProperties(){
-		return data;
-	}
-
 }

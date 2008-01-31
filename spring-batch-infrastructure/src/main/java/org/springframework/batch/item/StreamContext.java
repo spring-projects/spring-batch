@@ -16,12 +16,110 @@
 
 package org.springframework.batch.item;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.Map.Entry;
+
+import org.springframework.util.Assert;
+
 
 /**
- * Interface for representing data necessary to recover state after restart.
+ * Value object representing a context for an {@link ItemStream}.  It is 
+ * essentially a thin wrapper for a map that allows for type safety
+ * on reads.  It also allows for dirty checking by setting a 'dirty'
+ * flag whenever any put is called.  
  */
-public interface StreamContext {
+public class StreamContext {
 
-	Properties getProperties();
+	private boolean dirty = false;
+	private final Map map;
+	
+	public StreamContext(){
+		map = new HashMap();
+	}
+	
+	public void putString(String key, String value){
+		
+		Assert.notNull(value);
+		put(key, value);
+	}
+	
+	public void putLong(String key, long value){
+		
+		put(key, new Long(value));
+	}
+	
+	public void putDouble(String key, double value){
+		
+		put(key, new Double(value));
+	}
+	
+	public void put(String key, Object value){
+		dirty = true;
+		map.put(key, value);
+	}
+	
+	public boolean isDirty() {
+		return dirty;
+	}
+	
+	public String getString(String key){
+		
+		return (String)readAndValidate(key, String.class);	
+	}
+	
+	public long getLong(String key){
+		
+		return ((Long)readAndValidate(key, Long.class)).longValue();
+	}
+	
+	public Object get(String key){
+		
+		return map.get(key);
+	}
+	
+	private Object readAndValidate(String key, Class type){
+		
+		Object value = map.get(key);
+		
+		if(!type.isInstance(key)){
+			throw new ClassCastException("Value is not of type: [" + type + "]");
+		}
+		
+		return value;
+	}
+	
+	public boolean isEmpty(){
+		return map.isEmpty();
+	}
+	
+	public void clearDirtyFlag(){
+		dirty = false;
+	}
+	
+	public Set entrySet(){
+		return map.entrySet();
+	}
+	
+	public boolean containsKey(String key){
+		return map.containsKey(key);
+	}
+	
+	public boolean containsValue(Object value){
+		return map.containsValue(value);
+	}
+	
+	public Properties getProperties(){
+		
+		Properties props = new Properties();
+		for(Iterator it = map.entrySet().iterator();it.hasNext();){
+			Entry entry = (Entry)it.next();
+			props.setProperty(entry.getKey().toString(), entry.getValue().toString());
+		}
+		
+		return props;
+	}
 }

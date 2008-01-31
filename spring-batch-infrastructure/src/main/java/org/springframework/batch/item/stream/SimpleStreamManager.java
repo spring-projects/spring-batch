@@ -54,7 +54,7 @@ public class SimpleStreamManager implements StreamManager {
 				set = new LinkedHashSet(collection);
 			}
 		}
-		return new SimpleStreamManagerStreamContext(set);
+		return aggregate(set);
 	}
 
 	/**
@@ -113,22 +113,6 @@ public class SimpleStreamManager implements StreamManager {
 		for (Iterator iterator = set.iterator(); iterator.hasNext();) {
 			ItemStream stream = (ItemStream) iterator.next();
 			stream.close();
-		}
-	}
-
-	private class SimpleStreamManagerStreamContext implements StreamContext {
-
-		private StreamContext data;
-
-		public SimpleStreamManagerStreamContext(Set streams) {
-			this.data = aggregate(streams);
-		}
-
-		public Properties getProperties() {
-			if (data != null) {
-				return data.getProperties();
-			}
-			return new Properties();
 		}
 	}
 

@@ -13,6 +13,7 @@ import java.util.Properties;
 import java.util.Map.Entry;
 
 import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.core.CollectionFactory;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -43,8 +44,9 @@ public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implemen
 		ColumnMapRestartData columnData = new ColumnMapRestartData(streamContext.getProperties());
 		
 		List columns = new ArrayList();
-		for (Iterator iterator = columnData.keys.values().iterator(); iterator.hasNext();) {
-			Object column = (Object) iterator.next();
+		for (Iterator iterator = columnData.entrySet().iterator(); iterator.hasNext();) {
+			Entry entry = (Entry)iterator.next();
+			Object column = entry.getValue();
 			columns.add(column);
 		}
 		
@@ -60,42 +62,18 @@ public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implemen
 	}
 	
 	
-	private static class ColumnMapRestartData implements StreamContext{
-
-		private final Map keys;
+	private static class ColumnMapRestartData extends GenericStreamContext{
 		
 		public ColumnMapRestartData(Map keys) {
-			this.keys = keys;
+			super();
+			for(Iterator it = keys.entrySet().iterator();it.hasNext();){
+				Entry entry = (Entry)it.next();
+				putString(entry.getKey().toString(), entry.getValue().toString());
+			}
 		}
 		
 		public ColumnMapRestartData(Properties props) {
-			
-			keys = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(props.size());
-			
-			
-			for(int counter = 0; counter < props.size(); counter++){
-				String column = props.getProperty(KEY + counter);
-				
-				if(column != null){
-					keys.put(KEY + counter, column);
-				}
-				else{
-					break;
-				}
-			}
-		}
-		
-		public Properties getProperties() {
-			Properties props = new Properties();
-			
-			int counter = 0;
-			for (Iterator iterator = keys.entrySet().iterator(); iterator.hasNext();) {
-				Entry entry = (Entry) iterator.next();
-				props.setProperty(KEY + counter, entry.getValue().toString());
-				counter++;
-			}
-			
-			return props;
+			super(props);
 		}
 		
 	}
