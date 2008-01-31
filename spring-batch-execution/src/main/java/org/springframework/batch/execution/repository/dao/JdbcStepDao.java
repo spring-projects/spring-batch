@@ -161,7 +161,9 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 
 				StepInstance step = new StepInstance(new Long(rs.getLong(1)));
 				step.setStatus(BatchStatus.getStatus(rs.getString(2)));
-				step.setStreamContext(new GenericStreamContext(PropertiesConverter.stringToProperties(rs.getString(3))));
+				step
+						.setStreamContext(new GenericStreamContext(PropertiesConverter.stringToProperties(rs
+								.getString(3))));
 				return step;
 			}
 
@@ -211,7 +213,8 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 				stepExecution.setStatus(BatchStatus.getStatus(rs.getString(5)));
 				stepExecution.setCommitCount(rs.getInt(6));
 				stepExecution.setTaskCount(rs.getInt(7));
-				stepExecution.setStatistics(PropertiesConverter.stringToProperties(rs.getString(8)));
+				stepExecution.setStreamContext(new GenericStreamContext(PropertiesConverter.stringToProperties(rs
+						.getString(8))));
 				stepExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(9)), rs.getString(10), rs
 						.getString(11)));
 				return stepExecution;
@@ -243,7 +246,9 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 				StepInstance step = new StepInstance(job, rs.getString(2), new Long(rs.getLong(1)));
 				String status = rs.getString(3);
 				step.setStatus(BatchStatus.getStatus(status));
-				step.setStreamContext(new GenericStreamContext(PropertiesConverter.stringToProperties(rs.getString(3))));
+				step
+						.setStreamContext(new GenericStreamContext(PropertiesConverter.stringToProperties(rs
+								.getString(3))));
 				return step;
 			}
 		};
@@ -312,7 +317,8 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 		Object[] parameters = new Object[] { stepExecution.getId(), stepExecution.getVersion(),
 				stepExecution.getStepId(), stepExecution.getJobExecutionId(), stepExecution.getStartTime(),
 				stepExecution.getEndTime(), stepExecution.getStatus().toString(), stepExecution.getCommitCount(),
-				stepExecution.getTaskCount(), PropertiesConverter.propertiesToString(stepExecution.getStatistics()),
+				stepExecution.getTaskCount(),
+				PropertiesConverter.propertiesToString(stepExecution.getStreamContext().getProperties()),
 				stepExecution.getExitStatus().isContinuable() ? "Y" : "N", stepExecution.getExitStatus().getExitCode(),
 				stepExecution.getExitStatus().getExitDescription() };
 		jdbcTemplate.update(getSaveStepExecutionQuery(), parameters, new int[] { Types.INTEGER, Types.INTEGER,
@@ -392,7 +398,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 			Integer version = new Integer(stepExecution.getVersion().intValue() + 1);
 			Object[] parameters = new Object[] { stepExecution.getStartTime(), stepExecution.getEndTime(),
 					stepExecution.getStatus().toString(), stepExecution.getCommitCount(), stepExecution.getTaskCount(),
-					PropertiesConverter.propertiesToString(stepExecution.getStatistics()),
+					PropertiesConverter.propertiesToString(stepExecution.getStreamContext().getProperties()),
 					stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
 					stepExecution.getExitStatus().getExitCode(), exitDescription, version, stepExecution.getId(),
 					stepExecution.getVersion() };

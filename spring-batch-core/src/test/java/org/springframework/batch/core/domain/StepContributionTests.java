@@ -17,18 +17,23 @@ package org.springframework.batch.core.domain;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class StepContributionTests extends TestCase {
 
 	private StepExecution execution = new StepExecution();
+
 	private StepContribution contribution = new StepContribution(execution);
+
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepContribution#incrementTaskCount()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.StepContribution#incrementTaskCount()}.
 	 */
 	public void testIncrementTaskCount() {
 		assertEquals(0, contribution.getTaskCount());
@@ -37,16 +42,18 @@ public class StepContributionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepContribution#setStatistics(java.util.Properties)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.StepContribution#setStreamContext(StreamContext)}.
 	 */
 	public void testSetStatistics() {
-		assertEquals(null, contribution.getStatistics());
-		contribution.setStatistics(PropertiesConverter.stringToProperties("foo=bar"));
-		assertEquals(1, contribution.getStatistics().size());
+		assertEquals(null, contribution.getStreamContext());
+		contribution.setStreamContext(new GenericStreamContext(PropertiesConverter.stringToProperties("foo=bar")));
+		assertEquals(1, contribution.getStreamContext().getProperties().size());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepContribution#incrementCommitCount()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.StepContribution#incrementCommitCount()}.
 	 */
 	public void testIncrementCommitCount() {
 		assertEquals(0, contribution.getCommitCount());
@@ -55,7 +62,8 @@ public class StepContributionTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepContribution#isTerminateOnly()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.domain.StepContribution#isTerminateOnly()}.
 	 */
 	public void testIsTerminateOnly() {
 		assertFalse(contribution.isTerminateOnly());

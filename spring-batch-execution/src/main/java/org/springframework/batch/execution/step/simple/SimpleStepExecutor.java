@@ -34,6 +34,7 @@ import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.ExitStatus;
@@ -227,7 +228,8 @@ public class SimpleStepExecutor {
 										// aggregate these contributions if they
 										// come in asynchronously.
 										StreamContext statistics = stepContext.getStreamContext();
-										contribution.setStatistics(statistics.getProperties());
+										contribution.setStreamContext(new GenericStreamContext(statistics
+												.getProperties()));
 										contribution.incrementCommitCount();
 										// Apply the contribution to the step
 										// only if chunk was successful

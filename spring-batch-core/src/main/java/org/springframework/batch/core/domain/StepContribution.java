@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.domain;
 
-import java.util.Properties;
+import org.springframework.batch.item.StreamContext;
 
 /**
  * Represents a contribution to a {@link StepExecution}, buffering changes
@@ -30,7 +30,7 @@ public class StepContribution {
 
 	private StepExecution execution;
 
-	private Properties statistics;
+	private StreamContext streamContext;
 
 	private int commitCount;
 
@@ -58,15 +58,6 @@ public class StepContribution {
 	}
 
 	/**
-	 * Set the statistics properties.
-	 * 
-	 * @param statistics
-	 */
-	public void setStatistics(Properties statistics) {
-		this.statistics = statistics;
-	}
-
-	/**
 	 * Increment the commit counter.
 	 */
 	public void incrementCommitCount() {
@@ -74,11 +65,20 @@ public class StepContribution {
 	}
 
 	/**
-	 * Public getter for the statistics.
-	 * @return the statistics
+	 * Set the statistics properties.
+	 * 
+	 * @param streamContext
 	 */
-	public Properties getStatistics() {
-		return statistics;
+	public void setStreamContext(StreamContext streamContext) {
+		this.streamContext = streamContext;
+	}
+
+	/**
+	 * Public getter for the {@link StreamContext}.
+	 * @return the stream context
+	 */
+	public StreamContext getStreamContext() {
+		return streamContext;
 	}
 
 	/**

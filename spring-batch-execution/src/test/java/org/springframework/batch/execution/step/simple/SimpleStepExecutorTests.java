@@ -409,7 +409,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
-		assertEquals(null, stepExecution.getStatistics().getProperty("foo"));
+		assertEquals(null, stepExecution.getStreamContext().getString("foo"));
 
 		final Map map = new HashMap();
 		stepExecutor.setStreamManager(new SimpleStreamManager() {
@@ -423,7 +423,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		// At least once in that process the statistics service was asked for
 		// statistics...
-		assertEquals("bar", stepExecution.getStatistics().getProperty("foo"));
+		assertEquals("bar", stepExecution.getStreamContext().getString("foo"));
 		// ...but nothing was registered because nothing with step scoped.
 		assertEquals(0, map.size());
 	}

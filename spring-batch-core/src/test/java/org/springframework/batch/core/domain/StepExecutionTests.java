@@ -16,10 +16,10 @@
 package org.springframework.batch.core.domain;
 
 import java.util.Date;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -199,13 +199,11 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	public void testStatistics() throws Exception {
-		assertNotNull(execution.getStatistics());
-		execution.setStatistics(new Properties() {
-			{
-				setProperty("foo", "bar");
-			}
-		});
-		assertEquals("bar", execution.getStatistics().getProperty("foo"));
+		assertNotNull(execution.getStreamContext());
+		StreamContext context = new StreamContext();
+		context.putString("foo", "bar");
+		execution.setStreamContext(context );
+		assertEquals("bar", execution.getStreamContext().getString("foo"));
 	}
 
 	public void testEqualsWithSameIdentifier() throws Exception {

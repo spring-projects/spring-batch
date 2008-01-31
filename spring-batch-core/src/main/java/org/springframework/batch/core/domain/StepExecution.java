@@ -17,8 +17,8 @@
 package org.springframework.batch.core.domain;
 
 import java.util.Date;
-import java.util.Properties;
 
+import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -51,7 +51,7 @@ public class StepExecution extends Entity {
 
 	private Date endTime = null;
 
-	private Properties statistics = new Properties();
+	private StreamContext streamContext = new StreamContext();
 
 	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
@@ -88,12 +88,12 @@ public class StepExecution extends Entity {
 		taskCount++;
 	}
 
-	public Properties getStatistics() {
-		return statistics;
+	public StreamContext getStreamContext() {
+		return streamContext;
 	}
 
-	public void setStatistics(Properties statistics) {
-		this.statistics = statistics;
+	public void setStreamContext(StreamContext statistics) {
+		this.streamContext = statistics;
 	}
 
 	public Integer getCommitCount() {
@@ -249,7 +249,7 @@ public class StepExecution extends Entity {
 	 */
 	public synchronized void apply(StepContribution contribution) {
 		taskCount += contribution.getTaskCount();
-		statistics = contribution.getStatistics();
+		streamContext = contribution.getStreamContext();
 		commitCount += contribution.getCommitCount();
 	}
 
