@@ -47,8 +47,8 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 	public void testRestoreKeys(){
 		
 		Properties props = new Properties();
-		props.setProperty(ColumnMapStreamContextRowMapper.KEY + "0", "3");
-		props.setProperty(ColumnMapStreamContextRowMapper.KEY + "1", "3");
+		props.setProperty(ColumnMapStreamContextRowMapper.KEY_PREFIX + "0", "3");
+		props.setProperty(ColumnMapStreamContextRowMapper.KEY_PREFIX + "1", "3");
 		StreamContext streamContext = new GenericStreamContext(props);
 		
 		List keys = keyStrategy.restoreKeys(streamContext);
@@ -72,8 +72,8 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 		Properties props = streamContext.getProperties();
 		
 		assertEquals(2, props.size());
-		assertEquals("3", props.get(ColumnMapStreamContextRowMapper.KEY + "0"));
-		assertEquals("3", props.get(ColumnMapStreamContextRowMapper.KEY + "1"));
+		assertEquals("3", props.get(ColumnMapStreamContextRowMapper.KEY_PREFIX + "0"));
+		assertEquals("3", props.get(ColumnMapStreamContextRowMapper.KEY_PREFIX + "1"));
 	}
 	
 	public void testGetNullKeyAsStreamContext(){

@@ -16,43 +16,44 @@
 
 package org.springframework.batch.sample.tasklet;
 
-import java.util.Properties;
-
 import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.StreamContextProvider;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
- * Simple module implementation that will always return true to indicate
- * that processing should continue.  This is useful for testing graceful
- * shutdown of jobs.
+ * Simple module implementation that will always return true to indicate that
+ * processing should continue. This is useful for testing graceful shutdown of
+ * jobs.
  * 
  * @author Lucas Ward
- *
+ * 
  */
-public class InfiniteLoopTasklet implements Tasklet, StatisticsProvider {
-	
+public class InfiniteLoopTasklet implements Tasklet, StreamContextProvider {
+
 	private int count = 0;
-	
+
 	/**
 	 * 
 	 */
 	public InfiniteLoopTasklet() {
 		super();
 	}
-	
+
 	public ExitStatus execute() throws Exception {
 		Thread.sleep(500);
 		count++;
 		return ExitStatus.CONTINUABLE;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.statistics.StatisticsProvider#getStatistics()
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getStreamContext()
 	 */
-	public Properties getStatistics() {
-		return PropertiesConverter.stringToProperties("count="+count);
+	public StreamContext getStreamContext() {
+		return new GenericStreamContext(PropertiesConverter.stringToProperties("count=" + count));
 	}
 
 }

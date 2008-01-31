@@ -40,7 +40,7 @@ public interface RestartDataRowMapper extends RowMapper {
 	 * @return ResartData representing the composite key.
 	 * @throws IllegalArgumentException if key is null or of an unsupported type.
 	 */
-	public StreamContext createRestartData(Object key);
+	public StreamContext createStreamContext(Object key);
 
 	/**
 	 * Given the provided restart data, return a PreparedStatementSeter that can

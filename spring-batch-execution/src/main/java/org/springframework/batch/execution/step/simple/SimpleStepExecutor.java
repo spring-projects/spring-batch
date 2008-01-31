@@ -17,7 +17,6 @@
 package org.springframework.batch.execution.step.simple;
 
 import java.util.Date;
-import java.util.Properties;
 
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Step;
@@ -34,6 +33,7 @@ import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.ExitStatus;
@@ -45,9 +45,6 @@ import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHa
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.batch.statistics.SimpleStatisticsService;
-import org.springframework.batch.statistics.StatisticsProvider;
-import org.springframework.batch.statistics.StatisticsService;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -91,8 +88,6 @@ public class SimpleStepExecutor {
 	// Not for production use...
 	protected PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-	private StatisticsService statisticsService = new SimpleStatisticsService();
-
 	private Tasklet tasklet;
 
 	private AbstractStep step;
@@ -104,20 +99,6 @@ public class SimpleStepExecutor {
 	 */
 	SimpleStepExecutor(AbstractStep abstractStep) {
 		this.step = abstractStep;
-	}
-
-	/**
-	 * Public setter for the {@link StatisticsService}. This will be used to
-	 * create the {@link StepContext}, and hence any component that is a
-	 * {@link StatisticsProvider} and in step scope will be registered with the
-	 * service. The {@link StepContext} is then a source of aggregate statistics
-	 * for the step.
-	 * 
-	 * @param statisticsService the {@link StatisticsService} to set. Default is
-	 * a {@link SimpleStatisticsService}.
-	 */
-	public void setStatisticsService(StatisticsService statisticsService) {
-		this.statisticsService = statisticsService;
 	}
 
 	/**
@@ -198,8 +179,7 @@ public class SimpleStepExecutor {
 		ExitStatus status = ExitStatus.FAILED;
 
 		StepContext parentStepContext = StepSynchronizationManager.getContext();
-		final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext, statisticsService,
-				streamManager);
+		final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext, streamManager);
 		StepSynchronizationManager.register(stepContext);
 		// Add the job identifier so that it can be used to identify
 		// the conversation in StepScope
@@ -246,8 +226,8 @@ public class SimpleStepExecutor {
 										// TODO: check that stepExecution can
 										// aggregate these contributions if they
 										// come in asynchronously.
-										Properties statistics = stepContext.getStatistics();
-										contribution.setStatistics(statistics);
+										StreamContext statistics = stepContext.getStreamContext();
+										contribution.setStatistics(statistics.getProperties());
 										contribution.incrementCommitCount();
 										// Apply the contribution to the step
 										// only if chunk was successful

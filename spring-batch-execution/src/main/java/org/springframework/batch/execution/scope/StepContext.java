@@ -19,7 +19,6 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamContextProvider;
-import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.core.AttributeAccessor;
 
 /**
@@ -28,7 +27,7 @@ import org.springframework.core.AttributeAccessor;
  * @author Dave Syer
  * 
  */
-public interface StepContext extends AttributeAccessor, StreamContextProvider, StatisticsProvider {
+public interface StepContext extends AttributeAccessor, StreamContextProvider {
 
 	/**
 	 * Accessor for the {@link StepExecution} associated with the currently

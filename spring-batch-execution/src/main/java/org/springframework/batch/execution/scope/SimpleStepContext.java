@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.batch.core.domain.StepExecution;
@@ -30,8 +29,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
-import org.springframework.batch.statistics.StatisticsProvider;
-import org.springframework.batch.statistics.StatisticsService;
 
 /**
  * Simple implementation of {@link StepContext}.
@@ -47,8 +44,6 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 
 	private StepExecution stepExecution;
 
-	private StatisticsService statisticsService;
-
 	private StreamManager streamManager;
 
 	private StreamContext streamContext;
@@ -57,24 +52,22 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 	 * Default constructor.
 	 */
 	public SimpleStepContext(StepExecution stepExecution) {
-		this(stepExecution, null, null, null);
+		this(stepExecution, null, null);
 	}
 
 	/**
 	 * Default constructor.
 	 */
 	public SimpleStepContext(StepExecution stepExecution, StepContext parent) {
-		this(stepExecution, parent, null, null);
+		this(stepExecution, parent, null);
 	}
 
 	/**
 	 * @param object
 	 */
-	public SimpleStepContext(StepExecution stepExecution, StepContext parent, StatisticsService statisticsService,
-			StreamManager streamManager) {
+	public SimpleStepContext(StepExecution stepExecution, StepContext parent, StreamManager streamManager) {
 		super();
 		this.parent = parent;
-		this.statisticsService = statisticsService;
 		this.streamManager = streamManager;
 		this.stepExecution = stepExecution;
 	}
@@ -86,9 +79,6 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 	 */
 	public void setAttribute(String name, Object value) {
 		super.setAttribute(name, value);
-		if (statisticsService != null && (value instanceof StatisticsProvider)) {
-			statisticsService.register(this, (StatisticsProvider) value);
-		}
 		if (streamManager != null && (value instanceof ItemStream)) {
 			ItemStream stream = (ItemStream) value;
 			streamManager.register(this, stream);
@@ -97,17 +87,6 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 				stream.restoreFrom(streamContext);
 			}
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.statistics.StatisticsProvider#getStatistics()
-	 */
-	public Properties getStatistics() {
-		if (statisticsService == null) {
-			return new Properties();
-		}
-		return statisticsService.getStatistics(this);
 	}
 
 	/*

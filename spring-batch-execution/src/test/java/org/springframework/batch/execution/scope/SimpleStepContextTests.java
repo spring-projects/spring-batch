@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -27,9 +26,8 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
+import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.batch.item.stream.StreamManager;
-import org.springframework.batch.statistics.StatisticsProvider;
-import org.springframework.batch.statistics.StatisticsService;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -136,45 +134,21 @@ public class SimpleStepContextTests extends TestCase {
 		assertTrue(list.contains("spam"));
 	}
 
-	public void testStatisticsWithNullService() throws Exception {
-		assertEquals(0, context.getStatistics().size());
-	}
-
 	public void testStatisticsWithNotNullService() throws Exception {
 		Map map = new HashMap();
-		context = new SimpleStepContext(null, null, new StubStatisticsService(map), new StubStreamManager(map));
-		assertEquals(1, context.getStatistics().size());
-		assertEquals("bar", context.getStatistics().getProperty("foo"));
+		context = new SimpleStepContext(null, null, new StubStreamManager(map));
+		assertEquals(1, context.getStreamContext().getProperties().size());
+		assertEquals("bar", context.getStreamContext().getProperties().getProperty("foo"));
 	}
 
 	public void testStatisticsServiceRegistration() throws Exception {
 		Map map = new HashMap();
-		context = new SimpleStepContext(null, null, new StubStatisticsService(map), new StubStreamManager(map));
-		StubStatisticsProvider provider = new StubStatisticsProvider();
+		context = new SimpleStepContext(null, null, new StubStreamManager(map));
+		ItemStreamAdapter provider = new ItemStreamAdapter();
 		context.setAttribute("foo", provider);
 		assertEquals(1, map.size());
 		assertEquals(context, map.keySet().iterator().next());
 		assertEquals(provider, map.values().iterator().next());
-	}
-
-	/**
-	 * @author Dave Syer
-	 * 
-	 */
-	private class StubStatisticsService implements StatisticsService {
-		private final Map map;
-
-		private StubStatisticsService(Map map) {
-			this.map = map;
-		}
-
-		public Properties getStatistics(Object key) {
-			return PropertiesConverter.stringToProperties("foo=bar");
-		}
-
-		public void register(Object key, StatisticsProvider provider) {
-			map.put(key, provider);
-		}
 	}
 
 	/**
@@ -203,16 +177,6 @@ public class SimpleStepContextTests extends TestCase {
 		}
 
 		public void restoreFrom(Object key, StreamContext data) {
-		}
-	}
-
-	/**
-	 * @author Dave Syer
-	 * 
-	 */
-	private class StubStatisticsProvider implements StatisticsProvider {
-		public Properties getStatistics() {
-			return null;
 		}
 	}
 

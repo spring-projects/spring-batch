@@ -68,7 +68,7 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 	 * Encapsulates the state of the input source. If it is null then we are
 	 * uninitialized.
 	 */
-	private LineReader reader;
+	protected LineReader reader;
 
 	private RecordSeparatorPolicy recordSeparatorPolicy;
 

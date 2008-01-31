@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -46,6 +45,7 @@ import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.item.stream.GenericStreamContext;
+import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
@@ -54,8 +54,6 @@ import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.interceptor.RepeatInterceptorAdapter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.statistics.StatisticsProvider;
-import org.springframework.batch.statistics.StatisticsService;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
@@ -399,7 +397,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
-	public void testStatisticsService() throws Exception {
+	public void testStreamManager() throws Exception {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
 		stepConfiguration.setTasklet(new Tasklet() {
@@ -414,22 +412,14 @@ public class SimpleStepExecutorTests extends TestCase {
 		assertEquals(null, stepExecution.getStatistics().getProperty("foo"));
 
 		final Map map = new HashMap();
-		stepExecutor.setStatisticsService(new StatisticsService() {
-			public Properties getStatistics(Object key) {
-				return PropertiesConverter.stringToProperties("foo=bar");
-			}
-
-			public void register(Object key, StatisticsProvider provider) {
-				map.put(key, provider);
+		stepExecutor.setStreamManager(new SimpleStreamManager() {
+			public StreamContext getStreamContext(Object key) {
+				// TODO Auto-generated method stub
+				return new GenericStreamContext(PropertiesConverter.stringToProperties("foo=bar"));
 			}
 		});
 
-		try {
-			stepExecutor.execute(stepExecution);
-		}
-		catch (Throwable t) {
-			fail();
-		}
+		stepExecutor.execute(stepExecution);
 
 		// At least once in that process the statistics service was asked for
 		// statistics...

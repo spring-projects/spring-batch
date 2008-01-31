@@ -24,102 +24,104 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.springframework.util.Assert;
-
+import org.springframework.util.ClassUtils;
 
 /**
- * Value object representing a context for an {@link ItemStream}.  It is 
- * essentially a thin wrapper for a map that allows for type safety
- * on reads.  It also allows for dirty checking by setting a 'dirty'
- * flag whenever any put is called.  
+ * Value object representing a context for an {@link ItemStream}. It is
+ * essentially a thin wrapper for a map that allows for type safety on reads. It
+ * also allows for dirty checking by setting a 'dirty' flag whenever any put is
+ * called.
  */
 public class StreamContext {
 
 	private boolean dirty = false;
+
 	private final Map map;
-	
-	public StreamContext(){
+
+	public StreamContext() {
 		map = new HashMap();
 	}
-	
-	public void putString(String key, String value){
-		
+
+	public void putString(String key, String value) {
+
 		Assert.notNull(value);
 		put(key, value);
 	}
-	
-	public void putLong(String key, long value){
-		
+
+	public void putLong(String key, long value) {
+
 		put(key, new Long(value));
 	}
-	
-	public void putDouble(String key, double value){
-		
+
+	public void putDouble(String key, double value) {
+
 		put(key, new Double(value));
 	}
-	
-	public void put(String key, Object value){
+
+	public void put(String key, Object value) {
 		dirty = true;
 		map.put(key, value);
 	}
-	
+
 	public boolean isDirty() {
 		return dirty;
 	}
-	
-	public String getString(String key){
-		
-		return (String)readAndValidate(key, String.class);	
+
+	public String getString(String key) {
+
+		return (String) readAndValidate(key, String.class);
 	}
-	
-	public long getLong(String key){
-		
-		return ((Long)readAndValidate(key, Long.class)).longValue();
+
+	public long getLong(String key) {
+
+		return ((Long) readAndValidate(key, Long.class)).longValue();
 	}
-	
-	public Object get(String key){
-		
+
+	public Object get(String key) {
+
 		return map.get(key);
 	}
-	
-	private Object readAndValidate(String key, Class type){
-		
+
+	private Object readAndValidate(String key, Class type) {
+
 		Object value = map.get(key);
-		
-		if(!type.isInstance(key)){
-			throw new ClassCastException("Value is not of type: [" + type + "]");
-		}
-		
+
+//		if (!type.isInstance(key)) {
+//			throw new ClassCastException("Value for key=[" + key + "] is not of type: [" + ClassUtils.getShortName(type)
+//					+ "], it is [" + (value == null ? null : ClassUtils.getShortName(value.getClass())) + "]");
+//		}
+
 		return value;
 	}
-	
-	public boolean isEmpty(){
+
+	public boolean isEmpty() {
 		return map.isEmpty();
 	}
-	
-	public void clearDirtyFlag(){
+
+	public void clearDirtyFlag() {
 		dirty = false;
 	}
-	
-	public Set entrySet(){
+
+	public Set entrySet() {
 		return map.entrySet();
 	}
-	
-	public boolean containsKey(String key){
+
+	public boolean containsKey(String key) {
 		return map.containsKey(key);
 	}
-	
-	public boolean containsValue(Object value){
+
+	public boolean containsValue(Object value) {
 		return map.containsValue(value);
 	}
-	
-	public Properties getProperties(){
-		
+
+	public Properties getProperties() {
+
 		Properties props = new Properties();
-		for(Iterator it = map.entrySet().iterator();it.hasNext();){
-			Entry entry = (Entry)it.next();
+		for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
+			Entry entry = (Entry) it.next();
 			props.setProperty(entry.getKey().toString(), entry.getValue().toString());
 		}
-		
+
 		return props;
 	}
 }

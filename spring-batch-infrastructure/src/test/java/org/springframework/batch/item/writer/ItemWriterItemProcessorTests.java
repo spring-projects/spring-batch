@@ -26,8 +26,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
-import org.springframework.batch.item.writer.DelegatingItemWriter;
-import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -55,7 +53,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 		assertEquals(1, list.size());
 		assertEquals("test:foo", list.get(0));
 	}
-	
+
 	/**
 	 * Gets restart data from the input template
 	 */
@@ -66,7 +64,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 
 	/**
 	 * Forward restart data to input template
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testRestoreFrom() throws Exception {
 		processor.restoreFrom(new GenericStreamContext(PropertiesConverter.stringToProperties("value=bar")));
@@ -76,7 +74,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 
 	/**
 	 * Forward restart data to input template
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testGetStreamContextWithoutItemStream() throws Exception {
 		processor.setDelegate(null);
@@ -91,7 +89,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 
 	/**
 	 * Forward restart data to input template
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testRestoreFromWithoutRestartable() throws Exception {
 		processor.setDelegate(null);
@@ -103,7 +101,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 			// expected
 		}
 	}
-	
+
 	public void testSkip() {
 		processor.skip();
 		assertEquals(1, list.size());
@@ -123,14 +121,14 @@ public class ItemWriterItemProcessorTests extends TestCase {
 			// expected
 		}
 	}
-	
-	private List list = new ArrayList(); 
+
+	private List list = new ArrayList();
 
 	/**
 	 * @author Dave Syer
 	 * 
 	 */
-	public class MockOutputSource implements ItemWriter, StatisticsProvider, ItemStream, Skippable {
+	public class MockOutputSource implements ItemWriter, ItemStream, Skippable {
 
 		private String value;
 
@@ -139,7 +137,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 		}
 
 		public void write(Object output) {
-			list.add(value+":"+output);
+			list.add(value + ":" + output);
 		}
 
 		public void close() {
@@ -161,7 +159,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 		}
 
 		public void skip() {
-			list.add("after skip");	
+			list.add("after skip");
 		}
 
 	}

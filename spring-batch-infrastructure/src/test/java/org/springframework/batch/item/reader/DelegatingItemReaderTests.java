@@ -24,15 +24,12 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.reader.AbstractItemReader;
-import org.springframework.batch.item.reader.DelegatingItemReader;
 import org.springframework.batch.item.stream.GenericStreamContext;
-import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * Unit test for {@link DelegatingItemReader}
- *
+ * 
  * @author Robert Kasanicky
  */
 public class DelegatingItemReaderTests extends TestCase {
@@ -48,24 +45,25 @@ public class DelegatingItemReaderTests extends TestCase {
 		itemProvider.setItemReader(source);
 	}
 
-	public void testAfterPropertiesSet()throws Exception{
-		//shouldn't throw an exception since the input source is set
+	public void testAfterPropertiesSet() throws Exception {
+		// shouldn't throw an exception since the input source is set
 		itemProvider.afterPropertiesSet();
 	}
 
-	public void testNullItemReader(){
-		try{
+	public void testNullItemReader() {
+		try {
 			itemProvider.setItemReader(null);
 			itemProvider.afterPropertiesSet();
 			fail();
-		}catch(Exception ex){
+		}
+		catch (Exception ex) {
 			assertTrue(ex instanceof IllegalArgumentException);
 		}
 	}
 
 	/**
 	 * Uses input template to provide the domain object.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testNext() throws Exception {
 		Object result = itemProvider.read();
@@ -82,7 +80,7 @@ public class DelegatingItemReaderTests extends TestCase {
 
 	/**
 	 * Forwared restart data to input template
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testRestoreFrom() throws Exception {
 		itemProvider.restoreFrom(new GenericStreamContext(PropertiesConverter.stringToProperties("value=bar")));
@@ -94,7 +92,7 @@ public class DelegatingItemReaderTests extends TestCase {
 		assertEquals("after skip", itemProvider.read());
 	}
 
-	private static class MockItemReader extends AbstractItemReader implements ItemReader, StatisticsProvider, ItemStream, Skippable {
+	private static class MockItemReader extends AbstractItemReader implements ItemReader, ItemStream, Skippable {
 
 		private Object value;
 

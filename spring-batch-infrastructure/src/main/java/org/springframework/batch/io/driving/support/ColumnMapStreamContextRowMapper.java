@@ -37,14 +37,14 @@ import org.springframework.util.ClassUtils;
  */
 public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implements RestartDataRowMapper{
 	
-	static final String KEY = ClassUtils.getQualifiedName(ColumnMapStreamContextRowMapper.class) + ".KEY.";
+	public static final String KEY_PREFIX = ClassUtils.getQualifiedName(ColumnMapStreamContextRowMapper.class) + ".KEY.";
 	
 	public PreparedStatementSetter createSetter(StreamContext streamContext) {
 		
 		ColumnMapRestartData columnData = new ColumnMapRestartData(streamContext.getProperties());
 		
 		List columns = new ArrayList();
-		for (Iterator iterator = columnData.entrySet().iterator(); iterator.hasNext();) {
+		for (Iterator iterator = columnData.keys.entrySet().iterator(); iterator.hasNext();) {
 			Entry entry = (Entry)iterator.next();
 			Object column = entry.getValue();
 			columns.add(column);
@@ -53,27 +53,51 @@ public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implemen
 		return new ArgPreparedStatementSetter(columns.toArray());
 	}
 
-	public StreamContext createRestartData(Object key) {
-		
-		Assert.isInstanceOf(Map.class, key, "Key must be of type Map.");
+	public StreamContext createStreamContext(Object key) {
+		Assert.isInstanceOf(Map.class, key, "Input to create StreamContext must be of type Map.");
 		Map keys = (Map)key;
-		
 		return new ColumnMapRestartData(keys);
 	}
 	
 	
-	private static class ColumnMapRestartData extends GenericStreamContext{
+	private static class ColumnMapRestartData extends GenericStreamContext {
 		
+		private final Map keys;
+
 		public ColumnMapRestartData(Map keys) {
-			super();
-			for(Iterator it = keys.entrySet().iterator();it.hasNext();){
-				Entry entry = (Entry)it.next();
-				putString(entry.getKey().toString(), entry.getValue().toString());
-			}
+			this.keys = keys;
 		}
 		
 		public ColumnMapRestartData(Properties props) {
-			super(props);
+			
+			keys = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(props.size());
+			
+			for(int counter = 0; counter < props.size(); counter++){
+
+				String key = KEY_PREFIX + counter;
+				String column = props.getProperty(key);
+				
+				if(column != null){
+					keys.put(key, column);
+				}
+				else{
+					break;
+				}
+				
+			}
+		}
+		
+		public Properties getProperties() {
+			Properties props = new Properties();
+			
+			int counter = 0;
+			for (Iterator iterator = keys.entrySet().iterator(); iterator.hasNext();) {
+				Entry entry = (Entry) iterator.next();
+				props.setProperty(KEY_PREFIX + counter, entry.getValue().toString());
+				counter++;
+			}
+			
+			return props;
 		}
 		
 	}

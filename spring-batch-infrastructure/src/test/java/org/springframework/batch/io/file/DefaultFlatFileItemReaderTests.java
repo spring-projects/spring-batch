@@ -27,6 +27,7 @@ import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.transform.LineTokenizer;
 import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.StreamException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -179,12 +180,16 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
 	}
 
-	public void testRestartWithNullReader() throws Exception {
+	public void testRestartBeforeOpen() throws Exception {
 		inputSource = new DefaultFlatFileItemReader();
 		inputSource.setResource(getInputResource(TEST_STRING));
 		inputSource.setFieldSetMapper(fieldSetMapper);
 		// do not open the template...
-		inputSource.restoreFrom(inputSource.getStreamContext());
+		try {
+			inputSource.restoreFrom(inputSource.getStreamContext());
+		} catch (StreamException e) {
+			assertTrue("Message does not contain open: "+e.getMessage(), e.getMessage().contains("open"));
+		}
 		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
 	}
 

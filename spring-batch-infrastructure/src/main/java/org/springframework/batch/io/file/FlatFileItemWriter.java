@@ -36,7 +36,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.item.writer.ItemTransformer;
-import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -59,9 +58,8 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemWriter extends AbstractTransactionalIoSource implements 
-	ItemWriter, ItemStream, StatisticsProvider, InitializingBean,
-	DisposableBean {
+public class FlatFileItemWriter extends AbstractTransactionalIoSource implements ItemWriter, ItemStream,
+		InitializingBean, DisposableBean {
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
@@ -88,7 +86,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	private static class BooleanHolder {
 		public boolean value;
 	}
-	
+
 	/**
 	 * Assert that mandatory properties (resource) are set.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
@@ -119,7 +117,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	}
 
 	/**
-	 * Commit the transaction.   
+	 * Commit the transaction.
 	 */
 	protected void transactionCommitted() {
 		getOutputState().mark();
@@ -159,7 +157,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 * Convert the date to a format that can be output and then write it out.
 	 * @param data
 	 * @param converted
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	private void transformAndWrite(Object data, BooleanHolder converted) throws Exception {
 
@@ -262,7 +260,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	public StreamContext getStreamContext() {
 		final OutputState os = getOutputState();
 
-		streamContext.getProperties().setProperty(RESTART_DATA_NAME, String.valueOf(os.position()));
+		streamContext.putString(RESTART_DATA_NAME, String.valueOf(os.position()));
 		return streamContext;
 	}
 
@@ -453,7 +451,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 						}
 					}
 					String parent = file.getParent();
-					if (parent!=null) {
+					if (parent != null) {
 						new File(parent).mkdirs();
 					}
 					file.createNewFile();

@@ -23,7 +23,6 @@ import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -43,7 +42,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  */
 public class StaxEventItemReader extends AbstractItemReader implements ItemReader, 
-		Skippable, ItemStream, StatisticsProvider, InitializingBean, DisposableBean {
+		Skippable, ItemStream, InitializingBean, DisposableBean {
 
 	public static final String READ_COUNT_STATISTICS_NAME = "StaxEventReaderItemReader.readCount";
 

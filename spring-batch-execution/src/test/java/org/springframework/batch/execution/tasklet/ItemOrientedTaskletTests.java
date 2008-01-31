@@ -34,7 +34,6 @@ import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
-import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -135,7 +134,8 @@ public class ItemOrientedTaskletTests extends TestCase {
 		try {
 			module.execute();
 			fail("RuntimeException was expected");
-		} catch (RuntimeException bce) {
+		}
+		catch (RuntimeException bce) {
 			// expected
 			assertEquals("foo", bce.getMessage());
 		}
@@ -144,7 +144,8 @@ public class ItemOrientedTaskletTests extends TestCase {
 	public void testNotSkippable() throws Exception {
 		try {
 			module.skip();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			// Unexpected
 			throw e;
 		}
@@ -183,7 +184,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 				return "bar";
 			}
 
-			public void close() throws StreamException {				
+			public void close() throws StreamException {
 			}
 		});
 
@@ -198,7 +199,8 @@ public class ItemOrientedTaskletTests extends TestCase {
 		try {
 			module.execute();
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("FOO", e.getMessage());
 		}
 
@@ -206,8 +208,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 
 		// verify method calls
 		assertEquals(1, list.size());
-		assertEquals("The item was not passed in to recover method", "bar",
-				list.get(0));
+		assertEquals("The item was not passed in to recover method", "bar", list.get(0));
 	}
 
 	public void testRetryPolicy() throws Exception {
@@ -215,7 +216,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 		module.setItemRecoverer(new ItemRecoverer() {
 			public boolean recover(Object item, Throwable cause) {
 				assertEquals("FOO", cause.getMessage());
-				list.add(item+"_recovered");
+				list.add(item + "_recovered");
 				return true;
 			}
 		});
@@ -232,7 +233,8 @@ public class ItemOrientedTaskletTests extends TestCase {
 		try {
 			module.execute();
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("FOO", e.getMessage());
 		}
 
@@ -243,15 +245,15 @@ public class ItemOrientedTaskletTests extends TestCase {
 
 		// verify method calls
 		assertEquals(1, list.size());
-		assertEquals("The item was not passed in to recover method",
-				"foo_recovered", list.get(0));
+		assertEquals("The item was not passed in to recover method", "foo_recovered", list.get(0));
 	}
 
 	public void testInitialisationWithNullProvider() throws Exception {
 		module.setItemReader(null);
 		try {
 			module.afterPropertiesSet();
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			assertTrue(e.getMessage().toLowerCase().indexOf("reader") >= 0);
 		}
 	}
@@ -260,8 +262,10 @@ public class ItemOrientedTaskletTests extends TestCase {
 		module.setItemWriter(null);
 		try {
 			module.afterPropertiesSet();
-		} catch (IllegalArgumentException e) {
-			assertTrue("Message did not contain writer: "+e.getMessage(), e.getMessage().toLowerCase().indexOf("writer") >= 0);
+		}
+		catch (IllegalArgumentException e) {
+			assertTrue("Message did not contain writer: " + e.getMessage(), e.getMessage().toLowerCase().indexOf(
+					"writer") >= 0);
 		}
 	}
 
@@ -269,31 +273,34 @@ public class ItemOrientedTaskletTests extends TestCase {
 		public Object read() throws Exception {
 			return "foo";
 		}
+
 		public Object getKey(Object item) {
 			return item;
 		}
 	}
 
-	private class SkippableItemReader implements KeyedItemReader,
-			Skippable, StatisticsProvider {
+	private class SkippableItemReader implements KeyedItemReader, Skippable {
 		public Object read() throws Exception {
 			return itemProvider.read();
 		}
+
 		public Object getKey(Object item) {
 			return item;
 		}
+
 		public void skip() {
 			list.add("provider");
 		}
+
 		public Properties getStatistics() {
 			return PropertiesConverter.stringToProperties("foo=bar");
 		}
-		public void close() throws StreamException {			
+
+		public void close() throws StreamException {
 		}
 	}
 
-	private class SkippableItemWriter implements ItemWriter, Skippable,
-			StatisticsProvider {
+	private class SkippableItemWriter implements ItemWriter, Skippable {
 		String props = "foo=bar";
 
 		public SkippableItemWriter() {

@@ -98,7 +98,7 @@ public class MultipleColumnJdbcKeyGenerator implements
 	 */
 	public StreamContext getKeyAsStreamContext(Object key) {
 		Assert.state(keyMapper != null, "RestartDataConverter must not be null.");
-		return keyMapper.createRestartData(key);
+		return keyMapper.createStreamContext(key);
 	}
 
 	/**

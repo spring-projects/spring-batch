@@ -21,10 +21,12 @@ import java.util.Properties;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.io.file.DefaultFlatFileItemReader;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.StreamContextProvider;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
-import org.springframework.batch.statistics.StatisticsProvider;
 
 /**
  * Simple implementation of a {@link Tasklet}, which illustrates the reading
@@ -40,7 +42,7 @@ import org.springframework.batch.statistics.StatisticsProvider;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class SimpleTradeTasklet implements Tasklet, StatisticsProvider {
+public class SimpleTradeTasklet implements Tasklet, StreamContextProvider {
 
 	/*
 	 * reads the data from input file
@@ -84,11 +86,14 @@ public class SimpleTradeTasklet implements Tasklet, StatisticsProvider {
 		this.tradeDao = tradeDao;
 	}
 
-	public Properties getStatistics() {
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.StreamContextProvider#getStreamContext()
+	 */
+	public StreamContext getStreamContext() {
 		Properties statistics = new Properties();
 		statistics.setProperty("trade.count", String.valueOf(tradeCount));
 		statistics.putAll(inputSource.getStatistics());
-		return statistics;
+		return new GenericStreamContext(statistics);
 	}
 
 }

@@ -23,7 +23,6 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.sql.DataSource;
 
@@ -35,7 +34,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
-import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
@@ -115,9 +113,8 @@ import org.springframework.util.StringUtils;
  * @author Lucas Ward
  * @author Peter Zozom
  */
-public class JdbcCursorItemReader extends AbstractTransactionalIoSource
-		implements KeyedItemReader, DisposableBean,
-		InitializingBean, ItemStream, StatisticsProvider, Skippable {
+public class JdbcCursorItemReader extends AbstractTransactionalIoSource implements KeyedItemReader, DisposableBean,
+		InitializingBean, ItemStream, Skippable {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);
 
@@ -156,9 +153,9 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	private SQLExceptionTranslator exceptionTranslator;
 
 	/* Current count of processed records. */
-	private int currentProcessedRow = 0;
+	private long currentProcessedRow = 0;
 
-	private int lastCommittedRow = 0;
+	private long lastCommittedRow = 0;
 
 	private RowMapper mapper;
 
@@ -167,8 +164,8 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	/**
 	 * Assert that mandatory properties are set.
 	 * 
-	 * @throws IllegalArgumentException
-	 *             if either data source or sql properties not set.
+	 * @throws IllegalArgumentException if either data source or sql properties
+	 * not set.
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource, "DataSOurce must be provided");
@@ -193,8 +190,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	 * 
 	 * @returns Object returned by RowMapper
 	 * @throws DataAccessException
-	 * @throws IllegalStateExceptino
-	 *             if mapper is null.
+	 * @throws IllegalStateExceptino if mapper is null.
 	 */
 	public Object read() {
 
@@ -207,12 +203,12 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 		try {
 			if (!rs.next()) {
 				return null;
-			} else {
+			}
+			else {
 				currentProcessedRow++;
 				if (!skippedRows.isEmpty()) {
 					// while is necessary to handle successive skips.
-					while (skippedRows
-							.contains(new Integer(currentProcessedRow))) {
+					while (skippedRows.contains(new Long(currentProcessedRow))) {
 						if (!rs.next()) {
 							return null;
 						}
@@ -220,20 +216,20 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 					}
 				}
 
-				Object mappedResult = mapper.mapRow(rs, currentProcessedRow);
+				Object mappedResult = mapper.mapRow(rs, (int)currentProcessedRow);
 
 				verifyCursorPosition(currentProcessedRow);
 
 				return mappedResult;
 			}
-		} catch (SQLException se) {
-			throw getExceptionTranslator().translate(
-					"Trying to process next row", sql, se);
+		}
+		catch (SQLException se) {
+			throw getExceptionTranslator().translate("Trying to process next row", sql, se);
 		}
 
 	}
 
-	public int getCurrentProcessedRow() {
+	public long getCurrentProcessedRow() {
 		return currentProcessedRow;
 	}
 
@@ -255,15 +251,15 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 		try {
 			currentProcessedRow = lastCommittedRow;
 			if (currentProcessedRow > 0) {
-				rs.absolute(currentProcessedRow);
-			} else {
+				rs.absolute((int)currentProcessedRow);
+			}
+			else {
 				rs.beforeFirst();
 			}
 
-		} catch (SQLException se) {
-			throw getExceptionTranslator().translate(
-					"Attempted to move ResultSet to last committed row", sql,
-					se);
+		}
+		catch (SQLException se) {
+			throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);
 		}
 	}
 
@@ -297,12 +293,10 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	// Check the result set is in synch with the currentRow attribute. This is
 	// important
 	// to ensure that the user hasn't modified the current row.
-	private void verifyCursorPosition(int expectedCurrentRow)
-			throws SQLException {
+	private void verifyCursorPosition(long expectedCurrentRow) throws SQLException {
 		if (verifyCursorPosition) {
 			if (expectedCurrentRow != this.rs.getRow()) {
-				throw new InvalidDataAccessResourceUsageException(
-						"Unexpected cursor position change.");
+				throw new InvalidDataAccessResourceUsageException("Unexpected cursor position change.");
 			}
 		}
 	}
@@ -320,17 +314,15 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 
 		try {
 			this.con = dataSource.getConnection();
-			this.stmt = this.con.createStatement(
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
-					ResultSet.CONCUR_READ_ONLY,
+			this.stmt = this.con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY,
 					ResultSet.HOLD_CURSORS_OVER_COMMIT);
 			applyStatementSettings(this.stmt);
 			this.rs = this.stmt.executeQuery(sql);
 			handleWarnings(this.stmt.getWarnings());
-		} catch (SQLException se) {
+		}
+		catch (SQLException se) {
 			close();
-			throw getExceptionTranslator()
-					.translate("Executing query", sql, se);
+			throw getExceptionTranslator().translate("Executing query", sql, se);
 		}
 
 		super.registerSynchronization();
@@ -367,9 +359,9 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	protected SQLExceptionTranslator getExceptionTranslator() {
 		if (exceptionTranslator == null) {
 			if (dataSource != null) {
-				exceptionTranslator = new SQLErrorCodeSQLExceptionTranslator(
-						dataSource);
-			} else {
+				exceptionTranslator = new SQLErrorCodeSQLExceptionTranslator(dataSource);
+			}
+			else {
 				exceptionTranslator = new SQLStateSQLExceptionTranslator();
 			}
 		}
@@ -389,13 +381,12 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 		if (ignoreWarnings) {
 			SQLWarning warningToLog = warnings;
 			while (warningToLog != null) {
-				log.debug("SQLWarning ignored: SQL state '"
-						+ warningToLog.getSQLState() + "', error code '"
-						+ warningToLog.getErrorCode() + "', message ["
-						+ warningToLog.getMessage() + "]");
+				log.debug("SQLWarning ignored: SQL state '" + warningToLog.getSQLState() + "', error code '"
+						+ warningToLog.getErrorCode() + "', message [" + warningToLog.getMessage() + "]");
 				warningToLog = warningToLog.getNextWarning();
 			}
-		} else if (warnings != null) {
+		}
+		else if (warnings != null) {
 			throw new SQLWarningException("Warning not ignored", warnings);
 		}
 	}
@@ -406,12 +397,12 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	 * @see org.springframework.batch.restart.Restartable#getRestartData()
 	 */
 	public StreamContext getStreamContext() {
-		StreamContext streamContext = new StreamContext();
-		
 		String skipped = skippedRows.toString();
-		Properties statistics = getStatistics();
-		statistics.setProperty(SKIPPED_ROWS, skipped.substring(1,skipped.length()-1));
-		return new GenericStreamContext(statistics);
+		StreamContext context = new GenericStreamContext();
+		context.putString(SKIPPED_ROWS, skipped.substring(1, skipped.length() - 1));
+		context.putLong(CURRENT_PROCESSED_ROW, currentProcessedRow);
+		context.putLong(SKIP_COUNT, skipCount);
+		return context;
 	}
 
 	/*
@@ -427,18 +418,17 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 
 		open();
 
-	//	Properties restartProperties = data.getProperties();
+		// Properties restartProperties = data.getProperties();
 		if (!data.containsKey(CURRENT_PROCESSED_ROW)) {
 			return;
 		}
 
 		try {
-			this.currentProcessedRow = new Long(data.getLong(CURRENT_PROCESSED_ROW)).intValue();
-			rs.absolute(currentProcessedRow);
-		} catch (SQLException se) {
-			throw getExceptionTranslator().translate(
-					"Attempted to move ResultSet to last committed row", sql,
-					se);
+			this.currentProcessedRow = data.getLong(CURRENT_PROCESSED_ROW);
+			rs.absolute((int)currentProcessedRow);
+		}
+		catch (SQLException se) {
+			throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);
 		}
 
 		if (!data.containsKey(SKIPPED_ROWS)) {
@@ -447,22 +437,8 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 
 		String[] skipped = StringUtils.commaDelimitedListToStringArray(data.getString(SKIPPED_ROWS));
 		for (int i = 0; i < skipped.length; i++) {
-			this.skippedRows.add(new Integer(skipped[i]));			
+			this.skippedRows.add(new Long(skipped[i]));
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.statistics.StatisticsProvider#getStatistics()
-	 */
-	public Properties getStatistics() {
-
-		Properties props = new Properties();
-		props.setProperty(CURRENT_PROCESSED_ROW, new Integer(
-				currentProcessedRow).toString());
-		props.setProperty(SKIP_COUNT, new Integer(skipCount).toString());
-		return props;
 	}
 
 	/**
@@ -472,7 +448,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	 * continue processing and find
 	 */
 	public void skip() {
-		skippedRows.add(new Integer(currentProcessedRow));
+		skippedRows.add(new Long(currentProcessedRow));
 		skipCount++;
 	}
 
@@ -482,8 +458,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	 * <code>ResultSet</code> object. If the fetch size specified is zero, the
 	 * JDBC driver ignores the value.
 	 * 
-	 * @param fetchSize
-	 *            the number of rows to fetch
+	 * @param fetchSize the number of rows to fetch
 	 * @see ResultSet#setFetchSize(int)
 	 */
 	public void setFetchSize(int fetchSize) {
@@ -494,8 +469,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	 * Sets the limit for the maximum number of rows that any
 	 * <code>ResultSet</code> object can contain to the given number.
 	 * 
-	 * @param maxRows
-	 *            the new max rows limit; zero means there is no limit
+	 * @param maxRows the new max rows limit; zero means there is no limit
 	 * @see Statement#setMaxRows(int)
 	 */
 	public void setMaxRows(int maxRows) {
@@ -508,9 +482,8 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	 * seconds. If the limit is exceeded, an <code>SQLException</code> is
 	 * thrown.
 	 * 
-	 * @param queryTimeout
-	 *            seconds the new query timeout limit in seconds; zero means
-	 *            there is no limit
+	 * @param queryTimeout seconds the new query timeout limit in seconds; zero
+	 * means there is no limit
 	 * @see Statement#setQueryTimeout(int)
 	 */
 	public void setQueryTimeout(int queryTimeout) {
@@ -521,8 +494,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	 * Set whether SQLWarnings should be ignored (only logged) or exception
 	 * should be thrown.
 	 * 
-	 * @param ignoreWarnings
-	 *            if TRUE, warnings are ignored
+	 * @param ignoreWarnings if TRUE, warnings are ignored
 	 */
 	public void setIgnoreWarnings(boolean ignoreWarnings) {
 		this.ignoreWarnings = ignoreWarnings;
@@ -532,8 +504,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	 * Allow verification of cursor position after current row is processed by
 	 * RowMapper or RowCallbackHandler. Default value is TRUE.
 	 * 
-	 * @param verifyCursorPosition
-	 *            if true, cursor position is verified
+	 * @param verifyCursorPosition if true, cursor position is verified
 	 */
 	public void setVerifyCursorPosition(boolean verifyCursorPosition) {
 		this.verifyCursorPosition = verifyCursorPosition;
@@ -565,7 +536,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 		initialized = true;
 
 	}
-	
+
 	/**
 	 * Return the item itself (which is already a key).
 	 * @see org.springframework.batch.item.ItemReader#getKey(java.lang.Object)
@@ -573,5 +544,5 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource
 	public Object getKey(Object item) {
 		return item;
 	}
-	
+
 }

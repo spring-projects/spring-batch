@@ -15,21 +15,20 @@ import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.core.CollectionFactory;
 import org.springframework.jdbc.core.PreparedStatementSetter;
-import org.springframework.util.ClassUtils;
 
 /**
  * @author Lucas Ward
  */
 public class ColumnMapRestartDataRowMapperTests extends TestCase {
 
-	private static final String KEY = ClassUtils.getQualifiedName(ColumnMapStreamContextRowMapper.class) + ".KEY.";
+	private static final String KEY = ColumnMapStreamContextRowMapper.KEY_PREFIX;
 	
-	ColumnMapStreamContextRowMapper mapper;
+	private ColumnMapStreamContextRowMapper mapper;
 	
-	Map key;
+	private Map key;
 	
-	MockControl psControl = MockControl.createControl(PreparedStatement.class);
-	PreparedStatement ps;
+	private MockControl psControl = MockControl.createControl(PreparedStatement.class);
+	private PreparedStatement ps;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -44,7 +43,7 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 	public void testCreateRestartDataWithInvalidType() throws Exception {
 		
 		try{
-			mapper.createRestartData(new Object());
+			mapper.createStreamContext(new Object());
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -54,7 +53,7 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 	public void testCreateRestartDataWithNull(){
 		
 		try{
-			mapper.createRestartData(null);
+			mapper.createStreamContext(null);
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -62,8 +61,7 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 	}
 	
 	public void testCreateRestartData() throws Exception {
-		
-		StreamContext streamContext = mapper.createRestartData(key);
+		StreamContext streamContext = mapper.createStreamContext(key);
 		Properties props = streamContext.getProperties();
 		assertEquals("1", props.getProperty(KEY + "0"));
 		assertEquals("2", props.getProperty(KEY + "1"));
@@ -71,7 +69,7 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 	
 	public void testCreateRestartDataFromEmptyKeys() throws Exception {
 		
-		StreamContext streamContext = mapper.createRestartData(new HashMap());
+		StreamContext streamContext = mapper.createStreamContext(new HashMap());
 		assertEquals(0, streamContext.getProperties().size());
 	}
 	

@@ -26,8 +26,8 @@ package org.springframework.batch.item;
  * The state that is stored is represented as {@link StreamContext} which
  * enforces a requirement that any restart data can be represented by a
  * Properties object. In general, the contract is that {@link StreamContext}
- * that is returned via the {@link #getStreamContext()} method will be given back
- * to the {@link #restoreFrom(StreamContext)} method, exactly as it was
+ * that is returned via the {@link #getStreamContext()} method will be given
+ * back to the {@link #restoreFrom(StreamContext)} method, exactly as it was
  * provided.
  * </p>
  * 
@@ -51,7 +51,8 @@ public interface ItemStream extends StreamContextProvider {
 
 	/**
 	 * If any resources are needed for the stream to operate they need to be
-	 * destroyed here.
+	 * destroyed here. Once this method has been called all other methods
+	 * (except open) may throw an exception.
 	 */
 	void close() throws StreamException;
 }

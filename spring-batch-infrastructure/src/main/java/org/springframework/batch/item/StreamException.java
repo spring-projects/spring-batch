@@ -23,4 +23,11 @@ import org.springframework.batch.io.exception.BatchCriticalException;
  */
 public class StreamException extends BatchCriticalException {
 
+	/**
+	 * @param message
+	 */
+	public StreamException(String message) {
+		super(message);
+	}
+
 }

@@ -21,7 +21,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -32,17 +31,16 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
- * An implementation of {@link ItemWriter} which uses
- * StAX and {@link EventWriterSerializer} for serializing object to XML.
- *
- * This output source also provides restart, statistics and transaction
- * features by implementing corresponding interfaces.
- *
+ * An implementation of {@link ItemWriter} which uses StAX and
+ * {@link EventWriterSerializer} for serializing object to XML.
+ * 
+ * This output source also provides restart, statistics and transaction features
+ * by implementing corresponding interfaces.
+ * 
  * @author Peter Zozom
- *
+ * 
  */
-public class StaxEventItemWriter implements ItemWriter, ItemStream,
-		StatisticsProvider, InitializingBean, DisposableBean {
+public class StaxEventItemWriter implements ItemWriter, ItemStream, InitializingBean, DisposableBean {
 
 	// default encoding
 	private static final String DEFAULT_ENCODING = "UTF-8";
@@ -83,13 +81,15 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 	// signalizes that marshalling was restarted
 	private boolean restarted = false;
 
-	// TRUE means, that output file will be overwritten if exists - default is TRUE
+	// TRUE means, that output file will be overwritten if exists - default is
+	// TRUE
 	private boolean overwriteOutput = true;
 
 	// file channel
 	private FileChannel channel;
 
-	// wrapper for XML event writer that swallows StartDocument and EndDocument events
+	// wrapper for XML event writer that swallows StartDocument and EndDocument
+	// events
 	private XMLEventWriter eventWriter;
 
 	// XML event writer
@@ -107,10 +107,9 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 	// current count of processed records
 	private long currentRecordCount = 0;
 
-
 	/**
 	 * Set output file.
-	 *
+	 * 
 	 * @param resource the output file
 	 */
 	public void setResource(Resource resource) {
@@ -119,7 +118,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 
 	/**
 	 * Set Object to XML serializer.
-	 *
+	 * 
 	 * @param serializer the Object to XML serializer
 	 */
 	public void setSerializer(EventWriterSerializer serializer) {
@@ -128,7 +127,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 
 	/**
 	 * Get used encoding.
-	 *
+	 * 
 	 * @return the encoding used
 	 */
 	public String getEncoding() {
@@ -137,7 +136,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 
 	/**
 	 * Set encoding to be used for output file.
-	 *
+	 * 
 	 * @param encoding the encoding to be used
 	 */
 	public void setEncoding(String encoding) {
@@ -146,7 +145,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 
 	/**
 	 * Get XML version.
-	 *
+	 * 
 	 * @return the XML version used
 	 */
 	public String getVersion() {
@@ -155,7 +154,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 
 	/**
 	 * Set XML version to be used for output XML.
-	 *
+	 * 
 	 * @param version the XML version to be used
 	 */
 	public void setVersion(String version) {
@@ -164,7 +163,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 
 	/**
 	 * Get the tag name of the root element.
-	 *
+	 * 
 	 * @return the root element tag name
 	 */
 	public String getRootTagName() {
@@ -172,8 +171,9 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 	}
 
 	/**
-	 * Set the tag name of the root element. If not set, default name is used ("root").
-	 *
+	 * Set the tag name of the root element. If not set, default name is used
+	 * ("root").
+	 * 
 	 * @param rootTagName the tag name to be used for the root element
 	 */
 	public void setRootTagName(String rootTagName) {
@@ -182,7 +182,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 
 	/**
 	 * Get attributes of the root element.
-	 *
+	 * 
 	 * @return attributes of the root element
 	 */
 	public Map getRootElementAttributes() {
@@ -191,7 +191,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 
 	/**
 	 * Set the root element attributes to be written.
-	 *
+	 * 
 	 * @param rootElementAttributes attributes of the root element
 	 */
 	public void setRootElementAttributes(Map rootElementAttributes) {
@@ -199,8 +199,9 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 	}
 
 	/**
-	 * Set "overwrite" flag for the output file. Flag is ignored when output file processing is restarted.
-	 *
+	 * Set "overwrite" flag for the output file. Flag is ignored when output
+	 * file processing is restarted.
+	 * 
 	 * @param shouldDeleteIfExists
 	 */
 	public void setOverwriteOutput(boolean overwriteOutput) {
@@ -237,7 +238,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 
 	/**
 	 * Open the output source
-	 *
+	 * 
 	 * @see org.springframework.batch.item.ResourceLifecycle#open()
 	 */
 	public void open() {
@@ -253,16 +254,16 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 
 		File file;
 		FileOutputStream os = null;
-		
+
 		try {
 			file = resource.getFile();
 			FileUtils.setUpOutputFile(file, restarted, overwriteOutput);
 			os = new FileOutputStream(file, true);
 			channel = os.getChannel();
 			setPosition(position);
-		} catch (IOException ioe) {
-			throw new DataAccessResourceFailureException(
-					"Unable to write to file resource: [" + resource + "]", ioe);
+		}
+		catch (IOException ioe) {
+			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", ioe);
 		}
 
 		XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
@@ -273,9 +274,9 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 			if (!restarted) {
 				startDocument(delegateEventWriter);
 			}
-		} catch (XMLStreamException xse) {
-			throw new DataAccessResourceFailureException(
-					"Unable to write to file resource: [" + resource + "]", xse);
+		}
+		catch (XMLStreamException xse) {
+			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", xse);
 		}
 
 		initialized = true;
@@ -289,27 +290,26 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 	 * </ul>
 	 * If this is not sufficient for you, simply override this method. Encoding,
 	 * version and root tag name can be retrieved with corresponding getters.
-	 *
-	 * @param writer
-	 *            XML event writer
+	 * 
+	 * @param writer XML event writer
 	 * @throws XMLStreamException
 	 */
 	protected void startDocument(XMLEventWriter writer) throws XMLStreamException {
 
 		XMLEventFactory factory = XMLEventFactory.newInstance();
 
-		//write start document
+		// write start document
 		writer.add(factory.createStartDocument(getEncoding(), getVersion()));
 
-		//write root tag
+		// write root tag
 		writer.add(factory.createStartElement("", "", getRootTagName()));
 
-		//write root tag attributes
+		// write root tag attributes
 		if (!CollectionUtils.isEmpty(getRootElementAttributes())) {
 
 			for (Iterator i = getRootElementAttributes().entrySet().iterator(); i.hasNext();) {
-				Map.Entry entry = (Map.Entry)i.next();
-				writer.add(factory.createAttribute((String)entry.getKey(), (String)entry.getValue()));
+				Map.Entry entry = (Map.Entry) i.next();
+				writer.add(factory.createAttribute((String) entry.getKey(), (String) entry.getValue()));
 			}
 
 		}
@@ -319,29 +319,27 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 	/**
 	 * Finishes the XML document. It closes any start tag and writes
 	 * corresponding end tags.
-	 *
-	 * @param writer
-	 *            XML event writer
+	 * 
+	 * @param writer XML event writer
 	 * @throws XMLStreamException
 	 */
-	protected void endDocument(XMLEventWriter writer)
-			throws XMLStreamException {
+	protected void endDocument(XMLEventWriter writer) throws XMLStreamException {
 
-		//writer.writeEndDocument(); <- this doesn't work after restart
-		//we need to write end tag of the root element manually
+		// writer.writeEndDocument(); <- this doesn't work after restart
+		// we need to write end tag of the root element manually
 		writer.flush();
 		ByteBuffer bbuf = ByteBuffer.wrap(("</" + getRootTagName() + ">").getBytes());
 		try {
 			getChannel().write(bbuf);
-		} catch (IOException ioe) {
-			throw new DataAccessResourceFailureException(
-					"Unable to close file resource: [" + resource + "]", ioe);
+		}
+		catch (IOException ioe) {
+			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", ioe);
 		}
 	}
 
 	/**
 	 * Close the output source.
-	 *
+	 * 
 	 * @see org.springframework.batch.item.ResourceLifecycle#close()
 	 */
 	public void close() {
@@ -350,19 +348,18 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 			endDocument(delegateEventWriter);
 			eventWriter.close();
 			channel.close();
-		} catch (XMLStreamException xse) {
-			throw new DataAccessResourceFailureException(
-					"Unable to close file resource: [" + resource + "]", xse);
+		}
+		catch (XMLStreamException xse) {
+			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", xse);
 		}
 		catch (IOException ioe) {
-			throw new DataAccessResourceFailureException(
-					"Unable to close file resource: [" + resource + "]", ioe);
+			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", ioe);
 		}
 	}
 
 	/**
 	 * Write the value object to XML stream.
-	 *
+	 * 
 	 * @param output the value object
 	 * @see org.springframework.batch.item.ItemWriter#write(java.lang.Object)
 	 */
@@ -399,12 +396,10 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 
 		long startAtPosition = 0;
 
-		//if restart data is provided, restart from provided offset
-		//otherwise start from beginning
-		if (data != null && data.getProperties() != null
-				&& data.getProperties().getProperty(RESTART_DATA_NAME) != null) {
-			startAtPosition = Long.parseLong(data.getProperties().getProperty(
-					RESTART_DATA_NAME));
+		// if restart data is provided, restart from provided offset
+		// otherwise start from beginning
+		if (data != null && data.getProperties() != null && data.getProperties().getProperty(RESTART_DATA_NAME) != null) {
+			startAtPosition = Long.parseLong(data.getProperties().getProperty(RESTART_DATA_NAME));
 			restarted = true;
 		}
 
@@ -426,9 +421,9 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 	}
 
 	/*
-	 * Get the actual position in file channel.
-	 * This method flushes any buffered data before position is read.
-	 *
+	 * Get the actual position in file channel. This method flushes any buffered
+	 * data before position is read.
+	 * 
 	 * @return byte offset in file channel
 	 */
 	private long getPosition() {
@@ -438,9 +433,9 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 		try {
 			eventWriter.flush();
 			position = channel.position();
-		} catch (Exception e) {
-			throw new DataAccessResourceFailureException(
-					"Unable to write to file resource: [" + resource + "]", e);
+		}
+		catch (Exception e) {
+			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);
 		}
 
 		return position;
@@ -448,7 +443,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 
 	/*
 	 * Set the file channel position.
-	 *
+	 * 
 	 * @param newPosition new file channel position
 	 */
 	private void setPosition(long newPosition) {
@@ -458,24 +453,23 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 					"Current file size is smaller than size at last commit");
 			channel.truncate(newPosition);
 			channel.position(newPosition);
-		} catch (IOException e) {
-			throw new DataAccessResourceFailureException(
-					"Unable to write to file resource: [" + resource + "]", e);
 		}
-
+		catch (IOException e) {
+			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);
+		}
 
 	}
 
 	/**
 	 * Encapsulates transaction events for the StaxEventWriterOutputSource.
 	 */
-	private class StaxEventWriterItemWriterTransactionSychronization extends
-			TransactionSynchronizationAdapter {
+	private class StaxEventWriterItemWriterTransactionSychronization extends TransactionSynchronizationAdapter {
 
 		public void afterCompletion(int status) {
 			if (status == TransactionSynchronization.STATUS_COMMITTED) {
 				transactionComitted();
-			} else if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
+			}
+			else if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
 				transactionRolledback();
 			}
 		}
@@ -488,10 +482,11 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 		private void transactionRolledback() {
 			currentRecordCount = lastCommitPointRecordCount;
 
-			//close output
+			// close output
 			close();
-			//and reopen it - we do this because we need to reopen stream
-			//reader at specified position - calling setPosition() is not enough!
+			// and reopen it - we do this because we need to reopen stream
+			// reader at specified position - calling setPosition() is not
+			// enough!
 			restarted = true;
 			open(lastCommitPointPosition);
 		}
@@ -501,6 +496,5 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 	TransactionSynchronization getSynchronization() {
 		return synchronization;
 	}
-
 
 }

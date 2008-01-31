@@ -28,11 +28,13 @@ public class GenericStreamContext extends StreamContext {
 		super();
 	}
 
-	public GenericStreamContext(Properties data){
+	public GenericStreamContext(Properties data) {
 		super();
-		for(Iterator it = data.entrySet().iterator();it.hasNext();){
-			Entry entry = (Entry)it.next();
-			putString(entry.getKey().toString(), entry.getValue().toString());
+		if (data != null) {
+			for (Iterator it = data.entrySet().iterator(); it.hasNext();) {
+				Entry entry = (Entry) it.next();
+				putString(entry.getKey().toString(), entry.getValue().toString());
+			}
 		}
 	}
 }
