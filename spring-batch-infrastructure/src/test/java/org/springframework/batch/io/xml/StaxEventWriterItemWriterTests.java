@@ -17,7 +17,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
-import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.util.Assert;
 import org.springframework.xml.transform.StaxResult;
 
@@ -67,9 +66,8 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	 */
 	public void testRollback() throws Exception {
 		writer.write(record);
-
 		// rollback
-		writer.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
+		writer.reset(null);
 		assertEquals("", outputFileContent());
 	}
 
@@ -78,10 +76,9 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	 */
 	public void testCommit() throws Exception {
 		writer.write(record);
-
 		// commit
-		writer.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
-		assertTrue(outputFileContent().indexOf(TEST_STRING) != NOT_FOUND);
+		writer.mark(null);
+		assertTrue(outputFileContent().contains(TEST_STRING));
 	}
 
 	/**
@@ -90,7 +87,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	public void testRestart() throws Exception {
 		// write records
 		writer.write(record);
-		writer.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+		writer.mark(null);
 		StreamContext streamContext = writer.getStreamContext();
 
 		// create new writer from saved restart data and continue writing
@@ -134,7 +131,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 			put("attribute", "value");
 		}});
 		writer.open();
-		writer.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+		writer.mark(null);
 
 		assertTrue(outputFileContent().indexOf("<testroot attribute=\"value\"") != NOT_FOUND);
 

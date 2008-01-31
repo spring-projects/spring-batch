@@ -46,12 +46,9 @@ import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
 /**
@@ -94,7 +91,7 @@ public class SimpleStepExecutor {
 
 	private AbstractStep step;
 
-	private StreamManager streamManager = new SimpleStreamManager();
+	private StreamManager streamManager;
 
 	/**
 	 * Package private constructor so the factory can create a the executor.
@@ -106,8 +103,8 @@ public class SimpleStepExecutor {
 	/**
 	 * Public setter for the {@link StreamManager}. This will be used to create
 	 * the {@link StepContext}, and hence any component that is a
-	 * {@link ItemStream} and in step scope will be registered with the service. The
-	 * {@link StepContext} is then a source of aggregate statistics for the
+	 * {@link ItemStream} and in step scope will be registered with the service.
+	 * The {@link StepContext} is then a source of aggregate statistics for the
 	 * step.
 	 * 
 	 * @param streamManager the {@link StreamManager} to set. Default is a
@@ -180,6 +177,10 @@ public class SimpleStepExecutor {
 
 		ExitStatus status = ExitStatus.FAILED;
 
+		if (streamManager==null) {
+			streamManager = new SimpleStreamManager(transactionManager);
+		}
+
 		StepContext parentStepContext = StepSynchronizationManager.getContext();
 		final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext, streamManager);
 		StepSynchronizationManager.register(stepContext);
@@ -192,7 +193,7 @@ public class SimpleStepExecutor {
 		if (saveStreamContext && isRestart) {
 			stepContext.setInitialStreamContext(stepInstance.getStreamContext());
 		}
-
+		
 		try {
 
 			stepExecution.setStartTime(new Date(System.currentTimeMillis()));
@@ -210,40 +211,31 @@ public class SimpleStepExecutor {
 
 					ExitStatus result;
 
+					TransactionStatus transaction = streamManager.getTransaction(stepContext);
+
 					try {
 
-						result = (ExitStatus) new TransactionTemplate(transactionManager)
-								.execute(new TransactionCallback() {
-									public Object doInTransaction(TransactionStatus status) {
-										/*
-										 * New transaction obtained,
-										 * resynchronize
-										 * TransactionSynchronization objects
-										 */
-										BatchTransactionSynchronizationManager.resynchronize();
-										ExitStatus result;
+						/*
+						 * New transaction obtained, resynchronize
+						 * TransactionSynchronization objects
+						 */
+						result = processChunk(step, contribution);
 
-										result = processChunk(step, contribution);
+						// TODO: check that stepExecution can
+						// aggregate these contributions if they
+						// come in asynchronously.
+						StreamContext statistics = stepContext.getStreamContext();
+						contribution.setStreamContext(new GenericStreamContext(statistics.getProperties()));
+						contribution.incrementCommitCount();
+						// Apply the contribution to the step
+						// only if chunk was successful
+						stepExecution.apply(contribution);
 
-										// TODO: check that stepExecution can
-										// aggregate these contributions if they
-										// come in asynchronously.
-										StreamContext statistics = stepContext.getStreamContext();
-										contribution.setStreamContext(new GenericStreamContext(statistics
-												.getProperties()));
-										contribution.incrementCommitCount();
-										// Apply the contribution to the step
-										// only if chunk was successful
-										stepExecution.apply(contribution);
-
-										if (saveStreamContext) {
-											stepInstance.setStreamContext(stepContext.getStreamContext());
-											jobRepository.update(stepInstance);
-										}
-										jobRepository.saveOrUpdate(stepExecution);
-										return result;
-									}
-								});
+						if (saveStreamContext) {
+							stepInstance.setStreamContext(stepContext.getStreamContext());
+							jobRepository.update(stepInstance);
+						}
+						jobRepository.saveOrUpdate(stepExecution);
 
 					}
 					catch (Throwable t) {
@@ -255,6 +247,7 @@ public class SimpleStepExecutor {
 						 * comes outside the transaction.
 						 */
 						stepExecution.rollback();
+						streamManager.rollback(transaction);
 						if (t instanceof RuntimeException) {
 							throw (RuntimeException) t;
 						}
@@ -268,10 +261,11 @@ public class SimpleStepExecutor {
 					// caller
 					interruptionPolicy.checkInterrupted(context);
 
+					streamManager.commit(transaction);
+
 					return result;
 
 				}
-
 			});
 
 			updateStatus(stepExecution, BatchStatus.COMPLETED);
@@ -298,12 +292,7 @@ public class SimpleStepExecutor {
 			}
 			finally {
 				// clear any registered synchronizations
-				try {
-					StepSynchronizationManager.close();
-				}
-				finally {
-					BatchTransactionSynchronizationManager.clearSynchronizations();
-				}
+				StepSynchronizationManager.close();
 			}
 		}
 

@@ -24,12 +24,11 @@ import java.util.Collections;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.transaction.support.TransactionSynchronizationUtils;
 
 /**
  * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be
@@ -286,15 +285,6 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals("testLine1", lineFromFile);
 	}
 
-	public void testUnknown() throws Exception {
-		inputSource.write("testLine1");
-		// rollback
-		unknown();
-		inputSource.close();
-		String lineFromFile = readLine();
-		assertEquals("testLine1", lineFromFile);
-	}
-
 	public void testRestart() throws Exception {
 
 		// write some lines
@@ -380,17 +370,11 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	private void commit() {
-		TransactionSynchronizationUtils.invokeAfterCompletion(TransactionSynchronizationManager.getSynchronizations(),
-				TransactionSynchronization.STATUS_COMMITTED);
+		((ItemStream) inputSource).mark(null);
 	}
 
 	private void rollback() {
-		TransactionSynchronizationUtils.invokeAfterCompletion(TransactionSynchronizationManager.getSynchronizations(),
-				TransactionSynchronization.STATUS_ROLLED_BACK);
+		((ItemStream) inputSource).reset(null);
 	}
 
-	private void unknown() {
-		TransactionSynchronizationUtils.invokeAfterCompletion(TransactionSynchronizationManager.getSynchronizations(),
-				TransactionSynchronization.STATUS_UNKNOWN);
-	}
 }

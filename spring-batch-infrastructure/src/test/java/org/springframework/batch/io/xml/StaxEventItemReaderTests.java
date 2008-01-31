@@ -19,7 +19,6 @@ import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.transaction.support.TransactionSynchronization;
 
 /**
  * Tests for {@link StaxEventItemReader}.
@@ -157,7 +156,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		source.skip();
 		List second = (List) source.read();
 		assertFalse(first.equals(second));
-		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
+		source.reset(null);
 
 		assertEquals(second, source.read());
 	}
@@ -169,21 +168,21 @@ public class StaxEventItemReaderTests extends TestCase {
 
 		// rollback between deserializing records
 		List first = (List) source.read();
-		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+		source.mark(null);
 		List second = (List) source.read();
 		assertFalse(first.equals(second));
-		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
+		source.reset(null);
 
 		assertEquals(second, source.read());
 
 		// rollback while deserializing record
-		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
+		source.reset(null);
 		source.setFragmentDeserializer(new ExceptionFragmentDeserializer());
 		try {
 			source.read();
 		}
 		catch (Exception expected) {
-			source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
+			source.reset(null);
 		}
 		source.setFragmentDeserializer(deserializer);
 

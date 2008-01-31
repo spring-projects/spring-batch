@@ -19,13 +19,10 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
-import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -93,9 +90,6 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 
 	// XML event writer
 	private XMLEventWriter delegateEventWriter;
-
-	// transaction synchronization object
-	private TransactionSynchronization synchronization = new StaxEventWriterItemWriterTransactionSychronization();
 
 	// byte offset in file channel at last commit point
 	private long lastCommitPointPosition = 0;
@@ -229,13 +223,6 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	}
 
 	/**
-	 * Register the input source for transaction synchronization.
-	 */
-	private void registerSynchronization() {
-		BatchTransactionSynchronizationManager.registerSynchronization(synchronization);
-	}
-
-	/**
 	 * Open the output source
 	 * 
 	 * @see org.springframework.batch.item.ResourceLifecycle#open()
@@ -248,8 +235,6 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	 * Helper method for opening output source at given file position
 	 */
 	private void open(long position) {
-
-		registerSynchronization();
 
 		File file;
 		FileOutputStream os = null;
@@ -279,6 +264,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 		}
 
 		initialized = true;
+		
 	}
 
 	/**
@@ -447,34 +433,6 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);
 		}
 
-	}
-
-	/**
-	 * Encapsulates transaction events for the StaxEventWriterOutputSource.
-	 */
-	private class StaxEventWriterItemWriterTransactionSychronization extends TransactionSynchronizationAdapter {
-
-		public void afterCompletion(int status) {
-			if (status == TransactionSynchronization.STATUS_COMMITTED) {
-				transactionComitted();
-			}
-			else if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-				transactionRolledback();
-			}
-		}
-
-		private void transactionComitted() {
-			mark(null);
-		}
-
-		private void transactionRolledback() {
-			reset(null);
-		}
-
-	}
-
-	TransactionSynchronization getSynchronization() {
-		return synchronization;
 	}
 
 	/* (non-Javadoc)

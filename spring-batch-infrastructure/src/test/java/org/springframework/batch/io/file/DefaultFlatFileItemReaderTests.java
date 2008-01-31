@@ -28,7 +28,6 @@ import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.transaction.support.TransactionSynchronization;
 
 /**
  * Tests for {@link DefaultFlatFileItemReader}
@@ -98,13 +97,13 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		inputSource.read(); // #1
 		inputSource.read(); // #2
 		// commit them
-		inputSource.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+		inputSource.mark(null);
 		// read next record
 		inputSource.read(); // # 3
 		// mark record as skipped
 		inputSource.skip();
 		// read next records
-		inputSource.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
+		inputSource.reset(null);
 
 		// we should now process all records after first commit point, that are
 		// not marked as skipped
@@ -136,7 +135,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		// mark record as skipped
 		inputSource.skip();
 		// rollback
-		inputSource.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
+		inputSource.reset(null);
 		// read next record
 		inputSource.read(); // should be #1
 
@@ -144,33 +143,6 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		// not marked as skipped
 		assertEquals("[testLine2]", inputSource.read().toString());
 
-	}
-
-	/**
-	 * Test skip and skipRollback functionality
-	 * @throws IOException
-	 */
-	public void testTransactionSynchronizationUnknown() throws Exception {
-
-		inputSource.close();
-		inputSource.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		inputSource.open();
-
-		// read some records
-		inputSource.read();
-		inputSource.skip();
-		inputSource.read();
-
-		StreamContext statistics = inputSource.getStreamContext();
-		long skipped = statistics.getLong(DefaultFlatFileItemReader.SKIPPED_STATISTICS_NAME);
-		long read = statistics.getLong(DefaultFlatFileItemReader.READ_STATISTICS_NAME);
-
-		// call unknown, which has no influence and therefore statistics should
-		// be the same
-		inputSource.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_UNKNOWN);
-		statistics = inputSource.getStreamContext();;
-		assertEquals(skipped, statistics.getLong(DefaultFlatFileItemReader.SKIPPED_STATISTICS_NAME));
-		assertEquals(read, statistics.getLong(DefaultFlatFileItemReader.READ_STATISTICS_NAME));
 	}
 
 	public void testRestartFromNullData() throws Exception {
@@ -201,7 +173,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		inputSource.read();
 		inputSource.read();
 		// commit them
-		inputSource.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+		inputSource.mark(null);
 		// read next two records
 		inputSource.read();
 		inputSource.read();

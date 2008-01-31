@@ -12,9 +12,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.transaction.support.TransactionSynchronizationUtils;
 import org.springframework.util.Assert;
 
 public class DrivingQueryItemReaderTests extends TestCase {
@@ -150,15 +148,11 @@ public class DrivingQueryItemReaderTests extends TestCase {
 
 
 	private void commit() {
-		TransactionSynchronizationUtils.invokeAfterCompletion(
-				TransactionSynchronizationManager.getSynchronizations(),
-				TransactionSynchronization.STATUS_COMMITTED);
+		((ItemStream) source).mark(null);
 	}
 
 	private void rollback() {
-		TransactionSynchronizationUtils.invokeAfterCompletion(
-				TransactionSynchronizationManager.getSynchronizations(),
-				TransactionSynchronization.STATUS_ROLLED_BACK);
+		((ItemStream) source).reset(null);
 	}
 	
 	private InitializingBean getAsInitializingBean(ItemReader source) {

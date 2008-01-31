@@ -26,6 +26,12 @@ import java.util.Set;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Simple {@link StreamManager} that tries to resolve conflicts between key
@@ -39,6 +45,31 @@ import org.springframework.batch.item.StreamException;
 public class SimpleStreamManager implements StreamManager {
 
 	private Map registry = new HashMap();
+
+	private PlatformTransactionManager transactionManager;
+
+	/**
+	 * @param transactionManager a {@link PlatformTransactionManager}
+	 */
+	public SimpleStreamManager(PlatformTransactionManager transactionManager) {
+		this();
+		this.transactionManager = transactionManager;
+	}
+
+	/**
+	 * 
+	 */
+	public SimpleStreamManager() {
+		super();
+	}
+
+	/**
+	 * Public setter for the {@link PlatformTransactionManager}.
+	 * @param transactionManager the {@link PlatformTransactionManager} to set
+	 */
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
+	}
 
 	/**
 	 * Simple aggregate statistics provider for the contributions registered
@@ -67,7 +98,8 @@ public class SimpleStreamManager implements StreamManager {
 			ItemStream provider = (ItemStream) iterator.next();
 			Properties properties = provider.getStreamContext().getProperties();
 			if (properties != null) {
-				String prefix = ""; // ClassUtils.getShortClassName(provider.getClass()) + ".";
+				String prefix = ""; // ClassUtils.getShortClassName(provider.getClass())
+									// + ".";
 				for (Iterator propiter = properties.keySet().iterator(); propiter.hasNext();) {
 					String key = (String) propiter.next();
 					String value = properties.getProperty(key);
@@ -82,7 +114,8 @@ public class SimpleStreamManager implements StreamManager {
 	 * Register a {@link ItemStream} as one of the interesting providers under
 	 * the provided key.
 	 * 
-	 * @see org.springframework.batch.item.stream.StreamManager#register(java.lang.Object, org.springframework.batch.item.ItemStream)
+	 * @see org.springframework.batch.item.stream.StreamManager#register(java.lang.Object,
+	 * org.springframework.batch.item.ItemStream)
 	 */
 	public void register(Object key, ItemStream provider) {
 		synchronized (registry) {
@@ -102,6 +135,46 @@ public class SimpleStreamManager implements StreamManager {
 	 * @see StreamManager#restoreFrom(Object, StreamContext)
 	 */
 	public void close(Object key) throws StreamException {
+		iterate(key, new Callback() {
+			public void execute(ItemStream stream) {
+				stream.close();
+			}
+		});
+	}
+
+	/**
+	 * Delegate to the {@link PlatformTransactionManager} to create a new
+	 * transaction.
+	 * 
+	 * @see org.springframework.batch.item.stream.StreamManager#getTransaction()
+	 */
+	public TransactionStatus getTransaction(final Object key) {
+		TransactionStatus transaction = transactionManager.getTransaction(new DefaultTransactionDefinition());
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+			public void afterCompletion(int status) {
+				if (status == TransactionSynchronization.STATUS_COMMITTED) {
+					iterate(key, new Callback() {
+						public void execute(ItemStream stream) {
+							stream.mark(stream.getStreamContext());
+						}
+					});
+				}
+				else if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
+					iterate(key, new Callback() {
+						public void execute(ItemStream stream) {
+							stream.reset(stream.getStreamContext());
+						}
+					});
+				}
+			}
+		});
+		return transaction;
+	}
+
+	/**
+	 * @param key
+	 */
+	private void iterate(Object key, Callback callback) {
 		Set set = new LinkedHashSet();
 		synchronized (registry) {
 			Collection collection = (Collection) registry.get(key);
@@ -111,8 +184,29 @@ public class SimpleStreamManager implements StreamManager {
 		}
 		for (Iterator iterator = set.iterator(); iterator.hasNext();) {
 			ItemStream stream = (ItemStream) iterator.next();
-			stream.close();
+			callback.execute(stream);
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.item.stream.StreamManager#commit(java.lang.Object)
+	 */
+	public void commit(TransactionStatus status) {
+		transactionManager.commit(status);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.item.stream.StreamManager#rollback(java.lang.Object)
+	 */
+	public void rollback(TransactionStatus status) {
+		transactionManager.rollback(status);
+	}
+
+	private interface Callback {
+		void execute(ItemStream stream);
+	}
+
 
 }

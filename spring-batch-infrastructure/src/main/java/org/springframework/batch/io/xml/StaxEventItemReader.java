@@ -20,13 +20,10 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.reader.AbstractItemReader;
-import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.util.Assert;
 
 /**
@@ -57,8 +54,6 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	private String fragmentRootElementName;
 
 	private boolean initialized = false;
-
-	private TransactionSynchronization synchronization = new StaxEventReaderItemReaderTransactionSychronization();
 
 	private long lastCommitPointRecordCount = 0;
 
@@ -116,8 +111,6 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 
 	public void open() {
 		Assert.state(resource.exists(), "Input resource does not exist: [" + resource + "]");
-		
-		registerSynchronization();
 		try {
 			inputStream = resource.getInputStream();
 			txReader = new DefaultTransactionalEventReader(XMLInputFactory.newInstance().createXMLEventReader(
@@ -131,6 +124,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 			throw new DataAccessResourceFailureException("Unable to get input stream", ioe);
 		}
 		initialized = true;
+		mark(null);
 	}
 
 	public void setResource(Resource resource) {
@@ -216,7 +210,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 			fragmentReader.next();
 			moveCursorToNextFragment(fragmentReader);
 		}
-		txReader.onCommit(); // reset the history buffer
+		mark(null); // reset the history buffer
 	}
 
 	/**
@@ -253,37 +247,8 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 		}
 	}
 
-	// package visibility method for simulating transaction events in tests
-	TransactionSynchronization getSynchronization() {
-		return synchronization;
-	}
-
-	/**
-	 * Encapsulates transaction events for the StaxEventReaderItemReader.
-	 */
-	private class StaxEventReaderItemReaderTransactionSychronization extends TransactionSynchronizationAdapter {
-
-		/**
-		 * @param status
-		 * @see org.springframework.transaction.support.TransactionSynchronizationAdapter#afterCompletion(int)
-		 */
-		public void afterCompletion(int status) {
-			if (status == TransactionSynchronization.STATUS_COMMITTED) {
-				mark(null);
-			}
-			else if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-				reset(null);
-			}
-		}
-
-	}
-
 	public void destroy() throws Exception {
 		close();
-	}
-
-	private void registerSynchronization() {
-		BatchTransactionSynchronizationManager.registerSynchronization(synchronization);
 	}
 
 	/* (non-Javadoc)

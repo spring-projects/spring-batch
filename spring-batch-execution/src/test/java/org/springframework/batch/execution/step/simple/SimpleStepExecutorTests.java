@@ -412,7 +412,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		assertEquals(false, stepExecution.getStreamContext().containsKey("foo"));
 
 		final Map map = new HashMap();
-		stepExecutor.setStreamManager(new SimpleStreamManager() {
+		stepExecutor.setStreamManager(new SimpleStreamManager(new ResourcelessTransactionManager()) {
 			public StreamContext getStreamContext(Object key) {
 				// TODO Auto-generated method stub
 				return new GenericStreamContext(PropertiesConverter.stringToProperties("foo=bar"));

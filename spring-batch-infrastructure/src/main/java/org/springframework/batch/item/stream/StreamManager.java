@@ -18,6 +18,7 @@ package org.springframework.batch.item.stream;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
+import org.springframework.transaction.TransactionStatus;
 
 /**
  * Generalised stream management broadcast strategy. Clients register
@@ -58,5 +59,11 @@ public interface StreamManager {
 	 * been registered.
 	 */
 	void close(Object key) throws StreamException;
+	
+	TransactionStatus getTransaction(Object key);
+	
+	void commit(TransactionStatus transaction);
+	
+	void rollback(TransactionStatus transaction);
 
 }

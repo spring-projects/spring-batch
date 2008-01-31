@@ -27,7 +27,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.item.stream.ItemStreamAdapter;
-import org.springframework.batch.item.stream.StreamManager;
+import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -155,7 +155,7 @@ public class SimpleStepContextTests extends TestCase {
 	 * @author Dave Syer
 	 * 
 	 */
-	private class StubStreamManager implements StreamManager {
+	private class StubStreamManager extends SimpleStreamManager {
 		private final Map map;
 
 		private StubStreamManager(Map map) {

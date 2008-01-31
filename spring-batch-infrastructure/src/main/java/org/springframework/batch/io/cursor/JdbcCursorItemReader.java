@@ -321,7 +321,6 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 			throw getExceptionTranslator().translate("Executing query", sql, se);
 		}
 
-		super.registerSynchronization();
 	}
 
 	/*

@@ -242,7 +242,6 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 */
 	public void open() {
 		getOutputState();
-		super.registerSynchronization();
 	}
 
 	/**

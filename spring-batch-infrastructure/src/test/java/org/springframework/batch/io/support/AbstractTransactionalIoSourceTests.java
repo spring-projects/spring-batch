@@ -16,14 +16,10 @@
 
 package org.springframework.batch.io.support;
 
-import java.util.List;
-
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.StreamContext;
-import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.transaction.support.TransactionSynchronizationUtils;
 import org.springframework.util.Assert;
 
 /**
@@ -44,58 +40,16 @@ public class AbstractTransactionalIoSourceTests extends TestCase {
 		TransactionSynchronizationManager.initSynchronization();
 	}
 		
-	//AbstractItemReader should synchronize on first call to read.
-	public void testSynchronizationRegistration(){
-		
-		source.registerSynchronization();
-		
-		List synchronizations = (List)TransactionSynchronizationManager.getSynchronizations();
-		assertEquals(1, synchronizations.size());
-	}
-	
 	public void testCommit(){
-		
-		source.registerSynchronization();
-		commit();
-		
+		source.mark(null);
 		assertTrue(source.commitCalled);
 		assertFalse(source.rollbackCalled);
 	}
 	
 	public void testRollback(){
-		
-		source.registerSynchronization();
-		
-		rollback();
-		
+		source.reset(null);
 		assertFalse(source.commitCalled);
 		assertTrue(source.rollbackCalled);
-	}
-	
-	public void testCommitUnsynchronizedSource(){
-		
-		commit();
-		
-		assertFalse(source.commitCalled);
-		assertFalse(source.rollbackCalled);
-	}
-	
-	public void testMultipleSynchronizations(){
-		
-		source.registerSynchronization();
-		source.registerSynchronization();
-		
-		//multiple calls to read should result in only one synchronization
-		List synchronizations = (List)TransactionSynchronizationManager.getSynchronizations();
-		assertEquals(1, synchronizations.size()); 
-	}
-	
-	public void testUnknownStatus(){
-		
-		invokeUnknown();
-		
-		assertFalse(source.commitCalled);
-		assertFalse(source.rollbackCalled);
 	}
 	
 	private static class MockIoSource extends AbstractTransactionalIoSource {
@@ -118,21 +72,4 @@ public class AbstractTransactionalIoSourceTests extends TestCase {
 		}
 	}
 	
-	private void commit() {
-		TransactionSynchronizationUtils.invokeAfterCompletion(
-				TransactionSynchronizationManager.getSynchronizations(),
-				TransactionSynchronization.STATUS_COMMITTED);
-	}
-
-	private void rollback() {
-		TransactionSynchronizationUtils.invokeAfterCompletion(
-				TransactionSynchronizationManager.getSynchronizations(),
-				TransactionSynchronization.STATUS_ROLLED_BACK);
-	}
-	
-	private void invokeUnknown() {
-		TransactionSynchronizationUtils.invokeAfterCompletion(
-				TransactionSynchronizationManager.getSynchronizations(),
-				TransactionSynchronization.STATUS_UNKNOWN);
-	}
 }

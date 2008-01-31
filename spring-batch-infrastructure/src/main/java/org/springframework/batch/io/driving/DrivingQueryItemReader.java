@@ -143,7 +143,6 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 						+ ", call close() first.");
 		keys = keyGenerator.retrieveKeys();
 		keysIterator = keys.listIterator();
-		super.registerSynchronization();
 		initialized = true;
 	}
 

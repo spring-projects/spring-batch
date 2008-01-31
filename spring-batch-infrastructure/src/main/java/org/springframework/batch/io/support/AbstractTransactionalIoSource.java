@@ -19,11 +19,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.ItemStreamAdapter;
-import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * <p>
@@ -34,42 +29,10 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * maintained regardless of rollbacks.
  * </p>
  * 
- * <p>
- * This class is primarily useful because it allows its subclasses to implement
- * a single method to be notified of a commit or rollback, rather than having an
- * inner class that implements {@link TransactionSyncrhonization} and likely
- * calls another method with similar semantics as commit and rollback.
- * </p>
- * 
- * <p>
- * It should be noted that this implementation will only register for
- * synchronization if a call to registerSynchronization() has been made. This is
- * less than ideal, however, it is the best solution until {@link StepScope} is
- * modified to handle registering synchronizations in a scoped manner.
- * Otherwise, registering at instantiation or initialization (such as via the
- * Spring {@link InitializingBean} interface) would cause commits to be called
- * on input sources for all steps, rather than the currently running step.
- * </p>
- * 
  * @author Lucas Ward
  * @since 1.0
- * @see TransactionSynchronization
- * @see TransactionSynchronizationManager
  */
 public abstract class AbstractTransactionalIoSource extends ItemStreamAdapter {
-
-	private final TransactionSynchronization synchronization = new AbstractTransactionalIoSourceTransactionSynchronization();
-
-	/**
-	 * Register for Synchronization. This method is left protected because
-	 * clients of this class should not be registering for synchronization, but
-	 * rather only subclasses, at the appropriate time, i.e. when they are not
-	 * initialized.
-	 */
-	protected void registerSynchronization() {
-		BatchTransactionSynchronizationManager
-				.registerSynchronization(synchronization);
-	}
 
 	/*
 	 * Called when a transaction has been committed.
@@ -85,20 +48,6 @@ public abstract class AbstractTransactionalIoSource extends ItemStreamAdapter {
 	 */
 	public abstract void reset(StreamContext streamContext);
 
-	/**
-	 * Encapsulates transaction events handling.
-	 */
-	private class AbstractTransactionalIoSourceTransactionSynchronization extends
-			TransactionSynchronizationAdapter {
-		public void afterCompletion(int status) {
-			if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-				reset(null);
-			} else if (status == TransactionSynchronization.STATUS_COMMITTED) {
-				mark(null);
-			}
-		}
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#isMarkSupported()
 	 */

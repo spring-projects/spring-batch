@@ -25,15 +25,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.reader.AbstractItemReader;
+import org.springframework.batch.item.reader.AbstractItemStreamItemReader;
 import org.springframework.batch.item.stream.GenericStreamContext;
-import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -56,8 +52,8 @@ import org.springframework.util.StringUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader extends AbstractItemReader implements ItemReader, ItemStream, Skippable,
-		InitializingBean, DisposableBean {
+public class HibernateCursorItemReader extends AbstractItemStreamItemReader implements Skippable, InitializingBean,
+		DisposableBean {
 
 	private static final String RESTART_DATA_ROW_NUMBER_KEY = ClassUtils.getShortName(HibernateCursorItemReader.class)
 			+ ".rowNumber";
@@ -87,8 +83,6 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 	private int currentProcessedRow = 0;
 
 	private boolean initialized = false;
-
-	private TransactionSynchronization synchronization = new HibernateItemReaderTransactionSynchronization();
 
 	public Object read() {
 		if (!initialized) {
@@ -140,8 +134,6 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 			statefulSession = sessionFactory.openSession();
 			cursor = statefulSession.createQuery(queryString).scroll();
 		}
-
-		BatchTransactionSynchronizationManager.registerSynchronization(synchronization);
 		initialized = true;
 	}
 
@@ -228,21 +220,6 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 	}
 
 	/**
-	 * Encapsulates transaction events handling.
-	 */
-	private class HibernateItemReaderTransactionSynchronization extends TransactionSynchronizationAdapter {
-
-		public void afterCompletion(int status) {
-			if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-				mark(null);
-			}
-			else if (status == TransactionSynchronization.STATUS_COMMITTED) {
-				reset(null);
-			}
-		}
-	}
-
-	/**
 	 * Always true, but only supported through a single processed row count, so
 	 * do not use in an asynchronous setting.
 	 * 
@@ -257,14 +234,9 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
 	 */
 	public void mark(StreamContext streamContext) {
-		currentProcessedRow = lastCommitRowNumber;
-		if (lastCommitRowNumber == 0) {
-			cursor.beforeFirst();
-		}
-		else {
-			// Set the cursor so that next time it is advanced it will
-			// come back to the committed row.
-			cursor.setRowNumber(lastCommitRowNumber - 1);
+		lastCommitRowNumber = currentProcessedRow;
+		if (!useStatelessSession) {
+			statefulSession.clear();
 		}
 	}
 
@@ -273,9 +245,14 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
 	 */
 	public void reset(StreamContext streamContext) {
-		lastCommitRowNumber = currentProcessedRow;
-		if (!useStatelessSession) {
-			statefulSession.clear();
+		currentProcessedRow = lastCommitRowNumber;
+		if (lastCommitRowNumber == 0) {
+			cursor.beforeFirst();
+		}
+		else {
+			// Set the cursor so that next time it is advanced it will
+			// come back to the committed row.
+			cursor.setRowNumber(lastCommitRowNumber - 1);
 		}
 	}
 

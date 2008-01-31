@@ -1,5 +1,7 @@
-#Fri Aug 03 14:01:44 BST 2007
-org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.4
+#Thu Jan 31 17:05:10 GMT 2008
 eclipse.preferences.version=1
-org.eclipse.jdt.core.compiler.source=1.4
+org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.4
 org.eclipse.jdt.core.compiler.compliance=1.4
+org.eclipse.jdt.core.compiler.problem.assertIdentifier=error
+org.eclipse.jdt.core.compiler.problem.enumIdentifier=warning
+org.eclipse.jdt.core.compiler.source=1.4

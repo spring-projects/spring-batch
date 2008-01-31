@@ -26,9 +26,6 @@ import org.springframework.batch.io.file.separator.LineReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
-import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 
 /**
  * <p>
@@ -51,19 +48,12 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 
 	private Set skippedLines = new HashSet();
 
-	private TransactionSynchronization transactionSynchronization = new ResourceLineReaderTransactionSynchronization();
-
 	/**
 	 * Initialize the input source. 
 	 */
 	public void open() {
-		registerSynchronization();
 		super.open();
-	}
-
-	// Registers transaction synchronization.
-	private void registerSynchronization() {
-		BatchTransactionSynchronizationManager.registerSynchronization(transactionSynchronization);
+		mark(null);
 	}
 
 	/**
@@ -92,6 +82,8 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 		while (reader.getCurrentLineCount() < lineCount && record != null) {
 			record = readLine();
 		}
+		
+		mark(data);
 
 	}
 
@@ -132,30 +124,6 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	}
 
 	/**
-	 * This method marks the start of a transaction. It marks the InputBuffer
-	 * Reader, so that in case of rollback it can position the file to start of
-	 * the transaction.
-	 */
-	private void transactionStarted() {
-		mark(null);
-	}
-
-	/**
-	 * Commit the transaction. At each commit point we clear the lines which we
-	 * had skipped during the commit interval.
-	 */
-	private void transactionComitted() {
-		transactionStarted();
-	}
-
-	/**
-	 * Rollback the transaction.
-	 */
-	private void transactionRolledback() {
-		reset(null);
-	}
-
-	/**
 	 * Skip the current line which is being processed.
 	 */
 	public void skip() {
@@ -173,29 +141,4 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 		return line;
 	}
 
-	// added package visibility method so that tests can invoke transaction
-	// events
-	TransactionSynchronization getTransactionSynchronization() {
-		return this.transactionSynchronization;
-	}
-
-	/**
-	 * Encapsulates transaction events.
-	 */
-	private class ResourceLineReaderTransactionSynchronization extends TransactionSynchronizationAdapter {
-		/**
-		 * TransactionSynchronization method indicating that a transaction has
-		 * completed.
-		 *
-		 * @param status indicates whether it was a rollback or commit
-		 */
-		public void afterCompletion(int status) {
-			if (status == TransactionSynchronization.STATUS_COMMITTED) {
-				transactionComitted();
-			}
-			else if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-				transactionRolledback();
-			}
-		}
-	}
 }

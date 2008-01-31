@@ -12,9 +12,6 @@ import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationMan
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.transaction.support.TransactionSynchronizationUtils;
 import org.springframework.util.Assert;
 
 /**
@@ -230,15 +227,11 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 	}
 
 	private void commit() {
-		TransactionSynchronizationUtils.invokeAfterCompletion(
-				TransactionSynchronizationManager.getSynchronizations(), 
-				TransactionSynchronization.STATUS_COMMITTED);
+		((ItemStream) source).mark(((ItemStream) source).getStreamContext());
 	}
 	
 	private void rollback() {
-		TransactionSynchronizationUtils.invokeAfterCompletion(
-				TransactionSynchronizationManager.getSynchronizations(), 
-				TransactionSynchronization.STATUS_ROLLED_BACK);
+		((ItemStream) source).reset(((ItemStream) source).getStreamContext());
 	}
 	
 	private Skippable getAsSkippable(ItemReader source) {
