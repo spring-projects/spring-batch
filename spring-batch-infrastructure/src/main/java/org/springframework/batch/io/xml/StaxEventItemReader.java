@@ -99,6 +99,9 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 
 	public void close() {
 		initialized = false;
+		if (fragmentReader==null && inputStream==null) {
+			return;
+		}
 		try {
 			fragmentReader.close();
 			inputStream.close();

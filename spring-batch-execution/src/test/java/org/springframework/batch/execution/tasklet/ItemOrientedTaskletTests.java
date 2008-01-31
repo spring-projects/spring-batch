@@ -19,7 +19,6 @@ package org.springframework.batch.execution.tasklet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -34,7 +33,6 @@ import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
-import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
@@ -292,10 +290,6 @@ public class ItemOrientedTaskletTests extends TestCase {
 			list.add("provider");
 		}
 
-		public Properties getStatistics() {
-			return PropertiesConverter.stringToProperties("foo=bar");
-		}
-
 		public void close() throws StreamException {
 		}
 	}
@@ -318,10 +312,6 @@ public class ItemOrientedTaskletTests extends TestCase {
 
 		public void skip() {
 			list.add("writer");
-		}
-
-		public Properties getStatistics() {
-			return PropertiesConverter.stringToProperties(props);
 		}
 
 		public void close() throws Exception {

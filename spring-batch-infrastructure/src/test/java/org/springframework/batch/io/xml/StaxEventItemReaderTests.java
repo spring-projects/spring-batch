@@ -29,7 +29,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
  *
  * @author Robert Kasanicky
  */
-public class StaxEventReaderItemReaderTests extends TestCase {
+public class StaxEventItemReaderTests extends TestCase {
 
 	// object under test
 	private StaxEventItemReader source;
@@ -216,9 +216,13 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 		assertEquals(NUMBER_OF_RECORDS, extractRecordCountFrom(source.getStatistics()));
 	}
 
-	public void testClose() throws Exception{
+	public void testCloseWithoutOpen() throws Exception{
+		source.close();
+		// No error!
+	}
 
-		MockStaxEventReaderItemReader newSource = new MockStaxEventReaderItemReader();
+	public void testClose() throws Exception{
+		MockStaxEventItemReader newSource = new MockStaxEventItemReader();
 		Resource resource = new ByteArrayResource(xml.getBytes());
 		newSource.setResource(resource);
 
@@ -229,7 +233,7 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 		assertNotNull(item);
 		assertTrue(newSource.isOpenCalled());
 
-		newSource.destroy();
+		newSource.destroy(); // includes close()
 		newSource.setOpenCalled(false);
 		//calling read again should require re-initialization because of close
 		item = newSource.read();
@@ -375,7 +379,7 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 
 	}
 
-	private static class MockStaxEventReaderItemReader extends StaxEventItemReader {
+	private static class MockStaxEventItemReader extends StaxEventItemReader {
 
 		private boolean openCalled = false;
 

@@ -198,7 +198,7 @@ public class StepExecutionTests extends TestCase {
 				execution.toString().indexOf("rollback") >= 0);
 	}
 
-	public void testStatistics() throws Exception {
+	public void testStreamContext() throws Exception {
 		assertNotNull(execution.getStreamContext());
 		StreamContext context = new StreamContext();
 		context.putString("foo", "bar");

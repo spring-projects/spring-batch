@@ -33,6 +33,7 @@ import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.item.stream.SimpleStreamManager;
@@ -105,9 +106,9 @@ public class SimpleStepExecutor {
 	/**
 	 * Public setter for the {@link StreamManager}. This will be used to create
 	 * the {@link StepContext}, and hence any component that is a
-	 * {@link StatisticsProvider} and in step scope will be registered with the
-	 * service. The {@link StepContext} is then a source of aggregate statistics
-	 * for the step.
+	 * {@link ItemStream} and in step scope will be registered with the service. The
+	 * {@link StepContext} is then a source of aggregate statistics for the
+	 * step.
 	 * 
 	 * @param streamManager the {@link StreamManager} to set. Default is a
 	 * {@link SimpleStreamManager}.

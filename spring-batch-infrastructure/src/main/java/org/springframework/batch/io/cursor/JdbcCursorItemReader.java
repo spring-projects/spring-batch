@@ -72,15 +72,11 @@ import org.springframework.util.StringUtils;
  * </p>
  * 
  * <p>
- * Restart: This implementation contains basic, simple restart. The current row
- * is returned as restart data, and when restored from that same data, the
- * cursor is opened and the current row set to the value within the restart
- * data.
- * </p>
- * 
- * <p>
- * Statistics: There are two statistics returned by this input source: the
- * current line being processed and the number of lines that have been skipped.
+ * {@link StreamContext}: The current row is returned as restart data, and when
+ * restored from that same data, the cursor is opened and the current row set to
+ * the value within the restart data. There are also two statistics returned by
+ * this input source: the current line being processed and the number of lines
+ * that have been skipped.
  * </p>
  * 
  * <p>
@@ -216,7 +212,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 					}
 				}
 
-				Object mappedResult = mapper.mapRow(rs, (int)currentProcessedRow);
+				Object mappedResult = mapper.mapRow(rs, (int) currentProcessedRow);
 
 				verifyCursorPosition(currentProcessedRow);
 
@@ -251,7 +247,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 		try {
 			currentProcessedRow = lastCommittedRow;
 			if (currentProcessedRow > 0) {
-				rs.absolute((int)currentProcessedRow);
+				rs.absolute((int) currentProcessedRow);
 			}
 			else {
 				rs.beforeFirst();
@@ -405,8 +401,8 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 		return context;
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.StreamContext)
 	 */
 	public void restoreFrom(StreamContext data) {
@@ -424,7 +420,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 
 		try {
 			this.currentProcessedRow = data.getLong(CURRENT_PROCESSED_ROW);
-			rs.absolute((int)currentProcessedRow);
+			rs.absolute((int) currentProcessedRow);
 		}
 		catch (SQLException se) {
 			throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);

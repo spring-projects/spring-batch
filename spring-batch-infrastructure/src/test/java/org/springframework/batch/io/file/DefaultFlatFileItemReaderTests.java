@@ -17,14 +17,12 @@
 package org.springframework.batch.io.file;
 
 import java.io.IOException;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.file.DefaultFlatFileItemReader;
 import org.springframework.batch.io.file.mapping.DefaultFieldSet;
-import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.transform.LineTokenizer;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
@@ -163,16 +161,16 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		inputSource.skip();
 		inputSource.read();
 
-		Properties statistics = inputSource.getStatistics();
-		String skipped = statistics.getProperty(DefaultFlatFileItemReader.SKIPPED_STATISTICS_NAME);
-		String read = statistics.getProperty(DefaultFlatFileItemReader.READ_STATISTICS_NAME);
+		StreamContext statistics = inputSource.getStreamContext();
+		long skipped = statistics.getLong(DefaultFlatFileItemReader.SKIPPED_STATISTICS_NAME);
+		long read = statistics.getLong(DefaultFlatFileItemReader.READ_STATISTICS_NAME);
 
 		// call unknown, which has no influence and therefore statistics should
 		// be the same
 		inputSource.getTransactionSynchronization().afterCompletion(TransactionSynchronization.STATUS_UNKNOWN);
-		statistics = inputSource.getStatistics();
-		assertEquals(skipped, statistics.getProperty(DefaultFlatFileItemReader.SKIPPED_STATISTICS_NAME));
-		assertEquals(read, statistics.getProperty(DefaultFlatFileItemReader.READ_STATISTICS_NAME));
+		statistics = inputSource.getStreamContext();;
+		assertEquals(skipped, statistics.getLong(DefaultFlatFileItemReader.SKIPPED_STATISTICS_NAME));
+		assertEquals(read, statistics.getLong(DefaultFlatFileItemReader.READ_STATISTICS_NAME));
 	}
 
 	public void testRestartFromNullData() throws Exception {
@@ -225,8 +223,8 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		assertEquals("[testLine5]", inputSource.read().toString());
 		assertEquals("[testLine6]", inputSource.read().toString());
 
-		Properties statistics = inputSource.getStatistics();
-		assertEquals("6", statistics.getProperty(DefaultFlatFileItemReader.READ_STATISTICS_NAME));
+		StreamContext statistics = inputSource.getStreamContext();
+		assertEquals(6, statistics.getLong(DefaultFlatFileItemReader.READ_STATISTICS_NAME));
 	}
 
 }

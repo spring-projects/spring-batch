@@ -134,14 +134,14 @@ public class SimpleStepContextTests extends TestCase {
 		assertTrue(list.contains("spam"));
 	}
 
-	public void testStatisticsWithNotNullService() throws Exception {
+	public void testStreamContextWithNotNullService() throws Exception {
 		Map map = new HashMap();
 		context = new SimpleStepContext(null, null, new StubStreamManager(map));
 		assertEquals(1, context.getStreamContext().getProperties().size());
 		assertEquals("bar", context.getStreamContext().getProperties().getProperty("foo"));
 	}
 
-	public void testStatisticsServiceRegistration() throws Exception {
+	public void testStreamManagerRegistration() throws Exception {
 		Map map = new HashMap();
 		context = new SimpleStepContext(null, null, new StubStreamManager(map));
 		ItemStreamAdapter provider = new ItemStreamAdapter();

@@ -34,6 +34,7 @@ import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.StreamException;
 import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.beans.factory.DisposableBean;
@@ -71,11 +72,9 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	private Resource resource;
 
-	private Properties statistics = new Properties();
-
 	private StreamContext streamContext = new GenericStreamContext(new Properties());
 
-	private OutputState state = new OutputState();
+	private OutputState state = null;
 
 	private ItemTransformer transformer = new ItemTransformer() {
 		public Object transform(Object input) {
@@ -201,7 +200,10 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 * @see ResourceLifecycle#close()
 	 */
 	public void close() {
-		getOutputState().close();
+		if (state!=null) {
+			getOutputState().close();
+			state = null;
+		}
 	}
 
 	/**
@@ -240,27 +242,20 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 * @see ResourceLifecycle#open()
 	 */
 	public void open() {
+		getOutputState();
 		super.registerSynchronization();
-	}
-
-	/**
-	 * @see StatisticsProvider
-	 */
-	public Properties getStatistics() {
-		final OutputState os = getOutputState();
-
-		statistics.setProperty(WRITTEN_STATISTICS_NAME, String.valueOf(os.linesWritten));
-		statistics.setProperty(RESTART_COUNT_STATISTICS_NAME, String.valueOf(os.restartCount));
-		return statistics;
 	}
 
 	/**
 	 * @see ItemStream#getStreamContext()
 	 */
 	public StreamContext getStreamContext() {
-		final OutputState os = getOutputState();
-
-		streamContext.putString(RESTART_DATA_NAME, String.valueOf(os.position()));
+		if (state == null) {
+			throw new StreamException("ItemStream not open or already closed.");
+		}
+		streamContext.putLong(RESTART_DATA_NAME, state.position());
+		streamContext.putLong(WRITTEN_STATISTICS_NAME, state.linesWritten);
+		streamContext.putLong(RESTART_COUNT_STATISTICS_NAME, state.restartCount);
 		return streamContext;
 	}
 
@@ -277,6 +272,9 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	// Returns object representing state.
 	private OutputState getOutputState() {
+		if (state==null) {
+			state = new OutputState();
+		}
 		return (OutputState) state;
 	}
 

@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -345,6 +344,8 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.write("testLine7");
 		inputSource.write("testLine8");
 
+		// get statistics
+		StreamContext statistics = inputSource.getStreamContext();
 		// close template
 		inputSource.close();
 
@@ -353,10 +354,8 @@ public class FlatFileItemWriterTests extends TestCase {
 			assertEquals("testLine" + i, readLine());
 		}
 
-		// get statistics
-		Properties statistics = inputSource.getStatistics();
 		// 3 lines were written to the file after restart
-		assertEquals("3", statistics.getProperty(FlatFileItemWriter.WRITTEN_STATISTICS_NAME));
+		assertEquals(3, statistics.getLong(FlatFileItemWriter.WRITTEN_STATISTICS_NAME));
 
 	}
 
@@ -373,10 +372,11 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	public void testDefaultStreamContext() throws Exception {
 		inputSource = new FlatFileItemWriter();
+		inputSource.open();
 		StreamContext streamContext = inputSource.getStreamContext();
 		assertNotNull(streamContext);
-		assertEquals(1, streamContext.getProperties().size());
-		assertEquals("0", streamContext.getProperties().getProperty(FlatFileItemWriter.RESTART_DATA_NAME));
+		assertEquals(3, streamContext.getProperties().size());
+		assertEquals(0, streamContext.getLong(FlatFileItemWriter.RESTART_DATA_NAME));
 	}
 
 	private void commit() {

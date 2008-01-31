@@ -409,7 +409,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
-		assertEquals(null, stepExecution.getStreamContext().getString("foo"));
+		assertEquals(false, stepExecution.getStreamContext().containsKey("foo"));
 
 		final Map map = new HashMap();
 		stepExecutor.setStreamManager(new SimpleStreamManager() {

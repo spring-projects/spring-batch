@@ -45,7 +45,7 @@ public class StepContributionTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.core.domain.StepContribution#setStreamContext(StreamContext)}.
 	 */
-	public void testSetStatistics() {
+	public void testSetStreamContext() {
 		assertEquals(null, contribution.getStreamContext());
 		contribution.setStreamContext(new GenericStreamContext(PropertiesConverter.stringToProperties("foo=bar")));
 		assertEquals(1, contribution.getStreamContext().getProperties().size());

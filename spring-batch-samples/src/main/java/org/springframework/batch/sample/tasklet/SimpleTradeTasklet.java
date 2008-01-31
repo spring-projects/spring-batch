@@ -16,14 +16,11 @@
 
 package org.springframework.batch.sample.tasklet;
 
-import java.util.Properties;
-
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.io.file.DefaultFlatFileItemReader;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamContextProvider;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
@@ -90,10 +87,9 @@ public class SimpleTradeTasklet implements Tasklet, StreamContextProvider {
 	 * @see org.springframework.batch.item.StreamContextProvider#getStreamContext()
 	 */
 	public StreamContext getStreamContext() {
-		Properties statistics = new Properties();
-		statistics.setProperty("trade.count", String.valueOf(tradeCount));
-		statistics.putAll(inputSource.getStatistics());
-		return new GenericStreamContext(statistics);
+		StreamContext statistics = new StreamContext();
+		statistics.putLong("trade.count", tradeCount);
+		return statistics;
 	}
 
 }

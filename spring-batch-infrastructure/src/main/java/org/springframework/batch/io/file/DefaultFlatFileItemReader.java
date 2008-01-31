@@ -17,7 +17,6 @@
 package org.springframework.batch.io.file;
 
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -27,7 +26,6 @@ import org.springframework.batch.io.file.separator.LineReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -53,8 +51,6 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	private Set skippedLines = new HashSet();
 
 	private TransactionSynchronization transactionSynchronization = new ResourceLineReaderTransactionSynchronization();
-
-	private Properties statistics = new Properties();
 
 	/**
 	 * Initialize the input source. 
@@ -104,19 +100,13 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * case of restart.
 	 */
 	public StreamContext getStreamContext() {
-		return new GenericStreamContext(getStatistics());
-	}
-
-	/**
-	 * @return statistics for input template
-	 * @see org.springframework.batch.statistics.StatisticsProvider#getStatistics()
-	 */
-	public Properties getStatistics() {
 		if (reader==null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
-		statistics.setProperty(READ_STATISTICS_NAME, String.valueOf(reader.getCurrentLineCount()));
-		return statistics;
+		StreamContext streamContext = new StreamContext();
+		streamContext.putLong(READ_STATISTICS_NAME, reader.getCurrentLineCount());
+		streamContext.putLong(SKIPPED_STATISTICS_NAME, skippedLines.size());
+		return streamContext;
 	}
 
 	/**
