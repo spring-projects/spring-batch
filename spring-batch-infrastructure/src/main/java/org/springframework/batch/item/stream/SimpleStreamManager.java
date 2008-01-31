@@ -23,16 +23,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.lang.ClassUtils;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
-import org.springframework.batch.statistics.StatisticsProvider;
-import org.springframework.batch.support.PropertiesConverter;
 
 /**
- * Simple {@link StreamManager} that makes no attempt to aggregate or resolve
- * conflicts between key names. All the contributions registered are simply
- * polled and added "as is" to the aggregate properties.
+ * Simple {@link StreamManager} that tries to resolve conflicts between key
+ * names by using the short class name of a stream to prefix property keys.
  * 
  * @author Dave Syer
  * 
@@ -55,23 +53,28 @@ public class SimpleStreamManager implements StreamManager {
 				set = new LinkedHashSet(collection);
 			}
 		}
-		return new GenericStreamContext(aggregate(set));
+		return new SimpleStreamManagerStreamContext(set);
 	}
 
 	/**
-	 * @param list a list of {@link StatisticsProvider}s
-	 * @return aggregated statistics
+	 * @param list a list of {@link ItemStream}s
+	 * @return aggregated streamcontext
 	 */
-	private Properties aggregate(Collection list) {
+	private StreamContext aggregate(Collection list) {
 		Properties result = new Properties();
 		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
 			ItemStream provider = (ItemStream) iterator.next();
 			Properties properties = provider.getStreamContext().getProperties();
 			if (properties != null) {
-				result.putAll(properties);
+				String prefix = ClassUtils.getShortClassName(provider.getClass()) + ".";
+				for (Iterator propiter = properties.keySet().iterator(); propiter.hasNext();) {
+					String key = (String) propiter.next();
+					String value = properties.getProperty(key);
+					result.setProperty(prefix + key, value);
+				}
 			}
 		}
-		return result;
+		return new GenericStreamContext(result);
 	}
 
 	/**
@@ -111,40 +114,21 @@ public class SimpleStreamManager implements StreamManager {
 			stream.close();
 		}
 	}
-	
-	// TODO: integrate this
+
 	private class SimpleStreamManagerStreamContext implements StreamContext {
 
-		private static final String READER_KEY = "DATA_PROVIDER";
+		private StreamContext data;
 
-		private static final String WRITER_KEY = "DATA_PROCESSOR";
-
-		private StreamContext readerData;
-
-		private StreamContext writerData;
-
-		public SimpleStreamManagerStreamContext(StreamContext providerData, StreamContext writerData) {
-			this.readerData = providerData;
-			this.writerData = writerData;
-		}
-
-		public SimpleStreamManagerStreamContext(Properties data) {
-			readerData = new GenericStreamContext(PropertiesConverter
-					.stringToProperties(data.getProperty(READER_KEY)));
-			writerData = new GenericStreamContext(PropertiesConverter.stringToProperties(data
-					.getProperty(WRITER_KEY)));
+		public SimpleStreamManagerStreamContext(Set streams) {
+			this.data = aggregate(streams);
 		}
 
 		public Properties getProperties() {
-			Properties props = new Properties();
-			if (readerData != null) {
-				props.setProperty(READER_KEY, PropertiesConverter.propertiesToString(readerData.getProperties()));
+			if (data != null) {
+				return data.getProperties();
 			}
-			if (writerData != null) {
-				props.setProperty(WRITER_KEY, PropertiesConverter.propertiesToString(writerData.getProperties()));
-			}
-			return props;
+			return new Properties();
 		}
 	}
-	
+
 }
