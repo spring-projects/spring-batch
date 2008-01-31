@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.lang.ClassUtils;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
@@ -31,6 +30,8 @@ import org.springframework.batch.item.StreamException;
 /**
  * Simple {@link StreamManager} that tries to resolve conflicts between key
  * names by using the short class name of a stream to prefix property keys.
+ * 
+ * TODO: actually implement the uniqueness strategy!
  * 
  * @author Dave Syer
  * 
@@ -66,7 +67,7 @@ public class SimpleStreamManager implements StreamManager {
 			ItemStream provider = (ItemStream) iterator.next();
 			Properties properties = provider.getStreamContext().getProperties();
 			if (properties != null) {
-				String prefix = ClassUtils.getShortClassName(provider.getClass()) + ".";
+				String prefix = ""; // ClassUtils.getShortClassName(provider.getClass()) + ".";
 				for (Iterator propiter = properties.keySet().iterator(); propiter.hasNext();) {
 					String key = (String) propiter.next();
 					String value = properties.getProperty(key);
