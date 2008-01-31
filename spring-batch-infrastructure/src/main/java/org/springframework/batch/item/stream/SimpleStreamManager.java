@@ -44,7 +44,7 @@ public class SimpleStreamManager implements StreamManager {
 	 * Simple aggregate statistics provider for the contributions registered
 	 * under the given key.
 	 * 
-	 * @see org.springframework.batch.statistics.StatisticsService#getStatistics(java.lang.Object)
+	 * @see org.springframework.batch.item.stream.StreamManager#getStreamContext(java.lang.Object)
 	 */
 	public StreamContext getStreamContext(Object key) {
 		Set set = new LinkedHashSet();
@@ -82,8 +82,7 @@ public class SimpleStreamManager implements StreamManager {
 	 * Register a {@link ItemStream} as one of the interesting providers under
 	 * the provided key.
 	 * 
-	 * @see org.springframework.batch.statistics.StreamManager#register(java.lang.Object,
-	 * org.springframework.batch.statistics.StatisticsProvider)
+	 * @see org.springframework.batch.item.stream.StreamManager#register(java.lang.Object, org.springframework.batch.item.ItemStream)
 	 */
 	public void register(Object key, ItemStream provider) {
 		synchronized (registry) {
