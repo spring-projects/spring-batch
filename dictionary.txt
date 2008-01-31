@@ -49,3 +49,4 @@ unbind
 tasklet
 bespoke
 standalone
+kasanicky
