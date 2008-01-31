@@ -35,16 +35,6 @@ package org.springframework.batch.item;
  * 
  */
 public interface ItemStream {
-	
-	void open() throws Exception;
-	
-	/**
-	 * Close the reader, freeing any resources that may have been allocated
-	 * since the first call to read().
-	 * 
-	 * @throws Exception if an underlying resource is unavailable
-	 */
-	void close() throws Exception;
 
 	/**
 	 * Get {@link StreamContext} representing this object's current state.
@@ -60,4 +50,16 @@ public interface ItemStream {
 	 * @param data
 	 */
 	void restoreFrom(StreamContext data);
+
+	/**
+	 * If any resources are needed for the stream to operate they need to be
+	 * initialised here.
+	 */
+	void open() throws Exception;
+
+	/**
+	 * If any resources are needed for the stream to operate they need to be
+	 * destroyed here.
+	 */
+	void close() throws Exception;
 }

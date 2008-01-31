@@ -8,7 +8,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-class FooItemReader extends AbstractItemReader implements ItemReader, ItemStream, DisposableBean, InitializingBean{
+class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader, DisposableBean, InitializingBean{
 
 	DrivingQueryItemReader inputSource;
 	FooDao fooDao = new SingleKeyFooDao();
@@ -44,5 +44,8 @@ class FooItemReader extends AbstractItemReader implements ItemReader, ItemStream
 	}
 
 	public void afterPropertiesSet() throws Exception {
+	}
+
+	public void open() throws Exception {
 	};
 }

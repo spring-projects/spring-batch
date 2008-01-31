@@ -17,13 +17,12 @@
 package org.springframework.batch.sample.item.writer;
 
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.sample.dao.CustomerCreditDao;
 import org.springframework.batch.sample.domain.CustomerCredit;
 
 
 
-public class CustomerCreditUpdateWriter extends AbstractItemWriter implements ItemWriter {
+public class CustomerCreditUpdateWriter implements ItemWriter {
     private double creditFilter = 800;
     private CustomerCreditDao dao;
 

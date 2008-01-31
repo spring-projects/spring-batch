@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
@@ -13,8 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;
 import org.springframework.batch.item.KeyedItemReader;
-import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.sample.item.writer.StagingItemWriter;
 import org.springframework.beans.factory.DisposableBean;
@@ -251,22 +248,6 @@ public class StagingItemReader extends JdbcDaoSupport implements KeyedItemReader
 		public String toString() {
 			return "list=" + list + "; iter.hasNext()=" + iter.hasNext();
 		}
-	}
-	
-	/**
-	 * Return empty {@link StreamContext}.
-	 * @see org.springframework.batch.item.ItemStream#getRestartData()
-	 */
-	public StreamContext getRestartData() {
-		return new GenericStreamContext(new Properties());
-	}
-	
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.StreamContext)
-	 */
-	public void restoreFrom(StreamContext data) {
-		
 	}
 
 }

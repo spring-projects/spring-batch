@@ -25,7 +25,7 @@
 						</property>
 						<property name="itemWriter">
 							<bean class="org.springframework.batch.item.writer.CompositeItemWriter" >
-								<property name="itemWriters" >
+								<property name="delegates" >
 									<list>
 										<bean class="org.springframework.batch.sample.item.writer.TradeWriter">
 											<property name="dao" ref="tradeDao" />

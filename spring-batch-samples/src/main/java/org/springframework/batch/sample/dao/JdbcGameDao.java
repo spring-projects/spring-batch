@@ -1,10 +1,6 @@
 package org.springframework.batch.sample.dao;
 
-import java.util.Properties;
-
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.sample.domain.Game;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.util.Assert;
@@ -38,36 +34,7 @@ public class JdbcGameDao extends JdbcDaoSupport implements ItemWriter {
 		this.getJdbcTemplate().update(INSERT_GAME, args);
 	}
 
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemStream#open()
-	 */
-	public void open() throws Exception {
-		// no-op
-	}
-	
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemStream#close()
-	 */
 	public void close() throws Exception {
-		// no-op
-	}
-
-	/**
-	 * Return empty {@link StreamContext}.
-	 * @see org.springframework.batch.item.ItemStream#getRestartData()
-	 */
-	public StreamContext getRestartData() {
-		return new GenericStreamContext(new Properties());
-	}
-	
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.StreamContext)
-	 */
-	public void restoreFrom(StreamContext data) {
-		
 	}
 
 }

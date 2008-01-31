@@ -273,7 +273,7 @@ public class ItemOrientedTaskletTests extends TestCase {
 		}
 	}
 
-	private class SkippableItemReader extends AbstractItemReader implements KeyedItemReader,
+	private class SkippableItemReader implements KeyedItemReader,
 			Skippable, StatisticsProvider {
 		public Object read() throws Exception {
 			return itemProvider.read();
@@ -287,9 +287,11 @@ public class ItemOrientedTaskletTests extends TestCase {
 		public Properties getStatistics() {
 			return PropertiesConverter.stringToProperties("foo=bar");
 		}
+		public void close() throws Exception {			
+		}
 	}
 
-	private class SkippableItemWriter extends AbstractItemWriter implements ItemWriter, Skippable,
+	private class SkippableItemWriter implements ItemWriter, Skippable,
 			StatisticsProvider {
 		String props = "foo=bar";
 

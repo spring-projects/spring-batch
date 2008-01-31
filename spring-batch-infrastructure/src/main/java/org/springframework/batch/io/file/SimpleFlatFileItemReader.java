@@ -22,8 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.exception.FlatFileParsingException;
 import org.springframework.batch.io.file.mapping.DefaultFieldSet;
-import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.separator.LineReader;
 import org.springframework.batch.io.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.io.file.separator.ResourceLineReader;
@@ -170,8 +170,10 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 	}
 
 	/**
-	 * Close and null out the delegate line reader.
+	 * Close and null out the reader.
 	 * @throws Exception 
+	 * 
+	 * @see ResourceLifecycle
 	 */
 	public void close() throws Exception {
 		try {

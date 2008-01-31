@@ -16,11 +16,7 @@
 
 package org.springframework.batch.item.reader;
 
-import java.util.Properties;
-
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.support.AbstractMethodInvokingDelegator;
 
 /**
@@ -39,33 +35,10 @@ public class ItemReaderAdapter extends AbstractMethodInvokingDelegator implement
 
 	/**
 	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemStream#open()
-	 */
-	public void open() throws Exception {
-		// no-op
-	}
-	
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemStream#close()
+	 * 
+	 * @see org.springframework.batch.item.ItemReader#close()
 	 */
 	public void close() throws Exception {
-		// no-op
-	}
-
-	/**
-	 * Return empty {@link StreamContext}.
-	 * @see org.springframework.batch.item.ItemStream#getRestartData()
-	 */
-	public StreamContext getRestartData() {
-		return new GenericStreamContext(new Properties());
-	}
-	
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.StreamContext)
-	 */
-	public void restoreFrom(StreamContext data) {
 		
 	}
 

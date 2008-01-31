@@ -75,7 +75,8 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 		}
 
 		int medium = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
-System.err.println(medium);
+		// assert based on commit inyerval = 2
+		assertEquals(before+2, medium);
 
 		runJob();
 

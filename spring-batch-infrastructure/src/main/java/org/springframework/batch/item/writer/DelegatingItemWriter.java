@@ -7,7 +7,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
-import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -18,7 +17,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class DelegatingItemWriter extends ItemStreamAdapter implements ItemWriter, Skippable, InitializingBean {
+public class DelegatingItemWriter implements ItemWriter, Skippable, InitializingBean {
 
 	private ItemWriter writer;
 
@@ -88,6 +87,7 @@ public class DelegatingItemWriter extends ItemStreamAdapter implements ItemWrite
 		Assert.notNull(writer);
 	}
 
+	// YODO: remove
 	public void close() throws Exception {
 		writer.close();
 	}

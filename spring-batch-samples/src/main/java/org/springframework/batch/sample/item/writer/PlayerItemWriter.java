@@ -1,10 +1,10 @@
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.item.writer.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.dao.PlayerDao;
 import org.springframework.batch.sample.domain.Player;
 
-public class PlayerItemWriter extends AbstractItemWriter {
+public class PlayerItemWriter implements ItemWriter {
 
 	PlayerDao playerDao;
 	
@@ -16,4 +16,6 @@ public class PlayerItemWriter extends AbstractItemWriter {
 		this.playerDao = playerDao;
 	}
 
+	public void close() throws Exception {
+	}
 }

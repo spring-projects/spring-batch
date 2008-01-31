@@ -21,11 +21,10 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.stream.GenericStreamContext;
-import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -33,16 +32,16 @@ import org.springframework.batch.support.PropertiesConverter;
  */
 public class RestartableItemOrientedTaskletTests extends TestCase {
 
-	private static class MockProvider extends AbstractItemReader {
+	private static class MockProvider implements ItemReader, ItemStream {
 
 		StreamContext data = new StreamContext() {
 
 			public Properties getProperties() {
 				return PropertiesConverter.stringToProperties("a=b");
 			}
-
+			
 		};
-
+		
 		public Object read() {
 			return null;
 		}
@@ -56,9 +55,21 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 			assertEquals(this.data.getProperties(), data.getProperties());
 		}
 
+		public boolean recover(Object data, Throwable cause) {
+			return false;
+		}
+
+		public void open() throws Exception {
+			throw new UnsupportedOperationException("Not implemented.");
+		}
+		
+		public void close() throws Exception {
+			throw new UnsupportedOperationException("Not implemented.");		
+		}
+
 	}
 
-	private static class MockWriter extends AbstractItemWriter {
+	private static class MockWriter implements ItemWriter, ItemStream {
 
 		StreamContext data = new StreamContext() {
 			public Properties getProperties() {
@@ -78,7 +89,12 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 			assertEquals(this.data.getProperties(), data.getProperties());
 		}
 
+		public void open() throws Exception {
+			throw new UnsupportedOperationException("Not implemented.");
+		}
+		
 		public void close() throws Exception {
+			throw new UnsupportedOperationException("Not implemented.");		
 		}
 
 	}
@@ -125,7 +141,7 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 		// restore from restart data (see asserts in mock classes)
 		module.restoreFrom(data);
 	}
-
+	
 	public void testRestartFromNotRestartable() {
 
 		// create and set up module
@@ -138,7 +154,7 @@ public class RestartableItemOrientedTaskletTests extends TestCase {
 		assertNotNull(data);
 		// restore from restart data (see asserts in mock classes)
 		module.restoreFrom(data);
-		// System.err.println(data.getProperties());
+		//System.err.println(data.getProperties());
 	}
-
+	
 }

@@ -42,7 +42,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReader extends AbstractItemReader implements ItemReader,
+public class StaxEventItemReader extends AbstractItemReader implements ItemReader, 
 		Skippable, ItemStream, StatisticsProvider, InitializingBean, DisposableBean {
 
 	public static final String READ_COUNT_STATISTICS_NAME = "StaxEventReaderItemReader.readCount";

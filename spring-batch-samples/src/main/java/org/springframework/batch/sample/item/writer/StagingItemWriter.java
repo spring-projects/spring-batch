@@ -2,14 +2,11 @@ package org.springframework.batch.sample.item.writer;
 
 import java.io.Serializable;
 import java.sql.Types;
-import java.util.Properties;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
@@ -76,37 +73,7 @@ public class StagingItemWriter extends JdbcDaoSupport implements
 						new int[] { Types.BIGINT, Types.BIGINT, Types.BLOB, Types.CHAR});
 	}
 
-
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemStream#open()
-	 */
-	public void open() throws Exception {
-		// no-op
-	}
-	
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemStream#close()
-	 */
 	public void close() throws Exception {
-		// no-op
-	}
-
-	/**
-	 * Return empty {@link StreamContext}.
-	 * @see org.springframework.batch.item.ItemStream#getRestartData()
-	 */
-	public StreamContext getRestartData() {
-		return new GenericStreamContext(new Properties());
-	}
-	
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.StreamContext)
-	 */
-	public void restoreFrom(StreamContext data) {
-		
 	}
 
 }

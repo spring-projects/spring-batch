@@ -15,16 +15,19 @@
  */
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.item.writer.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 
 /**
  * @author Dave Syer
  *
  */
-public class DummyItemWriter extends AbstractItemWriter  {
+public class DummyItemWriter implements ItemWriter {
 
 	public void write(Object item) throws Exception {
 		// NO-OP
+	}
+
+	public void close() throws Exception {
 	}
 
 }

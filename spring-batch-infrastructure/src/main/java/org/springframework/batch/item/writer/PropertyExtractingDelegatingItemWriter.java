@@ -16,11 +16,7 @@
 
 package org.springframework.batch.item.writer;
 
-import java.util.Properties;
-
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.support.AbstractMethodInvokingDelegator;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -70,35 +66,7 @@ public class PropertyExtractingDelegatingItemWriter extends AbstractMethodInvoki
 		this.fieldsUsedAsTargetMethodArguments = fieldsUsedAsMethodArguments;
 	}
 
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemStream#open()
-	 */
-	public void open() throws Exception {
-		// no-op
-	}
-	
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemStream#close()
-	 */
-	public void close() throws Exception {
-		// no-op
-	}
 
-	/**
-	 * Return empty {@link StreamContext}.
-	 * @see org.springframework.batch.item.ItemStream#getRestartData()
-	 */
-	public StreamContext getRestartData() {
-		return new GenericStreamContext(new Properties());
-	}
-	
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.StreamContext)
-	 */
-	public void restoreFrom(StreamContext data) {
-		
+	public void close() throws Exception {
 	}
 }

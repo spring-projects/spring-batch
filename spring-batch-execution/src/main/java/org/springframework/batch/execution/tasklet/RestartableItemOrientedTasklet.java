@@ -47,15 +47,15 @@ public class RestartableItemOrientedTasklet extends ItemOrientedTasklet implemen
 		StreamContext itemProviderRestartData = null;
 		StreamContext itemProcessorRestartData = null;
 
-		if (itemProvider != null) {
-			itemProviderRestartData = itemProvider.getRestartData();
-		}
-		if (itemWriter != null) {
-			itemProcessorRestartData = itemWriter.getRestartData();
+		if (itemProvider instanceof ItemStream) {
+			itemProviderRestartData = ((ItemStream) itemProvider).getRestartData();
 		}
 
-		RestartableItemOrientedTaskletRestartData restartData = new RestartableItemOrientedTaskletRestartData(
-				itemProviderRestartData, itemProcessorRestartData);
+		if (itemWriter instanceof ItemStream) {
+			itemProcessorRestartData = ((ItemStream) itemWriter).getRestartData();
+		}
+
+		RestartableItemOrientedTaskletRestartData restartData = new RestartableItemOrientedTaskletRestartData(itemProviderRestartData, itemProcessorRestartData);
 
 		return restartData;
 	}
@@ -76,11 +76,11 @@ public class RestartableItemOrientedTasklet extends ItemOrientedTasklet implemen
 			moduleRestartData = new RestartableItemOrientedTaskletRestartData(data.getProperties());
 		}
 
-		if (itemProvider != null) {
-			itemProvider.restoreFrom(moduleRestartData.readerData);
+		if (itemProvider instanceof ItemStream) {
+			((ItemStream) itemProvider).restoreFrom(moduleRestartData.readerData);
 		}
-		if (itemWriter != null) {
-			itemWriter.restoreFrom(moduleRestartData.writerData);
+		if (itemWriter instanceof ItemStream) {
+			((ItemStream) itemWriter).restoreFrom(moduleRestartData.writerData);
 		}
 	}
 
@@ -100,8 +100,10 @@ public class RestartableItemOrientedTasklet extends ItemOrientedTasklet implemen
 		}
 
 		public RestartableItemOrientedTaskletRestartData(Properties data) {
-			readerData = new GenericStreamContext(PropertiesConverter.stringToProperties(data.getProperty(READER_KEY)));
-			writerData = new GenericStreamContext(PropertiesConverter.stringToProperties(data.getProperty(WRITER_KEY)));
+			readerData = new GenericStreamContext(PropertiesConverter
+					.stringToProperties(data.getProperty(READER_KEY)));
+			writerData = new GenericStreamContext(PropertiesConverter.stringToProperties(data
+					.getProperty(WRITER_KEY)));
 		}
 
 		public Properties getProperties() {
@@ -115,20 +117,18 @@ public class RestartableItemOrientedTasklet extends ItemOrientedTasklet implemen
 			return props;
 		}
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#close()
-	 */
-	public void close() throws Exception {
-		// no-op
-	}
-
-	/*
-	 * (non-Javadoc)
+	
+	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#open()
 	 */
 	public void open() throws Exception {
-		// no-op
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#close()
+	 */
+	public void close() throws Exception {
+		throw new UnsupportedOperationException("Not implemented.");		
 	}
 }

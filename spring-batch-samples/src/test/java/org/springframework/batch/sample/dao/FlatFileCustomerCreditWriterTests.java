@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.CustomerCredit;
 
@@ -74,7 +75,7 @@ public class FlatFileCustomerCreditWriterTests extends TestCase {
 		outputControl.verify();
 	}
 	
-	private interface ResourceLifecycleItemWriter extends ItemWriter {
+	private interface ResourceLifecycleItemWriter extends ItemWriter, ItemStream{
 		
 	}
 }

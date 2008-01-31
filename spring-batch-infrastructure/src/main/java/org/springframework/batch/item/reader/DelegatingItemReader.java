@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  */
-public class DelegatingItemReader extends AbstractItemReader implements ItemStream, Skippable, InitializingBean{
+public class DelegatingItemReader extends AbstractItemReader implements Skippable, InitializingBean, ItemStream {
 
 	private ItemReader inputSource;
 
@@ -85,6 +85,24 @@ public class DelegatingItemReader extends AbstractItemReader implements ItemStre
 	public void skip() {
 		if (inputSource instanceof Skippable) {
 			((Skippable)inputSource).skip();
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#open()
+	 */
+	public void open() throws Exception {
+		if (inputSource instanceof ItemStream) {
+			((ItemStream) inputSource).open();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#open()
+	 */
+	public void close() throws Exception {
+		if (inputSource instanceof ItemStream) {
+			((ItemStream) inputSource).close();
 		}
 	}
 }

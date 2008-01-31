@@ -25,7 +25,7 @@ package org.springframework.batch.item;
  * @author Dave Syer
  * @author Lucas Ward
  */
-public interface ItemWriter extends ItemStream {
+public interface ItemWriter {
 
 	/**
 	 * Process the supplied data element. Will be called multiple times during a
@@ -38,4 +38,10 @@ public interface ItemWriter extends ItemStream {
 	 */
 	public void write(Object item) throws Exception;
 	
+	/**
+	 * Close the writer, allowing all allocated resources to be cleaned up.
+	 * 
+	 * @throws Exception
+	 */
+	void close() throws Exception;
 }

@@ -16,6 +16,7 @@
 
 package org.springframework.batch.sample.dao;
 
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.CustomerCredit;
 import org.springframework.beans.factory.DisposableBean;
@@ -56,12 +57,16 @@ public class FlatFileCustomerCreditWriter implements CustomerCreditDao,
 	}
 
 	public void open() throws Exception {
-		outputSource.open();
+		if (outputSource instanceof ItemStream) {
+			((ItemStream) outputSource).open();
+		}
 		opened = true;
 	}
 
 	public void close() throws Exception {
-		outputSource.close();
+		if (outputSource instanceof ItemStream) {
+			((ItemStream) outputSource).close();
+		}
 	}
 
 	/*
