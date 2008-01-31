@@ -30,21 +30,26 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * <p>Jdbc {@link KeyGenerator} implementation that only works for a single column key.  A sql
- * query must be passed in which will be used to return a list of keys.  Each key will be mapped 
- * by a {@link RowMapper} that returns a mapped key. By default, the {@link SingleColumnRowMapper}
- * is used, and will convert keys into well known types at runtime.  It is extremely important to 
- * note that only one column should be mapped to an object and returned as a key.  If multiple
- * columns are returned as a key in this strategy, then restart will not function properly.  Instead
- * a strategy that supports keys comprised of multiple columns should be used.
- *
- * <p>Restartability: Because the key is only one column, restart is made much more simple.  Before
- * each commit, the last processed key is returned to be stored as restart data.  Upon restart, that
- * same key is given back to restore from, using a separate 'RestartQuery'.  This means that only the
- * keys remaining to be processed are returned, rather than returning the original list of keys and
- * iterating forward to that last committed point.
+ * <p>
+ * Jdbc {@link KeyGenerator} implementation that only works for a single column
+ * key. A sql query must be passed in which will be used to return a list of
+ * keys. Each key will be mapped by a {@link RowMapper} that returns a mapped
+ * key. By default, the {@link SingleColumnRowMapper} is used, and will convert
+ * keys into well known types at runtime. It is extremely important to note that
+ * only one column should be mapped to an object and returned as a key. If
+ * multiple columns are returned as a key in this strategy, then restart will
+ * not function properly. Instead a strategy that supports keys comprised of
+ * multiple columns should be used.
+ * 
+ * <p>
+ * Restartability: Because the key is only one column, restart is made much more
+ * simple. Before each commit, the last processed key is returned to be stored
+ * as restart data. Upon restart, that same key is given back to restore from,
+ * using a separate 'RestartQuery'. This means that only the keys remaining to
+ * be processed are returned, rather than returning the original list of keys
+ * and iterating forward to that last committed point.
  * </p>
- *
+ * 
  * @author Lucas Ward
  * @since 1.0
  */
@@ -63,10 +68,10 @@ public class SingleColumnJdbcKeyGenerator implements KeyGenerator {
 	public SingleColumnJdbcKeyGenerator() {
 		super();
 	}
- 
+
 	/**
-	 * Constructs a new instance using the provided jdbcTemplate and string representing
-	 * the sql statement that should be used to retrieve keys.
+	 * Constructs a new instance using the provided jdbcTemplate and string
+	 * representing the sql statement that should be used to retrieve keys.
 	 * 
 	 * @param jdbcTemplate
 	 * @param sql
@@ -81,7 +86,8 @@ public class SingleColumnJdbcKeyGenerator implements KeyGenerator {
 		this.sql = sql;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.driving.KeyGenerationStrategy#retrieveKeys()
 	 */
 	public List retrieveKeys() {
@@ -90,27 +96,28 @@ public class SingleColumnJdbcKeyGenerator implements KeyGenerator {
 
 	/**
 	 * Get the restart data representing the last processed key.
-	 *
-	 * @see KeyGenerator#getKeyAsRestartData()
+	 * 
+	 * @see KeyGenerator#getKeyAsStreamContext(Object)
 	 * @throws IllegalArgumentException if key is null.
 	 */
 	public StreamContext getKeyAsStreamContext(Object key) {
-		
+
 		Assert.notNull(key, "The key must not be null.");
-		
+
 		Properties props = new Properties();
 		props.setProperty(RESTART_KEY, key.toString());
 		return new GenericStreamContext(props);
 	}
 
 	/**
-	 * Return the remaining to be processed for the provided {@link StreamContext}.  
-	 * The RestartData attempting to be restored from must have been obtained from the 
-	 * <strong>same KeyGenerationStrategy as the one
-	 * being restored from</strong> otherwise it is invalid.
-	 *
-	 * @param StreamContext obtained by calling getRestartData during a previous
-	 * run.
+	 * Return the remaining to be processed for the provided
+	 * {@link StreamContext}. The {@link StreamContext} attempting to be
+	 * restored from must have been obtained from the <strong>same
+	 * KeyGenerationStrategy as the one being restored from</strong> otherwise
+	 * it is invalid.
+	 * 
+	 * @param StreamContext obtained by calling
+	 * {@link #getKeyAsStreamContext(Object)} during a previous run.
 	 * @throws IllegalStateException if restart sql statement is null.
 	 * @throws IllegalArgumentException if restart data is null.
 	 * @see KeyGenerator#restoreKeys(org.springframework.batch.item.StreamContext)
@@ -118,8 +125,8 @@ public class SingleColumnJdbcKeyGenerator implements KeyGenerator {
 	public List restoreKeys(StreamContext streamContext) {
 
 		Assert.notNull(streamContext, "The restart data must not be null.");
-		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty" +
-		" in order to restart.");
+		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty"
+				+ " in order to restart.");
 
 		String lastProcessedKey = streamContext.getProperties().getProperty(RESTART_KEY);
 
@@ -130,18 +137,18 @@ public class SingleColumnJdbcKeyGenerator implements KeyGenerator {
 		return new ArrayList();
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jdbcTemplate, "JdbcTemplate must not be null.");
 		Assert.hasText(sql, "The DrivingQuery must not be null or empty.");
 	}
-	
+
 	/**
 	 * Set the {@link RowMapper} to be used to map each key to an object.
-	 *
+	 * 
 	 * @param keyMapper
 	 */
 	public void setKeyMapper(RowMapper keyMapper) {
@@ -149,14 +156,15 @@ public class SingleColumnJdbcKeyGenerator implements KeyGenerator {
 	}
 
 	/**
-	 * Set the SQL query to be used to return the remaining keys to be processed.
-	 *
+	 * Set the SQL query to be used to return the remaining keys to be
+	 * processed.
+	 * 
 	 * @param restartSql
 	 */
 	public void setRestartSql(String restartSql) {
 		this.restartSql = restartSql;
 	}
-	
+
 	/**
 	 * Set the SQL statement to be used to return the keys to be processed.
 	 * 

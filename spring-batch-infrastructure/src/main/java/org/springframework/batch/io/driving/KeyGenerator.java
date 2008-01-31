@@ -20,9 +20,9 @@ public interface KeyGenerator {
 	/**
 	 * Restore the keys list based on provided restart data.
 	 *
-	 * @param restartData, the restart data to restore the keys list from.
+	 * @param streamContext, the restart data to restore the keys list from.
 	 * @return a list of keys.
-	 * @throws IllegalArgumentException is restartData is null.
+	 * @throws IllegalArgumentException is streamContext is null.
 	 */
 	List restoreKeys(StreamContext streamContext);
 	
@@ -30,7 +30,7 @@ public interface KeyGenerator {
 	 * Return the provided key as restart data.
 	 * 
 	 * @param key to be converted to restart data.
-	 * @return RestartData representation of the key.
+	 * @return StreamContext representation of the key.
 	 * @throws IllegalArgumentException if key is null.
 	 * @throws IllegalArgumentException if key is an incompatible type.
 	 */

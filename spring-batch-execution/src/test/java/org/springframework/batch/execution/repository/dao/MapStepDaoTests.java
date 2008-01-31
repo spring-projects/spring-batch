@@ -106,7 +106,7 @@ public class MapStepDaoTests extends TestCase {
 		assertEquals(2, dao.getStepExecutionCount(step));
 	}
 
-	public void testSaveRestartData() throws Exception {
+	public void testSaveStreamContext() throws Exception {
 		assertEquals(null, dao.getStreamContext(step.getId()));
 		step.setStatus(BatchStatus.COMPLETED);
 		Properties data = new Properties();

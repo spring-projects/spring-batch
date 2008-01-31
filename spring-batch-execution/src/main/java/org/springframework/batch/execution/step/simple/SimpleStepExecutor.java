@@ -185,9 +185,9 @@ public class SimpleStepExecutor {
 		// the conversation in StepScope
 		stepContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
 
-		final boolean saveRestartData = step.isSaveStreamContext();
+		final boolean saveStreamContext = step.isSaveStreamContext();
 
-		if (saveRestartData && isRestart) {
+		if (saveStreamContext && isRestart) {
 			stepContext.setInitialStreamContext(stepInstance.getStreamContext());
 		}
 
@@ -233,7 +233,7 @@ public class SimpleStepExecutor {
 										// only if chunk was successful
 										stepExecution.apply(contribution);
 
-										if (saveRestartData) {
+										if (saveStreamContext) {
 											stepInstance.setStreamContext(stepContext.getStreamContext());
 											jobRepository.update(stepInstance);
 										}

@@ -22,7 +22,6 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.item.StreamContext;
 
 public class MockStepDao implements StepDao {
 
@@ -46,18 +45,11 @@ public class MockStepDao implements StepDao {
 		return newSteps;
 	}
 
-	public StreamContext getRestartData(Long stepId) {
-		return null;
-	}
-
 	public int getStepExecutionCount(StepInstance step) {
 		return 1;
 	}
 
 	public void save(StepExecution stepExecution) {
-	}
-
-	public void saveRestartData(Long stepId, StreamContext streamContext) {
 	}
 
 	public void update(StepInstance step) {

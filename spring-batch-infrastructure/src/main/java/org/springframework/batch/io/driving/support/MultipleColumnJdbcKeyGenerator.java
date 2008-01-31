@@ -28,7 +28,7 @@ import org.springframework.util.StringUtils;
 /**
  * <p>Jdbc implementation of the {@link KeyGenerator} interface that works for composite keys.
  * (i.e. keys represented by multiple columns)  A sql query to be used to return the keys and
- * a {@link RestartDataRowMapper} to map each row in the resultset to an Object must be set in 
+ * a {@link StreamContextRowMapper} to map each row in the resultset to an Object must be set in 
  * order to work correctly.
  * </p>
  *
@@ -43,7 +43,7 @@ public class MultipleColumnJdbcKeyGenerator implements
 
 	private JdbcTemplate jdbcTemplate;
 
-	private RestartDataRowMapper keyMapper = new ColumnMapStreamContextRowMapper();
+	private StreamContextRowMapper keyMapper = new ColumnMapStreamContextRowMapper();
 
 	private String sql;
 
@@ -78,7 +78,7 @@ public class MultipleColumnJdbcKeyGenerator implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.sql.scratch.AbstractDrivingQueryItemReader#restoreKeys(org.springframework.batch.restart.RestartData)
+	 * @see org.springframework.batch.io.driving.KeyGenerator#restoreKeys(org.springframework.batch.item.StreamContext)
 	 */
 	public List restoreKeys(StreamContext streamContext) {
 
@@ -94,10 +94,10 @@ public class MultipleColumnJdbcKeyGenerator implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.restart.Restartable#getRestartData()
+	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsStreamContext(java.lang.Object)
 	 */
 	public StreamContext getKeyAsStreamContext(Object key) {
-		Assert.state(keyMapper != null, "RestartDataConverter must not be null.");
+		Assert.state(keyMapper != null, "Kye mapper must not be null.");
 		return keyMapper.createStreamContext(key);
 	}
 
@@ -121,12 +121,12 @@ public class MultipleColumnJdbcKeyGenerator implements
 	}
 	
 	/**
-	 * Set the {@link RestartDataRowMapper} to be used to map a resultset
+	 * Set the {@link StreamContextRowMapper} to be used to map a resultset
 	 * to keys.
 	 * 
 	 * @param keyMapper
 	 */
-	public void setKeyMapper(RestartDataRowMapper keyMapper) {
+	public void setKeyMapper(StreamContextRowMapper keyMapper) {
 		this.keyMapper = keyMapper;
 	}
 	

@@ -161,7 +161,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	 * been initialized before calling restore (meaning, read has been called)
 	 * then an IllegalStateException will be thrown, since all input sources
 	 * should be restored before being read from, otherwise already processed
-	 * data could be returned. The RestartData attempting to be restored from
+	 * data could be returned. The {@link StreamContext} attempting to be restored from
 	 * must have been obtained from the <strong>same input source as the one
 	 * being restored from</strong> otherwise it is invalid.
 	 * 
@@ -172,9 +172,9 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	 */
 	public final void restoreFrom(StreamContext data) {
 
-		Assert.notNull(data, "RestartData must not be null.");
+		Assert.notNull(data, "StreamContext must not be null.");
 		Assert.notNull(data.getProperties(),
-				"RestartData properties must not be null.");
+				"StreamContext properties must not be null.");
 		Assert.state(!initialized,
 				"Cannot restore when already intialized.  Call"
 						+ " close() first before restore()");

@@ -139,7 +139,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		assertEquals(step3, tempStep);
 	}
 	
-	public void testUpdateStepWithoutRestartData(){
+	public void testUpdateStepWithoutStreamContext(){
 		
 		step1.setStatus(BatchStatus.COMPLETED);
 		stepDao.update(step1);
@@ -147,7 +147,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		assertEquals(tempStep, step1);
 	}
 	
-	public void testUpdateStepWithRestartData(){
+	public void testUpdateStepWithStreamContext(){
 		
 		step1.setStatus(BatchStatus.COMPLETED);
 		Properties data = new Properties();

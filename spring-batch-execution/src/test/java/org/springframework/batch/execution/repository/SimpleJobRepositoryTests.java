@@ -396,7 +396,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 	 * Test to ensure that if a StepDao returns invalid
 	 * restart data, it is corrected.
 	 */
-	public void testCreateStepsFixesInvalidRestartData() throws Exception{
+	public void testCreateStepsFixesInvalidStreamContext() throws Exception{
 
 		List jobs = new ArrayList();
 
@@ -432,7 +432,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		assertTrue(step.getStreamContext().getProperties().isEmpty());
 	}
 
-	public void testFindStepsFixesInvalidRestartData() throws Exception{
+	public void testFindStepsFixesInvalidStreamContext() throws Exception{
 		List jobs = new ArrayList();
 		jobDao.findJobInstances(jobConfiguration.getName(), jobParameters);
 		jobs.add(databaseJob);

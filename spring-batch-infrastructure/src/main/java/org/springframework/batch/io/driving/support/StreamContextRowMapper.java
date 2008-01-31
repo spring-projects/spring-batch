@@ -31,7 +31,7 @@ import org.springframework.jdbc.core.RowMapper;
  * @see RowMapper
  * @since 1.0
  */
-public interface RestartDataRowMapper extends RowMapper {
+public interface StreamContextRowMapper extends RowMapper {
 
 	/**
 	 * Given the provided composite key, return a RestartData representation.

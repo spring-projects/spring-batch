@@ -74,7 +74,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * file and position the buffer reader according to information provided by
 	 * the restart data
 	 *
-	 * @param restartData restartData information
+	 * @param data {@link StreamContext} information
 	 */
 	public void restoreFrom(StreamContext data) {
 

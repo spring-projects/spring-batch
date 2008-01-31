@@ -394,7 +394,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.restart.Restartable#getRestartData()
+	 * @see org.springframework.batch.restart.Restartable#getStreamContext()
 	 */
 	public StreamContext getStreamContext() {
 		String skipped = skippedRows.toString();
@@ -405,10 +405,9 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 		return context;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.restart.Restartable#restoreFrom(org.springframework.batch.restart.RestartData)
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.StreamContext)
 	 */
 	public void restoreFrom(StreamContext data) {
 		Assert.state(!initialized);

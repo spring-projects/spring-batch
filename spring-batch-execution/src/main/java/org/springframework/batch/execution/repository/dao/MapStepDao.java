@@ -98,10 +98,6 @@ public class MapStepDao implements StepDao {
 		stepExecution.setId(new Long(currentId++));
 		executions.add(stepExecution);
 	}
-
-	public void saveRestartData(Long stepId, StreamContext streamContext) {
-		restartsById.put(stepId, streamContext);
-	}
 	
 	public List findStepExecutions(StepInstance step) {
 		Set executions = (Set) executionsById.get(step.getId());

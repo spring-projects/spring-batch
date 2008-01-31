@@ -277,7 +277,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 	/*
 	 * make sure a job that has never been executed before, but does have
-	 * saveRestartData = true, doesn't have restoreFrom called on it.
+	 * saveStreamContext = true, doesn't have restoreFrom called on it.
 	 */
 	public void testNonRestartedJob() throws Exception {
 		StepInstance step = new StepInstance(new Long(1));
@@ -290,7 +290,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		stepExecutor.execute(stepExecution);
 
 		assertFalse(tasklet.isRestoreFromCalled());
-		assertTrue(tasklet.isGetRestartDataCalled());
+		assertTrue(tasklet.isGetStreamContextCalled());
 	}
 
 	/*
@@ -312,14 +312,14 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		assertTrue(tasklet.isRestoreFromCalled());
 		assertTrue(tasklet.isRestoreFromCalledWithSomeContext());
-		assertTrue(tasklet.isGetRestartDataCalled());
+		assertTrue(tasklet.isGetStreamContextCalled());
 	}
 
 	/*
-	 * Test that a job that is being restarted, but has saveRestartData set to
-	 * false, doesn't have restore or getRestartData called on it.
+	 * Test that a job that is being restarted, but has saveStreamContext set to
+	 * false, doesn't have restore or getStreamContext called on it.
 	 */
-	public void testNoSaveRestartDataRestartableJob() {
+	public void testNoSaveStreamContextRestartableJob() {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
@@ -336,11 +336,11 @@ public class SimpleStepExecutorTests extends TestCase {
 		}
 
 		assertFalse(tasklet.isRestoreFromCalled());
-		assertFalse(tasklet.isGetRestartDataCalled());
+		assertFalse(tasklet.isGetStreamContextCalled());
 	}
 
 	/*
-	 * Even though the job is restarted, and saveRestartData is true, nothing
+	 * Even though the job is restarted, and saveStreamContext is true, nothing
 	 * will be restored because the Tasklet does not implement Restartable.
 	 */
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
@@ -430,7 +430,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 	private class MockRestartableTasklet implements Tasklet, ItemStream {
 
-		private boolean getRestartDataCalled = false;
+		private boolean getStreamContextCalled = false;
 
 		private boolean restoreFromCalled = false;
 
@@ -446,7 +446,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		}
 
 		public StreamContext getStreamContext() {
-			getRestartDataCalled = true;
+			getStreamContextCalled = true;
 			return new GenericStreamContext(PropertiesConverter.stringToProperties("spam=bucket"));
 		}
 
@@ -455,8 +455,8 @@ public class SimpleStepExecutorTests extends TestCase {
 			restoreFromCalledWithSomeContext = data.getProperties().size() > 0;
 		}
 
-		public boolean isGetRestartDataCalled() {
-			return getRestartDataCalled;
+		public boolean isGetStreamContextCalled() {
+			return getStreamContextCalled;
 		}
 
 		public boolean isRestoreFromCalled() {

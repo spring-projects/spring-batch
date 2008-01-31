@@ -184,7 +184,7 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 	}
 
 	/**
-	 * @return the current row number wrapped as <code>RestartData</code>
+	 * @return the current row number wrapped as <code>StreamContext</code>
 	 */
 	public StreamContext getStreamContext() {
 		Properties props = new Properties();

@@ -33,15 +33,15 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Lucas Ward
  * @author Dave Syer
- * @see RestartDataRowMapper
+ * @see StreamContextRowMapper
  */
-public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implements RestartDataRowMapper{
+public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implements StreamContextRowMapper{
 	
 	public static final String KEY_PREFIX = ClassUtils.getQualifiedName(ColumnMapStreamContextRowMapper.class) + ".KEY.";
 	
 	public PreparedStatementSetter createSetter(StreamContext streamContext) {
 		
-		ColumnMapRestartData columnData = new ColumnMapRestartData(streamContext.getProperties());
+		ColumnMapStreamContext columnData = new ColumnMapStreamContext(streamContext.getProperties());
 		
 		List columns = new ArrayList();
 		for (Iterator iterator = columnData.keys.entrySet().iterator(); iterator.hasNext();) {
@@ -56,19 +56,19 @@ public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implemen
 	public StreamContext createStreamContext(Object key) {
 		Assert.isInstanceOf(Map.class, key, "Input to create StreamContext must be of type Map.");
 		Map keys = (Map)key;
-		return new ColumnMapRestartData(keys);
+		return new ColumnMapStreamContext(keys);
 	}
 	
 	
-	private static class ColumnMapRestartData extends GenericStreamContext {
+	private static class ColumnMapStreamContext extends GenericStreamContext {
 		
 		private final Map keys;
 
-		public ColumnMapRestartData(Map keys) {
+		public ColumnMapStreamContext(Map keys) {
 			this.keys = keys;
 		}
 		
-		public ColumnMapRestartData(Properties props) {
+		public ColumnMapStreamContext(Properties props) {
 			
 			keys = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(props.size());
 			
