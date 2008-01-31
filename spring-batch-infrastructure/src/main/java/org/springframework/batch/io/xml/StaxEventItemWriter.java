@@ -7,7 +7,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
@@ -19,7 +18,7 @@ import org.springframework.batch.io.xml.stax.NoStartEndDocumentStreamWriter;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
+import org.springframework.batch.item.StreamException;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -52,10 +51,10 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	private static final String DEFAULT_ROOT_TAG_NAME = "root";
 
 	// restart data property name
-	private static final String RESTART_DATA_NAME = "staxstreamoutputsource.position";
+	public static final String RESTART_DATA_NAME = "staxstreamoutputsource.position";
 
-	// read statistics property name
-	public static final String WRITE_STATISTICS_NAME = "staxstreamoutputsource.processedrecordcount";
+	// restart data property name
+	public static final String WRITE_STATISTICS_NAME = "staxstreamoutputsource.record.count";
 
 	// file system resource
 	private Resource resource;
@@ -379,12 +378,13 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	 * @see org.springframework.batch.item.ItemStream#getStreamContext()
 	 */
 	public StreamContext getStreamContext() {
-
-		Properties properties = new Properties();
-
-		properties.setProperty(RESTART_DATA_NAME, String.valueOf(getPosition()));
-
-		return new GenericStreamContext(properties);
+		if (!initialized) {
+			throw new StreamException("ItemStream is not open, or may have been closed.  Cannot access context.");
+		}
+		StreamContext context = new StreamContext();
+		context.putLong(RESTART_DATA_NAME, getPosition());
+		context.putLong(WRITE_STATISTICS_NAME, currentRecordCount);
+		return context;
 	}
 
 	/**
@@ -398,8 +398,8 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 
 		// if restart data is provided, restart from provided offset
 		// otherwise start from beginning
-		if (data != null && data.getProperties() != null && data.getProperties().getProperty(RESTART_DATA_NAME) != null) {
-			startAtPosition = Long.parseLong(data.getProperties().getProperty(RESTART_DATA_NAME));
+		if (data != null && data.getProperties() != null && data.containsKey(RESTART_DATA_NAME)) {
+			startAtPosition = data.getLong(RESTART_DATA_NAME);
 			restarted = true;
 		}
 
@@ -407,17 +407,6 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 			open(startAtPosition);
 		}
 
-	}
-
-	/**
-	 * Get actual statistics for output source.
-	 * @return
-	 * @see org.springframework.batch.statistics.StatisticsProvider#getStatistics()
-	 */
-	public Properties getStatistics() {
-		Properties p = new Properties();
-		p.setProperty(WRITE_STATISTICS_NAME, String.valueOf(currentRecordCount));
-		return p;
 	}
 
 	/*

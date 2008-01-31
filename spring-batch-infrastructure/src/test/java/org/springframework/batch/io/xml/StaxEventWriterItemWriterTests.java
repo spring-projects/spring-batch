@@ -11,7 +11,6 @@ import javax.xml.transform.Result;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.FileUtils;
-import org.springframework.batch.io.xml.StaxEventItemWriter;
 import org.springframework.batch.io.xml.oxm.MarshallingEventWriterSerializer;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.core.io.FileSystemResource;
@@ -115,14 +114,14 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	/**
 	 * Count of 'records written so far' is returned as statistics.
 	 */
-	public void testStatistics() throws Exception {
+	public void testStreamContext() throws Exception {
 		final int NUMBER_OF_RECORDS = 10;
-		for (int i = 0; i < NUMBER_OF_RECORDS; i++) {
-			String writeStatistics =
-				writer.getStatistics().getProperty(StaxEventItemWriter.WRITE_STATISTICS_NAME);
-
-			assertEquals(String.valueOf(i), writeStatistics);
+		for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
 			writer.write(record);
+			long writeStatistics =
+				writer.getStreamContext().getLong(StaxEventItemWriter.WRITE_STATISTICS_NAME);
+
+			assertEquals(i, writeStatistics);
 		}
 	}
 
