@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * Value object representing a context for an {@link ItemStream}. It is
@@ -76,9 +75,13 @@ public class StreamContext {
 
 		return ((Long) readAndValidate(key, Long.class)).longValue();
 	}
-
-	public Object get(String key) {
-
+	
+	public double getDouble(String key){
+		return ((Double)readAndValidate(key, Double.class)).doubleValue();
+	}
+	
+	public Object get(String key){
+		
 		return map.get(key);
 	}
 
@@ -86,10 +89,10 @@ public class StreamContext {
 
 		Object value = map.get(key);
 
-//		if (!type.isInstance(key)) {
-//			throw new ClassCastException("Value for key=[" + key + "] is not of type: [" + ClassUtils.getShortName(type)
-//					+ "], it is [" + (value == null ? null : ClassUtils.getShortName(value.getClass())) + "]");
-//		}
+		if (!type.isInstance(value)) {
+			throw new ClassCastException("Value for key=[" + key + "] is not of type: [" + type
+					+ "], it is [" + (value == null ? null : value) + "]");
+		}
 
 		return value;
 	}
@@ -123,5 +126,20 @@ public class StreamContext {
 		}
 
 		return props;
+	}
+	
+	public boolean equals(Object obj) {
+		if(obj instanceof StreamContext == false){
+			return false;
+		}
+		if(this == obj){
+			return true;
+		}
+		StreamContext rhs = (StreamContext)obj;
+		return this.entrySet().equals(rhs.entrySet());
+	}
+	
+	public int hashCode() {
+		return map.hashCode();
 	}
 }
