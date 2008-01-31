@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventReader;
@@ -15,9 +14,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.xml.StaxEventItemReader;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -26,7 +23,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 
 /**
  * Tests for {@link StaxEventItemReader}.
- *
+ * 
  * @author Robert Kasanicky
  */
 public class StaxEventItemReaderTests extends TestCase {
@@ -45,20 +42,20 @@ public class StaxEventItemReaderTests extends TestCase {
 		source = createNewInputSouce();
 	}
 
-	public void testAfterPropertiesSet() throws Exception{
+	public void testAfterPropertiesSet() throws Exception {
 		source.afterPropertiesSet();
 	}
 
-	public void testAfterPropertesSetException() throws Exception{
+	public void testAfterPropertesSetException() throws Exception {
 		source.setResource(null);
 		try {
 			source.afterPropertiesSet();
 			fail();
 		}
-		catch (IllegalArgumentException e){
-			//expected;
+		catch (IllegalArgumentException e) {
+			// expected;
 		}
-		
+
 		source = createNewInputSouce();
 		source.setFragmentRootElementName("");
 		try {
@@ -68,7 +65,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		catch (IllegalArgumentException e) {
 			// expected
 		}
-		
+
 		source = createNewInputSouce();
 		source.setFragmentDeserializer(null);
 		try {
@@ -81,9 +78,8 @@ public class StaxEventItemReaderTests extends TestCase {
 	}
 
 	/**
-	 * Regular usage scenario.
-	 * ItemReader should pass XML fragments to deserializer wrapped with
-	 * StartDocument and EndDocument events.
+	 * Regular usage scenario. ItemReader should pass XML fragments to
+	 * deserializer wrapped with StartDocument and EndDocument events.
 	 */
 	public void testFragmentWrapping() throws Exception {
 		source.afterPropertiesSet();
@@ -118,8 +114,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	public void testRestart() {
 		source.read();
 		StreamContext streamContext = source.getStreamContext();
-		assertEquals("1", streamContext.getProperties().
-				getProperty("StaxEventReaderItemReader.recordcount"));
+		assertEquals(1, streamContext.getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME));
 		List expectedAfterRestart = (List) source.read();
 
 		source = createNewInputSouce();
@@ -127,28 +122,26 @@ public class StaxEventItemReaderTests extends TestCase {
 		List afterRestart = (List) source.read();
 		assertEquals(expectedAfterRestart.size(), afterRestart.size());
 	}
-	
+
 	/**
-	 * Restore point must not exceed end of file,
-	 * input source must not be already initialized when restoring.
+	 * Restore point must not exceed end of file, input source must not be
+	 * already initialised when restoring.
 	 */
 	public void testInvalidRestore() {
-		Properties props = new Properties() {{
-			final String MORE_RECORDS_THAN_INPUT_CONTAINS = "100000";
-			setProperty("StaxEventReaderItemReader.recordcount", MORE_RECORDS_THAN_INPUT_CONTAINS);
-		}};
+		StreamContext context = new StreamContext();
+		context.putLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME, 100000);
 		try {
-			source.restoreFrom(new GenericStreamContext(props));
+			source.restoreFrom(context);
 			fail();
 		}
 		catch (IllegalStateException e) {
 			// expected
 		}
-		
+
 		source = createNewInputSouce();
 		source.open();
 		try {
-			source.restoreFrom(new GenericStreamContext(new Properties()));
+			source.restoreFrom(new StreamContext());
 			fail();
 		}
 		catch (IllegalStateException e) {
@@ -174,7 +167,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	 */
 	public void testRollback() {
 
-		//rollback between deserializing records
+		// rollback between deserializing records
 		List first = (List) source.read();
 		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
 		List second = (List) source.read();
@@ -183,8 +176,7 @@ public class StaxEventItemReaderTests extends TestCase {
 
 		assertEquals(second, source.read());
 
-
-		//rollback while deserializing record
+		// rollback while deserializing record
 		source.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
 		source.setFragmentDeserializer(new ExceptionFragmentDeserializer());
 		try {
@@ -202,26 +194,30 @@ public class StaxEventItemReaderTests extends TestCase {
 	 * Statistics return the current record count. Calling read after end of
 	 * input does not increase the counter.
 	 */
-	public void testStatistics() {
+	public void testStreamContext() {
 		final int NUMBER_OF_RECORDS = 2;
 
 		for (int i = 0; i < NUMBER_OF_RECORDS; i++) {
-			int recordCount = extractRecordCountFrom(source.getStatistics());
+			long recordCount = extractRecordCount();
 			assertEquals(i, recordCount);
 			source.read();
 		}
 
-		assertEquals(NUMBER_OF_RECORDS, extractRecordCountFrom(source.getStatistics()));
+		assertEquals(NUMBER_OF_RECORDS, extractRecordCount());
 		source.read();
-		assertEquals(NUMBER_OF_RECORDS, extractRecordCountFrom(source.getStatistics()));
+		assertEquals(NUMBER_OF_RECORDS, extractRecordCount());
 	}
 
-	public void testCloseWithoutOpen() throws Exception{
+	private long extractRecordCount() {
+		return source.getStreamContext().getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME);
+	}
+
+	public void testCloseWithoutOpen() throws Exception {
 		source.close();
 		// No error!
 	}
 
-	public void testClose() throws Exception{
+	public void testClose() throws Exception {
 		MockStaxEventItemReader newSource = new MockStaxEventItemReader();
 		Resource resource = new ByteArrayResource(xml.getBytes());
 		newSource.setResource(resource);
@@ -235,60 +231,58 @@ public class StaxEventItemReaderTests extends TestCase {
 
 		newSource.destroy(); // includes close()
 		newSource.setOpenCalled(false);
-		//calling read again should require re-initialization because of close
+		// calling read again should require re-initialization because of close
 		item = newSource.read();
 		assertNotNull(item);
 		assertTrue(newSource.isOpenCalled());
 	}
 
-	public void testOpenBadIOInput(){
+	public void testOpenBadIOInput() {
 
-		source.setResource(new AbstractResource(){
-			public String getDescription() { return null; }
+		source.setResource(new AbstractResource() {
+			public String getDescription() {
+				return null;
+			}
 
 			public InputStream getInputStream() throws IOException {
 				throw new IOException();
 			}
-			
+
 			public boolean exists() {
 				return true;
 			}
 		});
 
-		try{
+		try {
 			source.open();
-		}catch(DataAccessResourceFailureException ex){
+		}
+		catch (DataAccessResourceFailureException ex) {
 			assertTrue(ex.getCause() instanceof IOException);
 		}
 
 	}
-	
-	public void testNonExistentResource() throws Exception{
-		
+
+	public void testNonExistentResource() throws Exception {
+
 		source.setResource(new NonExistentResource());
 		source.afterPropertiesSet();
-		
-		try{
+
+		try {
 			source.open();
 			fail();
 		}
-		catch(IllegalStateException ex){
-			//expected
+		catch (IllegalStateException ex) {
+			// expected
 		}
 	}
-	
-	public void testRuntimeFileCreation() throws Exception{
-		
+
+	public void testRuntimeFileCreation() throws Exception {
+
 		source.setResource(new NonExistentResource());
 		source.afterPropertiesSet();
-		
+
 		source.setResource(new ByteArrayResource(xml.getBytes()));
 		source.read();
-	}
-
-	private int extractRecordCountFrom(Properties statistics) {
-		return Integer.valueOf(
-				source.getStatistics().getProperty(StaxEventItemReader.READ_COUNT_STATISTICS_NAME)).intValue();
 	}
 
 	private StaxEventItemReader createNewInputSouce() {
@@ -396,12 +390,12 @@ public class StaxEventItemReaderTests extends TestCase {
 			this.openCalled = openCalled;
 		}
 	}
-	
-	private class NonExistentResource extends AbstractResource{
+
+	private class NonExistentResource extends AbstractResource {
 
 		public NonExistentResource() {
 		}
-		
+
 		public boolean exists() {
 			return false;
 		}

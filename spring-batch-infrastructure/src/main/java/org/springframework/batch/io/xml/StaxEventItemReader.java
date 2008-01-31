@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -21,7 +20,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.reader.AbstractItemReader;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -45,8 +43,6 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 		Skippable, ItemStream, InitializingBean, DisposableBean {
 
 	public static final String READ_COUNT_STATISTICS_NAME = "StaxEventReaderItemReader.readCount";
-
-	private static final String RESTART_DATA_NAME = "StaxEventReaderItemReader.recordcount";
 
 	private FragmentEventReader fragmentReader;
 
@@ -168,15 +164,6 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	}
 
 	/**
-	 * @return Properties wrapper for the count of records read so far.
-	 */
-	public Properties getStatistics() {
-		Properties statistics = new Properties();
-		statistics.setProperty(READ_COUNT_STATISTICS_NAME, String.valueOf(currentRecordCount));
-		return statistics;
-	}
-
-	/**
 	 * Ensure that all required dependencies for the ItemReader to run are
 	 * provided after all properties have been set.
 	 * 
@@ -196,11 +183,9 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	 * @see ItemStream#getStreamContext()
 	 */
 	public StreamContext getStreamContext() {
-		Properties restartData = new Properties();
-
-		restartData.setProperty(RESTART_DATA_NAME, String.valueOf(currentRecordCount));
-
-		return new GenericStreamContext(restartData);
+		StreamContext restartData = new StreamContext();
+		restartData.putLong(READ_COUNT_STATISTICS_NAME, currentRecordCount);
+		return restartData;
 	}
 
 	/**
@@ -214,13 +199,13 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	 */
 	public void restoreFrom(StreamContext data) {
 		Assert.state(!initialized);
-		if (data == null || data.getProperties() == null || data.getProperties().getProperty(RESTART_DATA_NAME) == null) {
+		if (data == null || data.getProperties() == null || !data.containsKey(READ_COUNT_STATISTICS_NAME)) {
 			return;
 		}
 
 		open();
 
-		long restoredRecordCount = Long.parseLong(data.getProperties().getProperty(RESTART_DATA_NAME));
+		long restoredRecordCount = data.getLong(READ_COUNT_STATISTICS_NAME);
 		int REASONABLE_ADHOC_COMMIT_FREQUENCY = 100;
 		while (currentRecordCount <= restoredRecordCount) {
 			currentRecordCount++;
