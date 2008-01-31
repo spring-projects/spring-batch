@@ -16,14 +16,11 @@
 
 package org.springframework.batch.execution.tasklet;
 
-import java.util.Properties;
-
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
-import org.springframework.batch.support.PropertiesConverter;
+import org.springframework.batch.item.StreamException;
 
 /**
  * An extension of {@link ItemOrientedTasklet} that delegates calls to
@@ -40,95 +37,30 @@ import org.springframework.batch.support.PropertiesConverter;
 public class RestartableItemOrientedTasklet extends ItemOrientedTasklet implements ItemStream {
 
 	/**
-	 * @see ItemStream#getRestartData()
+	 * @see ItemStream#getStreamContext()
 	 */
-	public StreamContext getRestartData() {
-
-		StreamContext itemProviderRestartData = null;
-		StreamContext itemProcessorRestartData = null;
-
-		if (itemProvider instanceof ItemStream) {
-			itemProviderRestartData = ((ItemStream) itemProvider).getRestartData();
-		}
-
-		if (itemWriter instanceof ItemStream) {
-			itemProcessorRestartData = ((ItemStream) itemWriter).getRestartData();
-		}
-
-		RestartableItemOrientedTaskletRestartData restartData = new RestartableItemOrientedTaskletRestartData(itemProviderRestartData, itemProcessorRestartData);
-
-		return restartData;
+	public StreamContext getStreamContext() {
+		throw new UnsupportedOperationException("This class is not used");
 	}
 
 	/**
 	 * @see ItemStream#restoreFrom(StreamContext)
 	 */
 	public void restoreFrom(StreamContext data) {
-		if (data == null || data.getProperties() == null)
-			return;
-
-		RestartableItemOrientedTaskletRestartData moduleRestartData;
-
-		if (data instanceof RestartableItemOrientedTaskletRestartData) {
-			moduleRestartData = (RestartableItemOrientedTaskletRestartData) data;
-		}
-		else {
-			moduleRestartData = new RestartableItemOrientedTaskletRestartData(data.getProperties());
-		}
-
-		if (itemProvider instanceof ItemStream) {
-			((ItemStream) itemProvider).restoreFrom(moduleRestartData.readerData);
-		}
-		if (itemWriter instanceof ItemStream) {
-			((ItemStream) itemWriter).restoreFrom(moduleRestartData.writerData);
-		}
-	}
-
-	private class RestartableItemOrientedTaskletRestartData implements StreamContext {
-
-		private static final String READER_KEY = "DATA_PROVIDER";
-
-		private static final String WRITER_KEY = "DATA_PROCESSOR";
-
-		private StreamContext readerData;
-
-		private StreamContext writerData;
-
-		public RestartableItemOrientedTaskletRestartData(StreamContext providerData, StreamContext writerData) {
-			this.readerData = providerData;
-			this.writerData = writerData;
-		}
-
-		public RestartableItemOrientedTaskletRestartData(Properties data) {
-			readerData = new GenericStreamContext(PropertiesConverter
-					.stringToProperties(data.getProperty(READER_KEY)));
-			writerData = new GenericStreamContext(PropertiesConverter.stringToProperties(data
-					.getProperty(WRITER_KEY)));
-		}
-
-		public Properties getProperties() {
-			Properties props = new Properties();
-			if (readerData != null) {
-				props.setProperty(READER_KEY, PropertiesConverter.propertiesToString(readerData.getProperties()));
-			}
-			if (writerData != null) {
-				props.setProperty(WRITER_KEY, PropertiesConverter.propertiesToString(writerData.getProperties()));
-			}
-			return props;
-		}
+		throw new UnsupportedOperationException("This class is not used");
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#open()
 	 */
-	public void open() throws Exception {
+	public void open() throws StreamException {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#close()
 	 */
-	public void close() throws Exception {
+	public void close() throws StreamException {
 		throw new UnsupportedOperationException("Not implemented.");		
 	}
 }

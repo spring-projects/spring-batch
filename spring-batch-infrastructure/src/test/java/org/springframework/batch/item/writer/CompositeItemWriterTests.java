@@ -3,17 +3,11 @@ package org.springframework.batch.item.writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
-import org.springframework.batch.item.writer.CompositeItemWriter;
-import org.springframework.batch.statistics.StatisticsProvider;
 
 /**
  * Tests for {@link CompositeItemWriter}
@@ -57,37 +51,7 @@ public class CompositeItemWriterTests extends TestCase {
 			control.verify();
 		}
 	}
-	
-	/**
-	 * All Restartable processors should be restarted, not-Restartable processors should be ignored.
-	 */
-	public void testRestart() {
-		//this mock with undefined behaviour makes sure not-Restartable processor is ignored
-		MockControl p1c = MockControl.createStrictControl(ItemWriter.class);
-		final ItemWriter p1 = (ItemWriter) p1c.getMock();
 		
-		final ItemWriter p2 = new StubItemWriter();
-		final ItemWriter p3 = new StubItemWriter();
-		List itemProcessors = new ArrayList(){{
-			add(p1);
-			add(p2);
-			add(p3);
-		}};
-		itemProcessor.setDelegates(itemProcessors);
-		
-		StreamContext rd = itemProcessor.getRestartData();
-		itemProcessor.restoreFrom(rd);
-		
-		for (Iterator iterator = itemProcessors.iterator(); iterator.hasNext();) {
-			ItemWriter processor = (ItemWriter) iterator.next();
-			if (processor instanceof StubItemWriter) {
-				assertTrue("Injected processors are restarted", 
-						((StubItemWriter)processor).restarted);
-			}
-		}
-		
-	}
-	
 	public void testClose() throws Exception {
 		
 		final int NUMBER_OF_PROCESSORS = 10;
@@ -115,49 +79,4 @@ public class CompositeItemWriterTests extends TestCase {
 		
 	}
 	
-	/**
-	 * Stub for testing restart. Checks the restart data received is the same that was returned by
-	 * <code>getRestartData()</code>
-	 */
-	private static class StubItemWriter implements ItemWriter, ItemStream, StatisticsProvider {
-		
-		private static final String RESTART_KEY = "restartData";
-		private static final String STATS_KEY = "stats";
-		
-		private boolean restarted = false;
-		
-		private final int hashCode = this.hashCode();
-		
-		
-		public StreamContext getRestartData() {
-			Properties props = new Properties(){{
-				setProperty(RESTART_KEY, String.valueOf(hashCode));
-			}};
-			return new GenericStreamContext(props);
-		}
-
-		public void restoreFrom(StreamContext data) {
-			if (Integer.valueOf(data.getProperties().getProperty(RESTART_KEY)).intValue() != hashCode()) {
-				fail("received restart data is not the same which was saved");
-			}
-			restarted = true;
-		}
-
-		public void write(Object data) throws Exception {
-			// do nothing
-		}
-		
-		public Properties getStatistics() {
-			return new Properties() {{
-				setProperty(STATS_KEY, String.valueOf(hashCode));
-			}};
-		}
-
-		public void close() throws Exception {
-		}
-		
-		public void open() throws Exception {
-		}
-	}
-
 }

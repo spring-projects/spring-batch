@@ -13,24 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.batch.item;
 
-package org.springframework.batch.item.reader;
-
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.StreamException;
+import org.springframework.batch.io.exception.BatchCriticalException;
 
 /**
- * Base class for {@link ItemReader} implementations.
  * @author Dave Syer
  *
  */
-public abstract class AbstractItemReader implements ItemReader {
-	
-	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemReader#close()
-	 */
-	public void close() throws StreamException {		
-	}
+public class StreamException extends BatchCriticalException {
 
 }

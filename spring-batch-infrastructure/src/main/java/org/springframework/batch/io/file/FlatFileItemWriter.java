@@ -257,9 +257,9 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	}
 
 	/**
-	 * @see ItemStream#getRestartData()
+	 * @see ItemStream#getStreamContext()
 	 */
-	public StreamContext getRestartData() {
+	public StreamContext getStreamContext() {
 		final OutputState os = getOutputState();
 
 		streamContext.getProperties().setProperty(RESTART_DATA_NAME, String.valueOf(os.position()));

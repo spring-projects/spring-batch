@@ -87,7 +87,7 @@
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="allowStartIfComplete" value="true" />
-		<property name="saveRestartData" value="false" />
+		<property name="saveStreamContext" value="false" />
 	</bean>
 
 	<bean id="simpleStep" parent="abstractStep"
@@ -101,13 +101,14 @@
 			</bean>
 		</property>
 		<property name="commitInterval" value="1" />
+		<property name="saveStreamContext" value="true" />
 	</bean>
 
 	<bean id="repeatOperationsStep" parent="abstractStep"
 		class="org.springframework.batch.execution.step.simple.RepeatOperationsStep"
 		abstract="true">
 		<property name="allowStartIfComplete" value="true" />
-		<property name="saveRestartData" value="false" />
+		<property name="saveStreamContext" value="false" />
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="transactionManager" ref="transactionManager" />
 	</bean>

@@ -92,7 +92,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 		// write records
 		writer.write(record);
 		writer.getSynchronization().afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
-		StreamContext streamContext = writer.getRestartData();
+		StreamContext streamContext = writer.getStreamContext();
 
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();

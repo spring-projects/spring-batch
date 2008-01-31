@@ -59,8 +59,8 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	/**
 	 * Gets restart data from the input template
 	 */
-	public void testGetRestartData() {
-		Properties props = processor.getRestartData().getProperties();
+	public void testGetStreamContext() {
+		Properties props = processor.getStreamContext().getProperties();
 		assertEquals("foo", props.getProperty("value"));
 	}
 
@@ -78,10 +78,10 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 * Forward restart data to input template
 	 * @throws Exception 
 	 */
-	public void testGetRestartDataWithoutRestartable() throws Exception {
+	public void testGetStreamContextWithoutItemStream() throws Exception {
 		processor.setDelegate(null);
 		try {
-			processor.getRestartData();
+			processor.getStreamContext();
 			fail("Expected IllegalStateException");
 		}
 		catch (IllegalStateException e) {
@@ -152,7 +152,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 			return PropertiesConverter.stringToProperties("a=b");
 		}
 
-		public StreamContext getRestartData() {
+		public StreamContext getStreamContext() {
 			return new GenericStreamContext(PropertiesConverter.stringToProperties("value=foo"));
 		}
 

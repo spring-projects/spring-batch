@@ -46,15 +46,15 @@ public class StepInstanceTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepInstance#getRestartData()}.
+	 * Test method for {@link org.springframework.batch.core.domain.StepInstance#getStreamContext()}.
 	 */
-	public void testGetRestartData() {
-		assertNotNull(instance.getRestartData());
-		assertTrue(instance.getRestartData().getProperties().isEmpty());
-		instance.setRestartData(new GenericStreamContext(new Properties() {{
+	public void testGetStreamContext() {
+		assertNotNull(instance.getStreamContext());
+		assertTrue(instance.getStreamContext().getProperties().isEmpty());
+		instance.setStreamContext(new GenericStreamContext(new Properties() {{
 			setProperty("foo", "bar");
 		}}));
-		assertEquals("bar", instance.getRestartData().getProperties().getProperty("foo"));
+		assertEquals("bar", instance.getStreamContext().getProperties().getProperty("foo"));
 	}
 
 	/**

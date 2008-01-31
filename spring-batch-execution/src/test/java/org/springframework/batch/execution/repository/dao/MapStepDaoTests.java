@@ -107,16 +107,16 @@ public class MapStepDaoTests extends TestCase {
 	}
 
 	public void testSaveRestartData() throws Exception {
-		assertEquals(null, dao.getRestartData(step.getId()));
+		assertEquals(null, dao.getStreamContext(step.getId()));
 		step.setStatus(BatchStatus.COMPLETED);
 		Properties data = new Properties();
 		data.setProperty("restart.key1", "restartData");
 		StreamContext streamContext = new GenericStreamContext(data);
-		step.setRestartData(streamContext);
+		step.setStreamContext(streamContext);
 		dao.update(step);
 		StepInstance tempStep = dao.findStep(job, step.getName());
 		assertEquals(tempStep, step);
-		assertEquals(tempStep.getRestartData().getProperties().toString(), 
+		assertEquals(tempStep.getStreamContext().getProperties().toString(), 
 				streamContext.getProperties().toString());
 	}
 

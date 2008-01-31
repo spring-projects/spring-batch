@@ -25,10 +25,10 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
@@ -43,7 +43,9 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.StreamException;
 import org.springframework.batch.item.reader.ListItemReader;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
@@ -72,7 +74,7 @@ public class SimpleStepExecutorTests extends TestCase {
 	private AbstractStep stepConfiguration;
 
 	private RepeatTemplate template;
-	
+
 	private JobInstance jobInstance;
 
 	private ItemReader getReader(String[] args) {
@@ -111,7 +113,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		stepExecutor.setChunkOperations(template);
-		
+
 		jobInstance = new JobInstance(new Long(0), new JobParameters());
 		jobInstance.setJob(new JobSupport("FOO"));
 	}
@@ -120,8 +122,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		StepInstance step = new StepInstance(new Long(9));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
-		StepExecution stepExecution = new StepExecution(step,
-				jobExecutionContext);
+		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
 		stepExecutor.execute(stepExecution);
 		assertEquals(1, processed.size());
@@ -158,8 +159,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		final StepInstance step = new StepInstance(new Long(1));
 		final JobExecution jobExecution = new JobExecution(jobInstance);
-		final StepExecution stepExecution = new StepExecution(step,
-				jobExecution);
+		final StepExecution stepExecution = new StepExecution(step, jobExecution);
 
 		stepConfiguration.setTasklet(new Tasklet() {
 			public ExitStatus execute() throws Exception {
@@ -186,8 +186,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		final StepInstance step = new StepInstance(new Long(1));
 		final JobExecution jobExecution = new JobExecution(jobInstance);
 		jobExecution.setId(new Long(1));
-		final StepExecution stepExecution = new StepExecution(step,
-				jobExecution);
+		final StepExecution stepExecution = new StepExecution(step, jobExecution);
 
 		template.setInterceptor(new RepeatInterceptorAdapter() {
 			public void open(RepeatContext context) {
@@ -210,8 +209,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		StepInstance step = new StepInstance(new Long(1));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
-		StepExecution stepExecution = new StepExecution(step,
-				jobExecutionContext);
+		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
 		stepExecutor.execute(stepExecution);
 		assertEquals(1, processed.size());
@@ -237,8 +235,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		StepInstance step = new StepInstance(new Long(1));
 		stepConfiguration.setTasklet(tasklet);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
-		StepExecution stepExecution = new StepExecution(step,
-				jobExecutionContext);
+		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
 		try {
 			stepExecutor.execute(stepExecution);
@@ -269,8 +266,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		StepInstance step = new StepInstance(new Long(1));
 		stepConfiguration.setTasklet(tasklet);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
-		StepExecution stepExecution = new StepExecution(step,
-				jobExecutionContext);
+		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
 		try {
 			stepExecutor.execute(stepExecution);
@@ -285,21 +281,15 @@ public class SimpleStepExecutorTests extends TestCase {
 	 * make sure a job that has never been executed before, but does have
 	 * saveRestartData = true, doesn't have restoreFrom called on it.
 	 */
-	public void testNonRestartedJob() {
+	public void testNonRestartedJob() throws Exception {
 		StepInstance step = new StepInstance(new Long(1));
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepExecutor.setTasklet(tasklet);
-		stepConfiguration.setSaveRestartData(true);
+		stepConfiguration.setSaveStreamContext(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
-		StepExecution stepExecution = new StepExecution(step,
-				jobExecutionContext);
+		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
-		try {
-			stepExecutor.execute(stepExecution);
-		}
-		catch (Throwable t) {
-			fail();
-		}
+		stepExecutor.execute(stepExecution);
 
 		assertFalse(tasklet.isRestoreFromCalled());
 		assertTrue(tasklet.isGetRestartDataCalled());
@@ -309,24 +299,21 @@ public class SimpleStepExecutorTests extends TestCase {
 	 * make sure a job that has been executed before, and is therefore being
 	 * restarted, is restored.
 	 */
-	public void testRestartedJob() {
+	public void testRestartedJob() throws Exception {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepExecutor.setTasklet(tasklet);
-		stepConfiguration.setSaveRestartData(true);
+		stepConfiguration.setSaveStreamContext(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
-		StepExecution stepExecution = new StepExecution(step,
-				jobExecutionContext);
+		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
+		stepExecution.getStep().setStreamContext(
+				new GenericStreamContext(PropertiesConverter.stringToProperties("foo=bar")));
 
-		try {
-			stepExecutor.execute(stepExecution);
-		}
-		catch (Throwable t) {
-			fail();
-		}
+		stepExecutor.execute(stepExecution);
 
 		assertTrue(tasklet.isRestoreFromCalled());
+		assertTrue(tasklet.isRestoreFromCalledWithSomeContext());
 		assertTrue(tasklet.isGetRestartDataCalled());
 	}
 
@@ -339,10 +326,9 @@ public class SimpleStepExecutorTests extends TestCase {
 		step.setStepExecutionCount(1);
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepConfiguration.setTasklet(tasklet);
-		stepConfiguration.setSaveRestartData(false);
+		stepConfiguration.setSaveStreamContext(false);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
-		StepExecution stepExecution = new StepExecution(step,
-				jobExecutionContext);
+		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
 		try {
 			stepExecutor.execute(stepExecution);
@@ -359,7 +345,7 @@ public class SimpleStepExecutorTests extends TestCase {
 	 * Even though the job is restarted, and saveRestartData is true, nothing
 	 * will be restored because the Tasklet does not implement Restartable.
 	 */
-	public void testRestartJobOnNonRestartableTasklet() {
+	public void testRestartJobOnNonRestartableTasklet() throws Exception {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
 		stepConfiguration.setTasklet(new Tasklet() {
@@ -367,16 +353,11 @@ public class SimpleStepExecutorTests extends TestCase {
 				return ExitStatus.FINISHED;
 			}
 		});
-		stepConfiguration.setSaveRestartData(true);
+		stepConfiguration.setSaveStreamContext(true);
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
-		try {
-			stepExecutor.execute(stepExecution);
-		}
-		catch (Throwable t) {
-			fail();
-		}
+		stepExecutor.execute(stepExecution);
 	}
 
 	public void testApplyConfigurationWithExceptionHandler() throws Exception {
@@ -426,10 +407,10 @@ public class SimpleStepExecutorTests extends TestCase {
 				return ExitStatus.FINISHED;
 			}
 		});
-		stepConfiguration.setSaveRestartData(true);
+		stepConfiguration.setSaveStreamContext(true);
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
-		
+
 		assertEquals(null, stepExecution.getStatistics().getProperty("foo"));
 
 		final Map map = new HashMap();
@@ -437,6 +418,7 @@ public class SimpleStepExecutorTests extends TestCase {
 			public Properties getStatistics(Object key) {
 				return PropertiesConverter.stringToProperties("foo=bar");
 			}
+
 			public void register(Object key, StatisticsProvider provider) {
 				map.put(key, provider);
 			}
@@ -448,8 +430,9 @@ public class SimpleStepExecutorTests extends TestCase {
 		catch (Throwable t) {
 			fail();
 		}
-		
-		// At least once in that process the statistics service was asked for statistics...
+
+		// At least once in that process the statistics service was asked for
+		// statistics...
 		assertEquals("bar", stepExecution.getStatistics().getProperty("foo"));
 		// ...but nothing was registered because nothing with step scoped.
 		assertEquals(0, map.size());
@@ -461,17 +444,25 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		private boolean restoreFromCalled = false;
 
+		private boolean restoreFromCalledWithSomeContext = false;
+
 		public ExitStatus execute() throws Exception {
+			StepSynchronizationManager.getContext().setAttribute("TASKLET_TEST", this);
 			return ExitStatus.FINISHED;
 		}
 
-		public StreamContext getRestartData() {
+		public boolean isRestoreFromCalledWithSomeContext() {
+			return restoreFromCalledWithSomeContext;
+		}
+
+		public StreamContext getStreamContext() {
 			getRestartDataCalled = true;
-			return null;
+			return new GenericStreamContext(PropertiesConverter.stringToProperties("spam=bucket"));
 		}
 
 		public void restoreFrom(StreamContext data) {
 			restoreFromCalled = true;
+			restoreFromCalledWithSomeContext = data.getProperties().size() > 0;
 		}
 
 		public boolean isGetRestartDataCalled() {
@@ -481,15 +472,13 @@ public class SimpleStepExecutorTests extends TestCase {
 		public boolean isRestoreFromCalled() {
 			return restoreFromCalled;
 		}
-		
-		public void open() throws Exception {
-			throw new UnsupportedOperationException("Not implemented.");
+
+		public void open() throws StreamException {
 		}
-		
-		public void close() throws Exception {
-			throw new UnsupportedOperationException("Not implemented.");		
+
+		public void close() throws StreamException {
 		}
-		
+
 	}
 
 	/*

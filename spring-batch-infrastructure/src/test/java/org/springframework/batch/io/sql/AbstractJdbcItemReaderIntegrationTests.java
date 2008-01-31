@@ -85,7 +85,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		StreamContext streamContext = getAsRestartable(source).getRestartData();
+		StreamContext streamContext = getAsRestartable(source).getStreamContext();
 
 		// create new input source
 		source = createItemReader();
@@ -107,7 +107,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		StreamContext streamContext = getAsRestartable(source).getRestartData();
+		StreamContext streamContext = getAsRestartable(source).getStreamContext();
 
 		// create new input source
 		source = createItemReader();

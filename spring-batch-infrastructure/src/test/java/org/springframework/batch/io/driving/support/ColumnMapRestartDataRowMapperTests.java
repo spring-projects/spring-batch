@@ -22,9 +22,9 @@ import org.springframework.util.ClassUtils;
  */
 public class ColumnMapRestartDataRowMapperTests extends TestCase {
 
-	private static final String KEY = ClassUtils.getQualifiedName(ColumnMapRestartDataRowMapper.class) + ".KEY.";
+	private static final String KEY = ClassUtils.getQualifiedName(ColumnMapStreamContextRowMapper.class) + ".KEY.";
 	
-	ColumnMapRestartDataRowMapper mapper;
+	ColumnMapStreamContextRowMapper mapper;
 	
 	Map key;
 	
@@ -34,7 +34,7 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 	
-		mapper = new ColumnMapRestartDataRowMapper();
+		mapper = new ColumnMapStreamContextRowMapper();
 		
 		key = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(2);
 		key.put("1", new Integer(1));

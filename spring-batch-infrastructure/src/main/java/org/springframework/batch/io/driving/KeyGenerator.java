@@ -34,5 +34,5 @@ public interface KeyGenerator {
 	 * @throws IllegalArgumentException if key is null.
 	 * @throws IllegalArgumentException if key is an incompatible type.
 	 */
-	StreamContext getKeyAsRestartData(Object key);
+	StreamContext getKeyAsStreamContext(Object key);
 }

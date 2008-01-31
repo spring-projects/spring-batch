@@ -184,7 +184,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		inputSource.setResource(getInputResource(TEST_STRING));
 		inputSource.setFieldSetMapper(fieldSetMapper);
 		// do not open the template...
-		inputSource.restoreFrom(inputSource.getRestartData());
+		inputSource.restoreFrom(inputSource.getStreamContext());
 		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
 	}
 
@@ -204,7 +204,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		inputSource.read();
 
 		// get restart data
-		StreamContext streamContext = inputSource.getRestartData();
+		StreamContext streamContext = inputSource.getStreamContext();
 		assertEquals("4", (String) streamContext.getProperties().getProperty(
 				DefaultFlatFileItemReader.READ_STATISTICS_NAME));
 		// close input

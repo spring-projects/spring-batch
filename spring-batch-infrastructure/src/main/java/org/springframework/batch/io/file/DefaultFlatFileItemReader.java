@@ -104,7 +104,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * current Line Count which can be used to re initialise the batch job in
 	 * case of restart.
 	 */
-	public StreamContext getRestartData() {
+	public StreamContext getStreamContext() {
 		return new GenericStreamContext(getStatistics());
 	}
 

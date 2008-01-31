@@ -25,6 +25,10 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.statistics.StatisticsService;
@@ -35,53 +39,72 @@ import org.springframework.batch.statistics.StatisticsService;
  * @author Dave Syer
  * 
  */
-public class SimpleStepContext extends SynchronizedAttributeAccessor implements
-		StepContext, StatisticsProvider {
+public class SimpleStepContext extends SynchronizedAttributeAccessor implements StepContext {
 
 	private Map callbacks = new HashMap();
+
 	private StepContext parent;
+
 	private StepExecution stepExecution;
+
 	private StatisticsService statisticsService;
+
+	private StreamManager streamManager;
+
+	private StreamContext streamContext;
 
 	/**
 	 * Default constructor.
 	 */
 	public SimpleStepContext(StepExecution stepExecution) {
-		this(stepExecution, null, null);
+		this(stepExecution, null, null, null);
 	}
 
 	/**
 	 * Default constructor.
 	 */
 	public SimpleStepContext(StepExecution stepExecution, StepContext parent) {
-		this(stepExecution, parent, null);
+		this(stepExecution, parent, null, null);
 	}
 
 	/**
 	 * @param object
 	 */
-	public SimpleStepContext(StepExecution stepExecution, StepContext parent, StatisticsService statisticsService) {
+	public SimpleStepContext(StepExecution stepExecution, StepContext parent, StatisticsService statisticsService,
+			StreamManager streamManager) {
 		super();
 		this.parent = parent;
 		this.statisticsService = statisticsService;
+		this.streamManager = streamManager;
 		this.stepExecution = stepExecution;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.repeat.context.SynchronizedAttributeAccessor#setAttribute(java.lang.String, java.lang.Object)
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.repeat.context.SynchronizedAttributeAccessor#setAttribute(java.lang.String,
+	 * java.lang.Object)
 	 */
 	public void setAttribute(String name, Object value) {
 		super.setAttribute(name, value);
-		if (statisticsService!=null && (value instanceof StatisticsProvider)) {
+		if (statisticsService != null && (value instanceof StatisticsProvider)) {
 			statisticsService.register(this, (StatisticsProvider) value);
 		}
+		if (streamManager != null && (value instanceof ItemStream)) {
+			ItemStream stream = (ItemStream) value;
+			streamManager.register(this, stream);
+			stream.open();
+			if (streamContext != null) {
+				stream.restoreFrom(streamContext);
+			}
+		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.statistics.StatisticsProvider#getStatistics()
 	 */
 	public Properties getStatistics() {
-		if (statisticsService==null) {
+		if (statisticsService == null) {
 			return new Properties();
 		}
 		return statisticsService.getStatistics(this);
@@ -100,13 +123,13 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements
 	 * (non-Javadoc)
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#registerDestructionCallback(java.lang.String,
-	 *      java.lang.Runnable)
+	 * java.lang.Runnable)
 	 */
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.springframework.batch.execution.scope.StepContext#registerDestructionCallback(java.lang.String,
-	 *      java.lang.Runnable)
+	 * java.lang.Runnable)
 	 */
 	public void registerDestructionCallback(String name, Runnable callback) {
 		synchronized (callbacks) {
@@ -119,12 +142,22 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.execution.scope.StepContext#close()
 	 */
 	public void close() {
 
 		List errors = new ArrayList();
+
+		try {
+			if (streamManager != null) {
+				streamManager.close(this);
+			}
+		}
+		catch (Exception t) {
+			errors.add(t);
+		}
 
 		Set copy;
 
@@ -152,7 +185,8 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements
 					 */
 					try {
 						callback.run();
-					} catch (RuntimeException t) {
+					}
+					catch (RuntimeException t) {
 						errors.add(t);
 					}
 				}
@@ -163,7 +197,14 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements
 			return;
 		}
 
-		throw (RuntimeException) errors.get(0);
+		Exception error = (Exception) errors.get(0);
+		if (error instanceof RuntimeException) {
+			throw (RuntimeException) error;
+		}
+		else {
+			throw new BatchCriticalException("Could not close step context, rethrowing first of " + errors.size()
+					+ " execptions.", error);
+		}
 	}
 
 	/*
@@ -173,6 +214,22 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements
 	 */
 	public StepExecution getStepExecution() {
 		return stepExecution;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#getStreamContext()
+	 */
+	public StreamContext getStreamContext() {
+		return streamManager.getStreamContext(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.execution.scope.StepContext#setInitialStreamContext(org.springframework.batch.item.StreamContext)
+	 */
+	public void setInitialStreamContext(StreamContext streamContext) {
+		this.streamContext = streamContext;
 	}
 
 }

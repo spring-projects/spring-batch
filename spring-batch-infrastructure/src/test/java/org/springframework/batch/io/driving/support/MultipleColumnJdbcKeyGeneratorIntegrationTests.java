@@ -47,8 +47,8 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 	public void testRestoreKeys(){
 		
 		Properties props = new Properties();
-		props.setProperty(ColumnMapRestartDataRowMapper.KEY + "0", "3");
-		props.setProperty(ColumnMapRestartDataRowMapper.KEY + "1", "3");
+		props.setProperty(ColumnMapStreamContextRowMapper.KEY + "0", "3");
+		props.setProperty(ColumnMapStreamContextRowMapper.KEY + "1", "3");
 		StreamContext streamContext = new GenericStreamContext(props);
 		
 		List keys = keyStrategy.restoreKeys(streamContext);
@@ -68,18 +68,18 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 		key.put("ID", new Long(3));
 		key.put("VALUE", new Integer(3));
 		
-		StreamContext streamContext = keyStrategy.getKeyAsRestartData(key);
+		StreamContext streamContext = keyStrategy.getKeyAsStreamContext(key);
 		Properties props = streamContext.getProperties();
 		
 		assertEquals(2, props.size());
-		assertEquals("3", props.get(ColumnMapRestartDataRowMapper.KEY + "0"));
-		assertEquals("3", props.get(ColumnMapRestartDataRowMapper.KEY + "1"));
+		assertEquals("3", props.get(ColumnMapStreamContextRowMapper.KEY + "0"));
+		assertEquals("3", props.get(ColumnMapStreamContextRowMapper.KEY + "1"));
 	}
 	
-	public void testGetNullKeyAsRestartData(){
+	public void testGetNullKeyAsStreamContext(){
 		
 		try{
-			keyStrategy.getKeyAsRestartData(null);
+			keyStrategy.getKeyAsStreamContext(null);
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -89,7 +89,7 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 	public void testRestoreKeysFromNull(){
 		
 		try{
-			keyStrategy.getKeyAsRestartData(null);
+			keyStrategy.getKeyAsStreamContext(null);
 		}catch(IllegalArgumentException ex){
 			//expected
 		}

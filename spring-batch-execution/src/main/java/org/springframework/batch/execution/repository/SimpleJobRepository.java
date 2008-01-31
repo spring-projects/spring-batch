@@ -303,8 +303,8 @@ public class SimpleJobRepository implements JobRepository {
 			Step step = (Step) i.next();
 			StepInstance stepInstance = stepDao.createStep(job, step.getName());
 			// Ensure valid restart data is being returned.
-			if (stepInstance.getRestartData() == null || stepInstance.getRestartData().getProperties() == null) {
-				stepInstance.setRestartData(new GenericStreamContext(new Properties()));
+			if (stepInstance.getStreamContext() == null || stepInstance.getStreamContext().getProperties() == null) {
+				stepInstance.setStreamContext(new GenericStreamContext(new Properties()));
 			}
 			stepInstances.add(stepInstance);
 		}
@@ -326,8 +326,8 @@ public class SimpleJobRepository implements JobRepository {
 
 				step.setStepExecutionCount(stepDao.getStepExecutionCount(step));
 				// Ensure valid restart data is being returned.
-				if (step.getRestartData() == null || step.getRestartData().getProperties() == null) {
-					step.setRestartData(new GenericStreamContext(new Properties()));
+				if (step.getStreamContext() == null || step.getStreamContext().getProperties() == null) {
+					step.setStreamContext(new GenericStreamContext(new Properties()));
 				}
 				stepInstances.add(step);
 			}

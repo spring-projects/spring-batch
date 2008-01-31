@@ -20,6 +20,7 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.StreamException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -47,15 +48,14 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	}
 
 	/**
-	 * @see ItemStream#getRestartData()
+	 * @see ItemStream#getStreamContext()
 	 * @throws IllegalStateException if the parent template is not itself
 	 * {@link ItemStream}.
 	 */
-	public StreamContext getRestartData() {
-		if (!(inputSource instanceof ItemStream)) {
-			throw new IllegalStateException("Input Template is not Restartable");
-		}
-		return ((ItemStream) inputSource).getRestartData();
+	public StreamContext getStreamContext() {
+		// TODO: this is not necessary...
+		Assert.state(inputSource instanceof ItemStream, "Input source is not ItemStream");
+		return ((ItemStream) inputSource).getStreamContext();
 	}
 
 	/**
@@ -64,9 +64,7 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 * {@link ItemStream}.
 	 */
 	public void restoreFrom(StreamContext data) {
-		if (!(inputSource instanceof ItemStream)) {
-			throw new IllegalStateException("Input Template is not Restartable");
-		}
+		Assert.state(inputSource instanceof ItemStream, "Input source is not ItemStream");
 		((ItemStream) inputSource).restoreFrom(data);
 	}
 
@@ -91,7 +89,7 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#open()
 	 */
-	public void open() throws Exception {
+	public void open() throws StreamException {
 		if (inputSource instanceof ItemStream) {
 			((ItemStream) inputSource).open();
 		}
@@ -100,7 +98,7 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#open()
 	 */
-	public void close() throws Exception {
+	public void close() throws StreamException {
 		if (inputSource instanceof ItemStream) {
 			((ItemStream) inputSource).close();
 		}

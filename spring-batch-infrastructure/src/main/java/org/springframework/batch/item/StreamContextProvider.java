@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.springframework.batch.item.reader;
-
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.StreamException;
+package org.springframework.batch.item;
 
 /**
- * Base class for {@link ItemReader} implementations.
  * @author Dave Syer
  *
  */
-public abstract class AbstractItemReader implements ItemReader {
-	
+public interface StreamContextProvider {
+
 	/**
-	 * Do nothing.
-	 * @see org.springframework.batch.item.ItemReader#close()
+	 * Get {@link StreamContext} representing this object's current state.
+	 * Should not return null even if there is no state.
+	 * 
+	 * @return {@link StreamContext} representing current state.
 	 */
-	public void close() throws StreamException {		
-	}
+	StreamContext getStreamContext();
 
 }

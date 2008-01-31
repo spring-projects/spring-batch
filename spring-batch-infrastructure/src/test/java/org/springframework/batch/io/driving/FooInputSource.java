@@ -27,8 +27,8 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 		}
 	}
 
-	public StreamContext getRestartData() {
-		return inputSource.getRestartData();
+	public StreamContext getStreamContext() {
+		return inputSource.getStreamContext();
 	}
 
 	public void restoreFrom(StreamContext data) {
@@ -46,6 +46,9 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public void open() throws Exception {
+	public void open() {
+	};
+
+	public void close() {
 	};
 }

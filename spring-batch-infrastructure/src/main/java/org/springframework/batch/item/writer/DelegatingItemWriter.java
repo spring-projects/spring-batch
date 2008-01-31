@@ -50,14 +50,14 @@ public class DelegatingItemWriter implements ItemWriter, Skippable, Initializing
 	}
 
 	/**
-	 * @see ItemStream#getRestartData()
+	 * @see ItemStream#getStreamContext()
 	 */
-	public StreamContext getRestartData() {
+	public StreamContext getStreamContext() {
 
 		Assert.state(writer != null, "Source must not be null.");
 
 		if (writer instanceof ItemStream) {
-			return ((ItemStream) writer).getRestartData();
+			return ((ItemStream) writer).getStreamContext();
 		}
 		else {
 			return new GenericStreamContext(new Properties());

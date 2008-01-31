@@ -34,8 +34,8 @@ import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.SimpleStreamManager;
+import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -97,6 +97,8 @@ public class SimpleStepExecutor {
 
 	private AbstractStep step;
 
+	private StreamManager streamManager = new SimpleStreamManager();
+
 	/**
 	 * Package private constructor so the factory can create a the executor.
 	 */
@@ -116,6 +118,20 @@ public class SimpleStepExecutor {
 	 */
 	public void setStatisticsService(StatisticsService statisticsService) {
 		this.statisticsService = statisticsService;
+	}
+
+	/**
+	 * Public setter for the {@link StreamManager}. This will be used to create
+	 * the {@link StepContext}, and hence any component that is a
+	 * {@link StatisticsProvider} and in step scope will be registered with the
+	 * service. The {@link StepContext} is then a source of aggregate statistics
+	 * for the step.
+	 * 
+	 * @param streamManager the {@link StreamManager} to set. Default is a
+	 * {@link SimpleStreamManager}.
+	 */
+	public void setStreamManager(StreamManager streamManager) {
+		this.streamManager = streamManager;
 	}
 
 	/**
@@ -173,8 +189,7 @@ public class SimpleStepExecutor {
 	 * execution
 	 * @see StepExecutor#execute(StepExecution)
 	 */
-	public void execute(final StepExecution stepExecution) throws BatchCriticalException,
-			StepInterruptedException {
+	public void execute(final StepExecution stepExecution) throws BatchCriticalException, StepInterruptedException {
 
 		final StepInstance stepInstance = stepExecution.getStep();
 		boolean isRestart = stepInstance.getStepExecutionCount() > 0 ? true : false;
@@ -182,23 +197,24 @@ public class SimpleStepExecutor {
 
 		ExitStatus status = ExitStatus.FAILED;
 
-		StepContext parentStepScopeContext = StepSynchronizationManager.getContext();
-		final StepContext stepScopeContext = new SimpleStepContext(stepExecution, parentStepScopeContext,
-				statisticsService);
-		StepSynchronizationManager.register(stepScopeContext);
+		StepContext parentStepContext = StepSynchronizationManager.getContext();
+		final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext, statisticsService,
+				streamManager);
+		StepSynchronizationManager.register(stepContext);
 		// Add the job identifier so that it can be used to identify
 		// the conversation in StepScope
-		stepScopeContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
+		stepContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
+
+		final boolean saveRestartData = step.isSaveStreamContext();
+
+		if (saveRestartData && isRestart) {
+			stepContext.setInitialStreamContext(stepInstance.getStreamContext());
+		}
 
 		try {
+
 			stepExecution.setStartTime(new Date(System.currentTimeMillis()));
 			updateStatus(stepExecution, BatchStatus.STARTED);
-
-			final boolean saveRestartData = step.isSaveRestartData();
-
-			if (saveRestartData && isRestart) {
-				restoreFromRestartData(tasklet, stepInstance.getRestartData());
-			}
 
 			status = stepOperations.iterate(new RepeatCallback() {
 
@@ -229,8 +245,8 @@ public class SimpleStepExecutor {
 
 										// TODO: check that stepExecution can
 										// aggregate these contributions if they
-										// come in asnchronously.
-										Properties statistics = stepScopeContext.getStatistics();
+										// come in asynchronously.
+										Properties statistics = stepContext.getStatistics();
 										contribution.setStatistics(statistics);
 										contribution.incrementCommitCount();
 										// Apply the contribution to the step
@@ -238,7 +254,7 @@ public class SimpleStepExecutor {
 										stepExecution.apply(contribution);
 
 										if (saveRestartData) {
-											stepInstance.setRestartData(getRestartData(tasklet));
+											stepInstance.setStreamContext(stepContext.getStreamContext());
 											jobRepository.update(stepInstance);
 										}
 										jobRepository.saveOrUpdate(stepExecution);
@@ -386,26 +402,6 @@ public class SimpleStepExecutor {
 		}
 
 		return exitStatus;
-	}
-
-	/**
-	 * @param tasklet
-	 * @return restart data from the {@link Tasklet} if it is
-	 * {@link ItemStream}
-	 */
-	private StreamContext getRestartData(Tasklet tasklet) {
-		if (tasklet instanceof ItemStream) {
-			return ((ItemStream) tasklet).getRestartData();
-		}
-		else {
-			return null;
-		}
-	}
-
-	private void restoreFromRestartData(Tasklet tasklet, StreamContext streamContext) {
-		if (tasklet instanceof ItemStream && streamContext != null) {
-			((ItemStream) tasklet).restoreFrom(streamContext);
-		}
 	}
 
 	/**

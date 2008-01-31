@@ -94,7 +94,7 @@ public class SingleColumnJdbcKeyGenerator implements KeyGenerator {
 	 * @see KeyGenerator#getKeyAsRestartData()
 	 * @throws IllegalArgumentException if key is null.
 	 */
-	public StreamContext getKeyAsRestartData(Object key) {
+	public StreamContext getKeyAsStreamContext(Object key) {
 		
 		Assert.notNull(key, "The key must not be null.");
 		

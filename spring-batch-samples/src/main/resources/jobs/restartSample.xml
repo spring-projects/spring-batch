@@ -18,7 +18,7 @@
 					<bean class="org.springframework.batch.sample.tasklet.ExceptionRestartableTasklet">
 						<property name="itemReader">
 							<bean
-								class="org.springframework.batch.item.reader.ValidatingItemReader">
+								class="org.springframework.batch.item.reader.ValidatingItemReader" scope="step">
 								<property name="itemReader" ref="fileItemReader" />
 								<property name="validator" ref="fixedValidator" />
 							</bean>
@@ -31,7 +31,7 @@
 					</bean>
 				</property>
 				<property name="commitInterval" value="2" />
-				<property name="saveRestartData" value="true"/>
+				<property name="saveStreamContext" value="true"/>
 			</bean>
 		</property>
 	</bean>

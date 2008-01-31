@@ -44,7 +44,7 @@ public class IbatisKeyGenerator implements KeyGenerator {
 	 *
 	 * @see org.springframework.batch.restart.Restartable#getRestartData()
 	 */
-	public StreamContext getKeyAsRestartData(Object key) {
+	public StreamContext getKeyAsStreamContext(Object key) {
 		Properties props = new Properties();
 		props.setProperty(RESTART_KEY, key.toString());
 

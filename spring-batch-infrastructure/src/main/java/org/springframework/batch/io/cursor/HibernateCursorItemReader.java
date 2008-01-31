@@ -186,7 +186,7 @@ public class HibernateCursorItemReader extends AbstractItemReader implements Ite
 	/**
 	 * @return the current row number wrapped as <code>RestartData</code>
 	 */
-	public StreamContext getRestartData() {
+	public StreamContext getStreamContext() {
 		Properties props = new Properties();
 		props.setProperty(RESTART_DATA_ROW_NUMBER_KEY, ""+currentProcessedRow);
 		String skipped = skippedRows.toString();

@@ -161,7 +161,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 
 				StepInstance step = new StepInstance(new Long(rs.getLong(1)));
 				step.setStatus(BatchStatus.getStatus(rs.getString(2)));
-				step.setRestartData(new GenericStreamContext(PropertiesConverter.stringToProperties(rs.getString(3))));
+				step.setStreamContext(new GenericStreamContext(PropertiesConverter.stringToProperties(rs.getString(3))));
 				return step;
 			}
 
@@ -243,7 +243,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 				StepInstance step = new StepInstance(job, rs.getString(2), new Long(rs.getLong(1)));
 				String status = rs.getString(3);
 				step.setStatus(BatchStatus.getStatus(status));
-				step.setRestartData(new GenericStreamContext(PropertiesConverter.stringToProperties(rs.getString(3))));
+				step.setStreamContext(new GenericStreamContext(PropertiesConverter.stringToProperties(rs.getString(3))));
 				return step;
 			}
 		};
@@ -422,7 +422,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 		Assert.notNull(step.getId(), "Step Id cannot be null.");
 
 		Properties restartProps = null;
-		StreamContext streamContext = step.getRestartData();
+		StreamContext streamContext = step.getStreamContext();
 		if (streamContext != null) {
 			restartProps = streamContext.getProperties();
 		}

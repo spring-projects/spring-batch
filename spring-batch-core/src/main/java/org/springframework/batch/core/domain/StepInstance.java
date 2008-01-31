@@ -87,11 +87,11 @@ public class StepInstance extends Entity {
 		this.stepExecutionCount = stepExecutionCount;
 	}
 
-	public StreamContext getRestartData() {
+	public StreamContext getStreamContext() {
 		return streamContext;
 	}
 
-	public void setRestartData(StreamContext streamContext) {
+	public void setStreamContext(StreamContext streamContext) {
 		this.streamContext = streamContext;
 	}
 

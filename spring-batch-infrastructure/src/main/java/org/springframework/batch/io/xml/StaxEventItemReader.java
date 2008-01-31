@@ -191,9 +191,9 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 
 	/**
 	 * @return wrapped count of records read so far.
-	 * @see ItemStream#getRestartData()
+	 * @see ItemStream#getStreamContext()
 	 */
-	public StreamContext getRestartData() {
+	public StreamContext getStreamContext() {
 		Properties restartData = new Properties();
 
 		restartData.setProperty(RESTART_DATA_NAME, String.valueOf(currentRecordCount));

@@ -43,7 +43,7 @@ public class MultipleColumnJdbcKeyGenerator implements
 
 	private JdbcTemplate jdbcTemplate;
 
-	private RestartDataRowMapper keyMapper = new ColumnMapRestartDataRowMapper();
+	private RestartDataRowMapper keyMapper = new ColumnMapStreamContextRowMapper();
 
 	private String sql;
 
@@ -96,7 +96,7 @@ public class MultipleColumnJdbcKeyGenerator implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.restart.Restartable#getRestartData()
 	 */
-	public StreamContext getKeyAsRestartData(Object key) {
+	public StreamContext getKeyAsStreamContext(Object key) {
 		Assert.state(keyMapper != null, "RestartDataConverter must not be null.");
 		return keyMapper.createRestartData(key);
 	}

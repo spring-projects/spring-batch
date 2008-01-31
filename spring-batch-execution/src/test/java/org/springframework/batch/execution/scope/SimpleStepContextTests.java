@@ -24,6 +24,10 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.stream.GenericStreamContext;
+import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.statistics.StatisticsProvider;
 import org.springframework.batch.statistics.StatisticsService;
 import org.springframework.batch.support.PropertiesConverter;
@@ -131,21 +135,21 @@ public class SimpleStepContextTests extends TestCase {
 		assertTrue(list.contains("bar"));
 		assertTrue(list.contains("spam"));
 	}
-	
+
 	public void testStatisticsWithNullService() throws Exception {
 		assertEquals(0, context.getStatistics().size());
 	}
 
 	public void testStatisticsWithNotNullService() throws Exception {
 		Map map = new HashMap();
-		context = new SimpleStepContext(null, null, new StubStatisticsService(map));
+		context = new SimpleStepContext(null, null, new StubStatisticsService(map), new StubStreamManager(map));
 		assertEquals(1, context.getStatistics().size());
 		assertEquals("bar", context.getStatistics().getProperty("foo"));
 	}
 
 	public void testStatisticsServiceRegistration() throws Exception {
 		Map map = new HashMap();
-		context = new SimpleStepContext(null, null, new StubStatisticsService(map));
+		context = new SimpleStepContext(null, null, new StubStatisticsService(map), new StubStreamManager(map));
 		StubStatisticsProvider provider = new StubStatisticsProvider();
 		context.setAttribute("foo", provider);
 		assertEquals(1, map.size());
@@ -155,7 +159,7 @@ public class SimpleStepContextTests extends TestCase {
 
 	/**
 	 * @author Dave Syer
-	 *
+	 * 
 	 */
 	private class StubStatisticsService implements StatisticsService {
 		private final Map map;
@@ -170,6 +174,35 @@ public class SimpleStepContextTests extends TestCase {
 
 		public void register(Object key, StatisticsProvider provider) {
 			map.put(key, provider);
+		}
+	}
+
+	/**
+	 * @author Dave Syer
+	 * 
+	 */
+	private class StubStreamManager implements StreamManager {
+		private final Map map;
+
+		private StubStreamManager(Map map) {
+			this.map = map;
+		}
+
+		public void close(Object key) {
+		}
+
+		public StreamContext getStreamContext(Object key) {
+			return new GenericStreamContext(PropertiesConverter.stringToProperties("foo=bar"));
+		}
+
+		public void open(Object key) {
+		}
+
+		public void register(Object key, ItemStream stream) {
+			map.put(key, stream);
+		}
+
+		public void restoreFrom(Object key, StreamContext data) {
 		}
 	}
 

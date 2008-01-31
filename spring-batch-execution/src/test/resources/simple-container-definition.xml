@@ -27,7 +27,7 @@
 		class="org.springframework.batch.execution.step.simple.SimpleStep"
 		abstract="true">
 		<property name="allowStartIfComplete" value="true" />
-		<property name="saveRestartData" value="false" />
+		<property name="saveStreamContext" value="false" />
 		<property name="exceptionHandler">
 			<bean
 				class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler">

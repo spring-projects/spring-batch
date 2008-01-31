@@ -19,7 +19,6 @@
 				<bean id="playerload" parent="simpleStep">
 					<property name="commitInterval" value="1"></property>
 					<property name="startLimit" value="100" />
-					<property name="saveRestartData" value="true" />
 					<property name="allowStartIfComplete" value="false" />
 					<property name="tasklet">
 						<bean
@@ -44,7 +43,6 @@
 				<bean id="gameLoad" parent="simpleStep">
 					<property name="commitInterval" value="1" />
 					<property name="startLimit" value="100" />
-					<property name="saveRestartData" value="true" />
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
@@ -63,7 +61,6 @@
 				<bean id="playerSummarization" parent="simpleStep">
 					<property name="commitInterval" value="1" />
 					<property name="startLimit" value="100" />
-					<property name="saveRestartData" value="true" />
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">

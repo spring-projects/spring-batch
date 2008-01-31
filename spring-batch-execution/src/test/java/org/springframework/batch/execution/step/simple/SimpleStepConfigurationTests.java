@@ -99,12 +99,12 @@ public class SimpleStepConfigurationTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.step.simple.AbstractStep#isSaveRestartData()}.
+	 * {@link org.springframework.batch.execution.step.simple.AbstractStep#isSaveStreamContext()}.
 	 */
 	public void testIsSaveRestartData() {
-		assertEquals(false, configuration.isSaveRestartData());
-		configuration.setSaveRestartData(true);
-		assertEquals(true, configuration.isSaveRestartData());
+		assertEquals(false, configuration.isSaveStreamContext());
+		configuration.setSaveStreamContext(true);
+		assertEquals(true, configuration.isSaveStreamContext());
 	}
 
 }

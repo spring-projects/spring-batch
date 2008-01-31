@@ -191,8 +191,8 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 		}
 	}
 
-	public StreamContext getRestartData() {
-		return keyGenerator.getKeyAsRestartData(getCurrentKey());
+	public StreamContext getStreamContext() {
+		return keyGenerator.getKeyAsStreamContext(getCurrentKey());
 	}
 
 	public void afterPropertiesSet() throws Exception {

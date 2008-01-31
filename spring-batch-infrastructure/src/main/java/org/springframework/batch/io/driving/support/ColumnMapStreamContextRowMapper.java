@@ -23,8 +23,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * </p>Extension of the ColumnMapRowMapper that converts a column map to RestartData and allows
- * RestartData to be converted back as a PreparedStatementSetter.  This is useful in a restart 
+ * </p>Extension of the ColumnMapRowMapper that converts a column map to {@link StreamContext} and allows
+ * {@link StreamContext} to be converted back as a PreparedStatementSetter.  This is useful in a restart 
  * scenario, as it allows for the standard functionality of the ColumnMapRowMapper to be used to 
  * create a map representing the columns returned by a query.  It should be noted that this column ordering
  * is preserved in the map using a link list version of Map. 
@@ -34,9 +34,9 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @see RestartDataRowMapper
  */
-public class ColumnMapRestartDataRowMapper extends ColumnMapRowMapper implements RestartDataRowMapper{
+public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implements RestartDataRowMapper{
 	
-	static final String KEY = ClassUtils.getQualifiedName(ColumnMapRestartDataRowMapper.class) + ".KEY.";
+	static final String KEY = ClassUtils.getQualifiedName(ColumnMapStreamContextRowMapper.class) + ".KEY.";
 	
 	public PreparedStatementSetter createSetter(StreamContext streamContext) {
 		

@@ -153,11 +153,11 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		Properties data = new Properties();
 		data.setProperty("restart.key1", "restartData");
 		StreamContext streamContext = new GenericStreamContext(data);
-		step1.setRestartData(streamContext);
+		step1.setStreamContext(streamContext);
 		stepDao.update(step1);
 		StepInstance tempStep = stepDao.findStep(jobInstance, step1.getName());
 		assertEquals(tempStep, step1);
-		assertEquals(tempStep.getRestartData().getProperties().toString(), 
+		assertEquals(tempStep.getStreamContext().getProperties().toString(), 
 				streamContext.getProperties().toString());
 	}
 	

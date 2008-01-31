@@ -379,9 +379,9 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream,
 	/**
 	 * Get the restart data.
 	 * @return the restart data
-	 * @see org.springframework.batch.item.ItemStream#getRestartData()
+	 * @see org.springframework.batch.item.ItemStream#getStreamContext()
 	 */
-	public StreamContext getRestartData() {
+	public StreamContext getStreamContext() {
 
 		Properties properties = new Properties();
 

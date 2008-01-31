@@ -92,7 +92,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		StreamContext streamContext = getAsRestartable(source).getRestartData();
+		StreamContext streamContext = getAsRestartable(source).getStreamContext();
 
 		// create new input source
 		source = createItemReader();
@@ -114,7 +114,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		StreamContext streamContext = getAsRestartable(source).getRestartData();
+		StreamContext streamContext = getAsRestartable(source).getStreamContext();
 
 		// create new input source
 		source = createItemReader();
@@ -217,7 +217,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 		
 		rollback();
 		
-		StreamContext streamContext = getAsRestartable(source).getRestartData();
+		StreamContext streamContext = getAsRestartable(source).getStreamContext();
 
 		// create new input source
 		source = createItemReader();

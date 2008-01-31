@@ -117,7 +117,7 @@ public class StaxEventReaderItemReaderTests extends TestCase {
 	 */
 	public void testRestart() {
 		source.read();
-		StreamContext streamContext = source.getRestartData();
+		StreamContext streamContext = source.getStreamContext();
 		assertEquals("1", streamContext.getProperties().
 				getProperty("StaxEventReaderItemReader.recordcount"));
 		List expectedAfterRestart = (List) source.read();

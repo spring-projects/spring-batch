@@ -58,5 +58,5 @@ public interface ItemReader {
 	 * TODO: this is only used in sandbox?
 	 * 
 	 */
-	void close() throws Exception;
+	void close() throws StreamException;
 }
