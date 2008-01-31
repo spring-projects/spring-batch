@@ -9,7 +9,6 @@ import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.sample.item.writer.StagingItemWriter;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -87,12 +86,10 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 
 	public void testProviderRollsBackMultipleTimes() throws Exception {
 
+		provider.mark(null);
 		setComplete();
 		endTransaction();
 		startNewTransaction();
-		// After a rollback we have to resynchronize the TX to simulate a real
-		// batch
-		BatchTransactionSynchronizationManager.resynchronize();
 
 		int count = getJdbcTemplate().queryForInt("SELECT COUNT(*) from BATCH_STAGING where JOB_ID=? AND PROCESSED=?",
 				new Object[] { jobId, StagingItemWriter.NEW });
@@ -103,9 +100,9 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 		item = provider.read();
 		assertEquals("BAR", item);
 
+		provider.reset(null);
 		endTransaction();
 		startNewTransaction();
-		BatchTransactionSynchronizationManager.resynchronize();
 
 		item = provider.read();
 		assertEquals("FOO", item);
@@ -114,9 +111,9 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 		item = provider.read();
 		assertEquals("SPAM", item);
 
+		provider.reset(null);
 		endTransaction();
 		startNewTransaction();
-		BatchTransactionSynchronizationManager.resynchronize();
 
 		item = provider.read();
 		assertEquals("FOO", item);
@@ -125,12 +122,12 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 
 	public void testProviderRollsBackProcessIndicator() throws Exception {
 
+		provider.mark(null);
 		setComplete();
 		endTransaction();
 		startNewTransaction();
 		// After a rollback we have to resynchronize the TX to simulate a real
 		// batch
-		BatchTransactionSynchronizationManager.resynchronize();
 
 		long id = getJdbcTemplate().queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?",
 				new Object[] { jobId });
@@ -141,11 +138,11 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 		Object item = provider.read();
 		assertEquals("FOO", item);
 
+		provider.reset(null);
 		endTransaction();
 		startNewTransaction();
 		// After a rollback we have to resynchronize the TX to simulate a real
 		// batch
-		BatchTransactionSynchronizationManager.resynchronize();
 
 		String after = (String) getJdbcTemplate().queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				new Object[] { new Long(id) }, String.class);

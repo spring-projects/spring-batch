@@ -72,10 +72,10 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 				scopedObject = context.getAttribute(name);
 				if (scopedObject == null) {
 					scopedObject = objectFactory.getObject();
-					context.setAttribute(name, scopedObject);
 					if (scopedObject instanceof StepContextAware) {
 						((StepContextAware) scopedObject).setStepContext(context);
 					}
+					context.setAttribute(name, scopedObject);
 				}
 			}
 		}

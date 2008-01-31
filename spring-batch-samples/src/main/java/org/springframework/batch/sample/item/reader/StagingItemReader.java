@@ -11,8 +11,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
-import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
+import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.sample.item.writer.StagingItemWriter;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -20,12 +21,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
-public class StagingItemReader extends JdbcDaoSupport implements KeyedItemReader, DisposableBean,
+public class StagingItemReader extends JdbcDaoSupport implements ItemStream, KeyedItemReader, DisposableBean,
 		StepContextAware {
 
 	// Key for buffer in transaction synchronization manager
@@ -42,8 +41,6 @@ public class StagingItemReader extends JdbcDaoSupport implements KeyedItemReader
 	private volatile boolean initialized = false;
 
 	private volatile Iterator keys;
-
-	private final TransactionSynchronization synchronization = new StagingInputTransactionSynchronization();
 
 	/**
 	 * 
@@ -151,8 +148,8 @@ public class StagingItemReader extends JdbcDaoSupport implements KeyedItemReader
 					getBuffer().add(next);
 					key = next;
 					logger.debug("Retrieved key from list: " + key);
-					Assert.state(TransactionSynchronizationManager.getSynchronizations().contains(synchronization),
-							"Appropriate transaction synchronization not registered for this thread.");
+					Assert.state(TransactionSynchronizationManager.isActualTransactionActive(),
+							"Transaction not active for this thread.");
 				}
 			}
 		}
@@ -166,55 +163,12 @@ public class StagingItemReader extends JdbcDaoSupport implements KeyedItemReader
 	private StagingBuffer getBuffer() {
 		if (!TransactionSynchronizationManager.hasResource(BUFFER_KEY)) {
 			TransactionSynchronizationManager.bindResource(BUFFER_KEY, new StagingBuffer());
-			registerSynchronization();
 		}
 		return (StagingBuffer) TransactionSynchronizationManager.getResource(BUFFER_KEY);
 	}
 
 	public boolean recover(Object data, Throwable cause) {
 		return false;
-	}
-
-	/**
-	 * Register for Synchronization. This method is left protected because
-	 * clients of this class should not be registering for synchronization, but
-	 * rather only subclasses, at the appropriate time, i.e. when they are not
-	 * initialized.
-	 */
-	protected void registerSynchronization() {
-		BatchTransactionSynchronizationManager.registerSynchronization(synchronization);
-	}
-
-	/*
-	 * Called when a transaction has been committed.
-	 * 
-	 * @see TransactionSynchronization#afterCompletion
-	 */
-	protected void transactionCommitted() {
-		getBuffer().commit();
-	}
-
-	/*
-	 * Called when a transaction has been rolled back.
-	 * 
-	 * @see TransactionSynchronization#afterCompletion
-	 */
-	protected void transactionRolledBack() {
-		getBuffer().rollback();
-	}
-
-	/**
-	 * Encapsulates transaction events handling.
-	 */
-	private class StagingInputTransactionSynchronization extends TransactionSynchronizationAdapter {
-		public void afterCompletion(int status) {
-			if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-				transactionRolledBack();
-			}
-			else if (status == TransactionSynchronization.STATUS_COMMITTED) {
-				transactionCommitted();
-			}
-		}
 	}
 
 	private class StagingBuffer {
@@ -248,6 +202,46 @@ public class StagingItemReader extends JdbcDaoSupport implements KeyedItemReader
 		public String toString() {
 			return "list=" + list + "; iter.hasNext()=" + iter.hasNext();
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
+	 */
+	public boolean isMarkSupported() {
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	 */
+	public void mark(StreamContext streamContext) {
+		getBuffer().commit();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	 */
+	public void reset(StreamContext streamContext) {
+		getBuffer().rollback();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.StreamContext)
+	 */
+	public void restoreFrom(StreamContext context) {
+		// no-op
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.item.StreamContextProvider#getStreamContext()
+	 */
+	public StreamContext getStreamContext() {
+		return new StreamContext();
 	}
 
 }

@@ -8,7 +8,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.stream.GenericStreamContext;
-import org.springframework.batch.repeat.synch.BatchTransactionSynchronizationManager;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -39,7 +38,6 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 	 */
 	protected void onSetUpInTransaction() throws Exception {
 		super.onSetUpInTransaction();
-		BatchTransactionSynchronizationManager.clearSynchronizations();
 		source = createItemReader();
 	}
 	
@@ -48,7 +46,6 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 	 */
 	protected void onTearDownAfterTransaction() throws Exception {
 		getAsDisposableBean(source).destroy();
-		BatchTransactionSynchronizationManager.clearSynchronizations();
 		super.onTearDownAfterTransaction();
 	}
 
