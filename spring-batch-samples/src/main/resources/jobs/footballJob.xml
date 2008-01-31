@@ -22,7 +22,7 @@
 					<property name="allowStartIfComplete" value="false" />
 					<property name="tasklet">
 						<bean
-							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
+							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
 							<property name="itemReader"
 								ref="playerFileItemReader" />
 							<property name="itemWriter">
@@ -45,7 +45,7 @@
 					<property name="startLimit" value="100" />
 					<property name="tasklet">
 						<bean
-							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
+							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
 							<property name="itemReader"
 								ref="gameFileItemReader" />
 							<property name="itemWriter">
@@ -63,7 +63,7 @@
 					<property name="startLimit" value="100" />
 					<property name="tasklet">
 						<bean
-							class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
+							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
 							<property name="itemReader"
 								ref="playerSummarizationSource" />
 							<property name="itemWriter">

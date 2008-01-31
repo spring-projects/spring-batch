@@ -18,7 +18,7 @@ package org.springframework.batch.sample.tasklet;
 
 
 import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet;
+import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -29,7 +29,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Robert Kasanicky
  *
  */
-public class ExceptionRestartableTasklet extends RestartableItemOrientedTasklet {
+public class ExceptionRestartableTasklet extends ItemOrientedTasklet {
 
 	private int counter = 0;
 	private int throwExceptionOnRecordNumber = 4;
@@ -57,7 +57,5 @@ public class ExceptionRestartableTasklet extends RestartableItemOrientedTasklet 
 	public int getThrowExceptionOnRecordNumber() {
 		return throwExceptionOnRecordNumber;
 	}
-	
-	
 
 }

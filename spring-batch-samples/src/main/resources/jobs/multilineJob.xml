@@ -15,7 +15,7 @@
 			<bean id="step1" parent="simpleStep">
 				<property name="tasklet">
 					<bean
-						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
+						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
 						<property name="itemReader">
 							<bean
 								class="org.springframework.batch.item.reader.AggregateItemReader">

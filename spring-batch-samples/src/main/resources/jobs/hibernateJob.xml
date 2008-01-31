@@ -21,7 +21,7 @@
 			<bean id="step1" parent="repeatOperationsStep">
 				<property name="tasklet">
 					<bean
-						class="org.springframework.batch.execution.tasklet.RestartableItemOrientedTasklet">
+						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
 						<property name="itemReader"
 							ref="hibernateItemReader" />
 						<property name="itemWriter"
