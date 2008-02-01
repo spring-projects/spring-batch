@@ -75,17 +75,17 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 	 * Prefix added to statistics keys from writer if needed to avoid
 	 * ambiguity between reader and writer.
 	 */
-	public static final String PROCESSOR_STATISTICS_PREFIX = "writer.";
+	public static final String WRITER_STATISTICS_PREFIX = "writer.";
 
 	/**
 	 * Prefix added to statistics keys from reader if needed to avoid
 	 * ambiguity between provider and writer.
 	 */
-	public static final String PROVIDER_STATISTICS_PREFIX = "provider.";
+	public static final String READER_STATISTICS_PREFIX = "reader.";
 
 	private RetryPolicy retryPolicy = null;
 
-	protected ItemReader itemProvider;
+	protected ItemReader itemReader;
 
 	protected ItemWriter itemWriter;
 
@@ -101,19 +101,19 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(itemProvider, "ItemReader must be provided");
+		Assert.notNull(itemReader, "ItemReader must be provided");
 		Assert.notNull(itemWriter, "ItemWriter must be provided");
 
-		if (itemRecoverer == null && (itemProvider instanceof ItemRecoverer)) {
-			itemRecoverer = (ItemRecoverer) itemProvider;
+		if (itemRecoverer == null && (itemReader instanceof ItemRecoverer)) {
+			itemRecoverer = (ItemRecoverer) itemReader;
 		}
 
 		ItemReaderRetryPolicy itemProviderRetryPolicy = new ItemReaderRetryPolicy(retryPolicy);
 		template.setRetryPolicy(itemProviderRetryPolicy);
 
 		if (retryPolicy != null) {
-			Assert.state(itemProvider instanceof KeyedItemReader, "ItemReader must be instance of KeyedItemReader to use the retry policy");
-			retryCallback = new ItemReaderRetryCallback((KeyedItemReader) itemProvider, itemWriter);
+			Assert.state(itemReader instanceof KeyedItemReader, "ItemReader must be instance of KeyedItemReader to use the retry policy");
+			retryCallback = new ItemReaderRetryCallback((KeyedItemReader) itemReader, itemWriter);
 			retryCallback.setRecoverer(itemRecoverer);
 		}
 
@@ -136,7 +136,7 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 	public ExitStatus execute() throws Exception {
 
 		if (retryCallback == null) {
-			Object item = itemProvider.read();
+			Object item = itemReader.read();
 			if (item == null) {
 				return ExitStatus.FINISHED;
 			}
@@ -159,17 +159,17 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 	}
 
 	/**
-	 * @param itemProvider
+	 * @param itemReader
 	 */
-	public void setItemReader(ItemReader itemProvider) {
-		this.itemProvider = itemProvider;
+	public void setItemReader(ItemReader itemReader) {
+		this.itemReader = itemReader;
 	}
 
 	/**
-	 * @param writer
+	 * @param itemWriter
 	 */
-	public void setItemWriter(ItemWriter writer) {
-		this.itemWriter = writer;
+	public void setItemWriter(ItemWriter itemWriter) {
+		this.itemWriter = itemWriter;
 	}
 
 	/**
@@ -196,8 +196,8 @@ public class ItemOrientedTasklet implements Tasklet, Skippable, InitializingBean
 			// necessary.
 			return;
 		}
-		if (this.itemProvider instanceof Skippable) {
-			((Skippable) this.itemProvider).skip();
+		if (this.itemReader instanceof Skippable) {
+			((Skippable) this.itemReader).skip();
 		}
 		if (this.itemWriter instanceof Skippable) {
 			((Skippable) this.itemWriter).skip();
