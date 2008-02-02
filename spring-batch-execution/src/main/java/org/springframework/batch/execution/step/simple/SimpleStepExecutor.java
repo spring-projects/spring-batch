@@ -35,7 +35,6 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.ExitStatus;
@@ -225,10 +224,14 @@ public class SimpleStepExecutor {
 						// aggregate these contributions if they
 						// come in asynchronously.
 						StreamContext statistics = stepContext.getStreamContext();
-						contribution.setStreamContext(new GenericStreamContext(statistics.getProperties()));
+						contribution.setStreamContext(statistics);
 						contribution.incrementCommitCount();
 
+						// If the step operations are asynchronous then we need
+						// to synchronize changes to the step execution (at a
+						// minimum).
 						synchronized (stepExecution) {
+
 							// Apply the contribution to the step
 							// only if chunk was successful
 							stepExecution.apply(contribution);
@@ -238,6 +241,7 @@ public class SimpleStepExecutor {
 								jobRepository.update(stepInstance);
 							}
 							jobRepository.saveOrUpdate(stepExecution);
+
 						}
 
 						streamManager.commit(transaction);
