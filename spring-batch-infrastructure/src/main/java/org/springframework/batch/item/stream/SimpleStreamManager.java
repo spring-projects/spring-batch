@@ -99,7 +99,7 @@ public class SimpleStreamManager implements StreamManager {
 			Properties properties = provider.getStreamContext().getProperties();
 			if (properties != null) {
 				String prefix = ""; // ClassUtils.getShortClassName(provider.getClass())
-									// + ".";
+				// + ".";
 				for (Iterator propiter = properties.keySet().iterator(); propiter.hasNext();) {
 					String key = (String) propiter.next();
 					String value = properties.getProperty(key);
@@ -155,14 +155,18 @@ public class SimpleStreamManager implements StreamManager {
 				if (status == TransactionSynchronization.STATUS_COMMITTED) {
 					iterate(key, new Callback() {
 						public void execute(ItemStream stream) {
-							stream.mark(stream.getStreamContext());
+							if (stream.isMarkSupported()) {
+								stream.mark(stream.getStreamContext());
+							}
 						}
 					});
 				}
 				else if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
 					iterate(key, new Callback() {
 						public void execute(ItemStream stream) {
-							stream.reset(stream.getStreamContext());
+							if (stream.isMarkSupported()) {
+								stream.reset(stream.getStreamContext());
+							}
 						}
 					});
 				}
@@ -207,6 +211,5 @@ public class SimpleStreamManager implements StreamManager {
 	private interface Callback {
 		void execute(ItemStream stream);
 	}
-
 
 }
