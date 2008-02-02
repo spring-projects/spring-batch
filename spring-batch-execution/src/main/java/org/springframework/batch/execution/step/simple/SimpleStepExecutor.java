@@ -177,7 +177,7 @@ public class SimpleStepExecutor {
 
 		ExitStatus status = ExitStatus.FAILED;
 
-		if (streamManager==null) {
+		if (streamManager == null) {
 			streamManager = new SimpleStreamManager(transactionManager);
 		}
 
@@ -193,7 +193,7 @@ public class SimpleStepExecutor {
 		if (saveStreamContext && isRestart) {
 			stepContext.setInitialStreamContext(stepInstance.getStreamContext());
 		}
-		
+
 		try {
 
 			stepExecution.setStartTime(new Date(System.currentTimeMillis()));
@@ -227,15 +227,20 @@ public class SimpleStepExecutor {
 						StreamContext statistics = stepContext.getStreamContext();
 						contribution.setStreamContext(new GenericStreamContext(statistics.getProperties()));
 						contribution.incrementCommitCount();
-						// Apply the contribution to the step
-						// only if chunk was successful
-						stepExecution.apply(contribution);
 
-						if (saveStreamContext) {
-							stepInstance.setStreamContext(stepContext.getStreamContext());
-							jobRepository.update(stepInstance);
+						synchronized (stepExecution) {
+							// Apply the contribution to the step
+							// only if chunk was successful
+							stepExecution.apply(contribution);
+
+							if (saveStreamContext) {
+								stepInstance.setStreamContext(stepContext.getStreamContext());
+								jobRepository.update(stepInstance);
+							}
+							jobRepository.saveOrUpdate(stepExecution);
 						}
-						jobRepository.saveOrUpdate(stepExecution);
+
+						streamManager.commit(transaction);
 
 					}
 					catch (Throwable t) {
@@ -246,7 +251,9 @@ public class SimpleStepExecutor {
 						 * commit (e.g. Hibernate flush) so this catch block
 						 * comes outside the transaction.
 						 */
-						stepExecution.rollback();
+						synchronized (stepExecution) {
+							stepExecution.rollback();
+						}
 						streamManager.rollback(transaction);
 						if (t instanceof RuntimeException) {
 							throw (RuntimeException) t;
@@ -260,8 +267,6 @@ public class SimpleStepExecutor {
 					// the interrupted exception is correctly propagated up to
 					// caller
 					interruptionPolicy.checkInterrupted(context);
-
-					streamManager.commit(transaction);
 
 					return result;
 
