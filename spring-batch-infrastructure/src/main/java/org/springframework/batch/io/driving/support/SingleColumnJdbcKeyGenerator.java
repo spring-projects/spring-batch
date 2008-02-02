@@ -17,12 +17,10 @@ package org.springframework.batch.io.driving.support;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.lang.ClassUtils;
 import org.springframework.batch.io.driving.KeyGenerator;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
@@ -101,12 +99,10 @@ public class SingleColumnJdbcKeyGenerator implements KeyGenerator {
 	 * @throws IllegalArgumentException if key is null.
 	 */
 	public StreamContext getKeyAsStreamContext(Object key) {
-
 		Assert.notNull(key, "The key must not be null.");
-
-		Properties props = new Properties();
-		props.setProperty(RESTART_KEY, key.toString());
-		return new GenericStreamContext(props);
+		StreamContext context = new StreamContext();
+		context.putString(RESTART_KEY, key.toString());
+		return context;
 	}
 
 	/**

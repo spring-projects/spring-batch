@@ -12,7 +12,6 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.core.CollectionFactory;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 
@@ -78,7 +77,7 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 		Properties props = new Properties();
 		props.setProperty(KEY + "0", "1");
 		props.setProperty(KEY + "1", "2");
-		StreamContext streamContext = new GenericStreamContext(props);
+		StreamContext streamContext = new StreamContext(props);
 		PreparedStatementSetter setter = mapper.createSetter(streamContext);
 		ps = (PreparedStatement)psControl.getMock();
 		

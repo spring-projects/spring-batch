@@ -33,7 +33,6 @@ import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
@@ -393,7 +392,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	 */
 	public StreamContext getStreamContext() {
 		String skipped = skippedRows.toString();
-		StreamContext context = new GenericStreamContext();
+		StreamContext context = new StreamContext();
 		context.putString(SKIPPED_ROWS, skipped.substring(1, skipped.length() - 1));
 		context.putLong(CURRENT_PROCESSED_ROW, currentProcessedRow);
 		context.putLong(SKIP_COUNT, skipCount);

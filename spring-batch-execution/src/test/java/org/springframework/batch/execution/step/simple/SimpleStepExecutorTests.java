@@ -43,7 +43,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
 import org.springframework.batch.item.reader.ListItemReader;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.writer.AbstractItemWriter;
@@ -306,7 +305,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 		stepExecution.getStep().setStreamContext(
-				new GenericStreamContext(PropertiesConverter.stringToProperties("foo=bar")));
+				new StreamContext(PropertiesConverter.stringToProperties("foo=bar")));
 
 		stepExecutor.execute(stepExecution);
 
@@ -415,7 +414,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		stepExecutor.setStreamManager(new SimpleStreamManager(new ResourcelessTransactionManager()) {
 			public StreamContext getStreamContext(Object key) {
 				// TODO Auto-generated method stub
-				return new GenericStreamContext(PropertiesConverter.stringToProperties("foo=bar"));
+				return new StreamContext(PropertiesConverter.stringToProperties("foo=bar"));
 			}
 		});
 
@@ -447,7 +446,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		public StreamContext getStreamContext() {
 			getStreamContextCalled = true;
-			return new GenericStreamContext(PropertiesConverter.stringToProperties("spam=bucket"));
+			return new StreamContext(PropertiesConverter.stringToProperties("spam=bucket"));
 		}
 
 		public void restoreFrom(StreamContext data) {

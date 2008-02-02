@@ -6,7 +6,6 @@ import java.util.Properties;
 import org.springframework.batch.io.driving.DrivingQueryItemReader;
 import org.springframework.batch.io.driving.KeyGenerator;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 import org.springframework.util.Assert;
 
@@ -48,7 +47,7 @@ public class IbatisKeyGenerator implements KeyGenerator {
 		Properties props = new Properties();
 		props.setProperty(RESTART_KEY, key.toString());
 
-		return new GenericStreamContext(props);
+		return new StreamContext(props);
 	}
 
 	/**

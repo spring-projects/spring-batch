@@ -25,11 +25,11 @@ import junit.framework.TestCase;
 
 import org.easymock.ArgumentsMatcher;
 import org.easymock.MockControl;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
@@ -37,7 +37,7 @@ import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.item.stream.GenericStreamContext;
+import org.springframework.batch.item.StreamContext;
 
 /*
  * Test SimpleJobRepository.  The majority of test cases are tested using EasyMock,
@@ -408,7 +408,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		databaseStep1.setStreamContext(null);
 		stepDaoControl.setReturnValue(databaseStep1);
 		stepDao.createStep(databaseJob, "TestStep2");
-		databaseStep2.setStreamContext(new GenericStreamContext(null));
+		databaseStep2.setStreamContext(new StreamContext());
 		stepDaoControl.setReturnValue(databaseStep2);
 		jobDao.save(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher(){
@@ -443,7 +443,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		stepDao.getStepExecutionCount(databaseStep1);
 		stepDaoControl.setReturnValue(1);
 		stepDao.findStep(databaseJob, "TestStep2");
-		databaseStep2.setStreamContext(new GenericStreamContext(null));
+		databaseStep2.setStreamContext(new StreamContext());
 		stepDaoControl.setReturnValue(databaseStep2);
 		stepDao.getStepExecutionCount(databaseStep2);
 		stepDaoControl.setReturnValue(1);

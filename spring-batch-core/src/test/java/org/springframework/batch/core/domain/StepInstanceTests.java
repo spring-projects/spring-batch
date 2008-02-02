@@ -15,11 +15,10 @@
  */
 package org.springframework.batch.core.domain;
 
-import java.util.Properties;
-
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.stream.GenericStreamContext;
+import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
@@ -51,9 +50,7 @@ public class StepInstanceTests extends TestCase {
 	public void testGetStreamContext() {
 		assertNotNull(instance.getStreamContext());
 		assertTrue(instance.getStreamContext().getProperties().isEmpty());
-		instance.setStreamContext(new GenericStreamContext(new Properties() {{
-			setProperty("foo", "bar");
-		}}));
+		instance.setStreamContext(new StreamContext(PropertiesConverter.stringToProperties("foo=bar")));
 		assertEquals("bar", instance.getStreamContext().getProperties().getProperty("foo"));
 	}
 

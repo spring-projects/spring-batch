@@ -18,7 +18,6 @@ package org.springframework.batch.execution.repository.dao;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Job;
@@ -30,8 +29,8 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
@@ -151,9 +150,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	public void testUpdateStepWithStreamContext() {
 
 		step1.setStatus(BatchStatus.COMPLETED);
-		Properties data = new Properties();
-		data.setProperty("restart.key1", "restartData");
-		StreamContext streamContext = new GenericStreamContext(data);
+		StreamContext streamContext = new StreamContext(PropertiesConverter.stringToProperties("key1=restartData"));
 		step1.setStreamContext(streamContext);
 		stepDao.update(step1);
 		StepInstance tempStep = stepDao.findStep(jobInstance, step1.getName());
@@ -166,10 +163,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		StepExecution execution = new StepExecution(step2, jobExecution, null);
 		execution.setStatus(BatchStatus.STARTED);
 		execution.setStartTime(new Date(System.currentTimeMillis()));
-		Properties statistics = new Properties();
-		statistics.setProperty("statistic.key1", "0");
-		statistics.setProperty("statistic.key2", "5");
-		execution.setStreamContext(new GenericStreamContext(statistics));
+		execution.setStreamContext(new StreamContext(PropertiesConverter.stringToProperties("key1=0,key2=5")));
 		execution.setExitStatus(new ExitStatus(false, ExitCodeExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));
 		stepDao.save(execution);
@@ -177,8 +171,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		assertEquals(1, executions.size());
 		StepExecution tempExecution = (StepExecution) executions.get(0);
 		assertEquals(execution, tempExecution);
-		assertEquals(execution.getStreamContext().getString("statistic.key1"), tempExecution.getStreamContext()
-				.getString("statistic.key1"));
+		assertEquals(execution.getStreamContext().getString("key1"), tempExecution.getStreamContext().getString("key1"));
 		assertEquals(execution.getExitStatus(), tempExecution.getExitStatus());
 	}
 
@@ -234,7 +227,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 
 	public void testUpdateStepExecutionOptimisticLocking() throws Exception {
 		stepExecution.incrementVersion(); // not really allowed outside dao
-											// code
+		// code
 		try {
 			stepDao.update(stepExecution);
 			fail("Expected OptimisticLockingFailureException");

@@ -27,7 +27,6 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.reader.AbstractItemStreamItemReader;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -180,8 +179,7 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 		props.setProperty(RESTART_DATA_ROW_NUMBER_KEY, "" + currentProcessedRow);
 		String skipped = skippedRows.toString();
 		props.setProperty(SKIPPED_ROWS, skipped.substring(1, skipped.length() - 1));
-
-		return new GenericStreamContext(props);
+		return new StreamContext(props);
 	}
 
 	/**

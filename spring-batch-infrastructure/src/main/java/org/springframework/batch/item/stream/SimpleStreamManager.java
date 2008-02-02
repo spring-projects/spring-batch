@@ -107,7 +107,7 @@ public class SimpleStreamManager implements StreamManager {
 				}
 			}
 		}
-		return new GenericStreamContext(result);
+		return new StreamContext(result);
 	}
 
 	/**

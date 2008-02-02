@@ -41,6 +41,10 @@ public class StreamContext {
 		map = new HashMap();
 	}
 
+	public StreamContext(Map map) {
+		this.map = map;
+	}
+
 	public void putString(String key, String value) {
 
 		Assert.notNull(value);

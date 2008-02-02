@@ -10,7 +10,6 @@ import org.springframework.batch.io.sample.domain.Foo;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
@@ -118,7 +117,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testRestoreFromEmptyData() throws Exception {
-		StreamContext streamContext = new GenericStreamContext(new Properties());
+		StreamContext streamContext = new StreamContext();
 
 		getAsRestartable(source).restoreFrom(streamContext);
 
@@ -174,7 +173,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 			//restart data properties cannot be empty.
 			props.setProperty("", "");
 			
-			streamContext = new GenericStreamContext(props);
+			streamContext = new StreamContext(props);
 		}
 		
 		public MockKeyGenerator() {

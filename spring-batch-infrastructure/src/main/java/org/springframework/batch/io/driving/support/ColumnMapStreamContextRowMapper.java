@@ -13,7 +13,6 @@ import java.util.Properties;
 import java.util.Map.Entry;
 
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.core.CollectionFactory;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -60,7 +59,7 @@ public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implemen
 	}
 	
 	
-	private static class ColumnMapStreamContext extends GenericStreamContext {
+	private static class ColumnMapStreamContext extends StreamContext {
 		
 		private final Map keys;
 

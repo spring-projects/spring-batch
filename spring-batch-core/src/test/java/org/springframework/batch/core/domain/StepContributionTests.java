@@ -18,8 +18,6 @@ package org.springframework.batch.core.domain;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
-import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
@@ -47,7 +45,9 @@ public class StepContributionTests extends TestCase {
 	 */
 	public void testSetStreamContext() {
 		assertEquals(null, contribution.getStreamContext());
-		contribution.setStreamContext(new GenericStreamContext(PropertiesConverter.stringToProperties("foo=bar")));
+		StreamContext context = new StreamContext();
+		context.putString("foo", "bar");
+		contribution.setStreamContext(context);
 		assertEquals(1, contribution.getStreamContext().getProperties().size());
 	}
 

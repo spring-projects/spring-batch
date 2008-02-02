@@ -16,10 +16,7 @@
 
 package org.springframework.batch.core.domain;
 
-import java.util.Properties;
-
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 
 /**
  * <p>
@@ -52,7 +49,7 @@ public class StepInstance extends Entity {
 
 	private BatchStatus status;
 
-	private StreamContext streamContext = new GenericStreamContext(new Properties());
+	private StreamContext streamContext = new StreamContext();
 
 	private int stepExecutionCount = 0;
 

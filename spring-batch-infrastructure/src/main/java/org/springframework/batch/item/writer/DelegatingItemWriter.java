@@ -1,12 +1,9 @@
 package org.springframework.batch.item.writer;
 
-import java.util.Properties;
-
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -60,7 +57,7 @@ public class DelegatingItemWriter implements ItemWriter, Skippable, Initializing
 			return ((ItemStream) writer).getStreamContext();
 		}
 		else {
-			return new GenericStreamContext(new Properties());
+			return new StreamContext();
 		}
 	}
 

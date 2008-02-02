@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.item.stream;
 
-import java.util.Properties;
-
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
@@ -53,7 +51,7 @@ public class ItemStreamAdapter implements ItemStream {
 	 * @see org.springframework.batch.item.StreamContextProvider#getStreamContext()
 	 */
 	public StreamContext getStreamContext() {
-		return new GenericStreamContext(new Properties());
+		return new StreamContext();
 	}
 
 	/* (non-Javadoc)

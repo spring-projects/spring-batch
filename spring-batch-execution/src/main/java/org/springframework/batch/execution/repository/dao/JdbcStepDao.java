@@ -31,7 +31,6 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.repository.dao.JdbcJobDao.JobExecutionRowMapper;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
@@ -161,9 +160,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 
 				StepInstance step = new StepInstance(new Long(rs.getLong(1)));
 				step.setStatus(BatchStatus.getStatus(rs.getString(2)));
-				step
-						.setStreamContext(new GenericStreamContext(PropertiesConverter.stringToProperties(rs
-								.getString(3))));
+				step.setStreamContext(new StreamContext(PropertiesConverter.stringToProperties(rs.getString(3))));
 				return step;
 			}
 
@@ -213,8 +210,8 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 				stepExecution.setStatus(BatchStatus.getStatus(rs.getString(5)));
 				stepExecution.setCommitCount(rs.getInt(6));
 				stepExecution.setTaskCount(rs.getInt(7));
-				stepExecution.setStreamContext(new GenericStreamContext(PropertiesConverter.stringToProperties(rs
-						.getString(8))));
+				stepExecution.setStreamContext(new StreamContext(PropertiesConverter
+						.stringToProperties(rs.getString(8))));
 				stepExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(9)), rs.getString(10), rs
 						.getString(11)));
 				return stepExecution;
@@ -247,7 +244,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 				String status = rs.getString(3);
 				step.setStatus(BatchStatus.getStatus(status));
 				step
-						.setStreamContext(new GenericStreamContext(PropertiesConverter.stringToProperties(rs
+						.setStreamContext(new StreamContext(PropertiesConverter.stringToProperties(rs
 								.getString(3))));
 				return step;
 			}

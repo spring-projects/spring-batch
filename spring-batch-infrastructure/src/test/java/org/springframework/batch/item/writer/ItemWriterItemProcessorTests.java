@@ -24,7 +24,6 @@ import junit.framework.TestCase;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -66,7 +65,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testRestoreFrom() throws Exception {
-		processor.restoreFrom(new GenericStreamContext(PropertiesConverter.stringToProperties("value=bar")));
+		processor.restoreFrom(new StreamContext(PropertiesConverter.stringToProperties("value=bar")));
 		processor.write("foo");
 		assertEquals("bar:foo", list.get(0));
 	}
@@ -93,7 +92,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 	public void testRestoreFromWithoutRestartable() throws Exception {
 		processor.setDelegate(null);
 		try {
-			processor.restoreFrom(new GenericStreamContext(PropertiesConverter.stringToProperties("value=bar")));
+			processor.restoreFrom(new StreamContext(PropertiesConverter.stringToProperties("value=bar")));
 			fail("Expected IllegalStateException");
 		}
 		catch (IllegalStateException e) {
@@ -145,12 +144,8 @@ public class ItemWriterItemProcessorTests extends TestCase {
 		public void open() {
 		}
 
-		public Properties getStatistics() {
-			return PropertiesConverter.stringToProperties("a=b");
-		}
-
 		public StreamContext getStreamContext() {
-			return new GenericStreamContext(PropertiesConverter.stringToProperties("value=foo"));
+			return new StreamContext(PropertiesConverter.stringToProperties("value=foo"));
 		}
 
 		public void restoreFrom(StreamContext data) {

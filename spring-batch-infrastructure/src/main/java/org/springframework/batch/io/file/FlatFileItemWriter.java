@@ -35,7 +35,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -72,7 +71,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	private Resource resource;
 
-	private StreamContext streamContext = new GenericStreamContext(new Properties());
+	private StreamContext streamContext = new StreamContext();
 
 	private OutputState state = null;
 

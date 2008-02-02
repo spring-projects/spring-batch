@@ -24,7 +24,6 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -83,7 +82,7 @@ public class DelegatingItemReaderTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testRestoreFrom() throws Exception {
-		itemProvider.restoreFrom(new GenericStreamContext(PropertiesConverter.stringToProperties("value=bar")));
+		itemProvider.restoreFrom(new StreamContext(PropertiesConverter.stringToProperties("value=bar")));
 		assertEquals("bar", itemProvider.read());
 	}
 
@@ -101,7 +100,7 @@ public class DelegatingItemReaderTests extends TestCase {
 		}
 
 		public StreamContext getStreamContext() {
-			return new GenericStreamContext(PropertiesConverter.stringToProperties("value=foo"));
+			return new StreamContext(PropertiesConverter.stringToProperties("value=foo"));
 		}
 
 		public void restoreFrom(StreamContext data) {

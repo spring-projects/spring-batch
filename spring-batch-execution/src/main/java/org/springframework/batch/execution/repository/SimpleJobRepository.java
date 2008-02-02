@@ -19,13 +19,12 @@ package org.springframework.batch.execution.repository;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
@@ -34,7 +33,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.item.stream.GenericStreamContext;
+import org.springframework.batch.item.StreamContext;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.Assert;
 
@@ -303,8 +302,8 @@ public class SimpleJobRepository implements JobRepository {
 			Step step = (Step) i.next();
 			StepInstance stepInstance = stepDao.createStep(job, step.getName());
 			// Ensure valid restart data is being returned.
-			if (stepInstance.getStreamContext() == null || stepInstance.getStreamContext().getProperties() == null) {
-				stepInstance.setStreamContext(new GenericStreamContext(new Properties()));
+			if (stepInstance.getStreamContext() == null || stepInstance.getStreamContext() == null) {
+				stepInstance.setStreamContext(new StreamContext());
 			}
 			stepInstances.add(stepInstance);
 		}
@@ -326,8 +325,8 @@ public class SimpleJobRepository implements JobRepository {
 
 				step.setStepExecutionCount(stepDao.getStepExecutionCount(step));
 				// Ensure valid restart data is being returned.
-				if (step.getStreamContext() == null || step.getStreamContext().getProperties() == null) {
-					step.setStreamContext(new GenericStreamContext(new Properties()));
+				if (step.getStreamContext() == null || step.getStreamContext() == null) {
+					step.setStreamContext(new StreamContext());
 				}
 				stepInstances.add(step);
 			}

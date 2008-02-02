@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 /**
@@ -44,7 +43,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 		
 		Properties props = new Properties();
 		props.setProperty(SingleColumnJdbcKeyGenerator.RESTART_KEY, "3");
-		StreamContext streamContext = new GenericStreamContext(props);
+		StreamContext streamContext = new StreamContext(props);
 		
 		List keys = keyStrategy.restoreKeys(streamContext);
 		
