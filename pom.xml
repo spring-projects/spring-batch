@@ -157,6 +157,27 @@
 				<version>1.2.2</version>
 			</extension>
 		</extensions>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clover-plugin</artifactId>
+					<configuration>
+						<licenseLocation>
+							${basedir}/src/test/resources/clover.license
+						</licenseLocation>
+					</configuration>
+					<executions>
+						<execution>
+							<phase>pre-site</phase>
+							<goals>
+								<goal>instrument</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -550,22 +571,30 @@
 		<repository>
 			<id>spring-release</id>
 			<name>Spring Portfolio Release Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/release</url>
+			<url>
+				http://s3.amazonaws.com/maven.springframework.org/release
+			</url>
 		</repository>
 		<repository>
 			<id>spring-milestone</id>
 			<name>Spring Portfolio Milestone Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+			<url>
+				http://s3.amazonaws.com/maven.springframework.org/milestone
+			</url>
 		</repository>
 		<repository>
 			<id>spring-external</id>
 			<name>Spring Portfolio External Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
+			<url>
+				http://s3.amazonaws.com/maven.springframework.org/external
+			</url>
 		</repository>
 		<repository>
 			<id>apache-snapshot</id>
 			<name>Apache Foundation Snapshot Repository</name>
-			<url>http://people.apache.org/maven-snapshot-repository</url>
+			<url>
+				http://people.apache.org/maven-snapshot-repository
+			</url>
 		</repository>
 		<repository>
 			<id>objectstyle</id>
@@ -578,12 +607,20 @@
 		<pluginRepository>
 			<id>spring-external</id>
 			<name>Spring External Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
+			<url>
+				http://s3.amazonaws.com/maven.springframework.org/external
+			</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>Codehaus Snapshots</id>
+			<url>http://snapshots.repository.codehaus.org/</url>
 		</pluginRepository>
 		<pluginRepository>
 			<id>spring-external-svn</id>
 			<name>Spring External SVN Repository</name>
-			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext</url>
+			<url>
+				https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext
+			</url>
 		</pluginRepository>
 	</pluginRepositories>
 
