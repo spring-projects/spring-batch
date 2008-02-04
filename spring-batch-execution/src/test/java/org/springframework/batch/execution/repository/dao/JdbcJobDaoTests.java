@@ -21,7 +21,7 @@ public class JdbcJobDaoTests extends AbstractJobDaoTests {
 		jobDao.update(jobExecution);
 
 		List executions = jdbcTemplate.queryForList(
-				"SELECT * FROM BATCH_JOB_EXECUTION where JOB_ID=?",
+				"SELECT * FROM BATCH_JOB_EXECUTION where JOB_INSTANCE_ID=?",
 				new Object[] { jobInstance.getId() });
 		assertEquals(1, executions.size());
 		assertEquals(LONG_STRING.substring(0, 250), ((Map) executions.get(0))

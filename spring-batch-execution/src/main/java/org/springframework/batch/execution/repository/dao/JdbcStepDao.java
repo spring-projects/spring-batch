@@ -61,26 +61,26 @@ import org.springframework.util.StringUtils;
  */
 public class JdbcStepDao implements StepDao, InitializingBean {
 
-	private static final String CREATE_STEP = "INSERT into %PREFIX%STEP_INSTANCE(ID, JOB_ID, STEP_NAME) values (?, ?, ?)";
+	private static final String CREATE_STEP = "INSERT into %PREFIX%STEP_INSTANCE(ID, JOB_INSTANCE_ID, STEP_NAME) values (?, ?, ?)";
 
 	private static final int EXIT_MESSAGE_LENGTH = 250;
 
-	private static final String FIND_STEP = "SELECT ID, STATUS, RESTART_DATA from %PREFIX%STEP_INSTANCE where JOB_ID = ? "
+	private static final String FIND_STEP = "SELECT ID, STATUS, RESTART_DATA from %PREFIX%STEP_INSTANCE where JOB_INSTANCE_ID = ? "
 			+ "and STEP_NAME = ?";
 
 	private static final String FIND_STEP_EXECUTIONS = "SELECT ID, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
-			+ " TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%STEP_EXECUTION where STEP_ID = ?";
+			+ " TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%STEP_EXECUTION where STEP_INSTANCE_ID = ?";
 
 	// Step SQL statements
-	private static final String FIND_STEPS = "SELECT ID, STEP_NAME, STATUS, RESTART_DATA from %PREFIX%STEP_INSTANCE where JOB_ID = ?";
+	private static final String FIND_STEPS = "SELECT ID, STEP_NAME, STATUS, RESTART_DATA from %PREFIX%STEP_INSTANCE where JOB_INSTANCE_ID = ?";
 
 	private static final String GET_STEP_EXECUTION_COUNT = "SELECT count(ID) from %PREFIX%STEP_EXECUTION where "
-			+ "STEP_ID = ?";
+			+ "STEP_INSTANCE_ID = ?";
 
 	protected static final Log logger = LogFactory.getLog(JdbcStepDao.class);
 
 	// StepExecution statements
-	private static final String SAVE_STEP_EXECUTION = "INSERT into %PREFIX%STEP_EXECUTION(ID, VERSION, STEP_ID, JOB_EXECUTION_ID, START_TIME, "
+	private static final String SAVE_STEP_EXECUTION = "INSERT into %PREFIX%STEP_EXECUTION(ID, VERSION, STEP_INSTANCE_ID, JOB_EXECUTION_ID, START_TIME, "
 			+ "END_TIME, STATUS, COMMIT_COUNT, TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) "
 			+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -178,7 +178,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 		}
 		else {
 			// This error will likely never be thrown, because there should
-			// never be two steps with the same name and Job_ID due to database
+			// never be two steps with the same name and JOB_INSTANCE_ID due to database
 			// constraints.
 			throw new IncorrectResultSizeDataAccessException("Step Invalid, multiple steps found for StepName:"
 					+ stepName + " and JobId:" + job.getId(), 1, steps.size());
@@ -226,7 +226,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	 * @see StepDao#findSteps(JobInstance)
 	 * 
 	 * Sql implementation which uses a RowMapper to populate a list of all rows
-	 * in the step table with the same JOB_ID.
+	 * in the step table with the same JOB_INSTANCE_ID.
 	 * 
 	 * @throws IllegalArgumentException if jobId is null.
 	 */

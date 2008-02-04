@@ -60,7 +60,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	private static final String CREATE_JOB = "INSERT into %PREFIX%JOB_INSTANCE(ID, JOB_NAME, JOB_KEY)"
 			+ " values (?, ?, ?)";
 	
-	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_INSTANCE_PARAMS(JOB_ID, KEY_NAME, TYPE_CD, " +
+	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_INSTANCE_PARAMS(JOB_INSTANCE_ID, KEY_NAME, TYPE_CD, " +
 			"STRING_VAL, DATE_VAL, LONG_VAL) values (?, ?, ?, ?, ?, ?)";
 	
 	/**	
@@ -73,11 +73,11 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	private static final String FIND_JOBS = "SELECT ID, STATUS from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?";
 
 	private static final String GET_JOB_EXECUTION_COUNT = "SELECT count(ID) from %PREFIX%JOB_EXECUTION "
-			+ "where JOB_ID = ?";
+			+ "where JOB_INSTANCE_ID = ?";
 
 	protected static final Log logger = LogFactory.getLog(JdbcJobDao.class);
 
-	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(ID, JOB_ID, START_TIME, "
+	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(ID, JOB_INSTANCE_ID, START_TIME, "
 			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) values (?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String UPDATE_JOB = "UPDATE %PREFIX%JOB_INSTANCE set STATUS = ? where ID = ?";
@@ -451,7 +451,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	public static class JobExecutionRowMapper implements RowMapper {
 
 		public static final String FIND_JOB_EXECUTIONS = "SELECT ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
-				+ " where JOB_ID = ?";
+				+ " where JOB_INSTANCE_ID = ?";
 
 		public static final String GET_JOB_EXECUTION = "SELECT ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
 				+ " where ID = ?";

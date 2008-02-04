@@ -31,7 +31,7 @@ public class JdbcStepDaoTests extends AbstractStepDaoTests {
 		stepDao.update(stepExecution);
 
 		List executions = jdbcTemplate.queryForList(
-				"SELECT * FROM BATCH_STEP_EXECUTION where STEP_ID=?",
+				"SELECT * FROM BATCH_STEP_EXECUTION where STEP_INSTANCE_ID=?",
 				new Object[] { step1.getId() });
 		assertEquals(1, executions.size());
 		assertEquals(LONG_STRING.substring(0, 250), ((Map) executions.get(0))
