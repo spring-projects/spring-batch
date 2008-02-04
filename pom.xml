@@ -160,11 +160,12 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
+					<groupId>com.atlassian.maven.plugins</groupId>
 					<artifactId>maven-clover-plugin</artifactId>
+					<version>2</version>
 					<configuration>
 						<licenseLocation>
-							${basedir}/src/test/resources/clover.license
+							${clover.license.path}
 						</licenseLocation>
 					</configuration>
 					<executions>
@@ -565,6 +566,11 @@
 			<name>Lucas Ward</name>
 			<email>lucas.l.ward@accenture.com</email>
 		</developer>
+		<developer>
+			<id>robokaso</id>
+			<name>Robert Kasanicky</name>
+			<email>robert.kasanicky@accenture.com</email>
+		</developer>
 	</developers>
 
 	<repositories>
@@ -621,6 +627,11 @@
 			<url>
 				https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext
 			</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>atlassian-m2-repository</id>
+			<name>Atlassian Maven 2.x Repository</name>
+			<url>http://repository.atlassian.com/maven2</url>
 		</pluginRepository>
 	</pluginRepositories>
 

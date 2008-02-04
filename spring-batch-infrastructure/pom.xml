@@ -16,6 +16,26 @@
 		<relativePath>..</relativePath>
 	</parent>
 
+	<profiles>
+		<profile>
+			<id>clover</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-clover-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+			<reporting>
+				<plugins>
+					<plugin>
+						<artifactId>maven-clover-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</reporting>
+		</profile>
+	</profiles>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>

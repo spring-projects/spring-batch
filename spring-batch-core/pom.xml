@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-core</artifactId>
@@ -15,6 +17,26 @@
 		<version>1.0.0.m4-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
+
+	<profiles>
+		<profile>
+			<id>clover</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-clover-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+			<reporting>
+				<plugins>
+					<plugin>
+						<artifactId>maven-clover-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</reporting>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		<dependency>
@@ -37,7 +59,7 @@
 			<groupId>easymock</groupId>
 			<artifactId>easymock</artifactId>
 		</dependency>
-<!-- Spring Dependencies -->
+		<!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
