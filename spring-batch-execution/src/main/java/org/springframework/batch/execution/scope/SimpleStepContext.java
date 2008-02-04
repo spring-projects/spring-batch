@@ -81,11 +81,8 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 		super.setAttribute(name, value);
 		if (streamManager != null && (value instanceof ItemStream)) {
 			ItemStream stream = (ItemStream) value;
-			streamManager.register(this, stream);
 			stream.open();
-			if (streamContext != null) {
-				stream.restoreFrom(streamContext);
-			}
+			streamManager.register(this, stream, streamContext);
 		}
 	}
 
@@ -203,11 +200,10 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 		return streamManager.getStreamContext(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.execution.scope.StepContext#setInitialStreamContext(org.springframework.batch.item.StreamContext)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.execution.scope.StepContext#restoreFrom(org.springframework.batch.item.StreamContext)
 	 */
-	public void setInitialStreamContext(StreamContext streamContext) {
+	public void restoreFrom(StreamContext streamContext) {
 		this.streamContext = streamContext;
 	}
 

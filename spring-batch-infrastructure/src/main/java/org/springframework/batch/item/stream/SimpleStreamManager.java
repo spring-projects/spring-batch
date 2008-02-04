@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
@@ -32,6 +32,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.ClassUtils;
 
 /**
  * Simple {@link StreamManager} that tries to resolve conflicts between key
@@ -47,6 +48,8 @@ public class SimpleStreamManager implements StreamManager {
 	private Map registry = new HashMap();
 
 	private PlatformTransactionManager transactionManager;
+
+	private boolean useClassNameAsPrefix = true;
 
 	/**
 	 * @param transactionManager a {@link PlatformTransactionManager}
@@ -64,6 +67,18 @@ public class SimpleStreamManager implements StreamManager {
 	}
 
 	/**
+	 * Public setter for the flag. If this is true then the class name of the
+	 * streams will be used as a prefix in the {@link StreamContext} in
+	 * {@link #getStreamContext(Object)}. The default value is true, which
+	 * gives the best chance of unique key names in the context.
+	 * 
+	 * @param useClassNameAsPrefix the flag to set (default true).
+	 */
+	public void setUseClassNameAsPrefix(boolean useClassNameAsPrefix) {
+		this.useClassNameAsPrefix = useClassNameAsPrefix;
+	}
+
+	/**
 	 * Public setter for the {@link PlatformTransactionManager}.
 	 * @param transactionManager the {@link PlatformTransactionManager} to set
 	 */
@@ -72,42 +87,28 @@ public class SimpleStreamManager implements StreamManager {
 	}
 
 	/**
-	 * Simple aggregate statistics provider for the contributions registered
-	 * under the given key.
+	 * Simple aggregate {@link StreamContext} provider for the contributions
+	 * registered under the given key.
 	 * 
 	 * @see org.springframework.batch.item.stream.StreamManager#getStreamContext(java.lang.Object)
 	 */
 	public StreamContext getStreamContext(Object key) {
-		Set set = new LinkedHashSet();
-		synchronized (registry) {
-			Collection collection = (Collection) registry.get(key);
-			if (collection != null) {
-				set = new LinkedHashSet(collection);
-			}
-		}
-		return aggregate(set);
-	}
-
-	/**
-	 * @param list a list of {@link ItemStream}s
-	 * @return aggregated streamcontext
-	 */
-	private StreamContext aggregate(Collection list) {
-		Properties result = new Properties();
-		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
-			ItemStream provider = (ItemStream) iterator.next();
-			Properties properties = provider.getStreamContext().getProperties();
-			if (properties != null) {
-				String prefix = ""; // ClassUtils.getShortClassName(provider.getClass())
-				// + ".";
-				for (Iterator propiter = properties.keySet().iterator(); propiter.hasNext();) {
-					String key = (String) propiter.next();
-					String value = properties.getProperty(key);
-					result.setProperty(prefix + key, value);
+		final StreamContext result = new StreamContext();
+		iterate(key, new Callback() {
+			public void execute(ItemStream stream) {
+				StreamContext context = stream.getStreamContext();
+				String prefix = ClassUtils.getQualifiedName(stream.getClass()) + ".";
+				if (!useClassNameAsPrefix) {
+					prefix = "";
+				}
+				for (Iterator iterator = context.entrySet().iterator(); iterator.hasNext();) {
+					Entry entry = (Entry) iterator.next();
+					String contextKey = prefix + entry.getKey();
+					result.put(contextKey, entry.getValue());
 				}
 			}
-		}
-		return new StreamContext(result);
+		});
+		return result;
 	}
 
 	/**
@@ -115,17 +116,41 @@ public class SimpleStreamManager implements StreamManager {
 	 * the provided key.
 	 * 
 	 * @see org.springframework.batch.item.stream.StreamManager#register(java.lang.Object,
-	 * org.springframework.batch.item.ItemStream)
+	 * org.springframework.batch.item.ItemStream, StreamContext)
 	 */
-	public void register(Object key, ItemStream provider) {
+	public void register(Object key, ItemStream stream, StreamContext streamContext) {
 		synchronized (registry) {
 			Set set = (Set) registry.get(key);
 			if (set == null) {
 				set = new LinkedHashSet();
 				registry.put(key, set);
 			}
-			set.add(provider);
+			set.add(stream);
 		}
+		if (streamContext != null) {
+			stream.restoreFrom(extract(stream, streamContext));
+		}
+	}
+
+	/**
+	 * @param stream
+	 * @param streamContext
+	 * @return
+	 */
+	private StreamContext extract(ItemStream stream, StreamContext context) {
+		StreamContext result = new StreamContext();
+		String prefix = ClassUtils.getQualifiedName(stream.getClass()) + ".";
+		if (!useClassNameAsPrefix) {
+			prefix = "";
+		}
+		for (Iterator iterator = context.entrySet().iterator(); iterator.hasNext();) {
+			Entry entry = (Entry) iterator.next();
+			String contextKey = (String) entry.getKey();
+			if (contextKey.startsWith(prefix)) {
+				result.put(contextKey.substring(prefix.length()), entry.getValue());
+			}
+		}
+		return result;
 	}
 
 	/**

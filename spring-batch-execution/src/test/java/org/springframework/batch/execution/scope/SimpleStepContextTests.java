@@ -171,7 +171,7 @@ public class SimpleStepContextTests extends TestCase {
 		public void open(Object key) {
 		}
 
-		public void register(Object key, ItemStream stream) {
+		public void register(Object key, ItemStream stream, StreamContext streamContext) {
 			map.put(key, stream);
 		}
 

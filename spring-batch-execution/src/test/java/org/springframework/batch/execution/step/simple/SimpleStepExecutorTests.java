@@ -98,10 +98,13 @@ public class SimpleStepExecutorTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
+		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
+
 		stepConfiguration = new SimpleStep();
 		stepConfiguration.setTasklet(getTasklet(new String[] { "foo", "bar", "spam" }));
 		stepConfiguration.setJobRepository(new JobRepositorySupport());
-		stepConfiguration.setTransactionManager(new ResourcelessTransactionManager());
+		stepConfiguration.setTransactionManager(transactionManager);
+
 		stepExecutor = (SimpleStepExecutor) stepConfiguration.createStepExecutor();
 		template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
@@ -113,6 +116,11 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		jobInstance = new JobInstance(new Long(0), new JobParameters());
 		jobInstance.setJob(new JobSupport("FOO"));
+		
+		SimpleStreamManager streamManager = new SimpleStreamManager(transactionManager);
+		streamManager.setUseClassNameAsPrefix(false);
+		stepExecutor.setStreamManager(streamManager);
+
 	}
 
 	public void testStepExecutor() throws Exception {
@@ -304,6 +312,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		stepConfiguration.setSaveStreamContext(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
+		
 		stepExecution.getStep().setStreamContext(
 				new StreamContext(PropertiesConverter.stringToProperties("foo=bar")));
 

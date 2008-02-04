@@ -37,8 +37,9 @@ public interface StreamManager {
 	 * 
 	 * @param key the key under which to add the provider
 	 * @param stream an {@link ItemStream}
+	 * @param streamContext the context (may be null) to restore from on registration
 	 */
-	void register(Object key, ItemStream stream);
+	void register(Object key, ItemStream stream, StreamContext streamContext);
 
 	/**
 	 * Extract and aggregate the {@link StreamContext} from all streams under

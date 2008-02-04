@@ -190,7 +190,7 @@ public class SimpleStepExecutor {
 		final boolean saveStreamContext = step.isSaveStreamContext();
 
 		if (saveStreamContext && isRestart) {
-			stepContext.setInitialStreamContext(stepInstance.getStreamContext());
+			stepContext.restoreFrom(stepInstance.getStreamContext());
 		}
 
 		try {

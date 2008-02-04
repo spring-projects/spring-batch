@@ -55,12 +55,13 @@ public interface StepContext extends AttributeAccessor, StreamContextProvider {
 	void close();
 
 	/**
-	 * Provide the stream context that will be needed to restore
-	 * {@link ItemStream} instances. If this is not set the streams will simply
-	 * not be initialised and repositioned for restart (which is sometimes
-	 * desirable).
+	 * Provide the stream context needed to restore {@link ItemStream}
+	 * instances. Implementations are free to use this as necessary (e.g. lazily
+	 * if all the streams are not available at once). If this is not set the
+	 * streams will simply not be initialised and repositioned for restart
+	 * (which is sometimes desirable).
 	 * 
 	 * @param streamContext
 	 */
-	void setInitialStreamContext(StreamContext streamContext);
+	void restoreFrom(StreamContext streamContext);
 }
