@@ -151,8 +151,9 @@ public abstract class AbstractStep extends StepSupport {
 		if (streamManager == null) {
 			manager = new SimpleStreamManager(transactionManager);
 		}
-		SimpleStepExecutor executor = new SimpleStepExecutor(manager, this);
+		SimpleStepExecutor executor = new SimpleStepExecutor(this);
 		executor.setRepository(jobRepository);
+		executor.setStreamManager(manager);
 		executor.applyConfiguration(this);
 		executor.setTasklet(tasklet);
 		return executor;

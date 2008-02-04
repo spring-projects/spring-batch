@@ -71,7 +71,7 @@ public class DefaultJobParametersFactory implements JobParametersFactory {
 	 */
 	public JobParameters getJobParameters(Properties props) {
 
-		if(props == null || props.isEmpty()){
+		if (props == null || props.isEmpty()) {
 			return new JobParameters();
 		}
 
@@ -87,7 +87,9 @@ public class DefaultJobParametersFactory implements JobParametersFactory {
 					date = dateFormat.parse(value);
 				}
 				catch (ParseException ex) {
-					throw new IllegalArgumentException("Date format is invalid: [" + value + "], use " + dateFormat, ex);
+					String suffix = (dateFormat instanceof SimpleDateFormat) ? ", use "
+							+ ((SimpleDateFormat) dateFormat).toPattern() : "";
+					throw new IllegalArgumentException("Date format is invalid: [" + value + "]" + suffix, ex);
 				}
 				propertiesBuilder.addDate(StringUtils.replace(key, DATE_TYPE, ""), date);
 			}
@@ -97,8 +99,10 @@ public class DefaultJobParametersFactory implements JobParametersFactory {
 					result = (Long) numberFormat.parse(value);
 				}
 				catch (ParseException ex) {
+					String suffix = (numberFormat instanceof DecimalFormat) ? ", use "
+							+ ((DecimalFormat) numberFormat).toPattern() : "";
 					throw new IllegalArgumentException(
-							"Number format is invalid: [" + value + "], use " + numberFormat, ex);
+							"Number format is invalid: [" + value + "], use " + suffix, ex);
 				}
 				catch (ClassCastException ex) {
 					throw new IllegalArgumentException("Number format is invalid: [" + value
@@ -124,22 +128,24 @@ public class DefaultJobParametersFactory implements JobParametersFactory {
 	 * @see org.springframework.batch.core.runtime.JobParametersFactory#getProperties(org.springframework.batch.core.domain.JobParameters)
 	 */
 	public Properties getProperties(JobParameters params) {
-		
-		if(params == null || params.isEmpty()){
+
+		if (params == null || params.isEmpty()) {
 			return new Properties();
 		}
-		
+
 		Map parameters = params.getParameters();
 		Properties result = new Properties();
 		for (Iterator iterator = parameters.keySet().iterator(); iterator.hasNext();) {
 			String key = (String) iterator.next();
 			Object value = parameters.get(key);
 			if (value instanceof Date) {
-				result.setProperty(key+DATE_TYPE, dateFormat.format(value));
-			} else if (value instanceof Long) {
-				result.setProperty(key+LONG_TYPE, numberFormat.format(value));
-			} else {
-				result.setProperty(key,""+value);
+				result.setProperty(key + DATE_TYPE, dateFormat.format(value));
+			}
+			else if (value instanceof Long) {
+				result.setProperty(key + LONG_TYPE, numberFormat.format(value));
+			}
+			else {
+				result.setProperty(key, "" + value);
 			}
 		}
 		return result;
@@ -151,5 +157,15 @@ public class DefaultJobParametersFactory implements JobParametersFactory {
 	 */
 	public void setDateFormat(DateFormat dateFormat) {
 		this.dateFormat = dateFormat;
+	}
+
+	/**
+	 * Public setter for the {@link NumberFormat}. Used to parse longs, so must
+	 * not contain decimal place (e.g. use "#" or "#,###").
+	 * 
+	 * @param numberFormat the {@link NumberFormat} to set
+	 */
+	public void setNumberFormat(NumberFormat numberFormat) {
+		this.numberFormat = numberFormat;
 	}
 }

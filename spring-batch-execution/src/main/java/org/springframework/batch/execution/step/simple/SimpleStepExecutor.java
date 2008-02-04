@@ -90,9 +90,8 @@ public class SimpleStepExecutor {
 	/**
 	 * Package private constructor so the step can create a the executor.
 	 */
-	SimpleStepExecutor(StreamManager streamManager, AbstractStep abstractStep) {
+	SimpleStepExecutor(AbstractStep abstractStep) {
 		this.step = abstractStep;
-		this.streamManager = streamManager;
 	}
 
 	/**
@@ -393,16 +392,6 @@ public class SimpleStepExecutor {
 	/**
 	 * Apply the configuration by inspecting it to see if it has any relevant
 	 * policy information.
-	 * <ul>
-	 * <li> If the configuration is a {@link RepeatOperationsHolder} then we use
-	 * the provided {@link RepeatOperations} instances for chunk and step. </li>
-	 * <li> If the configuration is a {@link SimpleStep} then we apply the
-	 * commit interval at the chunk level and the exception handler at the step
-	 * level, provided the existing repeat operations are instances of
-	 * {@link RepeatTemplate}. In addition if there is a non-zero skip limit
-	 * and no {@link ExceptionHandler} then we inject a
-	 * {@link SimpleLimitExceptionHandler} with that limit.</li>
-	 * </ul>
 	 * 
 	 * @param step a step
 	 */

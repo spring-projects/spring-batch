@@ -58,7 +58,7 @@ public class ScheduledJobParametersFactory implements JobParametersFactory {
 					scheduleDate = dateFormat.parse(entry.getValue().toString());
 				}
 				catch (ParseException ex) {
-					throw new IllegalArgumentException("Schedule date format is invalid: [" + entry.getValue() + "]",
+					throw new IllegalArgumentException("Date format is invalid: [" + entry.getValue() + "]",
 							ex);
 				}
 				propertiesBuilder.addDate(entry.getKey().toString(), scheduleDate);

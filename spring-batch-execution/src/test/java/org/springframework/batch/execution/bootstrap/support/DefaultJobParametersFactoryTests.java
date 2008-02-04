@@ -16,6 +16,7 @@
 package org.springframework.batch.execution.bootstrap.support;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -50,6 +51,67 @@ public class DefaultJobParametersFactoryTests extends TestCase {
 		assertEquals(new Long(33243243L), props.getLong("vendor.id"));
 		Date date = dateFormat.parse("01/23/2008");
 		assertEquals(date, props.getDate("schedule.date"));
+	}
+
+	public void testGetParametersWithDateFormat() throws Exception {
+
+		String[] args = new String[] { "schedule.date(date)=2008/23/01" };
+
+		factory.setDateFormat(new SimpleDateFormat("yyyy/dd/MM"));
+		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(props);
+		Date date = dateFormat.parse("01/23/2008");
+		assertEquals(date, props.getDate("schedule.date"));
+	}
+
+	public void testGetParametersWithBogusDate() throws Exception {
+
+		String[] args = new String[] { "schedule.date(date)=20080123" };
+
+		try {
+			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		} catch (IllegalArgumentException e) {
+			String message = e.getMessage();
+			assertTrue("Message should contain wrong date: "+message, message.contains("20080123"));
+			assertTrue("Message should contain format: "+message, message.contains("yyyy/MM/dd"));
+		}
+	}
+
+	public void testGetParametersWithNumberFormat() throws Exception {
+
+		String[] args = new String[] { "value(long)=1,000" };
+
+		factory.setNumberFormat(new DecimalFormat("#,###"));
+		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(props);
+		assertEquals(1000L, props.getLong("value").longValue());
+	}
+
+	public void testGetParametersWithBogusLong() throws Exception {
+
+		String[] args = new String[] { "value(long)=foo" };
+
+		try {
+			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		} catch (IllegalArgumentException e) {
+			String message = e.getMessage();
+			assertTrue("Message should contain wrong number: "+message, message.contains("foo"));
+			assertTrue("Message should contain format: "+message, message.contains("#"));
+		}
+	}
+
+	public void testGetParametersWithDouble() throws Exception {
+
+		String[] args = new String[] { "value(long)=1.03" };
+		factory.setNumberFormat(new DecimalFormat("#.#"));
+
+		try {
+			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		} catch (IllegalArgumentException e) {
+			String message = e.getMessage();
+			assertTrue("Message should contain wrong number: "+message, message.contains("1.03"));
+			assertTrue("Message should contain 'decimal': "+message, message.contains("decimal"));
+		}
 	}
 
 	public void testGetProperties() throws Exception {

@@ -80,4 +80,28 @@ public class ScheduledJobParametersFactoryTests extends TestCase {
 		assertEquals(new JobParameters(), factory.getJobParameters(null));
 		assertEquals(new Properties(), factory.getProperties(null));
 	}
+	
+	public void testGetParametersWithDateFormat() throws Exception {
+
+		String[] args = new String[] { "schedule.date=2008/23/01" };
+
+		factory.setDateFormat(new SimpleDateFormat("yyyy/dd/MM"));
+		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(props);
+		Date date = dateFormat.parse("01/23/2008");
+		assertEquals(date, props.getDate("schedule.date"));
+	}
+
+	public void testGetParametersWithBogusDate() throws Exception {
+
+		String[] args = new String[] { "schedule.date=20080123" };
+
+		try {
+			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		} catch (IllegalArgumentException e) {
+			String message = e.getMessage();
+			assertTrue("Message should contain wrong date: "+message, message.contains("20080123"));
+		}
+	}
+	
 }
