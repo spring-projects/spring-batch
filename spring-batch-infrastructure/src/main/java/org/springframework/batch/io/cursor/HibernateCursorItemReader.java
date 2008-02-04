@@ -25,6 +25,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.reader.AbstractItemStreamItemReader;
 import org.springframework.beans.factory.DisposableBean;
@@ -218,8 +219,10 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	}
 
 	/**
-	 * Always true, but only supported through a single processed row count, so
-	 * do not use in an asynchronous setting.
+	 * Mark is supported as long as this {@link ItemStream} is used in a
+	 * single-threaded environment. The state backing the mark is a single
+	 * counter, keeping track of the current position, so multiple threads
+	 * cannot be accommodated.
 	 * 
 	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
 	 */

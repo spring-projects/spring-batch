@@ -251,7 +251,12 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 		close();
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Mark is supported as long as this {@link ItemStream} is used in a
+	 * single-threaded environment. The state backing the mark is a single
+	 * counter, keeping track of the current position, so multiple threads
+	 * cannot be accommodated.
+	 * 
 	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
 	 */
 	public boolean isMarkSupported() {

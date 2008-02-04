@@ -29,10 +29,10 @@ import org.springframework.batch.item.StreamException;
 
 /**
  * <p>
- * This class is a {@link FieldSetItemReader} that supports restart,
- * skipping invalid lines and storing statistics.
+ * This class is a {@link FieldSetItemReader} that supports restart, skipping
+ * invalid lines and storing statistics.
  * </p>
- *
+ * 
  * @author Waseem Malik
  * @author Tomas Slanina
  * @author Robert Kasanicky
@@ -49,7 +49,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	private Set skippedLines = new HashSet();
 
 	/**
-	 * Initialize the input source. 
+	 * Initialize the input source.
 	 */
 	public void open() {
 		super.open();
@@ -60,15 +60,13 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * This method initialises the Input Source for Restart. It opens the input
 	 * file and position the buffer reader according to information provided by
 	 * the restart data
-	 *
+	 * 
 	 * @param data {@link StreamContext} information
 	 */
 	public void restoreFrom(StreamContext data) {
 
-		if (data==null ||
-			data.getProperties() == null ||
-			data.getProperties().getProperty(READ_STATISTICS_NAME) == null ||
-			getReader()==null) {
+		if (data == null || data.getProperties() == null
+				|| data.getProperties().getProperty(READ_STATISTICS_NAME) == null || getReader() == null) {
 			// do nothing
 			return;
 		}
@@ -82,7 +80,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 		while (reader.getCurrentLineCount() < lineCount && record != null) {
 			record = readLine();
 		}
-		
+
 		mark(data);
 
 	}
@@ -93,7 +91,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * case of restart.
 	 */
 	public StreamContext getStreamContext() {
-		if (reader==null) {
+		if (reader == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
 		StreamContext streamContext = new StreamContext();
@@ -102,21 +100,28 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 		return streamContext;
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Mark is supported as long as this {@link ItemStream} is used in a
+	 * single-threaded environment. The state backing the mark is a single
+	 * counter, keeping track of the current position, so multiple threads
+	 * cannot be accommodated.
+	 * 
 	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
 	 */
 	public boolean isMarkSupported() {
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
 	 */
 	public void mark(StreamContext streamContext) {
 		getReader().mark();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
 	 */
 	public void reset(StreamContext streamContext) {

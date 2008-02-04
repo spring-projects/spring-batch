@@ -104,7 +104,9 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 		}
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Delegates the call if the delegate is an {@link ItemStream}.
+	 * 
 	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
 	 */
 	public boolean isMarkSupported() {

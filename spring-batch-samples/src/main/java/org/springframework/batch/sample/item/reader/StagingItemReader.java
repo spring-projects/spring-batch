@@ -204,8 +204,11 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Mark is supported in a multi- as well as a single-threaded environment.
+	 * The state backing the mark is a buffer, and access is synchronized, so
+	 * multiple threads cannot be accommodated.
+	 * 
 	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
 	 */
 	public boolean isMarkSupported() {
