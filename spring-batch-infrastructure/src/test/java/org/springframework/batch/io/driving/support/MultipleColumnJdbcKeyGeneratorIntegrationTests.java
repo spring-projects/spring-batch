@@ -29,7 +29,7 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 		keyStrategy = new MultipleColumnJdbcKeyGenerator(getJdbcTemplate(),
 		"SELECT ID, VALUE from T_FOOS order by ID");
 		
-		keyStrategy.setRestartQuery("SELECT ID, VALUE from T_FOOS where ID > ? and VALUE > ? order by ID");
+		keyStrategy.setRestartSql("SELECT ID, VALUE from T_FOOS where ID > ? and VALUE > ? order by ID");
 	}
 	
 	public void testRetrieveKeys(){

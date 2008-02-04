@@ -107,7 +107,7 @@ public class MultipleColumnJdbcKeyGenerator implements
 	 *
 	 * @param restartQuery
 	 */
-	public void setRestartQuery(String restartQuery) {
+	public void setRestartSql(String restartQuery) {
 		this.restartSql = restartQuery;
 	}
 

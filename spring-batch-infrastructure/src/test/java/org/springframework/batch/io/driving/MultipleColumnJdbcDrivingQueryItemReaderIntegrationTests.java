@@ -32,7 +32,7 @@ public class MultipleColumnJdbcDrivingQueryItemReaderIntegrationTests extends
 			new MultipleColumnJdbcKeyGenerator(getJdbcTemplate(),
 					"SELECT ID, VALUE from T_FOOS order by ID, VALUE");
 
-		keyGenerator.setRestartQuery("SELECT ID, VALUE from T_FOOS where ID > ? and VALUE > ? order by ID");
+		keyGenerator.setRestartSql("SELECT ID, VALUE from T_FOOS where ID > ? and VALUE > ? order by ID");
 		DrivingQueryItemReader inputSource = new DrivingQueryItemReader();
 		inputSource.setKeyGenerator(keyGenerator);
 		FooItemReader fooItemReader = new FooItemReader(inputSource, getJdbcTemplate());
