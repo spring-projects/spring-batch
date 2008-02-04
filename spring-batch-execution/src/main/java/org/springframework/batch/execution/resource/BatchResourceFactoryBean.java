@@ -17,8 +17,14 @@
 package org.springframework.batch.execution.resource;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.Map.Entry;
 
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.runtime.JobParametersFactory;
+import org.springframework.batch.execution.bootstrap.support.DefaultJobParametersFactory;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;
 import org.springframework.beans.factory.FactoryBean;
@@ -40,14 +46,20 @@ import org.springframework.util.StringUtils;
  * If no pattern is passed in, then following default is used:
  * 
  * <pre>
- * /%BATCH_ROOT%/job_data/%JOB_NAME%/%JOB_IDENTIFIER%-%STEP_NAME%.txt
+ * data/%JOB_NAME%/%STEP_NAME%.txt
  * </pre>
  * 
  * The %% variables are replaced with the corresponding bean property at run
- * time, when the factory method is executed. Note that the default pattern
- * starts with a forward slash "/", which means the root directory will be
- * interpreted as an absolute path if it too starts with "/" (because of the
- * implementation of the Spring Core Resource abstractions).<br/>
+ * time, when the factory method is executed. To insert {@link JobParameters}
+ * use a pattern with the parameter key surrounded by %%, e.g.
+ * 
+ * <pre>
+ * //home/jobs/data/%JOB_NAME%/%STEP_NAME%-%schedule.date%.txt
+ * </pre>
+ * 
+ * Note that the default pattern does not start with a separator. Because of the
+ * implementation of the Spring Core Resource abstractions, it would need to
+ * start with a double forward slash "//" to resolve to an absolute directory.<br/>
  * 
  * It doesn't make much sense to use this factory unless it is step scoped, but
  * note that it is thread safe only if it is step scoped and its mutators are
@@ -59,27 +71,35 @@ import org.springframework.util.StringUtils;
  * 
  * @see FactoryBean
  */
-public class BatchResourceFactoryBean extends AbstractFactoryBean implements
-		ResourceLoaderAware, StepContextAware {
-
-	private static final String BATCH_ROOT_PATTERN = "%BATCH_ROOT%";
+public class BatchResourceFactoryBean extends AbstractFactoryBean implements ResourceLoaderAware, StepContextAware {
 
 	private static final String JOB_NAME_PATTERN = "%JOB_NAME%";
 
 	private static final String STEP_NAME_PATTERN = "%STEP_NAME%";
 
-	private static final String DEFAULT_PATTERN = "/%BATCH_ROOT%/data/%JOB_NAME%/"
-			+ "%STEP_NAME%.txt";
+	private static final String DEFAULT_PATTERN = "data/%JOB_NAME%/" + "%STEP_NAME%.txt";
 
 	private String filePattern = DEFAULT_PATTERN;
 
 	private String jobName = null;
 
-	private String rootDirectory = "";
-
 	private String stepName = "";
 
+	private JobParametersFactory jobParametersFactory = new DefaultJobParametersFactory();
+
 	private ResourceLoader resourceLoader = new FileSystemResourceLoader();
+
+	private Properties properties;
+
+	/**
+	 * Public setter for the {@link JobParametersFactory} used to translate
+	 * {@link JobParameters} into {@link Properties}. Defaults to a
+	 * {@link DefaultJobParametersFactory}.
+	 * @param jobParametersFactory the {@link JobParametersFactory} to set
+	 */
+	public void setJobParametersFactory(JobParametersFactory jobParametersFactory) {
+		this.jobParametersFactory = jobParametersFactory;
+	}
 
 	/**
 	 * Always false because we are expecting to be step scoped.
@@ -106,11 +126,11 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 	 * @see org.springframework.batch.execution.scope.StepContextAware#setStepScopeContext(org.springframework.core.AttributeAccessor)
 	 */
 	public void setStepContext(StepContext context) {
-		Assert.state(context.getStepExecution() != null,
-				"The StepContext does not have an execution.");
+		Assert.state(context.getStepExecution() != null, "The StepContext does not have an execution.");
 		StepExecution execution = context.getStepExecution();
 		stepName = execution.getStep().getName();
 		jobName = execution.getStep().getJobInstance().getJobName();
+		properties = jobParametersFactory.getProperties(execution.getStep().getJobInstance().getJobParameters());
 	}
 
 	/**
@@ -130,8 +150,7 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 	/**
 	 * helper method for <code>createFileName()</code>
 	 */
-	private String replacePattern(String string, String pattern,
-			String replacement) {
+	private String replacePattern(String string, String pattern, String replacement) {
 
 		if (string == null)
 			return null;
@@ -155,24 +174,22 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements
 
 		String fileName = filePattern;
 
-		fileName = replacePattern(fileName, BATCH_ROOT_PATTERN, rootDirectory);
-		fileName = replacePattern(fileName, JOB_NAME_PATTERN,
-				jobName == null ? "job" : jobName);
+		fileName = replacePattern(fileName, JOB_NAME_PATTERN, jobName == null ? "job" : jobName);
 		fileName = replacePattern(fileName, STEP_NAME_PATTERN, stepName);
+
+		if (properties != null) {
+			for (Iterator iterator = properties.entrySet().iterator(); iterator.hasNext();) {
+				Entry entry = (Entry) iterator.next();
+				String key = (String) entry.getKey();
+				fileName = replacePattern(fileName, "%" + key + "%", (String) entry.getValue());
+			}
+		}
 
 		return fileName;
 	}
 
 	public void setFilePattern(String filePattern) {
 		this.filePattern = replacePattern(filePattern, "\\", File.separator);
-	}
-
-	public void setRootDirectory(String rootDirectory) {
-		this.rootDirectory = replacePattern(rootDirectory, "\\", File.separator);
-		if (rootDirectory != null && rootDirectory.endsWith(File.separator)) {
-			this.rootDirectory = rootDirectory.substring(0, rootDirectory
-					.lastIndexOf(File.separator));
-		}
 	}
 
 }

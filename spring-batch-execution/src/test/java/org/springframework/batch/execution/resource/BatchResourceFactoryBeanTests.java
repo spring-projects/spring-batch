@@ -21,17 +21,16 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.JobParametersBuilder;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 /**
  * Unit tests for {@link BatchResourceFactoryBean}
@@ -47,13 +46,13 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	 */
 	private BatchResourceFactoryBean resourceFactory = new BatchResourceFactoryBean();
 
-	private String rootDir = getRootDir();
-	
 	private char pathsep = File.separatorChar;
 
 	private String path = "data" + pathsep;
 
 	private JobInstance jobInstance;
+
+	private StepInstance stepInstance;
 
 	/**
 	 * mock step context
@@ -61,27 +60,14 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 	protected void setUp() throws Exception {
 
-		resourceFactory.setRootDirectory(rootDir);
-		
 		jobInstance = new JobInstance(new Long(0), new JobParameters());
 		jobInstance.setJob(new JobSupport("testJob"));
-		JobExecution jobExecution = new JobExecution(jobInstance);
-		StepInstance step = new StepInstance(jobInstance, "bar");
-		StepExecution stepExecution = new StepExecution(step, jobExecution, null);
-		SimpleStepContext context = new SimpleStepContext(stepExecution);
-		resourceFactory.setStepContext(context);
+		JobExecution jobExecution = jobInstance.createJobExecution();
+		stepInstance = new StepInstance(jobInstance, "bar");
+		resourceFactory.setStepContext(new SimpleStepContext(jobExecution.createStepExecution(stepInstance)));
 
 		resourceFactory.afterPropertiesSet();
-		
-	}
 
-	private String getRootDir() {
-		String rootDir = System.getProperty("java.io.tmpdir");
-		assertNotNull(rootDir);
-		if (rootDir != null && rootDir.endsWith(File.separator)) {
-			rootDir = rootDir.substring(0, rootDir.lastIndexOf(File.separator));
-		}
-		return rootDir;
 	}
 
 	/**
@@ -101,15 +87,26 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		try {
 			resourceFactory.getObject();
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
 
 	public void testNonStandardFilePattern() throws Exception {
-		resourceFactory.setFilePattern("/%BATCH_ROOT%/data/%JOB_NAME%/"
-				+ "%STEP_NAME%-job");
-		doTestPathName("bar-job", path);
+		resourceFactory.setFilePattern("foo/data/%JOB_NAME%/" + "%STEP_NAME%-job");
+		doTestPathName("bar-job", "foo" + pathsep + "data" + pathsep);
+	}
+
+	public void testNonStandardFilePatternWithJobParameters() throws Exception {
+		jobInstance = new JobInstance(new Long(0), new JobParametersBuilder().addString("job.key", "spam")
+				.toJobParameters());
+		jobInstance.setJob(new JobSupport("testJob"));
+		JobExecution jobExecution = jobInstance.createJobExecution();
+		stepInstance = new StepInstance(jobInstance, "bar");
+		resourceFactory.setStepContext(new SimpleStepContext(jobExecution.createStepExecution(stepInstance)));
+		resourceFactory.setFilePattern("foo/data/%JOB_NAME%/%job.key%-foo");
+		doTestPathName("spam-foo", "foo" + pathsep + "data" + pathsep);
 	}
 
 	public void testResoureLoaderAware() throws Exception {
@@ -125,30 +122,11 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		assertTrue(resource.exists());
 	}
 
-	public void testRootDirectoryEndsWithForwardSlash() throws Exception {
-		String rootDir = getRootDir();
-		rootDir = StringUtils.replace(rootDir, File.separator, "/") + "/";
-		resourceFactory.setRootDirectory(rootDir);
-		doTestPathName("bar.txt", path);
-	}
-
-	public void testRootDirectoryEndsWithBackSlash() throws Exception {
-		String rootDir = getRootDir();
-		rootDir = "/"+StringUtils.replace(rootDir, File.separator, "\\") + "\\";
-		resourceFactory.setRootDirectory(rootDir);
-		doTestPathName("bar.txt", path);
-	}
-
 	private void doTestPathName(String filename, String path) throws Exception, IOException {
 		Resource resource = (Resource) resourceFactory.getObject();
-		
 		String returnedPath = resource.getFile().getAbsolutePath();
-		
-		String absolutePath = new File("/" + rootDir + pathsep + path + jobInstance.getJobName() + pathsep + filename).getAbsolutePath();
-		
-		// System.err.println(absolutePath);
-		// System.err.println(returnedPath);
+		String absolutePath = new File(path + jobInstance.getJobName() + pathsep + filename).getAbsolutePath();
 		assertEquals(absolutePath, returnedPath);
 	}
-	
+
 }
