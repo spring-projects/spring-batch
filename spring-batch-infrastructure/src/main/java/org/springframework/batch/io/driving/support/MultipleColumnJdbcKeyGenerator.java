@@ -138,17 +138,7 @@ public class MultipleColumnJdbcKeyGenerator implements
 	public void setSql(String sql) {
 		this.sql = sql;
 	}
-	
-	/**
-	 * Set the sql statement to be used to restore the keys list
-	 * after a restart.
-	 * 
-	 * @param restartSql
-	 */
-	public void setRestartSql(String restartSql) {
-		this.restartSql = restartSql;
-	}
-	
+		
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}

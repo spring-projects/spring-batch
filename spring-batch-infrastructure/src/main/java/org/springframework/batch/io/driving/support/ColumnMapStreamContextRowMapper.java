@@ -23,92 +23,94 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * </p>Extension of the ColumnMapRowMapper that converts a column map to {@link StreamContext} and allows
- * {@link StreamContext} to be converted back as a PreparedStatementSetter.  This is useful in a restart 
- * scenario, as it allows for the standard functionality of the ColumnMapRowMapper to be used to 
- * create a map representing the columns returned by a query.  It should be noted that this column ordering
- * is preserved in the map using a link list version of Map. 
+ * </p>
+ * Extension of the ColumnMapRowMapper that converts a column map to
+ * {@link StreamContext} and allows {@link StreamContext} to be converted back
+ * as a PreparedStatementSetter. This is useful in a restart scenario, as it
+ * allows for the standard functionality of the {@link ColumnMapRowMapper} to be
+ * used to create a map representing the columns returned by a query. It should
+ * be noted that this column ordering is preserved in the map using a link list
+ * version of Map.
  * 
  * 
  * @author Lucas Ward
  * @author Dave Syer
  * @see StreamContextRowMapper
  */
-public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implements StreamContextRowMapper{
-	
-	public static final String KEY_PREFIX = ClassUtils.getQualifiedName(ColumnMapStreamContextRowMapper.class) + ".KEY.";
-	
+public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implements StreamContextRowMapper {
+
+	public static final String KEY_PREFIX = ClassUtils.getQualifiedName(ColumnMapStreamContextRowMapper.class)
+			+ ".KEY.";
+
 	public PreparedStatementSetter createSetter(StreamContext streamContext) {
-		
+
 		ColumnMapStreamContext columnData = new ColumnMapStreamContext(streamContext.getProperties());
-		
+
 		List columns = new ArrayList();
 		for (Iterator iterator = columnData.keys.entrySet().iterator(); iterator.hasNext();) {
-			Entry entry = (Entry)iterator.next();
+			Entry entry = (Entry) iterator.next();
 			Object column = entry.getValue();
 			columns.add(column);
 		}
-		
+
 		return new ArgPreparedStatementSetter(columns.toArray());
 	}
 
 	public StreamContext createStreamContext(Object key) {
 		Assert.isInstanceOf(Map.class, key, "Input to create StreamContext must be of type Map.");
-		Map keys = (Map)key;
+		Map keys = (Map) key;
 		return new ColumnMapStreamContext(keys);
 	}
-	
-	
+
 	private static class ColumnMapStreamContext extends StreamContext {
-		
+
 		private final Map keys;
 
 		public ColumnMapStreamContext(Map keys) {
 			this.keys = keys;
 		}
-		
+
 		public ColumnMapStreamContext(Properties props) {
-			
+
 			keys = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(props.size());
-			
-			for(int counter = 0; counter < props.size(); counter++){
+
+			for (int counter = 0; counter < props.size(); counter++) {
 
 				String key = KEY_PREFIX + counter;
 				String column = props.getProperty(key);
-				
-				if(column != null){
+
+				if (column != null) {
 					keys.put(key, column);
 				}
-				else{
+				else {
 					break;
 				}
-				
+
 			}
 		}
-		
+
 		public Properties getProperties() {
 			Properties props = new Properties();
-			
+
 			int counter = 0;
 			for (Iterator iterator = keys.entrySet().iterator(); iterator.hasNext();) {
 				Entry entry = (Entry) iterator.next();
 				props.setProperty(KEY_PREFIX + counter, entry.getValue().toString());
 				counter++;
 			}
-			
+
 			return props;
 		}
-		
+
 	}
-	
+
 	/*
 	 * Exact duplicate of Spring class of the same name, copied because it is
 	 * package private.
 	 */
-	private static class ArgPreparedStatementSetter implements PreparedStatementSetter{
+	private static class ArgPreparedStatementSetter implements PreparedStatementSetter {
 
 		private final Object[] args;
-
 
 		/**
 		 * Create a new ArgPreparedStatementSetter for the given arguments.
@@ -117,7 +119,6 @@ public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implemen
 		public ArgPreparedStatementSetter(Object[] args) {
 			this.args = args;
 		}
-
 
 		public void setValues(PreparedStatement ps) throws SQLException {
 			if (this.args != null) {
