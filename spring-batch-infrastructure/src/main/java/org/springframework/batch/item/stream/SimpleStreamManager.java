@@ -36,9 +36,7 @@ import org.springframework.util.ClassUtils;
 
 /**
  * Simple {@link StreamManager} that tries to resolve conflicts between key
- * names by using the short class name of a stream to prefix property keys.
- * 
- * TODO: actually implement the uniqueness strategy!
+ * names by using the class name of a stream to prefix property keys.
  * 
  * @author Dave Syer
  * 

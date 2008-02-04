@@ -45,8 +45,6 @@ import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.util.Assert;
 
@@ -83,9 +81,6 @@ public class SimpleStepExecutor {
 	// default to checking current thread for interruption.
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
 
-	// Not for production use...
-	protected PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-
 	private Tasklet tasklet;
 
 	private AbstractStep step;
@@ -93,10 +88,11 @@ public class SimpleStepExecutor {
 	private StreamManager streamManager;
 
 	/**
-	 * Package private constructor so the factory can create a the executor.
+	 * Package private constructor so the step can create a the executor.
 	 */
-	SimpleStepExecutor(AbstractStep abstractStep) {
+	SimpleStepExecutor(StreamManager streamManager, AbstractStep abstractStep) {
 		this.step = abstractStep;
+		this.streamManager = streamManager;
 	}
 
 	/**
@@ -111,14 +107,6 @@ public class SimpleStepExecutor {
 	 */
 	public void setStreamManager(StreamManager streamManager) {
 		this.streamManager = streamManager;
-	}
-
-	/**
-	 * Injected strategy for transaction management
-	 * @param transactionManager
-	 */
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
-		this.transactionManager = transactionManager;
 	}
 
 	/**
@@ -175,10 +163,6 @@ public class SimpleStepExecutor {
 		Assert.notNull(stepInstance);
 
 		ExitStatus status = ExitStatus.FAILED;
-
-		if (streamManager == null) {
-			streamManager = new SimpleStreamManager(transactionManager);
-		}
 
 		StepContext parentStepContext = StepSynchronizationManager.getContext();
 		final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext, streamManager);

@@ -22,13 +22,14 @@ import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.item.stream.SimpleStreamManager;
+import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**
- * A {@link Step} implementation that provides common behaviour to
- * subclasses.
+ * A {@link Step} implementation that provides common behaviour to subclasses.
  * 
  * @author Dave Syer
  * 
@@ -44,6 +45,8 @@ public abstract class AbstractStep extends StepSupport {
 	private PlatformTransactionManager transactionManager;
 
 	private Tasklet tasklet;
+
+	private StreamManager streamManager;
 
 	/**
 	 * Default constructor.
@@ -79,8 +82,7 @@ public abstract class AbstractStep extends StepSupport {
 	/**
 	 * Public setter for {@link JobRepository}.
 	 * 
-	 * @param jobRepository
-	 *            is a mandatory dependence (no default).
+	 * @param jobRepository is a mandatory dependence (no default).
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
@@ -93,7 +95,16 @@ public abstract class AbstractStep extends StepSupport {
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
-	
+
+	/**
+	 * Public setter for the {@link StreamManager}. Set either this or the
+	 * transaction manager, but not both.
+	 * @param streamManager the {@link StreamManager} to set.
+	 */
+	public void setStreamManager(StreamManager streamManager) {
+		this.streamManager = streamManager;
+	}
+
 	/**
 	 * Assert that all mandatory properties are set (the {@link JobRepository}).
 	 * 
@@ -105,10 +116,14 @@ public abstract class AbstractStep extends StepSupport {
 
 	protected void assertMandatoryProperties() {
 		Assert.notNull(jobRepository, "JobRepository is mandatory");
-		Assert.notNull(transactionManager, "TransactionManager is mandatory");
+		Assert.state(transactionManager != null || streamManager != null,
+				"Either StreamManager or TransactionManager must be set");
+		Assert.state(transactionManager == null || streamManager == null,
+				"Only one of StreamManager or TransactionManager must be set");
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepSupport#process(org.springframework.batch.core.domain.StepExecution)
 	 */
 	public void execute(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
@@ -126,15 +141,20 @@ public abstract class AbstractStep extends StepSupport {
 	}
 
 	/**
-	 * @return
+	 * @return a {@link SimpleStepExecutor} that can be used to launch the job.
 	 */
 	protected SimpleStepExecutor createStepExecutor() {
 		assertMandatoryProperties();
-		SimpleStepExecutor executor = new SimpleStepExecutor(this);
+		// Do not set the streamManager field if it is null, otherwise
+		// the mandatory properties check will fail.
+		StreamManager manager = streamManager;
+		if (streamManager == null) {
+			manager = new SimpleStreamManager(transactionManager);
+		}
+		SimpleStepExecutor executor = new SimpleStepExecutor(manager, this);
 		executor.setRepository(jobRepository);
 		executor.applyConfiguration(this);
 		executor.setTasklet(tasklet);
-		executor.setTransactionManager(transactionManager);
 		return executor;
 	}
 

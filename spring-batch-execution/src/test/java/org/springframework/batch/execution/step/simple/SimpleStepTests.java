@@ -25,6 +25,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -48,23 +49,22 @@ public class SimpleStepTests extends TestCase {
 		configuration.setTransactionManager(new ResourcelessTransactionManager());
 		final List list = new ArrayList();
 		configuration.setExceptionHandler(new ExceptionHandler() {
-			public void handleException(RepeatContext context,
-					Throwable throwable) throws RuntimeException {
+			public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
 				list.add(throwable);
 				throw new RuntimeException("Oops");
 			}
 		});
-		SimpleStepExecutor executor = (SimpleStepExecutor) configuration
-				.createStepExecutor();
-		StepExecution stepExecution = new StepExecution(new StepInstance(
-				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
-				new Long(12)));
+		SimpleStepExecutor executor = (SimpleStepExecutor) configuration.createStepExecutor();
+		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(11)), new JobExecution(
+				new JobInstance(new Long(0L), new JobParameters()), new Long(12)));
 		try {
 			executor.execute(stepExecution);
 			fail("Expected RuntimeException");
-		} catch (NullPointerException e) {
+		}
+		catch (NullPointerException e) {
 			throw e;
-		}catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("Oops", e.getMessage());
 		}
 		assertEquals(1, list.size());
@@ -74,11 +74,11 @@ public class SimpleStepTests extends TestCase {
 		try {
 			new SimpleStep().createStepExecutor();
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// expected
-			assertTrue("Error message does not contain JobRepository: "
-					+ e.getMessage(),
-					e.getMessage().indexOf("JobRepository") >= 0);
+			assertTrue("Error message does not contain JobRepository: " + e.getMessage(), e.getMessage().indexOf(
+					"JobRepository") >= 0);
 		}
 	}
 
@@ -86,9 +86,45 @@ public class SimpleStepTests extends TestCase {
 		try {
 			new SimpleStep().afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
 
+	public void testMandatoryPropertiesNoTransactionManagerOrStreamManager() throws Exception {
+		try {
+			SimpleStep configuration = new SimpleStep("foo");
+			configuration.setJobRepository(new JobRepositorySupport());
+			configuration.assertMandatoryProperties();
+			fail("Experetscted IllegalStateException");
+		}
+		catch (IllegalStateException e) {
+			// expected
+		}
+	}
+
+	public void testMandatoryPropertiesTransactionManagerAndStreamManager() throws Exception {
+		try {
+			SimpleStep configuration = new SimpleStep("foo");
+			configuration.setJobRepository(new JobRepositorySupport());
+			configuration.setTransactionManager(new ResourcelessTransactionManager());
+			configuration.setStreamManager(new SimpleStreamManager());
+			configuration.assertMandatoryProperties();
+			fail("Expected IllegalStateException");
+		}
+		catch (IllegalStateException e) {
+			// expected
+		}
+	}
+
+	public void testMandatoryPropertiesAfterExecution() throws Exception {
+		SimpleStep step = new SimpleStep();
+		step.setJobRepository(new JobRepositorySupport());
+		step.setTransactionManager(new ResourcelessTransactionManager());
+		assertNotNull(step.createStepExecutor());
+		// If we do that again, we don't expect a different result (e.g.
+		// mandatory properties test failing).
+		assertNotNull(step.createStepExecutor());
+	}
 }
