@@ -48,7 +48,7 @@
 					</property>
 					<property name="commitInterval" value="2" />
 					<property name="startLimit" value="100" />
-					<property name="saveStreamContext" value="true" />
+					<property name="saveExecutionAttributes" value="true" />
 					<property name="allowStartIfComplete" value="false" />
 				</bean>
 				<bean id="loading" parent="repeatOperationsStep">

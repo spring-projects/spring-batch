@@ -136,8 +136,8 @@ public class SimpleStepContextTests extends TestCase {
 	public void testStreamContextWithNotNullService() throws Exception {
 		Map map = new HashMap();
 		context = new SimpleStepContext(null, null, new StubStreamManager(map));
-		assertEquals(1, context.getStreamContext().getProperties().size());
-		assertEquals("bar", context.getStreamContext().getProperties().getProperty("foo"));
+		assertEquals(1, context.getExecutionAttributes().getProperties().size());
+		assertEquals("bar", context.getExecutionAttributes().getProperties().getProperty("foo"));
 	}
 
 	public void testStreamManagerRegistration() throws Exception {
@@ -164,7 +164,7 @@ public class SimpleStepContextTests extends TestCase {
 		public void close(Object key) {
 		}
 
-		public ExecutionAttributes getStreamContext(Object key) {
+		public ExecutionAttributes getExecutionAttributes(Object key) {
 			return new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar"));
 		}
 

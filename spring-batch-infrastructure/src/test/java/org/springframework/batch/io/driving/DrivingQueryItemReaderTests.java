@@ -73,7 +73,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionAttributes streamContext = getAsRestartable(source).getStreamContext();
+		ExecutionAttributes streamContext = getAsRestartable(source).getExecutionAttributes();
 
 		// create new input source
 		source = createItemReader();
@@ -95,7 +95,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionAttributes streamContext = getAsRestartable(source).getStreamContext();
+		ExecutionAttributes streamContext = getAsRestartable(source).getExecutionAttributes();
 
 		// create new input source
 		source = createItemReader();

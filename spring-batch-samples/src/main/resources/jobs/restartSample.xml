@@ -31,7 +31,6 @@
 					</bean>
 				</property>
 				<property name="commitInterval" value="2" />
-				<property name="saveStreamContext" value="true"/>
 			</bean>
 		</property>
 	</bean>

@@ -290,7 +290,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		StepInstance step = new StepInstance(new Long(1));
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepExecutor.setTasklet(tasklet);
-		stepConfiguration.setSaveStreamContext(true);
+		stepConfiguration.setSaveExecutionAttributes(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
@@ -309,7 +309,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		step.setStepExecutionCount(1);
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepExecutor.setTasklet(tasklet);
-		stepConfiguration.setSaveStreamContext(true);
+		stepConfiguration.setSaveExecutionAttributes(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 		
@@ -332,7 +332,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		step.setStepExecutionCount(1);
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepConfiguration.setTasklet(tasklet);
-		stepConfiguration.setSaveStreamContext(false);
+		stepConfiguration.setSaveExecutionAttributes(false);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
@@ -359,7 +359,7 @@ public class SimpleStepExecutorTests extends TestCase {
 				return ExitStatus.FINISHED;
 			}
 		});
-		stepConfiguration.setSaveStreamContext(true);
+		stepConfiguration.setSaveExecutionAttributes(true);
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
@@ -413,7 +413,7 @@ public class SimpleStepExecutorTests extends TestCase {
 				return ExitStatus.FINISHED;
 			}
 		});
-		stepConfiguration.setSaveStreamContext(true);
+		stepConfiguration.setSaveExecutionAttributes(true);
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
@@ -421,7 +421,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		final Map map = new HashMap();
 		stepExecutor.setStreamManager(new SimpleStreamManager(new ResourcelessTransactionManager()) {
-			public ExecutionAttributes getStreamContext(Object key) {
+			public ExecutionAttributes getExecutionAttributes(Object key) {
 				// TODO Auto-generated method stub
 				return new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar"));
 			}
@@ -453,7 +453,7 @@ public class SimpleStepExecutorTests extends TestCase {
 			return restoreFromCalledWithSomeContext;
 		}
 
-		public ExecutionAttributes getStreamContext() {
+		public ExecutionAttributes getExecutionAttributes() {
 			getStreamContextCalled = true;
 			return new ExecutionAttributes(PropertiesConverter.stringToProperties("spam=bucket"));
 		}

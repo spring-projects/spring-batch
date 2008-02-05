@@ -309,7 +309,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		commit();
 
 		// get restart data
-		ExecutionAttributes streamContext = inputSource.getStreamContext();
+		ExecutionAttributes streamContext = inputSource.getExecutionAttributes();
 		// close template
 		inputSource.close();
 
@@ -335,7 +335,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.write("testLine8");
 
 		// get statistics
-		ExecutionAttributes statistics = inputSource.getStreamContext();
+		ExecutionAttributes statistics = inputSource.getExecutionAttributes();
 		// close template
 		inputSource.close();
 
@@ -363,7 +363,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	public void testDefaultStreamContext() throws Exception {
 		inputSource = new FlatFileItemWriter();
 		inputSource.open();
-		ExecutionAttributes streamContext = inputSource.getStreamContext();
+		ExecutionAttributes streamContext = inputSource.getExecutionAttributes();
 		assertNotNull(streamContext);
 		assertEquals(3, streamContext.getProperties().size());
 		assertEquals(0, streamContext.getLong(FlatFileItemWriter.RESTART_DATA_NAME));

@@ -206,7 +206,7 @@ public class SimpleStepExecutor {
 						// TODO: check that stepExecution can
 						// aggregate these contributions if they
 						// come in asynchronously.
-						ExecutionAttributes statistics = stepContext.getStreamContext();
+						ExecutionAttributes statistics = stepContext.getExecutionAttributes();
 						contribution.setStreamContext(statistics);
 						contribution.incrementCommitCount();
 
@@ -220,7 +220,7 @@ public class SimpleStepExecutor {
 							stepExecution.apply(contribution);
 
 							if (saveStreamContext) {
-								stepInstance.setStreamContext(stepContext.getStreamContext());
+								stepInstance.setStreamContext(stepContext.getExecutionAttributes());
 								jobRepository.update(stepInstance);
 							}
 							jobRepository.saveOrUpdate(stepExecution);

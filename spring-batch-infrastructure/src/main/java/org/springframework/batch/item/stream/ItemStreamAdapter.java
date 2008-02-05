@@ -48,9 +48,9 @@ public class ItemStreamAdapter implements ItemStream {
 
 	/**
 	 * Return empty {@link ExecutionAttributes}.
-	 * @see org.springframework.batch.item.StreamContextProvider#getStreamContext()
+	 * @see org.springframework.batch.item.ExecutionAttributesProvider#getExecutionAttributes()
 	 */
-	public ExecutionAttributes getStreamContext() {
+	public ExecutionAttributes getExecutionAttributes() {
 		return new ExecutionAttributes();
 	}
 

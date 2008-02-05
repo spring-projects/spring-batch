@@ -144,7 +144,7 @@ public class ItemWriterItemProcessorTests extends TestCase {
 		public void open() {
 		}
 
-		public ExecutionAttributes getStreamContext() {
+		public ExecutionAttributes getExecutionAttributes() {
 			return new ExecutionAttributes(PropertiesConverter.stringToProperties("value=foo"));
 		}
 

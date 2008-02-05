@@ -27,8 +27,8 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 		}
 	}
 
-	public ExecutionAttributes getStreamContext() {
-		return inputSource.getStreamContext();
+	public ExecutionAttributes getExecutionAttributes() {
+		return inputSource.getExecutionAttributes();
 	}
 
 	public void restoreFrom(ExecutionAttributes data) {

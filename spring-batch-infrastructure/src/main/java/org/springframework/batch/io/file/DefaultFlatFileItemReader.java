@@ -90,7 +90,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * current Line Count which can be used to re initialise the batch job in
 	 * case of restart.
 	 */
-	public ExecutionAttributes getStreamContext() {
+	public ExecutionAttributes getExecutionAttributes() {
 		if (reader == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}

@@ -244,9 +244,9 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	}
 
 	/**
-	 * @see ItemStream#getStreamContext()
+	 * @see ItemStream#getExecutionAttributes()
 	 */
-	public ExecutionAttributes getStreamContext() {
+	public ExecutionAttributes getExecutionAttributes() {
 		if (state == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}

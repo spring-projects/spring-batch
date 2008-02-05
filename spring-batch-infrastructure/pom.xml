@@ -19,6 +19,9 @@
 	<profiles>
 		<profile>
 			<id>clover</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
 			<build>
 				<plugins>
 					<plugin>

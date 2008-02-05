@@ -87,7 +87,7 @@
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="allowStartIfComplete" value="true" />
-		<property name="saveStreamContext" value="true" />
+		<property name="saveExecutionAttributes" value="true" />
 	</bean>
 
 	<bean id="simpleStep" parent="abstractStep"

@@ -156,7 +156,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		inputSource.setFieldSetMapper(fieldSetMapper);
 		// do not open the template...
 		try {
-			inputSource.restoreFrom(inputSource.getStreamContext());
+			inputSource.restoreFrom(inputSource.getExecutionAttributes());
 		} catch (StreamException e) {
 			assertTrue("Message does not contain open: "+e.getMessage(), e.getMessage().contains("open"));
 		}
@@ -179,7 +179,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		inputSource.read();
 
 		// get restart data
-		ExecutionAttributes streamContext = inputSource.getStreamContext();
+		ExecutionAttributes streamContext = inputSource.getExecutionAttributes();
 		assertEquals("4", (String) streamContext.getProperties().getProperty(
 				DefaultFlatFileItemReader.READ_STATISTICS_NAME));
 		// close input
@@ -195,7 +195,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		assertEquals("[testLine5]", inputSource.read().toString());
 		assertEquals("[testLine6]", inputSource.read().toString());
 
-		ExecutionAttributes statistics = inputSource.getStreamContext();
+		ExecutionAttributes statistics = inputSource.getExecutionAttributes();
 		assertEquals(6, statistics.getLong(DefaultFlatFileItemReader.READ_STATISTICS_NAME));
 	}
 

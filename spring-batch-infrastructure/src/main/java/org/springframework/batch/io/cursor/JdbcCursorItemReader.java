@@ -390,7 +390,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	 * 
 	 * @see org.springframework.batch.restart.Restartable#getStreamContext()
 	 */
-	public ExecutionAttributes getStreamContext() {
+	public ExecutionAttributes getExecutionAttributes() {
 		String skipped = skippedRows.toString();
 		ExecutionAttributes context = new ExecutionAttributes();
 		context.putString(SKIPPED_ROWS, skipped.substring(1, skipped.length() - 1));

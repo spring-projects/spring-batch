@@ -83,7 +83,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionAttributes streamContext = getAsRestartable(source).getStreamContext();
+		ExecutionAttributes streamContext = getAsRestartable(source).getExecutionAttributes();
 
 		// create new input source
 		source = createItemReader();
@@ -105,7 +105,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionAttributes streamContext = getAsRestartable(source).getStreamContext();
+		ExecutionAttributes streamContext = getAsRestartable(source).getExecutionAttributes();
 
 		// create new input source
 		source = createItemReader();
@@ -208,7 +208,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 		
 		rollback();
 		
-		ExecutionAttributes streamContext = getAsRestartable(source).getStreamContext();
+		ExecutionAttributes streamContext = getAsRestartable(source).getExecutionAttributes();
 
 		// create new input source
 		source = createItemReader();
@@ -221,11 +221,11 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 	}
 
 	private void commit() {
-		((ItemStream) source).mark(((ItemStream) source).getStreamContext());
+		((ItemStream) source).mark(((ItemStream) source).getExecutionAttributes());
 	}
 	
 	private void rollback() {
-		((ItemStream) source).reset(((ItemStream) source).getStreamContext());
+		((ItemStream) source).reset(((ItemStream) source).getExecutionAttributes());
 	}
 	
 	private Skippable getAsSkippable(ItemReader source) {

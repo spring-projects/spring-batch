@@ -88,7 +88,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 		// write records
 		writer.write(record);
 		writer.mark(null);
-		ExecutionAttributes streamContext = writer.getStreamContext();
+		ExecutionAttributes streamContext = writer.getExecutionAttributes();
 
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();
@@ -116,7 +116,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 		for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
 			writer.write(record);
 			long writeStatistics =
-				writer.getStreamContext().getLong(StaxEventItemWriter.WRITE_STATISTICS_NAME);
+				writer.getExecutionAttributes().getLong(StaxEventItemWriter.WRITE_STATISTICS_NAME);
 
 			assertEquals(i, writeStatistics);
 		}

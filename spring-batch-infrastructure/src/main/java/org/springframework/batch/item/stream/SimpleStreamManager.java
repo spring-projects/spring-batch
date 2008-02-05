@@ -67,7 +67,7 @@ public class SimpleStreamManager implements StreamManager {
 	/**
 	 * Public setter for the flag. If this is true then the class name of the
 	 * streams will be used as a prefix in the {@link StreamContext} in
-	 * {@link #getStreamContext(Object)}. The default value is true, which
+	 * {@link #getExecutionAttributes(Object)}. The default value is true, which
 	 * gives the best chance of unique key names in the context.
 	 * 
 	 * @param useClassNameAsPrefix the flag to set (default true).
@@ -88,13 +88,13 @@ public class SimpleStreamManager implements StreamManager {
 	 * Simple aggregate {@link StreamContext} provider for the contributions
 	 * registered under the given key.
 	 * 
-	 * @see org.springframework.batch.item.stream.StreamManager#getStreamContext(java.lang.Object)
+	 * @see org.springframework.batch.item.stream.StreamManager#getExecutionAttributes(java.lang.Object)
 	 */
-	public ExecutionAttributes getStreamContext(Object key) {
+	public ExecutionAttributes getExecutionAttributes(Object key) {
 		final ExecutionAttributes result = new ExecutionAttributes();
 		iterate(key, new Callback() {
 			public void execute(ItemStream stream) {
-				ExecutionAttributes context = stream.getStreamContext();
+				ExecutionAttributes context = stream.getExecutionAttributes();
 				String prefix = ClassUtils.getQualifiedName(stream.getClass()) + ".";
 				if (!useClassNameAsPrefix) {
 					prefix = "";
@@ -179,7 +179,7 @@ public class SimpleStreamManager implements StreamManager {
 					iterate(key, new Callback() {
 						public void execute(ItemStream stream) {
 							if (stream.isMarkSupported()) {
-								stream.mark(stream.getStreamContext());
+								stream.mark(stream.getExecutionAttributes());
 							}
 						}
 					});
@@ -188,7 +188,7 @@ public class SimpleStreamManager implements StreamManager {
 					iterate(key, new Callback() {
 						public void execute(ItemStream stream) {
 							if (stream.isMarkSupported()) {
-								stream.reset(stream.getStreamContext());
+								stream.reset(stream.getExecutionAttributes());
 							}
 						}
 					});

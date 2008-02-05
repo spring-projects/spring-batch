@@ -361,9 +361,9 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	/**
 	 * Get the restart data.
 	 * @return the restart data
-	 * @see org.springframework.batch.item.ItemStream#getStreamContext()
+	 * @see org.springframework.batch.item.ItemStream#getExecutionAttributes()
 	 */
-	public ExecutionAttributes getStreamContext() {
+	public ExecutionAttributes getExecutionAttributes() {
 		if (!initialized) {
 			throw new StreamException("ItemStream is not open, or may have been closed.  Cannot access context.");
 		}

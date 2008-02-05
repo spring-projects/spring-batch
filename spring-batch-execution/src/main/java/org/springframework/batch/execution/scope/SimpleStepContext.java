@@ -192,12 +192,11 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 		return stepExecution;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#getStreamContext()
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ExecutionAttributesProvider#getExecutionAttributes()
 	 */
-	public ExecutionAttributes getStreamContext() {
-		return streamManager.getStreamContext(this);
+	public ExecutionAttributes getExecutionAttributes() {
+		return streamManager.getExecutionAttributes(this);
 	}
 
 	/* (non-Javadoc)

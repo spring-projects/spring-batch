@@ -48,14 +48,14 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	}
 
 	/**
-	 * @see ItemStream#getStreamContext()
+	 * @see ItemStream#getExecutionAttributes()
 	 * @throws IllegalStateException if the parent template is not itself
 	 * {@link ItemStream}.
 	 */
-	public ExecutionAttributes getStreamContext() {
+	public ExecutionAttributes getExecutionAttributes() {
 		// TODO: this is not necessary...
 		Assert.state(inputSource instanceof ItemStream, "Input source is not ItemStream");
-		return ((ItemStream) inputSource).getStreamContext();
+		return ((ItemStream) inputSource).getExecutionAttributes();
 	}
 
 	/**

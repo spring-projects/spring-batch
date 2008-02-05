@@ -174,7 +174,7 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	/**
 	 * @return the current row number wrapped as <code>StreamContext</code>
 	 */
-	public ExecutionAttributes getStreamContext() {
+	public ExecutionAttributes getExecutionAttributes() {
 		Properties props = new Properties();
 		props.setProperty(RESTART_DATA_ROW_NUMBER_KEY, "" + currentProcessedRow);
 

@@ -73,7 +73,7 @@ public class DelegatingItemReaderTests extends TestCase {
 	 * Gets restart data from the input template
 	 */
 	public void testGetStreamContext() {
-		Properties props = itemProvider.getStreamContext().getProperties();
+		Properties props = itemProvider.getExecutionAttributes().getProperties();
 		assertEquals("foo", props.getProperty("value"));
 	}
 
@@ -99,7 +99,7 @@ public class DelegatingItemReaderTests extends TestCase {
 			return PropertiesConverter.stringToProperties("a=b");
 		}
 
-		public ExecutionAttributes getStreamContext() {
+		public ExecutionAttributes getExecutionAttributes() {
 			return new ExecutionAttributes(PropertiesConverter.stringToProperties("value=foo"));
 		}
 

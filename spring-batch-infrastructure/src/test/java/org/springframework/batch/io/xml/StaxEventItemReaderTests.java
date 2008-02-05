@@ -112,7 +112,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	 */
 	public void testRestart() {
 		source.read();
-		ExecutionAttributes streamContext = source.getStreamContext();
+		ExecutionAttributes streamContext = source.getExecutionAttributes();
 		assertEquals(1, streamContext.getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME));
 		List expectedAfterRestart = (List) source.read();
 
@@ -208,7 +208,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	}
 
 	private long extractRecordCount() {
-		return source.getStreamContext().getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME);
+		return source.getExecutionAttributes().getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME);
 	}
 
 	public void testCloseWithoutOpen() throws Exception {

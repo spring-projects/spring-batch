@@ -243,7 +243,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.StreamContextProvider#getStreamContext()
 	 */
-	public ExecutionAttributes getStreamContext() {
+	public ExecutionAttributes getExecutionAttributes() {
 		return new ExecutionAttributes();
 	}
 

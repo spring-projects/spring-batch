@@ -65,7 +65,7 @@ public class StepSupportTests extends TestCase {
 	
 	public void testSaveRestartFlag() throws Exception {
 		assertEquals(false, configuration.isSaveStreamContext());
-		configuration.setSaveStreamContext(true);
+		configuration.setSaveExecutionAttributes(true);
 		assertEquals(true, configuration.isSaveStreamContext());
 	}
 

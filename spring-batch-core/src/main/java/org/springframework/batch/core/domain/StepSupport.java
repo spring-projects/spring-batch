@@ -121,7 +121,7 @@ public class StepSupport implements Step, BeanNameAware {
 		this.allowStartIfComplete = allowStartIfComplete;
 	}
 
-	public void setSaveStreamContext(boolean saveStreamContext) {
+	public void setSaveExecutionAttributes(boolean saveStreamContext) {
 		this.saveStreamContext = saveStreamContext;
 	}
 

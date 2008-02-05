@@ -50,7 +50,7 @@ public interface StreamManager {
 	 * @return {@link ExecutionAttributes} aggregating the contexts of all providers
 	 * registered under this key, or empty otherwise.
 	 */
-	ExecutionAttributes getStreamContext(Object key);
+	ExecutionAttributes getExecutionAttributes(Object key);
 
 	/**
 	 * If any resources are needed for the stream to operate they need to be

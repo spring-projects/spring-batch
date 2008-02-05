@@ -189,7 +189,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 		}
 	}
 
-	public ExecutionAttributes getStreamContext() {
+	public ExecutionAttributes getExecutionAttributes() {
 		return keyGenerator.getKeyAsStreamContext(getCurrentKey());
 	}
 

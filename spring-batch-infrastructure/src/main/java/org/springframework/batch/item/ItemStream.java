@@ -26,7 +26,7 @@ package org.springframework.batch.item;
  * The state that is stored is represented as {@link ExecutionAttributes} which
  * enforces a requirement that any restart data can be represented by a
  * Properties object. In general, the contract is that {@link ExecutionAttributes}
- * that is returned via the {@link #getStreamContext()} method will be given
+ * that is returned via the {@link #getExecutionAttributes()} method will be given
  * back to the {@link #restoreFrom(ExecutionAttributes)} method, exactly as it was
  * provided.
  * </p>
@@ -34,7 +34,7 @@ package org.springframework.batch.item;
  * @author Dave Syer
  * 
  */
-public interface ItemStream extends StreamContextProvider {
+public interface ItemStream extends ExecutionAttributesProvider {
 
 	/**
 	 * Restart state given the provided {@link ExecutionAttributes}.

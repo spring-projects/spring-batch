@@ -103,7 +103,7 @@ public class SimpleStepConfigurationTests extends TestCase {
 	 */
 	public void testIsSaveStreamContext() {
 		assertEquals(false, configuration.isSaveStreamContext());
-		configuration.setSaveStreamContext(true);
+		configuration.setSaveExecutionAttributes(true);
 		assertEquals(true, configuration.isSaveStreamContext());
 	}
 
