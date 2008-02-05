@@ -33,7 +33,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.Assert;
 
@@ -255,10 +255,12 @@ public class SimpleJobRepository implements JobRepository {
 		if (stepExecution.getId() == null) {
 			// new execution, obtain id and insert
 			stepDao.save(stepExecution);
+			stepDao.save(stepExecution.getId(), stepExecution.getStreamContext());
 		}
 		else {
 			// existing execution, update
 			stepDao.update(stepExecution);
+			stepDao.update(stepExecution.getId(), stepExecution.getStreamContext());
 		}
 	}
 
@@ -303,7 +305,7 @@ public class SimpleJobRepository implements JobRepository {
 			StepInstance stepInstance = stepDao.createStep(job, step.getName());
 			// Ensure valid restart data is being returned.
 			if (stepInstance.getStreamContext() == null || stepInstance.getStreamContext() == null) {
-				stepInstance.setStreamContext(new StreamContext());
+				stepInstance.setStreamContext(new ExecutionAttributes());
 			}
 			stepInstances.add(stepInstance);
 		}
@@ -326,7 +328,7 @@ public class SimpleJobRepository implements JobRepository {
 				step.setStepExecutionCount(stepDao.getStepExecutionCount(step));
 				// Ensure valid restart data is being returned.
 				if (step.getStreamContext() == null || step.getStreamContext() == null) {
-					step.setStreamContext(new StreamContext());
+					step.setStreamContext(new ExecutionAttributes());
 				}
 				stepInstances.add(step);
 			}

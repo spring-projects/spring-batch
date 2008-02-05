@@ -25,7 +25,7 @@ import java.util.Set;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
 public class MapStepDao implements StepDao {
@@ -80,8 +80,8 @@ public class MapStepDao implements StepDao {
 		return  new ArrayList(steps);
 	}
 
-	public StreamContext getStreamContext(Long stepId) {
-		return (StreamContext) restartsById.get(stepId);
+	public ExecutionAttributes getStreamContext(Long stepId) {
+		return (ExecutionAttributes) restartsById.get(stepId);
 	}
 
 	public int getStepExecutionCount(StepInstance stepInstance) {
@@ -117,6 +117,18 @@ public class MapStepDao implements StepDao {
 
 	public void update(StepExecution stepExecution) {
 		// no-op
+	}
+
+	public ExecutionAttributes findExecutionAttributes(Long executionId) {
+		return null;
+	}
+
+	public void save(Long executionId,
+			ExecutionAttributes executionAttributes) {
+	}
+
+	public void update(Long executionId,
+			ExecutionAttributes executionAttributes) {
 	}
 
 }

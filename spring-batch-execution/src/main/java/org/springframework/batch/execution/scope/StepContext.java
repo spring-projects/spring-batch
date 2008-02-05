@@ -17,7 +17,7 @@ package org.springframework.batch.execution.scope;
 
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.StreamContextProvider;
 import org.springframework.core.AttributeAccessor;
 
@@ -63,5 +63,5 @@ public interface StepContext extends AttributeAccessor, StreamContextProvider {
 	 * 
 	 * @param streamContext
 	 */
-	void restoreFrom(StreamContext streamContext);
+	void restoreFrom(ExecutionAttributes streamContext);
 }

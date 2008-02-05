@@ -40,7 +40,7 @@ import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.StreamException;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.item.stream.ItemStreamAdapter;
@@ -314,7 +314,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 		
 		stepExecution.getStep().setStreamContext(
-				new StreamContext(PropertiesConverter.stringToProperties("foo=bar")));
+				new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar")));
 
 		stepExecutor.execute(stepExecution);
 
@@ -421,9 +421,9 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		final Map map = new HashMap();
 		stepExecutor.setStreamManager(new SimpleStreamManager(new ResourcelessTransactionManager()) {
-			public StreamContext getStreamContext(Object key) {
+			public ExecutionAttributes getStreamContext(Object key) {
 				// TODO Auto-generated method stub
-				return new StreamContext(PropertiesConverter.stringToProperties("foo=bar"));
+				return new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar"));
 			}
 		});
 
@@ -453,12 +453,12 @@ public class SimpleStepExecutorTests extends TestCase {
 			return restoreFromCalledWithSomeContext;
 		}
 
-		public StreamContext getStreamContext() {
+		public ExecutionAttributes getStreamContext() {
 			getStreamContextCalled = true;
-			return new StreamContext(PropertiesConverter.stringToProperties("spam=bucket"));
+			return new ExecutionAttributes(PropertiesConverter.stringToProperties("spam=bucket"));
 		}
 
-		public void restoreFrom(StreamContext data) {
+		public void restoreFrom(ExecutionAttributes data) {
 			restoreFromCalled = true;
 			restoreFromCalledWithSomeContext = data.getProperties().size() > 0;
 		}

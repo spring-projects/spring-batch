@@ -37,6 +37,7 @@ import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.StreamContext;
 
 /*
@@ -364,7 +365,10 @@ public class SimpleJobRepositoryTests extends TestCase {
 	public void testUpdateStepExecution(){
 		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(10L)), null, new Long(1));
 		stepExecution.setId(new Long(11));
+		ExecutionAttributes executionAttributes = new ExecutionAttributes();
+		stepExecution.setStreamContext(executionAttributes);
 		stepDao.update(stepExecution);
+		stepDao.update(stepExecution.getId(), executionAttributes);
 		stepDaoControl.replay();
 		jobRepository.saveOrUpdate(stepExecution);
 		stepDaoControl.verify();
@@ -372,7 +376,10 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	public void testSaveExistingStepExecution(){
 		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(10L)), null, null);
+		ExecutionAttributes executionAttributes = new ExecutionAttributes();
+		stepExecution.setStreamContext(executionAttributes);
 		stepDao.save(stepExecution);
+		stepDao.save(stepExecution.getId(), executionAttributes);
 		stepDaoControl.replay();
 		jobRepository.saveOrUpdate(stepExecution);
 		stepDaoControl.verify();
@@ -408,7 +415,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		databaseStep1.setStreamContext(null);
 		stepDaoControl.setReturnValue(databaseStep1);
 		stepDao.createStep(databaseJob, "TestStep2");
-		databaseStep2.setStreamContext(new StreamContext());
+		databaseStep2.setStreamContext(new ExecutionAttributes());
 		stepDaoControl.setReturnValue(databaseStep2);
 		jobDao.save(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher(){
@@ -443,7 +450,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		stepDao.getStepExecutionCount(databaseStep1);
 		stepDaoControl.setReturnValue(1);
 		stepDao.findStep(databaseJob, "TestStep2");
-		databaseStep2.setStreamContext(new StreamContext());
+		databaseStep2.setStreamContext(new ExecutionAttributes());
 		stepDaoControl.setReturnValue(databaseStep2);
 		stepDao.getStepExecutionCount(databaseStep2);
 		stepDaoControl.setReturnValue(1);

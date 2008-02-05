@@ -21,6 +21,7 @@ import java.util.List;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.item.ExecutionAttributes;
 
 /**
  * Data access object for steps.
@@ -101,4 +102,34 @@ public interface StepDao {
 	 * @return list of stepExecutions
 	 */
 	public List findStepExecutions(StepInstance step);
+	
+	/**
+	 * Find all {@link ExecutionAttributes} for the given execution id.
+	 * 
+	 * @param executionId - Long id of the {@link StepExecution}
+	 *   that the attributes belongs to.
+	 * @return attributes for the provided id.  If
+	 * none are found, an empty {@link ExecutionAttributes} will be returned.
+	 * @throws IllegalArgumentException if the id is null.
+	 */
+	ExecutionAttributes findExecutionAttributes(final Long executionId);
+	
+	/**
+	 * Save the provided {@link ExecutionAttributes} for the given 
+	 * execution Id.
+	 * 
+	 * @param executionId to be saved
+	 * @param executionAttributes to be saved.
+	 * @throws IllegalArgumentException if the executionId or 
+	 * attributes are null.
+	 */
+	void save(final Long executionId, final ExecutionAttributes executionAttributes);
+	
+	/**
+	 * Update the provided execution attributes.
+	 * 
+	 * @param executionId
+	 * @param executionAttributes
+	 */
+	void update(final Long executionId, ExecutionAttributes executionAttributes);
 }

@@ -16,12 +16,17 @@
 
 package org.springframework.batch.execution.repository.dao;
 
+import java.io.Serializable;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Map.Entry;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
@@ -30,22 +35,30 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.repository.dao.JdbcJobDao.JobExecutionRowMapper;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.support.AbstractLobCreatingPreparedStatementCallback;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.jdbc.support.lob.DefaultLobHandler;
+import org.springframework.jdbc.support.lob.LobCreator;
+import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
  * Jdbc implementation of {@link StepDao}.<br/>
  * 
- * Allows customisation of the tables names used by Spring Batch for step meta
+ * Allows customization of the tables names used by Spring Batch for step meta
  * data via a prefix property.<br/>
  * 
  * Uses sequences or tables (via Spring's {@link DataFieldMaxValueIncrementer}
@@ -57,6 +70,7 @@ import org.springframework.util.StringUtils;
  * 
  * @author Lucas Ward
  * @author Dave Syer
+ * 
  * @see StepDao
  */
 public class JdbcStepDao implements StepDao, InitializingBean {
@@ -90,6 +104,15 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 			+ "STATUS = ?, COMMIT_COUNT = ?, TASK_COUNT = ?, TASK_STATISTICS = ?, CONTINUABLE = ? , EXIT_CODE = ?, "
 			+ "EXIT_MESSAGE = ?, VERSION = ? where ID = ? and VERSION = ?";
 
+	private static final String UPDATE_STEP_EXECUTION_ATTRS = "UPDATE %PREFIX%STEP_EXECUTION_ATTRS set " +
+			"TYPE_CD = ?, STRING_VAL = ?, DOUBLE_VAL = ?, LONG_VAL = ?, OBJECT_VAL = ? where EXECUTION_ID = ? and KEY_NAME = ?";
+	
+	private static final String INSERT_STEP_EXECUTION_ATTRS = "INSERT into %PREFIX%STEP_EXECUTION_ATTRS(EXECUTION_ID, TYPE_CD," +
+			" KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL) values(?,?,?,?,?,?,?)";
+	
+	private static final String FIND_STEP_EXECUTION_ATTRS = "SELECT TYPE_CD, KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL " +
+			"from %PREFIX%STEP_EXECUTION_ATTRS where EXECUTION_ID = ?";
+	
 	private JdbcOperations jdbcTemplate;
 
 	private JobDao jobDao;
@@ -97,6 +120,8 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
 
 	private DataFieldMaxValueIncrementer stepIncrementer;
+	
+	private LobHandler lobHandler = new DefaultLobHandler();
 
 	private String tablePrefix = JdbcJobDao.DEFAULT_TABLE_PREFIX;
 
@@ -160,7 +185,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 
 				StepInstance step = new StepInstance(new Long(rs.getLong(1)));
 				step.setStatus(BatchStatus.getStatus(rs.getString(2)));
-				step.setStreamContext(new StreamContext(PropertiesConverter.stringToProperties(rs.getString(3))));
+				step.setStreamContext(new ExecutionAttributes(PropertiesConverter.stringToProperties(rs.getString(3))));
 				return step;
 			}
 
@@ -210,7 +235,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 				stepExecution.setStatus(BatchStatus.getStatus(rs.getString(5)));
 				stepExecution.setCommitCount(rs.getInt(6));
 				stepExecution.setTaskCount(rs.getInt(7));
-				stepExecution.setStreamContext(new StreamContext(PropertiesConverter
+				stepExecution.setStreamContext(new ExecutionAttributes(PropertiesConverter
 						.stringToProperties(rs.getString(8))));
 				stepExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(9)), rs.getString(10), rs
 						.getString(11)));
@@ -220,6 +245,156 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 
 		return jdbcTemplate.query(getFindStepExecutionsQuery(), new Object[] { step.getId() }, rowMapper);
 
+	}
+	
+	/*
+	 * Insert execution attributes.  A lob creator must be used, since any attributes
+	 * that don't match a provided type must be serialized into a blob.
+	 */
+	public void save(final Long executionId, final ExecutionAttributes executionAttributes){
+				
+		Assert.notNull(executionId, "ExecutionId must not be null.");
+		Assert.notNull(executionAttributes, "The ExecutionAttributes must not be null.");
+		
+		for(Iterator it = executionAttributes.entrySet().iterator();it.hasNext();){
+			Entry entry = (Entry)it.next();
+			final String key = entry.getKey().toString();
+			final Object value = entry.getValue();
+
+			if(value instanceof String){
+				insertExecutionAttribute(executionId, key, value, AttributeType.STRING);
+			}
+			else if(value instanceof Double){
+				insertExecutionAttribute(executionId, key, value, AttributeType.DOUBLE);
+			}
+			else if(value instanceof Long){
+				insertExecutionAttribute(executionId, key, value, AttributeType.LONG);
+			}
+			else
+			{
+				insertExecutionAttribute(executionId, key, value, AttributeType.OBJECT);
+			}
+		}
+	}
+	
+	private void insertExecutionAttribute(final Long executionId, final String key, final Object value, final AttributeType type){
+		PreparedStatementCallback callback = new AbstractLobCreatingPreparedStatementCallback(lobHandler){
+
+			protected void setValues(PreparedStatement ps, LobCreator lobCreator)
+					throws SQLException, DataAccessException {
+				
+				ps.setLong(1, executionId.longValue());
+				ps.setString(3, key);
+				if(type == AttributeType.STRING){
+					ps.setString(2,AttributeType.STRING.toString());
+					ps.setString(4,value.toString());
+					ps.setDouble(5, 0.0);
+					ps.setLong(6, 0);
+					lobCreator.setBlobAsBytes(ps, 7, null);
+				}
+				else if(type == AttributeType.DOUBLE){
+					ps.setString(2,AttributeType.DOUBLE.toString());
+					ps.setString(4,null);
+					ps.setDouble(5, ((Double)value).doubleValue());
+					ps.setLong(6, 0);
+					lobCreator.setBlobAsBytes(ps, 7, null);
+				}
+				else if(type == AttributeType.LONG){
+					ps.setString(2,AttributeType.LONG.toString());
+					ps.setString(4,null);
+					ps.setDouble(5, 0.0 );
+					ps.setLong(6, ((Long)value).longValue());
+					lobCreator.setBlobAsBytes(ps, 7, null);
+				}
+				else{
+					ps.setString(2,AttributeType.OBJECT.toString());
+					ps.setString(4,null);
+					ps.setDouble(5, 0.0 );
+					ps.setLong(6, 0);
+					lobCreator.setBlobAsBytes(ps, 7, SerializationUtils.serialize((Serializable)value));
+				}
+			}};
+			
+			jdbcTemplate.execute(getQuery(INSERT_STEP_EXECUTION_ATTRS), callback);
+	}
+	
+	/**
+	 * update execution attributes.  A lob creator must be used, since any attributes
+	 * that don't match a provided type must be serialized into a blob.
+	 * 
+	 * @see {@link LobCreator}
+	 */
+	public void update(final Long executionId, ExecutionAttributes executionAttributes){
+		
+		Assert.notNull(executionId, "ExecutionId must not be null.");
+		Assert.notNull(executionAttributes, "The ExecutionAttributes must not be null.");
+		
+		for(Iterator it = executionAttributes.entrySet().iterator();it.hasNext();){
+			Entry entry = (Entry)it.next();
+			final String key = entry.getKey().toString();
+			final Object value = entry.getValue();
+			
+			if(value instanceof String){
+				updateExecutionAttribute(executionId, key, value, AttributeType.STRING);
+			}
+			else if(value instanceof Double){
+				updateExecutionAttribute(executionId, key, value, AttributeType.DOUBLE);
+			}
+			else if(value instanceof Long){
+				updateExecutionAttribute(executionId, key, value, AttributeType.LONG);
+			}
+			else
+			{
+				updateExecutionAttribute(executionId, key, value, AttributeType.OBJECT);
+			}
+		}
+	}
+	
+	private void updateExecutionAttribute(final Long executionId, final String key, final Object value, final AttributeType type){
+		
+		PreparedStatementCallback callback = new AbstractLobCreatingPreparedStatementCallback(lobHandler){
+
+			protected void setValues(PreparedStatement ps, LobCreator lobCreator)
+					throws SQLException, DataAccessException {
+				
+				ps.setLong(6, executionId.longValue());
+				ps.setString(7, key);
+				if(type == AttributeType.STRING){
+					ps.setString(1,AttributeType.STRING.toString());
+					ps.setString(2,value.toString());
+					ps.setDouble(3, 0.0);
+					ps.setLong(4, 0);
+					lobCreator.setBlobAsBytes(ps, 5, null);
+				}
+				else if(type == AttributeType.DOUBLE){
+					ps.setString(1,AttributeType.DOUBLE.toString());
+					ps.setString(2,null);
+					ps.setDouble(3, ((Double)value).doubleValue());
+					ps.setLong(4, 0);
+					lobCreator.setBlobAsBytes(ps, 5, null);
+				}
+				else if(type == AttributeType.LONG){
+					ps.setString(1,AttributeType.LONG.toString());
+					ps.setString(2,null);
+					ps.setDouble(3, 0.0 );
+					ps.setLong(4, ((Long)value).longValue());
+					lobCreator.setBlobAsBytes(ps, 5, null);
+				}
+				else{
+					ps.setString(1,AttributeType.OBJECT.toString());
+					ps.setString(2,null);
+					ps.setDouble(3, 0.0 );
+					ps.setLong(4, 0);
+					lobCreator.setBlobAsBytes(ps, 5, SerializationUtils.serialize((Serializable)value));
+				}
+			}};
+			
+			//LobCreating callbacks always return the affect row count for SQL DML statements, if less than 1 row
+			//is affected, then this row is new and should be inserted.
+			Integer affectedRows = (Integer)jdbcTemplate.execute(getQuery(UPDATE_STEP_EXECUTION_ATTRS), callback);
+			if(affectedRows.intValue() < 1){
+				insertExecutionAttribute(executionId, key, value, type);
+			}
 	}
 
 	/**
@@ -244,7 +419,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 				String status = rs.getString(3);
 				step.setStatus(BatchStatus.getStatus(status));
 				step
-						.setStreamContext(new StreamContext(PropertiesConverter.stringToProperties(rs
+						.setStreamContext(new ExecutionAttributes(PropertiesConverter.stringToProperties(rs
 								.getString(3))));
 				return step;
 			}
@@ -321,7 +496,6 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 		jdbcTemplate.update(getSaveStepExecutionQuery(), parameters, new int[] { Types.INTEGER, Types.INTEGER,
 				Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER,
 				Types.INTEGER, Types.VARCHAR, Types.CHAR, Types.VARCHAR, Types.VARCHAR });
-
 	}
 
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
@@ -408,10 +582,47 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 				throw new OptimisticLockingFailureException("Attempt to update step execution id="
 						+ stepExecution.getId() + " with out of date version (" + stepExecution.getVersion() + ")");
 			}
-
+			
 			stepExecution.incrementVersion();
-
+			
 		}
+	}
+	
+	public ExecutionAttributes findExecutionAttributes(final Long executionId){
+		
+		Assert.notNull(executionId, "ExecutionId must not be null.");
+		
+		final ExecutionAttributes executionAttributes = new ExecutionAttributes();
+		
+		RowCallbackHandler callback = new RowCallbackHandler(){
+
+			public void processRow(ResultSet rs) throws SQLException {
+				
+				String typeCd = rs.getString("TYPE_CD");
+				AttributeType type = AttributeType.getType(typeCd);
+				String key = rs.getString("KEY_NAME");
+				if(type == AttributeType.STRING){
+					executionAttributes.putString(key, rs.getString("STRING_VAL"));
+				}
+				else if(type == AttributeType.LONG){
+					executionAttributes.putLong(key, rs.getLong("LONG_VAL"));
+				}
+				else if(type == AttributeType.DOUBLE){
+					executionAttributes.putDouble(key, rs.getDouble("DOUBLE_VAL"));
+				}
+				else if(type == AttributeType.OBJECT){
+					executionAttributes.putLong(key, rs.getLong("OBJECT_VAL"));
+				}
+				else{
+					throw new BatchCriticalException("Invalid type found: [" + typeCd + "] for execution id: [" +
+							executionId + "]");
+				}
+			}
+		};
+		
+		jdbcTemplate.query(getQuery(FIND_STEP_EXECUTION_ATTRS), new Object[]{executionId}, callback);
+		
+		return executionAttributes;
 	}
 
 	/**
@@ -425,7 +636,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 		Assert.notNull(step.getId(), "Step Id cannot be null.");
 
 		Properties restartProps = null;
-		StreamContext streamContext = step.getStreamContext();
+		ExecutionAttributes streamContext = step.getStreamContext();
 		if (streamContext != null) {
 			restartProps = streamContext.getProperties();
 		}
@@ -443,11 +654,49 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	 * @param jobExecution @throws IllegalArgumentException
 	 */
 	private void validateStepExecution(StepExecution stepExecution) {
-
 		Assert.notNull(stepExecution);
 		Assert.notNull(stepExecution.getStepId(), "StepExecution Step-Id cannot be null.");
 		Assert.notNull(stepExecution.getStartTime(), "StepExecution start time cannot be null.");
 		Assert.notNull(stepExecution.getStatus(), "StepExecution status cannot be null.");
+	}
+	
+	public void setLobHandler(LobHandler lobHandler) {
+		this.lobHandler = lobHandler;
+	}
+	
+	public static class AttributeType {
+
+		private final String type;
+
+		private AttributeType(String type) {
+			this.type = type;
+		}
+
+		public String toString() {
+			return type;
+		}
+
+		public static final AttributeType STRING = new AttributeType("STRING");
+
+		public static final AttributeType LONG = new AttributeType("LONG");
+
+		public static final AttributeType OBJECT = new AttributeType("OBJECT");
+
+		public static final AttributeType DOUBLE = new AttributeType("DOUBLE");
+
+		private static final AttributeType[] VALUES = { STRING, OBJECT, LONG,
+				DOUBLE };
+
+		public static AttributeType getType(String typeAsString) {
+
+			for (int i = 0; i < VALUES.length; i++) {
+				if (VALUES[i].toString().equals(typeAsString)) {
+					return (AttributeType) VALUES[i];
+				}
+			}
+
+			return null;
+		}
 	}
 
 }

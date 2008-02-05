@@ -18,6 +18,7 @@ package org.springframework.batch.execution.repository.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Job;
@@ -28,7 +29,8 @@ import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -60,6 +62,8 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	protected JobExecution jobExecution;
 
 	protected JobParameters jobParameters = new JobParameters();
+	
+	protected ExecutionAttributes executionAttributes;
 
 	public void setJobDao(JobDao jobDao) {
 		this.jobDao = jobDao;
@@ -92,6 +96,13 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setStartTime(new Date(System.currentTimeMillis()));
 		stepDao.save(stepExecution);
+		
+		executionAttributes = new ExecutionAttributes();
+		executionAttributes.putString("1", "testString1");
+		executionAttributes.putString("2", "testString2");
+		executionAttributes.putLong("3", 3);
+		executionAttributes.putDouble("4", 4.4);
+
 	}
 
 	public void testVersionIsNotNullForStep() throws Exception {
@@ -150,7 +161,9 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	public void testUpdateStepWithStreamContext() {
 
 		step1.setStatus(BatchStatus.COMPLETED);
-		StreamContext streamContext = new StreamContext(PropertiesConverter.stringToProperties("key1=restartData"));
+		Properties data = new Properties();
+		data.setProperty("restart.key1", "restartData");
+		ExecutionAttributes streamContext = new ExecutionAttributes(data);
 		step1.setStreamContext(streamContext);
 		stepDao.update(step1);
 		StepInstance tempStep = stepDao.findStep(jobInstance, step1.getName());
@@ -163,7 +176,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		StepExecution execution = new StepExecution(step2, jobExecution, null);
 		execution.setStatus(BatchStatus.STARTED);
 		execution.setStartTime(new Date(System.currentTimeMillis()));
-		execution.setStreamContext(new StreamContext(PropertiesConverter.stringToProperties("key1=0,key2=5")));
+		execution.setStreamContext(new ExecutionAttributes(PropertiesConverter.stringToProperties("key1=0,key2=5")));
 		execution.setExitStatus(new ExitStatus(false, ExitCodeExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));
 		stepDao.save(execution);
@@ -181,7 +194,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 		stepExecution.setCommitCount(5);
 		stepExecution.setTaskCount(5);
-		stepExecution.setStreamContext(new StreamContext());
+		stepExecution.setStreamContext(new ExecutionAttributes());
 		stepExecution.setExitStatus(new ExitStatus(false, ExitCodeExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));
 		stepDao.update(stepExecution);
@@ -240,5 +253,16 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 					.indexOf("" + stepExecution.getVersion()) >= 0);
 		}
 	}
-
+	
+	public void testSaveExecutionAttributes(){
+	
+		stepDao.save(stepExecution.getId(), executionAttributes);
+		ExecutionAttributes attributes = stepDao.findExecutionAttributes(stepExecution.getId());
+		assertEquals(executionAttributes, attributes);
+		executionAttributes.putString("newString", "newString");
+		stepDao.update(stepExecution.getId(), executionAttributes);
+		attributes = stepDao.findExecutionAttributes(stepExecution.getId());
+		assertEquals(executionAttributes, attributes);
+	}
+		
 }

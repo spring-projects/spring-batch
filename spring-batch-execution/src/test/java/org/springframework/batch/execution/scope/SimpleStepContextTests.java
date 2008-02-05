@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.support.PropertiesConverter;
@@ -164,18 +164,18 @@ public class SimpleStepContextTests extends TestCase {
 		public void close(Object key) {
 		}
 
-		public StreamContext getStreamContext(Object key) {
-			return new StreamContext(PropertiesConverter.stringToProperties("foo=bar"));
+		public ExecutionAttributes getStreamContext(Object key) {
+			return new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar"));
 		}
 
 		public void open(Object key) {
 		}
 
-		public void register(Object key, ItemStream stream, StreamContext streamContext) {
+		public void register(Object key, ItemStream stream, ExecutionAttributes streamContext) {
 			map.put(key, stream);
 		}
 
-		public void restoreFrom(Object key, StreamContext data) {
+		public void restoreFrom(Object key, ExecutionAttributes data) {
 		}
 	}
 

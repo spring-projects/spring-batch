@@ -17,6 +17,7 @@
 package org.springframework.batch.execution.repository.dao;
 
 import java.util.List;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -25,8 +26,9 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.support.PropertiesConverter;
+import org.springframework.batch.execution.repository.dao.MapStepDao;
+import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.stream.GenericStreamContext;
 
 public class MapStepDaoTests extends TestCase {
 
@@ -107,7 +109,9 @@ public class MapStepDaoTests extends TestCase {
 	public void testSaveStreamContext() throws Exception {
 		assertEquals(null, dao.getStreamContext(step.getId()));
 		step.setStatus(BatchStatus.COMPLETED);
-		StreamContext streamContext = new StreamContext(PropertiesConverter.stringToProperties("key1=restartData"));
+		Properties data = new Properties();
+		data.setProperty("restart.key1", "restartData");
+		ExecutionAttributes streamContext = new ExecutionAttributes(data);
 		step.setStreamContext(streamContext);
 		dao.update(step);
 		StepInstance tempStep = dao.findStep(job, step.getName());
