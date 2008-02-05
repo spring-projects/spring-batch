@@ -61,7 +61,7 @@ public interface StepContext extends AttributeAccessor, ExecutionAttributesProvi
 	 * streams will simply not be initialised and repositioned for restart
 	 * (which is sometimes desirable).
 	 * 
-	 * @param streamContext
+	 * @param executionAttributes
 	 */
-	void restoreFrom(ExecutionAttributes streamContext);
+	void restoreFrom(ExecutionAttributes executionAttributes);
 }

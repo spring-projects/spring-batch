@@ -49,7 +49,7 @@ public class StepInstance extends Entity {
 
 	private BatchStatus status;
 
-	private ExecutionAttributes streamContext = new ExecutionAttributes();
+	private ExecutionAttributes executionAttributes = new ExecutionAttributes();
 
 	private int stepExecutionCount = 0;
 
@@ -84,12 +84,12 @@ public class StepInstance extends Entity {
 		this.stepExecutionCount = stepExecutionCount;
 	}
 
-	public ExecutionAttributes getStreamContext() {
-		return streamContext;
+	public ExecutionAttributes getExecutionAttributes() {
+		return executionAttributes;
 	}
 
-	public void setStreamContext(ExecutionAttributes streamContext) {
-		this.streamContext = streamContext;
+	public void setExecutionAttributes(ExecutionAttributes executionAttributes) {
+		this.executionAttributes = executionAttributes;
 	}
 
 	public BatchStatus getStatus() {

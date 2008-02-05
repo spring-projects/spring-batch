@@ -20,9 +20,9 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
  */
 public class ColumnMapRestartDataRowMapperTests extends TestCase {
 
-	private static final String KEY = ColumnMapStreamContextRowMapper.KEY_PREFIX;
+	private static final String KEY = ColumnMapExecutionAttributesRowMapper.KEY_PREFIX;
 	
-	private ColumnMapStreamContextRowMapper mapper;
+	private ColumnMapExecutionAttributesRowMapper mapper;
 	
 	private Map key;
 	
@@ -32,7 +32,7 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 	
-		mapper = new ColumnMapStreamContextRowMapper();
+		mapper = new ColumnMapExecutionAttributesRowMapper();
 		
 		key = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(2);
 		key.put("1", new Integer(1));
@@ -42,7 +42,7 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 	public void testCreateRestartDataWithInvalidType() throws Exception {
 		
 		try{
-			mapper.createStreamContext(new Object());
+			mapper.createExecutionAttributes(new Object());
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -52,7 +52,7 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 	public void testCreateRestartDataWithNull(){
 		
 		try{
-			mapper.createStreamContext(null);
+			mapper.createExecutionAttributes(null);
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -60,7 +60,7 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 	}
 	
 	public void testCreateRestartData() throws Exception {
-		ExecutionAttributes streamContext = mapper.createStreamContext(key);
+		ExecutionAttributes streamContext = mapper.createExecutionAttributes(key);
 		Properties props = streamContext.getProperties();
 		assertEquals("1", props.getProperty(KEY + "0"));
 		assertEquals("2", props.getProperty(KEY + "1"));
@@ -68,7 +68,7 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 	
 	public void testCreateRestartDataFromEmptyKeys() throws Exception {
 		
-		ExecutionAttributes streamContext = mapper.createStreamContext(new HashMap());
+		ExecutionAttributes streamContext = mapper.createExecutionAttributes(new HashMap());
 		assertEquals(0, streamContext.getProperties().size());
 	}
 	

@@ -28,7 +28,7 @@ import org.springframework.util.StringUtils;
 /**
  * <p>Jdbc implementation of the {@link KeyGenerator} interface that works for composite keys.
  * (i.e. keys represented by multiple columns)  A sql query to be used to return the keys and
- * a {@link StreamContextRowMapper} to map each row in the resultset to an Object must be set in 
+ * a {@link ExecutionAttributesRowMapper} to map each row in the resultset to an Object must be set in 
  * order to work correctly.
  * </p>
  *
@@ -43,7 +43,7 @@ public class MultipleColumnJdbcKeyGenerator implements
 
 	private JdbcTemplate jdbcTemplate;
 
-	private StreamContextRowMapper keyMapper = new ColumnMapStreamContextRowMapper();
+	private ExecutionAttributesRowMapper keyMapper = new ColumnMapExecutionAttributesRowMapper();
 
 	private String sql;
 
@@ -78,27 +78,27 @@ public class MultipleColumnJdbcKeyGenerator implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.driving.KeyGenerator#restoreKeys(org.springframework.batch.item.StreamContext)
+	 * @see org.springframework.batch.io.driving.KeyGenerator#restoreKeys(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public List restoreKeys(ExecutionAttributes streamContext) {
+	public List restoreKeys(ExecutionAttributes executionAttributes) {
 
 		Assert.state(keyMapper != null, "KeyMapper must not be null.");
 		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty" +
 		" in order to restart.");
 
-		if (streamContext.getProperties() != null) {
-			return jdbcTemplate.query(restartSql, keyMapper.createSetter(streamContext), keyMapper);
+		if (executionAttributes.getProperties() != null) {
+			return jdbcTemplate.query(restartSql, keyMapper.createSetter(executionAttributes), keyMapper);
 		}
 
 		return new ArrayList();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsStreamContext(java.lang.Object)
+	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionAttributes(java.lang.Object)
 	 */
-	public ExecutionAttributes getKeyAsStreamContext(Object key) {
+	public ExecutionAttributes getKeyAsExecutionAttributes(Object key) {
 		Assert.state(keyMapper != null, "Kye mapper must not be null.");
-		return keyMapper.createStreamContext(key);
+		return keyMapper.createExecutionAttributes(key);
 	}
 
 	/**
@@ -121,12 +121,12 @@ public class MultipleColumnJdbcKeyGenerator implements
 	}
 	
 	/**
-	 * Set the {@link StreamContextRowMapper} to be used to map a resultset
+	 * Set the {@link ExecutionAttributesRowMapper} to be used to map a resultset
 	 * to keys.
 	 * 
 	 * @param keyMapper
 	 */
-	public void setKeyMapper(StreamContextRowMapper keyMapper) {
+	public void setKeyMapper(ExecutionAttributesRowMapper keyMapper) {
 		this.keyMapper = keyMapper;
 	}
 	

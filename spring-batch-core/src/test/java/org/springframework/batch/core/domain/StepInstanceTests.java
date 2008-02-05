@@ -44,15 +44,15 @@ public class StepInstanceTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepInstance#getStreamContext()}.
+	 * Test method for {@link org.springframework.batch.core.domain.StepInstance#getExecutionAttributes()}.
 	 */
-	public void testGetStreamContext() {
-		assertNotNull(instance.getStreamContext());
-		assertTrue(instance.getStreamContext().getProperties().isEmpty());
+	public void testGetExecutionAttributes() {
+		assertNotNull(instance.getExecutionAttributes());
+		assertTrue(instance.getExecutionAttributes().getProperties().isEmpty());
 		ExecutionAttributes executionAttributes = new ExecutionAttributes();
 		executionAttributes.putString("foo", "bar");
-		instance.setStreamContext(executionAttributes);
-		assertEquals("bar", instance.getStreamContext().getProperties().getProperty("foo"));
+		instance.setExecutionAttributes(executionAttributes);
+		assertEquals("bar", instance.getExecutionAttributes().getProperties().getProperty("foo"));
 	}
 
 	/**

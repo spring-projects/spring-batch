@@ -365,7 +365,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(10L)), null, new Long(1));
 		stepExecution.setId(new Long(11));
 		ExecutionAttributes executionAttributes = new ExecutionAttributes();
-		stepExecution.setStreamContext(executionAttributes);
+		stepExecution.setExecutionAttributes(executionAttributes);
 		stepDao.update(stepExecution);
 		stepDao.update(stepExecution.getId(), executionAttributes);
 		stepDaoControl.replay();
@@ -376,7 +376,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 	public void testSaveExistingStepExecution(){
 		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(10L)), null, null);
 		ExecutionAttributes executionAttributes = new ExecutionAttributes();
-		stepExecution.setStreamContext(executionAttributes);
+		stepExecution.setExecutionAttributes(executionAttributes);
 		stepDao.save(stepExecution);
 		stepDao.save(stepExecution.getId(), executionAttributes);
 		stepDaoControl.replay();
@@ -402,7 +402,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 	 * Test to ensure that if a StepDao returns invalid
 	 * restart data, it is corrected.
 	 */
-	public void testCreateStepsFixesInvalidStreamContext() throws Exception{
+	public void testCreateStepsFixesInvalidExecutionAttributes() throws Exception{
 
 		List jobs = new ArrayList();
 
@@ -411,10 +411,10 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDao.createJobInstance(jobConfiguration.getName(), jobParameters);
 		jobDaoControl.setReturnValue(databaseJob);
 		stepDao.createStep(databaseJob, "TestStep1");
-		databaseStep1.setStreamContext(null);
+		databaseStep1.setExecutionAttributes(null);
 		stepDaoControl.setReturnValue(databaseStep1);
 		stepDao.createStep(databaseJob, "TestStep2");
-		databaseStep2.setStreamContext(new ExecutionAttributes());
+		databaseStep2.setExecutionAttributes(new ExecutionAttributes());
 		stepDaoControl.setReturnValue(databaseStep2);
 		jobDao.save(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher(){
@@ -432,24 +432,24 @@ public class SimpleJobRepositoryTests extends TestCase {
 		Iterator it = jobSteps.iterator();
 		StepInstance step = (StepInstance) it.next();
 		assertTrue(step.equals(databaseStep1));
-		assertTrue(step.getStreamContext().getProperties().isEmpty());
+		assertTrue(step.getExecutionAttributes().getProperties().isEmpty());
 		step = (StepInstance) it.next();
 		assertTrue(step.equals(databaseStep2));
-		assertTrue(step.getStreamContext().getProperties().isEmpty());
+		assertTrue(step.getExecutionAttributes().getProperties().isEmpty());
 	}
 
-	public void testFindStepsFixesInvalidStreamContext() throws Exception{
+	public void testFindStepsFixesInvalidExecutionAttributes() throws Exception{
 		List jobs = new ArrayList();
 		jobDao.findJobInstances(jobConfiguration.getName(), jobParameters);
 		jobs.add(databaseJob);
 		jobDaoControl.setReturnValue(jobs);
 		stepDao.findStep(databaseJob, "TestStep1");
-		databaseStep1.setStreamContext(null);
+		databaseStep1.setExecutionAttributes(null);
 		stepDaoControl.setReturnValue(databaseStep1);
 		stepDao.getStepExecutionCount(databaseStep1);
 		stepDaoControl.setReturnValue(1);
 		stepDao.findStep(databaseJob, "TestStep2");
-		databaseStep2.setStreamContext(new ExecutionAttributes());
+		databaseStep2.setExecutionAttributes(new ExecutionAttributes());
 		stepDaoControl.setReturnValue(databaseStep2);
 		stepDao.getStepExecutionCount(databaseStep2);
 		stepDaoControl.setReturnValue(1);
@@ -476,9 +476,9 @@ public class SimpleJobRepositoryTests extends TestCase {
 		Iterator it = jobSteps.iterator();
 		StepInstance step = (StepInstance) it.next();
 		assertTrue(step.equals(databaseStep1));
-		assertTrue(step.getStreamContext().getProperties().isEmpty());
+		assertTrue(step.getExecutionAttributes().getProperties().isEmpty());
 		step = (StepInstance) it.next();
-		assertTrue(step.getStreamContext().getProperties().isEmpty());
+		assertTrue(step.getExecutionAttributes().getProperties().isEmpty());
 		assertTrue(step.equals(databaseStep2));
 	}
 

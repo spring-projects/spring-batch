@@ -198,12 +198,12 @@ public class StepExecutionTests extends TestCase {
 				execution.toString().indexOf("rollback") >= 0);
 	}
 
-	public void testStreamContext() throws Exception {
-		assertNotNull(execution.getStreamContext());
+	public void testExecutionAttributes() throws Exception {
+		assertNotNull(execution.getExecutionAttributes());
 		ExecutionAttributes context = new ExecutionAttributes();
 		context.putString("foo", "bar");
-		execution.setStreamContext(context );
-		assertEquals("bar", execution.getStreamContext().getString("foo"));
+		execution.setExecutionAttributes(context );
+		assertEquals("bar", execution.getExecutionAttributes().getString("foo"));
 	}
 
 	public void testEqualsWithSameIdentifier() throws Exception {

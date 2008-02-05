@@ -105,18 +105,18 @@ public class MapStepDaoTests extends TestCase {
 		assertEquals(2, dao.getStepExecutionCount(step));
 	}
 
-	public void testSaveStreamContext() throws Exception {
-		assertEquals(null, dao.getStreamContext(step.getId()));
+	public void testSaveExecutionAttributes() throws Exception {
+		assertEquals(null, dao.getExecutionAttributes(step.getId()));
 		step.setStatus(BatchStatus.COMPLETED);
 		Properties data = new Properties();
 		data.setProperty("restart.key1", "restartData");
-		ExecutionAttributes streamContext = new ExecutionAttributes(data);
-		step.setStreamContext(streamContext);
+		ExecutionAttributes executionAttributes = new ExecutionAttributes(data);
+		step.setExecutionAttributes(executionAttributes);
 		dao.update(step);
 		StepInstance tempStep = dao.findStep(job, step.getName());
 		assertEquals(tempStep, step);
-		assertEquals(tempStep.getStreamContext().getProperties().toString(), 
-				streamContext.getProperties().toString());
+		assertEquals(tempStep.getExecutionAttributes().getProperties().toString(), 
+				executionAttributes.getProperties().toString());
 	}
 
 }

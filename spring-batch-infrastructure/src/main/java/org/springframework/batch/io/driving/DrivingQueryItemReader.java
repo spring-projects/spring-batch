@@ -170,9 +170,9 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	 */
 	public final void restoreFrom(ExecutionAttributes data) {
 
-		Assert.notNull(data, "StreamContext must not be null.");
+		Assert.notNull(data, "ExecutionAttributes must not be null.");
 		Assert.notNull(data.getProperties(),
-				"StreamContext properties must not be null.");
+				"ExecutionAttributes properties must not be null.");
 		Assert.state(!initialized,
 				"Cannot restore when already intialized.  Call"
 						+ " close() first before restore()");
@@ -190,7 +190,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	}
 
 	public ExecutionAttributes getExecutionAttributes() {
-		return keyGenerator.getKeyAsStreamContext(getCurrentKey());
+		return keyGenerator.getKeyAsExecutionAttributes(getCurrentKey());
 	}
 
 	public void afterPropertiesSet() throws Exception {
@@ -235,16 +235,16 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void mark(ExecutionAttributes streamContext) {
+	public void mark(ExecutionAttributes executionAttributes) {
 		lastCommitIndex = currentIndex;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset(ExecutionAttributes streamContext) {
+	public void reset(ExecutionAttributes executionAttributes) {
 		keysIterator = keys.listIterator(lastCommitIndex);
 	}
 

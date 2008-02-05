@@ -53,7 +53,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 			public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException {
 				JobExecution result = new JobExecution(null);
 				StepExecution stepExecution = result.createStepExecution(new StepInstance(null, "step"));
-				stepExecution.setStreamContext(new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar")));
+				stepExecution.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar")));
 				list.add(jobParameters);
 				return result;
 			}

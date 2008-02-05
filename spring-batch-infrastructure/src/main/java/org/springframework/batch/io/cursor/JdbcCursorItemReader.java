@@ -232,7 +232,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	 * Mark the current row. Calling reset will cause the result set to be set
 	 * to the current row when mark was called.
 	 */
-	public void mark(ExecutionAttributes streamContext) {
+	public void mark(ExecutionAttributes executionAttributes) {
 		lastCommittedRow = currentProcessedRow;
 		skippedRows.clear();
 	}
@@ -242,7 +242,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	 * 
 	 * @throws DataAccessException
 	 */
-	public void reset(ExecutionAttributes streamContext) {
+	public void reset(ExecutionAttributes executionAttributes) {
 		try {
 			currentProcessedRow = lastCommittedRow;
 			if (currentProcessedRow > 0) {
@@ -385,10 +385,8 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.restart.Restartable#getStreamContext()
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getExecutionAttributes()
 	 */
 	public ExecutionAttributes getExecutionAttributes() {
 		String skipped = skippedRows.toString();
@@ -399,9 +397,8 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 		return context;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.StreamContext)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#restoreFrom(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void restoreFrom(ExecutionAttributes data) {
 		Assert.state(!initialized);

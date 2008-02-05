@@ -191,7 +191,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 			restartKeys.add(new Foo(5, "5", 5));
 		}
 		
-		public ExecutionAttributes getKeyAsStreamContext(Object key) {
+		public ExecutionAttributes getKeyAsExecutionAttributes(Object key) {
 			return streamContext;
 		}
 

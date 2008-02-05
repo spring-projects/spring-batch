@@ -103,7 +103,7 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 		int i = 0;
 		for (Iterator iterator = execution.getStepExecutions().iterator(); iterator.hasNext();) {
 			StepExecution stepExecution = (StepExecution) iterator.next();
-			Properties statistics = stepExecution.getStreamContext().getProperties();
+			Properties statistics = stepExecution.getExecutionAttributes().getProperties();
 			for (Iterator iter = statistics.keySet().iterator(); iter.hasNext();) {
 				String key = (String) iter.next();
 				result.setProperty(prefix + "step" + i + "." + key, statistics.getProperty(key));

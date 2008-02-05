@@ -1,15 +1,12 @@
 package org.springframework.batch.item.writer;
 
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Simple wrapper around {@link ItemWriter} providing {@link ItemStream} where
- * the {@link ItemWriter} does.  To make sure 
+ * Simple wrapper around {@link ItemWriter}.
  * 
  * @author Dave Syer
  * @author Robert Kasanicky
@@ -44,34 +41,6 @@ public class DelegatingItemWriter implements ItemWriter, Skippable, Initializing
 	 */
 	public void setDelegate(ItemWriter writer) {
 		this.writer = writer;
-	}
-
-	/**
-	 * @see ItemStream#getExecutionAttributes()
-	 */
-	public ExecutionAttributes getStreamContext() {
-
-		Assert.state(writer != null, "Source must not be null.");
-
-		if (writer instanceof ItemStream) {
-			return ((ItemStream) writer).getExecutionAttributes();
-		}
-		else {
-			return new ExecutionAttributes();
-		}
-	}
-
-	/**
-	 * @see ItemStream#restoreFrom(ExecutionAttributes)
-	 */
-	public void restoreFrom(ExecutionAttributes data) {
-
-		Assert.state(writer != null, "Source must not be null.");
-
-		if (writer instanceof ItemStream) {
-			((ItemStream) writer).restoreFrom(data);
-		}
-
 	}
 
 	public void skip() {

@@ -170,10 +170,10 @@ public class SimpleStepExecutor {
 		// the conversation in StepScope
 		stepContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
 
-		final boolean saveStreamContext = step.isSaveStreamContext();
+		final boolean saveExecutionAttributes = step.isSaveExecutionAttributes();
 
-		if (saveStreamContext && isRestart) {
-			stepContext.restoreFrom(stepInstance.getStreamContext());
+		if (saveExecutionAttributes && isRestart) {
+			stepContext.restoreFrom(stepInstance.getExecutionAttributes());
 		}
 
 		try {
@@ -207,7 +207,7 @@ public class SimpleStepExecutor {
 						// aggregate these contributions if they
 						// come in asynchronously.
 						ExecutionAttributes statistics = stepContext.getExecutionAttributes();
-						contribution.setStreamContext(statistics);
+						contribution.setExecutionAttributes(statistics);
 						contribution.incrementCommitCount();
 
 						// If the step operations are asynchronous then we need
@@ -219,8 +219,8 @@ public class SimpleStepExecutor {
 							// only if chunk was successful
 							stepExecution.apply(contribution);
 
-							if (saveStreamContext) {
-								stepInstance.setStreamContext(stepContext.getExecutionAttributes());
+							if (saveExecutionAttributes) {
+								stepInstance.setExecutionAttributes(stepContext.getExecutionAttributes());
 								jobRepository.update(stepInstance);
 							}
 							jobRepository.saveOrUpdate(stepExecution);

@@ -54,7 +54,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	
 	public void testGetKeyAsStreamContext(){
 		
-		ExecutionAttributes streamContext = keyStrategy.getKeyAsStreamContext(new Long(3));
+		ExecutionAttributes streamContext = keyStrategy.getKeyAsExecutionAttributes(new Long(3));
 		Properties props = streamContext.getProperties();
 		
 		assertEquals(1, props.size());
@@ -64,7 +64,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	public void testGetNullKeyAsStreamContext(){
 		
 		try{
-			keyStrategy.getKeyAsStreamContext(null);
+			keyStrategy.getKeyAsExecutionAttributes(null);
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -74,7 +74,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	public void testRestoreKeysFromNull(){
 		
 		try{
-			keyStrategy.getKeyAsStreamContext(null);
+			keyStrategy.getKeyAsExecutionAttributes(null);
 		}catch(IllegalArgumentException ex){
 			//expected
 		}

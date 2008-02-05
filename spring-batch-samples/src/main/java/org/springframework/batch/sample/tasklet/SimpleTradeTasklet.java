@@ -84,7 +84,7 @@ public class SimpleTradeTasklet implements Tasklet, ExecutionAttributesProvider 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.StreamContextProvider#getStreamContext()
+	 * @see org.springframework.batch.item.ExecutionAttributesProvider#getExecutionAttributes()
 	 */
 	public ExecutionAttributes getExecutionAttributes() {
 		ExecutionAttributes statistics = new ExecutionAttributes();

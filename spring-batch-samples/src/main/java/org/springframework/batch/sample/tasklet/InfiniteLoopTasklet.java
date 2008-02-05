@@ -47,9 +47,8 @@ public class InfiniteLoopTasklet implements Tasklet, ExecutionAttributesProvider
 		return ExitStatus.CONTINUABLE;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getStreamContext()
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ExecutionAttributesProvider#getExecutionAttributes()
 	 */
 	public ExecutionAttributes getExecutionAttributes() {
 		return new ExecutionAttributes(PropertiesConverter.stringToProperties("count=" + count));

@@ -32,15 +32,15 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Lucas Ward
  * @author Dave Syer
- * @see StreamContextRowMapper
+ * @see ExecutionAttributesRowMapper
  */
-public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implements StreamContextRowMapper{
+public class ColumnMapExecutionAttributesRowMapper extends ColumnMapRowMapper implements ExecutionAttributesRowMapper {
 	
-	public static final String KEY_PREFIX = ClassUtils.getQualifiedName(ColumnMapStreamContextRowMapper.class) + ".KEY.";
+	public static final String KEY_PREFIX = ClassUtils.getQualifiedName(ColumnMapExecutionAttributesRowMapper.class) + ".KEY.";
 	
-	public PreparedStatementSetter createSetter(ExecutionAttributes streamContext) {
+	public PreparedStatementSetter createSetter(ExecutionAttributes executionAttributes) {
 		
-		ColumnMapStreamContext columnData = new ColumnMapStreamContext(streamContext.getProperties());
+		ColumnMapExecutionAttributes columnData = new ColumnMapExecutionAttributes(executionAttributes.getProperties());
 
 		List columns = new ArrayList();
 		for (Iterator iterator = columnData.keys.entrySet().iterator(); iterator.hasNext();) {
@@ -52,21 +52,21 @@ public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implemen
 		return new ArgPreparedStatementSetter(columns.toArray());
 	}
 
-	public ExecutionAttributes createStreamContext(Object key) {
-		Assert.isInstanceOf(Map.class, key, "Input to create StreamContext must be of type Map.");
+	public ExecutionAttributes createExecutionAttributes(Object key) {
+		Assert.isInstanceOf(Map.class, key, "Input to create ExecutionAttributes must be of type Map.");
 		Map keys = (Map) key;
-		return new ColumnMapStreamContext(keys);
+		return new ColumnMapExecutionAttributes(keys);
 	}
 
-	private static class ColumnMapStreamContext extends ExecutionAttributes {
+	private static class ColumnMapExecutionAttributes extends ExecutionAttributes {
 
 		private final Map keys;
 
-		public ColumnMapStreamContext(Map keys) {
+		public ColumnMapExecutionAttributes(Map keys) {
 			this.keys = keys;
 		}
 
-		public ColumnMapStreamContext(Properties props) {
+		public ColumnMapExecutionAttributes(Properties props) {
 
 			keys = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(props.size());
 

@@ -99,12 +99,12 @@ public class SimpleStepConfigurationTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.step.simple.AbstractStep#isSaveStreamContext()}.
+	 * {@link org.springframework.batch.execution.step.simple.AbstractStep#isSaveExecutionAttributes()}.
 	 */
-	public void testIsSaveStreamContext() {
-		assertEquals(false, configuration.isSaveStreamContext());
+	public void testIsSaveExecutionAttributes() {
+		assertEquals(false, configuration.isSaveExecutionAttributes());
 		configuration.setSaveExecutionAttributes(true);
-		assertEquals(true, configuration.isSaveStreamContext());
+		assertEquals(true, configuration.isSaveExecutionAttributes());
 	}
 
 }

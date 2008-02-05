@@ -66,7 +66,7 @@ public class SimpleStreamManager implements StreamManager {
 
 	/**
 	 * Public setter for the flag. If this is true then the class name of the
-	 * streams will be used as a prefix in the {@link StreamContext} in
+	 * streams will be used as a prefix in the {@link ExecutionAttributes} in
 	 * {@link #getExecutionAttributes(Object)}. The default value is true, which
 	 * gives the best chance of unique key names in the context.
 	 * 
@@ -85,7 +85,7 @@ public class SimpleStreamManager implements StreamManager {
 	}
 
 	/**
-	 * Simple aggregate {@link StreamContext} provider for the contributions
+	 * Simple aggregate {@link ExecutionAttributes} provider for the contributions
 	 * registered under the given key.
 	 * 
 	 * @see org.springframework.batch.item.stream.StreamManager#getExecutionAttributes(java.lang.Object)
@@ -114,9 +114,9 @@ public class SimpleStreamManager implements StreamManager {
 	 * the provided key.
 	 * 
 	 * @see org.springframework.batch.item.stream.StreamManager#register(java.lang.Object,
-	 * org.springframework.batch.item.ItemStream, StreamContext)
+	 * org.springframework.batch.item.ItemStream, ExecutionAttributes)
 	 */
-	public void register(Object key, ItemStream stream, ExecutionAttributes streamContext) {
+	public void register(Object key, ItemStream stream, ExecutionAttributes executionAttributes) {
 		synchronized (registry) {
 			Set set = (Set) registry.get(key);
 			if (set == null) {
@@ -125,23 +125,23 @@ public class SimpleStreamManager implements StreamManager {
 			}
 			set.add(stream);
 		}
-		if (streamContext != null) {
-			stream.restoreFrom(extract(stream, streamContext));
+		if (executionAttributes != null) {
+			stream.restoreFrom(extract(stream, executionAttributes));
 		}
 	}
 
 	/**
 	 * @param stream
-	 * @param streamContext
+	 * @param executionAttributes
 	 * @return
 	 */
-	private ExecutionAttributes extract(ItemStream stream, ExecutionAttributes context) {
+	private ExecutionAttributes extract(ItemStream stream, ExecutionAttributes executionAttributes) {
 		ExecutionAttributes result = new ExecutionAttributes();
 		String prefix = ClassUtils.getQualifiedName(stream.getClass()) + ".";
 		if (!useClassNameAsPrefix) {
 			prefix = "";
 		}
-		for (Iterator iterator = context.entrySet().iterator(); iterator.hasNext();) {
+		for (Iterator iterator = executionAttributes.entrySet().iterator(); iterator.hasNext();) {
 			Entry entry = (Entry) iterator.next();
 			String contextKey = (String) entry.getKey();
 			if (contextKey.startsWith(prefix)) {
@@ -152,10 +152,8 @@ public class SimpleStreamManager implements StreamManager {
 	}
 
 	/**
-	 * Broadcast the call to close from this {@link StreamContext}.
+	 * Broadcast the call to close from this {@link StreamManager}.
 	 * @throws Exception
-	 * 
-	 * @see StreamManager#restoreFrom(Object, StreamContext)
 	 */
 	public void close(Object key) throws StreamException {
 		iterate(key, new Callback() {

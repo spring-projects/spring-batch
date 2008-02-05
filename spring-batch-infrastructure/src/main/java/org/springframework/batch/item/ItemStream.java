@@ -75,7 +75,7 @@ public interface ItemStream extends ExecutionAttributesProvider {
 	 * 
 	 * @throws UnsupportedOperationException if the operation is not supported
 	 */
-	void mark(ExecutionAttributes streamContext);
+	void mark(ExecutionAttributes executionAttributes);
 
 	/**
 	 * Reset the stream to the last mark. After a reset the stream state will be
@@ -84,5 +84,5 @@ public interface ItemStream extends ExecutionAttributesProvider {
 	 * 
 	 * @throws UnsupportedOperationException if the operation is not supported
 	 */
-	void reset(ExecutionAttributes streamContext);
+	void reset(ExecutionAttributes executionAttributes);
 }

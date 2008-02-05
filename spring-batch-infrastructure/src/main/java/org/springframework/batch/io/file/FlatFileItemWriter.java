@@ -71,7 +71,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	private Resource resource;
 
-	private ExecutionAttributes streamContext = new ExecutionAttributes();
+	private ExecutionAttributes executionAttributes = new ExecutionAttributes();
 
 	private OutputState state = null;
 
@@ -250,10 +250,10 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 		if (state == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
-		streamContext.putLong(RESTART_DATA_NAME, state.position());
-		streamContext.putLong(WRITTEN_STATISTICS_NAME, state.linesWritten);
-		streamContext.putLong(RESTART_COUNT_STATISTICS_NAME, state.restartCount);
-		return streamContext;
+		executionAttributes.putLong(RESTART_DATA_NAME, state.position());
+		executionAttributes.putLong(WRITTEN_STATISTICS_NAME, state.linesWritten);
+		executionAttributes.putLong(RESTART_COUNT_STATISTICS_NAME, state.restartCount);
+		return executionAttributes;
 	}
 
 	/**
@@ -550,16 +550,16 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void mark(ExecutionAttributes streamContext) {
+	public void mark(ExecutionAttributes executionAttributes) {
 		getOutputState().mark();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset(ExecutionAttributes streamContext) {
+	public void reset(ExecutionAttributes executionAttributes) {
 		getOutputState().checkFileSize();
 		resetPositionForRestart();
 	}

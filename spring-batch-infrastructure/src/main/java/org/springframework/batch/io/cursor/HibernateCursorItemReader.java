@@ -172,7 +172,7 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	}
 
 	/**
-	 * @return the current row number wrapped as <code>StreamContext</code>
+	 * @return the current row number wrapped as {@link ExecutionAttributes}
 	 */
 	public ExecutionAttributes getExecutionAttributes() {
 		Properties props = new Properties();
@@ -232,22 +232,20 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void mark(ExecutionAttributes streamContext) {
+	public void mark(ExecutionAttributes executionAttributes) {
 		lastCommitRowNumber = currentProcessedRow;
 		if (!useStatelessSession) {
 			statefulSession.clear();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset(ExecutionAttributes streamContext) {
+	public void reset(ExecutionAttributes executionAttributes) {
 		currentProcessedRow = lastCommitRowNumber;
 		if (lastCommitRowNumber == 0) {
 			cursor.beforeFirst();

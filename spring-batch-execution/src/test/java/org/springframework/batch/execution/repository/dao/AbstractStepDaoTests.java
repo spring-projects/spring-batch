@@ -149,7 +149,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		assertEquals(step3, tempStep);
 	}
 
-	public void testUpdateStepWithoutStreamContext() {
+	public void testUpdateStepWithoutExecutionAttributes() {
 
 		step1.setStatus(BatchStatus.COMPLETED);
 		stepDao.update(step1);
@@ -157,17 +157,17 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		assertEquals(tempStep, step1);
 	}
 
-	public void testUpdateStepWithStreamContext() {
+	public void testUpdateStepWithExecutionAttributes() {
 
 		step1.setStatus(BatchStatus.COMPLETED);
 		Properties data = new Properties();
 		data.setProperty("restart.key1", "restartData");
-		ExecutionAttributes streamContext = new ExecutionAttributes(data);
-		step1.setStreamContext(streamContext);
+		ExecutionAttributes executionAttributes = new ExecutionAttributes(data);
+		step1.setExecutionAttributes(executionAttributes);
 		stepDao.update(step1);
 		StepInstance tempStep = stepDao.findStep(jobInstance, step1.getName());
 		assertEquals(tempStep, step1);
-		assertEquals(tempStep.getStreamContext().getProperties().toString(), streamContext.getProperties().toString());
+		assertEquals(tempStep.getExecutionAttributes().getProperties().toString(), executionAttributes.getProperties().toString());
 	}
 
 	public void testSaveStepExecution() {
@@ -175,7 +175,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		StepExecution execution = new StepExecution(step2, jobExecution, null);
 		execution.setStatus(BatchStatus.STARTED);
 		execution.setStartTime(new Date(System.currentTimeMillis()));
-		execution.setStreamContext(new ExecutionAttributes(PropertiesConverter.stringToProperties("key1=0,key2=5")));
+		execution.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter.stringToProperties("key1=0,key2=5")));
 		execution.setExitStatus(new ExitStatus(false, ExitCodeExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));
 		stepDao.save(execution);
@@ -183,7 +183,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		assertEquals(1, executions.size());
 		StepExecution tempExecution = (StepExecution) executions.get(0);
 		assertEquals(execution, tempExecution);
-		assertEquals(execution.getStreamContext().getString("key1"), tempExecution.getStreamContext().getString("key1"));
+		assertEquals(execution.getExecutionAttributes().getString("key1"), tempExecution.getExecutionAttributes().getString("key1"));
 		assertEquals(execution.getExitStatus(), tempExecution.getExitStatus());
 	}
 
@@ -193,7 +193,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 		stepExecution.setCommitCount(5);
 		stepExecution.setTaskCount(5);
-		stepExecution.setStreamContext(new ExecutionAttributes());
+		stepExecution.setExecutionAttributes(new ExecutionAttributes());
 		stepExecution.setExitStatus(new ExitStatus(false, ExitCodeExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));
 		stepDao.update(stepExecution);

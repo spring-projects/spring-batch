@@ -39,14 +39,14 @@ public abstract class AbstractTransactionalIoSource extends ItemStreamAdapter {
 	 * 
 	 * @see TransactionSynchronization#afterCompletion
 	 */
-	public abstract void mark(ExecutionAttributes streamContext);
+	public abstract void mark(ExecutionAttributes executionAttributes);
 
 	/*
 	 * Called when a transaction has been rolled back.
 	 * 
 	 * @see TransactionSynchronization#afterCompletion
 	 */
-	public abstract void reset(ExecutionAttributes streamContext);
+	public abstract void reset(ExecutionAttributes executionAttributes);
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#isMarkSupported()

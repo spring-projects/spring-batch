@@ -30,7 +30,7 @@ public class StepContribution {
 
 	private StepExecution execution;
 
-	private ExecutionAttributes streamContext;
+	private ExecutionAttributes executionAttributes;
 
 	private int commitCount;
 
@@ -67,18 +67,18 @@ public class StepContribution {
 	/**
 	 * Set the statistics properties.
 	 * 
-	 * @param streamContext
+	 * @param executionAttributes
 	 */
-	public void setStreamContext(ExecutionAttributes streamContext) {
-		this.streamContext = streamContext;
+	public void setExecutionAttributes(ExecutionAttributes executionAttributes) {
+		this.executionAttributes = executionAttributes;
 	}
 
 	/**
 	 * Public getter for the {@link ExecutionAttributes}.
 	 * @return the stream context
 	 */
-	public ExecutionAttributes getStreamContext() {
-		return streamContext;
+	public ExecutionAttributes getExecutionAttributes() {
+		return executionAttributes;
 	}
 
 	/**

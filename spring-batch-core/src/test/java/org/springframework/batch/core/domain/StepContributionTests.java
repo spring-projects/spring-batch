@@ -41,14 +41,14 @@ public class StepContributionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepContribution#setStreamContext(ExecutionAttributes)}.
+	 * {@link org.springframework.batch.core.domain.StepContribution#setExecutionAttributes(ExecutionAttributes)}.
 	 */
-	public void testSetStreamContext() {
-		assertEquals(null, contribution.getStreamContext());
+	public void testSetExecutionAttributes() {
+		assertEquals(null, contribution.getExecutionAttributes());
 		ExecutionAttributes context = new ExecutionAttributes();
 		context.putString("foo", "bar");
-		contribution.setStreamContext(context);
-		assertEquals(1, contribution.getStreamContext().getProperties().size());
+		contribution.setExecutionAttributes(context);
+		assertEquals(1, contribution.getExecutionAttributes().getProperties().size());
 	}
 
 	/**

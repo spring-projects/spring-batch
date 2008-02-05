@@ -39,11 +39,10 @@ public class IbatisKeyGenerator implements KeyGenerator {
 		return sqlMapClientTemplate.queryForList(drivingQuery);
 	}
 
-	/*
-	 *
-	 * @see org.springframework.batch.restart.Restartable#getRestartData()
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionAttributes(java.lang.Object)
 	 */
-	public ExecutionAttributes getKeyAsStreamContext(Object key) {
+	public ExecutionAttributes getKeyAsExecutionAttributes(Object key) {
 		Properties props = new Properties();
 		props.setProperty(RESTART_KEY, key.toString());
 		ExecutionAttributes executionAttributes = new ExecutionAttributes();

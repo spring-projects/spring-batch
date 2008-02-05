@@ -284,7 +284,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 	/*
 	 * make sure a job that has never been executed before, but does have
-	 * saveStreamContext = true, doesn't have restoreFrom called on it.
+	 * saveExecutionAttributes = true, doesn't have restoreFrom called on it.
 	 */
 	public void testNonRestartedJob() throws Exception {
 		StepInstance step = new StepInstance(new Long(1));
@@ -297,7 +297,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		stepExecutor.execute(stepExecution);
 
 		assertFalse(tasklet.isRestoreFromCalled());
-		assertTrue(tasklet.isGetStreamContextCalled());
+		assertTrue(tasklet.isGetExecutionAttributesCalled());
 	}
 
 	/*
@@ -313,21 +313,21 @@ public class SimpleStepExecutorTests extends TestCase {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 		
-		stepExecution.getStep().setStreamContext(
+		stepExecution.getStep().setExecutionAttributes(
 				new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar")));
 
 		stepExecutor.execute(stepExecution);
 
 		assertTrue(tasklet.isRestoreFromCalled());
 		assertTrue(tasklet.isRestoreFromCalledWithSomeContext());
-		assertTrue(tasklet.isGetStreamContextCalled());
+		assertTrue(tasklet.isGetExecutionAttributesCalled());
 	}
 
 	/*
-	 * Test that a job that is being restarted, but has saveStreamContext set to
-	 * false, doesn't have restore or getStreamContext called on it.
+	 * Test that a job that is being restarted, but has saveExecutionAttributes set to
+	 * false, doesn't have restore or getExecutionAttributes called on it.
 	 */
-	public void testNoSaveStreamContextRestartableJob() {
+	public void testNoSaveExecutionAttributesRestartableJob() {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
@@ -344,11 +344,11 @@ public class SimpleStepExecutorTests extends TestCase {
 		}
 
 		assertFalse(tasklet.isRestoreFromCalled());
-		assertFalse(tasklet.isGetStreamContextCalled());
+		assertFalse(tasklet.isGetExecutionAttributesCalled());
 	}
 
 	/*
-	 * Even though the job is restarted, and saveStreamContext is true, nothing
+	 * Even though the job is restarted, and saveExecutionAttributes is true, nothing
 	 * will be restored because the Tasklet does not implement Restartable.
 	 */
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
@@ -417,7 +417,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
-		assertEquals(false, stepExecution.getStreamContext().containsKey("foo"));
+		assertEquals(false, stepExecution.getExecutionAttributes().containsKey("foo"));
 
 		final Map map = new HashMap();
 		stepExecutor.setStreamManager(new SimpleStreamManager(new ResourcelessTransactionManager()) {
@@ -431,14 +431,14 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		// At least once in that process the statistics service was asked for
 		// statistics...
-		assertEquals("bar", stepExecution.getStreamContext().getString("foo"));
+		assertEquals("bar", stepExecution.getExecutionAttributes().getString("foo"));
 		// ...but nothing was registered because nothing with step scoped.
 		assertEquals(0, map.size());
 	}
 
 	private class MockRestartableTasklet extends ItemStreamAdapter implements Tasklet {
 
-		private boolean getStreamContextCalled = false;
+		private boolean getExecutionAttributesCalled = false;
 
 		private boolean restoreFromCalled = false;
 
@@ -454,7 +454,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		}
 
 		public ExecutionAttributes getExecutionAttributes() {
-			getStreamContextCalled = true;
+			getExecutionAttributesCalled = true;
 			return new ExecutionAttributes(PropertiesConverter.stringToProperties("spam=bucket"));
 		}
 
@@ -463,8 +463,8 @@ public class SimpleStepExecutorTests extends TestCase {
 			restoreFromCalledWithSomeContext = data.getProperties().size() > 0;
 		}
 
-		public boolean isGetStreamContextCalled() {
-			return getStreamContextCalled;
+		public boolean isGetExecutionAttributesCalled() {
+			return getExecutionAttributesCalled;
 		}
 
 		public boolean isRestoreFromCalled() {

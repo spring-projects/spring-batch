@@ -255,12 +255,12 @@ public class SimpleJobRepository implements JobRepository {
 		if (stepExecution.getId() == null) {
 			// new execution, obtain id and insert
 			stepDao.save(stepExecution);
-			stepDao.save(stepExecution.getId(), stepExecution.getStreamContext());
+			stepDao.save(stepExecution.getId(), stepExecution.getExecutionAttributes());
 		}
 		else {
 			// existing execution, update
 			stepDao.update(stepExecution);
-			stepDao.update(stepExecution.getId(), stepExecution.getStreamContext());
+			stepDao.update(stepExecution.getId(), stepExecution.getExecutionAttributes());
 		}
 	}
 
@@ -304,8 +304,8 @@ public class SimpleJobRepository implements JobRepository {
 			Step step = (Step) i.next();
 			StepInstance stepInstance = stepDao.createStep(job, step.getName());
 			// Ensure valid restart data is being returned.
-			if (stepInstance.getStreamContext() == null || stepInstance.getStreamContext() == null) {
-				stepInstance.setStreamContext(new ExecutionAttributes());
+			if (stepInstance.getExecutionAttributes() == null || stepInstance.getExecutionAttributes() == null) {
+				stepInstance.setExecutionAttributes(new ExecutionAttributes());
 			}
 			stepInstances.add(stepInstance);
 		}
@@ -327,8 +327,8 @@ public class SimpleJobRepository implements JobRepository {
 
 				step.setStepExecutionCount(stepDao.getStepExecutionCount(step));
 				// Ensure valid restart data is being returned.
-				if (step.getStreamContext() == null || step.getStreamContext() == null) {
-					step.setStreamContext(new ExecutionAttributes());
+				if (step.getExecutionAttributes() == null || step.getExecutionAttributes() == null) {
+					step.setExecutionAttributes(new ExecutionAttributes());
 				}
 				stepInstances.add(step);
 			}

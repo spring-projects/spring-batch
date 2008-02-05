@@ -46,8 +46,8 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 	public void testRestoreKeys(){
 		
 		ExecutionAttributes streamContext = new ExecutionAttributes();
-		streamContext.putString(ColumnMapStreamContextRowMapper.KEY_PREFIX + "0", "3");
-		streamContext.putString(ColumnMapStreamContextRowMapper.KEY_PREFIX + "1", "3");
+		streamContext.putString(ColumnMapExecutionAttributesRowMapper.KEY_PREFIX + "0", "3");
+		streamContext.putString(ColumnMapExecutionAttributesRowMapper.KEY_PREFIX + "1", "3");
 		
 		List keys = keyStrategy.restoreKeys(streamContext);
 		
@@ -66,18 +66,18 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 		key.put("ID", new Long(3));
 		key.put("VALUE", new Integer(3));
 		
-		ExecutionAttributes streamContext = keyStrategy.getKeyAsStreamContext(key);
+		ExecutionAttributes streamContext = keyStrategy.getKeyAsExecutionAttributes(key);
 		Properties props = streamContext.getProperties();
 		
 		assertEquals(2, props.size());
-		assertEquals("3", props.get(ColumnMapStreamContextRowMapper.KEY_PREFIX + "0"));
-		assertEquals("3", props.get(ColumnMapStreamContextRowMapper.KEY_PREFIX + "1"));
+		assertEquals("3", props.get(ColumnMapExecutionAttributesRowMapper.KEY_PREFIX + "0"));
+		assertEquals("3", props.get(ColumnMapExecutionAttributesRowMapper.KEY_PREFIX + "1"));
 	}
 	
 	public void testGetNullKeyAsStreamContext(){
 		
 		try{
-			keyStrategy.getKeyAsStreamContext(null);
+			keyStrategy.getKeyAsExecutionAttributes(null);
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -87,7 +87,7 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 	public void testRestoreKeysFromNull(){
 		
 		try{
-			keyStrategy.getKeyAsStreamContext(null);
+			keyStrategy.getKeyAsExecutionAttributes(null);
 		}catch(IllegalArgumentException ex){
 			//expected
 		}

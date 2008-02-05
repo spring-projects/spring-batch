@@ -31,23 +31,23 @@ import org.springframework.jdbc.core.RowMapper;
  * @see RowMapper
  * @since 1.0
  */
-public interface StreamContextRowMapper extends RowMapper {
+public interface ExecutionAttributesRowMapper extends RowMapper {
 
 	/**
 	 * Given the provided composite key, return a RestartData representation.
 	 *
 	 * @param key
-	 * @return ResartData representing the composite key.
+	 * @return ExecutionAttributes representing the composite key.
 	 * @throws IllegalArgumentException if key is null or of an unsupported type.
 	 */
-	public ExecutionAttributes createStreamContext(Object key);
+	public ExecutionAttributes createExecutionAttributes(Object key);
 
 	/**
 	 * Given the provided restart data, return a PreparedStatementSeter that can
 	 * be used as parameters to a JdbcTemplate.
 	 *
-	 * @param streamContext
+	 * @param executionAttributes
 	 * @return an array of objects that can be used as arguments to a JdbcTemplate.
 	 */
-	public PreparedStatementSetter createSetter(ExecutionAttributes streamContext);
+	public PreparedStatementSetter createSetter(ExecutionAttributes executionAttributes);
 }

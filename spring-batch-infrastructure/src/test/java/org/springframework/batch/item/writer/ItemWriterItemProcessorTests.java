@@ -17,13 +17,12 @@ package org.springframework.batch.item.writer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -50,54 +49,6 @@ public class ItemWriterItemProcessorTests extends TestCase {
 		processor.write("foo");
 		assertEquals(1, list.size());
 		assertEquals("test:foo", list.get(0));
-	}
-
-	/**
-	 * Gets restart data from the input template
-	 */
-	public void testGetStreamContext() {
-		Properties props = processor.getStreamContext().getProperties();
-		assertEquals("foo", props.getProperty("value"));
-	}
-
-	/**
-	 * Forward restart data to input template
-	 * @throws Exception
-	 */
-	public void testRestoreFrom() throws Exception {
-		processor.restoreFrom(new ExecutionAttributes(PropertiesConverter.stringToProperties("value=bar")));
-		processor.write("foo");
-		assertEquals("bar:foo", list.get(0));
-	}
-
-	/**
-	 * Forward restart data to input template
-	 * @throws Exception
-	 */
-	public void testGetStreamContextWithoutItemStream() throws Exception {
-		processor.setDelegate(null);
-		try {
-			processor.getStreamContext();
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
-	}
-
-	/**
-	 * Forward restart data to input template
-	 * @throws Exception
-	 */
-	public void testRestoreFromWithoutRestartable() throws Exception {
-		processor.setDelegate(null);
-		try {
-			processor.restoreFrom(new ExecutionAttributes(PropertiesConverter.stringToProperties("value=bar")));
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			// expected
-		}
 	}
 
 	public void testSkip() {

@@ -133,7 +133,7 @@ public class SimpleStepContextTests extends TestCase {
 		assertTrue(list.contains("spam"));
 	}
 
-	public void testStreamContextWithNotNullService() throws Exception {
+	public void testExecutionAttributesWithNotNullService() throws Exception {
 		Map map = new HashMap();
 		context = new SimpleStepContext(null, null, new StubStreamManager(map));
 		assertEquals(1, context.getExecutionAttributes().getProperties().size());
@@ -171,7 +171,7 @@ public class SimpleStepContextTests extends TestCase {
 		public void open(Object key) {
 		}
 
-		public void register(Object key, ItemStream stream, ExecutionAttributes streamContext) {
+		public void register(Object key, ItemStream stream, ExecutionAttributes executionAttributes) {
 			map.put(key, stream);
 		}
 

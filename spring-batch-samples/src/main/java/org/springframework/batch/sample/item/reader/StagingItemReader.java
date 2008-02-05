@@ -215,33 +215,29 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void mark(ExecutionAttributes streamContext) {
+	public void mark(ExecutionAttributes executionAttributes) {
 		getBuffer().commit();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset(ExecutionAttributes streamContext) {
+	public void reset(ExecutionAttributes executionAttributes) {
 		getBuffer().rollback();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.StreamContext)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void restoreFrom(ExecutionAttributes context) {
 		// no-op
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.StreamContextProvider#getStreamContext()
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ExecutionAttributesProvider#getExecutionAttributes()
 	 */
 	public ExecutionAttributes getExecutionAttributes() {
 		return new ExecutionAttributes();

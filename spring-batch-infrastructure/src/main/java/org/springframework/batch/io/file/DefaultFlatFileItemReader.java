@@ -94,10 +94,10 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 		if (reader == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
-		ExecutionAttributes streamContext = new ExecutionAttributes();
-		streamContext.putLong(READ_STATISTICS_NAME, reader.getCurrentLineCount());
-		streamContext.putLong(SKIPPED_STATISTICS_NAME, skippedLines.size());
-		return streamContext;
+		ExecutionAttributes executionAttributes = new ExecutionAttributes();
+		executionAttributes.putLong(READ_STATISTICS_NAME, reader.getCurrentLineCount());
+		executionAttributes.putLong(SKIPPED_STATISTICS_NAME, skippedLines.size());
+		return executionAttributes;
 	}
 
 	/**
@@ -112,19 +112,17 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void mark(ExecutionAttributes streamContext) {
+	public void mark(ExecutionAttributes executionAttributes) {
 		getReader().mark();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset(ExecutionAttributes streamContext) {
+	public void reset(ExecutionAttributes executionAttributes) {
 		getReader().reset();
 	}
 

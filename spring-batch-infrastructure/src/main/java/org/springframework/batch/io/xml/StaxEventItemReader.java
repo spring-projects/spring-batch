@@ -264,18 +264,18 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void mark(ExecutionAttributes streamContext) {
+	public void mark(ExecutionAttributes executionAttributes) {
 		lastCommitPointRecordCount = currentRecordCount;
 		txReader.onCommit();
 		skipRecords = new ArrayList();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset(ExecutionAttributes streamContext) {
+	public void reset(ExecutionAttributes executionAttributes) {
 		currentRecordCount = lastCommitPointRecordCount;
 		txReader.onRollback();
 		fragmentReader.reset();

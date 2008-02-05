@@ -80,7 +80,7 @@ public class MapStepDao implements StepDao {
 		return  new ArrayList(steps);
 	}
 
-	public ExecutionAttributes getStreamContext(Long stepId) {
+	public ExecutionAttributes getExecutionAttributes(Long stepId) {
 		return (ExecutionAttributes) restartsById.get(stepId);
 	}
 

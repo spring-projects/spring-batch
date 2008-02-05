@@ -51,7 +51,7 @@ public class StepExecution extends Entity {
 
 	private Date endTime = null;
 
-	private ExecutionAttributes streamContext = new ExecutionAttributes();
+	private ExecutionAttributes executionAttributes = new ExecutionAttributes();
 
 	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
@@ -88,12 +88,12 @@ public class StepExecution extends Entity {
 		taskCount++;
 	}
 
-	public ExecutionAttributes getStreamContext() {
-		return streamContext;
+	public ExecutionAttributes getExecutionAttributes() {
+		return executionAttributes;
 	}
 
-	public void setStreamContext(ExecutionAttributes statistics) {
-		this.streamContext = statistics;
+	public void setExecutionAttributes(ExecutionAttributes executionAttributes) {
+		this.executionAttributes = executionAttributes;
 	}
 
 	public Integer getCommitCount() {
@@ -249,7 +249,7 @@ public class StepExecution extends Entity {
 	 */
 	public synchronized void apply(StepContribution contribution) {
 		taskCount += contribution.getTaskCount();
-		streamContext = contribution.getStreamContext();
+		executionAttributes = contribution.getExecutionAttributes();
 		commitCount += contribution.getCommitCount();
 	}
 
