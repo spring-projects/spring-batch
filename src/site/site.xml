@@ -31,7 +31,8 @@
 			<item name="Getting Started" href="getting-started.html"/>
 			<item name="FAQ" href="faq.html"/>
 			<item name="Changelog" href="changelog.html"/>
-			<item name="Migrating" href="migration/1.0-m2-m3.html"/>
+			<item name="Migrating M2 to M3" href="migration/1.0-m2-m3.html"/>
+			<item name="Migrating M3 to M4" href="migration/1.0-m3-m4.html"/>
 			<item name="Downloads" href="downloads.html"/>
 		</menu>
 		<menu ref="modules"/>

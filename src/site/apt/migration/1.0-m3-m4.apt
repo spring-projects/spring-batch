@@ -1,0 +1,56 @@
+			 ------
+                         Spring Batch Upgrade
+                         ------
+                         Robert Kasanicky
+                         ------
+                         February 2008
+
+Updating Spring Batch jobs from 1.0.0.m3 to 1.0.0.m4 framework
+
+  This is a description of what needed to be done to migrate the samples 
+from m3 to the m4 release.
+
+  [Tip:] if you use SpringIDE, make sure it tracks all your configuration 
+files, so that errors are immediately visible.
+
+* JOB CONFIGURATION
+
+  * ItemProviderTasklet and RestartableItemProviderTasklet have been replaced 
+with ItemOrientedTasklet
+
+  * ItemProvider/ItemProcessor pair is now ItemReader/ItemWriter 
+
+  * InputSource and ItemProvider interfaces have been merged into ItemReader 
+(ItemReaders can be composite when desired)
+
+  * OutputSource and ItemProcessor interfaces have been merged into ItemWriter 
+(ItemTransformerItemWriter and CompositeItemTransformer provide support for 
+item transformations before writing to output)
+
+
+* CONTAINER CONFIGURATION
+
+  * JobIdentifier is replaced by JobParameters
+
+  * JobLauncher#run(Job, JobParameters) now returns JobExecution which has 
+methods stop() and isRunnig() (previously part of JobLauncher)
+
+  * Hibernate repository (JobDao and StepDao) has been removed
+
+  * JobExecutor and StepExecutor are no longer explicitly declared 
+(Job and Step execute themselves)
+
+
+* VARIOUS
+
+  * Remember to update the database schema
+
+  * Several moves and package renames easily fixed by IDE refactoring support
+('organize imports' in Eclipse)
+
+  * FieldSet is now an interface with DefaultFieldSet as provided implementation
+
+  * ResourceLifecycle and Restartable interfaces have been removed, ItemStream 
+now covers their responsibilities
+
+  * StatisticsProvider interface has been replaced by ExecutionAttributesProvider
