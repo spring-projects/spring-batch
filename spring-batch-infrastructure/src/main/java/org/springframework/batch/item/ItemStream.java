@@ -37,7 +37,9 @@ package org.springframework.batch.item;
 public interface ItemStream extends ExecutionAttributesProvider {
 
 	/**
-	 * Restart state given the provided {@link ExecutionAttributes}.
+	 * Restore to the state given the provided {@link ExecutionAttributes}.
+	 * This can be used to restart after a failure - hence not normally used
+	 * more than once per call to {@link #open()}.
 	 * 
 	 * @param context
 	 */
