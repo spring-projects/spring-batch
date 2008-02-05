@@ -21,7 +21,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -176,7 +175,7 @@ public class SimpleStreamManagerTests extends TestCase {
 				return true;
 			}
 
-			public void mark(StreamContext streamContext) {
+			public void mark(ExecutionAttributes streamContext) {
 				list.add("bar");
 			}
 		}, null);
@@ -191,7 +190,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testCommitWithoutMark() {
 		manager.register("foo", new ItemStreamAdapter() {
-			public void mark(StreamContext streamContext) {
+			public void mark(ExecutionAttributes streamContext) {
 				list.add("bar");
 			}
 		}, null);
@@ -210,7 +209,7 @@ public class SimpleStreamManagerTests extends TestCase {
 				return true;
 			}
 
-			public void reset(StreamContext streamContext) {
+			public void reset(ExecutionAttributes streamContext) {
 				list.add("bar");
 			}
 		}, null);
@@ -225,7 +224,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testRollbackWithoutMark() {
 		manager.register("foo", new ItemStreamAdapter() {
-			public void reset(StreamContext streamContext) {
+			public void reset(ExecutionAttributes streamContext) {
 				list.add("bar");
 			}
 		}, null);
@@ -239,7 +238,7 @@ public class SimpleStreamManagerTests extends TestCase {
 			return new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar"));
 		}
 
-		public void restoreFrom(StreamContext context) {
+		public void restoreFrom(ExecutionAttributes context) {
 			list.add(context.getString("foo"));
 		}
 	}

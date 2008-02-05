@@ -33,7 +33,6 @@ import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.batch.execution.configuration.MapJobRegistry;
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**

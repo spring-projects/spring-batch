@@ -38,7 +38,6 @@ import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
 import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.StreamContext;
 
 /*
  * Test SimpleJobRepository.  The majority of test cases are tested using EasyMock,

@@ -12,7 +12,6 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.core.CollectionFactory;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 

@@ -30,7 +30,6 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
 import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.dao.OptimisticLockingFailureException;

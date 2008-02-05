@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.core.CollectionFactory;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 

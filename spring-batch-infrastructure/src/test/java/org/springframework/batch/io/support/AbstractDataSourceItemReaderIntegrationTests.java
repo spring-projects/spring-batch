@@ -5,7 +5,6 @@ import org.springframework.batch.io.sample.domain.Foo;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;

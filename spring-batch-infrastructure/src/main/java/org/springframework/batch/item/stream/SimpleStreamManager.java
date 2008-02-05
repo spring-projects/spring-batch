@@ -23,9 +23,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.StreamException;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;

@@ -10,7 +10,6 @@ import org.springframework.batch.io.sample.domain.Foo;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
@@ -118,7 +117,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testRestoreFromEmptyData() throws Exception {
-		ExecutionAttributes streamContext = new GenericStreamContext(new Properties());
+		ExecutionAttributes streamContext = new ExecutionAttributes(new Properties());
 
 		getAsRestartable(source).restoreFrom(streamContext);
 

@@ -18,8 +18,6 @@ package org.springframework.batch.core.domain;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.StreamContext;
-import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
