@@ -18,8 +18,11 @@ package org.springframework.batch.item;
 import org.springframework.batch.io.exception.BatchCriticalException;
 
 /**
+ * Exception representing any errors encountered while processing
+ * a stream.
+ * 
  * @author Dave Syer
- *
+ * @author Lucas Ward
  */
 public class StreamException extends BatchCriticalException {
 
@@ -29,5 +32,21 @@ public class StreamException extends BatchCriticalException {
 	public StreamException(String message) {
 		super(message);
 	}
+	
+	/**
+	 * Constructs a new instance with a message and nested exception.
+	 * 
+	 * @param msg the exception message.
+	 * 
+	 */
+	public StreamException(String msg, Throwable nested) {
+		super(msg, nested);
+	}
 
+	/**
+	 * Constructs a new instance with a nested exception and empty message.
+	 */
+	public StreamException(Throwable nested) {
+		super(nested);
+	}
 }
