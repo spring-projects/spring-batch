@@ -13,7 +13,7 @@ import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.sample.item.writer.StagingItemWriter;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -219,7 +219,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
 	 */
-	public void mark(StreamContext streamContext) {
+	public void mark(ExecutionAttributes streamContext) {
 		getBuffer().commit();
 	}
 
@@ -227,7 +227,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
 	 */
-	public void reset(StreamContext streamContext) {
+	public void reset(ExecutionAttributes streamContext) {
 		getBuffer().rollback();
 	}
 
@@ -235,7 +235,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.StreamContext)
 	 */
-	public void restoreFrom(StreamContext context) {
+	public void restoreFrom(ExecutionAttributes context) {
 		// no-op
 	}
 
@@ -243,8 +243,8 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.StreamContextProvider#getStreamContext()
 	 */
-	public StreamContext getStreamContext() {
-		return new StreamContext();
+	public ExecutionAttributes getStreamContext() {
+		return new ExecutionAttributes();
 	}
 
 }

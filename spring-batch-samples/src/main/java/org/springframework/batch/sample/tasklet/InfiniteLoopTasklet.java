@@ -17,7 +17,7 @@
 package org.springframework.batch.sample.tasklet;
 
 import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.StreamContextProvider;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.PropertiesConverter;
@@ -51,8 +51,8 @@ public class InfiniteLoopTasklet implements Tasklet, StreamContextProvider {
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getStreamContext()
 	 */
-	public StreamContext getStreamContext() {
-		return new StreamContext(PropertiesConverter.stringToProperties("count=" + count));
+	public ExecutionAttributes getStreamContext() {
+		return new ExecutionAttributes(PropertiesConverter.stringToProperties("count=" + count));
 	}
 
 }
