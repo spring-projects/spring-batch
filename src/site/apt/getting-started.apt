@@ -9,7 +9,7 @@ Spring Batch Getting Started
 
   A convenient way to get started quickly with Spring Batch is to run the samples which are packaged in the samples module.  The source code for the samples (and the other modules) is available either from the {{{downloads.html}.Zip assembly}} or from {{{source-repository.html}Subversion}}.
 
-  These instructions work with the "m3a" .Zip distribution.  The original "m3" release had some issues like missing dependencies, so if you are using that either get the newer release, or see {{{#m3}below}}.  (The m3a release is just an update of the .Zip packages - there is no corresponding update of the jar files, which did not change.)
+  These instructions work with the "m4" .Zip distribution.
 
 * Using the .Zip Distribution
 
@@ -65,7 +65,9 @@ $ mvn test
 
 The Original {m3} Distribution
 
-  If you are not using Maven you will need some dependencies that were missing from the distro, so get these jar files from somewhere else:
+  The original "m3" release had some issues like missing dependencies, so if you are using that either get the newer release, or see below.  (The m3a release is just an update of the .Zip packages - there is no corresponding update of the jar files, which did not change.)
+
+  If you are using not using Maven you will need some dependencies that were missing from the distro, so get these jar files from somewhere else:
 
     * Servlet API (2.3 or better)
 

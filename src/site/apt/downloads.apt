@@ -7,11 +7,11 @@
 
 Milestone Builds
 
-  These builds are provided for evaluation and community feedback.  They will have a release identifier ending in "mX" where X is the milestone number.  The current release is <<1.0.0.m3>>.
+  These builds are provided for evaluation and community feedback.  They will have a release identifier ending in "mX" where X is the milestone number.  The current release is <<1.0.0.m4>>.
 
 * Zip Downloads
 
-  Starting with Spring Batch 1.0.0.m3 there are ZIP based artifacts that contain the release JARs.  You can find those releases {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.  There are two ZIP files in the release.  The first zip file is called <<<spring-batch-*-no-dependencies.zip>>>.  This file contains only the JAR files for the release.  The second zip file is called <<<spring-batch-*-with-dependencies.zip>>>.  This file contains the JAR files for the release as well as all of the third-party dependencies for the release.  In addition, this release contains the Spring Batch source code including the samples and their third-party dependencies as well.
+  Starting with Spring Batch 1.0.0.m4 there are ZIP based artifacts that contain the release JARs.  You can find those releases {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.  There are two ZIP files in the release.  The first zip file is called <<<spring-batch-*-no-dependencies.zip>>>.  This file contains only the JAR files for the release.  The second zip file is called <<<spring-batch-*-with-dependencies.zip>>>.  This file contains the JAR files for the release as well as all of the third-party dependencies for the release.  In addition, this release contains the Spring Batch source code including the samples and their third-party dependencies as well.
 
 * Maven Artifacts
 
@@ -33,7 +33,7 @@ Milestone Builds
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-core</artifactId>
-    <version>1.0.0.m3</version>
+    <version>1.0.0.m4</version>
 </dependency>
 +---------------
 
@@ -43,7 +43,7 @@ Milestone Builds
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-execution</artifactId>
-    <version>1.0.0.m3</version>
+    <version>1.0.0.m4</version>
 </dependency>
 +---------------
 
