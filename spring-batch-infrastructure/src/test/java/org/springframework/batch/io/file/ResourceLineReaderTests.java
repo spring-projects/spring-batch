@@ -92,7 +92,7 @@ public class ResourceLineReaderTests extends TestCase {
 		Resource resource = new ByteArrayResource("1,2,\"3\n4\"\n5,6,7".getBytes());
 		ResourceLineReader reader = new ResourceLineReader(resource);
 		reader.read();	
-		assertEquals(2, reader.getCurrentLineCount());
+		assertEquals(2, reader.getPosition());
 	}
 
   public void testLineContent() throws Exception {
@@ -116,10 +116,10 @@ public class ResourceLineReaderTests extends TestCase {
 		reader.read();
 		String line = (String) reader.read();
 		assertEquals("2", line);
-		assertEquals(2, reader.getCurrentLineCount());
+		assertEquals(2, reader.getPosition());
 		line = (String) reader.read();
 		assertEquals("3", line);
-		assertEquals(3, reader.getCurrentLineCount());
+		assertEquals(3, reader.getPosition());
 	}
 
 	public void testDefaultComments() throws Exception {
@@ -151,20 +151,20 @@ public class ResourceLineReaderTests extends TestCase {
 		Resource resource = new ByteArrayResource("1\n4\n5".getBytes());
 		ResourceLineReader reader = new ResourceLineReader(resource);
 		reader.reset();
-		assertEquals(0, reader.getCurrentLineCount());
+		assertEquals(0, reader.getPosition());
 	}
 	
 	public void testMarkReset() throws Exception {
 		Resource resource = new ByteArrayResource("1\n4\n5".getBytes());
 		ResourceLineReader reader = new ResourceLineReader(resource);
 		reader.read();	
-		assertEquals(1, reader.getCurrentLineCount());
+		assertEquals(1, reader.getPosition());
 		reader.mark();
 		reader.read();	
-		assertEquals(2, reader.getCurrentLineCount());
+		assertEquals(2, reader.getPosition());
 		reader.reset();
 		reader.read();	
-		assertEquals(2, reader.getCurrentLineCount());
+		assertEquals(2, reader.getPosition());
 	}
 
 	public void testMarkOnFirstRead() throws Exception {
@@ -181,7 +181,7 @@ public class ResourceLineReaderTests extends TestCase {
 		Resource resource = new ByteArrayResource("1\n\"4\n5\"; \n6".getBytes());
 		ResourceLineReader reader = new ResourceLineReader(resource);
 		reader.setRecordSeparatorPolicy(new SuffixRecordSeparatorPolicy());
-		assertEquals(0, reader.getCurrentLineCount());
+		assertEquals(0, reader.getPosition());
 		String line = (String) reader.read();
 		assertEquals("1\"4\n5\"", line);				
 	}

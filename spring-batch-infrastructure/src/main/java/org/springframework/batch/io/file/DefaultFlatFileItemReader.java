@@ -77,7 +77,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 		LineReader reader = getReader();
 
 		Object record = "";
-		while (reader.getCurrentLineCount() < lineCount && record != null) {
+		while (reader.getPosition() < lineCount && record != null) {
 			record = readLine();
 		}
 
@@ -95,7 +95,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 			throw new StreamException("ItemStream not open or already closed.");
 		}
 		ExecutionAttributes executionAttributes = new ExecutionAttributes();
-		executionAttributes.putLong(READ_STATISTICS_NAME, reader.getCurrentLineCount());
+		executionAttributes.putLong(READ_STATISTICS_NAME, reader.getPosition());
 		executionAttributes.putLong(SKIPPED_STATISTICS_NAME, skippedLines.size());
 		return executionAttributes;
 	}
@@ -130,7 +130,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * Skip the current line which is being processed.
 	 */
 	public void skip() {
-		Integer count = new Integer(getReader().getCurrentLineCount());
+		Integer count = new Integer(getReader().getPosition());
 		// we are not really thread safe so we don't need to synchronize
 		skippedLines.add(count);
 		log.debug("Skipping line in template=[" + this + "], line=" + count);
@@ -138,7 +138,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 
 	protected String readLine() {
 		String line = super.readLine();
-		while (line != null && skippedLines.contains(new Integer(getReader().getCurrentLineCount()))) {
+		while (line != null && skippedLines.contains(new Integer(getReader().getPosition()))) {
 			line = super.readLine();
 		}
 		return line;

@@ -27,7 +27,8 @@ import java.util.Iterator;
 
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.reader.AbstractItemReader;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -55,7 +56,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Rob Harrop
  */
-public class ResourceLineReader extends AbstractItemReader implements LineReader, ItemReader,
+public class ResourceLineReader extends ItemStreamAdapter implements LineReader, ItemReader,
 		DisposableBean {
 
 	private static final Collection DEFAULT_COMMENTS = Collections.singleton("#");
@@ -199,8 +200,20 @@ public class ResourceLineReader extends AbstractItemReader implements LineReader
 	 * 
 	 * @return the current line count.
 	 */
-	public int getCurrentLineCount() {
+	public int getPosition() {
 		return getState().getCurrentLineCount();
+	}
+	
+	/**
+	 * Mark is supported as long as this {@link ItemStream} is used in a
+	 * single-threaded environment. The state backing the mark is a single
+	 * counter, keeping track of the current position, so multiple threads
+	 * cannot be accommodated.
+	 * 
+	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
+	 */
+	public boolean isMarkSupported() {
+		return true;
 	}
 
 	/**

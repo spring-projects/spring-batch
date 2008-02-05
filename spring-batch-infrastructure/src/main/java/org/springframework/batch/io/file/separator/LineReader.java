@@ -16,26 +16,17 @@
 package org.springframework.batch.io.file.separator;
 
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
 
 /**
  * @author Dave Syer
  *
  */
-public interface LineReader extends ItemReader {
+public interface LineReader extends ItemReader, ItemStream {
 
 	/**
 	 * @return
 	 */
-	int getCurrentLineCount();
-
-	/**
-	 * 
-	 */
-	void mark();
-
-	/**
-	 * 
-	 */
-	void reset();
+	int getPosition();
 
 }

@@ -51,12 +51,4 @@ public interface ItemReader {
 	 */
 	Object read() throws Exception;
 
-	/**
-	 * Close the reader, freeing any resources that may have been allocated
-	 * since the first call to read().
-	 * 
-	 * TODO: this is only used in sandbox?
-	 * 
-	 */
-	void close() throws StreamException;
 }

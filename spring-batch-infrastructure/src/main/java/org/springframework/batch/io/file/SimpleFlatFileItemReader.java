@@ -223,7 +223,7 @@ public class SimpleFlatFileItemReader extends AbstractItemReader implements Item
 				return fieldSetMapper.mapLine(tokenizedLine);
 			} catch (RuntimeException ex) {
 				// add current line count to message and re-throw
-				int lineCount = getReader().getCurrentLineCount();
+				int lineCount = getReader().getPosition();
 				throw new FlatFileParsingException("Parsing error at line: "+lineCount+" in resource="+path+", input=["+line+"]", ex, line,
 						lineCount);
 			}
