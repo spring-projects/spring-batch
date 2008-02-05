@@ -53,9 +53,4 @@ public class DelegatingItemWriter implements ItemWriter, Skippable, Initializing
 		Assert.notNull(writer);
 	}
 
-	// YODO: remove
-	public void close() throws Exception {
-		writer.close();
-	}
-
 }

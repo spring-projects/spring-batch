@@ -26,6 +26,4 @@ import org.springframework.batch.item.ItemWriter;
  */
 public abstract class AbstractItemWriter implements ItemWriter{
 
-	public void close() throws Exception {
-	}
 }

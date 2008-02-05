@@ -51,32 +51,5 @@ public class CompositeItemWriterTests extends TestCase {
 			control.verify();
 		}
 	}
-		
-	public void testClose() throws Exception {
-		
-		final int NUMBER_OF_PROCESSORS = 10;
-		
-		List processors = new ArrayList(NUMBER_OF_PROCESSORS);
-		final List list = new ArrayList(NUMBER_OF_PROCESSORS);
-		
-		for (int i = 0; i < NUMBER_OF_PROCESSORS; i++) {
-			ItemWriter processor = new AbstractItemWriter() {
-				public void write(Object item) throws Exception {
-					throw new IllegalStateException("No way!");
-				}
-				public void close() throws Exception {
-					list.add(this);
-				}
-			};
-			processor.close();
-			processors.add(processor);
-		}
-		
-		itemProcessor.setDelegates(processors);
-		itemProcessor.close();
-		
-		assertEquals(NUMBER_OF_PROCESSORS, list.size());
-		
-	}
 	
 }

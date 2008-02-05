@@ -38,10 +38,4 @@ public interface ItemWriter {
 	 */
 	public void write(Object item) throws Exception;
 	
-	/**
-	 * Close the writer, allowing all allocated resources to be cleaned up.
-	 * 
-	 * @throws Exception
-	 */
-	void close() throws Exception;
 }
