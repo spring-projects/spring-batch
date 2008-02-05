@@ -17,7 +17,6 @@ package org.springframework.batch.io.support;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.stream.ItemStreamAdapter;
 
 /**
@@ -39,14 +38,14 @@ public abstract class AbstractTransactionalIoSource extends ItemStreamAdapter {
 	 * 
 	 * @see TransactionSynchronization#afterCompletion
 	 */
-	public abstract void mark(ExecutionAttributes executionAttributes);
+	public abstract void mark();
 
 	/*
 	 * Called when a transaction has been rolled back.
 	 * 
 	 * @see TransactionSynchronization#afterCompletion
 	 */
-	public abstract void reset(ExecutionAttributes executionAttributes);
+	public abstract void reset();
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#isMarkSupported()

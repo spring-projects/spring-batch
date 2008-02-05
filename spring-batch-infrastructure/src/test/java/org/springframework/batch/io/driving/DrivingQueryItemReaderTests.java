@@ -147,11 +147,11 @@ public class DrivingQueryItemReaderTests extends TestCase {
 
 
 	private void commit() {
-		((ItemStream) source).mark(null);
+		((ItemStream) source).mark();
 	}
 
 	private void rollback() {
-		((ItemStream) source).reset(null);
+		((ItemStream) source).reset();
 	}
 	
 	private InitializingBean getAsInitializingBean(ItemReader source) {

@@ -129,10 +129,10 @@ public class DelegatingItemReaderTests extends TestCase {
 			return false;
 		}
 
-		public void mark(ExecutionAttributes streamContext) {
+		public void mark() {
 		}
 
-		public void reset(ExecutionAttributes streamContext) {
+		public void reset() {
 		}
 
 	}

@@ -25,10 +25,10 @@ package org.springframework.batch.item;
  * <p>
  * The state that is stored is represented as {@link ExecutionAttributes} which
  * enforces a requirement that any restart data can be represented by a
- * Properties object. In general, the contract is that {@link ExecutionAttributes}
- * that is returned via the {@link #getExecutionAttributes()} method will be given
- * back to the {@link #restoreFrom(ExecutionAttributes)} method, exactly as it was
- * provided.
+ * Properties object. In general, the contract is that
+ * {@link ExecutionAttributes} that is returned via the
+ * {@link #getExecutionAttributes()} method will be given back to the
+ * {@link #restoreFrom(ExecutionAttributes)} method, exactly as it was provided.
  * </p>
  * 
  * @author Dave Syer
@@ -57,7 +57,14 @@ public interface ItemStream extends ExecutionAttributesProvider {
 	void close() throws StreamException;
 
 	/**
-	 * Clients are expected to check this flag before calling mark or reset.
+	 * Clients are expected to check this flag before calling mark or reset.<br/>
+	 * 
+	 * Implementations should also document explicitly, if mark is supported,
+	 * how it will behave in a multi-threaded environment. Generally, if the
+	 * stream is being accessed from multiple threads concurrently, it will have
+	 * to manage that internally, and also reflect only the completed marks
+	 * (independent of the order they happen) when
+	 * {@link ExecutionAttributesProvider#getExecutionAttributes()} is called.
 	 * 
 	 * @return true if mark and reset are supported by the {@link ItemStream}
 	 */
@@ -65,24 +72,25 @@ public interface ItemStream extends ExecutionAttributesProvider {
 
 	/**
 	 * Mark the stream so that it can be reset later and the items backed out.
-	 * Implementations may use the information in the provided context to make
-	 * calculations that account for things like multiple open cursors. The
-	 * context should also be updated with any information of this nature that
-	 * might be needed by a reset or by future calls to mark.
+	 * After this method is called the result will be reflected in subsequent
+	 * calls to {@link ExecutionAttributesProvider#getExecutionAttributes()}.<br/>
 	 * 
-	 * @param the context which might contain information needed to determine
-	 * what action to take, and into which the current mark information can go.
+	 * In a multi-threaded setting implementations have to ensure that only the
+	 * state from the current thread is saved.
 	 * 
 	 * @throws UnsupportedOperationException if the operation is not supported
 	 */
-	void mark(ExecutionAttributes executionAttributes);
+	void mark();
 
 	/**
 	 * Reset the stream to the last mark. After a reset the stream state will be
 	 * such that changes (items read or written) since the last call to mark
-	 * with the same context will not be visible after a call to close.
+	 * will not be visible after a call to close.<br/>
+	 * 
+	 * In a multi-threaded setting implementations have to ensure that only the
+	 * state from the current thread is reset.
 	 * 
 	 * @throws UnsupportedOperationException if the operation is not supported
 	 */
-	void reset(ExecutionAttributes executionAttributes);
+	void reset();
 }

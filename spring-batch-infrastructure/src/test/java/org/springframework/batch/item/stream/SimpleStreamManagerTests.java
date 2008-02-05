@@ -175,7 +175,7 @@ public class SimpleStreamManagerTests extends TestCase {
 				return true;
 			}
 
-			public void mark(ExecutionAttributes streamContext) {
+			public void mark() {
 				list.add("bar");
 			}
 		}, null);
@@ -190,7 +190,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testCommitWithoutMark() {
 		manager.register("foo", new ItemStreamAdapter() {
-			public void mark(ExecutionAttributes streamContext) {
+			public void mark() {
 				list.add("bar");
 			}
 		}, null);
@@ -209,7 +209,7 @@ public class SimpleStreamManagerTests extends TestCase {
 				return true;
 			}
 
-			public void reset(ExecutionAttributes streamContext) {
+			public void reset() {
 				list.add("bar");
 			}
 		}, null);
@@ -224,7 +224,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testRollbackWithoutMark() {
 		manager.register("foo", new ItemStreamAdapter() {
-			public void reset(ExecutionAttributes streamContext) {
+			public void reset() {
 				list.add("bar");
 			}
 		}, null);

@@ -370,11 +370,11 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	private void commit() {
-		((ItemStream) inputSource).mark(null);
+		((ItemStream) inputSource).mark();
 	}
 
 	private void rollback() {
-		((ItemStream) inputSource).reset(null);
+		((ItemStream) inputSource).reset();
 	}
 
 }

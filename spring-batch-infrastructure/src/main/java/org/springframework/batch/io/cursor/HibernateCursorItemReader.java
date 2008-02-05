@@ -235,7 +235,7 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void mark(ExecutionAttributes executionAttributes) {
+	public void mark() {
 		lastCommitRowNumber = currentProcessedRow;
 		if (!useStatelessSession) {
 			statefulSession.clear();
@@ -245,7 +245,7 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset(ExecutionAttributes executionAttributes) {
+	public void reset() {
 		currentProcessedRow = lastCommitRowNumber;
 		if (lastCommitRowNumber == 0) {
 			cursor.beforeFirst();

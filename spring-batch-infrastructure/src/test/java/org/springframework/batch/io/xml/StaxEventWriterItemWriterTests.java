@@ -67,7 +67,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	public void testRollback() throws Exception {
 		writer.write(record);
 		// rollback
-		writer.reset(null);
+		writer.reset();
 		assertEquals("", outputFileContent());
 	}
 
@@ -77,7 +77,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	public void testCommit() throws Exception {
 		writer.write(record);
 		// commit
-		writer.mark(null);
+		writer.mark();
 		assertTrue(outputFileContent().contains(TEST_STRING));
 	}
 
@@ -87,7 +87,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	public void testRestart() throws Exception {
 		// write records
 		writer.write(record);
-		writer.mark(null);
+		writer.mark();
 		ExecutionAttributes streamContext = writer.getExecutionAttributes();
 
 		// create new writer from saved restart data and continue writing
@@ -131,7 +131,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 			put("attribute", "value");
 		}});
 		writer.open();
-		writer.mark(null);
+		writer.mark();
 
 		assertTrue(outputFileContent().indexOf("<testroot attribute=\"value\"") != NOT_FOUND);
 

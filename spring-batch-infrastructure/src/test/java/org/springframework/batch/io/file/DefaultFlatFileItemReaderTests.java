@@ -97,13 +97,13 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		inputSource.read(); // #1
 		inputSource.read(); // #2
 		// commit them
-		inputSource.mark(null);
+		inputSource.mark();
 		// read next record
 		inputSource.read(); // # 3
 		// mark record as skipped
 		inputSource.skip();
 		// read next records
-		inputSource.reset(null);
+		inputSource.reset();
 
 		// we should now process all records after first commit point, that are
 		// not marked as skipped
@@ -135,7 +135,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		// mark record as skipped
 		inputSource.skip();
 		// rollback
-		inputSource.reset(null);
+		inputSource.reset();
 		// read next record
 		inputSource.read(); // should be #1
 
@@ -173,7 +173,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		inputSource.read();
 		inputSource.read();
 		// commit them
-		inputSource.mark(null);
+		inputSource.mark();
 		// read next two records
 		inputSource.read();
 		inputSource.read();

@@ -232,7 +232,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	 * Mark the current row. Calling reset will cause the result set to be set
 	 * to the current row when mark was called.
 	 */
-	public void mark(ExecutionAttributes executionAttributes) {
+	public void mark() {
 		lastCommittedRow = currentProcessedRow;
 		skippedRows.clear();
 	}
@@ -242,7 +242,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	 * 
 	 * @throws DataAccessException
 	 */
-	public void reset(ExecutionAttributes executionAttributes) {
+	public void reset() {
 		try {
 			currentProcessedRow = lastCommittedRow;
 			if (currentProcessedRow > 0) {

@@ -177,7 +177,7 @@ public class SimpleStreamManager implements StreamManager {
 					iterate(key, new Callback() {
 						public void execute(ItemStream stream) {
 							if (stream.isMarkSupported()) {
-								stream.mark(stream.getExecutionAttributes());
+								stream.mark();
 							}
 						}
 					});
@@ -186,7 +186,7 @@ public class SimpleStreamManager implements StreamManager {
 					iterate(key, new Callback() {
 						public void execute(ItemStream stream) {
 							if (stream.isMarkSupported()) {
-								stream.reset(stream.getExecutionAttributes());
+								stream.reset();
 							}
 						}
 					});

@@ -150,11 +150,11 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 
 
 	private void commit() {
-		((ItemStream) source).mark(null);
+		((ItemStream) source).mark();
 	}
 
 	private void rollback() {
-		((ItemStream) source).reset(null);
+		((ItemStream) source).reset();
 	}
 
 	private ItemStream getAsRestartable(ItemReader source) {

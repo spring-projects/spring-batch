@@ -118,14 +118,14 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 * Commit the transaction.
 	 */
 	protected void transactionCommitted() {
-		mark(null);
+		mark();
 	}
 
 	/**
 	 * Rollback the transaction.
 	 */
 	protected void transactionRolledBack() {
-		reset(null);
+		reset();
 	}
 
 	// This method removes any information in the file before this reset point.
@@ -552,14 +552,14 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void mark(ExecutionAttributes executionAttributes) {
+	public void mark() {
 		getOutputState().mark();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset(ExecutionAttributes executionAttributes) {
+	public void reset() {
 		getOutputState().checkFileSize();
 		resetPositionForRestart();
 	}

@@ -53,7 +53,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 */
 	public void open() {
 		super.open();
-		mark(null);
+		mark();
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 			record = readLine();
 		}
 
-		mark(data);
+		mark();
 
 	}
 
@@ -115,14 +115,14 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void mark(ExecutionAttributes executionAttributes) {
+	public void mark() {
 		getReader().mark();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset(ExecutionAttributes executionAttributes) {
+	public void reset() {
 		getReader().reset();
 	}
 

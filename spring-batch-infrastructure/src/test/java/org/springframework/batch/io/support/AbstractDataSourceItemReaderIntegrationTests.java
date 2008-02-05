@@ -221,11 +221,11 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends Abstr
 	}
 
 	private void commit() {
-		((ItemStream) source).mark(((ItemStream) source).getExecutionAttributes());
+		((ItemStream) source).mark();
 	}
 	
 	private void rollback() {
-		((ItemStream) source).reset(((ItemStream) source).getExecutionAttributes());
+		((ItemStream) source).reset();
 	}
 	
 	private Skippable getAsSkippable(ItemReader source) {

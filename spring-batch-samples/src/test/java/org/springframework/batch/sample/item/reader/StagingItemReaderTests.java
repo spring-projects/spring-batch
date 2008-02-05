@@ -86,7 +86,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 
 	public void testProviderRollsBackMultipleTimes() throws Exception {
 
-		provider.mark(null);
+		provider.mark();
 		setComplete();
 		endTransaction();
 		startNewTransaction();
@@ -100,7 +100,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 		item = provider.read();
 		assertEquals("BAR", item);
 
-		provider.reset(null);
+		provider.reset();
 		endTransaction();
 		startNewTransaction();
 
@@ -111,7 +111,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 		item = provider.read();
 		assertEquals("SPAM", item);
 
-		provider.reset(null);
+		provider.reset();
 		endTransaction();
 		startNewTransaction();
 
@@ -122,7 +122,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 
 	public void testProviderRollsBackProcessIndicator() throws Exception {
 
-		provider.mark(null);
+		provider.mark();
 		setComplete();
 		endTransaction();
 		startNewTransaction();
@@ -138,7 +138,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 		Object item = provider.read();
 		assertEquals("FOO", item);
 
-		provider.reset(null);
+		provider.reset();
 		endTransaction();
 		startNewTransaction();
 		// After a rollback we have to resynchronize the TX to simulate a real

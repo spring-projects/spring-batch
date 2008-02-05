@@ -145,7 +145,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 			synchronized (lock) {
 				if (keys.hasNext()) {
 					Assert.state(TransactionSynchronizationManager.isActualTransactionActive(),
-					"Transaction not active for this thread.");
+							"Transaction not active for this thread.");
 					Long next = (Long) keys.next();
 					getBuffer().add(next);
 					key = next;
@@ -207,7 +207,10 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	/**
 	 * Mark is supported in a multi- as well as a single-threaded environment.
 	 * The state backing the mark is a buffer, and access is synchronized, so
-	 * multiple threads cannot be accommodated.
+	 * multiple threads can be accommodated. Buffers are stored as transaction
+	 * resources (using
+	 * {@link TransactionSynchronizationManager#bindResource(Object, Object)}),
+	 * so they are thread bound.
 	 * 
 	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
 	 */
@@ -215,28 +218,32 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void mark() {
 		getBuffer().commit();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset(ExecutionAttributes executionAttributes) {
+	public void reset() {
 		getBuffer().rollback();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void restoreFrom(ExecutionAttributes context) {
 		// no-op
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ExecutionAttributesProvider#getExecutionAttributes()
 	 */
 	public ExecutionAttributes getExecutionAttributes() {

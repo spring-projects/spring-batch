@@ -156,7 +156,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		source.skip();
 		List second = (List) source.read();
 		assertFalse(first.equals(second));
-		source.reset(null);
+		source.reset();
 
 		assertEquals(second, source.read());
 	}
@@ -168,21 +168,21 @@ public class StaxEventItemReaderTests extends TestCase {
 
 		// rollback between deserializing records
 		List first = (List) source.read();
-		source.mark(null);
+		source.mark();
 		List second = (List) source.read();
 		assertFalse(first.equals(second));
-		source.reset(null);
+		source.reset();
 
 		assertEquals(second, source.read());
 
 		// rollback while deserializing record
-		source.reset(null);
+		source.reset();
 		source.setFragmentDeserializer(new ExceptionFragmentDeserializer());
 		try {
 			source.read();
 		}
 		catch (Exception expected) {
-			source.reset(null);
+			source.reset();
 		}
 		source.setFragmentDeserializer(deserializer);
 

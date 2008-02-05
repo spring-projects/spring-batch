@@ -450,7 +450,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void mark(ExecutionAttributes executionAttributes) {
+	public void mark() {
 		lastCommitPointPosition = getPosition();
 		lastCommitPointRecordCount = currentRecordCount;
 	}
@@ -458,7 +458,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset(ExecutionAttributes executionAttributes) {
+	public void reset() {
 		currentRecordCount = lastCommitPointRecordCount;
 		// close output
 		close();

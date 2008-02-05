@@ -18,7 +18,6 @@ package org.springframework.batch.io.support;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
@@ -41,13 +40,13 @@ public class AbstractTransactionalIoSourceTests extends TestCase {
 	}
 		
 	public void testCommit(){
-		source.mark(null);
+		source.mark();
 		assertTrue(source.commitCalled);
 		assertFalse(source.rollbackCalled);
 	}
 	
 	public void testRollback(){
-		source.reset(null);
+		source.reset();
 		assertFalse(source.commitCalled);
 		assertTrue(source.rollbackCalled);
 	}
@@ -57,12 +56,12 @@ public class AbstractTransactionalIoSourceTests extends TestCase {
 		private boolean commitCalled = false;
 		private boolean rollbackCalled = false;
 		
-		public void mark(ExecutionAttributes streamContext) {
+		public void mark() {
 			Assert.isTrue(!commitCalled, "Commit aleady called");
 			commitCalled = true;
 		}
 
-		public void reset(ExecutionAttributes streamContext) {
+		public void reset() {
 			Assert.isTrue(!rollbackCalled, "Rollback aleady called");
 			rollbackCalled = true;
 		}

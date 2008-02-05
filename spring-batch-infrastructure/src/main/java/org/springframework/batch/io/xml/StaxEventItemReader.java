@@ -124,7 +124,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 			throw new DataAccessResourceFailureException("Unable to get input stream", ioe);
 		}
 		initialized = true;
-		mark(null);
+		mark();
 	}
 
 	public void setResource(Resource resource) {
@@ -210,7 +210,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 			fragmentReader.next();
 			moveCursorToNextFragment(fragmentReader);
 		}
-		mark(null); // reset the history buffer
+		mark(); // reset the history buffer
 	}
 
 	/**
@@ -266,7 +266,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void mark(ExecutionAttributes executionAttributes) {
+	public void mark() {
 		lastCommitPointRecordCount = currentRecordCount;
 		txReader.onCommit();
 		skipRecords = new ArrayList();
@@ -275,7 +275,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset(ExecutionAttributes executionAttributes) {
+	public void reset() {
 		currentRecordCount = lastCommitPointRecordCount;
 		txReader.onRollback();
 		fragmentReader.reset();

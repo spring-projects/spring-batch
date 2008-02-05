@@ -207,11 +207,11 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	}
 
 	protected void transactionCommitted() {
-		mark(null);
+		mark();
 	}
 
 	protected void transactionRolledBack() {
-		reset(null);
+		reset();
 	}
 
 	/**
@@ -237,14 +237,14 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void mark(ExecutionAttributes executionAttributes) {
+	public void mark() {
 		lastCommitIndex = currentIndex;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset(ExecutionAttributes executionAttributes) {
+	public void reset() {
 		keysIterator = keys.listIterator(lastCommitIndex);
 	}
 
