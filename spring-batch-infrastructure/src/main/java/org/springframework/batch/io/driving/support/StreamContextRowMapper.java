@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.io.driving.support;
 
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -40,7 +40,7 @@ public interface StreamContextRowMapper extends RowMapper {
 	 * @return ResartData representing the composite key.
 	 * @throws IllegalArgumentException if key is null or of an unsupported type.
 	 */
-	public StreamContext createStreamContext(Object key);
+	public ExecutionAttributes createStreamContext(Object key);
 
 	/**
 	 * Given the provided restart data, return a PreparedStatementSeter that can
@@ -49,5 +49,5 @@ public interface StreamContextRowMapper extends RowMapper {
 	 * @param streamContext
 	 * @return an array of objects that can be used as arguments to a JdbcTemplate.
 	 */
-	public PreparedStatementSetter createSetter(StreamContext streamContext);
+	public PreparedStatementSetter createSetter(ExecutionAttributes streamContext);
 }

@@ -14,7 +14,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -112,7 +112,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	 */
 	public void testRestart() {
 		source.read();
-		StreamContext streamContext = source.getStreamContext();
+		ExecutionAttributes streamContext = source.getStreamContext();
 		assertEquals(1, streamContext.getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME));
 		List expectedAfterRestart = (List) source.read();
 
@@ -127,7 +127,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	 * already initialised when restoring.
 	 */
 	public void testInvalidRestore() {
-		StreamContext context = new StreamContext();
+		ExecutionAttributes context = new ExecutionAttributes();
 		context.putLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME, 100000);
 		try {
 			source.restoreFrom(context);
@@ -140,7 +140,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		source = createNewInputSouce();
 		source.open();
 		try {
-			source.restoreFrom(new StreamContext());
+			source.restoreFrom(new ExecutionAttributes());
 			fail();
 		}
 		catch (IllegalStateException e) {

@@ -3,7 +3,8 @@ package org.springframework.batch.io.sql;
 import org.springframework.batch.io.sample.domain.Foo;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -76,7 +77,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		StreamContext streamContext = getAsRestartable(source).getStreamContext();
+		ExecutionAttributes streamContext = getAsRestartable(source).getStreamContext();
 
 		// create new input source
 		source = createItemReader();
@@ -98,7 +99,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		StreamContext streamContext = getAsRestartable(source).getStreamContext();
+		ExecutionAttributes streamContext = getAsRestartable(source).getStreamContext();
 
 		// create new input source
 		source = createItemReader();
@@ -120,7 +121,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 	 * @throws Exception 
 	 */
 	public void testRestoreFromEmptyData() throws Exception {
-		StreamContext streamContext = new StreamContext();
+		ExecutionAttributes streamContext = new ExecutionAttributes();
 
 		getAsRestartable(source).restoreFrom(streamContext);
 

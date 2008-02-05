@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.springframework.batch.io.driving.DrivingQueryItemReader;
 import org.springframework.batch.io.driving.KeyGenerator;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -80,7 +80,7 @@ public class MultipleColumnJdbcKeyGenerator implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.driving.KeyGenerator#restoreKeys(org.springframework.batch.item.StreamContext)
 	 */
-	public List restoreKeys(StreamContext streamContext) {
+	public List restoreKeys(ExecutionAttributes streamContext) {
 
 		Assert.state(keyMapper != null, "KeyMapper must not be null.");
 		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty" +
@@ -96,7 +96,7 @@ public class MultipleColumnJdbcKeyGenerator implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsStreamContext(java.lang.Object)
 	 */
-	public StreamContext getKeyAsStreamContext(Object key) {
+	public ExecutionAttributes getKeyAsStreamContext(Object key) {
 		Assert.state(keyMapper != null, "Kye mapper must not be null.");
 		return keyMapper.createStreamContext(key);
 	}

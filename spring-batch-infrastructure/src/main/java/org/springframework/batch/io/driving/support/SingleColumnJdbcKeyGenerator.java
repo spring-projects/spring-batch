@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.apache.commons.lang.ClassUtils;
 import org.springframework.batch.io.driving.KeyGenerator;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
@@ -98,27 +98,27 @@ public class SingleColumnJdbcKeyGenerator implements KeyGenerator {
 	 * @see KeyGenerator#getKeyAsStreamContext(Object)
 	 * @throws IllegalArgumentException if key is null.
 	 */
-	public StreamContext getKeyAsStreamContext(Object key) {
+	public ExecutionAttributes getKeyAsStreamContext(Object key) {
 		Assert.notNull(key, "The key must not be null.");
-		StreamContext context = new StreamContext();
+		ExecutionAttributes context = new ExecutionAttributes();
 		context.putString(RESTART_KEY, key.toString());
 		return context;
 	}
 
 	/**
 	 * Return the remaining to be processed for the provided
-	 * {@link StreamContext}. The {@link StreamContext} attempting to be
+	 * {@link ExecutionAttributes}. The {@link ExecutionAttributes} attempting to be
 	 * restored from must have been obtained from the <strong>same
 	 * KeyGenerationStrategy as the one being restored from</strong> otherwise
 	 * it is invalid.
 	 * 
-	 * @param StreamContext obtained by calling
+	 * @param ExecutionAttributes obtained by calling
 	 * {@link #getKeyAsStreamContext(Object)} during a previous run.
 	 * @throws IllegalStateException if restart sql statement is null.
 	 * @throws IllegalArgumentException if restart data is null.
-	 * @see KeyGenerator#restoreKeys(org.springframework.batch.item.StreamContext)
+	 * @see KeyGenerator#restoreKeys(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public List restoreKeys(StreamContext streamContext) {
+	public List restoreKeys(ExecutionAttributes streamContext) {
 
 		Assert.notNull(streamContext, "The restart data must not be null.");
 		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty"

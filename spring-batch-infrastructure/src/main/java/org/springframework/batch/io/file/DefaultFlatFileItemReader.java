@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.file.separator.LineReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.StreamException;
 
 /**
@@ -61,9 +61,9 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * file and position the buffer reader according to information provided by
 	 * the restart data
 	 * 
-	 * @param data {@link StreamContext} information
+	 * @param data {@link ExecutionAttributes} information
 	 */
-	public void restoreFrom(StreamContext data) {
+	public void restoreFrom(ExecutionAttributes data) {
 
 		if (data == null || data.getProperties() == null
 				|| data.getProperties().getProperty(READ_STATISTICS_NAME) == null || getReader() == null) {
@@ -90,11 +90,11 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * current Line Count which can be used to re initialise the batch job in
 	 * case of restart.
 	 */
-	public StreamContext getStreamContext() {
+	public ExecutionAttributes getStreamContext() {
 		if (reader == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
-		StreamContext streamContext = new StreamContext();
+		ExecutionAttributes streamContext = new ExecutionAttributes();
 		streamContext.putLong(READ_STATISTICS_NAME, reader.getCurrentLineCount());
 		streamContext.putLong(SKIPPED_STATISTICS_NAME, skippedLines.size());
 		return streamContext;
@@ -116,7 +116,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
 	 */
-	public void mark(StreamContext streamContext) {
+	public void mark(ExecutionAttributes streamContext) {
 		getReader().mark();
 	}
 
@@ -124,7 +124,7 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
 	 */
-	public void reset(StreamContext streamContext) {
+	public void reset(ExecutionAttributes streamContext) {
 		getReader().reset();
 	}
 

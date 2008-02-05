@@ -2,7 +2,7 @@ package org.springframework.batch.io.driving;
 
 import java.util.List;
 
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 
 /**
  * Strategy interface used to generate keys in driving query input.
@@ -24,7 +24,7 @@ public interface KeyGenerator {
 	 * @return a list of keys.
 	 * @throws IllegalArgumentException is streamContext is null.
 	 */
-	List restoreKeys(StreamContext streamContext);
+	List restoreKeys(ExecutionAttributes streamContext);
 	
 	/**
 	 * Return the provided key as restart data.
@@ -34,5 +34,5 @@ public interface KeyGenerator {
 	 * @throws IllegalArgumentException if key is null.
 	 * @throws IllegalArgumentException if key is an incompatible type.
 	 */
-	StreamContext getKeyAsStreamContext(Object key);
+	ExecutionAttributes getKeyAsStreamContext(Object key);
 }

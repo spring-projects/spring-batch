@@ -21,14 +21,14 @@ import junit.framework.TestCase;
  * @author Lucas Ward
  *
  */
-public class StreamContextTests extends TestCase{
+public class ExecutionAttributesTests extends TestCase{
 
-	StreamContext context;
+	ExecutionAttributes context;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		context = new StreamContext();
+		context = new ExecutionAttributes();
 	}
 	
 	public void testNormalUsage(){
@@ -58,30 +58,41 @@ public class StreamContextTests extends TestCase{
 	
 	public void testIsEmpty(){
 		assertTrue(context.isEmpty());
-		context.put("1", new Object());
+		context.putString("1", "test");
 		assertFalse(context.isEmpty());
 	}
 	
 	public void testDirtyFlag(){
 		assertFalse(context.isDirty());
-		context.put("1", new Object());
+		context.putString("1", "test");
 		assertTrue(context.isDirty());
 		context.clearDirtyFlag();
 		assertFalse(context.isDirty());
 	}
 	
 	public void testContains(){
-		context.put("1", "testString");
+		context.putString("1", "testString");
 		assertTrue(context.containsKey("1"));
 		assertTrue(context.containsValue("testString"));
 	}
 	
 	public void testEquals(){
-		context.put("1", "testString");
-		StreamContext tempContext = new StreamContext();
+		context.putString("1", "testString");
+		ExecutionAttributes tempContext = new ExecutionAttributes();
 		assertFalse(tempContext.equals(context));
-		tempContext.put("1", "testString");
+		tempContext.putString("1", "testString");
 		assertTrue(tempContext.equals(context));
+	}
+	
+	public void testSerializationCheck(){
+		//adding a non serializable object should cause an error.
+		try{
+			context.put("1", new Object());
+			fail();
+		}
+		catch(IllegalArgumentException ex){
+			//expected
+		}
 	}
 	
 }

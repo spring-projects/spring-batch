@@ -24,7 +24,7 @@ import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.transform.LineTokenizer;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.StreamException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -179,7 +179,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		inputSource.read();
 
 		// get restart data
-		StreamContext streamContext = inputSource.getStreamContext();
+		ExecutionAttributes streamContext = inputSource.getStreamContext();
 		assertEquals("4", (String) streamContext.getProperties().getProperty(
 				DefaultFlatFileItemReader.READ_STATISTICS_NAME));
 		// close input
@@ -195,7 +195,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 		assertEquals("[testLine5]", inputSource.read().toString());
 		assertEquals("[testLine6]", inputSource.read().toString());
 
-		StreamContext statistics = inputSource.getStreamContext();
+		ExecutionAttributes statistics = inputSource.getStreamContext();
 		assertEquals(6, statistics.getLong(DefaultFlatFileItemReader.READ_STATISTICS_NAME));
 	}
 

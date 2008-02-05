@@ -18,7 +18,7 @@ import org.springframework.batch.io.xml.stax.FragmentEventReader;
 import org.springframework.batch.io.xml.stax.TransactionalEventReader;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -176,8 +176,8 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	 * @return wrapped count of records read so far.
 	 * @see ItemStream#getStreamContext()
 	 */
-	public StreamContext getStreamContext() {
-		StreamContext restartData = new StreamContext();
+	public ExecutionAttributes getStreamContext() {
+		ExecutionAttributes restartData = new ExecutionAttributes();
 		restartData.putLong(READ_COUNT_STATISTICS_NAME, currentRecordCount);
 		return restartData;
 	}
@@ -186,12 +186,12 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	 * Restores the input source for the given restart data by rereading and
 	 * skipping the number of records stored in the RestartData.
 	 * 
-	 * @param StreamContext that holds the line count from the last commit.
+	 * @param ExecutionAttributes that holds the line count from the last commit.
 	 * @throws IllegalStateException if the ItemReader has already been
 	 * initialized or if the number of records to read and skip exceeds the
 	 * available records.
 	 */
-	public void restoreFrom(StreamContext data) {
+	public void restoreFrom(ExecutionAttributes data) {
 		Assert.state(!initialized);
 		if (data == null || data.getProperties() == null || !data.containsKey(READ_COUNT_STATISTICS_NAME)) {
 			return;
@@ -266,7 +266,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
 	 */
-	public void mark(StreamContext streamContext) {
+	public void mark(ExecutionAttributes streamContext) {
 		lastCommitPointRecordCount = currentRecordCount;
 		txReader.onCommit();
 		skipRecords = new ArrayList();
@@ -275,7 +275,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
 	 */
-	public void reset(StreamContext streamContext) {
+	public void reset(ExecutionAttributes streamContext) {
 		currentRecordCount = lastCommitPointRecordCount;
 		txReader.onRollback();
 		fragmentReader.reset();

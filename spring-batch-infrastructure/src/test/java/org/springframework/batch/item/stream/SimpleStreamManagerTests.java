@@ -20,6 +20,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
 import org.springframework.batch.support.PropertiesConverter;
@@ -75,7 +76,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getStreamContext(java.lang.Object)}.
 	 */
 	public void testGetStreamContextEmpty() {
-		StreamContext streamContext = manager.getStreamContext("foo");
+		ExecutionAttributes streamContext = manager.getStreamContext("foo");
 		assertEquals(0, streamContext.entrySet().size());
 	}
 
@@ -85,7 +86,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testGetStreamContextNotEmpty() {
 		manager.register("foo", stream, null);
-		StreamContext streamContext = manager.getStreamContext("foo");
+		ExecutionAttributes streamContext = manager.getStreamContext("foo");
 		assertEquals(1, streamContext.entrySet().size());
 		assertEquals("bar", streamContext.getString(ClassUtils.getQualifiedName(stream.getClass()) + ".foo"));
 	}
@@ -96,7 +97,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testGetStreamContextNotEmptyAndRestore() {
 		testGetStreamContextNotEmpty();
-		StreamContext context = manager.getStreamContext("foo");
+		ExecutionAttributes context = manager.getStreamContext("foo");
 		// Register again, now with the context that was created from the same
 		// stream...
 		manager.register("foo", stream, context);
@@ -110,7 +111,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getStreamContext(java.lang.Object)}.
 	 */
 	public void testGetStreamContextNotEmptyAndRestoreWithNoPrefix() {
-		StreamContext context = new StreamContext(PropertiesConverter.stringToProperties("foo=bar"));
+		ExecutionAttributes context = new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar"));
 		manager.setUseClassNameAsPrefix(false);
 		manager.register("foo", stream, context);
 		assertEquals(1, list.size());
@@ -125,7 +126,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	public void testGetStreamContextWithNoPrefix() {
 		manager.setUseClassNameAsPrefix(false);
 		manager.register("foo", stream, null);
-		StreamContext context = manager.getStreamContext("foo");
+		ExecutionAttributes context = manager.getStreamContext("foo");
 		assertEquals(1, context.entrySet().size());
 		// The list should have the foo= map value from the sub-context
 		assertEquals("bar", context.getString("foo"));
@@ -137,16 +138,16 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testGetStreamContextTwoRegistrations() {
 		manager.register("foo", new ItemStreamAdapter() {
-			public StreamContext getStreamContext() {
-				return new StreamContext(PropertiesConverter.stringToProperties("foo=bar"));
+			public ExecutionAttributes getStreamContext() {
+				return new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar"));
 			}
 		}, null);
 		manager.register("foo", new ItemStreamAdapter() {
-			public StreamContext getStreamContext() {
-				return new StreamContext(PropertiesConverter.stringToProperties("foo=spam"));
+			public ExecutionAttributes getStreamContext() {
+				return new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=spam"));
 			}
 		}, null);
-		StreamContext streamContext = manager.getStreamContext("foo");
+		ExecutionAttributes streamContext = manager.getStreamContext("foo");
 		assertEquals(2, streamContext.entrySet().size());
 	}
 
@@ -234,8 +235,8 @@ public class SimpleStreamManagerTests extends TestCase {
 	}
 
 	private final class ItemStreamAdapterExtension extends ItemStreamAdapter {
-		public StreamContext getStreamContext() {
-			return new StreamContext(PropertiesConverter.stringToProperties("foo=bar"));
+		public ExecutionAttributes getStreamContext() {
+			return new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar"));
 		}
 
 		public void restoreFrom(StreamContext context) {

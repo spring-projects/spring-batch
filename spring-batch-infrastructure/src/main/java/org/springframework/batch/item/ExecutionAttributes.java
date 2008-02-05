@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -31,17 +32,17 @@ import org.springframework.util.Assert;
  * also allows for dirty checking by setting a 'dirty' flag whenever any put is
  * called.
  */
-public class StreamContext {
+public class ExecutionAttributes {
 
 	private boolean dirty = false;
 
 	private final Map map;
 
-	public StreamContext() {
+	public ExecutionAttributes() {
 		map = new HashMap();
 	}
-
-	public StreamContext(Map map) {
+	
+	public ExecutionAttributes(Map map){
 		this.map = map;
 	}
 
@@ -60,8 +61,9 @@ public class StreamContext {
 
 		put(key, new Double(value));
 	}
-
-	public void put(String key, Object value) {
+	
+	public void put(String key, Object value){
+		Assert.isInstanceOf(Serializable.class, value, "Value: [ " + value + "must be serializable.");
 		dirty = true;
 		map.put(key, value);
 	}
@@ -133,17 +135,22 @@ public class StreamContext {
 	}
 	
 	public boolean equals(Object obj) {
-		if(obj instanceof StreamContext == false){
+		if(obj instanceof ExecutionAttributes == false){
 			return false;
 		}
 		if(this == obj){
 			return true;
 		}
-		StreamContext rhs = (StreamContext)obj;
+		ExecutionAttributes rhs = (ExecutionAttributes)obj;
 		return this.entrySet().equals(rhs.entrySet());
 	}
 	
 	public int hashCode() {
 		return map.hashCode();
 	}
+	
+	public String toString() {
+		return map.toString();
+	}
+
 }

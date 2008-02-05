@@ -32,7 +32,8 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
@@ -71,7 +72,7 @@ import org.springframework.util.StringUtils;
  * </p>
  * 
  * <p>
- * {@link StreamContext}: The current row is returned as restart data, and when
+ * {@link ExecutionAttributes}: The current row is returned as restart data, and when
  * restored from that same data, the cursor is opened and the current row set to
  * the value within the restart data. There are also two statistics returned by
  * this input source: the current line being processed and the number of lines
@@ -232,7 +233,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	 * Mark the current row. Calling reset will cause the result set to be set
 	 * to the current row when mark was called.
 	 */
-	public void mark(StreamContext streamContext) {
+	public void mark(ExecutionAttributes streamContext) {
 		lastCommittedRow = currentProcessedRow;
 		skippedRows.clear();
 	}
@@ -242,7 +243,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	 * 
 	 * @throws DataAccessException
 	 */
-	public void reset(StreamContext streamContext) {
+	public void reset(ExecutionAttributes streamContext) {
 		try {
 			currentProcessedRow = lastCommittedRow;
 			if (currentProcessedRow > 0) {
@@ -390,9 +391,9 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	 * 
 	 * @see org.springframework.batch.restart.Restartable#getStreamContext()
 	 */
-	public StreamContext getStreamContext() {
+	public ExecutionAttributes getStreamContext() {
 		String skipped = skippedRows.toString();
-		StreamContext context = new StreamContext();
+		ExecutionAttributes context = new GenericStreamContext();
 		context.putString(SKIPPED_ROWS, skipped.substring(1, skipped.length() - 1));
 		context.putLong(CURRENT_PROCESSED_ROW, currentProcessedRow);
 		context.putLong(SKIP_COUNT, skipCount);
@@ -403,7 +404,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.StreamContext)
 	 */
-	public void restoreFrom(StreamContext data) {
+	public void restoreFrom(ExecutionAttributes data) {
 		Assert.state(!initialized);
 
 		if (data == null)

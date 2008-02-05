@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -82,7 +82,7 @@ public class DelegatingItemReaderTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testRestoreFrom() throws Exception {
-		itemProvider.restoreFrom(new StreamContext(PropertiesConverter.stringToProperties("value=bar")));
+		itemProvider.restoreFrom(new ExecutionAttributes(PropertiesConverter.stringToProperties("value=bar")));
 		assertEquals("bar", itemProvider.read());
 	}
 
@@ -99,11 +99,11 @@ public class DelegatingItemReaderTests extends TestCase {
 			return PropertiesConverter.stringToProperties("a=b");
 		}
 
-		public StreamContext getStreamContext() {
-			return new StreamContext(PropertiesConverter.stringToProperties("value=foo"));
+		public ExecutionAttributes getStreamContext() {
+			return new ExecutionAttributes(PropertiesConverter.stringToProperties("value=foo"));
 		}
 
-		public void restoreFrom(StreamContext data) {
+		public void restoreFrom(ExecutionAttributes data) {
 			value = data.getProperties().getProperty("value");
 		}
 
@@ -129,10 +129,10 @@ public class DelegatingItemReaderTests extends TestCase {
 			return false;
 		}
 
-		public void mark(StreamContext streamContext) {
+		public void mark(ExecutionAttributes streamContext) {
 		}
 
-		public void reset(StreamContext streamContext) {
+		public void reset(ExecutionAttributes streamContext) {
 		}
 
 	}

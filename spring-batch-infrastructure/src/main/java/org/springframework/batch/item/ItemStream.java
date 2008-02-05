@@ -23,11 +23,11 @@ package org.springframework.batch.item;
  * <p>
  * 
  * <p>
- * The state that is stored is represented as {@link StreamContext} which
+ * The state that is stored is represented as {@link ExecutionAttributes} which
  * enforces a requirement that any restart data can be represented by a
- * Properties object. In general, the contract is that {@link StreamContext}
+ * Properties object. In general, the contract is that {@link ExecutionAttributes}
  * that is returned via the {@link #getStreamContext()} method will be given
- * back to the {@link #restoreFrom(StreamContext)} method, exactly as it was
+ * back to the {@link #restoreFrom(ExecutionAttributes)} method, exactly as it was
  * provided.
  * </p>
  * 
@@ -37,11 +37,11 @@ package org.springframework.batch.item;
 public interface ItemStream extends StreamContextProvider {
 
 	/**
-	 * Restart state given the provided {@link StreamContext}.
+	 * Restart state given the provided {@link ExecutionAttributes}.
 	 * 
 	 * @param context
 	 */
-	void restoreFrom(StreamContext context);
+	void restoreFrom(ExecutionAttributes context);
 
 	/**
 	 * If any resources are needed for the stream to operate they need to be
@@ -75,7 +75,7 @@ public interface ItemStream extends StreamContextProvider {
 	 * 
 	 * @throws UnsupportedOperationException if the operation is not supported
 	 */
-	void mark(StreamContext streamContext);
+	void mark(ExecutionAttributes streamContext);
 
 	/**
 	 * Reset the stream to the last mark. After a reset the stream state will be
@@ -84,5 +84,5 @@ public interface ItemStream extends StreamContextProvider {
 	 * 
 	 * @throws UnsupportedOperationException if the operation is not supported
 	 */
-	void reset(StreamContext streamContext);
+	void reset(ExecutionAttributes streamContext);
 }

@@ -25,8 +25,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.reader.AbstractItemStreamItemReader;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -175,18 +174,21 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	/**
 	 * @return the current row number wrapped as <code>StreamContext</code>
 	 */
-	public StreamContext getStreamContext() {
+	public ExecutionAttributes getStreamContext() {
 		Properties props = new Properties();
 		props.setProperty(RESTART_DATA_ROW_NUMBER_KEY, "" + currentProcessedRow);
+
+		ExecutionAttributes executionAttributes = new ExecutionAttributes();
+		executionAttributes.putString(RESTART_DATA_ROW_NUMBER_KEY, "" + currentProcessedRow);
 		String skipped = skippedRows.toString();
-		props.setProperty(SKIPPED_ROWS, skipped.substring(1, skipped.length() - 1));
-		return new StreamContext(props);
+		executionAttributes.putString(SKIPPED_ROWS, skipped.substring(1, skipped.length() - 1));
+		return executionAttributes;
 	}
 
 	/**
 	 * Sets the cursor to the received row number.
 	 */
-	public void restoreFrom(StreamContext data) {
+	public void restoreFrom(ExecutionAttributes data) {
 		Assert.state(!initialized, "Cannot restore when already intialized.  Call close() first before restore()");
 
 		Properties props = data.getProperties();
@@ -234,7 +236,7 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
 	 */
-	public void mark(StreamContext streamContext) {
+	public void mark(ExecutionAttributes streamContext) {
 		lastCommitRowNumber = currentProcessedRow;
 		if (!useStatelessSession) {
 			statefulSession.clear();
@@ -245,7 +247,7 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
 	 */
-	public void reset(StreamContext streamContext) {
+	public void reset(ExecutionAttributes streamContext) {
 		currentProcessedRow = lastCommitRowNumber;
 		if (lastCommitRowNumber == 0) {
 			cursor.beforeFirst();

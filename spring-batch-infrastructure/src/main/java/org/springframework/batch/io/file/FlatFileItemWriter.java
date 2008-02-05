@@ -33,7 +33,7 @@ import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.StreamException;
 import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.beans.factory.DisposableBean;
@@ -71,7 +71,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	private Resource resource;
 
-	private StreamContext streamContext = new StreamContext();
+	private ExecutionAttributes streamContext = new ExecutionAttributes();
 
 	private OutputState state = null;
 
@@ -246,7 +246,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	/**
 	 * @see ItemStream#getStreamContext()
 	 */
-	public StreamContext getStreamContext() {
+	public ExecutionAttributes getStreamContext() {
 		if (state == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
@@ -257,9 +257,9 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	}
 
 	/**
-	 * @see ItemStream#restoreFrom(StreamContext)
+	 * @see ItemStream#restoreFrom(ExecutionAttributes)
 	 */
-	public void restoreFrom(StreamContext data) {
+	public void restoreFrom(ExecutionAttributes data) {
 		if (data == null)
 			return;
 
@@ -552,14 +552,14 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
 	 */
-	public void mark(StreamContext streamContext) {
+	public void mark(ExecutionAttributes streamContext) {
 		getOutputState().mark();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
 	 */
-	public void reset(StreamContext streamContext) {
+	public void reset(ExecutionAttributes streamContext) {
 		getOutputState().checkFileSize();
 		resetPositionForRestart();
 	}

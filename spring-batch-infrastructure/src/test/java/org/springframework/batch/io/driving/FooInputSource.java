@@ -2,7 +2,7 @@ package org.springframework.batch.io.driving;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -27,11 +27,11 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 		}
 	}
 
-	public StreamContext getStreamContext() {
+	public ExecutionAttributes getStreamContext() {
 		return inputSource.getStreamContext();
 	}
 
-	public void restoreFrom(StreamContext data) {
+	public void restoreFrom(ExecutionAttributes data) {
 		inputSource.restoreFrom(data);
 	}
 
@@ -63,14 +63,14 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
 	 */
-	public void mark(StreamContext streamContext) {
+	public void mark(ExecutionAttributes streamContext) {
 		inputSource.mark(streamContext);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
 	 */
-	public void reset(StreamContext streamContext) {
+	public void reset(ExecutionAttributes streamContext) {
 		inputSource.reset(streamContext);
 	};
 }

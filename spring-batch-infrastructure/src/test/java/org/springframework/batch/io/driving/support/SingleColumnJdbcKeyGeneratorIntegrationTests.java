@@ -3,7 +3,8 @@ package org.springframework.batch.io.driving.support;
 import java.util.List;
 import java.util.Properties;
 
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 /**
@@ -43,7 +44,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 		
 		Properties props = new Properties();
 		props.setProperty(SingleColumnJdbcKeyGenerator.RESTART_KEY, "3");
-		StreamContext streamContext = new StreamContext(props);
+		ExecutionAttributes streamContext = new GenericStreamContext(props);
 		
 		List keys = keyStrategy.restoreKeys(streamContext);
 		
@@ -54,7 +55,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	
 	public void testGetKeyAsStreamContext(){
 		
-		StreamContext streamContext = keyStrategy.getKeyAsStreamContext(new Long(3));
+		ExecutionAttributes streamContext = keyStrategy.getKeyAsStreamContext(new Long(3));
 		Properties props = streamContext.getProperties();
 		
 		assertEquals(1, props.size());

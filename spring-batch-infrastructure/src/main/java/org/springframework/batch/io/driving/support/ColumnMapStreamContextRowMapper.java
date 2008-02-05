@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.core.CollectionFactory;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -23,27 +23,23 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * </p>
- * Extension of the ColumnMapRowMapper that converts a column map to
- * {@link StreamContext} and allows {@link StreamContext} to be converted back
- * as a PreparedStatementSetter. This is useful in a restart scenario, as it
- * allows for the standard functionality of the {@link ColumnMapRowMapper} to be
- * used to create a map representing the columns returned by a query. It should
- * be noted that this column ordering is preserved in the map using a link list
- * version of Map.
+ * </p>Extension of the ColumnMapRowMapper that converts a column map to {@link ExecutionAttributes} and allows
+ * {@link ExecutionAttributes} to be converted back as a PreparedStatementSetter.  This is useful in a restart 
+ * scenario, as it allows for the standard functionality of the ColumnMapRowMapper to be used to 
+ * create a map representing the columns returned by a query.  It should be noted that this column ordering
+ * is preserved in the map using a link list version of Map. 
  * 
  * 
  * @author Lucas Ward
  * @author Dave Syer
  * @see StreamContextRowMapper
  */
-public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implements StreamContextRowMapper {
-
-	public static final String KEY_PREFIX = ClassUtils.getQualifiedName(ColumnMapStreamContextRowMapper.class)
-			+ ".KEY.";
-
-	public PreparedStatementSetter createSetter(StreamContext streamContext) {
-
+public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implements StreamContextRowMapper{
+	
+	public static final String KEY_PREFIX = ClassUtils.getQualifiedName(ColumnMapStreamContextRowMapper.class) + ".KEY.";
+	
+	public PreparedStatementSetter createSetter(ExecutionAttributes streamContext) {
+		
 		ColumnMapStreamContext columnData = new ColumnMapStreamContext(streamContext.getProperties());
 
 		List columns = new ArrayList();
@@ -56,13 +52,13 @@ public class ColumnMapStreamContextRowMapper extends ColumnMapRowMapper implemen
 		return new ArgPreparedStatementSetter(columns.toArray());
 	}
 
-	public StreamContext createStreamContext(Object key) {
+	public ExecutionAttributes createStreamContext(Object key) {
 		Assert.isInstanceOf(Map.class, key, "Input to create StreamContext must be of type Map.");
 		Map keys = (Map) key;
 		return new ColumnMapStreamContext(keys);
 	}
 
-	private static class ColumnMapStreamContext extends StreamContext {
+	private static class ColumnMapStreamContext extends ExecutionAttributes {
 
 		private final Map keys;
 

@@ -25,7 +25,7 @@ import java.util.Collections;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -309,7 +309,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		commit();
 
 		// get restart data
-		StreamContext streamContext = inputSource.getStreamContext();
+		ExecutionAttributes streamContext = inputSource.getStreamContext();
 		// close template
 		inputSource.close();
 
@@ -335,7 +335,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.write("testLine8");
 
 		// get statistics
-		StreamContext statistics = inputSource.getStreamContext();
+		ExecutionAttributes statistics = inputSource.getStreamContext();
 		// close template
 		inputSource.close();
 
@@ -363,7 +363,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	public void testDefaultStreamContext() throws Exception {
 		inputSource = new FlatFileItemWriter();
 		inputSource.open();
-		StreamContext streamContext = inputSource.getStreamContext();
+		ExecutionAttributes streamContext = inputSource.getStreamContext();
 		assertNotNull(streamContext);
 		assertEquals(3, streamContext.getProperties().size());
 		assertEquals(0, streamContext.getLong(FlatFileItemWriter.RESTART_DATA_NAME));

@@ -3,7 +3,7 @@ package org.springframework.batch.item.writer;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -49,7 +49,7 @@ public class DelegatingItemWriter implements ItemWriter, Skippable, Initializing
 	/**
 	 * @see ItemStream#getStreamContext()
 	 */
-	public StreamContext getStreamContext() {
+	public ExecutionAttributes getStreamContext() {
 
 		Assert.state(writer != null, "Source must not be null.");
 
@@ -57,14 +57,14 @@ public class DelegatingItemWriter implements ItemWriter, Skippable, Initializing
 			return ((ItemStream) writer).getStreamContext();
 		}
 		else {
-			return new StreamContext();
+			return new ExecutionAttributes();
 		}
 	}
 
 	/**
-	 * @see ItemStream#restoreFrom(StreamContext)
+	 * @see ItemStream#restoreFrom(ExecutionAttributes)
 	 */
-	public void restoreFrom(StreamContext data) {
+	public void restoreFrom(ExecutionAttributes data) {
 
 		Assert.state(writer != null, "Source must not be null.");
 

@@ -19,7 +19,7 @@ package org.springframework.batch.item.reader;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.StreamException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -52,18 +52,18 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 * @throws IllegalStateException if the parent template is not itself
 	 * {@link ItemStream}.
 	 */
-	public StreamContext getStreamContext() {
+	public ExecutionAttributes getStreamContext() {
 		// TODO: this is not necessary...
 		Assert.state(inputSource instanceof ItemStream, "Input source is not ItemStream");
 		return ((ItemStream) inputSource).getStreamContext();
 	}
 
 	/**
-	 * @see ItemStream#restoreFrom(StreamContext)
+	 * @see ItemStream#restoreFrom(ExecutionAttributes)
 	 * @throws IllegalStateException if the parent template is not itself
 	 * {@link ItemStream}.
 	 */
-	public void restoreFrom(StreamContext data) {
+	public void restoreFrom(ExecutionAttributes data) {
 		Assert.state(inputSource instanceof ItemStream, "Input source is not ItemStream");
 		((ItemStream) inputSource).restoreFrom(data);
 	}
@@ -119,7 +119,7 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
 	 */
-	public void mark(StreamContext streamContext) {
+	public void mark(ExecutionAttributes streamContext) {
 		if (inputSource instanceof ItemStream) {
 			((ItemStream) inputSource).mark(streamContext);
 		}
@@ -128,7 +128,7 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
 	 */
-	public void reset(StreamContext streamContext) {
+	public void reset(ExecutionAttributes streamContext) {
 		if (inputSource instanceof ItemStream) {
 			((ItemStream) inputSource).reset(streamContext);
 		}

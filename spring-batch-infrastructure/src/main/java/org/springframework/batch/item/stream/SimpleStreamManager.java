@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.item.StreamException;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -90,11 +91,11 @@ public class SimpleStreamManager implements StreamManager {
 	 * 
 	 * @see org.springframework.batch.item.stream.StreamManager#getStreamContext(java.lang.Object)
 	 */
-	public StreamContext getStreamContext(Object key) {
-		final StreamContext result = new StreamContext();
+	public ExecutionAttributes getStreamContext(Object key) {
+		final ExecutionAttributes result = new ExecutionAttributes();
 		iterate(key, new Callback() {
 			public void execute(ItemStream stream) {
-				StreamContext context = stream.getStreamContext();
+				ExecutionAttributes context = stream.getStreamContext();
 				String prefix = ClassUtils.getQualifiedName(stream.getClass()) + ".";
 				if (!useClassNameAsPrefix) {
 					prefix = "";
@@ -102,7 +103,7 @@ public class SimpleStreamManager implements StreamManager {
 				for (Iterator iterator = context.entrySet().iterator(); iterator.hasNext();) {
 					Entry entry = (Entry) iterator.next();
 					String contextKey = prefix + entry.getKey();
-					result.put(contextKey, entry.getValue());
+					result.putString(contextKey, entry.getValue().toString());
 				}
 			}
 		});
@@ -116,7 +117,7 @@ public class SimpleStreamManager implements StreamManager {
 	 * @see org.springframework.batch.item.stream.StreamManager#register(java.lang.Object,
 	 * org.springframework.batch.item.ItemStream, StreamContext)
 	 */
-	public void register(Object key, ItemStream stream, StreamContext streamContext) {
+	public void register(Object key, ItemStream stream, ExecutionAttributes streamContext) {
 		synchronized (registry) {
 			Set set = (Set) registry.get(key);
 			if (set == null) {
@@ -135,8 +136,8 @@ public class SimpleStreamManager implements StreamManager {
 	 * @param streamContext
 	 * @return
 	 */
-	private StreamContext extract(ItemStream stream, StreamContext context) {
-		StreamContext result = new StreamContext();
+	private ExecutionAttributes extract(ItemStream stream, ExecutionAttributes context) {
+		ExecutionAttributes result = new ExecutionAttributes();
 		String prefix = ClassUtils.getQualifiedName(stream.getClass()) + ".";
 		if (!useClassNameAsPrefix) {
 			prefix = "";
@@ -145,7 +146,7 @@ public class SimpleStreamManager implements StreamManager {
 			Entry entry = (Entry) iterator.next();
 			String contextKey = (String) entry.getKey();
 			if (contextKey.startsWith(prefix)) {
-				result.put(contextKey.substring(prefix.length()), entry.getValue());
+				result.putString(contextKey.substring(prefix.length()), entry.getValue().toString());
 			}
 		}
 		return result;

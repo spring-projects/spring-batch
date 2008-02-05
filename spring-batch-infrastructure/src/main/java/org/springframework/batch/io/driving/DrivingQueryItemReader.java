@@ -21,7 +21,7 @@ import java.util.List;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -159,7 +159,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	 * been initialized before calling restore (meaning, read has been called)
 	 * then an IllegalStateException will be thrown, since all input sources
 	 * should be restored before being read from, otherwise already processed
-	 * data could be returned. The {@link StreamContext} attempting to be restored from
+	 * data could be returned. The {@link ExecutionAttributes} attempting to be restored from
 	 * must have been obtained from the <strong>same input source as the one
 	 * being restored from</strong> otherwise it is invalid.
 	 * 
@@ -168,7 +168,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	 * @throws IllegalStateException
 	 *             if the input source has already been initialized.
 	 */
-	public final void restoreFrom(StreamContext data) {
+	public final void restoreFrom(ExecutionAttributes data) {
 
 		Assert.notNull(data, "StreamContext must not be null.");
 		Assert.notNull(data.getProperties(),
@@ -189,7 +189,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 		}
 	}
 
-	public StreamContext getStreamContext() {
+	public ExecutionAttributes getStreamContext() {
 		return keyGenerator.getKeyAsStreamContext(getCurrentKey());
 	}
 
@@ -237,14 +237,14 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
 	 */
-	public void mark(StreamContext streamContext) {
+	public void mark(ExecutionAttributes streamContext) {
 		lastCommitIndex = currentIndex;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
 	 */
-	public void reset(StreamContext streamContext) {
+	public void reset(ExecutionAttributes streamContext) {
 		keysIterator = keys.listIterator(lastCommitIndex);
 	}
 

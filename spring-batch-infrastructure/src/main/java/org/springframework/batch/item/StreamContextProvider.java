@@ -22,11 +22,11 @@ package org.springframework.batch.item;
 public interface StreamContextProvider {
 
 	/**
-	 * Get {@link StreamContext} representing this object's current state.
+	 * Get {@link ExecutionAttributes} representing this object's current state.
 	 * Should not return null even if there is no state.
 	 * 
-	 * @return {@link StreamContext} representing current state.
+	 * @return {@link ExecutionAttributes} representing current state.
 	 */
-	StreamContext getStreamContext();
+	ExecutionAttributes getStreamContext();
 
 }

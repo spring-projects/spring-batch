@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.stream.GenericStreamContext;
 import org.springframework.core.CollectionFactory;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
@@ -45,10 +46,9 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 	
 	public void testRestoreKeys(){
 		
-		Properties props = new Properties();
-		props.setProperty(ColumnMapStreamContextRowMapper.KEY_PREFIX + "0", "3");
-		props.setProperty(ColumnMapStreamContextRowMapper.KEY_PREFIX + "1", "3");
-		StreamContext streamContext = new StreamContext(props);
+		ExecutionAttributes streamContext = new ExecutionAttributes();
+		streamContext.putString(ColumnMapStreamContextRowMapper.KEY_PREFIX + "0", "3");
+		streamContext.putString(ColumnMapStreamContextRowMapper.KEY_PREFIX + "1", "3");
 		
 		List keys = keyStrategy.restoreKeys(streamContext);
 		
@@ -67,7 +67,7 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 		key.put("ID", new Long(3));
 		key.put("VALUE", new Integer(3));
 		
-		StreamContext streamContext = keyStrategy.getKeyAsStreamContext(key);
+		ExecutionAttributes streamContext = keyStrategy.getKeyAsStreamContext(key);
 		Properties props = streamContext.getProperties();
 		
 		assertEquals(2, props.size());
