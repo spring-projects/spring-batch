@@ -144,12 +144,12 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 		if (key == null) {
 			synchronized (lock) {
 				if (keys.hasNext()) {
+					Assert.state(TransactionSynchronizationManager.isActualTransactionActive(),
+					"Transaction not active for this thread.");
 					Long next = (Long) keys.next();
 					getBuffer().add(next);
 					key = next;
 					logger.debug("Retrieved key from list: " + key);
-					Assert.state(TransactionSynchronizationManager.isActualTransactionActive(),
-							"Transaction not active for this thread.");
 				}
 			}
 		}
@@ -218,7 +218,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void mark(ExecutionAttributes executionAttributes) {
+	public void mark() {
 		getBuffer().commit();
 	}
 
