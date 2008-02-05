@@ -15,6 +15,29 @@
 		<relativePath>..</relativePath>
 	</parent>
 
+	<profiles>
+		<profile>
+			<id>clover</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-clover-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+			<reporting>
+				<plugins>
+					<plugin>
+						<artifactId>maven-clover-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</reporting>
+		</profile>
+	</profiles>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
@@ -290,23 +313,6 @@
 						</configuration>
 						<goals>
 							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clover-plugin</artifactId>
-				<configuration>
-					<licenseLocation>
-						${basedir}/src/test/resources/clover.license
-					</licenseLocation>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>pre-site</phase>
-						<goals>
-							<goal>instrument</goal>
 						</goals>
 					</execution>
 				</executions>
