@@ -40,34 +40,4 @@ public class MultipleColumnJdbcDrivingQueryItemReaderIntegrationTests extends
 		return fooItemReader;
 	}
 
-//	private static class FooRestartDataConverter implements RestartDataRowMapper{
-//
-//		private static final String ID_RESTART_KEY = "FooRestartDataConverter.id";
-//		private static final String VALUE_RESTART_KEY = "FooRestartDataConverter.value";
-//
-//		public RestartData createRestartData(Object compositeKey) {
-//
-//			List values = (List)compositeKey;
-//			Properties data = new Properties();
-//			data.setProperty(ID_RESTART_KEY, values.get(0).toString());
-//			data.setProperty(VALUE_RESTART_KEY, values.get(1).toString());
-//			return new GenericRestartData(data);
-//		}
-//
-//		public Object[] createSetter(RestartData restartData) {
-//			Object[] args = new Object[2];
-//			args[0] = restartData.getProperties().get(ID_RESTART_KEY);
-//			args[1] = restartData.getProperties().getProperty(VALUE_RESTART_KEY);
-//			return args;
-//		}
-//	}
-//
-//	private static class FooCompositeKeyMapper implements RowMapper{
-//		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-//			List key = new ArrayList();
-//			key.add(new Long(rs.getLong(1)));
-//			key.add(new Long(rs.getLong(2)));
-//			return key;
-//		}
-//	}
 }

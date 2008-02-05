@@ -177,14 +177,14 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	 * @see ItemStream#getExecutionAttributes()
 	 */
 	public ExecutionAttributes getExecutionAttributes() {
-		ExecutionAttributes restartData = new ExecutionAttributes();
-		restartData.putLong(READ_COUNT_STATISTICS_NAME, currentRecordCount);
-		return restartData;
+		ExecutionAttributes executionAttributes = new ExecutionAttributes();
+		executionAttributes.putLong(READ_COUNT_STATISTICS_NAME, currentRecordCount);
+		return executionAttributes;
 	}
 
 	/**
 	 * Restores the input source for the given restart data by rereading and
-	 * skipping the number of records stored in the RestartData.
+	 * skipping the number of records stored in the {@link ExecutionAttributes}.
 	 * 
 	 * @param ExecutionAttributes that holds the line count from the last commit.
 	 * @throws IllegalStateException if the ItemReader has already been

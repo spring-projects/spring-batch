@@ -18,7 +18,7 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 /**
  * @author Lucas Ward
  */
-public class ColumnMapRestartDataRowMapperTests extends TestCase {
+public class ColumnMapExecutionAttributesRowMapperTests extends TestCase {
 
 	private static final String KEY = ColumnMapExecutionAttributesRowMapper.KEY_PREFIX;
 	
@@ -39,7 +39,7 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 		key.put("2", new Integer(2));
 	}
 	
-	public void testCreateRestartDataWithInvalidType() throws Exception {
+	public void testCreateExecutionAttributesWithInvalidType() throws Exception {
 		
 		try{
 			mapper.createExecutionAttributes(new Object());
@@ -49,7 +49,7 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 		}
 	}
 	
-	public void testCreateRestartDataWithNull(){
+	public void testCreateExecutionAttributesWithNull(){
 		
 		try{
 			mapper.createExecutionAttributes(null);
@@ -59,14 +59,14 @@ public class ColumnMapRestartDataRowMapperTests extends TestCase {
 		}
 	}
 	
-	public void testCreateRestartData() throws Exception {
+	public void testCreateExecutionAttributes() throws Exception {
 		ExecutionAttributes streamContext = mapper.createExecutionAttributes(key);
 		Properties props = streamContext.getProperties();
 		assertEquals("1", props.getProperty(KEY + "0"));
 		assertEquals("2", props.getProperty(KEY + "1"));
 	}
 	
-	public void testCreateRestartDataFromEmptyKeys() throws Exception {
+	public void testCreateExecutionAttributesFromEmptyKeys() throws Exception {
 		
 		ExecutionAttributes streamContext = mapper.createExecutionAttributes(new HashMap());
 		assertEquals(0, streamContext.getProperties().size());

@@ -60,7 +60,7 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 		assertEquals(new Integer(5), key.get("VALUE"));
 	}
 	
-	public void testGetKeyAsRestartData(){
+	public void testGetKeyAsExecutionAttributes(){
 		
 		Map key = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(1);
 		key.put("ID", new Long(3));

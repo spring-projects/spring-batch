@@ -20,12 +20,12 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
- * RestartDataRowMapper extends the standard {@link RowMapper} interface to provide for
- * converting an object returned from a RowMapper to RestartData and back again.  One
+ * {@link ExecutionAttributesRowMapper} extends the standard {@link RowMapper} interface to provide for
+ * converting an object returned from a RowMapper to {@link ExecutionAttributes} and back again.  One
  * of the most common use cases for this type of functionality is the DrivingQuery approach
- * to sql processing.  Using a RestartDataRowMapper, developers can create each unique key
+ * to sql processing.  Using a {@link ExecutionAttributesRowMapper}, developers can create each unique key
  * to suite their specific needs, and also describe how such a key would be converted to
- * RestartData, so that it can be serialized and stored.
+ * {@link ExecutionAttributes}, so that it can be serialized and stored.
  *
  * @author Lucas Ward
  * @see RowMapper
@@ -34,7 +34,7 @@ import org.springframework.jdbc.core.RowMapper;
 public interface ExecutionAttributesRowMapper extends RowMapper {
 
 	/**
-	 * Given the provided composite key, return a RestartData representation.
+	 * Given the provided composite key, return a {@link ExecutionAttributes} representation.
 	 *
 	 * @param key
 	 * @return ExecutionAttributes representing the composite key.
