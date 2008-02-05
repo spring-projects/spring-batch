@@ -17,7 +17,7 @@ package org.springframework.batch.core.domain;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 
 /**
  * @author Dave Syer
@@ -41,11 +41,11 @@ public class StepContributionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepContribution#setStreamContext(StreamContext)}.
+	 * {@link org.springframework.batch.core.domain.StepContribution#setStreamContext(ExecutionAttributes)}.
 	 */
 	public void testSetStreamContext() {
 		assertEquals(null, contribution.getStreamContext());
-		StreamContext context = new StreamContext();
+		ExecutionAttributes context = new ExecutionAttributes();
 		context.putString("foo", "bar");
 		contribution.setStreamContext(context);
 		assertEquals(1, contribution.getStreamContext().getProperties().size());

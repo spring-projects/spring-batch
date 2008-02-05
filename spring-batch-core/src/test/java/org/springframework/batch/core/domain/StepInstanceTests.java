@@ -17,6 +17,7 @@ package org.springframework.batch.core.domain;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.StreamContext;
 import org.springframework.batch.support.PropertiesConverter;
 
@@ -50,7 +51,9 @@ public class StepInstanceTests extends TestCase {
 	public void testGetStreamContext() {
 		assertNotNull(instance.getStreamContext());
 		assertTrue(instance.getStreamContext().getProperties().isEmpty());
-		instance.setStreamContext(new StreamContext(PropertiesConverter.stringToProperties("foo=bar")));
+		ExecutionAttributes executionAttributes = new ExecutionAttributes();
+		executionAttributes.putString("foo", "bar");
+		instance.setStreamContext(executionAttributes);
 		assertEquals("bar", instance.getStreamContext().getProperties().getProperty("foo"));
 	}
 

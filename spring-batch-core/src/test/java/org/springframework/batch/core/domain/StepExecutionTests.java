@@ -19,7 +19,7 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -200,7 +200,7 @@ public class StepExecutionTests extends TestCase {
 
 	public void testStreamContext() throws Exception {
 		assertNotNull(execution.getStreamContext());
-		StreamContext context = new StreamContext();
+		ExecutionAttributes context = new ExecutionAttributes();
 		context.putString("foo", "bar");
 		execution.setStreamContext(context );
 		assertEquals("bar", execution.getStreamContext().getString("foo"));

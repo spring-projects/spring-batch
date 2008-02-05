@@ -16,7 +16,7 @@
 
 package org.springframework.batch.core.domain;
 
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 
 /**
  * <p>
@@ -49,7 +49,7 @@ public class StepInstance extends Entity {
 
 	private BatchStatus status;
 
-	private StreamContext streamContext = new StreamContext();
+	private ExecutionAttributes streamContext = new ExecutionAttributes();
 
 	private int stepExecutionCount = 0;
 
@@ -84,11 +84,11 @@ public class StepInstance extends Entity {
 		this.stepExecutionCount = stepExecutionCount;
 	}
 
-	public StreamContext getStreamContext() {
+	public ExecutionAttributes getStreamContext() {
 		return streamContext;
 	}
 
-	public void setStreamContext(StreamContext streamContext) {
+	public void setStreamContext(ExecutionAttributes streamContext) {
 		this.streamContext = streamContext;
 	}
 

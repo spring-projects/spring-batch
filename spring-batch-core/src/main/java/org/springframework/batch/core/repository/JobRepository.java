@@ -22,7 +22,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.item.StreamContext;
+import org.springframework.batch.item.ExecutionAttributes;
 
 /**
  * <p>
@@ -30,7 +30,7 @@ import org.springframework.batch.item.StreamContext;
  * must first be obtained using the findOrCreateJob method. Once a Job and it's
  * related steps are obtained, they can be updated. It should be noted that any
  * reconstituted steps are expected to contain restart data <strong>if the step
- * says it wants to be restored after a restart, and {@link StreamContext}
+ * says it wants to be restored after a restart, and {@link ExecutionAttributes}
  * exists.</strong>
  * </p>
  * 
