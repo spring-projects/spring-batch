@@ -172,13 +172,15 @@ public class SimpleStepExecutor {
 
 		final boolean saveExecutionAttributes = step.isSaveExecutionAttributes();
 
-		if (saveExecutionAttributes && isRestart) {
-			stepContext.restoreFrom(stepInstance.getExecutionAttributes());
+		if (saveExecutionAttributes && isRestart && stepInstance.getLastExecution() != null) {
+			stepExecution.setExecutionAttributes(stepInstance.getLastExecution().getExecutionAttributes());
+			stepContext.restoreFrom(stepExecution.getExecutionAttributes());
 		}
 
 		try {
 
 			stepExecution.setStartTime(new Date(System.currentTimeMillis()));
+			stepInstance.setLastExecution(stepExecution);
 			updateStatus(stepExecution, BatchStatus.STARTED);
 
 			status = stepOperations.iterate(new RepeatCallback() {
@@ -220,8 +222,7 @@ public class SimpleStepExecutor {
 							stepExecution.apply(contribution);
 
 							if (saveExecutionAttributes) {
-								stepInstance.setExecutionAttributes(stepContext.getExecutionAttributes());
-								jobRepository.update(stepInstance);
+								stepExecution.setExecutionAttributes(stepContext.getExecutionAttributes());
 							}
 							jobRepository.saveOrUpdate(stepExecution);
 
@@ -300,7 +301,6 @@ public class SimpleStepExecutor {
 	private void updateStatus(StepExecution stepExecution, BatchStatus status) {
 		StepInstance step = stepExecution.getStep();
 		stepExecution.setStatus(status);
-		step.setStatus(status);
 		jobRepository.update(step);
 		jobRepository.saveOrUpdate(stepExecution);
 	}

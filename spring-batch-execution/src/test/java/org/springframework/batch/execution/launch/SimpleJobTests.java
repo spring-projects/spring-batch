@@ -114,10 +114,9 @@ public class SimpleJobTests extends TestCase {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 
 		job.execute(jobExecutionContext);
-		assertEquals(BatchStatus.COMPLETED, jobInstance.getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobExecutionContext.getStatus());
 		assertEquals(3, processed.size());
 		assertTrue(processed.contains("foo"));
-
 	}
 
 	public void testSimpleJobWithRecovery() throws Exception {
@@ -155,7 +154,7 @@ public class SimpleJobTests extends TestCase {
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
 		job.execute(jobExecution);
 
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getJobInstance().getStatus());
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(0, processed.size());
 		// provider should be exhausted
 		assertEquals(null, provider.read());
@@ -185,6 +184,6 @@ public class SimpleJobTests extends TestCase {
 			assertEquals("Foo", e.getMessage());
 			// expected
 		}
-		assertEquals(BatchStatus.FAILED, jobExecution.getJobInstance().getStatus());
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 	}
 }

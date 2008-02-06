@@ -313,9 +313,9 @@ public class SimpleStepExecutorTests extends TestCase {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 		
-		stepExecution.getStep().setExecutionAttributes(
+		stepExecution.setExecutionAttributes(
 				new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar")));
-
+		step.setLastExecution(stepExecution);
 		stepExecutor.execute(stepExecution);
 
 		assertTrue(tasklet.isRestoreFromCalled());

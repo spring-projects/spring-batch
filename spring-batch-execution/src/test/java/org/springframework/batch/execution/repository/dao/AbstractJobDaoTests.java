@@ -80,18 +80,20 @@ public abstract class AbstractJobDaoTests extends
 		jobExecution.setStartTime(jobExecutionStartTime);
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobDao.save(jobExecution);
+		jobInstance.setLastExecution(jobExecution);
+		jobDao.update(jobInstance);
 	}
 
 	public void testVersionIsNotNullForJob() throws Exception {
 		int version = jdbcTemplate
-				.queryForInt("select version from BATCH_JOB_INSTANCE where ID="
+				.queryForInt("select version from BATCH_JOB_INSTANCE where JOB_INSTANCE_ID="
 						+ jobInstance.getId());
 		assertEquals(0, version);
 	}
 
 	public void testVersionIsNotNullForJobExecution() throws Exception {
 		int version = jdbcTemplate
-				.queryForInt("select version from BATCH_JOB_EXECUTION where ID="
+				.queryForInt("select version from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID="
 						+ jobExecution.getId());
 		assertEquals(0, version);
 	}
@@ -148,7 +150,9 @@ public abstract class AbstractJobDaoTests extends
 
 	public void testUpdateJob() {
 		// Update the returned job with a new status
-		jobInstance.setStatus(BatchStatus.COMPLETED);
+		JobExecution newExecution = new JobExecution(jobInstance);
+		jobDao.save(newExecution);
+		jobInstance.setLastExecution(newExecution);
 		jobDao.update(jobInstance);
 
 		// The job just updated should be found, with the saved status.
@@ -156,7 +160,19 @@ public abstract class AbstractJobDaoTests extends
 		assertTrue(jobs.size() == 1);
 		JobInstance tempJob = (JobInstance) jobs.get(0);
 		assertTrue(jobInstance.equals(tempJob));
-		assertEquals(tempJob.getStatus(), BatchStatus.COMPLETED);
+		assertEquals(newExecution, tempJob.getLastExecution());
+	}
+	
+	public void testGetJobExecution(){
+		
+		JobExecution tempExecution = jobDao.getJobExecution(jobExecution.getId());
+		assertEquals(jobExecution, tempExecution);
+	}
+	
+	public void testJobInstanceLastExecution(){
+		//ensure the last execution id is being stored
+		JobExecution lastJobExecution = jobDao.getJobExecution(jobInstance.getLastExecution().getId());
+		assertEquals(lastJobExecution, jobExecution);
 	}
 
 	public void testUpdateJobWithNullId() {
@@ -249,7 +265,7 @@ public abstract class AbstractJobDaoTests extends
 		jobInstance = jobDao.createJobInstance("test", jobParameters);
 
 		List jobs = jdbcTemplate.queryForList(
-				"SELECT * FROM BATCH_JOB_INSTANCE where ID=?", new Object[] { jobInstance
+				"SELECT * FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", new Object[] { jobInstance
 						.getId() });
 		assertEquals(1, jobs.size());
 		assertEquals("test", ((Map) jobs.get(0)).get("JOB_NAME"));

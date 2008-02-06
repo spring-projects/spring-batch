@@ -21,12 +21,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
 public class MapStepDao implements StepDao {
 
@@ -110,6 +112,35 @@ public class MapStepDao implements StepDao {
 			return new ArrayList(executions);
 		}
 	}
+	
+	public StepExecution getStepExecution(Long stepExecutionId,
+			StepInstance stepInstance)  {
+		
+		List stepExecutions = new ArrayList();
+		
+		for(Iterator it = executionsById.entrySet().iterator();it.hasNext();){
+			Entry entry = (Entry)it.next();
+			Set executions = (Set)entry.getValue();
+			for(Iterator executionsIt = executions.iterator();executionsIt.hasNext();){
+				StepExecution stepExecution = (StepExecution)executionsIt.next();
+				if(stepExecution.getId() == stepExecutionId){
+					stepExecutions.add(stepExecution);
+				}
+			}
+		}
+		
+		if(stepExecutions.size() == 0){
+			return null;
+		}
+		else if(stepExecutions.size() == 1){
+			return (StepExecution)stepExecutions.get(0);
+		}
+		else{
+			throw new IncorrectResultSizeDataAccessException("Multiple StepExecutions found for given id"
+					, 1, stepExecutions.size());
+		}
+	}
+
 
 	public void update(StepInstance step) {
 		// no-op
@@ -130,6 +161,5 @@ public class MapStepDao implements StepDao {
 	public void update(Long executionId,
 			ExecutionAttributes executionAttributes) {
 	}
-
 }
 

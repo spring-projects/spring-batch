@@ -58,6 +58,7 @@ public class SimpleJob extends JobSupport {
 	public void execute(JobExecution execution) throws BatchCriticalException {
 
 		JobInstance jobInstance = execution.getJobInstance();
+		jobInstance.setLastExecution(execution);
 		updateStatus(execution, BatchStatus.STARTING);
 
 		List stepInstances = jobInstance.getStepInstances();
@@ -115,10 +116,9 @@ public class SimpleJob extends JobSupport {
 	}
 
 	private void updateStatus(JobExecution jobExecution, BatchStatus status) {
-		JobInstance job = jobExecution.getJobInstance();
+		JobInstance jobIntance = jobExecution.getJobInstance();
 		jobExecution.setStatus(status);
-		job.setStatus(status);
-		jobRepository.update(job);
+		jobRepository.update(jobIntance);
 		jobRepository.saveOrUpdate(jobExecution);
 	}
 
@@ -128,7 +128,16 @@ public class SimpleJob extends JobSupport {
 	 */
 	private boolean shouldStart(StepInstance stepInstance, Step step) {
 
-		if (stepInstance.getStatus() == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) {
+		BatchStatus stepStatus;
+		//if the last execution is null, the step has never been executed.
+		if(stepInstance.getLastExecution() == null){
+			stepStatus = BatchStatus.STARTING;
+		}
+		else{
+			stepStatus = stepInstance.getLastExecution().getStatus();
+		}
+		
+		if (stepStatus== BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) {
 			// step is complete, false should be returned, indicating that the
 			// step should not be started
 			return false;

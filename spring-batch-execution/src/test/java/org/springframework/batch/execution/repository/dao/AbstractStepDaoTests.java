@@ -95,22 +95,25 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setStartTime(new Date(System.currentTimeMillis()));
 		stepDao.save(stepExecution);
+		step1.setLastExecution(stepExecution);
+		stepDao.update(step1);
 		
 		executionAttributes = new ExecutionAttributes();
 		executionAttributes.putString("1", "testString1");
 		executionAttributes.putString("2", "testString2");
 		executionAttributes.putLong("3", 3);
 		executionAttributes.putDouble("4", 4.4);
+		
 
 	}
 
 	public void testVersionIsNotNullForStep() throws Exception {
-		int version = jdbcTemplate.queryForInt("select version from BATCH_STEP_INSTANCE where ID=" + step1.getId());
+		int version = jdbcTemplate.queryForInt("select version from BATCH_STEP_INSTANCE where STEP_INSTANCE_ID=" + step1.getId());
 		assertEquals(0, version);
 	}
 
 	public void testVersionIsNotNullForStepExecution() throws Exception {
-		int version = jdbcTemplate.queryForInt("select version from BATCH_STEP_EXECUTION where ID="
+		int version = jdbcTemplate.queryForInt("select version from BATCH_STEP_EXECUTION where STEP_EXECUTION_ID="
 				+ stepExecution.getId());
 		assertEquals(0, version);
 	}
@@ -151,7 +154,6 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 
 	public void testUpdateStepWithoutExecutionAttributes() {
 
-		step1.setStatus(BatchStatus.COMPLETED);
 		stepDao.update(step1);
 		StepInstance tempStep = stepDao.findStep(jobInstance, step1.getName());
 		assertEquals(tempStep, step1);
@@ -159,15 +161,11 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 
 	public void testUpdateStepWithExecutionAttributes() {
 
-		step1.setStatus(BatchStatus.COMPLETED);
-		Properties data = new Properties();
-		data.setProperty("restart.key1", "restartData");
-		ExecutionAttributes executionAttributes = new ExecutionAttributes(data);
-		step1.setExecutionAttributes(executionAttributes);
-		stepDao.update(step1);
+		stepDao.save(step1.getId(), executionAttributes);
 		StepInstance tempStep = stepDao.findStep(jobInstance, step1.getName());
+		ExecutionAttributes tempAttributes = stepDao.findExecutionAttributes(step1.getId());
 		assertEquals(tempStep, step1);
-		assertEquals(tempStep.getExecutionAttributes().getProperties().toString(), executionAttributes.getProperties().toString());
+		assertEquals(executionAttributes, tempAttributes);
 	}
 
 	public void testSaveStepExecution() {

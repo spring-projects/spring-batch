@@ -21,6 +21,7 @@ import java.util.List;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
 /**
  * Data Access Object for jobs.
@@ -94,5 +95,15 @@ public interface JobDao {
 	 * @param job
 	 * @return list of jobExecutions.
 	 */
-	public List findJobExecutions(JobInstance job);
+	public List findJobExecutions(JobInstance jobInstance);
+	
+	/**
+	 * Given an id, return the matching JobExecution.
+	 * 
+	 * @param jobExecutionId - id of the execution to be returned.
+	 * @return {@link JobExecution} matching the id.
+	 * @throws {@link IncorrectResultSizeDataAccessException} if
+	 * more than one execution is found for the given id.
+	 */
+	public JobExecution getJobExecution(Long jobExecutionId);
 }

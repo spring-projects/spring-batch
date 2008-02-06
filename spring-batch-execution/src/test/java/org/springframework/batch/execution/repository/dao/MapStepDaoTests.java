@@ -21,12 +21,10 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.item.ExecutionAttributes;
 
 public class MapStepDaoTests extends TestCase {
@@ -107,16 +105,15 @@ public class MapStepDaoTests extends TestCase {
 
 	public void testSaveExecutionAttributes() throws Exception {
 		assertEquals(null, dao.getExecutionAttributes(step.getId()));
-		step.setStatus(BatchStatus.COMPLETED);
 		Properties data = new Properties();
 		data.setProperty("restart.key1", "restartData");
 		ExecutionAttributes executionAttributes = new ExecutionAttributes(data);
-		step.setExecutionAttributes(executionAttributes);
-		dao.update(step);
-		StepInstance tempStep = dao.findStep(job, step.getName());
-		assertEquals(tempStep, step);
-		assertEquals(tempStep.getExecutionAttributes().getProperties().toString(), 
-				executionAttributes.getProperties().toString());
+		StepExecution stepExecution = new StepExecution(step, null, null);
+		stepExecution.setExecutionAttributes(executionAttributes);
+		dao.save(stepExecution);
+		StepExecution tempExecution = dao.getStepExecution(stepExecution.getId(), step);
+		assertEquals(tempExecution, stepExecution);
+		assertEquals(stepExecution.getExecutionAttributes(), tempExecution.getExecutionAttributes());
 	}
 
 }

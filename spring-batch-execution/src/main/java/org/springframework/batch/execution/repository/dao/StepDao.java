@@ -22,6 +22,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
 /**
  * Data access object for steps.
@@ -102,6 +103,16 @@ public interface StepDao {
 	 * @return list of stepExecutions
 	 */
 	public List findStepExecutions(StepInstance step);
+	
+	/**
+	 * Return a StepExecution for the given id.
+	 * 
+	 * @param stepExecutionId
+	 * @return {@link StepExecution} for the provided id.
+	 * @throws {@link IncorrectResultSizeDataAccessException} if more
+	 * than one execution is found.
+	 */
+	public StepExecution getStepExecution(Long stepExecutionId, StepInstance stepInstance);
 	
 	/**
 	 * Find all {@link ExecutionAttributes} for the given execution id.

@@ -84,4 +84,9 @@ public class MockStepDao implements StepDao {
 			ExecutionAttributes executionAttributes) {
 	}
 
+	public StepExecution getStepExecution(Long stepExecutionId,
+			StepInstance stepInstance) {
+		return null;
+	}
+
 }

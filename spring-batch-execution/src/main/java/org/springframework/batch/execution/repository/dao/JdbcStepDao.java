@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.SerializationUtils;
@@ -75,43 +74,46 @@ import org.springframework.util.StringUtils;
  */
 public class JdbcStepDao implements StepDao, InitializingBean {
 
-	private static final String CREATE_STEP = "INSERT into %PREFIX%STEP_INSTANCE(ID, JOB_INSTANCE_ID, STEP_NAME) values (?, ?, ?)";
+	private static final String CREATE_STEP = "INSERT into %PREFIX%STEP_INSTANCE(STEP_INSTANCE_ID, JOB_INSTANCE_ID, STEP_NAME) values (?, ?, ?)";
 
 	private static final int EXIT_MESSAGE_LENGTH = 250;
 
-	private static final String FIND_STEP = "SELECT ID, STATUS, RESTART_DATA from %PREFIX%STEP_INSTANCE where JOB_INSTANCE_ID = ? "
+	private static final String FIND_STEP = "SELECT STEP_INSTANCE_ID, LAST_STEP_EXECUTION_ID from %PREFIX%STEP_INSTANCE where JOB_INSTANCE_ID = ? "
 			+ "and STEP_NAME = ?";
 
-	private static final String FIND_STEP_EXECUTIONS = "SELECT ID, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
+	private static final String FIND_STEP_EXECUTIONS = "SELECT STEP_EXECUTION_ID, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
 			+ " TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%STEP_EXECUTION where STEP_INSTANCE_ID = ?";
 
+	private static final String GET_STEP_EXECUTION = "SELECT STEP_EXECUTION_ID, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
+		+ " TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%STEP_EXECUTION where STEP_EXECUTION_ID = ?";
+	
 	// Step SQL statements
-	private static final String FIND_STEPS = "SELECT ID, STEP_NAME, STATUS, RESTART_DATA from %PREFIX%STEP_INSTANCE where JOB_INSTANCE_ID = ?";
+	private static final String FIND_STEPS = "SELECT STEP_INSTANCE_ID, LAST_STEP_EXECUTION_ID, STEP_NAME from %PREFIX%STEP_INSTANCE where JOB_INSTANCE_ID = ?";
 
-	private static final String GET_STEP_EXECUTION_COUNT = "SELECT count(ID) from %PREFIX%STEP_EXECUTION where "
+	private static final String GET_STEP_EXECUTION_COUNT = "SELECT count(STEP_EXECUTION_ID) from %PREFIX%STEP_EXECUTION where "
 			+ "STEP_INSTANCE_ID = ?";
 
 	protected static final Log logger = LogFactory.getLog(JdbcStepDao.class);
 
 	// StepExecution statements
-	private static final String SAVE_STEP_EXECUTION = "INSERT into %PREFIX%STEP_EXECUTION(ID, VERSION, STEP_INSTANCE_ID, JOB_EXECUTION_ID, START_TIME, "
+	private static final String SAVE_STEP_EXECUTION = "INSERT into %PREFIX%STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_INSTANCE_ID, JOB_EXECUTION_ID, START_TIME, "
 			+ "END_TIME, STATUS, COMMIT_COUNT, TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) "
 			+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String UPDATE_STEP = "UPDATE %PREFIX%STEP_INSTANCE set STATUS = ?, RESTART_DATA = ? where ID = ?";
+	private static final String UPDATE_STEP = "UPDATE %PREFIX%STEP_INSTANCE set LAST_STEP_EXECUTION_ID = ? where STEP_INSTANCE_ID = ?";
 
 	private static final String UPDATE_STEP_EXECUTION = "UPDATE %PREFIX%STEP_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ "STATUS = ?, COMMIT_COUNT = ?, TASK_COUNT = ?, TASK_STATISTICS = ?, CONTINUABLE = ? , EXIT_CODE = ?, "
-			+ "EXIT_MESSAGE = ?, VERSION = ? where ID = ? and VERSION = ?";
+			+ "EXIT_MESSAGE = ?, VERSION = ? where STEP_EXECUTION_ID = ? and VERSION = ?";
 
 	private static final String UPDATE_STEP_EXECUTION_ATTRS = "UPDATE %PREFIX%STEP_EXECUTION_ATTRS set " +
-			"TYPE_CD = ?, STRING_VAL = ?, DOUBLE_VAL = ?, LONG_VAL = ?, OBJECT_VAL = ? where EXECUTION_ID = ? and KEY_NAME = ?";
+			"TYPE_CD = ?, STRING_VAL = ?, DOUBLE_VAL = ?, LONG_VAL = ?, OBJECT_VAL = ? where STEP_EXECUTION_ID = ? and KEY_NAME = ?";
 	
-	private static final String INSERT_STEP_EXECUTION_ATTRS = "INSERT into %PREFIX%STEP_EXECUTION_ATTRS(EXECUTION_ID, TYPE_CD," +
+	private static final String INSERT_STEP_EXECUTION_ATTRS = "INSERT into %PREFIX%STEP_EXECUTION_ATTRS(STEP_EXECUTION_ID, TYPE_CD," +
 			" KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL) values(?,?,?,?,?,?,?)";
 	
 	private static final String FIND_STEP_EXECUTION_ATTRS = "SELECT TYPE_CD, KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL " +
-			"from %PREFIX%STEP_EXECUTION_ATTRS where EXECUTION_ID = ?";
+			"from %PREFIX%STEP_EXECUTION_ATTRS where STEP_EXECUTION_ID = ?";
 	
 	private JdbcOperations jdbcTemplate;
 
@@ -171,25 +173,15 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	 * @throws IncorrectResultSizeDataAccessException if more than one step is
 	 * found.
 	 */
-	public StepInstance findStep(JobInstance job, String stepName) {
+	public StepInstance findStep(JobInstance jobInstance, String stepName) {
 
-		Assert.notNull(job, "Job cannot be null.");
-		Assert.notNull(job.getId(), "Job ID cannot be null");
+		Assert.notNull(jobInstance, "Job cannot be null.");
+		Assert.notNull(jobInstance.getId(), "Job ID cannot be null");
 		Assert.notNull(stepName, "StepName cannot be null");
 
-		Object[] parameters = new Object[] { job.getId(), stepName };
+		Object[] parameters = new Object[] { jobInstance.getId(), stepName };
 
-		RowMapper rowMapper = new RowMapper() {
-
-			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-				StepInstance step = new StepInstance(new Long(rs.getLong(1)));
-				step.setStatus(BatchStatus.getStatus(rs.getString(2)));
-				step.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter.stringToProperties(rs.getString(3))));
-				return step;
-			}
-
-		};
+		RowMapper rowMapper = new StepInstanceRowMapper(jobInstance, stepName);
 
 		List steps = jdbcTemplate.query(getFindStepQuery(), parameters, rowMapper);
 
@@ -206,7 +198,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 			// never be two steps with the same name and JOB_INSTANCE_ID due to database
 			// constraints.
 			throw new IncorrectResultSizeDataAccessException("Step Invalid, multiple steps found for StepName:"
-					+ stepName + " and JobId:" + job.getId(), 1, steps.size());
+					+ stepName + " and JobId:" + jobInstance.getId(), 1, steps.size());
 		}
 
 	}
@@ -223,28 +215,32 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 		Assert.notNull(step, "Step cannot be null.");
 		Assert.notNull(step.getId(), "Step id cannot be null.");
 
-		RowMapper rowMapper = new RowMapper() {
-			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-				JobExecution jobExecution = (JobExecution) jdbcTemplate.queryForObject(
-						getQuery(JobExecutionRowMapper.GET_JOB_EXECUTION), new Object[] { new Long(rs.getLong(2)) },
-						new JobExecutionRowMapper(step.getJobInstance()));
-				StepExecution stepExecution = new StepExecution(step, jobExecution, new Long(rs.getLong(1)));
-				stepExecution.setStartTime(rs.getTimestamp(3));
-				stepExecution.setEndTime(rs.getTimestamp(4));
-				stepExecution.setStatus(BatchStatus.getStatus(rs.getString(5)));
-				stepExecution.setCommitCount(rs.getInt(6));
-				stepExecution.setTaskCount(rs.getInt(7));
-				stepExecution.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter
-						.stringToProperties(rs.getString(8))));
-				stepExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(9)), rs.getString(10), rs
-						.getString(11)));
-				return stepExecution;
-			}
-		};
+		RowMapper rowMapper = new StepExecutionRowMapper(step);
 
 		return jdbcTemplate.query(getFindStepExecutionsQuery(), new Object[] { step.getId() }, rowMapper);
+	}
+	
+	public StepExecution getStepExecution(Long stepExecutionId, StepInstance stepInstance) {
+		
+		Assert.notNull(stepExecutionId, "Step Execution id must not be null");
 
+		RowMapper rowMapper = new StepExecutionRowMapper(stepInstance);
+
+		List executions = jdbcTemplate.query(getQuery(GET_STEP_EXECUTION), new Object[] { stepExecutionId }, rowMapper);
+		
+		StepExecution stepExecution;
+		if(executions.size() == 1){
+			stepExecution = (StepExecution)executions.get(0);
+		}
+		else if(executions.size() == 0){
+			stepExecution = null;
+		}
+		else{
+			throw new IncorrectResultSizeDataAccessException("Only one StepExecution may exist for given id: [" + 
+					stepExecutionId + "]", 1, executions.size());
+		}
+		
+		return stepExecution;
 	}
 	
 	/*
@@ -405,25 +401,13 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	 * 
 	 * @throws IllegalArgumentException if jobId is null.
 	 */
-	public List findSteps(final JobInstance job) {
+	public List findSteps(final JobInstance jobInstance) {
 
-		Assert.notNull(job, "Job cannot be null.");
+		Assert.notNull(jobInstance, "Job cannot be null.");
 
-		Object[] parameters = new Object[] { job.getId() };
+		Object[] parameters = new Object[] { jobInstance.getId() };
 
-		RowMapper rowMapper = new RowMapper() {
-
-			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-				StepInstance step = new StepInstance(job, rs.getString(2), new Long(rs.getLong(1)));
-				String status = rs.getString(3);
-				step.setStatus(BatchStatus.getStatus(status));
-				step
-						.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter.stringToProperties(rs
-								.getString(3))));
-				return step;
-			}
-		};
+		RowMapper rowMapper = new StepInstanceRowMapper(jobInstance, null);
 
 		return jdbcTemplate.query(getFindStepsQuery(), parameters, rowMapper);
 	}
@@ -632,17 +616,9 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	public void update(final StepInstance step) {
 
 		Assert.notNull(step, "Step cannot be null.");
-		Assert.notNull(step.getStatus(), "Step status cannot be null.");
 		Assert.notNull(step.getId(), "Step Id cannot be null.");
 
-		Properties restartProps = null;
-		ExecutionAttributes executionAttributes = step.getExecutionAttributes();
-		if (executionAttributes != null) {
-			restartProps = executionAttributes.getProperties();
-		}
-
-		Object[] parameters = new Object[] { step.getStatus().toString(),
-				PropertiesConverter.propertiesToString(restartProps), step.getId() };
+		Object[] parameters = new Object[] { step.getLastExecution().getId(), step.getId() };
 
 		jdbcTemplate.update(getUpdateStepQuery(), parameters);
 	}
@@ -697,6 +673,58 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 
 			return null;
 		}
+	}
+	
+	private class StepExecutionRowMapper implements RowMapper{
+
+		private final StepInstance stepInstance;
+		
+		public StepExecutionRowMapper(StepInstance stepInstance) {
+			this.stepInstance = stepInstance;
+		}
+		
+		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+			JobExecution jobExecution = (JobExecution) jdbcTemplate.queryForObject(
+					getQuery(JobExecutionRowMapper.GET_JOB_EXECUTION), new Object[] { new Long(rs.getLong(2)) },
+					new JobExecutionRowMapper(stepInstance.getJobInstance()));
+			StepExecution stepExecution = new StepExecution(stepInstance, jobExecution, new Long(rs.getLong(1)));
+			stepExecution.setStartTime(rs.getTimestamp(3));
+			stepExecution.setEndTime(rs.getTimestamp(4));
+			stepExecution.setStatus(BatchStatus.getStatus(rs.getString(5)));
+			stepExecution.setCommitCount(rs.getInt(6));
+			stepExecution.setTaskCount(rs.getInt(7));
+			stepExecution.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter
+					.stringToProperties(rs.getString(8))));
+			stepExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(9)), rs.getString(10), rs
+					.getString(11)));
+			return stepExecution;
+		}
+		
+	}
+	
+	private class StepInstanceRowMapper implements RowMapper{
+
+		private final JobInstance jobInstance;
+		private String stepName;
+		
+		public StepInstanceRowMapper(JobInstance jobInstance, String stepName) {
+			this.jobInstance = jobInstance;
+			this.stepName = stepName;
+		}
+		
+		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+			if(stepName == null){
+				stepName = rs.getString(3);
+			}
+			StepInstance stepInstance = new StepInstance(jobInstance, stepName, new Long(rs.getLong(1)));
+			StepExecution lastExecution = getStepExecution(new Long(rs.getLong(2)), stepInstance);
+			stepInstance.setLastExecution(lastExecution);
+			return stepInstance;
+		}
+
+		
 	}
 
 }

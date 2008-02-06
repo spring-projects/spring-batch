@@ -303,10 +303,6 @@ public class SimpleJobRepository implements JobRepository {
 		while (i.hasNext()) {
 			Step step = (Step) i.next();
 			StepInstance stepInstance = stepDao.createStep(job, step.getName());
-			// Ensure valid restart data is being returned.
-			if (stepInstance.getExecutionAttributes() == null || stepInstance.getExecutionAttributes() == null) {
-				stepInstance.setExecutionAttributes(new ExecutionAttributes());
-			}
 			stepInstances.add(stepInstance);
 		}
 
@@ -322,15 +318,16 @@ public class SimpleJobRepository implements JobRepository {
 		while (i.hasNext()) {
 
 			Step stepConfiguration = (Step) i.next();
-			StepInstance step = stepDao.findStep(job, stepConfiguration.getName());
-			if (step != null) {
+			StepInstance stepInstance = stepDao.findStep(job, stepConfiguration.getName());
+			if (stepInstance != null) {
 
-				step.setStepExecutionCount(stepDao.getStepExecutionCount(step));
-				// Ensure valid restart data is being returned.
-				if (step.getExecutionAttributes() == null || step.getExecutionAttributes() == null) {
-					step.setExecutionAttributes(new ExecutionAttributes());
+				if(stepInstance.getLastExecution() != null){
+					ExecutionAttributes executionAttributes = stepDao.findExecutionAttributes(
+							stepInstance.getLastExecution().getId());
+					stepInstance.getLastExecution().setExecutionAttributes(executionAttributes);
 				}
-				stepInstances.add(step);
+				stepInstance.setStepExecutionCount(stepDao.getStepExecutionCount(stepInstance));
+				stepInstances.add(stepInstance);
 			}
 		}
 		return stepInstances;

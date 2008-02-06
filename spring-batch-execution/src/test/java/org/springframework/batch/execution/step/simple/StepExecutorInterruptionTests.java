@@ -107,7 +107,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		}
 
 		assertFalse(processingThread.isAlive());
-		assertEquals(BatchStatus.STOPPED, step.getStatus());
+		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 	}
 
 	public void testInterruptStep() throws Exception {

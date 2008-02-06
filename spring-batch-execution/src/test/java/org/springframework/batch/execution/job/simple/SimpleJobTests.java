@@ -218,8 +218,10 @@ public class SimpleJobTests extends TestCase {
 	}
 
 	public void testNoStepsExecuted() throws Exception {
-		step1.setStatus(BatchStatus.COMPLETED);
-		step2.setStatus(BatchStatus.COMPLETED);
+		StepExecution completedExecution = new StepExecution(null, null);
+		completedExecution.setStatus(BatchStatus.COMPLETED);
+		step1.setLastExecution(completedExecution);
+		step2.setLastExecution(completedExecution);
 
 		job.execute(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
@@ -233,7 +235,6 @@ public class SimpleJobTests extends TestCase {
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
 		assertEquals(jobInstance, jobDao.findJobInstances(jobInstance.getJobName(), jobParameters).get(0));
 		// because map dao stores in memory, it can be checked directly
-		assertEquals(status, jobInstance.getStatus());
 		JobExecution jobExecution = (JobExecution) jobDao.findJobExecutions(jobInstance).get(0);
 		assertEquals(jobInstance.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());

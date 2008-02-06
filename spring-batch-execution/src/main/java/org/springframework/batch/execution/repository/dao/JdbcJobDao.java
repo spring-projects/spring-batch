@@ -34,6 +34,7 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
@@ -54,13 +55,13 @@ import org.springframework.util.StringUtils;
  */
 public class JdbcJobDao implements JobDao, InitializingBean {
 
-	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE ID=?";
+	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?";
 
 	// Job SQL statements
-	private static final String CREATE_JOB = "INSERT into %PREFIX%JOB_INSTANCE(ID, JOB_NAME, JOB_KEY)"
+	private static final String CREATE_JOB = "INSERT into %PREFIX%JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY)"
 			+ " values (?, ?, ?)";
 	
-	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_INSTANCE_PARAMS(JOB_INSTANCE_ID, KEY_NAME, TYPE_CD, " +
+	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_PARAMS(JOB_INSTANCE_ID, KEY_NAME, TYPE_CD, " +
 			"STRING_VAL, DATE_VAL, LONG_VAL) values (?, ?, ?, ?, ?, ?)";
 	
 	/**	
@@ -70,21 +71,21 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 
 	private static final int EXIT_MESSAGE_LENGTH = 250;
 
-	private static final String FIND_JOBS = "SELECT ID, STATUS from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?";
+	private static final String FIND_JOBS = "SELECT JOB_INSTANCE_ID, LAST_JOB_EXECUTION_ID from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?";
 
-	private static final String GET_JOB_EXECUTION_COUNT = "SELECT count(ID) from %PREFIX%JOB_EXECUTION "
+	private static final String GET_JOB_EXECUTION_COUNT = "SELECT count(JOB_EXECUTION_ID) from %PREFIX%JOB_EXECUTION "
 			+ "where JOB_INSTANCE_ID = ?";
 
 	protected static final Log logger = LogFactory.getLog(JdbcJobDao.class);
 
-	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(ID, JOB_INSTANCE_ID, START_TIME, "
+	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, "
 			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) values (?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String UPDATE_JOB = "UPDATE %PREFIX%JOB_INSTANCE set STATUS = ? where ID = ?";
+	private static final String UPDATE_JOB = "UPDATE %PREFIX%JOB_INSTANCE set LAST_JOB_EXECUTION_ID = ? where JOB_INSTANCE_ID = ?";
 
 	// Job Execution SqlStatements
 	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
-			+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ? where ID = ?";
+			+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ? where JOB_EXECUTION_ID = ?";
 
 	private JdbcOperations jdbcTemplate;
 
@@ -156,6 +157,29 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 				getQuery(JobExecutionRowMapper.FIND_JOB_EXECUTIONS),
 				new Object[] { job.getId() }, new JobExecutionRowMapper(job));
 	}
+	
+	public JobExecution getJobExecution(Long jobExecutionId) {
+		
+		Assert.notNull(jobExecutionId, "Job Execution id must not be null.");
+		
+		List executions = jdbcTemplate.query(
+				getQuery(JobExecutionRowMapper.GET_JOB_EXECUTION),
+				new Object[] { jobExecutionId }, new JobExecutionRowMapper(null));
+		
+		JobExecution jobExecution;
+		if(executions.size() == 1){
+			jobExecution = (JobExecution)executions.get(0);
+		}
+		else if(executions.size() == 0){
+			jobExecution = null;
+		}
+		else{
+			throw new IncorrectResultSizeDataAccessException("Only one JobExecution may exist for given id: [" + 
+					jobExecutionId + "]", 1, executions.size());
+		}
+		
+		return jobExecution;
+	}
 
 	/**
 	 * The job table is queried for <strong>any</strong> jobs that match the
@@ -176,10 +200,14 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-				JobInstance job = new JobInstance(new Long(rs.getLong(1)), jobParameters);
-				job.setStatus(BatchStatus.getStatus(rs.getString(2)));
-
-				return job;
+				JobInstance jobInstance = new JobInstance(new Long(rs.getLong(1)), jobParameters);
+				long lastExecutionId = rs.getLong(2);
+				JobExecution lastExecution = getJobExecution(new Long(lastExecutionId));
+				if(lastExecution != null){
+					lastExecution.setJobInstance(jobInstance);
+				}
+				jobInstance.setLastExecution(lastExecution);
+				return jobInstance;
 			}
 		};
 
@@ -413,16 +441,15 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	 * @throws IllegalArgumentException
 	 *             if Job, Job.status, or job.id is null
 	 */
-	public void update(JobInstance job) {
+	public void update(JobInstance jobInstance) {
 
-		Assert.notNull(job, "Job Cannot be Null");
-		Assert.notNull(job.getStatus(), "Job Status cannot be Null");
-		Assert.notNull(job.getId(), "Job ID cannot be null");
-
-		Object[] parameters = new Object[] { job.getStatus().toString(),
-				job.getId() };
+		Assert.notNull(jobInstance, "Job Cannot be Null");
+		Assert.notNull(jobInstance.getId(), "Job ID cannot be null");
+		
+		Long lastExecutionId = jobInstance.getLastExecution() == null ? null : jobInstance.getLastExecution().getId();
+		Object[] parameters = new Object[] { lastExecutionId, jobInstance.getId() };
 		jdbcTemplate.update(getUpdateJobQuery(), parameters, new int[] {
-			 Types.VARCHAR, Types.INTEGER});
+			 Types.INTEGER, Types.INTEGER});
 	}
 
 	/*
@@ -450,11 +477,11 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	 */
 	public static class JobExecutionRowMapper implements RowMapper {
 
-		public static final String FIND_JOB_EXECUTIONS = "SELECT ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
+		public static final String FIND_JOB_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
 				+ " where JOB_INSTANCE_ID = ?";
 
-		public static final String GET_JOB_EXECUTION = "SELECT ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
-				+ " where ID = ?";
+		public static final String GET_JOB_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
+				+ " where JOB_EXECUTION_ID = ?";
 
 		private JobInstance job;
 
@@ -507,6 +534,4 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 			return null;
 		}
 	}
-
-
 }

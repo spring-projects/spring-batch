@@ -21,12 +21,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
 public class MapJobDao implements JobDao {
 
@@ -95,6 +97,33 @@ public class MapJobDao implements JobDao {
 
 	public void update(JobExecution jobExecution) {
 		// no-op
+	}
+
+	public JobExecution getJobExecution(Long jobExecutionId) {
+		
+		List jobExecutions = new ArrayList();
+		
+		for(Iterator it = executionsById.entrySet().iterator();it.hasNext();){
+			Entry entry = (Entry)it.next();
+			Set executions = (Set)entry.getValue();
+			for(Iterator executionsIt = executions.iterator();executionsIt.hasNext();){
+				JobExecution jobExecution = (JobExecution)executionsIt.next();
+				if(jobExecution.getId() == jobExecutionId){
+					jobExecutions.add(jobExecution);
+				}
+			}
+		}
+		
+		if(jobExecutions.size() == 0){
+			return null;
+		}
+		else if(jobExecutions.size() == 1){
+			return (JobExecution)jobExecutions.get(0);
+		}
+		else{
+			throw new IncorrectResultSizeDataAccessException("Multiple JobExecutions found for given id"
+					, 1, jobExecutions.size());
+		}
 	}
 
 }
