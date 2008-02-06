@@ -43,25 +43,11 @@ public class StepInstanceTests extends TestCase {
 		assertEquals(23, instance.getStepExecutionCount());
 	}
 
-	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepInstance#getExecutionAttributes()}.
-	 */
-	public void testGetExecutionAttributes() {
-		assertNotNull(instance.getExecutionAttributes());
-		assertTrue(instance.getExecutionAttributes().getProperties().isEmpty());
-		ExecutionAttributes executionAttributes = new ExecutionAttributes();
-		executionAttributes.putString("foo", "bar");
-		instance.setExecutionAttributes(executionAttributes);
-		assertEquals("bar", instance.getExecutionAttributes().getProperties().getProperty("foo"));
-	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.core.domain.StepInstance#getStatus()}.
-	 */
-	public void testGetStatus() {
-		assertEquals(null, instance.getStatus());
-		instance.setStatus(BatchStatus.COMPLETED);
-		assertEquals(BatchStatus.COMPLETED, instance.getStatus());
+	public void testLastExecution(){
+		StepExecution lastExecution = new StepExecution();
+		assertNull(instance.getLastExecution());
+		instance.setLastExecution(lastExecution);
+		assertEquals(lastExecution, instance.getLastExecution());
 	}
 
 	/**
@@ -109,7 +95,6 @@ public class StepInstanceTests extends TestCase {
 
 	public void testToString() throws Exception {
 		assertTrue("Should contain name", instance.toString().indexOf("name=")>=0);
-		assertTrue("Should contain status", instance.toString().indexOf("status=")>=0);
 	}
 
 }

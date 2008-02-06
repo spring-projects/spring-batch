@@ -37,9 +37,9 @@ public class JobInstance extends Entity {
 	
 	private Job job;
 
-	private BatchStatus status;
-
 	private int jobExecutionCount;
+	
+	private JobExecution lastExecution;
 	
 	public JobInstance(Long id, JobParameters jobParameters) {
 		super(id);
@@ -51,12 +51,12 @@ public class JobInstance extends Entity {
 		this.job = job;
 	}
 	
-	public BatchStatus getStatus() {
-		return status;
+	public void setLastExecution(JobExecution lastExecution) {
+		this.lastExecution = lastExecution;
 	}
-
-	public void setStatus(BatchStatus status) {
-		this.status = status;
+	
+	public JobExecution getLastExecution() {
+		return lastExecution;
 	}
 	
 	public List getStepInstances() {
@@ -94,7 +94,9 @@ public class JobInstance extends Entity {
 	}
 	
 	public JobExecution createJobExecution() {
-		return new JobExecution(this);
+		JobExecution newExecution = new JobExecution(this);
+		this.setLastExecution(newExecution);
+		return newExecution;
 	}
 	
 	public String toString() {

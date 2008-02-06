@@ -124,6 +124,10 @@ public class JobExecution extends Entity {
 	public JobInstance getJobInstance() {
 		return jobInstance;
 	}
+	
+	public void setJobInstance(JobInstance jobInstance) {
+		this.jobInstance = jobInstance;
+	}
 
 	/**
 	 * Accessor for the step executions.

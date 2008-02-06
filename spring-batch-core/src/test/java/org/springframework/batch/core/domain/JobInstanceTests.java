@@ -27,13 +27,11 @@ public class JobInstanceTests extends TestCase {
 
 	private JobInstance instance = new JobInstance(new Long(11), new JobParameters(), new JobSupport("job"));
 	
-	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getStatus()}.
-	 */
-	public void testGetStatus() {
-		assertNull(instance.getStatus());
-		instance.setStatus(BatchStatus.COMPLETED);
-		assertNotNull(instance.getStatus());
+	public void testLastExecution(){
+		JobExecution lastExecution = new JobExecution();
+		assertNull(instance.getLastExecution());
+		instance.setLastExecution(lastExecution);
+		assertEquals(lastExecution, instance.getLastExecution());
 	}
 
 	/**
@@ -77,7 +75,9 @@ public class JobInstanceTests extends TestCase {
 	}
 
 	public void testCreateJobExecution(){
-		assertNotNull(instance.createJobExecution());
+		JobExecution execution = instance.createJobExecution();
+		assertNotNull(execution);
+		assertEquals(execution, instance.getLastExecution());
 	}
 
 	public void testCreateWithNulls(){

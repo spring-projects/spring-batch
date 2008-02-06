@@ -46,10 +46,8 @@ import org.springframework.batch.item.ExecutionAttributes;
 public class StepInstance extends Entity {
 
 	private JobInstance jobInstance;
-
-	private BatchStatus status;
-
-	private ExecutionAttributes executionAttributes = new ExecutionAttributes();
+	
+	private StepExecution lastExecution;
 
 	private int stepExecutionCount = 0;
 
@@ -84,22 +82,6 @@ public class StepInstance extends Entity {
 		this.stepExecutionCount = stepExecutionCount;
 	}
 
-	public ExecutionAttributes getExecutionAttributes() {
-		return executionAttributes;
-	}
-
-	public void setExecutionAttributes(ExecutionAttributes executionAttributes) {
-		this.executionAttributes = executionAttributes;
-	}
-
-	public BatchStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(BatchStatus status) {
-		this.status = status;
-	}
-
 	public JobInstance getJobInstance() {
 		return jobInstance;
 	}
@@ -111,10 +93,18 @@ public class StepInstance extends Entity {
 	public Long getJobId() {
 		return jobInstance==null ? null : jobInstance.getId();
 	}
+	
+	public void setLastExecution(StepExecution lastExecution) {
+		this.lastExecution = lastExecution;
+	}
+	
+	public StepExecution getLastExecution() {
+		return lastExecution;
+	}
 
 	// @Override
 	public String toString() {
-		return super.toString() + ", name=" + name + ", status=" + getStatus() + " in " + jobInstance;
+		return super.toString() + ", name=" + name + " in " + jobInstance;
 	}
 
 }
