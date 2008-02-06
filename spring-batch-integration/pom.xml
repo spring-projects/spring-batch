@@ -10,7 +10,7 @@
 
 	<parent>
 		<groupId>org.springframework.batch</groupId>
-		<version>1.0.0.m4-SNAPSHOT</version>
+		<version>1.0.0.m4</version>
 		<artifactId>spring-batch</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
