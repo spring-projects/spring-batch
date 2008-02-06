@@ -560,6 +560,7 @@
 			<id>nebhale</id>
 			<name>Ben Hale</name>
 			<email>ben.hale@springsource.com</email>
+			<timezone>0</timezone>
 		</developer>
 		<developer>
 			<id>lward</id>
