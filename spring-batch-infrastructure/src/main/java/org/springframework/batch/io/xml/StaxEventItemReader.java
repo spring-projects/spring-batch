@@ -16,11 +16,10 @@ import org.springframework.batch.io.xml.stax.DefaultFragmentEventReader;
 import org.springframework.batch.io.xml.stax.DefaultTransactionalEventReader;
 import org.springframework.batch.io.xml.stax.FragmentEventReader;
 import org.springframework.batch.io.xml.stax.TransactionalEventReader;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.reader.AbstractItemReader;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -36,8 +35,8 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReader extends AbstractItemReader implements ItemReader, 
-		Skippable, ItemStream, InitializingBean, DisposableBean {
+public class StaxEventItemReader extends AbstractItemReader implements ItemReader, Skippable, ItemStream,
+		InitializingBean {
 
 	public static final String READ_COUNT_STATISTICS_NAME = "StaxEventReaderItemReader.readCount";
 
@@ -90,7 +89,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 
 	public void close() {
 		initialized = false;
-		if (fragmentReader==null && inputStream==null) {
+		if (fragmentReader == null && inputStream == null) {
 			return;
 		}
 		try {
@@ -132,8 +131,8 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	}
 
 	/**
-	 * @param eventReaderDeserializer maps xml fragments corresponding to records
-	 * to objects
+	 * @param eventReaderDeserializer maps xml fragments corresponding to
+	 * records to objects
 	 */
 	public void setFragmentDeserializer(EventReaderDeserializer eventReaderDeserializer) {
 		this.eventReaderDeserializer = eventReaderDeserializer;
@@ -186,7 +185,8 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	 * Restores the input source for the given restart data by rereading and
 	 * skipping the number of records stored in the {@link ExecutionAttributes}.
 	 * 
-	 * @param ExecutionAttributes that holds the line count from the last commit.
+	 * @param ExecutionAttributes that holds the line count from the last
+	 * commit.
 	 * @throws IllegalStateException if the ItemReader has already been
 	 * initialized or if the number of records to read and skip exceeds the
 	 * available records.
@@ -247,10 +247,6 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 		}
 	}
 
-	public void destroy() throws Exception {
-		close();
-	}
-
 	/**
 	 * Mark is supported as long as this {@link ItemStream} is used in a
 	 * single-threaded environment. The state backing the mark is a single
@@ -263,7 +259,8 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void mark() {
@@ -272,7 +269,8 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 		skipRecords = new ArrayList();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void reset() {
@@ -281,5 +279,4 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 		fragmentReader.reset();
 	}
 
-	
 }

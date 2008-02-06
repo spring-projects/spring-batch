@@ -88,7 +88,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		assertNotNull(source.read());
 		assertNull(source.read()); // there are only two fragments
 
-		source.destroy();
+		source.close();
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		assertNotNull(item);
 		assertTrue(newSource.isOpenCalled());
 
-		newSource.destroy(); // includes close()
+		newSource.close(); 
 		newSource.setOpenCalled(false);
 		// calling read again should require re-initialization because of close
 		item = newSource.read();

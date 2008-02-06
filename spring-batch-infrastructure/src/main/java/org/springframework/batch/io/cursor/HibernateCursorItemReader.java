@@ -24,10 +24,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.reader.AbstractItemStreamItemReader;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -51,8 +51,7 @@ import org.springframework.util.StringUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader extends AbstractItemStreamItemReader implements Skippable, InitializingBean,
-		DisposableBean {
+public class HibernateCursorItemReader extends AbstractItemStreamItemReader implements Skippable, InitializingBean {
 
 	private static final String RESTART_DATA_ROW_NUMBER_KEY = ClassUtils.getShortName(HibernateCursorItemReader.class)
 			+ ".rowNumber";
@@ -148,10 +147,6 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 		Assert.hasLength(queryString);
 	}
 
-	public void destroy() throws Exception {
-		close();
-	}
-
 	/**
 	 * @param queryString HQL query string
 	 */
@@ -232,7 +227,8 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void mark() {
@@ -242,7 +238,8 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void reset() {

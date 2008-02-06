@@ -31,12 +31,11 @@ import java.util.Properties;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.StreamException;
 import org.springframework.batch.item.writer.ItemTransformer;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -59,7 +58,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  */
 public class FlatFileItemWriter extends AbstractTransactionalIoSource implements ItemWriter, ItemStream,
-		InitializingBean, DisposableBean {
+		InitializingBean {
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
@@ -198,20 +197,10 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 * @see ResourceLifecycle#close()
 	 */
 	public void close() {
-		if (state!=null) {
+		if (state != null) {
 			getOutputState().close();
 			state = null;
 		}
-	}
-
-	/**
-	 * Calls close to ensure that bean factories can close and always release
-	 * resources.
-	 * 
-	 * @see org.springframework.beans.factory.DisposableBean#destroy()
-	 */
-	public void destroy() throws Exception {
-		close();
 	}
 
 	/**
@@ -269,7 +258,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	// Returns object representing state.
 	private OutputState getOutputState() {
-		if (state==null) {
+		if (state == null) {
 			state = new OutputState();
 		}
 		return (OutputState) state;
@@ -549,14 +538,16 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void mark() {
 		getOutputState().mark();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void reset() {

@@ -42,7 +42,6 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 
 	private static final int NOT_FOUND = -1;
 
-
 	protected void setUp() throws Exception {
 		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", "xml"));
 		writer = createItemWriter();
@@ -94,9 +93,10 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 		writer = createItemWriter();
 		writer.restoreFrom(streamContext);
 		writer.write(record);
-		writer.destroy();
+		writer.close();
 
-		// check the output is concatenation of 'before restart' and 'after restart' writes.
+		// check the output is concatenation of 'before restart' and 'after
+		// restart' writes.
 		String outputFile = outputFileContent();
 		int firstRecord = outputFile.indexOf(TEST_STRING);
 		int secondRecord = outputFile.indexOf(TEST_STRING, firstRecord + TEST_STRING.length());
@@ -115,8 +115,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 		final int NUMBER_OF_RECORDS = 10;
 		for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
 			writer.write(record);
-			long writeStatistics =
-				writer.getExecutionAttributes().getLong(StaxEventItemWriter.WRITE_STATISTICS_NAME);
+			long writeStatistics = writer.getExecutionAttributes().getLong(StaxEventItemWriter.WRITE_STATISTICS_NAME);
 
 			assertEquals(i, writeStatistics);
 		}
@@ -127,9 +126,11 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	 */
 	public void testOpenAndClose() throws IOException {
 		writer.setRootTagName("testroot");
-		writer.setRootElementAttributes(new HashMap() {{
-			put("attribute", "value");
-		}});
+		writer.setRootElementAttributes(new HashMap() {
+			{
+				put("attribute", "value");
+			}
+		});
 		writer.open();
 		writer.mark();
 
@@ -191,12 +192,12 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 		Marshaller marshaller = new SimpleMarshaller();
 		MarshallingEventWriterSerializer serializer = new MarshallingEventWriterSerializer(marshaller);
 		source.setSerializer(serializer);
-		
+
 		source.setEncoding("UTF-8");
 		source.setRootTagName("root");
 		source.setVersion("1.0");
 		source.setOverwriteOutput(true);
-		
+
 		source.afterPropertiesSet();
 
 		return source;

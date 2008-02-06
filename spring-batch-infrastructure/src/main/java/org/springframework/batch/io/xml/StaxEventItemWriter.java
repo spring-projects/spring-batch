@@ -15,11 +15,10 @@ import javax.xml.stream.XMLStreamException;
 
 import org.springframework.batch.io.support.FileUtils;
 import org.springframework.batch.io.xml.stax.NoStartEndDocumentStreamWriter;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.StreamException;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -36,7 +35,7 @@ import org.springframework.util.CollectionUtils;
  * @author Peter Zozom
  * 
  */
-public class StaxEventItemWriter implements ItemWriter, ItemStream, InitializingBean, DisposableBean {
+public class StaxEventItemWriter implements ItemWriter, ItemStream, InitializingBean {
 
 	// default encoding
 	private static final String DEFAULT_ENCODING = "UTF-8";
@@ -215,14 +214,6 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	}
 
 	/**
-	 * @throws Exception
-	 * @see org.springframework.beans.factory.DisposableBean#destroy()
-	 */
-	public void destroy() throws Exception {
-		close();
-	}
-
-	/**
 	 * Open the output source
 	 * 
 	 * @see org.springframework.batch.item.ResourceLifecycle#open()
@@ -264,7 +255,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 		}
 
 		initialized = true;
-		
+
 	}
 
 	/**
@@ -447,7 +438,8 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void mark() {
@@ -455,7 +447,8 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 		lastCommitPointRecordCount = currentRecordCount;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void reset() {

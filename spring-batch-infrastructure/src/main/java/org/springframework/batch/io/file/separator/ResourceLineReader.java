@@ -29,7 +29,6 @@ import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.stream.ItemStreamAdapter;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
@@ -56,8 +55,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Rob Harrop
  */
-public class ResourceLineReader extends ItemStreamAdapter implements LineReader, ItemReader,
-		DisposableBean {
+public class ResourceLineReader extends ItemStreamAdapter implements LineReader, ItemReader {
 
 	private static final Collection DEFAULT_COMMENTS = Collections.singleton("#");
 
@@ -187,15 +185,6 @@ public class ResourceLineReader extends ItemStreamAdapter implements LineReader,
 	}
 
 	/**
-	 * Calls close to ensure that bean factory releases all resources.
-	 * 
-	 * @see org.springframework.beans.factory.DisposableBean#destroy()
-	 */
-	public void destroy() throws Exception {
-		close();
-	}
-
-	/**
 	 * Getter for current line count (not the current number of lines returned).
 	 * 
 	 * @return the current line count.
@@ -203,7 +192,7 @@ public class ResourceLineReader extends ItemStreamAdapter implements LineReader,
 	public int getPosition() {
 		return getState().getCurrentLineCount();
 	}
-	
+
 	/**
 	 * Mark is supported as long as this {@link ItemStream} is used in a
 	 * single-threaded environment. The state backing the mark is a single

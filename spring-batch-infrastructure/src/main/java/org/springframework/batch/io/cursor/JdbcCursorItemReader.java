@@ -30,10 +30,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
-import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -108,7 +107,7 @@ import org.springframework.util.StringUtils;
  * @author Lucas Ward
  * @author Peter Zozom
  */
-public class JdbcCursorItemReader extends AbstractTransactionalIoSource implements KeyedItemReader, DisposableBean,
+public class JdbcCursorItemReader extends AbstractTransactionalIoSource implements KeyedItemReader,
 		InitializingBean, ItemStream, Skippable {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);
@@ -273,16 +272,6 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 		this.currentProcessedRow = 0;
 		skippedRows.clear();
 		skipCount = 0;
-	}
-
-	/**
-	 * Calls close to ensure that bean factories can close and always release
-	 * resources.
-	 * 
-	 * @see org.springframework.beans.factory.DisposableBean#destroy()
-	 */
-	public void destroy() throws Exception {
-		close();
 	}
 
 	// Check the result set is in synch with the currentRow attribute. This is

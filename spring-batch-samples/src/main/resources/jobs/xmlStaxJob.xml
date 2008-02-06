@@ -52,7 +52,8 @@
 	</bean>
 
 	<bean class="org.springframework.batch.io.xml.StaxEventItemWriter"
-		id="tradeStaxWriter">
+		id="tradeStaxWriter" scope="step">
+		<aop:scoped-proxy />
 		<property name="resource"
 			value="file:target/test-outputs/20070918.testStream.xmlFileStep.output.xml" />
 		<property name="serializer" ref="tradeMarshallingSerializer" />

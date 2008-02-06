@@ -11,11 +11,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
-import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.sample.item.writer.StagingItemWriter;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
@@ -24,8 +23,7 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
-public class StagingItemReader extends JdbcDaoSupport implements ItemStream, KeyedItemReader, DisposableBean,
-		StepContextAware {
+public class StagingItemReader extends JdbcDaoSupport implements ItemStream, KeyedItemReader, StepContextAware {
 
 	// Key for buffer in transaction synchronization manager
 	private static final String BUFFER_KEY = StagingItemReader.class.getName() + ".BUFFER";
@@ -52,14 +50,6 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 		if (TransactionSynchronizationManager.hasResource(BUFFER_KEY)) {
 			TransactionSynchronizationManager.unbindResource(BUFFER_KEY);
 		}
-	}
-
-	/**
-	 * @throws Exception
-	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#destroy()
-	 */
-	public void destroy() throws Exception {
-		close();
 	}
 
 	/**
@@ -220,6 +210,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void mark() {
@@ -228,6 +219,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void reset() {
@@ -236,6 +228,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void restoreFrom(ExecutionAttributes context) {
@@ -244,6 +237,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.item.ExecutionAttributesProvider#getExecutionAttributes()
 	 */
 	public ExecutionAttributes getExecutionAttributes() {

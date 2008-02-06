@@ -8,9 +8,10 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader, DisposableBean, InitializingBean{
+class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader, DisposableBean, InitializingBean {
 
 	DrivingQueryItemReader inputSource;
+
 	FooDao fooDao = new SingleKeyFooDao();
 
 	public FooItemReader(DrivingQueryItemReader inputSource, JdbcTemplate jdbcTemplate) {
@@ -20,9 +21,10 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 
 	public Object read() {
 		Object key = inputSource.read();
-		if(key != null){
+		if (key != null) {
 			return fooDao.getFoo(key);
-		}else{
+		}
+		else {
 			return null;
 		}
 	}
@@ -36,7 +38,7 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 	}
 
 	public void destroy() throws Exception {
-		inputSource.destroy();
+		inputSource.close();
 	}
 
 	public void setFooDao(FooDao fooDao) {
@@ -60,14 +62,16 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
 	 */
 	public void mark() {
 		inputSource.mark();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
 	 */
 	public void reset() {

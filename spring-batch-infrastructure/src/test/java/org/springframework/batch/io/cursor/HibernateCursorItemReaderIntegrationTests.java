@@ -45,7 +45,7 @@ public class HibernateCursorItemReaderIntegrationTests extends AbstractDataSourc
 	 * called only in uninitialized state.
 	 */
 	public void testSetUseStatelessSession() {
-		HibernateCursorItemReader inputSource = ((HibernateCursorItemReader) source);
+		HibernateCursorItemReader inputSource = ((HibernateCursorItemReader) reader);
 
 		// initialize and call setter => error
 		inputSource.open();

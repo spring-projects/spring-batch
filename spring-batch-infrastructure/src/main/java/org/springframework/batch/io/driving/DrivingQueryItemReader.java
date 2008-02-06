@@ -19,10 +19,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
-import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -48,9 +47,8 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @since 1.0
  */
-public class DrivingQueryItemReader extends AbstractTransactionalIoSource
-		implements KeyedItemReader, InitializingBean,
-		DisposableBean, ItemStream {
+public class DrivingQueryItemReader extends AbstractTransactionalIoSource implements KeyedItemReader, InitializingBean,
+		ItemStream {
 
 	private boolean initialized = false;
 
@@ -84,7 +82,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	 * be called.
 	 * 
 	 * @return next key in the list if not index is not at the last element,
-	 *         null otherwise.
+	 * null otherwise.
 	 */
 	public Object read() {
 		if (!initialized) {
@@ -132,26 +130,16 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	 * {@link BatchTransactionSynchronizationManager} in order to ensure it is
 	 * notified about commits and rollbacks.
 	 * 
-	 * @throws IllegalStateException
-	 *             if the keys list is null or initialized is true.
+	 * @throws IllegalStateException if the keys list is null or initialized is
+	 * true.
 	 */
 	public void open() {
 
-		Assert.state(keys == null || initialized,
-				"Cannot open an already opened input source"
-						+ ", call close() first.");
+		Assert.state(keys == null || initialized, "Cannot open an already opened input source"
+				+ ", call close() first.");
 		keys = keyGenerator.retrieveKeys();
 		keysIterator = keys.listIterator();
 		initialized = true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.DisposableBean#destroy()
-	 */
-	public void destroy() throws Exception {
-		close();
 	}
 
 	/**
@@ -159,23 +147,20 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 	 * been initialized before calling restore (meaning, read has been called)
 	 * then an IllegalStateException will be thrown, since all input sources
 	 * should be restored before being read from, otherwise already processed
-	 * data could be returned. The {@link ExecutionAttributes} attempting to be restored from
-	 * must have been obtained from the <strong>same input source as the one
-	 * being restored from</strong> otherwise it is invalid.
+	 * data could be returned. The {@link ExecutionAttributes} attempting to be
+	 * restored from must have been obtained from the <strong>same input source
+	 * as the one being restored from</strong> otherwise it is invalid.
 	 * 
-	 * @throws IllegalArgumentException
-	 *             if restart data or it's properties is null.
-	 * @throws IllegalStateException
-	 *             if the input source has already been initialized.
+	 * @throws IllegalArgumentException if restart data or it's properties is
+	 * null.
+	 * @throws IllegalStateException if the input source has already been
+	 * initialized.
 	 */
 	public final void restoreFrom(ExecutionAttributes data) {
 
 		Assert.notNull(data, "ExecutionAttributes must not be null.");
-		Assert.notNull(data.getProperties(),
-				"ExecutionAttributes properties must not be null.");
-		Assert.state(!initialized,
-				"Cannot restore when already intialized.  Call"
-						+ " close() first before restore()");
+		Assert.notNull(data.getProperties(), "ExecutionAttributes properties must not be null.");
+		Assert.state(!initialized, "Cannot restore when already intialized.  Call" + " close() first before restore()");
 
 		if (data.getProperties().size() == 0) {
 			return;
@@ -216,6 +201,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 
 	/**
 	 * Return the item itself (which is already a key).
+	 * 
 	 * @see org.springframework.batch.item.ItemReader#getKey(java.lang.Object)
 	 */
 	public Object getKey(Object item) {
@@ -234,14 +220,18 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void mark() {
 		lastCommitIndex = currentIndex;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void reset() {
