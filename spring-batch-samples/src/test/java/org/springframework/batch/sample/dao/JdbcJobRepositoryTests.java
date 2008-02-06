@@ -55,17 +55,17 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 		startNewTransaction();
 		for (Iterator iterator = jobExecutionIds.iterator(); iterator.hasNext();) {
 			Long id = (Long) iterator.next();
-			getJdbcTemplate().update("DELETE FROM BATCH_JOB_EXECUTION where ID=?", new Object[] { id });
+			getJdbcTemplate().update("DELETE FROM BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=?", new Object[] { id });
 		}
 		for (Iterator iterator = jobIds.iterator(); iterator.hasNext();) {
 			Long id = (Long) iterator.next();
-			getJdbcTemplate().update("DELETE FROM BATCH_JOB_INSTANCE where ID=?", new Object[] { id });
+			getJdbcTemplate().update("DELETE FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", new Object[] { id });
 		}
 		setComplete();
 		endTransaction();
 		for (Iterator iterator = jobIds.iterator(); iterator.hasNext();) {
 			Long id = (Long) iterator.next();
-			int count = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE where ID=?", new Object[] { id });
+			int count = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", new Object[] { id });
 			assertEquals(0, count);
 		}
 	}
@@ -123,7 +123,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 		execution.setEndTime(new Timestamp(System.currentTimeMillis()));
 		repository.saveOrUpdate(execution);
 		JobInstance job = execution.getJobInstance();
-		job.setStatus(BatchStatus.FAILED);
+		execution.setStatus(BatchStatus.FAILED);
 		repository.update(job);
 		setComplete();
 		endTransaction();
