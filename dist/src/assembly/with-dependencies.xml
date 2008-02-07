@@ -45,10 +45,6 @@
 							<exclude>org.springframework.batch:spring-batch-infrastructure</exclude>
 						</excludes>
 					</dependencySet>
-					<dependencySet>
-						<outputFileNameMapping>sources/lib/${groupId}/${artifactId}-${version}.${extension}</outputFileNameMapping>
-						<scope>provided</scope>
-					</dependencySet>
 				</dependencySets>
 			</binaries>
 			<sources>
@@ -68,7 +64,7 @@
 				<include>org.springframework.batch:spring-batch-samples</include>
 			</includes>
 			<binaries>
-				<includeDependencies>false</includeDependencies>
+				<includeDependencies>true</includeDependencies>
 				<outputFileNameMapping>samples/${artifactId}-${version}.${extension}</outputFileNameMapping>
 				<unpack>false</unpack>
 				<dependencySets>
@@ -83,8 +79,12 @@
 						</excludes>
 					</dependencySet>
 					<dependencySet>
-						<outputFileNameMapping>sources/lib/${groupId}/${artifactId}-${version}.${extension}</outputFileNameMapping>
+						<outputFileNameMapping>samples/lib/${groupId}/${artifactId}-${version}.${extension}</outputFileNameMapping>
 						<scope>provided</scope>
+					</dependencySet>
+					<dependencySet>
+						<outputFileNameMapping>samples/lib/${groupId}/${artifactId}-${version}.${extension}</outputFileNameMapping>
+						<scope>test</scope>
 					</dependencySet>
 				</dependencySets>
 			</binaries>
