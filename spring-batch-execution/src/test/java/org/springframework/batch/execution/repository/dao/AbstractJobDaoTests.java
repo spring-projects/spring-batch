@@ -79,9 +79,9 @@ public abstract class AbstractJobDaoTests extends
 		jobExecution = new JobExecution(jobInstance);
 		jobExecution.setStartTime(jobExecutionStartTime);
 		jobExecution.setStatus(BatchStatus.STARTED);
-		jobDao.save(jobExecution);
+		jobDao.saveJobExecution(jobExecution);
 		jobInstance.setLastExecution(jobExecution);
-		jobDao.update(jobInstance);
+		jobDao.updateJobInstance(jobInstance);
 	}
 
 	public void testVersionIsNotNullForJob() throws Exception {
@@ -151,9 +151,9 @@ public abstract class AbstractJobDaoTests extends
 	public void testUpdateJob() {
 		// Update the returned job with a new status
 		JobExecution newExecution = new JobExecution(jobInstance);
-		jobDao.save(newExecution);
+		jobDao.saveJobExecution(newExecution);
 		jobInstance.setLastExecution(newExecution);
-		jobDao.update(jobInstance);
+		jobDao.updateJobInstance(jobInstance);
 
 		// The job just updated should be found, with the saved status.
 		List jobs = jobDao.findJobInstances(job.getName(), jobParameters);
@@ -180,7 +180,7 @@ public abstract class AbstractJobDaoTests extends
 		
 		try {
 			JobInstance testJob = new JobInstance(null, null);
-			jobDao.update(testJob);
+			jobDao.updateJobInstance(testJob);
 			fail();
 		} catch (IllegalArgumentException ex) {
 			// expected
@@ -191,7 +191,7 @@ public abstract class AbstractJobDaoTests extends
 
 		JobInstance testJob = null;
 		try {
-			jobDao.update(testJob);
+			jobDao.updateJobInstance(testJob);
 		} catch (IllegalArgumentException ex) {
 			// expected
 		}
@@ -202,7 +202,7 @@ public abstract class AbstractJobDaoTests extends
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		jobExecution.setExitStatus(ExitStatus.FINISHED);
 		jobExecution.setEndTime(new Date(System.currentTimeMillis()));
-		jobDao.update(jobExecution);
+		jobDao.updateJobExecution(jobExecution);
 
 		List executions = jobDao.findJobExecutions(jobInstance);
 		assertEquals(executions.size(), 1);
@@ -222,7 +222,7 @@ public abstract class AbstractJobDaoTests extends
 		// id is invalid
 		JobExecution execution = new JobExecution(jobInstance, new Long(29432));
 		try {
-			jobDao.update(execution);
+			jobDao.updateJobExecution(execution);
 			fail("Expected NoSuchBatchDomainObjectException");
 		} catch (NoSuchBatchDomainObjectException ex) {
 			// expected
@@ -233,7 +233,7 @@ public abstract class AbstractJobDaoTests extends
 
 		JobExecution execution = new JobExecution(jobInstance);
 		try {
-			jobDao.update(execution);
+			jobDao.updateJobExecution(execution);
 			fail();
 		} catch (IllegalArgumentException ex) {
 			// expected
@@ -247,7 +247,7 @@ public abstract class AbstractJobDaoTests extends
 
 		// Save new JobExecution for same job
 		JobExecution testJobExecution = new JobExecution(jobInstance);
-		jobDao.save(testJobExecution);
+		jobDao.saveJobExecution(testJobExecution);
 		// JobExecutionCount should be incremented by 1
 		assertEquals(jobDao.getJobExecutionCount(jobInstance.getId()), 2);
 	}

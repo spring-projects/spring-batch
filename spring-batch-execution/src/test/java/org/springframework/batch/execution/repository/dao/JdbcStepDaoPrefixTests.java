@@ -61,7 +61,7 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 	
 	public void testModifiedUpdateStepExecution(){
 		stepDao.setTablePrefix("FOO_");
-		stepDao.update(stepExecution);
+		stepDao.updateStepExecution(stepExecution);
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("FOO_STEP_EXECUTION") != -1);
 	}
 	
@@ -70,7 +70,7 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 		stepExecutionIncrementer.nextLongValue();
 		stepExecutionIncrementerControl.setReturnValue(1);
 		stepExecutionIncrementerControl.replay();
-		stepDao.save(stepExecution);
+		stepDao.saveStepExecution(stepExecution);
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("FOO_STEP_EXECUTION") != -1);
 	}
 	
@@ -82,7 +82,7 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 	
 	public void testModifiedUpdateStep(){
 		stepDao.setTablePrefix("FOO_");
-		stepDao.update(step);
+		stepDao.updateStepInstance(step);
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("FOO_STEP") != -1);
 	}
 	
@@ -91,20 +91,20 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 		stepIncrementer.nextLongValue();
 		stepIncrementerControl.setReturnValue(1);
 		stepIncrementerControl.replay();
-		stepDao.createStep(job, "test");
+		stepDao.createStepInstance(job, "test");
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("FOO_STEP") != -1);
 	}
 	
 	public void testModifiedFindSteps(){
 		stepDao.setTablePrefix("FOO_");
-		stepDao.findSteps(new JobInstance(new Long(1), new JobParameters()));
+		stepDao.findStepInstances(new JobInstance(new Long(1), new JobParameters()));
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("FOO_STEP") != -1);
 	}
 	
 	public void testModifiedFindStep(){
 		stepDao.setTablePrefix("FOO_");
 		try{
-			stepDao.findStep(job, "test");
+			stepDao.findStepInstance(job, "test");
 		}
 		catch(NullPointerException ex){
 			//It's going to throw a NullPointerException because the MockJdbcTemplate
@@ -116,7 +116,7 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 	
 	public void testDefaultFindStep(){
 		try{
-			stepDao.findStep(job, "test");
+			stepDao.findStepInstance(job, "test");
 		}
 		catch(NullPointerException ex){
 			//It's going to throw a NullPointerException because the MockJdbcTemplate
@@ -128,7 +128,7 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 	}
 	
 	public void testDefaultFindSteps(){
-		stepDao.findSteps(new JobInstance(new Long(1), new JobParameters()));
+		stepDao.findStepInstances(new JobInstance(new Long(1), new JobParameters()));
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP") != -1);
 	}
 	
@@ -136,12 +136,12 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 		stepIncrementer.nextLongValue();
 		stepIncrementerControl.setReturnValue(1);
 		stepIncrementerControl.replay();
-		stepDao.createStep(job, "test");
+		stepDao.createStepInstance(job, "test");
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP") != -1);
 	}
 	
 	public void testDefaultUpdateStep(){
-		stepDao.update(step);
+		stepDao.updateStepInstance(step);
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP") != -1);
 	}
 	
@@ -154,12 +154,12 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 		stepExecutionIncrementer.nextLongValue();
 		stepExecutionIncrementerControl.setReturnValue(1);
 		stepExecutionIncrementerControl.replay();
-		stepDao.save(stepExecution);
+		stepDao.saveStepExecution(stepExecution);
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP_EXECUTION") != -1);
 	}	
 
 	public void testDefaultUpdateStepExecution(){
-		stepDao.update(stepExecution);
+		stepDao.updateStepExecution(stepExecution);
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP_EXECUTION") != -1);
 	}
 	

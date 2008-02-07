@@ -36,48 +36,49 @@ public interface StepDao {
 	 * Find a step with the given JobId and Step Name. Return null if none are
 	 * found.
 	 * 
-	 * @param jobId
+	 * @param jobInstance
 	 * @param stepName
-	 * @return Step
+	 * @return StepInstance
 	 */
-	public StepInstance findStep(JobInstance job, String stepName);
+	StepInstance findStepInstance(JobInstance jobInstance, String stepName);
 
 	/**
-	 * Find all steps with the given Job.
+	 * Find all StepInstances of the given JobInstance.
 	 * 
-	 * @param job the job to use as a search key
+	 * @param jobInstance the job to use as a search key
 	 * @return list of {@link StepInstance}
 	 */
-	public List findSteps(JobInstance job);
+	List findStepInstances(JobInstance jobInstance);
 
 	/**
-	 * Create a step for the given Step Name and Job Id.
+	 * Create a StepInstance for the given name and JobInstance.
 	 * 
-	 * @param job
+	 * @param jobInstance
 	 * @param stepName
 	 * 
 	 * @return
 	 */
-	public StepInstance createStep(JobInstance job, String stepName);
+	StepInstance createStepInstance(JobInstance jobInstance, String stepName);
 
 	/**
-	 * Update an existing Step.
+	 * Update an existing StepInstance.
 	 * 
-	 * Preconditions: Step must have an ID.
+	 * Preconditions: StepInstance must have an ID.
 	 * 
 	 * @param job
 	 */
-	public void update(StepInstance step);
+	void updateStepInstance(StepInstance stepInstance);
 
 	/**
 	 * Save the given StepExecution.
 	 * 
-	 * Preconditions: Id must be null. Postconditions: Id will be set to a
-	 * Unique Long.
+	 * Preconditions: Id must be null.
+	 * 
+	 * Postconditions: Id will be set to a unique Long.
 	 * 
 	 * @param stepExecution
 	 */
-	public void save(StepExecution stepExecution);
+	void saveStepExecution(StepExecution stepExecution);
 
 	/**
 	 * Update the given StepExecution
@@ -86,61 +87,60 @@ public interface StepDao {
 	 * 
 	 * @param stepExecution
 	 */
-	public void update(StepExecution stepExecution);
+	void updateStepExecution(StepExecution stepExecution);
 
 	/**
-	 * Return the count of StepExecutions with the given {@link StepInstance}.
+	 * Return the count of StepExecutions for the given {@link StepInstance}.
 	 * 
-	 * @param step the {@link StepInstance} to check for executions
+	 * @param stepInstance the {@link StepInstance} to check for executions
 	 * @return the number of step executions for this step
 	 */
-	public int getStepExecutionCount(StepInstance step);
+	int getStepExecutionCount(StepInstance stepInstance);
 
 	/**
 	 * Return all StepExecutions for the given step.
 	 * 
-	 * @param step the step to use as a search key
+	 * @param stepInstance the step to use as a search key
 	 * @return list of stepExecutions
 	 */
-	public List findStepExecutions(StepInstance step);
-	
+	List findStepExecutions(StepInstance stepInstance);
+
 	/**
 	 * Return a StepExecution for the given id.
 	 * 
 	 * @param stepExecutionId
 	 * @return {@link StepExecution} for the provided id.
-	 * @throws {@link IncorrectResultSizeDataAccessException} if more
-	 * than one execution is found.
+	 * @throws {@link IncorrectResultSizeDataAccessException} if more than one
+	 * execution is found.
 	 */
-	public StepExecution getStepExecution(Long stepExecutionId, StepInstance stepInstance);
-	
+	StepExecution getStepExecution(Long stepExecutionId, StepInstance stepInstance);
+
 	/**
 	 * Find all {@link ExecutionAttributes} for the given execution id.
 	 * 
-	 * @param executionId - Long id of the {@link StepExecution}
-	 *   that the attributes belongs to.
-	 * @return attributes for the provided id.  If
-	 * none are found, an empty {@link ExecutionAttributes} will be returned.
+	 * @param executionId - Long id of the {@link StepExecution} that the
+	 * attributes belongs to.
+	 * @return attributes for the provided id. If none are found, an empty
+	 * {@link ExecutionAttributes} will be returned.
 	 * @throws IllegalArgumentException if the id is null.
 	 */
 	ExecutionAttributes findExecutionAttributes(final Long executionId);
-	
+
 	/**
-	 * Save the provided {@link ExecutionAttributes} for the given 
-	 * execution Id.
+	 * Save the provided {@link ExecutionAttributes} for the given executionId.
 	 * 
 	 * @param executionId to be saved
 	 * @param executionAttributes to be saved.
-	 * @throws IllegalArgumentException if the executionId or 
-	 * attributes are null.
+	 * @throws IllegalArgumentException if the executionId or attributes are
+	 * null.
 	 */
-	void save(final Long executionId, final ExecutionAttributes executionAttributes);
-	
+	void saveExecutionAttributes(final Long executionId, final ExecutionAttributes executionAttributes);
+
 	/**
-	 * Update the provided execution attributes.
+	 * Update the provided ExecutionAttributes.
 	 * 
 	 * @param executionId
 	 * @param executionAttributes
 	 */
-	void update(final Long executionId, ExecutionAttributes executionAttributes);
+	void updateExecutionAttributes(final Long executionId, ExecutionAttributes executionAttributes);
 }

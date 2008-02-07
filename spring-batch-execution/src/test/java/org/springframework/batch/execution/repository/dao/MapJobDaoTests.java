@@ -57,20 +57,20 @@ public class MapJobDaoTests extends TestCase {
 		JobInstance job = dao.createJobInstance("foo", jobParameters);
 		JobExecution execution = new JobExecution(job);
 		assertNull(execution.getId());
-		dao.save(execution);
+		dao.saveJobExecution(execution);
 		assertNotNull(execution.getId());
 	}
 	public void testCorrectExecutionCountForExistingJob() throws Exception {
 		JobInstance job = dao.createJobInstance("foo", jobParameters);
-		dao.save(new JobExecution(job));
+		dao.saveJobExecution(new JobExecution(job));
 		assertEquals(1, dao.getJobExecutionCount(job.getId()));
 	}
 
 	public void testMultipleExecutionsPerExisting() throws Exception {
 		JobInstance job = dao.createJobInstance("foo", jobParameters);
-		dao.save(new JobExecution(job));
+		dao.saveJobExecution(new JobExecution(job));
 		Thread.sleep(50L); // Hack, hack, hackety, hack - job executions are not unique if created too close together!
-		dao.save(new JobExecution(job));
+		dao.saveJobExecution(new JobExecution(job));
 		assertEquals(2, dao.getJobExecutionCount(job.getId()));
 	}
 	
@@ -78,7 +78,7 @@ public class MapJobDaoTests extends TestCase {
 		
 		JobInstance jobInstance = dao.createJobInstance("foo", jobParameters);
 		JobExecution jobExecution = new JobExecution(jobInstance);
-		dao.save(jobExecution);
+		dao.saveJobExecution(jobExecution);
 		JobExecution tempExecution = dao.getJobExecution(jobExecution.getId());
 		assertEquals(jobExecution, tempExecution);
 	}
@@ -87,7 +87,7 @@ public class MapJobDaoTests extends TestCase {
 		
 		JobInstance jobInstance = dao.createJobInstance("foo", jobParameters);
 		JobExecution jobExecution = new JobExecution(jobInstance);
-		dao.save(jobExecution);
+		dao.saveJobExecution(jobExecution);
 		assertNull(dao.getJobExecution(new Long(999999)));
 
 	}

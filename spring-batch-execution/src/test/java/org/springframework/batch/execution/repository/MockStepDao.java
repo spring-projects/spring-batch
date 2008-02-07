@@ -30,19 +30,19 @@ public class MockStepDao implements StepDao {
 
 	private int currentNewStep = 0;
 
-	public StepInstance createStep(JobInstance job, String stepName) {
+	public StepInstance createStepInstance(JobInstance job, String stepName) {
 		StepInstance newStep = (StepInstance) newSteps.get(currentNewStep);
 		currentNewStep++;
 		return newStep;
 	}
 
-	public StepInstance findStep(JobInstance job, String stepName) {
+	public StepInstance findStepInstance(JobInstance job, String stepName) {
 		StepInstance newStep = (StepInstance) newSteps.get(currentNewStep);
 		currentNewStep++;
 		return newStep;
 	}
 
-	public List findSteps(JobInstance job) {
+	public List findStepInstances(JobInstance job) {
 		return newSteps;
 	}
 
@@ -50,13 +50,13 @@ public class MockStepDao implements StepDao {
 		return 1;
 	}
 
-	public void save(StepExecution stepExecution) {
+	public void saveStepExecution(StepExecution stepExecution) {
 	}
 
-	public void update(StepInstance step) {
+	public void updateStepInstance(StepInstance step) {
 	}
 
-	public void update(StepExecution stepExecution) {
+	public void updateStepExecution(StepExecution stepExecution) {
 	}
 
 	public void setStepsToReturnOnCreate(List steps) {
@@ -76,11 +76,11 @@ public class MockStepDao implements StepDao {
 		return null;
 	}
 
-	public void save(Long executionId,
+	public void saveExecutionAttributes(Long executionId,
 			ExecutionAttributes executionAttributes) {
 	}
 
-	public void update(Long executionId,
+	public void updateExecutionAttributes(Long executionId,
 			ExecutionAttributes executionAttributes) {
 	}
 

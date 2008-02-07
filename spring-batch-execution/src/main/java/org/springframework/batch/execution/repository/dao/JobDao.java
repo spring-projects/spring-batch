@@ -32,78 +32,81 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException;
 public interface JobDao {
 
 	/**
-	 * Create a job using the provided JobIdentifier as the natural key.
+	 * Create a JobInstance with given name and parameters.
 	 * 
 	 * PostConditions: A valid job will be returned which has been persisted and
 	 * contains an unique Id.
 	 * 
-	 * @param jobIdentifier
-	 * @return Job
+	 * @param jobName
+	 * @param jobParameters
+	 * @return JobInstance
 	 */
-	public JobInstance createJobInstance(String jobName, JobParameters jobParameters);
+	JobInstance createJobInstance(String jobName, JobParameters jobParameters);
 
 	/**
-	 * Find all jobs that match the given JobIdentifier. If no jobs matching the
-	 * Identifier are found, then a list of size 0 will be returned.
+	 * Find all job instances that match the given name and parameters. If no
+	 * matching job instances are found, then a list of size 0 will be
+	 * returned.
 	 * 
-	 * @param jobIdentifier
+	 * @param jobName
+	 * @param jobParameters
 	 * @return List of {@link JobInstance} objects matching
-	 *         {@link JobIdentifier}
+	 * {@link JobIdentifier}
 	 */
-	public List findJobInstances(String jobName, JobParameters jobParameters);
+	List findJobInstances(String jobName, JobParameters jobParameters);
 
 	/**
-	 * Update an existing Job.
+	 * Update an existing JobInstance.
 	 * 
-	 * Preconditions: Job must have an ID.
+	 * Preconditions: jobInstance must have an ID.
 	 * 
-	 * @param job
+	 * @param jobInstance
 	 */
-	public void update(JobInstance job);
+	void updateJobInstance(JobInstance jobInstance);
 
 	/**
 	 * Save a new JobExecution.
 	 * 
-	 * Preconditions: JobExecution must have a JobId.
+	 * Preconditions: jobExecution must have a jobInstanceId.
 	 * 
 	 * @param jobExecution
 	 */
-	public void save(JobExecution jobExecution);
+	void saveJobExecution(JobExecution jobExecution);
 
 	/**
 	 * Update and existing JobExecution.
 	 * 
-	 * Preconditions: JobExecution must have an Id (which can be obtained by the
-	 * save method) and a JobId.
+	 * Preconditions: jobExecution must have an Id (which can be obtained by the
+	 * save method) and a jobInstanceId.
 	 * 
 	 * @param jobExecution
 	 */
-	public void update(JobExecution jobExecution);
+	void updateJobExecution(JobExecution jobExecution);
 
 	/**
-	 * Return the number of JobExecutions with the given Job Id
+	 * Return the number of JobExecutions with the given jobInstanceId
 	 * 
-	 * Preconditions: Job must have an id.
+	 * Preconditions: jobInstance must have an id.
 	 * 
-	 * @param job
+	 * @param jobInstanceId
 	 */
-	public int getJobExecutionCount(Long jobId);
+	int getJobExecutionCount(Long jobInstanceId);
 
 	/**
-	 * Return list of JobExecutions for given job.
+	 * Return list of JobExecutions for given JobInstance.
 	 * 
-	 * @param job
+	 * @param jobInstance
 	 * @return list of jobExecutions.
 	 */
-	public List findJobExecutions(JobInstance jobInstance);
-	
+	List findJobExecutions(JobInstance jobInstance);
+
 	/**
 	 * Given an id, return the matching JobExecution.
 	 * 
 	 * @param jobExecutionId - id of the execution to be returned.
 	 * @return {@link JobExecution} matching the id.
-	 * @throws {@link IncorrectResultSizeDataAccessException} if
-	 * more than one execution is found for the given id.
+	 * @throws {@link IncorrectResultSizeDataAccessException} if more than one
+	 * execution is found for the given id.
 	 */
-	public JobExecution getJobExecution(Long jobExecutionId);
+	JobExecution getJobExecution(Long jobExecutionId);
 }

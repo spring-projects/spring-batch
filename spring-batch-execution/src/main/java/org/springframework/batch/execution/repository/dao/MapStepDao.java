@@ -49,7 +49,7 @@ public class MapStepDao implements StepDao {
 		restartsById.clear();
 	}
 
-	public StepInstance createStep(JobInstance job, String stepName) {
+	public StepInstance createStepInstance(JobInstance job, String stepName) {
 		StepInstance step = new StepInstance(job, stepName, new Long(currentId++));
 		Set steps = (Set) stepsByJobId.get(job.getId());
 		if (steps==null) {
@@ -61,7 +61,7 @@ public class MapStepDao implements StepDao {
 		return step;
 	}
 
-	public StepInstance findStep(JobInstance job, String stepName) {
+	public StepInstance findStepInstance(JobInstance job, String stepName) {
 		for (Iterator iter = stepsByJobId.values().iterator(); iter.hasNext();) {
 			Set steps = (Set) iter.next();
 			for (Iterator iterator = steps.iterator(); iterator.hasNext();) {
@@ -74,7 +74,7 @@ public class MapStepDao implements StepDao {
 		return null;
 	}
 
-	public List findSteps(JobInstance job) {
+	public List findStepInstances(JobInstance job) {
 		Set steps = (Set) stepsByJobId.get(job.getId());
 		if (steps==null) {
 			return new ArrayList();
@@ -91,7 +91,7 @@ public class MapStepDao implements StepDao {
 		if (executions==null) return 0;
 		return executions.size();	}
 
-	public void save(StepExecution stepExecution) {
+	public void saveStepExecution(StepExecution stepExecution) {
 		Set executions = (Set) executionsById.get(stepExecution.getStepId());
 		if (executions==null) {
 			executions = TransactionAwareProxyFactory.createTransactionalSet();
@@ -142,11 +142,11 @@ public class MapStepDao implements StepDao {
 	}
 
 
-	public void update(StepInstance step) {
+	public void updateStepInstance(StepInstance step) {
 		// no-op
 	}
 
-	public void update(StepExecution stepExecution) {
+	public void updateStepExecution(StepExecution stepExecution) {
 		// no-op
 	}
 
@@ -154,11 +154,11 @@ public class MapStepDao implements StepDao {
 		return null;
 	}
 
-	public void save(Long executionId,
+	public void saveExecutionAttributes(Long executionId,
 			ExecutionAttributes executionAttributes) {
 	}
 
-	public void update(Long executionId,
+	public void updateExecutionAttributes(Long executionId,
 			ExecutionAttributes executionAttributes) {
 	}
 }

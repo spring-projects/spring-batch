@@ -326,12 +326,12 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	 * abstraction. Once a new id has been obtained, the JobExecution is saved
 	 * via a SQL INSERT statement.
 	 * 
-	 * @see JobDao#save(JobExecution)
+	 * @see JobDao#saveJobExecution(JobExecution)
 	 * @throws IllegalArgumentException
 	 *             if jobExecution is null, as well as any of it's fields to be
 	 *             persisted.
 	 */
-	public void save(JobExecution jobExecution) {
+	public void saveJobExecution(JobExecution jobExecution) {
 
 		validateJobExecution(jobExecution);
 
@@ -392,9 +392,9 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	 * ID. The database is then queried to ensure that the ID exists, which
 	 * ensures that it is valid.
 	 * 
-	 * @see JobDao#update(JobExecution)
+	 * @see JobDao#updateJobExecution(JobExecution)
 	 */
-	public void update(JobExecution jobExecution) {
+	public void updateJobExecution(JobExecution jobExecution) {
 
 		validateJobExecution(jobExecution);
 
@@ -437,11 +437,11 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	}
 
 	/**
-	 * @see JobDao#update(JobInstance)
+	 * @see JobDao#updateJobInstance(JobInstance)
 	 * @throws IllegalArgumentException
 	 *             if Job, Job.status, or job.id is null
 	 */
-	public void update(JobInstance jobInstance) {
+	public void updateJobInstance(JobInstance jobInstance) {
 
 		Assert.notNull(jobInstance, "Job Cannot be Null");
 		Assert.notNull(jobInstance.getId(), "Job ID cannot be null");

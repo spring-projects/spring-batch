@@ -71,7 +71,7 @@ public class MapJobDao implements JobDao {
 		if (executions==null) return 0;
 		return executions.size();	}
 
-	public void save(JobExecution jobExecution) {
+	public void saveJobExecution(JobExecution jobExecution) {
 		Set executions = (Set) executionsById.get(jobExecution.getJobId());
 		if (executions==null) {
 			executions = TransactionAwareProxyFactory.createTransactionalSet();
@@ -91,11 +91,11 @@ public class MapJobDao implements JobDao {
 		}
 	}
 
-	public void update(JobInstance job) {
+	public void updateJobInstance(JobInstance job) {
 		// no-op
 	}
 
-	public void update(JobExecution jobExecution) {
+	public void updateJobExecution(JobExecution jobExecution) {
 		// no-op
 	}
 

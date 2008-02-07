@@ -67,7 +67,7 @@ public class JdbcJobDaoQueryTests extends TestCase {
 				return 1;
 			}
 		});
-		sqlDao.save(new JobInstance(new Long(11), new JobParameters()).createJobExecution());
+		sqlDao.saveJobExecution(new JobInstance(new Long(11), new JobParameters()).createJobExecution());
 		assertEquals(1, list.size());
 		String query = (String) list.get(0);
 		assertTrue("Query did not contain FOO_:" + query, query.indexOf("FOO_") >= 0);

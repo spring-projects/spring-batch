@@ -28,7 +28,7 @@ public class JdbcStepDaoTests extends AbstractStepDaoTests {
 
 		assertTrue(LONG_STRING.length()>250);
 		stepExecution.setExitStatus(ExitStatus.FINISHED.addExitDescription(LONG_STRING));
-		stepDao.update(stepExecution);
+		stepDao.updateStepExecution(stepExecution);
 
 		List executions = jdbcTemplate.queryForList(
 				"SELECT * FROM BATCH_STEP_EXECUTION where STEP_INSTANCE_ID=?",

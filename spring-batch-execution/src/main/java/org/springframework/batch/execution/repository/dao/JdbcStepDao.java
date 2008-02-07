@@ -138,7 +138,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 			// assume already saved...
 			return;
 		}
-		jobDao.save(jobExecution);
+		jobDao.saveJobExecution(jobExecution);
 	}
 
 	/**
@@ -146,10 +146,10 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	 * unique id is created for the step using an incrementer. (@link
 	 * DataFieldMaxValueIncrementer)
 	 * 
-	 * @see StepDao#createStep(JobInstance, String)
+	 * @see StepDao#createStepInstance(JobInstance, String)
 	 * @throws IllegalArgumentException if job or stepName is null.
 	 */
-	public StepInstance createStep(JobInstance job, String stepName) {
+	public StepInstance createStepInstance(JobInstance job, String stepName) {
 
 		Assert.notNull(job, "Job cannot be null.");
 		Assert.notNull(stepName, "StepName cannot be null.");
@@ -168,12 +168,12 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	 * and null will be returned. If one step is found, it will be returned. If
 	 * anymore than one step is found, an exception is thrown.
 	 * 
-	 * @see StepDao#findStep(Long, String)
+	 * @see StepDao#findStepInstance(Long, String)
 	 * @throws IllegalArgumentException if job, stepName, or job.id is null.
 	 * @throws IncorrectResultSizeDataAccessException if more than one step is
 	 * found.
 	 */
-	public StepInstance findStep(JobInstance jobInstance, String stepName) {
+	public StepInstance findStepInstance(JobInstance jobInstance, String stepName) {
 
 		Assert.notNull(jobInstance, "Job cannot be null.");
 		Assert.notNull(jobInstance.getId(), "Job ID cannot be null");
@@ -247,7 +247,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	 * Insert execution attributes.  A lob creator must be used, since any attributes
 	 * that don't match a provided type must be serialized into a blob.
 	 */
-	public void save(final Long executionId, final ExecutionAttributes executionAttributes){
+	public void saveExecutionAttributes(final Long executionId, final ExecutionAttributes executionAttributes){
 				
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 		Assert.notNull(executionAttributes, "The ExecutionAttributes must not be null.");
@@ -320,7 +320,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	 * 
 	 * @see {@link LobCreator}
 	 */
-	public void update(final Long executionId, ExecutionAttributes executionAttributes){
+	public void updateExecutionAttributes(final Long executionId, ExecutionAttributes executionAttributes){
 		
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 		Assert.notNull(executionAttributes, "The ExecutionAttributes must not be null.");
@@ -394,14 +394,14 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	}
 
 	/**
-	 * @see StepDao#findSteps(JobInstance)
+	 * @see StepDao#findStepInstances(JobInstance)
 	 * 
 	 * Sql implementation which uses a RowMapper to populate a list of all rows
 	 * in the step table with the same JOB_INSTANCE_ID.
 	 * 
 	 * @throws IllegalArgumentException if jobId is null.
 	 */
-	public List findSteps(final JobInstance jobInstance) {
+	public List findStepInstances(final JobInstance jobInstance) {
 
 		Assert.notNull(jobInstance, "Job cannot be null.");
 
@@ -460,9 +460,9 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	 * stepExecutionIncrementor, and then set in the StepExecution. All values
 	 * will then be stored via an INSERT statement.
 	 * 
-	 * @see StepDao#save(StepExecution)
+	 * @see StepDao#saveStepExecution(StepExecution)
 	 */
-	public void save(StepExecution stepExecution) {
+	public void saveStepExecution(StepExecution stepExecution) {
 
 		validateStepExecution(stepExecution);
 
@@ -529,9 +529,9 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	}
 
 	/**
-	 * @see StepDao#update(StepExecution)
+	 * @see StepDao#updateStepExecution(StepExecution)
 	 */
-	public void update(StepExecution stepExecution) {
+	public void updateStepExecution(StepExecution stepExecution) {
 
 		validateStepExecution(stepExecution);
 		Assert.notNull(stepExecution.getId(), "StepExecution Id cannot be null. StepExecution must saved"
@@ -610,10 +610,10 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 	}
 
 	/**
-	 * @see StepDao#update(StepInstance)
+	 * @see StepDao#updateStepInstance(StepInstance)
 	 * @throws IllegalArgumentException if step, or it's status and id is null.
 	 */
-	public void update(final StepInstance step) {
+	public void updateStepInstance(final StepInstance step) {
 
 		Assert.notNull(step, "Step cannot be null.");
 		Assert.notNull(step.getId(), "Step Id cannot be null.");
