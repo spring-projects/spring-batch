@@ -139,8 +139,7 @@ public class ResourceLineReader extends ItemStreamAdapter implements LineReader,
 	}
 
 	/**
-	 * @return
-	 * @throws IOException
+	 * @return the next non-comment line
 	 */
 	private String readLine() {
 		return getState().readLine();
@@ -209,7 +208,7 @@ public class ResourceLineReader extends ItemStreamAdapter implements LineReader,
 
 	/**
 	 * Mark the state for return later with reset. Uses the read-ahead limit
-	 * from the underlying {@link BufferedReader}, which means that there is a
+	 * from an underlying {@link BufferedReader}, which means that there is a
 	 * limit to how much data can be recovered if the mark needs to be reset.
 	 * 
 	 * @see #reset()
@@ -250,9 +249,6 @@ public class ResourceLineReader extends ItemStreamAdapter implements LineReader,
 		private int markedLineCount = -1;
 
 		public String readLine() {
-			if (reader == null) {
-				open();
-			}
 			String line = null;
 
 			try {

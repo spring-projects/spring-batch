@@ -177,6 +177,14 @@ public class ResourceLineReaderTests extends TestCase {
 		assertEquals("1", line);		
 	}
 
+	public void testMarkAfterClose() throws Exception {
+		Resource resource = new ByteArrayResource("1\n# 2\n3".getBytes());
+		ResourceLineReader reader = new ResourceLineReader(resource);
+		reader.read();
+		reader.close();
+		reader.mark();		
+	}
+
 	public void testNonDefaultRecordSeparatorPolicy() throws Exception {
 		Resource resource = new ByteArrayResource("1\n\"4\n5\"; \n6".getBytes());
 		ResourceLineReader reader = new ResourceLineReader(resource);
