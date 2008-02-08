@@ -163,8 +163,8 @@ public class SimpleStepExecutor {
 	public void execute(final StepExecution stepExecution) throws BatchCriticalException, StepInterruptedException {
 
 		final StepInstance stepInstance = stepExecution.getStep();
-		boolean isRestart = stepInstance.getStepExecutionCount() > 0 ? true : false;
 		Assert.notNull(stepInstance);
+		boolean isRestart = stepInstance.getStepExecutionCount() > 0 ? true : false;
 
 		ExitStatus status = ExitStatus.FAILED;
 
