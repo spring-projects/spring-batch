@@ -31,35 +31,29 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.util.Assert;
 
 /**
- * {@link ItemWriter} that is aware of the Hibernate session and can take some
- * responsibilities to do with chunk boundaries away from a less smart
- * {@link ItemWriter} (the delegate). A delegate is required, and will be used
- * to do the actual writing of the item.<br/>
+ * {@link ItemWriter} that is aware of the Hibernate session and can take some responsibilities to do with chunk
+ * boundaries away from a less smart {@link ItemWriter} (the delegate). A delegate is required, and will be used to do
+ * the actual writing of the item.<br/>
  * 
- * This class implements {@link RepeatInterceptor} and it will only work if
- * properly registered. If the delegate is also a {@link RepeatInterceptor} then
- * it does not need to be separately registered as we make the callbacks here in
- * the right places.
+ * This class implements {@link RepeatInterceptor} and it will only work if properly registered. If the delegate is also
+ * a {@link RepeatInterceptor} then it does not need to be separately registered as we make the callbacks here in the
+ * right places.
  * 
  * @author Dave Syer
  * 
  */
-public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
-		InitializingBean {
+public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor, InitializingBean {
 
 	/**
 	 * Key for items processed in the current transaction {@link RepeatContext}.
 	 */
-	private static final String ITEMS_PROCESSED = HibernateAwareItemWriter.class
-			.getName()
-			+ ".ITEMS_PROCESSED";
+	private static final String ITEMS_PROCESSED = HibernateAwareItemWriter.class.getName() + ".ITEMS_PROCESSED";
 
 	/**
 	 * Key for {@link RepeatContext} in transaction resource context.
 	 */
-	private static final String WRITER_REPEAT_CONTEXT = HibernateAwareItemWriter.class
-			.getName()
-			+ ".WRITER_REPEAT_CONTEXT";
+	private static final String WRITER_REPEAT_CONTEXT = HibernateAwareItemWriter.class.getName()
+	        + ".WRITER_REPEAT_CONTEXT";
 
 	private Set failed = new HashSet();
 
@@ -70,8 +64,7 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
 	/**
 	 * Public setter for the {@link ItemWriter} property.
 	 * 
-	 * @param delegate
-	 *            the delegate to set
+	 * @param delegate the delegate to set
 	 */
 	public void setDelegate(ItemWriter delegate) {
 		this.delegate = delegate;
@@ -80,22 +73,20 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
 	/**
 	 * Public setter for the {@link HibernateOperations} property.
 	 * 
-	 * @param hibernateTemplate
-	 *            the hibernateTemplate to set
+	 * @param hibernateTemplate the hibernateTemplate to set
 	 */
 	public void setHibernateTemplate(HibernateOperations hibernateTemplate) {
 		this.hibernateTemplate = hibernateTemplate;
 	}
 
 	/**
-	 * Set the Hibernate SessionFactory to be used internally. Will
-	 * automatically create a HibernateTemplate for the given SessionFactory.
+	 * Set the Hibernate SessionFactory to be used internally. Will automatically create a HibernateTemplate for the
+	 * given SessionFactory.
 	 * 
 	 * @see #setHibernateTemplate
 	 */
 	public final void setSessionFactory(SessionFactory sessionFactory) {
 		this.hibernateTemplate = new HibernateTemplate(sessionFactory);
-		;
 	}
 
 	/**
@@ -104,17 +95,15 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
 	 * @see org.springframework.dao.support.DaoSupport#initDao()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert
-				.notNull(delegate,
-						"HibernateAwareItemWriter requires an ItemWriter as a delegate.");
-		Assert.notNull(hibernateTemplate,
-				"HibernateAwareItemWriter requires a HibernateOperations");
+		Assert.notNull(delegate, "HibernateAwareItemWriter requires an ItemWriter as a delegate.");
+		Assert.notNull(hibernateTemplate, "HibernateAwareItemWriter requires a HibernateOperations");
 	}
 
 	/**
-	 * Use the delegate to actually do the writing, but flush aggressively if
-	 * the item was previously part of a failed chunk.
-	 * @throws Exception 
+	 * Use the delegate to actually do the writing, but flush aggressively if the item was previously part of a failed
+	 * chunk.
+	 * 
+	 * @throws Exception
 	 * 
 	 * @see org.springframework.batch.io.OutputSource#write(java.lang.Object)
 	 */
@@ -125,8 +114,7 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
 	}
 
 	/**
-	 * Does nothing unless the delegate is also a {@link RepeatInterceptor} in
-	 * which case pass on the call to him.
+	 * Does nothing unless the delegate is also a {@link RepeatInterceptor} in which case pass on the call to him.
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatInterceptor#before(org.springframework.batch.repeat.RepeatContext)
 	 */
@@ -138,8 +126,7 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
 	}
 
 	/**
-	 * Does nothing unless the delegate is also a {@link RepeatInterceptor} in
-	 * which case pass on the call to him.
+	 * Does nothing unless the delegate is also a {@link RepeatInterceptor} in which case pass on the call to him.
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatInterceptor#after(org.springframework.batch.repeat.RepeatContext,
 	 *      org.springframework.batch.repeat.ExitStatus)
@@ -152,9 +139,8 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
 	}
 
 	/**
-	 * Flush the Hibernate session so that any batch exceptions are within the
-	 * RepeatContext. If the delegate is also a {@link RepeatInterceptor} then
-	 * it will be given the call before flushing.
+	 * Flush the Hibernate session so that any batch exceptions are within the RepeatContext. If the delegate is also a
+	 * {@link RepeatInterceptor} then it will be given the call before flushing.
 	 * 
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatInterceptor#close(org.springframework.batch.repeat.RepeatContext)
@@ -189,8 +175,7 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
 	}
 
 	/**
-	 * Does nothing unless the delegate is also a {@link RepeatInterceptor} in
-	 * which case pass on the call to him.
+	 * Does nothing unless the delegate is also a {@link RepeatInterceptor} in which case pass on the call to him.
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatInterceptor#onError(org.springframework.batch.repeat.RepeatContext,
 	 *      java.lang.Throwable)
@@ -203,10 +188,9 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
 	}
 
 	/**
-	 * Sets up the context as a transaction resource so that we can store state
-	 * and refer back to it in the {@link #write(Object)} method. If the
-	 * delegate is also a {@link RepeatInterceptor} then it will be given the
-	 * call afterwards.
+	 * Sets up the context as a transaction resource so that we can store state and refer back to it in the
+	 * {@link #write(Object)} method. If the delegate is also a {@link RepeatInterceptor} then it will be given the call
+	 * afterwards.
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatInterceptor#open(org.springframework.batch.repeat.RepeatContext)
 	 */
@@ -225,28 +209,23 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
 	 * @return the processed
 	 */
 	private Set getProcessed() {
-		Assert.state(TransactionSynchronizationManager
-				.hasResource(WRITER_REPEAT_CONTEXT),
-				"RepeatContext not bound to transaction.");
-		Set processed = (Set) ((AttributeAccessor) TransactionSynchronizationManager
-				.getResource(WRITER_REPEAT_CONTEXT))
-				.getAttribute(ITEMS_PROCESSED);
+		Assert.state(TransactionSynchronizationManager.hasResource(WRITER_REPEAT_CONTEXT),
+		        "RepeatContext not bound to transaction.");
+		Set processed = (Set) ((AttributeAccessor) TransactionSynchronizationManager.getResource(WRITER_REPEAT_CONTEXT))
+		        .getAttribute(ITEMS_PROCESSED);
 		return processed;
 	}
 
 	/**
 	 * Set up the {@link RepeatContext} as a transaction resource.
 	 * 
-	 * @param context
-	 *            the context to set
+	 * @param context the context to set
 	 */
 	private void setContext(RepeatContext context) {
-		if (TransactionSynchronizationManager
-				.hasResource(WRITER_REPEAT_CONTEXT)) {
+		if (TransactionSynchronizationManager.hasResource(WRITER_REPEAT_CONTEXT)) {
 			return;
 		}
-		TransactionSynchronizationManager.bindResource(WRITER_REPEAT_CONTEXT,
-				context);
+		TransactionSynchronizationManager.bindResource(WRITER_REPEAT_CONTEXT, context);
 		context.setAttribute(ITEMS_PROCESSED, new HashSet());
 	}
 
@@ -254,8 +233,7 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
 	 * Remove the transaction resource associated with this context.
 	 */
 	private void unsetContext() {
-		if (!TransactionSynchronizationManager
-				.hasResource(WRITER_REPEAT_CONTEXT)) {
+		if (!TransactionSynchronizationManager.hasResource(WRITER_REPEAT_CONTEXT)) {
 			return;
 		}
 		TransactionSynchronizationManager.unbindResource(WRITER_REPEAT_CONTEXT);
@@ -269,8 +247,7 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor,
 	 * @return the context
 	 */
 	private void flushIfNecessary(Object output) {
-		RepeatContext context = (RepeatContext) TransactionSynchronizationManager
-				.getResource(WRITER_REPEAT_CONTEXT);
+		RepeatContext context = (RepeatContext) TransactionSynchronizationManager.getResource(WRITER_REPEAT_CONTEXT);
 		boolean flush;
 		synchronized (failed) {
 			flush = failed.contains(output);
