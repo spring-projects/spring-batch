@@ -34,6 +34,7 @@ import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.beans.factory.InitializingBean;
@@ -111,25 +112,6 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 */
 	public void setResource(Resource resource) {
 		this.resource = resource;
-	}
-
-	/**
-	 * Commit the transaction.
-	 */
-	protected void transactionCommitted() {
-		mark();
-	}
-
-	/**
-	 * Rollback the transaction.
-	 */
-	protected void transactionRolledBack() {
-		reset();
-	}
-
-	// This method removes any information in the file before this reset point.
-	private void resetPositionForRestart() {
-		getOutputState().truncate();
 	}
 
 	/**
@@ -251,9 +233,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	public void restoreFrom(ExecutionAttributes data) {
 		if (data == null)
 			return;
-
 		getOutputState().restoreFrom(data.getProperties());
-
 	}
 
 	// Returns object representing state.
@@ -396,8 +376,8 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 				fileChannel.truncate(lastMarkedByteOffsetPosition);
 				fileChannel.position(lastMarkedByteOffsetPosition);
 			}
-			catch (Exception e) {
-				throw new BatchCriticalException("An Error occured while reseting position in a file for restart", e);
+			catch (IOException e) {
+				throw new BatchCriticalException("An Error occured while truncating output file", e);
 			}
 		}
 
@@ -458,7 +438,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 			// in case of restarting reset position to last commited point
 			if (restarted) {
-				this.resetPosition();
+				this.reset();
 			}
 
 			initialized = true;
@@ -497,9 +477,9 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 		 * truncates the file to that reset position, and set the cursor to
 		 * start writing at that point.
 		 */
-		private void resetPosition() {
+		public void reset() throws BatchCriticalException {
 			checkFileSize();
-			resetPositionForRestart();
+			getOutputState().truncate();
 		}
 
 		/**
@@ -508,14 +488,14 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 		 * file has been damaged in some way and whole task must be started over
 		 * again from the beginning.
 		 */
-		public void checkFileSize() {
+		private void checkFileSize() {
 			long size = -1;
 
 			try {
 				outputBufferedWriter.flush();
 				size = fileChannel.size();
 			}
-			catch (Exception e) {
+			catch (IOException e) {
 				throw new BatchCriticalException("An Error occured while checking file size", e);
 			}
 
@@ -550,8 +530,11 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
-	public void reset() {
-		getOutputState().checkFileSize();
-		resetPositionForRestart();
+	public void reset() throws ResetFailedException {
+		try {
+			getOutputState().reset();
+		} catch (BatchCriticalException e) {
+			throw new ResetFailedException(e);
+		}
 	}
 }

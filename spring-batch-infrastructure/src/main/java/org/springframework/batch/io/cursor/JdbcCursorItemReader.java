@@ -33,6 +33,7 @@ import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
+import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -70,11 +71,11 @@ import org.springframework.util.StringUtils;
  * </p>
  * 
  * <p>
- * {@link ExecutionAttributes}: The current row is returned as restart data, and when
- * restored from that same data, the cursor is opened and the current row set to
- * the value within the restart data. There are also two statistics returned by
- * this input source: the current line being processed and the number of lines
- * that have been skipped.
+ * {@link ExecutionAttributes}: The current row is returned as restart data,
+ * and when restored from that same data, the cursor is opened and the current
+ * row set to the value within the restart data. There are also two statistics
+ * returned by this input source: the current line being processed and the
+ * number of lines that have been skipped.
  * </p>
  * 
  * <p>
@@ -107,8 +108,8 @@ import org.springframework.util.StringUtils;
  * @author Lucas Ward
  * @author Peter Zozom
  */
-public class JdbcCursorItemReader extends AbstractTransactionalIoSource implements KeyedItemReader,
-		InitializingBean, ItemStream, Skippable {
+public class JdbcCursorItemReader extends AbstractTransactionalIoSource implements KeyedItemReader, InitializingBean,
+		ItemStream, Skippable {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);
 
@@ -241,7 +242,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	 * 
 	 * @throws DataAccessException
 	 */
-	public void reset() {
+	public void reset() throws ResetFailedException {
 		try {
 			currentProcessedRow = lastCommittedRow;
 			if (currentProcessedRow > 0) {
@@ -253,7 +254,8 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 
 		}
 		catch (SQLException se) {
-			throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);
+			throw new ResetFailedException(getExceptionTranslator().translate(
+					"Attempted to move ResultSet to last committed row", sql, se));
 		}
 	}
 
@@ -374,7 +376,8 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getExecutionAttributes()
 	 */
 	public ExecutionAttributes getExecutionAttributes() {
@@ -386,7 +389,8 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 		return context;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#restoreFrom(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void restoreFrom(ExecutionAttributes data) {
