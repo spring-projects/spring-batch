@@ -16,7 +16,6 @@
 
 package org.springframework.batch.core.domain;
 
-
 /**
  * <p>
  * Batch domain entity representing a step which is sequentially executed by a

@@ -17,7 +17,7 @@
 package org.springframework.batch.item.reader;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.StreamException;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.support.AbstractMethodInvokingDelegator;
 
 /**

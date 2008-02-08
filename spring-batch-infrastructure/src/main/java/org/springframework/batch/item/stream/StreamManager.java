@@ -17,7 +17,7 @@ package org.springframework.batch.item.stream;
 
 import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.StreamException;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.transaction.TransactionStatus;
 
 /**

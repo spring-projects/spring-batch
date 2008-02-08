@@ -16,6 +16,10 @@
 
 package org.springframework.batch.item;
 
+import org.springframework.batch.item.exception.MarkFailedException;
+import org.springframework.batch.item.exception.ResetFailedException;
+import org.springframework.batch.item.exception.StreamException;
+
 /**
  * <p>
  * Marker interface defining a contract for periodically storing state and
@@ -81,8 +85,11 @@ public interface ItemStream extends ExecutionAttributesProvider {
 	 * state from the current thread is saved.
 	 * 
 	 * @throws UnsupportedOperationException if the operation is not supported
+	 * @throws MarkFailedException if there is a problem with the mark. If a
+	 * mark fails inside a transaction, it would be worrying, but not normally
+	 * fatal.
 	 */
-	void mark();
+	void mark() throws MarkFailedException;
 
 	/**
 	 * Reset the stream to the last mark. After a reset the stream state will be
@@ -93,6 +100,10 @@ public interface ItemStream extends ExecutionAttributesProvider {
 	 * state from the current thread is reset.
 	 * 
 	 * @throws UnsupportedOperationException if the operation is not supported
+	 * @throws ResetFailedException if there is a problem with the reset. If a
+	 * reset fails inside a transaction, it would normally be fatal, and would
+	 * leave the stream in an inconsistent state. So while this is an unchecked
+	 * exception, it may be important for a client to catch it explicitly.
 	 */
-	void reset();
+	void reset() throws ResetFailedException;
 }

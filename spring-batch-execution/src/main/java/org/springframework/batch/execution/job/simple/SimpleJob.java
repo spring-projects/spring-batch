@@ -129,15 +129,23 @@ public class SimpleJob extends JobSupport {
 	private boolean shouldStart(StepInstance stepInstance, Step step) {
 
 		BatchStatus stepStatus;
-		//if the last execution is null, the step has never been executed.
-		if(stepInstance.getLastExecution() == null){
+		// if the last execution is null, the step has never been executed.
+		if (stepInstance.getLastExecution() == null) {
 			stepStatus = BatchStatus.STARTING;
 		}
-		else{
+		else {
 			stepStatus = stepInstance.getLastExecution().getStatus();
 		}
-		
-		if (stepStatus== BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) {
+
+		if (stepStatus == BatchStatus.UNKNOWN) {
+			throw new BatchCriticalException(
+					"Cannot restart step from UNKNOWN status.  " +
+					"The last execution ended with a failure that could not be rolled back, " +
+					"so it may be dangerous to proceed.  " +
+					"Manual intervention is probably necessary.");
+		}
+
+		if (stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) {
 			// step is complete, false should be returned, indicating that the
 			// step should not be started
 			return false;

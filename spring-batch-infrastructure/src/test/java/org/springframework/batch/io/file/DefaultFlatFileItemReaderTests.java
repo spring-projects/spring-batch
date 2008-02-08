@@ -25,7 +25,7 @@ import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.transform.LineTokenizer;
 import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.StreamException;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 

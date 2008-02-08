@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.exception;
 
+
 /**
  * Used to signal an unexpected end of an input or message stream. This is an
  * abnormal condition, not just the end of the data - e.g. if a resource becomes
@@ -23,7 +24,7 @@ package org.springframework.batch.item.exception;
  * 
  * @author Dave Syer
  */
-public class UnexpectedInputException extends RuntimeException {
+public class UnexpectedInputException extends StreamException {
 
 	/**
 	 * Generated serial UID.

@@ -5,7 +5,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;

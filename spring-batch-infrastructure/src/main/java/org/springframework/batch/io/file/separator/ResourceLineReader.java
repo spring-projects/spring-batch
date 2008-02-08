@@ -28,6 +28,8 @@ import java.util.Iterator;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.exception.MarkFailedException;
+import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -212,9 +214,9 @@ public class ResourceLineReader extends ItemStreamAdapter implements LineReader,
 	 * 
 	 * @see #reset()
 	 * 
-	 * @throws BatchEnvironmentException if the mark could not be set.
+	 * @throws MarkFailedException if the mark could not be set.
 	 */
-	public synchronized void mark() {
+	public synchronized void mark() throws MarkFailedException {
 		getState().mark();
 	}
 
@@ -223,10 +225,10 @@ public class ResourceLineReader extends ItemStreamAdapter implements LineReader,
 	 * 
 	 * @see #mark()
 	 * 
-	 * @throws BatchEnvironmentException if the reset is unsuccessful, e.g. if
+	 * @throws ResetFailedException if the reset is unsuccessful, e.g. if
 	 * the read-ahead limit was breached.
 	 */
-	public synchronized void reset() {
+	public synchronized void reset() throws ResetFailedException {
 		getState().reset();
 	}
 
@@ -318,13 +320,13 @@ public class ResourceLineReader extends ItemStreamAdapter implements LineReader,
 		/**
 		 * Mark the underlying reader and set the line counters.
 		 */
-		public void mark() {
+		public void mark() throws MarkFailedException {
 			try {
 				reader.mark(READ_AHEAD_LIMIT);
 				markedLineCount = currentLineCount;
 			}
 			catch (IOException e) {
-				throw new BatchEnvironmentException("Could not mark reader", e);
+				throw new MarkFailedException("Could not mark reader", e);
 			}
 		}
 
@@ -332,7 +334,7 @@ public class ResourceLineReader extends ItemStreamAdapter implements LineReader,
 		 * Reset the reader and line counters to the last marked position if
 		 * possible.
 		 */
-		public void reset() {
+		public void reset() throws ResetFailedException {
 
 			if (markedLineCount < 0) {
 				return;
@@ -342,7 +344,7 @@ public class ResourceLineReader extends ItemStreamAdapter implements LineReader,
 				currentLineCount = markedLineCount;
 			}
 			catch (IOException e) {
-				throw new BatchEnvironmentException("Could not reset reader", e);
+				throw new ResetFailedException("Could not reset reader", e);
 			}
 
 		}

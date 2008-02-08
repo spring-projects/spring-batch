@@ -24,6 +24,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -31,6 +32,7 @@ import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
@@ -38,10 +40,11 @@ import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.StreamException;
+import org.springframework.batch.item.exception.ResetFailedException;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.batch.item.stream.SimpleStreamManager;
@@ -55,6 +58,7 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 
 public class SimpleStepExecutorTests extends TestCase {
 
@@ -73,6 +77,8 @@ public class SimpleStepExecutorTests extends TestCase {
 	private RepeatTemplate template;
 
 	private JobInstance jobInstance;
+
+	private ResourcelessTransactionManager transactionManager;
 
 	private ItemReader getReader(String[] args) {
 		return new ListItemReader(Arrays.asList(args));
@@ -98,8 +104,7 @@ public class SimpleStepExecutorTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
-
+		transactionManager = new ResourcelessTransactionManager();
 		stepConfiguration = new SimpleStep();
 		stepConfiguration.setTasklet(getTasklet(new String[] { "foo", "bar", "spam" }));
 		stepConfiguration.setJobRepository(new JobRepositorySupport());
@@ -116,7 +121,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		jobInstance = new JobInstance(new Long(0), new JobParameters());
 		jobInstance.setJob(new JobSupport("FOO"));
-		
+
 		SimpleStreamManager streamManager = new SimpleStreamManager(transactionManager);
 		streamManager.setUseClassNameAsPrefix(false);
 		stepExecutor.setStreamManager(streamManager);
@@ -312,9 +317,9 @@ public class SimpleStepExecutorTests extends TestCase {
 		stepConfiguration.setSaveExecutionAttributes(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
-		
-		stepExecution.setExecutionAttributes(
-				new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar")));
+
+		stepExecution
+				.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar")));
 		step.setLastExecution(stepExecution);
 		stepExecutor.execute(stepExecution);
 
@@ -324,8 +329,9 @@ public class SimpleStepExecutorTests extends TestCase {
 	}
 
 	/*
-	 * Test that a job that is being restarted, but has saveExecutionAttributes set to
-	 * false, doesn't have restore or getExecutionAttributes called on it.
+	 * Test that a job that is being restarted, but has saveExecutionAttributes
+	 * set to false, doesn't have restore or getExecutionAttributes called on
+	 * it.
 	 */
 	public void testNoSaveExecutionAttributesRestartableJob() {
 		StepInstance step = new StepInstance(new Long(1));
@@ -348,8 +354,9 @@ public class SimpleStepExecutorTests extends TestCase {
 	}
 
 	/*
-	 * Even though the job is restarted, and saveExecutionAttributes is true, nothing
-	 * will be restored because the Tasklet does not implement Restartable.
+	 * Even though the job is restarted, and saveExecutionAttributes is true,
+	 * nothing will be restored because the Tasklet does not implement
+	 * Restartable.
 	 */
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
 		StepInstance step = new StepInstance(new Long(1));
@@ -479,41 +486,88 @@ public class SimpleStepExecutorTests extends TestCase {
 
 	}
 
-	/*
-	 * StepExecutor will never pass StepInterruptedException to the
-	 * exceptionClassifier. This may or may not stay the same, so the test will
-	 * remain commented out for reference purposes.
-	 */
-	/*
-	 * public void testExitCodeInterruptedClassification(){
-	 * 
-	 * StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy(){
-	 * 
-	 * public void checkInterrupted(RepeatContext context) throws
-	 * StepInterruptedException { throw new StepInterruptedException(""); } };
-	 * 
-	 * stepExecutor.setInterruptionPolicy(interruptionPolicy);
-	 * 
-	 * Tasklet tasklet = new Tasklet(){
-	 * 
-	 * public ExitStatus execute() throws Exception { int counter = 0;
-	 * counter++;
-	 * 
-	 * if(counter == 1){ throw new StepInterruptedException(""); }
-	 * 
-	 * return ExitStatus.CONTINUABLE; } };
-	 * 
-	 * StepInstance step = new StepInstance(new Long(1));
-	 * stepConfiguration.setTasklet(tasklet); JobExecutionContext
-	 * jobExecutionContext = new JobExecutionContext(new
-	 * SimpleJobIdentifier("FOO"), new JobInstance(new Long(3))); StepExecution
-	 * stepExecution = new StepExecution(step, jobExecutionContext);
-	 * 
-	 * try{ stepExecutor.process(stepConfiguration, stepExecution); }
-	 * catch(Exception ex){
-	 * assertEquals(ExitCodeExceptionClassifier.STEP_INTERRUPTED,
-	 * step.getStepExecution().getExitCode() );
-	 * assertEquals(step.getStepExecution().getExitDescription(),
-	 * "java.lang.RuntimeException"); } }
-	 */
+	public void testStatusForInterruptedException() {
+
+		StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy() {
+
+			public void checkInterrupted(RepeatContext context) throws StepInterruptedException {
+				throw new StepInterruptedException("");
+			}
+		};
+
+		stepExecutor.setInterruptionPolicy(interruptionPolicy);
+
+		Tasklet tasklet = new Tasklet() {
+
+			public ExitStatus execute() throws Exception {
+				int counter = 0;
+				counter++;
+
+				if (counter == 1) {
+					throw new StepInterruptedException("");
+				}
+
+				return ExitStatus.CONTINUABLE;
+			}
+		};
+		stepExecutor.setTasklet(tasklet);
+
+		StepInstance step = new StepInstance(new Long(1));
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
+
+		stepExecution
+				.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar")));
+		step.setLastExecution(stepExecution);
+
+		try {
+			stepExecutor.execute(stepExecution);
+			fail("Expected StepInterruptedException");
+		}
+		catch (StepInterruptedException ex) {
+			assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
+			String msg = stepExecution.getExitStatus().getExitDescription();
+			assertTrue("Message does not contain StepInterruptedException: " + msg, msg
+					.contains("StepInterruptedException"));
+		}
+	}
+
+	public void testStatusForResetFailedException() throws Exception {
+
+		Tasklet tasklet = new Tasklet() {
+			public ExitStatus execute() throws Exception {
+				// Trigger a rollback
+				throw new RuntimeException("Foo");
+			}
+		};
+		stepExecutor.setTasklet(tasklet);
+		stepExecutor.setStreamManager(new SimpleStreamManager(transactionManager) {
+			public void rollback(TransactionStatus status) {
+				super.rollback(status);
+				// Simulate failure on rollback when stream resets
+				throw new ResetFailedException("Bar");
+			}
+		});
+
+		StepInstance step = new StepInstance(new Long(1));
+		JobExecution jobExecutionContext = jobInstance.createJobExecution();
+		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
+
+		stepExecution
+				.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar")));
+		step.setLastExecution(stepExecution);
+
+		try {
+			stepExecutor.execute(stepExecution);
+			fail("Expected ResetFailedException");
+		}
+		catch (ResetFailedException ex) {
+			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
+			String msg = stepExecution.getExitStatus().getExitDescription();
+			assertTrue("Message does not contain ResetFailedException: " + msg, msg.contains("ResetFailedException"));
+			// The original rollback was caused by this one:
+			assertEquals("Foo", ex.getCause().getMessage());
+		}
+	}
+
 }

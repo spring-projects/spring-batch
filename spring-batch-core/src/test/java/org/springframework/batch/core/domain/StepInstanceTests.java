@@ -17,8 +17,6 @@ package org.springframework.batch.core.domain;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.ExecutionAttributes;
-
 /**
  * @author Dave Syer
  *

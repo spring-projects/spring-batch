@@ -21,7 +21,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.StreamException;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.TransactionException;

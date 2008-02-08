@@ -18,6 +18,8 @@ package org.springframework.batch.execution.step.simple;
 
 import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
@@ -33,8 +35,9 @@ import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.ExitStatus;
@@ -69,6 +72,8 @@ import org.springframework.util.Assert;
  * 
  */
 public class SimpleStepExecutor {
+
+	private static final Log logger = LogFactory.getLog(SimpleStepExecutor.class);
 
 	private RepeatOperations chunkOperations = new RepeatTemplate();
 
@@ -242,7 +247,22 @@ public class SimpleStepExecutor {
 						synchronized (stepExecution) {
 							stepExecution.rollback();
 						}
-						streamManager.rollback(transaction);
+						try {
+							streamManager.rollback(transaction);
+						}
+						catch (ResetFailedException e) {
+							// The original Throwable cause is in danger of
+							// being lost here, so we log the reset
+							// failure and re-throw with cause of the rollback.
+							logger.error("Encountered reset error on rollback: "
+									+ "one of the streams may be in an inconsistent state, "
+									+ "so this step should not proceed", e);
+							throw new ResetFailedException(
+									"Encountered reset error on rollback.  " +
+									"Consult logs for the cause of the reet failure.  " +
+									"The cause of the original rollback is incuded here.",
+									t);
+						}
 						if (t instanceof RuntimeException) {
 							throw (RuntimeException) t;
 						}
@@ -270,6 +290,10 @@ public class SimpleStepExecutor {
 			if (e.getCause() instanceof StepInterruptedException) {
 				updateStatus(stepExecution, BatchStatus.STOPPED);
 				throw (StepInterruptedException) e.getCause();
+			}
+			else if (e instanceof ResetFailedException) {
+				updateStatus(stepExecution, BatchStatus.UNKNOWN);
+				throw (ResetFailedException) e;
 			}
 			else {
 				updateStatus(stepExecution, BatchStatus.FAILED);
