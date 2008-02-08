@@ -69,81 +69,169 @@ public class StepExecution extends Entity {
 	 * 
 	 * @param step the step to which this execution belongs
 	 * @param jobExecution the current job execution
+	 * @param id the id of this execution
 	 */
 	public StepExecution(StepInstance step, JobExecution jobExecution, Long id) {
 		super(id);
 		this.step = step;
 		this.jobExecution = jobExecution;
 	}
-	
-	public StepExecution(StepInstance step, JobExecution jobExecution){
+
+	/**
+	 * Constructor that substitutes in null for the execution id
+	 * 
+	 * @param step the step to which this execution belongs
+	 * @param jobExecution the current job execution
+	 */
+	public StepExecution(StepInstance step, JobExecution jobExecution) {
 		this(step, jobExecution, null);
 	}
 
+	/**
+	 * Increments the number of commits in this execution
+	 */
 	public void incrementCommitCount() {
 		commitCount++;
 	}
 
+	/**
+	 * Increments the number of tasks in this execution
+	 */
 	public void incrementTaskCount() {
 		taskCount++;
 	}
 
+	/**
+	 * Returns the {@link ExecutionAttributes} for this execution
+	 * 
+	 * @return the attributes
+	 */
 	public ExecutionAttributes getExecutionAttributes() {
 		return executionAttributes;
 	}
 
+	/**
+	 * Sets the {@link ExecutionAttributes} for this execution
+	 * 
+	 * @param executionAttributes the attributes
+	 */
 	public void setExecutionAttributes(ExecutionAttributes executionAttributes) {
 		this.executionAttributes = executionAttributes;
 	}
 
+	/**
+	 * Returns the current number of commits for this execution
+	 * 
+	 * @return the current number of commits
+	 */
 	public Integer getCommitCount() {
 		return new Integer(commitCount);
 	}
 
+	/**
+	 * Sets the current number of commits for this execution
+	 * 
+	 * @param commitCount the current number of commits
+	 */
 	public void setCommitCount(int commitCount) {
 		this.commitCount = commitCount;
 	}
 
+	/**
+	 * Returns the time that this execution ended
+	 * 
+	 * @return the time that this execution ended
+	 */
 	public Date getEndTime() {
 		return endTime;
 	}
 
+	/**
+	 * Sets the time that this execution ended
+	 * 
+	 * @param endTime the time that this execution ended
+	 */
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
 
+	/**
+	 * Returns the current number of tasks for this execution
+	 * 
+	 * @return the current number of tasks for this execution
+	 */
 	public Integer getTaskCount() {
 		return new Integer(taskCount);
 	}
 
+	/**
+	 * Sets the current number of tasks for this execution
+	 * 
+	 * @param taskCount the current number of tasks for this execution
+	 */
 	public void setTaskCount(int taskCount) {
 		this.taskCount = taskCount;
 	}
 
+	/**
+	 * Sets the current number of rollbacks for this execution
+	 * 
+	 * @param rollbackCount the current number of rollbacks for this execution
+	 */
 	public void setRollbackCount(int rollbackCount) {
 		this.rollbackCount = rollbackCount;
 	}
 
+	/**
+	 * Returns the current number of rollbacks for this execution
+	 * 
+	 * @return the current number of rollbacks for this execution
+	 */
 	public Integer getRollbackCount() {
 		return new Integer(rollbackCount);
 	}
 
+	/**
+	 * Gets the time this execution started
+	 * 
+	 * @return the time this execution started
+	 */
 	public Date getStartTime() {
 		return startTime;
 	}
 
+	/**
+	 * Sets the time this execution started
+	 * 
+	 * @param startTime the time this execution started
+	 */
 	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
 	}
 
+	/**
+	 * Returns the current status of this step
+	 * 
+	 * @return the current status of this step
+	 */
 	public BatchStatus getStatus() {
 		return status;
 	}
 
+	/**
+	 * Sets the current status of this step
+	 * 
+	 * @param status the current status of this step
+	 */
 	public void setStatus(BatchStatus status) {
 		this.status = status;
 	}
 
+	/**
+	 * Returns the id for this step
+	 * 
+	 * @return the id for this step
+	 */
 	public Long getStepId() {
 		if (step != null) {
 			return step.getId();
@@ -153,6 +241,7 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Accessor for the job execution id.
+	 * 
 	 * @return the jobExecutionId
 	 */
 	public Long getJobExecutionId() {
@@ -164,6 +253,7 @@ public class StepExecution extends Entity {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.container.common.domain.Entity#equals(java.lang.Object)
 	 */
 	public boolean equals(Object obj) {
@@ -177,23 +267,24 @@ public class StepExecution extends Entity {
 			return jobExecutionId.equals(other.getJobExecutionId());
 		}
 		return stepId.equals(other.getStepId())
-				&& (jobExecutionId == null || jobExecutionId.equals(other.getJobExecutionId()));
+		        && (jobExecutionId == null || jobExecutionId.equals(other.getJobExecutionId()));
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.container.common.domain.Entity#hashCode()
 	 */
 	public int hashCode() {
 		Object stepId = getStepId();
 		Object jobExecutionId = getJobExecutionId();
 		return super.hashCode() + 31 * (stepId != null ? stepId.hashCode() : 0) + 91
-				* (jobExecutionId != null ? jobExecutionId.hashCode() : 0);
+		        * (jobExecutionId != null ? jobExecutionId.hashCode() : 0);
 	}
 
 	public String toString() {
 		return super.toString() + ", name=" + getName() + ", taskCount=" + taskCount + ", commitCount=" + commitCount
-				+ ", rollbackCount=" + rollbackCount;
+		        + ", rollbackCount=" + rollbackCount;
 	}
 
 	private String getName() {
@@ -216,6 +307,7 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Accessor for the step governing this execution.
+	 * 
 	 * @return the step
 	 */
 	public StepInstance getStep() {
@@ -224,8 +316,9 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Accessor for the execution context information of the enclosing job.
-	 * @return the {@link jobExecutionContext} that was used to start this step
-	 * execution.
+	 * 
+	 * @return the {@link JobExecution} that was used to start this step
+	 *         execution.
 	 */
 	public JobExecution getJobExecution() {
 		return jobExecution;

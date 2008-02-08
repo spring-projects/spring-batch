@@ -19,9 +19,8 @@ import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**
- * Basic no-op support implementation for use as base class for {@link Step}.
- * Implements {@link BeanNameAware} so that if no name is provided explicitly it
- * will be inferred from the bean definition in Spring configuration.
+ * Basic no-op support implementation for use as base class for {@link Step}. Implements {@link BeanNameAware} so that
+ * if no name is provided explicitly it will be inferred from the bean definition in Spring configuration.
  * 
  * @author Dave Syer
  * 
@@ -51,21 +50,14 @@ public class StepSupport implements Step, BeanNameAware {
 		this.name = string;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.core.configuration.StepConfiguration#getName()
-	 */
 	public String getName() {
 		return this.name;
 	}
 
 	/**
-	 * Set the name property if it is not already set. Because of the order of
-	 * the callbacks in a Spring container the name property will be set first
-	 * if it is present. Care is needed with bean definition inheritance - if a
-	 * parent bean has a name, then its children need an explicit name as well,
-	 * otherwise they will not be unique.
+	 * Set the name property if it is not already set. Because of the order of the callbacks in a Spring container the
+	 * name property will be set first if it is present. Care is needed with bean definition inheritance - if a parent
+	 * bean has a name, then its children need an explicit name as well, otherwise they will not be unique.
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
@@ -76,8 +68,7 @@ public class StepSupport implements Step, BeanNameAware {
 	}
 
 	/**
-	 * Set the name property. Always overrides the default value if this object
-	 * is a Spring bean.
+	 * Set the name property. Always overrides the default value if this object is a Spring bean.
 	 * 
 	 * @see #setBeanName(java.lang.String)
 	 */
@@ -85,11 +76,6 @@ public class StepSupport implements Step, BeanNameAware {
 		this.name = name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.core.configuration.StepConfiguration#getStartLimit()
-	 */
 	public int getStartLimit() {
 		return this.startLimit;
 	}
@@ -103,11 +89,6 @@ public class StepSupport implements Step, BeanNameAware {
 		this.startLimit = startLimit;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.core.configuration.StepConfiguration#shouldAllowStartIfComplete()
-	 */
 	public boolean isAllowStartIfComplete() {
 		return this.allowStartIfComplete;
 	}
@@ -136,9 +117,8 @@ public class StepSupport implements Step, BeanNameAware {
 	 * 
 	 * @see org.springframework.batch.core.domain.Step#execute(org.springframework.batch.core.domain.StepExecution)
 	 */
-	public void execute(StepExecution stepExecution)
-			throws StepInterruptedException, BatchCriticalException {
+	public void execute(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
 		throw new UnsupportedOperationException(
-				"Cannot process a StepExecution.  Use a smarter subclass of StepSupport.");
+		        "Cannot process a StepExecution.  Use a smarter subclass of StepSupport.");
 	}
 }

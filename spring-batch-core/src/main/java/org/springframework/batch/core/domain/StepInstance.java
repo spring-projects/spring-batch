@@ -16,7 +16,6 @@
 
 package org.springframework.batch.core.domain;
 
-import org.springframework.batch.item.ExecutionAttributes;
 
 /**
  * <p>

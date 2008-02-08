@@ -19,24 +19,22 @@ package org.springframework.batch.core.domain;
 import java.io.Serializable;
 
 /**
- * Typesafe enumeration representing the status of an artifact within the
- * batch environment. See Effective Java Programming by Joshua Bloch for more
- * details on the pattern used.
+ * Typesafe enumeration representing the status of an artifact within the batch environment. See Effective Java
+ * Programming by Joshua Bloch for more details on the pattern used.
  * 
- * A BatchStatus can be safely serialized, however, it should be noted
- * that the pattern can break down if different class loaders load
- * the enumeration.
+ * A BatchStatus can be safely serialized, however, it should be noted that the pattern can break down if different
+ * class loaders load the enumeration.
  * 
  * @author Lucas Ward
  * @author Greg Kick
  */
 
-public class BatchStatus implements Serializable{
+public class BatchStatus implements Serializable {
 
 	private static final long serialVersionUID = 1634960297477743037L;
 
 	private final String name;
-	
+
 	private BatchStatus(String name) {
 		this.name = name;
 	}
@@ -64,12 +62,12 @@ public class BatchStatus implements Serializable{
 	/**
 	 * Given a string representation of a status, return the appropriate BatchStatus.
 	 * 
-	 * @param statusAsString: string representation of a status
+	 * @param statusAsString string representation of a status
 	 * @return a valid BatchStatus or null if the input is null
 	 * @throws IllegalArgumentException if no status matches provided string.
 	 */
 	public static BatchStatus getStatus(String statusAsString) {
-		if (statusAsString==null) {
+		if (statusAsString == null) {
 			return null;
 		}
 		final String upperCaseStatusAsString = statusAsString.toUpperCase();
