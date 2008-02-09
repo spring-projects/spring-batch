@@ -29,6 +29,7 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
@@ -39,7 +40,6 @@ import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
-import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -84,31 +84,21 @@ public class SimpleStepExecutorTests extends TestCase {
 		return new ListItemReader(Arrays.asList(args));
 	}
 
-	/**
-	 * @param strings
-	 * @return
-	 * @throws Exception
-	 */
-	private Tasklet getTasklet(String[] strings) throws Exception {
-		ItemOrientedTasklet module = new ItemOrientedTasklet();
-		module.setItemWriter(processor);
-		module.setItemReader(getReader(strings));
-		module.afterPropertiesSet();
-		return module;
+
+	
+	private AbstractStep getStep(String[] strings) throws Exception {
+		SimpleStep step = new SimpleStep();
+		step.setItemWriter(processor);
+		step.setItemReader(getReader(strings));
+		step.setJobRepository(new JobRepositorySupport());
+		step.setTransactionManager(transactionManager);
+		step.afterPropertiesSet();
+		return step;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	protected void setUp() throws Exception {
-		super.setUp();
 		transactionManager = new ResourcelessTransactionManager();
-		stepConfiguration = new SimpleStep();
-		stepConfiguration.setTasklet(getTasklet(new String[] { "foo", "bar", "spam" }));
-		stepConfiguration.setJobRepository(new JobRepositorySupport());
-		stepConfiguration.setTransactionManager(transactionManager);
+		stepConfiguration = getStep(new String[] { "foo", "bar", "spam" });
 
 		stepExecutor = (SimpleStepExecutor) stepConfiguration.createStepExecutor();
 		template = new RepeatTemplate();

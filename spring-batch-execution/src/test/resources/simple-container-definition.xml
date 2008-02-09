@@ -18,7 +18,8 @@
 		class="org.springframework.batch.execution.configuration.MapJobRegistry" />
 
 	<bean id="simpleJob"
-		class="org.springframework.batch.execution.job.simple.SimpleJob" abstract="true">
+		class="org.springframework.batch.execution.job.simple.SimpleJob"
+		abstract="true">
 		<property name="restartable" value="true" />
 		<property name="jobRepository" ref="simpleJobRepository" />
 	</bean>
@@ -35,8 +36,8 @@
 				<property name="useParent" value="true" />
 			</bean>
 		</property>
-		<property name="jobRepository" ref="jobRegistry"/>
-		<property name="transactionManager" ref="transactionManager"/>
+		<property name="jobRepository" ref="jobRegistry" />
+		<property name="transactionManager" ref="transactionManager" />
 	</bean>
 
 	<bean id="transactionManager"

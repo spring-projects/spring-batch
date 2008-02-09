@@ -17,31 +17,26 @@
 package org.springframework.batch.execution.step.simple;
 
 import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.tasklet.Tasklet;
 
 /**
- * Simple {@link Step} good enough for most purposes and easy to
- * configure simple properties, principally the commit interval.
+ * Simple {@link Step} good enough for most purposes and easy to configure simple properties, principally the commit
+ * interval.
  * 
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ * @author Ben Hale
  */
 public class SimpleStep extends AbstractStep {
-	
+
 	// default commit interval is one
 	private int commitInterval = 1;
+
 	public SimpleStep() {
 		super();
 	}
 
 	public SimpleStep(String name) {
 		super(name);
-	}
-
-	public SimpleStep(Tasklet module) {
-		this();
-		setTasklet(module);
 	}
 
 	public void setCommitInterval(int commitInterval) {

@@ -27,15 +27,12 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.job.simple.SimpleJob;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.step.simple.AbstractStep;
-import org.springframework.batch.execution.step.simple.RepeatOperationsStep;
 import org.springframework.batch.execution.step.simple.SimpleStep;
-import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
@@ -71,42 +68,40 @@ public class SimpleJobTests extends TestCase {
 		job.setJobRepository(repository);
 	}
 
-	private Tasklet getTasklet(String arg) throws Exception {
-		return getTasklet(new String[] { arg });
+	private AbstractStep getStep(String arg) throws Exception {
+		return getStep(new String[] { arg });
 	}
 
-	private Tasklet getTasklet(String arg0, String arg1) throws Exception {
-		return getTasklet(new String[] { arg0, arg1 });
+	private AbstractStep getStep(String arg0, String arg1) throws Exception {
+		return getStep(new String[] { arg0, arg1 });
 	}
-
-	private ItemOrientedTasklet getTasklet(String[] args) throws Exception {
-		ItemOrientedTasklet module = new ItemOrientedTasklet();
+	
+	private AbstractStep getStep(String[] args) throws Exception {
+		SimpleStep step = new SimpleStep();
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
 		provider = new ListItemReader(items);
-		module.setItemRecoverer(new ItemRecoverer() {
+		step.setItemRecoverer(new ItemRecoverer() {
 			public boolean recover(Object item, Throwable cause) {
 				recovered.add(item);
 				assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
 				return true;
 			}
 		});
-		module.setItemReader(provider);
-		module.setItemWriter(processor);
-		module.afterPropertiesSet();
-		return module;
+		step.setItemReader(provider);
+		step.setItemWriter(processor);
+		step.setJobRepository(repository);
+		step.setTransactionManager(new ResourcelessTransactionManager());
+		step.afterPropertiesSet();
+		return step;
 	}
 
 	public void testSimpleJob() throws Exception {
 
 		job.setSteps(new ArrayList());
-		AbstractStep step = new SimpleStep(getTasklet("foo", "bar"));
-		step.setJobRepository(repository);
-		step.setTransactionManager(new ResourcelessTransactionManager());
+		AbstractStep step = getStep("foo", "bar");
 		job.addStep(step);
-		step = new SimpleStep(getTasklet("spam"));
-		step.setJobRepository(repository);
-		step.setTransactionManager(new ResourcelessTransactionManager());
+		step = getStep("spam");
 		job.addStep(step);
 
 		JobInstance jobInstance = repository.createJobExecution(job, new JobParameters()).getJobInstance();
@@ -137,18 +132,19 @@ public class SimpleJobTests extends TestCase {
 		 * is recovered ("skipped") on the second attempt (see retry policy
 		 * definition above)...
 		 */
-		final ItemOrientedTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
-		RepeatOperationsStep step = new RepeatOperationsStep();
-		step.setTasklet(module);
-		step.setChunkOperations(chunkOperations);
-		step.setJobRepository(repository);
-		step.setTransactionManager(new ResourcelessTransactionManager());
-		module.setItemWriter(new AbstractItemWriter() {
+		AbstractStep step = getStep(new String[] { "foo", "bar", "spam" });
+		
+		
+//		Tasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
+//		RepeatOperationsStep step = new RepeatOperationsStep();
+//		step.setTasklet(module);
+//		step.setChunkOperations(chunkOperations);
+		step.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
 				throw new RuntimeException("Try again Dummy!");
 			}
 		});
-		module.afterPropertiesSet();
+		step.afterPropertiesSet();
 		job.setSteps(Collections.singletonList(step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
@@ -162,17 +158,14 @@ public class SimpleJobTests extends TestCase {
 	}
 
 	public void testExceptionTerminates() throws Exception {
-
-		final ItemOrientedTasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
-		AbstractStep step = new SimpleStep(module);
-		step.setJobRepository(repository);
-		step.setTransactionManager(new ResourcelessTransactionManager());
-		module.setItemWriter(new AbstractItemWriter() {
+//		Tasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
+		AbstractStep step = getStep(new String[] { "foo", "bar", "spam" });
+		step.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
 				throw new RuntimeException("Foo");
 			}
 		});
-		module.afterPropertiesSet();
+		step.afterPropertiesSet();
 		job.setSteps(Collections.singletonList(step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());

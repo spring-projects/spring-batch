@@ -251,6 +251,7 @@ public class SimpleJobTests extends TestCase {
 
 		private Runnable runnable;
 		private Exception exception;
+		private Tasklet tasklet;
 
 		/**
 		 * @param string
@@ -265,6 +266,13 @@ public class SimpleJobTests extends TestCase {
 		public void setProcessException(Exception exception) {
 			this.exception = exception;
 		}
+		
+		/**
+         * @param tasklet the tasklet to set
+         */
+        public void setTasklet(Tasklet tasklet) {
+	        this.tasklet = tasklet;
+        }
 
 		/**
 		 * @param runnable

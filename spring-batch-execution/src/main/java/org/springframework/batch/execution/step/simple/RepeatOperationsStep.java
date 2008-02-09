@@ -19,6 +19,7 @@ package org.springframework.batch.execution.step.simple;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInterruptedException;
+import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.RepeatOperations;
 
@@ -28,15 +29,15 @@ import org.springframework.batch.repeat.RepeatOperations;
  * 
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ * @author Ben Hale
  */
 public class RepeatOperationsStep extends AbstractStep implements RepeatOperationsHolder {
 
-	// default chunkOperations is null
-	private RepeatOperations chunkOperations;
+	private volatile RepeatOperations chunkOperations;
 
-	// default stepOperations is null
-	private RepeatOperations stepOperations;
+	private volatile RepeatOperations stepOperations;
+	
+	private volatile Tasklet tasklet;
 
 	/**
 	 * Public accessor for the chunkOperations property.
@@ -55,6 +56,11 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 	public void setChunkOperations(RepeatOperations chunkOperations) {
 		this.chunkOperations = chunkOperations;
 	}
+	
+
+    public void setTasklet(Tasklet tasklet) {
+	    this.tasklet = tasklet;
+    }
 
 	/**
 	 * Public accessor for the stepOperations property.
@@ -74,9 +80,6 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 		this.stepOperations = stepOperations;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.execution.step.simple.AbstractStep#process(org.springframework.batch.core.domain.StepExecution)
-	 */
 	public void execute(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
 		assertMandatoryProperties();
 		SimpleStepExecutor executor = (SimpleStepExecutor) super.createStepExecutor();
