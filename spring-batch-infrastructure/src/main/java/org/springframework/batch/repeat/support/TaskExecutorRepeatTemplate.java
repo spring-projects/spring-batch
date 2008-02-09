@@ -272,6 +272,9 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		// Arbitrary lock object.
 		private Object lock = new Object();
 
+		// Arbitrary lock object.
+		private Object hold = new Object();
+
 		// Counter to monitor the difference between expected and actually
 		// collected results. When this reaches zero there are really no more
 		// results.
@@ -303,13 +306,15 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		}
 
 		public void put(ResultHolder holder) {
-			// There should be no need to block here, or to use offer():
-			// TODO: fix race condition where many calls come into put() at once
-			// and the queue fills up...
-			results.add(holder);
-			// Take from the waits queue now to allow another result to
-			// accumulate. But don't decrement the counter.
-			waits.release();
+			// There should be no need to block here, or to use offer(), but
+			// apparently the add() sometimes takes so long on the CI build that
+			// the queue fills up...
+			synchronized (hold) {
+				results.add(holder);
+				// Take from the waits queue now to allow another result to
+				// accumulate. But don't decrement the counter.
+				waits.release();
+			}
 		}
 
 		public ResultHolder take() {
