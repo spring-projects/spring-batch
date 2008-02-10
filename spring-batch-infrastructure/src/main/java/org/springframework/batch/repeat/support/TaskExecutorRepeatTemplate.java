@@ -33,13 +33,12 @@ import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 
 /**
  * Provides {@link RepeatOperations} support including interceptors that can be
- * used to modify or monitor the batch behaviour at run time.<br/>
+ * used to modify or monitor the behaviour at run time.<br/>
  * 
  * This implementation is sufficient to be used to configure transactional
- * behaviour for each batch item by making the {@link RepeatCallback}
- * transactional, or for the whole batch by making the execute method
- * transactional (but only then if the task executor is synchronous).
- * Intermediate transactional chunks can be implemented using custom callbacks.<br/>
+ * behaviour for each item by making the {@link RepeatCallback} transactional,
+ * or for the whole batch by making the execute method transactional (but only
+ * then if the task executor is synchronous).<br/>
  * 
  * This class is thread safe if its collaborators are thread safe (interceptors,
  * terminationPolicy, callback). Normally this will be the case, but clients
@@ -120,18 +119,11 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			 */
 		} while (queue.isEmpty() && !isComplete(context));
 
-		Object result;
-		try {
-			result = queue.take().getResult();
+		ResultHolder result = queue.take();
+		if (result.getError() != null) {
+			throw result.getError();
 		}
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw e;
-		}
-		if (result instanceof Throwable) {
-			throw (Throwable) result;
-		}
-		return (ExitStatus) result;
+		return result.getResult();
 	}
 
 	/**
@@ -154,19 +146,11 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			 */
 			ResultHolder future = (ResultHolder) futures.take();
 
-			Object value;
-			try {
-				value = future.getResult();
-			}
-			catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				value = e;
-			}
-			if (value instanceof Throwable) {
-				state.getThrowables().add(value);
+			if (future.getError() != null) {
+				state.getThrowables().add(future.getError());
 			}
 			else {
-				ExitStatus status = (ExitStatus) value;
+				ExitStatus status = future.getResult();
 				result = result && canContinue(status);
 				executeAfterInterceptors(future.getContext(), status);
 			}
@@ -190,13 +174,15 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * 
 	 */
 	private static class ExecutingRunnable implements Runnable, ResultHolder {
-		RepeatCallback callback;
+		private RepeatCallback callback;
 
-		RepeatContext context;
+		private RepeatContext context;
 
-		ResultQueue queue;
+		private ResultQueue queue;
 
-		Object result;
+		private ExitStatus result;
+
+		private Throwable error;
 
 		public ExecutingRunnable(RepeatCallback callback, RepeatContext context, ResultQueue queue) {
 
@@ -224,7 +210,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 				result = callback.doInIteration(context);
 			}
 			catch (Exception e) {
-				result = e;
+				error = e;
 			}
 			finally {
 				queue.put(this);
@@ -234,11 +220,17 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		/**
 		 * Get the result - never blocks because the queue manages waiting for
 		 * the task to finish.
-		 * 
-		 * @throws InterruptedException if the thread is interrupted.
 		 */
-		public Object getResult() throws InterruptedException {
+		public ExitStatus getResult() {
 			return result;
+		}
+
+		/**
+		 * Get the error - never blocks because the queue manages waiting for
+		 * the task to finish.
+		 */
+		public Throwable getError() {
+			return error;
 		}
 
 		/**
@@ -345,15 +337,22 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 */
 	public interface ResultHolder {
 		/**
-		 * Get the result for client from this holder, blocking if necessary
-		 * until it is ready.
+		 * Get the result for client from this holder. Does not block if none is
+		 * available yet.
 		 * 
-		 * @return the result.
-		 * @throws InterruptedException if the thread is interrupted while
-		 * waiting for the result.
+		 * @return the result, or null if there is none.
 		 * @throws IllegalStateException
 		 */
-		Object getResult() throws InterruptedException;
+		ExitStatus getResult();
+
+		/**
+		 * Get the error for client from this holder if any. Does not block if
+		 * none is available yet.
+		 * 
+		 * @return the error, or null if there is none.
+		 * @throws IllegalStateException
+		 */
+		Throwable getError();
 
 		/**
 		 * Get the context in which the result evaluation is executing.
