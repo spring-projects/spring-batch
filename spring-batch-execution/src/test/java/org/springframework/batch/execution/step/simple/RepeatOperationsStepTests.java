@@ -25,12 +25,10 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ItemReaderAdapter;
 import org.springframework.batch.item.writer.ItemWriterAdapter;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.interceptor.RepeatInterceptorAdapter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -135,11 +133,6 @@ public class RepeatOperationsStepTests extends TestCase {
 		configuration.setStepOperations(stepTemplate);
 		configuration.setJobRepository(new JobRepositorySupport());
 		configuration.setTransactionManager(new ResourcelessTransactionManager());
-		configuration.setTasklet(new Tasklet() {
-			public ExitStatus execute() throws Exception {
-				return ExitStatus.CONTINUABLE;
-			}
-		});
 		StepExecution stepExecution = new StepExecution(new StepInstance(
 				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
 				new Long(12)));

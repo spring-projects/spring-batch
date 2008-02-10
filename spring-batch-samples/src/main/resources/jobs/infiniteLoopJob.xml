@@ -21,11 +21,10 @@
 
 	<bean id="infiniteLoopJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="simpleStep">
+			<bean id="step1" parent="taskletStep">
 				<property name="tasklet">
 					<bean id="module" class="org.springframework.batch.sample.tasklet.InfiniteLoopTasklet"/>
 				</property>
-				<property name="commitInterval" value="2" />
 			</bean>
 		</property>
 	</bean>

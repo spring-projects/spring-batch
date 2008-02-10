@@ -83,15 +83,20 @@
 		<property name="restartable" value="true" />
 	</bean>
 
-	<bean id="abstractStep" abstract="true">
+	<bean id="taskletStep"
+		class="org.springframework.batch.execution.step.tasklet.TaskletStep"
+		abstract="true">
 		<property name="jobRepository" ref="jobRepository" />
-		<property name="transactionManager" ref="transactionManager" />
 		<property name="allowStartIfComplete" value="true" />
 		<property name="saveExecutionAttributes" value="true" />
 	</bean>
 
+	<bean id="abstractStep" class="org.springframework.batch.execution.step.simple.SimpleStep"
+		abstract="true" parent="taskletStep">
+		<property name="transactionManager" ref="transactionManager" />
+	</bean>
+
 	<bean id="simpleStep" parent="abstractStep"
-		class="org.springframework.batch.execution.step.simple.SimpleStep"
 		abstract="true">
 		<property name="exceptionHandler">
 			<bean

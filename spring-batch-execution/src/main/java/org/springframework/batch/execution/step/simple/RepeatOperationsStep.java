@@ -19,7 +19,6 @@ package org.springframework.batch.execution.step.simple;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInterruptedException;
-import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.RepeatOperations;
 
@@ -37,8 +36,6 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 
 	private volatile RepeatOperations stepOperations;
 	
-	private volatile Tasklet tasklet;
-
 	/**
 	 * Public accessor for the chunkOperations property.
 	 * 
@@ -56,11 +53,6 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 	public void setChunkOperations(RepeatOperations chunkOperations) {
 		this.chunkOperations = chunkOperations;
 	}
-	
-
-    public void setTasklet(Tasklet tasklet) {
-	    this.tasklet = tasklet;
-    }
 
 	/**
 	 * Public accessor for the stepOperations property.

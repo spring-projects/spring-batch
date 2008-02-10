@@ -30,7 +30,6 @@ import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
-import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
@@ -38,6 +37,7 @@ import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
 import org.springframework.batch.execution.step.simple.SimpleStep;
 import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -136,17 +136,17 @@ public class SimpleJobTests extends TestCase {
 		job.setJobRepository(jobRepository);
 		// do not set StepExecutorFactory...
 		stepConfiguration1.setStartLimit(5);
-		stepConfiguration1.setTasklet(new Tasklet() {
-			public ExitStatus execute() throws Exception {
+		stepConfiguration1.setItemReader(new AbstractItemReader() {
+			public Object read() throws Exception {
 				list.add("1");
-				return ExitStatus.FINISHED;
+				return null;
 			}
 		});
 		stepConfiguration2.setStartLimit(5);
-		stepConfiguration2.setTasklet(new Tasklet() {
-			public ExitStatus execute() throws Exception {
+		stepConfiguration2.setItemReader(new AbstractItemReader() {
+			public Object read() throws Exception {
 				list.add("2");
-				return ExitStatus.FINISHED;
+				return null;
 			}
 		});
 		job.execute(jobExecution);
@@ -251,7 +251,6 @@ public class SimpleJobTests extends TestCase {
 
 		private Runnable runnable;
 		private Exception exception;
-		private Tasklet tasklet;
 
 		/**
 		 * @param string
@@ -266,13 +265,6 @@ public class SimpleJobTests extends TestCase {
 		public void setProcessException(Exception exception) {
 			this.exception = exception;
 		}
-		
-		/**
-         * @param tasklet the tasklet to set
-         */
-        public void setTasklet(Tasklet tasklet) {
-	        this.tasklet = tasklet;
-        }
 
 		/**
 		 * @param runnable

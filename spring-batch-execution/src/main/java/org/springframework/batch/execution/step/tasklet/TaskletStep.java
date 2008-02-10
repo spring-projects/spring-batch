@@ -28,29 +28,66 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 /**
- * A {@link Step} that executes a {@link Tasklet} directly. This step does not manage transactions or any looping
- * functionality. The tasklet should do this on its own.
+ * A {@link Step} that executes a {@link Tasklet} directly. This step does not
+ * manage transactions or any looping functionality. The tasklet should do this
+ * on its own.
  * 
  * @author Ben Hale
  */
-public class TaskletStep extends StepSupport {
+public class TaskletStep extends StepSupport implements InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(TaskletStep.class);
 
-	private final Tasklet tasklet;
+	private Tasklet tasklet;
 
-	private final JobRepository jobRepository;
+	private JobRepository jobRepository;
+
+	/**
+	 * Check mandatory properties.
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(jobRepository, "JobRepository is mandatory for TaskletStep");
+		Assert.notNull(tasklet, "Tasklet is mandatory for TaskletStep");
+	}
+
+	/**
+	 * Default constructor is useful for XML configuration.
+	 */
+	public TaskletStep() {
+		super();
+	}
 
 	/**
 	 * Creates a new <code>Step</code> for executing a <code>Tasklet</code>
 	 * 
 	 * @param tasklet The <code>Tasklet</code> to execute
-	 * @param jobRepository The <code>JobRepository</code> to use for persistence of incremental state
+	 * @param jobRepository The <code>JobRepository</code> to use for
+	 * persistence of incremental state
 	 */
 	public TaskletStep(Tasklet tasklet, JobRepository jobRepository) {
+		this();
 		this.tasklet = tasklet;
+		this.jobRepository = jobRepository;
+	}
+
+	/**
+	 * Public setter for the {@link Tasklet}.
+	 * @param tasklet the {@link Tasklet} to set
+	 */
+	public void setTasklet(Tasklet tasklet) {
+		this.tasklet = tasklet;
+	}
+
+	/**
+	 * Public setter for the {@link JobRepository}.
+	 * @param jobRepository the {@link JobRepository} to set
+	 */
+	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
 
@@ -62,11 +99,13 @@ public class TaskletStep extends StepSupport {
 		try {
 			exitStatus = tasklet.execute();
 			updateStatus(stepExecution, BatchStatus.COMPLETED);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			logger.error("Encountered an error running the tasklet");
 			updateStatus(stepExecution, BatchStatus.FAILED);
 			throw new BatchCriticalException(e);
-		} finally {
+		}
+		finally {
 			stepExecution.setExitStatus(exitStatus);
 			stepExecution.setEndTime(new Date());
 			jobRepository.saveOrUpdate(stepExecution);

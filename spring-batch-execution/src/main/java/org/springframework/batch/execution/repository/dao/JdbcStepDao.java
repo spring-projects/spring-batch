@@ -564,7 +564,7 @@ public class JdbcStepDao implements StepDao, InitializingBean {
 			// Avoid concurrent modifications...
 			if (count == 0) {
 				throw new OptimisticLockingFailureException("Attempt to update step execution id="
-						+ stepExecution.getId() + " with out of date version (" + stepExecution.getVersion() + ")");
+						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion() + ")");
 			}
 			
 			stepExecution.incrementVersion();
