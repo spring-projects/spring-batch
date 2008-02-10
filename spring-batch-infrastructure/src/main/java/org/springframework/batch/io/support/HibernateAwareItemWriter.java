@@ -22,7 +22,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatInterceptor;
+import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.AttributeAccessor;
 import org.springframework.orm.hibernate3.HibernateOperations;
@@ -35,14 +35,14 @@ import org.springframework.util.Assert;
  * boundaries away from a less smart {@link ItemWriter} (the delegate). A delegate is required, and will be used to do
  * the actual writing of the item.<br/>
  * 
- * This class implements {@link RepeatInterceptor} and it will only work if properly registered. If the delegate is also
- * a {@link RepeatInterceptor} then it does not need to be separately registered as we make the callbacks here in the
+ * This class implements {@link RepeatListener} and it will only work if properly registered. If the delegate is also
+ * a {@link RepeatListener} then it does not need to be separately registered as we make the callbacks here in the
  * right places.
  * 
  * @author Dave Syer
  * 
  */
-public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor, InitializingBean {
+public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, InitializingBean {
 
 	/**
 	 * Key for items processed in the current transaction {@link RepeatContext}.
@@ -114,41 +114,41 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor, 
 	}
 
 	/**
-	 * Does nothing unless the delegate is also a {@link RepeatInterceptor} in which case pass on the call to him.
+	 * Does nothing unless the delegate is also a {@link RepeatListener} in which case pass on the call to him.
 	 * 
-	 * @see org.springframework.batch.repeat.RepeatInterceptor#before(org.springframework.batch.repeat.RepeatContext)
+	 * @see org.springframework.batch.repeat.RepeatListener#before(org.springframework.batch.repeat.RepeatContext)
 	 */
 	public void before(RepeatContext context) {
-		if (delegate instanceof RepeatInterceptor) {
-			RepeatInterceptor interceptor = (RepeatInterceptor) delegate;
+		if (delegate instanceof RepeatListener) {
+			RepeatListener interceptor = (RepeatListener) delegate;
 			interceptor.before(context);
 		}
 	}
 
 	/**
-	 * Does nothing unless the delegate is also a {@link RepeatInterceptor} in which case pass on the call to him.
+	 * Does nothing unless the delegate is also a {@link RepeatListener} in which case pass on the call to him.
 	 * 
-	 * @see org.springframework.batch.repeat.RepeatInterceptor#after(org.springframework.batch.repeat.RepeatContext,
+	 * @see org.springframework.batch.repeat.RepeatListener#after(org.springframework.batch.repeat.RepeatContext,
 	 *      org.springframework.batch.repeat.ExitStatus)
 	 */
 	public void after(RepeatContext context, ExitStatus result) {
-		if (delegate instanceof RepeatInterceptor) {
-			RepeatInterceptor interceptor = (RepeatInterceptor) delegate;
+		if (delegate instanceof RepeatListener) {
+			RepeatListener interceptor = (RepeatListener) delegate;
 			interceptor.after(context, result);
 		}
 	}
 
 	/**
 	 * Flush the Hibernate session so that any batch exceptions are within the RepeatContext. If the delegate is also a
-	 * {@link RepeatInterceptor} then it will be given the call before flushing.
+	 * {@link RepeatListener} then it will be given the call before flushing.
 	 * 
 	 * 
-	 * @see org.springframework.batch.repeat.RepeatInterceptor#close(org.springframework.batch.repeat.RepeatContext)
+	 * @see org.springframework.batch.repeat.RepeatListener#close(org.springframework.batch.repeat.RepeatContext)
 	 */
 	public void close(RepeatContext context) {
 		try {
-			if (delegate instanceof RepeatInterceptor) {
-				RepeatInterceptor interceptor = (RepeatInterceptor) delegate;
+			if (delegate instanceof RepeatListener) {
+				RepeatListener interceptor = (RepeatListener) delegate;
 				interceptor.close(context);
 			}
 			flush();
@@ -175,30 +175,30 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatInterceptor, 
 	}
 
 	/**
-	 * Does nothing unless the delegate is also a {@link RepeatInterceptor} in which case pass on the call to him.
+	 * Does nothing unless the delegate is also a {@link RepeatListener} in which case pass on the call to him.
 	 * 
-	 * @see org.springframework.batch.repeat.RepeatInterceptor#onError(org.springframework.batch.repeat.RepeatContext,
+	 * @see org.springframework.batch.repeat.RepeatListener#onError(org.springframework.batch.repeat.RepeatContext,
 	 *      java.lang.Throwable)
 	 */
 	public void onError(RepeatContext context, Throwable e) {
-		if (delegate instanceof RepeatInterceptor) {
-			RepeatInterceptor interceptor = (RepeatInterceptor) delegate;
+		if (delegate instanceof RepeatListener) {
+			RepeatListener interceptor = (RepeatListener) delegate;
 			interceptor.onError(context, e);
 		}
 	}
 
 	/**
 	 * Sets up the context as a transaction resource so that we can store state and refer back to it in the
-	 * {@link #write(Object)} method. If the delegate is also a {@link RepeatInterceptor} then it will be given the call
+	 * {@link #write(Object)} method. If the delegate is also a {@link RepeatListener} then it will be given the call
 	 * afterwards.
 	 * 
-	 * @see org.springframework.batch.repeat.RepeatInterceptor#open(org.springframework.batch.repeat.RepeatContext)
+	 * @see org.springframework.batch.repeat.RepeatListener#open(org.springframework.batch.repeat.RepeatContext)
 	 */
 	public void open(RepeatContext context) {
 		this.setContext(context);
 		getProcessed().clear();
-		if (delegate instanceof RepeatInterceptor) {
-			RepeatInterceptor interceptor = (RepeatInterceptor) delegate;
+		if (delegate instanceof RepeatListener) {
+			RepeatListener interceptor = (RepeatListener) delegate;
 			interceptor.open(context);
 		}
 	}

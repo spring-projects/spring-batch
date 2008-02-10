@@ -38,7 +38,6 @@ import org.springframework.util.Assert;
  * not-null, representing the {@link Void#TYPE}).
  * 
  * @author Dave Syer
- * @since 2.1
  */
 public class RepeatOperationsInterceptor implements MethodInterceptor {
 

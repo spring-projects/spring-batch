@@ -17,20 +17,19 @@
 package org.springframework.batch.repeat;
 
 /**
- * Interface for interceptors in the batch process. Implementers can provide
+ * Interface for listeners to the batch process. Implementers can provide
  * enhance the behaviour of a batch in small cross-cutting modules. The
  * framework provides callbacks at key points in the processing.
  * 
  * @author Dave Syer
  * 
  */
-public interface RepeatInterceptor {
+public interface RepeatListener {
 	/**
 	 * Called by the framework before each batch item. Implementers can halt a
 	 * batch by setting the complete flag on the context.
 	 * 
-	 * @param context
-	 *            the current batch context.
+	 * @param context the current batch context.
 	 */
 	void before(RepeatContext context);
 
@@ -39,10 +38,8 @@ public interface RepeatInterceptor {
 	 * item processing results in an exception. This method is called as soon as
 	 * the result is known.
 	 * 
-	 * @param context
-	 *            the current batch context
-	 * @param result
-	 *            the result of the callback
+	 * @param context the current batch context
+	 * @param result the result of the callback
 	 */
 	void after(RepeatContext context, ExitStatus result);
 
@@ -54,8 +51,7 @@ public interface RepeatInterceptor {
 	 * enclosing batches (the whole job), the would need to use the parent
 	 * context (recursively).
 	 * 
-	 * @param context
-	 *            the current batch context
+	 * @param context the current batch context
 	 */
 	void open(RepeatContext context);
 
@@ -67,10 +63,8 @@ public interface RepeatInterceptor {
 	 * There is no need to re-throw the exception here - that will be done by
 	 * the enclosing framework.
 	 * 
-	 * @param context
-	 *            the current batch context
-	 * @param e
-	 *            the error that was encountered in an item callback.
+	 * @param context the current batch context
+	 * @param e the error that was encountered in an item callback.
 	 */
 	void onError(RepeatContext context, Throwable e);
 
@@ -79,8 +73,7 @@ public interface RepeatInterceptor {
 	 * completion (i.e. even after an exception). Implementers can use this
 	 * method to clean up any resources.
 	 * 
-	 * @param context
-	 *            the current batch context.
+	 * @param context the current batch context.
 	 */
 	void close(RepeatContext context);
 }

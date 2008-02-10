@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatInterceptor;
+import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -46,7 +46,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		};
 	}
 
-	private class StubItemWriter implements ItemWriter, RepeatInterceptor {
+	private class StubItemWriter implements ItemWriter, RepeatListener {
 		public void write(Object item) {
 			list.add(item);
 		}

@@ -24,7 +24,7 @@ import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatInterceptor;
+import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.exception.RepeatException;
 import org.springframework.batch.repeat.exception.handler.DefaultExceptionHandler;
@@ -48,9 +48,9 @@ import org.springframework.util.Assert;
  * 
  * Clients that want to take some business action when an exception is thrown by
  * the {@link RepeatCallback} can consider using a custom
- * {@link RepeatInterceptor} instead of trying to customise the
+ * {@link RepeatListener} instead of trying to customise the
  * {@link CompletionPolicy}. This is generally a friendlier interface to
- * implement, and the {@link RepeatInterceptor#after(RepeatContext, ExitStatus)}
+ * implement, and the {@link RepeatListener#after(RepeatContext, ExitStatus)}
  * method is passed in the result of the callback, which would be an instance of
  * {@link Throwable} if the business processing had thrown an exception. If the
  * exception is not to be propagated to the caller, then a non-default
@@ -64,18 +64,18 @@ public class RepeatTemplate implements RepeatOperations {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private RepeatInterceptor[] interceptors = new RepeatInterceptor[] {};
+	private RepeatListener[] listeners = new RepeatListener[] {};
 
 	private CompletionPolicy completionPolicy = new DefaultResultCompletionPolicy();
 
 	private ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
 
-	public void setInterceptors(RepeatInterceptor[] interceptors) {
-		this.interceptors = interceptors;
+	public void setListeners(RepeatListener[] listeners) {
+		this.listeners = listeners;
 	}
 
-	public void setInterceptor(RepeatInterceptor interceptor) {
-		interceptors = new RepeatInterceptor[] { interceptor };
+	public void setListener(RepeatListener listener) {
+		listeners = new RepeatListener[] { listener };
 	}
 
 	/**
@@ -159,8 +159,8 @@ public class RepeatTemplate implements RepeatOperations {
 		// processing takes place.
 		boolean running = !isMarkedComplete(context);
 
-		for (int i = 0; i < interceptors.length; i++) {
-			RepeatInterceptor interceptor = interceptors[i];
+		for (int i = 0; i < listeners.length; i++) {
+			RepeatListener interceptor = listeners[i];
 			interceptor.open(context);
 			running = running && !isMarkedComplete(context);
 			if (!running)
@@ -182,8 +182,8 @@ public class RepeatTemplate implements RepeatOperations {
 				 * that they all happen in the same thread - it's easier for
 				 * tracking batch status, amongst other things.
 				 */
-				for (int i = 0; i < interceptors.length; i++) {
-					RepeatInterceptor interceptor = interceptors[i];
+				for (int i = 0; i < listeners.length; i++) {
+					RepeatListener interceptor = listeners[i];
 					interceptor.before(context);
 					// Allow before interceptors to veto the batch by setting
 					// flag.
@@ -208,14 +208,14 @@ public class RepeatTemplate implements RepeatOperations {
 
 						try {
 
-							for (int i = interceptors.length; i-- > 0;) {
-								RepeatInterceptor interceptor = interceptors[i];
+							for (int i = listeners.length; i-- > 0;) {
+								RepeatListener interceptor = listeners[i];
 								interceptor.onError(context, throwable);
 								// This is not an error - only log at debug
 								// level.
 								logger.debug("Exception intercepted ("
 										+ (i + 1) + " of "
-										+ interceptors.length + ")", throwable);
+										+ listeners.length + ")", throwable);
 							}
 							exceptionHandler
 									.handleException(context, throwable);
@@ -257,8 +257,8 @@ public class RepeatTemplate implements RepeatOperations {
 			} finally {
 
 				try {
-					for (int i = interceptors.length; i-- > 0;) {
-						RepeatInterceptor interceptor = interceptors[i];
+					for (int i = listeners.length; i-- > 0;) {
+						RepeatListener interceptor = listeners[i];
 						interceptor.close(context);
 					}
 				} finally {
@@ -379,8 +379,8 @@ public class RepeatTemplate implements RepeatOperations {
 		// that...
 
 		if (value != null && value.isContinuable()) {
-			for (int i = interceptors.length; i-- > 0;) {
-				RepeatInterceptor interceptor = interceptors[i];
+			for (int i = listeners.length; i-- > 0;) {
+				RepeatListener interceptor = listeners[i];
 				interceptor.after(context, value);
 			}
 

@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatInterceptor;
+import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.sample.domain.CustomerCredit;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -30,7 +30,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * 
  */
 public class HibernateCreditWriter extends HibernateDaoSupport implements
-		CustomerCreditDao, RepeatInterceptor {
+		CustomerCreditDao, RepeatListener {
 
 	private int failOnFlush = -1;
 	private List errors = new ArrayList();

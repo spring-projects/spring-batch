@@ -24,23 +24,23 @@ import junit.framework.TestCase;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatInterceptor;
+import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
-public class RepeatInterceptorTests extends TestCase {
+public class RepeatListenerTests extends TestCase {
 
 	int count = 0;
 
 	public void testBeforeInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List calls = new ArrayList();
-		template.setInterceptors(new RepeatInterceptor[] { new RepeatInterceptorAdapter() {
+		template.setListeners(new RepeatListener[] { new RepeatListenerAdapter() {
 			public void before(RepeatContext context) {
 				calls.add("1");
 			}
-		}, new RepeatInterceptorAdapter() {
+		}, new RepeatListenerAdapter() {
 			public void before(RepeatContext context) {
 				calls.add("2");
 			}
@@ -62,7 +62,7 @@ public class RepeatInterceptorTests extends TestCase {
 	public void testBeforeInterceptorCanVeto() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List calls = new ArrayList();
-		template.setInterceptor(new RepeatInterceptorAdapter() {
+		template.setListener(new RepeatListenerAdapter() {
 			public void before(RepeatContext context) {
 				calls.add("1");
 				context.setCompleteOnly();
@@ -82,11 +82,11 @@ public class RepeatInterceptorTests extends TestCase {
 	public void testAfterInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List calls = new ArrayList();
-		template.setInterceptors(new RepeatInterceptor[] { new RepeatInterceptorAdapter() {
+		template.setListeners(new RepeatListener[] { new RepeatListenerAdapter() {
 			public void after(RepeatContext context, ExitStatus result) {
 				calls.add("1");
 			}
-		}, new RepeatInterceptorAdapter() {
+		}, new RepeatListenerAdapter() {
 			public void after(RepeatContext context, ExitStatus result) {
 				calls.add("2");
 			}
@@ -106,11 +106,11 @@ public class RepeatInterceptorTests extends TestCase {
 	public void testOpenInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List calls = new ArrayList();
-		template.setInterceptors(new RepeatInterceptor[] { new RepeatInterceptorAdapter() {
+		template.setListeners(new RepeatListener[] { new RepeatListenerAdapter() {
 			public void open(RepeatContext context) {
 				calls.add("1");
 			}
-		}, new RepeatInterceptorAdapter() {
+		}, new RepeatListenerAdapter() {
 			public void open(RepeatContext context) {
 				calls.add("2");
 				context.setCompleteOnly();
@@ -129,7 +129,7 @@ public class RepeatInterceptorTests extends TestCase {
 	public void testSingleOpenInterceptor() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List calls = new ArrayList();
-		template.setInterceptor(new RepeatInterceptorAdapter() {
+		template.setListener(new RepeatListenerAdapter() {
 			public void open(RepeatContext context) {
 				calls.add("1");
 			}
@@ -148,11 +148,11 @@ public class RepeatInterceptorTests extends TestCase {
 	public void testCloseInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List calls = new ArrayList();
-		template.setInterceptors(new RepeatInterceptor[] { new RepeatInterceptorAdapter() {
+		template.setListeners(new RepeatListener[] { new RepeatListenerAdapter() {
 			public void close(RepeatContext context) {
 				calls.add("1");
 			}
-		}, new RepeatInterceptorAdapter() {
+		}, new RepeatListenerAdapter() {
 			public void close(RepeatContext context) {
 				calls.add("2");
 			}
@@ -173,11 +173,11 @@ public class RepeatInterceptorTests extends TestCase {
 	public void testOnErrorInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List calls = new ArrayList();
-		template.setInterceptors(new RepeatInterceptor[] { new RepeatInterceptorAdapter() {
+		template.setListeners(new RepeatListener[] { new RepeatListenerAdapter() {
 			public void onError(RepeatContext context, Throwable t) {
 				calls.add("1");
 			}
-		}, new RepeatInterceptorAdapter() {
+		}, new RepeatListenerAdapter() {
 			public void onError(RepeatContext context, Throwable t) {
 				calls.add("2");
 			}
@@ -200,11 +200,11 @@ public class RepeatInterceptorTests extends TestCase {
 	public void testOnErrorInterceptorsPrecedence() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List calls = new ArrayList();
-		template.setInterceptors(new RepeatInterceptor[] { new RepeatInterceptorAdapter() {
+		template.setListeners(new RepeatListener[] { new RepeatListenerAdapter() {
 			public void after(RepeatContext context, ExitStatus result) {
 				calls.add("1");
 			}
-		}, new RepeatInterceptorAdapter() {
+		}, new RepeatListenerAdapter() {
 			public void onError(RepeatContext context, Throwable t) {
 				calls.add("2");
 			}
@@ -230,11 +230,11 @@ public class RepeatInterceptorTests extends TestCase {
 		template.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		final List calls = new ArrayList();
 		final List fails = new ArrayList();
-		template.setInterceptors(new RepeatInterceptor[] { new RepeatInterceptorAdapter() {
+		template.setListeners(new RepeatListener[] { new RepeatListenerAdapter() {
 			public void after(RepeatContext context, ExitStatus result) {
 				calls.add("1");
 			}
-		}, new RepeatInterceptorAdapter() {
+		}, new RepeatListenerAdapter() {
 			public void onError(RepeatContext context, Throwable t) {
 				calls.add("2");
 				fails.add("2");

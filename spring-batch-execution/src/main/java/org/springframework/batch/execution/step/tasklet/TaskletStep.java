@@ -28,6 +28,11 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatCallback;
+import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatListener;
+import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -45,6 +50,16 @@ public class TaskletStep extends StepSupport implements InitializingBean {
 	private Tasklet tasklet;
 
 	private JobRepository jobRepository;
+
+	private RepeatListener[] listeners = new RepeatListener[] {};
+	
+	public void setListeners(RepeatListener[] listeners) {
+		this.listeners  = listeners;
+	}
+
+	public void setListener(RepeatListener listener) {
+		listeners = new RepeatListener[] { listener };
+	}	
 
 	/**
 	 * Check mandatory properties.
@@ -97,8 +112,21 @@ public class TaskletStep extends StepSupport implements InitializingBean {
 
 		ExitStatus exitStatus = ExitStatus.FAILED;
 		try {
-			exitStatus = tasklet.execute();
+
+			// We are using the RepeatTemplate as a vehicle for the listener
+			// so it can be set up cheaply here with standard properties.
+			RepeatTemplate template = new RepeatTemplate();
+			template.setCompletionPolicy(new SimpleCompletionPolicy(1));
+
+			template.setListeners(listeners);
+			exitStatus =template.iterate(new RepeatCallback() {
+				public ExitStatus doInIteration(RepeatContext context) throws Exception {
+					return tasklet.execute();
+				}	
+			});
+			
 			updateStatus(stepExecution, BatchStatus.COMPLETED);
+			
 		}
 		catch (Exception e) {
 			logger.error("Encountered an error running the tasklet");

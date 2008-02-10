@@ -16,20 +16,33 @@
 
 package org.springframework.batch.retry.interceptor;
 
-import org.springframework.batch.retry.RetryCallback;
-import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryInterceptor;
+import junit.framework.TestCase;
 
-public class RetryInterceptorSupport implements RetryInterceptor {
+public class RetryListenerSupportTests extends TestCase {
 
-	public void close(RetryContext context, RetryCallback callback, Throwable throwable) {
+	public void testClose() {
+		RetryListenerAdapter support = new RetryListenerAdapter();
+		try {
+			support.close(null, null, null);
+		}
+		catch (Exception e) {
+			fail("Unexpected exception");
+		}
 	}
 
-	public void onError(RetryContext context, RetryCallback callback, Throwable throwable) {
+	public void testOnError() {
+		RetryListenerAdapter support = new RetryListenerAdapter();
+		try {
+			support.onError(null, null, null);
+		}
+		catch (Exception e) {
+			fail("Unexpected exception");
+		}
 	}
 
-	public boolean open(RetryContext context, RetryCallback callback) {
-		return true;
+	public void testOpen() {
+		RetryListenerAdapter support = new RetryListenerAdapter();
+		assertTrue(support.open(null, null));
 	}
 
 }

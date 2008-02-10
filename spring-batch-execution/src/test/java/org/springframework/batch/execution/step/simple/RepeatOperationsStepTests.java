@@ -30,7 +30,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ItemReaderAdapter;
 import org.springframework.batch.item.writer.ItemWriterAdapter;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.interceptor.RepeatInterceptorAdapter;
+import org.springframework.batch.repeat.interceptor.RepeatListenerAdapter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -75,7 +75,7 @@ public class RepeatOperationsStepTests extends TestCase {
 	public void testSuccessfulRepeatOperationsHolder() throws Exception {
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
 		final List list = new ArrayList();
-		repeatTemplate.setInterceptor(new RepeatInterceptorAdapter() {
+		repeatTemplate.setListener(new RepeatListenerAdapter() {
 			public void onError(RepeatContext context, Throwable e) {
 				list.add(e);
 			}
@@ -107,7 +107,7 @@ public class RepeatOperationsStepTests extends TestCase {
 	public void testSuccessfulRepeatOperationsHolderWithStepOperations() throws Exception {
 		RepeatTemplate chunkTemplate = new RepeatTemplate();
 		final List list = new ArrayList();
-		chunkTemplate.setInterceptor(new RepeatInterceptorAdapter() {
+		chunkTemplate.setListener(new RepeatListenerAdapter() {
 			public void before(RepeatContext context) {
 				list.add(context);
 			}
@@ -115,7 +115,7 @@ public class RepeatOperationsStepTests extends TestCase {
 		chunkTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		RepeatTemplate stepTemplate = new RepeatTemplate();
 		final List steps = new ArrayList();
-		stepTemplate.setInterceptor(new RepeatInterceptorAdapter() {
+		stepTemplate.setListener(new RepeatListenerAdapter() {
 			public void before(RepeatContext context) {
 				steps.add(context);
 			}

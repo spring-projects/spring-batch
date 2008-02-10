@@ -17,7 +17,7 @@ package org.springframework.batch.repeat.interceptor;
 
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatInterceptor;
+import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 
@@ -25,7 +25,7 @@ import org.springframework.context.ApplicationEventPublisherAware;
  * @author Dave Syer
  * 
  */
-public class ApplicationEventPublisherRepeatInterceptor implements ApplicationEventPublisherAware, RepeatInterceptor {
+public class ApplicationEventPublisherRepeatListener implements ApplicationEventPublisherAware, RepeatListener {
 
 	private ApplicationEventPublisher applicationEventPublisher;
 

@@ -23,12 +23,12 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryInterceptor;
+import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.exception.TerminatedRetryException;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 
-public class RetryInterceptorTests extends TestCase {
+public class RetryListenerTests extends TestCase {
 
 	RetryTemplate template = new RetryTemplate();
 
@@ -37,13 +37,13 @@ public class RetryInterceptorTests extends TestCase {
 	List list = new ArrayList();
 
 	public void testOpenInterceptors() throws Exception {
-		template.setInterceptors(new RetryInterceptor[] { new RetryInterceptorSupport() {
+		template.setListeners(new RetryListener[] { new RetryListenerAdapter() {
 			public boolean open(RetryContext context, RetryCallback callback) {
 				count++;
 				list.add("1:" + count);
 				return true;
 			}
-		}, new RetryInterceptorSupport() {
+		}, new RetryListenerAdapter() {
 			public boolean open(RetryContext context, RetryCallback callback) {
 				count++;
 				list.add("2:" + count);
@@ -61,7 +61,7 @@ public class RetryInterceptorTests extends TestCase {
 	}
 
 	public void testOpenCanVetoRetry() throws Exception {
-		template.setInterceptor(new RetryInterceptorSupport() {
+		template.setListener(new RetryListenerAdapter() {
 			public boolean open(RetryContext context, RetryCallback callback) {
 				list.add("1");
 				return false;
@@ -85,12 +85,12 @@ public class RetryInterceptorTests extends TestCase {
 	}
 
 	public void testCloseInterceptors() throws Exception {
-		template.setInterceptors(new RetryInterceptor[] { new RetryInterceptorSupport() {
+		template.setListeners(new RetryListener[] { new RetryListenerAdapter() {
 			public void close(RetryContext context, RetryCallback callback, Throwable t) {
 				count++;
 				list.add("1:" + count);
 			}
-		}, new RetryInterceptorSupport() {
+		}, new RetryListenerAdapter() {
 			public void close(RetryContext context, RetryCallback callback, Throwable t) {
 				count++;
 				list.add("2:" + count);
@@ -109,11 +109,11 @@ public class RetryInterceptorTests extends TestCase {
 
 	public void testOnError() throws Exception {
 		template.setRetryPolicy(new NeverRetryPolicy());
-		template.setInterceptors(new RetryInterceptor[] { new RetryInterceptorSupport() {
+		template.setListeners(new RetryListener[] { new RetryListenerAdapter() {
 			public void onError(RetryContext context, RetryCallback callback, Throwable throwable) {
 				list.add("1");
 			}
-		}, new RetryInterceptorSupport() {
+		}, new RetryListenerAdapter() {
 			public void onError(RetryContext context, RetryCallback callback, Throwable throwable) {
 				list.add("2");
 			}
@@ -139,7 +139,7 @@ public class RetryInterceptorTests extends TestCase {
 	}
 
 	public void testCloseInterceptorsAfterRetry() throws Exception {
-		template.setInterceptor(new RetryInterceptorSupport() {
+		template.setListener(new RetryListenerAdapter() {
 			public void close(RetryContext context, RetryCallback callback, Throwable t) {
 				list.add("" + count);
 				// The last attempt should have been successful:

@@ -25,7 +25,7 @@
 				<property name="chunkOperations">
 					<bean
 						class="org.springframework.batch.repeat.support.RepeatTemplate">
-						<property name="interceptors"
+						<property name="listeners"
 							ref="hibernateOutputSource" />
 						<property name="completionPolicy">
 							<bean

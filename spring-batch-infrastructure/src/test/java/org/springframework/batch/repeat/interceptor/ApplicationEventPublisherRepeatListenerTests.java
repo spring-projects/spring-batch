@@ -30,9 +30,9 @@ import junit.framework.TestCase;
  * @author Dave Syer
  *
  */
-public class ApplicationEventPublisherRepeatInterceptorTests extends TestCase {
+public class ApplicationEventPublisherRepeatListenerTests extends TestCase {
 
-	private ApplicationEventPublisherRepeatInterceptor interceptor = new ApplicationEventPublisherRepeatInterceptor();
+	private ApplicationEventPublisherRepeatListener interceptor = new ApplicationEventPublisherRepeatListener();
 	
 	private List list = new ArrayList();
 
@@ -51,7 +51,7 @@ public class ApplicationEventPublisherRepeatInterceptorTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatInterceptor#after(org.springframework.batch.repeat.RepeatContext, ExitStatus)}.
+	 * Test method for {@link org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatListener#after(org.springframework.batch.repeat.RepeatContext, ExitStatus)}.
 	 */
 	public void testAfter() {
 		interceptor.after(context, ExitStatus.CONTINUABLE);
@@ -62,7 +62,7 @@ public class ApplicationEventPublisherRepeatInterceptorTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatInterceptor#before(org.springframework.batch.repeat.RepeatContext)}.
+	 * Test method for {@link org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatListener#before(org.springframework.batch.repeat.RepeatContext)}.
 	 */
 	public void testBefore() {
 		interceptor.before(context);
@@ -73,7 +73,7 @@ public class ApplicationEventPublisherRepeatInterceptorTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatInterceptor#close(org.springframework.batch.repeat.RepeatContext)}.
+	 * Test method for {@link org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatListener#close(org.springframework.batch.repeat.RepeatContext)}.
 	 */
 	public void testClose() {
 		interceptor.close(context);
@@ -84,7 +84,7 @@ public class ApplicationEventPublisherRepeatInterceptorTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatInterceptor#onError(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}.
+	 * Test method for {@link org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatListener#onError(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}.
 	 */
 	public void testOnError() {
 		interceptor.onError(context, new RuntimeException("foo"));
@@ -95,7 +95,7 @@ public class ApplicationEventPublisherRepeatInterceptorTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatInterceptor#open(org.springframework.batch.repeat.RepeatContext)}.
+	 * Test method for {@link org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatListener#open(org.springframework.batch.repeat.RepeatContext)}.
 	 */
 	public void testOpen() {
 		interceptor.open(context);

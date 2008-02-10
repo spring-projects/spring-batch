@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryInterceptor;
+import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.backoff.BackOffContext;
@@ -57,7 +57,6 @@ import org.springframework.batch.retry.synch.RetrySynchronizationManager;
  * 
  * @author Rob Harrop
  * @author Dave Syer
- * @since 2.1
  */
 public class RetryTemplate implements RetryOperations {
 
@@ -67,26 +66,26 @@ public class RetryTemplate implements RetryOperations {
 
 	private volatile RetryPolicy retryPolicy = new SimpleRetryPolicy();
 
-	private volatile RetryInterceptor[] interceptors = new RetryInterceptor[0];
+	private volatile RetryListener[] listeners = new RetryListener[0];
 
 	/**
-	 * Setter for interceptors. The interceptors are executed before and after a
+	 * Setter for listeners. The listeners are executed before and after a
 	 * retry block (i.e. before and after all the attempts), and on an error
 	 * (every attempt).
-	 * @param interceptors
-	 * @see RetryInterceptor
+	 * @param listeners
+	 * @see RetryListener
 	 */
-	public void setInterceptors(RetryInterceptor[] interceptors) {
-		this.interceptors = interceptors;
+	public void setListeners(RetryListener[] listeners) {
+		this.listeners = listeners;
 	}
 
 	/**
-	 * Setter for single interceptor if there is only one.
-	 * @param interceptor
-	 * @see #setInterceptors(RetryInterceptor[])
+	 * Setter for single listener if there is only one.
+	 * @param listener
+	 * @see #setListeners(RetryListener[])
 	 */
-	public void setInterceptor(RetryInterceptor interceptor) {
-		this.interceptors = new RetryInterceptor[] { interceptor };
+	public void setListener(RetryListener listener) {
+		this.listeners = new RetryListener[] { listener };
 	}
 
 	/**
@@ -220,8 +219,8 @@ public class RetryTemplate implements RetryOperations {
 
 		boolean result = true;
 
-		for (int i = 0; i < interceptors.length; i++) {
-			result = result && interceptors[i].open(context, callback);
+		for (int i = 0; i < listeners.length; i++) {
+			result = result && listeners[i].open(context, callback);
 		}
 
 		return result;
@@ -229,14 +228,14 @@ public class RetryTemplate implements RetryOperations {
 	}
 
 	private void doCloseInterceptors(RetryCallback callback, RetryContext context, Throwable lastException) {
-		for (int i = interceptors.length; i-- > 0;) {
-			interceptors[i].close(context, callback, lastException);
+		for (int i = listeners.length; i-- > 0;) {
+			listeners[i].close(context, callback, lastException);
 		}
 	}
 
 	private void doOnErrorInterceptors(RetryCallback callback, RetryContext context, Throwable throwable) {
-		for (int i = interceptors.length; i-- > 0;) {
-			interceptors[i].onError(context, callback, throwable);
+		for (int i = listeners.length; i-- > 0;) {
+			listeners[i].onError(context, callback, throwable);
 		}
 	}
 

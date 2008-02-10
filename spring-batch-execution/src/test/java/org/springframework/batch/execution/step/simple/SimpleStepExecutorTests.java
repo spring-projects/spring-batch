@@ -51,7 +51,7 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.DefaultExceptionHandler;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
-import org.springframework.batch.repeat.interceptor.RepeatInterceptorAdapter;
+import org.springframework.batch.repeat.interceptor.RepeatListenerAdapter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.PropertiesConverter;
@@ -186,7 +186,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		jobExecution.setId(new Long(1));
 		final StepExecution stepExecution = new StepExecution(step, jobExecution);
 
-		template.setInterceptor(new RepeatInterceptorAdapter() {
+		template.setListener(new RepeatListenerAdapter() {
 			public void open(RepeatContext context) {
 				assertNotNull(StepSynchronizationManager.getContext().getStepExecution());
 				assertEquals(stepExecution, StepSynchronizationManager.getContext().getStepExecution());

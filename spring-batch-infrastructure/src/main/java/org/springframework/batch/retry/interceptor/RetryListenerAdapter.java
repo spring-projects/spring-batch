@@ -14,27 +14,22 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.repeat.interceptor;
+package org.springframework.batch.retry.interceptor;
 
-import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatInterceptor;
+import org.springframework.batch.retry.RetryCallback;
+import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryListener;
 
-public class RepeatInterceptorAdapter implements RepeatInterceptor {
+public class RetryListenerAdapter implements RetryListener {
 
-	public void before(RepeatContext context) {
+	public void close(RetryContext context, RetryCallback callback, Throwable throwable) {
 	}
 
-	public void after(RepeatContext context, ExitStatus result) {
+	public void onError(RetryContext context, RetryCallback callback, Throwable throwable) {
 	}
 
-	public void close(RepeatContext context) {
-	}
-
-	public void onError(RepeatContext context, Throwable e) {
-	}
-
-	public void open(RepeatContext context) {
+	public boolean open(RetryContext context, RetryCallback callback) {
+		return true;
 	}
 
 }

@@ -1,5 +1,8 @@
 package org.springframework.batch.execution.step.tasklet;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.JobExecution;
@@ -12,10 +15,14 @@ import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.step.simple.JobRepositorySupport;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.interceptor.RepeatListenerAdapter;
 
 public class TaskletStepTests extends TestCase {
 
 	private StepExecution stepExecution;
+
+	private List list = new ArrayList();
 
 	protected void setUp() throws Exception {
 		stepExecution = new StepExecution(new StepInstance(new Long(11)), new JobExecution(new JobInstance(
@@ -45,20 +52,35 @@ public class TaskletStepTests extends TestCase {
 		}
 	}
 
-	public void testSuccessfulExecution() throws StepInterruptedException, BatchCriticalException {
+	public void testSuccessfulExecution() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, false), new JobRepositorySupport());
 		step.execute(stepExecution);
 		assertNotNull(stepExecution.getStartTime());
-		assertSame(ExitStatus.FINISHED, stepExecution.getExitStatus());
+		assertEquals(ExitStatus.FINISHED, stepExecution.getExitStatus());
 		assertNotNull(stepExecution.getEndTime());
 	}
 
-	public void testFailureExecution() throws StepInterruptedException, BatchCriticalException {
+	public void testFailureExecution() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(true, false), new JobRepositorySupport());
 		step.execute(stepExecution);
 		assertNotNull(stepExecution.getStartTime());
-		assertSame(ExitStatus.FAILED, stepExecution.getExitStatus());
+		assertEquals(ExitStatus.FAILED, stepExecution.getExitStatus());
 		assertNotNull(stepExecution.getEndTime());
+	}
+
+	public void testSuccessfulExecutionWithListener() throws Exception {
+		TaskletStep step = new TaskletStep(new StubTasklet(false, false), new JobRepositorySupport());
+		step.setListener(new RepeatListenerAdapter() {
+			public void open(RepeatContext context) {
+				list.add("open");
+			}
+			public void close(RepeatContext context) {
+				list.add("close");
+			}
+		});
+		step.execute(stepExecution);
+		System.err.println(list);
+		assertEquals(2, list.size());
 	}
 
 	public void testExceptionExecution() throws StepInterruptedException, BatchCriticalException {
@@ -69,7 +91,7 @@ public class TaskletStepTests extends TestCase {
 		}
 		catch (BatchCriticalException e) {
 			assertNotNull(stepExecution.getStartTime());
-			assertSame(ExitStatus.FAILED, stepExecution.getExitStatus());
+			assertEquals(ExitStatus.FAILED, stepExecution.getExitStatus());
 			assertNotNull(stepExecution.getEndTime());
 		}
 	}

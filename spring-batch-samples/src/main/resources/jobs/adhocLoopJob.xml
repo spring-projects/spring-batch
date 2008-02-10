@@ -15,7 +15,7 @@
 
 	<bean id="loopJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="repeatOperationsStep">
+			<bean id="step1" parent="taskletStep">
 				<property name="tasklet">
 					<bean id="module"
 						class="org.springframework.batch.sample.tasklet.InfiniteLoopTasklet"
@@ -23,27 +23,10 @@
 						<aop:scoped-proxy />
 					</bean>
 				</property>
-				<property name="chunkOperations">
+				<property name="listener">
 					<bean
-						class="org.springframework.batch.repeat.support.RepeatTemplate">
-						<property name="completionPolicy">
-							<bean
-								class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
-								<property name="chunkSize" value="2"/>
-							</bean>
-						</property>
-					</bean>
+						class="org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatListener" />
 				</property>
-				<property name="stepOperations">
-					<bean
-						class="org.springframework.batch.repeat.support.RepeatTemplate">
-						<property name="interceptor">
-							<bean
-								class="org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatInterceptor" />
-						</property>
-					</bean>
-				</property>
-
 			</bean>
 		</property>
 	</bean>

@@ -19,14 +19,14 @@ package org.springframework.batch.retry;
 import org.springframework.batch.retry.exception.TerminatedRetryException;
 
 /**
- * Interface for interceptor that can be used to add behaviour to a retry.
+ * Interface for listener that can be used to add behaviour to a retry.
  * Implementations of {@link RetryOperations} can chose to issue callbacks to an
  * interceptor during the retry lifecycle.
  * 
  * @author Dave Syer
  * 
  */
-public interface RetryInterceptor {
+public interface RetryListener {
 
 	/**
 	 * Called before the first attempt in a retry. For instance, implementers

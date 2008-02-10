@@ -40,7 +40,6 @@ import org.springframework.util.Assert;
  * 
  * @author Rob Harrop
  * @author Dave Syer
- * @since 2.1
  */
 public class RetryOperationsInterceptor implements MethodInterceptor {
 
