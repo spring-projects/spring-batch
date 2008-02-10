@@ -20,23 +20,28 @@
 	<bean id="test-job"
 		class="org.springframework.batch.core.domain.JobSupport">
 		<property name="steps">
-			<bean id="step1">
-				<property name="itemReader">
-					<bean
-						class="org.springframework.batch.item.reader.ListItemReader">
-						<constructor-arg value="foo,bar,spam" />
-					</bean>
-				</property>
-				<property name="itemWriter">
-					<bean
-						class="org.springframework.batch.execution.launch.EmptyItemWriter" />
-				</property>
-				<property name="jobRepository" >
-					<bean class="org.springframework.batch.execution.step.simple.JobRepositorySupport" />
+			<bean id="step1" class="org.springframework.batch.execution.step.simple.SimpleStep">
+				<property name="itemReader" ref="itemReader" />
+				<property name="itemWriter" ref="itemWriter" />
+				<property name="jobRepository" ref="jobRepository" />
+				<property name="streamManager">
+					<bean class="org.springframework.batch.item.stream.SimpleStreamManager" />
 				</property>
 			</bean>
 		</property>
 	</bean>
+
+	<bean id="itemReader"
+		class="org.springframework.batch.item.reader.ListItemReader">
+		<constructor-arg value="foo,bar,spam" />
+	</bean>
+
+	<bean id="itemWriter"
+		class="org.springframework.batch.execution.launch.EmptyItemWriter" />
+
+	<bean id="jobRepository"
+		class="org.springframework.batch.execution.step.simple.JobRepositorySupport" />
+
 
 	<bean id="test-job-with-name"
 		class="org.springframework.batch.core.domain.JobSupport">
@@ -58,7 +63,7 @@
 		p:name="spam" />
 
 	<bean id="test-job-with-parent-and-bean-name" parent="abstract-job"
-		p:beanName="bucket" />
+		p:name="bucket" />
 
 	<bean id="parent-job"
 		class="org.springframework.batch.core.domain.JobSupport" />

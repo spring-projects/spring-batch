@@ -16,6 +16,8 @@
 
 package org.springframework.batch.execution.step.simple;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.repeat.RepeatContext;
 
@@ -28,6 +30,10 @@ import org.springframework.batch.repeat.RepeatContext;
  */
 public class ThreadStepInterruptionPolicy implements StepInterruptionPolicy {
 
+	protected static final Log logger = LogFactory
+	.getLog(ThreadStepInterruptionPolicy.class);
+
+	
 	/**
 	 * Returns if the current job lifecycle has been interrupted by checking if
 	 * the current thread is interrupted.
@@ -45,7 +51,11 @@ public class ThreadStepInterruptionPolicy implements StepInterruptionPolicy {
 	 * @return true if the job has been interrupted
 	 */
 	private boolean isInterrupted(RepeatContext context) {
-		return Thread.currentThread().isInterrupted() || context.isTerminateOnly();
+		boolean interrupted = (Thread.currentThread().isInterrupted() || context.isTerminateOnly());
+		if(interrupted){
+			logger.error("Step interrupted");
+		}
+		return interrupted;
 	}
 
 }

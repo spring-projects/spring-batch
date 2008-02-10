@@ -441,7 +441,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		public Object read() throws Exception {
 			StepSynchronizationManager.getContext().setAttribute("TASKLET_TEST", this);
-			return ExitStatus.FINISHED;
+			return "item";
 		}
 
 		public boolean isRestoreFromCalledWithSomeContext() {

@@ -26,6 +26,10 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.reader.ItemReaderAdapter;
+import org.springframework.batch.item.writer.ItemWriterAdapter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.interceptor.RepeatInterceptorAdapter;
@@ -39,16 +43,23 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
  */
 public class RepeatOperationsStepTests extends TestCase {
 
-	RepeatOperationsStep configuration = new RepeatOperationsStep();
+	RepeatOperationsStep repeatStep = new RepeatOperationsStep();
+	
+	protected void setUp() throws Exception {
+		super.setUp();
+		
+		repeatStep.setItemReader(new ItemReaderAdapter());
+		repeatStep.setItemWriter(new ItemWriterAdapter());
+	}
 	
 	/**
 	 * Test method for {@link org.springframework.batch.execution.step.simple.RepeatOperationsStep#getChunkOperations()}.
 	 */
 	public void testSetChunkOperations() {
-		assertNull(configuration.getChunkOperations());
+		assertNull(repeatStep.getChunkOperations());
 		RepeatTemplate executor = new RepeatTemplate();
-		configuration.setChunkOperations(executor);
-		assertEquals(executor, configuration.getChunkOperations());
+		repeatStep.setChunkOperations(executor);
+		assertEquals(executor, repeatStep.getChunkOperations());
 		
 	}
 
@@ -56,10 +67,10 @@ public class RepeatOperationsStepTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.execution.step.simple.RepeatOperationsStep#getChunkOperations()}.
 	 */
 	public void testSetStepOperations() {
-		assertNull(configuration.getChunkOperations());
+		assertNull(repeatStep.getChunkOperations());
 		RepeatTemplate executor = new RepeatTemplate();
-		configuration.setStepOperations(executor);
-		assertEquals(executor, configuration.getStepOperations());
+		repeatStep.setStepOperations(executor);
+		assertEquals(executor, repeatStep.getStepOperations());
 		
 	}
 	
@@ -73,6 +84,13 @@ public class RepeatOperationsStepTests extends TestCase {
 		});
 		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		RepeatOperationsStep configuration = new RepeatOperationsStep();
+		configuration.setItemReader(new ItemReader(){
+			public Object read() throws Exception {
+				throw new NullPointerException();
+			}});
+		configuration.setItemWriter(new ItemWriter(){
+			public void write(Object item) throws Exception {
+			}});
 		configuration.setChunkOperations(repeatTemplate);
 		configuration.setJobRepository(new JobRepositorySupport());
 		configuration.setTransactionManager(new ResourcelessTransactionManager());
@@ -106,6 +124,13 @@ public class RepeatOperationsStepTests extends TestCase {
 		});
 		stepTemplate.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		RepeatOperationsStep configuration = new RepeatOperationsStep();
+		configuration.setItemReader(new ItemReader(){
+			public Object read() throws Exception {
+				return new Object();
+			}});
+		configuration.setItemWriter(new ItemWriter(){
+			public void write(Object item) throws Exception {
+			}});
 		configuration.setChunkOperations(chunkTemplate);
 		configuration.setStepOperations(stepTemplate);
 		configuration.setJobRepository(new JobRepositorySupport());

@@ -32,7 +32,7 @@ import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.step.simple.AbstractStep;
-import org.springframework.batch.execution.step.simple.SimpleStep;
+import org.springframework.batch.execution.step.simple.RepeatOperationsStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
@@ -76,8 +76,8 @@ public class SimpleJobTests extends TestCase {
 		return getStep(new String[] { arg0, arg1 });
 	}
 	
-	private AbstractStep getStep(String[] args) throws Exception {
-		SimpleStep step = new SimpleStep();
+	private RepeatOperationsStep getStep(String[] args) throws Exception {
+		RepeatOperationsStep step = new RepeatOperationsStep();
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
 		provider = new ListItemReader(items);
@@ -123,7 +123,7 @@ public class SimpleJobTests extends TestCase {
 		chunkOperations.setExceptionHandler(new ExceptionHandler() {
 			public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
 				throwables.add(throwable);
-				assertEquals("Try again Dummy!", throwable.getMessage());
+				assertEquals("Error!", throwable.getMessage());
 			}
 		});
 
@@ -132,16 +132,15 @@ public class SimpleJobTests extends TestCase {
 		 * is recovered ("skipped") on the second attempt (see retry policy
 		 * definition above)...
 		 */
-		AbstractStep step = getStep(new String[] { "foo", "bar", "spam" });
+		RepeatOperationsStep step = getStep(new String[] { "foo", "bar", "spam" });
 		
 		
 //		Tasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
 //		RepeatOperationsStep step = new RepeatOperationsStep();
-//		step.setTasklet(module);
-//		step.setChunkOperations(chunkOperations);
+		step.setChunkOperations(chunkOperations);
 		step.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
-				throw new RuntimeException("Try again Dummy!");
+				throw new RuntimeException("Error!");
 			}
 		});
 		step.afterPropertiesSet();
