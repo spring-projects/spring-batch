@@ -18,7 +18,7 @@ package org.springframework.batch.retry.interceptor;
 
 import junit.framework.TestCase;
 
-public class RetryListenerSupportTests extends TestCase {
+public class RetryListenerAdapterTests extends TestCase {
 
 	public void testClose() {
 		RetryListenerAdapter support = new RetryListenerAdapter();
