@@ -11,7 +11,7 @@ import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 
-public class ExceptionRestartableTaskletTests extends TestCase {
+public class ExceptionThrowingItemReaderProxyTests extends TestCase {
 
 	//expected call count before exception is thrown (exception should be thrown in next iteration)
 	private static final int ITER_COUNT = 5;
@@ -21,23 +21,9 @@ public class ExceptionRestartableTaskletTests extends TestCase {
 	}
 	
 	public void testProcess() throws Exception {
-		
-		//create mock item processor which will be called by module.process() method
-		MockControl processorControl = MockControl.createControl(ItemWriter.class);
-		ItemWriter itemProcessor = (ItemWriter)processorControl.getMock();
-		
-		//set expected call count and argument matcher 
-		itemProcessor.write(null);
-		processorControl.setMatcher(MockControl.ALWAYS_MATCHER);
-		processorControl.setVoidCallable(ITER_COUNT);
-		processorControl.replay();
-		
+				
 		//create module and set item processor and iteration count
-		ExceptionRestartableTasklet module = new ExceptionRestartableTasklet();
-		module.setItemWriter(itemProcessor);
-		module.setThrowExceptionOnRecordNumber(ITER_COUNT + 1);
-		
-		module.setItemReader(new ListItemReader(new ArrayList() {{
+		ExceptionThrowingItemReaderProxy itemReader = new ExceptionThrowingItemReaderProxy(new ListItemReader(new ArrayList() {{
 			add("a");
 			add("b");
 			add("c");
@@ -45,20 +31,20 @@ public class ExceptionRestartableTaskletTests extends TestCase {
 			add("e");
 			add("f");
 		}}));
+
+		itemReader.setThrowExceptionOnRecordNumber(ITER_COUNT + 1);
 		
 		RepeatSynchronizationManager.register(new RepeatContextSupport(null));
 		
 		//call process method multiple times and verify whether exception is thrown when expected
 		for (int i = 0; i <= ITER_COUNT; i++) {
 			try {
-				module.execute();
+				itemReader.read();
 				assertTrue(i < ITER_COUNT);
 			} catch (BatchCriticalException bce) {
 				assertEquals(ITER_COUNT,i);
 			}
 		}
 		
-		//verify method calls 
-		processorControl.verify();
 	}
 }

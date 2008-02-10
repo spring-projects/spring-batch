@@ -17,36 +17,28 @@
 package org.springframework.batch.sample.tasklet;
 
 
-import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.item.ItemReader;
 
 /**
- * Hacked {@link Tasklet} that throws exception on a given record number
+ * Hacked {@link ItemReader} that throws exception on a given record number
  * (useful for testing restart).
  * 
  * @author Robert Kasanicky
+ * @author Lucas Ward
  *
  */
-public class ExceptionRestartableTasklet extends ItemOrientedTasklet {
+public class ExceptionThrowingItemReaderProxy implements ItemReader {
 
 	private int counter = 0;
 	private int throwExceptionOnRecordNumber = 4;
 	
-	/* (non-Javadoc)
-	 * @see Tasklet#execute()
-	 */
-	public ExitStatus execute() throws Exception {
-		
-		counter++;
-		if (counter == throwExceptionOnRecordNumber) {
-			throw new BatchCriticalException("Planned failure on count="+counter);
-		}
-		
-		return super.execute();
+	private final ItemReader itemReader;
+	
+	public ExceptionThrowingItemReaderProxy(ItemReader itemReader) {
+		this.itemReader = itemReader;
 	}
-
+	
 	/**
 	 * @param throwExceptionOnRecordNumber The number of record on which exception should be thrown
 	 */
@@ -56,6 +48,16 @@ public class ExceptionRestartableTasklet extends ItemOrientedTasklet {
 	
 	public int getThrowExceptionOnRecordNumber() {
 		return throwExceptionOnRecordNumber;
+	}
+
+	public Object read() throws Exception {
+		
+		counter++;
+		if (counter == throwExceptionOnRecordNumber) {
+			throw new BatchCriticalException("Planned failure on count="+counter);
+		}
+		
+		return itemReader.read();
 	}
 
 }

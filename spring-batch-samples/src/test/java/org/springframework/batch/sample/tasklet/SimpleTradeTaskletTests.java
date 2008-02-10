@@ -44,19 +44,14 @@ public class SimpleTradeTaskletTests extends TestCase {
 		};
 
 		//create module
-		SimpleTradeTasklet module = new SimpleTradeTasklet();
-		module.setItemReader(input);
+		SimpleTradeWriter module = new SimpleTradeWriter();
 		module.setTradeDao(dao);
 
-		//call tested methods
-		//read method should return true, because input returned fieldset
-		assertTrue(module.execute().isContinuable());
+		module.write(input.read());
 
 		//verify whether input and writer were called
 		assertTrue(inputCalled);
 		assertTrue(writerCalled);
 
-		//read should return false, because input returned null
-		assertFalse(module.execute().isContinuable());
 	}
 }

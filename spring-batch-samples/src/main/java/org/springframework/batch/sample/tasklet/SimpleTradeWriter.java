@@ -17,13 +17,12 @@
 package org.springframework.batch.sample.tasklet;
 
 import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.execution.tasklet.ItemOrientedTasklet;
-import org.springframework.batch.io.file.DefaultFlatFileItemReader;
 import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ExecutionAttributesProvider;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
+import org.springframework.util.Assert;
 
 /**
  * Simple implementation of a {@link Tasklet}, which illustrates the reading
@@ -39,12 +38,7 @@ import org.springframework.batch.sample.domain.Trade;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class SimpleTradeTasklet implements Tasklet, ExecutionAttributesProvider {
-
-	/*
-	 * reads the data from input file
-	 */
-	private DefaultFlatFileItemReader inputSource;
+public class SimpleTradeWriter implements ItemWriter, ExecutionAttributesProvider {
 
 	/*
 	 * writes a Trade object to output
@@ -62,21 +56,10 @@ public class SimpleTradeTasklet implements Tasklet, ExecutionAttributesProvider 
 	 * processed. Because this is a simple example job, the data is simply
 	 * written out without any processing.
 	 */
-	public ExitStatus execute() throws Exception {
-		Trade trade = (Trade)inputSource.read();
-
-		if (trade == null) {
-			// no Trade object returned, reading input is finished
-			return ExitStatus.FINISHED;
-		}
-
+	public void write(Object item) throws Exception {
+		Assert.isInstanceOf(Trade.class, item, "Only items of type: [" + Trade.class + "] are supported by this writer");
 		tradeCount++;
-		tradeDao.writeTrade(trade);
-		return ExitStatus.CONTINUABLE;
-	}
-
-	public void setItemReader(DefaultFlatFileItemReader inputTemplate) {
-		this.inputSource = inputTemplate;
+		tradeDao.writeTrade((Trade)item);
 	}
 
 	public void setTradeDao(TradeDao tradeDao) {
