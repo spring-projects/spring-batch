@@ -1,35 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
-		<property name="jobConfigurationRegistry" ref="jobRegistry"/>
+	<bean
+		class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
+		<property name="jobConfigurationRegistry" ref="jobRegistry" />
 	</bean>
 
-	<bean id="test-job" class="org.springframework.batch.core.domain.JobSupport">
+	<bean id="test-job"
+		class="org.springframework.batch.core.domain.JobSupport">
 		<property name="steps">
-			<bean id="step1" class="org.springframework.batch.execution.step.simple.SimpleStep">
-				<constructor-arg>
+			<bean id="step1"
+				class="org.springframework.batch.execution.step.simple.SimpleStep">
+				<property name="itemReader">
 					<bean
-						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
-						<property name="itemReader">
-							<bean 
-								class="org.springframework.batch.item.reader.ListItemReader">
-								<constructor-arg value="foo,bar,spam"/>
-							</bean>
-						</property>
-						<property name="itemWriter">
-							<bean class="org.springframework.batch.execution.launch.EmptyItemWriter"/>
-						</property>
+						class="org.springframework.batch.item.reader.ListItemReader">
+						<constructor-arg value="foo,bar,spam" />
 					</bean>
-				</constructor-arg>
+				</property>
+				<property name="itemWriter">
+					<bean
+						class="org.springframework.batch.execution.launch.EmptyItemWriter" />
+				</property>
 			</bean>
 		</property>
 	</bean>
-	
+
 </beans>

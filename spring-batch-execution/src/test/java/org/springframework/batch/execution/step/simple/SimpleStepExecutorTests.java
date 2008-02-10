@@ -29,12 +29,10 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
-import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.domain.StepInterruptedException;
-import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
@@ -161,8 +159,8 @@ public class SimpleStepExecutorTests extends TestCase {
 		final JobExecution jobExecution = new JobExecution(jobInstance);
 		final StepExecution stepExecution = new StepExecution(step, jobExecution);
 
-		stepConfiguration.setTasklet(new Tasklet() {
-			public ExitStatus execute() throws Exception {
+		stepConfiguration.setItemReader(new ItemReader() {
+			public Object read() throws Exception {
 				assertEquals(step, stepExecution.getStep());
 				assertNotNull(StepSynchronizationManager.getContext().getStepExecution());
 				processed.add("foo");
@@ -217,14 +215,14 @@ public class SimpleStepExecutorTests extends TestCase {
 
 	public void testIncrementRollbackCount() {
 
-		Tasklet tasklet = new Tasklet() {
+		ItemReader itemReader = new ItemReader() {
 
-			public ExitStatus execute() throws Exception {
+			public Object read() throws Exception {
 				int counter = 0;
 				counter++;
 
 				if (counter == 1) {
-					throw new Exception();
+					throw new RuntimeException();
 				}
 
 				return ExitStatus.CONTINUABLE;
@@ -233,7 +231,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		};
 
 		StepInstance step = new StepInstance(new Long(1));
-		stepConfiguration.setTasklet(tasklet);
+		stepConfiguration.setItemReader(itemReader);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
@@ -248,9 +246,9 @@ public class SimpleStepExecutorTests extends TestCase {
 
 	public void testExitCodeDefaultClassification() throws Exception {
 
-		Tasklet tasklet = new Tasklet() {
+		ItemReader itemReader = new ItemReader() {
 
-			public ExitStatus execute() throws Exception {
+			public Object read() throws Exception {
 				int counter = 0;
 				counter++;
 
@@ -264,7 +262,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		};
 
 		StepInstance step = new StepInstance(new Long(1));
-		stepConfiguration.setTasklet(tasklet);
+		stepConfiguration.setItemReader(itemReader);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
@@ -284,7 +282,7 @@ public class SimpleStepExecutorTests extends TestCase {
 	public void testNonRestartedJob() throws Exception {
 		StepInstance step = new StepInstance(new Long(1));
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
-		stepExecutor.setTasklet(tasklet);
+		stepExecutor.setItemReader(tasklet);
 		stepConfiguration.setSaveExecutionAttributes(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
@@ -303,7 +301,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
-		stepExecutor.setTasklet(tasklet);
+		stepExecutor.setItemReader(tasklet);
 		stepConfiguration.setSaveExecutionAttributes(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
@@ -327,7 +325,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
-		stepConfiguration.setTasklet(tasklet);
+		stepConfiguration.setItemReader(tasklet);
 		stepConfiguration.setSaveExecutionAttributes(false);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
@@ -351,8 +349,8 @@ public class SimpleStepExecutorTests extends TestCase {
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
-		stepConfiguration.setTasklet(new Tasklet() {
-			public ExitStatus execute() throws Exception {
+		stepConfiguration.setItemReader(new ItemReader() {
+			public Object read() throws Exception {
 				return ExitStatus.FINISHED;
 			}
 		});
@@ -405,8 +403,8 @@ public class SimpleStepExecutorTests extends TestCase {
 	public void testStreamManager() throws Exception {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
-		stepConfiguration.setTasklet(new Tasklet() {
-			public ExitStatus execute() throws Exception {
+		stepConfiguration.setItemReader(new ItemReader() {
+			public Object read() throws Exception {
 				return ExitStatus.FINISHED;
 			}
 		});
@@ -433,7 +431,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		assertEquals(0, map.size());
 	}
 
-	private class MockRestartableTasklet extends ItemStreamAdapter implements Tasklet {
+	private class MockRestartableTasklet extends ItemStreamAdapter implements ItemReader {
 
 		private boolean getExecutionAttributesCalled = false;
 
@@ -441,7 +439,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		private boolean restoreFromCalledWithSomeContext = false;
 
-		public ExitStatus execute() throws Exception {
+		public Object read() throws Exception {
 			StepSynchronizationManager.getContext().setAttribute("TASKLET_TEST", this);
 			return ExitStatus.FINISHED;
 		}
@@ -487,20 +485,22 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		stepExecutor.setInterruptionPolicy(interruptionPolicy);
 
-		Tasklet tasklet = new Tasklet() {
+		ItemReader itemReader = new ItemReader() {
 
-			public ExitStatus execute() throws Exception {
+			public Object read() throws Exception {
 				int counter = 0;
 				counter++;
 
 				if (counter == 1) {
-					throw new StepInterruptedException("");
+					throw new RuntimeException();
 				}
 
 				return ExitStatus.CONTINUABLE;
 			}
+
 		};
-		stepExecutor.setTasklet(tasklet);
+
+		stepExecutor.setItemReader(itemReader);
 
 		StepInstance step = new StepInstance(new Long(1));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
@@ -524,13 +524,13 @@ public class SimpleStepExecutorTests extends TestCase {
 
 	public void testStatusForResetFailedException() throws Exception {
 
-		Tasklet tasklet = new Tasklet() {
-			public ExitStatus execute() throws Exception {
+		ItemReader itemReader = new ItemReader() {
+			public Object read() throws Exception {
 				// Trigger a rollback
 				throw new RuntimeException("Foo");
 			}
 		};
-		stepExecutor.setTasklet(tasklet);
+		stepExecutor.setItemReader(itemReader);
 		stepExecutor.setStreamManager(new SimpleStreamManager(transactionManager) {
 			public void rollback(TransactionStatus status) {
 				super.rollback(status);

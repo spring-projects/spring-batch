@@ -21,21 +21,22 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.reader.ItemReaderAdapter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -50,43 +51,52 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private JobInstance job;
 
-	private RepeatOperationsStep stepConfiguration;
+	private RepeatOperationsStep step;
 
 	public void setUp() throws Exception {
 
 		jobRepository = new SimpleJobRepository(jobDao, stepDao);
 
 		JobSupport jobConfiguration = new JobSupport();
-		stepConfiguration = new RepeatOperationsStep();
-		jobConfiguration.addStep(stepConfiguration);
+		step = new RepeatOperationsStep();
+		jobConfiguration.addStep(step);
 		jobConfiguration.setBeanName("testJob");
 		job = jobRepository.createJobExecution(jobConfiguration, new JobParameters()).getJobInstance();
-		stepConfiguration.setJobRepository(jobRepository);
-		stepConfiguration.setTransactionManager(new ResourcelessTransactionManager());
+		step.setJobRepository(jobRepository);
+		step.setTransactionManager(new ResourcelessTransactionManager());
+		step.setItemReader(new ItemReaderAdapter());
+		step.setItemWriter(new ItemWriter(){
+			public void write(Object item) throws Exception {
+			}});
 	}
 
 	public void testInterruptChunk() throws Exception {
 
 		List steps = job.getStepInstances();
-		final StepInstance step = (StepInstance) steps.get(0);
+		final StepInstance stepInstance = (StepInstance) steps.get(0);
 		JobExecution jobExecutionContext = new JobExecution(new JobInstance(new Long(0L), new JobParameters()));
-		final StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
-		stepConfiguration.setTasklet(new Tasklet() {
-			public ExitStatus execute() throws Exception {
+		final StepExecution stepExecution = new StepExecution(stepInstance, jobExecutionContext);
+		step.setItemReader(new ItemReader() {
+			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
 				double foo = 1;
 				for (int i = 2; i < 250; i++) {
 					foo = foo * i;
 				}
-				// always return true, so processing always continues
-				return new ExitStatus(foo != 1);
+				
+				if(foo != 1){
+					return new Double(foo);
+				}
+				else{
+					return null;
+				}
 			}
 		});
 
 		Thread processingThread = new Thread() {
 			public void run() {
 				try {
-					stepConfiguration.execute(stepExecution);
+					step.execute(stepExecution);
 				}
 				catch (StepInterruptedException e) {
 					// do nothing...
@@ -114,7 +124,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		// N.B, If we don't set the completion policy it might run forever
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		stepConfiguration.setChunkOperations(template);
+		step.setChunkOperations(template);
 		testInterruptChunk();
 	}
 

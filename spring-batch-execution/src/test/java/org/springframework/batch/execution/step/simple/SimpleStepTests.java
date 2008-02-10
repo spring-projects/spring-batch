@@ -25,7 +25,9 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.item.reader.ItemReaderAdapter;
 import org.springframework.batch.item.stream.SimpleStreamManager;
+import org.springframework.batch.item.writer.ItemWriterAdapter;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -40,21 +42,25 @@ public class SimpleStepTests extends TestCase {
 		SimpleStep step = new SimpleStep();
 		step.setJobRepository(new JobRepositorySupport());
 		step.setTransactionManager(new ResourcelessTransactionManager());
+		step.setItemReader(new ItemReaderAdapter());
+		step.setItemWriter(new ItemWriterAdapter());
 		assertNotNull(step.createStepExecutor());
 	}
 
 	public void testSuccessfulExceptionHandler() throws Exception {
-		SimpleStep configuration = new SimpleStep("foo");
-		configuration.setJobRepository(new JobRepositorySupport());
-		configuration.setTransactionManager(new ResourcelessTransactionManager());
+		SimpleStep step = new SimpleStep("foo");
+		step.setItemReader(new ItemReaderAdapter());
+		step.setItemWriter(new ItemWriterAdapter());
+		step.setJobRepository(new JobRepositorySupport());
+		step.setTransactionManager(new ResourcelessTransactionManager());
 		final List list = new ArrayList();
-		configuration.setExceptionHandler(new ExceptionHandler() {
+		step.setExceptionHandler(new ExceptionHandler() {
 			public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
 				list.add(throwable);
 				throw new RuntimeException("Oops");
 			}
 		});
-		SimpleStepExecutor executor = (SimpleStepExecutor) configuration.createStepExecutor();
+		SimpleStepExecutor executor = (SimpleStepExecutor) step.createStepExecutor();
 		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(11)), new JobExecution(
 				new JobInstance(new Long(0L), new JobParameters()), new Long(12)));
 		try {
@@ -120,6 +126,8 @@ public class SimpleStepTests extends TestCase {
 
 	public void testMandatoryPropertiesAfterExecution() throws Exception {
 		SimpleStep step = new SimpleStep();
+		step.setItemReader(new ItemReaderAdapter());
+		step.setItemWriter(new ItemWriterAdapter());
 		step.setJobRepository(new JobRepositorySupport());
 		step.setTransactionManager(new ResourcelessTransactionManager());
 		assertNotNull(step.createStepExecutor());
