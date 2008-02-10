@@ -117,6 +117,12 @@
 						http://people.apache.org/maven-snapshot-repository
 					</url>
 				</pluginRepository>
+				<!-- Clover 2 is still a snapshot plugin -->
+				<pluginRepository>
+					<id>atlassian-m2-repository</id>
+					<name>Atlassian Maven 2.x Repository</name>
+					<url>http://repository.atlassian.com/maven2</url>
+				</pluginRepository>
 			</pluginRepositories>
 		</profile>
 	</profiles>
@@ -617,11 +623,6 @@
 			<url>
 				https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext
 			</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>atlassian-m2-repository</id>
-			<name>Atlassian Maven 2.x Repository</name>
-			<url>http://repository.atlassian.com/maven2</url>
 		</pluginRepository>
 	</pluginRepositories>
 
