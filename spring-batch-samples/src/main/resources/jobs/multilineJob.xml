@@ -13,25 +13,20 @@
 	<bean id="multilineJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
-				<property name="tasklet">
+				<property name="itemReader">
 					<bean
-						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
-						<property name="itemReader">
-							<bean
-								class="org.springframework.batch.item.reader.AggregateItemReader">
-								<property name="itemReader"
-									ref="fileItemReader" />
-							</bean>
-						</property>
-						<property name="itemWriter">
-							<bean
-								class="org.springframework.batch.io.file.FlatFileItemWriter"
-								scope="step">
-								<aop:scoped-proxy />
-								<property name="resource"
-									value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
-							</bean>
-						</property>
+						class="org.springframework.batch.item.reader.AggregateItemReader">
+						<property name="itemReader"
+							ref="fileItemReader" />
+					</bean>
+				</property>
+				<property name="itemWriter">
+					<bean
+						class="org.springframework.batch.io.file.FlatFileItemWriter"
+						scope="step">
+						<aop:scoped-proxy />
+						<property name="resource"
+							value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
 					</bean>
 				</property>
 			</bean>

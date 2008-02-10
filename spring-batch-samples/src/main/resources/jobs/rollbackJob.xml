@@ -40,38 +40,28 @@
 							</property>
 						</bean>
 					</property>
-					<property name="tasklet">
+					<property name="itemReader">
 						<bean
-							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
-							<property name="itemReader">
-								<bean
-									class="org.springframework.batch.item.reader.ValidatingItemReader">
-									<property name="itemReader"
-										ref="fileInputTemplate" />
-									<property name="validator"
-										ref="tradeValidator" />
-								</bean>
-							</property>
-							<property name="itemWriter">
-								<bean
-									class="org.springframework.batch.sample.item.writer.TradeWriter"
-									p:dao-ref="tradeDao" p:failure="3" />
-							</property>
+							class="org.springframework.batch.item.reader.ValidatingItemReader">
+							<property name="itemReader"
+								ref="fileInputTemplate" />
+							<property name="validator"
+								ref="tradeValidator" />
 						</bean>
+					</property>
+					<property name="itemWriter">
+						<bean
+							class="org.springframework.batch.sample.item.writer.TradeWriter"
+							p:dao-ref="tradeDao" p:failure="3" />
 					</property>
 					<property name="jobRepository" ref="jobRepository" />
 				</bean>
 				<bean id="step2" parent="simpleStep">
-					<property name="tasklet">
+					<property name="itemReader"
+						ref="tradeSqlItemReader" />
+					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
-							<property name="itemReader"
-								ref="tradeSqlItemReader" />
-							<property name="itemWriter">
-								<bean
-									class="org.springframework.batch.sample.item.writer.DummyItemWriter" />
-							</property>
-						</bean>
+							class="org.springframework.batch.sample.item.writer.DummyItemWriter" />
 					</property>
 				</bean>
 			</list>

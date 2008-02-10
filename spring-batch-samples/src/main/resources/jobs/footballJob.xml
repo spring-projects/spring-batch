@@ -20,21 +20,16 @@
 					<property name="commitInterval" value="1"></property>
 					<property name="startLimit" value="100" />
 					<property name="allowStartIfComplete" value="false" />
-					<property name="tasklet">
+					<property name="itemReader"
+						ref="playerFileItemReader" />
+					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
-							<property name="itemReader"
-								ref="playerFileItemReader" />
-							<property name="itemWriter">
+							class="org.springframework.batch.sample.item.writer.PlayerItemWriter">
+							<property name="playerDao">
 								<bean
-									class="org.springframework.batch.sample.item.writer.PlayerItemWriter">
-									<property name="playerDao">
-										<bean
-											class="org.springframework.batch.sample.dao.JdbcPlayerDao">
-											<property name="dataSource"
-												ref="dataSource" />
-										</bean>
-									</property>
+									class="org.springframework.batch.sample.dao.JdbcPlayerDao">
+									<property name="dataSource"
+										ref="dataSource" />
 								</bean>
 							</property>
 						</bean>
@@ -43,36 +38,26 @@
 				<bean id="gameLoad" parent="simpleStep">
 					<property name="commitInterval" value="1" />
 					<property name="startLimit" value="100" />
-					<property name="tasklet">
+					<property name="itemReader"
+						ref="gameFileItemReader" />
+					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
-							<property name="itemReader"
-								ref="gameFileItemReader" />
-							<property name="itemWriter">
-								<bean
-									class="org.springframework.batch.sample.dao.JdbcGameDao">
-									<property name="dataSource"
-										ref="dataSource" />
-								</bean>
-							</property>
+							class="org.springframework.batch.sample.dao.JdbcGameDao">
+							<property name="dataSource"
+								ref="dataSource" />
 						</bean>
 					</property>
 				</bean>
 				<bean id="playerSummarization" parent="simpleStep">
 					<property name="commitInterval" value="1" />
 					<property name="startLimit" value="100" />
-					<property name="tasklet">
+					<property name="itemReader"
+						ref="playerSummarizationSource" />
+					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
-							<property name="itemReader"
-								ref="playerSummarizationSource" />
-							<property name="itemWriter">
-								<bean
-									class="org.springframework.batch.sample.dao.JdbcPlayerSummaryDao">
-									<property name="dataSource"
-										ref="dataSource" />
-								</bean>
-							</property>
+							class="org.springframework.batch.sample.dao.JdbcPlayerSummaryDao">
+							<property name="dataSource"
+								ref="dataSource" />
 						</bean>
 					</property>
 				</bean>

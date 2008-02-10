@@ -20,7 +20,7 @@
 					<bean
 						class="org.springframework.batch.item.reader.ValidatingItemReader">
 						<property name="itemReader"
-							ref="fileItemReader" />
+							ref="itemReader" />
 						<property name="validator" ref="fixedValidator" />
 					</bean>
 				</property>
@@ -36,6 +36,11 @@
 	</bean>
 
 	<!-- INFRASTRUCTURE SETUP -->
+	
+	<bean id="itemReader" 
+		class="org.springframework.batch.sample.tasklet.ExceptionThrowingItemReaderProxy">
+		<constructor-arg ref="fileItemReader" />
+	</bean>
 
 	<bean id="fileItemReader"
 		class="org.springframework.batch.io.file.DefaultFlatFileItemReader"

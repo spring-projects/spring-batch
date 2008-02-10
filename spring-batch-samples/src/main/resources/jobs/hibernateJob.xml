@@ -19,15 +19,9 @@
 		<property name="restartable" value="false" />
 		<property name="steps">
 			<bean id="step1" parent="repeatOperationsStep">
-				<property name="tasklet">
-					<bean
-						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
-						<property name="itemReader"
-							ref="hibernateItemReader" />
-						<property name="itemWriter"
-							ref="hibernateOutputSource" />
-					</bean>
-				</property>
+				<property name="itemReader" ref="hibernateItemReader" />
+				<property name="itemWriter" ref="hibernateOutputSource" />
+
 				<property name="chunkOperations">
 					<bean
 						class="org.springframework.batch.repeat.support.RepeatTemplate">
@@ -55,6 +49,7 @@
 		</property>
 	</bean>
 
+
 	<!-- This is a framework class that needs a delegate and also needs to be registered as a RepeatInterceptor in the chunk -->
 	<bean id="hibernateOutputSource"
 		class="org.springframework.batch.io.support.HibernateAwareItemWriter">
@@ -64,7 +59,7 @@
 
 	<bean id="hibernateCreditWriter"
 		class="org.springframework.batch.sample.item.writer.CustomerCreditIncreaseWriter">
-		<property name="customerCreditDao" ref="customerCreditDao"/>
+		<property name="customerCreditDao" ref="customerCreditDao" />
 	</bean>
 
 	<bean id="customerCreditDao"

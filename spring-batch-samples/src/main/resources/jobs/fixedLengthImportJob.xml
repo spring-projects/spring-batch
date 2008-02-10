@@ -1,33 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean parent="stepScope"/>
-	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
+	<bean parent="stepScope" />
+	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
 	<bean id="fixedLengthImportJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
-				<property name="tasklet">
+				<property name="itemReader">
 					<bean
-						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
-						<property name="itemReader">
-							<bean
-								class="org.springframework.batch.item.reader.ValidatingItemReader">
-								<property name="itemReader" ref="fileInputTemplate" />
-								<property name="validator" ref="fixedValidator" />
-							</bean>
-						</property>
-						<property name="itemWriter">
-							<bean class="org.springframework.batch.sample.item.writer.TradeWriter">
-								<property name="dao" ref="tradeDao" />
-							</bean>
-						</property>
+						class="org.springframework.batch.item.reader.ValidatingItemReader">
+						<property name="itemReader"
+							ref="fileInputTemplate" />
+						<property name="validator" ref="fixedValidator" />
+					</bean>
+				</property>
+				<property name="itemWriter">
+					<bean
+						class="org.springframework.batch.sample.item.writer.TradeWriter">
+						<property name="dao" ref="tradeDao" />
 					</bean>
 				</property>
 			</bean>
@@ -37,24 +36,29 @@
 	<!-- INFRASTRUCTURE SETUP -->
 
 	<!-- This input source is injected into the test case to verify the output - not used by the job at all -->
-	<bean id="testInputTemplate" class="org.springframework.batch.io.file.DefaultFlatFileItemReader">
+	<bean id="testInputTemplate"
+		class="org.springframework.batch.io.file.DefaultFlatFileItemReader">
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
 		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 
-	<bean id="fileInputTemplate" parent="testInputTemplate" autowire-candidate="false" scope="step">
-		<aop:scoped-proxy/>
+	<bean id="fileInputTemplate" parent="testInputTemplate"
+		autowire-candidate="false" scope="step">
+		<aop:scoped-proxy />
 	</bean>
 
-	<bean id="fixedFileDescriptor" class="org.springframework.batch.io.file.transform.FixedLengthTokenizer">
+	<bean id="fixedFileDescriptor"
+		class="org.springframework.batch.io.file.transform.FixedLengthTokenizer">
 		<property name="names" value="ISIN, Quantity, Price, Customer" />
 		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
 	</bean>
 
-	<bean id="fixedValidator" class="org.springframework.batch.item.validator.SpringValidator">
+	<bean id="fixedValidator"
+		class="org.springframework.batch.item.validator.SpringValidator">
 		<property name="validator">
-			<bean id="tradeValidator" class="org.springmodules.validation.valang.ValangValidator">
+			<bean id="tradeValidator"
+				class="org.springmodules.validation.valang.ValangValidator">
 				<property name="valang">
 					<value>
 						<![CDATA[
@@ -66,7 +70,8 @@
 		</property>
 	</bean>
 
-	<bean id="tradeDao" class="org.springframework.batch.sample.dao.JdbcTradeDao">
+	<bean id="tradeDao"
+		class="org.springframework.batch.sample.dao.JdbcTradeDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="incrementer">
 			<bean parent="incrementerParent">
@@ -76,13 +81,15 @@
 		</property>
 	</bean>
 
-	<bean id="fileLocator" class="org.springframework.core.io.ClassPathResource">
+	<bean id="fileLocator"
+		class="org.springframework.core.io.ClassPathResource">
 		<constructor-arg type="java.lang.String"
 			value="data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 	</bean>
 
-	<bean id="fieldSetMapper" class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
+	<bean id="fieldSetMapper"
+		class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
 
-	<bean parent="customEditorConfigurer"/>
+	<bean parent="customEditorConfigurer" />
 
 </beans>

@@ -1,46 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean parent="stepScope"/>
-	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
+	<bean parent="stepScope" />
+	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
 	<bean id="beanWrapperMapperJob" parent="simpleJob">
 		<property name="steps">
 			<list>
 				<bean id="step1" parent="simpleStep">
-					<property name="tasklet">
+					<property name="itemReader">
 						<bean
-							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
-							<property name="itemReader">
-								<bean
-									class="org.springframework.batch.item.reader.ValidatingItemReader">
-									<property name="itemReader" ref="fileInputTemplate" />
-									<property name="validator" ref="fixedValidator" />
-								</bean>
-							</property>
-							<property name="itemWriter">
-								<bean class="org.springframework.batch.sample.item.writer.TradeWriter">
-									<property name="dao" ref="tradeDao" />
-								</bean>
-							</property>
+							class="org.springframework.batch.item.reader.ValidatingItemReader">
+							<property name="itemReader"
+								ref="fileInputTemplate" />
+							<property name="validator"
+								ref="fixedValidator" />
+						</bean>
+					</property>
+					<property name="itemWriter">
+						<bean
+							class="org.springframework.batch.sample.item.writer.TradeWriter">
+							<property name="dao" ref="tradeDao" />
 						</bean>
 					</property>
 				</bean>
 				<bean id="step2" parent="simpleStep">
-					<property name="tasklet">
+					<property name="itemReader"
+						ref="fileInputTemplate2" />
+					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
-							<property name="itemReader" ref="fileInputTemplate2" />
-							<property name="itemWriter">
-								<bean class="org.springframework.batch.sample.item.writer.PersonWriter" />
-							</property>
-						</bean>
+							class="org.springframework.batch.sample.item.writer.PersonWriter" />
 					</property>
 				</bean>
 
@@ -50,21 +47,23 @@
 
 	<!-- INFRASTRUCTURE SETUP -->
 
-	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.DefaultFlatFileItemReader"
-		scope="step" >
+	<bean id="fileInputTemplate"
+		class="org.springframework.batch.io.file.DefaultFlatFileItemReader"
+		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator" />
 		<property name="tokenizer" ref="fixedFileDescriptor" />
 		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 
-	<bean id="fileInputTemplate2" class="org.springframework.batch.io.file.DefaultFlatFileItemReader"
+	<bean id="fileInputTemplate2"
+		class="org.springframework.batch.io.file.DefaultFlatFileItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator2" />
 		<property name="tokenizer" ref="fixedFileDescriptor2" />
 		<property name="fieldSetMapper" ref="fieldSetMapper2" />
-<!--		<property name="validator" ref="fixedValidator" />-->
+		<!--		<property name="validator" ref="fixedValidator" />-->
 	</bean>
 
 	<bean id="fixedFileDescriptor"
@@ -75,13 +74,17 @@
 
 	<bean id="fixedFileDescriptor2"
 		class="org.springframework.batch.io.file.transform.FixedLengthTokenizer">
-		<property name="names" value="Title, FirstName, LastName, Age, Address.AddrLine1, children[0].name, children[1].name" />
-		<property name="columns" value="1-5, 6-20, 21-40, 41-45, 46-55, 56-65, 66-75" />
+		<property name="names"
+			value="Title, FirstName, LastName, Age, Address.AddrLine1, children[0].name, children[1].name" />
+		<property name="columns"
+			value="1-5, 6-20, 21-40, 41-45, 46-55, 56-65, 66-75" />
 	</bean>
 
-	<bean id="fixedValidator" class="org.springframework.batch.item.validator.SpringValidator">
+	<bean id="fixedValidator"
+		class="org.springframework.batch.item.validator.SpringValidator">
 		<property name="validator">
-			<bean id="tradeValidator" class="org.springmodules.validation.valang.ValangValidator">
+			<bean id="tradeValidator"
+				class="org.springmodules.validation.valang.ValangValidator">
 				<property name="valang">
 					<value>
 						<![CDATA[
@@ -93,7 +96,8 @@
 		</property>
 	</bean>
 
-	<bean id="tradeDao" class="org.springframework.batch.sample.dao.JdbcTradeDao">
+	<bean id="tradeDao"
+		class="org.springframework.batch.sample.dao.JdbcTradeDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="incrementer">
 			<bean parent="incrementerParent">
@@ -104,29 +108,37 @@
 
 
 
-	<bean id="fileLocator" class="org.springframework.core.io.ClassPathResource">
+	<bean id="fileLocator"
+		class="org.springframework.core.io.ClassPathResource">
 		<constructor-arg type="java.lang.String"
 			value="data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 	</bean>
 
-	<bean id="fileLocator2" class="org.springframework.core.io.ClassPathResource">
+	<bean id="fileLocator2"
+		class="org.springframework.core.io.ClassPathResource">
 		<constructor-arg type="java.lang.String"
 			value="data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportPersonDataStep.txt" />
 	</bean>
 
-	<bean id="fieldSetMapper" class="org.springframework.batch.io.file.mapping.BeanWrapperFieldSetMapper">
-		<property name="prototypeBeanName" value="trade"/>
+	<bean id="fieldSetMapper"
+		class="org.springframework.batch.io.file.mapping.BeanWrapperFieldSetMapper">
+		<property name="prototypeBeanName" value="trade" />
 	</bean>
 
-	<bean id="fieldSetMapper2" class="org.springframework.batch.io.file.mapping.BeanWrapperFieldSetMapper">
-		<property name="prototypeBeanName" value="person"/>
+	<bean id="fieldSetMapper2"
+		class="org.springframework.batch.io.file.mapping.BeanWrapperFieldSetMapper">
+		<property name="prototypeBeanName" value="person" />
 	</bean>
 
-	<bean id="trade" class="org.springframework.batch.sample.domain.Trade" scope="prototype"/>
+	<bean id="trade"
+		class="org.springframework.batch.sample.domain.Trade"
+		scope="prototype" />
 
-	<bean id="person" class="org.springframework.batch.sample.domain.Person" scope="prototype"/>
+	<bean id="person"
+		class="org.springframework.batch.sample.domain.Person"
+		scope="prototype" />
 
-	<bean parent="customEditorConfigurer"/>
+	<bean parent="customEditorConfigurer" />
 
 	<!-- register the step scope with the application context -->
 	<bean class="org.springframework.batch.execution.scope.StepScope" />

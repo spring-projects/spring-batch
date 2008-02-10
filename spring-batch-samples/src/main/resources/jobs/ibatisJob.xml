@@ -1,36 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
-		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd" >
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-<description>
-	Example for iBATIS integration.
-</description>
+	<description>Example for iBATIS integration.</description>
 
-	<bean parent="stepScope"/>
-	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
+	<bean parent="stepScope" />
+	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
 	<bean id="ibatisJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
-				<property name="tasklet">
+				<property name="itemReader" ref="ibatisItemReader" />
+				<property name="itemWriter">
 					<bean
-						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
-						<property name="itemReader" ref="ibatisItemReader" />
-						<property name="itemWriter">
-							<bean class="org.springframework.batch.sample.item.writer.CustomerCreditIncreaseWriter">
-								<property name="customerCreditDao">
-									<bean class="org.springframework.batch.sample.dao.IbatisCustomerCreditWriter"
-										scope="step">
-										<aop:scoped-proxy />
-										<property name="sqlMapClient" ref="sqlMapClient" />
-										<property name="statementId" value="updateCredit" />
-									</bean>
-								</property>
+						class="org.springframework.batch.sample.item.writer.CustomerCreditIncreaseWriter">
+						<property name="customerCreditDao">
+							<bean
+								class="org.springframework.batch.sample.dao.IbatisCustomerCreditWriter"
+								scope="step">
+								<aop:scoped-proxy />
+								<property name="sqlMapClient"
+									ref="sqlMapClient" />
+								<property name="statementId"
+									value="updateCredit" />
 							</bean>
 						</property>
 					</bean>
@@ -39,20 +38,23 @@
 		</property>
 	</bean>
 
-	<bean id="ibatisItemReader" class="org.springframework.batch.io.driving.IbatisDrivingQueryItemReader"
-		scope="step" >
+	<bean id="ibatisItemReader"
+		class="org.springframework.batch.io.driving.IbatisDrivingQueryItemReader"
+		scope="step">
 		<aop:scoped-proxy />
 		<property name="detailsQueryId" value="getCustomerCreditById" />
 		<property name="sqlMapClient" ref="sqlMapClient" />
 		<property name="keyGenerator" ref="ibatisKeyGenerator" />
 	</bean>
 
-	<bean id="ibatisKeyGenerator" class="org.springframework.batch.io.driving.support.IbatisKeyGenerator">
+	<bean id="ibatisKeyGenerator"
+		class="org.springframework.batch.io.driving.support.IbatisKeyGenerator">
 		<property name="drivingQueryId" value="getAllCustomerCreditIds" />
 		<property name="sqlMapClient" ref="sqlMapClient" />
 	</bean>
 
-	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+	<bean id="sqlMapClient"
+		class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
 		<property name="configLocation" value="ibatis-config.xml" />
 		<property name="dataSource" ref="dataSource" />
 	</bean>
@@ -60,7 +62,7 @@
 
 
 
-	<bean parent="customEditorConfigurer"/>
+	<bean parent="customEditorConfigurer" />
 
 	<!-- register the step scope with the application context -->
 	<bean class="org.springframework.batch.execution.scope.StepScope" />

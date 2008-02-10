@@ -17,36 +17,30 @@
 	<bean id="xmlStaxJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
-				<property name="tasklet">
+				<property name="itemReader">
 					<bean
-						class="org.springframework.batch.execution.tasklet.ItemOrientedTasklet">
-						<property name="itemReader">
+						class="org.springframework.batch.io.xml.StaxEventItemReader"
+						scope="step">
+						<aop:scoped-proxy />
+						<property name="fragmentRootElementName"
+							value="trade" />
+						<property name="resource"
+							value="data/staxJob/input/20070918.testStream.xmlFileStep.xml" />
+						<property name="fragmentDeserializer">
 							<bean
-								class="org.springframework.batch.io.xml.StaxEventItemReader"
-								scope="step">
-								<aop:scoped-proxy />
-								<property name="fragmentRootElementName"
-									value="trade" />
-								<property name="resource"
-									value="data/staxJob/input/20070918.testStream.xmlFileStep.xml" />
-								<property name="fragmentDeserializer">
+								class="org.springframework.batch.io.xml.oxm.UnmarshallingEventReaderDeserializer">
+								<constructor-arg>
 									<bean
-										class="org.springframework.batch.io.xml.oxm.UnmarshallingEventReaderDeserializer">
-										<constructor-arg>
-											<bean
-												class="org.springframework.oxm.xstream.XStreamMarshaller">
-												<property name="aliases"
-													ref="aliases" />
-											</bean>
-										</constructor-arg>
+										class="org.springframework.oxm.xstream.XStreamMarshaller">
+										<property name="aliases"
+											ref="aliases" />
 									</bean>
-								</property>
+								</constructor-arg>
 							</bean>
 						</property>
-						<property name="itemWriter"
-							ref="tradeStaxWriter" />
 					</bean>
 				</property>
+				<property name="itemWriter" ref="tradeStaxWriter" />
 			</bean>
 		</property>
 	</bean>
