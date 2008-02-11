@@ -46,6 +46,10 @@ public class StepExecution extends Entity {
 	private int commitCount = 0;
 
 	private int rollbackCount = 0;
+	
+	private int skipCount = 0;
+	
+	private int retryCount = 0;
 
 	private Date startTime = new Date(System.currentTimeMillis());
 
@@ -367,6 +371,26 @@ public class StepExecution extends Entity {
 	 */
 	public void setTerminateOnly() {
 		this.terminateOnly = true;
+	}
+	
+	public void setSkipCount(int skipCount) {
+		this.skipCount = skipCount;
+	}
+	
+	public int getSkipCount() {
+		return skipCount;
+	}
+	
+	public void incrementSkipCount(){
+		skipCount++;
+	}
+	
+	public void setRetryCount(int retryCount) {
+		this.retryCount = retryCount;
+	}
+	
+	public int getRetryCount() {
+		return retryCount;
 	}
 
 }
