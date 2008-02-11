@@ -20,7 +20,7 @@ package org.springframework.batch.io.exception;
 /**
  * This exception should be thrown when there are validation errors.
  */
-public class ValidationException extends TransactionValidException {
+public class ValidationException extends ReadFailureException {
 	private static final long serialVersionUID = 7926495144451758088L;
 
 	public ValidationException(String message) {

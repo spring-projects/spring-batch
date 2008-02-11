@@ -22,7 +22,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.exception.TransactionInvalidException;
+import org.springframework.batch.io.exception.WriteFailureException;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
@@ -161,7 +161,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 		List throwables = new ArrayList() {
 			{
 				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
-					add(new TransactionInvalidException("below exception limit"));
+					add(new WriteFailureException("below exception limit"));
 				}
 			}
 		};
@@ -195,13 +195,13 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 		List throwables = new ArrayList() {
 			{
 				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
-					add(new TransactionInvalidException("below exception limit"));
+					add(new WriteFailureException("below exception limit"));
 				}
 			}
 		};
 
 		throwables
-				.add(new TransactionInvalidException("above exception limit"));
+				.add(new WriteFailureException("above exception limit"));
 
 		RepeatContextSupport context = new RepeatContextSupport(null);
 
@@ -213,7 +213,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 				assertTrue("exceptions up to limit are swallowed", true);
 
 			}
-		} catch (TransactionInvalidException expected) {
+		} catch (WriteFailureException expected) {
 			assertEquals("above exception limit", expected.getMessage());
 		}
 

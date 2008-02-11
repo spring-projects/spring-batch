@@ -17,20 +17,24 @@
 package org.springframework.batch.io.exception;
 
 /**
- * Throwing this exception causes transaction rollback.
+ * Exception thrown after encountering an error during a write.  It should
+ * generally be thrown by classes that implement the {@link ItemWriter} 
+ * interface.
+ * 
+ *  @author Lucas Ward
  */
-public class TransactionInvalidException extends BatchCriticalException {
+public class WriteFailureException extends BatchCriticalException {
 	private static final long serialVersionUID = -1933213086873834098L;
 
-	public TransactionInvalidException(String msg, Throwable ex) {
+	public WriteFailureException(String msg, Throwable ex) {
 		super(msg, ex);
 	}
 
-	public TransactionInvalidException(String msg) {
+	public WriteFailureException(String msg) {
 		super(msg);
 	}
 
-	public TransactionInvalidException(Throwable nested) {
+	public WriteFailureException(Throwable nested) {
 		super(nested);
 	}
 }

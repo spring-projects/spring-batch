@@ -20,15 +20,15 @@ package org.springframework.batch.io.exception;
 public class TransactionInvalidExceptionTests extends AbstractExceptionTests {
 
 	public Exception getException(String msg) throws Exception {
-		return new TransactionInvalidException(msg);
+		return new WriteFailureException(msg);
 	}
 
 	public Exception getException(Throwable t) throws Exception {
-		return new TransactionInvalidException(t);
+		return new WriteFailureException(t);
 	}
 
 	public Exception getException(String msg, Throwable t) throws Exception {
-		return new TransactionInvalidException(msg, t);
+		return new WriteFailureException(msg, t);
 	}
 
 	public void testNothing() throws Exception {

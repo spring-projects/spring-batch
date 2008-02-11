@@ -20,15 +20,15 @@ package org.springframework.batch.io.exception;
 public class TransactionValidExceptionTests extends AbstractExceptionTests {
 
 	public Exception getException(String msg) throws Exception {
-		return new TransactionValidException(msg);
+		return new ReadFailureException(msg);
 	}
 
 	public Exception getException(Throwable t) throws Exception {
-		return new TransactionValidException(t);
+		return new ReadFailureException(t);
 	}
 
 	public Exception getException(String msg, Throwable t) throws Exception {
-		return new TransactionValidException(msg, t);
+		return new ReadFailureException(msg, t);
 	}
 
 	public void testNothing() throws Exception {

@@ -21,7 +21,7 @@ import org.springframework.batch.item.exception.StreamException;
 import org.springframework.transaction.TransactionStatus;
 
 /**
- * Generalised stream management broadcast strategy. Clients register
+ * Generalized stream management broadcast strategy. Clients register
  * {@link ItemStream} instances under a well-known key, and then when they ask
  * for {@link ItemStream} operations by that key, we call each one in turn that
  * is registered under the key.

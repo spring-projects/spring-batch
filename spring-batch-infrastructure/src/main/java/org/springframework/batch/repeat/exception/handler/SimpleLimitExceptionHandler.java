@@ -19,7 +19,7 @@ package org.springframework.batch.repeat.exception.handler;
 import java.util.HashMap;
 
 import org.springframework.batch.common.ExceptionClassifierSupport;
-import org.springframework.batch.io.exception.TransactionInvalidException;
+import org.springframework.batch.io.exception.WriteFailureException;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**
@@ -33,13 +33,13 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 
 	/**
 	 * Name of exception classifier key for the
-	 * {@link TransactionInvalidException}.
+	 * {@link WriteFailureException}.
 	 */
 	private static final String TX_INVALID = "TX_INVALID";
 
 	private RethrowOnThresholdExceptionHandler delegate = new RethrowOnThresholdExceptionHandler();
 
-	private Class type = TransactionInvalidException.class;
+	private Class type = WriteFailureException.class;
 
 	/**
 	 * Flag to indicate the the exception counters should be shared between
@@ -102,7 +102,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 
 	/**
 	 * Setter for the Throwable type that this handler counts. Defaults to
-	 * {@link TransactionInvalidException}.
+	 * {@link WriteFailureException}.
 	 * 
 	 * @param type
 	 */

@@ -17,21 +17,24 @@
 package org.springframework.batch.io.exception;
 
 /**
- * This exception indicates an error which does not require the transaction to
- * be rolled back (for example when an invalid record is skipped).
+ * This exception indicates an error encountered while reading.  It should generally
+ * be thrown by classes that implement the {@link ItemReader} interface.
+ * 
+ * @author Lucas Ward
  */
-public class TransactionValidException extends BatchCriticalException {
+public class ReadFailureException extends BatchCriticalException {
+	
 	private static final long serialVersionUID = 4113323182216735223L;
 
-	public TransactionValidException(String msg, Throwable ex) {
+	public ReadFailureException(String msg, Throwable ex) {
 		super(msg, ex);
 	}
 
-	public TransactionValidException(String msg) {
+	public ReadFailureException(String msg) {
 		super(msg);
 	}
 
-	public TransactionValidException(Throwable nested) {
+	public ReadFailureException(Throwable nested) {
 		super(nested);
 	}
 }
