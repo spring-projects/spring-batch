@@ -27,6 +27,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
+import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
@@ -42,6 +43,8 @@ public abstract class AbstractStep extends StepSupport implements InitializingBe
 	private int skipLimit = 0;
 
 	private ExceptionHandler exceptionHandler;
+	
+	private RetryPolicy retryPolicy;
 
 	private JobRepository jobRepository;
 
@@ -69,6 +72,22 @@ public abstract class AbstractStep extends StepSupport implements InitializingBe
 	 */
 	public AbstractStep(String name) {
 		super(name);
+	}
+
+	/**
+	 * Public getter for the {@link RetryPolicy}.
+	 * @return the {@link RetryPolicy}
+	 */
+	public RetryPolicy getRetryPolicy() {
+		return retryPolicy;
+	}
+
+	/**
+	 * Public setter for the {@link RetryPolicy}.
+	 * @param retryPolicy the {@link RetryPolicy} to set
+	 */
+	public void setRetryPolicy(RetryPolicy retryPolicy) {
+		this.retryPolicy = retryPolicy;
 	}
 
 	public ExceptionHandler getExceptionHandler() {
@@ -177,6 +196,7 @@ public abstract class AbstractStep extends StepSupport implements InitializingBe
 		executor.setItemWriter(itemWriter);
 		executor.setItemRecoverer(itemRecoverer);
 		executor.setRepository(jobRepository);
+		executor.setRetryPolicy(retryPolicy);
 		executor.setStreamManager(manager);
 		try {
 			executor.afterPropertiesSet();

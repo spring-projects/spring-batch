@@ -23,8 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.file.separator.LineReader;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
 
 /**

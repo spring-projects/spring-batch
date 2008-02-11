@@ -16,6 +16,8 @@
 
 package org.springframework.batch.io.exception;
 
+import org.springframework.batch.item.ItemReader;
+
 /**
  * This exception indicates an error encountered while reading.  It should generally
  * be thrown by classes that implement the {@link ItemReader} interface.

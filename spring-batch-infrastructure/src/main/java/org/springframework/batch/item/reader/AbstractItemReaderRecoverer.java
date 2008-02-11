@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item;
+package org.springframework.batch.item.reader;
 
-import org.springframework.batch.item.reader.AbstractItemReader;
+import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.KeyedItemReader;
+
 
 /**
  * @author Dave Syer

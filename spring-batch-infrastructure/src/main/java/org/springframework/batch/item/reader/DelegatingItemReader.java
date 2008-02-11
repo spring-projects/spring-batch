@@ -17,9 +17,9 @@
 package org.springframework.batch.item.reader;
 
 import org.springframework.batch.io.Skippable;
+import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;

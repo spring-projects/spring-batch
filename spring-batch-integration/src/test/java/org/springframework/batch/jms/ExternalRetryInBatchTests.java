@@ -21,8 +21,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.item.AbstractItemReaderRecoverer;
 import org.springframework.batch.item.KeyedItemReader;
+import org.springframework.batch.item.reader.AbstractItemReaderRecoverer;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;

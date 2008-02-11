@@ -315,9 +315,6 @@ public class SimpleStepExecutor implements InitializingBean {
 
 					try {
 
-						/*
-						 * New transaction obtained, resynchronize TransactionSynchronization objects
-						 */
 						result = processChunk(step, contribution);
 
 						// TODO: check that stepExecution can

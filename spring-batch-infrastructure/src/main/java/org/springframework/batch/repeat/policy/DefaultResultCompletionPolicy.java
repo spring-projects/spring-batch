@@ -16,9 +16,9 @@
 
 package org.springframework.batch.repeat.policy;
 
-import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatContext;
 
 /**
  * Very simple {@link CompletionPolicy} that bases its decision on the result of

@@ -16,6 +16,8 @@
 
 package org.springframework.batch.io.exception;
 
+import org.springframework.batch.item.ItemWriter;
+
 /**
  * Exception thrown after encountering an error during a write.  It should
  * generally be thrown by classes that implement the {@link ItemWriter} 

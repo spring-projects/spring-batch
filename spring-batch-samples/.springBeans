@@ -31,6 +31,7 @@
 		<config>src/main/resources/jobs/delegatingJob.xml</config>
 		<config>src/main/resources/jobs/parallelJob.xml</config>
 		<config>src/main/resources/jobs/rollbackJob.xml</config>
+		<config>src/main/resources/jobs/retrySample.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -233,6 +234,17 @@
 				<config>src/main/resources/jobs/rollbackJob.xml</config>
 				<config>src/main/resources/simple-container-definition.xml</config>
 				<config>src/main/resources/jobs/tradeJobIo.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[retry]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/jobs/retrySample.xml</config>
+				<config>src/main/resources/simple-container-definition.xml</config>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
 			</configs>
 		</configSet>
 	</configSets>
