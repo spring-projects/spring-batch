@@ -16,19 +16,19 @@
 package org.springframework.batch.core.domain;
 
 import org.springframework.batch.core.AbstractExceptionTests;
-import org.springframework.batch.core.domain.StepInterruptedException;
+import org.springframework.batch.core.domain.JobInterruptedException;
 
 /**
  * @author Dave Syer
  *
  */
-public class StepInterruptedExceptionTests extends AbstractExceptionTests {
+public class JobInterruptedExceptionTests extends AbstractExceptionTests {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
 	public Exception getException(String msg) throws Exception {
-		return new StepInterruptedException(msg);
+		return new JobInterruptedException(msg);
 	}
 
 	/* (non-Javadoc)

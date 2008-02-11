@@ -19,21 +19,22 @@ import org.springframework.batch.common.ExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * Extension of the ExceptionClassifier that explicitly deals with
- * returns an ExitStatus.  This is useful for mapping from an exception
- * type to an Exit Code with a detailed message.
+ * Extension of the {@link ExceptionClassifier} that explicitly deals with
+ * returns an {@link ExitStatus}. This is useful for mapping from an exception
+ * type to an exit status with a customised code or detailed message.
  * 
  * @author Lucas Ward
- *
+ * 
  */
-public interface ExitCodeExceptionClassifier extends ExceptionClassifier {
+public interface ExitStatusExceptionClassifier extends ExceptionClassifier {
 
-	static final String FATAL_EXCEPTION = "FATAL_EXCEPTION";
-	static final String STEP_INTERRUPTED = "STEP_INTERRUPTED";
-	
+	public static final String FATAL_EXCEPTION = "FATAL_EXCEPTION";
+
+	public static final String JOB_INTERRUPTED = "JOB_INTERRUPTED";
+
 	/**
-	 * Typesafe version of classify that explicitly returns an {@link ExitStatus}
-	 * object.
+	 * Typesafe version of classify that explicitly returns an
+	 * {@link ExitStatus} object.
 	 * 
 	 * @param throwable
 	 * @return ExitStatus representing the ExitCode and Message for the given

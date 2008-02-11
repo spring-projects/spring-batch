@@ -32,7 +32,7 @@ import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.domain.StepInterruptedException;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
@@ -478,8 +478,8 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy() {
 
-			public void checkInterrupted(RepeatContext context) throws StepInterruptedException {
-				throw new StepInterruptedException("");
+			public void checkInterrupted(RepeatContext context) throws JobInterruptedException {
+				throw new JobInterruptedException("");
 			}
 		};
 
@@ -514,11 +514,11 @@ public class SimpleStepExecutorTests extends TestCase {
 			stepExecutor.execute(stepExecution);
 			fail("Expected StepInterruptedException");
 		}
-		catch (StepInterruptedException ex) {
+		catch (JobInterruptedException ex) {
 			assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertTrue("Message does not contain StepInterruptedException: " + msg, msg
-					.contains("StepInterruptedException"));
+			assertTrue("Message does not contain JobInterruptedException: " + msg, msg
+					.contains("JobInterruptedException"));
 		}
 	}
 

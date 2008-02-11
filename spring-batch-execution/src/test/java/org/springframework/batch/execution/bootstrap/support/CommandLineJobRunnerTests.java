@@ -21,7 +21,7 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
+import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -133,7 +133,7 @@ public class CommandLineJobRunnerTests extends TestCase {
 		}
 	}
 	
-	public static class StubExceptionClassifier implements ExitCodeExceptionClassifier{
+	public static class StubExceptionClassifier implements ExitStatusExceptionClassifier{
 
 		public static Throwable exception;
 		

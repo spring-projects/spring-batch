@@ -58,15 +58,6 @@
 			ref="jobExecutionIncrementer" />
 	</bean>
 
-	<!--bean id="stepDao" lazy-init="true"
-		class="org.springframework.batch.execution.repository.dao.JdbcStepDao">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
-		<property name="stepIncrementer" ref="stepIncrementer" />
-		<property name="stepExecutionIncrementer"
-			ref="stepExecutionIncrementer" />
-		<property name="jobDao" ref="jobDao" />
-	</bean-->
-	
 	<bean id="stepInstanceDao" lazy-init="true"
 		class="org.springframework.batch.execution.repository.dao.JdbcStepInstanceDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />

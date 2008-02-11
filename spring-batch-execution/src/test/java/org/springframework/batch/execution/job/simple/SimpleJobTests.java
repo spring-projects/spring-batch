@@ -24,12 +24,12 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.domain.StepInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
+import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
@@ -170,7 +170,7 @@ public class SimpleJobTests extends TestCase {
 	public void testInterrupted() throws Exception {
 		stepConfiguration1.setStartLimit(5);
 		stepConfiguration2.setStartLimit(5);
-		final StepInterruptedException exception = new StepInterruptedException("Interrupt!");
+		final JobInterruptedException exception = new JobInterruptedException("Interrupt!");
 		stepConfiguration1.setProcessException(exception);
 		try {
 			job.execute(jobExecution);
@@ -179,7 +179,7 @@ public class SimpleJobTests extends TestCase {
 			assertEquals(exception, e.getCause());
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.STOPPED, new ExitStatus(false, ExitCodeExceptionClassifier.STEP_INTERRUPTED));
+		checkRepository(BatchStatus.STOPPED, new ExitStatus(false, ExitStatusExceptionClassifier.JOB_INTERRUPTED));
 	}
 
 	public void testFailed() throws Exception {
@@ -194,7 +194,7 @@ public class SimpleJobTests extends TestCase {
 			assertEquals(exception, e);
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.FAILED, new ExitStatus(false, ExitCodeExceptionClassifier.FATAL_EXCEPTION));
+		checkRepository(BatchStatus.FAILED, new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION));
 	}
 
 	public void testStepShouldNotStart() throws Exception {
@@ -229,8 +229,25 @@ public class SimpleJobTests extends TestCase {
 
 		job.execute(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
-		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().indexOf(
-				"steps already completed") >= 0);
+		assertEquals(ExitStatus.NOOP.getExitCode(), exitStatus.getExitCode());
+		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().contains(
+				"steps already completed"));
+	}
+
+	public void testNotExecutedIfAlreadyStopped() throws Exception {
+		jobExecution.stop();
+		try {
+			job.execute(jobExecution);
+		}
+		catch (BatchCriticalException e) {
+			assertTrue(e.getCause() instanceof JobInterruptedException);
+		}
+		assertEquals(0, list.size());
+		checkRepository(BatchStatus.STOPPED, new ExitStatus(false, ExitStatusExceptionClassifier.JOB_INTERRUPTED));
+		ExitStatus exitStatus = jobExecution.getExitStatus();
+		assertEquals(ExitStatusExceptionClassifier.JOB_INTERRUPTED, exitStatus.getExitCode());
+		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().contains(
+				"JobInterruptedException"));
 	}
 
 	/*
@@ -277,12 +294,12 @@ public class SimpleJobTests extends TestCase {
 			this.runnable = runnable;
 		}
 
-		public void execute(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
+		public void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException {
 			if (exception instanceof RuntimeException) {
 				throw (RuntimeException)exception;
 			}
-			if (exception instanceof StepInterruptedException) {
-				throw (StepInterruptedException)exception;
+			if (exception instanceof JobInterruptedException) {
+				throw (JobInterruptedException)exception;
 			}
 			if (runnable!=null) {
 				runnable.run();

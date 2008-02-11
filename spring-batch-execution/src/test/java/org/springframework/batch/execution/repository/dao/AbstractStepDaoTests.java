@@ -26,7 +26,7 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
+import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.PropertiesConverter;
@@ -178,7 +178,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		execution.setStatus(BatchStatus.STARTED);
 		execution.setStartTime(new Date(System.currentTimeMillis()));
 		execution.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter.stringToProperties("key1=0,key2=5")));
-		execution.setExitStatus(new ExitStatus(false, ExitCodeExceptionClassifier.FATAL_EXCEPTION,
+		execution.setExitStatus(new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));
 		stepExecutionDao.saveStepExecution(execution);
 		List executions = stepExecutionDao.findStepExecutions(step2);
@@ -196,7 +196,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepExecution.setCommitCount(5);
 		stepExecution.setTaskCount(5);
 		stepExecution.setExecutionAttributes(new ExecutionAttributes());
-		stepExecution.setExitStatus(new ExitStatus(false, ExitCodeExceptionClassifier.FATAL_EXCEPTION,
+		stepExecution.setExitStatus(new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));
 		stepExecutionDao.updateStepExecution(stepExecution);
 		List executions = stepExecutionDao.findStepExecutions(step1);

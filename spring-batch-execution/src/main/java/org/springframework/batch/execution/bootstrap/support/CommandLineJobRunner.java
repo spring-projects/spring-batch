@@ -24,10 +24,10 @@ import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.repository.JobLocator;
-import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
+import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.batch.execution.launch.JobLauncher;
-import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
+import org.springframework.batch.execution.step.simple.SimpleExitStatusExceptionClassifier;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -122,7 +122,7 @@ public class CommandLineJobRunner {
 
 	private ExitCodeMapper exitCodeMapper = new SimpleJvmExitCodeMapper();
 
-	private ExitCodeExceptionClassifier exceptionClassifier = new SimpleExitCodeExceptionClassifier();
+	private ExitStatusExceptionClassifier exceptionClassifier = new SimpleExitStatusExceptionClassifier();
 
 	private JobLauncher launcher;
 
@@ -143,12 +143,12 @@ public class CommandLineJobRunner {
 	}
 
 	/**
-	 * Injection setter for the {@link ExitCodeExceptionClassifier}
+	 * Injection setter for the {@link ExitStatusExceptionClassifier}
 	 * 
 	 * @param exceptionClassifier
 	 */
 	public void setExceptionClassifier(
-			ExitCodeExceptionClassifier exceptionClassifier) {
+			ExitStatusExceptionClassifier exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 

@@ -24,9 +24,9 @@ import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.domain.StepInterruptedException;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
+import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepContext;
@@ -85,7 +85,7 @@ public class SimpleStepExecutor implements InitializingBean {
 
 	private JobRepository jobRepository;
 
-	private ExitCodeExceptionClassifier exceptionClassifier = new SimpleExitCodeExceptionClassifier();
+	private ExitStatusExceptionClassifier exceptionClassifier = new SimpleExitStatusExceptionClassifier();
 
 	// default to checking current thread for interruption.
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
@@ -164,12 +164,12 @@ public class SimpleStepExecutor implements InitializingBean {
 	}
 
 	/**
-	 * Setter for the {@link ExitCodeExceptionClassifier} that will be used to classify any exception that causes a job
+	 * Setter for the {@link ExitStatusExceptionClassifier} that will be used to classify any exception that causes a job
 	 * to fail.
 	 * 
 	 * @param exceptionClassifier
 	 */
-	public void setExceptionClassifier(ExitCodeExceptionClassifier exceptionClassifier) {
+	public void setExceptionClassifier(ExitStatusExceptionClassifier exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 
@@ -267,11 +267,11 @@ public class SimpleStepExecutor implements InitializingBean {
 	 * information are also added to the current context (the {@link RepeatContext} governing the step execution, which
 	 * would normally be available to the caller somehow through the step's {@link JobExecutionContext}.<br/>
 	 * 
-	 * @throws StepInterruptedException if the step or a chunk is interrupted
+	 * @throws JobInterruptedException if the step or a chunk is interrupted
 	 * @throws RuntimeException if there is an exception during a chunk execution
 	 * @see StepExecutor#execute(StepExecution)
 	 */
-	public void execute(final StepExecution stepExecution) throws BatchCriticalException, StepInterruptedException {
+	public void execute(final StepExecution stepExecution) throws BatchCriticalException, JobInterruptedException {
 
 		final StepInstance stepInstance = stepExecution.getStep();
 		Assert.notNull(stepInstance);
@@ -386,9 +386,9 @@ public class SimpleStepExecutor implements InitializingBean {
 
 			// classify exception so an exit code can be stored.
 			status = exceptionClassifier.classifyForExitCode(e);
-			if (e.getCause() instanceof StepInterruptedException) {
+			if (e.getCause() instanceof JobInterruptedException) {
 				updateStatus(stepExecution, BatchStatus.STOPPED);
-				throw (StepInterruptedException) e.getCause();
+				throw (JobInterruptedException) e.getCause();
 			} else if (e instanceof ResetFailedException) {
 				updateStatus(stepExecution, BatchStatus.UNKNOWN);
 				throw (ResetFailedException) e;

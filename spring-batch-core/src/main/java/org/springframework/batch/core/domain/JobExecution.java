@@ -66,7 +66,7 @@ public class JobExecution extends Entity {
 	public JobExecution(JobInstance job) {
 		this(job, null);
 	}
-
+	
 	public Date getEndTime() {
 		return endTime;
 	}
@@ -164,7 +164,7 @@ public class JobExecution extends Entity {
 	 * @return true if the end time is null
 	 */
 	public boolean isRunning() {
-		return endTime == null;
+		return endTime == null && !(BatchStatus.STOPPED==status);
 	}
 
 	/**
@@ -177,5 +177,6 @@ public class JobExecution extends Entity {
 			StepExecution stepExecution = (StepExecution) it.next();
 			stepExecution.setTerminateOnly();
 		}
+		status = BatchStatus.STOPPED;
 	}
 }

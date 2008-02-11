@@ -17,7 +17,7 @@ package org.springframework.batch.execution.step.simple;
 
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInterruptedException;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.io.exception.BatchCriticalException;
@@ -174,7 +174,7 @@ public abstract class AbstractStep extends StepSupport implements InitializingBe
 
 	}
 
-	public void execute(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
+	public void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException {
 		SimpleStepExecutor executor = createStepExecutor();
 		executor.execute(stepExecution);
 	}

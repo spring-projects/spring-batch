@@ -18,13 +18,13 @@ package org.springframework.batch.execution.step.simple;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.springframework.batch.core.domain.StepInterruptedException;
-import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
+import org.springframework.batch.core.domain.JobInterruptedException;
+import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * <p>
- * Simple implementation of {@link ExitCodeExceptionClassifier} that returns
+ * Simple implementation of {@link ExitStatusExceptionClassifier} that returns
  * basic String exit codes, and defaults to the class name of the throwable for
  * the message. Most users will want to write their own implementation that
  * creates more specific exit codes for different exception types.
@@ -33,8 +33,8 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Lucas Ward
  * 
  */
-public class SimpleExitCodeExceptionClassifier implements
-		ExitCodeExceptionClassifier {
+public class SimpleExitStatusExceptionClassifier implements
+		ExitStatusExceptionClassifier {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.executor.ExitCodeExceptionClassifier#classifyForExitCode(java.lang.Throwable)
@@ -50,9 +50,9 @@ public class SimpleExitCodeExceptionClassifier implements
 
 		ExitStatus exitStatus = ExitStatus.FAILED;
 
-		if (throwable instanceof StepInterruptedException) {
-			exitStatus = new ExitStatus(false, STEP_INTERRUPTED,
-					StepInterruptedException.class.getName());
+		if (throwable instanceof JobInterruptedException) {
+			exitStatus = new ExitStatus(false, JOB_INTERRUPTED,
+					JobInterruptedException.class.getName());
 		} else {
 			String message = "";
 			if (throwable!=null) {

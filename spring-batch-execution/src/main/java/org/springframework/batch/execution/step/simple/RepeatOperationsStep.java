@@ -18,7 +18,7 @@ package org.springframework.batch.execution.step.simple;
 
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInterruptedException;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.RepeatOperations;
 
@@ -72,7 +72,7 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 		this.stepOperations = stepOperations;
 	}
 
-	public void execute(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
+	public void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException {
 		assertMandatoryProperties();
 		SimpleStepExecutor executor = (SimpleStepExecutor) super.createStepExecutor();
 		if (stepOperations != null) {

@@ -17,7 +17,7 @@
 package org.springframework.batch.execution.step.simple;
 
 import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.domain.StepInterruptedException;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**
@@ -31,10 +31,10 @@ public interface StepInterruptionPolicy {
 
 	/**
 	 * Has the job been interrupted? If so then throw a
-	 * {@link StepInterruptedException}.
+	 * {@link JobInterruptedException}.
 	 * @param context the current context of the running step.
 	 * 
-	 * @throws StepInterruptedException when the job has been interrupted.
+	 * @throws JobInterruptedException when the job has been interrupted.
 	 */
-	void checkInterrupted(RepeatContext context) throws StepInterruptedException;
+	void checkInterrupted(RepeatContext context) throws JobInterruptedException;
 }

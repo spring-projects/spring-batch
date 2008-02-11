@@ -17,7 +17,7 @@ package org.springframework.batch.execution.step.simple;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.StepInterruptedException;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 
@@ -48,7 +48,7 @@ public class ThreadStepInterruptionPolicyTests extends TestCase {
 		try {
 			policy.checkInterrupted(context);
 			fail("Expected StepInterruptedException");
-		} catch (StepInterruptedException e) {
+		} catch (JobInterruptedException e) {
 			// expected
 			assertTrue(e.getMessage().indexOf("interrupt")>=0);
 		}

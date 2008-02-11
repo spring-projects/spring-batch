@@ -10,7 +10,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.domain.StepInterruptedException;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.step.simple.JobRepositorySupport;
 import org.springframework.batch.io.exception.BatchCriticalException;
@@ -83,7 +83,7 @@ public class TaskletStepTests extends TestCase {
 		assertEquals(2, list.size());
 	}
 
-	public void testExceptionExecution() throws StepInterruptedException, BatchCriticalException {
+	public void testExceptionExecution() throws JobInterruptedException, BatchCriticalException {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, true), new JobRepositorySupport());
 		try {
 			step.execute(stepExecution);

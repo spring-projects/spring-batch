@@ -62,10 +62,10 @@ public interface Step {
 	 * 
 	 * @param stepExecution an entity representing the step to be executed
 	 * 
-	 * @throws StepInterruptedException if the step is interrupted externally
+	 * @throws JobInterruptedException if the step is interrupted externally
 	 * @throws BatchCriticalException if there is a problem that needs to be
 	 * signalled to the caller
 	 */
-	void execute(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException;
+	void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException;
 
 }

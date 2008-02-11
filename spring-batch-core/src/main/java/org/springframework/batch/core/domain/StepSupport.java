@@ -117,7 +117,7 @@ public class StepSupport implements Step, BeanNameAware {
 	 * 
 	 * @see org.springframework.batch.core.domain.Step#execute(org.springframework.batch.core.domain.StepExecution)
 	 */
-	public void execute(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
+	public void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException {
 		throw new UnsupportedOperationException(
 		        "Cannot process a StepExecution.  Use a smarter subclass of StepSupport.");
 	}

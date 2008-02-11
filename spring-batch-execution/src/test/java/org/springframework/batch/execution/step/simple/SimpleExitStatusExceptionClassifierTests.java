@@ -16,8 +16,8 @@
 package org.springframework.batch.execution.step.simple;
 
 
-import org.springframework.batch.core.domain.StepInterruptedException;
-import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
+import org.springframework.batch.core.domain.JobInterruptedException;
+import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
 
 import junit.framework.TestCase;
@@ -26,15 +26,14 @@ import junit.framework.TestCase;
  * @author Lucas Ward
  *
  */
-public class SimpleExitCodeExceptionClassifierTests extends TestCase {
+public class SimpleExitStatusExceptionClassifierTests extends TestCase {
 
 	NullPointerException exception;
 	
-	SimpleExitCodeExceptionClassifier classifier = new SimpleExitCodeExceptionClassifier();
+	SimpleExitStatusExceptionClassifier classifier = new SimpleExitStatusExceptionClassifier();
 	
 	protected void setUp() throws Exception {		
 		super.setUp();
-		
 		exception = new NullPointerException();
 	}
 	
@@ -69,9 +68,9 @@ public class SimpleExitCodeExceptionClassifierTests extends TestCase {
 	}
 	
 	public void testClassifyInterruptedException(){
-		ExitStatus exitStatus = (ExitStatus)classifier.classifyForExitCode(new StepInterruptedException(""));
-		assertEquals(exitStatus.getExitCode(), ExitCodeExceptionClassifier.STEP_INTERRUPTED);
+		ExitStatus exitStatus = (ExitStatus)classifier.classifyForExitCode(new JobInterruptedException(""));
+		assertEquals(exitStatus.getExitCode(), ExitStatusExceptionClassifier.JOB_INTERRUPTED);
 		assertEquals(exitStatus.getExitDescription(), 
-				StepInterruptedException.class.getName());
+				JobInterruptedException.class.getName());
 	}
 }

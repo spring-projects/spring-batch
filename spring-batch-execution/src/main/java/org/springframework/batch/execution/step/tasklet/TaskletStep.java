@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInterruptedException;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
@@ -106,7 +106,7 @@ public class TaskletStep extends StepSupport implements InitializingBean {
 		this.jobRepository = jobRepository;
 	}
 
-	public void execute(StepExecution stepExecution) throws StepInterruptedException, BatchCriticalException {
+	public void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException {
 		stepExecution.setStartTime(new Date());
 		updateStatus(stepExecution, BatchStatus.STARTED);
 

@@ -28,10 +28,10 @@ import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.domain.StepInterruptedException;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.ExitCodeExceptionClassifier;
-import org.springframework.batch.execution.step.simple.SimpleExitCodeExceptionClassifier;
+import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
+import org.springframework.batch.execution.step.simple.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -47,7 +47,7 @@ public class SimpleJob extends JobSupport {
 
 	private JobRepository jobRepository;
 
-	private ExitCodeExceptionClassifier exceptionClassifier = new SimpleExitCodeExceptionClassifier();
+	private ExitStatusExceptionClassifier exceptionClassifier = new SimpleExitStatusExceptionClassifier();
 
 	/**
 	 * Run the specified job by looping through the steps and delegating to the
@@ -59,13 +59,20 @@ public class SimpleJob extends JobSupport {
 
 		JobInstance jobInstance = execution.getJobInstance();
 		jobInstance.setLastExecution(execution);
-		updateStatus(execution, BatchStatus.STARTING);
 
 		List stepInstances = jobInstance.getStepInstances();
 
 		ExitStatus status = ExitStatus.FAILED;
 
 		try {
+
+			// The job was already stopped before we even got this far. Deal
+			// with it in the same way as any other interruption.
+			if (execution.getStatus() == BatchStatus.STOPPED) {
+				throw new JobInterruptedException("JobExecution already stopped before being executed.");
+			}
+
+			updateStatus(execution, BatchStatus.STARTING);
 
 			int startedCount = 0;
 
@@ -97,7 +104,7 @@ public class SimpleJob extends JobSupport {
 			updateStatus(execution, BatchStatus.COMPLETED);
 
 		}
-		catch (StepInterruptedException e) {
+		catch (JobInterruptedException e) {
 			updateStatus(execution, BatchStatus.STOPPED);
 			status = exceptionClassifier.classifyForExitCode(e);
 			rethrow(e);
@@ -138,11 +145,9 @@ public class SimpleJob extends JobSupport {
 		}
 
 		if (stepStatus == BatchStatus.UNKNOWN) {
-			throw new BatchCriticalException(
-					"Cannot restart step from UNKNOWN status.  " +
-					"The last execution ended with a failure that could not be rolled back, " +
-					"so it may be dangerous to proceed.  " +
-					"Manual intervention is probably necessary.");
+			throw new BatchCriticalException("Cannot restart step from UNKNOWN status.  "
+					+ "The last execution ended with a failure that could not be rolled back, "
+					+ "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
 		}
 
 		if (stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) {
@@ -191,7 +196,7 @@ public class SimpleJob extends JobSupport {
 	 * 
 	 * @param exceptionClassifier
 	 */
-	public void setExceptionClassifier(ExitCodeExceptionClassifier exceptionClassifier) {
+	public void setExceptionClassifier(ExitStatusExceptionClassifier exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 }

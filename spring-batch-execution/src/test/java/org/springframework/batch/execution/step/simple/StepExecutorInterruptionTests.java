@@ -27,7 +27,7 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.domain.StepInterruptedException;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
@@ -98,7 +98,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 				try {
 					step.execute(stepExecution);
 				}
-				catch (StepInterruptedException e) {
+				catch (JobInterruptedException e) {
 					// do nothing...
 				}
 			}
