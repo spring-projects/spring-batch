@@ -34,7 +34,8 @@ import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
-import org.springframework.batch.execution.repository.dao.StepDao;
+import org.springframework.batch.execution.repository.dao.StepExecutionDao;
+import org.springframework.batch.execution.repository.dao.StepInstanceDao;
 import org.springframework.batch.execution.step.simple.SimpleStep;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.reader.AbstractItemReader;
@@ -52,7 +53,9 @@ public class SimpleJobTests extends TestCase {
 
 	private JobDao jobDao;
 
-	private StepDao stepDao;
+	private StepInstanceDao stepInstanceDao;
+	
+	private StepExecutionDao stepExecutionDao;
 
 	private List list = new ArrayList();
 
@@ -82,8 +85,9 @@ public class SimpleJobTests extends TestCase {
 		MapJobDao.clear();
 		MapStepDao.clear();
 		jobDao = new MapJobDao();
-		stepDao = new MapStepDao();
-		jobRepository = new SimpleJobRepository(jobDao, stepDao);
+		stepInstanceDao = new MapStepDao();
+		stepExecutionDao = new MapStepDao();
+		jobRepository = new SimpleJobRepository(jobDao, stepInstanceDao, stepExecutionDao);
 		job = new SimpleJob();
 		job.setJobRepository(jobRepository);
 

@@ -35,11 +35,9 @@ import org.springframework.batch.core.repository.NoSuchBatchDomainObjectExceptio
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * Jdbc implementation of {@link JobDao}. Uses sequences (via Spring's
@@ -53,7 +51,7 @@ import org.springframework.util.StringUtils;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class JdbcJobDao implements JobDao, InitializingBean {
+public class JdbcJobDao extends AbstractJdbcBatchMetadataDao implements JobDao, InitializingBean {
 
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?";
 
@@ -63,11 +61,6 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	
 	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_PARAMS(JOB_INSTANCE_ID, KEY_NAME, TYPE_CD, " +
 			"STRING_VAL, DATE_VAL, LONG_VAL) values (?, ?, ?, ?, ?, ?)";
-	
-	/**	
-	 * Default value for the table prefix property.
-	 */
-	public static final String DEFAULT_TABLE_PREFIX = "BATCH_";
 
 	private static final int EXIT_MESSAGE_LENGTH = 250;
 
@@ -87,13 +80,9 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ? where JOB_EXECUTION_ID = ?";
 
-	private JdbcOperations jdbcTemplate;
-
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
 	private DataFieldMaxValueIncrementer jobIncrementer;
-
-	private String tablePrefix = DEFAULT_TABLE_PREFIX;
 
 	/*
 	 * (non-Javadoc)
@@ -103,8 +92,6 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	 * Ensure jdbcTemplate and incrementers have been provided.
 	 */
 	public void afterPropertiesSet() throws Exception {
-
-		Assert.notNull(jdbcTemplate, "JdbcTemplate cannot be null");
 		Assert.notNull(jobIncrementer, "JobIncrementor cannot be null");
 		Assert.notNull(jobExecutionIncrementer,
 				"JobExecutionIncrementer cannot be null");
@@ -127,7 +114,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 
 		Long jobId = new Long(jobIncrementer.nextLongValue());
 		Object[] parameters = new Object[] { jobId, jobName, createJobKey(jobParameters) };
-		jdbcTemplate.update(getCreateJobQuery(), parameters, new int[] {
+		getJdbcTemplate().update(getCreateJobQuery(), parameters, new int[] {
 			 Types.INTEGER, Types.VARCHAR, Types.VARCHAR});
 
 		insertJobParameters(jobId, jobParameters);
@@ -153,7 +140,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 		Assert.notNull(job, "Job cannot be null.");
 		Assert.notNull(job.getId(), "Job Id cannot be null.");
 
-		return jdbcTemplate.query(
+		return getJdbcTemplate().query(
 				getQuery(JobExecutionRowMapper.FIND_JOB_EXECUTIONS),
 				new Object[] { job.getId() }, new JobExecutionRowMapper(job));
 	}
@@ -162,7 +149,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 		
 		Assert.notNull(jobExecutionId, "Job Execution id must not be null.");
 		
-		List executions = jdbcTemplate.query(
+		List executions = getJdbcTemplate().query(
 				getQuery(JobExecutionRowMapper.GET_JOB_EXECUTION),
 				new Object[] { jobExecutionId }, new JobExecutionRowMapper(null));
 		
@@ -211,7 +198,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 			}
 		};
 
-		return jdbcTemplate.query(getFindJobsQuery(), parameters, rowMapper);
+		return getJdbcTemplate().query(getFindJobsQuery(), parameters, rowMapper);
 	}
 
 	private String getCheckJobExecutionExistsQuery() {
@@ -241,16 +228,12 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 
 		Object[] parameters = new Object[] { jobId };
 
-		return jdbcTemplate
+		return getJdbcTemplate()
 				.queryForInt(getJobExecutionCountQuery(), parameters);
 	}
 
 	private String getJobExecutionCountQuery() {
 		return getQuery(GET_JOB_EXECUTION_COUNT);
-	}
-
-	private String getQuery(String base) {
-		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
 	}
 
 	private String getSaveJobExecutionQuery() {
@@ -317,7 +300,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 			args = new Object[]{jobId, key, type, "", value, new Long(0)};
 		}
 		
-		jdbcTemplate.update(getCreateJobParamsQuery(), args, argTypes);
+		getJdbcTemplate().update(getCreateJobParamsQuery(), args, argTypes);
 	}
 
 	/**
@@ -342,13 +325,9 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 				jobExecution.getExitStatus().isContinuable() ? "Y" : "N",
 				jobExecution.getExitStatus().getExitCode(),
 				jobExecution.getExitStatus().getExitDescription() };
-		jdbcTemplate.update(getSaveJobExecutionQuery(), parameters, new int[] {
+		getJdbcTemplate().update(getSaveJobExecutionQuery(), parameters, new int[] {
 				Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP,
 				Types.VARCHAR, Types.CHAR, Types.VARCHAR, Types.VARCHAR });
-	}
-
-	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
 	}
 
 	/**
@@ -372,18 +351,6 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 	 */
 	public void setJobIncrementer(DataFieldMaxValueIncrementer jobIncrementer) {
 		this.jobIncrementer = jobIncrementer;
-	}
-
-	/**
-	 * Public setter for the table prefix property. This will be prefixed to all
-	 * the table names before queries are executed. Defaults to
-	 * {@value #DEFAULT_TABLE_PREFIX}.
-	 * 
-	 * @param tablePrefix
-	 *            the tablePrefix to set
-	 */
-	public void setTablePrefix(String tablePrefix) {
-		this.tablePrefix = tablePrefix;
 	}
 
 	/**
@@ -422,14 +389,14 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 		// Check if given JobExecution's Id already exists, if none is found it
 		// is invalid and
 		// an exception should be thrown.
-		if (jdbcTemplate.queryForInt(getCheckJobExecutionExistsQuery(),
+		if (getJdbcTemplate().queryForInt(getCheckJobExecutionExistsQuery(),
 				new Object[] { jobExecution.getId() }) != 1) {
 			throw new NoSuchBatchDomainObjectException(
 					"Invalid JobExecution, ID " + jobExecution.getId()
 							+ " not found.");
 		}
 
-		jdbcTemplate
+		getJdbcTemplate()
 				.update(getUpdateJobExecutionQuery(), parameters,
 						new int[] { Types.TIMESTAMP, Types.TIMESTAMP,
 								Types.VARCHAR, Types.CHAR, Types.VARCHAR,
@@ -448,7 +415,7 @@ public class JdbcJobDao implements JobDao, InitializingBean {
 		
 		Long lastExecutionId = jobInstance.getLastExecution() == null ? null : jobInstance.getLastExecution().getId();
 		Object[] parameters = new Object[] { lastExecutionId, jobInstance.getId() };
-		jdbcTemplate.update(getUpdateJobQuery(), parameters, new int[] {
+		getJdbcTemplate().update(getUpdateJobQuery(), parameters, new int[] {
 			 Types.INTEGER, Types.INTEGER});
 	}
 

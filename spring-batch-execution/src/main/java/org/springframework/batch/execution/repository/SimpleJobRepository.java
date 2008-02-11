@@ -32,7 +32,8 @@ import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
-import org.springframework.batch.execution.repository.dao.StepDao;
+import org.springframework.batch.execution.repository.dao.StepExecutionDao;
+import org.springframework.batch.execution.repository.dao.StepInstanceDao;
 import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.Assert;
@@ -56,7 +57,9 @@ public class SimpleJobRepository implements JobRepository {
 
 	private JobDao jobDao;
 
-	private StepDao stepDao;
+	private StepInstanceDao stepInstanceDao;
+
+	private StepExecutionDao stepExecutionDao;
 
 	/**
 	 * Provide default constructor with low visibility in case user wants to use
@@ -65,10 +68,11 @@ public class SimpleJobRepository implements JobRepository {
 	SimpleJobRepository() {
 	}
 
-	public SimpleJobRepository(JobDao jobDao, StepDao stepDao) {
+	public SimpleJobRepository(JobDao jobDao, StepInstanceDao stepInstanceDao, StepExecutionDao stepExecutionDao) {
 		super();
 		this.jobDao = jobDao;
-		this.stepDao = stepDao;
+		this.stepInstanceDao = stepInstanceDao;
+		this.stepExecutionDao = stepExecutionDao;
 	}
 
 	/**
@@ -85,8 +89,8 @@ public class SimpleJobRepository implements JobRepository {
 	 * There are two ways in which the method determines if a job should be
 	 * created or an existing one should be returned. The first is
 	 * restartability. The {@link JobSupport} restartable property will be
-	 * checked first. If it is false, a new job will be created, regardless
-	 * of whether or not one exists. If it is true, the {@link JobDao} will be
+	 * checked first. If it is false, a new job will be created, regardless of
+	 * whether or not one exists. If it is true, the {@link JobDao} will be
 	 * checked to determine if the job already exists, if it does, it's steps
 	 * will be populated (there must be at least 1) and a new
 	 * {@link JobExecution} will be returned. If no job is found, a new one will
@@ -256,13 +260,13 @@ public class SimpleJobRepository implements JobRepository {
 
 		if (stepExecution.getId() == null) {
 			// new execution, obtain id and insert
-			stepDao.saveStepExecution(stepExecution);
-			stepDao.saveExecutionAttributes(stepExecution.getId(), stepExecution.getExecutionAttributes());
+			stepExecutionDao.saveStepExecution(stepExecution);
+			stepExecutionDao.saveExecutionAttributes(stepExecution.getId(), stepExecution.getExecutionAttributes());
 		}
 		else {
 			// existing execution, update
-			stepDao.updateStepExecution(stepExecution);
-			stepDao.updateExecutionAttributes(stepExecution.getId(), stepExecution.getExecutionAttributes());
+			stepExecutionDao.updateStepExecution(stepExecution);
+			stepExecutionDao.updateExecutionAttributes(stepExecution.getId(), stepExecution.getExecutionAttributes());
 		}
 	}
 
@@ -278,7 +282,7 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(step.getId(), "Step cannot be updated if it's ID is null.  It must be obtained"
 				+ "from SimpleJobRepository.findOrCreateJob to be considered valid.");
 
-		stepDao.updateStepInstance(step);
+		stepInstanceDao.updateStepInstance(step);
 
 	}
 
@@ -304,7 +308,7 @@ public class SimpleJobRepository implements JobRepository {
 		Iterator i = steps.iterator();
 		while (i.hasNext()) {
 			Step step = (Step) i.next();
-			StepInstance stepInstance = stepDao.createStepInstance(job, step.getName());
+			StepInstance stepInstance = stepInstanceDao.createStepInstance(job, step.getName());
 			stepInstances.add(stepInstance);
 		}
 
@@ -320,15 +324,15 @@ public class SimpleJobRepository implements JobRepository {
 		while (i.hasNext()) {
 
 			Step stepConfiguration = (Step) i.next();
-			StepInstance stepInstance = stepDao.findStepInstance(jobInstance, stepConfiguration.getName());
+			StepInstance stepInstance = stepInstanceDao.findStepInstance(jobInstance, stepConfiguration.getName());
 			if (stepInstance != null) {
 
 				if (stepInstance.getLastExecution() != null) {
-					ExecutionAttributes executionAttributes = stepDao.findExecutionAttributes(stepInstance
+					ExecutionAttributes executionAttributes = stepExecutionDao.findExecutionAttributes(stepInstance
 							.getLastExecution().getId());
 					stepInstance.getLastExecution().setExecutionAttributes(executionAttributes);
 				}
-				stepInstance.setStepExecutionCount(stepDao.getStepExecutionCount(stepInstance));
+				stepInstance.setStepExecutionCount(stepExecutionDao.getStepExecutionCount(stepInstance));
 				stepInstances.add(stepInstance);
 			}
 		}

@@ -11,11 +11,13 @@ public class JdbcStepDaoTests extends AbstractStepDaoTests {
 	private static final String LONG_STRING = JdbcJobDaoTests.LONG_STRING;
 
 	protected void onSetUpBeforeTransaction() throws Exception {
-		((JdbcStepDao) stepDao).setTablePrefix(JdbcJobDao.DEFAULT_TABLE_PREFIX);
+		((JdbcStepInstanceDao) stepInstanceDao).setTablePrefix(JdbcJobDao.DEFAULT_TABLE_PREFIX);
+		((JdbcStepExecutionDao) stepExecutionDao).setTablePrefix(JdbcJobDao.DEFAULT_TABLE_PREFIX);
 	}
 
 	public void testTablePrefix() throws Exception {
-		((JdbcStepDao) stepDao).setTablePrefix("FOO_");
+		((JdbcStepInstanceDao) stepInstanceDao).setTablePrefix("FOO_");
+		((JdbcStepExecutionDao) stepExecutionDao).setTablePrefix("FOO_");
 		try {
 			testCreateStep();
 			fail("Expected DataAccessException");
@@ -28,7 +30,7 @@ public class JdbcStepDaoTests extends AbstractStepDaoTests {
 
 		assertTrue(LONG_STRING.length()>250);
 		stepExecution.setExitStatus(ExitStatus.FINISHED.addExitDescription(LONG_STRING));
-		stepDao.updateStepExecution(stepExecution);
+		stepExecutionDao.updateStepExecution(stepExecution);
 
 		List executions = jdbcTemplate.queryForList(
 				"SELECT * FROM BATCH_STEP_EXECUTION where STEP_INSTANCE_ID=?",

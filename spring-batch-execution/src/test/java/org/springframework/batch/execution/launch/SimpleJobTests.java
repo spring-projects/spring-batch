@@ -49,7 +49,7 @@ public class SimpleJobTests extends TestCase {
 
 	private List recovered = new ArrayList();
 
-	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobDao(), new MapStepDao());
+	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobDao(), new MapStepDao(), new MapStepDao());
 
 	private List processed = new ArrayList();
 

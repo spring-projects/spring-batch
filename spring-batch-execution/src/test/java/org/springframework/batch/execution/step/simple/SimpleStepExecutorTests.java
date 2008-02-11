@@ -202,7 +202,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 	public void testRepository() throws Exception {
 
-		SimpleJobRepository repository = new SimpleJobRepository(new MapJobDao(), new MapStepDao());
+		SimpleJobRepository repository = new SimpleJobRepository(new MapJobDao(), new MapStepDao(), new MapStepDao());
 		stepExecutor.setRepository(repository);
 
 		StepInstance step = new StepInstance(new Long(1));
