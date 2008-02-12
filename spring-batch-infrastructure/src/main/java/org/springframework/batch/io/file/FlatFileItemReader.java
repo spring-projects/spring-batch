@@ -51,9 +51,9 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class DefaultFlatFileItemReader implements ItemReader, Skippable, ItemStream, InitializingBean {
+public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, InitializingBean {
 
-	private static Log log = LogFactory.getLog(DefaultFlatFileItemReader.class);
+	private static Log log = LogFactory.getLog(FlatFileItemReader.class);
 
 	public static final String READ_STATISTICS_NAME = "lines.read.count";
 

@@ -18,7 +18,7 @@ package org.springframework.batch.repeat.support;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.file.DefaultFlatFileItemReader;
+import org.springframework.batch.io.file.FlatFileItemReader;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.reader.DelegatingItemReader;
@@ -51,7 +51,7 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 
 		protected TradeItemReader(Resource resource) throws Exception {
 			super();
-			DefaultFlatFileItemReader inputSource = new DefaultFlatFileItemReader();
+			FlatFileItemReader inputSource = new FlatFileItemReader();
 			inputSource.setResource(resource);
 			inputSource.setFieldSetMapper(new TradeMapper());
 			inputSource.afterPropertiesSet();

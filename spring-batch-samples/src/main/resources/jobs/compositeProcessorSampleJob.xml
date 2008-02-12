@@ -41,7 +41,7 @@
 
 	<!-- INFRASTRUCTURE SETUP -->
 
-	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.DefaultFlatFileItemReader"
+	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.FlatFileItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator" />

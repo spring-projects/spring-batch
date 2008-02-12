@@ -30,13 +30,14 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
 /**
- * Tests for {@link DefaultFlatFileItemReader}
+ * Tests for {@link FlatFileItemReader} - skip and restart functionality.
  * 
+ * @see FlatFileItemReaderBasicTests
  */
-public class DefaultFlatFileItemReaderTests extends TestCase {
+public class FlatFileItemReaderTests extends TestCase {
 
 	// object under test
-	private DefaultFlatFileItemReader inputSource = new DefaultFlatFileItemReader();
+	private FlatFileItemReader reader = new FlatFileItemReader();
 
 	// common value used for writing to a file
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
@@ -60,19 +61,19 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 
-		inputSource.setResource(getInputResource(TEST_STRING));
-		inputSource.setLineTokenizer(tokenizer);
-		inputSource.setFieldSetMapper(fieldSetMapper);
+		reader.setResource(getInputResource(TEST_STRING));
+		reader.setLineTokenizer(tokenizer);
+		reader.setFieldSetMapper(fieldSetMapper);
 		// context argument is necessary only for the FileLocator, which
 		// is mocked
-		inputSource.open();
+		reader.open();
 	}
 
 	/**
 	 * Release resources and delete the temporary file
 	 */
 	protected void tearDown() throws Exception {
-		inputSource.close();
+		reader.close();
 	}
 
 	private Resource getInputResource(String input) {
@@ -85,25 +86,25 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 	 */
 	public void testSkip() throws Exception {
 
-		inputSource.close();
-		inputSource.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		inputSource.open();
+		reader.close();
+		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		reader.open();
 
 		// read some records
-		inputSource.read(); // #1
-		inputSource.read(); // #2
+		reader.read(); // #1
+		reader.read(); // #2
 		// commit them
-		inputSource.mark();
+		reader.mark();
 		// read next record
-		inputSource.read(); // # 3
+		reader.read(); // # 3
 		// mark record as skipped
-		inputSource.skip();
+		reader.skip();
 		// read next records
-		inputSource.reset();
+		reader.reset();
 
 		// we should now process all records after first commit point, that are
 		// not marked as skipped
-		assertEquals("[testLine4]", inputSource.read().toString());
+		assertEquals("[testLine4]", reader.read().toString());
 
 		// TODO update
 		// Map statistics = template.getStatistics();
@@ -120,79 +121,79 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 	 */
 	public void testSkipFirstChunk() throws Exception {
 
-		inputSource.close();
-		inputSource.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		inputSource.open();
+		reader.close();
+		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		reader.open();
 
 		// read some records
-		inputSource.read(); // #1
-		inputSource.read(); // #2
-		inputSource.read(); // #3
+		reader.read(); // #1
+		reader.read(); // #2
+		reader.read(); // #3
 		// mark record as skipped
-		inputSource.skip();
+		reader.skip();
 		// rollback
-		inputSource.reset();
+		reader.reset();
 		// read next record
-		inputSource.read(); // should be #1
+		reader.read(); // should be #1
 
 		// we should now process all records after first commit point, that are
 		// not marked as skipped
-		assertEquals("[testLine2]", inputSource.read().toString());
+		assertEquals("[testLine2]", reader.read().toString());
 
 	}
 
 	public void testRestartFromNullData() throws Exception {
-		inputSource.restoreFrom(null);
-		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
+		reader.restoreFrom(null);
+		assertEquals("[FlatFileInputTemplate-TestData]", reader.read().toString());
 	}
 
 	public void testRestartBeforeOpen() throws Exception {
-		inputSource = new DefaultFlatFileItemReader();
-		inputSource.setResource(getInputResource(TEST_STRING));
-		inputSource.setFieldSetMapper(fieldSetMapper);
+		reader = new FlatFileItemReader();
+		reader.setResource(getInputResource(TEST_STRING));
+		reader.setFieldSetMapper(fieldSetMapper);
 		// do not open the template...
 		try {
-			inputSource.restoreFrom(inputSource.getExecutionAttributes());
+			reader.restoreFrom(reader.getExecutionAttributes());
 		} catch (StreamException e) {
 			assertTrue("Message does not contain open: "+e.getMessage(), e.getMessage().contains("open"));
 		}
-		assertEquals("[FlatFileInputTemplate-TestData]", inputSource.read().toString());
+		assertEquals("[FlatFileInputTemplate-TestData]", reader.read().toString());
 	}
 
 	public void testRestart() throws Exception {
 
-		inputSource.close();
-		inputSource.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		inputSource.open();
+		reader.close();
+		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		reader.open();
 
 		// read some records
-		inputSource.read();
-		inputSource.read();
+		reader.read();
+		reader.read();
 		// commit them
-		inputSource.mark();
+		reader.mark();
 		// read next two records
-		inputSource.read();
-		inputSource.read();
+		reader.read();
+		reader.read();
 
 		// get restart data
-		ExecutionAttributes streamContext = inputSource.getExecutionAttributes();
+		ExecutionAttributes streamContext = reader.getExecutionAttributes();
 		assertEquals("4", (String) streamContext.getProperties().getProperty(
-				DefaultFlatFileItemReader.READ_STATISTICS_NAME));
+				FlatFileItemReader.READ_STATISTICS_NAME));
 		// close input
-		inputSource.close();
+		reader.close();
 
-		inputSource.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 
 		// init for restart
-		inputSource.open();
-		inputSource.restoreFrom(streamContext);
+		reader.open();
+		reader.restoreFrom(streamContext);
 
 		// read remaining records
-		assertEquals("[testLine5]", inputSource.read().toString());
-		assertEquals("[testLine6]", inputSource.read().toString());
+		assertEquals("[testLine5]", reader.read().toString());
+		assertEquals("[testLine6]", reader.read().toString());
 
-		ExecutionAttributes statistics = inputSource.getExecutionAttributes();
-		assertEquals(6, statistics.getLong(DefaultFlatFileItemReader.READ_STATISTICS_NAME));
+		ExecutionAttributes statistics = reader.getExecutionAttributes();
+		assertEquals(6, statistics.getLong(FlatFileItemReader.READ_STATISTICS_NAME));
 	}
 
 }

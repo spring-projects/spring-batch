@@ -34,7 +34,7 @@
 	</bean>
 
 	<bean id="fileItemReader"
-		class="org.springframework.batch.io.file.DefaultFlatFileItemReader"
+		class="org.springframework.batch.io.file.FlatFileItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource"

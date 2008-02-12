@@ -38,7 +38,7 @@
 	</bean>
 
 	<!-- This input source is injected into the test case to verify the output - not used by the job at all -->
-	<bean id="testInputTemplate" class="org.springframework.batch.io.file.DefaultFlatFileItemReader">
+	<bean id="testInputTemplate" class="org.springframework.batch.io.file.FlatFileItemReader">
 		<property name="resource" ref="fileLocator" />
 		<property name="lineTokenizer" ref="tradeTokenizer" />
 		<property name="fieldSetMapper" ref="tradeMapper" />

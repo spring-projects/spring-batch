@@ -66,7 +66,7 @@
 	</bean>
 
 	<bean id="playerFileItemReader"
-		class="org.springframework.batch.io.file.DefaultFlatFileItemReader"
+		class="org.springframework.batch.io.file.FlatFileItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource"
@@ -85,7 +85,7 @@
 	</bean>
 
 	<bean id="gameFileItemReader"
-		class="org.springframework.batch.io.file.DefaultFlatFileItemReader"
+		class="org.springframework.batch.io.file.FlatFileItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource"

@@ -34,15 +34,15 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
 /**
- * Tests for {@link SimpleFlatFileItemReaderTests}
+ * Tests for {@link FlatFileItemReader} - the fundamental item reading functionality.
  *
+ * @see FlatFileItemReaderTests
  * @author Dave Syer
- *
  */
-public class SimpleFlatFileItemReaderTests extends TestCase {
+public class BasicFlatFileItemReaderTests extends TestCase {
 
 	// object under test
-	private DefaultFlatFileItemReader itemReader = new DefaultFlatFileItemReader();
+	private FlatFileItemReader itemReader = new FlatFileItemReader();
 
 	// common value used for writing to a file
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
@@ -136,14 +136,14 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	}
 
 	public void testReadBeforeOpen() throws Exception {
-		itemReader = new DefaultFlatFileItemReader();
+		itemReader = new FlatFileItemReader();
 		itemReader.setResource(getInputResource(TEST_STRING));
 		itemReader.setFieldSetMapper(fieldSetMapper);
 		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
 	}
 
 	public void testCloseBeforeOpen() throws Exception {
-		itemReader = new DefaultFlatFileItemReader();
+		itemReader = new FlatFileItemReader();
 		itemReader.setResource(getInputResource(TEST_STRING));
 		itemReader.setFieldSetMapper(fieldSetMapper);
 		itemReader.close();
@@ -152,7 +152,7 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	}
 
 	public void testInitializationWithNullResource() throws Exception {
-		itemReader = new DefaultFlatFileItemReader();
+		itemReader = new FlatFileItemReader();
 		try {
 			itemReader.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
@@ -168,7 +168,7 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	}
 
 	public void testSetValidEncoding() throws Exception {
-		itemReader = new DefaultFlatFileItemReader();
+		itemReader = new FlatFileItemReader();
 		itemReader.setEncoding("UTF-8");
 		itemReader.setResource(getInputResource(TEST_STRING));
 		itemReader.setFieldSetMapper(fieldSetMapper);
@@ -176,7 +176,7 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	}
 
 	public void testSetNullEncoding() throws Exception {
-		itemReader = new DefaultFlatFileItemReader();
+		itemReader = new FlatFileItemReader();
 		itemReader.setEncoding(null);
 		itemReader.setResource(getInputResource(TEST_STRING));
 		try {
@@ -189,7 +189,7 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	}
 
 	public void testSetInvalidEncoding() throws Exception {
-		itemReader = new DefaultFlatFileItemReader();
+		itemReader = new FlatFileItemReader();
 		itemReader.setEncoding("foo");
 		itemReader.setResource(getInputResource(TEST_STRING));
 		try {
@@ -224,7 +224,7 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	public void testColumnNamesInHeader() throws Exception {
 		final String INPUT = "name1|name2\nvalue1|value2\nvalue3|value4";
 		
-		itemReader = new DefaultFlatFileItemReader();
+		itemReader = new FlatFileItemReader();
 		itemReader.setResource(getInputResource(INPUT));
 		itemReader.setLineTokenizer(new DelimitedLineTokenizer('|'));
 		itemReader.setFieldSetMapper(fieldSetMapper);
@@ -247,7 +247,7 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 	public void testLinesToSkip() throws Exception {
 		final String INPUT = "foo bar spam\none two\nthree four";
 		
-		itemReader = new DefaultFlatFileItemReader();
+		itemReader = new FlatFileItemReader();
 		itemReader.setResource(getInputResource(INPUT));
 		itemReader.setLineTokenizer(new DelimitedLineTokenizer(' '));
 		itemReader.setFieldSetMapper(fieldSetMapper);
@@ -268,7 +268,7 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 		
 		Resource resource = new NonExistentResource();
 		
-		DefaultFlatFileItemReader testReader = new DefaultFlatFileItemReader();
+		FlatFileItemReader testReader = new FlatFileItemReader();
 		testReader.setResource(resource);
 		testReader.setLineTokenizer(tokenizer);
 		testReader.setFieldSetMapper(fieldSetMapper);
@@ -290,7 +290,7 @@ public class SimpleFlatFileItemReaderTests extends TestCase {
 		
 		Resource resource = new NonExistentResource();
 		
-		DefaultFlatFileItemReader testReader = new DefaultFlatFileItemReader();
+		FlatFileItemReader testReader = new FlatFileItemReader();
 		testReader.setResource(resource);
 		testReader.setLineTokenizer(tokenizer);
 		testReader.setFieldSetMapper(fieldSetMapper);
