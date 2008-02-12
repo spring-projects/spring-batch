@@ -18,7 +18,7 @@ package org.springframework.batch.execution.step.simple;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.Chunk;
-import org.springframework.batch.core.domain.ReadFailurePolicy;
+import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.StepExecution;
 
 public class ItemChunkerTests extends TestCase {
@@ -35,7 +35,7 @@ public class ItemChunkerTests extends TestCase {
 		try {
 			MockItemReader itemReader = new MockItemReader(10);
 			ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
-			chunkReader.read(-1);
+			chunkReader.chunk(-1);
 			fail();
 		} catch (IllegalArgumentException e) {
 		}
@@ -45,7 +45,7 @@ public class ItemChunkerTests extends TestCase {
 		try {
 			MockItemReader itemReader = new MockItemReader(10);
 			ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
-			chunkReader.read(0);
+			chunkReader.chunk(0);
 			fail();
 		} catch (IllegalArgumentException e) {
 		}
@@ -54,14 +54,14 @@ public class ItemChunkerTests extends TestCase {
 	public void testSizePositive() {
 		MockItemReader itemReader = new MockItemReader(10);
 		ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
-		Chunk chunk = chunkReader.read(10);
+		Chunk chunk = chunkReader.chunk(10);
 		assertEquals(10, chunk.getItems().size());
 	}
 
 	public void testIncompleteChunk() {
 		MockItemReader itemReader = new MockItemReader(5);
 		ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
-		Chunk chunk = chunkReader.read(10);
+		Chunk chunk = chunkReader.chunk(10);
 		assertEquals(5, chunk.getItems().size());
 	}
 
@@ -71,7 +71,7 @@ public class ItemChunkerTests extends TestCase {
 		ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
 		chunkReader.setReadFailurePolicy(new StubReadFailurePolicy(true));
 		try {
-			chunkReader.read(10);
+			chunkReader.chunk(10);
 			fail();
 		} catch (RuntimeException e) {
 		}
@@ -82,11 +82,11 @@ public class ItemChunkerTests extends TestCase {
 		itemReader.setFail(true);
 		ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
 		chunkReader.setReadFailurePolicy(new StubReadFailurePolicy(false));
-		Chunk chunk = chunkReader.read(1);
+		Chunk chunk = chunkReader.chunk(1);
 		assertEquals(1, chunk.getItems().size());
 	}
 
-	private class StubReadFailurePolicy implements ReadFailurePolicy {
+	private class StubReadFailurePolicy implements ItemSkipPolicy {
 
 		private final boolean fail;
 
@@ -94,7 +94,7 @@ public class ItemChunkerTests extends TestCase {
 			this.fail = fail;
 		}
 
-		public boolean shouldContinue(Exception ex, StepExecution stepExecution) {
+		public boolean shouldSkip(Exception ex, StepExecution stepExecution) {
 			return !fail;
 		}
 	}

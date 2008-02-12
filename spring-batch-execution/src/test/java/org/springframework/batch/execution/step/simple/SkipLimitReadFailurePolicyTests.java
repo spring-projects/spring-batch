@@ -30,7 +30,7 @@ import junit.framework.TestCase;
  */
 public class SkipLimitReadFailurePolicyTests extends TestCase {
 
-	SkipLimitReadFailurePolicy failurePolicy;
+	LimitCheckingItemSkipPolicy failurePolicy;
 	StepExecution stepExecution;
 	
 	protected void setUp() throws Exception {
@@ -39,14 +39,14 @@ public class SkipLimitReadFailurePolicyTests extends TestCase {
 		List skippableExceptions = new ArrayList();
 		skippableExceptions.add(FlatFileParsingException.class);
 		
-		failurePolicy = new SkipLimitReadFailurePolicy(1, skippableExceptions);
+		failurePolicy = new LimitCheckingItemSkipPolicy(1, skippableExceptions);
 		stepExecution = new StepExecution(null, null);
 		stepExecution.setSkipCount(2);
 	}
 	
 	public void testLimitExceed(){		
 		try{
-			failurePolicy.shouldContinue(new FlatFileParsingException("", ""), stepExecution);
+			failurePolicy.shouldSkip(new FlatFileParsingException("", ""), stepExecution);
 			fail();
 		}
 		catch(SkipLimitExceededException ex){
@@ -55,12 +55,12 @@ public class SkipLimitReadFailurePolicyTests extends TestCase {
 	}
 	
 	public void testNonSkippableException(){
-		assertFalse(failurePolicy.shouldContinue(new FileNotFoundException(), stepExecution));
+		assertFalse(failurePolicy.shouldSkip(new FileNotFoundException(), stepExecution));
 	}
 	
 	public void testSkip(){
 		stepExecution.setSkipCount(0);
-		assertTrue(failurePolicy.shouldContinue(new FlatFileParsingException("",""), stepExecution));
+		assertTrue(failurePolicy.shouldSkip(new FlatFileParsingException("",""), stepExecution));
 	}
 
 }

@@ -19,12 +19,12 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.domain.ReadFailurePolicy;
+import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.FlatFileParsingException;
 
 /**
- * <p>{@link ReadFailurePolicy} that determines whether or not reading should
+ * <p>{@link ItemSkipPolicy} that determines whether or not reading should
  * continue based upon how many items have been skipped.  This is extremely
  * useful behavior, as it allows you to skip records, but will throw a
  * {@link SkipLimitExceededException} if a set limit has been exceeded.  For example,
@@ -41,17 +41,17 @@ import org.springframework.batch.io.exception.FlatFileParsingException;
  * @author Ben Hale
  * @author Lucas Ward
  */
-public class SkipLimitReadFailurePolicy implements ReadFailurePolicy {
+public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 
 	private final int skipLimit;
 
 	private final List skippableExceptions;
 
-	public SkipLimitReadFailurePolicy(int skipLimit) {
+	public LimitCheckingItemSkipPolicy(int skipLimit) {
 		this(skipLimit, new ArrayList(0));
 	}
 
-	public SkipLimitReadFailurePolicy(int skipLimit, List skippableExceptions) {
+	public LimitCheckingItemSkipPolicy(int skipLimit, List skippableExceptions) {
 		this.skipLimit = skipLimit;
 		this.skippableExceptions = skippableExceptions;
 	}
@@ -64,7 +64,7 @@ public class SkipLimitReadFailurePolicy implements ReadFailurePolicy {
 	 * is greater than the skipLimit, then a {@link SkipLimitExceededException}
 	 * will be thrown.
 	 */
-	public boolean shouldContinue(Exception ex, StepExecution stepExecution){
+	public boolean shouldSkip(Exception ex, StepExecution stepExecution){
 		if(skippableExceptions.contains(ex.getClass())){
 			if(stepExecution.getSkipCount() < skipLimit){
 				stepExecution.incrementSkipCount();

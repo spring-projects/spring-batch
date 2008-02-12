@@ -15,19 +15,19 @@
  */
 package org.springframework.batch.execution.step.simple;
 
-import org.springframework.batch.core.domain.ReadFailurePolicy;
+import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.StepExecution;
 
 /**
- * Implementation of the {@link ReadFailurePolicy} interface that
- * will always return that reading should continue.
+ * Implementation of the {@link ItemSkipPolicy} interface that
+ * will always return that an item should be skipped.
  * 
  * @author Ben Hale
  * @author Lucas Ward
  */
-public class AlwaysSkipReadFailurePolicy implements ReadFailurePolicy {
+public class AlwaysSkipItemSkipPolicy implements ItemSkipPolicy {
 
-	public boolean shouldContinue(Exception ex, StepExecution stepExecution) {
+	public boolean shouldSkip(Exception ex, StepExecution stepExecution) {
 		return true;
 	}
 }

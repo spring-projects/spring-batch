@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.core.domain.Chunk;
-import org.springframework.batch.core.domain.ReadFailurePolicy;
+import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.ReadFailureException;
 import org.springframework.batch.item.ItemReader;
@@ -39,18 +39,18 @@ public class ItemChunker implements Chunker {
 
 	private long chunkCounter = 0;
 
-	private ReadFailurePolicy readFailurePolicy = new AlwaysSkipReadFailurePolicy();
+	private ItemSkipPolicy readFailurePolicy = new AlwaysSkipItemSkipPolicy();
 
 	public ItemChunker(ItemReader itemReader, StepExecution stepExecution) {
 		this.itemReader = itemReader;
 		this.stepExecution = stepExecution;
 	}
 
-	public void setReadFailurePolicy(ReadFailurePolicy readFailurePolicy) {
+	public void setReadFailurePolicy(ItemSkipPolicy readFailurePolicy) {
 		this.readFailurePolicy = readFailurePolicy;
 	}
 
-	public Chunk read(int size) throws ReadFailureException {
+	public Chunk chunk(int size) throws ReadFailureException {
 		Assert.isTrue(size > 0, "Chunk size must be greater than 0");
 
 		int counter = 0;
@@ -66,7 +66,7 @@ public class ItemChunker implements Chunker {
 				items.add(item);
 				counter++;
 			} catch (Exception ex) {
-				if(!readFailurePolicy.shouldContinue(ex, stepExecution)){
+				if(!readFailurePolicy.shouldSkip(ex, stepExecution)){
 					rethrow(ex);
 				}
 			}

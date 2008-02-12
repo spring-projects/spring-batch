@@ -36,6 +36,6 @@ public interface Chunker {
 	 * @return the {@link Chunk} that has been read.
 	 * @throws IllegalArgumentException if chunkSize is less than zero.
 	 */
-	public Chunk read(int chunkSize) throws ReadFailureException;
+	public Chunk chunk(int chunkSize) throws ReadFailureException;
 
 }
