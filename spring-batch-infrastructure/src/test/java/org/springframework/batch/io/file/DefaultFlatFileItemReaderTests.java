@@ -32,10 +32,6 @@ import org.springframework.core.io.Resource;
 /**
  * Tests for {@link DefaultFlatFileItemReader}
  * 
- * @author robert.kasanicky
- * 
- * TODO only regular reading is tested currently, add exception cases, restart,
- * skip, validation...
  */
 public class DefaultFlatFileItemReaderTests extends TestCase {
 
@@ -65,7 +61,7 @@ public class DefaultFlatFileItemReaderTests extends TestCase {
 	protected void setUp() throws Exception {
 
 		inputSource.setResource(getInputResource(TEST_STRING));
-		inputSource.setTokenizer(tokenizer);
+		inputSource.setLineTokenizer(tokenizer);
 		inputSource.setFieldSetMapper(fieldSetMapper);
 		// context argument is necessary only for the FileLocator, which
 		// is mocked

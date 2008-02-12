@@ -39,7 +39,7 @@
 		<aop:scoped-proxy />
 		<property name="resource"
 			value="classpath:data/multilineJob/input/20070122.teststream.multilineStep.txt" />
-		<property name="tokenizer" ref="fixedFileDescriptor" />
+		<property name="lineTokenizer" ref="fixedFileDescriptor" />
 		<property name="fieldSetMapper" ref="tradeLineMapper" />
 		<!-- <property name="validator" ref="fixedValidator" /> -->
 	</bean>

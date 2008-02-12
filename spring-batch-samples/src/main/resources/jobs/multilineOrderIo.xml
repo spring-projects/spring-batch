@@ -12,7 +12,7 @@
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileInputLocator" />
-		<property name="tokenizer" ref="orderFileDescriptor" />
+		<property name="lineTokenizer" ref="orderFileDescriptor" />
 		<property name="fieldSetMapper">
 			<bean class="org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper" />
 		</property>

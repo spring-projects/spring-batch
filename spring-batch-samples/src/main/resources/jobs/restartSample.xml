@@ -47,7 +47,7 @@
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileLocator" />
-		<property name="tokenizer" ref="fixedFileDescriptor" />
+		<property name="lineTokenizer" ref="fixedFileDescriptor" />
 		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 

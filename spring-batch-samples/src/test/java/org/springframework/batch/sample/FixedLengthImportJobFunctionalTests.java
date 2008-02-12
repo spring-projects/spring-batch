@@ -47,7 +47,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 		fileLocator = new ClassPathResource("data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt");
 		inputSource = new DefaultFlatFileItemReader();
 		inputSource.setFieldSetMapper(new TradeFieldSetMapper());
-		inputSource.setTokenizer(lineTokenizer);
+		inputSource.setLineTokenizer(lineTokenizer);
 		inputSource.setResource(fileLocator);
 	}
 

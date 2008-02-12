@@ -94,7 +94,7 @@
 	<bean id="testInputTemplate"
 		class="org.springframework.batch.io.file.DefaultFlatFileItemReader">
 		<property name="resource" ref="fileLocator" />
-		<property name="tokenizer" ref="fixedFileDescriptor" />
+		<property name="lineTokenizer" ref="fixedFileDescriptor" />
 		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 

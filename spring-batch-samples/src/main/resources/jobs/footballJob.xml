@@ -71,7 +71,7 @@
 		<aop:scoped-proxy />
 		<property name="resource"
 			value="classpath:data/footballjob/input/${player.file.name}" />
-		<property name="tokenizer">
+		<property name="lineTokenizer">
 			<bean
 				class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer">
 				<property name="names"
@@ -90,7 +90,7 @@
 		<aop:scoped-proxy />
 		<property name="resource"
 			value="classpath:data/footballjob/input/${games.file.name}" />
-		<property name="tokenizer">
+		<property name="lineTokenizer">
 			<bean
 				class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer">
 				<property name="names"

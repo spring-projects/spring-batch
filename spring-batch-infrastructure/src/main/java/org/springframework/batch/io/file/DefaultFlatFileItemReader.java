@@ -16,16 +16,29 @@
 
 package org.springframework.batch.io.file;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.Skippable;
+import org.springframework.batch.io.exception.FlatFileParsingException;
+import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.separator.LineReader;
+import org.springframework.batch.io.file.separator.RecordSeparatorPolicy;
+import org.springframework.batch.io.file.separator.ResourceLineReader;
+import org.springframework.batch.io.file.transform.AbstractLineTokenizer;
+import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.io.file.transform.LineTokenizer;
 import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.Resource;
+import org.springframework.util.Assert;
 
 /**
  * <p>
@@ -38,7 +51,7 @@ import org.springframework.batch.item.exception.StreamException;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implements Skippable, ItemStream {
+public class DefaultFlatFileItemReader implements ItemReader, Skippable, ItemStream, InitializingBean {
 
 	private static Log log = LogFactory.getLog(DefaultFlatFileItemReader.class);
 
@@ -46,14 +59,111 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 
 	public static final String SKIPPED_STATISTICS_NAME = "skipped.lines.count";
 
+	// default encoding for input files
+	public static final String DEFAULT_CHARSET = "ISO-8859-1";
+
+	private String encoding = DEFAULT_CHARSET;
+
 	private Set skippedLines = new HashSet();
 
+	private Resource resource;
+
+	private String path;
+
+	private RecordSeparatorPolicy recordSeparatorPolicy;
+
+	private String[] comments;
+
+	private int linesToSkip = 0;
+
+	private boolean firstLineIsHeader = false;
+
+	private LineTokenizer tokenizer = new DelimitedLineTokenizer();
+
+	private FieldSetMapper fieldSetMapper;
+
 	/**
-	 * Initialize the input source.
+	 * Encapsulates the state of the input source. If it is null then we are
+	 * uninitialized.
 	 */
-	public void open() {
-		super.open();
+	protected LineReader reader;
+
+	/**
+	 * Initialize the reader if necessary.
+	 * @throws IllegalStateException if the resource cannot be opened
+	 */
+	public void open() throws IllegalStateException {
+
+		Assert.state(resource.exists(), "Resource must exist: [" + resource + "]");
+
+		log.debug("Opening flat file for reading: " + resource);
+
+		if (this.reader == null) {
+			ResourceLineReader reader = new ResourceLineReader(resource, encoding);
+			if (recordSeparatorPolicy != null) {
+				reader.setRecordSeparatorPolicy(recordSeparatorPolicy);
+			}
+			if (comments != null) {
+				reader.setComments(comments);
+			}
+			reader.open();
+			this.reader = reader;
+		}
+
+		for (int i = 0; i < linesToSkip; i++) {
+			readLine();
+		}
+
+		if (firstLineIsHeader) {
+			// skip the header
+			String firstLine = readLine();
+			// set names in tokenizer if they haven't been set already
+			if (tokenizer instanceof AbstractLineTokenizer && !((AbstractLineTokenizer) tokenizer).hasNames()) {
+				String[] names = tokenizer.tokenize(firstLine).getValues();
+				((AbstractLineTokenizer) tokenizer).setNames(names);
+			}
+		}
 		mark();
+	}
+
+	/**
+	 * Close and null out the reader.
+	 * @throws Exception
+	 */
+	public void close() throws StreamException {
+		try {
+			if (reader != null) {
+				log.debug("Closing flat file for reading: " + resource);
+				reader.close();
+			}
+		}
+		finally {
+			reader = null;
+		}
+	}
+
+	/**
+	 * Reads a line from input, tokenizes is it using the {@link #tokenizer} and
+	 * maps to domain object using {@link #fieldSetMapper}.
+	 * 
+	 * @see org.springframework.batch.io.ItemReader#read()
+	 */
+	public Object read() throws Exception {
+		String line = readLine();
+
+		if (line != null) {
+			try {
+				FieldSet tokenizedLine = tokenizer.tokenize(line);
+				return fieldSetMapper.mapLine(tokenizedLine);
+			}
+			catch (RuntimeException ex) {
+				// add current line count to message and re-throw
+				int lineCount = getReader().getPosition();
+				throw new FlatFileParsingException("Parsing error at line: " + lineCount + " in resource=" + path
+						+ ", input=[" + line + "]", ex, line, lineCount);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -112,14 +222,16 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void mark() {
 		getReader().mark();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
 	 */
 	public void reset() {
@@ -136,12 +248,130 @@ public class DefaultFlatFileItemReader extends SimpleFlatFileItemReader implemen
 		log.debug("Skipping line in template=[" + this + "], line=" + count);
 	}
 
+	/**
+	 * @return next line to be tokenized and mapped
+	 */
 	protected String readLine() {
-		String line = super.readLine();
+		String line = nextLine();
+
 		while (line != null && skippedLines.contains(new Integer(getReader().getPosition()))) {
-			line = super.readLine();
+			line = nextLine();
 		}
 		return line;
+	}
+
+	/**
+	 * @return next line from the input
+	 */
+	private String nextLine() {
+		try {
+			return (String) getReader().read();
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	/**
+	 * @return line reader used to read input file
+	 */
+	protected LineReader getReader() {
+		if (reader == null) {
+			open();
+			// reader is now not null, or else an exception is thrown
+		}
+		return reader;
+	}
+
+	/**
+	 * Setter for resource property. The location of an input stream that can be
+	 * read.
+	 * 
+	 * @param resource
+	 * @throws IOException
+	 */
+	public void setResource(Resource resource) throws IOException {
+		this.resource = resource;
+		path = resource.toString();
+		if (path.length() > 50) {
+			path = path.substring(0, 20) + "..." + path.substring(path.length());
+		}
+	}
+
+	/**
+	 * Public setter for the recordSeparatorPolicy. Used to determine where the
+	 * line endings are and do things like continue over a line ending if inside
+	 * a quoted string.
+	 * 
+	 * @param recordSeparatorPolicy the recordSeparatorPolicy to set
+	 */
+	public void setRecordSeparatorPolicy(RecordSeparatorPolicy recordSeparatorPolicy) {
+		this.recordSeparatorPolicy = recordSeparatorPolicy;
+	}
+
+	/**
+	 * Setter for comment prefixes. Can be used to ignore header lines as well
+	 * by using e.g. the first couple of column names as a prefix.
+	 * 
+	 * @param comments an array of comment line prefixes.
+	 */
+	public void setComments(String[] comments) {
+		this.comments = new String[comments.length];
+		System.arraycopy(comments, 0, this.comments, 0, comments.length);
+	}
+
+	/**
+	 * Indicates whether first line is a header. If the tokenizer is an
+	 * {@link AbstractLineTokenizer} and the column names haven't been set
+	 * already then the header will be used to setup column names. Default is
+	 * <code>false</code>.
+	 */
+	public void setFirstLineIsHeader(boolean firstLineIsHeader) {
+		this.firstLineIsHeader = firstLineIsHeader;
+	}
+
+	/**
+	 * @param lineTokenizer tokenizes each line from file into {@link FieldSet}.
+	 */
+	public void setLineTokenizer(LineTokenizer lineTokenizer) {
+		this.tokenizer = lineTokenizer;
+	}
+
+	/**
+	 * Set the FieldSetMapper to be used for each line.
+	 * 
+	 * @param fieldSetMapper
+	 */
+	public void setFieldSetMapper(FieldSetMapper fieldSetMapper) {
+		this.fieldSetMapper = fieldSetMapper;
+	}
+
+	/**
+	 * Public setter for the number of lines to skip at the start of a file. Can
+	 * be used if the file contains a header without useful (column name)
+	 * information, and without a comment delimiter at the beginning of the
+	 * lines.
+	 * 
+	 * @param linesToSkip the number of lines to skip
+	 */
+	public void setLinesToSkip(int linesToSkip) {
+		this.linesToSkip = linesToSkip;
+	}
+
+	/**
+	 * Setter for the encoding for this input source. Default value is
+	 * {@value #DEFAULT_CHARSET}.
+	 * 
+	 * @param encoding a properties object which possibly contains the encoding
+	 * for this input file;
+	 */
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
+
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(resource, "Input resource must not be null");
+		Assert.notNull(fieldSetMapper, "FieldSetMapper must not be null.");
 	}
 
 }
