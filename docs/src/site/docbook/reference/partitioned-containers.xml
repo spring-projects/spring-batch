@@ -1,0 +1,10 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="Partitioned Containers">
+	<title>Batch IO Support</title>
+  <section>
+    <title id="s.1">Partitioned Containers</title>
+    <para>Much stuff goes here.</para>
+   </section>
+
+</chapter>

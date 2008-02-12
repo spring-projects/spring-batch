@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="spring-batch-infrastructure">
+  <title>The Spring Batch Infrastructure</title>
+
+  <section>
+    <title id="i-0.spring-batch-infrastructure-overview">Introduction to the
+    Spring Batch Infrastructure</title>
+
+    <para>Spring Batch is a Pipe and Filters architecture. The Spring Batch
+    Infrastructure implements key services that enable a high volume of
+    throughput. These include: <itemizedlist>
+        <listitem>
+          <para>Input and Output Resource Faciltities - the management of
+          input items including reading, validating and mapping raw input to
+          objects.</para>
+        </listitem>
+
+        <listitem>
+          <para>Item Providers and Processors - strategy interfaces for
+          providing and processing the data for a given batch stage
+          execution.</para>
+        </listitem>
+
+        <listitem>
+          <para>Validation- interface to support pluggable validation
+          strategies to ensure the integrity of the input source items or, in
+          other words, object level validation.</para>
+        </listitem>
+
+        <listitem>
+          <para>RepeatTemplates- the Repeat Template is responsible for
+          repeatedly invoking an operation on the Input Provider pulling input
+          items from an input source until there are no more items to be
+          processed.</para>
+        </listitem>
+
+        <listitem>
+          <para>RetryTemplates - a mechanism for attempting to reprocess an
+          input item that has thrown an exception.</para>
+        </listitem>
+
+        <listitem>
+          <para>Support for Statistics - an interface that dependent projects
+          can use to implement application specific statistics.</para>
+        </listitem>
+
+        <listitem>
+          <para>Transaction semantics for batch - support facilities for
+          giving transaction extensions used by the batch architecture.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para><mediaobject>
+        <imageobject role="fo">
+          <imagedata align="center"
+                     fileref="../../resources/reference/images/PipeAndFilter.jpg"
+                     format="JPG" />
+        </imageobject>
+
+        <imageobject role="html">
+          <imagedata align="center"
+                     fileref="../../resources/reference/images/PipeAndFilter.jpg"
+                     format="JPG" />
+        </imageobject>
+
+        <caption><para>Figure 1: Spring Batch Pipe and Filter
+        Design</para></caption>
+      </mediaobject></para>
+
+    <para>The Batch Lifecycle is simple. Data comes in one side of the pipe.
+    It is then parsed, validated and transformed and handed off for business
+    logic processing. That processing can be as simple as loading records into
+    a database or as complicated as supporting batch job styles of generating
+    reports, conversion, pdf generation, generation of high volume print
+    formats, etc. Spring Batch provides a framework for simplifying the
+    handling of input and output resources so that developers can concentrate
+    on what needs to happen during the processing steps.</para>
+  </section>
+
+  <section>
+    <title id="infrastructure.1">Input and Output Sources</title>
+
+    <para><itemizedlist>
+        <listitem>
+          <para>Input Source - This is an interface responsible for reading
+          records from an input stream and also possibly for mapping these
+          records to objects. It is the responsibility of the implementing
+          class to decide which technology to use for mapping and configuring
+          an input source.</para>
+        </listitem>
+
+        <listitem>
+          <para>Ouput Source - this is the interface for the generation output
+          operations and works conversely from the input source for
+          serializing processed data to the appropriate targeted output
+          source, which includes files, databases or queues.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>The Input Source is a basic interface for generic input operations.
+    Subclasses implementing this interface will be responsible for reading
+    records from input stream and also possibly for mapping these records to
+    objects. Generally it is the responsibility of implementing class to
+    decide which technology to use for mapping and how it should be
+    configured. A picture of the I/O hierarhcy is helpful in understanding
+    their place within the spring batch infrastructure.</para>
+
+    <para><mediaobject>
+        <imageobject role="fo">
+          <imagedata align="center"
+                     fileref="../../../../target/site/reference/images/io-design.jpg"
+                     format="JPG" />
+        </imageobject>
+
+        <imageobject role="html">
+          <imagedata align="center"
+                     fileref="../../../../target/site/reference/images/io-design.jpg"
+                     format="JPG" />
+        </imageobject>
+
+        <caption><para>Figure 2: Input/Output Sources</para></caption>
+      </mediaobject></para>
+
+    <para>A description of input and output resources that spring batch
+    supports are the following:</para>
+
+    <para><itemizedlist>
+        <listitem>
+          <para>File - File Sources read and write lines of data from a flat
+          file that typically describe records with fields of data defined by
+          fixed positions in the file or delimited by some special character
+          (e.g. a comma). There is a line tokenizer associated with input
+          sources and a line aggregator associated with the output
+          source.</para>
+        </listitem>
+
+        <listitem>
+          <para>SQL - a database resource accessed that returns resultsets
+          that can be mapped to objects for processing. The default SQL Input
+          Sources invoke a RowMapper to return objects, keep track of the
+          current row if restart is required, basic statistics, and some
+          transaction enhancements that will be explained later.</para>
+
+          <para>Note: There is no SQL Output Source because there is no state
+          to manage whereas the SQL Input Source requires state to monitor
+          skips, the current position in the input source, restart data,
+          etc.</para>
+        </listitem>
+
+        <listitem>
+          <para>XML - an XML input and output sources process XML
+          independently of technologies used for parsing, mapping and
+          validating objects. Input data allows for the validation of and XML
+          file against and XSD schema. The input template provides for
+          restart, skip, statistics and transaction features by implementing
+          the corresponding interfaces.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <section>
+       
+
+      <title id="infrastructure.1.1">Flat File Sources</title>
+
+       
+
+      <para>Flat File Input Sources - Flat File Input Sources are basic input
+      sources that read data from a file and return it as structured tuples in
+      the form of FieldSet instances. Flat File Input Sources are further
+      refined as both fixed length and delimited formats.</para>
+
+       
+
+      <para />
+
+       
+
+      <para>
+        <mediaobject>
+          <imageobject role="fo">
+            <imagedata align="center"
+                       fileref="../../../../target/site/reference/images/flatfile-input-source-diagram.jpg"
+                       format="JPG" />
+          </imageobject>
+
+          <imageobject role="html">
+            <imagedata align="center"
+                       fileref="../../../../target/site/reference/images/flatfile-input-source-diagram.jpg"
+                       format="JPG" />
+          </imageobject>
+
+          <caption>
+            <para>Figure 1: Flat File Input Source Collaborations</para>
+          </caption>
+        </mediaobject>
+      </para>
+
+       
+
+      <para>The location of the file is defined by the resource property.
+      There are only a few methods exposed through a resource service. A
+      resource is used to help locate, open, and close resources. It can be as
+      simple as: <programlisting>
+	Resource resource = new FileSystemResource("resources/trades.csv");
+	</programlisting></para>
+
+       
+
+      <para>In complex batch environments the directory structures are often
+      managed by the EAI infrastructure where drop zones for external
+      interfaces are established for moving files from ftp locations to batch
+      processing locations and vice versa. File moving utilities are beyond
+      the scope of the batch architecture but its not unusual for batch job
+      streams to include file moving utilities as steps in the job stream.
+      It's sufficient to know that the batch architecture only needs to know
+      how to find the files to be processed and it begins the process of
+      feeding the data into the pipe from this starting point.</para>
+
+       
+
+      <para>To separate the structure of the file, LineTokenizer, or one of it
+      subclasses, is used to parse data obtained from the file. Flat File
+      Input Sources, as mentioned above, typically come in two forms, fixed
+      and delimited. A fixed length input record is where the fields are
+      assigned fixed locations within a line of a file. An example would be:
+      <programlisting>
+	12345678901234567890123456789012345678901234567890
+	AbduKa00Abdul-Jabbar    Karim    rb19741996
+	AbduRa00Abdullah        Rabih    rb19751999
+	AberWa00Abercrombie     Walter   rb19591982
+	AbraDa00Abramowicz      Danny    wr19451967
+	AdamBo00Adams           Bob      te19461969
+	AdamCh00Adams           Charlie  wr19792003
+	</programlisting></para>
+
+       On the other hand a delimited record format might look like the following: 
+
+      <para>
+        <programlisting>
+	AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996
+	AbduRa00,Abdullah,Rabih,rb,1975,1999
+	AberWa00,Abercrombie,Walter,rb,1959,1982
+	AbraDa00,Abramowicz,Danny,wr,1945,1967
+	AdamBo00,Adams,Bob,te,1946,1969
+	AdamCh00,Adams,Charlie,wr,1979,2003
+	</programlisting>
+      </para>
+
+       
+
+      <para>Neither of these formats are particularly self describing but are
+      still very much in use in flat file exchanges between system interfaces.
+      Both formats share in common the requirement to read in a line of data
+      (a String) and parse it into tokens that can be mapped to an object (or
+      objects) to be passed to the ItemProcessor. As you can see, there are
+      two required dependencies of the input source; the first is a resource
+      to read in, which is the file to process. The second dependency is a
+      LineTokenizer, which will be discused below.</para>
+
+       
+    </section>
+
+    <section>
+      <title id="infrastructure.1.2">Configuring and using FieldSets</title>
+
+      <para>A FieldSet is Spring Batch’s abstraction for typing fields from a
+      flat file data source. It allows developers to work with file input in
+      much the same way as they would work with database input. A FieldSet is
+      conceptually very similar to a Jdbc Result Set. FieldSets only require
+      one argument, a list of tokens. Optionally you can also configure in the
+      names of the fields so that the fields may be accessed either by index
+      or name as patterned after the JdbcResultSet. In code it means it's as
+      simple as:</para>
+
+      <para><programlisting>
+		tokens = new String[] { "TestString", "true", "C", "10", "-472", "354224", "543", "124.3", "424.3", "324",
+				null, "2007-10-12", "12-10-2007", "" };
+		names = new String[] { "String", "Boolean", "Char", "Byte", "Short", "Integer", "Long", "Float", "Double",
+				"BigDecimal", "Null", "Date", "DatePattern", "BlankInput" };
+
+		fieldSet = new FieldSet(tokens, names);
+		assertTrue(fieldSet.getFieldCount() == 14);		    
+	</programlisting></para>
+    </section>
+
+    <section>
+      <title id="infrastructure.1.3">Configuring and Using
+      LineTokenizers</title>
+
+      <para>The interface for a LineTokenizer is very simple, given a string;
+      it will return a FieldSet that wraps the results from tokenizing the
+      provided string. The tokens are created through a
+      <emphasis>LineTokenizer</emphasis> and a
+      <emphasis>FieldSetMapper</emphasis> is used to map a the
+      <emphasis>FieldSet</emphasis> to an object. The framework provides a few
+      convenience classes, the <emphasis>FieldSetInputSource</emphasis> and
+      the <emphasis>SimpleFlatFileInputSource</emphasis>. They provide a
+      convenient way to read the FieldSet. The <emphasis>FieldSet</emphasis>
+      is configured as a property for an Item Provider, which wraps an Input
+      Source. You can see this in the following example:</para>
+
+      <para><programlisting>
+	&lt;property name="itemProvider"&gt;
+		&lt;bean class="org.springframework.batch.sample.item.provider.PlayerItemProvider"&gt;
+			&lt;property name="inputSource" ref="playerFileInputSource" /&gt;
+			&lt;property name="fieldSetMapper"&gt;
+				&lt;bean class="org.springframework.batch.sample.mapping.PlayerMapper" /&gt;
+			&lt;/property&gt;
+		&lt;/bean&gt;
+	&lt;/property&gt;
+	</programlisting></para>
+
+      <para>The LineTokenizer is just one additional property to the
+      InputSource as seen here:</para>
+
+      <para><programlisting>
+		&lt;property name="tokenizer"&gt;
+			&lt;bean
+				class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer"&gt;
+				&lt;property name="names"
+					value="ID,lastName,firstName,position,birthYear,debutYear" /&gt;
+			&lt;/bean&gt;
+		&lt;/property&gt;
+	</programlisting></para>
+
+      <para>And, as you can see, the field names will get passed in the the
+      mapper. The actual mapping provided by the developer would then look as
+      simple as:</para>
+
+      <para><programlisting>
+public class PlayerMapper implements FieldSetMapper {
+	public Object mapLine(FieldSet fs) {
+		if(fs == null){
+			return null;
+		}
+		
+		Player player = new player();
+		player.setID(fs.readString("ID"));
+		player.setLastName(fs.readString("lastName"));
+		player.setFirstName(fs.readString("firstName"));
+		player.setPosition(fs.readString("position"));
+		player.setDebutYear(fs.readInt("debutYear"));
+		player.setBirthYear(fs.readInt("birthYear"));
+		
+		return player;
+	}
+}	
+	</programlisting></para>
+    </section>
+
+    <section>
+      <title id="infrastructure.1.4">Output Sources</title>
+
+      <para>The output source is similar in functionality to the input source
+      with the exception that the operations are reversed. They still need to
+      be located, opened and closed but they differ in the case that we write
+      to output sources. In the case of databases or queues these may be
+      inserts, updates or sends. The format of the serialization of the output
+      source is specific for every batch job.</para>
+    </section>
+  </section>
+
+  <section>
+    <title id="infrastructure.2.2">SQL Sources</title>
+
+    <para>SQL input sources can be configured for various reasons, for
+    example:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>a staging table for large volumes of sorted data that was loaded
+        from flat files</para>
+      </listitem>
+
+      <listitem>
+        <para>the beginning of an outbound collection of data targeted for an
+        external flat file interface</para>
+      </listitem>
+
+      <listitem>
+        <para>the target of a triggered event like "collect all cases that can
+        be automatically closed"</para>
+
+        <para>Spring Batch supports two approaches for accessing a SQL Input
+        Source; 1) a cursor driven input source and 2) an indexed based Input
+        Query. The cursor driven input source is named because it utilizes a
+        jdbc cursor to stream over the SQL input source whereas an indexed
+        based input query is designed for easy division of the input into
+        ranges.</para>
+
+        <para></para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section>
+    <title id="infrastructure.2.3">XML Input and Output</title>
+
+    <para>Spring Batch provides transactional infrastructure for both reading
+    XML records and mapping them to Java objects as well as writing Java
+    objects as XML records.</para>
+
+    <para>StAX API is used for I/O as other standard XML APIs do not fit batch
+    processing requirements (DOM loads the whole input into memory at once and
+    SAX controls the parsing process allowing the user only to provide
+    callbacks).</para>
+
+    <para>Spring Batch is not tied to any particular OXM technology. Typical
+    use is to delegate OXM to Spring WS which provides uniform abstraction for
+    the most popular OXM technologies. However dependency on Spring WS is
+    optional and you can choose to implement Spring Batch specific interfaces
+    if desired.</para>
+
+    <para>Lets take a closer look how XML input and output work in batch. It
+    is assumed the XML resource is a collection of 'fragments' corresponding
+    to individual records. Note that OXM tools are designed to work with
+    standalone XML documents rather than XML fragments cut out of an XML
+    document, therefore the Spring Batch infrastructure needs to work around
+    this fact (as described below).</para>
+
+    <para>On input the reader reads the XML resource until it recognizes a new
+    fragment is about to start (by matching the tag name by default). The
+    reader creates a standalone XML document from the fragment (or at least
+    makes it appear so) and passes the document to a deserializer (typically a
+    wrapper around Spring WS Unmarshaller) to map the XML to a Java
+    object.</para>
+
+    <para>Output works symetrically to input. Java object is passed to a
+    serializer (typically a wrapper around Spring WS Marshaller) which writes
+    to output using a custom event writer that filters the StartDocument and
+    EndDocument events produced for each fragment by the OXM tools.</para>
+
+    <para>For example configuration of XML input and output see the sample
+    xmlStaxJob. //TODO inline the example once it is not subject to change +
+    show sample input file</para>
+
+    <para></para>
+  </section>
+
+  <section>
+    <title id="infrastructure.3">Item Providers and Processors</title>
+
+    <para>We finally arrive at the Item Provider, We've already alluded to
+    Item Providers in some of the code samples above.</para>
+  </section>
+
+  <section>
+    <title id="infrastructure.5">Validating Input</title>
+
+    <para></para>
+  </section>
+
+  <section>
+    <title id="infrastructure.6">Repeat Templates</title>
+
+    <para>One of the most fundamental concepts in the batch architecture is
+    the Repeat Template. The Repeat Template is responsible for repeatedly
+    invoking an operation on the Input Provider pulling input items from an
+    input source until there are no more items to be processed. One
+    interesting analogy used by Dierk Koenig in the book "Groovy in Action" is
+    a boiler vs. a continuous-flow heater. In this analogy he illustrates how
+    XML parsers can typically be divided into those that read the entire input
+    before process begins like DOM Parsers vs. those that stream over the
+    input like SAX parsers. Spring Batch is a continuous-flow heater and uses
+    the RepeatTemplate as the mechanism to keep the hot water or input stream
+    in constant flow.</para>
+
+    <para>Many times batch processes are not only working on non-transaction
+    input sources like files but the output is a transactional resource such
+    as a queue or database. A common scenario when a batch job is a datastream
+    coming from a flat file interface is to have a file or files as input
+    sources and a database resource as the output source. In this case the
+    repeat templates can be used like the following: <mediaobject>
+        <imageobject role="fo">
+          <imagedata align="center"
+                     fileref="../../../../target/site/reference/images/RepeatTemplate.png"
+                     format="PNG" />
+        </imageobject>
+
+        <imageobject role="html">
+          <imagedata align="center"
+                     fileref="../../../../target/site/reference/images/RepeatTemplate.png"
+                     format="PNG" />
+        </imageobject>
+
+        <caption><para>Figure 2: Simple Batch Pseduo code for Repeat
+        Templates</para></caption>
+      </mediaobject></para>
+
+    <para>In this batch scenario an outer RepeatTemplate initialies the
+    continuous flow, a TransactionTemplate wraps the input and output
+    resources and an inner RepeatTemplate manages the commit interval or
+    chunks of data to be processed. The Business Logic occurs in the input and
+    output of single items. Of course this is a simplistic view of how batch
+    really works. Input can be quite complex with multiple files and
+    complicated validation scenarios. Conversely, the output source can also
+    be quite complex in determining how the records will be stored in the
+    database. Spring Batch makes no assumptions about how simple or complex
+    the business processing is within the RepeatTemplates. It's only job is to
+    keep the flow moving from the Item Provider to the Item Processor as
+    quickly as possible. The repeat template can process records irrespective
+    of the batch architecture. A simple example would be: <programlisting>
+	    
+		RepeatTemplate template = new RepeatTemplate();
+		Resource resource = new FileSystemResource("resources/trades.csv");
+		TradeProcessor executor = new TradeProcessor();
+		TradeItemProvider provider = null;
+		try {
+			provider = new TradeItemProvider(resource);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		template.iterate(new ItemProviderRepeatCallback(provider, executor));
+</programlisting></para>
+
+    <para>A RepeatTemplate has an exception policy that can be
+    leveraged</para>
+  </section>
+
+  <section>
+    <title id="infrastructure.7">Retry Template</title>
+
+    <para>The retry template is used as a way to overcome failures in the
+    stream</para>
+  </section>
+</chapter>

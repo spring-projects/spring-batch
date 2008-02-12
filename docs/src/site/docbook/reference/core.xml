@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="core">
+  <title>Spring Batch Core - the Domain language of Batch</title>
+
+  <section>
+    <title>Introduction</title>
+
+    <para>To any experienced batch architect, the overall concepts of batch
+    processing described above should be familiar and comfortable. There are
+    “Jobs” and “Steps” and a developer supplied processing unit that Spring
+    Batch refers to as the “Tasklet.” The following diagram is only a slight
+    variation of the batch reference architecture that has been used for
+    decades. JCL and COBOL developers are likely to be as comfortable with the
+    concepts as C++, C# and Java developers. However, because of the Spring
+    patterns, operations, templates, callbacks, and idioms, there are
+    opportunities for <itemizedlist>
+        <listitem>
+          <para>significant improvement in adherence to a clear separation of
+          concerns,</para>
+        </listitem>
+
+        <listitem>
+          <para>clearly delineated architectural layers and services provided
+          as interfaces,</para>
+        </listitem>
+
+        <listitem>
+          <para>simple and default implementations that allowed for quick
+          adoption and ease of use out-of-the-box, and</para>
+        </listitem>
+
+        <listitem>
+          <para>significantly enhanced extensibility.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>The diagram below provides an overview of the high level components,
+    technical services, and basic operations required by a batch architecture.
+    This architecture framework is a blueprint that has been proven through
+    decades of implementations on the last several generations of platforms
+    (COBOL/Mainframe, C++/Unix, and now Java/anywhere). The Simple Batch
+    Execution Environment provides a physical implementation of the layers,
+    components and technical services commonly found in robust, maintainable
+    systems used to address the creation of simple to complex batch
+    applications, with the infrastructure and extensions to address very
+    complex processing needs. The materials below will walk through the
+    details of the diagram.</para>
+  </section>
+
+  <section>
+    <title id="s.2">Simple Batch Execution Environment high level flow and
+    interaction of the architecture.</title>
+
+    <mediaobject>
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="../../resources/reference/images/simple-batch-execution-env.jpg"
+                   format="JPG" />
+      </imageobject>
+
+      <imageobject role="html">
+        <imagedata align="center"
+                   fileref="../../resources/reference/images/simple-batch-execution-env.jpg"
+                   format="JPG" />
+      </imageobject>
+
+      <caption><para>Figure 1: Batch Stereotypes</para></caption>
+    </mediaobject>
+
+    <para>The application style is organized into four logical tiers, which
+    include Run, Job, Application, and Data tiers. The primary goal for
+    organizing an application according to the tiers is to embed what is known
+    as "separation of concerns" within the system. These tiers can be
+    conceptual but may they prove effective in mapping the deployment of the
+    artifacts onto physical components like Java runtimes and integration with
+    data sources and targets. Effective separation of concerns results in
+    reducing the impact of change to the system. The four conceptual tiers
+    containing batch artifacts are:</para>
+
+    <para><itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">Run Tier:</emphasis> The Run Tier is
+          concerned with the scheduling and launching of the application. A
+          vendor product is typically used in this tier to allow time-based
+          and interdependent scheduling of batch jobs as well as providing
+          parallel processing capabilities.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Job Tier:</emphasis> The Job Tier is
+          responsible for the overall execution of a batch job. It
+          sequentially executes batch steps, ensuring that all steps are in
+          the correct state and all appropriate policies are enforced.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Application Tier:</emphasis> The
+          Application Tier contains components required to execute the
+          program. It contains specific tasklets that address the required
+          batch functionality and enforces policies around a tasklet execution
+          (e.g., commit intervals, capture of statistics, etc.)</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Data Tier:</emphasis> The Data Tier
+          provides the integration with the physical data sources that might
+          include databases, files, or queues. <emphasis
+          role="bold">Note</emphasis> : In some cases the Job tier can be
+          completely missing and in other cases one Job Script can start
+          several Batch Job instances.</para>
+        </listitem>
+      </itemizedlist>In addition the components describe the batch interaction
+    and services stereotypes that are the domain language and interfaces
+    implemented by developers in constructing a batch solution. As he diagram
+    illustrates, custom applicaton archifacts, generally created by the
+    developer, are the following:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Job Scripts</para>
+      </listitem>
+
+      <listitem>
+        <para>JobConfigurations</para>
+      </listitem>
+
+      <listitem>
+        <para>Tasklet</para>
+      </listitem>
+
+      <listitem>
+        <para>Business Logic</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>The application architect needs to consider the batch execution
+    environment with the following issues:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Define how the batch jobs will be launched</para>
+      </listitem>
+
+      <listitem>
+        <para>Define the Job Execution Environment</para>
+      </listitem>
+
+      <listitem>
+        <para>Step construction and Configuration</para>
+      </listitem>
+
+      <listitem>
+        <para>ItemReaders</para>
+      </listitem>
+
+      <listitem>
+        <para>ItemWriters</para>
+      </listitem>
+
+      <listitem>
+        <para>Data Access Strategies</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>The grey icons indicate the technologies selected as part of the
+    batch solution that are not part of the final solution and entail items
+    like:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Schedulers (e.g. Quartz, Tivoli, etc.)</para>
+      </listitem>
+
+      <listitem>
+        <para>Physical Resources in the Data Tier that are the source and
+        target of ItemReaders and Writers like Message Queues, Databases,
+        Files and Print Queues.</para>
+
+      </listitem>
+    </itemizedlist>
+    <section>
+      <title id="s.2.1">Batch Domain Stereotypes</title>
+        <para>We will discuss each of these Batch domain Stereotypes
+        individually. This section describes stereotypes relating to the concept of a batch job. 
+	A job is an entity that encapsulates an entire batch process.</para>
+	<section>
+	  <title id="s.2.1.1">Job Configuration</title>
+	  <para>
+	    The job configuration could be described as the heart of the Spring Batch framework. 
+	    It is represented by a Spring bean of class _JobConfiguration_ and contains all of 
+	    the information necessary to define the operations performed by a job. A job configuration 
+	    is typically contained within a Spring XML configuration file and the job's name is 
+	    determined by the "id" attribute associated with the job configuration bean. The job configuration contains:
+	    </para>	    
+	    <itemizedlist>
+	      <listitem>
+		<para> The simple name of the job</para>
+	      </listitem>
+	      <listitem>
+		<para>Definition and ordering of [Step Configurations|#Step Configuration]</para>
+	      </listitem>
+	      <listitem>
+		<para>The limit of how many times this job may be started</para>
+	      </listitem>
+	      <listitem>
+		<para>Whether or not the job is restartable</para>
+	      </listitem>
+	    </itemizedlist>
+	    The mechanics of defining a job configuration will be discussed in the next chapter. [Provide a link]
+	</section>
+	<section>
+	  <title id="s.2.1.2">Job Instance</title>
+	  <para>A job instance refers to the business concept of a single job invocation. In other words, suppose 
+	    you have a job called "foo" that is run three times a day. There will be one "foo" configuration, 
+	    and each time "foo" is supposed to run would be an instance of the "foo" job. Each instance would be 
+	    uniquely identified as each one represents a distinct batch need. Further, each instance might 
+	    have attempted several times to complete its work. Each attempt is represented by a [#Job Execution], 
+	    described below. A job instance is not considered to be complete until an associated job execution 
+	    completes successfully. As such, a single job instance may have many executions.
+	  </para>
+	  <para>For example, a unique instance might be identified by just a job name, or by the combination of a 
+	    job name and a scheduled date. Using this second type of identification, we might have two distinct 
+	    instances, "foo-01-01-2008" and "foo-01-02-2008." Although these two instances would share the same 
+	    configuration, they would each have their own set of executions and the successful completion of one 
+	    instance would not affect the status of the other.
+	    </para>
+	  <para>Job instances are represented by objects of the _JobInstance_ class, which are created when the 
+	    job is executed. Each job instance contains references to related [Step Instances|#Step Instance] 
+	    and a _JobIdentifier_ that uniquely identifies this job instance.
+	  </para>
+	      
+	</section>
+	<section>
+	  <title id="s.2.1.3">Job Execution</title>
+	  <para>
+A job execution refers to the technical concept of a single attempt to run a job. It is a single attempt to execute the logic represented by a job instance. A job execution may end in failure or success, but the job instance corresponding to a given execution will not be marked as complete unless the execution completes successfully.
+</para>
+<para>
+For instance, if we have a job instance "foo-01-01-2008" that fails to successfully complete its work the first time it is run, when we attempt to run it again, a new job execution will be created. If our "foo" configuration is restartable, we may begin our second job execution from a restart point. Otherwise, our job execution will start from the beginning. In either case, we will see that our single job instance has had two job executions.
+</para>
+<para>
+Job executions are represented by objects of the _JobExecution_ class. These job executions are created by an implementation of the _JobExecutorFacade_ interface from a given _JobInstance_ corresponding to a unique _JobIdentifier_. Each job execution contains a reference to its corresponding job instance, related Step Executions and step/chunk context data.
+</para>
+	</section>
+	<section>
+	  <title id="s.2.1.4">Step Stereotypes</title>
+	  <para>
+This section describes stereotypes relating to the concept of a batch step. A step is an entity that encapsulates a single, independent phase of a batch job. Therefore, every batch job is composed entirely of one or more batch steps.	  
+	  </para>
+	</section>
+	<section>
+	  <title id="s.2.1.5">Step Configuration</title>
+	  <para>
+The step configuration contains all of the information necessary to define a discrete set of business logic within a job configuration. This is a necessarily vague description because the contents of any given step configuration are at the discretion of the developer writing your jobs. A step can be as narrowly defined as a single line of code or as broadly defined as necessary to complete the entire work of your job. There are several factors that will affect the breadth of your step configurations.
+	  </para>
+	  <itemizedlist>
+	  <listitem>
+	    <para>Re-usability - step definitions can be shared between jobs</para>
+	  </listitem>
+	  <listitem>
+	    <para>Transaction Management - depending on your desired transaction strategy, you may divide the work of your job differently between steps</para>
+	  </listitem>
+	  <listitem>
+	    <para>Extensibility - adequately granular definition of steps allows the addition or subtraction of steps at a later time in the appropriate position within your job configuration</para>
+	  </listitem>
+	  </itemizedlist>
+	  <para>
+Step configurations are defined by instantiating implementations of the _StepConfiguration_ interface. Additionally, the utility class _StepConfigurationSupport_ provides a basic implementation of _StepConfiguration_ with default functionality that should be common to any concrete _StepConfiguration_ implementation. Generally, all step configuration implementations should extend from this class.
+	  </para>
+	  <para>
+Two step configuration classes are available in the Spring Batch framework, and they are each discussed in detail in other sections of this guide. For most situations, the _SimpleStepConfiguration_ implementation is sufficient, but custom transaction management behavior can also be configured by using a _RepeatOperationsStepConfiguration_.
+</para>
+	</section>
+	<section>
+	  <title id="s.2.1.6">Step Instance</title>
+	  <para>
+A step instance, represented by the _StepInstance_ class, represents the business concept of a single step within a job invocation. That is to say, every job instance contains one or more step instances.
+	  </para>
+	  <para>
+For example, suppose we have a job instance called "foo-01-01-2008" that is an instance of a job configuration containing three steps. Suppose these steps are named "step1", "step2" and "step3." There will be corresponding "foo-01-01-2008#step1", "foo-01-01-2008#step2" and "foo-01-01-2008#step3" step instances, which will be distinct from the step instances of any other job instance (e.g. those of "foo-01-02-2008").
+{note}The step instance naming here is for clarity, this is not necessarily how the instance will be named internally within the framework.{note}
+	  </para>
+	  <para>
+Each step instance will contain the current status of the batch execution, restart data, and a reference to its corresponding [Job Instance]. Additionally, a step instance keeps track of how many attempts are made to run the corresponding step. Each attempt to run a step will create a [Step Execution], so a single job instance might have several corresponding step executions.
+	  </para>
+	</section>
+	<section>
+	  <title id="s.2.1.7">Step Execution</title>
+	  <para>
+A step execution represents the technical concept of a single attempt to execute a step. It is a single attempt to execute the logic represented by a step instance.
+	  </para>
+	  <para>
+For instance, if we have a step instance "foo-01-01-2008#step1" that fails to successfully complete its work the first time it is run, when we attempt to run it again, a new step execution will be created. Each of these step executions may represent a different invocation of the batch framework, but they will all correspond to the same step instance.
+	  </para>
+	  <para>
+Step executions are represented by objects of the _StepExecution_ class. These step executions are created by an implementation of the _JobExecutor_ interface from a given _StepInstance_ and _JobExecution_. Each step execution contains a reference to its corresponding step instance and job execution, and transaction related data such as commit and rollback counts, start and end times and a _Properties_ instance containing statistics.
+	  </para>
+	</section>
+	<section>
+	  <title id="s.2.1.8">Tasklets</title>
+	  <para>
+	    A tasklet represents the execution of a logical unit of work, as defined by its implementation of the Spring Batch provided _Tasklet_ interface. Tasklets are used when defining step configurations to specify the work done by the step. Subsequently, the logic in a tasklet is atomic in terms of transactions. A transaction will never commit until an entire tasklet execution is complete (unless an exception occurs - a transaction might either commit or rollback if that behavior is specified in the step's exception management strategy).
+	  </para>
+	</section>
+    </section>
+	  <title id="s.2.3">Item-Oriented Processing Stereotypes</title>
+	  <para>
+A powerful batch processing paradigm implemented by the Spring Batch framework is the concept of item-oriented processing. That is, doing work by defining each unit of work as the operation of retrieving an item from input and then processing that item, including any side effects that processing might entail, such as file or database operations.
+	  </para>
+	  <para>
+There are two basic stereotypes that represent the first-class participants in item-oriented processing, item providers and item processors. They are each represented by a simple interface provided by the Spring Batch framework, which allows free reign over their implementations and improves our ability to leverage the Spring framework's dependency injection capabilities.
+	  </para>
+	  <section>
+	    <title id="s.2.3.1">Item Readers</title>
+	    <para>
+	      An item reader is an object that is used to retrieve the inputs for a step, one at a time. When the item reader has exhausted the items it can provide, it will indicate this in a meaningful way (generally by returning _null_). When coupled with an item processor, this forms a complete item-oriented process, as each item taken from the provider is then processed by the processor.
+	    </para>
+	  </section>
+	  <section>
+	    <title id="s.2.3.2">Item Writers/Processors</title>
+	    <para>
+	      An item processor is an object that is used to perform processing for a step, one item at a time. Generally, an item processor has no knowledge of the input it will receive next, only the item that that was passed in its current invocation. As a result, item processors will generally make no assumptions about the input they receive an treat every item the same way and keep track of its own state between invocations. When coupled with an item provider, this forms a complete item-oriented process, as each item taken from the provider is then processed by the processor.
+	    </para>
+	  </section>
+  </section>
+  <section>
+    <title id="s.2.4">Support Stereotypes</title>
+    <para>While item providers and processors serve as the main entry points for item-oriented processing, they are supplemented by a number of support classes that perform specific tasks within the provider / processor lifecycle. These support stereotypes are useful for dividing the work of item providers and processors into reusable pieces, as well as abstracting away the details of processing, such as interaction with external systems. Additionally, they give us another opportunity to leverage the powerful configuration features of the Spring framework, as we can switch between several beans implementing these support interfaces without changing the driving item provider or processor.
+    </para>
+    <section>
+      <title id="s.2.4.1">Input Sources</title>
+    <para>  An input source is a class that mediates interactions with an external source of input data, such as a file or a database. An input source often serves as a support for an item provider, typically abstracting away the details of interaction, such as the creation and maintenance of file handles, sockets or database connections.
+    </para>
+    </section>
+    <section>
+      <title id="s.2.4.2">Item Transformers</title>
+      <para>An item transformer is a class that is capable of taking an object and changing it somehow before processing occurs. For instance, an item transformer my alter an object by changing its properties or by replacing it with another object entirely, such as a wrapper or derivative object. It can also be defined as an adaptor, allowing an object of one type to be converted for use as an object of a second type.
+      </para>
+    </section>
+    <section>
+      <title id="s.2.4.3">Item Writers</title>
+      <para>An item writer is a class that mediates interactions with an external target of output data, such as a file or database. An item writer often serves as a support for an item processor, typically abstracting away the details of interaction, such as the creation and maintenance of file handles, sockets, database connections and other output-related tasks such as buffering and stream flushing.
+      </para>
+    </section>
+  </section>
+    
+  <section>
+    <title id="s.3">High Level Processing Flow</title>
+
+    <para>The diagram above illustrates the flow and architecture components
+    in a typical batch run execution.</para>
+
+    <para>Standard interaction is described as follows:</para>
+
+    <para><emphasis role="bold">1.</emphasis> In the Run tier, a Scheduler
+    starts a batch application by invoking a Job Script. The Scheduler
+    identifies what batch process it wants to run by passing the name of the
+    batch process and any required additional parameters to the Job
+    Script.</para>
+
+    <para><emphasis role="bold">2.</emphasis> The Job Script initializes the
+    program and executes any job specific scripts prior to calling the Batch
+    Launcher.</para>
+
+    <para><emphasis role="bold">3.</emphasis> The Batch Launcher starts the
+    Batch Execution Environment based upon any environment settings
+    established in the script.</para>
+
+    <para><emphasis role="bold">3.1</emphasis> The Batch Environment starts
+    and controls the batch execution. It initializes the Job execution
+    environment with static configuration items such as database settings,
+    logging levels and creates a Job based on the Job Configuration created by
+    a Batch Developer.</para>
+
+    <para><emphasis role="bold">4</emphasis> Based on configuration provided
+    by a Batch Developer, the Job sequentially executes steps after checking
+    policies to ensure that each step should be started. The status of the Job
+    and Step (start time, end time, status such as "started" or "completed" is
+    stored at various points during the process. In order to maintain data
+    integrity at the application tier, the Step acts as a controller to ensure
+    that either an entire group of actions completes successfully or that none
+    of the actions completes. In online applications the Unit Of Work and the
+    scope of a transaction tend to be the same thing (e.g. update customer).
+    This group of actions controlled by a user interaction is referred to as a
+    logical unit of work (LUW). However, in batch processing the Step
+    frequently separates the transactional scope from the LUW so that many
+    LUWs complete within one commit. This greatly improves batch throughput
+    (see pseudo code above where REPEAT(size=500). The Step controls the
+    overall execution of the Tasklet, ensuring that transactions are committed
+    at the appropriate time and that restart and statistics information is
+    stored appropriately.</para>
+
+    <para><emphasis role="bold">4.1</emphasis> The first thing the Step is
+    responsible for is the initialization of the data required to begin
+    processing. The Step will interact with other architecture components,
+    such as the Input Source, to setup the data required to be
+    processed.</para>
+
+    <para><emphasis role="bold">4.1.1</emphasis> The Input Source provides
+    services to access various data sources. It provides location transparency
+    to the Batch Tasklet and hides the physical location details of the
+    data.</para>
+
+    <para><emphasis role="bold">4.2</emphasis> Once the data is initialized by
+    the Input Source, the Step will call into the Tasklet to begin processing.
+    The Tasklet contains the business logic to define the LUW and the Step
+    repeatedly calls the Tasklets LUW to finish the business function. The
+    Step does this by first invoking the execute method on the Tasklet in
+    order to acquire a single record/set of data for processing.</para>
+
+    <para><emphasis role="bold">4.2.1</emphasis> Before a record is returned
+    to the Tasklet, it may be validated by any number of validation Frameworks
+    that can be provided to an input source. A single record/set of data is
+    gathered by interacting with the Input Source.</para>
+
+    <para><emphasis role="bold">4.3</emphasis> Once a record/set has been
+    obtained, the step calls the tasklet to begin processing.</para>
+
+    <para><emphasis role="bold">4.3.1</emphasis> The Tasklet executes its
+    internal business logic by calling other Business Logic components as
+    necessary. Based on the business service, it requests or persists objects
+    from the data access components.</para>
+
+    <para><emphasis role="bold">4.3.3</emphasis> Data Access components can be
+    leveraged retrieve or persist domain objects.</para>
+
+    <para><emphasis role="bold">4.3.4</emphasis> Once the business logic has
+    been executed, the resulting output record is written out by utilizing the
+    Output Source interface. The Step will repeatedly call steps 4.2 -&gt; 4.3
+    for every record provided by the Input Source.</para>
+
+    <para><emphasis role="bold">4.4</emphasis> Once all of the records are
+    processed, the Step calls the Tasklet to perform any clean up activities
+    such as closing connections, exporting files, etc.</para>
+
+    <para><emphasis role="bold">4.4.1</emphasis> The Step is responsible for
+    committing data associated with the remaining logical units of work as
+    well as performing any finalization and administrative functions (e.g.
+    closing database connections).</para>
+
+    <para>Once the Step has completed finalization the control is passed back
+    to the Job, where any necessary logging or clean up is executed for
+    application termination and wrap-up -- provided there are no additional
+    Steps to execute.</para>
+  </section>
+</chapter>

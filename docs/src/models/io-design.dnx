@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--xtools2_universal_type_manager-->
+<?com.ibm.xtools.emf.core.signature <signature id="com.ibm.xtools.mmi.ui.signatures.diagram" version="7.0.0"><feature description="" name="Rational Modeling Platform (com.ibm.xtools.rmp)" url="" version="7.0.0"/></signature>?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.0/notation" xmlns:uml="http://www.eclipse.org/uml2/2.0.0/UML" xmlns:umlnotation="http://www.ibm.com/xtools/1.5.2/Umlnotation" xmi:id="_nppmkGYJEdySpMFhuX87fw" type="Class" name="io-design.dnx">
+  <children xmi:id="_nvd6sGYJEdySpMFhuX87fw">
+    <children xmi:id="_nvd6s2YJEdySpMFhuX87fw" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_nvd6tGYJEdySpMFhuX87fw" width="530" height="530"/>
+    </children>
+    <children xmi:id="_nvd6tWYJEdySpMFhuX87fw" type="Stereotype"/>
+    <children xmi:id="_nvd6tmYJEdySpMFhuX87fw" type="Kind"/>
+    <children xmi:id="_nvd6t2YJEdySpMFhuX87fw" type="Name"/>
+    <children xmi:id="_nvd6uGYJEdySpMFhuX87fw" type="Parent"/>
+    <children xmi:id="_nvd6uWYJEdySpMFhuX87fw" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_nvd6umYJEdySpMFhuX87fw"/>
+    </children>
+    <children xmi:id="_nvd6u2YJEdySpMFhuX87fw" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_nvd6vGYJEdySpMFhuX87fw"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLClassifierStyle" xmi:id="_nvd6sWYJEdySpMFhuX87fw" showStereotype="Label" useClassifierShape="true"/>
+    <element xmi:type="uml:Interface" href="mmi:///#jsrctype%5Ename=InputSource%5Bjcu%5Ename=InputSource.java%5Bjpack%5Ename=org.springframework.batch.io%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Interface"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_nvd6smYJEdySpMFhuX87fw" x="317" y="1902"/>
+  </children>
+  <children xmi:id="_nvd6vWYJEdySpMFhuX87fw">
+    <children xmi:id="_nvd6wGYJEdySpMFhuX87fw" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_nvd6wWYJEdySpMFhuX87fw" width="530" height="530"/>
+    </children>
+    <children xmi:id="_nvd6wmYJEdySpMFhuX87fw" type="Stereotype"/>
+    <children xmi:id="_nvd6w2YJEdySpMFhuX87fw" type="Kind"/>
+    <children xmi:id="_nvd6xGYJEdySpMFhuX87fw" type="Name"/>
+    <children xmi:id="_nvd6xWYJEdySpMFhuX87fw" type="Parent"/>
+    <children xmi:id="_nvd6xmYJEdySpMFhuX87fw" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_nvd6x2YJEdySpMFhuX87fw"/>
+    </children>
+    <children xmi:id="_nvd6yGYJEdySpMFhuX87fw" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_nvd6yWYJEdySpMFhuX87fw"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLClassifierStyle" xmi:id="_nvd6vmYJEdySpMFhuX87fw" showStereotype="Label" useClassifierShape="true"/>
+    <element xmi:type="uml:Interface" href="mmi:///#jsrctype%5Ename=OutputSource%5Bjcu%5Ename=OutputSource.java%5Bjpack%5Ename=org.springframework.batch.io%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Interface"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_nvd6v2YJEdySpMFhuX87fw" x="19020" y="1902"/>
+  </children>
+  <children xmi:id="_7eV5EGYJEdySpMFhuX87fw">
+    <children xmi:id="_7eV5E2YJEdySpMFhuX87fw" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_7eV5FGYJEdySpMFhuX87fw" width="530" height="530"/>
+    </children>
+    <children xmi:id="_7eV5FWYJEdySpMFhuX87fw" type="Stereotype"/>
+    <children xmi:id="_7eV5FmYJEdySpMFhuX87fw" type="Kind"/>
+    <children xmi:id="_7eV5F2YJEdySpMFhuX87fw" type="Name"/>
+    <children xmi:id="_7eV5GGYJEdySpMFhuX87fw" type="Parent"/>
+    <children xmi:id="_7eV5GWYJEdySpMFhuX87fw" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_7eV5GmYJEdySpMFhuX87fw"/>
+    </children>
+    <children xmi:id="_7eV5G2YJEdySpMFhuX87fw" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_7eV5HGYJEdySpMFhuX87fw"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLClassifierStyle" xmi:id="_7eV5EWYJEdySpMFhuX87fw" showStereotype="Label" useClassifierShape="true"/>
+    <element xmi:type="uml:Interface" href="mmi:///#jsrctype%5Ename=ResourceLifecycle%5Bjcu%5Ename=ResourceLifecycle.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Interface"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_7eV5EmYJEdySpMFhuX87fw" x="9827" y="1268"/>
+  </children>
+  <children xmi:id="_DlV1aWYKEdySpMFhuX87fw">
+    <children xmi:id="_DlV1bGYKEdySpMFhuX87fw" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_DlV1bWYKEdySpMFhuX87fw" width="1320" height="1320"/>
+    </children>
+    <children xmi:id="_DlV1bmYKEdySpMFhuX87fw" type="Stereotype"/>
+    <children xmi:id="_DlV1b2YKEdySpMFhuX87fw" type="Name"/>
+    <children xmi:id="_DlV1cGYKEdySpMFhuX87fw" type="Parent"/>
+    <children xmi:id="_DlV1cWYKEdySpMFhuX87fw" visible="false" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_DlV1cmYKEdySpMFhuX87fw"/>
+    </children>
+    <children xmi:id="_DlV1c2YKEdySpMFhuX87fw" visible="false" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_DlV1dGYKEdySpMFhuX87fw"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_DlV1amYKEdySpMFhuX87fw" showStereotype="Label"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=XmlInputSource%5Bjcu%5Ename=XmlInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.xml%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_DlV1a2YKEdySpMFhuX87fw" x="8876" y="5706"/>
+  </children>
+  <children xmi:id="_G5-18WYKEdySpMFhuX87fw">
+    <children xmi:id="_G5-19GYKEdySpMFhuX87fw" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_G5-19WYKEdySpMFhuX87fw" width="1320" height="1320"/>
+    </children>
+    <children xmi:id="_G5-19mYKEdySpMFhuX87fw" type="Stereotype"/>
+    <children xmi:id="_G5-192YKEdySpMFhuX87fw" type="Name"/>
+    <children xmi:id="_G5-1-GYKEdySpMFhuX87fw" type="Parent"/>
+    <children xmi:id="_G5-1-WYKEdySpMFhuX87fw" visible="false" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_G5-1-mYKEdySpMFhuX87fw"/>
+    </children>
+    <children xmi:id="_G5-1-2YKEdySpMFhuX87fw" visible="false" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_G6Im8GYKEdySpMFhuX87fw"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_G5-18mYKEdySpMFhuX87fw" showStereotype="Label"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=XmlOutputSource%5Bjcu%5Ename=XmlOutputSource.java%5Bjpack%5Ename=org.springframework.batch.io.xml%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_G5-182YKEdySpMFhuX87fw" x="19971" y="6657"/>
+  </children>
+  <children xmi:id="_bgvekGYKEdySpMFhuX87fw">
+    <children xmi:id="_bgvek2YKEdySpMFhuX87fw" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_bgvelGYKEdySpMFhuX87fw" width="1320" height="1320"/>
+    </children>
+    <children xmi:id="_bgvelWYKEdySpMFhuX87fw" type="Stereotype"/>
+    <children xmi:id="_bgvelmYKEdySpMFhuX87fw" type="Name"/>
+    <children xmi:id="_bgvel2YKEdySpMFhuX87fw" type="Parent"/>
+    <children xmi:id="_bgvemGYKEdySpMFhuX87fw" visible="false" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_bgvemWYKEdySpMFhuX87fw"/>
+    </children>
+    <children xmi:id="_bgvemmYKEdySpMFhuX87fw" visible="false" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_bgvem2YKEdySpMFhuX87fw"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_bgvekWYKEdySpMFhuX87fw" showStereotype="Label"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=SqlCursorInputSource%5Bjcu%5Ename=SqlCursorInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.sql%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_bgvekmYKEdySpMFhuX87fw" x="-3170" y="5389"/>
+  </children>
+  <children xmi:id="_UeKXNmYLEdySpMFhuX87fw">
+    <children xmi:id="_UeKXOWYLEdySpMFhuX87fw" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_UeKXOmYLEdySpMFhuX87fw" width="530" height="530"/>
+    </children>
+    <children xmi:id="_UeKXO2YLEdySpMFhuX87fw" type="Stereotype"/>
+    <children xmi:id="_UeKXPGYLEdySpMFhuX87fw" type="Kind"/>
+    <children xmi:id="_UeKXPWYLEdySpMFhuX87fw" type="Name"/>
+    <children xmi:id="_UeKXPmYLEdySpMFhuX87fw" type="Parent"/>
+    <children xmi:id="_UeKXP2YLEdySpMFhuX87fw" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_UeKXQGYLEdySpMFhuX87fw"/>
+    </children>
+    <children xmi:id="_UeKXQWYLEdySpMFhuX87fw" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_UeKXQmYLEdySpMFhuX87fw"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLClassifierStyle" xmi:id="_UeKXN2YLEdySpMFhuX87fw" showStereotype="Label" useClassifierShape="true"/>
+    <element xmi:type="uml:Interface" href="mmi:///#jsrctype%5Ename=FieldSetInputSource%5Bjcu%5Ename=FieldSetInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Interface"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_UeKXOGYLEdySpMFhuX87fw" x="2853" y="5389"/>
+  </children>
+  <children xmi:id="_fpausGYLEdySpMFhuX87fw">
+    <children xmi:id="_fpaus2YLEdySpMFhuX87fw" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_fpautGYLEdySpMFhuX87fw" width="1320" height="1320"/>
+    </children>
+    <children xmi:id="_fpautWYLEdySpMFhuX87fw" type="Stereotype"/>
+    <children xmi:id="_fpautmYLEdySpMFhuX87fw" type="Name"/>
+    <children xmi:id="_fpaut2YLEdySpMFhuX87fw" type="Parent"/>
+    <children xmi:id="_fpauuGYLEdySpMFhuX87fw" visible="false" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_fpauuWYLEdySpMFhuX87fw"/>
+    </children>
+    <children xmi:id="_fpauumYLEdySpMFhuX87fw" visible="false" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_fpauu2YLEdySpMFhuX87fw"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_fpausWYLEdySpMFhuX87fw" showStereotype="Label"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=SimpleFlatFileInputSource%5Bjcu%5Ename=SimpleFlatFileInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.file.support%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fpausmYLEdySpMFhuX87fw" x="2536" y="8084"/>
+  </children>
+  <children xmi:id="_gPQmsmYLEdySpMFhuX87fw">
+    <children xmi:id="_gPQmtWYLEdySpMFhuX87fw" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_gPQmtmYLEdySpMFhuX87fw" width="1320" height="1320"/>
+    </children>
+    <children xmi:id="_gPQmt2YLEdySpMFhuX87fw" type="Stereotype"/>
+    <children xmi:id="_gPQmuGYLEdySpMFhuX87fw" type="Name"/>
+    <children xmi:id="_gPQmuWYLEdySpMFhuX87fw" type="Parent"/>
+    <children xmi:id="_gPQmumYLEdySpMFhuX87fw" visible="false" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_gPQmu2YLEdySpMFhuX87fw"/>
+    </children>
+    <children xmi:id="_gPQmvGYLEdySpMFhuX87fw" visible="false" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_gPQmvWYLEdySpMFhuX87fw"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_gPQms2YLEdySpMFhuX87fw" showStereotype="Label"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=DefaultFlatFileInputSource%5Bjcu%5Ename=DefaultFlatFileInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.file.support%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_gPQmtGYLEdySpMFhuX87fw" x="2536" y="10461"/>
+  </children>
+  <children xmi:id="_BFEmRWYMEdySpMFhuX87fw">
+    <children xmi:id="_BFOXIGYMEdySpMFhuX87fw" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_BFOXIWYMEdySpMFhuX87fw" width="1320" height="1320"/>
+    </children>
+    <children xmi:id="_BFOXImYMEdySpMFhuX87fw" type="Stereotype"/>
+    <children xmi:id="_BFOXI2YMEdySpMFhuX87fw" type="Name"/>
+    <children xmi:id="_BFOXJGYMEdySpMFhuX87fw" type="Parent"/>
+    <children xmi:id="_BFOXJWYMEdySpMFhuX87fw" visible="false" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_BFOXJmYMEdySpMFhuX87fw"/>
+    </children>
+    <children xmi:id="_BFOXJ2YMEdySpMFhuX87fw" visible="false" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_BFOXKGYMEdySpMFhuX87fw"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_BFEmRmYMEdySpMFhuX87fw" showStereotype="Label"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=FlatFileOutputSource%5Bjcu%5Ename=FlatFileOutputSource.java%5Bjpack%5Ename=org.springframework.batch.io.file.support%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_BFEmR2YMEdySpMFhuX87fw" x="14582" y="6657"/>
+  </children>
+  <styles xmi:type="umlnotation:UMLDiagramStyle" xmi:id="_nppmkWYJEdySpMFhuX87fw"/>
+  <element xsi:nil="true"/>
+  <edges xmi:id="_7fFf8GYJEdySpMFhuX87fw" source="_nvd6sGYJEdySpMFhuX87fw" target="_7eV5EGYJEdySpMFhuX87fw">
+    <children xmi:id="_7fFf82YJEdySpMFhuX87fw" type="NameLabel">
+      <children xmi:id="_7fOp4GYJEdySpMFhuX87fw" type="Stereotype"/>
+      <children xmi:id="_7fOp4WYJEdySpMFhuX87fw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_7fFf9GYJEdySpMFhuX87fw" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_7fFf8WYJEdySpMFhuX87fw" showStereotype="Text"/>
+    <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=InputSource%5Bjcu%5Ename=InputSource.java%5Bjpack%5Ename=org.springframework.batch.io%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ResourceLifecycle%5Bjcu%5Ename=ResourceLifecycle.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Generalization"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_7fFf8mYJEdySpMFhuX87fw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:id="_7fOp4mYJEdySpMFhuX87fw" source="_nvd6vWYJEdySpMFhuX87fw" target="_7eV5EGYJEdySpMFhuX87fw">
+    <children xmi:id="_7fOp5WYJEdySpMFhuX87fw" type="NameLabel">
+      <children xmi:id="_7fOp52YJEdySpMFhuX87fw" type="Stereotype"/>
+      <children xmi:id="_7fOp6GYJEdySpMFhuX87fw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_7fOp5mYJEdySpMFhuX87fw" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_7fOp42YJEdySpMFhuX87fw" showStereotype="Text"/>
+    <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=OutputSource%5Bjcu%5Ename=OutputSource.java%5Bjpack%5Ename=org.springframework.batch.io%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ResourceLifecycle%5Bjcu%5Ename=ResourceLifecycle.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Generalization"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_7fOp5GYJEdySpMFhuX87fw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:id="_DoU3-mYKEdySpMFhuX87fw" source="_DlV1aWYKEdySpMFhuX87fw" target="_nvd6sGYJEdySpMFhuX87fw">
+    <children xmi:id="_Doeo8GYKEdySpMFhuX87fw" type="NameLabel">
+      <children xmi:id="_Doeo8mYKEdySpMFhuX87fw" type="Stereotype"/>
+      <children xmi:id="_Doeo82YKEdySpMFhuX87fw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Doeo8WYKEdySpMFhuX87fw" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_DoU3-2YKEdySpMFhuX87fw" showStereotype="Text"/>
+    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=XmlInputSource%5Bjcu%5Ename=XmlInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.xml%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=InputSource%5Bjcu%5Ename=InputSource.java%5Bjpack%5Ename=org.springframework.batch.io%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_DoU3_GYKEdySpMFhuX87fw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:id="_G894jGYKEdySpMFhuX87fw" source="_G5-18WYKEdySpMFhuX87fw" target="_nvd6vWYJEdySpMFhuX87fw">
+    <children xmi:id="_G894j2YKEdySpMFhuX87fw" type="NameLabel">
+      <children xmi:id="_G894kWYKEdySpMFhuX87fw" type="Stereotype"/>
+      <children xmi:id="_G894kmYKEdySpMFhuX87fw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_G894kGYKEdySpMFhuX87fw" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_G894jWYKEdySpMFhuX87fw" showStereotype="Text"/>
+    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=XmlOutputSource%5Bjcu%5Ename=XmlOutputSource.java%5Bjpack%5Ename=org.springframework.batch.io.xml%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=OutputSource%5Bjcu%5Ename=OutputSource.java%5Bjpack%5Ename=org.springframework.batch.io%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_G894jmYKEdySpMFhuX87fw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:id="_bihnRmYKEdySpMFhuX87fw" source="_bgvekGYKEdySpMFhuX87fw" target="_nvd6sGYJEdySpMFhuX87fw">
+    <children xmi:id="_bihnSWYKEdySpMFhuX87fw" type="NameLabel">
+      <children xmi:id="_bihnS2YKEdySpMFhuX87fw" type="Stereotype"/>
+      <children xmi:id="_bihnTGYKEdySpMFhuX87fw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_bihnSmYKEdySpMFhuX87fw" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_bihnR2YKEdySpMFhuX87fw" showStereotype="Text"/>
+    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=SqlCursorInputSource%5Bjcu%5Ename=SqlCursorInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.sql%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=InputSource%5Bjcu%5Ename=InputSource.java%5Bjpack%5Ename=org.springframework.batch.io%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_bihnSGYKEdySpMFhuX87fw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:id="_UeThImYLEdySpMFhuX87fw" source="_UeKXNmYLEdySpMFhuX87fw" target="_nvd6sGYJEdySpMFhuX87fw">
+    <children xmi:id="_UeThJWYLEdySpMFhuX87fw" type="NameLabel">
+      <children xmi:id="_UeThJ2YLEdySpMFhuX87fw" type="Stereotype"/>
+      <children xmi:id="_UeThKGYLEdySpMFhuX87fw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_UeThJmYLEdySpMFhuX87fw" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_UeThI2YLEdySpMFhuX87fw" showStereotype="Text"/>
+    <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=FieldSetInputSource%5Bjcu%5Ename=FieldSetInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=InputSource%5Bjcu%5Ename=InputSource.java%5Bjpack%5Ename=org.springframework.batch.io%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Generalization"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_UeThJGYLEdySpMFhuX87fw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:id="_fqAkkGYLEdySpMFhuX87fw" source="_fpausGYLEdySpMFhuX87fw" target="_UeKXNmYLEdySpMFhuX87fw">
+    <children xmi:id="_fqAkk2YLEdySpMFhuX87fw" type="NameLabel">
+      <children xmi:id="_fqAklWYLEdySpMFhuX87fw" type="Stereotype"/>
+      <children xmi:id="_fqAklmYLEdySpMFhuX87fw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fqAklGYLEdySpMFhuX87fw" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_fqAkkWYLEdySpMFhuX87fw" showStereotype="Text"/>
+    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=SimpleFlatFileInputSource%5Bjcu%5Ename=SimpleFlatFileInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.file.support%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=FieldSetInputSource%5Bjcu%5Ename=FieldSetInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_fqAkkmYLEdySpMFhuX87fw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:id="_gQ5ld2YLEdySpMFhuX87fw" source="_gPQmsmYLEdySpMFhuX87fw" target="_fpausGYLEdySpMFhuX87fw">
+    <children xmi:id="_gQ5lemYLEdySpMFhuX87fw" type="NameLabel">
+      <children xmi:id="_gQ5lfGYLEdySpMFhuX87fw" type="Stereotype"/>
+      <children xmi:id="_gQ5lfWYLEdySpMFhuX87fw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_gQ5le2YLEdySpMFhuX87fw" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_gQ5leGYLEdySpMFhuX87fw" showStereotype="Text"/>
+    <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=DefaultFlatFileInputSource%5Bjcu%5Ename=DefaultFlatFileInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.file.support%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=SimpleFlatFileInputSource%5Bjcu%5Ename=SimpleFlatFileInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.file.support%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Generalization"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_gQ5leWYLEdySpMFhuX87fw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:id="_gQ5lfmYLEdySpMFhuX87fw" source="_gPQmsmYLEdySpMFhuX87fw" target="_fpausGYLEdySpMFhuX87fw">
+    <children xmi:id="_gQ5lgWYLEdySpMFhuX87fw" type="KindLabel">
+      <children xmi:id="_gQ5lg2YLEdySpMFhuX87fw" type="Stereotype"/>
+      <children xmi:id="_gQ5lhWYLEdySpMFhuX87fw" type="Kind"/>
+      <children xmi:id="_gQ5lhGYLEdySpMFhuX87fw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_gQ5lgmYLEdySpMFhuX87fw" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_gQ5lf2YLEdySpMFhuX87fw" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=DefaultFlatFileInputSource%5Bjcu%5Ename=DefaultFlatFileInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.file.support%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=SimpleFlatFileInputSource%5Bjcu%5Ename=SimpleFlatFileInputSource.java%5Bjpack%5Ename=org.springframework.batch.io.file.support%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_gQ5lgGYLEdySpMFhuX87fw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:id="_BIWjtmYMEdySpMFhuX87fw" source="_BFEmRWYMEdySpMFhuX87fw" target="_nvd6vWYJEdySpMFhuX87fw">
+    <children xmi:id="_BIWjuWYMEdySpMFhuX87fw" type="NameLabel">
+      <children xmi:id="_BIWju2YMEdySpMFhuX87fw" type="Stereotype"/>
+      <children xmi:id="_BIWjvGYMEdySpMFhuX87fw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_BIWjumYMEdySpMFhuX87fw" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_BIWjt2YMEdySpMFhuX87fw" showStereotype="Text"/>
+    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=FlatFileOutputSource%5Bjcu%5Ename=FlatFileOutputSource.java%5Bjpack%5Ename=org.springframework.batch.io.file.support%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=OutputSource%5Bjcu%5Ename=OutputSource.java%5Bjpack%5Ename=org.springframework.batch.io%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_BIWjuGYMEdySpMFhuX87fw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+</notation:Diagram>

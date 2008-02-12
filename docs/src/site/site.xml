@@ -22,6 +22,11 @@
 		
 		<menu name="Project Documentation">
 			<item name="${project.name}" href="index.html"/>
+			<!-- Useful for debugging with "mvn site:run" -->
+			<!-- item name="Doxia" href="reference/toc.html"/-->
+			<item name="Html" href="reference/html/index.html"/>
+			<item name="Html-Single" href="reference/html-single/index.html"/>
+			<item name="Pdf" href="reference/pdf/spring-batch-docs.pdf"/>
 		</menu>
 		${reports} 
 	</body>
