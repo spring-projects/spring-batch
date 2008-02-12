@@ -18,11 +18,11 @@ package org.springframework.batch.core.domain;
 import org.springframework.batch.core.domain.StepExecution;
 
 /**
- * Policy for determining whether or not reading should continue.
+ * Policy for determining whether or not an item should be skipped.
  * 
  * @author Lucas Ward
  */
-public interface ReadFailurePolicy {
+public interface ItemSkipPolicy {
 
 	/**
 	 * Returns true or false, indicating whether or not reading should
@@ -33,5 +33,5 @@ public interface ReadFailurePolicy {
 	 * @return true if reading should continue, false otherwise.
 	 * @throws IllegalArgumentException if t or stepExecution is null
 	 */
-	boolean shouldContinue(Exception ex, StepExecution stepExecution);
+	boolean shouldSkip(Exception ex, StepExecution stepExecution);
 }
