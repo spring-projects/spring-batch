@@ -55,7 +55,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	public void setUp() throws Exception {
 
-		jobRepository = new SimpleJobRepository(jobDao, stepDao, stepDao);
+		jobRepository = new SimpleJobRepository(jobDao, jobDao, stepDao, stepDao);
 
 		JobSupport jobConfiguration = new JobSupport();
 		step = new RepeatOperationsStep();

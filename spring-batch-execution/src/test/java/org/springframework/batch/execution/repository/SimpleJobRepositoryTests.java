@@ -86,7 +86,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDao = (JobDao) jobDaoControl.getMock();
 		stepDao = (StepDao) stepDaoControl.getMock();
 
-		jobRepository = new SimpleJobRepository(jobDao, stepDao, stepDao);
+		jobRepository = new SimpleJobRepository(jobDao, jobDao,  stepDao, stepDao);
 
 		jobParameters = new JobParametersBuilder().toJobParameters();
 		

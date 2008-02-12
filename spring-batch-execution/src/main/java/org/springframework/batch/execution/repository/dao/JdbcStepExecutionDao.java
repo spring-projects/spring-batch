@@ -16,7 +16,7 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.execution.repository.dao.JdbcJobDao.JobExecutionRowMapper;
+import org.springframework.batch.execution.repository.dao.JdbcJobExecutionDao.JobExecutionRowMapper;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.repeat.ExitStatus;
@@ -91,7 +91,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
 
-	private JobDao jobDao;
+	private JobExecutionDao jobExecutionDao;
 
 	public ExecutionAttributes findExecutionAttributes(final Long executionId) {
 
@@ -282,7 +282,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 			// assume already saved...
 			return;
 		}
-		jobDao.saveJobExecution(jobExecution);
+		jobExecutionDao.saveJobExecution(jobExecution);
 	}
 
 	/**
@@ -458,13 +458,13 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 		this.stepExecutionIncrementer = stepExecutionIncrementer;
 	}
 
-	public void setJobDao(JobDao jobDao) {
-		this.jobDao = jobDao;
+	public void setJobExecutionDao(JobExecutionDao jobExecutionDao) {
+		this.jobExecutionDao = jobExecutionDao;
 	}
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(stepExecutionIncrementer, "StepExecutionIncrementer cannot be null.");
-		Assert.notNull(jobDao, "JobDao cannot be null");
+		Assert.notNull(jobExecutionDao, "JobDao cannot be null");
 	}
 
 	public static class AttributeType {

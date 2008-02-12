@@ -10,7 +10,8 @@ public class JdbcJobDaoTests extends AbstractJobDaoTests {
 	public static final String LONG_STRING = "A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String A very long String ";
 
 	protected void onSetUpBeforeTransaction() throws Exception {
-		((JdbcJobDao) jobDao).setTablePrefix(JdbcJobDao.DEFAULT_TABLE_PREFIX);
+		((JdbcJobInstanceDao) jobInstanceDao).setTablePrefix(AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX);
+		((JdbcJobExecutionDao) jobExecutionDao).setTablePrefix(AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX);
 	}
 
 	public void testUpdateJobExecutionWithLongExitCode() {
@@ -18,7 +19,7 @@ public class JdbcJobDaoTests extends AbstractJobDaoTests {
 		assertTrue(LONG_STRING.length() > 250);
 		jobExecution.setExitStatus(ExitStatus.FINISHED
 				.addExitDescription(LONG_STRING));
-		jobDao.updateJobExecution(jobExecution);
+		jobExecutionDao.updateJobExecution(jobExecution);
 
 		List executions = jdbcTemplate.queryForList(
 				"SELECT * FROM BATCH_JOB_EXECUTION where JOB_INSTANCE_ID=?",

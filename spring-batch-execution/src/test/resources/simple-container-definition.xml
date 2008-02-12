@@ -46,6 +46,7 @@
 	<bean id="simpleJobRepository"
 		class="org.springframework.batch.execution.repository.SimpleJobRepository">
 		<constructor-arg ref="jobDao" />
+		<constructor-arg ref="jobDao" />
 		<constructor-arg ref="stepDao" />
 		<constructor-arg ref="stepDao" />
 	</bean>

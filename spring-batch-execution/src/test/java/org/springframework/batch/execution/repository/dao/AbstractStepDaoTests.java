@@ -44,7 +44,7 @@ import org.springframework.util.ClassUtils;
  */
 public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	protected JobDao jobDao;
+	protected JobInstanceDao jobInstanceDao;
 	
 	protected StepInstanceDao stepInstanceDao;
 	
@@ -64,8 +64,8 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	
 	protected ExecutionAttributes executionAttributes;
 
-	public void setJobDao(JobDao jobDao) {
-		this.jobDao = jobDao;
+	public void setJobInstanceDao(JobInstanceDao jobInstanceDao) {
+		this.jobInstanceDao = jobInstanceDao;
 	}
 
 	public void setStepInstanceDao(StepInstanceDao stepInstanceDao) {
@@ -90,7 +90,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	 */
 	protected void onSetUpInTransaction() throws Exception {
 		Job job = new JobSupport("TestJob");
-		jobInstance = jobDao.createJobInstance(job.getName(), jobParameters);
+		jobInstance = jobInstanceDao.createJobInstance(job.getName(), jobParameters);
 		step1 = stepInstanceDao.createStepInstance(jobInstance, "TestStep1");
 		step2 = stepInstanceDao.createStepInstance(jobInstance, "TestStep2");
 		jobExecution = new JobExecution(step2.getJobInstance());

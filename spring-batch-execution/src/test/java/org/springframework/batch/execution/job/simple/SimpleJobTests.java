@@ -31,7 +31,8 @@ import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
-import org.springframework.batch.execution.repository.dao.JobDao;
+import org.springframework.batch.execution.repository.dao.JobExecutionDao;
+import org.springframework.batch.execution.repository.dao.JobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
@@ -51,7 +52,9 @@ public class SimpleJobTests extends TestCase {
 
 	private JobRepository jobRepository;
 
-	private JobDao jobDao;
+	private JobInstanceDao jobInstanceDao;
+	
+	private JobExecutionDao jobExecutionDao;
 
 	private StepInstanceDao stepInstanceDao;
 	
@@ -84,10 +87,11 @@ public class SimpleJobTests extends TestCase {
 
 		MapJobDao.clear();
 		MapStepDao.clear();
-		jobDao = new MapJobDao();
+		jobInstanceDao = new MapJobDao();
+		jobExecutionDao = new MapJobDao();
 		stepInstanceDao = new MapStepDao();
 		stepExecutionDao = new MapStepDao();
-		jobRepository = new SimpleJobRepository(jobDao, stepInstanceDao, stepExecutionDao);
+		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepInstanceDao, stepExecutionDao);
 		job = new SimpleJob();
 		job.setJobRepository(jobRepository);
 
@@ -254,9 +258,9 @@ public class SimpleJobTests extends TestCase {
 	 * Check JobRepository to ensure status is being saved.
 	 */
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
-		assertEquals(jobInstance, jobDao.findJobInstances(jobInstance.getJobName(), jobParameters).get(0));
+		assertEquals(jobInstance, jobInstanceDao.findJobInstances(jobInstance.getJobName(), jobParameters).get(0));
 		// because map dao stores in memory, it can be checked directly
-		JobExecution jobExecution = (JobExecution) jobDao.findJobExecutions(jobInstance).get(0);
+		JobExecution jobExecution = (JobExecution) jobExecutionDao.findJobExecutions(jobInstance).get(0);
 		assertEquals(jobInstance.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());
 		if (exitStatus != null) {

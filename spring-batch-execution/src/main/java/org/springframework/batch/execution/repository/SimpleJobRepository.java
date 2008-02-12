@@ -32,6 +32,8 @@ import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.dao.JobDao;
+import org.springframework.batch.execution.repository.dao.JobExecutionDao;
+import org.springframework.batch.execution.repository.dao.JobInstanceDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
 import org.springframework.batch.execution.repository.dao.StepInstanceDao;
 import org.springframework.batch.item.ExecutionAttributes;
@@ -55,7 +57,9 @@ import org.springframework.util.Assert;
  */
 public class SimpleJobRepository implements JobRepository {
 
-	private JobDao jobDao;
+	private JobInstanceDao jobDao;
+
+	private JobExecutionDao jobExecutionDao;
 
 	private StepInstanceDao stepInstanceDao;
 
@@ -68,9 +72,11 @@ public class SimpleJobRepository implements JobRepository {
 	SimpleJobRepository() {
 	}
 
-	public SimpleJobRepository(JobDao jobDao, StepInstanceDao stepInstanceDao, StepExecutionDao stepExecutionDao) {
+	public SimpleJobRepository(JobInstanceDao jobDao, JobExecutionDao jobExecutionDao, StepInstanceDao stepInstanceDao,
+			StepExecutionDao stepExecutionDao) {
 		super();
 		this.jobDao = jobDao;
+		this.jobExecutionDao = jobExecutionDao;
 		this.stepInstanceDao = stepInstanceDao;
 		this.stepExecutionDao = stepExecutionDao;
 	}
@@ -166,11 +172,11 @@ public class SimpleJobRepository implements JobRepository {
 			// One job was found
 			jobInstance = (JobInstance) jobs.get(0);
 			jobInstance.setStepInstances(findStepInstances(job.getSteps(), jobInstance));
-			jobInstance.setJobExecutionCount(jobDao.getJobExecutionCount(jobInstance.getId()));
+			jobInstance.setJobExecutionCount(jobExecutionDao.getJobExecutionCount(jobInstance.getId()));
 			if (jobInstance.getJobExecutionCount() > job.getStartLimit()) {
 				throw new BatchRestartException("Restart Max exceeded for Job: " + jobInstance.toString());
 			}
-			List executions = jobDao.findJobExecutions(jobInstance);
+			List executions = jobExecutionDao.findJobExecutions(jobInstance);
 			for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
 				JobExecution execution = (JobExecution) iterator.next();
 				if (execution.isRunning()) {
@@ -219,11 +225,11 @@ public class SimpleJobRepository implements JobRepository {
 
 		if (jobExecution.getId() == null) {
 			// existing instance
-			jobDao.saveJobExecution(jobExecution);
+			jobExecutionDao.saveJobExecution(jobExecution);
 		}
 		else {
 			// new execution
-			jobDao.updateJobExecution(jobExecution);
+			jobExecutionDao.updateJobExecution(jobExecution);
 		}
 	}
 

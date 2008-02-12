@@ -31,8 +31,8 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
  * 
  */
 public class JdbcJobDaoQueryTests extends TestCase {
-
-	JdbcJobDao sqlDao;
+	
+	JdbcJobExecutionDao jobExecutionDao;
 
 	List list = new ArrayList();
 
@@ -41,8 +41,9 @@ public class JdbcJobDaoQueryTests extends TestCase {
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
-		sqlDao = new JdbcJobDao();
-		sqlDao.setJobExecutionIncrementer(new DataFieldMaxValueIncrementer() {
+		
+		jobExecutionDao = new JdbcJobExecutionDao();
+		jobExecutionDao.setJobExecutionIncrementer(new DataFieldMaxValueIncrementer() {
 
 			public int nextIntValue() throws DataAccessException {
 				return 0;
@@ -60,14 +61,14 @@ public class JdbcJobDaoQueryTests extends TestCase {
 	}
 
 	public void testTablePrefix() throws Exception {
-		sqlDao.setTablePrefix("FOO_");
-		sqlDao.setJdbcTemplate(new JdbcTemplate() {
+		jobExecutionDao.setTablePrefix("FOO_");
+		jobExecutionDao.setJdbcTemplate(new JdbcTemplate() {
 			public int update(String sql, Object[] args, int[] argTypes) throws DataAccessException {
 				list.add(sql);
 				return 1;
 			}
 		});
-		sqlDao.saveJobExecution(new JobInstance(new Long(11), new JobParameters()).createJobExecution());
+		jobExecutionDao.saveJobExecution(new JobInstance(new Long(11), new JobParameters()).createJobExecution());
 		assertEquals(1, list.size());
 		String query = (String) list.get(0);
 		assertTrue("Query did not contain FOO_:" + query, query.indexOf("FOO_") >= 0);

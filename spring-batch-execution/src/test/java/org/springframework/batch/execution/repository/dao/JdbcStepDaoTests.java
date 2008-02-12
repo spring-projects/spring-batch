@@ -11,8 +11,8 @@ public class JdbcStepDaoTests extends AbstractStepDaoTests {
 	private static final String LONG_STRING = JdbcJobDaoTests.LONG_STRING;
 
 	protected void onSetUpBeforeTransaction() throws Exception {
-		((JdbcStepInstanceDao) stepInstanceDao).setTablePrefix(JdbcJobDao.DEFAULT_TABLE_PREFIX);
-		((JdbcStepExecutionDao) stepExecutionDao).setTablePrefix(JdbcJobDao.DEFAULT_TABLE_PREFIX);
+		((JdbcStepInstanceDao) stepInstanceDao).setTablePrefix(AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX);
+		((JdbcStepExecutionDao) stepExecutionDao).setTablePrefix(AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX);
 	}
 
 	public void testTablePrefix() throws Exception {

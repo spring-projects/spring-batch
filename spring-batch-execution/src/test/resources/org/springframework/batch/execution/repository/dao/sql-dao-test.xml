@@ -5,9 +5,14 @@
 
 	<import resource="data-source-context.xml" />
 
-	<bean id="jobDao" class="org.springframework.batch.execution.repository.dao.JdbcJobDao" >
+	<bean id="jobInstanceDao" class="org.springframework.batch.execution.repository.dao.JdbcJobInstanceDao" >
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="jobIncrementer" ref="jobIncrementer" />
+		<property name="jobExecutionDao" ref="jobExecutionDao" />
+	</bean>
+	
+	<bean id="jobExecutionDao" class="org.springframework.batch.execution.repository.dao.JdbcJobExecutionDao" >
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" />
 	</bean>
 
@@ -20,7 +25,7 @@
 	<bean id="stepExecutionDao" class="org.springframework.batch.execution.repository.dao.JdbcStepExecutionDao" >
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" />
-		<property name="jobDao" ref="jobDao"/>
+		<property name="jobExecutionDao" ref="jobExecutionDao"/>
 	</bean>
 
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" >
