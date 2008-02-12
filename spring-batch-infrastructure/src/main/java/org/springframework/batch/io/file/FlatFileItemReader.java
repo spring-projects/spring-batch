@@ -41,9 +41,21 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
+ * This class represents a {@link ItemReader}, that reads lines from text file,
+ * tokenizes them to structured tuples ({@link FieldSet}s) instances and maps
+ * the {@link FieldSet}s to domain objects. The location of the file is defined
+ * by the resource property. To separate the structure of the file,
+ * {@link LineTokenizer} is used to parse data obtained from the file. <br/>
+ * 
+ * A {@link FlatFileItemReader} is not thread safe because it maintains state in
+ * the form of a {@link ResourceLineReader}. Be careful to configure a
+ * {@link FlatFileItemReader} using an appropriate factory or scope so that it
+ * is not shared between threads.<br/>
+ * 
  * <p>
- * This class is a {@link FieldSetItemReader} that supports restart, skipping
- * invalid lines and storing statistics.
+ * This class supports restart, skipping invalid lines and storing statistics.
+ * It can be configured to setup {@link FieldSet} column names from the file
+ * header, skip given number of lines at the beginning of the file.
  * </p>
  * 
  * @author Waseem Malik
@@ -86,13 +98,13 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	 * Encapsulates the state of the input source. If it is null then we are
 	 * uninitialized.
 	 */
-	protected LineReader reader;
+	private LineReader reader;
 
 	/**
 	 * Initialize the reader if necessary.
 	 * @throws IllegalStateException if the resource cannot be opened
 	 */
-	public void open() throws IllegalStateException {
+	public void open() throws StreamException {
 
 		Assert.state(resource.exists(), "Resource must exist: [" + resource + "]");
 
@@ -123,6 +135,7 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 				((AbstractLineTokenizer) tokenizer).setNames(names);
 			}
 		}
+		
 		mark();
 	}
 
@@ -167,7 +180,7 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	}
 
 	/**
-	 * This method initialises the Input Source for Restart. It opens the input
+	 * This method initialises the reader for Restart. It opens the input
 	 * file and position the buffer reader according to information provided by
 	 * the restart data
 	 * 
@@ -196,8 +209,8 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	}
 
 	/**
-	 * This method returns the restart Data for the input Source. It returns the
-	 * current Line Count which can be used to re initialise the batch job in
+	 * This method returns the execution attributes for the reader. It returns the
+	 * current Line Count which can be used to reinitialise the batch job in
 	 * case of restart.
 	 */
 	public ExecutionAttributes getExecutionAttributes() {
@@ -249,7 +262,7 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	}
 
 	/**
-	 * @return next line to be tokenized and mapped
+	 * @return next line to be tokenized and mapped (possibly skips multiple lines).
 	 */
 	protected String readLine() {
 		String line = nextLine();

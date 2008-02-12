@@ -36,10 +36,10 @@ import org.springframework.core.io.Resource;
 /**
  * Tests for {@link FlatFileItemReader} - the fundamental item reading functionality.
  *
- * @see FlatFileItemReaderTests
+ * @see FlatFileItemReaderAdvancedTests
  * @author Dave Syer
  */
-public class BasicFlatFileItemReaderTests extends TestCase {
+public class FlatFileItemReaderBasicTests extends TestCase {
 
 	// object under test
 	private FlatFileItemReader itemReader = new FlatFileItemReader();

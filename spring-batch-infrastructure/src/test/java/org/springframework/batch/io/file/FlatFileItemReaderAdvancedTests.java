@@ -34,7 +34,7 @@ import org.springframework.core.io.Resource;
  * 
  * @see FlatFileItemReaderBasicTests
  */
-public class FlatFileItemReaderTests extends TestCase {
+public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 	// object under test
 	private FlatFileItemReader reader = new FlatFileItemReader();
