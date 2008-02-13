@@ -18,47 +18,37 @@ package org.springframework.batch.core.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.core.enums.ShortCodedLabeledEnum;
-
 /**
+ * Value object representing the result of dechunking a {@link Chunk}.  It contains
+ * the id of the chunk that was processed, a list of exceptions, and whether or not
+ * the chunk was successful.
  * 
  * @author Ben Hale
+ * @author Lucas Ward
  */
-public class ChunkResult {
-
-	public static final ChunkResultType SUCCESS = new ChunkResultType(0, "Success");
-
-	public static final ChunkResultType FAILURE = new ChunkResultType(1, "Failure");
-
-	private final ChunkResultType resultType;
+public class DechunkingResult {
 
 	private final Long chunkId;
 
-	private final List skippedItems;
+	private final List exceptions;
+	
+	private final boolean successful;
 
-	public ChunkResult(ChunkResultType resultType, Long chunkId, List skippedItems) {
-		this.resultType = resultType;
+	public DechunkingResult(boolean successful, Long chunkId, List exceptions) {
 		this.chunkId = chunkId;
-		this.skippedItems = skippedItems;
-	}
-
-	public ChunkResultType getResultType() {
-		return resultType;
+		this.exceptions = exceptions;
+		this.successful = successful;
 	}
 
 	public Long getChunkId() {
 		return chunkId;
 	}
 
-	public List getSkippedItems() {
-		return new ArrayList(skippedItems);
+	public List getExceptions() {
+		return new ArrayList(exceptions);
 	}
-
-	private static class ChunkResultType extends ShortCodedLabeledEnum {
-
-		public ChunkResultType(int code, String label) {
-			super(code, label);
-		}
-
+	
+	public boolean isSuccessful() {
+		return successful;
 	}
 }

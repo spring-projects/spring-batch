@@ -15,19 +15,17 @@
  */
 package org.springframework.batch.core.domain;
 
-import org.springframework.batch.item.ItemReader;
+import java.util.List;
 
 /**
- * Interface defining the contract for dechunking a {@link Chunk}.  Similar
- * to the differences between an {@link ItemReader} and an {@link ItemWriter},
- * a dechunker is the polar oposite of a {@link Chunker}.  A {@link Chunker} creates
- * a chunk from a stream of items, wheras a Dechunker removes each item from the 
- * {@link Chunk} and adds it to an outgoing stream of items.
+ * Interface for defining the contract to log out read and write
+ * failures encountered during batch processing.
  * 
  * @author Lucas Ward
  *
  */
-public interface Dechunker {
+public interface ItemFailureLog {
+	
+	void log(List exceptions);
 
-	DechunkingResult dechunk(Chunk chunk) throws Exception;
 }

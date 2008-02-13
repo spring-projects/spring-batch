@@ -15,19 +15,28 @@
  */
 package org.springframework.batch.core.domain;
 
-import org.springframework.batch.item.ItemReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.TestCase;
 
 /**
- * Interface defining the contract for dechunking a {@link Chunk}.  Similar
- * to the differences between an {@link ItemReader} and an {@link ItemWriter},
- * a dechunker is the polar oposite of a {@link Chunker}.  A {@link Chunker} creates
- * a chunk from a stream of items, wheras a Dechunker removes each item from the 
- * {@link Chunk} and adds it to an outgoing stream of items.
- * 
  * @author Lucas Ward
  *
  */
-public interface Dechunker {
+public class ChunkingResultTests extends TestCase {
 
-	DechunkingResult dechunk(Chunk chunk) throws Exception;
+	private Chunk chunk;
+	private List exceptions;
+	
+	public void testChunk(){
+		
+		chunk = new Chunk(new Long(1), new ArrayList());
+		exceptions = new ArrayList();
+		
+		ChunkingResult result = new ChunkingResult(chunk,exceptions);
+		
+		assertEquals(chunk,result.getChunk());
+		assertEquals(exceptions,result.getExceptions());
+	}
 }
