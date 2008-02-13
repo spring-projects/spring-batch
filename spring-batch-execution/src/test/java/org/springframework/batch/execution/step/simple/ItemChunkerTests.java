@@ -17,7 +17,7 @@ package org.springframework.batch.execution.step.simple;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.Chunk;
+import org.springframework.batch.core.domain.ChunkingResult;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.StepExecution;
 
@@ -54,15 +54,15 @@ public class ItemChunkerTests extends TestCase {
 	public void testSizePositive() {
 		MockItemReader itemReader = new MockItemReader(10);
 		ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
-		Chunk chunk = chunkReader.chunk(10);
-		assertEquals(10, chunk.getItems().size());
+		ChunkingResult chunkingResult = chunkReader.chunk(10);
+		assertEquals(10, chunkingResult.getChunk().getItems().size());
 	}
 
 	public void testIncompleteChunk() {
 		MockItemReader itemReader = new MockItemReader(5);
 		ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
-		Chunk chunk = chunkReader.chunk(10);
-		assertEquals(5, chunk.getItems().size());
+		ChunkingResult chunkingResult = chunkReader.chunk(10);
+		assertEquals(5, chunkingResult.getChunk().getItems().size());
 	}
 
 	public void testPolicyNoContinue() {
@@ -82,8 +82,8 @@ public class ItemChunkerTests extends TestCase {
 		itemReader.setFail(true);
 		ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
 		chunkReader.setReadFailurePolicy(new StubReadFailurePolicy(false));
-		Chunk chunk = chunkReader.chunk(1);
-		assertEquals(1, chunk.getItems().size());
+		ChunkingResult chunkingResult = chunkReader.chunk(1);
+		assertEquals(1,chunkingResult.getChunk().getItems().size());
 	}
 
 	private class StubReadFailurePolicy implements ItemSkipPolicy {

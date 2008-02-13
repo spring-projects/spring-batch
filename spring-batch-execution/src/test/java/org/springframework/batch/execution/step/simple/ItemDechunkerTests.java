@@ -20,8 +20,9 @@ import java.util.List;
 
 import org.easymock.MockControl;
 import org.springframework.batch.core.domain.Chunk;
-import org.springframework.batch.core.domain.ChunkResult;
+import org.springframework.batch.core.domain.DechunkingResult;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.io.exception.WriteFailureException;
 import org.springframework.batch.item.ItemWriter;
 
 import junit.framework.TestCase;
@@ -71,9 +72,12 @@ public class ItemDechunkerTests extends TestCase {
 		itemWriter.write("2");
 		writerControl.setThrowable(new Exception());
 		writerControl.replay();
-		ChunkResult result = dechunker.dechunk(chunk);
+		DechunkingResult result = dechunker.dechunk(chunk);
 		writerControl.verify();
-		assertEquals("2",result.getSkippedItems().get(0));
+		List exceptions = result.getExceptions();
+		assertEquals(1, exceptions.size());
+		WriteFailureException exception = (WriteFailureException)exceptions.get(0);
+		assertEquals("2",exception.getItem());
 		
 	}
 	

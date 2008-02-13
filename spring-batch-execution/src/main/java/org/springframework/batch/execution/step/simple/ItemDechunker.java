@@ -20,10 +20,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.domain.Chunk;
-import org.springframework.batch.core.domain.ChunkResult;
+import org.springframework.batch.core.domain.DechunkingResult;
 import org.springframework.batch.core.domain.Dechunker;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.io.exception.WriteFailureException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.util.Assert;
 
@@ -48,7 +49,7 @@ public class ItemDechunker implements Dechunker {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.Dechunker#dechunk(org.springframework.batch.core.domain.Chunk)
 	 */
-	public ChunkResult dechunk(Chunk chunk) throws Exception {
+	public DechunkingResult dechunk(Chunk chunk) throws Exception {
 		
 		Assert.notNull(chunk, "Chunk must not be null");
 		List skippedItems = new ArrayList();
@@ -61,7 +62,7 @@ public class ItemDechunker implements Dechunker {
 			catch(Exception ex){
 				if(itemSkipPolicy.shouldSkip(ex, stepExecution)){
 					stepExecution.incrementSkipCount();
-					skippedItems.add(item);
+					skippedItems.add(new WriteFailureException(ex, item));
 				}
 				else{
 					rethrow(ex);
@@ -69,7 +70,7 @@ public class ItemDechunker implements Dechunker {
 			}
 		}
 		
-		return new ChunkResult(ChunkResult.SUCCESS, chunk.getId(), skippedItems);
+		return new DechunkingResult(true, chunk.getId(), skippedItems);
 	}
 	
 	public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {

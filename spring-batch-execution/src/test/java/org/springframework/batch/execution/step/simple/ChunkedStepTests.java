@@ -18,7 +18,6 @@ package org.springframework.batch.execution.step.simple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -31,10 +30,6 @@ import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.execution.repository.SimpleJobRepository;
-import org.springframework.batch.execution.repository.dao.MapJobDao;
-import org.springframework.batch.execution.repository.dao.MapStepDao;
-import org.springframework.batch.execution.repository.dao.StepDao;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.item.ExecutionAttributes;

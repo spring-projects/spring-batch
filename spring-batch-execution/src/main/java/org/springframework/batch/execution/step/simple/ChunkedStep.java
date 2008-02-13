@@ -21,8 +21,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Chunk;
-import org.springframework.batch.core.domain.ChunkResult;
+import org.springframework.batch.core.domain.ChunkingResult;
 import org.springframework.batch.core.domain.Dechunker;
+import org.springframework.batch.core.domain.DechunkingResult;
+import org.springframework.batch.core.domain.ItemFailureLog;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
@@ -81,6 +83,8 @@ public class ChunkedStep extends AbstractStep {
 
 	// default to checking current thread for interruption.
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
+	
+	private ItemFailureLog failureLog = new DefaultItemFailureLog();
 
 	private StreamManager streamManager;
 
@@ -106,6 +110,10 @@ public class ChunkedStep extends AbstractStep {
 	 */
 	public void setStreamManager(StreamManager streamManager) {
 		this.streamManager = streamManager;
+	}
+	
+	public void setFailureLog(ItemFailureLog failureLog) {
+		this.failureLog = failureLog;
 	}
 
 	/**
@@ -222,10 +230,14 @@ public class ChunkedStep extends AbstractStep {
 					
 					//shouldn't have to create a chunker each time, I'll refactor the interface later
 					Chunker chunker = new ItemChunker(itemReader, stepExecution);
-					final Chunk chunk = chunker.chunk(chunkSize);
-					if(chunk == null){
+					ChunkingResult chunkingResult = chunker.chunk(chunkSize);
+					
+					if(chunkingResult == null){
 						return ExitStatus.FINISHED;
 					}
+					
+					final Chunk chunk = chunkingResult.getChunk();
+					failureLog.log(chunkingResult.getExceptions());
 
 					retryTemplate.execute(new RetryCallback(){
 
@@ -292,7 +304,8 @@ public class ChunkedStep extends AbstractStep {
 
 			Dechunker dechunker = new ItemDechunker(itemWriter, stepExecution);
 			
-			ChunkResult chunkResult = dechunker.dechunk(chunk);
+			DechunkingResult chunkResult = dechunker.dechunk(chunk);
+			failureLog.log(chunkResult.getExceptions());
 
 			// TODO: check that stepExecution can
 			// aggregate these contributions if they
