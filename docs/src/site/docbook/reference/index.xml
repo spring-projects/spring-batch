@@ -37,6 +37,6 @@
 	<xi:include href="samples.xml"/>
 	<xi:include href="batch-job-testing.xml"/>
 	<xi:include href="batch-performance-testing.xml"/>
-        <xi:include href="glossary.xml"/> 
+<!--        <xi:include href="glossary.xml"/>  -->
 </book>
 
