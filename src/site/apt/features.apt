@@ -3,7 +3,7 @@
                                     ------
                                     Dave Syer
                                     ------
-                                    July 2007
+                                    July 2007, February 2008
 
 Spring Batch Features and Roadmap
 
@@ -19,81 +19,78 @@ Spring Batch Features and Roadmap
  
   * RetryOperations: an abstraction for automatic retry.
 
-  * InputSource abstraction and implementations for flat files, xml
+  * ItemReader abstraction and implementations for flat files, xml
   streaming and simple database queries.
 
   * Flat files are supported with fixed length and delimited records
   (input and ouput).
   
-  * Xml is supported through Xstream mapping between objects and Xml
-  elements (input and ouput).
+  * Xml is supported through Spring OXM mapping between objects and Xml
+  elements (input and ouput).  Large files are streamed, not read as a whole.
 
-  * A database input source is provided that maps a row of a ResultSet
-  identified by a simple (single column) primary key.
+  * Database implementations ItemReader are provided that map a row of
+  a ResultSet identified by a simple (single or multiple column)
+  primary key.
 
-  * OutputSource abstraction and implementations for flat files and
-  xml (the Sql case is just a regular Jdbc Dao).
+  * ItemWriter abstraction and implementations for flat files and xml
+  (the Sql case is just a regular Jdbc Dao).
 
-  * InputSource and OutputSource implementations are generally
-  Restartable and Skippable.  Skippable means that they can be asked by
-  clients to mark items as skipped, and not provide or process them
-  next time they arrive.
+  * ItemReader and ItenWriter implementations are generally Skippable.
+  Skippable means that they can be asked by clients to mark items as
+  skipped, and not provide or process them next time they arrive.
 
-  * Complementary to InputSource and OutputSource is a higher-level
-  abstraction layer with ItemProvider and ItemProcessor.  Some
-  specialised concrete retry and repeat strategies have dependencies
-  on ItemProvider and/or ItemProcessor.
+  * ItemReader and ItenWriter implementations are also generally
+  ItemStreams.  An ItemStrean encapsulates stream-like behaviour that
+  is needed for transaction synchronization (mark/reset). It also
+  provides the facility to be restored from a persistent
+  ExecutionAttributes so that jobs can fail and be restarted in
+  another process.
+
+  * For modifying an item before it is written, there is the
+  ItemTransformer abstraction.  ItemTransformer and ItemWriter are the
+  two most common application developer touch points.
 
 ** Core Domain
 
-  * JobConfiguration is the root of the core domain - it is what most
-  developers and operators will be happy to call a "job": a recipe for
-  how to construct and run a JobInstance.
+  * Job is the root of the core domain - it is a recipe for how to
+  construct and run a JobInstance.
 
-  * A JobConfiguration is composed of a list of StepConfigurations
-  (sequential step model for job).
+  * A Job is composed of a list of Steps (sequential step model for
+  job).
 
-  * StepConfiguration is a wrapper for a "unit of work", otherwise
-  known as a Tasklet (formerly Module).
+  * Job is the entry point for launching a JobExecution.
 
-  * JobExecutor is the entry point for launching a JobConfiguration.
+  * Step is the corresponding point for a StepExecution.  Step is the
+  main strategy for different scaling, distribution and processing
+  approaches.  The 1.0 release contains implementations for in-process
+  execution (single VM).  See below (in the Execution module).
 
-  * StepExecutor is the corresponding point for a StepConfiguration.
-  StepExecutor is the main strategy for different scaling,
-  distribution and processing approaches.  The 1.0 release contains
-  implementations for in-process execution (single VM).  See below.
+  * The most commonly used implementation of Step is a wrapper for an
+  ItemReader and an ItemWriter.  There is also a special
+  implementation that wraps a Tasklet, which can be used to execute a
+  single action like a stored procedure call.
 
 ** Job Execution and Management
 
-  * A simple JobExecutorFacade to launch jobs.  Start a new one or
-  restart one that has previously failed.  The facade can be used by a
-  command-line or JMX launcher to take simple input parameters and
-  convert them to the form required by the Core.
+  * A simple JobLauncher to launch jobs.  Start a new one or restart
+  one that has previously failed.  This can be used by a command-line
+  or JMX launcher to take simple input parameters and convert them to
+  the form required by the Core.  (Examples of both are in the Samples
+  module.)
 
   * Persistence of job meta data for management and reporting
-  purposes: job and step identifiers, commit counts, task counts,
-  statistics (a human readable represenation of the state of the job -
-  can be augmented by developers).
+  purposes: job and step identifiers, job parameters, commit counts,
+  rollback counts.  Execution attributes (a human readable
+  represenation of the state of the job - can be augmented by
+  developers).
 
-  * ItemProviderProcessorTasklet - uses an ItemProvider to obtain the
-  next record to process, and hands it to an ItemProvider if it is not
-  null.
-
-  Developers are encouraged to use the ItemProviderProcessorTasklet
-  rather than implementing their own, because this is the
-  implementation that in future versions of Spring Batch will be able
-  to adapt to different deployment architectures, and take advantage
-  of automatic scaling up through distributed processing.
-
-  * A StepExecutor (SimpleStepExecutor) that can run a
-  StepConfiguration in the same process (VM).
+  * SimpleStep - uses an ItemReader to obtain the next record to
+  process, and hands it to an ItemWriter if it is not null.  It can
+  run a StepExecution in the same process (VM).
 
   * Concurrent execution of chunks (a chunk is a batch of items
   processed in the same transaction) through the Spring TaskExecutor
   abstraction.
-
-  * Additional StepExecutor implementation that is aware of whether
-  its task is Recoverable - take recovery action on error.
 
   * Automatic retry of a chunk and recovery for items that have
   exhausted their retry count.
@@ -107,27 +104,12 @@ Spring Batch Features and Roadmap
   use a common simple configuration and extend in various ways to show
   the different features of the Execution module.
 
-** Partial Support or Potentially Unstable APIs
-
-  A milestone is a milestone, so we are going to continue refining the
-  APIs until we get to a release candidate.  Hopefully most of the
-  developer touch points are functionally pretty stable, even if the
-  names and packages might still change.  Partial implementations or
-  areas currently known to be undergoing refactoring
-  are listed in JIRA
-  (http://opensource.atlassian.com/projects/spring/browse/BATCH) for
-  items marked as open for future versions.
-
-  Documentation is extensive but still incomplete.  The recent
-  refactoring to create the Execution module is not yet reflected, so
-  the "container" concept is still ubiquitous.
-
 * Roadmap (Beyond 1.0).
 
-  * Remote or distributed execution of steps.  The step has to be
-  partitioned and the partition information passed on to the remote
-  processes to avoid double counting.  The remote execution might be
-  in an EJB or other RPC like a web service.
+  * Remote or distributed execution of steps.  The step proceeds as in
+  the single JVM case, but each chunk is passed on to the remote
+  processes.  The remote execution is an asynchronous listener of some
+  sort (e.g. message-driven component or web service).
 
   * Asynchronous pipeline processing - steps execute concurrently and
   optionally in separate processes.  Feedback loop between consumers
