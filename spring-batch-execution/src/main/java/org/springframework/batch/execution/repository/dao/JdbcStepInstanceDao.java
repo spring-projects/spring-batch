@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -36,16 +35,12 @@ public class JdbcStepInstanceDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final String CREATE_STEP = "INSERT into %PREFIX%STEP_INSTANCE(STEP_INSTANCE_ID, JOB_INSTANCE_ID, STEP_NAME) values (?, ?, ?)";
 
-	private static final String FIND_STEP = "SELECT STEP_INSTANCE_ID, LAST_STEP_EXECUTION_ID from %PREFIX%STEP_INSTANCE where JOB_INSTANCE_ID = ? "
+	private static final String FIND_STEP = "SELECT STEP_INSTANCE_ID from %PREFIX%STEP_INSTANCE where JOB_INSTANCE_ID = ? "
 			+ "and STEP_NAME = ?";
 
-	private static final String FIND_STEPS = "SELECT STEP_INSTANCE_ID, LAST_STEP_EXECUTION_ID, STEP_NAME from %PREFIX%STEP_INSTANCE where JOB_INSTANCE_ID = ?";
-
-	private static final String UPDATE_STEP = "UPDATE %PREFIX%STEP_INSTANCE set LAST_STEP_EXECUTION_ID = ? where STEP_INSTANCE_ID = ?";
+	private static final String FIND_STEPS = "SELECT STEP_INSTANCE_ID, STEP_NAME from %PREFIX%STEP_INSTANCE where JOB_INSTANCE_ID = ?";
 
 	private DataFieldMaxValueIncrementer stepIncrementer;
-
-	private StepExecutionDao stepExecutionDao;
 
 	/**
 	 * Create a step with the given job's id, and the provided step name. A
@@ -129,19 +124,19 @@ public class JdbcStepInstanceDao extends AbstractJdbcBatchMetadataDao implements
 		return getJdbcTemplate().query(getQuery(FIND_STEPS), parameters, rowMapper);
 	}
 
-	/**
-	 * @see StepDao#updateStepInstance(StepInstance)
-	 * @throws IllegalArgumentException if step, or it's status and id is null.
-	 */
-	public void updateStepInstance(final StepInstance step) {
-
-		Assert.notNull(step, "Step cannot be null.");
-		Assert.notNull(step.getId(), "Step Id cannot be null.");
-
-		Object[] parameters = new Object[] { step.getLastExecution().getId(), step.getId() };
-
-		getJdbcTemplate().update(getQuery(UPDATE_STEP), parameters);
-	}
+//	/**
+//	 * @see StepDao#updateStepInstance(StepInstance)
+//	 * @throws IllegalArgumentException if step, or it's status and id is null.
+//	 */
+//	public void updateStepInstance(final StepInstance step) {
+//
+//		Assert.notNull(step, "Step cannot be null.");
+//		Assert.notNull(step.getId(), "Step Id cannot be null.");
+//
+//		Object[] parameters = new Object[] { step.getLastExecution().getId(), step.getId() };
+//
+//		getJdbcTemplate().update(getQuery(UPDATE_STEP), parameters);
+//	}
 
 	public void setStepIncrementer(DataFieldMaxValueIncrementer stepIncrementer) {
 		this.stepIncrementer = stepIncrementer;
@@ -161,23 +156,16 @@ public class JdbcStepInstanceDao extends AbstractJdbcBatchMetadataDao implements
 		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
 			if (stepName == null) {
-				stepName = rs.getString(3);
+				stepName = rs.getString(2);
 			}
 			StepInstance stepInstance = new StepInstance(jobInstance, stepName, new Long(rs.getLong(1)));
-			StepExecution lastExecution = stepExecutionDao.getStepExecution(new Long(rs.getLong(2)), stepInstance);
-			stepInstance.setLastExecution(lastExecution);
 			return stepInstance;
 		}
 
 	}
 
-	public void setStepExecutionDao(StepExecutionDao stepExecutionDao) {
-		this.stepExecutionDao = stepExecutionDao;
-	}
-
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(stepIncrementer, "StepIncrementer cannot be null.");
-		Assert.notNull(stepExecutionDao, "StepExecutionDao cannot be null.");
 	}
 
 }

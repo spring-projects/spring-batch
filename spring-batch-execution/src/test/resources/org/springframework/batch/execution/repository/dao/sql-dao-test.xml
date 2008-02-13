@@ -19,7 +19,6 @@
 	<bean id="stepInstanceDao" class="org.springframework.batch.execution.repository.dao.JdbcStepInstanceDao" >
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="stepIncrementer" ref="stepIncrementer" />
-		<property name="stepExecutionDao" ref="stepExecutionDao" />
 	</bean>
 	
 	<bean id="stepExecutionDao" class="org.springframework.batch.execution.repository.dao.JdbcStepExecutionDao" >

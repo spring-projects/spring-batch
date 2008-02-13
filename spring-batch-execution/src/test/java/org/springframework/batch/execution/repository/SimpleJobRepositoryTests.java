@@ -40,12 +40,12 @@ import org.springframework.batch.execution.repository.dao.StepDao;
 import org.springframework.batch.item.ExecutionAttributes;
 
 /**
- * Test SimpleJobRepository.  The majority of test cases are tested using EasyMock,
- * however, there were some issues with using it for the stepDao when testing finding
- * or creating steps, so an actual mock class had to be written.
- *
+ * Test SimpleJobRepository. The majority of test cases are tested using
+ * EasyMock, however, there were some issues with using it for the stepDao when
+ * testing finding or creating steps, so an actual mock class had to be written.
+ * 
  * @author Lucas Ward
- *
+ * 
  */
 public class SimpleJobRepositoryTests extends TestCase {
 
@@ -76,7 +76,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 	StepInstance databaseStep2;
 
 	List steps;
-	
+
 	ExecutionAttributes executionAttributes;
 
 	private JobExecution jobExecution;
@@ -86,10 +86,9 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDao = (JobDao) jobDaoControl.getMock();
 		stepDao = (StepDao) stepDaoControl.getMock();
 
-		jobRepository = new SimpleJobRepository(jobDao, jobDao,  stepDao, stepDao);
+		jobRepository = new SimpleJobRepository(jobDao, jobDao, stepDao, stepDao);
 
 		jobParameters = new JobParametersBuilder().toJobParameters();
-		
 
 		jobConfiguration = new JobSupport();
 		jobConfiguration.setBeanName("RepositoryTest");
@@ -104,7 +103,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		stepConfigurations.add(stepConfiguration2);
 
 		jobConfiguration.setSteps(stepConfigurations);
-		
+
 		databaseJob = new JobInstance(new Long(1), jobParameters) {
 			public JobExecution createJobExecution() {
 				jobExecution = super.createJobExecution();
@@ -120,7 +119,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		steps = new ArrayList();
 		steps.add(databaseStep1);
 		steps.add(databaseStep2);
-		
+
 		executionAttributes = new ExecutionAttributes();
 	}
 
@@ -140,12 +139,13 @@ public class SimpleJobRepositoryTests extends TestCase {
 		stepDao.createStepInstance(databaseJob, "TestStep2");
 		stepDaoControl.setReturnValue(databaseStep2);
 		jobDao.saveJobExecution(new JobExecution(databaseJob));
-		jobDaoControl.setMatcher(new ArgumentsMatcher(){
+		jobDaoControl.setMatcher(new ArgumentsMatcher() {
 			public boolean matches(Object[] expected, Object[] actual) {
 				return ((JobExecution) actual[0]).getJobInstance().equals(databaseJob);
 			}
+
 			public String toString(Object[] arguments) {
-				return ""+arguments[0];
+				return "" + arguments[0];
 			}
 		});
 		stepDaoControl.replay();
@@ -160,20 +160,35 @@ public class SimpleJobRepositoryTests extends TestCase {
 		assertTrue(step.equals(databaseStep2));
 	}
 
-	public void testRestartedJob() throws Exception{
+	public void testRestartedJob() throws Exception {
+
+		final List executions = new ArrayList();
+		JobExecution execution = databaseJob.createJobExecution();
+		executions.add(execution);
+		// For this test it is important that the execution is finished
+		// and the executions in the list contain one with an end date
+		execution.setEndTime(new Date(System.currentTimeMillis()));
+
+		StepExecution databaseStep1Exec = new StepExecution(databaseStep1, execution, new Long(1));
+		StepExecution databaseStep2Exec = new StepExecution(databaseStep2, execution, new Long(2));
+
 		List jobs = new ArrayList();
 		jobDao.findJobInstances(jobConfiguration.getName(), jobParameters);
 		jobs.add(databaseJob);
 		jobDaoControl.setReturnValue(jobs);
 		stepDao.findStepInstance(databaseJob, "TestStep1");
 		stepDaoControl.setReturnValue(databaseStep1);
-		stepDao.findExecutionAttributes(databaseStep1.getLastExecution().getId());
+		stepDao.getLastStepExecution(databaseStep1);
+		stepDaoControl.setReturnValue(databaseStep1Exec);
+		stepDao.findExecutionAttributes(databaseStep1Exec.getId());
 		stepDaoControl.setReturnValue(executionAttributes);
 		stepDao.getStepExecutionCount(databaseStep1);
 		stepDaoControl.setReturnValue(1);
 		stepDao.findStepInstance(databaseJob, "TestStep2");
 		stepDaoControl.setReturnValue(databaseStep2);
-		stepDao.findExecutionAttributes(databaseStep2.getLastExecution().getId());
+		stepDao.getLastStepExecution(databaseStep2);
+		stepDaoControl.setReturnValue(databaseStep2Exec);
+		stepDao.findExecutionAttributes(databaseStep2Exec.getId());
 		stepDaoControl.setReturnValue(executionAttributes);
 		stepDao.getStepExecutionCount(databaseStep2);
 		stepDaoControl.setReturnValue(1);
@@ -181,22 +196,17 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDao.getJobExecutionCount(databaseJob.getId());
 		jobDaoControl.setReturnValue(1);
 		jobDao.findJobExecutions(databaseJob);
-		final List executions = new ArrayList();
-		JobExecution execution =databaseJob.createJobExecution();
-		executions.add(execution);
-		// For this test it is important that the execution is finished
-		// and the executions in the list contain one with an end date
-		execution.setEndTime(new Date(System.currentTimeMillis()));
 		jobDaoControl.setReturnValue(executions);
 		jobDao.updateJobInstance(databaseJob);
 		jobDao.saveJobExecution(new JobExecution(databaseJob));
-		jobDaoControl.setMatcher(new ArgumentsMatcher(){
+		jobDaoControl.setMatcher(new ArgumentsMatcher() {
 			public boolean matches(Object[] expected, Object[] actual) {
 				JobExecution execution = (JobExecution) actual[0];
 				return execution.getJobInstance().equals(databaseJob);
 			}
+
 			public String toString(Object[] arguments) {
-				return ""+arguments[0];
+				return "" + arguments[0];
 			}
 		});
 		jobDaoControl.setVoidCallable();
@@ -213,8 +223,9 @@ public class SimpleJobRepositoryTests extends TestCase {
 		assertTrue(step.getStepExecutionCount() == 1);
 	}
 
-	//Test that a restartable job that has multiple instances throws an exception.
-	public void testFindRestartableJobWithMultipleInstances() throws Exception{
+	// Test that a restartable job that has multiple instances throws an
+	// exception.
+	public void testFindRestartableJobWithMultipleInstances() throws Exception {
 
 		List jobs = new ArrayList();
 		jobs.add(databaseJob);
@@ -223,19 +234,23 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.setReturnValue(jobs);
 		jobDaoControl.replay();
 
-		try{
+		try {
 			jobRepository.createJobExecution(jobConfiguration, jobParameters);
 			fail("Expected BatchRestartException");
-		}catch(BatchRestartException e){
-			//expected
+		}
+		catch (BatchRestartException e) {
+			// expected
 		}
 
 		jobDaoControl.verify();
 	}
 
-	public void testRestartJobStartLimitExceeded() throws Exception{
+	public void testRestartJobStartLimitExceeded() throws Exception {
 
 		jobConfiguration.setStartLimit(1);
+
+		StepExecution databaseStep1Exec = new StepExecution(databaseStep1, null, new Long(1));
+		StepExecution databaseStep2Exec = new StepExecution(databaseStep2, null, new Long(2));
 
 		List jobs = new ArrayList();
 		jobDao.findJobInstances(jobConfiguration.getName(), jobParameters);
@@ -243,34 +258,40 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.setReturnValue(jobs);
 		stepDao.findStepInstance(databaseJob, "TestStep1");
 		stepDaoControl.setReturnValue(databaseStep1);
-		stepDao.findExecutionAttributes(databaseStep1.getLastExecution().getId());
+		stepDao.getLastStepExecution(databaseStep1);
+		stepDaoControl.setReturnValue(databaseStep1Exec);
+		stepDao.findExecutionAttributes(databaseStep1Exec.getId());
 		stepDaoControl.setReturnValue(executionAttributes);
 		stepDao.getStepExecutionCount(databaseStep1);
 		stepDaoControl.setReturnValue(1);
 		stepDao.findStepInstance(databaseJob, "TestStep2");
 		stepDaoControl.setReturnValue(databaseStep2);
-		stepDao.findExecutionAttributes(databaseStep2.getLastExecution().getId());
+		stepDao.getLastStepExecution(databaseStep2);
+		stepDaoControl.setReturnValue(databaseStep2Exec);
+		stepDao.findExecutionAttributes(databaseStep2Exec.getId());
 		stepDaoControl.setReturnValue(executionAttributes);
 		stepDao.getStepExecutionCount(databaseStep2);
 		stepDaoControl.setReturnValue(1);
 		stepDaoControl.replay();
 		jobDao.getJobExecutionCount(databaseJob.getId());
-		//return a greater execution count then the start limit, should throw exception
+		// return a greater execution count then the start limit, should throw
+		// exception
 		jobDaoControl.setReturnValue(2);
 		jobDaoControl.replay();
 
-		try{
+		try {
 			jobRepository.createJobExecution(jobConfiguration, jobParameters);
 			fail();
-		}catch(BatchRestartException ex){
-			//expected
+		}
+		catch (BatchRestartException ex) {
+			// expected
 		}
 
 		jobDaoControl.verify();
 		stepDaoControl.verify();
 	}
 
-	public void testCreateNonRestartableJob() throws Exception{
+	public void testCreateNonRestartableJob() throws Exception {
 
 		List jobs = new ArrayList();
 		jobConfiguration.setRestartable(false);
@@ -284,12 +305,13 @@ public class SimpleJobRepositoryTests extends TestCase {
 		stepDao.createStepInstance(databaseJob, "TestStep2");
 		stepDaoControl.setReturnValue(databaseStep2);
 		jobDao.saveJobExecution(new JobExecution(databaseJob));
-		jobDaoControl.setMatcher(new ArgumentsMatcher(){
+		jobDaoControl.setMatcher(new ArgumentsMatcher() {
 			public boolean matches(Object[] expected, Object[] actual) {
 				return ((JobExecution) actual[0]).getJobInstance().equals(databaseJob);
 			}
+
 			public String toString(Object[] arguments) {
-				return ""+arguments[0];
+				return "" + arguments[0];
 			}
 		});
 		stepDaoControl.replay();
@@ -307,7 +329,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 	public void testUpdateJob() {
 
 		// failure scenario - no ID
-		JobInstance updateJob; 
+		JobInstance updateJob;
 		try {
 			updateJob = new JobInstance(null, jobParameters);
 			jobRepository.update(updateJob);
@@ -370,12 +392,12 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 		// successful update
 		step = new StepInstance(new Long(0L));
-		stepDao.updateStepInstance(step);
+		// stepDao.updateStepInstance(step);
 		stepDaoControl.replay();
 		jobRepository.update(step);
 	}
 
-	public void testUpdateStepExecution(){
+	public void testUpdateStepExecution() {
 		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(10L)), null, new Long(1));
 		stepExecution.setId(new Long(11));
 		ExecutionAttributes executionAttributes = new ExecutionAttributes();
@@ -387,7 +409,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		stepDaoControl.verify();
 	}
 
-	public void testSaveExistingStepExecution(){
+	public void testSaveExistingStepExecution() {
 		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(10L)), null, null);
 		ExecutionAttributes executionAttributes = new ExecutionAttributes();
 		stepExecution.setExecutionAttributes(executionAttributes);
@@ -413,10 +435,10 @@ public class SimpleJobRepositoryTests extends TestCase {
 	}
 
 	/*
-	 * Test to ensure that if a StepDao returns invalid
-	 * restart data, it is corrected.
+	 * Test to ensure that if a StepDao returns invalid restart data, it is
+	 * corrected.
 	 */
-	public void testCreateStepsFixesInvalidExecutionAttributes() throws Exception{
+	public void testCreateStepsFixesInvalidExecutionAttributes() throws Exception {
 
 		List jobs = new ArrayList();
 
@@ -429,12 +451,13 @@ public class SimpleJobRepositoryTests extends TestCase {
 		stepDao.createStepInstance(databaseJob, "TestStep2");
 		stepDaoControl.setReturnValue(databaseStep2);
 		jobDao.saveJobExecution(new JobExecution(databaseJob));
-		jobDaoControl.setMatcher(new ArgumentsMatcher(){
+		jobDaoControl.setMatcher(new ArgumentsMatcher() {
 			public boolean matches(Object[] expected, Object[] actual) {
 				return ((JobExecution) actual[0]).getJobInstance().equals(databaseJob);
 			}
+
 			public String toString(Object[] arguments) {
-				return ""+arguments[0];
+				return "" + arguments[0];
 			}
 		});
 		stepDaoControl.replay();
@@ -448,20 +471,28 @@ public class SimpleJobRepositoryTests extends TestCase {
 		assertTrue(step.equals(databaseStep2));
 	}
 
-	public void testFindStepsFixesInvalidExecutionAttributes() throws Exception{
+	public void testFindStepsFixesInvalidExecutionAttributes() throws Exception {
+
+		StepExecution databaseStep1Exec = new StepExecution(databaseStep1, null, new Long(1));
+		StepExecution databaseStep2Exec = new StepExecution(databaseStep2, null, new Long(2));
+
 		List jobs = new ArrayList();
 		jobDao.findJobInstances(jobConfiguration.getName(), jobParameters);
 		jobs.add(databaseJob);
 		jobDaoControl.setReturnValue(jobs);
 		stepDao.findStepInstance(databaseJob, "TestStep1");
 		stepDaoControl.setReturnValue(databaseStep1);
-		stepDao.findExecutionAttributes(databaseStep1.getLastExecution().getId());
+		stepDao.getLastStepExecution(databaseStep1);
+		stepDaoControl.setReturnValue(databaseStep1Exec);
+		stepDao.findExecutionAttributes(databaseStep1Exec.getId());
 		stepDaoControl.setReturnValue(executionAttributes);
 		stepDao.getStepExecutionCount(databaseStep1);
 		stepDaoControl.setReturnValue(1);
 		stepDao.findStepInstance(databaseJob, "TestStep2");
 		stepDaoControl.setReturnValue(databaseStep2);
-		stepDao.findExecutionAttributes(databaseStep2.getLastExecution().getId());
+		stepDao.getLastStepExecution(databaseStep2);
+		stepDaoControl.setReturnValue(databaseStep2Exec);
+		stepDao.findExecutionAttributes(databaseStep2Exec.getId());
 		stepDaoControl.setReturnValue(executionAttributes);
 		stepDao.getStepExecutionCount(databaseStep2);
 		stepDaoControl.setReturnValue(1);
@@ -473,12 +504,13 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDao.updateJobInstance(databaseJob);
 		jobDaoControl.setVoidCallable();
 		jobDao.saveJobExecution(new JobExecution(databaseJob));
-		jobDaoControl.setMatcher(new ArgumentsMatcher(){
+		jobDaoControl.setMatcher(new ArgumentsMatcher() {
 			public boolean matches(Object[] expected, Object[] actual) {
 				return ((JobExecution) actual[0]).getJobInstance().equals(databaseJob);
 			}
+
 			public String toString(Object[] arguments) {
-				return ""+arguments[0];
+				return "" + arguments[0];
 			}
 		});
 		jobDaoControl.replay();

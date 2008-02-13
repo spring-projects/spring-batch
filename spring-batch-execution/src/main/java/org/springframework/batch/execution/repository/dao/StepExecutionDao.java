@@ -83,4 +83,8 @@ public interface StepExecutionDao {
 	 */
 	void updateExecutionAttributes(final Long executionId, ExecutionAttributes executionAttributes);
 
+	/**
+	 * @return the last execution of the given instance
+	 */
+	StepExecution getLastStepExecution(StepInstance stepInstance);
 }

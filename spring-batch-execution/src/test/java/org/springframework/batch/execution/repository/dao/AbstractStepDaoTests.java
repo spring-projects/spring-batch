@@ -100,7 +100,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepExecution.setStartTime(new Date(System.currentTimeMillis()));
 		stepExecutionDao.saveStepExecution(stepExecution);
 		step1.setLastExecution(stepExecution);
-		stepInstanceDao.updateStepInstance(step1);
+		//stepInstanceDao.updateStepInstance(step1);
 		
 		executionAttributes = new ExecutionAttributes();
 		executionAttributes.putString("1", "testString1");
@@ -158,7 +158,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 
 	public void testUpdateStepWithoutExecutionAttributes() {
 
-		stepInstanceDao.updateStepInstance(step1);
+		//stepInstanceDao.updateStepInstance(step1);
 		StepInstance tempStep = stepInstanceDao.findStepInstance(jobInstance, step1.getName());
 		assertEquals(tempStep, step1);
 	}
@@ -264,6 +264,17 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepExecutionDao.updateExecutionAttributes(stepExecution.getId(), executionAttributes);
 		attributes = stepExecutionDao.findExecutionAttributes(stepExecution.getId());
 		assertEquals(executionAttributes, attributes);
+	}
+	
+	public void testGetLastStepExecution() {
+		StepExecution lastExecution = new StepExecution(step1, jobExecution, null);
+		lastExecution.setStatus(BatchStatus.STARTED);
+		
+		int JUMP_INTO_FUTURE = 1000; // makes sure start time is 'greatest'
+		lastExecution.setStartTime(new Date(System.currentTimeMillis() + JUMP_INTO_FUTURE));
+		stepExecutionDao.saveStepExecution(lastExecution);
+		
+		assertEquals(lastExecution, stepExecutionDao.getLastStepExecution(step1));
 	}
 		
 }

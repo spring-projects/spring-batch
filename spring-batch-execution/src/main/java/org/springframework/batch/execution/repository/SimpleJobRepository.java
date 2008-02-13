@@ -57,7 +57,7 @@ import org.springframework.util.Assert;
  */
 public class SimpleJobRepository implements JobRepository {
 
-	private JobInstanceDao jobDao;
+	private JobInstanceDao jobInstanceDao;
 
 	private JobExecutionDao jobExecutionDao;
 
@@ -75,7 +75,7 @@ public class SimpleJobRepository implements JobRepository {
 	public SimpleJobRepository(JobInstanceDao jobDao, JobExecutionDao jobExecutionDao, StepInstanceDao stepInstanceDao,
 			StepExecutionDao stepExecutionDao) {
 		super();
-		this.jobDao = jobDao;
+		this.jobInstanceDao = jobDao;
 		this.jobExecutionDao = jobExecutionDao;
 		this.stepInstanceDao = stepInstanceDao;
 		this.stepExecutionDao = stepExecutionDao;
@@ -165,7 +165,7 @@ public class SimpleJobRepository implements JobRepository {
 			 * thread or process will block until this transaction has finished.
 			 */
 
-			jobs = jobDao.findJobInstances(job.getName(), jobParameters);
+			jobs = jobInstanceDao.findJobInstances(job.getName(), jobParameters);
 		}
 
 		if (jobs.size() == 1) {
@@ -247,7 +247,7 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(job.getId(), "Job cannot be updated if it's ID is null.  It must be obtained"
 				+ "from SimpleJobRepository.findOrCreateJob to be considered valid.");
 
-		jobDao.updateJobInstance(job);
+		jobInstanceDao.updateJobInstance(job);
 	}
 
 	/**
@@ -288,7 +288,8 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(step.getId(), "Step cannot be updated if it's ID is null.  It must be obtained"
 				+ "from SimpleJobRepository.findOrCreateJob to be considered valid.");
 
-		stepInstanceDao.updateStepInstance(step);
+		//TODO no-op to be removed
+		//stepInstanceDao.updateStepInstance(step);
 
 	}
 
@@ -299,7 +300,7 @@ public class SimpleJobRepository implements JobRepository {
 	 */
 	private JobInstance createJobInstance(Job job, JobParameters jobParameters) {
 
-		JobInstance jobInstance = jobDao.createJobInstance(job.getName(), jobParameters);
+		JobInstance jobInstance = jobInstanceDao.createJobInstance(job.getName(), jobParameters);
 		jobInstance.setJob(job);
 		jobInstance.setStepInstances(createStepInstances(jobInstance, job.getSteps()));
 		return jobInstance;
@@ -321,7 +322,7 @@ public class SimpleJobRepository implements JobRepository {
 		return stepInstances;
 	}
 
-	/*
+	/**
 	 * Find Steps for the given list of Steps with a given JobId
 	 */
 	protected List findStepInstances(List steps, JobInstance jobInstance) {
@@ -332,7 +333,7 @@ public class SimpleJobRepository implements JobRepository {
 			Step stepConfiguration = (Step) i.next();
 			StepInstance stepInstance = stepInstanceDao.findStepInstance(jobInstance, stepConfiguration.getName());
 			if (stepInstance != null) {
-
+				stepInstance.setLastExecution(stepExecutionDao.getLastStepExecution(stepInstance));
 				if (stepInstance.getLastExecution() != null) {
 					ExecutionAttributes executionAttributes = stepExecutionDao.findExecutionAttributes(stepInstance
 							.getLastExecution().getId());

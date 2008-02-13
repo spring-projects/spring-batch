@@ -161,5 +161,21 @@ public class MapStepDao implements StepDao {
 	public void updateExecutionAttributes(Long executionId,
 			ExecutionAttributes executionAttributes) {
 	}
+
+	public StepExecution getLastStepExecution(StepInstance stepInstance) {
+		List executions = findStepExecutions(stepInstance);
+		StepExecution lastExec = null;
+		for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
+			StepExecution exec = (StepExecution) iterator.next();
+			if (lastExec == null) {
+				lastExec = exec;
+				continue;
+			}
+			if (lastExec.getStartTime().getTime() < exec.getStartTime().getTime()) {
+				lastExec = exec;
+			}
+		}
+		return lastExec;
+	}
 }
 

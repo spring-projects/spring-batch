@@ -89,4 +89,9 @@ public class MockStepDao implements StepDao {
 		return null;
 	}
 
+	public StepExecution getLastStepExecution(StepInstance stepInstance) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -84,6 +84,11 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 	private static final String UPDATE_STEP_EXECUTION = "UPDATE %PREFIX%STEP_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ "STATUS = ?, COMMIT_COUNT = ?, TASK_COUNT = ?, TASK_STATISTICS = ?, CONTINUABLE = ? , EXIT_CODE = ?, "
 			+ "EXIT_MESSAGE = ?, VERSION = ? where STEP_EXECUTION_ID = ? and VERSION = ?";
+	
+	private static final String FIND_LAST_STEP_EXECUTION = "SELECT STEP_EXECUTION_ID, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
+		+ " TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%STEP_EXECUTION where STEP_INSTANCE_ID = ?"
+		+ " and START_TIME = (SELECT max(START_TIME) FROM %PREFIX%STEP_EXECUTION where STEP_INSTANCE_ID = ?)";
+
 
 	private static final int EXIT_MESSAGE_LENGTH = 250;
 
@@ -168,6 +173,21 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 		}
 
 		return stepExecution;
+	}
+	
+	public StepExecution getLastStepExecution(StepInstance stepInstance) {
+		Long stepInstanceId = stepInstance.getId();
+		List executions = getJdbcTemplate().query(getQuery(FIND_LAST_STEP_EXECUTION),
+				new Object[] { stepInstanceId, stepInstanceId }, new StepExecutionRowMapper(stepInstance));
+
+		Assert.state(executions.size() <= 1, "There must be at most one latest execution");
+
+		if (executions.size() == 0) {
+			return null;
+		}
+		else {
+			return (StepExecution) executions.get(0);
+		}
 	}
 
 	public int getStepExecutionCount(StepInstance step) {
@@ -500,4 +520,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 			return null;
 		}
 	}
+
+	
 }
