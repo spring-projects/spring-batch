@@ -82,8 +82,6 @@ public class ChunkedStep extends AbstractStep {
 	// default to checking current thread for interruption.
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
 
-	private AbstractStep step;
-
 	private StreamManager streamManager;
 
 	private ItemReader itemReader;
@@ -98,12 +96,6 @@ public class ChunkedStep extends AbstractStep {
 		this.chunkSize = chunkSize;
 	}
 
-	/**
-	 * Package private constructor so the step can create a the executor.
-	 */
-	ChunkedStep(AbstractStep abstractStep) {
-		this.step = abstractStep;
-	}
 
 	/**
 	 * Public setter for the {@link StreamManager}. This will be used to create the {@link StepContext}, and hence any
@@ -206,7 +198,7 @@ public class ChunkedStep extends AbstractStep {
 		// the conversation in StepScope
 		stepContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
 
-		final boolean saveExecutionAttributes = step.isSaveExecutionAttributes();
+		final boolean saveExecutionAttributes = isSaveExecutionAttributes();
 
 		if (saveExecutionAttributes && isRestart && stepInstance.getLastExecution() != null) {
 			stepExecution.setExecutionAttributes(stepInstance.getLastExecution().getExecutionAttributes());
@@ -231,12 +223,16 @@ public class ChunkedStep extends AbstractStep {
 					//shouldn't have to create a chunker each time, I'll refactor the interface later
 					Chunker chunker = new ItemChunker(itemReader, stepExecution);
 					final Chunk chunk = chunker.chunk(chunkSize);
+					if(chunk == null){
+						return ExitStatus.FINISHED;
+					}
 
-					ExitStatus result = (ExitStatus)retryTemplate.execute(new RetryCallback(){
+					retryTemplate.execute(new RetryCallback(){
 
 						public Object doWithRetry(RetryContext context)
 								throws Throwable {
-							return processChunk(chunk, stepExecution, stepContext);
+							processChunk(chunk, stepExecution, stepContext);
+							return null;
 						}});
 
 					// Check for interruption after transaction as well, so that
@@ -244,7 +240,7 @@ public class ChunkedStep extends AbstractStep {
 					// caller
 					interruptionPolicy.checkInterrupted(context);
 
-					return result;
+					return ExitStatus.CONTINUABLE;
 
 				}
 			});
@@ -283,10 +279,10 @@ public class ChunkedStep extends AbstractStep {
 	 * programmatically started and stopped outside this method, so subclasses that override do not need to create a
 	 * transaction.
 	 * 
-	 * @param step the current step containing the {@link Tasklet} with the business logic.
+	 * @param stepInstance the current step containing the {@link Tasklet} with the business logic.
 	 * @return true if there is more data to process.
 	 */
-	ExitStatus processChunk(Chunk chunk, final StepExecution stepExecution, StepContext stepContext) {
+	void processChunk(Chunk chunk, final StepExecution stepExecution, StepContext stepContext) {
 		
 		TransactionStatus transaction = streamManager.getTransaction(stepContext);
 
@@ -314,7 +310,7 @@ public class ChunkedStep extends AbstractStep {
 				// only if chunk was successful
 				stepExecution.apply(contribution);
 
-				if (step.isSaveExecutionAttributes()) {
+				if (isSaveExecutionAttributes()) {
 					stepExecution.setExecutionAttributes(stepContext.getExecutionAttributes());
 				}
 				jobRepository.saveOrUpdate(stepExecution);
@@ -352,14 +348,12 @@ public class ChunkedStep extends AbstractStep {
 			}
 		}
 		
-		return null;
-
 	}
 
 	/**
 	 * Convenience method to update the status in all relevant places.
 	 * 
-	 * @param step the current step
+	 * @param stepInstance the current step
 	 * @param stepExecution the current stepExecution
 	 * @param status the status to set
 	 */

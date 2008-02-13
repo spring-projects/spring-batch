@@ -523,7 +523,7 @@ public class SimpleStepExecutor implements InitializingBean {
 	/**
 	 * Convenience method to update the status in all relevant places.
 	 * 
-	 * @param step the current step
+	 * @param stepInstance the current step
 	 * @param stepExecution the current stepExecution
 	 * @param status the status to set
 	 */

@@ -39,7 +39,7 @@ public class ItemChunker implements Chunker {
 
 	private long chunkCounter = 0;
 
-	private ItemSkipPolicy readFailurePolicy = new AlwaysSkipItemSkipPolicy();
+	private ItemSkipPolicy readFailurePolicy = new NeverSkipItemSkipPolicy();
 
 	public ItemChunker(ItemReader itemReader, StepExecution stepExecution) {
 		this.itemReader = itemReader;
