@@ -27,16 +27,31 @@ import org.springframework.batch.item.ItemWriter;
  */
 public class WriteFailureException extends BatchCriticalException {
 	private static final long serialVersionUID = -1933213086873834098L;
+	
+	private final Object item;
 
-	public WriteFailureException(String msg, Throwable ex) {
+	public WriteFailureException(String msg, Throwable ex, Object item) {
 		super(msg, ex);
+		this.item = item;
 	}
 
 	public WriteFailureException(String msg) {
-		super(msg);
+		this(msg, null, null);
 	}
 
 	public WriteFailureException(Throwable nested) {
-		super(nested);
+		this("", nested, null);
+	}
+	
+	public WriteFailureException(String msg, Object item){
+		this(msg, null, item);
+	}
+	
+	public WriteFailureException(Throwable nested, Object item){
+		this("", nested, item);
+	}
+	
+	public Object getItem() {
+		return item;
 	}
 }

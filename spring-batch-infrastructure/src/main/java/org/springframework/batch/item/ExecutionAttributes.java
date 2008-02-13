@@ -31,6 +31,8 @@ import org.springframework.util.Assert;
  * essentially a thin wrapper for a map that allows for type safety on reads. It
  * also allows for dirty checking by setting a 'dirty' flag whenever any put is
  * called.
+ * 
+ * @author Lucas Ward
  */
 public class ExecutionAttributes {
 
