@@ -8,10 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
