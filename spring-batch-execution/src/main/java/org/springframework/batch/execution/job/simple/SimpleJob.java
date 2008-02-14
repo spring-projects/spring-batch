@@ -123,9 +123,7 @@ public class SimpleJob extends JobSupport {
 	}
 
 	private void updateStatus(JobExecution jobExecution, BatchStatus status) {
-		JobInstance jobIntance = jobExecution.getJobInstance();
 		jobExecution.setStatus(status);
-		jobRepository.update(jobIntance);
 		jobRepository.saveOrUpdate(jobExecution);
 	}
 

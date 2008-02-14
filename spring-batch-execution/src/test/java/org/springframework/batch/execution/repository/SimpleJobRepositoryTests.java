@@ -356,26 +356,6 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobRepository.saveOrUpdate(jobExecution);
 	}
 
-	public void testUpdateStep() {
-
-		StepInstance step = new StepInstance(null);
-
-		// failure scenario - id not set
-		try {
-			jobRepository.update(step);
-			fail();
-		}
-		catch (Exception ex) {
-			// expected
-		}
-
-		// successful update
-		step = new StepInstance(new Long(0L));
-		// stepDao.updateStepInstance(step);
-		stepDaoControl.replay();
-		jobRepository.update(step);
-	}
-
 	public void testUpdateStepExecution() {
 		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(10L)), null, new Long(1));
 		stepExecution.setId(new Long(11));

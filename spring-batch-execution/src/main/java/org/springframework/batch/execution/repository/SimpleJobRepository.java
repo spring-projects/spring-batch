@@ -187,7 +187,7 @@ public class SimpleJobRepository implements JobRepository {
 				if (lastExecution.getStartTime().getTime() < execution.getStartTime().getTime()) {
 					lastExecution = execution;
 				}
-				
+
 				if (execution.isRunning()) {
 					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "
 							+ jobInstance);
@@ -244,18 +244,6 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	/**
-	 * Update an existing job. A job must have been obtained from the
-	 * findOrCreateJob method, otherwise it is likely that the id is incorrect
-	 * or non-existant.
-	 * 
-	 * @param job to be updated.
-	 * @throws IllegalArgumentException if Job or it's Id is null.
-	 */
-	public void update(JobInstance job) {
-		//TODO no-op to be removed
-	}
-
-	/**
 	 * Save or Update the given StepExecution. If it's id is null, it will be
 	 * saved and an id will be set, otherwise it will be updated. It should be
 	 * noted that assigning an ID randomly will likely cause an exception
@@ -282,23 +270,6 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	/**
-	 * Update the given step.
-	 * 
-	 * @param StepInstance to be updated.
-	 * @throws IllegalArgumentException if step or it's id is null.
-	 */
-	public void update(StepInstance step) {
-
-		Assert.notNull(step, "Step cannot be null.");
-		Assert.notNull(step.getId(), "Step cannot be updated if it's ID is null.  It must be obtained"
-				+ "from SimpleJobRepository.findOrCreateJob to be considered valid.");
-
-		//TODO no-op to be removed
-		//stepInstanceDao.updateStepInstance(step);
-
-	}
-
-	/*
 	 * Convenience method for creating a new job. A new job is created by
 	 * calling {@link JobDao#createJob(JobRuntimeInformation)} and then it's
 	 * list of StepConfigurations is passed to the createSteps method.
@@ -311,7 +282,7 @@ public class SimpleJobRepository implements JobRepository {
 		return jobInstance;
 	}
 
-	/*
+	/**
 	 * Create steps based on the given Job and list of Steps.
 	 */
 	private List createStepInstances(JobInstance job, List steps) {

@@ -67,17 +67,6 @@ public interface JobRepository {
 			throws JobExecutionAlreadyRunningException;
 
 	/**
-	 * Update a Job.
-	 * 
-	 * Preconditions: Job must contain a valid ID. This can be ensured by first
-	 * obtaining a job from findOrCreateJob.
-	 * 
-	 * @param job
-	 * @see JobInstance
-	 */
-	public void update(JobInstance jobInstance);
-
-	/**
 	 * Save or Update a {@link JobExecution}. If no ID is found a new instance
 	 * will be saved. If an ID does exist it will be updated. The ID should only
 	 * be assigned to a {@link JobExecution} by calling this method - it should
@@ -90,18 +79,6 @@ public interface JobRepository {
 	 * @param jobInstance
 	 */
 	public void saveOrUpdate(JobExecution jobExecution);
-
-	/**
-	 * Update a step.
-	 * 
-	 * Preconditions: {@link StepInstance} must contain a valid ID. This can be
-	 * ensured by first obtaining a {@link JobInstance} from findOrCreateJob,
-	 * and accessing it's step list.
-	 * 
-	 * @param step
-	 * @see StepInstance
-	 */
-	public void update(StepInstance stepInstance);
 
 	/**
 	 * Save or Update a StepExecution. If no ID is found a new instance will be

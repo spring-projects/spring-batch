@@ -430,9 +430,7 @@ public class ChunkedStep extends AbstractStep {
 	 * @param status the status to set
 	 */
 	private void updateStatus(StepExecution stepExecution, BatchStatus status) {
-		StepInstance step = stepExecution.getStep();
 		stepExecution.setStatus(status);
-		jobRepository.update(step);
 		jobRepository.saveOrUpdate(stepExecution);
 	}
 }
