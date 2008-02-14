@@ -27,6 +27,7 @@ with ItemOrientedTasklet
 (ItemTransformerItemWriter and CompositeItemTransformer provide support for 
 item transformations before writing to output)
 
+  * JobConfiguration and Step Configuration are now called simply Job and Step.  There is no JobExecutor or StepExecutor.
 
 * CONTAINER CONFIGURATION
 
@@ -53,4 +54,6 @@ methods stop() and isRunnig() (previously part of JobLauncher)
   * ResourceLifecycle and Restartable interfaces have been removed, ItemStream 
 now covers their responsibilities
 
-  * StatisticsProvider interface has been replaced by ExecutionAttributesProvider
+  * StatisticsProvider interface has been superceded by ExecutionAttributesProvider
+
+  * BatchTransationSynchronizationManager has been removed.  Use the regular TransactionSynchronizationManager if you need to register a synchronization.
