@@ -25,9 +25,20 @@ import org.springframework.batch.item.ItemReader;
  * {@link Chunk} and adds it to an outgoing stream of items.
  * 
  * @author Lucas Ward
- *
  */
 public interface Dechunker {
 
-	DechunkingResult dechunk(Chunk chunk) throws Exception;
+	/**
+	 * Dechunk the provided chunk.  In general, this will be done by delegating to an
+	 * {@link ItemWriter} for each item in the {@link Chunk}, however, it's purely at the
+	 * discretion of various implementations.
+	 * 
+	 * @param chunk to be 'dechunked'
+	 * @param stepExecution the chunk belongs to.
+	 * @return a Dechunking result detailing whether or not dechunking was successful, and
+	 * if any items were skipped.
+	 * @throws Exception, specifically throws IllegalArgumentException if either the chunk
+	 * or StepExecution is null.
+	 */
+	DechunkingResult dechunk(Chunk chunk, StepExecution stepExecution) throws Exception;
 }
