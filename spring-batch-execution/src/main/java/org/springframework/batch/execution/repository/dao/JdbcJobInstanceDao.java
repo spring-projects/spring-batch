@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.beans.factory.InitializingBean;
@@ -38,13 +37,9 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_PARAMS(JOB_INSTANCE_ID, KEY_NAME, TYPE_CD, "
 			+ "STRING_VAL, DATE_VAL, LONG_VAL) values (?, ?, ?, ?, ?, ?)";
 
-	private static final String FIND_JOBS = "SELECT JOB_INSTANCE_ID, LAST_JOB_EXECUTION_ID from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?";
-
-	private static final String UPDATE_JOB = "UPDATE %PREFIX%JOB_INSTANCE set LAST_JOB_EXECUTION_ID = ? where JOB_INSTANCE_ID = ?";
+	private static final String FIND_JOBS = "SELECT JOB_INSTANCE_ID from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?";
 
 	private DataFieldMaxValueIncrementer jobIncrementer;
-	
-	private JobExecutionDao jobExecutionDao;
 
 	/**
 	 * In this jdbc implementation a job id is obtained by asking the
@@ -146,48 +141,24 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * given identifier, adding them to a list via the RowMapper callback.
 	 * 
 	 * @see JobDao#findJobInstances(JobIdentifier)
-	 * @throws IllegalArgumentException
-	 *             if any {@link JobIdentifier} fields are null.
+	 * @throws IllegalArgumentException if any {@link JobIdentifier} fields are
+	 * null.
 	 */
 	public List findJobInstances(final String jobName, final JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job Name must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
-		Object[] parameters = new Object[] { jobName,
-				createJobKey(jobParameters) };
+		Object[] parameters = new Object[] { jobName, createJobKey(jobParameters) };
 
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-
 				JobInstance jobInstance = new JobInstance(new Long(rs.getLong(1)), jobParameters);
-				long lastExecutionId = rs.getLong(2);
-				JobExecution lastExecution = jobExecutionDao.getJobExecution(new Long(lastExecutionId));
-				if(lastExecution != null){
-					lastExecution.setJobInstance(jobInstance);
-				}
-				jobInstance.setLastExecution(lastExecution);
 				return jobInstance;
 			}
 		};
 
 		return getJdbcTemplate().query(getQuery(FIND_JOBS), parameters, rowMapper);
-	}
-
-	/**
-	 * @see JobDao#updateJobInstance(JobInstance)
-	 * @throws IllegalArgumentException
-	 *             if Job, Job.status, or job.id is null
-	 */
-	public void updateJobInstance(JobInstance jobInstance) {
-
-		Assert.notNull(jobInstance, "Job Cannot be Null");
-		Assert.notNull(jobInstance.getId(), "Job ID cannot be null");
-		
-		Long lastExecutionId = jobInstance.getLastExecution() == null ? null : jobInstance.getLastExecution().getId();
-		Object[] parameters = new Object[] { lastExecutionId, jobInstance.getId() };
-		getJdbcTemplate().update(getQuery(UPDATE_JOB), parameters, new int[] {
-			 Types.INTEGER, Types.INTEGER});
 	}
 
 	/**
@@ -199,17 +170,11 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	public void setJobIncrementer(DataFieldMaxValueIncrementer jobIncrementer) {
 		this.jobIncrementer = jobIncrementer;
 	}
-	
-	public void setJobExecutionDao(JobExecutionDao jobExecutionDao) {
-		this.jobExecutionDao = jobExecutionDao;
-	}
 
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(jobExecutionDao);
 		Assert.notNull(jobIncrementer);
 	}
-
 
 	private static class ParameterType {
 

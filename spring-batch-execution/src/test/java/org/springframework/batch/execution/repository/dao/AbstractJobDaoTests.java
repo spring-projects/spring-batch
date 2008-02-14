@@ -22,11 +22,11 @@ import java.util.Map;
 
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -87,7 +87,6 @@ public abstract class AbstractJobDaoTests extends
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobExecutionDao.saveJobExecution(jobExecution);
 		jobInstance.setLastExecution(jobExecution);
-		jobInstanceDao.updateJobInstance(jobInstance);
 	}
 
 	public void testVersionIsNotNullForJob() throws Exception {
@@ -153,21 +152,6 @@ public abstract class AbstractJobDaoTests extends
 		assertEquals(0, jobs.size());
 
 	}
-
-	public void testUpdateJob() {
-		// Update the returned job with a new status
-		JobExecution newExecution = new JobExecution(jobInstance);
-		jobExecutionDao.saveJobExecution(newExecution);
-		jobInstance.setLastExecution(newExecution);
-		jobInstanceDao.updateJobInstance(jobInstance);
-
-		// The job just updated should be found, with the saved status.
-		List jobs = jobInstanceDao.findJobInstances(job.getName(), jobParameters);
-		assertTrue(jobs.size() == 1);
-		JobInstance tempJob = (JobInstance) jobs.get(0);
-		assertTrue(jobInstance.equals(tempJob));
-		assertEquals(newExecution, tempJob.getLastExecution());
-	}
 	
 	public void testGetJobExecution(){
 		
@@ -181,27 +165,6 @@ public abstract class AbstractJobDaoTests extends
 		assertEquals(lastJobExecution, jobExecution);
 	}
 
-	public void testUpdateJobWithNullId() {
-
-		
-		try {
-			JobInstance testJob = new JobInstance(null, null);
-			jobInstanceDao.updateJobInstance(testJob);
-			fail();
-		} catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
-	public void testUpdateNullJob() {
-
-		JobInstance testJob = null;
-		try {
-			jobInstanceDao.updateJobInstance(testJob);
-		} catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
 
 	public void testUpdateJobExecution() {
 
@@ -312,4 +275,14 @@ public abstract class AbstractJobDaoTests extends
 		assertEquals(lhs.getExitStatus(), rhs.getExitStatus());
 	}
 
+//	public void testGetLastJobExecution() {
+//		JobExecution lastExecution = new JobExecution(jobInstance);
+//		lastExecution.setStatus(BatchStatus.STARTED);
+//		
+//		int JUMP_INTO_FUTURE = 1000; // makes sure start time is 'greatest'
+//		lastExecution.setStartTime(new Date(System.currentTimeMillis() + JUMP_INTO_FUTURE));
+//		jobExecutionDao.saveJobExecution(lastExecution);
+//		
+//		assertEquals(lastExecution, jobExecutionDao.getLastJobExecution(jobInstance));
+//	}
 }

@@ -197,7 +197,6 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.setReturnValue(1);
 		jobDao.findJobExecutions(databaseJob);
 		jobDaoControl.setReturnValue(executions);
-		jobDao.updateJobInstance(databaseJob);
 		jobDao.saveJobExecution(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher() {
 			public boolean matches(Object[] expected, Object[] actual) {
@@ -326,26 +325,6 @@ public class SimpleJobRepositoryTests extends TestCase {
 		assertTrue(step.equals(databaseStep2));
 	}
 
-	public void testUpdateJob() {
-
-		// failure scenario - no ID
-		JobInstance updateJob;
-		try {
-			updateJob = new JobInstance(null, jobParameters);
-			jobRepository.update(updateJob);
-			fail();
-		}
-		catch (Exception ex) {
-			// expected
-		}
-
-		// successful update
-		updateJob = new JobInstance(new Long(0L), jobParameters);
-		jobDao.updateJobInstance(updateJob);
-		jobDaoControl.replay();
-		jobRepository.update(updateJob);
-
-	}
 
 	public void testSaveOrUpdateInvalidJobExecution() {
 
@@ -501,8 +480,6 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.setReturnValue(1);
 		jobDao.findJobExecutions(databaseJob);
 		jobDaoControl.setReturnValue(new ArrayList());
-		jobDao.updateJobInstance(databaseJob);
-		jobDaoControl.setVoidCallable();
 		jobDao.saveJobExecution(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher() {
 			public boolean matches(Object[] expected, Object[] actual) {

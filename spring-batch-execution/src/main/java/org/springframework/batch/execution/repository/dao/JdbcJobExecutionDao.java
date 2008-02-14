@@ -34,22 +34,22 @@ import org.springframework.util.Assert;
 public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements JobExecutionDao, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(JdbcJobExecutionDao.class);
-	
+
 	private static final int EXIT_MESSAGE_LENGTH = 250;
-	
+
 	private static final String GET_JOB_EXECUTION_COUNT = "SELECT count(JOB_EXECUTION_ID) from %PREFIX%JOB_EXECUTION "
-		+ "where JOB_INSTANCE_ID = ?";
-	
+			+ "where JOB_INSTANCE_ID = ?";
+
 	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, "
-		+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) values (?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) values (?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?";
 
 	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
-		+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ? where JOB_EXECUTION_ID = ?";
+			+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ? where JOB_EXECUTION_ID = ?";
 
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
-	
+
 	public List findJobExecutions(final JobInstance job) {
 
 		Assert.notNull(job, "Job cannot be null.");
@@ -83,8 +83,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	/**
 	 * @see JobDao#getJobExecutionCount(JobInstance)
-	 * @throws IllegalArgumentException
-	 *             if jobId is null.
+	 * @throws IllegalArgumentException if jobId is null.
 	 */
 	public int getJobExecutionCount(Long jobId) {
 
@@ -92,8 +91,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		Object[] parameters = new Object[] { jobId };
 
-		return getJdbcTemplate()
-				.queryForInt(getQuery(GET_JOB_EXECUTION_COUNT), parameters);
+		return getJdbcTemplate().queryForInt(getQuery(GET_JOB_EXECUTION_COUNT), parameters);
 	}
 
 	/**
@@ -103,41 +101,38 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * via a SQL INSERT statement.
 	 * 
 	 * @see JobDao#saveJobExecution(JobExecution)
-	 * @throws IllegalArgumentException
-	 *             if jobExecution is null, as well as any of it's fields to be
-	 *             persisted.
+	 * @throws IllegalArgumentException if jobExecution is null, as well as any
+	 * of it's fields to be persisted.
 	 */
 	public void saveJobExecution(JobExecution jobExecution) {
 
 		validateJobExecution(jobExecution);
 
 		jobExecution.setId(new Long(jobExecutionIncrementer.nextLongValue()));
-		Object[] parameters = new Object[] { jobExecution.getId(),
-				jobExecution.getJobId(), jobExecution.getStartTime(),
-				jobExecution.getEndTime(), jobExecution.getStatus().toString(),
-				jobExecution.getExitStatus().isContinuable() ? "Y" : "N",
-				jobExecution.getExitStatus().getExitCode(),
+		Object[] parameters = new Object[] { jobExecution.getId(), jobExecution.getJobId(),
+				jobExecution.getStartTime(), jobExecution.getEndTime(), jobExecution.getStatus().toString(),
+				jobExecution.getExitStatus().isContinuable() ? "Y" : "N", jobExecution.getExitStatus().getExitCode(),
 				jobExecution.getExitStatus().getExitDescription() };
-		getJdbcTemplate().update(getQuery(SAVE_JOB_EXECUTION), parameters, new int[] {
-				Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP,
-				Types.VARCHAR, Types.CHAR, Types.VARCHAR, Types.VARCHAR });
+		getJdbcTemplate().update(
+				getQuery(SAVE_JOB_EXECUTION),
+				parameters,
+				new int[] { Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.CHAR,
+						Types.VARCHAR, Types.VARCHAR });
 	}
-	
+
 	/**
 	 * Validate JobExecution. At a minimum, JobId, StartTime, EndTime, and
 	 * Status cannot be null.
 	 * 
-	 * @param jobExecution @throws IllegalArgumentException
+	 * @param jobExecution
+	 * @throws IllegalArgumentException
 	 */
 	private void validateJobExecution(JobExecution jobExecution) {
 
 		Assert.notNull(jobExecution);
-		Assert.notNull(jobExecution.getJobId(),
-				"JobExecution Job-Id cannot be null.");
-		Assert.notNull(jobExecution.getStartTime(),
-				"JobExecution start time cannot be null.");
-		Assert.notNull(jobExecution.getStatus(),
-				"JobExecution status cannot be null.");
+		Assert.notNull(jobExecution.getJobId(), "JobExecution Job-Id cannot be null.");
+		Assert.notNull(jobExecution.getStartTime(), "JobExecution start time cannot be null.");
+		Assert.notNull(jobExecution.getStatus(), "JobExecution status cannot be null.");
 	}
 
 	/**
@@ -152,56 +147,45 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		validateJobExecution(jobExecution);
 
-		String exitDescription = jobExecution.getExitStatus()
-				.getExitDescription();
-		if (exitDescription != null
-				&& exitDescription.length() > EXIT_MESSAGE_LENGTH) {
+		String exitDescription = jobExecution.getExitStatus().getExitDescription();
+		if (exitDescription != null && exitDescription.length() > EXIT_MESSAGE_LENGTH) {
 			exitDescription = exitDescription.substring(0, EXIT_MESSAGE_LENGTH);
-			logger
-					.debug("Truncating long message before update of JobExecution: "
-							+ jobExecution);
+			logger.debug("Truncating long message before update of JobExecution: " + jobExecution);
 		}
-		Object[] parameters = new Object[] { jobExecution.getStartTime(),
-				jobExecution.getEndTime(), jobExecution.getStatus().toString(),
-				jobExecution.getExitStatus().isContinuable() ? "Y" : "N",
-				jobExecution.getExitStatus().getExitCode(), exitDescription,
-				jobExecution.getId() };
+		Object[] parameters = new Object[] { jobExecution.getStartTime(), jobExecution.getEndTime(),
+				jobExecution.getStatus().toString(), jobExecution.getExitStatus().isContinuable() ? "Y" : "N",
+				jobExecution.getExitStatus().getExitCode(), exitDescription, jobExecution.getId() };
 
 		if (jobExecution.getId() == null) {
-			throw new IllegalArgumentException(
-					"JobExecution ID cannot be null.  JobExecution must be saved "
-							+ "before it can be updated.");
+			throw new IllegalArgumentException("JobExecution ID cannot be null.  JobExecution must be saved "
+					+ "before it can be updated.");
 		}
 
 		// Check if given JobExecution's Id already exists, if none is found it
 		// is invalid and
 		// an exception should be thrown.
-		if (getJdbcTemplate().queryForInt(getQuery(CHECK_JOB_EXECUTION_EXISTS),
-				new Object[] { jobExecution.getId() }) != 1) {
-			throw new NoSuchBatchDomainObjectException(
-					"Invalid JobExecution, ID " + jobExecution.getId()
-							+ " not found.");
+		if (getJdbcTemplate().queryForInt(getQuery(CHECK_JOB_EXECUTION_EXISTS), new Object[] { jobExecution.getId() }) != 1) {
+			throw new NoSuchBatchDomainObjectException("Invalid JobExecution, ID " + jobExecution.getId()
+					+ " not found.");
 		}
 
-		getJdbcTemplate()
-				.update(getQuery(UPDATE_JOB_EXECUTION), parameters,
-						new int[] { Types.TIMESTAMP, Types.TIMESTAMP,
-								Types.VARCHAR, Types.CHAR, Types.VARCHAR,
-								Types.VARCHAR, Types.INTEGER });
+		getJdbcTemplate().update(
+				getQuery(UPDATE_JOB_EXECUTION),
+				parameters,
+				new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.CHAR, Types.VARCHAR, Types.VARCHAR,
+						Types.INTEGER });
 	}
-	
+
 	/**
 	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
 	 * generating primary keys for {@link JobExecution} instances.
 	 * 
-	 * @param jobExecutionIncrementer
-	 *            the {@link DataFieldMaxValueIncrementer}
+	 * @param jobExecutionIncrementer the {@link DataFieldMaxValueIncrementer}
 	 */
-	public void setJobExecutionIncrementer(
-			DataFieldMaxValueIncrementer jobExecutionIncrementer) {
+	public void setJobExecutionIncrementer(DataFieldMaxValueIncrementer jobExecutionIncrementer) {
 		this.jobExecutionIncrementer = jobExecutionIncrementer;
 	}
-	
+
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(jobExecutionIncrementer);

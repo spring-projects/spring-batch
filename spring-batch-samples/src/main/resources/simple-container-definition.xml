@@ -55,7 +55,6 @@
 		class="org.springframework.batch.execution.repository.dao.JdbcJobInstanceDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="jobIncrementer" ref="jobIncrementer" />
-		<property name="jobExecutionDao" ref="jobExecutionDao" />
 	</bean>
 	
 	<bean id="jobExecutionDao" lazy-init="true"

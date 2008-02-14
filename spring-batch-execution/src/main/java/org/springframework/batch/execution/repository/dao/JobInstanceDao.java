@@ -38,12 +38,4 @@ public interface JobInstanceDao {
 	 */
 	List findJobInstances(String jobName, JobParameters jobParameters);
 
-	/**
-	 * Update an existing JobInstance.
-	 * 
-	 * Preconditions: jobInstance must have an ID.
-	 * 
-	 * @param jobInstance
-	 */
-	void updateJobInstance(JobInstance jobInstance);
 }

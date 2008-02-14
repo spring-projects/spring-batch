@@ -177,13 +177,23 @@ public class SimpleJobRepository implements JobRepository {
 				throw new BatchRestartException("Restart Max exceeded for Job: " + jobInstance.toString());
 			}
 			List executions = jobExecutionDao.findJobExecutions(jobInstance);
+			JobExecution lastExecution = null;
+			// check for running executions and find the last started
 			for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
 				JobExecution execution = (JobExecution) iterator.next();
+				if (lastExecution == null) {
+					lastExecution = execution;
+				}
+				if (lastExecution.getStartTime().getTime() < execution.getStartTime().getTime()) {
+					lastExecution = execution;
+				}
+				
 				if (execution.isRunning()) {
 					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "
 							+ jobInstance);
 				}
 			}
+			jobInstance.setLastExecution(lastExecution);
 		}
 		else if (jobs.size() == 0) {
 			// no job found, create one
@@ -242,12 +252,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * @throws IllegalArgumentException if Job or it's Id is null.
 	 */
 	public void update(JobInstance job) {
-
-		Assert.notNull(job, "Job cannot be null.");
-		Assert.notNull(job.getId(), "Job cannot be updated if it's ID is null.  It must be obtained"
-				+ "from SimpleJobRepository.findOrCreateJob to be considered valid.");
-
-		jobInstanceDao.updateJobInstance(job);
+		//TODO no-op to be removed
 	}
 
 	/**

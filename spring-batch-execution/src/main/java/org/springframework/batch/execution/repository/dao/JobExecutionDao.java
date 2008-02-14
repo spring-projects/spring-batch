@@ -58,4 +58,9 @@ public interface JobExecutionDao {
 	 * execution is found for the given id.
 	 */
 	JobExecution getJobExecution(Long jobExecutionId);
+	
+//	/**
+//	 * @return return the last execution for the given instance
+//	 */
+//	JobExecution getLastJobExecution(JobInstance jobInstance);
 }

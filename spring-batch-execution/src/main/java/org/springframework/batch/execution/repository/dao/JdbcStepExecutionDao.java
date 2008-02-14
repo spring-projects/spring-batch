@@ -180,7 +180,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 		List executions = getJdbcTemplate().query(getQuery(FIND_LAST_STEP_EXECUTION),
 				new Object[] { stepInstanceId, stepInstanceId }, new StepExecutionRowMapper(stepInstance));
 
-		Assert.state(executions.size() <= 1, "There must be at most one latest execution");
+		Assert.state(executions.size() <= 1, "There must be at most one latest step execution");
 
 		if (executions.size() == 0) {
 			return null;
