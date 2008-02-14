@@ -17,15 +17,28 @@ package org.springframework.batch.core.domain;
 
 import java.util.List;
 
+import org.springframework.batch.io.exception.WriteFailureException;
+
 /**
  * Interface for defining the contract to log out read and write
- * failures encountered during batch processing.
+ * failures encountered during batch processing.  It is expected
+ * that any failures encountered while writing will be
+ * represented as {@link WriteFailureException}s, which contain
+ * the items which caused the exception.
  * 
  * @author Lucas Ward
  *
  */
-public interface ItemFailureLog {
+public interface SkippedItemHandler {
 	
-	void log(List exceptions);
+	/**
+	 * Handler the list of exceptions.  This will usually be done
+	 * by logging out the details of the exception to either a
+	 * file or database table.  It is expected that any implementors of this
+	 * of this method will not throw an exception.
+	 * 
+	 * @param exceptions
+	 */
+	void handle(List exceptions);
 
 }
