@@ -85,7 +85,7 @@ public class ChunkedStepTests extends TestCase {
 		step.setItemWriter(processor);
 		step.setItemReader(getReader(strings));
 		step.setJobRepository(new JobRepositorySupport());
-		step.setTransactionManager(transactionManager);
+		step.setStreamManager(new SimpleStreamManager(transactionManager));
 		step.afterPropertiesSet();
 		return step;
 	}
@@ -103,7 +103,7 @@ public class ChunkedStepTests extends TestCase {
 		SimpleStreamManager streamManager = new SimpleStreamManager(transactionManager);
 		streamManager.setUseClassNameAsPrefix(false);
 		chunkedStep.setStreamManager(streamManager);
-		chunkedStep.setRepository(new JobRepositorySupport());
+		chunkedStep.setJobRepository(new JobRepositorySupport());
 		
 		stepInstance = new StepInstance(new Long(9));
 		jobExecutionContext = new JobExecution(jobInstance);
@@ -172,7 +172,7 @@ public class ChunkedStepTests extends TestCase {
 
 		MockControl repoControl = MockControl.createControl(JobRepository.class);
 		JobRepository repository = (JobRepository)repoControl.getMock();
-		chunkedStep.setRepository(repository);
+		chunkedStep.setJobRepository(repository);
 
 //		StepInstance step = new StepInstance(new Long(1));
 //		JobExecution jobExecutionContext = new JobExecution(jobInstance);

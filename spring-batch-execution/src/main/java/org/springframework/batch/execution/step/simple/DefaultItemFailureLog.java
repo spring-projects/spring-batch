@@ -20,10 +20,10 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.domain.ItemFailureLog;
+import org.springframework.batch.core.domain.SkippedItemHandler;
 
 /**
- * Default implementation of the {@link ItemFailureLog} interface that
+ * Default implementation of the {@link SkippedItemHandler} interface that
  * writes all exceptions via commons logging.  Since generics can't be
  * used to ensure the list contains exceptions, any non exceptions will
  * be logged out by calling toString on the object.
@@ -31,7 +31,7 @@ import org.springframework.batch.core.domain.ItemFailureLog;
  * @author Lucas Ward
  *
  */
-public class DefaultItemFailureLog implements ItemFailureLog {
+public class DefaultItemFailureLog implements SkippedItemHandler {
 
 	protected static final Log logger = LogFactory
 	.getLog(DefaultItemFailureLog.class);
@@ -39,7 +39,7 @@ public class DefaultItemFailureLog implements ItemFailureLog {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.ItemFailureLog#log(java.util.List)
 	 */
-	public void log(List exceptions) {
+	public void handle(List exceptions) {
 		for(Iterator it = exceptions.iterator(); it.hasNext();){
 			Object exception = it.next();
 			try{

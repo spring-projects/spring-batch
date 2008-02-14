@@ -21,18 +21,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Chunk;
+import org.springframework.batch.core.domain.Chunker;
 import org.springframework.batch.core.domain.ChunkingResult;
 import org.springframework.batch.core.domain.Dechunker;
 import org.springframework.batch.core.domain.DechunkingResult;
-import org.springframework.batch.core.domain.ItemFailureLog;
+import org.springframework.batch.core.domain.SkippedItemHandler;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
-import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepScope;
@@ -54,6 +55,7 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.support.RetryTemplate;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.util.Assert;
 
@@ -61,14 +63,14 @@ import org.springframework.util.Assert;
  * <p>Implementation of the {@link Step} interface that deals with input and output as 'chunks'.  Reading is 
  * delegated to a {@link Chunker} that will read in a {@link Chunk} of items for processing.  The number of
  * items per chunks is configurable as the chunk size.  Once the chunk has been read, any errors encountered
- * while reading (usually skipped unless configured not to) will be logged out via the {@link ItemFailureLog}.
+ * while reading (usually skipped unless configured not to) will be logged out via the {@link SkippedItemHandler}.
  * The chunk will then be 'dechunked', which in most scenarios will mean delegating to an {@link ItemWriter} 
  * by writing out one chunk at a time.  The transaction boundary is around this process.  If any errors are 
  * encountered, the dechunking process will error out, leaving the decision for retrying the chunk up to
  * a {@link RepeatTemplate}.  This template is configurable, allowing for the number of retries and how long 
  * to wait between retries (backoff) to be set.  Once dechunking has been finished, any errors not fatal to
  * the chunk (usually because the error didn't invalidate the transaction) will also be written out via
- * the {@link ItemFailureLog}</p>
+ * the {@link SkippedItemHandler}</p>
  * 
  * <p>Clients can use {@link RepeatListener}s in the step operations to intercept or listen to the iteration 
  * on a step-wide basis, for instance to get a callback when the step is complete.  The open and close methods of
@@ -95,7 +97,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Ben Hale
  */
-public class ChunkedStep extends AbstractStep {
+public class ChunkedStep extends StepSupport implements InitializingBean{
 
 	private static final Log logger = LogFactory.getLog(ChunkedStep.class);
 
@@ -109,7 +111,7 @@ public class ChunkedStep extends AbstractStep {
 	// default to checking current thread for interruption.
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
 	
-	private ItemFailureLog failureLog = new DefaultItemFailureLog();
+	private SkippedItemHandler failureLog = new DefaultItemFailureLog();
 
 	private StreamManager streamManager;
 
@@ -141,7 +143,7 @@ public class ChunkedStep extends AbstractStep {
 		this.streamManager = streamManager;
 	}
 	
-	public void setFailureLog(ItemFailureLog failureLog) {
+	public void setFailureLog(SkippedItemHandler failureLog) {
 		this.failureLog = failureLog;
 	}
 
@@ -150,10 +152,10 @@ public class ChunkedStep extends AbstractStep {
 	 * 
 	 * @param jobRepository
 	 */
-	public void setRepository(JobRepository jobRepository) {
+	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
-
+	
 	/**
 	 * The {@link RepeatOperations} to use for the outer loop of the batch processing. Should be set up by the caller
 	 * through a factory. Defaults to a plain {@link RepeatTemplate}.
@@ -239,7 +241,7 @@ public class ChunkedStep extends AbstractStep {
 			}
 		}
 		
-		
+		Assert.notNull(jobRepository, "JobRepository must not be null");
 	}
 
 	/**
@@ -298,7 +300,7 @@ public class ChunkedStep extends AbstractStep {
 					}
 					
 					final Chunk chunk = chunkingResult.getChunk();
-					failureLog.log(chunkingResult.getExceptions());
+					failureLog.handle(chunkingResult.getExceptions());
 
 					retryTemplate.execute(new RetryCallback(){
 
@@ -364,7 +366,7 @@ public class ChunkedStep extends AbstractStep {
 		try {
 			
 			DechunkingResult chunkResult = dechunker.dechunk(chunk, stepExecution);
-			failureLog.log(chunkResult.getExceptions());
+			failureLog.handle(chunkResult.getExceptions());
 
 			// TODO: check that stepExecution can
 			// aggregate these contributions if they

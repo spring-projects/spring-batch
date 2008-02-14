@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.core.domain.Chunk;
+import org.springframework.batch.core.domain.Chunker;
 import org.springframework.batch.core.domain.ChunkingResult;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.StepExecution;
@@ -28,7 +29,8 @@ import org.springframework.util.Assert;
 
 /**
  * Implementation of the {@link Chunker} interface that creates chunks from
- * an {@link ItemReader} 
+ * an {@link ItemReader}.  <strong>It does not buffer chunks</strong>.  If 
+ * the underlying reader has been rolled back, and
  * 
  * @author Ben Hale
  * @author Lucas Ward
@@ -91,6 +93,12 @@ public class ItemChunker implements Chunker {
 
 	private synchronized Long getChunkId() {
 		return new Long(chunkCounter++);
+	}
+
+	/**
+	 * No-op implementation. 
+	 */
+	public void flush(StepExecution stepExecution) {
 	}
 
 }
