@@ -49,6 +49,8 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	protected StepInstanceDao stepInstanceDao;
 	
 	protected StepExecutionDao stepExecutionDao;
+	
+	protected JobExecutionDao jobExecutionDao;
 
 	protected JobInstance jobInstance;
 
@@ -76,6 +78,10 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		this.stepExecutionDao = stepExecutionDao;
 	}
 
+	public void setJobExecutionDao(JobExecutionDao jobExecutionDao) {
+		this.jobExecutionDao = jobExecutionDao;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.test.AbstractSingleSpringContextTests#getConfigLocations()
@@ -94,6 +100,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		step1 = stepInstanceDao.createStepInstance(jobInstance, "TestStep1");
 		step2 = stepInstanceDao.createStepInstance(jobInstance, "TestStep2");
 		jobExecution = new JobExecution(step2.getJobInstance());
+		jobExecutionDao.saveJobExecution(jobExecution);
 
 		stepExecution = new StepExecution(step1, jobExecution, null);
 		stepExecution.setStatus(BatchStatus.STARTED);

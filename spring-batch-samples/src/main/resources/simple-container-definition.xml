@@ -73,7 +73,6 @@
 		class="org.springframework.batch.execution.repository.dao.JdbcStepExecutionDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" />
-		<property name="jobExecutionDao" ref="jobExecutionDao" />
 	</bean>
 
 	<bean id="mapJobDao" lazy-init="true"

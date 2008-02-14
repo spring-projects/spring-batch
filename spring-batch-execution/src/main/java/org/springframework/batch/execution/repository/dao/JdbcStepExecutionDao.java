@@ -96,8 +96,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
 
-	private JobExecutionDao jobExecutionDao;
-
 	public ExecutionAttributes findExecutionAttributes(final Long executionId) {
 
 		Assert.notNull(executionId, "ExecutionId must not be null.");
@@ -281,8 +279,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 
 		validateStepExecution(stepExecution);
 
-		cascadeJobExecution(stepExecution.getJobExecution());
-
 		stepExecution.setId(new Long(stepExecutionIncrementer.nextLongValue()));
 		stepExecution.incrementVersion(); // should be 0 now
 		Object[] parameters = new Object[] { stepExecution.getId(), stepExecution.getVersion(),
@@ -295,14 +291,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 		getJdbcTemplate().update(getQuery(SAVE_STEP_EXECUTION), parameters, new int[] { Types.INTEGER, Types.INTEGER,
 				Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER,
 				Types.INTEGER, Types.VARCHAR, Types.CHAR, Types.VARCHAR, Types.VARCHAR });
-	}
-
-	private void cascadeJobExecution(JobExecution jobExecution) {
-		if (jobExecution.getId() != null) {
-			// assume already saved...
-			return;
-		}
-		jobExecutionDao.saveJobExecution(jobExecution);
 	}
 
 	/**
@@ -478,13 +466,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 		this.stepExecutionIncrementer = stepExecutionIncrementer;
 	}
 
-	public void setJobExecutionDao(JobExecutionDao jobExecutionDao) {
-		this.jobExecutionDao = jobExecutionDao;
-	}
-
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(stepExecutionIncrementer, "StepExecutionIncrementer cannot be null.");
-		Assert.notNull(jobExecutionDao, "JobDao cannot be null");
 	}
 
 	public static class AttributeType {

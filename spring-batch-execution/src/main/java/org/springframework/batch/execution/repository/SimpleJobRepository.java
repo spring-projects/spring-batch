@@ -259,6 +259,10 @@ public class SimpleJobRepository implements JobRepository {
 
 		if (stepExecution.getId() == null) {
 			// new execution, obtain id and insert
+			JobExecution jobExecution = stepExecution.getJobExecution();
+			if (jobExecution.getId() == null) {
+				jobExecutionDao.saveJobExecution(jobExecution);
+			}
 			stepExecutionDao.saveStepExecution(stepExecution);
 			stepExecutionDao.saveExecutionAttributes(stepExecution.getId(), stepExecution.getExecutionAttributes());
 		}

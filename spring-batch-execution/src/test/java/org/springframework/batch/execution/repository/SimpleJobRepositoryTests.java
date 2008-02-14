@@ -369,7 +369,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 	}
 
 	public void testSaveExistingStepExecution() {
-		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(10L)), null, null);
+		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(10L)), new JobExecution(null), null);
 		ExecutionAttributes executionAttributes = new ExecutionAttributes();
 		stepExecution.setExecutionAttributes(executionAttributes);
 		stepDao.saveStepExecution(stepExecution);

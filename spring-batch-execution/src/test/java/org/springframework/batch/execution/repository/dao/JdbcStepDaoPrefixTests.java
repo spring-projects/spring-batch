@@ -46,7 +46,6 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 		
 		stepInstanceDao = new JdbcStepInstanceDao();
 		stepExecutionDao = new JdbcStepExecutionDao();
-		stepExecutionDao.setJobExecutionDao(new MapJobDao());
 		stepExecutionIncrementer = (DataFieldMaxValueIncrementer)stepExecutionIncrementerControl.getMock();
 		stepIncrementer = (DataFieldMaxValueIncrementer)stepIncrementerControl.getMock();
 		
