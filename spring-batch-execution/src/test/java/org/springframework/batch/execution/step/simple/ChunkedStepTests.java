@@ -123,7 +123,7 @@ public class ChunkedStepTests extends TestCase {
 		final JobExecution jobExecution = new JobExecution(jobInstance);
 		final StepExecution stepExecution = new StepExecution(step, jobExecution);
 
-		chunkedStep.setItemReader(new ItemReader() {
+		chunkedStep.setChunker(new ItemChunker(new ItemReader() {
 			int counter = 0;
 			public Object read() throws Exception {
 				assertEquals(step, stepExecution.getStep());
@@ -135,7 +135,7 @@ public class ChunkedStepTests extends TestCase {
 					return null;
 				}
 			}
-		});
+		}));
 
 		chunkedStep.execute(stepExecution);
 		assertEquals(2, processed.size());
@@ -212,7 +212,7 @@ public class ChunkedStepTests extends TestCase {
 
 		};
 
-		chunkedStep.setItemReader(itemReader);
+		chunkedStep.setChunker(new ItemChunker(itemReader));
 
 		try {
 			chunkedStep.execute(stepExecution);
@@ -233,7 +233,7 @@ public class ChunkedStepTests extends TestCase {
 			}
 		};
 		
-		chunkedStep.setItemWriter(itemWriter);
+		chunkedStep.setDechunker(new ItemDechunker(itemWriter));
 		
 		try{
 			chunkedStep.execute(stepExecution);

@@ -34,8 +34,8 @@ public class ItemChunkerTests extends TestCase {
 	public void testSizeNegative() {
 		try {
 			MockItemReader itemReader = new MockItemReader(10);
-			ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
-			chunkReader.chunk(-1);
+			ItemChunker chunkReader = new ItemChunker(itemReader);
+			chunkReader.chunk(-1, stepExecution);
 			fail();
 		} catch (IllegalArgumentException e) {
 		}
@@ -44,8 +44,8 @@ public class ItemChunkerTests extends TestCase {
 	public void testSizeZero() {
 		try {
 			MockItemReader itemReader = new MockItemReader(10);
-			ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
-			chunkReader.chunk(0);
+			ItemChunker chunkReader = new ItemChunker(itemReader);
+			chunkReader.chunk(0, stepExecution);
 			fail();
 		} catch (IllegalArgumentException e) {
 		}
@@ -53,25 +53,25 @@ public class ItemChunkerTests extends TestCase {
 
 	public void testSizePositive() {
 		MockItemReader itemReader = new MockItemReader(10);
-		ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
-		ChunkingResult chunkingResult = chunkReader.chunk(10);
+		ItemChunker chunkReader = new ItemChunker(itemReader);
+		ChunkingResult chunkingResult = chunkReader.chunk(10, stepExecution);
 		assertEquals(10, chunkingResult.getChunk().getItems().size());
 	}
 
 	public void testIncompleteChunk() {
 		MockItemReader itemReader = new MockItemReader(5);
-		ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
-		ChunkingResult chunkingResult = chunkReader.chunk(10);
+		ItemChunker chunkReader = new ItemChunker(itemReader);
+		ChunkingResult chunkingResult = chunkReader.chunk(10, stepExecution);
 		assertEquals(5, chunkingResult.getChunk().getItems().size());
 	}
 
 	public void testPolicyNoContinue() {
 		MockItemReader itemReader = new MockItemReader(1);
 		itemReader.setFail(true);
-		ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
-		chunkReader.setReadFailurePolicy(new StubReadFailurePolicy(true));
+		ItemChunker chunkReader = new ItemChunker(itemReader);
+		chunkReader.setItemSkipPolicy(new StubReadFailurePolicy(true));
 		try {
-			chunkReader.chunk(10);
+			chunkReader.chunk(10, stepExecution);
 			fail();
 		} catch (RuntimeException e) {
 		}
@@ -80,9 +80,9 @@ public class ItemChunkerTests extends TestCase {
 	public void testPolicyContinueWithFailure() {
 		MockItemReader itemReader = new MockItemReader(1);
 		itemReader.setFail(true);
-		ItemChunker chunkReader = new ItemChunker(itemReader,stepExecution);
-		chunkReader.setReadFailurePolicy(new StubReadFailurePolicy(false));
-		ChunkingResult chunkingResult = chunkReader.chunk(1);
+		ItemChunker chunkReader = new ItemChunker(itemReader);
+		chunkReader.setItemSkipPolicy(new StubReadFailurePolicy(false));
+		ChunkingResult chunkingResult = chunkReader.chunk(1, stepExecution);
 		assertEquals(1,chunkingResult.getChunk().getItems().size());
 	}
 

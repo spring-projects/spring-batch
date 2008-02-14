@@ -36,22 +36,20 @@ import org.springframework.util.Assert;
 public class ItemChunker implements Chunker {
 
 	private final ItemReader itemReader;
-	private final StepExecution stepExecution;
-
 	private long chunkCounter = 0;
 
-	private ItemSkipPolicy readFailurePolicy = new NeverSkipItemSkipPolicy();
+	private ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
 
-	public ItemChunker(ItemReader itemReader, StepExecution stepExecution) {
+	public ItemChunker(ItemReader itemReader) {
+		Assert.notNull(itemReader, "ItemReader must not be null");
 		this.itemReader = itemReader;
-		this.stepExecution = stepExecution;
 	}
 
-	public void setReadFailurePolicy(ItemSkipPolicy readFailurePolicy) {
-		this.readFailurePolicy = readFailurePolicy;
+	public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
+		this.itemSkipPolicy = itemSkipPolicy;
 	}
 
-	public ChunkingResult chunk(int size) throws ReadFailureException {
+	public ChunkingResult chunk(int size, StepExecution stepExecution) throws ReadFailureException {
 		Assert.isTrue(size > 0, "Chunk size must be greater than 0");
 
 		int counter = 0;
@@ -69,7 +67,7 @@ public class ItemChunker implements Chunker {
 				counter++;
 			} catch (Exception ex) {
 				exceptions.add(ex);
-				if(!readFailurePolicy.shouldSkip(ex, stepExecution)){
+				if(!itemSkipPolicy.shouldSkip(ex, stepExecution)){
 					rethrow(ex);
 				}
 			}

@@ -17,6 +17,7 @@ package org.springframework.batch.execution.step.simple;
 
 import org.springframework.batch.core.domain.Chunk;
 import org.springframework.batch.core.domain.ChunkingResult;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.ReadFailureException;
 
 
@@ -31,12 +32,13 @@ import org.springframework.batch.io.exception.ReadFailureException;
 public interface Chunker {
 
 	/**
-	 * Read in a chunk, given the provided chunk size.
+	 * Read in a chunk, given the provided chunk size for the given StepExecution.
 	 * 
 	 * @param chunkSize the number of items that should be read for this chunk.
+	 * @param StepExecution the stepExecution the current chunk is being processed within.
 	 * @return the {@link Chunk} that has been read.
 	 * @throws IllegalArgumentException if chunkSize is less than zero.
 	 */
-	public ChunkingResult chunk(int chunkSize) throws ReadFailureException;
+	public ChunkingResult chunk(int chunkSize, StepExecution stepExecution) throws ReadFailureException;
 
 }

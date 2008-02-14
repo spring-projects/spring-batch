@@ -25,6 +25,7 @@ import org.springframework.batch.core.domain.ChunkingResult;
 import org.springframework.batch.core.domain.Dechunker;
 import org.springframework.batch.core.domain.DechunkingResult;
 import org.springframework.batch.core.domain.ItemFailureLog;
+import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
@@ -47,6 +48,7 @@ import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.RetryCallback;
@@ -56,16 +58,38 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of executing the step as a set of chunks, each chunk surrounded by a transaction. The structure
- * is therefore that of two nested loops, with transaction boundary around the whole inner loop. The outer loop is
- * controlled by the step operations ({@link #setStepOperations(RepeatOperations)}), and the inner loop by the chunk
- * operations ({@link #setChunkOperations(RepeatOperations)}). The inner loop should always be executed in a single
- * thread, so the chunk operations should not do any concurrent execution. N.B. usually that means that the chunk
- * operations should be a {@link RepeatTemplate} (which is the default).<br/>
+ * <p>Implementation of the {@link Step} interface that deals with input and output as 'chunks'.  Reading is 
+ * delegated to a {@link Chunker} that will read in a {@link Chunk} of items for processing.  The number of
+ * items per chunks is configurable as the chunk size.  Once the chunk has been read, any errors encountered
+ * while reading (usually skipped unless configured not to) will be logged out via the {@link ItemFailureLog}.
+ * The chunk will then be 'dechunked', which in most scenarios will mean delegating to an {@link ItemWriter} 
+ * by writing out one chunk at a time.  The transaction boundary is around this process.  If any errors are 
+ * encountered, the dechunking process will error out, leaving the decision for retrying the chunk up to
+ * a {@link RepeatTemplate}.  This template is configurable, allowing for the number of retries and how long 
+ * to wait between retries (backoff) to be set.  Once dechunking has been finished, any errors not fatal to
+ * the chunk (usually because the error didn't invalidate the transaction) will also be written out via
+ * the {@link ItemFailureLog}</p>
  * 
- * Clients can use interceptors in the step operations to intercept or listen to the iteration on a step-wide basis, for
- * instance to get a callback when the step is complete. Those that want callbacks at the level of an individual tasks,
- * can specify interceptors for the chunk operations.
+ * <p>Clients can use {@link RepeatListener}s in the step operations to intercept or listen to the iteration 
+ * on a step-wide basis, for instance to get a callback when the step is complete.  The open and close methods of
+ * could easily be done with AOP, however, notifications in between complete chunks (before and after) can
+ * be quite useful</p>
+ * 
+ * <p>Repository Usage: The {@link JobRepository} is used extensively to store metadata about the run such as
+ * when the {@link StepExecution} was started, or the commit count.</p>
+ * 
+ * <p>Interruption: At various times while processing, the step will check to see if it has been interrupted 
+ * by calling the {@link StepInterruptionPolicy}.  This policy could check if thread.isInterupted() is true, 
+ * or RepeatContext.isTerminateOnly() is set.  It could even be a check to see if a 'stop file' has been added 
+ * to a particular directory.  If the step should finish, a {@link JobInterruptedException} is thrown, and the
+ * step will clean up, set the status of the {@link StepExecution} to 'STOPPED' and rethrow.</p.
+ * 
+ * <p>ExitStatusClassification: Any number of fatal errors could be thrown during processing.  In general, the
+ * framework must remain fairly dumb as to what error code these exceptions should translate to.  By default
+ * it's a fairly generic 'FATAL_EXECUTION'.  However, this may be insufficient for many scenarios.  If an
+ * enterprise scheduler is used to kick off a batch job, the exit code is the only means of communication as
+ * to what action must be taken.  It may also be the only result that many batch operators see as well.  Therefore,
+ * an {@link ExitStatusExceptionClassifier} may be used to classify an exception to a particular exit code.</p>
  * 
  * @author Dave Syer
  * @author Lucas Ward
@@ -79,6 +103,7 @@ public class ChunkedStep extends AbstractStep {
 
 	private JobRepository jobRepository;
 
+	//default to simple exception classification.
 	private ExitStatusExceptionClassifier exceptionClassifier = new SimpleExitStatusExceptionClassifier();
 
 	// default to checking current thread for interruption.
@@ -89,8 +114,12 @@ public class ChunkedStep extends AbstractStep {
 	private StreamManager streamManager;
 
 	private ItemReader itemReader;
+	private Chunker chunker;
 
 	private ItemWriter itemWriter;
+	private Dechunker dechunker;
+	
+	private ItemSkipPolicy itemSkipPolicy;
 
 	private RetryTemplate retryTemplate = new RetryTemplate();
 	
@@ -168,6 +197,24 @@ public class ChunkedStep extends AbstractStep {
 	public void setItemWriter(ItemWriter itemWriter) {
 		this.itemWriter = itemWriter;
 	}
+	
+	public void setChunker(Chunker chunker) {
+		this.chunker = chunker;
+	}
+	
+	public void setDechunker(Dechunker dechunker) {
+		this.dechunker = dechunker;
+	}
+	
+	/**
+	 * Set the skip policy.  If set, it will be used for both reading
+	 * and writing.
+	 * 
+	 * @param itemSkipPolicy
+	 */
+	public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
+		this.itemSkipPolicy = itemSkipPolicy;
+	}
 
 	/**
 	 * Check mandatory properties (reader and writer).
@@ -175,8 +222,24 @@ public class ChunkedStep extends AbstractStep {
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(itemReader, "ItemReader must be provided");
-		Assert.notNull(itemWriter, "ItemWriter must be provided");
+		//This is currently a little bit funky, I don't want to require a chunker or
+		//dechunker to be wired in, since the developer should really only be wiring in a
+		//ItemReader and ItemWriter, a namespace should take care of the issue though.
+		if(chunker == null){
+			chunker = new ItemChunker(itemReader);
+			if(itemSkipPolicy != null){
+				((ItemChunker)chunker).setItemSkipPolicy(itemSkipPolicy);
+			}
+		}
+		
+		if(dechunker == null){
+			dechunker = new ItemDechunker(itemWriter);
+			if(itemSkipPolicy != null){
+				((ItemChunker)dechunker).setItemSkipPolicy(itemSkipPolicy);
+			}
+		}
+		
+		
 	}
 
 	/**
@@ -184,7 +247,7 @@ public class ChunkedStep extends AbstractStep {
 	 * into chunks, each one executing in a transaction. The step and its execution and execution context are all given
 	 * an up to date {@link BatchStatus}, and the {@link JobRepository} is used to store the result. Various reporting
 	 * information are also added to the current context (the {@link RepeatContext} governing the step execution, which
-	 * would normally be available to the caller somehow through the step's {@link JobExecutionContext}.<br/>
+	 * would normally be available to the caller somehow through the step's {@link StepContext}.<br/>
 	 * 
 	 * @throws JobInterruptedException if the step or a chunk is interrupted
 	 * @throws RuntimeException if there is an exception during a chunk execution
@@ -228,9 +291,7 @@ public class ChunkedStep extends AbstractStep {
 					// interruption.
 					interruptionPolicy.checkInterrupted(context);
 					
-					//shouldn't have to create a chunker each time, I'll refactor the interface later
-					Chunker chunker = new ItemChunker(itemReader, stepExecution);
-					ChunkingResult chunkingResult = chunker.chunk(chunkSize);
+					ChunkingResult chunkingResult = chunker.chunk(chunkSize, stepExecution);
 					
 					if(chunkingResult == null){
 						return ExitStatus.FINISHED;
@@ -287,11 +348,11 @@ public class ChunkedStep extends AbstractStep {
 	}
 
 	/**
-	 * Execute a bunch of identical business logic operations all within a transaction. The transaction is
-	 * programmatically started and stopped outside this method, so subclasses that override do not need to create a
-	 * transaction.
+	 * Execute a bunch of identical business logic operations all within a transaction.
 	 * 
-	 * @param stepInstance the current step containing the {@link Tasklet} with the business logic.
+	 * @param stepExecution the current execution in which to process the chunk in.
+	 * @param chunk to be processed.
+	 * @param stepContext the current step context.
 	 * @return true if there is more data to process.
 	 */
 	void processChunk(Chunk chunk, final StepExecution stepExecution, StepContext stepContext) {
@@ -301,10 +362,8 @@ public class ChunkedStep extends AbstractStep {
 		final StepContribution contribution = stepExecution.createStepContribution();
 		
 		try {
-
-			Dechunker dechunker = new ItemDechunker(itemWriter, stepExecution);
 			
-			DechunkingResult chunkResult = dechunker.dechunk(chunk);
+			DechunkingResult chunkResult = dechunker.dechunk(chunk, stepExecution);
 			failureLog.log(chunkResult.getExceptions());
 
 			// TODO: check that stepExecution can
@@ -363,7 +422,7 @@ public class ChunkedStep extends AbstractStep {
 		
 	}
 
-	/**
+	/*
 	 * Convenience method to update the status in all relevant places.
 	 * 
 	 * @param stepInstance the current step

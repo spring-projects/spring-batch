@@ -48,7 +48,7 @@ public class ItemDechunkerTests extends TestCase {
 		
 		itemWriter = (ItemWriter)writerControl.getMock();
 		stepExecution = new StepExecution(null,null);
-		dechunker = new ItemDechunker(itemWriter, stepExecution);
+		dechunker = new ItemDechunker(itemWriter);
 		List items = new ArrayList();
 		items.add("1");
 		items.add("2");
@@ -61,7 +61,7 @@ public class ItemDechunkerTests extends TestCase {
 		itemWriter.write("1");
 		itemWriter.write("2");
 		writerControl.replay();
-		dechunker.dechunk(chunk);
+		dechunker.dechunk(chunk, stepExecution);
 		writerControl.verify();
 	}
 	
@@ -72,7 +72,7 @@ public class ItemDechunkerTests extends TestCase {
 		itemWriter.write("2");
 		writerControl.setThrowable(new Exception());
 		writerControl.replay();
-		DechunkingResult result = dechunker.dechunk(chunk);
+		DechunkingResult result = dechunker.dechunk(chunk, stepExecution);
 		writerControl.verify();
 		List exceptions = result.getExceptions();
 		assertEquals(1, exceptions.size());
@@ -87,7 +87,7 @@ public class ItemDechunkerTests extends TestCase {
 		writerControl.setThrowable(new NullPointerException());
 		writerControl.replay();
 		try{
-			dechunker.dechunk(chunk);
+			dechunker.dechunk(chunk, stepExecution);
 			fail();
 		}
 		catch(NullPointerException ex){

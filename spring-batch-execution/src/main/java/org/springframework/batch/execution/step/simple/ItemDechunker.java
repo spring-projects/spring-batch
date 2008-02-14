@@ -38,20 +38,19 @@ import org.springframework.util.Assert;
 public class ItemDechunker implements Dechunker {
 
 	private final ItemWriter itemWriter;
-	private final StepExecution stepExecution;
 	private ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
 		
-	public ItemDechunker(ItemWriter itemWriter, StepExecution stepExecution) {
+	public ItemDechunker(ItemWriter itemWriter) {
 		this.itemWriter = itemWriter;
-		this.stepExecution = stepExecution;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.Dechunker#dechunk(org.springframework.batch.core.domain.Chunk)
 	 */
-	public DechunkingResult dechunk(Chunk chunk) throws Exception {
+	public DechunkingResult dechunk(Chunk chunk, StepExecution stepExecution) throws Exception {
 		
 		Assert.notNull(chunk, "Chunk must not be null");
+		Assert.notNull(stepExecution, "StepExecution must not be null");
 		List skippedItems = new ArrayList();
 		for(Iterator it = chunk.getItems().iterator(); it.hasNext();){
 			
