@@ -20,10 +20,10 @@ package org.springframework.batch.sample;
  * This job differs from FixedLengthImportJob only in internal job, therefore
  * the test is reused, only the job config location is overridden
  */
-public class SimpleTaskletJobFunctionalTests extends FixedLengthImportJobFunctionalTests {
+public class SimpleJobFunctionalTests extends FixedLengthImportJobFunctionalTests {
 	
 	protected String[] getConfigLocations() {
-		return new String[]{"jobs/simpleTaskletJob.xml"};
+		return new String[]{"jobs/simpleJob.xml"};
 	}
 
 }
