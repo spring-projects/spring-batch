@@ -38,13 +38,4 @@ public interface Chunker {
 	 */
 	public ChunkingResult chunk(int chunkSize, StepExecution stepExecution) throws ReadFailureException;
 	
-	/**
-	 * Flush any chunks that may be buffered.  Because it may be advantageous to buffer chunks in case of
-	 * failures, calling this method should flush any that are stored, however, it is not a requirement
-	 * of the interface that it be implementated.
-	 * 
-	 * @param stepExecution
-	 */
-	public void flush(Entity stepExecution);
-
 }
