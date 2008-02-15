@@ -16,14 +16,12 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.execution.repository.dao.JdbcJobExecutionDao.JobExecutionRowMapper;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -61,12 +59,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 
 	private static final String FIND_STEP_EXECUTION_ATTRS = "SELECT TYPE_CD, KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL "
 			+ "from %PREFIX%STEP_EXECUTION_ATTRS where STEP_EXECUTION_ID = ?";
-
-	private static final String FIND_STEP_EXECUTIONS = "SELECT STEP_EXECUTION_ID, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
-			+ " TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%STEP_EXECUTION where STEP_INSTANCE_ID = ?";
-
-	private static final String GET_STEP_EXECUTION = "SELECT STEP_EXECUTION_ID, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
-			+ " TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%STEP_EXECUTION where STEP_EXECUTION_ID = ?";
 
 	private static final String GET_STEP_EXECUTION_COUNT = "SELECT count(STEP_EXECUTION_ID) from %PREFIX%STEP_EXECUTION where "
 			+ "STEP_INSTANCE_ID = ?";
@@ -132,51 +124,11 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 
 		return executionContext;
 	}
-
-	/**
-	 * Get StepExecution for the given step. Due to the nature of statistics,
-	 * they will not be returned with reconstituted object.
-	 * 
-	 * @see StepDao#getStepExecution(Long)
-	 * @throws IllegalArgumentException if id is null.
-	 */
-	public List findStepExecutions(final StepInstance step) {
-
-		Assert.notNull(step, "Step cannot be null.");
-		Assert.notNull(step.getId(), "Step id cannot be null.");
-
-		RowMapper rowMapper = new StepExecutionRowMapper(step);
-
-		return getJdbcTemplate().query(getQuery(FIND_STEP_EXECUTIONS), new Object[] { step.getId() }, rowMapper);
-	}
-
-	public StepExecution getStepExecution(Long stepExecutionId, StepInstance stepInstance) {
-
-		Assert.notNull(stepExecutionId, "Step Execution id must not be null");
-
-		RowMapper rowMapper = new StepExecutionRowMapper(stepInstance);
-
-		List executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION), new Object[] { stepExecutionId }, rowMapper);
-
-		StepExecution stepExecution;
-		if (executions.size() == 1) {
-			stepExecution = (StepExecution) executions.get(0);
-		}
-		else if (executions.size() == 0) {
-			stepExecution = null;
-		}
-		else {
-			throw new IncorrectResultSizeDataAccessException("Only one StepExecution may exist for given id: ["
-					+ stepExecutionId + "]", 1, executions.size());
-		}
-
-		return stepExecution;
-	}
 	
-	public StepExecution getLastStepExecution(StepInstance stepInstance) {
+	public StepExecution getLastStepExecution(StepInstance stepInstance, JobExecution jobExecution) {
 		Long stepInstanceId = stepInstance.getId();
 		List executions = getJdbcTemplate().query(getQuery(FIND_LAST_STEP_EXECUTION),
-				new Object[] { stepInstanceId, stepInstanceId }, new StepExecutionRowMapper(stepInstance));
+				new Object[] { stepInstanceId, stepInstanceId }, new StepExecutionRowMapper(stepInstance, jobExecution));
 
 		Assert.state(executions.size() <= 1, "There must be at most one latest step execution");
 
@@ -433,16 +385,16 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 	private class StepExecutionRowMapper implements RowMapper {
 
 		private final StepInstance stepInstance;
+		
+		private final JobExecution jobExecution;
 
-		public StepExecutionRowMapper(StepInstance stepInstance) {
+		public StepExecutionRowMapper(StepInstance stepInstance, JobExecution jobExecution) {
 			this.stepInstance = stepInstance;
+			this.jobExecution = jobExecution;
 		}
 
 		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-			JobExecution jobExecution = (JobExecution) getJdbcTemplate().queryForObject(
-					getQuery(JobExecutionRowMapper.GET_JOB_EXECUTION), new Object[] { new Long(rs.getLong(2)) },
-					new JobExecutionRowMapper(stepInstance.getJobInstance()));
 			StepExecution stepExecution = new StepExecution(stepInstance, jobExecution, new Long(rs.getLong(1)));
 			stepExecution.setStartTime(rs.getTimestamp(3));
 			stepExecution.setEndTime(rs.getTimestamp(4));

@@ -51,6 +51,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final String FIND_JOB_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
 		+ " where JOB_INSTANCE_ID = ?";
 	
+	private static final String GET_JOB_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
+		+ " where JOB_EXECUTION_ID = ?";
+	
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
 	public List findJobExecutions(final JobInstance job) {
@@ -66,7 +69,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		Assert.notNull(jobExecutionId, "Job Execution id must not be null.");
 
-		List executions = getJdbcTemplate().query(getQuery(JobExecutionRowMapper.GET_JOB_EXECUTION),
+		List executions = getJdbcTemplate().query(getQuery(GET_JOB_EXECUTION),
 				new Object[] { jobExecutionId }, new JobExecutionRowMapper(null));
 
 		JobExecution jobExecution;
@@ -200,10 +203,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @author Dave Syer
 	 * 
 	 */
-	public static class JobExecutionRowMapper implements RowMapper {
-
-		public static final String GET_JOB_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
-				+ " where JOB_EXECUTION_ID = ?";
+	private static class JobExecutionRowMapper implements RowMapper {
 
 		private JobInstance job;
 

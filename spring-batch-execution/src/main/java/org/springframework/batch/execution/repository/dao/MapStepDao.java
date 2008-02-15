@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
@@ -101,7 +102,7 @@ public class MapStepDao implements StepDao {
 		executions.add(stepExecution);
 	}
 	
-	public List findStepExecutions(StepInstance step) {
+	public List findStepExecutions(StepInstance step, JobExecution jobExecution) {
 		Set executions = (Set) executionsById.get(step.getId());
 		
 		if(executions == null){
@@ -162,8 +163,8 @@ public class MapStepDao implements StepDao {
 			ExecutionContext executionContext) {
 	}
 
-	public StepExecution getLastStepExecution(StepInstance stepInstance) {
-		List executions = findStepExecutions(stepInstance);
+	public StepExecution getLastStepExecution(StepInstance stepInstance, JobExecution jobExecution) {
+		List executions = findStepExecutions(stepInstance, null);
 		StepExecution lastExec = null;
 		for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
 			StepExecution exec = (StepExecution) iterator.next();

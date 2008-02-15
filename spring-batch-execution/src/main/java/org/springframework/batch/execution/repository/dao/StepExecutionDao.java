@@ -1,7 +1,6 @@
 package org.springframework.batch.execution.repository.dao;
 
-import java.util.List;
-
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.item.ExecutionContext;
@@ -37,24 +36,6 @@ public interface StepExecutionDao {
 	int getStepExecutionCount(StepInstance stepInstance);
 
 	/**
-	 * Return all StepExecutions for the given step.
-	 * 
-	 * @param stepInstance the step to use as a search key
-	 * @return list of stepExecutions
-	 */
-	List findStepExecutions(StepInstance stepInstance);
-
-	/**
-	 * Return a StepExecution for the given id.
-	 * 
-	 * @param stepExecutionId
-	 * @return {@link StepExecution} for the provided id.
-	 * @throws {@link IncorrectResultSizeDataAccessException} if more than one
-	 * execution is found.
-	 */
-	StepExecution getStepExecution(Long stepExecutionId, StepInstance stepInstance);
-
-	/**
 	 * Find all {@link ExecutionContext} for the given execution id.
 	 * 
 	 * @param executionId - Long id of the {@link StepExecution} that the
@@ -84,7 +65,8 @@ public interface StepExecutionDao {
 	void updateExecutionContext(final Long executionId, ExecutionContext executionContext);
 
 	/**
+	 * @param lastJobExecution last job execution
 	 * @return the last execution of the given instance
 	 */
-	StepExecution getLastStepExecution(StepInstance stepInstance);
+	StepExecution getLastStepExecution(StepInstance stepInstance, JobExecution lastJobExecution);
 }

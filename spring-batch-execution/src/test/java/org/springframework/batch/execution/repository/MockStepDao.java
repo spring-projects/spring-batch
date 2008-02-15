@@ -18,6 +18,7 @@ package org.springframework.batch.execution.repository;
 
 import java.util.List;
 
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
@@ -67,7 +68,7 @@ public class MockStepDao implements StepDao {
 		currentNewStep = 0;
 	}
 
-	public List findStepExecutions(StepInstance step) {
+	public List findStepExecutions(StepInstance step, JobExecution jobExecution) {
 		
 		return null;
 	}
@@ -89,7 +90,7 @@ public class MockStepDao implements StepDao {
 		return null;
 	}
 
-	public StepExecution getLastStepExecution(StepInstance stepInstance) {
+	public StepExecution getLastStepExecution(StepInstance stepInstance, JobExecution jobExecution) {
 		// TODO Auto-generated method stub
 		return null;
 	}

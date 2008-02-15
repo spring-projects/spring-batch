@@ -49,6 +49,7 @@ import org.springframework.util.Assert;
  * 
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Robert Kasanicky
  * 
  * @see JobRepository
  * @see StepDao
@@ -72,10 +73,10 @@ public class SimpleJobRepository implements JobRepository {
 	SimpleJobRepository() {
 	}
 
-	public SimpleJobRepository(JobInstanceDao jobDao, JobExecutionDao jobExecutionDao, StepInstanceDao stepInstanceDao,
+	public SimpleJobRepository(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao, StepInstanceDao stepInstanceDao,
 			StepExecutionDao stepExecutionDao) {
 		super();
-		this.jobInstanceDao = jobDao;
+		this.jobInstanceDao = jobInstanceDao;
 		this.jobExecutionDao = jobExecutionDao;
 		this.stepInstanceDao = stepInstanceDao;
 		this.stepExecutionDao = stepExecutionDao;
@@ -171,7 +172,6 @@ public class SimpleJobRepository implements JobRepository {
 		if (jobs.size() == 1) {
 			// One job was found
 			jobInstance = (JobInstance) jobs.get(0);
-			jobInstance.setStepInstances(findStepInstances(job.getSteps(), jobInstance));
 			jobInstance.setJobExecutionCount(jobExecutionDao.getJobExecutionCount(jobInstance.getId()));
 			if (jobInstance.getJobExecutionCount() > job.getStartLimit()) {
 				throw new BatchRestartException("Restart Max exceeded for Job: " + jobInstance.toString());
@@ -194,6 +194,7 @@ public class SimpleJobRepository implements JobRepository {
 				}
 			}
 			jobInstance.setLastExecution(lastExecution);
+			jobInstance.setStepInstances(findStepInstances(job.getSteps(), jobInstance, lastExecution));
 		}
 		else if (jobs.size() == 0) {
 			// no job found, create one
@@ -305,7 +306,7 @@ public class SimpleJobRepository implements JobRepository {
 	/**
 	 * Find Steps for the given list of Steps with a given JobId
 	 */
-	protected List findStepInstances(List steps, JobInstance jobInstance) {
+	protected List findStepInstances(List steps, JobInstance jobInstance, JobExecution lastJobExecution) {
 		List stepInstances = new ArrayList();
 		Iterator i = steps.iterator();
 		while (i.hasNext()) {
@@ -313,7 +314,7 @@ public class SimpleJobRepository implements JobRepository {
 			Step stepConfiguration = (Step) i.next();
 			StepInstance stepInstance = stepInstanceDao.findStepInstance(jobInstance, stepConfiguration.getName());
 			if (stepInstance != null) {
-				stepInstance.setLastExecution(stepExecutionDao.getLastStepExecution(stepInstance));
+				stepInstance.setLastExecution(stepExecutionDao.getLastStepExecution(stepInstance, lastJobExecution));
 				if (stepInstance.getLastExecution() != null) {
 					ExecutionContext executionContext = stepExecutionDao.findExecutionContext(stepInstance
 							.getLastExecution().getId());
