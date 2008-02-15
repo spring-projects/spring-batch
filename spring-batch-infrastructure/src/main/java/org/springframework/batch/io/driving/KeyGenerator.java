@@ -2,7 +2,7 @@ package org.springframework.batch.io.driving;
 
 import java.util.List;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Strategy interface used to generate keys in driving query input.
@@ -20,19 +20,19 @@ public interface KeyGenerator {
 	/**
 	 * Restore the keys list based on provided restart data.
 	 *
-	 * @param executionAttributes, the restart data to restore the keys list from.
+	 * @param executionContext, the restart data to restore the keys list from.
 	 * @return a list of keys.
-	 * @throws IllegalArgumentException is executionAttributes is null.
+	 * @throws IllegalArgumentException if executionContext is null.
 	 */
-	List restoreKeys(ExecutionAttributes executionAttributes);
+	List restoreKeys(ExecutionContext executionContext);
 	
 	/**
 	 * Return the provided key as restart data.
 	 * 
 	 * @param key to be converted to restart data.
-	 * @return {@link ExecutionAttributes} representation of the key.
+	 * @return {@link ExecutionContext} representation of the key.
 	 * @throws IllegalArgumentException if key is null.
 	 * @throws IllegalArgumentException if key is an incompatible type.
 	 */
-	ExecutionAttributes getKeyAsExecutionAttributes(Object key);
+	ExecutionContext getKeyAsExecutionContext(Object key);
 }

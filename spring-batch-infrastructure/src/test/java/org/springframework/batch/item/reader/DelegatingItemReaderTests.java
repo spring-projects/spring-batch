@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -73,7 +73,7 @@ public class DelegatingItemReaderTests extends TestCase {
 	 * Gets restart data from the input template
 	 */
 	public void testGetStreamContext() {
-		Properties props = itemProvider.getExecutionAttributes().getProperties();
+		Properties props = itemProvider.getExecutionContext().getProperties();
 		assertEquals("foo", props.getProperty("value"));
 	}
 
@@ -82,7 +82,7 @@ public class DelegatingItemReaderTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testRestoreFrom() throws Exception {
-		itemProvider.restoreFrom(new ExecutionAttributes(PropertiesConverter.stringToProperties("value=bar")));
+		itemProvider.restoreFrom(new ExecutionContext(PropertiesConverter.stringToProperties("value=bar")));
 		assertEquals("bar", itemProvider.read());
 	}
 
@@ -99,11 +99,11 @@ public class DelegatingItemReaderTests extends TestCase {
 			return PropertiesConverter.stringToProperties("a=b");
 		}
 
-		public ExecutionAttributes getExecutionAttributes() {
-			return new ExecutionAttributes(PropertiesConverter.stringToProperties("value=foo"));
+		public ExecutionContext getExecutionContext() {
+			return new ExecutionContext(PropertiesConverter.stringToProperties("value=foo"));
 		}
 
-		public void restoreFrom(ExecutionAttributes data) {
+		public void restoreFrom(ExecutionContext data) {
 			value = data.getProperties().getProperty("value");
 		}
 

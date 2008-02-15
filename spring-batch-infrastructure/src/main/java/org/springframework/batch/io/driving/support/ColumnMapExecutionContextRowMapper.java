@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.CollectionFactory;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -23,8 +23,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * </p>Extension of the ColumnMapRowMapper that converts a column map to {@link ExecutionAttributes} and allows
- * {@link ExecutionAttributes} to be converted back as a PreparedStatementSetter.  This is useful in a restart 
+ * </p>Extension of the ColumnMapRowMapper that converts a column map to {@link ExecutionContext} and allows
+ * {@link ExecutionContext} to be converted back as a PreparedStatementSetter.  This is useful in a restart 
  * scenario, as it allows for the standard functionality of the ColumnMapRowMapper to be used to 
  * create a map representing the columns returned by a query.  It should be noted that this column ordering
  * is preserved in the map using a link list version of Map. 
@@ -32,15 +32,15 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Lucas Ward
  * @author Dave Syer
- * @see ExecutionAttributesRowMapper
+ * @see ExecutionContextRowMapper
  */
-public class ColumnMapExecutionAttributesRowMapper extends ColumnMapRowMapper implements ExecutionAttributesRowMapper {
+public class ColumnMapExecutionContextRowMapper extends ColumnMapRowMapper implements ExecutionContextRowMapper {
 	
-	public static final String KEY_PREFIX = ClassUtils.getQualifiedName(ColumnMapExecutionAttributesRowMapper.class) + ".KEY.";
+	public static final String KEY_PREFIX = ClassUtils.getQualifiedName(ColumnMapExecutionContextRowMapper.class) + ".KEY.";
 	
-	public PreparedStatementSetter createSetter(ExecutionAttributes executionAttributes) {
+	public PreparedStatementSetter createSetter(ExecutionContext executionContext) {
 		
-		ColumnMapExecutionAttributes columnData = new ColumnMapExecutionAttributes(executionAttributes.getProperties());
+		ColumnMapExecutionContext columnData = new ColumnMapExecutionContext(executionContext.getProperties());
 
 		List columns = new ArrayList();
 		for (Iterator iterator = columnData.keys.entrySet().iterator(); iterator.hasNext();) {
@@ -52,21 +52,21 @@ public class ColumnMapExecutionAttributesRowMapper extends ColumnMapRowMapper im
 		return new ArgPreparedStatementSetter(columns.toArray());
 	}
 
-	public ExecutionAttributes createExecutionAttributes(Object key) {
-		Assert.isInstanceOf(Map.class, key, "Input to create ExecutionAttributes must be of type Map.");
+	public ExecutionContext createExecutionContext(Object key) {
+		Assert.isInstanceOf(Map.class, key, "Input to create ExecutionContext must be of type Map.");
 		Map keys = (Map) key;
-		return new ColumnMapExecutionAttributes(keys);
+		return new ColumnMapExecutionContext(keys);
 	}
 
-	private static class ColumnMapExecutionAttributes extends ExecutionAttributes {
+	private static class ColumnMapExecutionContext extends ExecutionContext {
 
 		private final Map keys;
 
-		public ColumnMapExecutionAttributes(Map keys) {
+		public ColumnMapExecutionContext(Map keys) {
 			this.keys = keys;
 		}
 
-		public ColumnMapExecutionAttributes(Properties props) {
+		public ColumnMapExecutionContext(Properties props) {
 
 			keys = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(props.size());
 

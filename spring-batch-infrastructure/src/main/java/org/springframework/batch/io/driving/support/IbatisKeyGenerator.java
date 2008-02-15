@@ -5,7 +5,7 @@ import java.util.Properties;
 
 import org.springframework.batch.io.driving.DrivingQueryItemReader;
 import org.springframework.batch.io.driving.KeyGenerator;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 import org.springframework.util.Assert;
 
@@ -40,22 +40,22 @@ public class IbatisKeyGenerator implements KeyGenerator {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionAttributes(java.lang.Object)
+	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionContext(java.lang.Object)
 	 */
-	public ExecutionAttributes getKeyAsExecutionAttributes(Object key) {
+	public ExecutionContext getKeyAsExecutionContext(Object key) {
 		Properties props = new Properties();
 		props.setProperty(RESTART_KEY, key.toString());
-		ExecutionAttributes executionAttributes = new ExecutionAttributes();
-		executionAttributes.putString(RESTART_KEY, key.toString());
-		return executionAttributes;
+		ExecutionContext executionContext = new ExecutionContext();
+		executionContext.putString(RESTART_KEY, key.toString());
+		return executionContext;
 	}
 
 	/**
 	 * Restore the keys list given the provided restart data.
 	 *
-	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#restoreKeys(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#restoreKeys(org.springframework.batch.item.ExecutionContext)
 	 */
-	public List restoreKeys(ExecutionAttributes data) {
+	public List restoreKeys(ExecutionContext data) {
 
 		Properties props = data.getProperties();
 		Object key = props.getProperty(RESTART_KEY);

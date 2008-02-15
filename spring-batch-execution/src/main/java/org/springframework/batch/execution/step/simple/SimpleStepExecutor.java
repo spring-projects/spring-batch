@@ -34,7 +34,7 @@ import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemStream;
@@ -302,11 +302,11 @@ public class SimpleStepExecutor implements InitializingBean {
 		// the conversation in StepScope
 		stepContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
 
-		final boolean saveExecutionAttributes = step.isSaveExecutionAttributes();
+		final boolean saveExecutionContext = step.isSaveExecutionContext();
 
-		if (saveExecutionAttributes && isRestart && stepInstance.getLastExecution() != null) {
-			stepExecution.setExecutionAttributes(stepInstance.getLastExecution().getExecutionAttributes());
-			stepContext.restoreFrom(stepExecution.getExecutionAttributes());
+		if (saveExecutionContext && isRestart && stepInstance.getLastExecution() != null) {
+			stepExecution.setExecutionContext(stepInstance.getLastExecution().getExecutionContext());
+			stepContext.restoreFrom(stepExecution.getExecutionContext());
 		}
 
 		try {
@@ -336,8 +336,8 @@ public class SimpleStepExecutor implements InitializingBean {
 						// TODO: check that stepExecution can
 						// aggregate these contributions if they
 						// come in asynchronously.
-						ExecutionAttributes statistics = stepContext.getExecutionAttributes();
-						contribution.setExecutionAttributes(statistics);
+						ExecutionContext statistics = stepContext.getExecutionContext();
+						contribution.setExecutionContext(statistics);
 						contribution.incrementCommitCount();
 
 						// If the step operations are asynchronous then we need
@@ -349,8 +349,8 @@ public class SimpleStepExecutor implements InitializingBean {
 							// only if chunk was successful
 							stepExecution.apply(contribution);
 
-							if (saveExecutionAttributes) {
-								stepExecution.setExecutionAttributes(stepContext.getExecutionAttributes());
+							if (saveExecutionContext) {
+								stepExecution.setExecutionContext(stepContext.getExecutionContext());
 							}
 							jobRepository.saveOrUpdate(stepExecution);
 

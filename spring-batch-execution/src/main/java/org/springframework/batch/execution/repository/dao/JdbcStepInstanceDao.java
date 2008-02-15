@@ -124,20 +124,6 @@ public class JdbcStepInstanceDao extends AbstractJdbcBatchMetadataDao implements
 		return getJdbcTemplate().query(getQuery(FIND_STEPS), parameters, rowMapper);
 	}
 
-//	/**
-//	 * @see StepDao#updateStepInstance(StepInstance)
-//	 * @throws IllegalArgumentException if step, or it's status and id is null.
-//	 */
-//	public void updateStepInstance(final StepInstance step) {
-//
-//		Assert.notNull(step, "Step cannot be null.");
-//		Assert.notNull(step.getId(), "Step Id cannot be null.");
-//
-//		Object[] parameters = new Object[] { step.getLastExecution().getId(), step.getId() };
-//
-//		getJdbcTemplate().update(getQuery(UPDATE_STEP), parameters);
-//	}
-
 	public void setStepIncrementer(DataFieldMaxValueIncrementer stepIncrementer) {
 		this.stepIncrementer = stepIncrementer;
 	}

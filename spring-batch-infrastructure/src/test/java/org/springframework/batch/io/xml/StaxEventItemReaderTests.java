@@ -14,7 +14,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
@@ -113,7 +113,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	 */
 	public void testRestart() {
 		source.read();
-		ExecutionAttributes streamContext = source.getExecutionAttributes();
+		ExecutionContext streamContext = source.getExecutionContext();
 		assertEquals(1, streamContext.getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME));
 		List expectedAfterRestart = (List) source.read();
 
@@ -128,7 +128,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	 * already initialised when restoring.
 	 */
 	public void testInvalidRestore() {
-		ExecutionAttributes context = new ExecutionAttributes();
+		ExecutionContext context = new ExecutionContext();
 		context.putLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME, 100000);
 		try {
 			source.restoreFrom(context);
@@ -143,7 +143,7 @@ public class StaxEventItemReaderTests extends TestCase {
 
 	public void testRestoreWorksFromClosedStream() throws Exception {
 		source.close();
-		source.restoreFrom(new ExecutionAttributes());
+		source.restoreFrom(new ExecutionContext());
 	}
 	/**
 	 * Skipping marked records after rollback.
@@ -205,7 +205,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	}
 
 	private long extractRecordCount() {
-		return source.getExecutionAttributes().getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME);
+		return source.getExecutionContext().getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME);
 	}
 
 	public void testCloseWithoutOpen() throws Exception {

@@ -2,7 +2,7 @@ package org.springframework.batch.io.support;
 
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.sample.domain.Foo;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.beans.factory.InitializingBean;
@@ -85,7 +85,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 		Foo foo2 = (Foo) reader.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionAttributes streamContext = getAsItemStream(reader).getExecutionAttributes();
+		ExecutionContext streamContext = getAsItemStream(reader).getExecutionContext();
 
 		// create new input source
 		reader = createItemReader();
@@ -107,7 +107,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 		Foo foo2 = (Foo) reader.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionAttributes streamContext = getAsItemStream(reader).getExecutionAttributes();
+		ExecutionContext streamContext = getAsItemStream(reader).getExecutionContext();
 
 		// create new input source
 		reader = createItemReader();
@@ -129,7 +129,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 	 * @throws Exception
 	 */
 	public void testRestoreFromEmptyData() throws Exception {
-		ExecutionAttributes streamContext = new ExecutionAttributes();
+		ExecutionContext streamContext = new ExecutionContext();
 
 		getAsItemStream(reader).restoreFrom(streamContext);
 
@@ -212,7 +212,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 
 		rollback();
 
-		ExecutionAttributes streamContext = getAsItemStream(reader).getExecutionAttributes();
+		ExecutionContext streamContext = getAsItemStream(reader).getExecutionContext();
 
 		// create new input source
 		reader = createItemReader();

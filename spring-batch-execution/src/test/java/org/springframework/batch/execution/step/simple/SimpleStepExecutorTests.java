@@ -38,7 +38,7 @@ import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ResetFailedException;
@@ -283,7 +283,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		StepInstance step = new StepInstance(new Long(1));
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepExecutor.setItemReader(tasklet);
-		stepConfiguration.setSaveExecutionAttributes(true);
+		stepConfiguration.setSaveExecutionContext(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
@@ -302,12 +302,12 @@ public class SimpleStepExecutorTests extends TestCase {
 		step.setStepExecutionCount(1);
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepExecutor.setItemReader(tasklet);
-		stepConfiguration.setSaveExecutionAttributes(true);
+		stepConfiguration.setSaveExecutionContext(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
 		stepExecution
-				.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar")));
+				.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
 		step.setLastExecution(stepExecution);
 		stepExecutor.execute(stepExecution);
 
@@ -326,7 +326,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		step.setStepExecutionCount(1);
 		MockRestartableTasklet tasklet = new MockRestartableTasklet();
 		stepConfiguration.setItemReader(tasklet);
-		stepConfiguration.setSaveExecutionAttributes(false);
+		stepConfiguration.setSaveExecutionContext(false);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
@@ -354,7 +354,7 @@ public class SimpleStepExecutorTests extends TestCase {
 				return ExitStatus.FINISHED;
 			}
 		});
-		stepConfiguration.setSaveExecutionAttributes(true);
+		stepConfiguration.setSaveExecutionContext(true);
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
@@ -408,17 +408,17 @@ public class SimpleStepExecutorTests extends TestCase {
 				return ExitStatus.FINISHED;
 			}
 		});
-		stepConfiguration.setSaveExecutionAttributes(true);
+		stepConfiguration.setSaveExecutionContext(true);
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
-		assertEquals(false, stepExecution.getExecutionAttributes().containsKey("foo"));
+		assertEquals(false, stepExecution.getExecutionContext().containsKey("foo"));
 
 		final Map map = new HashMap();
 		stepExecutor.setStreamManager(new SimpleStreamManager(new ResourcelessTransactionManager()) {
-			public ExecutionAttributes getExecutionAttributes(Object key) {
+			public ExecutionContext getExecutionContext(Object key) {
 				// TODO Auto-generated method stub
-				return new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar"));
+				return new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
 			}
 		});
 
@@ -426,7 +426,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		// At least once in that process the statistics service was asked for
 		// statistics...
-		assertEquals("bar", stepExecution.getExecutionAttributes().getString("foo"));
+		assertEquals("bar", stepExecution.getExecutionContext().getString("foo"));
 		// ...but nothing was registered because nothing with step scoped.
 		assertEquals(0, map.size());
 	}
@@ -448,12 +448,12 @@ public class SimpleStepExecutorTests extends TestCase {
 			return restoreFromCalledWithSomeContext;
 		}
 
-		public ExecutionAttributes getExecutionAttributes() {
+		public ExecutionContext getExecutionContext() {
 			getExecutionAttributesCalled = true;
-			return new ExecutionAttributes(PropertiesConverter.stringToProperties("spam=bucket"));
+			return new ExecutionContext(PropertiesConverter.stringToProperties("spam=bucket"));
 		}
 
-		public void restoreFrom(ExecutionAttributes data) {
+		public void restoreFrom(ExecutionContext data) {
 			restoreFromCalled = true;
 			restoreFromCalledWithSomeContext = data.getProperties().size() > 0;
 		}
@@ -507,7 +507,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
 		stepExecution
-				.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar")));
+				.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
 		step.setLastExecution(stepExecution);
 
 		try {
@@ -544,7 +544,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
 		stepExecution
-				.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar")));
+				.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
 		step.setLastExecution(stepExecution);
 
 		try {

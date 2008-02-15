@@ -31,7 +31,7 @@ import java.util.Properties;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ResetFailedException;
@@ -71,7 +71,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	private Resource resource;
 
-	private ExecutionAttributes executionAttributes = new ExecutionAttributes();
+	private ExecutionContext executionContext = new ExecutionContext();
 
 	private OutputState state = null;
 
@@ -215,22 +215,22 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	}
 
 	/**
-	 * @see ItemStream#getExecutionAttributes()
+	 * @see ItemStream#getExecutionContext()
 	 */
-	public ExecutionAttributes getExecutionAttributes() {
+	public ExecutionContext getExecutionContext() {
 		if (state == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
-		executionAttributes.putLong(RESTART_DATA_NAME, state.position());
-		executionAttributes.putLong(WRITTEN_STATISTICS_NAME, state.linesWritten);
-		executionAttributes.putLong(RESTART_COUNT_STATISTICS_NAME, state.restartCount);
-		return executionAttributes;
+		executionContext.putLong(RESTART_DATA_NAME, state.position());
+		executionContext.putLong(WRITTEN_STATISTICS_NAME, state.linesWritten);
+		executionContext.putLong(RESTART_COUNT_STATISTICS_NAME, state.restartCount);
+		return executionContext;
 	}
 
 	/**
-	 * @see ItemStream#restoreFrom(ExecutionAttributes)
+	 * @see ItemStream#restoreFrom(ExecutionContext)
 	 */
-	public void restoreFrom(ExecutionAttributes data) {
+	public void restoreFrom(ExecutionContext data) {
 		if (data == null)
 			return;
 		getOutputState().restoreFrom(data.getProperties());
@@ -520,7 +520,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
 		getOutputState().mark();
@@ -528,7 +528,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() throws ResetFailedException {
 		try {

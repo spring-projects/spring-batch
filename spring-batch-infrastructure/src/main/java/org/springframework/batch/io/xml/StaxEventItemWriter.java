@@ -15,7 +15,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.springframework.batch.io.support.FileUtils;
 import org.springframework.batch.io.xml.stax.NoStartEndDocumentStreamWriter;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.StreamException;
@@ -352,13 +352,13 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	/**
 	 * Get the restart data.
 	 * @return the restart data
-	 * @see org.springframework.batch.item.ItemStream#getExecutionAttributes()
+	 * @see org.springframework.batch.item.ItemStream#getExecutionContext()
 	 */
-	public ExecutionAttributes getExecutionAttributes() {
+	public ExecutionContext getExecutionContext() {
 		if (!initialized) {
 			throw new StreamException("ItemStream is not open, or may have been closed.  Cannot access context.");
 		}
-		ExecutionAttributes context = new ExecutionAttributes();
+		ExecutionContext context = new ExecutionContext();
 		context.putLong(RESTART_DATA_NAME, getPosition());
 		context.putLong(WRITE_STATISTICS_NAME, currentRecordCount);
 		return context;
@@ -367,9 +367,9 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	/**
 	 * Restore processing from provided restart data.
 	 * @param data the restart data
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionContext)
 	 */
-	public void restoreFrom(ExecutionAttributes data) {
+	public void restoreFrom(ExecutionContext data) {
 
 		long startAtPosition = 0;
 
@@ -440,7 +440,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
 		lastCommitPointPosition = getPosition();
@@ -449,7 +449,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() {
 		currentRecordCount = lastCommitPointRecordCount;

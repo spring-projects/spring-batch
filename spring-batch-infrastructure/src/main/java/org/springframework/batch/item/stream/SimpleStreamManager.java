@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -66,8 +66,8 @@ public class SimpleStreamManager implements StreamManager {
 
 	/**
 	 * Public setter for the flag. If this is true then the class name of the
-	 * streams will be used as a prefix in the {@link ExecutionAttributes} in
-	 * {@link #getExecutionAttributes(Object)}. The default value is true, which
+	 * streams will be used as a prefix in the {@link ExecutionContext} in
+	 * {@link #getExecutionContext(Object)}. The default value is true, which
 	 * gives the best chance of unique key names in the context.
 	 * 
 	 * @param useClassNameAsPrefix the flag to set (default true).
@@ -85,16 +85,16 @@ public class SimpleStreamManager implements StreamManager {
 	}
 
 	/**
-	 * Simple aggregate {@link ExecutionAttributes} provider for the contributions
+	 * Simple aggregate {@link ExecutionContext} provider for the contributions
 	 * registered under the given key.
 	 * 
-	 * @see org.springframework.batch.item.stream.StreamManager#getExecutionAttributes(java.lang.Object)
+	 * @see org.springframework.batch.item.stream.StreamManager#getExecutionContext(java.lang.Object)
 	 */
-	public ExecutionAttributes getExecutionAttributes(Object key) {
-		final ExecutionAttributes result = new ExecutionAttributes();
+	public ExecutionContext getExecutionContext(Object key) {
+		final ExecutionContext result = new ExecutionContext();
 		iterate(key, new Callback() {
 			public void execute(ItemStream stream) {
-				ExecutionAttributes context = stream.getExecutionAttributes();
+				ExecutionContext context = stream.getExecutionContext();
 				String prefix = ClassUtils.getQualifiedName(stream.getClass()) + ".";
 				if (!useClassNameAsPrefix) {
 					prefix = "";
@@ -114,9 +114,9 @@ public class SimpleStreamManager implements StreamManager {
 	 * the provided key.
 	 * 
 	 * @see org.springframework.batch.item.stream.StreamManager#register(java.lang.Object,
-	 * org.springframework.batch.item.ItemStream, ExecutionAttributes)
+	 * org.springframework.batch.item.ItemStream, ExecutionContext)
 	 */
-	public void register(Object key, ItemStream stream, ExecutionAttributes executionAttributes) {
+	public void register(Object key, ItemStream stream, ExecutionContext executionContext) {
 		synchronized (registry) {
 			Set set = (Set) registry.get(key);
 			if (set == null) {
@@ -125,23 +125,23 @@ public class SimpleStreamManager implements StreamManager {
 			}
 			set.add(stream);
 		}
-		if (executionAttributes != null) {
-			stream.restoreFrom(extract(stream, executionAttributes));
+		if (executionContext != null) {
+			stream.restoreFrom(extract(stream, executionContext));
 		}
 	}
 
 	/**
 	 * @param stream
-	 * @param executionAttributes
+	 * @param executionContext
 	 * @return
 	 */
-	private ExecutionAttributes extract(ItemStream stream, ExecutionAttributes executionAttributes) {
-		ExecutionAttributes result = new ExecutionAttributes();
+	private ExecutionContext extract(ItemStream stream, ExecutionContext executionContext) {
+		ExecutionContext result = new ExecutionContext();
 		String prefix = ClassUtils.getQualifiedName(stream.getClass()) + ".";
 		if (!useClassNameAsPrefix) {
 			prefix = "";
 		}
-		for (Iterator iterator = executionAttributes.entrySet().iterator(); iterator.hasNext();) {
+		for (Iterator iterator = executionContext.entrySet().iterator(); iterator.hasNext();) {
 			Entry entry = (Entry) iterator.next();
 			String contextKey = (String) entry.getKey();
 			if (contextKey.startsWith(prefix)) {

@@ -11,7 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.exception.StreamException;
@@ -212,7 +212,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
 		getBuffer().commit();
@@ -221,7 +221,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() {
 		getBuffer().rollback();
@@ -230,19 +230,19 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionContext)
 	 */
-	public void restoreFrom(ExecutionAttributes context) {
+	public void restoreFrom(ExecutionContext context) {
 		// no-op
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.item.ExecutionAttributesProvider#getExecutionAttributes()
+	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
-	public ExecutionAttributes getExecutionAttributes() {
-		return new ExecutionAttributes();
+	public ExecutionContext getExecutionContext() {
+		return new ExecutionContext();
 	}
 
 }

@@ -24,7 +24,7 @@ import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.transform.LineTokenizer;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -153,7 +153,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		reader.setFieldSetMapper(fieldSetMapper);
 		// do not open the template...
 		try {
-			reader.restoreFrom(reader.getExecutionAttributes());
+			reader.restoreFrom(reader.getExecutionContext());
 		} catch (StreamException e) {
 			assertTrue("Message does not contain open: "+e.getMessage(), e.getMessage().contains("open"));
 		}
@@ -177,7 +177,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		reader.read();
 
 		// get restart data
-		ExecutionAttributes streamContext = reader.getExecutionAttributes();
+		ExecutionContext streamContext = reader.getExecutionContext();
 		assertEquals("4", (String) streamContext.getProperties().getProperty(
 				FlatFileItemReader.READ_STATISTICS_NAME));
 		// close input
@@ -193,7 +193,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		assertEquals("[testLine5]", reader.read().toString());
 		assertEquals("[testLine6]", reader.read().toString());
 
-		ExecutionAttributes statistics = reader.getExecutionAttributes();
+		ExecutionContext statistics = reader.getExecutionContext();
 		assertEquals(6, statistics.getLong(FlatFileItemReader.READ_STATISTICS_NAME));
 	}
 

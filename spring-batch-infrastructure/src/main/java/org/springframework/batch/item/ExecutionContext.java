@@ -34,17 +34,17 @@ import org.springframework.util.Assert;
  * 
  * @author Lucas Ward
  */
-public class ExecutionAttributes {
+public class ExecutionContext {
 
 	private boolean dirty = false;
 
 	private final Map map;
 
-	public ExecutionAttributes() {
+	public ExecutionContext() {
 		map = new HashMap();
 	}
 	
-	public ExecutionAttributes(Map map){
+	public ExecutionContext(Map map){
 		this.map = map;
 	}
 
@@ -137,13 +137,13 @@ public class ExecutionAttributes {
 	}
 	
 	public boolean equals(Object obj) {
-		if(obj instanceof ExecutionAttributes == false){
+		if(obj instanceof ExecutionContext == false){
 			return false;
 		}
 		if(this == obj){
 			return true;
 		}
-		ExecutionAttributes rhs = (ExecutionAttributes)obj;
+		ExecutionContext rhs = (ExecutionContext)obj;
 		return this.entrySet().equals(rhs.entrySet());
 	}
 	

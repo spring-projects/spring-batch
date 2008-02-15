@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.domain;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Represents a contribution to a {@link StepExecution}, buffering changes
@@ -30,7 +30,7 @@ public class StepContribution {
 
 	private StepExecution execution;
 
-	private ExecutionAttributes executionAttributes;
+	private ExecutionContext executionContext;
 
 	private int commitCount;
 
@@ -67,18 +67,18 @@ public class StepContribution {
 	/**
 	 * Set the statistics properties.
 	 * 
-	 * @param executionAttributes
+	 * @param executionContext
 	 */
-	public void setExecutionAttributes(ExecutionAttributes executionAttributes) {
-		this.executionAttributes = executionAttributes;
+	public void setExecutionContext(ExecutionContext executionContext) {
+		this.executionContext = executionContext;
 	}
 
 	/**
-	 * Public getter for the {@link ExecutionAttributes}.
+	 * Public getter for the {@link ExecutionContext}.
 	 * @return the stream context
 	 */
-	public ExecutionAttributes getExecutionAttributes() {
-		return executionAttributes;
+	public ExecutionContext getExecutionContext() {
+		return executionContext;
 	}
 
 	/**

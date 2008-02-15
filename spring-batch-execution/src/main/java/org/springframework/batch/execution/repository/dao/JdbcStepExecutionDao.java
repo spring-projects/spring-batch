@@ -18,7 +18,7 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.repository.dao.JdbcJobExecutionDao.JobExecutionRowMapper;
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
@@ -96,11 +96,11 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
 
-	public ExecutionAttributes findExecutionAttributes(final Long executionId) {
+	public ExecutionContext findExecutionContext(final Long executionId) {
 
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
-		final ExecutionAttributes executionAttributes = new ExecutionAttributes();
+		final ExecutionContext executionContext = new ExecutionContext();
 
 		RowCallbackHandler callback = new RowCallbackHandler() {
 
@@ -110,16 +110,16 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 				AttributeType type = AttributeType.getType(typeCd);
 				String key = rs.getString("KEY_NAME");
 				if (type == AttributeType.STRING) {
-					executionAttributes.putString(key, rs.getString("STRING_VAL"));
+					executionContext.putString(key, rs.getString("STRING_VAL"));
 				}
 				else if (type == AttributeType.LONG) {
-					executionAttributes.putLong(key, rs.getLong("LONG_VAL"));
+					executionContext.putLong(key, rs.getLong("LONG_VAL"));
 				}
 				else if (type == AttributeType.DOUBLE) {
-					executionAttributes.putDouble(key, rs.getDouble("DOUBLE_VAL"));
+					executionContext.putDouble(key, rs.getDouble("DOUBLE_VAL"));
 				}
 				else if (type == AttributeType.OBJECT) {
-					executionAttributes.putLong(key, rs.getLong("OBJECT_VAL"));
+					executionContext.putLong(key, rs.getLong("OBJECT_VAL"));
 				}
 				else {
 					throw new BatchCriticalException("Invalid type found: [" + typeCd + "] for execution id: ["
@@ -130,7 +130,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 
 		getJdbcTemplate().query(getQuery(FIND_STEP_EXECUTION_ATTRS), new Object[] { executionId }, callback);
 
-		return executionAttributes;
+		return executionContext;
 	}
 
 	/**
@@ -200,12 +200,12 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 	 * attributes that don't match a provided type must be serialized into a
 	 * blob.
 	 */
-	public void saveExecutionAttributes(final Long executionId, final ExecutionAttributes executionAttributes) {
+	public void saveExecutionContext(final Long executionId, final ExecutionContext executionContext) {
 
 		Assert.notNull(executionId, "ExecutionId must not be null.");
-		Assert.notNull(executionAttributes, "The ExecutionAttributes must not be null.");
+		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
-		for (Iterator it = executionAttributes.entrySet().iterator(); it.hasNext();) {
+		for (Iterator it = executionContext.entrySet().iterator(); it.hasNext();) {
 			Entry entry = (Entry) it.next();
 			final String key = entry.getKey().toString();
 			final Object value = entry.getValue();
@@ -285,7 +285,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 				stepExecution.getStepId(), stepExecution.getJobExecutionId(), stepExecution.getStartTime(),
 				stepExecution.getEndTime(), stepExecution.getStatus().toString(), stepExecution.getCommitCount(),
 				stepExecution.getTaskCount(),
-				PropertiesConverter.propertiesToString(stepExecution.getExecutionAttributes().getProperties()),
+				PropertiesConverter.propertiesToString(stepExecution.getExecutionContext().getProperties()),
 				stepExecution.getExitStatus().isContinuable() ? "Y" : "N", stepExecution.getExitStatus().getExitCode(),
 				stepExecution.getExitStatus().getExitDescription() };
 		getJdbcTemplate().update(getQuery(SAVE_STEP_EXECUTION), parameters, new int[] { Types.INTEGER, Types.INTEGER,
@@ -314,12 +314,12 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 	 * 
 	 * @see {@link LobCreator}
 	 */
-	public void updateExecutionAttributes(final Long executionId, ExecutionAttributes executionAttributes) {
+	public void updateExecutionContext(final Long executionId, ExecutionContext executionContext) {
 
 		Assert.notNull(executionId, "ExecutionId must not be null.");
-		Assert.notNull(executionAttributes, "The ExecutionAttributes must not be null.");
+		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
-		for (Iterator it = executionAttributes.entrySet().iterator(); it.hasNext();) {
+		for (Iterator it = executionContext.entrySet().iterator(); it.hasNext();) {
 			Entry entry = (Entry) it.next();
 			final String key = entry.getKey().toString();
 			final Object value = entry.getValue();
@@ -411,7 +411,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 			Integer version = new Integer(stepExecution.getVersion().intValue() + 1);
 			Object[] parameters = new Object[] { stepExecution.getStartTime(), stepExecution.getEndTime(),
 					stepExecution.getStatus().toString(), stepExecution.getCommitCount(), stepExecution.getTaskCount(),
-					PropertiesConverter.propertiesToString(stepExecution.getExecutionAttributes().getProperties()),
+					PropertiesConverter.propertiesToString(stepExecution.getExecutionContext().getProperties()),
 					stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
 					stepExecution.getExitStatus().getExitCode(), exitDescription, version, stepExecution.getId(),
 					stepExecution.getVersion() };
@@ -449,7 +449,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 			stepExecution.setStatus(BatchStatus.getStatus(rs.getString(5)));
 			stepExecution.setCommitCount(rs.getInt(6));
 			stepExecution.setTaskCount(rs.getInt(7));
-			stepExecution.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter.stringToProperties(rs
+			stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties(rs
 					.getString(8))));
 			stepExecution
 					.setExitStatus(new ExitStatus("Y".equals(rs.getString(9)), rs.getString(10), rs.getString(11)));

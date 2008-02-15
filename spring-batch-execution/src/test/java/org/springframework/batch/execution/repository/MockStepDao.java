@@ -22,7 +22,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.repository.dao.StepDao;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 
 public class MockStepDao implements StepDao {
 
@@ -72,16 +72,16 @@ public class MockStepDao implements StepDao {
 		return null;
 	}
 
-	public ExecutionAttributes findExecutionAttributes(Long executionId) {
+	public ExecutionContext findExecutionContext(Long executionId) {
 		return null;
 	}
 
-	public void saveExecutionAttributes(Long executionId,
-			ExecutionAttributes executionAttributes) {
+	public void saveExecutionContext(Long executionId,
+			ExecutionContext executionContext) {
 	}
 
-	public void updateExecutionAttributes(Long executionId,
-			ExecutionAttributes executionAttributes) {
+	public void updateExecutionContext(Long executionId,
+			ExecutionContext executionContext) {
 	}
 
 	public StepExecution getStepExecution(Long stepExecutionId,

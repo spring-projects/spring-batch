@@ -26,7 +26,7 @@ import java.util.Set;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
 
@@ -46,7 +46,7 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 
 	private StreamManager streamManager;
 
-	private ExecutionAttributes executionAttributes;
+	private ExecutionContext executionContext;
 
 	/**
 	 * Default constructor.
@@ -82,7 +82,7 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 		if (streamManager != null && (value instanceof ItemStream)) {
 			ItemStream stream = (ItemStream) value;
 			stream.open();
-			streamManager.register(this, stream, executionAttributes);
+			streamManager.register(this, stream, executionContext);
 		}
 	}
 
@@ -193,17 +193,17 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ExecutionAttributesProvider#getExecutionAttributes()
+	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
-	public ExecutionAttributes getExecutionAttributes() {
-		return streamManager.getExecutionAttributes(this);
+	public ExecutionContext getExecutionContext() {
+		return streamManager.getExecutionContext(this);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.execution.scope.StepContext#restoreFrom(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.execution.scope.StepContext#restoreFrom(org.springframework.batch.item.ExecutionContext)
 	 */
-	public void restoreFrom(ExecutionAttributes executionAttributes) {
-		this.executionAttributes = executionAttributes;
+	public void restoreFrom(ExecutionContext executionContext) {
+		this.executionContext = executionContext;
 	}
 
 }

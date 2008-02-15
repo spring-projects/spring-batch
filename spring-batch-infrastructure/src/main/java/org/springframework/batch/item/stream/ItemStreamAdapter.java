@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.stream;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
 
@@ -41,17 +41,17 @@ public class ItemStreamAdapter implements ItemStream {
 
 	/**
 	 * No-op.
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionContext)
 	 */
-	public void restoreFrom(ExecutionAttributes context) {
+	public void restoreFrom(ExecutionContext context) {
 	}
 
 	/**
-	 * Return empty {@link ExecutionAttributes}.
-	 * @see org.springframework.batch.item.ExecutionAttributesProvider#getExecutionAttributes()
+	 * Return empty {@link ExecutionContext}.
+	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
-	public ExecutionAttributes getExecutionAttributes() {
-		return new ExecutionAttributes();
+	public ExecutionContext getExecutionContext() {
+		return new ExecutionContext();
 	}
 
 	/* (non-Javadoc)
@@ -62,14 +62,14 @@ public class ItemStreamAdapter implements ItemStream {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
 		throw new UnsupportedOperationException("Mark operation not supported.");
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() {
 		throw new UnsupportedOperationException("Reset operation not supported.");

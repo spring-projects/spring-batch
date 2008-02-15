@@ -21,14 +21,14 @@ import junit.framework.TestCase;
  * @author Lucas Ward
  *
  */
-public class ExecutionAttributesTests extends TestCase{
+public class ExecutionContextTests extends TestCase{
 
-	ExecutionAttributes context;
+	ExecutionContext context;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		context = new ExecutionAttributes();
+		context = new ExecutionContext();
 	}
 	
 	public void testNormalUsage(){
@@ -78,7 +78,7 @@ public class ExecutionAttributesTests extends TestCase{
 	
 	public void testEquals(){
 		context.putString("1", "testString");
-		ExecutionAttributes tempContext = new ExecutionAttributes();
+		ExecutionContext tempContext = new ExecutionContext();
 		assertFalse(tempContext.equals(context));
 		tempContext.putString("1", "testString");
 		assertTrue(tempContext.equals(context));

@@ -32,7 +32,7 @@ import org.springframework.batch.io.file.separator.ResourceLineReader;
 import org.springframework.batch.io.file.transform.AbstractLineTokenizer;
 import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.io.file.transform.LineTokenizer;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
@@ -184,9 +184,9 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	 * and position the buffer reader according to information provided by the
 	 * restart data
 	 * 
-	 * @param data {@link ExecutionAttributes} information
+	 * @param data {@link ExecutionContext} information
 	 */
-	public void restoreFrom(ExecutionAttributes data) {
+	public void restoreFrom(ExecutionContext data) {
 
 		if (data == null || data.getProperties() == null
 				|| data.getProperties().getProperty(READ_STATISTICS_NAME) == null || getReader() == null) {
@@ -213,14 +213,14 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	 * the current Line Count which can be used to reinitialise the batch job in
 	 * case of restart.
 	 */
-	public ExecutionAttributes getExecutionAttributes() {
+	public ExecutionContext getExecutionContext() {
 		if (reader == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
-		ExecutionAttributes executionAttributes = new ExecutionAttributes();
-		executionAttributes.putLong(READ_STATISTICS_NAME, reader.getPosition());
-		executionAttributes.putLong(SKIPPED_STATISTICS_NAME, skippedLines.size());
-		return executionAttributes;
+		ExecutionContext executionContext = new ExecutionContext();
+		executionContext.putLong(READ_STATISTICS_NAME, reader.getPosition());
+		executionContext.putLong(SKIPPED_STATISTICS_NAME, skippedLines.size());
+		return executionContext;
 	}
 
 	/**
@@ -237,7 +237,7 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
 		getReader().mark();
@@ -245,7 +245,7 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() {
 		getReader().reset();

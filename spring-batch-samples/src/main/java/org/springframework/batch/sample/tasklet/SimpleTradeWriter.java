@@ -17,8 +17,8 @@
 package org.springframework.batch.sample.tasklet;
 
 import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.ExecutionAttributesProvider;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ExecutionContextProvider;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class SimpleTradeWriter implements ItemWriter, ExecutionAttributesProvider {
+public class SimpleTradeWriter implements ItemWriter, ExecutionContextProvider {
 
 	/*
 	 * writes a Trade object to output
@@ -67,10 +67,10 @@ public class SimpleTradeWriter implements ItemWriter, ExecutionAttributesProvide
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ExecutionAttributesProvider#getExecutionAttributes()
+	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
-	public ExecutionAttributes getExecutionAttributes() {
-		ExecutionAttributes statistics = new ExecutionAttributes();
+	public ExecutionContext getExecutionContext() {
+		ExecutionContext statistics = new ExecutionContext();
 		statistics.putLong("trade.count", tradeCount);
 		return statistics;
 	}

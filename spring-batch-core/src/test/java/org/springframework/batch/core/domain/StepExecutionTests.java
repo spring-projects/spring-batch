@@ -19,7 +19,7 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -198,12 +198,12 @@ public class StepExecutionTests extends TestCase {
 				execution.toString().indexOf("rollback") >= 0);
 	}
 
-	public void testExecutionAttributes() throws Exception {
-		assertNotNull(execution.getExecutionAttributes());
-		ExecutionAttributes context = new ExecutionAttributes();
+	public void testExecutionContext() throws Exception {
+		assertNotNull(execution.getExecutionContext());
+		ExecutionContext context = new ExecutionContext();
 		context.putString("foo", "bar");
-		execution.setExecutionAttributes(context );
-		assertEquals("bar", execution.getExecutionAttributes().getString("foo"));
+		execution.setExecutionContext(context );
+		assertEquals("bar", execution.getExecutionContext().getString("foo"));
 	}
 
 	public void testEqualsWithSameIdentifier() throws Exception {

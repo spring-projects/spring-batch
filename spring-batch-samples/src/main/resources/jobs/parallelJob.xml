@@ -42,7 +42,7 @@
 					</property>
 					<property name="commitInterval" value="2" />
 					<property name="startLimit" value="100" />
-					<property name="saveExecutionAttributes"
+					<property name="saveExecutionContext"
 						value="true" />
 					<property name="allowStartIfComplete" value="false" />
 				</bean>

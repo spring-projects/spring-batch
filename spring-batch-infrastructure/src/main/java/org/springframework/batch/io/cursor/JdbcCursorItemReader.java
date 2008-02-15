@@ -30,7 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.exception.ResetFailedException;
@@ -71,7 +71,7 @@ import org.springframework.util.StringUtils;
  * </p>
  * 
  * <p>
- * {@link ExecutionAttributes}: The current row is returned as restart data,
+ * {@link ExecutionContext}: The current row is returned as restart data,
  * and when restored from that same data, the cursor is opened and the current
  * row set to the value within the restart data. There are also two statistics
  * returned by this input source: the current line being processed and the
@@ -378,11 +378,11 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getExecutionAttributes()
+	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getExecutionContext()
 	 */
-	public ExecutionAttributes getExecutionAttributes() {
+	public ExecutionContext getExecutionContext() {
 		String skipped = skippedRows.toString();
-		ExecutionAttributes context = new ExecutionAttributes();
+		ExecutionContext context = new ExecutionContext();
 		context.putString(SKIPPED_ROWS, skipped.substring(1, skipped.length() - 1));
 		context.putLong(CURRENT_PROCESSED_ROW, currentProcessedRow);
 		context.putLong(SKIP_COUNT, skipCount);
@@ -391,9 +391,9 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#restoreFrom(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#restoreFrom(org.springframework.batch.item.ExecutionContext)
 	 */
-	public void restoreFrom(ExecutionAttributes data) {
+	public void restoreFrom(ExecutionContext data) {
 		Assert.state(!initialized);
 
 		if (data == null)

@@ -17,7 +17,7 @@
 package org.springframework.batch.item.reader;
 
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
@@ -48,22 +48,22 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	}
 
 	/**
-	 * @see ItemStream#getExecutionAttributes()
+	 * @see ItemStream#getExecutionContext()
 	 * @throws IllegalStateException if the parent template is not itself
 	 * {@link ItemStream}.
 	 */
-	public ExecutionAttributes getExecutionAttributes() {
+	public ExecutionContext getExecutionContext() {
 		// TODO: this is not necessary...
 		Assert.state(inputSource instanceof ItemStream, "Input source is not ItemStream");
-		return ((ItemStream) inputSource).getExecutionAttributes();
+		return ((ItemStream) inputSource).getExecutionContext();
 	}
 
 	/**
-	 * @see ItemStream#restoreFrom(ExecutionAttributes)
+	 * @see ItemStream#restoreFrom(ExecutionContext)
 	 * @throws IllegalStateException if the parent template is not itself
 	 * {@link ItemStream}.
 	 */
-	public void restoreFrom(ExecutionAttributes data) {
+	public void restoreFrom(ExecutionContext data) {
 		Assert.state(inputSource instanceof ItemStream, "Input source is not ItemStream");
 		((ItemStream) inputSource).restoreFrom(data);
 	}
@@ -117,7 +117,7 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
 		if (inputSource instanceof ItemStream) {
@@ -126,7 +126,7 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() {
 		if (inputSource instanceof ItemStream) {

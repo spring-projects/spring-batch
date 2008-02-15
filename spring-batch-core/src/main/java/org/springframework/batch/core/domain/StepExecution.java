@@ -18,7 +18,7 @@ package org.springframework.batch.core.domain;
 
 import java.util.Date;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -55,7 +55,7 @@ public class StepExecution extends Entity {
 
 	private Date endTime = null;
 
-	private ExecutionAttributes executionAttributes = new ExecutionAttributes();
+	private ExecutionContext executionContext = new ExecutionContext();
 
 	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
@@ -106,21 +106,21 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Returns the {@link ExecutionAttributes} for this execution
+	 * Returns the {@link ExecutionContext} for this execution
 	 * 
 	 * @return the attributes
 	 */
-	public ExecutionAttributes getExecutionAttributes() {
-		return executionAttributes;
+	public ExecutionContext getExecutionContext() {
+		return executionContext;
 	}
 
 	/**
-	 * Sets the {@link ExecutionAttributes} for this execution
+	 * Sets the {@link ExecutionContext} for this execution
 	 * 
-	 * @param executionAttributes the attributes
+	 * @param executionContext the attributes
 	 */
-	public void setExecutionAttributes(ExecutionAttributes executionAttributes) {
-		this.executionAttributes = executionAttributes;
+	public void setExecutionContext(ExecutionContext executionContext) {
+		this.executionContext = executionContext;
 	}
 
 	/**
@@ -346,7 +346,7 @@ public class StepExecution extends Entity {
 	 */
 	public synchronized void apply(StepContribution contribution) {
 		taskCount += contribution.getTaskCount();
-		executionAttributes = contribution.getExecutionAttributes();
+		executionContext = contribution.getExecutionContext();
 		commitCount += contribution.getCommitCount();
 	}
 

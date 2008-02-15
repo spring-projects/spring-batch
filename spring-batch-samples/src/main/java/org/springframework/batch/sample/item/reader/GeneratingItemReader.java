@@ -2,7 +2,7 @@ package org.springframework.batch.sample.item.reader;
 
 import java.math.BigDecimal;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.MarkFailedException;
 import org.springframework.batch.item.exception.ResetFailedException;
@@ -94,16 +94,16 @@ public class GeneratingItemReader extends AbstractItemReaderRecoverer implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionContext)
 	 */
-	public void restoreFrom(ExecutionAttributes context) {
+	public void restoreFrom(ExecutionContext context) {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ExecutionAttributesProvider#getExecutionAttributes()
+	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
-	public ExecutionAttributes getExecutionAttributes() {
-		return new ExecutionAttributes();
+	public ExecutionContext getExecutionContext() {
+		return new ExecutionContext();
 	}
 
 }

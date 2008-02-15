@@ -27,27 +27,27 @@ import org.springframework.batch.item.exception.StreamException;
  * <p>
  * 
  * <p>
- * The state that is stored is represented as {@link ExecutionAttributes} which
+ * The state that is stored is represented as {@link ExecutionContext} which
  * enforces a requirement that any restart data can be represented by a
  * Properties object. In general, the contract is that
- * {@link ExecutionAttributes} that is returned via the
- * {@link #getExecutionAttributes()} method will be given back to the
- * {@link #restoreFrom(ExecutionAttributes)} method, exactly as it was provided.
+ * {@link ExecutionContext} that is returned via the
+ * {@link #getExecutionContext()} method will be given back to the
+ * {@link #restoreFrom(ExecutionContext)} method, exactly as it was provided.
  * </p>
  * 
  * @author Dave Syer
  * 
  */
-public interface ItemStream extends ExecutionAttributesProvider {
+public interface ItemStream extends ExecutionContextProvider {
 
 	/**
-	 * Restore to the state given the provided {@link ExecutionAttributes}.
+	 * Restore to the state given the provided {@link ExecutionContext}.
 	 * This can be used to restart after a failure - hence not normally used
 	 * more than once per call to {@link #open()}.
 	 * 
 	 * @param context
 	 */
-	void restoreFrom(ExecutionAttributes context);
+	void restoreFrom(ExecutionContext context);
 
 	/**
 	 * If any resources are needed for the stream to operate they need to be
@@ -70,7 +70,7 @@ public interface ItemStream extends ExecutionAttributesProvider {
 	 * stream is being accessed from multiple threads concurrently, it will have
 	 * to manage that internally, and also reflect only the completed marks
 	 * (independent of the order they happen) when
-	 * {@link ExecutionAttributesProvider#getExecutionAttributes()} is called.
+	 * {@link ExecutionContextProvider#getExecutionContext()} is called.
 	 * 
 	 * @return true if mark and reset are supported by the {@link ItemStream}
 	 */
@@ -79,7 +79,7 @@ public interface ItemStream extends ExecutionAttributesProvider {
 	/**
 	 * Mark the stream so that it can be reset later and the items backed out.
 	 * After this method is called the result will be reflected in subsequent
-	 * calls to {@link ExecutionAttributesProvider#getExecutionAttributes()}.<br/>
+	 * calls to {@link ExecutionContextProvider#getExecutionContext()}.<br/>
 	 * 
 	 * In a multi-threaded setting implementations have to ensure that only the
 	 * state from the current thread is saved.

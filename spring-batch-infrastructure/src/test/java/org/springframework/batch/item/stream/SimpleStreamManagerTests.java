@@ -20,7 +20,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -72,31 +72,31 @@ public class SimpleStreamManagerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionAttributes(java.lang.Object)}.
+	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
 	 */
 	public void testGetStreamContextEmpty() {
-		ExecutionAttributes streamContext = manager.getExecutionAttributes("foo");
+		ExecutionContext streamContext = manager.getExecutionContext("foo");
 		assertEquals(0, streamContext.entrySet().size());
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionAttributes(java.lang.Object)}.
+	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
 	 */
 	public void testGetStreamContextNotEmpty() {
 		manager.register("foo", stream, null);
-		ExecutionAttributes streamContext = manager.getExecutionAttributes("foo");
+		ExecutionContext streamContext = manager.getExecutionContext("foo");
 		assertEquals(1, streamContext.entrySet().size());
 		assertEquals("bar", streamContext.getString(ClassUtils.getQualifiedName(stream.getClass()) + ".foo"));
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionAttributes(java.lang.Object)}.
+	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
 	 */
 	public void testGetStreamContextNotEmptyAndRestore() {
 		testGetStreamContextNotEmpty();
-		ExecutionAttributes context = manager.getExecutionAttributes("foo");
+		ExecutionContext context = manager.getExecutionContext("foo");
 		// Register again, now with the context that was created from the same
 		// stream...
 		manager.register("foo", stream, context);
@@ -107,10 +107,10 @@ public class SimpleStreamManagerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionAttributes(java.lang.Object)}.
+	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
 	 */
 	public void testGetStreamContextNotEmptyAndRestoreWithNoPrefix() {
-		ExecutionAttributes context = new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar"));
+		ExecutionContext context = new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
 		manager.setUseClassNameAsPrefix(false);
 		manager.register("foo", stream, context);
 		assertEquals(1, list.size());
@@ -120,12 +120,12 @@ public class SimpleStreamManagerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionAttributes(java.lang.Object)}.
+	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
 	 */
 	public void testGetStreamContextWithNoPrefix() {
 		manager.setUseClassNameAsPrefix(false);
 		manager.register("foo", stream, null);
-		ExecutionAttributes context = manager.getExecutionAttributes("foo");
+		ExecutionContext context = manager.getExecutionContext("foo");
 		assertEquals(1, context.entrySet().size());
 		// The list should have the foo= map value from the sub-context
 		assertEquals("bar", context.getString("foo"));
@@ -133,20 +133,20 @@ public class SimpleStreamManagerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionAttributes(java.lang.Object)}.
+	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
 	 */
 	public void testGetStreamContextTwoRegistrations() {
 		manager.register("foo", new ItemStreamAdapter() {
-			public ExecutionAttributes getExecutionAttributes() {
-				return new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar"));
+			public ExecutionContext getExecutionContext() {
+				return new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
 			}
 		}, null);
 		manager.register("foo", new ItemStreamAdapter() {
-			public ExecutionAttributes getExecutionAttributes() {
-				return new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=spam"));
+			public ExecutionContext getExecutionContext() {
+				return new ExecutionContext(PropertiesConverter.stringToProperties("foo=spam"));
 			}
 		}, null);
-		ExecutionAttributes streamContext = manager.getExecutionAttributes("foo");
+		ExecutionContext streamContext = manager.getExecutionContext("foo");
 		assertEquals(2, streamContext.entrySet().size());
 	}
 
@@ -234,11 +234,11 @@ public class SimpleStreamManagerTests extends TestCase {
 	}
 
 	private final class ItemStreamAdapterExtension extends ItemStreamAdapter {
-		public ExecutionAttributes getExecutionAttributes() {
-			return new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar"));
+		public ExecutionContext getExecutionContext() {
+			return new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
 		}
 
-		public void restoreFrom(ExecutionAttributes context) {
+		public void restoreFrom(ExecutionContext context) {
 			list.add(context.getString("foo"));
 		}
 	}

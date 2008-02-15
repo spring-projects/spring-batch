@@ -17,7 +17,7 @@ package org.springframework.batch.core.domain;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * @author Dave Syer
@@ -41,14 +41,14 @@ public class StepContributionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepContribution#setExecutionAttributes(ExecutionAttributes)}.
+	 * {@link org.springframework.batch.core.domain.StepContribution#setExecutionContext(ExecutionContext)}.
 	 */
-	public void testSetExecutionAttributes() {
-		assertEquals(null, contribution.getExecutionAttributes());
-		ExecutionAttributes context = new ExecutionAttributes();
+	public void testSetExecutionContext() {
+		assertEquals(null, contribution.getExecutionContext());
+		ExecutionContext context = new ExecutionContext();
 		context.putString("foo", "bar");
-		contribution.setExecutionAttributes(context);
-		assertEquals(1, contribution.getExecutionAttributes().getProperties().size());
+		contribution.setExecutionContext(context);
+		assertEquals(1, contribution.getExecutionContext().getProperties().size());
 	}
 
 	/**

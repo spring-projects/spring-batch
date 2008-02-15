@@ -35,12 +35,4 @@ public interface StepInstanceDao {
 	 */
 	StepInstance createStepInstance(JobInstance jobInstance, String stepName);
 
-//	/**
-//	 * Update an existing StepInstance.
-//	 * 
-//	 * Preconditions: StepInstance must have an ID.
-//	 * 
-//	 * @param job
-//	 */
-//	void updateStepInstance(StepInstance stepInstance);
 }

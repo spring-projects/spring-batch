@@ -27,7 +27,7 @@ import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -64,7 +64,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 
 	protected JobParameters jobParameters = new JobParameters();
 	
-	protected ExecutionAttributes executionAttributes;
+	protected ExecutionContext executionContext;
 
 	public void setJobInstanceDao(JobInstanceDao jobInstanceDao) {
 		this.jobInstanceDao = jobInstanceDao;
@@ -109,11 +109,11 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		step1.setLastExecution(stepExecution);
 		//stepInstanceDao.updateStepInstance(step1);
 		
-		executionAttributes = new ExecutionAttributes();
-		executionAttributes.putString("1", "testString1");
-		executionAttributes.putString("2", "testString2");
-		executionAttributes.putLong("3", 3);
-		executionAttributes.putDouble("4", 4.4);
+		executionContext = new ExecutionContext();
+		executionContext.putString("1", "testString1");
+		executionContext.putString("2", "testString2");
+		executionContext.putLong("3", 3);
+		executionContext.putDouble("4", 4.4);
 		
 
 	}
@@ -163,20 +163,20 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		assertEquals(step3, tempStep);
 	}
 
-	public void testUpdateStepWithoutExecutionAttributes() {
+	public void testUpdateStepWithoutExecutionContext() {
 
 		//stepInstanceDao.updateStepInstance(step1);
 		StepInstance tempStep = stepInstanceDao.findStepInstance(jobInstance, step1.getName());
 		assertEquals(tempStep, step1);
 	}
 
-	public void testUpdateStepWithExecutionAttributes() {
+	public void testUpdateStepWithExecutionContext() {
 
-		stepExecutionDao.saveExecutionAttributes(step1.getId(), executionAttributes);
+		stepExecutionDao.saveExecutionContext(step1.getId(), executionContext);
 		StepInstance tempStep = stepInstanceDao.findStepInstance(jobInstance, step1.getName());
-		ExecutionAttributes tempAttributes = stepExecutionDao.findExecutionAttributes(step1.getId());
+		ExecutionContext tempAttributes = stepExecutionDao.findExecutionContext(step1.getId());
 		assertEquals(tempStep, step1);
-		assertEquals(executionAttributes, tempAttributes);
+		assertEquals(executionContext, tempAttributes);
 	}
 
 	public void testSaveStepExecution() {
@@ -184,7 +184,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		StepExecution execution = new StepExecution(step2, jobExecution, null);
 		execution.setStatus(BatchStatus.STARTED);
 		execution.setStartTime(new Date(System.currentTimeMillis()));
-		execution.setExecutionAttributes(new ExecutionAttributes(PropertiesConverter.stringToProperties("key1=0,key2=5")));
+		execution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("key1=0,key2=5")));
 		execution.setExitStatus(new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));
 		stepExecutionDao.saveStepExecution(execution);
@@ -192,7 +192,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		assertEquals(1, executions.size());
 		StepExecution tempExecution = (StepExecution) executions.get(0);
 		assertEquals(execution, tempExecution);
-		assertEquals(execution.getExecutionAttributes().getString("key1"), tempExecution.getExecutionAttributes().getString("key1"));
+		assertEquals(execution.getExecutionContext().getString("key1"), tempExecution.getExecutionContext().getString("key1"));
 		assertEquals(execution.getExitStatus(), tempExecution.getExitStatus());
 	}
 
@@ -202,7 +202,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 		stepExecution.setCommitCount(5);
 		stepExecution.setTaskCount(5);
-		stepExecution.setExecutionAttributes(new ExecutionAttributes());
+		stepExecution.setExecutionContext(new ExecutionContext());
 		stepExecution.setExitStatus(new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));
 		stepExecutionDao.updateStepExecution(stepExecution);
@@ -262,15 +262,15 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		}
 	}
 	
-	public void testSaveExecutionAttributes(){
+	public void testSaveExecutionContext(){
 	
-		stepExecutionDao.saveExecutionAttributes(stepExecution.getId(), executionAttributes);
-		ExecutionAttributes attributes = stepExecutionDao.findExecutionAttributes(stepExecution.getId());
-		assertEquals(executionAttributes, attributes);
-		executionAttributes.putString("newString", "newString");
-		stepExecutionDao.updateExecutionAttributes(stepExecution.getId(), executionAttributes);
-		attributes = stepExecutionDao.findExecutionAttributes(stepExecution.getId());
-		assertEquals(executionAttributes, attributes);
+		stepExecutionDao.saveExecutionContext(stepExecution.getId(), executionContext);
+		ExecutionContext attributes = stepExecutionDao.findExecutionContext(stepExecution.getId());
+		assertEquals(executionContext, attributes);
+		executionContext.putString("newString", "newString");
+		stepExecutionDao.updateExecutionContext(stepExecution.getId(), executionContext);
+		attributes = stepExecutionDao.findExecutionContext(stepExecution.getId());
+		assertEquals(executionContext, attributes);
 	}
 	
 	public void testGetLastStepExecution() {

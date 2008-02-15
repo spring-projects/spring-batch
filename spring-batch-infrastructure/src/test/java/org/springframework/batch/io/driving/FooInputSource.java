@@ -2,7 +2,7 @@ package org.springframework.batch.io.driving;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -29,11 +29,11 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 		}
 	}
 
-	public ExecutionAttributes getExecutionAttributes() {
-		return inputSource.getExecutionAttributes();
+	public ExecutionContext getExecutionContext() {
+		return inputSource.getExecutionContext();
 	}
 
-	public void restoreFrom(ExecutionAttributes data) {
+	public void restoreFrom(ExecutionContext data) {
 		inputSource.restoreFrom(data);
 	}
 

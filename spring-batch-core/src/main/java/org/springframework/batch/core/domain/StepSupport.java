@@ -33,7 +33,7 @@ public class StepSupport implements Step, BeanNameAware {
 
 	private boolean allowStartIfComplete;
 
-	private boolean saveExecutionAttributes = false;
+	private boolean saveExecutionContext = false;
 
 	/**
 	 * Default constructor for {@link StepSupport}.
@@ -102,12 +102,12 @@ public class StepSupport implements Step, BeanNameAware {
 		this.allowStartIfComplete = allowStartIfComplete;
 	}
 
-	public void setSaveExecutionAttributes(boolean saveExecutionAttributes) {
-		this.saveExecutionAttributes = saveExecutionAttributes;
+	public void setSaveExecutionContext(boolean saveExecutionContext) {
+		this.saveExecutionContext = saveExecutionContext;
 	}
 
-	public boolean isSaveExecutionAttributes() {
-		return saveExecutionAttributes;
+	public boolean isSaveExecutionContext() {
+		return saveExecutionContext;
 	}
 
 	/**

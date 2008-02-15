@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.springframework.batch.io.driving.DrivingQueryItemReader;
 import org.springframework.batch.io.driving.KeyGenerator;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -28,7 +28,7 @@ import org.springframework.util.StringUtils;
 /**
  * <p>Jdbc implementation of the {@link KeyGenerator} interface that works for composite keys.
  * (i.e. keys represented by multiple columns)  A sql query to be used to return the keys and
- * a {@link ExecutionAttributesRowMapper} to map each row in the resultset to an Object must be set in 
+ * a {@link ExecutionContextRowMapper} to map each row in the resultset to an Object must be set in 
  * order to work correctly.
  * </p>
  *
@@ -43,7 +43,7 @@ public class MultipleColumnJdbcKeyGenerator implements
 
 	private JdbcTemplate jdbcTemplate;
 
-	private ExecutionAttributesRowMapper keyMapper = new ColumnMapExecutionAttributesRowMapper();
+	private ExecutionContextRowMapper keyMapper = new ColumnMapExecutionContextRowMapper();
 
 	private String sql;
 
@@ -78,27 +78,27 @@ public class MultipleColumnJdbcKeyGenerator implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.driving.KeyGenerator#restoreKeys(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.io.driving.KeyGenerator#restoreKeys(org.springframework.batch.item.ExecutionContext)
 	 */
-	public List restoreKeys(ExecutionAttributes executionAttributes) {
+	public List restoreKeys(ExecutionContext executionContext) {
 
 		Assert.state(keyMapper != null, "KeyMapper must not be null.");
 		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty" +
 		" in order to restart.");
 
-		if (executionAttributes.getProperties() != null) {
-			return jdbcTemplate.query(restartSql, keyMapper.createSetter(executionAttributes), keyMapper);
+		if (executionContext.getProperties() != null) {
+			return jdbcTemplate.query(restartSql, keyMapper.createSetter(executionContext), keyMapper);
 		}
 
 		return new ArrayList();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionAttributes(java.lang.Object)
+	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionContext(java.lang.Object)
 	 */
-	public ExecutionAttributes getKeyAsExecutionAttributes(Object key) {
+	public ExecutionContext getKeyAsExecutionContext(Object key) {
 		Assert.state(keyMapper != null, "Kye mapper must not be null.");
-		return keyMapper.createExecutionAttributes(key);
+		return keyMapper.createExecutionContext(key);
 	}
 
 	/**
@@ -121,12 +121,12 @@ public class MultipleColumnJdbcKeyGenerator implements
 	}
 	
 	/**
-	 * Set the {@link ExecutionAttributesRowMapper} to be used to map a resultset
+	 * Set the {@link ExecutionContextRowMapper} to be used to map a resultset
 	 * to keys.
 	 * 
 	 * @param keyMapper
 	 */
-	public void setKeyMapper(ExecutionAttributesRowMapper keyMapper) {
+	public void setKeyMapper(ExecutionContextRowMapper keyMapper) {
 		this.keyMapper = keyMapper;
 	}
 	

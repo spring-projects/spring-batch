@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.CollectionFactory;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
@@ -45,9 +45,9 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 	
 	public void testRestoreKeys(){
 		
-		ExecutionAttributes streamContext = new ExecutionAttributes();
-		streamContext.putString(ColumnMapExecutionAttributesRowMapper.KEY_PREFIX + "0", "3");
-		streamContext.putString(ColumnMapExecutionAttributesRowMapper.KEY_PREFIX + "1", "3");
+		ExecutionContext streamContext = new ExecutionContext();
+		streamContext.putString(ColumnMapExecutionContextRowMapper.KEY_PREFIX + "0", "3");
+		streamContext.putString(ColumnMapExecutionContextRowMapper.KEY_PREFIX + "1", "3");
 		
 		List keys = keyStrategy.restoreKeys(streamContext);
 		
@@ -60,24 +60,24 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 		assertEquals(new Integer(5), key.get("VALUE"));
 	}
 	
-	public void testGetKeyAsExecutionAttributes(){
+	public void testGetKeyAsExecutionContext(){
 		
 		Map key = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(1);
 		key.put("ID", new Long(3));
 		key.put("VALUE", new Integer(3));
 		
-		ExecutionAttributes streamContext = keyStrategy.getKeyAsExecutionAttributes(key);
+		ExecutionContext streamContext = keyStrategy.getKeyAsExecutionContext(key);
 		Properties props = streamContext.getProperties();
 		
 		assertEquals(2, props.size());
-		assertEquals("3", props.get(ColumnMapExecutionAttributesRowMapper.KEY_PREFIX + "0"));
-		assertEquals("3", props.get(ColumnMapExecutionAttributesRowMapper.KEY_PREFIX + "1"));
+		assertEquals("3", props.get(ColumnMapExecutionContextRowMapper.KEY_PREFIX + "0"));
+		assertEquals("3", props.get(ColumnMapExecutionContextRowMapper.KEY_PREFIX + "1"));
 	}
 	
 	public void testGetNullKeyAsStreamContext(){
 		
 		try{
-			keyStrategy.getKeyAsExecutionAttributes(null);
+			keyStrategy.getKeyAsExecutionContext(null);
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -87,7 +87,7 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 	public void testRestoreKeysFromNull(){
 		
 		try{
-			keyStrategy.getKeyAsExecutionAttributes(null);
+			keyStrategy.getKeyAsExecutionContext(null);
 		}catch(IllegalArgumentException ex){
 			//expected
 		}

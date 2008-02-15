@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 
 public interface StepExecutionDao {
 
@@ -55,33 +55,33 @@ public interface StepExecutionDao {
 	StepExecution getStepExecution(Long stepExecutionId, StepInstance stepInstance);
 
 	/**
-	 * Find all {@link ExecutionAttributes} for the given execution id.
+	 * Find all {@link ExecutionContext} for the given execution id.
 	 * 
 	 * @param executionId - Long id of the {@link StepExecution} that the
 	 * attributes belongs to.
 	 * @return attributes for the provided id. If none are found, an empty
-	 * {@link ExecutionAttributes} will be returned.
+	 * {@link ExecutionContext} will be returned.
 	 * @throws IllegalArgumentException if the id is null.
 	 */
-	ExecutionAttributes findExecutionAttributes(final Long executionId);
+	ExecutionContext findExecutionContext(final Long executionId);
 
 	/**
-	 * Save the provided {@link ExecutionAttributes} for the given executionId.
+	 * Save the provided {@link ExecutionContext} for the given executionId.
 	 * 
 	 * @param executionId to be saved
-	 * @param executionAttributes to be saved.
+	 * @param executionContext to be saved.
 	 * @throws IllegalArgumentException if the executionId or attributes are
 	 * null.
 	 */
-	void saveExecutionAttributes(final Long executionId, final ExecutionAttributes executionAttributes);
+	void saveExecutionContext(final Long executionId, final ExecutionContext executionContext);
 
 	/**
-	 * Update the provided ExecutionAttributes.
+	 * Update the provided ExecutionContext.
 	 * 
 	 * @param executionId
-	 * @param executionAttributes
+	 * @param executionContext
 	 */
-	void updateExecutionAttributes(final Long executionId, ExecutionAttributes executionAttributes);
+	void updateExecutionContext(final Long executionId, ExecutionContext executionContext);
 
 	/**
 	 * @return the last execution of the given instance

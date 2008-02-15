@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.stream;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.transaction.TransactionStatus;
@@ -37,20 +37,20 @@ public interface StreamManager {
 	 * 
 	 * @param key the key under which to add the provider
 	 * @param stream an {@link ItemStream}
-	 * @param executionAttributes the context (may be null) to restore from on registration
+	 * @param executionContext the context (may be null) to restore from on registration
 	 */
-	void register(Object key, ItemStream stream, ExecutionAttributes executionAttributes);
+	void register(Object key, ItemStream stream, ExecutionContext executionContext);
 
 	/**
-	 * Extract and aggregate the {@link ExecutionAttributes} from all streams under
+	 * Extract and aggregate the {@link ExecutionContext} from all streams under
 	 * this key.
 	 * 
 	 * @param key the key under which {@link ItemStream} instances might have
 	 * been registered.
-	 * @return {@link ExecutionAttributes} aggregating the contexts of all providers
+	 * @return {@link ExecutionContext} aggregating the contexts of all providers
 	 * registered under this key, or empty otherwise.
 	 */
-	ExecutionAttributes getExecutionAttributes(Object key);
+	ExecutionContext getExecutionContext(Object key);
 
 	/**
 	 * If any resources are needed for the stream to operate they need to be

@@ -19,14 +19,14 @@ package org.springframework.batch.item;
  * @author Dave Syer
  *
  */
-public interface ExecutionAttributesProvider {
+public interface ExecutionContextProvider {
 
 	/**
-	 * Get {@link ExecutionAttributes} representing this object's current state.
+	 * Get {@link ExecutionContext} representing this object's current state.
 	 * Should not return null even if there is no state.
 	 * 
-	 * @return {@link ExecutionAttributes} representing current state.
+	 * @return {@link ExecutionContext} representing current state.
 	 */
-	ExecutionAttributes getExecutionAttributes();
+	ExecutionContext getExecutionContext();
 
 }

@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.batch.io.xml.oxm.MarshallingEventWriterSerializer;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;
@@ -88,7 +88,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 		// write record
 		writer.write(record);
 		// writer.mark();
-		ExecutionAttributes streamContext = writer.getExecutionAttributes();
+		ExecutionContext streamContext = writer.getExecutionContext();
 		writer.close();
 
 		// create new writer from saved restart data and continue writing
@@ -117,7 +117,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 		final int NUMBER_OF_RECORDS = 10;
 		for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
 			writer.write(record);
-			long writeStatistics = writer.getExecutionAttributes().getLong(StaxEventItemWriter.WRITE_STATISTICS_NAME);
+			long writeStatistics = writer.getExecutionContext().getLong(StaxEventItemWriter.WRITE_STATISTICS_NAME);
 
 			assertEquals(i, writeStatistics);
 		}

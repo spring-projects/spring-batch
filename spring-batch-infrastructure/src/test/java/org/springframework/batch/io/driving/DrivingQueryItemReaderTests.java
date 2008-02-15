@@ -9,7 +9,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.io.sample.domain.Foo;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
@@ -73,7 +73,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionAttributes streamContext = getAsRestartable(source).getExecutionAttributes();
+		ExecutionContext streamContext = getAsRestartable(source).getExecutionContext();
 
 		// create new input source
 		source = createItemReader();
@@ -95,7 +95,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		Foo foo2 = (Foo) source.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionAttributes streamContext = getAsRestartable(source).getExecutionAttributes();
+		ExecutionContext streamContext = getAsRestartable(source).getExecutionContext();
 
 		// create new input source
 		source = createItemReader();
@@ -117,7 +117,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testRestoreFromEmptyData() throws Exception {
-		ExecutionAttributes streamContext = new ExecutionAttributes(new Properties());
+		ExecutionContext streamContext = new ExecutionContext(new Properties());
 
 		getAsRestartable(source).restoreFrom(streamContext);
 
@@ -164,7 +164,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	
 	private static class MockKeyGenerator implements KeyGenerator{
 
-		static ExecutionAttributes streamContext;
+		static ExecutionContext streamContext;
 		List keys;
 		List restartKeys;
 		
@@ -173,7 +173,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 			//restart data properties cannot be empty.
 			props.setProperty("", "");
 			
-			streamContext = new ExecutionAttributes(props);
+			streamContext = new ExecutionContext(props);
 		}
 		
 		public MockKeyGenerator() {
@@ -191,11 +191,11 @@ public class DrivingQueryItemReaderTests extends TestCase {
 			restartKeys.add(new Foo(5, "5", 5));
 		}
 		
-		public ExecutionAttributes getKeyAsExecutionAttributes(Object key) {
+		public ExecutionContext getKeyAsExecutionContext(Object key) {
 			return streamContext;
 		}
 
-		public List restoreKeys(ExecutionAttributes streamContext) {
+		public List restoreKeys(ExecutionContext streamContext) {
 			
 			assertEquals(MockKeyGenerator.streamContext, streamContext);
 			return restartKeys;

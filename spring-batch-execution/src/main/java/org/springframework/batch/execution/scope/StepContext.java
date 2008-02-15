@@ -17,8 +17,8 @@ package org.springframework.batch.execution.scope;
 
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ExecutionAttributes;
-import org.springframework.batch.item.ExecutionAttributesProvider;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ExecutionContextProvider;
 import org.springframework.core.AttributeAccessor;
 
 /**
@@ -27,7 +27,7 @@ import org.springframework.core.AttributeAccessor;
  * @author Dave Syer
  * 
  */
-public interface StepContext extends AttributeAccessor, ExecutionAttributesProvider {
+public interface StepContext extends AttributeAccessor, ExecutionContextProvider {
 
 	/**
 	 * Accessor for the {@link StepExecution} associated with the currently
@@ -61,7 +61,7 @@ public interface StepContext extends AttributeAccessor, ExecutionAttributesProvi
 	 * streams will simply not be initialised and repositioned for restart
 	 * (which is sometimes desirable).
 	 * 
-	 * @param executionAttributes
+	 * @param executionContext
 	 */
-	void restoreFrom(ExecutionAttributes executionAttributes);
+	void restoreFrom(ExecutionContext executionContext);
 }

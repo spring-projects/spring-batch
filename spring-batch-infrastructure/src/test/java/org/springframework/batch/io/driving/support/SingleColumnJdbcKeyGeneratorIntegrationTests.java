@@ -3,7 +3,7 @@ package org.springframework.batch.io.driving.support;
 import java.util.List;
 import java.util.Properties;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 /**
@@ -43,7 +43,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 		
 		Properties props = new Properties();
 		props.setProperty(SingleColumnJdbcKeyGenerator.RESTART_KEY, "3");
-		ExecutionAttributes streamContext = new ExecutionAttributes(props);
+		ExecutionContext streamContext = new ExecutionContext(props);
 		
 		List keys = keyStrategy.restoreKeys(streamContext);
 		
@@ -54,7 +54,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	
 	public void testGetKeyAsStreamContext(){
 		
-		ExecutionAttributes streamContext = keyStrategy.getKeyAsExecutionAttributes(new Long(3));
+		ExecutionContext streamContext = keyStrategy.getKeyAsExecutionContext(new Long(3));
 		Properties props = streamContext.getProperties();
 		
 		assertEquals(1, props.size());
@@ -64,7 +64,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	public void testGetNullKeyAsStreamContext(){
 		
 		try{
-			keyStrategy.getKeyAsExecutionAttributes(null);
+			keyStrategy.getKeyAsExecutionContext(null);
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -74,7 +74,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	public void testRestoreKeysFromNull(){
 		
 		try{
-			keyStrategy.getKeyAsExecutionAttributes(null);
+			keyStrategy.getKeyAsExecutionContext(null);
 		}catch(IllegalArgumentException ex){
 			//expected
 		}

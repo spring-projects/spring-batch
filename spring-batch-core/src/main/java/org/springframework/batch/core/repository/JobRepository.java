@@ -21,7 +21,7 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * <p>
@@ -29,7 +29,7 @@ import org.springframework.batch.item.ExecutionAttributes;
  * must first be obtained using the findOrCreateJob method. Once a Job and it's
  * related steps are obtained, they can be updated. It should be noted that any
  * reconstituted steps are expected to contain restart data <strong>if the step
- * says it wants to be restored after a restart, and {@link ExecutionAttributes}
+ * says it wants to be restored after a restart, and {@link ExecutionContext}
  * exists.</strong>
  * </p>
  * 

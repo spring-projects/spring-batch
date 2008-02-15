@@ -15,39 +15,39 @@
  */
 package org.springframework.batch.io.driving.support;
 
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
- * {@link ExecutionAttributesRowMapper} extends the standard {@link RowMapper} interface to provide for
- * converting an object returned from a RowMapper to {@link ExecutionAttributes} and back again.  One
+ * {@link ExecutionContextRowMapper} extends the standard {@link RowMapper} interface to provide for
+ * converting an object returned from a RowMapper to {@link ExecutionContext} and back again.  One
  * of the most common use cases for this type of functionality is the DrivingQuery approach
- * to sql processing.  Using a {@link ExecutionAttributesRowMapper}, developers can create each unique key
+ * to sql processing.  Using a {@link ExecutionContextRowMapper}, developers can create each unique key
  * to suite their specific needs, and also describe how such a key would be converted to
- * {@link ExecutionAttributes}, so that it can be serialized and stored.
+ * {@link ExecutionContext}, so that it can be serialized and stored.
  *
  * @author Lucas Ward
  * @see RowMapper
  * @since 1.0
  */
-public interface ExecutionAttributesRowMapper extends RowMapper {
+public interface ExecutionContextRowMapper extends RowMapper {
 
 	/**
-	 * Given the provided composite key, return a {@link ExecutionAttributes} representation.
+	 * Given the provided composite key, return a {@link ExecutionContext} representation.
 	 *
 	 * @param key
-	 * @return ExecutionAttributes representing the composite key.
+	 * @return ExecutionContext representing the composite key.
 	 * @throws IllegalArgumentException if key is null or of an unsupported type.
 	 */
-	public ExecutionAttributes createExecutionAttributes(Object key);
+	public ExecutionContext createExecutionContext(Object key);
 
 	/**
 	 * Given the provided restart data, return a PreparedStatementSeter that can
 	 * be used as parameters to a JdbcTemplate.
 	 *
-	 * @param executionAttributes
+	 * @param executionContext
 	 * @return an array of objects that can be used as arguments to a JdbcTemplate.
 	 */
-	public PreparedStatementSetter createSetter(ExecutionAttributes executionAttributes);
+	public PreparedStatementSetter createSetter(ExecutionContext executionContext);
 }

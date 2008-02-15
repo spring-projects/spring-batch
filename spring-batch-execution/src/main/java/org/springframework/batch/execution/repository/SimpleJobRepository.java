@@ -36,7 +36,7 @@ import org.springframework.batch.execution.repository.dao.JobExecutionDao;
 import org.springframework.batch.execution.repository.dao.JobInstanceDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
 import org.springframework.batch.execution.repository.dao.StepInstanceDao;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.Assert;
 
@@ -264,12 +264,12 @@ public class SimpleJobRepository implements JobRepository {
 				jobExecutionDao.saveJobExecution(jobExecution);
 			}
 			stepExecutionDao.saveStepExecution(stepExecution);
-			stepExecutionDao.saveExecutionAttributes(stepExecution.getId(), stepExecution.getExecutionAttributes());
+			stepExecutionDao.saveExecutionContext(stepExecution.getId(), stepExecution.getExecutionContext());
 		}
 		else {
 			// existing execution, update
 			stepExecutionDao.updateStepExecution(stepExecution);
-			stepExecutionDao.updateExecutionAttributes(stepExecution.getId(), stepExecution.getExecutionAttributes());
+			stepExecutionDao.updateExecutionContext(stepExecution.getId(), stepExecution.getExecutionContext());
 		}
 	}
 
@@ -315,9 +315,9 @@ public class SimpleJobRepository implements JobRepository {
 			if (stepInstance != null) {
 				stepInstance.setLastExecution(stepExecutionDao.getLastStepExecution(stepInstance));
 				if (stepInstance.getLastExecution() != null) {
-					ExecutionAttributes executionAttributes = stepExecutionDao.findExecutionAttributes(stepInstance
+					ExecutionContext executionContext = stepExecutionDao.findExecutionContext(stepInstance
 							.getLastExecution().getId());
-					stepInstance.getLastExecution().setExecutionAttributes(executionAttributes);
+					stepInstance.getLastExecution().setExecutionContext(executionContext);
 				}
 				stepInstance.setStepExecutionCount(stepExecutionDao.getStepExecutionCount(stepInstance));
 				stepInstances.add(stepInstance);

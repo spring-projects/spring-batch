@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.support.PropertiesConverter;
@@ -133,11 +133,11 @@ public class SimpleStepContextTests extends TestCase {
 		assertTrue(list.contains("spam"));
 	}
 
-	public void testExecutionAttributesWithNotNullService() throws Exception {
+	public void testExecutionContextWithNotNullService() throws Exception {
 		Map map = new HashMap();
 		context = new SimpleStepContext(null, null, new StubStreamManager(map));
-		assertEquals(1, context.getExecutionAttributes().getProperties().size());
-		assertEquals("bar", context.getExecutionAttributes().getProperties().getProperty("foo"));
+		assertEquals(1, context.getExecutionContext().getProperties().size());
+		assertEquals("bar", context.getExecutionContext().getProperties().getProperty("foo"));
 	}
 
 	public void testStreamManagerRegistration() throws Exception {
@@ -164,18 +164,18 @@ public class SimpleStepContextTests extends TestCase {
 		public void close(Object key) {
 		}
 
-		public ExecutionAttributes getExecutionAttributes(Object key) {
-			return new ExecutionAttributes(PropertiesConverter.stringToProperties("foo=bar"));
+		public ExecutionContext getExecutionContext(Object key) {
+			return new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
 		}
 
 		public void open(Object key) {
 		}
 
-		public void register(Object key, ItemStream stream, ExecutionAttributes executionAttributes) {
+		public void register(Object key, ItemStream stream, ExecutionContext executionContext) {
 			map.put(key, stream);
 		}
 
-		public void restoreFrom(Object key, ExecutionAttributes data) {
+		public void restoreFrom(Object key, ExecutionContext data) {
 		}
 	}
 

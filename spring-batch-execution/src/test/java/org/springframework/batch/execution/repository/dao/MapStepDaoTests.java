@@ -25,7 +25,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 
 public class MapStepDaoTests extends TestCase {
 
@@ -103,17 +103,17 @@ public class MapStepDaoTests extends TestCase {
 		assertEquals(2, dao.getStepExecutionCount(step));
 	}
 
-	public void testSaveExecutionAttributes() throws Exception {
-		assertEquals(null, dao.getExecutionAttributes(step.getId()));
+	public void testSaveExecutionContext() throws Exception {
+		assertEquals(null, dao.getExecutionContext(step.getId()));
 		Properties data = new Properties();
 		data.setProperty("restart.key1", "restartData");
-		ExecutionAttributes executionAttributes = new ExecutionAttributes(data);
+		ExecutionContext executionContext = new ExecutionContext(data);
 		StepExecution stepExecution = new StepExecution(step, null, null);
-		stepExecution.setExecutionAttributes(executionAttributes);
+		stepExecution.setExecutionContext(executionContext);
 		dao.saveStepExecution(stepExecution);
 		StepExecution tempExecution = dao.getStepExecution(stepExecution.getId(), step);
 		assertEquals(tempExecution, stepExecution);
-		assertEquals(stepExecution.getExecutionAttributes(), tempExecution.getExecutionAttributes());
+		assertEquals(stepExecution.getExecutionContext(), tempExecution.getExecutionContext());
 	}
 
 }

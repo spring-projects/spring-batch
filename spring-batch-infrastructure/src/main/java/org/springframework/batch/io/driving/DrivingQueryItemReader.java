@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -147,7 +147,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource implem
 	 * been initialized before calling restore (meaning, read has been called)
 	 * then an IllegalStateException will be thrown, since all input sources
 	 * should be restored before being read from, otherwise already processed
-	 * data could be returned. The {@link ExecutionAttributes} attempting to be
+	 * data could be returned. The {@link ExecutionContext} attempting to be
 	 * restored from must have been obtained from the <strong>same input source
 	 * as the one being restored from</strong> otherwise it is invalid.
 	 * 
@@ -156,10 +156,10 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource implem
 	 * @throws IllegalStateException if the input source has already been
 	 * initialized.
 	 */
-	public final void restoreFrom(ExecutionAttributes data) {
+	public final void restoreFrom(ExecutionContext data) {
 
-		Assert.notNull(data, "ExecutionAttributes must not be null.");
-		Assert.notNull(data.getProperties(), "ExecutionAttributes properties must not be null.");
+		Assert.notNull(data, "ExecutionContext must not be null.");
+		Assert.notNull(data.getProperties(), "ExecutionContext properties must not be null.");
 		Assert.state(!initialized, "Cannot restore when already intialized.  Call" + " close() first before restore()");
 
 		if (data.getProperties().size() == 0) {
@@ -174,8 +174,8 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource implem
 		}
 	}
 
-	public ExecutionAttributes getExecutionAttributes() {
-		return keyGenerator.getKeyAsExecutionAttributes(getCurrentKey());
+	public ExecutionContext getExecutionContext() {
+		return keyGenerator.getKeyAsExecutionContext(getCurrentKey());
 	}
 
 	public void afterPropertiesSet() throws Exception {
@@ -223,7 +223,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource implem
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
 		lastCommitIndex = currentIndex;
@@ -232,7 +232,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource implem
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionAttributes)
+	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() {
 		keysIterator = keys.listIterator(lastCommitIndex);

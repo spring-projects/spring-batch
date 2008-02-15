@@ -21,7 +21,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.PropertiesConverter;
 
@@ -95,11 +95,11 @@ public class ItemWriterItemProcessorTests extends TestCase {
 		public void open() {
 		}
 
-		public ExecutionAttributes getExecutionAttributes() {
-			return new ExecutionAttributes(PropertiesConverter.stringToProperties("value=foo"));
+		public ExecutionContext getExecutionContext() {
+			return new ExecutionContext(PropertiesConverter.stringToProperties("value=foo"));
 		}
 
-		public void restoreFrom(ExecutionAttributes data) {
+		public void restoreFrom(ExecutionContext data) {
 			value = data.getProperties().getProperty("value");
 		}
 
