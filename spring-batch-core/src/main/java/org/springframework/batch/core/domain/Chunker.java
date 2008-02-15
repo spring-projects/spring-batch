@@ -45,6 +45,6 @@ public interface Chunker {
 	 * 
 	 * @param stepExecution
 	 */
-	public void flush(StepExecution stepExecution);
+	public void flush(Entity stepExecution);
 
 }

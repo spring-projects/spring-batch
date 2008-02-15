@@ -25,6 +25,7 @@ import junit.framework.TestCase;
 
 import org.easymock.ArgumentsMatcher;
 import org.easymock.MockControl;
+import org.springframework.batch.core.domain.Entity;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -169,8 +170,8 @@ public class SimpleJobRepositoryTests extends TestCase {
 		// and the executions in the list contain one with an end date
 		execution.setEndTime(new Date(System.currentTimeMillis()));
 
-		StepExecution databaseStep1Exec = new StepExecution(databaseStep1, execution, new Long(1));
-		StepExecution databaseStep2Exec = new StepExecution(databaseStep2, execution, new Long(2));
+		Entity databaseStep1Exec = new StepExecution(databaseStep1, execution, new Long(1));
+		Entity databaseStep2Exec = new StepExecution(databaseStep2, execution, new Long(2));
 
 		List jobs = new ArrayList();
 		jobDao.findJobInstances(jobConfiguration.getName(), jobParameters);
@@ -411,8 +412,8 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	public void testFindStepsFixesInvalidExecutionContext() throws Exception {
 
-		StepExecution databaseStep1Exec = new StepExecution(databaseStep1, null, new Long(1));
-		StepExecution databaseStep2Exec = new StepExecution(databaseStep2, null, new Long(2));
+		Entity databaseStep1Exec = new StepExecution(databaseStep1, null, new Long(1));
+		Entity databaseStep2Exec = new StepExecution(databaseStep2, null, new Long(2));
 
 		List jobs = new ArrayList();
 		jobDao.findJobInstances(jobConfiguration.getName(), jobParameters);

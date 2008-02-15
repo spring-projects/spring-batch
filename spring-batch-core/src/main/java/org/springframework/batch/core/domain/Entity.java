@@ -75,6 +75,17 @@ public class Entity implements Serializable {
 		}
 	}
 
+	/**
+	 * 
+	 */
+	protected void decrementVersion() {
+		if (version == null || version.intValue()==0) {
+			version = new Integer(0);
+		} else {
+			version = new Integer(version.intValue() - 1);
+		}
+	}
+
 	// @Override
 	public String toString() {
 		return ClassUtils.getShortName(getClass()) + ": id=" + getId();
@@ -121,4 +132,5 @@ public class Entity implements Serializable {
 		}
 		return 39 + 87 * id.hashCode();
 	}
+
 }

@@ -216,7 +216,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 				}
 			}
 		};
-
 		getJdbcTemplate().execute(getQuery(INSERT_STEP_EXECUTION_ATTRS), callback);
 	}
 

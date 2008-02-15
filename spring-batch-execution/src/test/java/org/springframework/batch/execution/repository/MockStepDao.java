@@ -18,6 +18,7 @@ package org.springframework.batch.execution.repository;
 
 import java.util.List;
 
+import org.springframework.batch.core.domain.Entity;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
@@ -85,7 +86,7 @@ public class MockStepDao implements StepDao {
 			ExecutionContext executionContext) {
 	}
 
-	public StepExecution getStepExecution(Long stepExecutionId,
+	public Entity getStepExecution(Long stepExecutionId,
 			StepInstance stepInstance) {
 		return null;
 	}

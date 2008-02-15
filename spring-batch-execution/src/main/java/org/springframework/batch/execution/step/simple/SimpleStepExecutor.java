@@ -434,9 +434,15 @@ public class SimpleStepExecutor implements InitializingBean {
 				jobRepository.saveOrUpdate(stepExecution);
 				streamManager.close(stepExecution);
 			}
+			catch (Exception e) {
+				logger
+						.error(
+								"Failed to update step execution: probably fatal, so there is already an exception on the stack.",
+								e);
+			}
 			finally {
 				// clear any registered synchronizations
-				
+
 				StepSynchronizationManager.close();
 			}
 		}

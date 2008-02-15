@@ -21,6 +21,7 @@ import java.util.List;
 import org.springframework.batch.core.domain.Chunk;
 import org.springframework.batch.core.domain.Chunker;
 import org.springframework.batch.core.domain.ChunkingResult;
+import org.springframework.batch.core.domain.Entity;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.ReadFailureException;
@@ -98,7 +99,7 @@ public class ItemChunker implements Chunker {
 	/**
 	 * No-op implementation. 
 	 */
-	public void flush(StepExecution stepExecution) {
+	public void flush(Entity stepExecution) {
 	}
 
 }

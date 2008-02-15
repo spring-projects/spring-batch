@@ -210,28 +210,28 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	public void testEqualsWithSameIdentifier() throws Exception {
-		StepExecution step1 = newStepExecution(new Long(100), new Long(11));
-		StepExecution step2 = newStepExecution(new Long(100), new Long(11));
+		Entity step1 = newStepExecution(new Long(100), new Long(11));
+		Entity step2 = newStepExecution(new Long(100), new Long(11));
 		assertEquals(step1, step2);
 	}
 
 	public void testEqualsWithNull() throws Exception {
-		StepExecution step = newStepExecution(new Long(100), new Long(11));
+		Entity step = newStepExecution(new Long(100), new Long(11));
 		assertFalse(step.equals(null));
 	}
 
 	public void testEqualsWithNullIdentifiers() throws Exception {
-		StepExecution step = newStepExecution(new Long(100), new Long(11));
+		Entity step = newStepExecution(new Long(100), new Long(11));
 		assertFalse(step.equals(new StepExecution()));
 	}
 
 	public void testEqualsWithNullJob() throws Exception {
-		StepExecution step = newStepExecution(null, new Long(11));
+		Entity step = newStepExecution(null, new Long(11));
 		assertFalse(step.equals(new StepExecution()));
 	}
 
 	public void testEqualsWithNullStep() throws Exception {
-		StepExecution step = newStepExecution(new Long(11), null);
+		Entity step = newStepExecution(new Long(11), null);
 		assertFalse(step.equals(new StepExecution()));
 	}
 
@@ -240,7 +240,7 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	public void testEqualsWithDifferent() throws Exception {
-		StepExecution step = newStepExecution(new Long(43), new Long(13));
+		Entity step = newStepExecution(new Long(43), new Long(13));
 		assertFalse(execution.equals(step));
 	}
 

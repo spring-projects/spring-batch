@@ -357,6 +357,7 @@ public class StepExecution extends Entity {
 	 */
 	public synchronized void rollback() {
 		rollbackCount++;
+		decrementVersion();
 	}
 
 	/**
