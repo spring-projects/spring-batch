@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
@@ -27,9 +29,15 @@
 		<url>http://www.springsource.com</url>
 	</organization>
 	<scm>
-		<url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk</url>
-		<connection>scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk</connection>
-		<developerConnection>scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk</developerConnection>
+		<url>
+			http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk
+		</url>
+		<connection>
+			scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+		</connection>
+		<developerConnection>
+			scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+		</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
@@ -125,6 +133,64 @@
 				</pluginRepository>
 			</pluginRepositories>
 		</profile>
+		<profile>
+			<id>xsl-aggregation</id>
+			<activation>
+				<file>
+					<exists>src/main/xsl/emma.xsl</exists>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<inherited>false</inherited>
+						<executions>
+							<execution>
+								<id>xsl</id>
+								<phase>site</phase>
+								<configuration>
+									<tasks>
+										<echo>
+											Aggregating XSL reports
+										</echo>
+										<mkdir dir="target/emma-reports" />
+										<concat
+											destfile="target/site/emma-reports/emma-report.xml">
+											<fileset dir="."
+												includes="**/coverage.fragment" />
+											<filterchain>
+												<linecontainsregexp>
+													<regexp
+														pattern="[a-zA-Z]" />
+												</linecontainsregexp>
+											</filterchain>
+											<header trimleading="yes">
+												<![CDATA[<summary>]]>
+											</header>
+											<footer trimleading="yes">
+												<![CDATA[</summary>]]>
+											</footer>
+										</concat>
+										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html"
+											style="src/main/xsl/emma2html.xsl">
+											<param name="project"
+												expression="${project.name}" />
+											<param name="version"
+												expression="${project.version}" />
+										</xslt>
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 
 	<distributionManagement>
@@ -175,6 +241,73 @@
 						</execution>
 					</executions>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>junitreport</id>
+							<phase>site</phase>
+							<configuration>
+								<tasks>
+									<echo>Creating JUnit reports</echo>
+									<mkdir
+										dir="target/surefire-reports" />
+									<junitreport
+										todir="target/surefire-reports">
+										<fileset dir=".">
+											<filename
+												name="**/target/surefire-reports/TEST-*.xml" />
+										</fileset>
+										<report
+											todir="target/site/junit-reports" />
+									</junitreport>
+									<echo>Creating Emma reports</echo>
+									<mkdir dir="target/site/emma-reports" />
+									<xslt
+										includes="target/emma/coverage.xml"
+										destdir="target/emma-reports"
+										style="${project.parent.basedir}/src/main/xsl/emma.xsl">
+										<mapper type="glob" from="*.xml"
+											to="*.fragment" />
+										<param name="project"
+											expression="${project.name}" />
+									</xslt>
+								</tasks>
+							</configuration>
+							<goals>
+								<goal>run</goal>
+							</goals>
+						</execution>
+					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.ant</groupId>
+							<artifactId>ant</artifactId>
+							<version>1.7.0</version>
+						</dependency>
+						<dependency>
+							<groupId>ant</groupId>
+							<artifactId>ant-junit</artifactId>
+							<version>1.6.5</version>
+						</dependency>
+						<dependency>
+							<groupId>org.apache.ant</groupId>
+							<artifactId>ant-trax</artifactId>
+							<version>1.7.0</version>
+						</dependency>
+						<dependency>
+							<groupId>org.apache.ant</groupId>
+							<artifactId>ant-apache-regexp</artifactId>
+							<version>1.7.0</version>
+						</dependency>
+						<dependency>
+							<groupId>foundrylogic.vpp</groupId>
+							<artifactId>vpp</artifactId>
+							<version>2.2.1</version>
+						</dependency>
+					</dependencies>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -210,43 +343,6 @@
 						<exclude>**/Abstract*.java</exclude>
 					</excludes>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>junitreport</id>
-						<phase>site</phase>
-						<configuration>
-							<tasks>
-								<echo>Creating JUnit reports</echo>
-								<mkdir dir="target/surefire-reports" />
-								<junitreport todir="target/surefire-reports">
-									<fileset dir=".">
-										<filename name="**/target/surefire-reports/TEST-*.xml" />
-									</fileset>
-									<report todir="target/site/junit-reports" />
-								</junitreport>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>ant</groupId>
-						<artifactId>ant-junit</artifactId>
-						<version>1.6.5</version>
-					</dependency>
-					<dependency>
-						<groupId>foundrylogic.vpp</groupId>
-						<artifactId>vpp</artifactId>
-						<version>2.2.1</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
