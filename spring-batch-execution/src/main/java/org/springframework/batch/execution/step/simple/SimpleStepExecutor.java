@@ -592,6 +592,12 @@ public class SimpleStepExecutor implements InitializingBean {
 	 */
 	private void updateStatus(StepExecution stepExecution, BatchStatus status) {
 		stepExecution.setStatus(status);
-		jobRepository.saveOrUpdate(stepExecution);
+		try {
+			jobRepository.saveOrUpdate(stepExecution);
+		}
+		catch (Exception e) {
+			logger.error("Failed to update step execution with status: probably fatal.", e);
+		}
+
 	}
 }
