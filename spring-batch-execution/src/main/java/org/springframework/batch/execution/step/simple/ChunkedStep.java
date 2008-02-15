@@ -330,20 +330,10 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 					// interruption.
 					interruptionPolicy.checkInterrupted(context);
 
-					ChunkingResult chunkingResult = chunker.chunk(chunkSize, stepExecution);
-
-					if (chunkingResult == null) {
-						return ExitStatus.FINISHED;
-					}
-
-					final Chunk chunk = chunkingResult.getChunk();
-					failureLog.handle(chunkingResult.getExceptions());
-
-					retryTemplate.execute(new RetryCallback() {
+					ExitStatus result = (ExitStatus)retryTemplate.execute(new RetryCallback() {
 
 						public Object doWithRetry(RetryContext context) throws Throwable {
-							processChunk(chunk, stepExecution, stepContext);
-							return null;
+							return processChunk(stepExecution, stepContext);
 						}
 					});
 
@@ -352,7 +342,7 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 					// caller
 					interruptionPolicy.checkInterrupted(context);
 
-					return ExitStatus.CONTINUABLE;
+					return result;
 
 				}
 			});
@@ -416,13 +406,22 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 	 * @param stepContext the current step context.
 	 * @return true if there is more data to process.
 	 */
-	void processChunk(Chunk chunk, final StepExecution stepExecution, StepContext stepContext) {
+	ExitStatus processChunk(final StepExecution stepExecution, StepContext stepContext) {
 
 		TransactionStatus transaction = streamManager.getTransaction(stepExecution);
 
 		final StepContribution contribution = stepExecution.createStepContribution();
 
 		try {
+			
+			ChunkingResult chunkingResult = chunker.chunk(chunkSize, stepExecution);
+
+			if (chunkingResult == null) {
+				return ExitStatus.FINISHED;
+			}
+
+			final Chunk chunk = chunkingResult.getChunk();
+			failureLog.handle(chunkingResult.getExceptions());
 
 			DechunkingResult chunkResult = dechunker.dechunk(chunk, stepExecution);
 			failureLog.handle(chunkResult.getExceptions());
@@ -451,6 +450,8 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 			}
 
 			streamManager.commit(transaction);
+			
+			return ExitStatus.CONTINUABLE;
 
 		}
 		catch (Throwable t) {
