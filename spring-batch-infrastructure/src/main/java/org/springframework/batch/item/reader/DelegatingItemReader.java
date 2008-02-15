@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  * Simple wrapper around {@link ItemReader}. The input source is expected to
  * take care of open and close operations. If necessary it should be registered
  * as a step scoped bean to ensure that the lifecycle methods are called.
- *
+ * 
  * @author Dave Syer
  */
 public class DelegatingItemReader extends AbstractItemReader implements Skippable, InitializingBean, ItemStream {
@@ -38,9 +38,10 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(inputSource, "ItemReader must not be null.");
 	}
+
 	/**
 	 * Get the next object from the input source.
-	 * @throws Exception 
+	 * @throws Exception
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
 	public Object read() throws Exception {
@@ -53,9 +54,10 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 * {@link ItemStream}.
 	 */
 	public ExecutionContext getExecutionContext() {
-		// TODO: this is not necessary...
-		Assert.state(inputSource instanceof ItemStream, "Input source is not ItemStream");
-		return ((ItemStream) inputSource).getExecutionContext();
+		if (inputSource instanceof ItemStream) {
+			return ((ItemStream) inputSource).getExecutionContext();
+		}
+		return new ExecutionContext();
 	}
 
 	/**
@@ -64,8 +66,9 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 * {@link ItemStream}.
 	 */
 	public void restoreFrom(ExecutionContext data) {
-		Assert.state(inputSource instanceof ItemStream, "Input source is not ItemStream");
-		((ItemStream) inputSource).restoreFrom(data);
+		if (inputSource instanceof ItemStream) {
+			((ItemStream) inputSource).restoreFrom(data);
+		}
 	}
 
 	/**
@@ -82,11 +85,12 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 
 	public void skip() {
 		if (inputSource instanceof Skippable) {
-			((Skippable)inputSource).skip();
+			((Skippable) inputSource).skip();
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#open()
 	 */
 	public void open() throws StreamException {
@@ -95,7 +99,8 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#open()
 	 */
 	public void close() throws StreamException {
@@ -116,7 +121,8 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
@@ -125,7 +131,8 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() {

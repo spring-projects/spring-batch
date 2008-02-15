@@ -23,8 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.reader.AbstractItemReader;
+import org.springframework.batch.item.reader.DelegatingItemReader;
 import org.springframework.batch.item.validator.Validator;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;
@@ -33,177 +32,180 @@ import org.springframework.batch.sample.domain.LineItem;
 import org.springframework.batch.sample.domain.Order;
 import org.springframework.batch.sample.domain.ShippingInfo;
 
-
-
 /**
  * @author peter.zozom
- *
+ * 
  */
-public class OrderItemReader extends AbstractItemReader {
-    private static Log log = LogFactory.getLog(OrderItemReader.class);
-    private ItemReader inputSource;
-    private Order order;
-    private boolean recordFinished;
-    private FieldSetMapper headerMapper;
-    private FieldSetMapper customerMapper;
-    private FieldSetMapper addressMapper;
-    private FieldSetMapper billingMapper;
-    private FieldSetMapper itemMapper;
-    private FieldSetMapper shippingMapper;
-    private Validator validator;
+public class OrderItemReader extends DelegatingItemReader {
+	private static Log log = LogFactory.getLog(OrderItemReader.class);
 
-    /**
-     * @throws Exception 
-     * @see org.springframework.batch.item.ItemReader#read()
-     */
-    public Object read() throws Exception {
-        recordFinished = false;
+	private Order order;
 
-        while (!recordFinished) {
-            process((FieldSet)inputSource.read());
-        }
+	private boolean recordFinished;
 
-        if (order!=null) {
-            log.info("Mapped: "+order);
-        	validator.validate(order);
-        }
+	private FieldSetMapper headerMapper;
 
-        Object result = order;
-        order = null;
+	private FieldSetMapper customerMapper;
 
-        return result;
-    }
+	private FieldSetMapper addressMapper;
 
-    /**
-     * @see org.springframework.batch.execution.io.FieldSetCallback#execute(StepExecution)
-     */
-    private void process(FieldSet fieldSet) {
-        //finish processing if we hit the end of file
-        if (fieldSet == null) {
-            log.debug("FINISHED");
-            recordFinished = true;
-            order = null;
+	private FieldSetMapper billingMapper;
 
-            return;
-        }
+	private FieldSetMapper itemMapper;
 
-        String lineId = fieldSet.readString(0);
+	private FieldSetMapper shippingMapper;
 
-        //start a new Order
-        if (Order.LINE_ID_HEADER.equals(lineId)) {
-            log.debug("STARTING NEW RECORD");
-            order = (Order) headerMapper.mapLine(fieldSet);
+	private Validator validator;
 
-            return;
-        }
+	/**
+	 * @throws Exception
+	 * @see org.springframework.batch.item.ItemReader#read()
+	 */
+	public Object read() throws Exception {
+		recordFinished = false;
 
-        //mark we are finished with current Order
-        if (Order.LINE_ID_FOOTER.equals(lineId)) {
-            log.debug("END OF RECORD");
+		while (!recordFinished) {
+			process((FieldSet) getItemReader().read());
+		}
 
-            //Do mapping for footer here, because mapper does not allow to pass an Order object as input.
-            //Mapper always creates new object
-            order.setTotalPrice(fieldSet.readBigDecimal("TOTAL_PRICE"));
-            order.setTotalLines(fieldSet.readInt("TOTAL_LINE_ITEMS"));
-            order.setTotalItems(fieldSet.readInt("TOTAL_ITEMS"));
+		if (order != null) {
+			log.info("Mapped: " + order);
+			validator.validate(order);
+		}
 
-            recordFinished = true;
+		Object result = order;
+		order = null;
 
-            return;
-        }
+		return result;
+	}
 
-        if (Customer.LINE_ID_BUSINESS_CUST.equals(lineId)) {
-            log.debug("MAPPING CUSTOMER");
+	/**
+	 * @see org.springframework.batch.execution.io.FieldSetCallback#execute(StepExecution)
+	 */
+	private void process(FieldSet fieldSet) {
+		// finish processing if we hit the end of file
+		if (fieldSet == null) {
+			log.debug("FINISHED");
+			recordFinished = true;
+			order = null;
 
-            if (order.getCustomer() == null) {
-                order.setCustomer((Customer) customerMapper.mapLine(fieldSet));
-                order.getCustomer().setBusinessCustomer(true);
-            }
+			return;
+		}
 
-            return;
-        }
+		String lineId = fieldSet.readString(0);
 
-        if (Customer.LINE_ID_NON_BUSINESS_CUST.equals(lineId)) {
-            log.debug("MAPPING CUSTOMER");
+		// start a new Order
+		if (Order.LINE_ID_HEADER.equals(lineId)) {
+			log.debug("STARTING NEW RECORD");
+			order = (Order) headerMapper.mapLine(fieldSet);
 
-            if (order.getCustomer() == null) {
-                order.setCustomer((Customer) customerMapper.mapLine(fieldSet));
-                order.getCustomer().setBusinessCustomer(false);
-            }
+			return;
+		}
 
-            return;
-        }
+		// mark we are finished with current Order
+		if (Order.LINE_ID_FOOTER.equals(lineId)) {
+			log.debug("END OF RECORD");
 
-        if (Address.LINE_ID_BILLING_ADDR.equals(lineId)) {
-            log.debug("MAPPING BILLING ADDRESS");
-            order.setBillingAddress((Address) addressMapper.mapLine(fieldSet));
-            return;
-        }
+			// Do mapping for footer here, because mapper does not allow to pass
+			// an Order object as input.
+			// Mapper always creates new object
+			order.setTotalPrice(fieldSet.readBigDecimal("TOTAL_PRICE"));
+			order.setTotalLines(fieldSet.readInt("TOTAL_LINE_ITEMS"));
+			order.setTotalItems(fieldSet.readInt("TOTAL_ITEMS"));
 
-        if (Address.LINE_ID_SHIPPING_ADDR.equals(lineId)) {
-            log.debug("MAPPING SHIPPING ADDRESS");
-            order.setShippingAddress((Address) addressMapper.mapLine(fieldSet));
-            return;
-        }
+			recordFinished = true;
 
-        if (BillingInfo.LINE_ID_BILLING_INFO.equals(lineId)) {
-            log.debug("MAPPING BILLING INFO");
-            order.setBilling((BillingInfo) billingMapper.mapLine(fieldSet));
-            return;
-        }
+			return;
+		}
 
-        if (ShippingInfo.LINE_ID_SHIPPING_INFO.equals(lineId)) {
-            log.debug("MAPPING SHIPPING INFO");
-            order.setShipping((ShippingInfo) shippingMapper.mapLine(fieldSet));
-            return;
-        }
+		if (Customer.LINE_ID_BUSINESS_CUST.equals(lineId)) {
+			log.debug("MAPPING CUSTOMER");
 
-        if (LineItem.LINE_ID_ITEM.equals(lineId)) {
-            log.debug("MAPPING LINE ITEM");
+			if (order.getCustomer() == null) {
+				order.setCustomer((Customer) customerMapper.mapLine(fieldSet));
+				order.getCustomer().setBusinessCustomer(true);
+			}
 
-            if (order.getLineItems() == null) {
-                order.setLineItems(new ArrayList());
-            }
+			return;
+		}
 
-            order.getLineItems().add(itemMapper.mapLine(fieldSet));
+		if (Customer.LINE_ID_NON_BUSINESS_CUST.equals(lineId)) {
+			log.debug("MAPPING CUSTOMER");
 
-            return;
-        }
+			if (order.getCustomer() == null) {
+				order.setCustomer((Customer) customerMapper.mapLine(fieldSet));
+				order.getCustomer().setBusinessCustomer(false);
+			}
 
-        log.debug("Could not map LINE_ID="+lineId);
+			return;
+		}
 
-    }
+		if (Address.LINE_ID_BILLING_ADDR.equals(lineId)) {
+			log.debug("MAPPING BILLING ADDRESS");
+			order.setBillingAddress((Address) addressMapper.mapLine(fieldSet));
+			return;
+		}
 
-    public void setAddressMapper(FieldSetMapper addressMapper) {
-        this.addressMapper = addressMapper;
-    }
+		if (Address.LINE_ID_SHIPPING_ADDR.equals(lineId)) {
+			log.debug("MAPPING SHIPPING ADDRESS");
+			order.setShippingAddress((Address) addressMapper.mapLine(fieldSet));
+			return;
+		}
 
-    public void setBillingMapper(FieldSetMapper billingMapper) {
-        this.billingMapper = billingMapper;
-    }
+		if (BillingInfo.LINE_ID_BILLING_INFO.equals(lineId)) {
+			log.debug("MAPPING BILLING INFO");
+			order.setBilling((BillingInfo) billingMapper.mapLine(fieldSet));
+			return;
+		}
 
-    public void setCustomerMapper(FieldSetMapper customerMapper) {
-        this.customerMapper = customerMapper;
-    }
+		if (ShippingInfo.LINE_ID_SHIPPING_INFO.equals(lineId)) {
+			log.debug("MAPPING SHIPPING INFO");
+			order.setShipping((ShippingInfo) shippingMapper.mapLine(fieldSet));
+			return;
+		}
 
-    public void setHeaderMapper(FieldSetMapper headerMapper) {
-        this.headerMapper = headerMapper;
-    }
+		if (LineItem.LINE_ID_ITEM.equals(lineId)) {
+			log.debug("MAPPING LINE ITEM");
 
-    public void setItemReader(ItemReader inputSource) {
-        this.inputSource = inputSource;
-    }
+			if (order.getLineItems() == null) {
+				order.setLineItems(new ArrayList());
+			}
 
-    public void setItemMapper(FieldSetMapper itemMapper) {
-        this.itemMapper = itemMapper;
-    }
+			order.getLineItems().add(itemMapper.mapLine(fieldSet));
 
-    public void setShippingMapper(FieldSetMapper shippingMapper) {
-        this.shippingMapper = shippingMapper;
-    }
+			return;
+		}
 
-    public void setValidator(Validator validator) {
-        this.validator = validator;
-    }
+		log.debug("Could not map LINE_ID=" + lineId);
+
+	}
+
+	public void setAddressMapper(FieldSetMapper addressMapper) {
+		this.addressMapper = addressMapper;
+	}
+
+	public void setBillingMapper(FieldSetMapper billingMapper) {
+		this.billingMapper = billingMapper;
+	}
+
+	public void setCustomerMapper(FieldSetMapper customerMapper) {
+		this.customerMapper = customerMapper;
+	}
+
+	public void setHeaderMapper(FieldSetMapper headerMapper) {
+		this.headerMapper = headerMapper;
+	}
+
+	public void setItemMapper(FieldSetMapper itemMapper) {
+		this.itemMapper = itemMapper;
+	}
+
+	public void setShippingMapper(FieldSetMapper shippingMapper) {
+		this.shippingMapper = shippingMapper;
+	}
+
+	public void setValidator(Validator validator) {
+		this.validator = validator;
+	}
 
 }

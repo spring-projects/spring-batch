@@ -281,7 +281,7 @@ public class SimpleStepExecutorTests extends TestCase {
 	 */
 	public void testNonRestartedJob() throws Exception {
 		StepInstance step = new StepInstance(new Long(1));
-		MockRestartableTasklet tasklet = new MockRestartableTasklet();
+		MockRestartableItemReader tasklet = new MockRestartableItemReader();
 		stepExecutor.setItemReader(tasklet);
 		stepConfiguration.setSaveExecutionContext(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
@@ -300,7 +300,7 @@ public class SimpleStepExecutorTests extends TestCase {
 	public void testRestartedJob() throws Exception {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
-		MockRestartableTasklet tasklet = new MockRestartableTasklet();
+		MockRestartableItemReader tasklet = new MockRestartableItemReader();
 		stepExecutor.setItemReader(tasklet);
 		stepConfiguration.setSaveExecutionContext(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
@@ -324,7 +324,7 @@ public class SimpleStepExecutorTests extends TestCase {
 	public void testNoSaveExecutionAttributesRestartableJob() {
 		StepInstance step = new StepInstance(new Long(1));
 		step.setStepExecutionCount(1);
-		MockRestartableTasklet tasklet = new MockRestartableTasklet();
+		MockRestartableItemReader tasklet = new MockRestartableItemReader();
 		stepConfiguration.setItemReader(tasklet);
 		stepConfiguration.setSaveExecutionContext(false);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
@@ -431,7 +431,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		assertEquals(0, map.size());
 	}
 
-	private class MockRestartableTasklet extends ItemStreamAdapter implements ItemReader {
+	private class MockRestartableItemReader extends ItemStreamAdapter implements ItemReader {
 
 		private boolean getExecutionAttributesCalled = false;
 

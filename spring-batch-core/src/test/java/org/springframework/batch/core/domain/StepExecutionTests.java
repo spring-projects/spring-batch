@@ -16,11 +16,14 @@
 package org.springframework.batch.core.domain;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
@@ -258,6 +261,14 @@ public class StepExecutionTests extends TestCase {
 		assertTrue("Hash code not same as parent",
 				new Entity(execution.getId()).hashCode() != new StepExecution()
 						.hashCode());
+	}
+
+	public void testHashCodeViaHashSet() throws Exception {
+		Set set = new HashSet();
+		set.add(execution);
+		assertTrue(set.contains(execution));
+		execution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		assertTrue(set.contains(execution));
 	}
 
 	private StepExecution newStepExecution(Long long1, Long long2) {

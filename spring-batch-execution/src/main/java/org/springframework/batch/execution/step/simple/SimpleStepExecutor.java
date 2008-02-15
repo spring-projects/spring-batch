@@ -20,11 +20,11 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
@@ -295,25 +295,30 @@ public class SimpleStepExecutor implements InitializingBean {
 
 		ExitStatus status = ExitStatus.FAILED;
 
-		StepContext parentStepContext = StepSynchronizationManager.getContext();
-		final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext, streamManager);
-		StepSynchronizationManager.register(stepContext);
-		// Add the job identifier so that it can be used to identify
-		// the conversation in StepScope
-		stepContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
-
-		final boolean saveExecutionContext = step.isSaveExecutionContext();
-
-		if (saveExecutionContext && isRestart && stepInstance.getLastExecution() != null) {
-			stepExecution.setExecutionContext(stepInstance.getLastExecution().getExecutionContext());
-			stepContext.restoreFrom(stepExecution.getExecutionContext());
-		}
-
 		try {
 
 			stepExecution.setStartTime(new Date(System.currentTimeMillis()));
-			stepInstance.setLastExecution(stepExecution);
+			// We need to save the step execution right away, before we start
+			// using its ID. It would be better to make the creation atomic in
+			// the caller.
 			updateStatus(stepExecution, BatchStatus.STARTED);
+
+			StepContext parentStepContext = StepSynchronizationManager.getContext();
+			final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext, streamManager);
+			StepSynchronizationManager.register(stepContext);
+			possiblyRegisterStreams(stepExecution);
+			// Add the job identifier so that it can be used to identify
+			// the conversation in StepScope
+			stepContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
+
+			final boolean saveExecutionContext = step.isSaveExecutionContext();
+
+			streamManager.open(stepExecution);
+
+			if (saveExecutionContext && isRestart && stepInstance.getLastExecution() != null) {
+				stepExecution.setExecutionContext(stepInstance.getLastExecution().getExecutionContext());
+				streamManager.restoreFrom(stepExecution, stepExecution.getExecutionContext());
+			}
 
 			status = stepOperations.iterate(new RepeatCallback() {
 
@@ -327,7 +332,7 @@ public class SimpleStepExecutor implements InitializingBean {
 
 					ExitStatus result;
 
-					TransactionStatus transaction = streamManager.getTransaction(stepContext);
+					TransactionStatus transaction = streamManager.getTransaction(stepExecution);
 
 					try {
 
@@ -336,7 +341,7 @@ public class SimpleStepExecutor implements InitializingBean {
 						// TODO: check that stepExecution can
 						// aggregate these contributions if they
 						// come in asynchronously.
-						ExecutionContext statistics = stepContext.getExecutionContext();
+						ExecutionContext statistics = streamManager.getExecutionContext(stepExecution);
 						contribution.setExecutionContext(statistics);
 						contribution.incrementCommitCount();
 
@@ -350,7 +355,7 @@ public class SimpleStepExecutor implements InitializingBean {
 							stepExecution.apply(contribution);
 
 							if (saveExecutionContext) {
-								stepExecution.setExecutionContext(stepContext.getExecutionContext());
+								stepExecution.setExecutionContext(statistics);
 							}
 							jobRepository.saveOrUpdate(stepExecution);
 
@@ -427,13 +432,29 @@ public class SimpleStepExecutor implements InitializingBean {
 			stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 			try {
 				jobRepository.saveOrUpdate(stepExecution);
+				streamManager.close(stepExecution);
 			}
 			finally {
 				// clear any registered synchronizations
+				
 				StepSynchronizationManager.close();
 			}
 		}
 
+	}
+
+	/**
+	 * 
+	 */
+	private void possiblyRegisterStreams(Object key) {
+		if (itemReader instanceof ItemStream) {
+			ItemStream stream = (ItemStream) itemReader;
+			streamManager.register(key, stream);
+		}
+		if (itemWriter instanceof ItemStream) {
+			ItemStream stream = (ItemStream) itemWriter;
+			streamManager.register(key, stream);
+		}
 	}
 
 	/**

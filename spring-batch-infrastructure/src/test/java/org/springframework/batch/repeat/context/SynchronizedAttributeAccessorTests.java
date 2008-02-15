@@ -34,7 +34,8 @@ public class SynchronizedAttributeAccessorTests extends TestCase {
 		SynchronizedAttributeAccessor another = new SynchronizedAttributeAccessor();
 		accessor.setAttribute("foo", "bar");
 		another.setAttribute("foo", "bar");
-		assertEquals(accessor.hashCode(), another.hashCode());
+		assertEquals(accessor, another);
+		assertEquals("Object.hashCode() contract broken", accessor.hashCode(), another.hashCode());
 	}
 
 	public void testToStringWithNoAttributes() throws Exception {

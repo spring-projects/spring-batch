@@ -116,7 +116,7 @@ public class SimpleStreamManager implements StreamManager {
 	 * @see org.springframework.batch.item.stream.StreamManager#register(java.lang.Object,
 	 * org.springframework.batch.item.ItemStream, ExecutionContext)
 	 */
-	public void register(Object key, ItemStream stream, ExecutionContext executionContext) {
+	public void register(Object key, ItemStream stream) {
 		synchronized (registry) {
 			Set set = (Set) registry.get(key);
 			if (set == null) {
@@ -125,9 +125,19 @@ public class SimpleStreamManager implements StreamManager {
 			}
 			set.add(stream);
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.stream.StreamManager#restoreFrom(java.lang.Object, org.springframework.batch.item.ExecutionAttributes)
+	 */
+	public void restoreFrom(Object key, final ExecutionContext executionContext) {
 		if (executionContext != null) {
-			stream.restoreFrom(extract(stream, executionContext));
-		}
+			iterate(key, new Callback() {
+				public void execute(ItemStream stream) {
+					stream.restoreFrom(extract(stream, executionContext));
+				}
+			});
+		}	
 	}
 
 	/**
@@ -153,12 +163,24 @@ public class SimpleStreamManager implements StreamManager {
 
 	/**
 	 * Broadcast the call to close from this {@link StreamManager}.
-	 * @throws Exception
+	 * @throws StreamException
 	 */
 	public void close(Object key) throws StreamException {
 		iterate(key, new Callback() {
 			public void execute(ItemStream stream) {
 				stream.close();
+			}
+		});
+	}
+
+	/**
+	 * Broadcast the call to open from this {@link StreamManager}.
+	 * @throws StreamException
+	 */
+	public void open(Object key) throws StreamException {
+		iterate(key, new Callback() {
+			public void execute(ItemStream stream) {
+				stream.open();
 			}
 		});
 	}

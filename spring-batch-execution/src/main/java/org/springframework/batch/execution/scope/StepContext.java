@@ -16,9 +16,6 @@
 package org.springframework.batch.execution.scope;
 
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ExecutionContextProvider;
 import org.springframework.core.AttributeAccessor;
 
 /**
@@ -27,7 +24,7 @@ import org.springframework.core.AttributeAccessor;
  * @author Dave Syer
  * 
  */
-public interface StepContext extends AttributeAccessor, ExecutionContextProvider {
+public interface StepContext extends AttributeAccessor {
 
 	/**
 	 * Accessor for the {@link StepExecution} associated with the currently
@@ -54,14 +51,4 @@ public interface StepContext extends AttributeAccessor, ExecutionContextProvider
 	 */
 	void close();
 
-	/**
-	 * Provide the stream context needed to restore {@link ItemStream}
-	 * instances. Implementations are free to use this as necessary (e.g. lazily
-	 * if all the streams are not available at once). If this is not set the
-	 * streams will simply not be initialised and repositioned for restart
-	 * (which is sometimes desirable).
-	 * 
-	 * @param executionContext
-	 */
-	void restoreFrom(ExecutionContext executionContext);
 }

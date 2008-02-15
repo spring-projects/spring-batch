@@ -39,7 +39,7 @@
 	
 	<bean id="itemReader" 
 		class="org.springframework.batch.sample.tasklet.ExceptionThrowingItemReaderProxy">
-		<constructor-arg ref="fileItemReader" />
+		<property name="itemReader" ref="fileItemReader" />
 	</bean>
 
 	<bean id="fileItemReader"

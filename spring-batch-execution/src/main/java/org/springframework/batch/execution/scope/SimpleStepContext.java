@@ -25,8 +25,6 @@ import java.util.Set;
 
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
 
@@ -45,8 +43,6 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 	private StepExecution stepExecution;
 
 	private StreamManager streamManager;
-
-	private ExecutionContext executionContext;
 
 	/**
 	 * Default constructor.
@@ -79,11 +75,6 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 	 */
 	public void setAttribute(String name, Object value) {
 		super.setAttribute(name, value);
-		if (streamManager != null && (value instanceof ItemStream)) {
-			ItemStream stream = (ItemStream) value;
-			stream.open();
-			streamManager.register(this, stream, executionContext);
-		}
 	}
 
 	/*
@@ -190,20 +181,6 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 	 */
 	public StepExecution getStepExecution() {
 		return stepExecution;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
-	 */
-	public ExecutionContext getExecutionContext() {
-		return streamManager.getExecutionContext(this);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.execution.scope.StepContext#restoreFrom(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void restoreFrom(ExecutionContext executionContext) {
-		this.executionContext = executionContext;
 	}
 
 }

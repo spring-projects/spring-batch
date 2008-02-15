@@ -19,6 +19,7 @@ package org.springframework.batch.sample.tasklet;
 
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.reader.DelegatingItemReader;
 
 /**
  * Hacked {@link ItemReader} that throws exception on a given record number
@@ -28,16 +29,10 @@ import org.springframework.batch.item.ItemReader;
  * @author Lucas Ward
  *
  */
-public class ExceptionThrowingItemReaderProxy implements ItemReader {
+public class ExceptionThrowingItemReaderProxy extends DelegatingItemReader {
 
 	private int counter = 0;
 	private int throwExceptionOnRecordNumber = 4;
-	
-	private final ItemReader itemReader;
-	
-	public ExceptionThrowingItemReaderProxy(ItemReader itemReader) {
-		this.itemReader = itemReader;
-	}
 	
 	/**
 	 * @param throwExceptionOnRecordNumber The number of record on which exception should be thrown
@@ -57,7 +52,7 @@ public class ExceptionThrowingItemReaderProxy implements ItemReader {
 			throw new BatchCriticalException("Planned failure on count="+counter);
 		}
 		
-		return itemReader.read();
+		return getItemReader().read();
 	}
 
 }

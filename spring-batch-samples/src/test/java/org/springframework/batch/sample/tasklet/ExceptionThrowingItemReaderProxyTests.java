@@ -21,7 +21,8 @@ public class ExceptionThrowingItemReaderProxyTests extends TestCase {
 	public void testProcess() throws Exception {
 				
 		//create module and set item processor and iteration count
-		ExceptionThrowingItemReaderProxy itemReader = new ExceptionThrowingItemReaderProxy(new ListItemReader(new ArrayList() {{
+		ExceptionThrowingItemReaderProxy itemReader = new ExceptionThrowingItemReaderProxy();
+		itemReader.setItemReader(new ListItemReader(new ArrayList() {{
 			add("a");
 			add("b");
 			add("c");

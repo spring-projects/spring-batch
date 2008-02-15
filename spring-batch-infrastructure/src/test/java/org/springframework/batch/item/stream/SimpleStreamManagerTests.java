@@ -84,7 +84,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
 	 */
 	public void testGetStreamContextNotEmpty() {
-		manager.register("foo", stream, null);
+		manager.register("foo", stream);
 		ExecutionContext streamContext = manager.getExecutionContext("foo");
 		assertEquals(1, streamContext.entrySet().size());
 		assertEquals("bar", streamContext.getString(ClassUtils.getQualifiedName(stream.getClass()) + ".foo"));
@@ -99,7 +99,7 @@ public class SimpleStreamManagerTests extends TestCase {
 		ExecutionContext context = manager.getExecutionContext("foo");
 		// Register again, now with the context that was created from the same
 		// stream...
-		manager.register("foo", stream, context);
+		manager.restoreFrom("foo", context);
 		assertEquals(1, list.size());
 		// The list should have the foo= map value from the sub-context
 		assertEquals("bar", list.get(0));
@@ -112,7 +112,8 @@ public class SimpleStreamManagerTests extends TestCase {
 	public void testGetStreamContextNotEmptyAndRestoreWithNoPrefix() {
 		ExecutionContext context = new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
 		manager.setUseClassNameAsPrefix(false);
-		manager.register("foo", stream, context);
+		manager.register("foo", stream);
+		manager.restoreFrom("foo", context);
 		assertEquals(1, list.size());
 		// The list should have the foo= map value from the sub-context
 		assertEquals("bar", list.get(0));
@@ -124,7 +125,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testGetStreamContextWithNoPrefix() {
 		manager.setUseClassNameAsPrefix(false);
-		manager.register("foo", stream, null);
+		manager.register("foo", stream);
 		ExecutionContext context = manager.getExecutionContext("foo");
 		assertEquals(1, context.entrySet().size());
 		// The list should have the foo= map value from the sub-context
@@ -140,12 +141,12 @@ public class SimpleStreamManagerTests extends TestCase {
 			public ExecutionContext getExecutionContext() {
 				return new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
 			}
-		}, null);
+		});
 		manager.register("foo", new ItemStreamAdapter() {
 			public ExecutionContext getExecutionContext() {
 				return new ExecutionContext(PropertiesConverter.stringToProperties("foo=spam"));
 			}
-		}, null);
+		});
 		ExecutionContext streamContext = manager.getExecutionContext("foo");
 		assertEquals(2, streamContext.entrySet().size());
 	}
@@ -160,7 +161,7 @@ public class SimpleStreamManagerTests extends TestCase {
 				list.add("bar");
 				super.close();
 			}
-		}, null);
+		});
 		manager.close("foo");
 		assertEquals(1, list.size());
 	}
@@ -178,7 +179,7 @@ public class SimpleStreamManagerTests extends TestCase {
 			public void mark() {
 				list.add("bar");
 			}
-		}, null);
+		});
 		TransactionStatus status = manager.getTransaction("foo");
 		manager.commit(status);
 		assertEquals(1, list.size());
@@ -193,7 +194,7 @@ public class SimpleStreamManagerTests extends TestCase {
 			public void mark() {
 				list.add("bar");
 			}
-		}, null);
+		});
 		TransactionStatus status = manager.getTransaction("foo");
 		manager.commit(status);
 		assertEquals(0, list.size());
@@ -212,7 +213,7 @@ public class SimpleStreamManagerTests extends TestCase {
 			public void reset() {
 				list.add("bar");
 			}
-		}, null);
+		});
 		TransactionStatus status = manager.getTransaction("foo");
 		manager.rollback(status);
 		assertEquals(1, list.size());
@@ -227,7 +228,7 @@ public class SimpleStreamManagerTests extends TestCase {
 			public void reset() {
 				list.add("bar");
 			}
-		}, null);
+		});
 		TransactionStatus status = manager.getTransaction("foo");
 		manager.rollback(status);
 		assertEquals(0, list.size());

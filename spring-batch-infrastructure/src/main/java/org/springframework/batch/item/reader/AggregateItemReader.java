@@ -37,12 +37,10 @@ import org.springframework.batch.item.ItemReader;
  * @author Dave Syer
  * 
  */
-public class AggregateItemReader extends AbstractItemReader {
+public class AggregateItemReader extends DelegatingItemReader {
 
 	private static final Log log = LogFactory
 			.getLog(AggregateItemReader.class);
-
-	private ItemReader inputSource;
 
 	/**
 	 * Marker for the end of a multi-object record.
@@ -63,7 +61,7 @@ public class AggregateItemReader extends AbstractItemReader {
 	public Object read() throws Exception {
 		ResultHolder holder = new ResultHolder();
 
-		while (process(inputSource.read(), holder)) {
+		while (process(getItemReader().read(), holder)) {
 			continue;
 		}
 
@@ -98,16 +96,6 @@ public class AggregateItemReader extends AbstractItemReader {
 		log.debug("Mapping: " + value);
 		holder.records.add(value);
 		return true;
-	}
-
-	/**
-	 * Injection setter for {@link ItemReader}.
-	 * 
-	 * @param inputSource
-	 *            an {@link ItemReader}.
-	 */
-	public void setItemReader(ItemReader inputSource) {
-		this.inputSource = inputSource;
 	}
 
 	/**
