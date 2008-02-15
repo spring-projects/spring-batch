@@ -157,6 +157,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		} catch (StreamException e) {
 			assertTrue("Message does not contain open: "+e.getMessage(), e.getMessage().contains("open"));
 		}
+		reader.open();
 		assertEquals("[FlatFileInputTemplate-TestData]", reader.read().toString());
 	}
 

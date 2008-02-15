@@ -15,6 +15,7 @@ import javax.xml.stream.events.XMLEvent;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionAttributes;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -131,23 +132,19 @@ public class StaxEventItemReaderTests extends TestCase {
 		context.putLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME, 100000);
 		try {
 			source.restoreFrom(context);
-			fail();
+			fail("Expected StreamException");
 		}
-		catch (IllegalStateException e) {
+		catch (StreamException e) {
 			// expected
-		}
-
-		source = createNewInputSouce();
-		source.open();
-		try {
-			source.restoreFrom(new ExecutionAttributes());
-			fail();
-		}
-		catch (IllegalStateException e) {
-			// expected
+			String message = e.getMessage();
+			assertTrue("Wrong message: "+message, message.contains("must be before"));
 		}
 	}
 
+	public void testRestoreWorksFromClosedStream() throws Exception {
+		source.close();
+		source.restoreFrom(new ExecutionAttributes());
+	}
 	/**
 	 * Skipping marked records after rollback.
 	 */
@@ -224,16 +221,22 @@ public class StaxEventItemReaderTests extends TestCase {
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
 		newSource.setFragmentDeserializer(deserializer);
 
+		newSource.open();
+
 		Object item = newSource.read();
 		assertNotNull(item);
 		assertTrue(newSource.isOpenCalled());
 
-		newSource.close(); 
+		newSource.close();
 		newSource.setOpenCalled(false);
 		// calling read again should require re-initialization because of close
-		item = newSource.read();
-		assertNotNull(item);
-		assertTrue(newSource.isOpenCalled());
+		try {
+			item = newSource.read();
+			fail("Expected StreamException");
+		}
+		catch (StreamException e) {
+			// expected
+		}
 	}
 
 	public void testOpenBadIOInput() {
@@ -292,6 +295,8 @@ public class StaxEventItemReaderTests extends TestCase {
 
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
 		newSource.setFragmentDeserializer(deserializer);
+
+		newSource.open();
 
 		return newSource;
 	}

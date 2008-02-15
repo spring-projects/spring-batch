@@ -45,6 +45,7 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		provider = new TradeItemReader(resource);
+		provider.open();
 	}
 
 	protected static class TradeItemReader extends DelegatingItemReader {

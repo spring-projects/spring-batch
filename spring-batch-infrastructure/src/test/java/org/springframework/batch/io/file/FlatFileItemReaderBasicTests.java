@@ -29,6 +29,7 @@ import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.io.file.transform.LineTokenizer;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -139,7 +140,12 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader = new FlatFileItemReader();
 		itemReader.setResource(getInputResource(TEST_STRING));
 		itemReader.setFieldSetMapper(fieldSetMapper);
-		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
+		try {
+			itemReader.read();
+			fail("Expected StreamException");
+		} catch (StreamException e) {
+			assertTrue(e.getMessage().contains("open"));
+		}
 	}
 
 	public void testCloseBeforeOpen() throws Exception {
@@ -147,7 +153,8 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader.setResource(getInputResource(TEST_STRING));
 		itemReader.setFieldSetMapper(fieldSetMapper);
 		itemReader.close();
-		// The open still happens automatically on a read...
+		// The open does not happen automatically on a read...
+		itemReader.open();
 		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
 	}
 
@@ -172,6 +179,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader.setEncoding("UTF-8");
 		itemReader.setResource(getInputResource(TEST_STRING));
 		itemReader.setFieldSetMapper(fieldSetMapper);
+		itemReader.open();
 		testRead();
 	}
 
@@ -301,6 +309,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		
 		//replace the resource to simulate runtime resource creation
 		testReader.setResource(getInputResource(TEST_STRING));
+		testReader.open();
 		assertEquals(TEST_OUTPUT, testReader.read().toString());
 	}
 		

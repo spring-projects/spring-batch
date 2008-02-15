@@ -60,6 +60,8 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	 * @throws Exception 
 	 */
 	protected void validatePostConditions() throws Exception {
+		
+		inputSource.open();
 
 		jdbcTemplate.query("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", new RowCallbackHandler() {
 

@@ -29,9 +29,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
  * Abstract unit test for running functional tests by getting context locations
  * for both the container and configuration separately and having them auto
  * wired in by type. This allows the two to be completely separated, and remove
- * any 'configuration coupling' between the two. However, it is still purely
- * theoretical until a decision is made as to how job configuration and
- * container configuration files are pulled together.
+ * any 'configuration coupling' between the two.
  * 
  * @author Lucas Ward
  * 

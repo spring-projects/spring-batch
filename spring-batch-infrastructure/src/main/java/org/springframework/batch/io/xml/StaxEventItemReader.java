@@ -19,6 +19,7 @@ import org.springframework.batch.io.xml.stax.TransactionalEventReader;
 import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -68,7 +69,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	 */
 	public Object read() {
 		if (!initialized) {
-			open();
+			throw new StreamException("ItemStream must be open before it can be read.");
 		}
 		Object item = null;
 
@@ -192,12 +193,10 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	 * available records.
 	 */
 	public void restoreFrom(ExecutionAttributes data) {
-		Assert.state(!initialized);
+
 		if (data == null || data.getProperties() == null || !data.containsKey(READ_COUNT_STATISTICS_NAME)) {
 			return;
 		}
-
-		open();
 
 		long restoredRecordCount = data.getLong(READ_COUNT_STATISTICS_NAME);
 		int REASONABLE_ADHOC_COMMIT_FREQUENCY = 100;
@@ -206,11 +205,14 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 			if (currentRecordCount % REASONABLE_ADHOC_COMMIT_FREQUENCY == 0) {
 				txReader.onCommit(); // reset the history buffer
 			}
-			Assert.state(fragmentReader.hasNext(), "restore point must be before end of input");
+			if (!fragmentReader.hasNext()) {
+				throw new StreamException("Restore point must be before end of input");
+			}
 			fragmentReader.next();
 			moveCursorToNextFragment(fragmentReader);
 		}
 		mark(); // reset the history buffer
+
 	}
 
 	/**

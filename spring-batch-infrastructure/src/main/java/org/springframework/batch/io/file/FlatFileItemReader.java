@@ -135,7 +135,7 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 				((AbstractLineTokenizer) tokenizer).setNames(names);
 			}
 		}
-		
+
 		mark();
 	}
 
@@ -180,9 +180,9 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	}
 
 	/**
-	 * This method initialises the reader for Restart. It opens the input
-	 * file and position the buffer reader according to information provided by
-	 * the restart data
+	 * This method initialises the reader for Restart. It opens the input file
+	 * and position the buffer reader according to information provided by the
+	 * restart data
 	 * 
 	 * @param data {@link ExecutionAttributes} information
 	 */
@@ -209,8 +209,8 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	}
 
 	/**
-	 * This method returns the execution attributes for the reader. It returns the
-	 * current Line Count which can be used to reinitialise the batch job in
+	 * This method returns the execution attributes for the reader. It returns
+	 * the current Line Count which can be used to reinitialise the batch job in
 	 * case of restart.
 	 */
 	public ExecutionAttributes getExecutionAttributes() {
@@ -262,7 +262,8 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	}
 
 	/**
-	 * @return next line to be tokenized and mapped (possibly skips multiple lines).
+	 * @return next line to be tokenized and mapped (possibly skips multiple
+	 * lines).
 	 */
 	protected String readLine() {
 		String line = nextLine();
@@ -280,6 +281,9 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 		try {
 			return (String) getReader().read();
 		}
+		catch (StreamException e) {
+			throw e;
+		}
 		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
@@ -290,7 +294,7 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	 */
 	protected LineReader getReader() {
 		if (reader == null) {
-			open();
+			throw new StreamException("ItemStream must be open before it can be read.");
 			// reader is now not null, or else an exception is thrown
 		}
 		return reader;

@@ -38,7 +38,7 @@ import org.springframework.batch.item.ExecutionAttributes;
  * these Id's are set, an execution can be persisted. If the object is in a
  * transient state (i.e. it has no id of it's own) then an ID will be created
  * for that specific execution, and then stored ('saved'). (NOTE: The
- * relationship between a Job/Step and Job/StepExecutions is 1:N) If an ID does
+ * relationship between a Job/Step and Job/StepExecutions is 1:N.) If an ID does
  * exist, then the execution will be stored ('updated').
  * 
  * 

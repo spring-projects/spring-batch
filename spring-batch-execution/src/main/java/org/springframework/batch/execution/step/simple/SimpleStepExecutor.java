@@ -60,16 +60,20 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of executing the step as a set of chunks, each chunk surrounded by a transaction. The structure
- * is therefore that of two nested loops, with transaction boundary around the whole inner loop. The outer loop is
- * controlled by the step operations ({@link #setStepOperations(RepeatOperations)}), and the inner loop by the chunk
- * operations ({@link #setChunkOperations(RepeatOperations)}). The inner loop should always be executed in a single
- * thread, so the chunk operations should not do any concurrent execution. N.B. usually that means that the chunk
- * operations should be a {@link RepeatTemplate} (which is the default).<br/>
+ * Simple implementation of executing the step as a set of chunks, each chunk
+ * surrounded by a transaction. The structure is therefore that of two nested
+ * loops, with transaction boundary around the whole inner loop. The outer loop
+ * is controlled by the step operations ({@link #setStepOperations(RepeatOperations)}),
+ * and the inner loop by the chunk operations ({@link #setChunkOperations(RepeatOperations)}).
+ * The inner loop should always be executed in a single thread, so the chunk
+ * operations should not do any concurrent execution. N.B. usually that means
+ * that the chunk operations should be a {@link RepeatTemplate} (which is the
+ * default).<br/>
  * 
- * Clients can use interceptors in the step operations to intercept or listen to the iteration on a step-wide basis, for
- * instance to get a callback when the step is complete. Those that want callbacks at the level of an individual tasks,
- * can specify interceptors for the chunk operations.
+ * Clients can use interceptors in the step operations to intercept or listen to
+ * the iteration on a step-wide basis, for instance to get a callback when the
+ * step is complete. Those that want callbacks at the level of an individual
+ * tasks, can specify interceptors for the chunk operations.
  * 
  * @author Dave Syer
  * @author Lucas Ward
@@ -114,18 +118,22 @@ public class SimpleStepExecutor implements InitializingBean {
 	}
 
 	/**
-	 * Public setter for the {@link StreamManager}. This will be used to create the {@link StepContext}, and hence any
-	 * component that is a {@link ItemStream} and in step scope will be registered with the service. The
-	 * {@link StepContext} is then a source of aggregate statistics for the step.
+	 * Public setter for the {@link StreamManager}. This will be used to create
+	 * the {@link StepContext}, and hence any component that is a
+	 * {@link ItemStream} and in step scope will be registered with the service.
+	 * The {@link StepContext} is then a source of aggregate statistics for the
+	 * step.
 	 * 
-	 * @param streamManager the {@link StreamManager} to set. Default is a {@link SimpleStreamManager}.
+	 * @param streamManager the {@link StreamManager} to set. Default is a
+	 * {@link SimpleStreamManager}.
 	 */
 	public void setStreamManager(StreamManager streamManager) {
 		this.streamManager = streamManager;
 	}
 
 	/**
-	 * Injected strategy for storage and retrieval of persistent step information. Mandatory property.
+	 * Injected strategy for storage and retrieval of persistent step
+	 * information. Mandatory property.
 	 * 
 	 * @param jobRepository
 	 */
@@ -134,8 +142,9 @@ public class SimpleStepExecutor implements InitializingBean {
 	}
 
 	/**
-	 * The {@link RepeatOperations} to use for the outer loop of the batch processing. Should be set up by the caller
-	 * through a factory. Defaults to a plain {@link RepeatTemplate}.
+	 * The {@link RepeatOperations} to use for the outer loop of the batch
+	 * processing. Should be set up by the caller through a factory. Defaults to
+	 * a plain {@link RepeatTemplate}.
 	 * 
 	 * @param stepOperations a {@link RepeatOperations} instance.
 	 */
@@ -144,8 +153,9 @@ public class SimpleStepExecutor implements InitializingBean {
 	}
 
 	/**
-	 * The {@link RepeatOperations} to use for the inner loop of the batch processing. Should be set up by the caller
-	 * through a factory. Defaults to a plain {@link RepeatTemplate}.
+	 * The {@link RepeatOperations} to use for the inner loop of the batch
+	 * processing. Should be set up by the caller through a factory. Defaults to
+	 * a plain {@link RepeatTemplate}.
 	 * 
 	 * @param chunkOperations a {@link RepeatOperations} instance.
 	 */
@@ -154,8 +164,9 @@ public class SimpleStepExecutor implements InitializingBean {
 	}
 
 	/**
-	 * Setter for the {@link StepInterruptionPolicy}. The policy is used to check whether an external request has been
-	 * made to interrupt the job execution.
+	 * Setter for the {@link StepInterruptionPolicy}. The policy is used to
+	 * check whether an external request has been made to interrupt the job
+	 * execution.
 	 * 
 	 * @param interruptionPolicy a {@link StepInterruptionPolicy}
 	 */
@@ -164,8 +175,8 @@ public class SimpleStepExecutor implements InitializingBean {
 	}
 
 	/**
-	 * Setter for the {@link ExitStatusExceptionClassifier} that will be used to classify any exception that causes a job
-	 * to fail.
+	 * Setter for the {@link ExitStatusExceptionClassifier} that will be used to
+	 * classify any exception that causes a job to fail.
 	 * 
 	 * @param exceptionClassifier
 	 */
@@ -186,7 +197,7 @@ public class SimpleStepExecutor implements InitializingBean {
 	public void setItemWriter(ItemWriter itemWriter) {
 		this.itemWriter = itemWriter;
 	}
-	
+
 	/**
 	 * Setter for injecting optional recovery handler.
 	 * 
@@ -223,7 +234,7 @@ public class SimpleStepExecutor implements InitializingBean {
 
 		if (retryPolicy != null) {
 			Assert.state(itemReader instanceof KeyedItemReader,
-			        "ItemReader must be instance of KeyedItemReader to use the retry policy");
+					"ItemReader must be instance of KeyedItemReader to use the retry policy");
 			retryCallback = new ItemReaderRetryCallback((KeyedItemReader) itemReader, itemWriter);
 			retryCallback.setRecoverer(itemRecoverer);
 		}
@@ -231,7 +242,8 @@ public class SimpleStepExecutor implements InitializingBean {
 	}
 
 	/**
-	 * Apply the configuration by inspecting it to see if it has any relevant policy information.
+	 * Apply the configuration by inspecting it to see if it has any relevant
+	 * policy information.
 	 * 
 	 * @param step a step
 	 */
@@ -261,14 +273,18 @@ public class SimpleStepExecutor implements InitializingBean {
 	}
 
 	/**
-	 * Process the step and update its context so that progress can be monitored by the caller. The step is broken down
-	 * into chunks, each one executing in a transaction. The step and its execution and execution context are all given
-	 * an up to date {@link BatchStatus}, and the {@link JobRepository} is used to store the result. Various reporting
-	 * information are also added to the current context (the {@link RepeatContext} governing the step execution, which
-	 * would normally be available to the caller somehow through the step's {@link JobExecutionContext}.<br/>
+	 * Process the step and update its context so that progress can be monitored
+	 * by the caller. The step is broken down into chunks, each one executing in
+	 * a transaction. The step and its execution and execution context are all
+	 * given an up to date {@link BatchStatus}, and the {@link JobRepository}
+	 * is used to store the result. Various reporting information are also added
+	 * to the current context (the {@link RepeatContext} governing the step
+	 * execution, which would normally be available to the caller somehow
+	 * through the step's {@link JobExecutionContext}.<br/>
 	 * 
 	 * @throws JobInterruptedException if the step or a chunk is interrupted
-	 * @throws RuntimeException if there is an exception during a chunk execution
+	 * @throws RuntimeException if there is an exception during a chunk
+	 * execution
 	 * @see StepExecutor#execute(StepExecution)
 	 */
 	public void execute(final StepExecution stepExecution) throws BatchCriticalException, JobInterruptedException {
@@ -342,31 +358,36 @@ public class SimpleStepExecutor implements InitializingBean {
 
 						streamManager.commit(transaction);
 
-					} catch (Throwable t) {
+					}
+					catch (Throwable t) {
 						/*
-						 * Any exception thrown within the transaction template will automatically cause the transaction
-						 * to rollback. We need to include exceptions during an attempted commit (e.g. Hibernate flush)
-						 * so this catch block comes outside the transaction.
+						 * Any exception thrown within the transaction template
+						 * will automatically cause the transaction to rollback.
+						 * We need to include exceptions during an attempted
+						 * commit (e.g. Hibernate flush) so this catch block
+						 * comes outside the transaction.
 						 */
 						synchronized (stepExecution) {
 							stepExecution.rollback();
 						}
 						try {
 							streamManager.rollback(transaction);
-						} catch (ResetFailedException e) {
+						}
+						catch (ResetFailedException e) {
 							// The original Throwable cause is in danger of
 							// being lost here, so we log the reset
 							// failure and re-throw with cause of the rollback.
 							logger.error("Encountered reset error on rollback: "
-							        + "one of the streams may be in an inconsistent state, "
-							        + "so this step should not proceed", e);
+									+ "one of the streams may be in an inconsistent state, "
+									+ "so this step should not proceed", e);
 							throw new ResetFailedException("Encountered reset error on rollback.  "
-							        + "Consult logs for the cause of the reet failure.  "
-							        + "The cause of the original rollback is incuded here.", t);
+									+ "Consult logs for the cause of the reet failure.  "
+									+ "The cause of the original rollback is incuded here.", t);
 						}
 						if (t instanceof RuntimeException) {
 							throw (RuntimeException) t;
-						} else {
+						}
+						else {
 							throw new RuntimeException(t);
 						}
 					}
@@ -382,27 +403,32 @@ public class SimpleStepExecutor implements InitializingBean {
 			});
 
 			updateStatus(stepExecution, BatchStatus.COMPLETED);
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 
 			// classify exception so an exit code can be stored.
 			status = exceptionClassifier.classifyForExitCode(e);
 			if (e.getCause() instanceof JobInterruptedException) {
 				updateStatus(stepExecution, BatchStatus.STOPPED);
 				throw (JobInterruptedException) e.getCause();
-			} else if (e instanceof ResetFailedException) {
+			}
+			else if (e instanceof ResetFailedException) {
 				updateStatus(stepExecution, BatchStatus.UNKNOWN);
 				throw (ResetFailedException) e;
-			} else {
+			}
+			else {
 				updateStatus(stepExecution, BatchStatus.FAILED);
 				throw e;
 			}
 
-		} finally {
+		}
+		finally {
 			stepExecution.setExitStatus(status);
 			stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 			try {
 				jobRepository.saveOrUpdate(stepExecution);
-			} finally {
+			}
+			finally {
 				// clear any registered synchronizations
 				StepSynchronizationManager.close();
 			}
@@ -411,11 +437,13 @@ public class SimpleStepExecutor implements InitializingBean {
 	}
 
 	/**
-	 * Execute a bunch of identical business logic operations all within a transaction. The transaction is
-	 * programmatically started and stopped outside this method, so subclasses that override do not need to create a
+	 * Execute a bunch of identical business logic operations all within a
+	 * transaction. The transaction is programmatically started and stopped
+	 * outside this method, so subclasses that override do not need to create a
 	 * transaction.
 	 * 
-	 * @param step the current step containing the {@link Tasklet} with the business logic.
+	 * @param step the current step containing the {@link Tasklet} with the
+	 * business logic.
 	 * @return true if there is more data to process.
 	 */
 	ExitStatus processChunk(final Step step, final StepContribution contribution) {
@@ -437,10 +465,12 @@ public class SimpleStepExecutor implements InitializingBean {
 	}
 
 	/**
-	 * Execute the business logic, delegating to the given {@link Tasklet}. Subclasses could extend the behaviour as
-	 * long as they always return the value of this method call in their superclass.<br/>
+	 * Execute the business logic, delegating to the given {@link Tasklet}.
+	 * Subclasses could extend the behaviour as long as they always return the
+	 * value of this method call in their superclass.<br/>
 	 * 
-	 * If there is an exception and the {@link Tasklet} implements {@link Skippable} then the skip method is called.
+	 * If there is an exception and the {@link Tasklet} implements
+	 * {@link Skippable} then the skip method is called.
 	 * 
 	 * @param tasklet the unit of business logic to execute
 	 * @param contribution the current step
@@ -454,7 +484,8 @@ public class SimpleStepExecutor implements InitializingBean {
 
 			exitStatus = execute();
 
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			skip();
 			// Rethrow so that outer transaction is rolled back properly
 			throw e;
@@ -465,13 +496,16 @@ public class SimpleStepExecutor implements InitializingBean {
 	}
 
 	/**
-	 * Read from the {@link ItemReader} and process (if not null) with the {@link ItemWriter}. The call to
-	 * {@link ItemWriter} is wrapped in a stateful retry, if a {@link RetryPolicy} is provided. The
-	 * {@link ItemRecoverer} is used (if provided) in the case of an exception to apply alternate processing to the
-	 * item. If the stateful retry is in place then the recovery will happen in the next transaction automatically,
-	 * otherwise it might be necessary for clients to make the recover method transactional with appropriate propagation
-	 * behaviour (probably REQUIRES_NEW because the call will happen in the context of a transaction that is about to
-	 * rollback).
+	 * Read from the {@link ItemReader} and process (if not null) with the
+	 * {@link ItemWriter}. The call to {@link ItemWriter} is wrapped in a
+	 * stateful retry, if a {@link RetryPolicy} is provided. The
+	 * {@link ItemRecoverer} is used (if provided) in the case of an exception
+	 * to apply alternate processing to the item. If the stateful retry is in
+	 * place then the recovery will happen in the next transaction
+	 * automatically, otherwise it might be necessary for clients to make the
+	 * recover method transactional with appropriate propagation behaviour
+	 * (probably REQUIRES_NEW because the call will happen in the context of a
+	 * transaction that is about to rollback).
 	 * 
 	 * @see org.springframework.batch.core.tasklet.Tasklet#execute()
 	 */
@@ -484,7 +518,8 @@ public class SimpleStepExecutor implements InitializingBean {
 			}
 			try {
 				itemWriter.write(item);
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				if (itemRecoverer != null) {
 					itemRecoverer.recover(item, e);
 				}
@@ -500,9 +535,10 @@ public class SimpleStepExecutor implements InitializingBean {
 	}
 
 	/**
-	 * Mark the current item as skipped if possible. If there is a retry policy in action there is no need to take any
-	 * action now because it will be covered by the retry in the next transaction. Otherwise if the reader and / or
-	 * writer are {@link Skippable} then delegate to them in that order.
+	 * Mark the current item as skipped if possible. If there is a retry policy
+	 * in action there is no need to take any action now because it will be
+	 * covered by the retry in the next transaction. Otherwise if the reader and /
+	 * or writer are {@link Skippable} then delegate to them in that order.
 	 * 
 	 * @see org.springframework.batch.io.Skippable#skip()
 	 */

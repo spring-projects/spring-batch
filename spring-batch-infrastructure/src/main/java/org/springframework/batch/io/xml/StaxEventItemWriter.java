@@ -342,7 +342,7 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	public void write(Object output) {
 
 		if (!initialized) {
-			open();
+			throw new StreamException("ItemStream must be open before it can be used.");
 		}
 
 		currentRecordCount++;

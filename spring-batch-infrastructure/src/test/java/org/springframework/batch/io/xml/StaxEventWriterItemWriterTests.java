@@ -45,6 +45,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	protected void setUp() throws Exception {
 		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", "xml"));
 		writer = createItemWriter();
+		writer.open();
 	}
 
 	/**
@@ -84,17 +85,18 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	 * Restart scenario - content is appended to the output file after restart.
 	 */
 	public void testRestart() throws Exception {
-		// write records
+		// write record
 		writer.write(record);
-		writer.mark();
+		// writer.mark();
 		ExecutionAttributes streamContext = writer.getExecutionAttributes();
+		writer.close();
 
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();
 		writer.restoreFrom(streamContext);
 		writer.write(record);
 		writer.close();
-
+		
 		// check the output is concatenation of 'before restart' and 'after
 		// restart' writes.
 		String outputFile = outputFileContent();
@@ -199,7 +201,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 		source.setOverwriteOutput(true);
 
 		source.afterPropertiesSet();
-
+		
 		return source;
 	}
 }

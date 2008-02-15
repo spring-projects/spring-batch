@@ -48,6 +48,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 		writer.write("BAR");
 		writer.write("SPAM");
 		writer.write("BUCKET");
+		provider.open();
 	}
 
 	protected void onTearDownAfterTransaction() throws Exception {

@@ -14,6 +14,7 @@ import org.springframework.batch.execution.scope.StepContextAware;
 import org.springframework.batch.item.ExecutionAttributes;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.sample.item.writer.StagingItemWriter;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowMapper;
@@ -127,7 +128,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 
 	private Long doRead() {
 		if (!initialized) {
-			open();
+			throw new StreamException("ItemStream must be open before it can be read.");
 		}
 
 		Long key = getBuffer().next();
