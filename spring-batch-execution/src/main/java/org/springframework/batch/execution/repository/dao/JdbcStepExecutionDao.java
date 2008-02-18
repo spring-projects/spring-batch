@@ -57,20 +57,20 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 
 	private static final Log logger = LogFactory.getLog(JdbcStepExecutionDao.class);
 
-	private static final String FIND_STEP_EXECUTION_ATTRS = "SELECT TYPE_CD, KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL "
-			+ "from %PREFIX%STEP_EXECUTION_ATTRS where STEP_EXECUTION_ID = ?";
+	private static final String FIND_STEP_EXECUTION_CONTEXT = "SELECT TYPE_CD, KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL "
+			+ "from %PREFIX%STEP_EXECUTION_CONTEXT where STEP_EXECUTION_ID = ?";
 
 	private static final String GET_STEP_EXECUTION_COUNT = "SELECT count(STEP_EXECUTION_ID) from %PREFIX%STEP_EXECUTION where "
 			+ "STEP_INSTANCE_ID = ?";
 
-	private static final String INSERT_STEP_EXECUTION_ATTRS = "INSERT into %PREFIX%STEP_EXECUTION_ATTRS(STEP_EXECUTION_ID, TYPE_CD,"
+	private static final String INSERT_STEP_EXECUTION_CONTEXT = "INSERT into %PREFIX%STEP_EXECUTION_CONTEXT(STEP_EXECUTION_ID, TYPE_CD,"
 			+ " KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL) values(?,?,?,?,?,?,?)";
 
 	private static final String SAVE_STEP_EXECUTION = "INSERT into %PREFIX%STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_INSTANCE_ID, JOB_EXECUTION_ID, START_TIME, "
 			+ "END_TIME, STATUS, COMMIT_COUNT, TASK_COUNT, TASK_STATISTICS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) "
 			+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String UPDATE_STEP_EXECUTION_ATTRS = "UPDATE %PREFIX%STEP_EXECUTION_ATTRS set "
+	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%STEP_EXECUTION_CONTEXT set "
 			+ "TYPE_CD = ?, STRING_VAL = ?, DOUBLE_VAL = ?, LONG_VAL = ?, OBJECT_VAL = ? where STEP_EXECUTION_ID = ? and KEY_NAME = ?";
 
 	private static final String UPDATE_STEP_EXECUTION = "UPDATE %PREFIX%STEP_EXECUTION set START_TIME = ?, END_TIME = ?, "
@@ -121,7 +121,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 			}
 		};
 
-		getJdbcTemplate().query(getQuery(FIND_STEP_EXECUTION_ATTRS), new Object[] { executionId }, callback);
+		getJdbcTemplate().query(getQuery(FIND_STEP_EXECUTION_CONTEXT), new Object[] { executionId }, callback);
 
 		return executionContext;
 	}
@@ -219,7 +219,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 				}
 			}
 		};
-		getJdbcTemplate().execute(getQuery(INSERT_STEP_EXECUTION_ATTRS), callback);
+		getJdbcTemplate().execute(getQuery(INSERT_STEP_EXECUTION_CONTEXT), callback);
 	}
 
 	/**
@@ -339,7 +339,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 		// LobCreating callbacks always return the affect row count for SQL DML
 		// statements, if less than 1 row
 		// is affected, then this row is new and should be inserted.
-		Integer affectedRows = (Integer) getJdbcTemplate().execute(getQuery(UPDATE_STEP_EXECUTION_ATTRS), callback);
+		Integer affectedRows = (Integer) getJdbcTemplate().execute(getQuery(UPDATE_STEP_EXECUTION_CONTEXT), callback);
 		if (affectedRows.intValue() < 1) {
 			insertExecutionAttribute(executionId, key, value, type);
 		}
