@@ -152,16 +152,14 @@ public class MapStepDao implements StepInstanceDao, StepExecutionDao {
 		// no-op
 	}
 
-	public ExecutionContext findExecutionContext(Long executionId) {
+	public ExecutionContext findExecutionContext(StepExecution stepExecution) {
 		return null;
 	}
 
-	public void saveExecutionContext(Long executionId,
-			ExecutionContext executionContext) {
+	public void saveExecutionContext(StepExecution stepExecution) {
 	}
 
-	public void updateExecutionContext(Long executionId,
-			ExecutionContext executionContext) {
+	public void updateExecutionContext(StepExecution stepExecution) {
 	}
 
 	public StepExecution getLastStepExecution(StepInstance stepInstance, JobExecution jobExecution) {

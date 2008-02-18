@@ -88,8 +88,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
 
-	public ExecutionContext findExecutionContext(final Long executionId) {
+	public ExecutionContext findExecutionContext(final StepExecution stepExecution) {
 
+		final Long executionId = stepExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
 		final ExecutionContext executionContext = new ExecutionContext();
@@ -152,8 +153,10 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 	 * attributes that don't match a provided type must be serialized into a
 	 * blob.
 	 */
-	public void saveExecutionContext(final Long executionId, final ExecutionContext executionContext) {
+	public void saveExecutionContext(final StepExecution stepExecution) {
 
+		final Long executionId = stepExecution.getId();
+		final ExecutionContext executionContext = stepExecution.getExecutionContext();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
@@ -265,8 +268,10 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao
 	 * 
 	 * @see {@link LobCreator}
 	 */
-	public void updateExecutionContext(final Long executionId, ExecutionContext executionContext) {
+	public void updateExecutionContext(final StepExecution stepExecution) {
 
+		Long executionId = stepExecution.getId();
+		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 

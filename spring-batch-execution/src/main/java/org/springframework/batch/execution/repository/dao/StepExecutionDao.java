@@ -44,7 +44,7 @@ public interface StepExecutionDao {
 	 * {@link ExecutionContext} will be returned.
 	 * @throws IllegalArgumentException if the id is null.
 	 */
-	ExecutionContext findExecutionContext(final Long executionId);
+	ExecutionContext findExecutionContext(StepExecution stepExecution);
 
 	/**
 	 * Save the provided {@link ExecutionContext} for the given executionId.
@@ -54,7 +54,7 @@ public interface StepExecutionDao {
 	 * @throws IllegalArgumentException if the executionId or attributes are
 	 * null.
 	 */
-	void saveExecutionContext(final Long executionId, final ExecutionContext executionContext);
+	void saveExecutionContext(StepExecution stepExecution);
 
 	/**
 	 * Update the provided ExecutionContext.
@@ -62,7 +62,7 @@ public interface StepExecutionDao {
 	 * @param executionId
 	 * @param executionContext
 	 */
-	void updateExecutionContext(final Long executionId, ExecutionContext executionContext);
+	void updateExecutionContext(StepExecution stepExecution);
 
 	/**
 	 * @param lastJobExecution last job execution

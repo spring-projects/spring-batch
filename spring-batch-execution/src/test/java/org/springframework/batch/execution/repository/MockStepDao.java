@@ -75,16 +75,14 @@ public class MockStepDao implements StepInstanceDao, StepExecutionDao {
 		return null;
 	}
 
-	public ExecutionContext findExecutionContext(Long executionId) {
+	public ExecutionContext findExecutionContext(StepExecution stepExecution) {
 		return null;
 	}
 
-	public void saveExecutionContext(Long executionId,
-			ExecutionContext executionContext) {
+	public void saveExecutionContext(StepExecution stepExecution) {
 	}
 
-	public void updateExecutionContext(Long executionId,
-			ExecutionContext executionContext) {
+	public void updateExecutionContext(StepExecution stepExecution) {
 	}
 
 	public Entity getStepExecution(Long stepExecutionId,

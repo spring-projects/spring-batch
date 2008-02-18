@@ -66,8 +66,8 @@ public class MapJobDao implements JobInstanceDao, JobExecutionDao {
 		return list;
 	}
 
-	public int getJobExecutionCount(Long jobId) {
-		Set executions = (Set) executionsById.get(jobId);
+	public int getJobExecutionCount(JobInstance jobInstance) {
+		Set executions = (Set) executionsById.get(jobInstance.getId());
 		if (executions==null) return 0;
 		return executions.size();	}
 

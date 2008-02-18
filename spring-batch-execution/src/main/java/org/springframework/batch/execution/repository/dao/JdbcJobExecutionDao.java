@@ -65,8 +65,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @see JobDao#getJobExecutionCount(JobInstance)
 	 * @throws IllegalArgumentException if jobId is null.
 	 */
-	public int getJobExecutionCount(Long jobId) {
-
+	public int getJobExecutionCount(JobInstance jobInstance) {
+		Long jobId = jobInstance.getId();
 		Assert.notNull(jobId, "JobId cannot be null");
 
 		Object[] parameters = new Object[] { jobId };

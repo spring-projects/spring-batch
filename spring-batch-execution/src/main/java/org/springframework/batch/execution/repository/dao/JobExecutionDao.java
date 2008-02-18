@@ -33,13 +33,11 @@ public interface JobExecutionDao {
 	void updateJobExecution(JobExecution jobExecution);
 
 	/**
-	 * Return the number of JobExecutions with the given jobInstanceId
+	 * Return the number of JobExecutions for the given JobInstance
 	 * 
 	 * Preconditions: jobInstance must have an id.
-	 * 
-	 * @param jobInstanceId
 	 */
-	int getJobExecutionCount(Long jobInstanceId);
+	int getJobExecutionCount(JobInstance jobInstance);
 
 	/**
 	 * Return list of JobExecutions for given JobInstance.

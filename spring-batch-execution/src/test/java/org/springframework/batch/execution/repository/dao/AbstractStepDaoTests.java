@@ -99,7 +99,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		jobExecution = new JobExecution(step2.getJobInstance());
 		jobExecutionDao.saveJobExecution(jobExecution);
 
-		stepExecution = new StepExecution(step1, jobExecution, null);
+		stepExecution = new StepExecution(step1, jobExecution, new Long(1));
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setStartTime(new Date(System.currentTimeMillis()));
 		stepExecutionDao.saveStepExecution(stepExecution);
@@ -153,10 +153,10 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	}
 
 	public void testUpdateStepWithExecutionContext() {
-
-		stepExecutionDao.saveExecutionContext(step1.getId(), executionContext);
+		stepExecution.setExecutionContext(executionContext);
+		stepExecutionDao.saveExecutionContext(stepExecution);
 		StepInstance tempStep = stepInstanceDao.findStepInstance(jobInstance, step1.getName());
-		ExecutionContext tempAttributes = stepExecutionDao.findExecutionContext(step1.getId());
+		ExecutionContext tempAttributes = stepExecutionDao.findExecutionContext(stepExecution);
 		assertEquals(tempStep, step1);
 		assertEquals(executionContext, tempAttributes);
 	}
@@ -245,13 +245,13 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	}
 	
 	public void testSaveExecutionContext(){
-	
-		stepExecutionDao.saveExecutionContext(stepExecution.getId(), executionContext);
-		ExecutionContext attributes = stepExecutionDao.findExecutionContext(stepExecution.getId());
+		stepExecution.setExecutionContext(executionContext);
+		stepExecutionDao.saveExecutionContext(stepExecution);
+		ExecutionContext attributes = stepExecutionDao.findExecutionContext(stepExecution);
 		assertEquals(executionContext, attributes);
 		executionContext.putString("newString", "newString");
-		stepExecutionDao.updateExecutionContext(stepExecution.getId(), executionContext);
-		attributes = stepExecutionDao.findExecutionContext(stepExecution.getId());
+		stepExecutionDao.updateExecutionContext(stepExecution);
+		attributes = stepExecutionDao.findExecutionContext(stepExecution);
 		assertEquals(executionContext, attributes);
 	}
 	

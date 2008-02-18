@@ -171,7 +171,7 @@ public class SimpleJobRepository implements JobRepository {
 		if (jobs.size() == 1) {
 			// One job was found
 			jobInstance = (JobInstance) jobs.get(0);
-			jobInstance.setJobExecutionCount(jobExecutionDao.getJobExecutionCount(jobInstance.getId()));
+			jobInstance.setJobExecutionCount(jobExecutionDao.getJobExecutionCount(jobInstance));
 			if (jobInstance.getJobExecutionCount() > job.getStartLimit()) {
 				throw new BatchRestartException("Restart Max exceeded for Job: " + jobInstance.toString());
 			}
@@ -264,12 +264,12 @@ public class SimpleJobRepository implements JobRepository {
 				jobExecutionDao.saveJobExecution(jobExecution);
 			}
 			stepExecutionDao.saveStepExecution(stepExecution);
-			stepExecutionDao.saveExecutionContext(stepExecution.getId(), stepExecution.getExecutionContext());
+			stepExecutionDao.saveExecutionContext(stepExecution);
 		}
 		else {
 			// existing execution, update
 			stepExecutionDao.updateStepExecution(stepExecution);
-			stepExecutionDao.updateExecutionContext(stepExecution.getId(), stepExecution.getExecutionContext());
+			stepExecutionDao.updateExecutionContext(stepExecution);
 		}
 	}
 
@@ -316,7 +316,7 @@ public class SimpleJobRepository implements JobRepository {
 				stepInstance.setLastExecution(stepExecutionDao.getLastStepExecution(stepInstance, lastJobExecution));
 				if (stepInstance.getLastExecution() != null) {
 					ExecutionContext executionContext = stepExecutionDao.findExecutionContext(stepInstance
-							.getLastExecution().getId());
+							.getLastExecution());
 					stepInstance.getLastExecution().setExecutionContext(executionContext);
 				}
 				stepInstance.setStepExecutionCount(stepExecutionDao.getStepExecutionCount(stepInstance));

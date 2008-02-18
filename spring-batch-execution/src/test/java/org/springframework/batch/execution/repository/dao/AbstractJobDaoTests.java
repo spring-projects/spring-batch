@@ -199,20 +199,20 @@ public abstract class AbstractJobDaoTests extends
 	public void testIncrementExecutionCount() {
 
 		// 1 JobExection already added in setup
-		assertEquals(jobExecutionDao.getJobExecutionCount(jobInstance.getId()), 1);
+		assertEquals(jobExecutionDao.getJobExecutionCount(jobInstance), 1);
 
 		// Save new JobExecution for same job
 		JobExecution testJobExecution = new JobExecution(jobInstance);
 		jobExecutionDao.saveJobExecution(testJobExecution);
 		// JobExecutionCount should be incremented by 1
-		assertEquals(jobExecutionDao.getJobExecutionCount(jobInstance.getId()), 2);
+		assertEquals(jobExecutionDao.getJobExecutionCount(jobInstance), 2);
 	}
 
 	public void testZeroExecutionCount() {
 
 		JobInstance testJob = jobInstanceDao.createJobInstance("test", new JobParameters());
 		// no jobExecutions saved for new job, count should be 0
-		assertEquals(jobExecutionDao.getJobExecutionCount(testJob.getId()), 0);
+		assertEquals(jobExecutionDao.getJobExecutionCount(testJob), 0);
 	}
 
 	public void testJobWithSimpleJobIdentifier() throws Exception {
