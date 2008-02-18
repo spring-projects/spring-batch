@@ -15,8 +15,11 @@
  */
 package org.springframework.batch.item.stream;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import junit.framework.TestCase;
 
@@ -234,6 +237,29 @@ public class SimpleStreamManagerTests extends TestCase {
 		assertEquals(0, list.size());
 	}
 
+	/**
+	 * Make sure the values from registered stream are present in 
+	 * manager's execution context.
+	 */
+	public void testGetExecutionContextPreservesValues() {
+		stream = new ItemStreamAdapter() {
+			public ExecutionContext getExecutionContext() {
+				ExecutionContext ctx = new ExecutionContext();
+				ctx.putString("string", "testString");
+				ctx.putDouble("double", 5.5);
+				ctx.putLong("long", 7);
+				return ctx;
+			}
+		};
+		manager.register("foo", stream);
+		ExecutionContext streamContext = stream.getExecutionContext();
+		ExecutionContext managerContext = manager.getExecutionContext("foo");
+		for (Iterator it = streamContext.entrySet().iterator(); it.hasNext();) {
+			Entry entry = (Entry) it.next();
+			assertTrue(managerContext.containsValue(entry.getValue()));
+		}
+		
+	}
 	private final class ItemStreamAdapterExtension extends ItemStreamAdapter {
 		public ExecutionContext getExecutionContext() {
 			return new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));

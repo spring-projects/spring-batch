@@ -102,7 +102,7 @@ public class SimpleStreamManager implements StreamManager {
 				for (Iterator iterator = context.entrySet().iterator(); iterator.hasNext();) {
 					Entry entry = (Entry) iterator.next();
 					String contextKey = prefix + entry.getKey();
-					result.putString(contextKey, entry.getValue().toString());
+					result.put(contextKey, entry.getValue());
 				}
 			}
 		});
