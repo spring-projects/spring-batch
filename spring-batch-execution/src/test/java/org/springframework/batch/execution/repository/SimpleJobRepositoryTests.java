@@ -37,12 +37,13 @@ import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.execution.repository.dao.JobDao;
-import org.springframework.batch.execution.repository.dao.StepDao;
+import org.springframework.batch.execution.repository.dao.StepExecutionDao;
+import org.springframework.batch.execution.repository.dao.StepInstanceDao;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Test SimpleJobRepository. The majority of test cases are tested using
- * EasyMock, however, there were some issues with using it for the stepDao when
+ * EasyMock, however, there were some issues with using it for the stepExecutionDao when
  * testing finding or creating steps, so an actual mock class had to be written.
  * 
  * @author Lucas Ward
@@ -62,11 +63,15 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	MockControl jobDaoControl = MockControl.createControl(JobDao.class);
 
-	MockControl stepDaoControl = MockControl.createControl(StepDao.class);
+	MockControl stepExecutionDaoControl = MockControl.createControl(StepExecutionDao.class);
+	
+	MockControl stepInstanceDaoControl = MockControl.createControl(StepInstanceDao.class);
 
 	JobDao jobDao;
 
-	StepDao stepDao;
+	StepExecutionDao stepExecutionDao;
+	
+	StepInstanceDao stepInstanceDao;
 
 	MockStepDao mockStepDao = new MockStepDao();
 
@@ -85,9 +90,10 @@ public class SimpleJobRepositoryTests extends TestCase {
 	public void setUp() throws Exception {
 
 		jobDao = (JobDao) jobDaoControl.getMock();
-		stepDao = (StepDao) stepDaoControl.getMock();
+		stepExecutionDao = (StepExecutionDao) stepExecutionDaoControl.getMock();
+		stepInstanceDao = (StepInstanceDao) stepInstanceDaoControl.getMock();
 
-		jobRepository = new SimpleJobRepository(jobDao, jobDao, stepDao, stepDao);
+		jobRepository = new SimpleJobRepository(jobDao, jobDao, stepInstanceDao, stepExecutionDao);
 
 		jobParameters = new JobParametersBuilder().toJobParameters();
 
@@ -135,10 +141,10 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.setReturnValue(jobExecutions);
 		jobDao.createJobInstance(jobConfiguration.getName(), jobParameters);
 		jobDaoControl.setReturnValue(databaseJob);
-		stepDao.createStepInstance(databaseJob, "TestStep1");
-		stepDaoControl.setReturnValue(databaseStep1);
-		stepDao.createStepInstance(databaseJob, "TestStep2");
-		stepDaoControl.setReturnValue(databaseStep2);
+		stepInstanceDao.createStepInstance(databaseJob, "TestStep1");
+		stepInstanceDaoControl.setReturnValue(databaseStep1);
+		stepInstanceDao.createStepInstance(databaseJob, "TestStep2");
+		stepInstanceDaoControl.setReturnValue(databaseStep2);
 		jobDao.saveJobExecution(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher() {
 			public boolean matches(Object[] expected, Object[] actual) {
@@ -149,7 +155,8 @@ public class SimpleJobRepositoryTests extends TestCase {
 				return "" + arguments[0];
 			}
 		});
-		stepDaoControl.replay();
+		stepExecutionDaoControl.replay();
+		stepInstanceDaoControl.replay();
 		jobDaoControl.replay();
 		JobInstance job = jobRepository.createJobExecution(jobConfiguration, jobParameters).getJobInstance();
 		assertTrue(job.equals(databaseJob));
@@ -177,23 +184,24 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDao.findJobInstances(jobConfiguration.getName(), jobParameters);
 		jobs.add(databaseJob);
 		jobDaoControl.setReturnValue(jobs);
-		stepDao.findStepInstance(databaseJob, "TestStep1");
-		stepDaoControl.setReturnValue(databaseStep1);
-		stepDao.getLastStepExecution(databaseStep1, jobExecution);
-		stepDaoControl.setReturnValue(databaseStep1Exec);
-		stepDao.findExecutionContext(databaseStep1Exec.getId());
-		stepDaoControl.setReturnValue(executionContext);
-		stepDao.getStepExecutionCount(databaseStep1);
-		stepDaoControl.setReturnValue(1);
-		stepDao.findStepInstance(databaseJob, "TestStep2");
-		stepDaoControl.setReturnValue(databaseStep2);
-		stepDao.getLastStepExecution(databaseStep2, jobExecution);
-		stepDaoControl.setReturnValue(databaseStep2Exec);
-		stepDao.findExecutionContext(databaseStep2Exec.getId());
-		stepDaoControl.setReturnValue(executionContext);
-		stepDao.getStepExecutionCount(databaseStep2);
-		stepDaoControl.setReturnValue(1);
-		stepDaoControl.replay();
+		stepInstanceDao.findStepInstance(databaseJob, "TestStep1");
+		stepInstanceDaoControl.setReturnValue(databaseStep1);
+		stepExecutionDao.getLastStepExecution(databaseStep1, jobExecution);
+		stepExecutionDaoControl.setReturnValue(databaseStep1Exec);
+		stepExecutionDao.findExecutionContext(databaseStep1Exec.getId());
+		stepExecutionDaoControl.setReturnValue(executionContext);
+		stepExecutionDao.getStepExecutionCount(databaseStep1);
+		stepExecutionDaoControl.setReturnValue(1);
+		stepInstanceDao.findStepInstance(databaseJob, "TestStep2");
+		stepInstanceDaoControl.setReturnValue(databaseStep2);
+		stepExecutionDao.getLastStepExecution(databaseStep2, jobExecution);
+		stepExecutionDaoControl.setReturnValue(databaseStep2Exec);
+		stepExecutionDao.findExecutionContext(databaseStep2Exec.getId());
+		stepExecutionDaoControl.setReturnValue(executionContext);
+		stepExecutionDao.getStepExecutionCount(databaseStep2);
+		stepExecutionDaoControl.setReturnValue(1);
+		stepExecutionDaoControl.replay();
+		stepInstanceDaoControl.replay();
 		jobDao.getJobExecutionCount(databaseJob.getId());
 		jobDaoControl.setReturnValue(1);
 		jobDao.findJobExecutions(databaseJob);
@@ -279,10 +287,10 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.setReturnValue(jobs);
 		jobDao.createJobInstance(jobConfiguration.getName(), jobParameters);
 		jobDaoControl.setReturnValue(databaseJob);
-		stepDao.createStepInstance(databaseJob, "TestStep1");
-		stepDaoControl.setReturnValue(databaseStep1);
-		stepDao.createStepInstance(databaseJob, "TestStep2");
-		stepDaoControl.setReturnValue(databaseStep2);
+		stepInstanceDao.createStepInstance(databaseJob, "TestStep1");
+		stepInstanceDaoControl.setReturnValue(databaseStep1);
+		stepInstanceDao.createStepInstance(databaseJob, "TestStep2");
+		stepInstanceDaoControl.setReturnValue(databaseStep2);
 		jobDao.saveJobExecution(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher() {
 			public boolean matches(Object[] expected, Object[] actual) {
@@ -293,7 +301,8 @@ public class SimpleJobRepositoryTests extends TestCase {
 				return "" + arguments[0];
 			}
 		});
-		stepDaoControl.replay();
+		stepExecutionDaoControl.replay();
+		stepInstanceDaoControl.replay();
 		jobDaoControl.replay();
 		JobInstance job = jobRepository.createJobExecution(jobConfiguration, jobParameters).getJobInstance();
 		assertTrue(job.equals(databaseJob));
@@ -341,22 +350,22 @@ public class SimpleJobRepositoryTests extends TestCase {
 		stepExecution.setId(new Long(11));
 		ExecutionContext executionContext = new ExecutionContext();
 		stepExecution.setExecutionContext(executionContext);
-		stepDao.updateStepExecution(stepExecution);
-		stepDao.updateExecutionContext(stepExecution.getId(), executionContext);
-		stepDaoControl.replay();
+		stepExecutionDao.updateStepExecution(stepExecution);
+		stepExecutionDao.updateExecutionContext(stepExecution.getId(), executionContext);
+		stepExecutionDaoControl.replay();
 		jobRepository.saveOrUpdate(stepExecution);
-		stepDaoControl.verify();
+		stepExecutionDaoControl.verify();
 	}
 
 	public void testSaveExistingStepExecution() {
 		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(10L)), new JobExecution(null), null);
 		ExecutionContext executionContext = new ExecutionContext();
 		stepExecution.setExecutionContext(executionContext);
-		stepDao.saveStepExecution(stepExecution);
-		stepDao.saveExecutionContext(stepExecution.getId(), executionContext);
-		stepDaoControl.replay();
+		stepExecutionDao.saveStepExecution(stepExecution);
+		stepExecutionDao.saveExecutionContext(stepExecution.getId(), executionContext);
+		stepExecutionDaoControl.replay();
 		jobRepository.saveOrUpdate(stepExecution);
-		stepDaoControl.verify();
+		stepExecutionDaoControl.verify();
 	}
 
 	public void testSaveOrUpdateStepExecutionException() {
@@ -385,10 +394,10 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDaoControl.setReturnValue(jobs);
 		jobDao.createJobInstance(jobConfiguration.getName(), jobParameters);
 		jobDaoControl.setReturnValue(databaseJob);
-		stepDao.createStepInstance(databaseJob, "TestStep1");
-		stepDaoControl.setReturnValue(databaseStep1);
-		stepDao.createStepInstance(databaseJob, "TestStep2");
-		stepDaoControl.setReturnValue(databaseStep2);
+		stepInstanceDao.createStepInstance(databaseJob, "TestStep1");
+		stepInstanceDaoControl.setReturnValue(databaseStep1);
+		stepInstanceDao.createStepInstance(databaseJob, "TestStep2");
+		stepInstanceDaoControl.setReturnValue(databaseStep2);
 		jobDao.saveJobExecution(new JobExecution(databaseJob));
 		jobDaoControl.setMatcher(new ArgumentsMatcher() {
 			public boolean matches(Object[] expected, Object[] actual) {
@@ -399,7 +408,8 @@ public class SimpleJobRepositoryTests extends TestCase {
 				return "" + arguments[0];
 			}
 		});
-		stepDaoControl.replay();
+		stepExecutionDaoControl.replay();
+		stepInstanceDaoControl.replay();
 		jobDaoControl.replay();
 		JobInstance job = jobRepository.createJobExecution(jobConfiguration, jobParameters).getJobInstance();
 		List jobSteps = job.getStepInstances();
@@ -419,23 +429,25 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobDao.findJobInstances(jobConfiguration.getName(), jobParameters);
 		jobs.add(databaseJob);
 		jobDaoControl.setReturnValue(jobs);
-		stepDao.findStepInstance(databaseJob, "TestStep1");
-		stepDaoControl.setReturnValue(databaseStep1);
-		stepDao.getLastStepExecution(databaseStep1, null);
-		stepDaoControl.setReturnValue(databaseStep1Exec);
-		stepDao.findExecutionContext(databaseStep1Exec.getId());
-		stepDaoControl.setReturnValue(executionContext);
-		stepDao.getStepExecutionCount(databaseStep1);
-		stepDaoControl.setReturnValue(1);
-		stepDao.findStepInstance(databaseJob, "TestStep2");
-		stepDaoControl.setReturnValue(databaseStep2);
-		stepDao.getLastStepExecution(databaseStep2, null);
-		stepDaoControl.setReturnValue(databaseStep2Exec);
-		stepDao.findExecutionContext(databaseStep2Exec.getId());
-		stepDaoControl.setReturnValue(executionContext);
-		stepDao.getStepExecutionCount(databaseStep2);
-		stepDaoControl.setReturnValue(1);
-		stepDaoControl.replay();
+		stepInstanceDao.findStepInstance(databaseJob, "TestStep1");
+		stepInstanceDaoControl.setReturnValue(databaseStep1);
+		stepExecutionDao.getLastStepExecution(databaseStep1, null);
+		stepExecutionDaoControl.setReturnValue(databaseStep1Exec);
+		stepExecutionDao.findExecutionContext(databaseStep1Exec.getId());
+		stepExecutionDaoControl.setReturnValue(executionContext);
+		stepExecutionDao.getStepExecutionCount(databaseStep1);
+		stepExecutionDaoControl.setReturnValue(1);
+		stepInstanceDao.findStepInstance(databaseJob, "TestStep2");
+		stepInstanceDaoControl.setReturnValue(databaseStep2);
+		stepExecutionDao.getLastStepExecution(databaseStep2, null);
+		stepExecutionDaoControl.setReturnValue(databaseStep2Exec);
+		stepExecutionDao.findExecutionContext(databaseStep2Exec.getId());
+		stepExecutionDaoControl.setReturnValue(executionContext);
+		stepExecutionDao.getStepExecutionCount(databaseStep2);
+		stepExecutionDaoControl.setReturnValue(1);
+		stepExecutionDaoControl.replay();
+		stepInstanceDaoControl.replay();
+		
 		jobDao.getJobExecutionCount(databaseJob.getId());
 		jobDaoControl.setReturnValue(1);
 		jobDao.findJobExecutions(databaseJob);

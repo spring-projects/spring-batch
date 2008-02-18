@@ -23,10 +23,11 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.execution.repository.dao.StepDao;
+import org.springframework.batch.execution.repository.dao.StepExecutionDao;
+import org.springframework.batch.execution.repository.dao.StepInstanceDao;
 import org.springframework.batch.item.ExecutionContext;
 
-public class MockStepDao implements StepDao {
+public class MockStepDao implements StepInstanceDao, StepExecutionDao {
 
 	private List newSteps;
 

@@ -32,7 +32,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
-public class MapStepDao implements StepDao {
+public class MapStepDao implements StepInstanceDao, StepExecutionDao {
 
 	private static Map stepsByJobId;
 	private static Map executionsById;

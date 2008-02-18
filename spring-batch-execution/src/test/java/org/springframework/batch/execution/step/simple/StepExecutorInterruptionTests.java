@@ -23,17 +23,19 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
-import org.springframework.batch.execution.repository.dao.JobDao;
+import org.springframework.batch.execution.repository.dao.JobExecutionDao;
+import org.springframework.batch.execution.repository.dao.JobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
-import org.springframework.batch.execution.repository.dao.StepDao;
+import org.springframework.batch.execution.repository.dao.StepExecutionDao;
+import org.springframework.batch.execution.repository.dao.StepInstanceDao;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ItemReaderAdapter;
@@ -45,9 +47,13 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private JobRepository jobRepository;
 
-	private JobDao jobDao = new MapJobDao();
+	private JobInstanceDao jobInstanceDao = new MapJobDao();
+	
+	private JobExecutionDao jobExecutionDao = new MapJobDao();
 
-	private StepDao stepDao = new MapStepDao();
+	private StepExecutionDao stepExecutionDao = new MapStepDao();
+	
+	private StepInstanceDao stepInstanceDao = new MapStepDao();
 
 	private JobInstance job;
 
@@ -55,7 +61,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	public void setUp() throws Exception {
 
-		jobRepository = new SimpleJobRepository(jobDao, jobDao, stepDao, stepDao);
+		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepInstanceDao, stepExecutionDao);
 
 		JobSupport jobConfiguration = new JobSupport();
 		step = new RepeatOperationsStep();
