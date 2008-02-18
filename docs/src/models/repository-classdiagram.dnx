@@ -19,23 +19,6 @@
     <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=SimpleJobRepository%5Bjcu%5Ename=SimpleJobRepository.java%5Bjpack%5Ename=org.springframework.batch.execution.repository%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D$uml.Class"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_LV6TItqUEdyZfZ-HsR_CLw" x="44713" y="6257"/>
   </children>
-  <children xmi:id="_N8qS8NqUEdyZfZ-HsR_CLw">
-    <children xmi:id="_N8qS89qUEdyZfZ-HsR_CLw" type="ImageCompartment">
-      <layoutConstraint xmi:type="notation:Size" xmi:id="_N8qS9NqUEdyZfZ-HsR_CLw" width="1320" height="1320"/>
-    </children>
-    <children xmi:id="_N8zc4NqUEdyZfZ-HsR_CLw" type="Stereotype"/>
-    <children xmi:id="_N8zc4dqUEdyZfZ-HsR_CLw" type="Name"/>
-    <children xmi:id="_N8zc4tqUEdyZfZ-HsR_CLw" type="Parent"/>
-    <children xmi:id="_N8zc49qUEdyZfZ-HsR_CLw" visible="false" type="AttributeCompartment">
-      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_N8zc5NqUEdyZfZ-HsR_CLw"/>
-    </children>
-    <children xmi:id="_N8zc5dqUEdyZfZ-HsR_CLw" type="OperationCompartment">
-      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_N8zc5tqUEdyZfZ-HsR_CLw"/>
-    </children>
-    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_N8qS8dqUEdyZfZ-HsR_CLw" showStereotype="Label"/>
-    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=ExecutionAttributes%5Bjcu%5Ename=ExecutionAttributes.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_N8qS8tqUEdyZfZ-HsR_CLw" x="32968" y="15216"/>
-  </children>
   <children xmi:id="_N8zc_9qUEdyZfZ-HsR_CLw">
     <children xmi:id="_N8zdAtqUEdyZfZ-HsR_CLw" type="ImageCompartment">
       <layoutConstraint xmi:type="notation:Size" xmi:id="_N8zdA9qUEdyZfZ-HsR_CLw" width="1320" height="1320"/>
@@ -138,7 +121,7 @@
     </children>
     <styles xmi:type="umlnotation:UMLClassifierStyle" xmi:id="_N8zdPdqUEdyZfZ-HsR_CLw" showStereotype="Label" useClassifierShape="true"/>
     <element xmi:type="uml:Interface" href="mmi:///#jsrctype%5Ename=StepInstanceDao%5Bjcu%5Ename=StepInstanceDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D$uml.Interface"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_N8zdPtqUEdyZfZ-HsR_CLw" x="51354" y="12363"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_N8zdPtqUEdyZfZ-HsR_CLw" x="51671" y="12997"/>
   </children>
   <children xmi:id="_N8zdSdqUEdyZfZ-HsR_CLw">
     <children xmi:id="_N8zdTNqUEdyZfZ-HsR_CLw" type="ImageCompartment">
@@ -210,7 +193,7 @@
     </children>
     <styles xmi:type="umlnotation:UMLClassifierStyle" xmi:id="_N89OAtqUEdyZfZ-HsR_CLw" showStereotype="Label" useClassifierShape="true"/>
     <element xmi:type="uml:Interface" href="mmi:///#jsrctype%5Ename=StepExecutionDao%5Bjcu%5Ename=StepExecutionDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D$uml.Interface"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_N89OA9qUEdyZfZ-HsR_CLw" x="60230" y="1902"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_N89OA9qUEdyZfZ-HsR_CLw" x="58962" y="5072"/>
   </children>
   <children xmi:id="_N89OMNqUEdyZfZ-HsR_CLw">
     <children xmi:id="_N89OM9qUEdyZfZ-HsR_CLw" type="ImageCompartment">
@@ -264,24 +247,6 @@
     <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=JobInstance%5Bjcu%5Ename=JobInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D$uml.Class"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_N89OS9qUEdyZfZ-HsR_CLw" x="33602" y="12363"/>
   </children>
-  <children xmi:id="_Pa_f4tqZEdyZfZ-HsR_CLw">
-    <children xmi:id="_Pa_f5dqZEdyZfZ-HsR_CLw" type="ImageCompartment">
-      <layoutConstraint xmi:type="notation:Size" xmi:id="_Pa_f5tqZEdyZfZ-HsR_CLw" width="530" height="530"/>
-    </children>
-    <children xmi:id="_Pa_f59qZEdyZfZ-HsR_CLw" type="Stereotype"/>
-    <children xmi:id="_Pa_f6NqZEdyZfZ-HsR_CLw" type="Kind"/>
-    <children xmi:id="_Pa_f6dqZEdyZfZ-HsR_CLw" type="Name"/>
-    <children xmi:id="_Pa_f6tqZEdyZfZ-HsR_CLw" type="Parent"/>
-    <children xmi:id="_Pa_f69qZEdyZfZ-HsR_CLw" type="AttributeCompartment">
-      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_Pa_f7NqZEdyZfZ-HsR_CLw"/>
-    </children>
-    <children xmi:id="_Pa_f7dqZEdyZfZ-HsR_CLw" visible="false" type="OperationCompartment">
-      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_Pa_f7tqZEdyZfZ-HsR_CLw"/>
-    </children>
-    <styles xmi:type="umlnotation:UMLClassifierStyle" xmi:id="_Pa_f49qZEdyZfZ-HsR_CLw" showStereotype="Label" useClassifierShape="true"/>
-    <element xmi:type="uml:Interface" href="mmi:///#jsrctype%5Ename=StepDao%5Bjcu%5Ename=StepDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D$uml.Interface"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Pa_f5NqZEdyZfZ-HsR_CLw" x="62449" y="8876"/>
-  </children>
   <children xmi:id="_Z2RL_tqZEdyZfZ-HsR_CLw">
     <children xmi:id="_Z2RMAdqZEdyZfZ-HsR_CLw" type="ImageCompartment">
       <layoutConstraint xmi:type="notation:Size" xmi:id="_Z2RMAtqZEdyZfZ-HsR_CLw" width="1320" height="1320"/>
@@ -316,6 +281,23 @@
     <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=MockStepDao%5Bjcu%5Ename=MockStepDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository%5Bjsrcroot%5Esrcfolder=src/test/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D$uml.Class"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Z2aV8NqZEdyZfZ-HsR_CLw" x="64761" y="11872"/>
   </children>
+  <children xmi:id="_ALWw2t5mEdyZfZ-HsR_CLw">
+    <children xmi:id="_ALWw3d5mEdyZfZ-HsR_CLw" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_ALWw3t5mEdyZfZ-HsR_CLw" width="1320" height="1320"/>
+    </children>
+    <children xmi:id="_ALWw395mEdyZfZ-HsR_CLw" type="Stereotype"/>
+    <children xmi:id="_ALWw4N5mEdyZfZ-HsR_CLw" type="Name"/>
+    <children xmi:id="_ALWw4d5mEdyZfZ-HsR_CLw" type="Parent"/>
+    <children xmi:id="_ALWw4t5mEdyZfZ-HsR_CLw" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_ALWw495mEdyZfZ-HsR_CLw"/>
+    </children>
+    <children xmi:id="_ALWw5N5mEdyZfZ-HsR_CLw" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_ALWw5d5mEdyZfZ-HsR_CLw"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_ALWw295mEdyZfZ-HsR_CLw" showStereotype="Label"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=ExecutionContext%5Bjcu%5Ename=ExecutionContext.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ALWw3N5mEdyZfZ-HsR_CLw" x="40384" y="10930"/>
+  </children>
   <styles xmi:type="umlnotation:UMLDiagramStyle" xmi:id="_JiD3YdaYEdyFWa-S-HPO7A"/>
   <element xsi:nil="true"/>
   <edges xmi:id="_N89OVdqUEdyZfZ-HsR_CLw" source="_LV6TINqUEdyZfZ-HsR_CLw" target="_N89OAdqUEdyZfZ-HsR_CLw">
@@ -345,17 +327,6 @@
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_N9G-6tqUEdyZfZ-HsR_CLw" showStereotype="Text"/>
     <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=SimpleJobRepository%5Bjcu%5Ename=SimpleJobRepository.java%5Bjpack%5Ename=org.springframework.batch.execution.repository%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=StepExecutionDao%5Bjcu%5Ename=StepExecutionDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D$uml.Usage"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_N9G-69qUEdyZfZ-HsR_CLw" points="[-14, 2884, -19500, -10385]$[19486, 4471, 0, -8798]"/>
-  </edges>
-  <edges xmi:id="_N9G-8dqUEdyZfZ-HsR_CLw" source="_LV6TINqUEdyZfZ-HsR_CLw" target="_N8qS8NqUEdyZfZ-HsR_CLw">
-    <children xmi:id="_N9G-9NqUEdyZfZ-HsR_CLw" type="KindLabel">
-      <children xmi:id="_N9G-9tqUEdyZfZ-HsR_CLw" type="Stereotype"/>
-      <children xmi:id="_N9G--NqUEdyZfZ-HsR_CLw" type="Kind"/>
-      <children xmi:id="_N9G-99qUEdyZfZ-HsR_CLw" type="Name"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_N9G-9dqUEdyZfZ-HsR_CLw" y="-530"/>
-    </children>
-    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_N9G-8tqUEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=SimpleJobRepository%5Bjcu%5Ename=SimpleJobRepository.java%5Bjpack%5Ename=org.springframework.batch.execution.repository%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ExecutionAttributes%5Bjcu%5Ename=ExecutionAttributes.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Usage"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_N9G-89qUEdyZfZ-HsR_CLw" points="[-14, 2884, 43325, -10385]$[-43353, 4471, -14, -8798]"/>
   </edges>
   <edges xmi:id="_N9G--dqUEdyZfZ-HsR_CLw" source="_LV6TINqUEdyZfZ-HsR_CLw" target="_N89N59qUEdyZfZ-HsR_CLw">
     <children xmi:id="_N9G-_NqUEdyZfZ-HsR_CLw" type="KindLabel">
@@ -539,17 +510,6 @@
     <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=SimpleJobRepository%5Bjcu%5Ename=SimpleJobRepository.java%5Bjpack%5Ename=org.springframework.batch.execution.repository%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=JobRepository%5Bjcu%5Ename=JobRepository.java%5Bjpack%5Ename=org.springframework.batch.core.repository%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_N9QJJdqUEdyZfZ-HsR_CLw" points="[-14, -2884, 0, 3202]$[-14, -4472, 0, 1614]"/>
   </edges>
-  <edges xmi:id="_Pa_f_NqZEdyZfZ-HsR_CLw" source="_N89OAdqUEdyZfZ-HsR_CLw" target="_N8qS8NqUEdyZfZ-HsR_CLw">
-    <children xmi:id="_Pa_f_9qZEdyZfZ-HsR_CLw" type="KindLabel">
-      <children xmi:id="_Pa_gAdqZEdyZfZ-HsR_CLw" type="Stereotype"/>
-      <children xmi:id="_Pa_gA9qZEdyZfZ-HsR_CLw" type="Kind"/>
-      <children xmi:id="_Pa_gAtqZEdyZfZ-HsR_CLw" type="Name"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Pa_gANqZEdyZfZ-HsR_CLw" y="-186"/>
-    </children>
-    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_Pa_f_dqZEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=StepExecutionDao%5Bjcu%5Ename=StepExecutionDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ExecutionAttributes%5Bjcu%5Ename=ExecutionAttributes.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Usage"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Pa_f_tqZEdyZfZ-HsR_CLw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
-  </edges>
   <edges xmi:id="_PbIp0NqZEdyZfZ-HsR_CLw" source="_N89OAdqUEdyZfZ-HsR_CLw" target="_N8zdMNqUEdyZfZ-HsR_CLw">
     <children xmi:id="_PbIp09qZEdyZfZ-HsR_CLw" type="KindLabel">
       <children xmi:id="_PbIp1dqZEdyZfZ-HsR_CLw" type="Stereotype"/>
@@ -560,16 +520,6 @@
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_PbIp0dqZEdyZfZ-HsR_CLw" showStereotype="Text"/>
     <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=StepExecutionDao%5Bjcu%5Ename=StepExecutionDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=StepInstance%5Bjcu%5Ename=StepInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Usage"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_PbIp0tqZEdyZfZ-HsR_CLw" points="[-2619, 1905, 17066, -11404]$[-8652, 6324, 11033, -6985]$[-18838, 12780, 847, -529]"/>
-  </edges>
-  <edges xmi:id="_PbIp2NqZEdyZfZ-HsR_CLw" source="_Pa_f4tqZEdyZfZ-HsR_CLw" target="_N89OAdqUEdyZfZ-HsR_CLw">
-    <children xmi:id="_PbIp29qZEdyZfZ-HsR_CLw" type="NameLabel">
-      <children xmi:id="_PbIp3dqZEdyZfZ-HsR_CLw" type="Stereotype"/>
-      <children xmi:id="_PbIp3tqZEdyZfZ-HsR_CLw" type="Name"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_PbIp3NqZEdyZfZ-HsR_CLw" y="-186"/>
-    </children>
-    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_PbIp2dqZEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=StepDao%5Bjcu%5Ename=StepDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=StepExecutionDao%5Bjcu%5Ename=StepExecutionDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D$uml.Generalization"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_PbIp2tqZEdyZfZ-HsR_CLw" points="[-13, -860, 0, 4048]$[-13, -2448, 0, 2460]"/>
   </edges>
   <edges xmi:id="_PbIp39qZEdyZfZ-HsR_CLw" source="_N89OAdqUEdyZfZ-HsR_CLw" target="_N8zc_9qUEdyZfZ-HsR_CLw">
     <children xmi:id="_PbIp4tqZEdyZfZ-HsR_CLw" type="KindLabel">
@@ -582,34 +532,46 @@
     <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=StepExecutionDao%5Bjcu%5Ename=StepExecutionDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=StepExecution%5Bjcu%5Ename=StepExecution.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Usage"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_PbIp4dqZEdyZfZ-HsR_CLw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
-  <edges xmi:id="_Z2aV-tqZEdyZfZ-HsR_CLw" source="_Z2aV7tqZEdyZfZ-HsR_CLw" target="_Pa_f4tqZEdyZfZ-HsR_CLw">
-    <children xmi:id="_Z2aV_dqZEdyZfZ-HsR_CLw" type="NameLabel">
-      <children xmi:id="_Z2aV_9qZEdyZfZ-HsR_CLw" type="Stereotype"/>
-      <children xmi:id="_Z2aWANqZEdyZfZ-HsR_CLw" type="Name"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Z2aV_tqZEdyZfZ-HsR_CLw" y="-186"/>
+  <edges xmi:id="_ALWw5t5mEdyZfZ-HsR_CLw" source="_Z2RL_tqZEdyZfZ-HsR_CLw" target="_N89OAdqUEdyZfZ-HsR_CLw">
+    <children xmi:id="_ALWw6d5mEdyZfZ-HsR_CLw" type="NameLabel">
+      <children xmi:id="_ALWw695mEdyZfZ-HsR_CLw" type="Stereotype"/>
+      <children xmi:id="_ALWw7N5mEdyZfZ-HsR_CLw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ALWw6t5mEdyZfZ-HsR_CLw" y="-186"/>
     </children>
-    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_Z2aV-9qZEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=MockStepDao%5Bjcu%5Ename=MockStepDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository%5Bjsrcroot%5Esrcfolder=src/test/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=StepDao%5Bjcu%5Ename=StepDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Z2aV_NqZEdyZfZ-HsR_CLw" points="[0, -4577, 3480, 2289]$[-3493, -6165, -13, 701]"/>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_ALWw595mEdyZfZ-HsR_CLw" showStereotype="Text"/>
+    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=MapStepDao%5Bjcu%5Ename=MapStepDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=StepExecutionDao%5Bjcu%5Ename=StepExecutionDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ALWw6N5mEdyZfZ-HsR_CLw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
-  <edges xmi:id="_Z2aWAdqZEdyZfZ-HsR_CLw" source="_Pa_f4tqZEdyZfZ-HsR_CLw" target="_N8zdPNqUEdyZfZ-HsR_CLw">
-    <children xmi:id="_Z2aWBNqZEdyZfZ-HsR_CLw" type="NameLabel">
-      <children xmi:id="_Z2aWBtqZEdyZfZ-HsR_CLw" type="Stereotype"/>
-      <children xmi:id="_Z2aWB9qZEdyZfZ-HsR_CLw" type="Name"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Z2aWBdqZEdyZfZ-HsR_CLw" y="-186"/>
+  <edges xmi:id="_ALWw8N5mEdyZfZ-HsR_CLw" source="_N89OAdqUEdyZfZ-HsR_CLw" target="_N8zdJNqUEdyZfZ-HsR_CLw">
+    <children xmi:id="_ALWw895mEdyZfZ-HsR_CLw" type="KindLabel">
+      <children xmi:id="_ALWw9d5mEdyZfZ-HsR_CLw" type="Stereotype"/>
+      <children xmi:id="_ALWw995mEdyZfZ-HsR_CLw" type="Kind"/>
+      <children xmi:id="_ALWw9t5mEdyZfZ-HsR_CLw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ALWw9N5mEdyZfZ-HsR_CLw" y="-186"/>
     </children>
-    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_Z2aWAtqZEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=StepDao%5Bjcu%5Ename=StepDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=StepInstanceDao%5Bjcu%5Ename=StepInstanceDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D$uml.Generalization"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Z2aWA9qZEdyZfZ-HsR_CLw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_ALWw8d5mEdyZfZ-HsR_CLw" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=StepExecutionDao%5Bjcu%5Ename=StepExecutionDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=JobExecution%5Bjcu%5Ename=JobExecution.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ALWw8t5mEdyZfZ-HsR_CLw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
-  <edges xmi:id="_Z2aWCNqZEdyZfZ-HsR_CLw" source="_Z2RL_tqZEdyZfZ-HsR_CLw" target="_Pa_f4tqZEdyZfZ-HsR_CLw">
-    <children xmi:id="_Z2aWC9qZEdyZfZ-HsR_CLw" type="NameLabel">
-      <children xmi:id="_Z2aWDdqZEdyZfZ-HsR_CLw" type="Stereotype"/>
-      <children xmi:id="_Z2aWDtqZEdyZfZ-HsR_CLw" type="Name"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Z2aWDNqZEdyZfZ-HsR_CLw" y="-186"/>
+  <edges xmi:id="_ALWw-N5mEdyZfZ-HsR_CLw" source="_Z2aV7tqZEdyZfZ-HsR_CLw" target="_N89OAdqUEdyZfZ-HsR_CLw">
+    <children xmi:id="_ALWw-95mEdyZfZ-HsR_CLw" type="NameLabel">
+      <children xmi:id="_ALWw_d5mEdyZfZ-HsR_CLw" type="Stereotype"/>
+      <children xmi:id="_ALWw_t5mEdyZfZ-HsR_CLw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ALWw_N5mEdyZfZ-HsR_CLw" y="-186"/>
     </children>
-    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_Z2aWCdqZEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=MapStepDao%5Bjcu%5Ename=MapStepDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=StepDao%5Bjcu%5Ename=StepDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Z2aWCtqZEdyZfZ-HsR_CLw" points="[0, -4577, -3505, 2289]$[3492, -6165, -13, 701]"/>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_ALWw-d5mEdyZfZ-HsR_CLw" showStereotype="Text"/>
+    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=MockStepDao%5Bjcu%5Ename=MockStepDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository%5Bjsrcroot%5Esrcfolder=src/test/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=StepExecutionDao%5Bjcu%5Ename=StepExecutionDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ALWw-t5mEdyZfZ-HsR_CLw" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:id="_ALWw_95mEdyZfZ-HsR_CLw" source="_N89OAdqUEdyZfZ-HsR_CLw" target="_ALWw2t5mEdyZfZ-HsR_CLw">
+    <children xmi:id="_ALWxAt5mEdyZfZ-HsR_CLw" type="KindLabel">
+      <children xmi:id="_ALWxBN5mEdyZfZ-HsR_CLw" type="Stereotype"/>
+      <children xmi:id="_ALWxBt5mEdyZfZ-HsR_CLw" type="Kind"/>
+      <children xmi:id="_ALWxBd5mEdyZfZ-HsR_CLw" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ALWxA95mEdyZfZ-HsR_CLw" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_ALWxAN5mEdyZfZ-HsR_CLw" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=StepExecutionDao%5Bjcu%5Ename=StepExecutionDao.java%5Bjpack%5Ename=org.springframework.batch.execution.repository.dao%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ExecutionContext%5Bjcu%5Ename=ExecutionContext.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ALWxAd5mEdyZfZ-HsR_CLw" points="[-13, 2038, -13, -7011]$[-13, 3625, -13, -5424]"/>
   </edges>
 </notation:Diagram>
