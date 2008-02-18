@@ -42,8 +42,8 @@ import org.springframework.util.Assert;
 /**
  * 
  * <p>
- * Simple Job Repository that stores Jobs, JobExecutions, Steps, and
- * StepExecutions using the provided JobDao and StepDao.
+ * Implementation of {@link JobRepository} that stores JobInstances,
+ * JobExecutions, StepInstances, and StepExecutions using the injected DAOs.
  * <p>
  * 
  * @author Lucas Ward
@@ -51,8 +51,10 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * 
  * @see JobRepository
- * @see StepDao
- * @see JobDao
+ * @see JobInstanceDao
+ * @see JobExecutionDao
+ * @see StepInstanceDao
+ * @see StepExecutionDao
  * 
  */
 public class SimpleJobRepository implements JobRepository {
@@ -72,8 +74,8 @@ public class SimpleJobRepository implements JobRepository {
 	SimpleJobRepository() {
 	}
 
-	public SimpleJobRepository(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao, StepInstanceDao stepInstanceDao,
-			StepExecutionDao stepExecutionDao) {
+	public SimpleJobRepository(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao,
+			StepInstanceDao stepInstanceDao, StepExecutionDao stepExecutionDao) {
 		super();
 		this.jobInstanceDao = jobInstanceDao;
 		this.jobExecutionDao = jobExecutionDao;
@@ -83,12 +85,11 @@ public class SimpleJobRepository implements JobRepository {
 
 	/**
 	 * <p>
-	 * Create a {@link JobExecution} based on the passed in
-	 * {@link JobIdentifier} and {@link JobSupport}. However, unique
-	 * identification of a job can only come from the database, and therefore
-	 * must come from JobDao by either creating a new job or finding an existing
-	 * one, which will ensure that the id of the job is populated with the
-	 * correct value.
+	 * Create a {@link JobExecution} based on the passed in {@link Job} and
+	 * {@link JobParameters}. However, unique identification of a job can only
+	 * come from the database, and therefore must come from JobDao by either
+	 * creating a new job instance or finding an existing one, which will ensure
+	 * that the id of the job instance is populated with the correct value.
 	 * </p>
 	 * 
 	 * <p>
@@ -96,19 +97,20 @@ public class SimpleJobRepository implements JobRepository {
 	 * created or an existing one should be returned. The first is
 	 * restartability. The {@link JobSupport} restartable property will be
 	 * checked first. If it is false, a new job will be created, regardless of
-	 * whether or not one exists. If it is true, the {@link JobDao} will be
-	 * checked to determine if the job already exists, if it does, it's steps
+	 * whether or not one exists. If it is true, the {@link JobInstanceDao} will
+	 * be checked to determine if the job already exists, if it does, it's steps
 	 * will be populated (there must be at least 1) and a new
-	 * {@link JobExecution} will be returned. If no job is found, a new one will
-	 * be created.
+	 * {@link JobExecution} will be returned. If no job instance is found, a new
+	 * one will be created.
 	 * </p>
 	 * 
 	 * <p>
 	 * A check is made to see if any job executions are already running, and an
 	 * exception will be thrown if one is detected. To detect a running job
-	 * execution we use the {@link JobDao}:
+	 * execution we use the {@link JobExecutionDao}:
 	 * <ol>
-	 * <li>First we find all jobs which match the given {@link JobIdentifier}</li>
+	 * <li>First we find all jobs which match the given {@link JobParameters}
+	 * and job name</li>
 	 * <li>What happens then depends on how many existing job instances we
 	 * find:
 	 * <ul>
@@ -128,12 +130,12 @@ public class SimpleJobRepository implements JobRepository {
 	 * If this method is run in a transaction (as it normally would be) with
 	 * isolation level at {@link Isolation#REPEATABLE_READ} or better, then this
 	 * method should block if another transaction is already executing it (for
-	 * the same {@link JobIdentifier}). The first transaction to complete in
-	 * this scenario obtains a valid {@link JobExecution}, and others throw
-	 * {@link JobExecutionAlreadyRunningException} (or timeout). There are no
-	 * such guarantees if the {@link JobDao} does not respect the transaction
-	 * isolation levels (e.g. if using a non-relational data-store, or if the
-	 * platform does not support the higher isolation levels).
+	 * the same {@link JobParameters} and job name). The first transaction to
+	 * complete in this scenario obtains a valid {@link JobExecution}, and
+	 * others throw {@link JobExecutionAlreadyRunningException} (or timeout).
+	 * There are no such guarantees if the {@link JobDao} does not respect the
+	 * transaction isolation levels (e.g. if using a non-relational data-store,
+	 * or if the platform does not support the higher isolation levels).
 	 * </p>
 	 * 
 	 * @see JobRepository#createJobExecution(JobSupport, JobParameters)
@@ -275,8 +277,8 @@ public class SimpleJobRepository implements JobRepository {
 
 	/**
 	 * Convenience method for creating a new job. A new job is created by
-	 * calling {@link JobDao#createJob(JobRuntimeInformation)} and then it's
-	 * list of StepConfigurations is passed to the createSteps method.
+	 * calling {@link JobInstanceDao#createJobInstance(String, JobParameters)} and then it's
+	 * list of StepInstances is passed to the createStepInstances method.
 	 */
 	private JobInstance createJobInstance(Job job, JobParameters jobParameters) {
 
@@ -287,7 +289,7 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	/**
-	 * Create steps based on the given Job and list of Steps.
+	 * Create step instances based on the given Job and list of Steps.
 	 */
 	private List createStepInstances(JobInstance job, List steps) {
 
@@ -303,7 +305,7 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	/**
-	 * Find Steps for the given list of Steps with a given JobId
+	 * Find StepInstances for the given list of Steps and JobInstance
 	 */
 	protected List findStepInstances(List steps, JobInstance jobInstance, JobExecution lastJobExecution) {
 		List stepInstances = new ArrayList();
