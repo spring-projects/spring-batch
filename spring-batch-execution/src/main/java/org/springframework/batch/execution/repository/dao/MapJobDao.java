@@ -30,7 +30,7 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
-public class MapJobDao implements JobDao {
+public class MapJobDao implements JobInstanceDao, JobExecutionDao {
 
 	private static Map jobsById;
 	private static Map executionsById;

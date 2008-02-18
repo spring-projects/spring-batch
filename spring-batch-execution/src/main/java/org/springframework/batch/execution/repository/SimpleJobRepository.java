@@ -31,7 +31,6 @@ import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.execution.repository.dao.JobDao;
 import org.springframework.batch.execution.repository.dao.JobExecutionDao;
 import org.springframework.batch.execution.repository.dao.JobInstanceDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
