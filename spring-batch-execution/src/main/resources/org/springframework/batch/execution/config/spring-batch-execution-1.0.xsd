@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns="http://www.springframework.org/schema/batch-core"
+<xs:schema xmlns="http://www.springframework.org/schema/batch-execution"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www.springframework.org/schema/batch-core"
+	targetNamespace="http://www.springframework.org/schema/batch-execution"
 	elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
 
 	<xs:element name="job">
