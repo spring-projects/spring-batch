@@ -1,7 +1,5 @@
 package org.springframework.batch.execution.repository.dao;
 
-import java.util.List;
-
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepInstance;
 
@@ -16,14 +14,6 @@ public interface StepInstanceDao {
 	 * @return StepInstance
 	 */
 	StepInstance findStepInstance(JobInstance jobInstance, String stepName);
-
-	/**
-	 * Find all StepInstances of the given JobInstance.
-	 * 
-	 * @param jobInstance the job to use as a search key
-	 * @return list of {@link StepInstance}
-	 */
-	List findStepInstances(JobInstance jobInstance);
 
 	/**
 	 * Create a StepInstance for the given name and JobInstance.

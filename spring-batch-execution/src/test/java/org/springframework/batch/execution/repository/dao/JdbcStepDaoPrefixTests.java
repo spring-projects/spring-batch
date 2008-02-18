@@ -85,12 +85,6 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("FOO_STEP") != -1);
 	}
 	
-	public void testModifiedFindSteps(){
-		stepInstanceDao.setTablePrefix("FOO_");
-		stepInstanceDao.findStepInstances(new JobInstance(new Long(1), new JobParameters()));
-		assertTrue(jdbcTemplate.getSqlStatement().indexOf("FOO_STEP") != -1);
-	}
-	
 	public void testModifiedFindStep(){
 		stepInstanceDao.setTablePrefix("FOO_");
 		try{
@@ -115,11 +109,6 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 		}
 		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP") != -1);
 		
-	}
-	
-	public void testDefaultFindSteps(){
-		stepInstanceDao.findStepInstances(new JobInstance(new Long(1), new JobParameters()));
-		assertTrue(jdbcTemplate.getSqlStatement().indexOf("BATCH_STEP") != -1);
 	}
 	
 	public void testDefaultCreateStep(){

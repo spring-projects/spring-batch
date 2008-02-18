@@ -17,7 +17,6 @@
 package org.springframework.batch.execution.repository.dao;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Job;
@@ -137,21 +136,6 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 
 		StepInstance tempStep = stepInstanceDao.findStepInstance(jobInstance, "TestStep1");
 		assertEquals(tempStep, step1);
-	}
-
-	public void testFindSteps() {
-
-		List steps = stepInstanceDao.findStepInstances(jobInstance);
-		assertEquals(steps.size(), 2);
-		assertTrue(steps.contains(step1));
-		assertTrue(steps.contains(step2));
-	}
-
-	public void testFindStepsNotSaved() {
-
-		// no steps are saved for given id, empty list should be returned
-		List steps = stepInstanceDao.findStepInstances(new JobInstance(new Long(38922), jobParameters));
-		assertEquals(steps.size(), 0);
 	}
 
 	public void testCreateStep() {

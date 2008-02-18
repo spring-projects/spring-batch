@@ -38,8 +38,6 @@ public class JdbcStepInstanceDao extends AbstractJdbcBatchMetadataDao implements
 	private static final String FIND_STEP = "SELECT STEP_INSTANCE_ID from %PREFIX%STEP_INSTANCE where JOB_INSTANCE_ID = ? "
 			+ "and STEP_NAME = ?";
 
-	private static final String FIND_STEPS = "SELECT STEP_INSTANCE_ID, STEP_NAME from %PREFIX%STEP_INSTANCE where JOB_INSTANCE_ID = ?";
-
 	private DataFieldMaxValueIncrementer stepIncrementer;
 
 	/**
@@ -103,25 +101,6 @@ public class JdbcStepInstanceDao extends AbstractJdbcBatchMetadataDao implements
 					+ stepName + " and JobId:" + jobInstance.getId(), 1, steps.size());
 		}
 
-	}
-
-	/**
-	 * @see StepDao#findStepInstances(JobInstance)
-	 * 
-	 * Sql implementation which uses a RowMapper to populate a list of all rows
-	 * in the step table with the same JOB_INSTANCE_ID.
-	 * 
-	 * @throws IllegalArgumentException if jobId is null.
-	 */
-	public List findStepInstances(final JobInstance jobInstance) {
-
-		Assert.notNull(jobInstance, "Job cannot be null.");
-
-		Object[] parameters = new Object[] { jobInstance.getId() };
-
-		RowMapper rowMapper = new StepInstanceRowMapper(jobInstance, null);
-
-		return getJdbcTemplate().query(getQuery(FIND_STEPS), parameters, rowMapper);
 	}
 
 	public void setStepIncrementer(DataFieldMaxValueIncrementer stepIncrementer) {
