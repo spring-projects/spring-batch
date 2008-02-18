@@ -36,18 +36,14 @@ public interface StepExecutionDao {
 	int getStepExecutionCount(StepInstance stepInstance);
 
 	/**
-	 * Find all {@link ExecutionContext} for the given execution id.
+	 * Find all {@link ExecutionContext} for the given {@link StepExecution}.
 	 * 
-	 * @param executionId - Long id of the {@link StepExecution} that the
-	 * attributes belongs to.
-	 * @return attributes for the provided id. If none are found, an empty
-	 * {@link ExecutionContext} will be returned.
 	 * @throws IllegalArgumentException if the id is null.
 	 */
 	ExecutionContext findExecutionContext(StepExecution stepExecution);
 
 	/**
-	 * Save the provided {@link ExecutionContext} for the given executionId.
+	 * Save the {@link ExecutionContext} of the given {@link StepExecution}.
 	 * 
 	 * @param executionId to be saved
 	 * @param executionContext to be saved.
@@ -57,15 +53,13 @@ public interface StepExecutionDao {
 	void saveExecutionContext(StepExecution stepExecution);
 
 	/**
-	 * Update the provided ExecutionContext.
-	 * 
-	 * @param executionId
-	 * @param executionContext
+	 * Update the ExecutionContext of given {@link StepExecution}.
 	 */
 	void updateExecutionContext(StepExecution stepExecution);
 
 	/**
 	 * @param lastJobExecution last job execution
+	 * @param stepInstance
 	 * @return the last execution of the given instance
 	 */
 	StepExecution getLastStepExecution(StepInstance stepInstance, JobExecution lastJobExecution);

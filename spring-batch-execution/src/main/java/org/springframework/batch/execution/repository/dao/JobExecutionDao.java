@@ -16,7 +16,7 @@ public interface JobExecutionDao {
 	/**
 	 * Save a new JobExecution.
 	 * 
-	 * Preconditions: jobExecution must have a jobInstanceId.
+	 * Preconditions: jobInstance the jobExecution belongs to must have a jobInstanceId.
 	 * 
 	 * @param jobExecution
 	 */
