@@ -49,18 +49,4 @@ public interface JobExecutionDao {
 	 */
 	List findJobExecutions(JobInstance jobInstance);
 
-	/**
-	 * Given an id, return the matching JobExecution.
-	 * 
-	 * @param jobExecutionId - id of the execution to be returned.
-	 * @return {@link JobExecution} matching the id.
-	 * @throws {@link IncorrectResultSizeDataAccessException} if more than one
-	 * execution is found for the given id.
-	 */
-	JobExecution getJobExecution(Long jobExecutionId);
-	
-//	/**
-//	 * @return return the last execution for the given instance
-//	 */
-//	JobExecution getLastJobExecution(JobInstance jobInstance);
 }

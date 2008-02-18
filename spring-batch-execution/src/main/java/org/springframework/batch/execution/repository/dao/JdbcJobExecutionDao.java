@@ -13,7 +13,6 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
@@ -51,9 +50,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final String FIND_JOB_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
 		+ " where JOB_INSTANCE_ID = ?";
 	
-	private static final String GET_JOB_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
-		+ " where JOB_EXECUTION_ID = ?";
-	
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
 	public List findJobExecutions(final JobInstance job) {
@@ -63,28 +59,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		return getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTIONS),
 				new Object[] { job.getId() }, new JobExecutionRowMapper(job));
-	}
-
-	public JobExecution getJobExecution(Long jobExecutionId) {
-
-		Assert.notNull(jobExecutionId, "Job Execution id must not be null.");
-
-		List executions = getJdbcTemplate().query(getQuery(GET_JOB_EXECUTION),
-				new Object[] { jobExecutionId }, new JobExecutionRowMapper(null));
-
-		JobExecution jobExecution;
-		if (executions.size() == 1) {
-			jobExecution = (JobExecution) executions.get(0);
-		}
-		else if (executions.size() == 0) {
-			jobExecution = null;
-		}
-		else {
-			throw new IncorrectResultSizeDataAccessException("Only one JobExecution may exist for given id: ["
-					+ jobExecutionId + "]", 1, executions.size());
-		}
-
-		return jobExecution;
 	}
 
 	/**

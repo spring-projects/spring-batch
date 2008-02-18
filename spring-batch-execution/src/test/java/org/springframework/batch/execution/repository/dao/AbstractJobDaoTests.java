@@ -152,19 +152,6 @@ public abstract class AbstractJobDaoTests extends
 		assertEquals(0, jobs.size());
 
 	}
-	
-	public void testGetJobExecution(){
-		
-		JobExecution tempExecution = jobExecutionDao.getJobExecution(jobExecution.getId());
-		assertEquals(jobExecution, tempExecution);
-	}
-	
-	public void testJobInstanceLastExecution(){
-		//ensure the last execution id is being stored
-		JobExecution lastJobExecution = jobExecutionDao.getJobExecution(jobInstance.getLastExecution().getId());
-		assertEquals(lastJobExecution, jobExecution);
-	}
-
 
 	public void testUpdateJobExecution() {
 
