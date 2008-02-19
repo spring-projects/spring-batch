@@ -161,73 +161,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * Regular usage of <code>write(String)</code> method
 	 * @throws Exception 
 	 */
-	public void testWriteWithConverterAndInfiniteLoopInCollection() throws Exception {
-		inputSource.setTransformer(new ItemTransformer() {
-			public Object transform(Object input) {
-				return "FOO:" + input;
-			}
-		});
-		Object data = new Object();
-		inputSource.write(new Object[] { data, data });
-		inputSource.close();
-		String lineFromFile = readLine();
-		assertEquals("FOO:" + data.toString(), lineFromFile);
-		lineFromFile = readLine();
-		assertEquals("FOO:" + data.toString(), lineFromFile);
-	}
-
-	/**
-	 * Regular usage of <code>write(String)</code> method
-	 * @throws Exception 
-	 */
-	public void testWriteWithConverterAndInfiniteLoopInConvertedCollection() throws Exception {
-		inputSource.setTransformer(new ItemTransformer() {
-			boolean converted = false;
-
-			public Object transform(Object input) {
-				if (converted) {
-					return input;
-				}
-				converted = true;
-				return new Object[] { input, input };
-			}
-		});
-		Object data = new Object();
-		try {
-			inputSource.write(data);
-			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
-			// expected
-			assertTrue("Wrong message: " + e, e.getMessage().toLowerCase().indexOf("infinite") >= 0);
-		}
-		inputSource.close();
-		String lineFromFile = readLine();
-		assertNull(lineFromFile);
-	}
-
-	/**
-	 * Regular usage of <code>write(String)</code> method
-	 * @throws Exception 
-	 */
 	public void testWriteWithConverterAndString() throws Exception {
-		inputSource.setTransformer(new ItemTransformer() {
-			public Object transform(Object input) {
-				return "FOO:" + input;
-			}
-		});
-		inputSource.write(Collections.singleton(TEST_STRING));
-		inputSource.close();
-		String lineFromFile = readLine();
-		// converter not used if input is String
-		assertEquals(TEST_STRING, lineFromFile);
-	}
-
-	/**
-	 * Regular usage of <code>write(String)</code> method
-	 * @throws Exception 
-	 */
-	public void testWriteWithConverterAndCollectionOfString() throws Exception {
 		inputSource.setTransformer(new ItemTransformer() {
 			public Object transform(Object input) {
 				return "FOO:" + input;
@@ -236,8 +170,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.write(TEST_STRING);
 		inputSource.close();
 		String lineFromFile = readLine();
-		// converter not used if input is String
-		assertEquals(TEST_STRING, lineFromFile);
+		assertEquals("FOO:"+TEST_STRING, lineFromFile);
 	}
 
 	/**

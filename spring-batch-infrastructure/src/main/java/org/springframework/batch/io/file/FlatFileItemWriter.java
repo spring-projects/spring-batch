@@ -24,12 +24,11 @@ import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Properties;
 
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
+import org.springframework.batch.io.file.transform.RecursiveCollectionItemTransformer;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
@@ -75,15 +74,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	private OutputState state = null;
 
-	private ItemTransformer transformer = new ItemTransformer() {
-		public Object transform(Object input) {
-			return "" + input;
-		}
-	};
-
-	private static class BooleanHolder {
-		public boolean value;
-	}
+	private ItemTransformer transformer = new RecursiveCollectionItemTransformer();
 
 	/**
 	 * Assert that mandatory properties (resource) are set.
@@ -128,51 +119,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 * @throws Exception if the transformer or file output fail
 	 */
 	public void write(Object data) throws Exception {
-		transformAndWrite(data, new BooleanHolder());
-	}
-
-	/**
-	 * Convert the date to a format that can be output and then write it out.
-	 * @param data
-	 * @param converted
-	 * @throws Exception
-	 */
-	private void transformAndWrite(Object data, BooleanHolder converted) throws Exception {
-
-		if (data instanceof Collection) {
-			converted.value = false;
-			for (Iterator iterator = ((Collection) data).iterator(); iterator.hasNext();) {
-				Object value = (Object) iterator.next();
-				// (recursive)
-				write(value);
-			}
-			return;
-		}
-		if (data.getClass().isArray()) {
-			converted.value = false;
-			Object[] array = (Object[]) data;
-			for (int i = 0; i < array.length; i++) {
-				Object value = array[i];
-				// (recursive)
-				write(value);
-			}
-			return;
-		}
-		if (data instanceof String) {
-			// This is where the output stream is actually written to
-			getOutputState().write(data + LINE_SEPARATOR);
-		}
-		else if (!converted.value) {
-			// (recursive)
-			converted.value = true;
-			transformAndWrite(transformer.transform(data), converted);
-			return;
-		}
-		else {
-			// Should not happen...
-			throw new IllegalStateException(
-					"Infinite loop detected - converter did not convert to String or collection/array of objects convertible to String.");
-		}
+		getOutputState().write(transformer.transform(data) + LINE_SEPARATOR);
 	}
 
 	/**
