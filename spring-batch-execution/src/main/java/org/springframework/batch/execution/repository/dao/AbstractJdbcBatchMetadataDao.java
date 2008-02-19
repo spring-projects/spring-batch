@@ -41,10 +41,6 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	protected String getTablePrefix() {
-		return tablePrefix;
-	}
-
 	protected JdbcOperations getJdbcTemplate() {
 		return jdbcTemplate;
 	}
