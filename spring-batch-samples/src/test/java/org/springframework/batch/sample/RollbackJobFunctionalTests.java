@@ -29,7 +29,7 @@ public class RollbackJobFunctionalTests extends AbstractValidatingBatchLauncherT
 
 	protected void validatePostConditions() throws Exception {
 		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
-		assertEquals(before+4, after);
+		assertEquals(before+5, after);
 	}
 	
 	

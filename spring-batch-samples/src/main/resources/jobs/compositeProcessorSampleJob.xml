@@ -12,7 +12,7 @@
 
 	<bean id="compositeProcessorJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="simpleStep">
+			<bean id="step1" parent="chunkedStep">
 						<property name="itemReader">
 							<bean
 								class="org.springframework.batch.item.reader.ValidatingItemReader">

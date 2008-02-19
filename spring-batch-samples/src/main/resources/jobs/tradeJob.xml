@@ -16,7 +16,7 @@
 	<bean id="tradeJob" parent="simpleJob">
 		<property name="steps">
 			<list>
-				<bean id="step1" parent="simpleStep">
+				<bean id="step1" parent="chunkedStep">
 							<property name="itemReader">
 								<bean
 									class="org.springframework.batch.item.reader.ValidatingItemReader">
@@ -32,7 +32,7 @@
 									p:dao-ref="tradeDao" />
 							</property>
 				</bean>
-				<bean id="step2" parent="simpleStep">
+				<bean id="step2" parent="chunkedStep">
 							<property name="itemReader" ref="tradeSqlItemReader" />
 							<property name="itemWriter">
 								<bean
@@ -40,7 +40,7 @@
 									p:dao-ref="customerDao" />
 							</property>
 				</bean>
-				<bean id="step3" parent="simpleStep">
+				<bean id="step3" parent="chunkedStep">
 							<property name="itemReader" ref="customerSqlItemReader" />
 							<property name="itemWriter">
 								<bean

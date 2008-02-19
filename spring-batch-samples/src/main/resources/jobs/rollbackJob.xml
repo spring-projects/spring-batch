@@ -17,44 +17,46 @@
 	<bean id="tradeJob" parent="simpleJob">
 		<property name="steps">
 			<list>
-				<bean id="step1" parent="repeatOperationsStep">
-					<property name="chunkOperations">
+				<bean id="step1" parent="chunkedStep">
+					<property name="retryPolicy">
+						<bean class="org.springframework.batch.retry.policy.SimpleRetryPolicy" />
+					</property>
+					<property name="chunker">
 						<bean
-							class="org.springframework.batch.repeat.support.RepeatTemplate">
-							<property name="completionPolicy">
+							class="org.springframework.batch.execution.step.simple.ItemChunker">
+							<constructor-arg>
 								<bean
-									class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
-									<property name="chunkSize"
-										value="50" />
+									class="org.springframework.batch.item.reader.ValidatingItemReader">
+									<property name="itemReader"
+										ref="fileInputTemplate" />
+									<property name="validator"
+										ref="tradeValidator" />
+								</bean>
+							</constructor-arg>
+							<property name="itemSkipPolicy">
+								<bean
+									class="org.springframework.batch.execution.step.simple.LimitCheckingItemSkipPolicy">
+									<constructor-arg value="5" />
 								</bean>
 							</property>
 						</bean>
 					</property>
-					<property name="stepOperations">
+					<property name="dechunker">
 						<bean
-							class="org.springframework.batch.repeat.support.RepeatTemplate">
-							<property name="exceptionHandler">
+							class="org.springframework.batch.execution.step.simple.ItemDechunker">
+							<constructor-arg>
 								<bean
-									class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler"
-									p:limit="5" p:type="java.lang.Exception" />
+									class="org.springframework.batch.sample.item.writer.TradeWriter"
+									p:dao-ref="tradeDao" p:failure="3" />
+							</constructor-arg>
+							<property name="itemSkipPolicy">
+								<bean
+									class="org.springframework.batch.execution.step.simple.LimitCheckingItemSkipPolicy">
+									<constructor-arg value="5" />
+								</bean>
 							</property>
 						</bean>
 					</property>
-					<property name="itemReader">
-						<bean
-							class="org.springframework.batch.item.reader.ValidatingItemReader">
-							<property name="itemReader"
-								ref="fileInputTemplate" />
-							<property name="validator"
-								ref="tradeValidator" />
-						</bean>
-					</property>
-					<property name="itemWriter">
-						<bean
-							class="org.springframework.batch.sample.item.writer.TradeWriter"
-							p:dao-ref="tradeDao" p:failure="3" />
-					</property>
-					<property name="jobRepository" ref="jobRepository" />
 				</bean>
 				<bean id="step2" parent="simpleStep">
 					<property name="itemReader"
