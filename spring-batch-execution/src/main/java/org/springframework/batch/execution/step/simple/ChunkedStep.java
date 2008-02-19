@@ -55,6 +55,8 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryPolicy;
+import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.TransactionStatus;
@@ -147,6 +149,8 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 	private ItemSkipPolicy itemSkipPolicy;
 
 	private RetryTemplate retryTemplate = new RetryTemplate();
+	
+	private RetryPolicy retryPolicy = new NeverRetryPolicy();
 
 	private int chunkSize;
 
@@ -161,8 +165,9 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 	 * The {@link StepContext} is then a source of aggregate statistics for the
 	 * step.
 	 * 
-	 * @param streamManager the {@link StreamManager} to set. Default is a
-	 * {@link SimpleStreamManager}.
+	 * @param streamManager
+	 *            the {@link StreamManager} to set. Default is a
+	 *            {@link SimpleStreamManager}.
 	 */
 	public void setStreamManager(StreamManager streamManager) {
 		this.streamManager = streamManager;
@@ -187,7 +192,8 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 	 * processing. Should be set up by the caller through a factory. Defaults to
 	 * a plain {@link RepeatTemplate}.
 	 * 
-	 * @param stepOperations a {@link RepeatOperations} instance.
+	 * @param stepOperations
+	 *            a {@link RepeatOperations} instance.
 	 */
 	public void setStepOperations(RepeatOperations stepOperations) {
 		this.stepOperations = stepOperations;
@@ -198,7 +204,8 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 	 * check whether an external request has been made to interrupt the job
 	 * execution.
 	 * 
-	 * @param interruptionPolicy a {@link StepInterruptionPolicy}
+	 * @param interruptionPolicy
+	 *            a {@link StepInterruptionPolicy}
 	 */
 	public void setInterruptionPolicy(StepInterruptionPolicy interruptionPolicy) {
 		this.interruptionPolicy = interruptionPolicy;
@@ -210,7 +217,8 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 	 * 
 	 * @param exceptionClassifier
 	 */
-	public void setExceptionClassifier(ExitStatusExceptionClassifier exceptionClassifier) {
+	public void setExceptionClassifier(
+			ExitStatusExceptionClassifier exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 
@@ -219,6 +227,10 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 	 */
 	public void setItemReader(ItemReader itemReader) {
 		this.itemReader = itemReader;
+	}
+	
+	public void setRetryPolicy(RetryPolicy retryPolicy) {
+		this.retryPolicy = retryPolicy;
 	}
 
 	/**
@@ -273,6 +285,8 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 		}
 
 		Assert.notNull(jobRepository, "JobRepository must not be null");
+		
+		this.retryTemplate.setRetryPolicy(retryPolicy);
 	}
 
 	/**
@@ -285,57 +299,71 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 	 * execution, which would normally be available to the caller somehow
 	 * through the step's {@link StepContext}.<br/>
 	 * 
-	 * @throws JobInterruptedException if the step or a chunk is interrupted
-	 * @throws RuntimeException if there is an exception during a chunk
-	 * execution
+	 * @throws JobInterruptedException
+	 *             if the step or a chunk is interrupted
+	 * @throws RuntimeException
+	 *             if there is an exception during a chunk execution
 	 * @see StepExecutor#execute(StepExecution)
 	 */
-	public void execute(final StepExecution stepExecution) throws BatchCriticalException, JobInterruptedException {
+	public void execute(final StepExecution stepExecution)
+			throws BatchCriticalException, JobInterruptedException {
 
 		final StepInstance stepInstance = stepExecution.getStep();
 		Assert.notNull(stepInstance);
-		boolean isRestart = stepInstance.getStepExecutionCount() > 0 ? true : false;
+		boolean isRestart = stepInstance.getStepExecutionCount() > 0 ? true
+				: false;
 
 		ExitStatus status = ExitStatus.FAILED;
 
 		final int chunkSize = this.chunkSize;
-		StepContext parentStepContext = StepSynchronizationManager.getContext();
-		final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext, streamManager);
-		StepSynchronizationManager.register(stepContext);
-		possiblyRegisterStreams(stepExecution);
-		// Add the job identifier so that it can be used to identify
-		// the conversation in StepScope
-		stepContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
-
-		final boolean saveExecutionContext = isSaveExecutionContext();
-
-		streamManager.open(stepExecution);
-
-		if (saveExecutionContext && isRestart && stepInstance.getLastExecution() != null) {
-			stepExecution.setExecutionContext(stepInstance.getLastExecution().getExecutionContext());
-			streamManager.restoreFrom(stepExecution, stepExecution.getExecutionContext());
-		}
-
 		try {
-
 			stepExecution.setStartTime(new Date(System.currentTimeMillis()));
-			stepInstance.setLastExecution(stepExecution);
+			// We need to save the step execution right away, before we start
+			// using its ID. It would be better to make the creation atomic in
+			// the caller.
 			updateStatus(stepExecution, BatchStatus.STARTED);
+
+			StepContext parentStepContext = StepSynchronizationManager
+					.getContext();
+			final StepContext stepContext = new SimpleStepContext(
+					stepExecution, parentStepContext, streamManager);
+			StepSynchronizationManager.register(stepContext);
+			possiblyRegisterStreams(stepExecution);
+			// Add the job identifier so that it can be used to identify
+			// the conversation in StepScope
+			stepContext.setAttribute(StepScope.ID_KEY, stepExecution
+					.getJobExecution().getId());
+
+			final boolean saveExecutionContext = isSaveExecutionContext();
+
+			streamManager.open(stepExecution);
+
+			if (saveExecutionContext && isRestart
+					&& stepInstance.getLastExecution() != null) {
+				stepExecution.setExecutionContext(stepInstance
+						.getLastExecution().getExecutionContext());
+				streamManager.restoreFrom(stepExecution, stepExecution
+						.getExecutionContext());
+			}
 
 			status = stepOperations.iterate(new RepeatCallback() {
 
-				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
+				public ExitStatus doInIteration(final RepeatContext context)
+						throws Exception {
 
 					// Before starting a new transaction, check for
 					// interruption.
 					interruptionPolicy.checkInterrupted(context);
 
-					ExitStatus result = (ExitStatus)retryTemplate.execute(new RetryCallback() {
+					ExitStatus result = (ExitStatus) retryTemplate
+							.execute(new RetryCallback() {
 
-						public Object doWithRetry(RetryContext context) throws Throwable {
-							return processChunk(stepExecution, stepContext);
-						}
-					});
+								public Object doWithRetry(RetryContext context)
+										throws Throwable {
+									return processChunk(stepExecution,
+											stepContext);
+								}
+							});
 
 					// Check for interruption after transaction as well, so that
 					// the interrupted exception is correctly propagated up to
@@ -348,35 +376,36 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 			});
 
 			updateStatus(stepExecution, BatchStatus.COMPLETED);
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 
 			// classify exception so an exit code can be stored.
 			status = exceptionClassifier.classifyForExitCode(e);
 			if (e.getCause() instanceof JobInterruptedException) {
 				updateStatus(stepExecution, BatchStatus.STOPPED);
 				throw (JobInterruptedException) e.getCause();
-			}
-			else if (e instanceof ResetFailedException) {
+			} else if (e instanceof ResetFailedException) {
 				updateStatus(stepExecution, BatchStatus.UNKNOWN);
 				throw (ResetFailedException) e;
-			}
-			else {
+			} else {
 				updateStatus(stepExecution, BatchStatus.FAILED);
 				throw e;
 			}
 
-		}
-		finally {
+		} finally {
 			stepExecution.setExitStatus(status);
 			stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 			try {
 				jobRepository.saveOrUpdate(stepExecution);
-			}
-			finally {
+				streamManager.close(stepExecution);
+			} catch (Exception e) {
+				logger
+						.error(
+								"Failed to update step execution: probably fatal, so there is already an exception on the stack.",
+								e);
+			} finally {
 				// clear any registered synchronizations
 				StepSynchronizationManager.close();
-				streamManager.close(stepExecution);
+
 			}
 		}
 
@@ -386,35 +415,36 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 	 * 
 	 */
 	private void possiblyRegisterStreams(Object key) {
-		if (itemReader instanceof ItemStream) {
-			ItemStream stream = (ItemStream) itemReader;
-			streamManager.register(key, stream);
-		}
-		if (itemWriter instanceof ItemStream) {
-			ItemStream stream = (ItemStream) itemWriter;
-			streamManager.register(key, stream);
-		}
+	
+		streamManager.register(key, chunker);
+		streamManager.register(key, dechunker);
 	}
 
 	/**
 	 * Execute a bunch of identical business logic operations all within a
 	 * transaction.
 	 * 
-	 * @param stepExecution the current execution in which to process the chunk
-	 * in.
-	 * @param chunk to be processed.
-	 * @param stepContext the current step context.
+	 * @param stepExecution
+	 *            the current execution in which to process the chunk in.
+	 * @param chunk
+	 *            to be processed.
+	 * @param stepContext
+	 *            the current step context.
 	 * @return true if there is more data to process.
 	 */
-	ExitStatus processChunk(final StepExecution stepExecution, StepContext stepContext) {
+	ExitStatus processChunk(final StepExecution stepExecution,
+			StepContext stepContext) {
 
-		TransactionStatus transaction = streamManager.getTransaction(stepExecution);
+		TransactionStatus transaction = streamManager
+				.getTransaction(stepExecution);
 
-		final StepContribution contribution = stepExecution.createStepContribution();
+		final StepContribution contribution = stepExecution
+				.createStepContribution();
 
 		try {
-			
-			ChunkingResult chunkingResult = chunker.chunk(chunkSize, stepExecution);
+
+			ChunkingResult chunkingResult = chunker.chunk(chunkSize,
+					stepExecution);
 
 			if (chunkingResult == null) {
 				return ExitStatus.FINISHED;
@@ -423,13 +453,15 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 			final Chunk chunk = chunkingResult.getChunk();
 			failureLog.handle(chunkingResult.getExceptions());
 
-			DechunkingResult chunkResult = dechunker.dechunk(chunk, stepExecution);
-			failureLog.handle(chunkResult.getExceptions());
+			DechunkingResult dechunkingResult = dechunker.dechunk(chunk,
+					stepExecution);
+			failureLog.handle(dechunkingResult.getExceptions());
 
 			// TODO: check that stepExecution can
 			// aggregate these contributions if they
 			// come in asynchronously.
-			ExecutionContext statistics = streamManager.getExecutionContext(stepExecution);
+			ExecutionContext statistics = streamManager
+					.getExecutionContext(stepExecution);
 			contribution.setExecutionContext(statistics);
 			contribution.incrementCommitCount();
 
@@ -450,11 +482,10 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 			}
 
 			streamManager.commit(transaction);
-			
+
 			return ExitStatus.CONTINUABLE;
 
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			/*
 			 * Any exception thrown within the transaction template will
 			 * automatically cause the transaction to rollback. We need to
@@ -466,23 +497,24 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 			}
 			try {
 				streamManager.rollback(transaction);
-			}
-			catch (ResetFailedException e) {
+			} catch (ResetFailedException e) {
 				// The original Throwable cause is in danger of
 				// being lost here, so we log the reset
 				// failure and re-throw with cause of the rollback.
 				logger
-						.error("Encountered reset error on rollback: "
-								+ "one of the streams may be in an inconsistent state, "
-								+ "so this step should not proceed", e);
-				throw new ResetFailedException("Encountered reset error on rollback.  "
-						+ "Consult logs for the cause of the reet failure.  "
-						+ "The cause of the original rollback is incuded here.", t);
+						.error(
+								"Encountered reset error on rollback: "
+										+ "one of the streams may be in an inconsistent state, "
+										+ "so this step should not proceed", e);
+				throw new ResetFailedException(
+						"Encountered reset error on rollback.  "
+								+ "Consult logs for the cause of the reet failure.  "
+								+ "The cause of the original rollback is incuded here.",
+						t);
 			}
 			if (t instanceof RuntimeException) {
 				throw (RuntimeException) t;
-			}
-			else {
+			} else {
 				throw new RuntimeException(t);
 			}
 		}

@@ -24,7 +24,12 @@ import org.springframework.batch.core.domain.ChunkingResult;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.ReadFailureException;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.exception.MarkFailedException;
+import org.springframework.batch.item.exception.ResetFailedException;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.util.Assert;
 
 /**
@@ -93,6 +98,54 @@ public class ItemChunker implements Chunker {
 
 	private synchronized Long getChunkId() {
 		return new Long(chunkCounter++);
+	}
+
+	//These methods are temporary hacks until something can be done 
+	//about the ItemStream interface.
+	public void close() throws StreamException {
+		if(itemReader instanceof ItemStream){
+			((ItemStream)itemReader).close();
+		}
+	}
+
+	public boolean isMarkSupported() {
+		if(itemReader instanceof ItemStream){
+			return ((ItemStream)itemReader).isMarkSupported();
+		}
+		
+		return false;
+	}
+
+	public void mark() throws MarkFailedException {
+		if(itemReader instanceof ItemStream){
+			((ItemStream)itemReader).mark();
+		}
+	}
+
+	public void open() throws StreamException {
+		if(itemReader instanceof ItemStream){
+			((ItemStream)itemReader).open();
+		}
+	}
+
+	public void reset() throws ResetFailedException {
+		if(itemReader instanceof ItemStream){
+			((ItemStream)itemReader).reset();
+		}
+	}
+
+	public void restoreFrom(ExecutionContext context) {
+		if(itemReader instanceof ItemStream){
+			((ItemStream)itemReader).restoreFrom(context);
+		}
+	}
+
+	public ExecutionContext getExecutionContext() {
+		if(itemReader instanceof ItemStream){
+			return ((ItemStream)itemReader).getExecutionContext();
+		}
+		
+		return new ExecutionContext();
 	}
 
 }

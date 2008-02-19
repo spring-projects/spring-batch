@@ -25,7 +25,12 @@ import org.springframework.batch.core.domain.Dechunker;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.WriteFailureException;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.MarkFailedException;
+import org.springframework.batch.item.exception.ResetFailedException;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.util.Assert;
 
 /**
@@ -82,6 +87,55 @@ public class ItemDechunker implements Dechunker {
 		}
 		else{
 			throw new RuntimeException("Error encountered while dechunking", ex);
+		}
+	}
+
+	//This a hack until the ItemStream interface can be updated.
+	public void close() throws StreamException {
+		if(itemWriter instanceof ItemStream){
+			((ItemStream)itemWriter).close();
+		}
+	}
+
+	public boolean isMarkSupported() {
+		if(itemWriter instanceof ItemStream){
+			return ((ItemStream)itemWriter).isMarkSupported();
+		}
+		else{
+			return false;
+		}
+	}
+
+	public void mark() throws MarkFailedException {
+		if(itemWriter instanceof ItemStream){
+			((ItemStream)itemWriter).mark();
+		}
+	}
+
+	public void open() throws StreamException {
+		if(itemWriter instanceof ItemStream){
+			((ItemStream)itemWriter).open();
+		}
+	}
+
+	public void reset() throws ResetFailedException {
+		if(itemWriter instanceof ItemStream){
+			((ItemStream)itemWriter).reset();
+		}
+	}
+
+	public void restoreFrom(ExecutionContext context) {
+		if(itemWriter instanceof ItemStream){
+			((ItemStream)itemWriter).restoreFrom(context);
+		}
+	}
+
+	public ExecutionContext getExecutionContext() {
+		if(itemWriter instanceof ItemStream){
+			return ((ItemStream)itemWriter).getExecutionContext();
+		}
+		else{
+			return new ExecutionContext();
 		}
 	}
 	
