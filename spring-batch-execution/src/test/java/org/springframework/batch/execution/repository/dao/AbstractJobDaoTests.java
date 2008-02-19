@@ -34,49 +34,45 @@ import org.springframework.util.ClassUtils;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
-public abstract class AbstractJobDaoTests extends
-		AbstractTransactionalDataSourceSpringContextTests {
+public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
 
 	protected JobInstanceDao jobInstanceDao;
-	
+
 	protected JobExecutionDao jobExecutionDao;
 
-	protected JobParameters jobParameters = new JobParametersBuilder().addString("job.key", "jobKey").toJobParameters();
-	
+	protected JobParameters jobParameters = new JobParametersBuilder().addString("job.key", "jobKey").
+		addLong("long", new Long(1)).addDate("date", new Date(7)).toJobParameters();
+
 	protected JobInstance jobInstance;
-	
+
 	protected Job job;
 
 	protected JobExecution jobExecution;
 
-	protected Date jobExecutionStartTime = new Date(System
-			.currentTimeMillis());
+	protected Date jobExecutionStartTime = new Date(System.currentTimeMillis());
 
 	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(
-				getClass(), "sql-dao-test.xml") };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "sql-dao-test.xml") };
 	}
 
-	/*
+	/**
 	 * Because AbstractTransactionalSpringContextTests is used, this method will
 	 * be called by Spring to set the JobRepository.
 	 */
 	public void setJobInstanceDao(JobInstanceDao jobInstanceDao) {
 		this.jobInstanceDao = jobInstanceDao;
 	}
-	
+
 	public void setJobExecutionDao(JobExecutionDao jobExecutionDao) {
 		this.jobExecutionDao = jobExecutionDao;
 	}
 
 	protected void onSetUpInTransaction() throws Exception {
-//		jobRuntimeInformation = new ScheduledJobIdentifier("Job1", "TestStream",
-//				new SimpleDateFormat("yyyyMMdd").parse("20070505"));
 
 		job = new JobSupport("Job1");
-		
+
 		// Create job.
 		jobInstance = jobInstanceDao.createJobInstance(job.getName(), jobParameters);
 
@@ -90,16 +86,14 @@ public abstract class AbstractJobDaoTests extends
 	}
 
 	public void testVersionIsNotNullForJob() throws Exception {
-		int version = jdbcTemplate
-				.queryForInt("select version from BATCH_JOB_INSTANCE where JOB_INSTANCE_ID="
-						+ jobInstance.getId());
+		int version = jdbcTemplate.queryForInt("select version from BATCH_JOB_INSTANCE where JOB_INSTANCE_ID="
+				+ jobInstance.getId());
 		assertEquals(0, version);
 	}
 
 	public void testVersionIsNotNullForJobExecution() throws Exception {
-		int version = jdbcTemplate
-				.queryForInt("select version from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID="
-						+ jobExecution.getId());
+		int version = jdbcTemplate.queryForInt("select version from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID="
+				+ jobExecution.getId());
 		assertEquals(0, version);
 	}
 
@@ -123,7 +117,8 @@ public abstract class AbstractJobDaoTests extends
 		try {
 			jobInstanceDao.findJobInstances(null, null);
 			fail();
-		} catch (IllegalArgumentException ex) {
+		}
+		catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -134,13 +129,12 @@ public abstract class AbstractJobDaoTests extends
 	 * get no result, not the existing one.
 	 */
 	public void testCreateJobWithExistingName() {
-		
+
 		jobInstanceDao.createJobInstance("ScheduledJob", jobParameters);
 
 		// Modifying the key should bring back a completely different
 		// JobInstance
-		JobParameters tempProps = new JobParametersBuilder().addString("job.key", "testKey1")
-			.toJobParameters();
+		JobParameters tempProps = new JobParametersBuilder().addString("job.key", "testKey1").toJobParameters();
 
 		List jobs;
 		jobs = jobInstanceDao.findJobInstances("ScheduledJob", jobParameters);
@@ -166,7 +160,7 @@ public abstract class AbstractJobDaoTests extends
 
 	}
 
-	public void testSaveJobExecution(){
+	public void testSaveJobExecution() {
 
 		List executions = jobExecutionDao.findJobExecutions(jobInstance);
 		assertEquals(executions.size(), 1);
@@ -180,7 +174,8 @@ public abstract class AbstractJobDaoTests extends
 		try {
 			jobExecutionDao.updateJobExecution(execution);
 			fail("Expected NoSuchBatchDomainObjectException");
-		} catch (NoSuchBatchDomainObjectException ex) {
+		}
+		catch (NoSuchBatchDomainObjectException ex) {
 			// expected
 		}
 	}
@@ -191,7 +186,8 @@ public abstract class AbstractJobDaoTests extends
 		try {
 			jobExecutionDao.updateJobExecution(execution);
 			fail();
-		} catch (IllegalArgumentException ex) {
+		}
+		catch (IllegalArgumentException ex) {
 			// expected
 		}
 	}
@@ -220,9 +216,8 @@ public abstract class AbstractJobDaoTests extends
 		// Create job.
 		jobInstance = jobInstanceDao.createJobInstance("test", jobParameters);
 
-		List jobs = jdbcTemplate.queryForList(
-				"SELECT * FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", new Object[] { jobInstance
-						.getId() });
+		List jobs = jdbcTemplate.queryForList("SELECT * FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?",
+				new Object[] { jobInstance.getId() });
 		assertEquals(1, jobs.size());
 		assertEquals("test", ((Map) jobs.get(0)).get("JOB_NAME"));
 
@@ -231,30 +226,29 @@ public abstract class AbstractJobDaoTests extends
 	public void testJobWithDefaultJobIdentifier() throws Exception {
 		// Create job.
 		jobInstance = jobInstanceDao.createJobInstance("testDefault", jobParameters);
-		
-		List jobs = jobInstanceDao.findJobInstances("testDefault", jobParameters); 
-			
+
+		List jobs = jobInstanceDao.findJobInstances("testDefault", jobParameters);
+
 		assertEquals(1, jobs.size());
-		assertEquals(jobParameters.getString("job.key"), ((JobInstance) jobs.get(0))
-				.getJobParameters().getString("job.key"));
+		assertEquals(jobParameters.getString("job.key"), ((JobInstance) jobs.get(0)).getJobParameters().getString(
+				"job.key"));
 
 	}
 
-	public void testFindJobExecutions(){
+	public void testFindJobExecutions() {
 
 		List results = jobExecutionDao.findJobExecutions(jobInstance);
 		assertEquals(results.size(), 1);
-		validateJobExecution(jobExecution, (JobExecution)results.get(0));
-	}
-	
-	public void testFindJobsWithProperties() throws Exception{
-		
-		
+		validateJobExecution(jobExecution, (JobExecution) results.get(0));
 	}
 
-	private void validateJobExecution(JobExecution lhs, JobExecution rhs){
+	public void testFindJobsWithProperties() throws Exception {
 
-		//equals operator only checks id
+	}
+
+	private void validateJobExecution(JobExecution lhs, JobExecution rhs) {
+
+		// equals operator only checks id
 		assertEquals(lhs, rhs);
 		assertEquals(lhs.getStartTime(), rhs.getStartTime());
 		assertEquals(lhs.getEndTime(), rhs.getEndTime());
@@ -265,11 +259,11 @@ public abstract class AbstractJobDaoTests extends
 	public void testGetLastJobExecution() {
 		JobExecution lastExecution = new JobExecution(jobInstance);
 		lastExecution.setStatus(BatchStatus.STARTED);
-		
+
 		int JUMP_INTO_FUTURE = 1000; // makes sure start time is 'greatest'
 		lastExecution.setStartTime(new Date(System.currentTimeMillis() + JUMP_INTO_FUTURE));
 		jobExecutionDao.saveJobExecution(lastExecution);
-		
+
 		assertEquals(lastExecution, jobExecutionDao.getLastJobExecution(jobInstance));
 	}
 }
