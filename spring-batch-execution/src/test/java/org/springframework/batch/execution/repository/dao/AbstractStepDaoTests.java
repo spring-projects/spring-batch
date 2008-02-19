@@ -96,8 +96,6 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setStartTime(new Date(System.currentTimeMillis()));
 		stepExecutionDao.saveStepExecution(stepExecution);
-//		step1.setLastExecution(stepExecution);
-		//stepInstanceDao.updateStepInstance(step1);
 		
 		executionContext = new ExecutionContext();
 		executionContext.putString("1", "testString1");
@@ -217,15 +215,8 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		assertEquals(executionContext, attributes);
 	}
 	
-	public void testGetLastStepExecution() {
-		StepExecution lastExecution = new StepExecution(step1, jobExecution, null);
-		lastExecution.setStatus(BatchStatus.STARTED);
-		
-		int JUMP_INTO_FUTURE = 1000; // makes sure start time is 'greatest'
-		lastExecution.setStartTime(new Date(System.currentTimeMillis() + JUMP_INTO_FUTURE));
-		stepExecutionDao.saveStepExecution(lastExecution);
-		
-//		assertEquals(lastExecution, stepExecutionDao.getLastStepExecution(step1, jobExecution));
+	public void testGetStepExecution() {
+		assertEquals(stepExecution, stepExecutionDao.getStepExecution(jobExecution, step1));
 	}
 		
 }
