@@ -27,7 +27,6 @@ import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JobExecutionDao;
@@ -35,7 +34,6 @@ import org.springframework.batch.execution.repository.dao.JobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
-import org.springframework.batch.execution.repository.dao.StepInstanceDao;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ItemReaderAdapter;
@@ -52,8 +50,6 @@ public class StepExecutorInterruptionTests extends TestCase {
 	private JobExecutionDao jobExecutionDao = new MapJobDao();
 
 	private StepExecutionDao stepExecutionDao = new MapStepDao();
-	
-	private StepInstanceDao stepInstanceDao = new MapStepDao();
 
 	private JobInstance job;
 
@@ -61,10 +57,11 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	public void setUp() throws Exception {
 
-		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepInstanceDao, stepExecutionDao);
+		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao);
 
 		JobSupport jobConfiguration = new JobSupport();
 		step = new RepeatOperationsStep();
+		step.setName("stepName");
 		jobConfiguration.addStep(step);
 		jobConfiguration.setBeanName("testJob");
 		job = jobRepository.createJobExecution(jobConfiguration, new JobParameters()).getJobInstance();
@@ -78,10 +75,10 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	public void testInterruptChunk() throws Exception {
 
-		List steps = job.getStepInstances();
-		final StepInstance stepInstance = (StepInstance) steps.get(0);
+		List steps = job.getStepNames();
+		final String stepName = (String) steps.get(0);
 		JobExecution jobExecutionContext = new JobExecution(new JobInstance(new Long(0L), new JobParameters()));
-		final StepExecution stepExecution = new StepExecution(stepInstance, jobExecutionContext);
+		final StepExecution stepExecution = new StepExecution(stepName, jobExecutionContext);
 		step.setItemReader(new ItemReader() {
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())

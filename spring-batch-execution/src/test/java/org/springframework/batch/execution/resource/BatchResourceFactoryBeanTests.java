@@ -26,7 +26,6 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
 import org.springframework.batch.core.domain.JobSupport;
-import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -52,7 +51,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 	private JobInstance jobInstance;
 
-	private StepInstance stepInstance;
+	private String stepInstance;
 
 	/**
 	 * mock step context
@@ -63,7 +62,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		jobInstance = new JobInstance(new Long(0), new JobParameters());
 		jobInstance.setJob(new JobSupport("testJob"));
 		JobExecution jobExecution = jobInstance.createJobExecution();
-		stepInstance = new StepInstance(jobInstance, "bar");
+		stepInstance = "bar";
 		resourceFactory.setStepContext(new SimpleStepContext(jobExecution.createStepExecution(stepInstance)));
 
 		resourceFactory.afterPropertiesSet();
@@ -103,7 +102,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 				.toJobParameters());
 		jobInstance.setJob(new JobSupport("testJob"));
 		JobExecution jobExecution = jobInstance.createJobExecution();
-		stepInstance = new StepInstance(jobInstance, "bar");
+		stepInstance = "bar";
 		resourceFactory.setStepContext(new SimpleStepContext(jobExecution.createStepExecution(stepInstance)));
 		resourceFactory.setFilePattern("foo/data/%JOB_NAME%/%job.key%-foo");
 		doTestPathName("spam-foo", "foo" + pathsep + "data" + pathsep);

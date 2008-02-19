@@ -20,11 +20,11 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
@@ -289,9 +289,11 @@ public class SimpleStepExecutor implements InitializingBean {
 	 */
 	public void execute(final StepExecution stepExecution) throws BatchCriticalException, JobInterruptedException {
 
-		final StepInstance stepInstance = stepExecution.getStep();
-		Assert.notNull(stepInstance);
-		boolean isRestart = stepInstance.getStepExecutionCount() > 0 ? true : false;
+		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
+		String stepName = stepExecution.getStepName();
+		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, stepName);
+
+		boolean isRestart = jobRepository.getStepExecutionCount(jobInstance, stepName) > 0 ? true : false;
 
 		ExitStatus status = ExitStatus.FAILED;
 
@@ -315,8 +317,8 @@ public class SimpleStepExecutor implements InitializingBean {
 
 			streamManager.open(stepExecution);
 
-			if (saveExecutionContext && isRestart && stepInstance.getLastExecution() != null) {
-				stepExecution.setExecutionContext(stepInstance.getLastExecution().getExecutionContext());
+			if (saveExecutionContext && isRestart && lastStepExecution != null) {
+				stepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
 				streamManager.restoreFrom(stepExecution, stepExecution.getExecutionContext());
 			}
 

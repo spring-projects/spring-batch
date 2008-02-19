@@ -24,11 +24,10 @@ import org.springframework.batch.common.ExceptionClassifier;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.execution.step.simple.SimpleExitStatusExceptionClassifier;
@@ -60,7 +59,7 @@ public class SimpleJob extends JobSupport {
 		JobInstance jobInstance = execution.getJobInstance();
 		jobInstance.setLastExecution(execution);
 
-		List stepInstances = jobInstance.getStepInstances();
+		List stepNames = jobInstance.getStepNames();
 
 		ExitStatus status = ExitStatus.FAILED;
 
@@ -77,12 +76,12 @@ public class SimpleJob extends JobSupport {
 			int startedCount = 0;
 
 			List steps = getSteps();
-			for (Iterator i = stepInstances.iterator(), j = steps.iterator(); i.hasNext() && j.hasNext();) {
+			for (Iterator i = stepNames.iterator(), j = steps.iterator(); i.hasNext() && j.hasNext();) {
 
-				StepInstance stepInstance = (StepInstance) i.next();
+				String stepInstance = (String) i.next();
 				Step step = (Step) j.next();
 
-				if (shouldStart(stepInstance, step)) {
+				if (shouldStart(jobInstance, step)) {
 					startedCount++;
 					updateStatus(execution, BatchStatus.STARTED);
 					StepExecution stepExecution = execution.createStepExecution(stepInstance);
@@ -131,15 +130,16 @@ public class SimpleJob extends JobSupport {
 	 * Given a step and configuration, return true if the step should start,
 	 * false if it should not, and throw an exception if the job should finish.
 	 */
-	private boolean shouldStart(StepInstance stepInstance, Step step) {
+	private boolean shouldStart(JobInstance jobInstance, Step step) {
 
 		BatchStatus stepStatus;
 		// if the last execution is null, the step has never been executed.
-		if (stepInstance.getLastExecution() == null) {
+		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
+		if (lastStepExecution == null) {
 			stepStatus = BatchStatus.STARTING;
 		}
 		else {
-			stepStatus = stepInstance.getLastExecution().getStatus();
+			stepStatus = lastStepExecution.getStatus();
 		}
 
 		if (stepStatus == BatchStatus.UNKNOWN) {
@@ -154,13 +154,13 @@ public class SimpleJob extends JobSupport {
 			return false;
 		}
 
-		if (stepInstance.getStepExecutionCount() < step.getStartLimit()) {
+		if (jobRepository.getStepExecutionCount(jobInstance, step.getName()) < step.getStartLimit()) {
 			// step start count is less than start max, return true
 			return true;
 		}
 		else {
 			// start max has been exceeded, throw an exception.
-			throw new BatchCriticalException("Maximum start limit exceeded for step: " + stepInstance.getName()
+			throw new BatchCriticalException("Maximum start limit exceeded for step: " + step.getName()
 					+ "StartMax: " + step.getStartLimit());
 		}
 	}

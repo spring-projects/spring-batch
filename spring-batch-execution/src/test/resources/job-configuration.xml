@@ -16,7 +16,7 @@
 
 	<bean id="test-job"
 		class="org.springframework.batch.core.domain.JobSupport">
-		<property name="steps">
+		<property name="stepNames">
 			<bean id="step1"
 				class="org.springframework.batch.execution.step.simple.SimpleStep">
 				<property name="itemReader">

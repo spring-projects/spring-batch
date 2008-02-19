@@ -4,7 +4,6 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
@@ -36,7 +35,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 	}
 
 	protected void prepareTestInstance() throws Exception {
-		StepContext stepScopeContext = new SimpleStepContext(new StepExecution(new StepInstance(new Long(12)),
+		StepContext stepScopeContext = new SimpleStepContext(new StepExecution("stepName",
 				new JobExecution(new JobInstance(jobId, new JobParameters()))));
 		StepSynchronizationManager.register(stepScopeContext);
 		RepeatSynchronizationManager.register(new RepeatContextSupport(null));

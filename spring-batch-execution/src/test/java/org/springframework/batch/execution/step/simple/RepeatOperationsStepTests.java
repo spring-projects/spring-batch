@@ -24,7 +24,6 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ItemReaderAdapter;
@@ -92,8 +91,7 @@ public class RepeatOperationsStepTests extends TestCase {
 		configuration.setChunkOperations(repeatTemplate);
 		configuration.setJobRepository(new JobRepositorySupport());
 		configuration.setTransactionManager(new ResourcelessTransactionManager());
-		StepExecution stepExecution = new StepExecution(new StepInstance(
-				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
+		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
 				new Long(12)));
 		try {
 			configuration.execute(stepExecution);
@@ -133,8 +131,7 @@ public class RepeatOperationsStepTests extends TestCase {
 		configuration.setStepOperations(stepTemplate);
 		configuration.setJobRepository(new JobRepositorySupport());
 		configuration.setTransactionManager(new ResourcelessTransactionManager());
-		StepExecution stepExecution = new StepExecution(new StepInstance(
-				new Long(11)), new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
+		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
 				new Long(12)));
 		configuration.execute(stepExecution);
 		assertEquals(2, list.size());

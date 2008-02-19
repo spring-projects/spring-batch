@@ -92,4 +92,15 @@ public interface JobRepository {
 	 */
 	public void saveOrUpdate(StepExecution stepExecution);
 
+	/**
+	 * @return the last execution of step for the given job instance.
+	 */
+	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName);
+
+	/**
+	 * @return the execution count of the step within the given job instance.
+	 */
+	public int getStepExecutionCount(JobInstance jobInstance, String stepName);
+
+
 }

@@ -130,7 +130,7 @@ public class JobExecutionTests extends TestCase {
 
 	public void testAddAndRemoveStepExecution() throws Exception {
 		assertEquals(0, execution.getStepExecutions().size());
-		execution.createStepExecution(new StepInstance(null, null));
+		execution.createStepExecution(null);
 		assertEquals(1, execution.getStepExecutions().size());
 	}
 	

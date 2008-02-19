@@ -262,14 +262,14 @@ public abstract class AbstractJobDaoTests extends
 		assertEquals(lhs.getExitStatus(), rhs.getExitStatus());
 	}
 
-//	public void testGetLastJobExecution() {
-//		JobExecution lastExecution = new JobExecution(jobInstance);
-//		lastExecution.setStatus(BatchStatus.STARTED);
-//		
-//		int JUMP_INTO_FUTURE = 1000; // makes sure start time is 'greatest'
-//		lastExecution.setStartTime(new Date(System.currentTimeMillis() + JUMP_INTO_FUTURE));
-//		jobExecutionDao.saveJobExecution(lastExecution);
-//		
-//		assertEquals(lastExecution, jobExecutionDao.getLastJobExecution(jobInstance));
-//	}
+	public void testGetLastJobExecution() {
+		JobExecution lastExecution = new JobExecution(jobInstance);
+		lastExecution.setStatus(BatchStatus.STARTED);
+		
+		int JUMP_INTO_FUTURE = 1000; // makes sure start time is 'greatest'
+		lastExecution.setStartTime(new Date(System.currentTimeMillis() + JUMP_INTO_FUTURE));
+		jobExecutionDao.saveJobExecution(lastExecution);
+		
+		assertEquals(lastExecution, jobExecutionDao.getLastJobExecution(jobInstance));
+	}
 }

@@ -27,15 +27,12 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.dao.JobExecutionDao;
 import org.springframework.batch.execution.repository.dao.JobInstanceDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
-import org.springframework.batch.execution.repository.dao.StepInstanceDao;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.Assert;
 
@@ -63,8 +60,6 @@ public class SimpleJobRepository implements JobRepository {
 
 	private JobExecutionDao jobExecutionDao;
 
-	private StepInstanceDao stepInstanceDao;
-
 	private StepExecutionDao stepExecutionDao;
 
 	/**
@@ -75,11 +70,10 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	public SimpleJobRepository(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao,
-			StepInstanceDao stepInstanceDao, StepExecutionDao stepExecutionDao) {
+			StepExecutionDao stepExecutionDao) {
 		super();
 		this.jobInstanceDao = jobInstanceDao;
 		this.jobExecutionDao = jobExecutionDao;
-		this.stepInstanceDao = stepInstanceDao;
 		this.stepExecutionDao = stepExecutionDao;
 	}
 
@@ -195,7 +189,7 @@ public class SimpleJobRepository implements JobRepository {
 				}
 			}
 			jobInstance.setLastExecution(lastExecution);
-			jobInstance.setStepInstances(findStepInstances(job.getSteps(), jobInstance, lastExecution));
+			jobInstance.setStepNames(getStepNames(job));
 		}
 		else if (jobs.size() == 0) {
 			// no job found, create one
@@ -210,6 +204,17 @@ public class SimpleJobRepository implements JobRepository {
 		return generateJobExecution(jobInstance);
 
 	}
+
+	private List getStepNames(Job job) {
+		List stepNames = new ArrayList(job.getSteps().size());
+		for (Iterator iterator = job.getSteps().iterator(); iterator.hasNext();) {
+			Step step = (Step) iterator.next();
+			stepNames.add(step.getName());
+		}
+		return stepNames;
+	}
+	
+
 
 	private JobExecution generateJobExecution(JobInstance job) {
 		JobExecution execution = job.createJobExecution();
@@ -257,7 +262,7 @@ public class SimpleJobRepository implements JobRepository {
 	public void saveOrUpdate(StepExecution stepExecution) {
 
 		Assert.notNull(stepExecution, "StepExecution cannot be null.");
-		Assert.notNull(stepExecution.getStepId(), "StepExecution's Step Id cannot be null.");
+		Assert.notNull(stepExecution.getStepName(), "StepExecution's step name cannot be null.");
 
 		if (stepExecution.getId() == null) {
 			// new execution, obtain id and insert
@@ -284,48 +289,47 @@ public class SimpleJobRepository implements JobRepository {
 
 		JobInstance jobInstance = jobInstanceDao.createJobInstance(job.getName(), jobParameters);
 		jobInstance.setJob(job);
-		jobInstance.setStepInstances(createStepInstances(jobInstance, job.getSteps()));
+		jobInstance.setStepNames(getStepNames(job));
 		return jobInstance;
 	}
 
-	/**
-	 * Create step instances based on the given Job and list of Steps.
-	 */
-	private List createStepInstances(JobInstance job, List steps) {
-
-		List stepInstances = new ArrayList();
-		Iterator i = steps.iterator();
-		while (i.hasNext()) {
-			Step step = (Step) i.next();
-			StepInstance stepInstance = stepInstanceDao.createStepInstance(job, step.getName());
-			stepInstances.add(stepInstance);
-		}
-
-		return stepInstances;
-	}
-
-	/**
-	 * Find StepInstances for the given list of Steps and JobInstance
-	 */
-	protected List findStepInstances(List steps, JobInstance jobInstance, JobExecution lastJobExecution) {
-		List stepInstances = new ArrayList();
-		Iterator i = steps.iterator();
-		while (i.hasNext()) {
-
-			Step stepConfiguration = (Step) i.next();
-			StepInstance stepInstance = stepInstanceDao.findStepInstance(jobInstance, stepConfiguration.getName());
-			if (stepInstance != null) {
-				stepInstance.setLastExecution(stepExecutionDao.getLastStepExecution(stepInstance, lastJobExecution));
-				if (stepInstance.getLastExecution() != null) {
-					ExecutionContext executionContext = stepExecutionDao.findExecutionContext(stepInstance
-							.getLastExecution());
-					stepInstance.getLastExecution().setExecutionContext(executionContext);
-				}
-				stepInstance.setStepExecutionCount(stepExecutionDao.getStepExecutionCount(stepInstance));
-				stepInstances.add(stepInstance);
+	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		List jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
+		List stepExecutions = new ArrayList(jobExecutions.size());
+		for (Iterator iterator = jobExecutions.iterator(); iterator.hasNext();) {
+			JobExecution jobExecution = (JobExecution) iterator.next();
+			StepExecution stepExecution = stepExecutionDao.getStepExecution(jobExecution, stepName);
+			if (stepExecution != null) {
+				stepExecutions.add(stepExecution);
 			}
 		}
-		return stepInstances;
+		StepExecution latest = null;
+		for (Iterator iterator = stepExecutions.iterator(); iterator.hasNext();) {
+			StepExecution stepExecution = (StepExecution) iterator.next();
+			if (latest == null) {
+				latest = stepExecution;
+			}
+			if (latest.getStartTime().getTime() < stepExecution.getStartTime().getTime()) {
+				latest = stepExecution;
+			}
+		}
+		return latest;
+	}
+	
+	private JobExecution getLastJobExecution(JobInstance jobInstance) {
+		return jobExecutionDao.getLastJobExecution(jobInstance);
+	}
+
+	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
+		int count = 0;
+		List jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
+		for (Iterator iterator = jobExecutions.iterator(); iterator.hasNext();) {
+			JobExecution jobExecution = (JobExecution) iterator.next();
+			if (stepExecutionDao.getStepExecution(jobExecution, stepName) != null) {
+				count++;
+			}
+		}
+		return count;
 	}
 
 }

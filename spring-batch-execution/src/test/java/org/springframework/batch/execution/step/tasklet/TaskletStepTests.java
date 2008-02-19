@@ -7,10 +7,9 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInstance;
-import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.step.simple.JobRepositorySupport;
 import org.springframework.batch.io.exception.BatchCriticalException;
@@ -25,7 +24,7 @@ public class TaskletStepTests extends TestCase {
 	private List list = new ArrayList();
 
 	protected void setUp() throws Exception {
-		stepExecution = new StepExecution(new StepInstance(new Long(11)), new JobExecution(new JobInstance(
+		stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(
 				new Long(0L), new JobParameters()), new Long(12)));
 	}
 

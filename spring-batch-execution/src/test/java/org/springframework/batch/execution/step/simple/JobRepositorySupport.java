@@ -20,7 +20,6 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.JobRepository;
 
 /**
@@ -54,10 +53,14 @@ public class JobRepositorySupport implements JobRepository {
 	public void update(JobInstance job) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.container.common.repository.JobRepository#update(org.springframework.batch.container.common.domain.Step)
-	 */
-	public void update(StepInstance step) {
+	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

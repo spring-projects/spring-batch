@@ -18,45 +18,23 @@ package org.springframework.batch.execution.repository;
 
 import java.util.List;
 
-import org.springframework.batch.core.domain.Entity;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
-import org.springframework.batch.execution.repository.dao.StepInstanceDao;
 import org.springframework.batch.item.ExecutionContext;
 
-public class MockStepDao implements StepInstanceDao, StepExecutionDao {
+public class MockStepDao implements StepExecutionDao {
 
 	private List newSteps;
 
 	private int currentNewStep = 0;
 
-	public StepInstance createStepInstance(JobInstance job, String stepName) {
-		StepInstance newStep = (StepInstance) newSteps.get(currentNewStep);
-		currentNewStep++;
-		return newStep;
-	}
-
-	public StepInstance findStepInstance(JobInstance job, String stepName) {
-		StepInstance newStep = (StepInstance) newSteps.get(currentNewStep);
-		currentNewStep++;
-		return newStep;
-	}
-
 	public List findStepInstances(JobInstance job) {
 		return newSteps;
 	}
 
-	public int getStepExecutionCount(StepInstance step) {
-		return 1;
-	}
-
 	public void saveStepExecution(StepExecution stepExecution) {
-	}
-
-	public void updateStepInstance(StepInstance step) {
 	}
 
 	public void updateStepExecution(StepExecution stepExecution) {
@@ -70,10 +48,10 @@ public class MockStepDao implements StepInstanceDao, StepExecutionDao {
 		currentNewStep = 0;
 	}
 
-	public List findStepExecutions(StepInstance step, JobExecution jobExecution) {
-		
-		return null;
-	}
+//	public List findStepExecutions(StepInstance step, JobExecution jobExecution) {
+//		
+//		return null;
+//	}
 
 	public ExecutionContext findExecutionContext(StepExecution stepExecution) {
 		return null;
@@ -85,12 +63,7 @@ public class MockStepDao implements StepInstanceDao, StepExecutionDao {
 	public void updateExecutionContext(StepExecution stepExecution) {
 	}
 
-	public Entity getStepExecution(Long stepExecutionId,
-			StepInstance stepInstance) {
-		return null;
-	}
-
-	public StepExecution getLastStepExecution(StepInstance stepInstance, JobExecution jobExecution) {
+	public StepExecution getStepExecution(JobExecution jobExecution, String stepName) {
 		// TODO Auto-generated method stub
 		return null;
 	}

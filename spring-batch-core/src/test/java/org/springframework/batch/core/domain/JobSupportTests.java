@@ -61,7 +61,7 @@ public class JobSupportTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobSupport#setSteps(java.util.List)}.
+	 * {@link org.springframework.batch.core.domain.JobSupport#setStepNames(java.util.List)}.
 	 */
 	public void testSetSteps() {
 		job.setSteps(Collections.singletonList(new StepSupport("step")));
@@ -70,7 +70,7 @@ public class JobSupportTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobSupport#addStepInstance(org.springframework.batch.core.configuration.StepConfiguration)}.
+	 * {@link org.springframework.batch.core.domain.JobSupport#addStepName(org.springframework.batch.core.configuration.StepConfiguration)}.
 	 */
 	public void testAddStep() {
 		job.addStep(new StepSupport("step"));

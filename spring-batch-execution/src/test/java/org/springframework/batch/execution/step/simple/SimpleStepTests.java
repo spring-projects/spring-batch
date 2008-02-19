@@ -24,7 +24,6 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.item.reader.ItemReaderAdapter;
 import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.writer.ItemWriterAdapter;
@@ -61,7 +60,7 @@ public class SimpleStepTests extends TestCase {
 			}
 		});
 		SimpleStepExecutor executor = (SimpleStepExecutor) step.createStepExecutor();
-		StepExecution stepExecution = new StepExecution(new StepInstance(new Long(11)), new JobExecution(
+		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(
 				new JobInstance(new Long(0L), new JobParameters()), new Long(12)));
 		try {
 			executor.execute(stepExecution);

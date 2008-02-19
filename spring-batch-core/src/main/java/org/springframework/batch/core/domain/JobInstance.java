@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class JobInstance extends Entity {
 
-	private List stepInstances = new ArrayList();
+	private List stepNames = new ArrayList();
 
 	private JobParameters jobParameters;
 	
@@ -59,16 +59,16 @@ public class JobInstance extends Entity {
 		return lastExecution;
 	}
 	
-	public List getStepInstances() {
-		return stepInstances;
+	public List getStepNames() {
+		return stepNames;
 	}
 
-	public void setStepInstances(List stepInstances) {
-		this.stepInstances = stepInstances;
+	public void setStepNames(List stepInstances) {
+		this.stepNames = stepInstances;
 	}
 
-	public void addStepInstance(StepInstance stepInstance) {
-		this.stepInstances.add(stepInstance);
+	public void addStepName(String stepName) {
+		this.stepNames.add(stepName);
 	}
 
 	public int getJobExecutionCount() {

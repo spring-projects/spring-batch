@@ -35,20 +35,20 @@ public class JobInstanceTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getStepInstances()}.
+	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getStepNames()}.
 	 */
 	public void testGetSteps() {
-		assertEquals(0, instance.getStepInstances().size());
-		instance.setStepInstances(Collections.singletonList(new StepInstance()));
-		assertEquals(1, instance.getStepInstances().size());
+		assertEquals(0, instance.getStepNames().size());
+		instance.setStepNames(Collections.singletonList(""));
+		assertEquals(1, instance.getStepNames().size());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#addStepInstance(org.springframework.batch.core.domain.StepInstance)}.
+	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#addStepName(org.springframework.batch.core.domain.StepInstance)}.
 	 */
 	public void testAddStep() {
-		instance.addStepInstance(new StepInstance());
-		assertEquals(1, instance.getStepInstances().size());
+		instance.addStepName("");
+		assertEquals(1, instance.getStepNames().size());
 	}
 
 	/**

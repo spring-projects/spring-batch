@@ -48,8 +48,11 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ? where JOB_EXECUTION_ID = ?";
 
 	private static final String FIND_JOB_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
-		+ " where JOB_INSTANCE_ID = ?";
-	
+			+ " where JOB_INSTANCE_ID = ?";
+
+	private static final String GET_LAST_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
+			+ " where JOB_INSTANCE_ID = ? and START_TIME = (SELECT max(START_TIME) from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ?)";
+
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
 	public List findJobExecutions(final JobInstance job) {
@@ -57,8 +60,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Assert.notNull(job, "Job cannot be null.");
 		Assert.notNull(job.getId(), "Job Id cannot be null.");
 
-		return getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTIONS),
-				new Object[] { job.getId() }, new JobExecutionRowMapper(job));
+		return getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTIONS), new Object[] { job.getId() },
+				new JobExecutionRowMapper(job));
 	}
 
 	/**
@@ -196,6 +199,23 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			return jobExecution;
 		}
 
+	}
+
+	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+
+		Long id = jobInstance.getId();
+
+		List executions = getJdbcTemplate().query(getQuery(GET_LAST_EXECUTION), new Object[] { id, id },
+				new JobExecutionRowMapper(jobInstance));
+
+		Assert.state(executions.size() <= 1, "There must be at most one latest job execution");
+
+		if (executions.isEmpty()) {
+			return null;
+		}
+		else {
+			return (JobExecution) executions.get(0);
+		}
 	}
 
 }

@@ -49,7 +49,7 @@ public class SimpleJobTests extends TestCase {
 
 	private List recovered = new ArrayList();
 
-	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobDao(), new MapJobDao(), new MapStepDao(), new MapStepDao());
+	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobDao(), new MapJobDao(), new MapStepDao());
 
 	private List processed = new ArrayList();
 
@@ -92,6 +92,7 @@ public class SimpleJobTests extends TestCase {
 		step.setItemWriter(processor);
 		step.setJobRepository(repository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
+		step.setName("stepName");
 		step.afterPropertiesSet();
 		return step;
 	}

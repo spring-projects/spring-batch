@@ -36,8 +36,8 @@ import org.springframework.batch.repeat.ExitStatus;
 public class StepExecution extends Entity {
 
 	private JobExecution jobExecution;
-
-	private StepInstance step;
+	
+	private String stepName;
 
 	private BatchStatus status = BatchStatus.STARTING;
 
@@ -75,9 +75,9 @@ public class StepExecution extends Entity {
 	 * @param jobExecution the current job execution
 	 * @param id the id of this execution
 	 */
-	public StepExecution(StepInstance step, JobExecution jobExecution, Long id) {
+	public StepExecution(String stepName, JobExecution jobExecution, Long id) {
 		super(id);
-		this.step = step;
+		this.stepName = stepName;
 		this.jobExecution = jobExecution;
 	}
 
@@ -87,8 +87,8 @@ public class StepExecution extends Entity {
 	 * @param step the step to which this execution belongs
 	 * @param jobExecution the current job execution
 	 */
-	public StepExecution(StepInstance step, JobExecution jobExecution) {
-		this(step, jobExecution, null);
+	public StepExecution(String stepName, JobExecution jobExecution) {
+		this(stepName, jobExecution, null);
 	}
 
 	/**
@@ -232,15 +232,10 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Returns the id for this step
-	 * 
-	 * @return the id for this step
+	 * @return the name of the step
 	 */
-	public Long getStepId() {
-		if (step != null) {
-			return step.getId();
-		}
-		return null;
+	public String getStepName() {
+		return stepName;
 	}
 
 	/**
@@ -261,16 +256,16 @@ public class StepExecution extends Entity {
 	 * @see org.springframework.batch.container.common.domain.Entity#equals(java.lang.Object)
 	 */
 	public boolean equals(Object obj) {
-		Object stepId = getStepId();
+		//TODO make sure the equality makes sense
 		Object jobExecutionId = getJobExecutionId();
-		if (stepId == null && jobExecutionId == null || !(obj instanceof StepExecution) || getId() == null) {
+		if (stepName == null && jobExecutionId == null || !(obj instanceof StepExecution) || getId() == null) {
 			return super.equals(obj);
 		}
 		StepExecution other = (StepExecution) obj;
-		if (stepId == null) {
+		if (stepName == null) {
 			return jobExecutionId.equals(other.getJobExecutionId());
 		}
-		return stepId.equals(other.getStepId())
+		return stepName.equals(other.getStepName())
 		        && (jobExecutionId == null || jobExecutionId.equals(other.getJobExecutionId()));
 	}
 
@@ -280,19 +275,14 @@ public class StepExecution extends Entity {
 	 * @see org.springframework.batch.container.common.domain.Entity#hashCode()
 	 */
 	public int hashCode() {
-		Object stepId = getStepId();
 		Object jobExecutionId = getJobExecutionId();
-		return super.hashCode() + 31 * (stepId != null ? stepId.hashCode() : 0) + 91
+		return super.hashCode() + 31 * (stepName != null ? stepName.hashCode() : 0) + 91
 		        * (jobExecutionId != null ? jobExecutionId.hashCode() : 0);
 	}
 
 	public String toString() {
-		return super.toString() + ", name=" + getName() + ", taskCount=" + taskCount + ", commitCount=" + commitCount
+		return super.toString() + ", name=" + stepName + ", taskCount=" + taskCount + ", commitCount=" + commitCount
 		        + ", rollbackCount=" + rollbackCount;
-	}
-
-	private String getName() {
-		return step == null ? null : step.getName();
 	}
 
 	/**
@@ -307,15 +297,6 @@ public class StepExecution extends Entity {
 	 */
 	public ExitStatus getExitStatus() {
 		return exitStatus;
-	}
-
-	/**
-	 * Accessor for the step governing this execution.
-	 * 
-	 * @return the step
-	 */
-	public StepInstance getStep() {
-		return step;
 	}
 
 	/**

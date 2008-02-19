@@ -126,4 +126,9 @@ public class MapJobDao implements JobInstanceDao, JobExecutionDao {
 		}
 	}
 
+	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

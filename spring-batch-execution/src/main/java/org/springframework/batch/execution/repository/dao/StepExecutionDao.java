@@ -2,7 +2,6 @@ package org.springframework.batch.execution.repository.dao;
 
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.item.ExecutionContext;
 
 public interface StepExecutionDao {
@@ -28,14 +27,6 @@ public interface StepExecutionDao {
 	void updateStepExecution(StepExecution stepExecution);
 
 	/**
-	 * Return the count of StepExecutions for the given {@link StepInstance}.
-	 * 
-	 * @param stepInstance the {@link StepInstance} to check for executions
-	 * @return the number of step executions for this step
-	 */
-	int getStepExecutionCount(StepInstance stepInstance);
-
-	/**
 	 * Find all {@link ExecutionContext} for the given {@link StepExecution}.
 	 * 
 	 * @throws IllegalArgumentException if the id is null.
@@ -56,11 +47,7 @@ public interface StepExecutionDao {
 	 * Update the ExecutionContext of given {@link StepExecution}.
 	 */
 	void updateExecutionContext(StepExecution stepExecution);
+	
+	StepExecution getStepExecution(JobExecution jobExecution, String stepName);
 
-	/**
-	 * @param lastJobExecution last job execution
-	 * @param stepInstance
-	 * @return the last execution of the given instance
-	 */
-	StepExecution getLastStepExecution(StepInstance stepInstance, JobExecution lastJobExecution);
 }

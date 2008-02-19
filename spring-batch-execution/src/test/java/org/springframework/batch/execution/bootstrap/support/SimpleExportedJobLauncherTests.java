@@ -27,7 +27,6 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
 import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepInstance;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.batch.execution.configuration.MapJobRegistry;
@@ -52,7 +51,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 		launcher.setLauncher(new JobLauncher() {
 			public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException {
 				JobExecution result = new JobExecution(null);
-				StepExecution stepExecution = result.createStepExecution(new StepInstance(null, "step"));
+				StepExecution stepExecution = result.createStepExecution("stepName");
 				stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
 				list.add(jobParameters);
 				return result;
