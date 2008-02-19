@@ -16,6 +16,7 @@
 package org.springframework.batch.core.domain;
 
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
 
 /**
  * Interface defining the contract for dechunking a {@link Chunk}.  Similar
@@ -26,7 +27,7 @@ import org.springframework.batch.item.ItemReader;
  * 
  * @author Lucas Ward
  */
-public interface Dechunker {
+public interface Dechunker extends ItemStream{
 
 	/**
 	 * Dechunk the provided chunk.  In general, this will be done by delegating to an

@@ -16,6 +16,7 @@
 package org.springframework.batch.core.domain;
 
 import org.springframework.batch.io.exception.ReadFailureException;
+import org.springframework.batch.item.ItemStream;
 
 
 /**
@@ -26,7 +27,7 @@ import org.springframework.batch.io.exception.ReadFailureException;
  * @author Ben Hale
  * @author Lucas Ward
  */
-public interface Chunker {
+public interface Chunker extends ItemStream {
 
 	/**
 	 * Read in a chunk, given the provided chunk size for the given StepExecution.
