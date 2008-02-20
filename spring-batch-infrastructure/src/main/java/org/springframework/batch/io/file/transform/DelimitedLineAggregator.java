@@ -16,6 +16,8 @@
 
 package org.springframework.batch.io.file.transform;
 
+import org.springframework.batch.io.file.mapping.FieldSet;
+
 
 /**
  * Class used to create string representing object. Values are separated by
@@ -30,13 +32,13 @@ public class DelimitedLineAggregator implements LineAggregator {
 	/**
 	 * Method used to create string representing object.
 	 * 
-	 * @param args arrays of strings representing data to be stored
+	 * @param fieldSet arrays of strings representing data to be stored
 	 * @param lineDescriptor for this implementation this parameter is not
 	 * used
 	 */
-	public String aggregate(String[] args) {
+	public String aggregate(FieldSet fieldSet) {
 		StringBuffer buffer = new StringBuffer();
-
+		String[] args = fieldSet.getValues();
 		for (int i = 0; i < args.length; i++) {
 			buffer.append(args[i]);
 

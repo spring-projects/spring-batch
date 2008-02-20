@@ -18,6 +18,7 @@ package org.springframework.batch.io.file.transform;
 
 import java.util.Arrays;
 
+import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.util.Assert;
 
 /**
@@ -60,14 +61,16 @@ public class FixedLengthLineAggregator implements LineAggregator {
 	 * Aggregate provided strings into single line using specified column
 	 * ranges.
 	 * 
-	 * @param args
+	 * @param fieldSet
 	 *            arrays of strings representing data to be aggregated
 	 * @return aggregated strings
 	 */
-	public String aggregate(String[] args) {
+	public String aggregate(FieldSet fieldSet) {
 
-		Assert.notNull(args);
+		Assert.notNull(fieldSet);
 		Assert.notNull(ranges);
+		
+		String[] args = fieldSet.getValues();
 		Assert.isTrue(args.length <= ranges.length,
 				"Number of arguments must match number of fields in a record");
 

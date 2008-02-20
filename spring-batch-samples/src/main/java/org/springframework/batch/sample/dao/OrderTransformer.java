@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
+import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.transform.LineAggregator;
 import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.batch.sample.domain.Address;
@@ -29,89 +31,94 @@ import org.springframework.batch.sample.domain.Customer;
 import org.springframework.batch.sample.domain.LineItem;
 import org.springframework.batch.sample.domain.Order;
 
-
 /**
  * Converts <code>Order</code> object to a String.
  * @author Dave Syer
  */
 public class OrderTransformer implements ItemTransformer {
 
-    /**
-     * Aggregators for all types of lines in the output file
-     */
-    private Map aggregators;
+	/**
+	 * Aggregators for all types of lines in the output file
+	 */
+	private Map aggregators;
 
-    /**
-     * Converts information from an Order object to a collection of Strings for output.
-     */
-    public Object transform(Object data) {
-        Order order = (Order) data;
-        
-        List result = new ArrayList();
+	/**
+	 * Converts information from an Order object to a collection of Strings for
+	 * output.
+	 */
+	public Object transform(Object data) {
+		Order order = (Order) data;
 
-        result.add(getAggregator("header").aggregate(OrderFormatterUtils.headerArgs(order)));
-        result.add(getAggregator("customer").aggregate(OrderFormatterUtils.customerArgs(order)));
-        result.add(getAggregator("address").aggregate(OrderFormatterUtils.billingAddressArgs(order)));
-        result.add(getAggregator("billing").aggregate(OrderFormatterUtils.billingInfoArgs(order)));
+		List result = new ArrayList();
 
-        List items = order.getLineItems();
-        LineItem item;
+		result.add(getAggregator("header").aggregate(OrderFormatterUtils.headerArgs(order)));
+		result.add(getAggregator("customer").aggregate(OrderFormatterUtils.customerArgs(order)));
+		result.add(getAggregator("address").aggregate(OrderFormatterUtils.billingAddressArgs(order)));
+		result.add(getAggregator("billing").aggregate(OrderFormatterUtils.billingInfoArgs(order)));
 
-        for (int i = 0; i < items.size(); i++) {
-            item = (LineItem) items.get(i);
-            result.add(getAggregator("item").aggregate(OrderFormatterUtils.lineItemArgs(item)));
-        }
+		List items = order.getLineItems();
+		LineItem item;
 
-        result.add(getAggregator("footer").aggregate(OrderFormatterUtils.footerArgs(order)));
-        
-        return result;
-    }
-    
-    public void setAggregators(Map aggregators) {
-        this.aggregators = aggregators;
-    }
-    
-    private LineAggregator getAggregator(String name) {
+		for (int i = 0; i < items.size(); i++) {
+			item = (LineItem) items.get(i);
+			result.add(getAggregator("item").aggregate(OrderFormatterUtils.lineItemArgs(item)));
+		}
+
+		result.add(getAggregator("footer").aggregate(OrderFormatterUtils.footerArgs(order)));
+
+		return result;
+	}
+
+	public void setAggregators(Map aggregators) {
+		this.aggregators = aggregators;
+	}
+
+	private LineAggregator getAggregator(String name) {
 		return (LineAggregator) aggregators.get(name);
 	}
 
-    /**
-     * Utility class encapsulating formatting of <code>Order</code> and its nested objects.
-     */
+	/**
+	 * Utility class encapsulating formatting of <code>Order</code> and its
+	 * nested objects.
+	 */
 	private static class OrderFormatterUtils {
-		
+
 		private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
-		static String[] headerArgs(Order order) {
-			return new String[] { "BEGIN_ORDER:", String.valueOf(order.getOrderId()), dateFormat.format(order.getOrderDate()) };
+		static FieldSet headerArgs(Order order) {
+			return new DefaultFieldSet(new String[] { "BEGIN_ORDER:", String.valueOf(order.getOrderId()),
+					dateFormat.format(order.getOrderDate()) });
 		}
 
-		static String[] footerArgs(Order order) {
-			return new String[] { "END_ORDER:", order.getTotalPrice().toString() };
+		static FieldSet footerArgs(Order order) {
+			return new DefaultFieldSet(new String[] { "END_ORDER:", order.getTotalPrice().toString() });
 		}
 
-		static String[] customerArgs(Order order) {
+		static FieldSet customerArgs(Order order) {
 			Customer customer = order.getCustomer();
 
-			return new String[] { "CUSTOMER:", String.valueOf(customer.getRegistrationId()), customer.getFirstName(),
-					customer.getMiddleName(), customer.getLastName() };
+			return new DefaultFieldSet(new String[] { "CUSTOMER:", String.valueOf(customer.getRegistrationId()),
+					customer.getFirstName(), customer.getMiddleName(), customer.getLastName() });
 		}
 
-		static String[] lineItemArgs(LineItem item) {
-			return new String[] { "ITEM:", String.valueOf(item.getItemId()), item.getPrice().toString() };
+		static FieldSet lineItemArgs(LineItem item) {
+			return new DefaultFieldSet(new String[] { "ITEM:", String.valueOf(item.getItemId()),
+					item.getPrice().toString() });
 		}
 
-		static String[] billingAddressArgs(Order order) {
+		static FieldSet billingAddressArgs(Order order) {
 			Address address = order.getBillingAddress();
 
-			return new String[] { "ADDRESS:", address.getAddrLine1(), address.getCity(), address.getZipCode() };
+			return new DefaultFieldSet(new String[] { "ADDRESS:", address.getAddrLine1(), address.getCity(),
+					address.getZipCode() });
 		}
 
-		static String[] billingInfoArgs(Order order) {
+		static FieldSet billingInfoArgs(Order order) {
 			BillingInfo billingInfo = order.getBilling();
 
-			return new String[] { "BILLING:", billingInfo.getPaymentId(), billingInfo.getPaymentDesc() };
+			return new DefaultFieldSet(new String[] { "BILLING:", billingInfo.getPaymentId(),
+					billingInfo.getPaymentDesc() });
 		}
 	}
-	
+
 }

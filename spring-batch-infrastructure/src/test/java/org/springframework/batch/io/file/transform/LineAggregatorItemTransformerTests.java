@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.io.file.transform;
 
+import org.springframework.batch.io.file.mapping.FieldSet;
+
 import junit.framework.TestCase;
 
 /**
@@ -31,7 +33,7 @@ public class LineAggregatorItemTransformerTests extends TestCase {
 	 */
 	public void testSetAggregator() throws Exception {
 		transformer.setAggregator(new LineAggregator() {
-			public String aggregate(String[] args) {
+			public String aggregate(FieldSet fieldSet) {
 				return "foo";
 			}
 		});

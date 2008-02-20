@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.io.file.transform;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
+import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.item.writer.ItemTransformer;
 
 /**
@@ -43,6 +45,14 @@ public class LineAggregatorItemTransformer implements ItemTransformer {
 	 * @see org.springframework.batch.item.writer.ItemTransformer#transform(java.lang.Object)
 	 */
 	public Object transform(Object item) throws Exception {
-		return aggregator.aggregate((String[]) item);
+		return aggregator.aggregate(createFieldSet(item));
+	}
+
+	/**
+	 * @param item
+	 * @return
+	 */
+	protected FieldSet createFieldSet(Object item) {
+		return new DefaultFieldSet((String[]) item);
 	}
 }

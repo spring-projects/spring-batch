@@ -16,6 +16,7 @@
 
 package org.springframework.batch.io.file.transform;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.transform.FixedLengthLineAggregator;
 import org.springframework.batch.io.file.transform.Range;
 
@@ -39,7 +40,7 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 		String[] args = { "does not matter what is here" };
 
 		try {
-			aggregator.aggregate(args);
+			aggregator.aggregate(new DefaultFieldSet(args));
 			fail("should not work with no ranges specified");
 		}
 		catch (IllegalArgumentException expected) {
@@ -55,7 +56,7 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 		aggregator.setColumns(new Range[0]);
 
 		try {
-			aggregator.aggregate(string);
+			aggregator.aggregate(new DefaultFieldSet(string));
 			fail("Exception expected: count of aggregated strings"
 					+ " does not match the number of columns");
 		}
@@ -71,7 +72,7 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 		String[] args = { "Oversize" };
 		aggregator.setColumns(new Range[] {new Range(1,args[0].length()-1)});
 		try {
-			aggregator.aggregate(args);
+			aggregator.aggregate(new DefaultFieldSet(args));
 			fail("Invalid text length, exception should have been thrown");
 		}
 		catch (IllegalArgumentException expected) {
@@ -85,7 +86,7 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 	public void testAggregate() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setColumns(new Range[] {new Range(1,9), new Range(10,18)});
-		String result = aggregator.aggregate(args);		
+		String result = aggregator.aggregate(new DefaultFieldSet(args));		
 		assertEquals("MatchsizeSmallsize", result);
 	}
 
@@ -95,7 +96,7 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 	public void testAggregateWithLastRangeUnbound() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setColumns(new Range[] {new Range(1,12), new Range(13)});
-		String result = aggregator.aggregate(args);		
+		String result = aggregator.aggregate(new DefaultFieldSet(args));		
 		assertEquals("Matchsize   Smallsize", result);
 	}
 
@@ -107,7 +108,7 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setAlignment("right");
 		aggregator.setColumns(new Range[] {new Range(1,13), new Range(14,23)});
-		String result = aggregator.aggregate(args);
+		String result = aggregator.aggregate(new DefaultFieldSet(args));
 		assertEquals(23,result.length());
 		assertEquals(result, "    Matchsize Smallsize");		
 	}
@@ -119,7 +120,7 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setAlignment("center");
 		aggregator.setColumns(new Range[] {new Range(1,13), new Range(14,25)});
-		String result = aggregator.aggregate(args);
+		String result = aggregator.aggregate(new DefaultFieldSet(args));
 		assertEquals(result, "  Matchsize   Smallsize  ");
 	}
 
@@ -131,7 +132,7 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 		aggregator.setPadding('.');
 		aggregator.setAlignment("left");
 		aggregator.setColumns(new Range[] {new Range(1,13), new Range(14,24)});
-		String result = aggregator.aggregate(args);
+		String result = aggregator.aggregate(new DefaultFieldSet(args));
 		assertEquals(result, "Matchsize....Smallsize..");
 	}
 
@@ -142,7 +143,7 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setAlignment("left");
 		aggregator.setColumns(new Range[] {new Range(1,13), new Range(14,24)});
-		String result = aggregator.aggregate(args);
+		String result = aggregator.aggregate(new DefaultFieldSet(args));
 		assertEquals(result, "Matchsize    Smallsize  ");
 	}
 
@@ -166,6 +167,6 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 	public void testAggregateNullArgument() {
 		String[] args = { null };
 		aggregator.setColumns(new Range[] {new Range(1,3)});
-		assertEquals("   ", aggregator.aggregate(args));
+		assertEquals("   ", aggregator.aggregate(new DefaultFieldSet(args)));
 	}
 }

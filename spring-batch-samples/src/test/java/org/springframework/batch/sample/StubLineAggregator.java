@@ -16,6 +16,7 @@
 
 package org.springframework.batch.sample;
 
+import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.transform.LineAggregator;
 
 
@@ -24,16 +25,16 @@ import org.springframework.batch.io.file.transform.LineAggregator;
  * 
  * @author robert.kasanicky
  */
-public class LineAggregatorStub implements LineAggregator {
+public class StubLineAggregator implements LineAggregator {
 
 	/**
 	 * Concatenates arguments. Ignores the LineDescriptor.
 	 */
-	public String aggregate(String[] args) {
+	public String aggregate(FieldSet fieldSet) {
 		String result = "";
 
-		for (int i = 1; i < args.length; i++) {
-			result = result + args[i];
+		for (int i = 1; i < fieldSet.getFieldCount(); i++) {
+			result = result + fieldSet.readString(i);
 		}
 
 		return result;

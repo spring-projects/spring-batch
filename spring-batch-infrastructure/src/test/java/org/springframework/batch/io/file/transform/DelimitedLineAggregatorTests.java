@@ -16,9 +16,9 @@
 
 package org.springframework.batch.io.file.transform;
 
-import org.springframework.batch.io.file.transform.DelimitedLineAggregator;
-
 import junit.framework.TestCase;
+
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 
 /**
  * Unit tests for {@link DelimitedLineAggregator}
@@ -34,7 +34,7 @@ public class DelimitedLineAggregatorTests extends TestCase {
 
 		String[] args = { "a", "bc", "def" };
 		String expectedResult = "a:bc:def";
-		String result = aggregator.aggregate(args);
+		String result = aggregator.aggregate(new DefaultFieldSet(args));
 		assertEquals(result, expectedResult);
 	}
 

@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.io.file.transform.LineAggregator;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.writer.AbstractItemWriter;
-import org.springframework.batch.sample.LineAggregatorStub;
+import org.springframework.batch.sample.StubLineAggregator;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;
 import org.springframework.batch.sample.domain.Customer;
@@ -56,7 +56,7 @@ public class FlatFileOrderWriterTests extends TestCase {
 		order.setTotalPrice(BigDecimal.valueOf(0));
 		
 		//create aggregator stub
-		LineAggregator aggregator = new LineAggregatorStub();
+		LineAggregator aggregator = new StubLineAggregator();
 		
 		//create map of aggregators and set it to writer
 		Map aggregators = new HashMap();

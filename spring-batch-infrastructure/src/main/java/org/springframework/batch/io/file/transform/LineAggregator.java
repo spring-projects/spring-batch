@@ -16,6 +16,8 @@
 
 package org.springframework.batch.io.file.transform;
 
+import org.springframework.batch.io.file.mapping.FieldSet;
+
 
 /**
  * Interface used to create string used to create string representing object.
@@ -26,9 +28,8 @@ public interface LineAggregator {
 	/**
 	 * Method used to create a string to be stored from the array of values.
 	 * 
-	 * @param args values to be stored
-	 * @param lineDescriptor structure of final string
+	 * @param fieldSet values to be converted
 	 * @return
 	 */
-	public String aggregate(String[] args);
+	public String aggregate(FieldSet fieldSet);
 }
