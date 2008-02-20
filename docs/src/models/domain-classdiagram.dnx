@@ -208,23 +208,6 @@
     <element xmi:type="uml:Interface" href="mmi:///#jsrctype%5Ename=Job%5Bjcu%5Ename=Job.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D$uml.Interface"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_qtIDMtZ1EdyFWa-S-HPO7A" x="45354" y="1436"/>
   </children>
-  <children xmi:id="_qtR0BdZ1EdyFWa-S-HPO7A">
-    <children xmi:id="_qtR0CNZ1EdyFWa-S-HPO7A" type="ImageCompartment">
-      <layoutConstraint xmi:type="notation:Size" xmi:id="_qtR0CdZ1EdyFWa-S-HPO7A" width="1320" height="1320"/>
-    </children>
-    <children xmi:id="_qtR0CtZ1EdyFWa-S-HPO7A" type="Stereotype"/>
-    <children xmi:id="_qtR0C9Z1EdyFWa-S-HPO7A" type="Name"/>
-    <children xmi:id="_qtR0DNZ1EdyFWa-S-HPO7A" type="Parent"/>
-    <children xmi:id="_qtR0DdZ1EdyFWa-S-HPO7A" type="AttributeCompartment">
-      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_qtR0DtZ1EdyFWa-S-HPO7A"/>
-    </children>
-    <children xmi:id="_qtR0D9Z1EdyFWa-S-HPO7A" visible="false" type="OperationCompartment">
-      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_qtR0ENZ1EdyFWa-S-HPO7A"/>
-    </children>
-    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_qtR0BtZ1EdyFWa-S-HPO7A" showStereotype="Label"/>
-    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=StepInstance%5Bjcu%5Ename=StepInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D$uml.Class"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_qtR0B9Z1EdyFWa-S-HPO7A" x="45974" y="19302"/>
-  </children>
   <children xmi:id="_ORU7wdn1Edy3x64p5vCglw">
     <children xmi:id="_ORU7xNn1Edy3x64p5vCglw" type="ImageCompartment">
       <layoutConstraint xmi:type="notation:Size" xmi:id="_ORU7xdn1Edy3x64p5vCglw" width="1320" height="1320"/>
@@ -394,7 +377,7 @@
     </children>
     <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_uqKW5tqHEdyZfZ-HsR_CLw" showStereotype="Label"/>
     <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=AbstractStep%5Bjcu%5Ename=AbstractStep.java%5Bjpack%5Ename=org.springframework.batch.execution.step.simple%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-execution%5D%5D%5D%5D$uml.Class"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_uqKW59qHEdyZfZ-HsR_CLw" x="72424" y="39682"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_uqKW59qHEdyZfZ-HsR_CLw" x="72910" y="30115"/>
   </children>
   <children xmi:id="_KI7cQNqMEdyZfZ-HsR_CLw">
     <children xmi:id="_KI7cQ9qMEdyZfZ-HsR_CLw" type="ImageCompartment">
@@ -523,17 +506,6 @@
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_rWtLhNZ1EdyFWa-S-HPO7A" showStereotype="Text"/>
     <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=StepExecution%5Bjcu%5Ename=StepExecution.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=Entity%5Bjcu%5Ename=Entity.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Generalization"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_rWtLhdZ1EdyFWa-S-HPO7A" points="[-14, -4366, 3796, 3625]$[-3824, -5954, -14, 2037]"/>
-  </edges>
-  <edges xmi:id="_rWtLitZ1EdyFWa-S-HPO7A" source="_qrC_YNZ1EdyFWa-S-HPO7A" target="_qtR0BdZ1EdyFWa-S-HPO7A">
-    <children xmi:id="_rWtLjdZ1EdyFWa-S-HPO7A" type="KindLabel">
-      <children xmi:id="_rWtLj9Z1EdyFWa-S-HPO7A" type="Stereotype"/>
-      <children xmi:id="_rWtLkdZ1EdyFWa-S-HPO7A" type="Kind"/>
-      <children xmi:id="_rWtLkNZ1EdyFWa-S-HPO7A" type="Name"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_rWtLjtZ1EdyFWa-S-HPO7A" y="-530"/>
-    </children>
-    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_rWtLi9Z1EdyFWa-S-HPO7A" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=StepExecution%5Bjcu%5Ename=StepExecution.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=StepInstance%5Bjcu%5Ename=StepInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Usage"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_rWtLjNZ1EdyFWa-S-HPO7A" points="[-14, -4366, 3809, 16219]$[0, -7991, 3823, 12594]$[-1720, -13230, 2103, 7355]$[-3824, -16431, -1, 4154]"/>
   </edges>
   <edges xmi:id="_rWtLktZ1EdyFWa-S-HPO7A" source="_qrC_YNZ1EdyFWa-S-HPO7A" target="_qtIDGNZ1EdyFWa-S-HPO7A">
     <children xmi:id="_rWtLldZ1EdyFWa-S-HPO7A" type="KindLabel">
@@ -708,17 +680,6 @@
     <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=JobExecution%5Bjcu%5Ename=JobExecution.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=JobInstance%5Bjcu%5Ename=JobInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Usage"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_rXJ3ctZ1EdyFWa-S-HPO7A" points="[-13, 2249, 15028, -13097]$[-13837, 7991, 1204, -7355]$[-15041, 13732, 0, -1614]"/>
   </edges>
-  <edges xmi:id="_rXJ3eNZ1EdyFWa-S-HPO7A" source="_qtIDGNZ1EdyFWa-S-HPO7A" target="_qtR0BdZ1EdyFWa-S-HPO7A">
-    <children xmi:id="_rXJ3e9Z1EdyFWa-S-HPO7A" type="KindLabel">
-      <children xmi:id="_rXJ3fdZ1EdyFWa-S-HPO7A" type="Stereotype"/>
-      <children xmi:id="_rXJ3f9Z1EdyFWa-S-HPO7A" type="Kind"/>
-      <children xmi:id="_rXJ3ftZ1EdyFWa-S-HPO7A" type="Name"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_rXJ3fNZ1EdyFWa-S-HPO7A" y="-530"/>
-    </children>
-    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_rXJ3edZ1EdyFWa-S-HPO7A" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=JobExecution%5Bjcu%5Ename=JobExecution.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=StepInstance%5Bjcu%5Ename=StepInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Usage"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_rXJ3etZ1EdyFWa-S-HPO7A" points="[-13, 2249, 6376, -5742]$[-6390, 3837, -1, -4154]"/>
-  </edges>
   <edges xmi:id="_rXJ3gNZ1EdyFWa-S-HPO7A" source="_qtIDJNZ1EdyFWa-S-HPO7A" target="_qtIDDNZ1EdyFWa-S-HPO7A">
     <children xmi:id="_rXJ3g9Z1EdyFWa-S-HPO7A" type="KindLabel">
       <children xmi:id="_rXJ3hdZ1EdyFWa-S-HPO7A" type="Stereotype"/>
@@ -729,17 +690,6 @@
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_rXJ3gdZ1EdyFWa-S-HPO7A" showStereotype="Text"/>
     <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=JobInstance%5Bjcu%5Ename=JobInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=Entity%5Bjcu%5Ename=Entity.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Usage"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_rXJ3gtZ1EdyFWa-S-HPO7A" points="[0, 1614, -8665, -3625]$[8651, 3201, -14, -2038]"/>
-  </edges>
-  <edges xmi:id="_rXJ3iNZ1EdyFWa-S-HPO7A" source="_qtIDJNZ1EdyFWa-S-HPO7A" target="_qtR0BdZ1EdyFWa-S-HPO7A">
-    <children xmi:id="_rXJ3i9Z1EdyFWa-S-HPO7A" type="KindLabel">
-      <children xmi:id="_rXJ3jdZ1EdyFWa-S-HPO7A" type="Stereotype"/>
-      <children xmi:id="_rXJ3j9Z1EdyFWa-S-HPO7A" type="Kind"/>
-      <children xmi:id="_rXJ3jtZ1EdyFWa-S-HPO7A" type="Name"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_rXJ3jNZ1EdyFWa-S-HPO7A" y="-530"/>
-    </children>
-    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_rXJ3idZ1EdyFWa-S-HPO7A" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=JobInstance%5Bjcu%5Ename=JobInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=StepInstance%5Bjcu%5Ename=StepInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Usage"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_rXJ3itZ1EdyFWa-S-HPO7A" points="[0, -1614, -8652, 5741]$[8651, -3201, -1, 4154]"/>
   </edges>
   <edges xmi:id="_rXJ3kNZ1EdyFWa-S-HPO7A" source="_qtIDJNZ1EdyFWa-S-HPO7A" target="_qtIDMNZ1EdyFWa-S-HPO7A">
     <children xmi:id="_rXJ3k9Z1EdyFWa-S-HPO7A" type="KindLabel">
@@ -794,49 +744,6 @@
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_rXJ3sNZ1EdyFWa-S-HPO7A" showStereotype="Text"/>
     <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=Job%5Bjcu%5Ename=Job.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=JobExecution%5Bjcu%5Ename=JobExecution.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Usage"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_rXJ3sdZ1EdyFWa-S-HPO7A" points="[-13, 2897, -8003, -8228]$[7990, 5887, 0, -5238]$[7977, 8876, -13, -2249]"/>
-  </edges>
-  <edges xmi:id="_rXTBYNZ1EdyFWa-S-HPO7A" source="_qtR0BdZ1EdyFWa-S-HPO7A" target="_qrC_YNZ1EdyFWa-S-HPO7A">
-    <children xmi:id="_rXTBY9Z1EdyFWa-S-HPO7A" type="KindLabel">
-      <children xmi:id="_rXTBZdZ1EdyFWa-S-HPO7A" type="Stereotype"/>
-      <children xmi:id="_rXTBZ9Z1EdyFWa-S-HPO7A" type="Kind"/>
-      <children xmi:id="_rXTBZtZ1EdyFWa-S-HPO7A" type="Name"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_rXTBZNZ1EdyFWa-S-HPO7A" y="-530"/>
-    </children>
-    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_rXTBYdZ1EdyFWa-S-HPO7A" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=StepInstance%5Bjcu%5Ename=StepInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=StepExecution%5Bjcu%5Ename=StepExecution.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Usage"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_rXTBYtZ1EdyFWa-S-HPO7A" points="[-1, 4154, -3824, -16431]$[-3797, 7355, -7620, -13230]$[-3797, 12594, -7620, -7991]$[3809, 16219, -14, -4366]"/>
-  </edges>
-  <edges xmi:id="_rXTBaNZ1EdyFWa-S-HPO7A" source="_qtR0BdZ1EdyFWa-S-HPO7A" target="_qtIDDNZ1EdyFWa-S-HPO7A">
-    <children xmi:id="_rXTBa9Z1EdyFWa-S-HPO7A" type="KindLabel">
-      <children xmi:id="_rXTBbdZ1EdyFWa-S-HPO7A" type="Stereotype"/>
-      <children xmi:id="_rXTBb9Z1EdyFWa-S-HPO7A" type="Kind"/>
-      <children xmi:id="_rXTBbtZ1EdyFWa-S-HPO7A" type="Name"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_rXTBbNZ1EdyFWa-S-HPO7A" y="-530"/>
-    </children>
-    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_rXTBadZ1EdyFWa-S-HPO7A" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=StepInstance%5Bjcu%5Ename=StepInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=Entity%5Bjcu%5Ename=Entity.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Usage"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_rXTBatZ1EdyFWa-S-HPO7A" points="[-1, 4154, -14, -8440]$[-1125, 7355, -1138, -5239]$[-1, 10556, -14, -2038]"/>
-  </edges>
-  <edges xmi:id="_rXTBcNZ1EdyFWa-S-HPO7A" source="_qtR0BdZ1EdyFWa-S-HPO7A" target="_qtIDJNZ1EdyFWa-S-HPO7A">
-    <children xmi:id="_rXTBc9Z1EdyFWa-S-HPO7A" type="KindLabel">
-      <children xmi:id="_rXTBddZ1EdyFWa-S-HPO7A" type="Stereotype"/>
-      <children xmi:id="_rXTBd9Z1EdyFWa-S-HPO7A" type="Kind"/>
-      <children xmi:id="_rXTBdtZ1EdyFWa-S-HPO7A" type="Name"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_rXTBdNZ1EdyFWa-S-HPO7A" y="-530"/>
-    </children>
-    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_rXTBcdZ1EdyFWa-S-HPO7A" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=StepInstance%5Bjcu%5Ename=StepInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=JobInstance%5Bjcu%5Ename=JobInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Usage"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_rXTBctZ1EdyFWa-S-HPO7A" points="[-1, 4154, 8651, -3201]$[-8652, 5741, 0, -1614]"/>
-  </edges>
-  <edges xmi:id="_rXTBeNZ1EdyFWa-S-HPO7A" source="_qtR0BdZ1EdyFWa-S-HPO7A" target="_qtIDDNZ1EdyFWa-S-HPO7A">
-    <children xmi:id="_rXTBe9Z1EdyFWa-S-HPO7A" type="NameLabel">
-      <children xmi:id="_rXTBfdZ1EdyFWa-S-HPO7A" type="Stereotype"/>
-      <children xmi:id="_rXTBftZ1EdyFWa-S-HPO7A" type="Name"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_rXTBfNZ1EdyFWa-S-HPO7A" y="-530"/>
-    </children>
-    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_rXTBedZ1EdyFWa-S-HPO7A" showStereotype="Text"/>
-    <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=StepInstance%5Bjcu%5Ename=StepInstance.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=Entity%5Bjcu%5Ename=Entity.java%5Bjpack%5Ename=org.springframework.batch.core.domain%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-core%5D%5D%5D%5D%5D$uml.Generalization"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_rXTBetZ1EdyFWa-S-HPO7A" points="[-1, 4154, -14, -8440]$[489, 7355, 476, -5239]$[-1, 10556, -14, -2038]"/>
   </edges>
   <edges xmi:id="_OR7Ymdn1Edy3x64p5vCglw" source="_ORestdn1Edy3x64p5vCglw" target="_qs1IENZ1EdyFWa-S-HPO7A">
     <children xmi:id="_OR7YnNn1Edy3x64p5vCglw" type="KindLabel">
