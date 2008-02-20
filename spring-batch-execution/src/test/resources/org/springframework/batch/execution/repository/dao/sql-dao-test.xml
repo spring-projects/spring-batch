@@ -4,6 +4,12 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
 	<import resource="data-source-context.xml" />
+	
+	<bean id="jobRepository" class="org.springframework.batch.execution.repository.SimpleJobRepository">
+		<constructor-arg ref="jobInstanceDao" />
+		<constructor-arg ref="jobExecutionDao" />
+		<constructor-arg ref="stepExecutionDao" />
+	</bean>
 
 	<bean id="jobInstanceDao" class="org.springframework.batch.execution.repository.dao.JdbcJobInstanceDao" >
 		<property name="jdbcTemplate" ref="jdbcTemplate" />

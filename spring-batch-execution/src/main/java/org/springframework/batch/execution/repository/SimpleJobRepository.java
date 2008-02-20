@@ -190,6 +190,7 @@ public class SimpleJobRepository implements JobRepository {
 			}
 			jobInstance.setLastExecution(lastExecution);
 			jobInstance.setStepNames(getStepNames(job));
+			jobInstance.setJob(job);
 		}
 		else if (jobs.size() == 0) {
 			// no job found, create one
