@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.springframework.org/schema/batch"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.springframework.org/schema/batch"
+	elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+
+	<xs:element name="job">
+		<xs:annotation>
+			<xs:documentation><![CDATA[Defines a uniquely identified job that is referenced at runtime.]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+	 		<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element name="chunk-step" type="chunkStepType">
+					<xs:annotation>
+						<xs:documentation><![CDATA[Defines a step that supports chunking]]></xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="tasklet-step" type="taskletStepType">
+					<xs:annotation>
+						<xs:documentation><![CDATA[Defines a step that executes a tasklet]]></xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+			<xs:attribute name="id" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation><![CDATA[The unique identifier to use in this step.  The id must be unique within the context of this job.]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- Types -->
+	 <xs:complexType name="chunkStepType">
+		<xs:attribute name="id" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation><![CDATA[The unique identifier to use in this step.  The id must be unique within the context of this job.]]></xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="size" type="xs:positiveInteger" use="required">
+			<xs:annotation>
+				<xs:documentation><![CDATA[The number of elements to be processed per chunk. This must be a number greater than 0.]]></xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="item-reader" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation><![CDATA[The id of the ItemReader implementation to read from in this step]]></xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="item-writer" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation><![CDATA[The id of the ItemWriter implementation to write to in this step]]></xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="transaction-manager" type="xs:string" use="optional"
+			default="transaction-manager">
+			<xs:annotation>
+				<xs:documentation><![CDATA[The id of the transaction manager to use in this step.  This should be an implementation of Spring's PlatformTransactionManager.]]></xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attributeGroup ref="rerun.enum"/>
+		<xs:attribute name="input-skip-limit" type="xs:nonNegativeInteger" use="optional">
+			<xs:annotation>
+				<xs:documentation><![CDATA[The maximum number of items the ItemReader can skip before this step is marked as a failure.  The default is no limit.]]></xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="output-skip-limit" type="xs:nonNegativeInteger" use="optional">
+			<xs:annotation>
+				<xs:documentation><![CDATA[The maximum number of items the ItemWriter can skip before this step is marked as a failure.  The default is no limit.]]></xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="taskletStepType">
+		<xs:attribute name="id" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation><![CDATA[The unique identifier to use in this step.  The id must be unique within the context of this job.]]></xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="tasklet" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation><![CDATA[The id of the Tasklet implementation to execute in this step.]]></xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attributeGroup ref="rerun.enum"/>
+	</xs:complexType>
+
+	<!-- Enumerations -->
+<xs:attributeGroup name="rerun.enum">
+		<xs:attribute name="rerun" use="optional" default="incomplete">
+			<xs:annotation>
+				<xs:documentation><![CDATA[When to re-run this step.  The default is 'incomplete.
+  * always:     Always re-run this step
+  * never:      Never re-run this step
+  * incomplete: Re-run this step whenever a previous execution was incomplete]]></xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="always"/>
+					<xs:enumeration value="never"/>
+					<xs:enumeration value="incomplete"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:attributeGroup>
+</xs:schema>

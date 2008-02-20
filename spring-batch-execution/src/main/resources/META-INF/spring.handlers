@@ -1,1 +1,1 @@
-http\://www.springframework.org/schema/batch-execution=org.springframework.batch.execution.config.BatchCoreNamespaceHandler
+http\://www.springframework.org/schema/batch=org.springframework.batch.execution.configuration.BatchNamespaceHandler

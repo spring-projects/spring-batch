@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.2.v200712142013]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.3.v200801241658]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
+	<enableImports><![CDATA[true]]></enableImports>
 	<configs>
 		<config>src/test/resources/simple-container-definition.xml</config>
 		<config>src/test/resources/job-configuration.xml</config>
@@ -15,6 +16,7 @@
 		<config>src/test/resources/beanRefContext.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/bootstrap/support/job.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/bootstrap/support/test-environment.xml</config>
+		<config>src/test/java/org/springframework/batch/execution/configuration/BatchNamespaceHandlerTaskletStepOk.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
