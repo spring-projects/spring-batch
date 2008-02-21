@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.core.domain.ItemSkipPolicy;
+import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.FlatFileParsingException;
 
@@ -64,10 +65,10 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	 * is greater than the skipLimit, then a {@link SkipLimitExceededException}
 	 * will be thrown.
 	 */
-	public boolean shouldSkip(Exception ex, StepExecution stepExecution){
+	public boolean shouldSkip(Exception ex, StepContribution stepContribution){
 		if(skippableExceptions.contains(ex.getClass())){
-			if(stepExecution.getSkipCount() < skipLimit){
-				stepExecution.incrementSkipCount();
+			if(stepContribution.getSkipCount() < skipLimit){
+				stepContribution.incrementSkipCount();
 				return true;
 			}
 			else{

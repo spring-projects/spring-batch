@@ -22,7 +22,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
-import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
@@ -42,7 +41,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.item.stream.SimpleStreamManager;
-import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -79,67 +77,26 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Ben Hale
  */
-public class SimpleStepExecutor implements InitializingBean {
+public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
-	private static final Log logger = LogFactory.getLog(SimpleStepExecutor.class);
+	private static final Log logger = LogFactory.getLog(ItemOrientedStep.class);
 
 	private RepeatOperations chunkOperations = new RepeatTemplate();
 
 	private RepeatOperations stepOperations = new RepeatTemplate();
-
-	private JobRepository jobRepository;
 
 	private ExitStatusExceptionClassifier exceptionClassifier = new SimpleExitStatusExceptionClassifier();
 
 	// default to checking current thread for interruption.
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
 
-	private AbstractStep step;
-
-	private StreamManager streamManager;
-
-	private ItemReader itemReader;
-
-	private ItemWriter itemWriter;
-
 	private RetryPolicy retryPolicy = null;
-
-	private ItemRecoverer itemRecoverer;
 
 	private RetryTemplate template = new RetryTemplate();
 
 	private ItemReaderRetryCallback retryCallback;
-
-	/**
-	 * Package private constructor so the step can create a the executor.
-	 */
-	SimpleStepExecutor(AbstractStep abstractStep) {
-		this.step = abstractStep;
-	}
-
-	/**
-	 * Public setter for the {@link StreamManager}. This will be used to create
-	 * the {@link StepContext}, and hence any component that is a
-	 * {@link ItemStream} and in step scope will be registered with the service.
-	 * The {@link StepContext} is then a source of aggregate statistics for the
-	 * step.
-	 * 
-	 * @param streamManager the {@link StreamManager} to set. Default is a
-	 * {@link SimpleStreamManager}.
-	 */
-	public void setStreamManager(StreamManager streamManager) {
-		this.streamManager = streamManager;
-	}
-
-	/**
-	 * Injected strategy for storage and retrieval of persistent step
-	 * information. Mandatory property.
-	 * 
-	 * @param jobRepository
-	 */
-	public void setRepository(JobRepository jobRepository) {
-		this.jobRepository = jobRepository;
-	}
+	
+	private int commitInterval = 0;
 
 	/**
 	 * The {@link RepeatOperations} to use for the outer loop of the batch
@@ -185,35 +142,16 @@ public class SimpleStepExecutor implements InitializingBean {
 	}
 
 	/**
-	 * @param itemReader
-	 */
-	public void setItemReader(ItemReader itemReader) {
-		this.itemReader = itemReader;
-	}
-
-	/**
-	 * @param itemWriter
-	 */
-	public void setItemWriter(ItemWriter itemWriter) {
-		this.itemWriter = itemWriter;
-	}
-
-	/**
-	 * Setter for injecting optional recovery handler.
-	 * 
-	 * @param itemRecoverer
-	 */
-	public void setItemRecoverer(ItemRecoverer itemRecoverer) {
-		this.itemRecoverer = itemRecoverer;
-	}
-
-	/**
 	 * Public setter for the retryPolicy.
 	 * 
 	 * @param retyPolicy the retryPolicy to set
 	 */
 	public void setRetryPolicy(RetryPolicy retryPolicy) {
 		this.retryPolicy = retryPolicy;
+	}
+	
+	public void setCommitInterval(int commitInterval) {
+		this.commitInterval = commitInterval;
 	}
 
 	/**
@@ -225,10 +163,6 @@ public class SimpleStepExecutor implements InitializingBean {
 		Assert.notNull(itemReader, "ItemReader must be provided");
 		Assert.notNull(itemWriter, "ItemWriter must be provided");
 
-		if (itemRecoverer == null && (itemReader instanceof ItemRecoverer)) {
-			itemRecoverer = (ItemRecoverer) itemReader;
-		}
-
 		ItemReaderRetryPolicy itemProviderRetryPolicy = new ItemReaderRetryPolicy(retryPolicy);
 		template.setRetryPolicy(itemProviderRetryPolicy);
 
@@ -236,9 +170,22 @@ public class SimpleStepExecutor implements InitializingBean {
 			Assert.state(itemReader instanceof KeyedItemReader,
 					"ItemReader must be instance of KeyedItemReader to use the retry policy");
 			retryCallback = new ItemReaderRetryCallback((KeyedItemReader) itemReader, itemWriter);
-			retryCallback.setRecoverer(itemRecoverer);
 		}
-
+		
+		if(streamManager == null && transactionManager != null){
+			streamManager = new SimpleStreamManager(transactionManager);
+		}
+		else if(streamManager == null && transactionManager == null){
+			throw new IllegalArgumentException("Either StreamManager or TransactionManager must be set");
+		}
+		
+		if(commitInterval > 0){
+			((RepeatTemplate)chunkOperations).setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
+		}
+		
+		if(exceptionHandler != null){
+			((RepeatTemplate)chunkOperations).setExceptionHandler(exceptionHandler);
+		}
 	}
 
 	/**
@@ -313,7 +260,7 @@ public class SimpleStepExecutor implements InitializingBean {
 			// the conversation in StepScope
 			stepContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
 
-			final boolean saveExecutionContext = step.isSaveExecutionContext();
+			final boolean saveExecutionContext = isSaveExecutionContext();
 
 			streamManager.open(stepExecution);
 
@@ -338,13 +285,19 @@ public class SimpleStepExecutor implements InitializingBean {
 
 					try {
 
-						result = processChunk(step, contribution);
+						result = processChunk(contribution);
 
 						// TODO: check that stepExecution can
 						// aggregate these contributions if they
 						// come in asynchronously.
-						ExecutionContext statistics = streamManager.getExecutionContext(stepExecution);
-						contribution.setExecutionContext(statistics);
+						ExecutionContext statistics; 
+						if(isSaveExecutionContext()){
+							statistics = streamManager.getExecutionContext(stepExecution);
+							contribution.setExecutionContext(statistics);
+						}
+						else{
+							statistics = new ExecutionContext();
+						}
 						contribution.incrementCommitCount();
 
 						// If the step operations are asynchronous then we need
@@ -475,7 +428,7 @@ public class SimpleStepExecutor implements InitializingBean {
 	 * business logic.
 	 * @return true if there is more data to process.
 	 */
-	ExitStatus processChunk(final Step step, final StepContribution contribution) {
+	ExitStatus processChunk(final StepContribution contribution) {
 		ExitStatus result = chunkOperations.iterate(new RepeatCallback() {
 			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
 				if (contribution.isTerminateOnly()) {
@@ -515,10 +468,13 @@ public class SimpleStepExecutor implements InitializingBean {
 
 		}
 		catch (Exception e) {
-			skip();
-			// Rethrow so that outer transaction is rolled back properly
-			throw e;
-
+			if(getItemSkipPolicy().shouldSkip(e, contribution)){
+				skip();
+			}
+			else{
+				// Rethrow so that outer transaction is rolled back properly
+				throw e;
+			}
 		}
 
 		return exitStatus;
@@ -541,7 +497,14 @@ public class SimpleStepExecutor implements InitializingBean {
 	private ExitStatus execute() throws Exception {
 
 		if (retryCallback == null) {
-			Object item = itemReader.read();
+			Object item = null; 
+			try{	
+				item = itemReader.read();
+			}
+			catch(Exception ex){
+				getItemFailureHandler().handleReadFailure(ex);
+				throw ex;
+			}
 			if (item == null) {
 				return ExitStatus.FINISHED;
 			}
@@ -549,9 +512,8 @@ public class SimpleStepExecutor implements InitializingBean {
 				itemWriter.write(item);
 			}
 			catch (Exception e) {
-				if (itemRecoverer != null) {
-					itemRecoverer.recover(item, e);
-				}
+	
+				getItemFailureHandler().handleWriteFailure(item, e);
 				// Re-throw the exception so that the surrounding transaction
 				// rolls back if there is one
 				throw e;

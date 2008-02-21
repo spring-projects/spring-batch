@@ -21,16 +21,20 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.batch.repeat.support.RepeatTemplate;
 
 /**
  * {@link Step} implementation that allows full step of the
  * {@link RepeatOperations} that will be used in the chunk (inner loop).
  * 
+ * This class will likely not be necessary given current changes, however, it
+ * is calling super classes for compatibility.
+ * 
  * @author Lucas Ward
  * @author Dave Syer
  * @author Ben Hale
  */
-public class RepeatOperationsStep extends AbstractStep implements RepeatOperationsHolder {
+public class RepeatOperationsStep extends ItemOrientedStep implements RepeatOperationsHolder {
 
 	private volatile RepeatOperations chunkOperations;
 
@@ -73,14 +77,12 @@ public class RepeatOperationsStep extends AbstractStep implements RepeatOperatio
 	}
 
 	public void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException {
-		assertMandatoryProperties();
-		SimpleStepExecutor executor = (SimpleStepExecutor) super.createStepExecutor();
 		if (stepOperations != null) {
-			executor.setStepOperations(stepOperations);
+			super.setStepOperations(stepOperations);
 		}
 		if (chunkOperations != null) {
-			executor.setChunkOperations(chunkOperations);
+			super.setChunkOperations(chunkOperations);
 		}
-		executor.execute(stepExecution);
+		super.execute(stepExecution);
 	}
 }

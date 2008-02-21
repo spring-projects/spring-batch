@@ -24,6 +24,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.ItemFailureHandler;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -81,13 +82,13 @@ public class SimpleJobTests extends TestCase {
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
 		provider = new ListItemReader(items);
-		step.setItemRecoverer(new ItemRecoverer() {
-			public boolean recover(Object item, Throwable cause) {
-				recovered.add(item);
-				assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
-				return true;
-			}
-		});
+//		step.setItemRecoverer(new ItemRecoverer() {
+//			public boolean recover(Object item, Throwable cause) {
+//				recovered.add(item);
+//				assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
+//				return true;
+//			}
+//		});
 		step.setItemReader(provider);
 		step.setItemWriter(processor);
 		step.setJobRepository(repository);
@@ -143,6 +144,17 @@ public class SimpleJobTests extends TestCase {
 			public void write(Object data) throws Exception {
 				throw new RuntimeException("Error!");
 			}
+		});
+		step.setItemFailureHandler(new ItemFailureHandler(){
+
+			public void handleReadFailure(Exception ex) {
+				recovered.add(ex);
+			}
+
+			public void handleWriteFailure(Object item, Exception ex) {
+				recovered.add(ex);
+			}
+			
 		});
 		step.afterPropertiesSet();
 		job.setSteps(Collections.singletonList(step));

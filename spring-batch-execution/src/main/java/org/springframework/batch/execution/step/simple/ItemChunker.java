@@ -22,6 +22,7 @@ import org.springframework.batch.core.domain.Chunk;
 import org.springframework.batch.core.domain.Chunker;
 import org.springframework.batch.core.domain.ChunkingResult;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
+import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.ReadFailureException;
 import org.springframework.batch.item.ExecutionContext;
@@ -56,7 +57,7 @@ public class ItemChunker implements Chunker {
 		this.itemSkipPolicy = itemSkipPolicy;
 	}
 
-	public ChunkingResult chunk(int size, StepExecution stepExecution) throws ReadFailureException {
+	public ChunkingResult chunk(int size, StepContribution stepContribution) throws ReadFailureException {
 		Assert.isTrue(size > 0, "Chunk size must be greater than 0");
 
 		int counter = 0;
@@ -74,7 +75,7 @@ public class ItemChunker implements Chunker {
 				counter++;
 			} catch (Exception ex) {
 				exceptions.add(ex);
-				if(!itemSkipPolicy.shouldSkip(ex, stepExecution)){
+				if(!itemSkipPolicy.shouldSkip(ex, stepContribution)){
 					rethrow(ex);
 				}
 			}

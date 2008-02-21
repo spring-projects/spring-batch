@@ -15,16 +15,16 @@
  */
 package org.springframework.batch.execution.step.simple;
 
+import org.springframework.batch.core.domain.ItemFailureHandler;
+import org.springframework.batch.core.domain.ItemSkipPolicy;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.retry.RetryPolicy;
@@ -42,21 +42,23 @@ public abstract class AbstractStep extends StepSupport implements InitializingBe
 
 	private int skipLimit = 0;
 
-	private ExceptionHandler exceptionHandler;
+	protected ExceptionHandler exceptionHandler;
 	
-	private RetryPolicy retryPolicy;
+	protected RetryPolicy retryPolicy;
 
-	private JobRepository jobRepository;
+	protected JobRepository jobRepository;
 
-	private PlatformTransactionManager transactionManager;
+	protected PlatformTransactionManager transactionManager;
 
-	private StreamManager streamManager;
+	protected StreamManager streamManager;
 
-	private ItemReader itemReader;
+	protected ItemReader itemReader;
 
-	private ItemWriter itemWriter;
-
-	private ItemRecoverer itemRecoverer;
+	protected ItemWriter itemWriter;
+	
+	protected ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
+	
+	protected ItemFailureHandler itemFailureHandler = new DefaultItemFailureHandler();
 
 	/**
 	 * Default constructor.
@@ -147,11 +149,20 @@ public abstract class AbstractStep extends StepSupport implements InitializingBe
 		this.itemWriter = itemWriter;
 	}
 
-	/**
-	 * @param itemRecoverer the itemRecoverer to set
-	 */
-	public void setItemRecoverer(ItemRecoverer itemRecoverer) {
-		this.itemRecoverer = itemRecoverer;
+	public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
+		this.itemSkipPolicy = itemSkipPolicy;
+	}
+	
+	public ItemSkipPolicy getItemSkipPolicy() {
+		return itemSkipPolicy;
+	}
+	
+	public void setItemFailureHandler(ItemFailureHandler itemFailureHandler) {
+		this.itemFailureHandler = itemFailureHandler;
+	}
+	
+	public ItemFailureHandler getItemFailureHandler() {
+		return itemFailureHandler;
 	}
 
 	/**
@@ -174,36 +185,5 @@ public abstract class AbstractStep extends StepSupport implements InitializingBe
 
 	}
 
-	public void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException {
-		SimpleStepExecutor executor = createStepExecutor();
-		executor.execute(stepExecution);
-	}
-
-	/**
-	 * @return a {@link SimpleStepExecutor} that can be used to launch the job.
-	 * @throws BatchCriticalException
-	 */
-	protected SimpleStepExecutor createStepExecutor() throws BatchCriticalException {
-		assertMandatoryProperties();
-		// Do not set the streamManager field if it is null, otherwise
-		// the mandatory properties check will fail.
-		StreamManager manager = streamManager;
-		if (streamManager == null) {
-			manager = new SimpleStreamManager(transactionManager);
-		}
-		SimpleStepExecutor executor = new SimpleStepExecutor(this);
-		executor.setItemReader(itemReader);
-		executor.setItemWriter(itemWriter);
-		executor.setItemRecoverer(itemRecoverer);
-		executor.setRepository(jobRepository);
-		executor.setRetryPolicy(retryPolicy);
-		executor.setStreamManager(manager);
-		try {
-			executor.afterPropertiesSet();
-		} catch (Exception e) {
-			throw new BatchCriticalException(e);
-		}
-		executor.applyConfiguration(this);
-		return executor;
-	}
+	public abstract void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException;
 }

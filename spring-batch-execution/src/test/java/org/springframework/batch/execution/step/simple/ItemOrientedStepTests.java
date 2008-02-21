@@ -57,7 +57,7 @@ import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 
-public class SimpleStepExecutorTests extends TestCase {
+public class ItemOrientedStepTests extends TestCase {
 
 	ArrayList processed = new ArrayList();
 
@@ -67,9 +67,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		}
 	};
 
-	private SimpleStepExecutor stepExecutor;
-
-	private AbstractStep stepConfiguration;
+	private ItemOrientedStep itemOrientedStep;
 
 	private RepeatTemplate template;
 
@@ -84,7 +82,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 	
 	private AbstractStep getStep(String[] strings) throws Exception {
-		SimpleStep step = new SimpleStep();
+		ItemOrientedStep step = new ItemOrientedStep();
 		step.setItemWriter(processor);
 		step.setItemReader(getReader(strings));
 		step.setJobRepository(new JobRepositorySupport());
@@ -95,23 +93,22 @@ public class SimpleStepExecutorTests extends TestCase {
 
 	protected void setUp() throws Exception {
 		transactionManager = new ResourcelessTransactionManager();
-		stepConfiguration = getStep(new String[] { "foo", "bar", "spam" });
 
-		stepExecutor = (SimpleStepExecutor) stepConfiguration.createStepExecutor();
+		itemOrientedStep = (ItemOrientedStep) getStep(new String[] { "foo", "bar", "spam" });
 		template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
-		stepExecutor.setStepOperations(template);
+		itemOrientedStep.setStepOperations(template);
 		// Only process one item:
 		template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
-		stepExecutor.setChunkOperations(template);
+		itemOrientedStep.setChunkOperations(template);
 
 		jobInstance = new JobInstance(new Long(0), new JobParameters());
 		jobInstance.setJob(new JobSupport("FOO"));
 
 		SimpleStreamManager streamManager = new SimpleStreamManager(transactionManager);
 		streamManager.setUseClassNameAsPrefix(false);
-		stepExecutor.setStreamManager(streamManager);
+		itemOrientedStep.setStreamManager(streamManager);
 
 	}
 
@@ -121,7 +118,7 @@ public class SimpleStepExecutorTests extends TestCase {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
-		stepExecutor.execute(stepExecution);
+		itemOrientedStep.execute(stepExecution);
 		assertEquals(1, processed.size());
 		assertEquals(1, stepExecution.getTaskCount().intValue());
 	}
@@ -132,14 +129,14 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		// Only process one item:
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
-		stepExecutor.setChunkOperations(template);
+		itemOrientedStep.setChunkOperations(template);
 
 		String step = "stepName";
 		JobExecution jobExecution = new JobExecution(jobInstance);
 
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 		StepContribution contribution = stepExecution.createStepContribution();
-		stepExecutor.processChunk(stepConfiguration, contribution);
+		itemOrientedStep.processChunk(contribution);
 		assertEquals(1, processed.size());
 		assertEquals(0, stepExecution.getTaskCount().intValue());
 		assertEquals(1, contribution.getTaskCount());
@@ -152,22 +149,21 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		// Only process one item:
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
-		stepExecutor.setChunkOperations(template);
+		itemOrientedStep.setChunkOperations(template);
 
 		final String step = "stepName";
 		final JobExecution jobExecution = new JobExecution(jobInstance);
 		final StepExecution stepExecution = new StepExecution(step, jobExecution);
 
-		stepConfiguration.setItemReader(new ItemReader() {
+		itemOrientedStep.setItemReader(new ItemReader() {
 			public Object read() throws Exception {
 				assertEquals(step, stepExecution.getStepName());
 				assertNotNull(StepSynchronizationManager.getContext().getStepExecution());
-				processed.add("foo");
-				return ExitStatus.CONTINUABLE;
+				return "foo";
 			}
 		});
 
-		stepExecutor.execute(stepExecution);
+		itemOrientedStep.execute(stepExecution);
 		assertEquals(1, processed.size());
 
 	}
@@ -178,7 +174,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		// Only process one chunk:
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
-		stepExecutor.setStepOperations(template);
+		itemOrientedStep.setStepOperations(template);
 
 		final String step = "stepName";
 		final JobExecution jobExecution = new JobExecution(jobInstance);
@@ -194,7 +190,7 @@ public class SimpleStepExecutorTests extends TestCase {
 			}
 		});
 
-		stepExecutor.execute(stepExecution);
+		itemOrientedStep.execute(stepExecution);
 		assertEquals(1, processed.size());
 
 	}
@@ -202,13 +198,13 @@ public class SimpleStepExecutorTests extends TestCase {
 	public void testRepository() throws Exception {
 
 		SimpleJobRepository repository = new SimpleJobRepository(new MapJobDao(), new MapJobDao(), new MapStepDao());
-		stepExecutor.setRepository(repository);
+		itemOrientedStep.setJobRepository(repository);
 
 		String step = "stepName";
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
-		stepExecutor.execute(stepExecution);
+		itemOrientedStep.execute(stepExecution);
 		assertEquals(1, processed.size());
 	}
 
@@ -230,12 +226,12 @@ public class SimpleStepExecutorTests extends TestCase {
 		};
 
 		String step = "stepName";
-		stepConfiguration.setItemReader(itemReader);
+		itemOrientedStep.setItemReader(itemReader);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
 		try {
-			stepExecutor.execute(stepExecution);
+			itemOrientedStep.execute(stepExecution);
 		}
 		catch (Exception ex) {
 			assertEquals(stepExecution.getRollbackCount(), new Integer(1));
@@ -261,12 +257,12 @@ public class SimpleStepExecutorTests extends TestCase {
 		};
 
 		String step = "stepName";
-		stepConfiguration.setItemReader(itemReader);
+		itemOrientedStep.setItemReader(itemReader);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
 		try {
-			stepExecutor.execute(stepExecution);
+			itemOrientedStep.execute(stepExecution);
 		}
 		catch (Exception ex) {
 			ExitStatus status = stepExecution.getExitStatus();
@@ -281,12 +277,12 @@ public class SimpleStepExecutorTests extends TestCase {
 	public void testNonRestartedJob() throws Exception {
 		String step = "stepName";
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
-		stepExecutor.setItemReader(tasklet);
-		stepConfiguration.setSaveExecutionContext(true);
+		itemOrientedStep.setItemReader(tasklet);
+		itemOrientedStep.setSaveExecutionContext(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
-		stepExecutor.execute(stepExecution);
+		itemOrientedStep.execute(stepExecution);
 
 		assertFalse(tasklet.isRestoreFromCalled());
 		assertTrue(tasklet.isGetExecutionAttributesCalled());
@@ -324,13 +320,13 @@ public class SimpleStepExecutorTests extends TestCase {
 		String step = "stepName";
 //		step.setStepExecutionCount(1);
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
-		stepConfiguration.setItemReader(tasklet);
-		stepConfiguration.setSaveExecutionContext(false);
+		itemOrientedStep.setItemReader(tasklet);
+		itemOrientedStep.setSaveExecutionContext(false);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
 		try {
-			stepExecutor.execute(stepExecution);
+			itemOrientedStep.execute(stepExecution);
 		}
 		catch (Throwable t) {
 			fail();
@@ -348,28 +344,28 @@ public class SimpleStepExecutorTests extends TestCase {
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
 		String step = "stepName";
 //		step.setStepExecutionCount(1);
-		stepConfiguration.setItemReader(new ItemReader() {
+		itemOrientedStep.setItemReader(new ItemReader() {
 			public Object read() throws Exception {
-				return ExitStatus.FINISHED;
+				return "foo";
 			}
 		});
-		stepConfiguration.setSaveExecutionContext(true);
+		itemOrientedStep.setSaveExecutionContext(true);
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
-		stepExecutor.execute(stepExecution);
+		itemOrientedStep.execute(stepExecution);
 	}
 
 	public void testApplyConfigurationWithExceptionHandler() throws Exception {
 		AbstractStep stepConfiguration = new SimpleStep("foo");
 		final List list = new ArrayList();
-		stepExecutor.setStepOperations(new RepeatTemplate() {
+		itemOrientedStep.setStepOperations(new RepeatTemplate() {
 			public void setExceptionHandler(ExceptionHandler exceptionHandler) {
 				list.add(exceptionHandler);
 			}
 		});
 		stepConfiguration.setExceptionHandler(new DefaultExceptionHandler());
-		stepExecutor.applyConfiguration(stepConfiguration);
+		itemOrientedStep.applyConfiguration(stepConfiguration);
 		assertEquals(1, list.size());
 	}
 
@@ -377,12 +373,12 @@ public class SimpleStepExecutorTests extends TestCase {
 		AbstractStep stepConfiguration = new SimpleStep("foo");
 		stepConfiguration.setSkipLimit(0);
 		final List list = new ArrayList();
-		stepExecutor.setStepOperations(new RepeatTemplate() {
+		itemOrientedStep.setStepOperations(new RepeatTemplate() {
 			public void setExceptionHandler(ExceptionHandler exceptionHandler) {
 				list.add(exceptionHandler);
 			}
 		});
-		stepExecutor.applyConfiguration(stepConfiguration);
+		itemOrientedStep.applyConfiguration(stepConfiguration);
 		assertEquals(0, list.size());
 	}
 
@@ -390,38 +386,38 @@ public class SimpleStepExecutorTests extends TestCase {
 		AbstractStep stepConfiguration = new SimpleStep("foo");
 		stepConfiguration.setSkipLimit(1);
 		final List list = new ArrayList();
-		stepExecutor.setStepOperations(new RepeatTemplate() {
+		itemOrientedStep.setStepOperations(new RepeatTemplate() {
 			public void setExceptionHandler(ExceptionHandler exceptionHandler) {
 				list.add(exceptionHandler);
 			}
 		});
-		stepExecutor.applyConfiguration(stepConfiguration);
+		itemOrientedStep.applyConfiguration(stepConfiguration);
 		assertEquals(1, list.size());
 	}
 
 	public void testStreamManager() throws Exception {
 		String step = "stepName";
 //		step.setStepExecutionCount(1);
-		stepConfiguration.setItemReader(new ItemReader() {
+		itemOrientedStep.setItemReader(new ItemReader() {
 			public Object read() throws Exception {
-				return ExitStatus.FINISHED;
+				return "foo";
 			}
 		});
-		stepConfiguration.setSaveExecutionContext(true);
+		itemOrientedStep.setSaveExecutionContext(true);
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
 		assertEquals(false, stepExecution.getExecutionContext().containsKey("foo"));
 
 		final Map map = new HashMap();
-		stepExecutor.setStreamManager(new SimpleStreamManager(new ResourcelessTransactionManager()) {
+		itemOrientedStep.setStreamManager(new SimpleStreamManager(new ResourcelessTransactionManager()) {
 			public ExecutionContext getExecutionContext(Object key) {
 				// TODO Auto-generated method stub
 				return new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
 			}
 		});
 
-		stepExecutor.execute(stepExecution);
+		itemOrientedStep.execute(stepExecution);
 
 		// At least once in that process the statistics service was asked for
 		// statistics...
@@ -482,7 +478,7 @@ public class SimpleStepExecutorTests extends TestCase {
 			}
 		};
 
-		stepExecutor.setInterruptionPolicy(interruptionPolicy);
+		itemOrientedStep.setInterruptionPolicy(interruptionPolicy);
 
 		ItemReader itemReader = new ItemReader() {
 
@@ -499,7 +495,7 @@ public class SimpleStepExecutorTests extends TestCase {
 
 		};
 
-		stepExecutor.setItemReader(itemReader);
+		itemOrientedStep.setItemReader(itemReader);
 
 		String step = "stepName";
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
@@ -510,7 +506,7 @@ public class SimpleStepExecutorTests extends TestCase {
 //		step.setLastExecution(stepExecution);
 
 		try {
-			stepExecutor.execute(stepExecution);
+			itemOrientedStep.execute(stepExecution);
 			fail("Expected StepInterruptedException");
 		}
 		catch (JobInterruptedException ex) {
@@ -529,8 +525,8 @@ public class SimpleStepExecutorTests extends TestCase {
 				throw new RuntimeException("Foo");
 			}
 		};
-		stepExecutor.setItemReader(itemReader);
-		stepExecutor.setStreamManager(new SimpleStreamManager(transactionManager) {
+		itemOrientedStep.setItemReader(itemReader);
+		itemOrientedStep.setStreamManager(new SimpleStreamManager(transactionManager) {
 			public void rollback(TransactionStatus status) {
 				super.rollback(status);
 				// Simulate failure on rollback when stream resets
@@ -547,7 +543,7 @@ public class SimpleStepExecutorTests extends TestCase {
 //		step.setLastExecution(stepExecution);
 
 		try {
-			stepExecutor.execute(stepExecution);
+			itemOrientedStep.execute(stepExecution);
 			fail("Expected ResetFailedException");
 		}
 		catch (ResetFailedException ex) {

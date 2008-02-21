@@ -20,6 +20,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.ItemFailureHandler;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -80,7 +81,7 @@ public class RepeatOperationsStepTests extends TestCase {
 			}
 		});
 		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		RepeatOperationsStep configuration = new RepeatOperationsStep();
+		ItemOrientedStep configuration = new ItemOrientedStep();
 		configuration.setItemReader(new ItemReader(){
 			public Object read() throws Exception {
 				throw new NullPointerException();
@@ -93,6 +94,7 @@ public class RepeatOperationsStepTests extends TestCase {
 		configuration.setTransactionManager(new ResourcelessTransactionManager());
 		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
 				new Long(12)));
+		configuration.afterPropertiesSet();
 		try {
 			configuration.execute(stepExecution);
 			fail("Expected RuntimeException");
@@ -133,6 +135,7 @@ public class RepeatOperationsStepTests extends TestCase {
 		configuration.setTransactionManager(new ResourcelessTransactionManager());
 		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
 				new Long(12)));
+		configuration.afterPropertiesSet();
 		configuration.execute(stepExecution);
 		assertEquals(2, list.size());
 		assertEquals(1, steps.size());

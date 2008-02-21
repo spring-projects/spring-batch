@@ -21,6 +21,7 @@ import java.util.List;
 import org.easymock.MockControl;
 import org.springframework.batch.core.domain.Chunk;
 import org.springframework.batch.core.domain.DechunkingResult;
+import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.WriteFailureException;
 import org.springframework.batch.item.ItemWriter;
@@ -34,7 +35,7 @@ import junit.framework.TestCase;
 public class ItemDechunkerTests extends TestCase {
 
 	private ItemDechunker dechunker;
-	private StepExecution stepExecution;
+	private StepContribution stepContribution;
 	private Chunk chunk;
 	private ItemWriter itemWriter;
 	private MockControl writerControl = MockControl.createControl(ItemWriter.class);
@@ -47,7 +48,8 @@ public class ItemDechunkerTests extends TestCase {
 		super.setUp();
 		
 		itemWriter = (ItemWriter)writerControl.getMock();
-		stepExecution = new StepExecution(null,null);
+		StepExecution execution = new StepExecution(null,null);
+		stepContribution = execution.createStepContribution();
 		dechunker = new ItemDechunker(itemWriter);
 		List items = new ArrayList();
 		items.add("1");
@@ -61,7 +63,7 @@ public class ItemDechunkerTests extends TestCase {
 		itemWriter.write("1");
 		itemWriter.write("2");
 		writerControl.replay();
-		dechunker.dechunk(chunk, stepExecution);
+		dechunker.dechunk(chunk, stepContribution);
 		writerControl.verify();
 	}
 	
@@ -72,7 +74,7 @@ public class ItemDechunkerTests extends TestCase {
 		itemWriter.write("2");
 		writerControl.setThrowable(new Exception());
 		writerControl.replay();
-		DechunkingResult result = dechunker.dechunk(chunk, stepExecution);
+		DechunkingResult result = dechunker.dechunk(chunk, stepContribution);
 		writerControl.verify();
 		List exceptions = result.getExceptions();
 		assertEquals(1, exceptions.size());
@@ -87,7 +89,7 @@ public class ItemDechunkerTests extends TestCase {
 		writerControl.setThrowable(new NullPointerException());
 		writerControl.replay();
 		try{
-			dechunker.dechunk(chunk, stepExecution);
+			dechunker.dechunk(chunk, stepContribution);
 			fail();
 		}
 		catch(NullPointerException ex){

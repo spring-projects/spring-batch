@@ -16,7 +16,7 @@
 package org.springframework.batch.execution.step.simple;
 
 import org.springframework.batch.core.domain.ItemSkipPolicy;
-import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepContribution;
 
 /**
  * Implementation of the {@link ItemSkipPolicy} interface that
@@ -27,7 +27,7 @@ import org.springframework.batch.core.domain.StepExecution;
  */
 public class AlwaysSkipItemSkipPolicy implements ItemSkipPolicy {
 
-	public boolean shouldSkip(Exception ex, StepExecution stepExecution) {
+	public boolean shouldSkip(Exception ex, StepContribution stepContribution) {
 		return true;
 	}
 }

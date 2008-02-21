@@ -16,7 +16,10 @@
 
 package org.springframework.batch.execution.step.simple;
 
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.Step;
+import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.io.exception.BatchCriticalException;
 
 /**
  * Simple {@link Step} good enough for most purposes and easy to configure simple properties, principally the commit
@@ -45,6 +48,12 @@ public class SimpleStep extends AbstractStep {
 
 	public int getCommitInterval() {
 		return commitInterval;
+	}
+
+	public void execute(StepExecution stepExecution)
+			throws JobInterruptedException, BatchCriticalException {
+		throw new UnsupportedOperationException(
+        "Cannot process a StepExecution.  Use a smarter subclass of StepSupport.");	
 	}
 
 }

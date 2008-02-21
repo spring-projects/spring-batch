@@ -71,6 +71,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		step.setItemWriter(new ItemWriter(){
 			public void write(Object item) throws Exception {
 			}});
+		step.afterPropertiesSet();
 	}
 
 	public void testInterruptChunk() throws Exception {

@@ -16,6 +16,7 @@
 package org.springframework.batch.execution.step.simple;
 
 import java.util.Date;
+import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,10 +26,10 @@ import org.springframework.batch.core.domain.Chunker;
 import org.springframework.batch.core.domain.ChunkingResult;
 import org.springframework.batch.core.domain.Dechunker;
 import org.springframework.batch.core.domain.DechunkingResult;
+import org.springframework.batch.core.domain.ItemFailureHandler;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
-import org.springframework.batch.core.domain.SkippedItemHandler;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
@@ -40,6 +41,7 @@ import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.WriteFailureException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -69,7 +71,7 @@ import org.springframework.util.Assert;
  * {@link Chunk} of items for processing. The number of items per chunks is
  * configurable as the chunk size. Once the chunk has been read, any errors
  * encountered while reading (usually skipped unless configured not to) will be
- * logged out via the {@link SkippedItemHandler}. The chunk will then be
+ * logged out via the {@link ItemFailureHandler}. The chunk will then be
  * 'dechunked', which in most scenarios will mean delegating to an
  * {@link ItemWriter} by writing out one chunk at a time. The transaction
  * boundary is around this process. If any errors are encountered, the
@@ -78,7 +80,7 @@ import org.springframework.util.Assert;
  * allowing for the number of retries and how long to wait between retries
  * (backoff) to be set. Once dechunking has been finished, any errors not fatal
  * to the chunk (usually because the error didn't invalidate the transaction)
- * will also be written out via the {@link SkippedItemHandler}
+ * will also be written out via the {@link ItemFailureHandler}
  * </p>
  * 
  * <p>
@@ -134,7 +136,7 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 	// default to checking current thread for interruption.
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
 
-	private SkippedItemHandler failureLog = new DefaultItemFailureLog();
+	private ItemFailureHandler failureLog = new DefaultItemFailureHandler();
 
 	private StreamManager streamManager;
 
@@ -173,7 +175,7 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 		this.streamManager = streamManager;
 	}
 
-	public void setFailureLog(SkippedItemHandler failureLog) {
+	public void setFailureLog(ItemFailureHandler failureLog) {
 		this.failureLog = failureLog;
 	}
 
@@ -445,18 +447,23 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 		try {
 
 			ChunkingResult chunkingResult = chunker.chunk(chunkSize,
-					stepExecution);
+					contribution);
 
 			if (chunkingResult == null) {
 				return ExitStatus.FINISHED;
 			}
 
 			final Chunk chunk = chunkingResult.getChunk();
-			failureLog.handle(chunkingResult.getExceptions());
+			for(Iterator it = chunkingResult.getExceptions().iterator();it.hasNext();){
+				failureLog.handleReadFailure((Exception)it.next());
+			}
 
 			DechunkingResult dechunkingResult = dechunker.dechunk(chunk,
-					stepExecution);
-			failureLog.handle(dechunkingResult.getExceptions());
+					contribution);
+			for(Iterator it = dechunkingResult.getExceptions().iterator(); it.hasNext();){
+				WriteFailureException exception = (WriteFailureException)it.next();
+				failureLog.handleWriteFailure(exception.getItem(), (Exception)exception.getCause());
+			}
 
 			// TODO: check that stepExecution can
 			// aggregate these contributions if they

@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.FlatFileParsingException;
 
@@ -32,6 +33,7 @@ public class SkipLimitReadFailurePolicyTests extends TestCase {
 
 	LimitCheckingItemSkipPolicy failurePolicy;
 	StepExecution stepExecution;
+	StepContribution stepContribution;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -42,11 +44,12 @@ public class SkipLimitReadFailurePolicyTests extends TestCase {
 		failurePolicy = new LimitCheckingItemSkipPolicy(1, skippableExceptions);
 		stepExecution = new StepExecution(null, null);
 		stepExecution.setSkipCount(2);
+		stepContribution = stepExecution.createStepContribution();
 	}
 	
 	public void testLimitExceed(){		
 		try{
-			failurePolicy.shouldSkip(new FlatFileParsingException("", ""), stepExecution);
+			failurePolicy.shouldSkip(new FlatFileParsingException("", ""), stepContribution);
 			fail();
 		}
 		catch(SkipLimitExceededException ex){
@@ -55,12 +58,12 @@ public class SkipLimitReadFailurePolicyTests extends TestCase {
 	}
 	
 	public void testNonSkippableException(){
-		assertFalse(failurePolicy.shouldSkip(new FileNotFoundException(), stepExecution));
+		assertFalse(failurePolicy.shouldSkip(new FileNotFoundException(), stepContribution));
 	}
 	
 	public void testSkip(){
 		stepExecution.setSkipCount(0);
-		assertTrue(failurePolicy.shouldSkip(new FlatFileParsingException("",""), stepExecution));
+		assertTrue(failurePolicy.shouldSkip(new FlatFileParsingException("",""), stepContribution));
 	}
 
 }
