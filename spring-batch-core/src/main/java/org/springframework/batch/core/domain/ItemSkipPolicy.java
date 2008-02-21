@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.domain;
 
-import org.springframework.batch.core.domain.StepExecution;
 
 /**
  * Policy for determining whether or not an item should be skipped.
@@ -29,9 +28,9 @@ public interface ItemSkipPolicy {
 	 * continue for the current step execution with the given throwable.
 	 * 
 	 * @param ex throwable encountered while reading
-	 * @param stepExecution currently running execution
+	 * @param stepContribution currently running execution
 	 * @return true if reading should continue, false otherwise.
 	 * @throws IllegalArgumentException if t or stepExecution is null
 	 */
-	boolean shouldSkip(Exception ex, StepExecution stepExecution);
+	boolean shouldSkip(Exception ex, StepContribution stepContribution);
 }

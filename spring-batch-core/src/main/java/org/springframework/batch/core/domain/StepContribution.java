@@ -33,6 +33,8 @@ public class StepContribution {
 	private ExecutionContext executionContext;
 
 	private int commitCount;
+	
+	private int skipCount;
 
 	/**
 	 * @param execution
@@ -95,6 +97,14 @@ public class StepContribution {
 	 */
 	public boolean isTerminateOnly() {
 		return execution.isTerminateOnly();
+	}
+	
+	public int getSkipCount() {
+		return skipCount + execution.getSkipCount();
+	}
+	
+	public void incrementSkipCount(){
+		skipCount++;
 	}
 
 }

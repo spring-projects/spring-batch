@@ -37,6 +37,6 @@ public interface Chunker extends ItemStream {
 	 * @return the {@link Chunk} that has been read.
 	 * @throws IllegalArgumentException if chunkSize is less than zero.
 	 */
-	public ChunkingResult chunk(int chunkSize, StepExecution stepExecution) throws ReadFailureException;
+	public ChunkingResult chunk(int chunkSize, StepContribution stepContribution) throws ReadFailureException;
 	
 }

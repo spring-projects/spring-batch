@@ -35,11 +35,11 @@ public interface Dechunker extends ItemStream{
 	 * discretion of various implementations.
 	 * 
 	 * @param chunk to be 'dechunked'
-	 * @param stepExecution the chunk belongs to.
+	 * @param stepContribution the chunk belongs to.
 	 * @return a Dechunking result detailing whether or not dechunking was successful, and
 	 * if any items were skipped.
 	 * @throws Exception, specifically throws IllegalArgumentException if either the chunk
 	 * or StepExecution is null.
 	 */
-	DechunkingResult dechunk(Chunk chunk, StepExecution stepExecution) throws Exception;
+	DechunkingResult dechunk(Chunk chunk, StepContribution stepContribution) throws Exception;
 }
