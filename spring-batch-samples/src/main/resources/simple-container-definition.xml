@@ -93,7 +93,7 @@
 		<property name="saveExecutionContext" value="true" />
 	</bean>
 
-	<bean id="abstractStep" class="org.springframework.batch.execution.step.simple.SimpleStep" abstract="true">
+	<bean id="abstractStep" class="org.springframework.batch.execution.step.simple.ItemOrientedStep" abstract="true">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="allowStartIfComplete" value="true" />
