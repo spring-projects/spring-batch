@@ -49,10 +49,23 @@ public class LineAggregatorItemTransformer implements ItemTransformer {
 	}
 
 	/**
-	 * @param item
-	 * @return
+	 * Extension point for subclasses. The default implementation just attempts
+	 * to cast the item to String[] and creates a {@link DefaultFieldSet} from
+	 * it.
+	 * 
+	 * @param item an object (in this implementation of type String[]).
+	 * @return a {@link FieldSet} representing the item
+	 * 
+	 * @throws ConversionException if the field set cannot be created
 	 */
-	protected FieldSet createFieldSet(Object item) {
-		return new DefaultFieldSet((String[]) item);
+	protected FieldSet createFieldSet(Object item) throws ConversionException {
+		try {
+			return new DefaultFieldSet((String[]) item);
+		}
+		catch (ClassCastException e) {
+			throw new ConversionException(
+					"Item must be of type String[] for conversion to FieldSet. " +
+					"Consider overriding this method to specify a less generic algorithm.");
+		}
 	}
 }

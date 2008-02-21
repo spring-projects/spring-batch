@@ -6,10 +6,12 @@ import java.util.Iterator;
 import org.springframework.batch.item.writer.ItemTransformer;
 
 /**
- * An implementation of {@link ItemTransformer} that just calls toString() on
- * its argument, unless it it an array or collection, in which case it loops
- * though, calling itself on each member in turn, concatenating the result with
- * line separators.
+ * An implementation of {@link ItemTransformer} that treats its argument
+ * specially if it is an array or collection. In this case it loops though,
+ * calling itself on each member in turn, until it encounters a non collection.
+ * At this point, if the item is a String, that is used, or else it is passed to
+ * the delegate {@link ItemTransformer}. The transformed single item Strings
+ * are all concatenated with line separators.
  * 
  * @author Dave Syer
  * 
@@ -18,18 +20,42 @@ public class RecursiveCollectionItemTransformer implements ItemTransformer {
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-	/* (non-Javadoc)
+	private ItemTransformer delegate = new ItemTransformer() {
+		public Object transform(Object item) throws Exception {
+			return item;
+		}
+	};
+
+	/**
+	 * Public setter for the {@link ItemTransformer} to use on single items,
+	 * that are not Strings. This can be used to strategise the conversion of
+	 * collection and array elements to a String, e.g. via a subclass of
+	 * {@link LineAggregatorItemTransformer}.<br/>
+	 * 
+	 * N.B. if the delegate returns an array or collection, it will not be
+	 * treated the same way as the original item passed in for transformation.
+	 * Rather, in this case, it will simply be converted immediately to a String
+	 * by calling its toString().
+	 * 
+	 * @param delegate the delegate to set. Defaults to a pass through.
+	 */
+	public void setDelegate(ItemTransformer delegate) {
+		this.delegate = delegate;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.writer.ItemTransformer#transform(java.lang.Object)
 	 */
-	public Object transform(Object input) {
+	public Object transform(Object input) throws Exception {
 		TransformHolder holder = new TransformHolder();
 		transformRecursively(input, holder);
 		String result = holder.builder.toString();
 		return result.substring(0, result.lastIndexOf(LINE_SEPARATOR));
 	}
 
-	public String stringify(Object input) {
-		return "" + input;
+	public String stringify(Object item) throws Exception {
+		return "" + delegate.transform(item);
 	}
 
 	/**
@@ -38,10 +64,9 @@ public class RecursiveCollectionItemTransformer implements ItemTransformer {
 	 * @param converted
 	 * @throws Exception
 	 */
-	private void transformRecursively(Object data, TransformHolder converted) {
+	private void transformRecursively(Object data, TransformHolder converted) throws Exception {
 
 		if (data instanceof Collection) {
-			converted.value = false;
 			for (Iterator iterator = ((Collection) data).iterator(); iterator.hasNext();) {
 				Object value = (Object) iterator.next();
 				// (recursive)
@@ -50,7 +75,6 @@ public class RecursiveCollectionItemTransformer implements ItemTransformer {
 			return;
 		}
 		if (data.getClass().isArray()) {
-			converted.value = false;
 			Object[] array = (Object[]) data;
 			for (int i = 0; i < array.length; i++) {
 				Object value = array[i];
@@ -63,21 +87,14 @@ public class RecursiveCollectionItemTransformer implements ItemTransformer {
 			// This is where the output stream is actually written to
 			converted.builder.append(data + LINE_SEPARATOR);
 		}
-		else if (!converted.value) {
+		else {
 			// (recursive)
-			converted.value = true;
 			transformRecursively(stringify(data), converted);
 			return;
-		}
-		else {
-			// Should not happen...
-			throw new IllegalStateException(
-					"Infinite loop detected - converter did not convert to String or collection/array of objects convertible to String.");
 		}
 	}
 
 	private static class TransformHolder {
-		boolean value;
 
 		StringBuilder builder = new StringBuilder();
 
