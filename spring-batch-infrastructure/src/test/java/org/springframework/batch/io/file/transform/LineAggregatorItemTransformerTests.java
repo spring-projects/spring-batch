@@ -57,8 +57,8 @@ public class LineAggregatorItemTransformerTests extends TestCase {
 	public void testTransformWrongType() throws Exception {
 		try {
 			transformer.transform("foo");
-			fail("Expected ClassCastException");
-		} catch (ClassCastException e) {
+			fail("Expected ConversionException");
+		} catch (ConversionException e) {
 			// Expected
 		}
 
