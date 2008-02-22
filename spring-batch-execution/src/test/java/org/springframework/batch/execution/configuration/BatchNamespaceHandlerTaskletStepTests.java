@@ -18,7 +18,7 @@ package org.springframework.batch.execution.configuration;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.execution.step.tasklet.TaskletStep;
+import org.springframework.batch.execution.step.TaskletStep;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

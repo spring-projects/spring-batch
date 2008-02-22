@@ -53,5 +53,13 @@ public class StubDataSource implements DataSource {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
     }
+
+	public boolean isWrapperFor(Class arg0) throws SQLException {
+		return false;
+	}
+
+	public Object unwrap(Class arg0) throws SQLException {
+		return null;
+	}
 	
 }

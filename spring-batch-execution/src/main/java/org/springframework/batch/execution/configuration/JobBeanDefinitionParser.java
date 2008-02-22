@@ -16,7 +16,7 @@
 
 package org.springframework.batch.execution.configuration;
 
-import org.springframework.batch.execution.step.tasklet.TaskletStep;
+import org.springframework.batch.execution.step.TaskletStep;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;

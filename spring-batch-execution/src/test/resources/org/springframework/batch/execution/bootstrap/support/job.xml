@@ -13,7 +13,7 @@
 		class="org.springframework.batch.core.domain.JobSupport">
 		<property name="steps">
 			<bean id="step1"
-				class="org.springframework.batch.execution.step.simple.SimpleStep">
+				class="org.springframework.batch.execution.step.ItemOrientedStep">
 				<property name="itemReader">
 					<bean
 						class="org.springframework.batch.item.reader.ListItemReader">

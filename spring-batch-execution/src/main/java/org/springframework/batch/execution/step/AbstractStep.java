@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step;
 
 import org.springframework.batch.core.domain.ItemFailureHandler;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
@@ -22,6 +22,8 @@ import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.execution.step.simple.DefaultItemFailureHandler;
+import org.springframework.batch.execution.step.simple.NeverSkipItemSkipPolicy;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;

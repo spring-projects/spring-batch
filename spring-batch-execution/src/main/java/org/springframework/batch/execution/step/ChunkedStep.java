@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -40,6 +40,12 @@ import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
+import org.springframework.batch.execution.step.simple.DefaultItemFailureHandler;
+import org.springframework.batch.execution.step.simple.ItemChunker;
+import org.springframework.batch.execution.step.simple.ItemDechunker;
+import org.springframework.batch.execution.step.simple.SimpleExitStatusExceptionClassifier;
+import org.springframework.batch.execution.step.simple.StepInterruptionPolicy;
+import org.springframework.batch.execution.step.simple.ThreadStepInterruptionPolicy;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.io.exception.WriteFailureException;
 import org.springframework.batch.item.ExecutionContext;
@@ -357,14 +363,29 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 					// Before starting a new transaction, check for
 					// interruption.
 					interruptionPolicy.checkInterrupted(context);
+					
+					final StepContribution contribution = stepExecution
+					.createStepContribution();
+					
+					ChunkingResult chunkingResult = chunker.chunk(chunkSize,
+							contribution);
+
+					if (chunkingResult == null) {
+						return ExitStatus.FINISHED;
+					}
+
+					final Chunk chunk = chunkingResult.getChunk();
+					for(Iterator it = chunkingResult.getExceptions().iterator();it.hasNext();){
+						failureLog.handleReadFailure((Exception)it.next());
+					}
 
 					ExitStatus result = (ExitStatus) retryTemplate
 							.execute(new RetryCallback() {
 
 								public Object doWithRetry(RetryContext context)
 										throws Throwable {
-									return processChunk(stepExecution,
-											stepContext);
+									return processChunk(contribution, stepExecution,
+											stepContext, chunk);
 								}
 							});
 
@@ -435,28 +456,13 @@ public class ChunkedStep extends StepSupport implements InitializingBean {
 	 *            the current step context.
 	 * @return true if there is more data to process.
 	 */
-	ExitStatus processChunk(final StepExecution stepExecution,
-			StepContext stepContext) {
+	ExitStatus processChunk(final StepContribution contribution,StepExecution stepExecution,
+			StepContext stepContext, final Chunk chunk) {
 
 		TransactionStatus transaction = streamManager
 				.getTransaction(stepExecution);
 
-		final StepContribution contribution = stepExecution
-				.createStepContribution();
-
 		try {
-
-			ChunkingResult chunkingResult = chunker.chunk(chunkSize,
-					contribution);
-
-			if (chunkingResult == null) {
-				return ExitStatus.FINISHED;
-			}
-
-			final Chunk chunk = chunkingResult.getChunk();
-			for(Iterator it = chunkingResult.getExceptions().iterator();it.hasNext();){
-				failureLog.handleReadFailure((Exception)it.next());
-			}
 
 			DechunkingResult dechunkingResult = dechunker.dechunk(chunk,
 					contribution);

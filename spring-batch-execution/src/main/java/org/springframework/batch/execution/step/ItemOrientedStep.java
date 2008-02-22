@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step;
 
 import java.util.Date;
 
@@ -31,6 +31,9 @@ import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
+import org.springframework.batch.execution.step.simple.SimpleExitStatusExceptionClassifier;
+import org.springframework.batch.execution.step.simple.StepInterruptionPolicy;
+import org.springframework.batch.execution.step.simple.ThreadStepInterruptionPolicy;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ExecutionContext;
@@ -110,14 +113,14 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	}
 
 	/**
-	 * The {@link RepeatOperations} to use for the inner loop of the batch
-	 * processing. Should be set up by the caller through a factory. Defaults to
-	 * a plain {@link RepeatTemplate}.
+	 * the {@link repeatoperations} to use for the inner loop of the batch
+	 * processing. should be set up by the caller through a factory. defaults to
+	 * a plain {@link repeattemplate}.
 	 * 
-	 * @param chunkOperations a {@link RepeatOperations} instance.
+	 * @param chunkoperations a {@link repeatoperations} instance.
 	 */
-	public void setChunkOperations(RepeatOperations chunkOperations) {
-		this.chunkOperations = chunkOperations;
+	public void setChunkOperations(RepeatOperations chunkoperations) {
+		this.chunkOperations = chunkoperations;
 	}
 
 	/**
@@ -195,14 +198,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	 * @param step a step
 	 */
 	void applyConfiguration(AbstractStep step) {
-
-		if (step instanceof SimpleStep) {
-			SimpleStep simple = (SimpleStep) step;
-			if (this.chunkOperations instanceof RepeatTemplate) {
-				RepeatTemplate template = (RepeatTemplate) this.chunkOperations;
-				template.setCompletionPolicy(new SimpleCompletionPolicy(simple.getCommitInterval()));
-			}
-		}
 
 		ExceptionHandler exceptionHandler = step.getExceptionHandler();
 

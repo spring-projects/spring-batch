@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +37,10 @@ import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
+import org.springframework.batch.execution.step.ItemOrientedStep;
+import org.springframework.batch.execution.step.simple.JobRepositorySupport;
+import org.springframework.batch.execution.step.simple.StepInterruptionPolicy;
+import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -357,7 +361,7 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testApplyConfigurationWithExceptionHandler() throws Exception {
-		AbstractStep stepConfiguration = new SimpleStep("foo");
+		AbstractStep stepConfiguration = new StubStep("foo");
 		final List list = new ArrayList();
 		itemOrientedStep.setStepOperations(new RepeatTemplate() {
 			public void setExceptionHandler(ExceptionHandler exceptionHandler) {
@@ -370,7 +374,7 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testApplyConfigurationWithZeroSkipLimit() throws Exception {
-		AbstractStep stepConfiguration = new SimpleStep("foo");
+		AbstractStep stepConfiguration = new StubStep("foo");
 		stepConfiguration.setSkipLimit(0);
 		final List list = new ArrayList();
 		itemOrientedStep.setStepOperations(new RepeatTemplate() {
@@ -383,7 +387,7 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testApplyConfigurationWithNonZeroSkipLimit() throws Exception {
-		AbstractStep stepConfiguration = new SimpleStep("foo");
+		AbstractStep stepConfiguration = new StubStep("foo");
 		stepConfiguration.setSkipLimit(1);
 		final List list = new ArrayList();
 		itemOrientedStep.setStepOperations(new RepeatTemplate() {
@@ -553,6 +557,18 @@ public class ItemOrientedStepTests extends TestCase {
 			// The original rollback was caused by this one:
 			assertEquals("Foo", ex.getCause().getMessage());
 		}
+	}
+	
+	private class StubStep extends AbstractStep{
+
+		public StubStep(String name) {
+			super(name);
+		}
+		
+		public void execute(StepExecution stepExecution)
+				throws JobInterruptedException, BatchCriticalException {
+		}
+		
 	}
 
 }

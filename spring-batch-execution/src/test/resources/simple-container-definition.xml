@@ -25,7 +25,7 @@
 	</bean>
 
 	<bean id="simpleStep"
-		class="org.springframework.batch.execution.step.simple.SimpleStep"
+		class="org.springframework.batch.execution.step.ItemOrientedStep"
 		abstract="true">
 		<property name="allowStartIfComplete" value="true" />
 		<property name="saveExecutionContext" value="false" />

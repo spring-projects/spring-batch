@@ -35,7 +35,7 @@ import org.springframework.batch.execution.repository.dao.JobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
-import org.springframework.batch.execution.step.simple.SimpleStep;
+import org.springframework.batch.execution.step.AbstractStep;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.repeat.ExitStatus;
@@ -265,7 +265,7 @@ public class SimpleJobTests extends TestCase {
 		checkRepository(status, null);
 	}
 
-	private class StubStep extends SimpleStep {
+	private class StubStep extends AbstractStep {
 
 		private Runnable runnable;
 		private Exception exception;
