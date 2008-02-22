@@ -164,7 +164,12 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 		String value = string.trim();
 		if (isQuoted(value)) {
 			value = StringUtils.replace(value, "" + quoteCharacter + quoteCharacter, "" + quoteCharacter);
-			string = value.substring(1, value.length() - 1);
+			int endLength = value.length() - 1;
+			// used to deal with empty quoted values
+			if(endLength == 0) {
+				endLength = 1;
+			}
+			string = value.substring(1, endLength);
 		}
 		return string;
 	}

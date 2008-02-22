@@ -174,5 +174,12 @@ public class DelimitedLineTokenizerTests extends TestCase {
 		assertEquals("c\nrap", line.readString(2));
 
 	}
+	
+	public void testTokenizeWithQuotesEmptyValue() {
+		FieldSet line = tokenizer.tokenize("\"a\",\"b\",\"\",\"d\"");
+		assertEquals(4, line.getFieldCount());
+		assertEquals("", line.readString(2));
+	}
+
 
 }
