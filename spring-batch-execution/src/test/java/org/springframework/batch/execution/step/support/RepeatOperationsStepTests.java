@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step.support;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +25,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.execution.step.ItemOrientedStep;
+import org.springframework.batch.execution.step.support.RepeatOperationsStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ItemReaderAdapter;
@@ -51,7 +52,7 @@ public class RepeatOperationsStepTests extends TestCase {
 	}
 	
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.simple.RepeatOperationsStep#getChunkOperations()}.
+	 * Test method for {@link org.springframework.batch.execution.step.support.RepeatOperationsStep#getChunkOperations()}.
 	 */
 	public void testSetChunkOperations() {
 		assertNull(repeatStep.getChunkOperations());
@@ -62,7 +63,7 @@ public class RepeatOperationsStepTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.simple.RepeatOperationsStep#getChunkOperations()}.
+	 * Test method for {@link org.springframework.batch.execution.step.support.RepeatOperationsStep#getChunkOperations()}.
 	 */
 	public void testSetStepOperations() {
 		assertNull(repeatStep.getChunkOperations());

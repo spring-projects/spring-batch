@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step.support;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -21,6 +21,8 @@ import java.util.List;
 
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.execution.step.support.LimitCheckingItemSkipPolicy;
+import org.springframework.batch.execution.step.support.SkipLimitExceededException;
 import org.springframework.batch.io.exception.FlatFileParsingException;
 
 import junit.framework.TestCase;

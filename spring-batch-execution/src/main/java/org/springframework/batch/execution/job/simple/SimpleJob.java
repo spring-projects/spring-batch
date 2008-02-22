@@ -30,7 +30,7 @@ import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
-import org.springframework.batch.execution.step.simple.SimpleExitStatusExceptionClassifier;
+import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 

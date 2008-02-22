@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step.support;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;

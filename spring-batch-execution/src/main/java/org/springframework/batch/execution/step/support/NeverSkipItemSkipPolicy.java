@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step.support;
 
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.StepContribution;
 
 /**
- * Implementation of the {@link ItemSkipPolicy} interface that
- * will always return that an item should be skipped.
+ * {@link ItemSkipPolicy} implementation that always returns false,
+ * indicating that an item should not be skipped.
  * 
- * @author Ben Hale
  * @author Lucas Ward
  */
-public class AlwaysSkipItemSkipPolicy implements ItemSkipPolicy {
+public class NeverSkipItemSkipPolicy implements ItemSkipPolicy{
 
 	public boolean shouldSkip(Exception ex, StepContribution stepContribution) {
-		return true;
+		return false;
 	}
+
+	
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step.support;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +23,8 @@ import org.springframework.batch.core.domain.Chunk;
 import org.springframework.batch.core.domain.DechunkingResult;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.execution.step.support.AlwaysSkipItemSkipPolicy;
+import org.springframework.batch.execution.step.support.ItemDechunker;
 import org.springframework.batch.io.exception.WriteFailureException;
 import org.springframework.batch.item.ItemWriter;
 

@@ -25,7 +25,7 @@
 						class="org.springframework.batch.execution.launch.EmptyItemWriter" />
 				</property>
 				<property name="jobRepository" >
-					<bean class="org.springframework.batch.execution.step.simple.JobRepositorySupport" />
+					<bean class="org.springframework.batch.execution.step.support.JobRepositorySupport" />
 				</property>
 				<property name="streamManager">
 					<bean class="org.springframework.batch.item.stream.SimpleStreamManager" />

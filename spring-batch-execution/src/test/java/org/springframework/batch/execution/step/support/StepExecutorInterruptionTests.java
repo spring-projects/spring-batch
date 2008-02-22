@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step.support;
 
 import java.util.List;
 
@@ -34,6 +34,7 @@ import org.springframework.batch.execution.repository.dao.JobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
+import org.springframework.batch.execution.step.support.RepeatOperationsStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ItemReaderAdapter;

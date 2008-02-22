@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

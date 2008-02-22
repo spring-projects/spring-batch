@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step.support;
 
 import junit.framework.TestCase;
 
@@ -21,6 +21,7 @@ import org.springframework.batch.core.domain.ChunkingResult;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.execution.step.support.ItemChunker;
 
 public class ItemChunkerTests extends TestCase {
 	

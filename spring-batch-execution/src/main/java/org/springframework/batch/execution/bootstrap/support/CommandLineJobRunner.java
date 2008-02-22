@@ -27,7 +27,7 @@ import org.springframework.batch.core.repository.JobLocator;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.batch.execution.launch.JobLauncher;
-import org.springframework.batch.execution.step.simple.SimpleExitStatusExceptionClassifier;
+import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;

@@ -12,7 +12,7 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.step.TaskletStep;
-import org.springframework.batch.execution.step.simple.JobRepositorySupport;
+import org.springframework.batch.execution.step.support.JobRepositorySupport;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;

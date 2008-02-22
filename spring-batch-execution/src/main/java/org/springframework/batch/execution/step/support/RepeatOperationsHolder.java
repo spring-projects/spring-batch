@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step.simple;
+package org.springframework.batch.execution.step.support;
 
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.repeat.RepeatOperations;

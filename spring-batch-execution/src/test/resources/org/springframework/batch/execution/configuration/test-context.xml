@@ -40,7 +40,7 @@
 		class="org.springframework.batch.execution.launch.EmptyItemWriter" />
 
 	<bean id="jobRepository"
-		class="org.springframework.batch.execution.step.simple.JobRepositorySupport" />
+		class="org.springframework.batch.execution.step.support.JobRepositorySupport" />
 
 
 	<bean id="test-job-with-name"
