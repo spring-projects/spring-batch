@@ -23,7 +23,7 @@
 					</property>
 					<property name="chunker">
 						<bean
-							class="org.springframework.batch.execution.step.simple.ItemChunker">
+							class="org.springframework.batch.execution.step.support.ItemChunker">
 							<constructor-arg>
 								<bean
 									class="org.springframework.batch.item.reader.ValidatingItemReader">
@@ -35,7 +35,7 @@
 							</constructor-arg>
 							<property name="itemSkipPolicy">
 								<bean
-									class="org.springframework.batch.execution.step.simple.LimitCheckingItemSkipPolicy">
+									class="org.springframework.batch.execution.step.support.LimitCheckingItemSkipPolicy">
 									<constructor-arg value="5" />
 								</bean>
 							</property>
@@ -43,7 +43,7 @@
 					</property>
 					<property name="dechunker">
 						<bean
-							class="org.springframework.batch.execution.step.simple.ItemDechunker">
+							class="org.springframework.batch.execution.step.support.ItemDechunker">
 							<constructor-arg>
 								<bean
 									class="org.springframework.batch.sample.item.writer.TradeWriter"
@@ -51,7 +51,7 @@
 							</constructor-arg>
 							<property name="itemSkipPolicy">
 								<bean
-									class="org.springframework.batch.execution.step.simple.LimitCheckingItemSkipPolicy">
+									class="org.springframework.batch.execution.step.support.LimitCheckingItemSkipPolicy">
 									<constructor-arg value="5" />
 								</bean>
 							</property>
