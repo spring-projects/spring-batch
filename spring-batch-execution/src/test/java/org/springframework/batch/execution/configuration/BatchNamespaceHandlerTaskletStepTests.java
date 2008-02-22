@@ -18,24 +18,44 @@ package org.springframework.batch.execution.configuration;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.execution.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class BatchNamespaceHandlerTaskletStepTests extends TestCase {
 
 	private static final String PACKAGE = "org/springframework/batch/execution/configuration/";
 
-	public void testNamespaceOk() {
+	public void testTaskletStepOk() {
 		new ClassPathXmlApplicationContext(PACKAGE + "BatchNamespaceHandlerTaskletStepOk.xml");
 	}
 
-	public void testNamespaceMissingTasklet() {
+	public void testTaskletStepMissingTasklet() {
 		try {
 			new ClassPathXmlApplicationContext(PACKAGE + "BatchNamespaceHandlerTaskletStepMissingTasklet.xml");
 			fail("Expected BeanDefinitionParsingException");
-		} catch (BeanDefinitionParsingException e) {
-
-		}
+		} catch (BeanDefinitionParsingException e) {	}
+	}
+	
+	public void testTaskletStepRerunAlways() {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(PACKAGE + "BatchNamespaceHandlerTaskletStepRerunAlways.xml");
+		TaskletStep step = (TaskletStep) ctx.getBean("process");
+		assertEquals(Integer.MAX_VALUE, step.getStartLimit());
+		assertTrue(step.isAllowStartIfComplete());
+	}
+	
+	public void testTaskletStepRerunNever() {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(PACKAGE + "BatchNamespaceHandlerTaskletStepRerunNever.xml");
+		TaskletStep step = (TaskletStep) ctx.getBean("process");
+		assertEquals(1, step.getStartLimit());
+		assertFalse(step.isAllowStartIfComplete());
 	}
 
+	public void testTaskletStepRerunIncomplete() {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(PACKAGE + "BatchNamespaceHandlerTaskletStepRerunIncomplete.xml");
+		TaskletStep step = (TaskletStep) ctx.getBean("process");
+		assertEquals(Integer.MAX_VALUE, step.getStartLimit());
+		assertFalse(step.isAllowStartIfComplete());
+	}
 }
