@@ -86,14 +86,14 @@
 	</bean>
 
 	<bean id="taskletStep"
-		class="org.springframework.batch.execution.step.tasklet.TaskletStep"
+		class="org.springframework.batch.execution.step.TaskletStep"
 		abstract="true">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="allowStartIfComplete" value="true" />
 		<property name="saveExecutionContext" value="true" />
 	</bean>
 
-	<bean id="abstractStep" class="org.springframework.batch.execution.step.simple.ItemOrientedStep" abstract="true">
+	<bean id="abstractStep" class="org.springframework.batch.execution.step.ItemOrientedStep" abstract="true">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="allowStartIfComplete" value="true" />
@@ -112,7 +112,7 @@
 		<property name="commitInterval" value="1" />
 	</bean>
 	
-	<bean id="chunkedStep" class="org.springframework.batch.execution.step.simple.ChunkedStep" abstract="true">
+	<bean id="chunkedStep" class="org.springframework.batch.execution.step.ChunkedStep" abstract="true">
 		<property name="allowStartIfComplete" value="true" />
 		<property name="saveExecutionContext" value="true" />
 		<property name="jobRepository" ref="jobRepository" />
