@@ -4,6 +4,34 @@
 	targetNamespace="http://www.springframework.org/schema/batch"
 	elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
 
+	<xs:element name="job-repository">
+		<xs:annotation>
+			<xs:documentation><![CDATA[Defines a repository for storing and retrieving metadata for jobs and steps.]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="data-source" type="xs:token" use="required">
+				<xs:annotation>
+					<xs:documentation><![CDATA[The datasource to use to back this repository.]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="db-type" use="required">
+				<xs:annotation>
+				<xs:documentation><![CDATA[The type of database this job repository will be communicating with.]]></xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:token">
+						<xs:enumeration value="db2"/>
+						<xs:enumeration value="derby"/>
+						<xs:enumeration value="hsql"/>
+						<xs:enumeration value="mysql"/>
+						<xs:enumeration value="oracle"/>
+						<xs:enumeration value="postgres"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
 	<xs:element name="job">
 		<xs:annotation>
 			<xs:documentation><![CDATA[Defines a uniquely identified job that is referenced at runtime.]]></xs:documentation>
@@ -21,7 +49,7 @@
 					</xs:annotation>
 				</xs:element>
 			</xs:choice>
-			<xs:attribute name="id" type="xs:string" use="required">
+			<xs:attribute name="id" type="xs:token" use="required">
 				<xs:annotation>
 					<xs:documentation><![CDATA[The unique identifier to use in this step.  The id must be unique within the context of this job.]]></xs:documentation>
 				</xs:annotation>
@@ -31,7 +59,7 @@
 
 	<!-- Types -->
 	 <xs:complexType name="chunkStepType">
-		<xs:attribute name="id" type="xs:string" use="required">
+		<xs:attribute name="id" type="xs:token" use="required">
 			<xs:annotation>
 				<xs:documentation><![CDATA[The unique identifier to use in this step.  The id must be unique within the context of this job.]]></xs:documentation>
 			</xs:annotation>
@@ -41,17 +69,17 @@
 				<xs:documentation><![CDATA[The number of elements to be processed per chunk. This must be a number greater than 0.]]></xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="item-reader" type="xs:string" use="required">
+		<xs:attribute name="item-reader" type="xs:token" use="required">
 			<xs:annotation>
 				<xs:documentation><![CDATA[The id of the ItemReader implementation to read from in this step]]></xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="item-writer" type="xs:string" use="required">
+		<xs:attribute name="item-writer" type="xs:token" use="required">
 			<xs:annotation>
 				<xs:documentation><![CDATA[The id of the ItemWriter implementation to write to in this step]]></xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="transaction-manager" type="xs:string" use="optional"
+		<xs:attribute name="transaction-manager" type="xs:token" use="optional"
 			default="transaction-manager">
 			<xs:annotation>
 				<xs:documentation><![CDATA[The id of the transaction manager to use in this step.  This should be an implementation of Spring's PlatformTransactionManager.]]></xs:documentation>
@@ -71,12 +99,12 @@
 	</xs:complexType>
 
 	<xs:complexType name="taskletStepType">
-		<xs:attribute name="id" type="xs:string" use="required">
+		<xs:attribute name="id" type="xs:token" use="required">
 			<xs:annotation>
 				<xs:documentation><![CDATA[The unique identifier to use in this step.  The id must be unique within the context of this job.]]></xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="tasklet" type="xs:string" use="required">
+		<xs:attribute name="tasklet" type="xs:token" use="required">
 			<xs:annotation>
 				<xs:documentation><![CDATA[The id of the Tasklet implementation to execute in this step.]]></xs:documentation>
 			</xs:annotation>

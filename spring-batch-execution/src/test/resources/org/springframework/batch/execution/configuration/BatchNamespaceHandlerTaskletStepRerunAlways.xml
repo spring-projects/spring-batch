@@ -8,11 +8,11 @@
 	<job-repository data-source="dataSource" db-type="db2"/>
 
 	<job id="processJob">
-		<tasklet-step id="process" tasklet="processorTasklet"/>
+		<tasklet-step id="process" tasklet="processorTasklet" rerun="always"/>
 	</job>
 
 	<beans:bean id="processorTasklet"
-		class="org.springframework.batch.execution.configuration.TaskletTestBean"/>
+			class="org.springframework.batch.execution.configuration.TaskletTestBean"/>
 	
 	<beans:bean id="dataSource"
 			class="org.springframework.batch.execution.configuration.StubDataSource"/>

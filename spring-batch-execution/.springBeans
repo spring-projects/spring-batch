@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.3.v200801241658]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.4.v200802132100]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -16,7 +16,19 @@
 		<config>src/test/resources/beanRefContext.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/bootstrap/support/job.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/bootstrap/support/test-environment.xml</config>
-		<config>src/test/java/org/springframework/batch/execution/configuration/BatchNamespaceHandlerTaskletStepOk.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerJobRepositoryDb2.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerJobRepositoryDerby.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerJobRepositoryHsql.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerJobRepositoryMissingDataSource.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerJobRepositoryMySql.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerJobRepositoryOk.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerJobRepositoryOracle.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerJobRepositoryPostgres.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerTaskletStepMissingTasklet.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerTaskletStepOk.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerTaskletStepRerunAlways.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerTaskletStepRerunIncomplete.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerTaskletStepRerunNever.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

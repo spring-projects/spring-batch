@@ -5,8 +5,13 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-1.0.xsd">
 
+	<job-repository data-source="dataSource" db-type="db2"/>
+
 	<job id="processJob">
 		<tasklet-step id="process" tasklet=""/>
 	</job>
+	
+	<beans:bean id="dataSource"
+			class="org.springframework.batch.execution.configuration.StubDataSource"/>
 
 </beans:beans>
