@@ -19,11 +19,17 @@ import org.springframework.batch.item.ItemWriter;
 
 /**
  * Abstract {@link ItemWriter} that allows for base classes to only
- * implement the close method if they need it.
+ * implement the close method if they need it.  Because it is likely
+ * that the flush and clear methods may not need to be implemented,
+ * they are provided in this class.
  * 
  * @author Lucas Ward
- *
  */
 public abstract class AbstractItemWriter implements ItemWriter{
-
+	
+	public void flush() throws Exception {
+	}
+	
+	public void clear() throws Exception {
+	}
 }

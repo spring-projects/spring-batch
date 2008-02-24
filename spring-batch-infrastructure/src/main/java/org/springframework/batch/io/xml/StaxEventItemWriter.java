@@ -438,20 +438,27 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 		return true;
 	}
 
-	/*
+	/* TODO remove once ItemStream interface is modified.
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
+	}
+	
+	public void flush() throws Exception {
 		lastCommitPointPosition = getPosition();
 		lastCommitPointRecordCount = currentRecordCount;
 	}
 
-	/*
+	/* TODO remove once ItemStream interface is modified.
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() {
+
+	}
+	
+	public void clear() throws Exception {
 		currentRecordCount = lastCommitPointRecordCount;
 		// close output
 		close();

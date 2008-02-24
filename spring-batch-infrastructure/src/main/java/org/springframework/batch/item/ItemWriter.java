@@ -17,10 +17,18 @@
 package org.springframework.batch.item;
 
 /**
- * Basic interface for generic output operations. Class implementing this
+ * <p>Basic interface for generic output operations. Class implementing this
  * interface will be responsible for serializing objects as necessary.
  * Generally, it is responsibility of implementing class to decide which
- * technology to use for mapping and how it should be configured.
+ * technology to use for mapping and how it should be configured.</p>
+ * 
+ * <p>
+ * Due to the nature of batch processing, it is expected that most writers
+ * will buffer output.  A flush method is provided to the interface in order
+ * to ensure that any buffers can be flushed before a transaction is
+ * committed.  Along the same lines, if a transaction has been rolled back,
+ * then the contents of any buffers should be thrown away.
+ * </p>
  * 
  * @author Dave Syer
  * @author Lucas Ward
@@ -38,4 +46,19 @@ public interface ItemWriter {
 	 */
 	public void write(Object item) throws Exception;
 	
+	/**
+	 * Flush any buffers that are being held.  This will usually be performed
+	 * prior to committing any transactions.
+	 * 
+	 * @throws Exception
+	 */
+	public void flush() throws Exception;
+	
+	/**
+	 * Clear any buffers that are being held.  This will usually be performed
+	 * prior to rolling back any transactions.
+	 * 
+	 * @throws Exception
+	 */
+	public void clear() throws Exception;
 }

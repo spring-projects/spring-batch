@@ -23,7 +23,7 @@ import org.springframework.xml.transform.StaxResult;
 /**
  * Tests for {@link StaxStreamWriterOutputSource}.
  */
-public class StaxEventWriterItemWriterTests extends TestCase {
+public class StaxEventItemWriterTests extends TestCase {
 
 	// object under test
 	private StaxEventItemWriter writer;
@@ -67,7 +67,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	public void testRollback() throws Exception {
 		writer.write(record);
 		// rollback
-		writer.reset();
+		writer.clear();
 		assertEquals("", outputFileContent());
 	}
 
@@ -77,7 +77,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	public void testCommit() throws Exception {
 		writer.write(record);
 		// commit
-		writer.mark();
+		writer.flush();
 		assertTrue(outputFileContent().contains(TEST_STRING));
 	}
 
@@ -126,7 +126,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 	/**
 	 * Open method writes the root tag, close method adds corresponding end tag.
 	 */
-	public void testOpenAndClose() throws IOException {
+	public void testOpenAndClose() throws Exception {
 		writer.setRootTagName("testroot");
 		writer.setRootElementAttributes(new HashMap() {
 			{
@@ -134,7 +134,7 @@ public class StaxEventWriterItemWriterTests extends TestCase {
 			}
 		});
 		writer.open();
-		writer.mark();
+		writer.flush();
 
 		assertTrue(outputFileContent().indexOf("<testroot attribute=\"value\"") != NOT_FOUND);
 

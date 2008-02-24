@@ -67,6 +67,10 @@ public class PropertyExtractingDelegatingItemWriter extends AbstractMethodInvoki
 	}
 
 
-	public void close() throws Exception {
+	public void clear() throws Exception {
+	}
+
+
+	public void flush() throws Exception {
 	}
 }

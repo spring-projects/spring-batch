@@ -146,32 +146,7 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	 * @see org.springframework.batch.repeat.RepeatListener#close(org.springframework.batch.repeat.RepeatContext)
 	 */
 	public void close(RepeatContext context) {
-		try {
-			if (delegate instanceof RepeatListener) {
-				RepeatListener interceptor = (RepeatListener) delegate;
-				interceptor.close(context);
-			}
-			flush();
-		} catch (RuntimeException e) {
-			synchronized (failed) {
-				failed.addAll(getProcessed());
-			}
-			// onError will not be called after close() by the framework so we
-			// have to do it here.
-			onError(context, e);
-			throw e;
-		}
-		unsetContext();
-	}
 
-	/**
-	 * Wrapper for Hibernate flush.
-	 */
-	private void flush() {
-		hibernateTemplate.flush();
-		// This should happen when the transaction commits anyway, but to be
-		// sure...
-		hibernateTemplate.clear();
 	}
 
 	/**
@@ -246,7 +221,7 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	 * 
 	 * @return the context
 	 */
-	private void flushIfNecessary(Object output) {
+	private void flushIfNecessary(Object output) throws Exception{
 		RepeatContext context = (RepeatContext) TransactionSynchronizationManager.getResource(WRITER_REPEAT_CONTEXT);
 		boolean flush;
 		synchronized (failed) {
@@ -262,6 +237,36 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 			flush();
 		}
 
+	}
+
+	public void clear() throws Exception {
+		if(delegate != null){
+			delegate.clear();
+		}
+		hibernateTemplate.clear();
+	}
+
+	/**
+	 * Flush the Hibernate session.  The delegate flush will also be called before finishing.
+	 */
+	public void flush() throws Exception {
+		try {
+			if (delegate != null) {
+				delegate.flush();
+			}
+			hibernateTemplate.flush();
+			// This should happen when the transaction commits anyway, but to be
+			// sure...
+			hibernateTemplate.clear();
+		} catch (RuntimeException e) {
+			synchronized (failed) {
+				failed.addAll(getProcessed());
+			}
+			// This used to contain a call to onError, however, I think this
+			// should be handled within the step.
+			throw e;
+		}
+		unsetContext();
 	}
 
 }

@@ -52,6 +52,10 @@ import org.springframework.util.Assert;
  * 
  * Use {@link #write(String)} method to output a line to an item writer.
  * 
+ * <p>This class will be updated in the future to use a buffering approach
+ * to handling transactions, rather than outputting directly to the file and
+ * truncating on rollback</p>
+ * 
  * @author Waseem Malik
  * @author Tomas Slanina
  * @author Robert Kasanicky
@@ -465,23 +469,31 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 		return true;
 	}
 
-	/*
+	/* To be deleted once interface changes are complete
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
-		getOutputState().mark();
+		
 	}
 
-	/*
+	/* To be deleted once interface changes are complete
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() throws ResetFailedException {
+
+	}
+
+	public void clear() throws Exception {
 		try {
 			getOutputState().reset();
 		} catch (BatchCriticalException e) {
 			throw new ResetFailedException(e);
 		}
+	}
+
+	public void flush() throws Exception {
+		getOutputState().mark();
 	}
 }

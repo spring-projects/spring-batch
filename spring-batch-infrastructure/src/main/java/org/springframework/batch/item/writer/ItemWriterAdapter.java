@@ -37,11 +37,15 @@ public class ItemWriterAdapter extends AbstractMethodInvokingDelegator implement
     /*
      * No-op, can't call more than one method.
      * 
-     * (non-Javadoc)
-     * @see org.springframework.batch.item.ItemWriter#close()
      */
-	public void close() throws Exception {
-		
+	public void clear() throws Exception {
+	}
+
+    /*
+     * No-op, can't call more than one method.
+     * 
+     */
+	public void flush() throws Exception {
 	}
 	
 }

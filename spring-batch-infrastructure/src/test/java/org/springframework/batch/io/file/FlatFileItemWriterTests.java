@@ -24,7 +24,6 @@ import java.util.Collections;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.core.io.FileSystemResource;
@@ -302,12 +301,12 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals(0, streamContext.getLong(FlatFileItemWriter.RESTART_DATA_NAME));
 	}
 
-	private void commit() {
-		((ItemStream) inputSource).mark();
+	private void commit() throws Exception{
+		inputSource.flush();
 	}
 
-	private void rollback() {
-		((ItemStream) inputSource).reset();
+	private void rollback() throws Exception{
+		inputSource.clear();
 	}
 
 }

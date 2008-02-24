@@ -1,6 +1,5 @@
 package org.springframework.batch.item.writer;
 
-import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -11,7 +10,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class DelegatingItemWriter implements ItemWriter, Skippable, InitializingBean {
+public class DelegatingItemWriter implements ItemWriter, InitializingBean {
 
 	private ItemWriter writer;
 
@@ -43,14 +42,22 @@ public class DelegatingItemWriter implements ItemWriter, Skippable, Initializing
 		this.writer = writer;
 	}
 
-	public void skip() {
-		if (writer instanceof Skippable) {
-			((Skippable) writer).skip();
-		}
-	}
-
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(writer);
+	}
+
+	/**
+	 * Delegates to {@link ItemWriter#clear()}
+	 */
+	public void clear() throws Exception {
+		writer.clear();
+	}
+
+	/**
+	 * Delegates to {@link ItemWriter#flush()}
+	 */
+	public void flush() throws Exception {
+		writer.flush();
 	}
 
 }

@@ -73,6 +73,14 @@ public class HibernateAwareItemWriterTests extends TestCase {
 
 		public void close() throws Exception {
 		}
+
+		public void clear() throws Exception {
+			list.add("clear");
+		}
+
+		public void flush() throws Exception {
+			list.add("flush");
+		}
 	}
 
 	HibernateAwareItemWriter writer = new HibernateAwareItemWriter();
@@ -148,7 +156,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.io.support.HibernateAwareItemWriter#write(java.lang.Object)}.
 	 */
-	public void testCloseWithFailure() {
+	public void testCloseWithFailure() throws Exception{
 		final RuntimeException ex = new RuntimeException("bar");
 		writer.setHibernateTemplate(new HibernateTemplate() {
 			public void flush() throws DataAccessException {
@@ -156,14 +164,13 @@ public class HibernateAwareItemWriterTests extends TestCase {
 			}
 		});
 		try {
-			writer.close(context);
+			writer.flush();
 			fail("Expected RuntimeException");
 		} catch (RuntimeException e) {
 			assertEquals("bar", e.getMessage());
 		}
-		assertEquals(2, list.size());
-		assertTrue(list.contains(ex));
-		assertTrue(list.contains(context));
+		assertEquals(1, list.size());
+		assertTrue(list.contains("flush"));
 	}
 
 	/**
@@ -180,14 +187,13 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		});
 		writer.write("foo");
 		try {
-			writer.close(context);
+			writer.flush();
 			fail("Expected RuntimeException");
 		} catch (RuntimeException e) {
 			assertEquals("bar", e.getMessage());
 		}
-		assertEquals(3, list.size());
-		assertTrue(list.contains(ex));
-		assertTrue(list.contains(context));
+		assertEquals(2, list.size());
+		assertTrue(list.contains("flush"));
 		writer.setHibernateTemplate(new HibernateTemplateWrapper() {
 			public void flush() throws DataAccessException {
 				list.add("flush");
@@ -221,8 +227,8 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.io.support.HibernateAwareItemWriter#close(org.springframework.batch.repeat.RepeatContext)}.
 	 */
-	public void testClose() {
-		writer.close(context);
+	public void testFlush() throws Exception{
+		writer.flush();
 		assertEquals(3, list.size());
 		assertTrue(list.contains("flush"));
 	}
@@ -231,11 +237,11 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.io.support.HibernateAwareItemWriter#close(org.springframework.batch.repeat.RepeatContext)}.
 	 */
-	public void testCloseAfterClear() {
+	public void testCloseAfterClear() throws Exception{
 		Map map = TransactionSynchronizationManager.getResourceMap();
 		String key = (String) map.keySet().iterator().next();
 		TransactionSynchronizationManager.unbindResource(key);
-		writer.close(context);
+		writer.flush();
 		assertEquals(3, list.size());
 		assertTrue(list.contains("flush"));
 		assertTrue(list.contains("clear"));
