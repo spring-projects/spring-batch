@@ -25,6 +25,10 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.beans.factory.InitializingBean;
 
+/**
+ * Mock {@link ItemWriter} that will throw an exception when a certain
+ * number of items have been written. 
+ */
 public class EmptyItemWriter implements ItemWriter, InitializingBean {
 
 	private boolean failed = false;
@@ -56,6 +60,14 @@ public class EmptyItemWriter implements ItemWriter, InitializingBean {
 
 	public List getList() {
 		return list;
+	}
+
+	public void clear() throws Exception {
+		//no-op
+	}
+
+	public void flush() throws Exception {
+		//no-op
 	}
 
 }

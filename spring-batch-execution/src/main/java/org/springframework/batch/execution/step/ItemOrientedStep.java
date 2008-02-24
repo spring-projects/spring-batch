@@ -311,6 +311,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 						}
 
+						itemWriter.flush();
 						streamManager.commit(transaction);
 
 					}
@@ -326,6 +327,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 							stepExecution.rollback();
 						}
 						try {
+							itemWriter.clear();
 							streamManager.rollback(transaction);
 						}
 						catch (ResetFailedException e) {

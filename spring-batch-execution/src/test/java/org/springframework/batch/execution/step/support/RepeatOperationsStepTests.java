@@ -25,10 +25,9 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.execution.step.ItemOrientedStep;
-import org.springframework.batch.execution.step.support.RepeatOperationsStep;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ItemReaderAdapter;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.item.writer.ItemWriterAdapter;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.interceptor.RepeatListenerAdapter;
@@ -87,7 +86,7 @@ public class RepeatOperationsStepTests extends TestCase {
 			public Object read() throws Exception {
 				throw new NullPointerException();
 			}});
-		configuration.setItemWriter(new ItemWriter(){
+		configuration.setItemWriter(new AbstractItemWriter(){
 			public void write(Object item) throws Exception {
 			}});
 		configuration.setChunkOperations(repeatTemplate);
@@ -127,7 +126,7 @@ public class RepeatOperationsStepTests extends TestCase {
 			public Object read() throws Exception {
 				return new Object();
 			}});
-		configuration.setItemWriter(new ItemWriter(){
+		configuration.setItemWriter(new AbstractItemWriter(){
 			public void write(Object item) throws Exception {
 			}});
 		configuration.setChunkOperations(chunkTemplate);

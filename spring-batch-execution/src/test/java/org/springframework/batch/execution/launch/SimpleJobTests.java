@@ -35,7 +35,6 @@ import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.step.AbstractStep;
 import org.springframework.batch.execution.step.support.RepeatOperationsStep;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.item.writer.AbstractItemWriter;
@@ -44,7 +43,6 @@ import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 public class SimpleJobTests extends TestCase {
 

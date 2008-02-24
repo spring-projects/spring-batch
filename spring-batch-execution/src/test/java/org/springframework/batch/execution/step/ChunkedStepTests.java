@@ -34,12 +34,9 @@ import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.ItemChunker;
 import org.springframework.batch.execution.step.support.ItemDechunker;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.item.reader.ListItemReader;
-import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
@@ -47,7 +44,6 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.interceptor.RepeatListenerAdapter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 /**
@@ -226,7 +222,7 @@ public class ChunkedStepTests extends TestCase {
 	
 	public void testWriterFailure(){
 		
-		ItemWriter itemWriter = new ItemWriter(){
+		ItemWriter itemWriter = new AbstractItemWriter(){
 			public void write(Object item) throws Exception {
 				throw new RuntimeException();
 			}
@@ -513,55 +509,55 @@ public class ChunkedStepTests extends TestCase {
 //		}
 //	}
 //	
-	private class MockRestartableItemReader extends ItemStreamAdapter implements ItemReader {
-
-		private boolean getExecutionAttributesCalled = false;
-
-		private boolean restoreFromCalled = false;
-
-		private boolean restoreFromCalledWithSomeContext = false;
-		
-		private int counter = 0;
-
-		public Object read() throws Exception {
-			StepSynchronizationManager.getContext().setAttribute("TASKLET_TEST", this);
-			counter++;
-			if(counter > 4){
-				return "item";
-			}
-			else{
-				return null;
-			}
-		}
-
-		public boolean isRestoreFromCalledWithSomeContext() {
-			return restoreFromCalledWithSomeContext;
-		}
-
-		public ExecutionContext getExecutionContext() {
-			getExecutionAttributesCalled = true;
-			return new ExecutionContext(PropertiesConverter.stringToProperties("spam=bucket"));
-		}
-
-		public void restoreFrom(ExecutionContext data) {
-			restoreFromCalled = true;
-			restoreFromCalledWithSomeContext = data.getProperties().size() > 0;
-		}
-
-		public boolean isGetExecutionAttributesCalled() {
-			return getExecutionAttributesCalled;
-		}
-
-		public boolean isRestoreFromCalled() {
-			return restoreFromCalled;
-		}
-
-		public void open() throws StreamException {
-		}
-
-		public void close() throws StreamException {
-		}
-
-	}
+//	private class MockRestartableItemReader extends ItemStreamAdapter implements ItemReader {
+//
+//		private boolean getExecutionAttributesCalled = false;
+//
+//		private boolean restoreFromCalled = false;
+//
+//		private boolean restoreFromCalledWithSomeContext = false;
+//		
+//		private int counter = 0;
+//
+//		public Object read() throws Exception {
+//			StepSynchronizationManager.getContext().setAttribute("TASKLET_TEST", this);
+//			counter++;
+//			if(counter > 4){
+//				return "item";
+//			}
+//			else{
+//				return null;
+//			}
+//		}
+//
+//		public boolean isRestoreFromCalledWithSomeContext() {
+//			return restoreFromCalledWithSomeContext;
+//		}
+//
+//		public ExecutionContext getExecutionContext() {
+//			getExecutionAttributesCalled = true;
+//			return new ExecutionContext(PropertiesConverter.stringToProperties("spam=bucket"));
+//		}
+//
+//		public void restoreFrom(ExecutionContext data) {
+//			restoreFromCalled = true;
+//			restoreFromCalledWithSomeContext = data.getProperties().size() > 0;
+//		}
+//
+//		public boolean isGetExecutionAttributesCalled() {
+//			return getExecutionAttributesCalled;
+//		}
+//
+//		public boolean isRestoreFromCalled() {
+//			return restoreFromCalled;
+//		}
+//
+//		public void open() throws StreamException {
+//		}
+//
+//		public void close() throws StreamException {
+//		}
+//
+//	}
 
 }

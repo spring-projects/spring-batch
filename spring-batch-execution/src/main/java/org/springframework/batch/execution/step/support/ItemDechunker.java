@@ -69,11 +69,13 @@ public class ItemDechunker implements Dechunker {
 					skippedItems.add(new WriteFailureException(ex, item));
 				}
 				else{
+					itemWriter.clear();
 					rethrow(ex);
 				}
 			}
 		}
 		
+		itemWriter.flush();
 		return new DechunkingResult(true, chunk.getId(), skippedItems);
 	}
 	
