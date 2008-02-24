@@ -29,9 +29,6 @@ import org.springframework.batch.item.exception.StreamException;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -193,28 +190,6 @@ public class SimpleStreamManager implements StreamManager {
 	 */
 	public TransactionStatus getTransaction(final Object key) {
 		TransactionStatus transaction = transactionManager.getTransaction(new DefaultTransactionDefinition());
-		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-			public void afterCompletion(int status) {
-				if (status == TransactionSynchronization.STATUS_COMMITTED) {
-					iterate(key, new Callback() {
-						public void execute(ItemStream stream) {
-							if (stream.isMarkSupported()) {
-								stream.mark();
-							}
-						}
-					});
-				}
-				else if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-					iterate(key, new Callback() {
-						public void execute(ItemStream stream) {
-							if (stream.isMarkSupported()) {
-								stream.reset();
-							}
-						}
-					});
-				}
-			}
-		});
 		return transaction;
 	}
 

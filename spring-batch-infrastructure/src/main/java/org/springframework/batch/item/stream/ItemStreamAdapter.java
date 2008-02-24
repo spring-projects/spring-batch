@@ -65,14 +65,12 @@ public class ItemStreamAdapter implements ItemStream {
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
-		throw new UnsupportedOperationException("Mark operation not supported.");
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() {
-		throw new UnsupportedOperationException("Reset operation not supported.");
 	}
 
 }

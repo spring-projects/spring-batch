@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.batch.item.exception.MarkFailedException;
-import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.item.exception.StreamException;
 
 /**
@@ -61,49 +59,4 @@ public interface ItemStream extends ExecutionContextProvider {
 	 * (except open) may throw an exception.
 	 */
 	void close() throws StreamException;
-
-	/**
-	 * Clients are expected to check this flag before calling mark or reset.<br/>
-	 * 
-	 * Implementations should also document explicitly, if mark is supported,
-	 * how it will behave in a multi-threaded environment. Generally, if the
-	 * stream is being accessed from multiple threads concurrently, it will have
-	 * to manage that internally, and also reflect only the completed marks
-	 * (independent of the order they happen) when
-	 * {@link ExecutionContextProvider#getExecutionContext()} is called.
-	 * 
-	 * @return true if mark and reset are supported by the {@link ItemStream}
-	 */
-	boolean isMarkSupported();
-
-	/**
-	 * Mark the stream so that it can be reset later and the items backed out.
-	 * After this method is called the result will be reflected in subsequent
-	 * calls to {@link ExecutionContextProvider#getExecutionContext()}.<br/>
-	 * 
-	 * In a multi-threaded setting implementations have to ensure that only the
-	 * state from the current thread is saved.
-	 * 
-	 * @throws UnsupportedOperationException if the operation is not supported
-	 * @throws MarkFailedException if there is a problem with the mark. If a
-	 * mark fails inside a transaction, it would be worrying, but not normally
-	 * fatal.
-	 */
-	void mark() throws MarkFailedException;
-
-	/**
-	 * Reset the stream to the last mark. After a reset the stream state will be
-	 * such that changes (items read or written) since the last call to mark
-	 * will not be visible after a call to close.<br/>
-	 * 
-	 * In a multi-threaded setting implementations have to ensure that only the
-	 * state from the current thread is reset.
-	 * 
-	 * @throws UnsupportedOperationException if the operation is not supported
-	 * @throws ResetFailedException if there is a problem with the reset. If a
-	 * reset fails inside a transaction, it would normally be fatal, and would
-	 * leave the stream in an inconsistent state. So while this is an unchecked
-	 * exception, it may be important for a client to catch it explicitly.
-	 */
-	void reset() throws ResetFailedException;
 }

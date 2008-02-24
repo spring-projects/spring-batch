@@ -172,25 +172,6 @@ public class SimpleStreamManagerTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#commit(org.springframework.transaction.TransactionStatus)}.
 	 */
-	public void testCommit() {
-		manager.register("foo", new ItemStreamAdapter() {
-			public boolean isMarkSupported() {
-				return true;
-			}
-
-			public void mark() {
-				list.add("bar");
-			}
-		});
-		TransactionStatus status = manager.getTransaction("foo");
-		manager.commit(status);
-		assertEquals(1, list.size());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#commit(org.springframework.transaction.TransactionStatus)}.
-	 */
 	public void testCommitWithoutMark() {
 		manager.register("foo", new ItemStreamAdapter() {
 			public void mark() {
@@ -200,25 +181,6 @@ public class SimpleStreamManagerTests extends TestCase {
 		TransactionStatus status = manager.getTransaction("foo");
 		manager.commit(status);
 		assertEquals(0, list.size());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#rollback(org.springframework.transaction.TransactionStatus)}.
-	 */
-	public void testRollback() {
-		manager.register("foo", new ItemStreamAdapter() {
-			public boolean isMarkSupported() {
-				return true;
-			}
-
-			public void reset() {
-				list.add("bar");
-			}
-		});
-		TransactionStatus status = manager.getTransaction("foo");
-		manager.rollback(status);
-		assertEquals(1, list.size());
 	}
 
 	/**

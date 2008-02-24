@@ -33,10 +33,10 @@ import org.springframework.util.Assert;
  */
 public class DelegatingItemReader extends AbstractItemReader implements Skippable, InitializingBean, ItemStream {
 
-	private ItemReader inputSource;
+	private ItemReader itemReader;
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(inputSource, "ItemReader must not be null.");
+		Assert.notNull(itemReader, "ItemReader must not be null.");
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
 	public Object read() throws Exception {
-		return inputSource.read();
+		return itemReader.read();
 	}
 
 	/**
@@ -54,8 +54,8 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 * {@link ItemStream}.
 	 */
 	public ExecutionContext getExecutionContext() {
-		if (inputSource instanceof ItemStream) {
-			return ((ItemStream) inputSource).getExecutionContext();
+		if (itemReader instanceof ItemStream) {
+			return ((ItemStream) itemReader).getExecutionContext();
 		}
 		return new ExecutionContext();
 	}
@@ -66,8 +66,8 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 * {@link ItemStream}.
 	 */
 	public void restoreFrom(ExecutionContext data) {
-		if (inputSource instanceof ItemStream) {
-			((ItemStream) inputSource).restoreFrom(data);
+		if (itemReader instanceof ItemStream) {
+			((ItemStream) itemReader).restoreFrom(data);
 		}
 	}
 
@@ -76,16 +76,16 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 * @param source
 	 */
 	public void setItemReader(ItemReader source) {
-		this.inputSource = source;
+		this.itemReader = source;
 	}
 
 	public ItemReader getItemReader() {
-		return inputSource;
+		return itemReader;
 	}
 
 	public void skip() {
-		if (inputSource instanceof Skippable) {
-			((Skippable) inputSource).skip();
+		if (itemReader instanceof Skippable) {
+			((Skippable) itemReader).skip();
 		}
 	}
 
@@ -94,8 +94,8 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 * @see org.springframework.batch.item.ItemStream#open()
 	 */
 	public void open() throws StreamException {
-		if (inputSource instanceof ItemStream) {
-			((ItemStream) inputSource).open();
+		if (itemReader instanceof ItemStream) {
+			((ItemStream) itemReader).open();
 		}
 	}
 
@@ -104,21 +104,9 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 * @see org.springframework.batch.item.ItemStream#open()
 	 */
 	public void close() throws StreamException {
-		if (inputSource instanceof ItemStream) {
-			((ItemStream) inputSource).close();
+		if (itemReader instanceof ItemStream) {
+			((ItemStream) itemReader).close();
 		}
-	}
-
-	/**
-	 * Delegates the call if the delegate is an {@link ItemStream}.
-	 * 
-	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
-	 */
-	public boolean isMarkSupported() {
-		if (inputSource instanceof ItemStream) {
-			return ((ItemStream) inputSource).isMarkSupported();
-		}
-		return false;
 	}
 
 	/*
@@ -126,9 +114,7 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
-		if (inputSource instanceof ItemStream) {
-			((ItemStream) inputSource).mark();
-		}
+		itemReader.mark();
 	}
 
 	/*
@@ -136,8 +122,6 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() {
-		if (inputSource instanceof ItemStream) {
-			((ItemStream) inputSource).reset();
-		}
+		itemReader.reset();
 	}
 }

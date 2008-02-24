@@ -225,11 +225,11 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 	}
 
 	private void commit() {
-		((ItemStream) reader).mark();
+		reader.mark();
 	}
 
 	private void rollback() {
-		((ItemStream) reader).reset();
+		reader.reset();
 	}
 
 	private Skippable getAsSkippable(ItemReader source) {
