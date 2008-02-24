@@ -27,8 +27,6 @@ import org.springframework.batch.io.exception.ReadFailureException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.exception.MarkFailedException;
-import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.util.Assert;
 
@@ -59,6 +57,7 @@ public class ItemChunker implements Chunker {
 	public ChunkingResult chunk(int size, StepContribution stepContribution) throws ReadFailureException {
 		Assert.isTrue(size > 0, "Chunk size must be greater than 0");
 
+		itemReader.mark();
 		int counter = 0;
 		List items = new ArrayList(size);
 		List exceptions = new ArrayList();
@@ -75,6 +74,7 @@ public class ItemChunker implements Chunker {
 			} catch (Exception ex) {
 				exceptions.add(ex);
 				if(!itemSkipPolicy.shouldSkip(ex, stepContribution)){
+					itemReader.reset();
 					rethrow(ex);
 				}
 			}
@@ -108,29 +108,9 @@ public class ItemChunker implements Chunker {
 		}
 	}
 
-	public boolean isMarkSupported() {
-		if(itemReader instanceof ItemStream){
-			return ((ItemStream)itemReader).isMarkSupported();
-		}
-		
-		return false;
-	}
-
-	public void mark() throws MarkFailedException {
-		if(itemReader instanceof ItemStream){
-			((ItemStream)itemReader).mark();
-		}
-	}
-
 	public void open() throws StreamException {
 		if(itemReader instanceof ItemStream){
 			((ItemStream)itemReader).open();
-		}
-	}
-
-	public void reset() throws ResetFailedException {
-		if(itemReader instanceof ItemStream){
-			((ItemStream)itemReader).reset();
 		}
 	}
 

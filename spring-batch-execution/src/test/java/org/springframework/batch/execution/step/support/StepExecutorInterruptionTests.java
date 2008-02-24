@@ -34,7 +34,7 @@ import org.springframework.batch.execution.repository.dao.JobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.reader.ItemReaderAdapter;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -80,7 +80,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		final String stepName = (String) steps.get(0);
 		JobExecution jobExecutionContext = new JobExecution(new JobInstance(new Long(0L), new JobParameters()));
 		final StepExecution stepExecution = new StepExecution(stepName, jobExecutionContext);
-		step.setItemReader(new ItemReader() {
+		step.setItemReader(new AbstractItemReader() {
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
 				double foo = 1;

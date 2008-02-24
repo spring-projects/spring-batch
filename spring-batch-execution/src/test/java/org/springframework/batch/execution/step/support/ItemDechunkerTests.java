@@ -64,6 +64,7 @@ public class ItemDechunkerTests extends TestCase {
 		
 		itemWriter.write("1");
 		itemWriter.write("2");
+		itemWriter.flush();
 		writerControl.replay();
 		dechunker.dechunk(chunk, stepContribution);
 		writerControl.verify();
@@ -75,6 +76,7 @@ public class ItemDechunkerTests extends TestCase {
 		itemWriter.write("1");
 		itemWriter.write("2");
 		writerControl.setThrowable(new Exception());
+		itemWriter.flush();
 		writerControl.replay();
 		DechunkingResult result = dechunker.dechunk(chunk, stepContribution);
 		writerControl.verify();
@@ -89,6 +91,7 @@ public class ItemDechunkerTests extends TestCase {
 		itemWriter.write("1");
 		itemWriter.write("2");
 		writerControl.setThrowable(new NullPointerException());
+		itemWriter.clear();
 		writerControl.replay();
 		try{
 			dechunker.dechunk(chunk, stepContribution);

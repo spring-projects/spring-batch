@@ -36,6 +36,7 @@ import org.springframework.batch.execution.step.support.ItemDechunker;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.writer.AbstractItemWriter;
@@ -118,7 +119,7 @@ public class ChunkedStepTests extends TestCase {
 		final JobExecution jobExecution = new JobExecution(jobInstance);
 		final StepExecution stepExecution = new StepExecution("testStep", jobExecution);
 
-		chunkedStep.setChunker(new ItemChunker(new ItemReader() {
+		chunkedStep.setChunker(new ItemChunker(new AbstractItemReader() {
 			int counter = 0;
 			public Object read() throws Exception {
 				assertNotNull(StepSynchronizationManager.getContext().getStepExecution());
@@ -192,7 +193,7 @@ public class ChunkedStepTests extends TestCase {
 	//fail.
 	public void testReadFailure() {
 
-		ItemReader itemReader = new ItemReader() {
+		ItemReader itemReader = new AbstractItemReader() {
 			int counter = 0;
 			public Object read() throws Exception {
 				
@@ -242,7 +243,7 @@ public class ChunkedStepTests extends TestCase {
 
 	public void testExitCodeDefaultClassification() throws Exception {
 
-		ItemReader itemReader = new ItemReader() {
+		ItemReader itemReader = new AbstractItemReader() {
 			int counter = 0;
 			public Object read() throws Exception {
 				counter++;

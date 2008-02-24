@@ -16,6 +16,8 @@
 package org.springframework.batch.execution.step.support;
 
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.exception.MarkFailedException;
+import org.springframework.batch.item.exception.ResetFailedException;
 
 public class MockItemReader implements ItemReader {
 
@@ -55,6 +57,12 @@ public class MockItemReader implements ItemReader {
 	public Object getKey(Object item) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void mark() throws MarkFailedException {
+	}
+	
+	public void reset() throws ResetFailedException {
 	}
 
 }

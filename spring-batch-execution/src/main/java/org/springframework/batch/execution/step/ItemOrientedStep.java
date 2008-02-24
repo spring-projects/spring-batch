@@ -279,7 +279,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 					TransactionStatus transaction = streamManager.getTransaction(stepExecution);
 
 					try {
-
+						itemReader.mark();
 						result = processChunk(contribution);
 
 						// TODO: check that stepExecution can
@@ -327,6 +327,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 							stepExecution.rollback();
 						}
 						try {
+							itemReader.reset();
 							itemWriter.clear();
 							streamManager.rollback(transaction);
 						}

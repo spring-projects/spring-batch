@@ -46,6 +46,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.item.exception.StreamException;
+import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.batch.item.stream.SimpleStreamManager;
@@ -159,7 +160,7 @@ public class ItemOrientedStepTests extends TestCase {
 		final JobExecution jobExecution = new JobExecution(jobInstance);
 		final StepExecution stepExecution = new StepExecution(step, jobExecution);
 
-		itemOrientedStep.setItemReader(new ItemReader() {
+		itemOrientedStep.setItemReader(new AbstractItemReader() {
 			public Object read() throws Exception {
 				assertEquals(step, stepExecution.getStepName());
 				assertNotNull(StepSynchronizationManager.getContext().getStepExecution());
@@ -214,7 +215,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 	public void testIncrementRollbackCount() {
 
-		ItemReader itemReader = new ItemReader() {
+		ItemReader itemReader = new AbstractItemReader() {
 
 			public Object read() throws Exception {
 				int counter = 0;
@@ -245,7 +246,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 	public void testExitCodeDefaultClassification() throws Exception {
 
-		ItemReader itemReader = new ItemReader() {
+		ItemReader itemReader = new AbstractItemReader() {
 
 			public Object read() throws Exception {
 				int counter = 0;
@@ -348,7 +349,7 @@ public class ItemOrientedStepTests extends TestCase {
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
 		String step = "stepName";
 //		step.setStepExecutionCount(1);
-		itemOrientedStep.setItemReader(new ItemReader() {
+		itemOrientedStep.setItemReader(new AbstractItemReader() {
 			public Object read() throws Exception {
 				return "foo";
 			}
@@ -402,7 +403,7 @@ public class ItemOrientedStepTests extends TestCase {
 	public void testStreamManager() throws Exception {
 		String step = "stepName";
 //		step.setStepExecutionCount(1);
-		itemOrientedStep.setItemReader(new ItemReader() {
+		itemOrientedStep.setItemReader(new AbstractItemReader() {
 			public Object read() throws Exception {
 				return "foo";
 			}
@@ -484,7 +485,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		itemOrientedStep.setInterruptionPolicy(interruptionPolicy);
 
-		ItemReader itemReader = new ItemReader() {
+		ItemReader itemReader = new AbstractItemReader() {
 
 			public Object read() throws Exception {
 				int counter = 0;
@@ -523,7 +524,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 	public void testStatusForResetFailedException() throws Exception {
 
-		ItemReader itemReader = new ItemReader() {
+		ItemReader itemReader = new AbstractItemReader() {
 			public Object read() throws Exception {
 				// Trigger a rollback
 				throw new RuntimeException("Foo");

@@ -25,7 +25,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.execution.step.ItemOrientedStep;
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.reader.ItemReaderAdapter;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.item.writer.ItemWriterAdapter;
@@ -82,7 +82,7 @@ public class RepeatOperationsStepTests extends TestCase {
 		});
 		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		ItemOrientedStep configuration = new ItemOrientedStep();
-		configuration.setItemReader(new ItemReader(){
+		configuration.setItemReader(new AbstractItemReader(){
 			public Object read() throws Exception {
 				throw new NullPointerException();
 			}});
@@ -122,7 +122,7 @@ public class RepeatOperationsStepTests extends TestCase {
 		});
 		stepTemplate.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		RepeatOperationsStep configuration = new RepeatOperationsStep();
-		configuration.setItemReader(new ItemReader(){
+		configuration.setItemReader(new AbstractItemReader(){
 			public Object read() throws Exception {
 				return new Object();
 			}});

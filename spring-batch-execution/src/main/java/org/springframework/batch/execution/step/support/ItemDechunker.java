@@ -20,16 +20,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.domain.Chunk;
-import org.springframework.batch.core.domain.DechunkingResult;
 import org.springframework.batch.core.domain.Dechunker;
+import org.springframework.batch.core.domain.DechunkingResult;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.io.exception.WriteFailureException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.exception.MarkFailedException;
-import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.util.Assert;
 
@@ -99,30 +97,9 @@ public class ItemDechunker implements Dechunker {
 		}
 	}
 
-	public boolean isMarkSupported() {
-		if(itemWriter instanceof ItemStream){
-			return ((ItemStream)itemWriter).isMarkSupported();
-		}
-		else{
-			return false;
-		}
-	}
-
-	public void mark() throws MarkFailedException {
-		if(itemWriter instanceof ItemStream){
-			((ItemStream)itemWriter).mark();
-		}
-	}
-
 	public void open() throws StreamException {
 		if(itemWriter instanceof ItemStream){
 			((ItemStream)itemWriter).open();
-		}
-	}
-
-	public void reset() throws ResetFailedException {
-		if(itemWriter instanceof ItemStream){
-			((ItemStream)itemWriter).reset();
 		}
 	}
 
