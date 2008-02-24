@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.sample.dao.JdbcCustomerDebitWriter;
 import org.springframework.batch.sample.domain.CustomerDebit;
 import org.springframework.batch.sample.domain.Trade;
@@ -27,7 +27,7 @@ import org.springframework.batch.sample.domain.Trade;
  * 
  * @author Robert Kasanicky
  */
-public class CustomerUpdateWriter implements ItemWriter {
+public class CustomerUpdateWriter extends AbstractItemWriter {
     private JdbcCustomerDebitWriter dao;
 
     public void write(Object data) {

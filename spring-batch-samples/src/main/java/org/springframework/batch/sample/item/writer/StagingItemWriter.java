@@ -76,4 +76,10 @@ public class StagingItemWriter extends JdbcDaoSupport implements
 	public void close() throws Exception {
 	}
 
+	public void clear() throws Exception {
+	}
+
+	public void flush() throws Exception {
+	}
+
 }

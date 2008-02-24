@@ -18,13 +18,13 @@ package org.springframework.batch.sample.item.writer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
 
 
 
-public class TradeWriter implements ItemWriter {
+public class TradeWriter extends AbstractItemWriter {
     private static Log log = LogFactory.getLog(TradeWriter.class);
     private TradeDao dao;
     

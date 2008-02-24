@@ -1,10 +1,10 @@
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.sample.dao.PlayerDao;
 import org.springframework.batch.sample.domain.Player;
 
-public class PlayerItemWriter implements ItemWriter {
+public class PlayerItemWriter extends AbstractItemWriter {
 
 	PlayerDao playerDao;
 	

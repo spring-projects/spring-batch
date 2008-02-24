@@ -31,4 +31,10 @@ public class JdbcPlayerSummaryDao extends JdbcDaoSupport implements ItemWriter {
 	public void close() throws Exception {
 	}
 
+	public void clear() throws Exception {
+	}
+
+	public void flush() throws Exception {
+	}
+
 }

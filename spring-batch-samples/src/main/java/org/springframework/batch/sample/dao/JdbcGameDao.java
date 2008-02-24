@@ -34,7 +34,10 @@ public class JdbcGameDao extends JdbcDaoSupport implements ItemWriter {
 		this.getJdbcTemplate().update(INSERT_GAME, args);
 	}
 
-	public void close() throws Exception {
+	public void clear() throws Exception {
+	}
+
+	public void flush() throws Exception {
 	}
 
 }

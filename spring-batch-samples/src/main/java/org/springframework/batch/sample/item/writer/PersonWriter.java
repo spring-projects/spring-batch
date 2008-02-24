@@ -18,12 +18,12 @@ package org.springframework.batch.sample.item.writer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.sample.domain.Person;
 
 
 
-public class PersonWriter implements ItemWriter {
+public class PersonWriter extends AbstractItemWriter {
     private static Log log = LogFactory.getLog(PersonWriter.class);
  
     public void write(Object data) {

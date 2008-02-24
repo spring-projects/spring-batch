@@ -19,7 +19,7 @@ package org.springframework.batch.sample.tasklet;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ExecutionContextProvider;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.util.Assert;
@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class SimpleTradeWriter implements ItemWriter, ExecutionContextProvider {
+public class SimpleTradeWriter extends AbstractItemWriter implements ExecutionContextProvider {
 
 	/*
 	 * writes a Trade object to output

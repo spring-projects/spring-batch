@@ -2,7 +2,7 @@ package org.springframework.batch.sample.item.writer;
 
 import java.math.BigDecimal;
 
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.sample.dao.CustomerCreditDao;
 import org.springframework.batch.sample.domain.CustomerCredit;
 
@@ -11,7 +11,7 @@ import org.springframework.batch.sample.domain.CustomerCredit;
  * 
  * @author Robert Kasanicky
  */
-public class CustomerCreditIncreaseWriter implements ItemWriter {
+public class CustomerCreditIncreaseWriter extends AbstractItemWriter {
 
 	public static final BigDecimal FIXED_AMOUNT = new BigDecimal(1000);
 	

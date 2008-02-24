@@ -1,6 +1,6 @@
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.writer.AbstractItemWriter;
 
 /**
  * Simulates temporary output trouble - requires to
@@ -8,7 +8,7 @@ import org.springframework.batch.item.ItemWriter;
  * 
  * @author Robert Kasanicky
  */
-public class RetrySampleItemWriter implements ItemWriter {
+public class RetrySampleItemWriter extends AbstractItemWriter {
 
 	private int counter = 0;
 	
