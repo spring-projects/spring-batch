@@ -124,11 +124,6 @@
 		<property name="chunkSize" value="1" />
 	</bean>
 	
-	<bean id="repeatOperationsStep" parent="abstractStep"
-		class="org.springframework.batch.execution.step.RepeatOperationsStep"
-		abstract="true">
-	</bean>
-
 	<bean id="customEditorConfigurer"
 		class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 		<property name="customEditors">

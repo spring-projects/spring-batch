@@ -18,7 +18,7 @@
 		<!-- set restartable=false so that this job can be used by more than one test -->
 		<property name="restartable" value="false" />
 		<property name="steps">
-			<bean id="step1" parent="repeatOperationsStep">
+			<bean id="step1" parent="simpleStep">
 				<property name="itemReader" ref="hibernateItemReader" />
 				<property name="itemWriter" ref="hibernateOutputSource" />
 

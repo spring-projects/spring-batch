@@ -32,7 +32,7 @@ import org.springframework.batch.execution.repository.dao.JobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
-import org.springframework.batch.execution.step.RepeatOperationsStep;
+import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.reader.ItemReaderAdapter;
 import org.springframework.batch.item.writer.AbstractItemWriter;
@@ -50,14 +50,14 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private StepExecutionDao stepExecutionDao = new MapStepDao();
 
-	private RepeatOperationsStep step;
+	private ItemOrientedStep step;
 
 	public void setUp() throws Exception {
 
 		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao);
 
 		JobSupport jobConfiguration = new JobSupport();
-		step = new RepeatOperationsStep();
+		step = new ItemOrientedStep();
 		step.setName("stepName");
 		jobConfiguration.addStep(step);
 		jobConfiguration.setBeanName("testJob");
