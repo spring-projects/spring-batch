@@ -13,19 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.io.file.mapping;
 
+package org.springframework.batch.retry.interceptor;
+
+import org.springframework.batch.retry.RetryCallback;
+import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryListener;
 
 /**
- * @author Dave Syer
+ * Empty method implementation of {@link RetryListener}.
  * 
+ * @author Dave Syer
+ *
  */
-public interface FieldSetUnmapper {
+public class RetryListenerSupport implements RetryListener {
 
-	/**
-	 * @param data an Object to convert.
-	 * @return a {@link FieldSet} created from the input.
-	 */
-	FieldSet unmapItem(Object data);
+	public void close(RetryContext context, RetryCallback callback, Throwable throwable) {
+	}
+
+	public void onError(RetryContext context, RetryCallback callback, Throwable throwable) {
+	}
+
+	public boolean open(RetryContext context, RetryCallback callback) {
+		return true;
+	}
 
 }

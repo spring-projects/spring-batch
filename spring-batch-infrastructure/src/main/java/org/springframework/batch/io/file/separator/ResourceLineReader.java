@@ -30,7 +30,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.MarkFailedException;
 import org.springframework.batch.item.exception.ResetFailedException;
-import org.springframework.batch.item.stream.ItemStreamAdapter;
+import org.springframework.batch.item.stream.ItemStreamSupport;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
@@ -57,7 +57,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Rob Harrop
  */
-public class ResourceLineReader extends ItemStreamAdapter implements LineReader, ItemReader {
+public class ResourceLineReader extends ItemStreamSupport implements LineReader, ItemReader {
 
 	private static final Collection DEFAULT_COMMENTS = Collections.singleton("#");
 

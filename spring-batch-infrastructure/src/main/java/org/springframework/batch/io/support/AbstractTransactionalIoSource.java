@@ -17,7 +17,7 @@ package org.springframework.batch.io.support;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.stream.ItemStreamAdapter;
+import org.springframework.batch.item.stream.ItemStreamSupport;
 
 /**
  * <p>
@@ -31,7 +31,7 @@ import org.springframework.batch.item.stream.ItemStreamAdapter;
  * @author Lucas Ward
  * @since 1.0
  */
-public abstract class AbstractTransactionalIoSource extends ItemStreamAdapter {
+public abstract class AbstractTransactionalIoSource extends ItemStreamSupport {
 
 	/*
 	 * Called when a transaction has been committed.

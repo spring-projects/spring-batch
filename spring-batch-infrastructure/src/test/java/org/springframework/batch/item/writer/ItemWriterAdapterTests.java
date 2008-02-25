@@ -12,7 +12,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
  * 
  * @author Robert Kasanicky
  */
-public class ItemWriterAdapterIntegrationTests extends AbstractDependencyInjectionSpringContextTests {
+public class ItemWriterAdapterTests extends AbstractDependencyInjectionSpringContextTests {
 
 	private ItemWriter processor;
 	

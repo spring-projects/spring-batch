@@ -38,7 +38,7 @@ public class SimpleStreamManagerTests extends TestCase {
 
 	private SimpleStreamManager manager = new SimpleStreamManager(new ResourcelessTransactionManager());
 
-	private ItemStreamAdapter stream = new ItemStreamAdapterExtension();
+	private ItemStreamSupport stream = new StubItemStream();
 
 	private List list = new ArrayList();
 
@@ -139,12 +139,12 @@ public class SimpleStreamManagerTests extends TestCase {
 	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
 	 */
 	public void testGetStreamContextTwoRegistrations() {
-		manager.register("foo", new ItemStreamAdapter() {
+		manager.register("foo", new ItemStreamSupport() {
 			public ExecutionContext getExecutionContext() {
 				return new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
 			}
 		});
-		manager.register("foo", new ItemStreamAdapter() {
+		manager.register("foo", new ItemStreamSupport() {
 			public ExecutionContext getExecutionContext() {
 				return new ExecutionContext(PropertiesConverter.stringToProperties("foo=spam"));
 			}
@@ -158,7 +158,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#close(java.lang.Object)}.
 	 */
 	public void testClose() {
-		manager.register("foo", new ItemStreamAdapter() {
+		manager.register("foo", new ItemStreamSupport() {
 			public void close() throws StreamException {
 				list.add("bar");
 				super.close();
@@ -173,7 +173,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#commit(org.springframework.transaction.TransactionStatus)}.
 	 */
 	public void testCommitWithoutMark() {
-		manager.register("foo", new ItemStreamAdapter() {
+		manager.register("foo", new ItemStreamSupport() {
 			public void mark() {
 				list.add("bar");
 			}
@@ -188,7 +188,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#rollback(org.springframework.transaction.TransactionStatus)}.
 	 */
 	public void testRollbackWithoutMark() {
-		manager.register("foo", new ItemStreamAdapter() {
+		manager.register("foo", new ItemStreamSupport() {
 			public void reset() {
 				list.add("bar");
 			}
@@ -203,7 +203,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 * manager's execution context.
 	 */
 	public void testGetExecutionContextPreservesValues() {
-		stream = new ItemStreamAdapter() {
+		stream = new ItemStreamSupport() {
 			public ExecutionContext getExecutionContext() {
 				ExecutionContext ctx = new ExecutionContext();
 				ctx.putString("string", "testString");
@@ -221,7 +221,7 @@ public class SimpleStreamManagerTests extends TestCase {
 		}
 		
 	}
-	private final class ItemStreamAdapterExtension extends ItemStreamAdapter {
+	private final class StubItemStream extends ItemStreamSupport {
 		public ExecutionContext getExecutionContext() {
 			return new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
 		}

@@ -20,10 +20,12 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
 
 /**
+ * Empty method implementation of {@link ItemStream}.
+ * 
  * @author Dave Syer
  *
  */
-public class ItemStreamAdapter implements ItemStream {
+public class ItemStreamSupport implements ItemStream {
 
 	/**
 	 * No-op.

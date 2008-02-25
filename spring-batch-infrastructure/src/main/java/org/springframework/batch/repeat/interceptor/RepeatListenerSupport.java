@@ -20,7 +20,13 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
 
-public class RepeatListenerAdapter implements RepeatListener {
+/**
+ * Empty method implementation of {@link RepeatListener}.
+ * 
+ * @author Dave Syer
+ * 
+ */
+public class RepeatListenerSupport implements RepeatListener {
 
 	public void before(RepeatContext context) {
 	}

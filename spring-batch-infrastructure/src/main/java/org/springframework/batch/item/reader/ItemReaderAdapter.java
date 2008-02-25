@@ -23,18 +23,19 @@ import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.support.AbstractMethodInvokingDelegator;
 
 /**
- * Invokes a custom method which provides an item.
+ * Invokes a custom method on a delegate plain old Java object which itself
+ * provides an item.
  * 
  * @author Robert Kasanicky
  */
 public class ItemReaderAdapter extends AbstractMethodInvokingDelegator implements ItemReader {
-	
+
 	/**
 	 * @return return value of the target method.
 	 */
-    public Object read() throws Exception {
+	public Object read() throws Exception {
 		return invokeDelegateMethod();
-    }
+	}
 
 	/**
 	 * Do nothing.
@@ -42,13 +43,12 @@ public class ItemReaderAdapter extends AbstractMethodInvokingDelegator implement
 	 * @see org.springframework.batch.item.ItemReader#close()
 	 */
 	public void close() throws StreamException {
-		
+
 	}
 
 	public void mark() throws MarkFailedException {
 	}
-	
+
 	public void reset() throws ResetFailedException {
 	}
 }
-

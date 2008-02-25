@@ -29,7 +29,7 @@ import java.util.Properties;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.file.mapping.FieldSet;
-import org.springframework.batch.io.file.mapping.FieldSetUnmapper;
+import org.springframework.batch.io.file.mapping.FieldSetCreator;
 import org.springframework.batch.io.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.io.file.transform.LineAggregator;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
@@ -84,7 +84,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	private LineAggregator lineAggregator = new DelimitedLineAggregator();
 
-	private FieldSetUnmapper fieldSetUnmapper;
+	private FieldSetCreator fieldSetCreator;
 
 	/**
 	 * Assert that mandatory properties (resource) are set.
@@ -92,7 +92,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource, "The resource must be set");
-		Assert.notNull(fieldSetUnmapper, "A FieldSetUnmapper must be provided.");
+		Assert.notNull(fieldSetCreator, "A FieldSetUnmapper must be provided.");
 		File file = resource.getFile();
 		Assert.state(!file.exists() || file.canWrite(), "Resource is not writable: [" + resource + "]");
 	}
@@ -108,14 +108,14 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	}
 
 	/**
-	 * Public setter for the {@link FieldSetUnmapper}. This will be used to
+	 * Public setter for the {@link FieldSetCreator}. This will be used to
 	 * transform the item into a {@link FieldSet} before it is aggregated by the
 	 * {@link LineAggregator}.
 	 * 
-	 * @param fieldSetUnmapper the {@link FieldSetUnmapper} to set
+	 * @param fieldSetCreator the {@link FieldSetCreator} to set
 	 */
-	public void setFieldSetUnmapper(FieldSetUnmapper fieldSetUnmapper) {
-		this.fieldSetUnmapper = fieldSetUnmapper;
+	public void setFieldSetUnmapper(FieldSetCreator fieldSetCreator) {
+		this.fieldSetCreator = fieldSetCreator;
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 * @throws Exception if the transformer or file output fail
 	 */
 	public void write(Object data) throws Exception {
-		FieldSet fieldSet = fieldSetUnmapper.unmapItem(data);
+		FieldSet fieldSet = fieldSetCreator.mapItem(data);
 		getOutputState().write(lineAggregator.aggregate(fieldSet) + LINE_SEPARATOR);
 	}
 

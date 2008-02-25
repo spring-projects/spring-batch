@@ -13,17 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.batch.io.file.mapping;
 
-package org.springframework.batch.item.reader;
-
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.stream.ItemStreamSupport;
+import org.springframework.batch.io.file.transform.LineTokenizer;
 
 /**
- * Base class for {@link ItemReader} implementations.
+ * Strategy interface for mapping between arbitrary objects and {@link FieldSet}.
+ * Similar to a {@link LineTokenizer}, but the input is generally a domain
+ * object, not a String.
+ * 
  * @author Dave Syer
- *
+ * 
  */
-public abstract class AbstractItemStreamItemReader extends ItemStreamSupport implements ItemReader {
+public interface FieldSetCreator {
+
+	/**
+	 * @param data an Object to convert.
+	 * @return a {@link FieldSet} created from the input.
+	 */
+	FieldSet mapItem(Object data);
 
 }

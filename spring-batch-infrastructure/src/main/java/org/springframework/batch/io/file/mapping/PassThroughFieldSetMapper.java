@@ -23,7 +23,7 @@ package org.springframework.batch.io.file.mapping;
  * @author Lucas Ward
  * 
  */
-public class PassThroughFieldSetMapper implements FieldSetMapper, FieldSetUnmapper {
+public class PassThroughFieldSetMapper implements FieldSetMapper, FieldSetCreator {
 
 	/*
 	 * (non-Javadoc)
@@ -38,9 +38,9 @@ public class PassThroughFieldSetMapper implements FieldSetMapper, FieldSetUnmapp
 	 * convert to a String with toString() and convert it to a single field
 	 * {@link FieldSet}.
 	 * 
-	 * @see org.springframework.batch.io.file.mapping.FieldSetUnmapper#unmapItem(java.lang.Object)
+	 * @see org.springframework.batch.io.file.mapping.FieldSetCreator#mapItem(java.lang.Object)
 	 */
-	public FieldSet unmapItem(Object data) {
+	public FieldSet mapItem(Object data) {
 		if (data instanceof FieldSet) {
 			return (FieldSet) data;
 		}

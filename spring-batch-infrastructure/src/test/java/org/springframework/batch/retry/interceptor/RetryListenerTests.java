@@ -37,13 +37,13 @@ public class RetryListenerTests extends TestCase {
 	List list = new ArrayList();
 
 	public void testOpenInterceptors() throws Exception {
-		template.setListeners(new RetryListener[] { new RetryListenerAdapter() {
+		template.setListeners(new RetryListener[] { new RetryListenerSupport() {
 			public boolean open(RetryContext context, RetryCallback callback) {
 				count++;
 				list.add("1:" + count);
 				return true;
 			}
-		}, new RetryListenerAdapter() {
+		}, new RetryListenerSupport() {
 			public boolean open(RetryContext context, RetryCallback callback) {
 				count++;
 				list.add("2:" + count);
@@ -61,7 +61,7 @@ public class RetryListenerTests extends TestCase {
 	}
 
 	public void testOpenCanVetoRetry() throws Exception {
-		template.setListener(new RetryListenerAdapter() {
+		template.setListener(new RetryListenerSupport() {
 			public boolean open(RetryContext context, RetryCallback callback) {
 				list.add("1");
 				return false;
@@ -85,12 +85,12 @@ public class RetryListenerTests extends TestCase {
 	}
 
 	public void testCloseInterceptors() throws Exception {
-		template.setListeners(new RetryListener[] { new RetryListenerAdapter() {
+		template.setListeners(new RetryListener[] { new RetryListenerSupport() {
 			public void close(RetryContext context, RetryCallback callback, Throwable t) {
 				count++;
 				list.add("1:" + count);
 			}
-		}, new RetryListenerAdapter() {
+		}, new RetryListenerSupport() {
 			public void close(RetryContext context, RetryCallback callback, Throwable t) {
 				count++;
 				list.add("2:" + count);
@@ -109,11 +109,11 @@ public class RetryListenerTests extends TestCase {
 
 	public void testOnError() throws Exception {
 		template.setRetryPolicy(new NeverRetryPolicy());
-		template.setListeners(new RetryListener[] { new RetryListenerAdapter() {
+		template.setListeners(new RetryListener[] { new RetryListenerSupport() {
 			public void onError(RetryContext context, RetryCallback callback, Throwable throwable) {
 				list.add("1");
 			}
-		}, new RetryListenerAdapter() {
+		}, new RetryListenerSupport() {
 			public void onError(RetryContext context, RetryCallback callback, Throwable throwable) {
 				list.add("2");
 			}
@@ -139,7 +139,7 @@ public class RetryListenerTests extends TestCase {
 	}
 
 	public void testCloseInterceptorsAfterRetry() throws Exception {
-		template.setListener(new RetryListenerAdapter() {
+		template.setListener(new RetryListenerSupport() {
 			public void close(RetryContext context, RetryCallback callback, Throwable t) {
 				list.add("" + count);
 				// The last attempt should have been successful:

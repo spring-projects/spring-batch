@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
-import org.springframework.batch.io.file.mapping.FieldSetUnmapper;
+import org.springframework.batch.io.file.mapping.FieldSetCreator;
 import org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.FileSystemResource;
@@ -117,8 +117,8 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteWithConverter() throws Exception {
-		inputSource.setFieldSetUnmapper(new FieldSetUnmapper() {
-			public FieldSet unmapItem(Object data) {
+		inputSource.setFieldSetUnmapper(new FieldSetCreator() {
+			public FieldSet mapItem(Object data) {
 				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
@@ -135,8 +135,8 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteWithConverterAndInfiniteLoop() throws Exception {
-		inputSource.setFieldSetUnmapper(new FieldSetUnmapper() {
-			public FieldSet unmapItem(Object data) {
+		inputSource.setFieldSetUnmapper(new FieldSetCreator() {
+			public FieldSet mapItem(Object data) {
 				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
@@ -153,8 +153,8 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteWithConverterAndString() throws Exception {
-		inputSource.setFieldSetUnmapper(new FieldSetUnmapper() {
-			public FieldSet unmapItem(Object data) {
+		inputSource.setFieldSetUnmapper(new FieldSetCreator() {
+			public FieldSet mapItem(Object data) {
 				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
