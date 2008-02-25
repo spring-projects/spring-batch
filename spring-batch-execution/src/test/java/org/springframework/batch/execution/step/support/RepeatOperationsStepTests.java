@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.item.reader.AbstractItemReader;
@@ -92,7 +93,7 @@ public class RepeatOperationsStepTests extends TestCase {
 		configuration.setChunkOperations(repeatTemplate);
 		configuration.setJobRepository(new JobRepositorySupport());
 		configuration.setTransactionManager(new ResourcelessTransactionManager());
-		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
+		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(new Long(0L), new JobParameters(), new JobSupport("testJob")),
 				new Long(12)));
 		configuration.afterPropertiesSet();
 		try {
@@ -133,7 +134,7 @@ public class RepeatOperationsStepTests extends TestCase {
 		configuration.setStepOperations(stepTemplate);
 		configuration.setJobRepository(new JobRepositorySupport());
 		configuration.setTransactionManager(new ResourcelessTransactionManager());
-		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(new Long(0L), new JobParameters()),
+		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(new Long(0L), new JobParameters(), new JobSupport("testJob")),
 				new Long(12)));
 		configuration.afterPropertiesSet();
 		configuration.execute(stepExecution);

@@ -51,8 +51,6 @@ public class JobInstanceTests extends TestCase {
 	
 	public void testGetJob(){
 		assertEquals("job", instance.getJob().getName());
-		instance.setJob(null);
-		assertEquals(null, instance.getJob());
 	}
 
 	public void testCreateJobExecution(){
@@ -62,8 +60,15 @@ public class JobInstanceTests extends TestCase {
 	}
 
 	public void testCreateWithNulls(){
-		instance = new JobInstance(null, null);
-		assertEquals(null, instance.getJobName());
+		try {
+			new JobInstance(null, null, null);
+			fail("job instance can't exist without job specified");
+		}
+		catch (IllegalArgumentException e) {
+			// expected 
+		}
+		instance = new JobInstance(null, null, new JobSupport("testJob"));
+		assertEquals("testJob", instance.getJobName());
 		assertEquals(0, instance.getJobParameters().getParameters().size());
 	}
 }

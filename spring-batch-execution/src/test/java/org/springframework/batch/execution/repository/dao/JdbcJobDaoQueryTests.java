@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
@@ -68,7 +69,7 @@ public class JdbcJobDaoQueryTests extends TestCase {
 				return 1;
 			}
 		});
-		jobExecutionDao.saveJobExecution(new JobInstance(new Long(11), new JobParameters()).createJobExecution());
+		jobExecutionDao.saveJobExecution(new JobInstance(new Long(11), new JobParameters(), new JobSupport("testJob")).createJobExecution());
 		assertEquals(1, list.size());
 		String query = (String) list.get(0);
 		assertTrue("Query did not contain FOO_:" + query, query.indexOf("FOO_") >= 0);

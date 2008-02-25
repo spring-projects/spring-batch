@@ -79,7 +79,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 		List steps = jobInstance.getJob().getSteps();
 		final String stepName = ((Step)steps.get(0)).getName();
-		JobExecution jobExecutionContext = new JobExecution(new JobInstance(new Long(0L), new JobParameters()));
+		JobExecution jobExecutionContext = new JobExecution(new JobInstance(new Long(0L), new JobParameters(), new JobSupport("testJob")));
 		final StepExecution stepExecution = new StepExecution(stepName, jobExecutionContext);
 		step.setItemReader(new AbstractItemReader() {
 			public Object read() throws Exception {

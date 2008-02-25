@@ -2,6 +2,7 @@ package org.springframework.batch.execution.repository.dao;
 
 import java.util.List;
 
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 
@@ -24,7 +25,7 @@ public interface JobInstanceDao {
 	 * @param jobParameters
 	 * @return JobInstance
 	 */
-	JobInstance createJobInstance(String jobName, JobParameters jobParameters);
+	JobInstance createJobInstance(Job job, JobParameters jobParameters);
 
 	/**
 	 * Find all job instances that match the given name and parameters. If no
@@ -36,6 +37,6 @@ public interface JobInstanceDao {
 	 * @return List of {@link JobInstance} objects matching
 	 * {@link JobIdentifier}
 	 */
-	List findJobInstances(String jobName, JobParameters jobParameters);
+	List findJobInstances(Job job, JobParameters jobParameters);
 
 }

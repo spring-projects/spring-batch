@@ -59,8 +59,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 	protected void setUp() throws Exception {
 
-		jobInstance = new JobInstance(new Long(0), new JobParameters());
-		jobInstance.setJob(new JobSupport("testJob"));
+		jobInstance = new JobInstance(new Long(0), new JobParameters(), new JobSupport("testJob"));
 		JobExecution jobExecution = jobInstance.createJobExecution();
 		stepInstance = "bar";
 		resourceFactory.setStepContext(new SimpleStepContext(jobExecution.createStepExecution(stepInstance)));
@@ -99,8 +98,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 	public void testNonStandardFilePatternWithJobParameters() throws Exception {
 		jobInstance = new JobInstance(new Long(0), new JobParametersBuilder().addString("job.key", "spam")
-				.toJobParameters());
-		jobInstance.setJob(new JobSupport("testJob"));
+				.toJobParameters(), new JobSupport("testJob"));
 		JobExecution jobExecution = jobInstance.createJobExecution();
 		stepInstance = "bar";
 		resourceFactory.setStepContext(new SimpleStepContext(jobExecution.createStepExecution(stepInstance)));

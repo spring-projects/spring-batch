@@ -109,7 +109,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 		jobConfiguration.setSteps(stepConfigurations);
 
-		databaseJob = new JobInstance(new Long(1), jobParameters) {
+		databaseJob = new JobInstance(new Long(1), jobParameters, jobConfiguration) {
 			public JobExecution createJobExecution() {
 				jobExecution = super.createJobExecution();
 				return jobExecution;
@@ -235,8 +235,8 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 		List jobs = new ArrayList();
 		jobs.add(databaseJob);
-		jobs.add(new JobInstance(new Long(127), jobParameters));
-		jobInstanceDao.findJobInstances(jobConfiguration.getName(), jobParameters);
+		jobs.add(new JobInstance(new Long(127), jobParameters, jobConfiguration));
+		jobInstanceDao.findJobInstances(jobConfiguration, jobParameters);
 		jobInstanceDaoControl.setReturnValue(jobs);
 		jobInstanceDaoControl.replay();
 
@@ -256,7 +256,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobConfiguration.setStartLimit(1);
 
 		List jobs = new ArrayList();
-		jobInstanceDao.findJobInstances(jobConfiguration.getName(), jobParameters);
+		jobInstanceDao.findJobInstances(jobConfiguration, jobParameters);
 		jobs.add(databaseJob);
 		jobInstanceDaoControl.setReturnValue(jobs);
 		jobExecutionDao.getJobExecutionCount(databaseJob);
@@ -330,7 +330,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	public void testSaveOrUpdateValidJobExecution() throws Exception {
 
-		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(1), jobParameters));
+		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(1), jobParameters, jobConfiguration));
 
 		// new execution - call save on job dao
 		jobExecutionDao.saveJobExecution(jobExecution);

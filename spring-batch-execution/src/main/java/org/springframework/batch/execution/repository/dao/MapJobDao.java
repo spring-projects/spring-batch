@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.springframework.batch.core.domain.JobSupport;
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -47,19 +47,18 @@ public class MapJobDao implements JobInstanceDao, JobExecutionDao {
 		executionsById.clear();
 	}
 
-	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
-		JobInstance jobInstance = new JobInstance(new Long(currentId++), jobParameters);
-		jobInstance.setJob(new JobSupport(jobName));
+	public JobInstance createJobInstance(Job job, JobParameters jobParameters) {
+		JobInstance jobInstance = new JobInstance(new Long(currentId++), jobParameters, job);
 		
 		jobsById.put(jobInstance.getId(), jobInstance);
 		return jobInstance;
 	}
 
-	public List findJobInstances(String jobName, JobParameters jobParameters) {
+	public List findJobInstances(Job job, JobParameters jobParameters) {
 		List list = new ArrayList();
 		for (Iterator iter = jobsById.values().iterator(); iter.hasNext();) {
 			JobInstance jobInstance = (JobInstance) iter.next();
-			if (jobInstance.getJobName().equals(jobName) && jobInstance.getJobParameters().equals(jobParameters)) {
+			if (jobInstance.getJobName().equals(job.getName()) && jobInstance.getJobParameters().equals(jobParameters)) {
 				list.add(jobInstance);
 			}
 		}

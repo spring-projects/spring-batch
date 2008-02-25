@@ -74,7 +74,7 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 		job = new JobSupport("Job1");
 
 		// Create job.
-		jobInstance = jobInstanceDao.createJobInstance(job.getName(), jobParameters);
+		jobInstance = jobInstanceDao.createJobInstance(job, jobParameters);
 
 		// Create an execution
 		jobExecutionStartTime = new Date(System.currentTimeMillis());
@@ -99,13 +99,13 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 
 	public void testFindNonExistentJob() {
 		// No job should be found since it hasn't been created.
-		List jobs = jobInstanceDao.findJobInstances("nonexistentJob", jobParameters);
+		List jobs = jobInstanceDao.findJobInstances(new JobSupport("nonexistentJob"), jobParameters);
 		assertTrue(jobs.size() == 0);
 	}
 
 	public void testFindJob() {
 
-		List jobs = jobInstanceDao.findJobInstances(job.getName(), jobParameters);
+		List jobs = jobInstanceDao.findJobInstances(job, jobParameters);
 		assertTrue(jobs.size() == 1);
 		JobInstance tempJob = (JobInstance) jobs.get(0);
 		assertTrue(jobInstance.equals(tempJob));
@@ -130,19 +130,20 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 	 */
 	public void testCreateJobWithExistingName() {
 
-		jobInstanceDao.createJobInstance("ScheduledJob", jobParameters);
+		Job scheduledJob = new JobSupport("ScheduledJob");
+		jobInstanceDao.createJobInstance(scheduledJob, jobParameters);
 
 		// Modifying the key should bring back a completely different
 		// JobInstance
 		JobParameters tempProps = new JobParametersBuilder().addString("job.key", "testKey1").toJobParameters();
 
 		List jobs;
-		jobs = jobInstanceDao.findJobInstances("ScheduledJob", jobParameters);
+		jobs = jobInstanceDao.findJobInstances(scheduledJob, jobParameters);
 		assertEquals(1, jobs.size());
 		JobInstance jobInstance = (JobInstance) jobs.get(0);
 		assertEquals(jobParameters, jobInstance.getJobParameters());
 
-		jobs = jobInstanceDao.findJobInstances("ScheduledJob", tempProps);
+		jobs = jobInstanceDao.findJobInstances(scheduledJob, tempProps);
 		assertEquals(0, jobs.size());
 
 	}
@@ -206,15 +207,16 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 
 	public void testZeroExecutionCount() {
 
-		JobInstance testJob = jobInstanceDao.createJobInstance("test", new JobParameters());
+		JobInstance testJob = jobInstanceDao.createJobInstance(new JobSupport("test"), new JobParameters());
 		// no jobExecutions saved for new job, count should be 0
 		assertEquals(jobExecutionDao.getJobExecutionCount(testJob), 0);
 	}
 
 	public void testJobWithSimpleJobIdentifier() throws Exception {
 
+		Job testJob = new JobSupport("test");
 		// Create job.
-		jobInstance = jobInstanceDao.createJobInstance("test", jobParameters);
+		jobInstance = jobInstanceDao.createJobInstance(testJob, jobParameters);
 
 		List jobs = jdbcTemplate.queryForList("SELECT * FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?",
 				new Object[] { jobInstance.getId() });
@@ -224,10 +226,12 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 	}
 
 	public void testJobWithDefaultJobIdentifier() throws Exception {
+		
+		Job testDefaultJob = new JobSupport("testDefault");
 		// Create job.
-		jobInstance = jobInstanceDao.createJobInstance("testDefault", jobParameters);
+		jobInstance = jobInstanceDao.createJobInstance(testDefaultJob, jobParameters);
 
-		List jobs = jobInstanceDao.findJobInstances("testDefault", jobParameters);
+		List jobs = jobInstanceDao.findJobInstances(testDefaultJob, jobParameters);
 
 		assertEquals(1, jobs.size());
 		assertEquals(jobParameters.getString("job.key"), ((JobInstance) jobs.get(0)).getJobParameters().getString(

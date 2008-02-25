@@ -260,7 +260,7 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	private StepExecution newStepExecution(String stepName, Long long2) {
-		JobInstance job = new JobInstance(new Long(3), new JobParameters());
+		JobInstance job = new JobInstance(new Long(3), new JobParameters(), new JobSupport("testJob"));
 		StepExecution execution = new StepExecution(stepName, new JobExecution(job, long2), new Long(4));
 		return execution;
 	}

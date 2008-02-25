@@ -16,8 +16,10 @@
 
 package org.springframework.batch.execution.repository.dao;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.StepExecution;
@@ -127,7 +129,13 @@ public class MapStepDao implements StepExecutionDao {
 	}
 
 	public StepExecution getStepExecution(JobExecution jobExecution, String stepName) {
-		// TODO Auto-generated method stub
+//		for (Iterator iterator = executionsById.entrySet().iterator(); iterator.hasNext();) {
+//			Entry entry = (Entry) iterator.next();
+//			StepExecution stepExecution = (StepExecution) entry.getValue();
+//			if (stepExecution.getJobExecution().equals(jobExecution) && stepExecution.getStepName().equals(stepName)){
+//				return stepExecution;
+//			}
+//		}
 		return null;
 	}
 

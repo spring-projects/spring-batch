@@ -8,6 +8,7 @@ import org.easymock.MockControl;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -29,7 +30,7 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 	
 	MockJdbcTemplate jdbcTemplate = new MockJdbcTemplate();
 	
-	JobInstance job = new JobInstance(new Long(1), new JobParameters());
+	JobInstance job = new JobInstance(new Long(1), new JobParameters(), new JobSupport("testJob"));
 	String step = "foo";
 	StepExecution stepExecution = new StepExecution(step, new JobExecution(job), null);
 	

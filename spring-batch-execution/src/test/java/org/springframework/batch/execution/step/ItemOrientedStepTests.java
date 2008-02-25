@@ -108,8 +108,7 @@ public class ItemOrientedStepTests extends TestCase {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		itemOrientedStep.setChunkOperations(template);
 
-		jobInstance = new JobInstance(new Long(0), new JobParameters());
-		jobInstance.setJob(new JobSupport("FOO"));
+		jobInstance = new JobInstance(new Long(0), new JobParameters(), new JobSupport("FOO"));
 
 		SimpleStreamManager streamManager = new SimpleStreamManager(transactionManager);
 		streamManager.setUseClassNameAsPrefix(false);

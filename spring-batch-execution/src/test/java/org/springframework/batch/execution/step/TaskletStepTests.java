@@ -9,6 +9,7 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.step.TaskletStep;
@@ -26,7 +27,7 @@ public class TaskletStepTests extends TestCase {
 
 	protected void setUp() throws Exception {
 		stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(
-				new Long(0L), new JobParameters()), new Long(12)));
+				new Long(0L), new JobParameters(), new JobSupport("testJob")), new Long(12)));
 	}
 
 	public void testTaskletMandatory() throws Exception {

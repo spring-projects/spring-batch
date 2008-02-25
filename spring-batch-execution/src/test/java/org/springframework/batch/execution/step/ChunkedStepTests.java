@@ -95,9 +95,7 @@ public class ChunkedStepTests extends TestCase {
 		// Only process one item:
 		chunkedStep.setChunkSize(1);
 
-		jobInstance = new JobInstance(new Long(0), new JobParameters());
-		jobInstance.setJob(new JobSupport("FOO"));
-
+		jobInstance = new JobInstance(new Long(0), new JobParameters(), new JobSupport("FOO"));
 		SimpleStreamManager streamManager = new SimpleStreamManager(transactionManager);
 		streamManager.setUseClassNameAsPrefix(false);
 		chunkedStep.setStreamManager(streamManager);

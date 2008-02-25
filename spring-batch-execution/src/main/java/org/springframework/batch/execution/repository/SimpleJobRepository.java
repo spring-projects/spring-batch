@@ -160,7 +160,7 @@ public class SimpleJobRepository implements JobRepository {
 			 * thread or process will block until this transaction has finished.
 			 */
 
-			jobInstances = jobInstanceDao.findJobInstances(job.getName(), jobParameters);
+			jobInstances = jobInstanceDao.findJobInstances(job, jobParameters);
 		}
 
 		if (jobInstances.size() == 1) {
@@ -188,7 +188,6 @@ public class SimpleJobRepository implements JobRepository {
 				}
 			}
 			jobInstance.setLastExecution(lastExecution);
-			jobInstance.setJob(job);
 		}
 		else if (jobInstances.size() == 0) {
 			// no job found, create one
@@ -286,8 +285,7 @@ public class SimpleJobRepository implements JobRepository {
 	 */
 	private JobInstance createJobInstance(Job job, JobParameters jobParameters) {
 
-		JobInstance jobInstance = jobInstanceDao.createJobInstance(job.getName(), jobParameters);
-		jobInstance.setJob(job);
+		JobInstance jobInstance = jobInstanceDao.createJobInstance(job, jobParameters);
 		return jobInstance;
 	}
 

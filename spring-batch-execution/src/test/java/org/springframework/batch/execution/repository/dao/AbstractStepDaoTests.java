@@ -86,7 +86,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	 */
 	protected void onSetUpInTransaction() throws Exception {
 		Job job = new JobSupport("TestJob");
-		jobInstance = jobInstanceDao.createJobInstance(job.getName(), jobParameters);
+		jobInstance = jobInstanceDao.createJobInstance(job, jobParameters);
 		step1 = "TestStep1";
 		step2 = "TestStep2";
 		jobExecution = new JobExecution(jobInstance);

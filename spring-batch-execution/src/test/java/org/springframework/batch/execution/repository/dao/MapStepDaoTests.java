@@ -16,11 +16,16 @@
 
 package org.springframework.batch.execution.repository.dao;
 
+import java.util.Properties;
+
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.item.ExecutionContext;
 
 public class MapStepDaoTests extends TestCase {
 
@@ -33,12 +38,8 @@ public class MapStepDaoTests extends TestCase {
 	
 	protected void setUp() throws Exception {
 		MapStepDao.clear();
-		job = new JobInstance(new Long(jobId++), new JobParameters());
+		job = new JobInstance(new Long(jobId++), new JobParameters(), new JobSupport("testJob"));
 		step = "foo";	
-	}
-
-	public void testNoExecutionsForNew() throws Exception {
-//		assertEquals(0, dao.getStepExecutionCount(step));
 	}
 
 	public void testSaveExecutionUpdatesId() throws Exception {
@@ -48,26 +49,16 @@ public class MapStepDaoTests extends TestCase {
 		assertNotNull(execution.getId());
 	}
 
-	public void testCorrectExecutionCountForExisting() throws Exception {
-//		dao.saveStepExecution(new StepExecution(step, null, null));
-//		assertEquals(1, dao.getStepExecutionCount(step));
-	}
-	
-	public void testOnlyOneExecutionPerStep() throws Exception {
-//		dao.saveStepExecution(new StepExecution(step, null, null));
-//		dao.saveStepExecution(new StepExecution(step, null, null));
-//		assertEquals(2, dao.getStepExecutionCount(step));
-	}
-
 	public void testSaveExecutionContext() throws Exception {
-//		assertEquals(null, dao.getExecutionContext(step.getId()));
+//		JobExecution jobExecution = new JobExecution(null);
+//		StepExecution stepExecution = new StepExecution(step, jobExecution, null);
+//		assertEquals(null, dao.findExecutionContext(stepExecution));
 //		Properties data = new Properties();
 //		data.setProperty("restart.key1", "restartData");
 //		ExecutionContext executionContext = new ExecutionContext(data);
-//		StepExecution stepExecution = new StepExecution(step, null, null);
 //		stepExecution.setExecutionContext(executionContext);
 //		dao.saveStepExecution(stepExecution);
-//		StepExecution tempExecution = dao.getStepExecution(stepExecution.getId(), step);
+//		StepExecution tempExecution = dao.getStepExecution(jobExecution, step);
 //		assertEquals(tempExecution, stepExecution);
 //		assertEquals(stepExecution.getExecutionContext(), tempExecution.getExecutionContext());
 	}

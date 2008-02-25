@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.domain;
 
+import org.springframework.util.Assert;
+
 
 
 /**
@@ -36,14 +38,11 @@ public class JobInstance extends Entity {
 	private int jobExecutionCount;
 	
 	private JobExecution lastExecution;
-	
-	public JobInstance(Long id, JobParameters jobParameters) {
-		super(id);
-		this.jobParameters = jobParameters==null ? new JobParameters() : jobParameters;
-	}
 
 	public JobInstance(Long id, JobParameters jobParameters, Job job){
-		this(id, jobParameters);
+		super(id);
+		Assert.notNull(job);
+		this.jobParameters = jobParameters==null ? new JobParameters() : jobParameters;
 		this.job = job;
 	}
 	
@@ -92,7 +91,4 @@ public class JobInstance extends Entity {
 		return job;
 	}
 
-	public void setJob(Job job) {
-		this.job = job;
-	}
 }

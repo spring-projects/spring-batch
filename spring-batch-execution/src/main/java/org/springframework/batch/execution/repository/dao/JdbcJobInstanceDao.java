@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.beans.factory.InitializingBean;
@@ -50,19 +51,20 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * @throws IllegalArgumentException if any {@link JobIdentifier} fields are
 	 * null.
 	 */
-	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
+	public JobInstance createJobInstance(Job job, JobParameters jobParameters) {
 
-		Assert.notNull(jobName, "Job Name must not be null.");
+		Assert.notNull(job, "Job must not be null.");
+		Assert.hasLength(job.getName(), "Job must have a name");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
 		Long jobId = new Long(jobIncrementer.nextLongValue());
-		Object[] parameters = new Object[] { jobId, jobName, createJobKey(jobParameters) };
+		Object[] parameters = new Object[] { jobId, job.getName(), createJobKey(jobParameters) };
 		getJdbcTemplate().update(getQuery(CREATE_JOB), parameters,
 				new int[] { Types.INTEGER, Types.VARCHAR, Types.VARCHAR });
 
 		insertJobParameters(jobId, jobParameters);
 
-		JobInstance jobInstance = new JobInstance(jobId, jobParameters);
+		JobInstance jobInstance = new JobInstance(jobId, jobParameters, job);
 		return jobInstance;
 	}
 
@@ -144,16 +146,17 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * @throws IllegalArgumentException if any {@link JobIdentifier} fields are
 	 * null.
 	 */
-	public List findJobInstances(final String jobName, final JobParameters jobParameters) {
+	public List findJobInstances(final Job job, final JobParameters jobParameters) {
 
-		Assert.notNull(jobName, "Job Name must not be null.");
+		Assert.notNull(job, "Job must not be null.");
+		Assert.hasLength(job.getName(), "Job must have a name");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
-		Object[] parameters = new Object[] { jobName, createJobKey(jobParameters) };
+		Object[] parameters = new Object[] { job.getName(), createJobKey(jobParameters) };
 
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-				JobInstance jobInstance = new JobInstance(new Long(rs.getLong(1)), jobParameters);
+				JobInstance jobInstance = new JobInstance(new Long(rs.getLong(1)), jobParameters, job);
 				return jobInstance;
 			}
 		};
