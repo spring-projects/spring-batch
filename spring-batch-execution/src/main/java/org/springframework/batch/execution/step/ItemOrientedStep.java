@@ -232,10 +232,9 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	public void execute(final StepExecution stepExecution) throws BatchCriticalException, JobInterruptedException {
 
 		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
-		String stepName = stepExecution.getStepName();
-		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, stepName);
+		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, this);
 
-		boolean isRestart = jobRepository.getStepExecutionCount(jobInstance, stepName) > 0 ? true : false;
+		boolean isRestart = jobRepository.getStepExecutionCount(jobInstance, this) > 0 ? true : false;
 
 		ExitStatus status = ExitStatus.FAILED;
 

@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ExecutionContext;
@@ -57,10 +58,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private static final String FIND_STEP_EXECUTION_CONTEXT = "SELECT TYPE_CD, KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL "
 			+ "from %PREFIX%STEP_EXECUTION_CONTEXT where STEP_EXECUTION_ID = ?";
-
-	// private static final String GET_STEP_EXECUTION_COUNT = "SELECT
-	// count(STEP_EXECUTION_ID) from %PREFIX%STEP_EXECUTION where "
-	// + "STEP_INSTANCE_ID = ?";
 
 	private static final String INSERT_STEP_EXECUTION_CONTEXT = "INSERT into %PREFIX%STEP_EXECUTION_CONTEXT(STEP_EXECUTION_ID, TYPE_CD,"
 			+ " KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL) values(?,?,?,?,?,?,?)";
@@ -438,9 +435,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		}
 	}
 
-	public StepExecution getStepExecution(JobExecution jobExecution, String stepName) {
+	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {
 		List executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION),
-				new Object[] { stepName, jobExecution.getId() }, new StepExecutionRowMapper(jobExecution));
+				new Object[] { step.getName(), jobExecution.getId() }, new StepExecutionRowMapper(jobExecution));
 
 		Assert.state(executions.size() <= 1,
 				"There can be at most one step execution with given name for single job execution");

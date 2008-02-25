@@ -131,7 +131,7 @@ public class SimpleJob extends JobSupport {
 
 		BatchStatus stepStatus;
 		// if the last execution is null, the step has never been executed.
-		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
+		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step);
 		if (lastStepExecution == null) {
 			stepStatus = BatchStatus.STARTING;
 		}
@@ -151,7 +151,7 @@ public class SimpleJob extends JobSupport {
 			return false;
 		}
 
-		if (jobRepository.getStepExecutionCount(jobInstance, step.getName()) < step.getStartLimit()) {
+		if (jobRepository.getStepExecutionCount(jobInstance, step) < step.getStartLimit()) {
 			// step start count is less than start max, return true
 			return true;
 		}

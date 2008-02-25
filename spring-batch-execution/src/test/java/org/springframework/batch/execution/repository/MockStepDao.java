@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
 import org.springframework.batch.item.ExecutionContext;
@@ -48,11 +49,6 @@ public class MockStepDao implements StepExecutionDao {
 		currentNewStep = 0;
 	}
 
-//	public List findStepExecutions(StepInstance step, JobExecution jobExecution) {
-//		
-//		return null;
-//	}
-
 	public ExecutionContext findExecutionContext(StepExecution stepExecution) {
 		return null;
 	}
@@ -63,8 +59,7 @@ public class MockStepDao implements StepExecutionDao {
 	public void updateExecutionContext(StepExecution stepExecution) {
 	}
 
-	public StepExecution getStepExecution(JobExecution jobExecution, String stepName) {
-		// TODO Auto-generated method stub
+	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {
 		return null;
 	}
 

@@ -25,6 +25,7 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -191,7 +192,7 @@ public class SimpleJobRepository implements JobRepository {
 		}
 		else if (jobInstances.size() == 0) {
 			// no job found, create one
-			jobInstance = createJobInstance(job, jobParameters);
+			jobInstance = jobInstanceDao.createJobInstance(job, jobParameters);
 		}
 		else {
 			// More than one job found, throw exception
@@ -203,19 +204,9 @@ public class SimpleJobRepository implements JobRepository {
 
 	}
 
-//	private List getStepNames(Job job) {
-//		List stepNames = new ArrayList(job.getSteps().size());
-//		for (Iterator iterator = job.getSteps().iterator(); iterator.hasNext();) {
-//			Step step = (Step) iterator.next();
-//			stepNames.add(step.getName());
-//		}
-//		return stepNames;
-//	}
-	
 
-
-	private JobExecution generateJobExecution(JobInstance job) {
-		JobExecution execution = job.createJobExecution();
+	private JobExecution generateJobExecution(JobInstance jobInstance) {
+		JobExecution execution = jobInstance.createJobExecution();
 		// Save the JobExecution so that it picks up an ID (useful for clients
 		// monitoring asynchronous executions):
 		saveOrUpdate(execution);
@@ -278,23 +269,12 @@ public class SimpleJobRepository implements JobRepository {
 		}
 	}
 
-	/**
-	 * Convenience method for creating a new job. A new job is created by
-	 * calling {@link JobInstanceDao#createJobInstance(String, JobParameters)} and then it's
-	 * list of StepInstances is passed to the createStepInstances method.
-	 */
-	private JobInstance createJobInstance(Job job, JobParameters jobParameters) {
-
-		JobInstance jobInstance = jobInstanceDao.createJobInstance(job, jobParameters);
-		return jobInstance;
-	}
-
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
 		List jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		List stepExecutions = new ArrayList(jobExecutions.size());
 		for (Iterator iterator = jobExecutions.iterator(); iterator.hasNext();) {
 			JobExecution jobExecution = (JobExecution) iterator.next();
-			StepExecution stepExecution = stepExecutionDao.getStepExecution(jobExecution, stepName);
+			StepExecution stepExecution = stepExecutionDao.getStepExecution(jobExecution, step);
 			if (stepExecution != null) {
 				stepExecutions.add(stepExecution);
 			}
@@ -312,12 +292,12 @@ public class SimpleJobRepository implements JobRepository {
 		return latest;
 	}
 
-	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
+	public int getStepExecutionCount(JobInstance jobInstance, Step step) {
 		int count = 0;
 		List jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		for (Iterator iterator = jobExecutions.iterator(); iterator.hasNext();) {
 			JobExecution jobExecution = (JobExecution) iterator.next();
-			if (stepExecutionDao.getStepExecution(jobExecution, stepName) != null) {
+			if (stepExecutionDao.getStepExecution(jobExecution, step) != null) {
 				count++;
 			}
 		}

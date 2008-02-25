@@ -20,6 +20,7 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 
@@ -95,12 +96,12 @@ public interface JobRepository {
 	/**
 	 * @return the last execution of step for the given job instance.
 	 */
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName);
+	public StepExecution getLastStepExecution(JobInstance jobInstance, Step step);
 
 	/**
 	 * @return the execution count of the step within the given job instance.
 	 */
-	public int getStepExecutionCount(JobInstance jobInstance, String stepName);
+	public int getStepExecutionCount(JobInstance jobInstance, Step step);
 
 
 }

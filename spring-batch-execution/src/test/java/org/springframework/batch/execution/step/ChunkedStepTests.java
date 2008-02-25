@@ -170,9 +170,9 @@ public class ChunkedStepTests extends TestCase {
 //		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 //		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 		
-		repository.getLastStepExecution(jobInstance, "testStep");
+		repository.getLastStepExecution(jobInstance, chunkedStep);
 		repoControl.setReturnValue(new StepExecution(null,null));
-		repository.getStepExecutionCount(jobInstance, "testStep");
+		repository.getStepExecutionCount(jobInstance, chunkedStep);
 		repoControl.setReturnValue(0);
 		repository.saveOrUpdate(stepExecution);
 		repository.saveOrUpdate(stepExecution);

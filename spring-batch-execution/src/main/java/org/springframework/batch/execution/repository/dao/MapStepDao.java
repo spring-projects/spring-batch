@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
@@ -128,7 +129,7 @@ public class MapStepDao implements StepExecutionDao {
 		executions.add(stepExecution);
 	}
 
-	public StepExecution getStepExecution(JobExecution jobExecution, String stepName) {
+	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {
 //		for (Iterator iterator = executionsById.entrySet().iterator(); iterator.hasNext();) {
 //			Entry entry = (Entry) iterator.next();
 //			StepExecution stepExecution = (StepExecution) entry.getValue();

@@ -1,6 +1,7 @@
 package org.springframework.batch.execution.repository.dao;
 
 import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 
@@ -48,6 +49,6 @@ public interface StepExecutionDao {
 	 */
 	void updateExecutionContext(StepExecution stepExecution);
 	
-	StepExecution getStepExecution(JobExecution jobExecution, String stepName);
+	StepExecution getStepExecution(JobExecution jobExecution, Step step);
 
 }
