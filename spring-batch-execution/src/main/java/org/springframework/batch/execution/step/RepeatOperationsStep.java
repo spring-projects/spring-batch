@@ -19,36 +19,26 @@ package org.springframework.batch.execution.step;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.execution.step.support.RepeatOperationsHolder;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.RepeatOperations;
 
 /**
- * {@link Step} implementation that allows full step of the
+ * A {@link Step} implementation that allows full configuration of the
  * {@link RepeatOperations} that will be used in the chunk (inner loop).
+ * <br/>
  * 
- * This class will likely not be necessary given current changes, however, it
- * is calling super classes for compatibility.
+ * This class may be obsolete soon.
  * 
  * @author Lucas Ward
  * @author Dave Syer
  * @author Ben Hale
  */
-public class RepeatOperationsStep extends ItemOrientedStep implements RepeatOperationsHolder {
+public class RepeatOperationsStep extends ItemOrientedStep {
 
 	private volatile RepeatOperations chunkOperations;
 
 	private volatile RepeatOperations stepOperations;
 	
-	/**
-	 * Public accessor for the chunkOperations property.
-	 * 
-	 * @return the executor
-	 */
-	public RepeatOperations getChunkOperations() {
-		return chunkOperations;
-	}
-
 	/**
 	 * Public setter for the chunkOperations.
 	 * 
@@ -56,15 +46,6 @@ public class RepeatOperationsStep extends ItemOrientedStep implements RepeatOper
 	 */
 	public void setChunkOperations(RepeatOperations chunkOperations) {
 		this.chunkOperations = chunkOperations;
-	}
-
-	/**
-	 * Public accessor for the stepOperations property.
-	 * 
-	 * @return the stepOperations
-	 */
-	public RepeatOperations getStepOperations() {
-		return stepOperations;
 	}
 
 	/**

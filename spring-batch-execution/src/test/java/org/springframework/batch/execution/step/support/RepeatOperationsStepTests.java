@@ -52,29 +52,7 @@ public class RepeatOperationsStepTests extends TestCase {
 		repeatStep.setItemReader(new ItemReaderAdapter());
 		repeatStep.setItemWriter(new ItemWriterAdapter());
 	}
-	
-	/**
-	 * Test method for {@link org.springframework.batch.execution.step.RepeatOperationsStep#getChunkOperations()}.
-	 */
-	public void testSetChunkOperations() {
-		assertNull(repeatStep.getChunkOperations());
-		RepeatTemplate executor = new RepeatTemplate();
-		repeatStep.setChunkOperations(executor);
-		assertEquals(executor, repeatStep.getChunkOperations());
 		
-	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.execution.step.RepeatOperationsStep#getChunkOperations()}.
-	 */
-	public void testSetStepOperations() {
-		assertNull(repeatStep.getChunkOperations());
-		RepeatTemplate executor = new RepeatTemplate();
-		repeatStep.setStepOperations(executor);
-		assertEquals(executor, repeatStep.getStepOperations());
-		
-	}
-	
 	public void testSuccessfulRepeatOperationsHolder() throws Exception {
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
 		final List list = new ArrayList();
