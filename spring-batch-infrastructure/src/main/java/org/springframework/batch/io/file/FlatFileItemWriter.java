@@ -28,14 +28,16 @@ import java.util.Properties;
 
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
-import org.springframework.batch.io.file.transform.RecursiveCollectionItemTransformer;
+import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSetUnmapper;
+import org.springframework.batch.io.file.transform.DelimitedLineAggregator;
+import org.springframework.batch.io.file.transform.LineAggregator;
 import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.item.exception.StreamException;
-import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -52,9 +54,11 @@ import org.springframework.util.Assert;
  * 
  * Use {@link #write(String)} method to output a line to an item writer.
  * 
- * <p>This class will be updated in the future to use a buffering approach
- * to handling transactions, rather than outputting directly to the file and
- * truncating on rollback</p>
+ * <p>
+ * This class will be updated in the future to use a buffering approach to
+ * handling transactions, rather than outputting directly to the file and
+ * truncating on rollback
+ * </p>
  * 
  * @author Waseem Malik
  * @author Tomas Slanina
@@ -78,26 +82,40 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	private OutputState state = null;
 
-	private ItemTransformer transformer = new RecursiveCollectionItemTransformer();
+	private LineAggregator lineAggregator = new DelimitedLineAggregator();
+
+	private FieldSetUnmapper fieldSetUnmapper;
 
 	/**
 	 * Assert that mandatory properties (resource) are set.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(resource);
+		Assert.notNull(resource, "The resource must be set");
+		Assert.notNull(fieldSetUnmapper, "A FieldSetUnmapper must be provided.");
 		File file = resource.getFile();
 		Assert.state(!file.exists() || file.canWrite(), "Resource is not writable: [" + resource + "]");
 	}
 
 	/**
-	 * Public setter for the converter. If not-null this will be used to convert
-	 * the input data before it is output.
+	 * Public setter for the {@link LineAggregator}. This will be used to
+	 * translate a {@link FieldSet} into a line for output.
 	 * 
-	 * @param transformer the converter to set
+	 * @param lineAggregator the {@link LineAggregator} to set
 	 */
-	public void setTransformer(ItemTransformer transformer) {
-		this.transformer = transformer;
+	public void setLineAggregator(LineAggregator lineAggregator) {
+		this.lineAggregator = lineAggregator;
+	}
+
+	/**
+	 * Public setter for the {@link FieldSetUnmapper}. This will be used to
+	 * transform the item into a {@link FieldSet} before it is aggregated by the
+	 * {@link LineAggregator}.
+	 * 
+	 * @param fieldSetUnmapper the {@link FieldSetUnmapper} to set
+	 */
+	public void setFieldSetUnmapper(FieldSetUnmapper fieldSetUnmapper) {
+		this.fieldSetUnmapper = fieldSetUnmapper;
 	}
 
 	/**
@@ -123,7 +141,8 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 * @throws Exception if the transformer or file output fail
 	 */
 	public void write(Object data) throws Exception {
-		getOutputState().write(transformer.transform(data) + LINE_SEPARATOR);
+		FieldSet fieldSet = fieldSetUnmapper.unmapItem(data);
+		getOutputState().write(lineAggregator.aggregate(fieldSet ) + LINE_SEPARATOR);
 	}
 
 	/**
@@ -228,6 +247,13 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 		long restartCount = 0;
 
 		boolean shouldDeleteIfExists = true;
+		
+		/**
+		 * 
+		 */
+		public OutputState() {
+			initializeBufferedWriter();
+		}
 
 		/**
 		 * Return the byte offset position of the cursor in the output file as a
@@ -469,16 +495,16 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 		return true;
 	}
 
-	/* To be deleted once interface changes are complete
-	 * (non-Javadoc)
+	/*
+	 * To be deleted once interface changes are complete (non-Javadoc)
 	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
-		
+
 	}
 
-	/* To be deleted once interface changes are complete
-	 * (non-Javadoc)
+	/*
+	 * To be deleted once interface changes are complete (non-Javadoc)
 	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() throws ResetFailedException {
@@ -488,7 +514,8 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	public void clear() throws Exception {
 		try {
 			getOutputState().reset();
-		} catch (BatchCriticalException e) {
+		}
+		catch (BatchCriticalException e) {
 			throw new ResetFailedException(e);
 		}
 	}

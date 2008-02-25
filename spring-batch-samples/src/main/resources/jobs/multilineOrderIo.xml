@@ -1,31 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans 	xmlns="http://www.springframework.org/schema/beans"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xmlns:p="http://www.springframework.org/schema/p"
-		xmlns:aop="http://www.springframework.org/schema/aop"
-		xsi:schemaLocation="http://www.springframework.org/schema/beans
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-	<bean id="fileInputTemplate" class="org.springframework.batch.io.file.FlatFileItemReader"
+	<bean id="fileInputTemplate"
+		class="org.springframework.batch.io.file.FlatFileItemReader"
 		scope="step">
 		<aop:scoped-proxy />
 		<property name="resource" ref="fileInputLocator" />
 		<property name="lineTokenizer" ref="orderFileDescriptor" />
 		<property name="fieldSetMapper">
-			<bean class="org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper" />
+			<bean
+				class="org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper" />
 		</property>
 	</bean>
 
-	<bean id="flatFileOutputSource" class="org.springframework.batch.io.file.FlatFileItemWriter"
-		scope="step" >
-		<aop:scoped-proxy />
-		<property name="resource" ref="fileOutputLocator" />
+	<bean id="flatFileOutputSource"
+		class="org.springframework.batch.item.writer.ItemTransformerItemWriter">
+		<property name="delegate">
+			<bean
+				class="org.springframework.batch.io.file.FlatFileItemWriter"
+				scope="step">
+				<aop:scoped-proxy />
+				<property name="resource" ref="fileOutputLocator" />
+				<property name="fieldSetUnmapper">
+					<bean
+						class="org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper" />
+				</property>
+			</bean>
+		</property>
+		<property name="itemTransformer">
+			<bean
+				class="org.springframework.batch.io.file.transform.RecursiveCollectionItemTransformer" />
+		</property>
 	</bean>
 
-	<bean id="delimitedLineAggregator" class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer" />
+	<bean id="delimitedLineAggregator"
+		class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer" />
 
-	<bean id="fixedLineAggregator" class="org.springframework.batch.io.file.transform.FixedLengthLineAggregator" />
+	<bean id="fixedLineAggregator"
+		class="org.springframework.batch.io.file.transform.FixedLengthLineAggregator" />
 
 </beans>

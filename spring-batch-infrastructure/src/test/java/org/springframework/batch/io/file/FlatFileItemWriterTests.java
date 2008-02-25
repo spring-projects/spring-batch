@@ -20,12 +20,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collections;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
+import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.io.file.mapping.FieldSetUnmapper;
+import org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -66,6 +68,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		outputFile = File.createTempFile("flatfile-output-", ".tmp");
 
 		inputSource.setResource(new FileSystemResource(outputFile));
+		inputSource.setFieldSetUnmapper(new PassThroughFieldSetMapper());
 		inputSource.afterPropertiesSet();
 
 		inputSource.open();
@@ -99,7 +102,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testWriteString() throws Exception {
 		inputSource.write(TEST_STRING);
@@ -111,23 +114,12 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
-	 * @throws Exception 
-	 */
-	public void testWriteCollection() throws Exception {
-		inputSource.write(Collections.singleton(TEST_STRING));
-		inputSource.close();
-		String lineFromFile = readLine();
-		assertEquals(TEST_STRING, lineFromFile);
-	}
-
-	/**
-	 * Regular usage of <code>write(String)</code> method
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testWriteWithConverter() throws Exception {
-		inputSource.setTransformer(new ItemTransformer() {
-			public Object transform(Object input) {
-				return "FOO:" + input;
+		inputSource.setFieldSetUnmapper(new FieldSetUnmapper() {
+			public FieldSet unmapItem(Object data) {
+				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
 		Object data = new Object();
@@ -140,12 +132,12 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testWriteWithConverterAndInfiniteLoop() throws Exception {
-		inputSource.setTransformer(new ItemTransformer() {
-			public Object transform(Object input) {
-				return "FOO:" + input;
+		inputSource.setFieldSetUnmapper(new FieldSetUnmapper() {
+			public FieldSet unmapItem(Object data) {
+				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
 		Object data = new Object();
@@ -158,36 +150,23 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testWriteWithConverterAndString() throws Exception {
-		inputSource.setTransformer(new ItemTransformer() {
-			public Object transform(Object input) {
-				return "FOO:" + input;
+		inputSource.setFieldSetUnmapper(new FieldSetUnmapper() {
+			public FieldSet unmapItem(Object data) {
+				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
 		inputSource.write(TEST_STRING);
 		inputSource.close();
 		String lineFromFile = readLine();
-		assertEquals("FOO:"+TEST_STRING, lineFromFile);
-	}
-
-	/**
-	 * Regular usage of <code>write(String)</code> method
-	 * @throws Exception 
-	 */
-	public void testWriteArray() throws Exception {
-		inputSource.write(new String[] { TEST_STRING, TEST_STRING });
-		inputSource.close();
-		String lineFromFile = readLine();
-		assertEquals(TEST_STRING, lineFromFile);
-		lineFromFile = readLine();
-		assertEquals(TEST_STRING, lineFromFile);
+		assertEquals("FOO:" + TEST_STRING, lineFromFile);
 	}
 
 	/**
 	 * Regular usage of <code>write(String[], LineDescriptor)</code> method
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testWriteRecord() throws Exception {
 		String args = "1";
@@ -301,11 +280,11 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals(0, streamContext.getLong(FlatFileItemWriter.RESTART_DATA_NAME));
 	}
 
-	private void commit() throws Exception{
+	private void commit() throws Exception {
 		inputSource.flush();
 	}
 
-	private void rollback() throws Exception{
+	private void rollback() throws Exception {
 		inputSource.clear();
 	}
 

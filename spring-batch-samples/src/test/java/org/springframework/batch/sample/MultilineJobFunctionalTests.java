@@ -23,11 +23,10 @@ import org.springframework.util.StringUtils;
 
 public class MultilineJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
-	// TODO: make the output group together in two lines, instead of all the
-	// trades coming out on a single line (it's the recursive transform call in
-	// FlatFileItemWriter).
-	private static final String EXPECTED_RESULT = "Trade: [isin=UK21341EAH45,quantity=978,price=98.34,customer=customer1]Trade: [isin=UK21341EAH46,quantity=112,price=18.12,customer=customer2]"
-			+ "Trade: [isin=UK21341EAH47,quantity=245,price=12.78,customer=customer2]Trade: [isin=UK21341EAH48,quantity=108,price=9.25,customer=customer3]Trade: [isin=UK21341EAH49,quantity=854,price=23.39,customer=customer4]";
+	// The output is grouped together in two lines, instead of all the
+	// trades coming out on a single line.
+	private static final String EXPECTED_RESULT = "[Trade: [isin=UK21341EAH45,quantity=978,price=98.34,customer=customer1], Trade: [isin=UK21341EAH46,quantity=112,price=18.12,customer=customer2]]"
+			+ "[Trade: [isin=UK21341EAH47,quantity=245,price=12.78,customer=customer2], Trade: [isin=UK21341EAH48,quantity=108,price=9.25,customer=customer3], Trade: [isin=UK21341EAH49,quantity=854,price=23.39,customer=customer4]]";
 
 	private Resource output = new FileSystemResource("target/test-outputs/20070122.testStream.multilineStep.txt");
 

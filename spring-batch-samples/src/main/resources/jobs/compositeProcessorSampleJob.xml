@@ -27,10 +27,7 @@
 										<bean class="org.springframework.batch.sample.item.writer.TradeWriter">
 											<property name="dao" ref="tradeDao" />
 										</bean>
-
-										<bean class="org.springframework.batch.item.writer.DelegatingItemWriter">
-											<property name="delegate" ref="flatFileOutputSource" />
-										</bean>
+										<ref bean="flatFileOutputSource" />
 									</list>
 								</property>
 							</bean>
@@ -80,6 +77,10 @@
 
 	<bean class="org.springframework.batch.io.file.FlatFileItemWriter" id="flatFileOutputSource">
 		<property name="resource" ref="customerFileLocator" />
+		<property name="fieldSetUnmapper">
+			<bean
+				class="org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper" />
+		</property>
 	</bean>
 
 	<bean id="customerFileLocator" class="org.springframework.core.io.FileSystemResource">

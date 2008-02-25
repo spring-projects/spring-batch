@@ -1,6 +1,10 @@
 package org.springframework.batch.item.writer;
 
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.StreamException;
+import org.springframework.batch.item.stream.ItemStreamAdapter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -10,9 +14,11 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class DelegatingItemWriter implements ItemWriter, InitializingBean {
+public class DelegatingItemWriter implements ItemWriter, ItemStream, InitializingBean {
 
 	private ItemWriter writer;
+	
+	private ItemStream stream;
 
 	/**
 	 * Calls {@link #doProcess(Object)} and then writes the result to the
@@ -40,6 +46,11 @@ public class DelegatingItemWriter implements ItemWriter, InitializingBean {
 	 */
 	public void setDelegate(ItemWriter writer) {
 		this.writer = writer;
+		if (writer instanceof ItemStream) {
+			this.stream = (ItemStream) writer;
+		} else {
+			this.stream = new ItemStreamAdapter();
+		}
 	}
 
 	public void afterPropertiesSet() throws Exception {
@@ -59,5 +70,39 @@ public class DelegatingItemWriter implements ItemWriter, InitializingBean {
 	public void flush() throws Exception {
 		writer.flush();
 	}
+
+	/**
+	 * @throws StreamException
+	 * @see org.springframework.batch.item.ItemStream#close()
+	 */
+	public void close() throws StreamException {
+		stream.close();
+	}
+
+	/**
+	 * @return
+	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
+	 */
+	public ExecutionContext getExecutionContext() {
+		return stream.getExecutionContext();
+	}
+
+	/**
+	 * @throws StreamException
+	 * @see org.springframework.batch.item.ItemStream#open()
+	 */
+	public void open() throws StreamException {
+		stream.open();
+	}
+
+	/**
+	 * @param context
+	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionContext)
+	 */
+	public void restoreFrom(ExecutionContext context) {
+		stream.restoreFrom(context);
+	}
+	
+	
 
 }

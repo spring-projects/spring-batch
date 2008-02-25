@@ -27,6 +27,9 @@
 						<aop:scoped-proxy />
 						<property name="resource"
 							value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
+							<property name="fieldSetUnmapper">
+								<bean class="org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper"/>
+							</property>
 					</bean>
 				</property>
 			</bean>
