@@ -17,13 +17,13 @@
 package org.springframework.batch.item.writer;
 
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.stream.ItemStreamAdapter;
+import org.springframework.batch.item.stream.ItemStreamSupport;
 
 /**
  * Base class for {@link ItemWriter} implementations.
  * @author Dave Syer
  *
  */
-public abstract class AbstractItemStreamItemWriter extends ItemStreamAdapter implements ItemWriter {
+public abstract class AbstractItemStreamItemWriter extends ItemStreamSupport implements ItemWriter {
 
 }

@@ -4,7 +4,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.StreamException;
-import org.springframework.batch.item.stream.ItemStreamAdapter;
+import org.springframework.batch.item.stream.ItemStreamSupport;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -49,7 +49,7 @@ public class DelegatingItemWriter implements ItemWriter, ItemStream, Initializin
 		if (writer instanceof ItemStream) {
 			this.stream = (ItemStream) writer;
 		} else {
-			this.stream = new ItemStreamAdapter();
+			this.stream = new ItemStreamSupport();
 		}
 	}
 

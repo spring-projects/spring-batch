@@ -142,7 +142,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 */
 	public void write(Object data) throws Exception {
 		FieldSet fieldSet = fieldSetUnmapper.unmapItem(data);
-		getOutputState().write(lineAggregator.aggregate(fieldSet ) + LINE_SEPARATOR);
+		getOutputState().write(lineAggregator.aggregate(fieldSet) + LINE_SEPARATOR);
 	}
 
 	/**
@@ -247,13 +247,6 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 		long restartCount = 0;
 
 		boolean shouldDeleteIfExists = true;
-		
-		/**
-		 * 
-		 */
-		public OutputState() {
-			initializeBufferedWriter();
-		}
 
 		/**
 		 * Return the byte offset position of the cursor in the output file as a

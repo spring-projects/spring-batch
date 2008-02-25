@@ -48,14 +48,14 @@ import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.reader.ListItemReader;
-import org.springframework.batch.item.stream.ItemStreamAdapter;
+import org.springframework.batch.item.stream.ItemStreamSupport;
 import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.DefaultExceptionHandler;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
-import org.springframework.batch.repeat.interceptor.RepeatListenerAdapter;
+import org.springframework.batch.repeat.interceptor.RepeatListenerSupport;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.PropertiesConverter;
@@ -185,7 +185,7 @@ public class ItemOrientedStepTests extends TestCase {
 		jobExecution.setId(new Long(1));
 		final StepExecution stepExecution = new StepExecution(step, jobExecution);
 
-		template.setListener(new RepeatListenerAdapter() {
+		template.setListener(new RepeatListenerSupport() {
 			public void open(RepeatContext context) {
 				assertNotNull(StepSynchronizationManager.getContext().getStepExecution());
 				assertEquals(stepExecution, StepSynchronizationManager.getContext().getStepExecution());
@@ -430,7 +430,7 @@ public class ItemOrientedStepTests extends TestCase {
 		assertEquals(0, map.size());
 	}
 
-	private class MockRestartableItemReader extends ItemStreamAdapter implements ItemReader {
+	private class MockRestartableItemReader extends ItemStreamSupport implements ItemReader {
 
 		private boolean getExecutionAttributesCalled = false;
 

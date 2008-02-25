@@ -273,6 +273,9 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	public void testDefaultStreamContext() throws Exception {
 		inputSource = new FlatFileItemWriter();
+		inputSource.setResource(new FileSystemResource(outputFile));
+		inputSource.setFieldSetUnmapper(new PassThroughFieldSetMapper());
+		inputSource.afterPropertiesSet();
 		inputSource.open();
 		ExecutionContext streamContext = inputSource.getExecutionContext();
 		assertNotNull(streamContext);

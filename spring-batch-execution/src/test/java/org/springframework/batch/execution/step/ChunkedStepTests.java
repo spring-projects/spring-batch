@@ -42,7 +42,7 @@ import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.interceptor.RepeatListenerAdapter;
+import org.springframework.batch.repeat.interceptor.RepeatListenerSupport;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -146,7 +146,7 @@ public class ChunkedStepTests extends TestCase {
 		jobExecution.setId(new Long(1));
 		final StepExecution stepExecution = new StepExecution("testStep", jobExecution);
 
-		template.setListener(new RepeatListenerAdapter() {
+		template.setListener(new RepeatListenerSupport() {
 			public void open(RepeatContext context) {
 				assertNotNull(StepSynchronizationManager.getContext().getStepExecution());
 				assertEquals(stepExecution, StepSynchronizationManager.getContext().getStepExecution());

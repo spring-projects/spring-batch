@@ -17,7 +17,7 @@ import org.springframework.batch.execution.step.support.JobRepositorySupport;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.interceptor.RepeatListenerAdapter;
+import org.springframework.batch.repeat.interceptor.RepeatListenerSupport;
 
 public class TaskletStepTests extends TestCase {
 
@@ -71,7 +71,7 @@ public class TaskletStepTests extends TestCase {
 
 	public void testSuccessfulExecutionWithListener() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, false), new JobRepositorySupport());
-		step.setListener(new RepeatListenerAdapter() {
+		step.setListener(new RepeatListenerSupport() {
 			public void open(RepeatContext context) {
 				list.add("open");
 			}
