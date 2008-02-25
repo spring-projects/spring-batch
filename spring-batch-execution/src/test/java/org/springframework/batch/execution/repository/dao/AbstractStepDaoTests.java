@@ -24,6 +24,7 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
@@ -52,9 +53,9 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 
 	protected JobInstance jobInstance;
 
-	protected String step1;
+	protected Step step1;
 
-	protected String step2;
+	protected Step step2;
 
 	protected StepExecution stepExecution;
 
@@ -91,8 +92,8 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	protected void onSetUpInTransaction() throws Exception {
 		Job job = new JobSupport("TestJob");
 		jobInstance = jobInstanceDao.createJobInstance(job, jobParameters);
-		step1 = "TestStep1";
-		step2 = "TestStep2";
+		step1 = new StepSupport("TestStep1");
+		step2 = new StepSupport("TestStep2");
 		jobExecution = new JobExecution(jobInstance);
 		jobExecutionDao.saveJobExecution(jobExecution);
 
@@ -132,7 +133,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		execution.setExitStatus(new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));
 		stepExecutionDao.saveStepExecution(execution);
-		StepExecution retrievedExecution = stepExecutionDao.getStepExecution(jobExecution, new StepSupport(step2));
+		StepExecution retrievedExecution = stepExecutionDao.getStepExecution(jobExecution, step2);
 		assertNotNull(retrievedExecution);
 		assertEquals(execution, retrievedExecution);
 		assertEquals(execution.getExecutionContext().getString("key1"), retrievedExecution.getExecutionContext().getString("key1"));
@@ -149,14 +150,14 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepExecution.setExitStatus(new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));
 		stepExecutionDao.updateStepExecution(stepExecution);
-		StepExecution retrievedExecution = stepExecutionDao.getStepExecution(jobExecution, new StepSupport(step1));
+		StepExecution retrievedExecution = stepExecutionDao.getStepExecution(jobExecution, step1);
 		assertNotNull(retrievedExecution);
 		assertEquals(stepExecution, retrievedExecution);
 		assertEquals(stepExecution.getExitStatus(), retrievedExecution.getExitStatus());
 	}
 
 	public void testUpdateStepExecutionWithNullId() {
-		StepExecution stepExecution = new StepExecution(null, null, null);
+		StepExecution stepExecution = new StepExecution(new StepSupport("testStep"), null, null);
 		try {
 			stepExecutionDao.updateStepExecution(stepExecution);
 			fail("Expected IllegalArgumentException");
@@ -201,7 +202,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	}
 	
 	public void testGetStepExecution() {
-		assertEquals(stepExecution, stepExecutionDao.getStepExecution(jobExecution, new StepSupport(step1)));
+		assertEquals(stepExecution, stepExecutionDao.getStepExecution(jobExecution, step1));
 	}
 		
 }

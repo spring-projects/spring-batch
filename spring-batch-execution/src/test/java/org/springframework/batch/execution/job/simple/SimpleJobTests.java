@@ -75,9 +75,9 @@ public class SimpleJobTests extends TestCase {
 
 	private SimpleJob job;
 	
-	private String step1;
+	private Step step1;
 	
-	private String step2;
+	private Step step2;
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -116,8 +116,8 @@ public class SimpleJobTests extends TestCase {
 		jobInstance = jobExecution.getJobInstance();
 
 		List steps = jobInstance.getJob().getSteps();
-		step1 = ((Step) steps.get(0)).getName();
-		step2 = ((Step) steps.get(1)).getName();
+		step1 = (Step) steps.get(0);
+		step2 = (Step) steps.get(1);
 		stepExecution1 = new StepExecution(step1, jobExecution, null);
 		stepExecution2 = new StepExecution(step2, jobExecution, null);
 
@@ -163,8 +163,8 @@ public class SimpleJobTests extends TestCase {
 		testRunNormally();
 		assertEquals(jobInstance, jobExecution.getJobInstance());
 		assertEquals(2, jobExecution.getStepExecutions().size());
-		assertEquals(step1, stepExecution1.getStepName());
-		assertEquals(step2, stepExecution2.getStepName());
+		assertEquals(step1.getName(), stepExecution1.getStepName());
+		assertEquals(step2.getName(), stepExecution2.getStepName());
 	}
 
 	public void testInterrupted() throws Exception {

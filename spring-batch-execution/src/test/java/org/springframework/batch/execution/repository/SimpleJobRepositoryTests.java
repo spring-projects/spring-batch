@@ -17,13 +17,10 @@
 package org.springframework.batch.execution.repository;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.easymock.ArgumentsMatcher;
 import org.easymock.MockControl;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
@@ -346,7 +343,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 	}
 
 	public void testUpdateStepExecution() {
-		StepExecution stepExecution = new StepExecution("stepName", null, new Long(1));
+		StepExecution stepExecution = new StepExecution(new StepSupport("stepName"), null, new Long(1));
 		stepExecution.setId(new Long(11));
 		ExecutionContext executionContext = new ExecutionContext();
 		stepExecution.setExecutionContext(executionContext);
@@ -358,7 +355,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 	}
 
 	public void testSaveExistingStepExecution() {
-		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(null), null);
+		StepExecution stepExecution = new StepExecution(new StepSupport("stepName"), new JobExecution(null), null);
 		ExecutionContext executionContext = new ExecutionContext();
 		stepExecution.setExecutionContext(executionContext);
 		stepExecutionDao.saveStepExecution(stepExecution);
@@ -370,7 +367,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	public void testSaveOrUpdateStepExecutionException() {
 
-		StepExecution stepExecution = new StepExecution(null, null, null);
+		StepExecution stepExecution = new StepExecution(new StepSupport("stepName"), null, null);
 
 		// failure scenario -- no step id set.
 		try {

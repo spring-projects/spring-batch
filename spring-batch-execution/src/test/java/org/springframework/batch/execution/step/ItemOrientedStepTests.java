@@ -30,14 +30,15 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
-import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.io.exception.BatchCriticalException;
@@ -118,7 +119,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 	public void testStepExecutor() throws Exception {
 
-		String step = "stepName";
+		Step step = new StepSupport("stepName");
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
@@ -135,7 +136,7 @@ public class ItemOrientedStepTests extends TestCase {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		itemOrientedStep.setChunkOperations(template);
 
-		String step = "stepName";
+		Step step = new StepSupport("stepName");
 		JobExecution jobExecution = new JobExecution(jobInstance);
 
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
@@ -155,13 +156,13 @@ public class ItemOrientedStepTests extends TestCase {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		itemOrientedStep.setChunkOperations(template);
 
-		final String step = "stepName";
+		final Step step = new StepSupport("stepName");
 		final JobExecution jobExecution = new JobExecution(jobInstance);
 		final StepExecution stepExecution = new StepExecution(step, jobExecution);
 
 		itemOrientedStep.setItemReader(new AbstractItemReader() {
 			public Object read() throws Exception {
-				assertEquals(step, stepExecution.getStepName());
+				assertEquals(step.getName(), stepExecution.getStepName());
 				assertNotNull(StepSynchronizationManager.getContext().getStepExecution());
 				return "foo";
 			}
@@ -180,7 +181,7 @@ public class ItemOrientedStepTests extends TestCase {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		itemOrientedStep.setStepOperations(template);
 
-		final String step = "stepName";
+		final Step step = new StepSupport("stepName");
 		final JobExecution jobExecution = new JobExecution(jobInstance);
 		jobExecution.setId(new Long(1));
 		final StepExecution stepExecution = new StepExecution(step, jobExecution);
@@ -204,7 +205,7 @@ public class ItemOrientedStepTests extends TestCase {
 		SimpleJobRepository repository = new SimpleJobRepository(new MapJobDao(), new MapJobDao(), new MapStepDao());
 		itemOrientedStep.setJobRepository(repository);
 
-		String step = "stepName";
+		Step step = new StepSupport("stepName");
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
@@ -229,7 +230,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		};
 
-		String step = "stepName";
+		Step step = new StepSupport("stepName");
 		itemOrientedStep.setItemReader(itemReader);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
@@ -260,7 +261,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		};
 
-		String step = "stepName";
+		Step step = new StepSupport("stepName");
 		itemOrientedStep.setItemReader(itemReader);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
@@ -279,7 +280,7 @@ public class ItemOrientedStepTests extends TestCase {
 	 * saveExecutionAttributes = true, doesn't have restoreFrom called on it.
 	 */
 	public void testNonRestartedJob() throws Exception {
-		String step = "stepName";
+		Step step = new StepSupport("stepName");
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
 		itemOrientedStep.setItemReader(tasklet);
 		itemOrientedStep.setSaveExecutionContext(true);
@@ -321,8 +322,7 @@ public class ItemOrientedStepTests extends TestCase {
 	 * it.
 	 */
 	public void testNoSaveExecutionAttributesRestartableJob() {
-		String step = "stepName";
-//		step.setStepExecutionCount(1);
+		Step step = new StepSupport("stepName");
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
 		itemOrientedStep.setItemReader(tasklet);
 		itemOrientedStep.setSaveExecutionContext(false);
@@ -346,8 +346,7 @@ public class ItemOrientedStepTests extends TestCase {
 	 * Restartable.
 	 */
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
-		String step = "stepName";
-//		step.setStepExecutionCount(1);
+		Step step = new StepSupport("stepName");
 		itemOrientedStep.setItemReader(new AbstractItemReader() {
 			public Object read() throws Exception {
 				return "foo";
@@ -400,8 +399,7 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testStreamManager() throws Exception {
-		String step = "stepName";
-//		step.setStepExecutionCount(1);
+		Step step = new StepSupport("stepName");
 		itemOrientedStep.setItemReader(new AbstractItemReader() {
 			public Object read() throws Exception {
 				return "foo";
@@ -501,7 +499,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		itemOrientedStep.setItemReader(itemReader);
 
-		String step = "stepName";
+		Step step = new StepSupport("stepName");
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
@@ -538,7 +536,7 @@ public class ItemOrientedStepTests extends TestCase {
 			}
 		});
 
-		String step = "stepName";
+		Step step = new StepSupport("stepName");
 		JobExecution jobExecutionContext = jobInstance.createJobExecution();
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 

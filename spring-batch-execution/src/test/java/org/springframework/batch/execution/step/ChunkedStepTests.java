@@ -28,6 +28,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
@@ -102,7 +103,7 @@ public class ChunkedStepTests extends TestCase {
 		chunkedStep.setJobRepository(new JobRepositorySupport());
 		
 		jobExecutionContext = new JobExecution(jobInstance);
-		stepExecution = new StepExecution("testStep", jobExecutionContext);
+		stepExecution = new StepExecution(new StepSupport("testStep"), jobExecutionContext);
 	}
 
 	public void testStepExecutor() throws Exception {
@@ -115,7 +116,7 @@ public class ChunkedStepTests extends TestCase {
 	public void testStepContextInitialized() throws Exception {
 
 		final JobExecution jobExecution = new JobExecution(jobInstance);
-		final StepExecution stepExecution = new StepExecution("testStep", jobExecution);
+		final StepExecution stepExecution = new StepExecution(new StepSupport("testStep"), jobExecution);
 
 		chunkedStep.setChunker(new ItemChunker(new AbstractItemReader() {
 			int counter = 0;
@@ -144,7 +145,7 @@ public class ChunkedStepTests extends TestCase {
 
 		final JobExecution jobExecution = new JobExecution(jobInstance);
 		jobExecution.setId(new Long(1));
-		final StepExecution stepExecution = new StepExecution("testStep", jobExecution);
+		final StepExecution stepExecution = new StepExecution(new StepSupport("testStep"), jobExecution);
 
 		template.setListener(new RepeatListenerSupport() {
 			public void open(RepeatContext context) {
@@ -171,7 +172,7 @@ public class ChunkedStepTests extends TestCase {
 //		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 		
 		repository.getLastStepExecution(jobInstance, chunkedStep);
-		repoControl.setReturnValue(new StepExecution(null,null));
+		repoControl.setReturnValue(stepExecution);
 		repository.getStepExecutionCount(jobInstance, chunkedStep);
 		repoControl.setReturnValue(0);
 		repository.saveOrUpdate(stepExecution);
@@ -508,7 +509,7 @@ public class ChunkedStepTests extends TestCase {
 //		}
 //	}
 //	
-//	private class MockRestartableItemReader extends ItemStreamAdapter implements ItemReader {
+//	private class MockRestartableItemReader extends ItemStreamSupport implements ItemReader {
 //
 //		private boolean getExecutionAttributesCalled = false;
 //

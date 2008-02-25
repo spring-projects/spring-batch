@@ -19,8 +19,13 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.ChunkingResult;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
+import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.execution.step.support.ItemChunker;
 
 public class ItemChunkerTests extends TestCase {
@@ -29,18 +34,19 @@ public class ItemChunkerTests extends TestCase {
 	
 	protected void setUp() throws Exception {
 		super.setUp();
-		
-		StepExecution execution = new StepExecution(null,null);
+		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(1), new JobParameters(), new JobSupport("jobName")));
+		StepExecution execution = new StepExecution(new StepSupport("stepName"), jobExecution);
 		stepContribution = execution.createStepContribution();
 	}
-	
+
 	public void testSizeNegative() {
 		try {
 			MockItemReader itemReader = new MockItemReader(10);
 			ItemChunker chunkReader = new ItemChunker(itemReader);
 			chunkReader.chunk(-1, stepContribution);
 			fail();
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 		}
 	}
 
@@ -50,7 +56,8 @@ public class ItemChunkerTests extends TestCase {
 			ItemChunker chunkReader = new ItemChunker(itemReader);
 			chunkReader.chunk(0, stepContribution);
 			fail();
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 		}
 	}
 
@@ -76,7 +83,8 @@ public class ItemChunkerTests extends TestCase {
 		try {
 			chunkReader.chunk(10, stepContribution);
 			fail();
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 		}
 	}
 
@@ -86,7 +94,7 @@ public class ItemChunkerTests extends TestCase {
 		ItemChunker chunkReader = new ItemChunker(itemReader);
 		chunkReader.setItemSkipPolicy(new StubReadFailurePolicy(false));
 		ChunkingResult chunkingResult = chunkReader.chunk(1, stepContribution);
-		assertEquals(1,chunkingResult.getChunk().getItems().size());
+		assertEquals(1, chunkingResult.getChunk().getItems().size());
 	}
 
 	private class StubReadFailurePolicy implements ItemSkipPolicy {

@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.execution.step.support.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.execution.step.support.SkipLimitExceededException;
 import org.springframework.batch.io.exception.FlatFileParsingException;
@@ -44,7 +45,7 @@ public class SkipLimitReadFailurePolicyTests extends TestCase {
 		skippableExceptions.add(FlatFileParsingException.class);
 		
 		failurePolicy = new LimitCheckingItemSkipPolicy(1, skippableExceptions);
-		stepExecution = new StepExecution(null, null);
+		stepExecution = new StepExecution(new StepSupport("stepName"), null);
 		stepExecution.setSkipCount(2);
 		stepContribution = stepExecution.createStepContribution();
 	}

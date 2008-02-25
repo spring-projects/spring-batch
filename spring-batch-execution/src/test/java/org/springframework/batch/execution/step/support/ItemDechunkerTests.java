@@ -23,6 +23,7 @@ import org.springframework.batch.core.domain.Chunk;
 import org.springframework.batch.core.domain.DechunkingResult;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.execution.step.support.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.execution.step.support.ItemDechunker;
 import org.springframework.batch.io.exception.WriteFailureException;
@@ -50,7 +51,7 @@ public class ItemDechunkerTests extends TestCase {
 		super.setUp();
 		
 		itemWriter = (ItemWriter)writerControl.getMock();
-		StepExecution execution = new StepExecution(null,null);
+		StepExecution execution = new StepExecution(new StepSupport("stepName"),null);
 		stepContribution = execution.createStepContribution();
 		dechunker = new ItemDechunker(itemWriter);
 		List items = new ArrayList();

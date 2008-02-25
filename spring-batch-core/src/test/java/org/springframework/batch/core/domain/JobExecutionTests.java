@@ -130,12 +130,12 @@ public class JobExecutionTests extends TestCase {
 
 	public void testAddAndRemoveStepExecution() throws Exception {
 		assertEquals(0, execution.getStepExecutions().size());
-		execution.createStepExecution(null);
+		execution.createStepExecution(new StepSupport("stepName"));
 		assertEquals(1, execution.getStepExecutions().size());
 	}
 	
 	public void testStop() throws Exception {
-		StepExecution stepExecution = execution.createStepExecution(null);
+		StepExecution stepExecution = execution.createStepExecution(new StepSupport("stepName"));
 		assertFalse(stepExecution.isTerminateOnly());
 		execution.stop();
 		assertTrue(stepExecution.isTerminateOnly());

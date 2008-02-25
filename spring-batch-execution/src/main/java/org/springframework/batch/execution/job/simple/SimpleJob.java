@@ -81,7 +81,7 @@ public class SimpleJob extends JobSupport {
 				if (shouldStart(jobInstance, step)) {
 					startedCount++;
 					updateStatus(execution, BatchStatus.STARTED);
-					StepExecution stepExecution = execution.createStepExecution(step.getName());
+					StepExecution stepExecution = execution.createStepExecution(step);
 					step.execute(stepExecution);
 					status = stepExecution.getExitStatus();
 				}

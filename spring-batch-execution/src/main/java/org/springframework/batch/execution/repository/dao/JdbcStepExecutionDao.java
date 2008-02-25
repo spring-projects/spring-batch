@@ -16,6 +16,7 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
@@ -367,14 +368,17 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	private class StepExecutionRowMapper implements RowMapper {
 
 		private final JobExecution jobExecution;
+		
+		private final Step step;
 
-		public StepExecutionRowMapper(JobExecution jobExecution) {
+		public StepExecutionRowMapper(JobExecution jobExecution, Step step) {
 			this.jobExecution = jobExecution;
+			this.step = step;
 		}
 
 		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-			StepExecution stepExecution = new StepExecution(rs.getString(2), jobExecution, new Long(rs.getLong(1)));
+			StepExecution stepExecution = new StepExecution(step, jobExecution, new Long(rs.getLong(1)));
 			stepExecution.setStartTime(rs.getTimestamp(3));
 			stepExecution.setEndTime(rs.getTimestamp(4));
 			stepExecution.setStatus(BatchStatus.getStatus(rs.getString(5)));
@@ -437,7 +441,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {
 		List executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION),
-				new Object[] { step.getName(), jobExecution.getId() }, new StepExecutionRowMapper(jobExecution));
+				new Object[] { step.getName(), jobExecution.getId() }, new StepExecutionRowMapper(jobExecution, step));
 
 		Assert.state(executions.size() <= 1,
 				"There can be at most one step execution with given name for single job execution");

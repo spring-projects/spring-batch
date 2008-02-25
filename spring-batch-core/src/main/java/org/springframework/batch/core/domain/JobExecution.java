@@ -143,8 +143,8 @@ public class JobExecution extends Entity {
 	 * 
 	 * @param stepExecution
 	 */
-	public StepExecution createStepExecution(String stepName) {
-		StepExecution stepExecution = new StepExecution(stepName, this, null);
+	public StepExecution createStepExecution(Step step) {
+		StepExecution stepExecution = new StepExecution(step, this, null);
 		this.stepExecutions.add(stepExecution);
 		return stepExecution;
 	}

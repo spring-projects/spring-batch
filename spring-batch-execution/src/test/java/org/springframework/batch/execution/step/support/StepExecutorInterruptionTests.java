@@ -16,8 +16,6 @@
 
 package org.springframework.batch.execution.step.support;
 
-import java.util.List;
-
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.BatchStatus;
@@ -26,7 +24,6 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
-import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
@@ -52,8 +49,6 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private StepExecutionDao stepExecutionDao = new MapStepDao();
 
-	private JobInstance jobInstance;
-
 	private RepeatOperationsStep step;
 
 	public void setUp() throws Exception {
@@ -65,7 +60,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		step.setName("stepName");
 		jobConfiguration.addStep(step);
 		jobConfiguration.setBeanName("testJob");
-		jobInstance = jobRepository.createJobExecution(jobConfiguration, new JobParameters()).getJobInstance();
+		jobRepository.createJobExecution(jobConfiguration, new JobParameters());
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
 		step.setItemReader(new ItemReaderAdapter());
@@ -77,10 +72,8 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	public void testInterruptChunk() throws Exception {
 
-		List steps = jobInstance.getJob().getSteps();
-		final String stepName = ((Step)steps.get(0)).getName();
 		JobExecution jobExecutionContext = new JobExecution(new JobInstance(new Long(0L), new JobParameters(), new JobSupport("testJob")));
-		final StepExecution stepExecution = new StepExecution(stepName, jobExecutionContext);
+		final StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 		step.setItemReader(new AbstractItemReader() {
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())

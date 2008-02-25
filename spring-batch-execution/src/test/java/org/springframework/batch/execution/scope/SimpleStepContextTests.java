@@ -21,6 +21,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepSupport;
 
 /**
  * @author Dave Syer
@@ -52,7 +53,7 @@ public class SimpleStepContextTests extends TestCase {
 	 */
 	public void testGetStepExecution() {
 		assertNull(context.getStepExecution());
-		context = new SimpleStepContext(new StepExecution(null, null, null));
+		context = new SimpleStepContext(new StepExecution(new StepSupport("stepName"), null, null));
 		assertNotNull(context.getStepExecution());
 	}
 

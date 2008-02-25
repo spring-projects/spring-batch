@@ -32,7 +32,7 @@ public class JdbcStepDaoTests extends AbstractStepDaoTests {
 
 		List executions = jdbcTemplate.queryForList(
 				"SELECT * FROM BATCH_STEP_EXECUTION where STEP_NAME=?",
-				new Object[] { step1 });
+				new Object[] { step1.getName() });
 		assertEquals(1, executions.size());
 		assertEquals(LONG_STRING.substring(0, 250), ((Map) executions.get(0))
 				.get("EXIT_MESSAGE"));

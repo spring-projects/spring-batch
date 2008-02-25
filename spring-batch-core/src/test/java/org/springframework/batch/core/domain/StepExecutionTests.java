@@ -31,9 +31,10 @@ import org.springframework.batch.support.PropertiesConverter;
  */
 public class StepExecutionTests extends TestCase {
 
-	private StepExecution execution = newStepExecution("stepName",
+	private StepExecution execution = newStepExecution(new StepSupport("stepName"),
 			new Long(23));
 
+	private StepExecution blankExecution = new StepExecution(new StepSupport("blank"), new JobExecution());
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.core.domain.JobExecution#JobExecution()}.
@@ -47,7 +48,7 @@ public class StepExecutionTests extends TestCase {
 	 * {@link org.springframework.batch.core.domain.JobExecution#JobExecution()}.
 	 */
 	public void testStepExecutionWithNullId() {
-		assertNull(new StepExecution(null, null).getId());
+		assertNull(new StepExecution(new StepSupport("stepName"), new JobExecution()).getId());
 	}
 
 	/**
@@ -176,7 +177,7 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	public void testToStringWithNullName() throws Exception {
-		String value = new StepExecution().toString();
+		String value = new StepExecution(new StepSupport(null), new JobExecution()).toString();
 		assertTrue("Should contain name=null: "+value, value.indexOf("name=null")>=0);
 	}
 
@@ -198,29 +199,30 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	public void testEqualsWithSameIdentifier() throws Exception {
-		Entity step1 = newStepExecution("stepName", new Long(11));
-		Entity step2 = newStepExecution("stepName", new Long(11));
-		assertEquals(step1, step2);
+		Step step = new StepSupport("stepName");
+		Entity stepExecution1 = newStepExecution(step, new Long(11));
+		Entity stepExecution2 = newStepExecution(step, new Long(11));
+		assertEquals(stepExecution1, stepExecution2);
 	}
 
 	public void testEqualsWithNull() throws Exception {
-		Entity step = newStepExecution("stepName", new Long(11));
-		assertFalse(step.equals(null));
+		Entity stepExecution = newStepExecution(new StepSupport("stepName"), new Long(11));
+		assertFalse(stepExecution.equals(null));
 	}
 
 	public void testEqualsWithNullIdentifiers() throws Exception {
-		Entity step = newStepExecution("stepName", new Long(11));
-		assertFalse(step.equals(new StepExecution()));
+		Entity stepExecution = newStepExecution(new StepSupport("stepName"), new Long(11));
+		assertFalse(stepExecution.equals(blankExecution));
 	}
 
 	public void testEqualsWithNullJob() throws Exception {
-		Entity step = newStepExecution(null, new Long(11));
-		assertFalse(step.equals(new StepExecution()));
+		Entity stepExecution = newStepExecution(new StepSupport("stepName"), new Long(11));
+		assertFalse(stepExecution.equals(blankExecution));
 	}
 
 	public void testEqualsWithNullStep() throws Exception {
-		Entity step = newStepExecution("stepName", null);
-		assertFalse(step.equals(new StepExecution()));
+		Entity stepExecution = newStepExecution(new StepSupport("stepName"), null);
+		assertFalse(stepExecution.equals(blankExecution));
 	}
 
 	public void testEqualsWithSelf() throws Exception {
@@ -228,16 +230,17 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	public void testEqualsWithDifferent() throws Exception {
-		Entity step = newStepExecution("foo", new Long(13));
-		assertFalse(execution.equals(step));
+		Entity stepExecution = newStepExecution(new StepSupport("foo"), new Long(13));
+		assertFalse(execution.equals(stepExecution));
 	}
 
 	public void testEqualsWithNullStepId() throws Exception {
-		execution = newStepExecution(null, new Long(31));
-		assertEquals(null, execution.getStepName());
-		StepExecution step = newStepExecution(null, new Long(31));
-		assertEquals(step.getJobExecutionId(), execution.getJobExecutionId());
-		assertTrue(execution.equals(step));
+		Step step = new StepSupport("name");
+		execution = newStepExecution(step, new Long(31));
+		assertEquals("name", execution.getStepName());
+		StepExecution stepExecution = newStepExecution(step, new Long(31));
+		assertEquals(stepExecution.getJobExecutionId(), execution.getJobExecutionId());
+		assertTrue(execution.equals(stepExecution));
 	}
 
 	public void testHashCode() throws Exception {
@@ -247,7 +250,7 @@ public class StepExecutionTests extends TestCase {
 
 	public void testHashCodeWithNullIds() throws Exception {
 		assertTrue("Hash code not same as parent",
-				new Entity(execution.getId()).hashCode() != new StepExecution()
+				new Entity(execution.getId()).hashCode() != blankExecution
 						.hashCode());
 	}
 
@@ -259,9 +262,9 @@ public class StepExecutionTests extends TestCase {
 		assertTrue(set.contains(execution));
 	}
 
-	private StepExecution newStepExecution(String stepName, Long long2) {
+	private StepExecution newStepExecution(Step step, Long long2) {
 		JobInstance job = new JobInstance(new Long(3), new JobParameters(), new JobSupport("testJob"));
-		StepExecution execution = new StepExecution(stepName, new JobExecution(job, long2), new Long(4));
+		StepExecution execution = new StepExecution(step, new JobExecution(job, long2), new Long(4));
 		return execution;
 	}
 

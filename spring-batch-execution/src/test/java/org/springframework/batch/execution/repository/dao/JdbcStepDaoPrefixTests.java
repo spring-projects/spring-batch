@@ -9,7 +9,9 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -31,7 +33,7 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 	MockJdbcTemplate jdbcTemplate = new MockJdbcTemplate();
 	
 	JobInstance job = new JobInstance(new Long(1), new JobParameters(), new JobSupport("testJob"));
-	String step = "foo";
+	Step step = new StepSupport("foo");
 	StepExecution stepExecution = new StepExecution(step, new JobExecution(job), null);
 	
 	MockControl stepExecutionIncrementerControl = MockControl.createControl(DataFieldMaxValueIncrementer.class);
