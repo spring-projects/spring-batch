@@ -26,6 +26,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
@@ -51,7 +52,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private StepExecutionDao stepExecutionDao = new MapStepDao();
 
-	private JobInstance job;
+	private JobInstance jobInstance;
 
 	private RepeatOperationsStep step;
 
@@ -64,7 +65,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		step.setName("stepName");
 		jobConfiguration.addStep(step);
 		jobConfiguration.setBeanName("testJob");
-		job = jobRepository.createJobExecution(jobConfiguration, new JobParameters()).getJobInstance();
+		jobInstance = jobRepository.createJobExecution(jobConfiguration, new JobParameters()).getJobInstance();
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
 		step.setItemReader(new ItemReaderAdapter());
@@ -76,8 +77,8 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	public void testInterruptChunk() throws Exception {
 
-		List steps = job.getStepNames();
-		final String stepName = (String) steps.get(0);
+		List steps = jobInstance.getJob().getSteps();
+		final String stepName = ((Step)steps.get(0)).getName();
 		JobExecution jobExecutionContext = new JobExecution(new JobInstance(new Long(0L), new JobParameters()));
 		final StepExecution stepExecution = new StepExecution(stepName, jobExecutionContext);
 		step.setItemReader(new AbstractItemReader() {

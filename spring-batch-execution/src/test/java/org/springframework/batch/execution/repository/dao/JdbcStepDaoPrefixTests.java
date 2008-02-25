@@ -50,8 +50,6 @@ public class JdbcStepDaoPrefixTests extends TestCase {
 		stepExecution.setId(new Long(1));
 		stepExecution.incrementVersion();
 		
-		job.addStepName(step);
-		
 	}
 	
 	public void testModifiedUpdateStepExecution(){

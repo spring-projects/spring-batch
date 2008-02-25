@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core.domain;
 
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -30,8 +28,6 @@ import java.util.List;
  * @author Dave Syer
  */
 public class JobInstance extends Entity {
-
-	private List stepNames = new ArrayList();
 
 	private JobParameters jobParameters;
 	
@@ -57,18 +53,6 @@ public class JobInstance extends Entity {
 	
 	public JobExecution getLastExecution() {
 		return lastExecution;
-	}
-	
-	public List getStepNames() {
-		return stepNames;
-	}
-
-	public void setStepNames(List stepInstances) {
-		this.stepNames = stepInstances;
-	}
-
-	public void addStepName(String stepName) {
-		this.stepNames.add(stepName);
 	}
 
 	public int getJobExecutionCount() {

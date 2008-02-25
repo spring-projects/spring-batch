@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.domain;
 
-import java.util.Collections;
-
 import junit.framework.TestCase;
 
 /**
@@ -32,23 +30,6 @@ public class JobInstanceTests extends TestCase {
 		assertNull(instance.getLastExecution());
 		instance.setLastExecution(lastExecution);
 		assertEquals(lastExecution, instance.getLastExecution());
-	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getStepNames()}.
-	 */
-	public void testGetSteps() {
-		assertEquals(0, instance.getStepNames().size());
-		instance.setStepNames(Collections.singletonList(""));
-		assertEquals(1, instance.getStepNames().size());
-	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#addStepName(org.springframework.batch.core.domain.StepInstance)}.
-	 */
-	public void testAddStep() {
-		instance.addStepName("");
-		assertEquals(1, instance.getStepNames().size());
 	}
 
 	/**

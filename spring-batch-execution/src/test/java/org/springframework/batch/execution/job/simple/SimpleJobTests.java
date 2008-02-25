@@ -26,6 +26,7 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
@@ -114,9 +115,9 @@ public class SimpleJobTests extends TestCase {
 		jobExecution = jobRepository.createJobExecution(job, jobParameters);
 		jobInstance = jobExecution.getJobInstance();
 
-		List steps = jobInstance.getStepNames();
-		step1 = (String) steps.get(0);
-		step2 = (String) steps.get(1);
+		List steps = jobInstance.getJob().getSteps();
+		step1 = ((Step) steps.get(0)).getName();
+		step2 = ((Step) steps.get(1)).getName();
 		stepExecution1 = new StepExecution(step1, jobExecution, null);
 		stepExecution2 = new StepExecution(step2, jobExecution, null);
 

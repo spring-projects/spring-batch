@@ -25,7 +25,6 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobSupport;
-import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -146,7 +145,7 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(job, "Job must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
-		List jobs = new ArrayList();
+		List jobInstances = new ArrayList();
 		JobInstance jobInstance;
 
 		// Check if a job is restartable, if not, create and return a new job
@@ -161,12 +160,12 @@ public class SimpleJobRepository implements JobRepository {
 			 * thread or process will block until this transaction has finished.
 			 */
 
-			jobs = jobInstanceDao.findJobInstances(job.getName(), jobParameters);
+			jobInstances = jobInstanceDao.findJobInstances(job.getName(), jobParameters);
 		}
 
-		if (jobs.size() == 1) {
+		if (jobInstances.size() == 1) {
 			// One job was found
-			jobInstance = (JobInstance) jobs.get(0);
+			jobInstance = (JobInstance) jobInstances.get(0);
 			jobInstance.setJobExecutionCount(jobExecutionDao.getJobExecutionCount(jobInstance));
 			if (jobInstance.getJobExecutionCount() > job.getStartLimit()) {
 				throw new BatchRestartException("Restart Max exceeded for Job: " + jobInstance.toString());
@@ -189,10 +188,9 @@ public class SimpleJobRepository implements JobRepository {
 				}
 			}
 			jobInstance.setLastExecution(lastExecution);
-			jobInstance.setStepNames(getStepNames(job));
 			jobInstance.setJob(job);
 		}
-		else if (jobs.size() == 0) {
+		else if (jobInstances.size() == 0) {
 			// no job found, create one
 			jobInstance = createJobInstance(job, jobParameters);
 		}
@@ -206,14 +204,14 @@ public class SimpleJobRepository implements JobRepository {
 
 	}
 
-	private List getStepNames(Job job) {
-		List stepNames = new ArrayList(job.getSteps().size());
-		for (Iterator iterator = job.getSteps().iterator(); iterator.hasNext();) {
-			Step step = (Step) iterator.next();
-			stepNames.add(step.getName());
-		}
-		return stepNames;
-	}
+//	private List getStepNames(Job job) {
+//		List stepNames = new ArrayList(job.getSteps().size());
+//		for (Iterator iterator = job.getSteps().iterator(); iterator.hasNext();) {
+//			Step step = (Step) iterator.next();
+//			stepNames.add(step.getName());
+//		}
+//		return stepNames;
+//	}
 	
 
 
@@ -290,7 +288,6 @@ public class SimpleJobRepository implements JobRepository {
 
 		JobInstance jobInstance = jobInstanceDao.createJobInstance(job.getName(), jobParameters);
 		jobInstance.setJob(job);
-		jobInstance.setStepNames(getStepNames(job));
 		return jobInstance;
 	}
 
@@ -315,10 +312,6 @@ public class SimpleJobRepository implements JobRepository {
 			}
 		}
 		return latest;
-	}
-	
-	private JobExecution getLastJobExecution(JobInstance jobInstance) {
-		return jobExecutionDao.getLastJobExecution(jobInstance);
 	}
 
 	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {

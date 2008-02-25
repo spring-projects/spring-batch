@@ -59,8 +59,6 @@ public class SimpleJob extends JobSupport {
 		JobInstance jobInstance = execution.getJobInstance();
 		jobInstance.setLastExecution(execution);
 
-		List stepNames = jobInstance.getStepNames();
-
 		ExitStatus status = ExitStatus.FAILED;
 
 		try {
@@ -76,15 +74,14 @@ public class SimpleJob extends JobSupport {
 			int startedCount = 0;
 
 			List steps = getSteps();
-			for (Iterator i = stepNames.iterator(), j = steps.iterator(); i.hasNext() && j.hasNext();) {
+			for (Iterator i = steps.iterator(); i.hasNext();) {
 
-				String stepInstance = (String) i.next();
-				Step step = (Step) j.next();
+				Step step = (Step) i.next();
 
 				if (shouldStart(jobInstance, step)) {
 					startedCount++;
 					updateStatus(execution, BatchStatus.STARTED);
-					StepExecution stepExecution = execution.createStepExecution(stepInstance);
+					StepExecution stepExecution = execution.createStepExecution(step.getName());
 					step.execute(stepExecution);
 					status = stepExecution.getExitStatus();
 				}
