@@ -125,7 +125,7 @@
 	</bean>
 	
 	<bean id="repeatOperationsStep" parent="abstractStep"
-		class="org.springframework.batch.execution.step.support.RepeatOperationsStep"
+		class="org.springframework.batch.execution.step.RepeatOperationsStep"
 		abstract="true">
 	</bean>
 

@@ -27,6 +27,7 @@ import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.execution.step.ItemOrientedStep;
+import org.springframework.batch.execution.step.RepeatOperationsStep;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.reader.ItemReaderAdapter;
 import org.springframework.batch.item.writer.AbstractItemWriter;
@@ -53,7 +54,7 @@ public class RepeatOperationsStepTests extends TestCase {
 	}
 	
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.support.RepeatOperationsStep#getChunkOperations()}.
+	 * Test method for {@link org.springframework.batch.execution.step.RepeatOperationsStep#getChunkOperations()}.
 	 */
 	public void testSetChunkOperations() {
 		assertNull(repeatStep.getChunkOperations());
@@ -64,7 +65,7 @@ public class RepeatOperationsStepTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.step.support.RepeatOperationsStep#getChunkOperations()}.
+	 * Test method for {@link org.springframework.batch.execution.step.RepeatOperationsStep#getChunkOperations()}.
 	 */
 	public void testSetStepOperations() {
 		assertNull(repeatStep.getChunkOperations());

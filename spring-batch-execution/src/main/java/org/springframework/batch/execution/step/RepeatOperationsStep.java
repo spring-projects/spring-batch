@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.step.support;
+package org.springframework.batch.execution.step;
 
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.execution.step.ItemOrientedStep;
+import org.springframework.batch.execution.step.support.RepeatOperationsHolder;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.RepeatOperations;
 

@@ -33,7 +33,7 @@ import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.step.AbstractStep;
-import org.springframework.batch.execution.step.support.RepeatOperationsStep;
+import org.springframework.batch.execution.step.RepeatOperationsStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
