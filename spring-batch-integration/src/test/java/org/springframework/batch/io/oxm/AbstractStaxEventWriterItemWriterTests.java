@@ -43,7 +43,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 		for (Iterator iterator = objects.listIterator(); iterator.hasNext();) {
 			writer.write(iterator.next());
 		}
-		writer.close();
+		writer.close(null);
 		XMLUnit.setIgnoreWhitespace(true);
 		XMLAssert.assertXMLEqual(new FileReader(expected.getFile()), new FileReader(resource.getFile()));
 

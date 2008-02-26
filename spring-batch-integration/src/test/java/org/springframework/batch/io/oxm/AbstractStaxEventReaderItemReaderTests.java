@@ -71,7 +71,7 @@ public abstract class AbstractStaxEventReaderItemReaderTests extends TestCase {
 	}
 
 	protected void tearDown() throws Exception {
-		source.close();
+		source.close(null);
 	}
 
 	public void setResource(Resource resource) {
