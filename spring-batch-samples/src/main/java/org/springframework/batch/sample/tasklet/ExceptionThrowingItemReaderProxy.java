@@ -52,7 +52,7 @@ public class ExceptionThrowingItemReaderProxy extends DelegatingItemReader {
 			throw new BatchCriticalException("Planned failure on count="+counter);
 		}
 		
-		return getItemReader().read();
+		return super.read();
 	}
 
 }

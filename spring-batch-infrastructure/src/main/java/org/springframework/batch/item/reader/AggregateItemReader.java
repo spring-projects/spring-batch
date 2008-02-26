@@ -61,7 +61,7 @@ public class AggregateItemReader extends DelegatingItemReader {
 	public Object read() throws Exception {
 		ResultHolder holder = new ResultHolder();
 
-		while (process(getItemReader().read(), holder)) {
+		while (process(super.read(), holder)) {
 			continue;
 		}
 

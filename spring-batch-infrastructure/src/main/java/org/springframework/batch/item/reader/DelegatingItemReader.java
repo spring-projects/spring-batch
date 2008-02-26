@@ -75,10 +75,6 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 		return item;
 	}
 
-	public ItemReader getItemReader() {
-		return itemReader;
-	}
-
 	public void skip() {
 		if (itemReader instanceof Skippable) {
 			((Skippable) itemReader).skip();

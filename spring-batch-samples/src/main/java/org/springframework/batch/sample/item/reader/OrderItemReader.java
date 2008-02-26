@@ -65,7 +65,7 @@ public class OrderItemReader extends DelegatingItemReader {
 		recordFinished = false;
 
 		while (!recordFinished) {
-			process((FieldSet) getItemReader().read());
+			process((FieldSet) super.read());
 		}
 
 		if (order != null) {
