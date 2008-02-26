@@ -57,7 +57,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	 * 
 	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#open()
 	 */
-	public void open() {
+	public void open(ExecutionContext executionContext) {
 		// Can be called from multiple threads because of lazy initialisation...
 		synchronized (lock) {
 			if (keys == null) {
@@ -230,19 +230,9 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void restoreFrom(ExecutionContext context) {
-		// no-op
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
-	public ExecutionContext getExecutionContext() {
-		return new ExecutionContext();
+	public void beforeSave() {
 	}
 
 }

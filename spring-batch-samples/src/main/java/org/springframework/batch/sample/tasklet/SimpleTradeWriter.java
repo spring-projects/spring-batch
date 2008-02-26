@@ -18,7 +18,8 @@ package org.springframework.batch.sample.tasklet;
 
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ExecutionContextProvider;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
@@ -38,7 +39,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class SimpleTradeWriter extends AbstractItemWriter implements ExecutionContextProvider {
+public class SimpleTradeWriter extends AbstractItemWriter implements ItemStream {
 
 	/*
 	 * writes a Trade object to output
@@ -49,6 +50,8 @@ public class SimpleTradeWriter extends AbstractItemWriter implements ExecutionCo
 	 * number of trade objects processed
 	 */
 	private int tradeCount = 0;
+	
+	private ExecutionContext executionContext;
 
 	/**
 	 * The input template is read using the readAndMap method, which accepts a
@@ -65,14 +68,18 @@ public class SimpleTradeWriter extends AbstractItemWriter implements ExecutionCo
 	public void setTradeDao(TradeDao tradeDao) {
 		this.tradeDao = tradeDao;
 	}
+	
+	public void open(ExecutionContext context) throws StreamException {
+		this.executionContext = context;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
-	public ExecutionContext getExecutionContext() {
-		ExecutionContext statistics = new ExecutionContext();
-		statistics.putLong("trade.count", tradeCount);
-		return statistics;
+	public void beforeSave() {
+		executionContext.putLong("trade.count", tradeCount);
 	}
 
+	public void close() throws StreamException {
+	}
 }

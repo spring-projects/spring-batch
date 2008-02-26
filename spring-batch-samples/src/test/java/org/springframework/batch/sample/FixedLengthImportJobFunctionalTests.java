@@ -23,6 +23,7 @@ import java.sql.SQLException;
 
 import org.springframework.batch.io.file.FlatFileItemReader;
 import org.springframework.batch.io.file.transform.LineTokenizer;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.batch.sample.mapping.TradeFieldSetMapper;
 import org.springframework.core.io.ClassPathResource;
@@ -61,7 +62,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	 */
 	protected void validatePostConditions() throws Exception {
 		
-		inputSource.open();
+		inputSource.open(new ExecutionContext());
 
 		jdbcTemplate.query("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", new RowCallbackHandler() {
 

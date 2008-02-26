@@ -16,6 +16,7 @@
 
 package org.springframework.batch.sample.dao;
 
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.CustomerCredit;
@@ -39,7 +40,7 @@ public class FlatFileCustomerCreditWriter implements CustomerCreditDao,
 	public void writeCredit(CustomerCredit customerCredit) throws Exception {
 
 		if (!opened) {
-			open();
+			open(new ExecutionContext());
 		}
 
 		String line = "" + customerCredit.getName() + separator
@@ -56,9 +57,9 @@ public class FlatFileCustomerCreditWriter implements CustomerCreditDao,
 		this.outputSource = outputSource;
 	}
 
-	public void open() throws Exception {
+	public void open(ExecutionContext executionContext) throws Exception {
 		if (outputSource instanceof ItemStream) {
-			((ItemStream) outputSource).open();
+			((ItemStream) outputSource).open(executionContext);
 		}
 		opened = true;
 	}

@@ -9,6 +9,7 @@ import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.sample.item.writer.StagingItemWriter;
@@ -49,7 +50,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 		writer.write("BAR");
 		writer.write("SPAM");
 		writer.write("BUCKET");
-		provider.open();
+		provider.open(new ExecutionContext());
 	}
 
 	protected void onTearDownAfterTransaction() throws Exception {

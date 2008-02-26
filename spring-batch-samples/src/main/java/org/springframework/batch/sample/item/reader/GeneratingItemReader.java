@@ -81,12 +81,6 @@ public class GeneratingItemReader extends AbstractItemReaderRecoverer implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#open()
-	 */
-	public void open() throws StreamException {
-	}
-
-	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#reset()
 	 */
 	public void reset() throws ResetFailedException {
@@ -102,8 +96,10 @@ public class GeneratingItemReader extends AbstractItemReaderRecoverer implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
-	public ExecutionContext getExecutionContext() {
-		return new ExecutionContext();
+	public void beforeSave() {
+	}
+
+	public void open(ExecutionContext context) throws StreamException {
 	}
 
 }

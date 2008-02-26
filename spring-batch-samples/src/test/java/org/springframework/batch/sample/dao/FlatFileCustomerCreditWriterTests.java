@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.CustomerCredit;
@@ -28,13 +29,13 @@ public class FlatFileCustomerCreditWriterTests extends TestCase {
 	}
 
 	public void testOpen() throws Exception {
-		
+		ExecutionContext executionContext = new ExecutionContext();
 		//set-up outputSource mock
-		output.open();
+		output.open(executionContext);
 		outputControl.replay();
 		
 		//call tested method
-		writer.open();
+		writer.open(executionContext);
 		
 		//verify method calls
 		outputControl.verify();
@@ -65,7 +66,7 @@ public class FlatFileCustomerCreditWriterTests extends TestCase {
 		
 		//set-up OutputSource mock
 		output.write("testName;1");
-		output.open();
+		output.open(new ExecutionContext());
 		outputControl.replay();
 		
 		//call tested method
