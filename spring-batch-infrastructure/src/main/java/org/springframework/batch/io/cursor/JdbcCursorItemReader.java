@@ -399,7 +399,7 @@ public class JdbcCursorItemReader implements KeyedItemReader, InitializingBean,
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#restoreFrom(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void open(ExecutionContext context) {
-		Assert.state(!initialized);
+		Assert.state(!initialized, "Stream is already initialized.  Close before re-opening.");
 		Assert.isNull(rs);
 		Assert.notNull(context, "ExecutionContext must not be null");
 		executeQuery();
