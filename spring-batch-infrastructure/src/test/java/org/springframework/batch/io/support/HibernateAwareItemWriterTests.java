@@ -164,13 +164,14 @@ public class HibernateAwareItemWriterTests extends TestCase {
 			}
 		});
 		try {
-			writer.flush();
+			writer.close(context);
 			fail("Expected RuntimeException");
 		} catch (RuntimeException e) {
 			assertEquals("bar", e.getMessage());
 		}
 		assertEquals(1, list.size());
-		assertTrue(list.contains("flush"));
+		System.err.println(list);
+		assertTrue(list.contains(context));
 	}
 
 	/**
@@ -187,18 +188,19 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		});
 		writer.write("foo");
 		try {
-			writer.flush();
+			writer.close(context);
 			fail("Expected RuntimeException");
 		} catch (RuntimeException e) {
 			assertEquals("bar", e.getMessage());
 		}
 		assertEquals(2, list.size());
-		assertTrue(list.contains("flush"));
+		assertTrue(list.contains(context));
 		writer.setHibernateTemplate(new HibernateTemplateWrapper() {
 			public void flush() throws DataAccessException {
 				list.add("flush");
 			}
 		});
+		writer.open(context);
 		writer.write("foo");
 		assertEquals(6, list.size());
 		assertTrue(list.contains("flush"));
@@ -229,7 +231,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	 */
 	public void testFlush() throws Exception{
 		writer.flush();
-		assertEquals(3, list.size());
+		assertEquals(1, list.size());
 		assertTrue(list.contains("flush"));
 	}
 
@@ -241,7 +243,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		Map map = TransactionSynchronizationManager.getResourceMap();
 		String key = (String) map.keySet().iterator().next();
 		TransactionSynchronizationManager.unbindResource(key);
-		writer.flush();
+		writer.close(context);
 		assertEquals(3, list.size());
 		assertTrue(list.contains("flush"));
 		assertTrue(list.contains("clear"));
