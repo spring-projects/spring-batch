@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.Properties;
 
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.io.exception.BatchEnvironmentException;
@@ -74,7 +73,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	public static final String RESTART_COUNT_STATISTICS_NAME = "restart.count";
 
-	public static final String RESTART_DATA_NAME = "flatfileoutput.current.line";
+	public static final String RESTART_DATA_NAME = "current.count";
 
 	private Resource resource;
 
@@ -85,7 +84,9 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	private LineAggregator lineAggregator = new DelimitedLineAggregator();
 
 	private FieldSetCreator fieldSetCreator;
-
+	
+	private String name = FlatFileItemWriter.class.getName();
+	
 	/**
 	 * Assert that mandatory properties (resource) are set.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
@@ -180,30 +181,24 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 * Initialize the Output Template.
 	 * @see ResourceLifecycle#open()
 	 */
-	public void open() {
-		getOutputState();
+	public void open(ExecutionContext executionContext) {
+		this.executionContext = executionContext;
+		OutputState outputState = getOutputState();
+		if(executionContext.containsKey(getKey(RESTART_DATA_NAME))){
+			outputState.restoreFrom(executionContext);
+		}
 	}
 
 	/**
-	 * @see ItemStream#getExecutionContext()
+	 * @see ItemStream#beforeSave()
 	 */
-	public ExecutionContext getExecutionContext() {
+	public void beforeSave() {
 		if (state == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
-		executionContext.putLong(RESTART_DATA_NAME, state.position());
-		executionContext.putLong(WRITTEN_STATISTICS_NAME, state.linesWritten);
-		executionContext.putLong(RESTART_COUNT_STATISTICS_NAME, state.restartCount);
-		return executionContext;
-	}
-
-	/**
-	 * @see ItemStream#restoreFrom(ExecutionContext)
-	 */
-	public void restoreFrom(ExecutionContext data) {
-		if (data == null)
-			return;
-		getOutputState().restoreFrom(data.getProperties());
+		executionContext.putLong(getKey(RESTART_DATA_NAME), state.position());
+		executionContext.putLong(getKey(WRITTEN_STATISTICS_NAME), state.linesWritten);
+		executionContext.putLong(getKey(RESTART_COUNT_STATISTICS_NAME), state.restartCount);
 	}
 
 	// Returns object representing state.
@@ -274,8 +269,8 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 		/**
 		 * @param properties
 		 */
-		public void restoreFrom(Properties properties) {
-			lastMarkedByteOffsetPosition = Long.parseLong(properties.getProperty(RESTART_DATA_NAME));
+		public void restoreFrom(ExecutionContext executionContext) {
+			lastMarkedByteOffsetPosition = executionContext.getLong(getKey(RESTART_DATA_NAME));
 			restarted = true;
 		}
 
@@ -515,5 +510,13 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	public void flush() throws Exception {
 		getOutputState().mark();
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	private String getKey(String key){
+		return name + "." + key;
 	}
 }

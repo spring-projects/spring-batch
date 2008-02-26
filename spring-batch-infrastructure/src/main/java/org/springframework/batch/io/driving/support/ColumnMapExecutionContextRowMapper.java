@@ -9,11 +9,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.core.CollectionFactory;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.SqlParameterValue;
@@ -39,11 +37,8 @@ public class ColumnMapExecutionContextRowMapper extends ColumnMapRowMapper imple
 	public static final String KEY_PREFIX = ClassUtils.getQualifiedName(ColumnMapExecutionContextRowMapper.class) + ".KEY.";
 	
 	public PreparedStatementSetter createSetter(ExecutionContext executionContext) {
-		
-		ColumnMapExecutionContext columnData = new ColumnMapExecutionContext(executionContext.getProperties());
-
 		List columns = new ArrayList();
-		for (Iterator iterator = columnData.keys.entrySet().iterator(); iterator.hasNext();) {
+		for (Iterator iterator = executionContext.entrySet().iterator(); iterator.hasNext();) {
 			Entry entry = (Entry) iterator.next();
 			Object column = entry.getValue();
 			columns.add(column);
@@ -52,52 +47,13 @@ public class ColumnMapExecutionContextRowMapper extends ColumnMapRowMapper imple
 		return new ArgPreparedStatementSetter(columns.toArray());
 	}
 
-	public ExecutionContext createExecutionContext(Object key) {
+	public void mapKeys(Object key, ExecutionContext executionContext) {
 		Assert.isInstanceOf(Map.class, key, "Input to create ExecutionContext must be of type Map.");
 		Map keys = (Map) key;
-		return new ColumnMapExecutionContext(keys);
-	}
-
-	private static class ColumnMapExecutionContext extends ExecutionContext {
-
-		private final Map keys;
-
-		public ColumnMapExecutionContext(Map keys) {
-			this.keys = keys;
+		for (Iterator it = keys.entrySet().iterator(); it.hasNext();) {
+			Entry entry = (Entry)it.next();
+			executionContext.put(entry.getKey().toString(), entry.getValue());
 		}
-
-		public ColumnMapExecutionContext(Properties props) {
-
-			keys = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(props.size());
-
-			for (int counter = 0; counter < props.size(); counter++) {
-
-				String key = KEY_PREFIX + counter;
-				String column = props.getProperty(key);
-
-				if (column != null) {
-					keys.put(key, column);
-				}
-				else {
-					break;
-				}
-
-			}
-		}
-
-		public Properties getProperties() {
-			Properties props = new Properties();
-
-			int counter = 0;
-			for (Iterator iterator = keys.entrySet().iterator(); iterator.hasNext();) {
-				Entry entry = (Entry) iterator.next();
-				props.setProperty(KEY_PREFIX + counter, entry.getValue().toString());
-				counter++;
-			}
-
-			return props;
-		}
-
 	}
 
 	/*
@@ -131,4 +87,5 @@ public class ColumnMapExecutionContextRowMapper extends ColumnMapRowMapper imple
 			}
 		}
 	}
+
 }

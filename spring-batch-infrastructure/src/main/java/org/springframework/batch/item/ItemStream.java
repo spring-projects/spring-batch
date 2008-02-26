@@ -24,35 +24,27 @@ import org.springframework.batch.item.exception.StreamException;
  * restoring from that state should an error occur.
  * <p>
  * 
- * <p>
- * The state that is stored is represented as {@link ExecutionContext} which
- * enforces a requirement that any restart data can be represented by a
- * Properties object. In general, the contract is that
- * {@link ExecutionContext} that is returned via the
- * {@link #getExecutionContext()} method will be given back to the
- * {@link #restoreFrom(ExecutionContext)} method, exactly as it was provided.
- * </p>
- * 
  * @author Dave Syer
+ * @author Lucas Ward
  * 
  */
-public interface ItemStream extends ExecutionContextProvider {
+public interface ItemStream {
 
 	/**
-	 * Restore to the state given the provided {@link ExecutionContext}.
-	 * This can be used to restart after a failure - hence not normally used
-	 * more than once per call to {@link #open()}.
+	 * Open the stream for the provided {@link ExecutionContext}.
 	 * 
-	 * @param context
+	 * @throws IllegalArgumentException if context is null
 	 */
-	void restoreFrom(ExecutionContext context);
-
+	void open(ExecutionContext context) throws StreamException;
+	
 	/**
-	 * If any resources are needed for the stream to operate they need to be
-	 * initialised here.
+	 * Indicates that the execution context provided during open
+	 * is about to be saved.  If any state is remaining, but 
+	 * has not been put in the context, it should be added
+	 * here.
 	 */
-	void open() throws StreamException;
-
+	void beforeSave();
+	
 	/**
 	 * If any resources are needed for the stream to operate they need to be
 	 * destroyed here. Once this method has been called all other methods

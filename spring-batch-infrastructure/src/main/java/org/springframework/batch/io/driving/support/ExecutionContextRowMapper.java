@@ -40,7 +40,7 @@ public interface ExecutionContextRowMapper extends RowMapper {
 	 * @return ExecutionContext representing the composite key.
 	 * @throws IllegalArgumentException if key is null or of an unsupported type.
 	 */
-	public ExecutionContext createExecutionContext(Object key);
+	public void mapKeys(Object key, ExecutionContext executionContext);
 
 	/**
 	 * Given the provided restart data, return a PreparedStatementSeter that can

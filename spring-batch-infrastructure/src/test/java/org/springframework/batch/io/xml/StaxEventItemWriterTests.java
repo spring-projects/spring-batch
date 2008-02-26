@@ -30,6 +30,8 @@ public class StaxEventItemWriterTests extends TestCase {
 
 	// output file
 	private Resource resource;
+	
+	private ExecutionContext executionContext;
 
 	// test record for writing to output
 	private Object record = new Object() {
@@ -45,13 +47,14 @@ public class StaxEventItemWriterTests extends TestCase {
 	protected void setUp() throws Exception {
 		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", "xml"));
 		writer = createItemWriter();
-		writer.open();
+		executionContext = new ExecutionContext();
 	}
 
 	/**
 	 * Write should pass its argument and StaxResult object to Serializer
 	 */
 	public void testWrite() throws Exception {
+		writer.open(executionContext);
 		Marshaller marshaller = new InputCheckMarshaller();
 		MarshallingEventWriterSerializer serializer = new MarshallingEventWriterSerializer(marshaller);
 		writer.setSerializer(serializer);
@@ -65,6 +68,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	 * Rolled back records should not be written to output file.
 	 */
 	public void testRollback() throws Exception {
+		writer.open(executionContext);
 		writer.write(record);
 		// rollback
 		writer.clear();
@@ -75,6 +79,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	 * Commited output is written to the output file.
 	 */
 	public void testCommit() throws Exception {
+		writer.open(executionContext);
 		writer.write(record);
 		// commit
 		writer.flush();
@@ -85,15 +90,16 @@ public class StaxEventItemWriterTests extends TestCase {
 	 * Restart scenario - content is appended to the output file after restart.
 	 */
 	public void testRestart() throws Exception {
+		writer.open(executionContext);
 		// write record
 		writer.write(record);
 		// writer.mark();
-		ExecutionContext streamContext = writer.getExecutionContext();
+		writer.beforeSave();
 		writer.close();
 
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();
-		writer.restoreFrom(streamContext);
+		writer.open(executionContext);
 		writer.write(record);
 		writer.close();
 		
@@ -114,10 +120,12 @@ public class StaxEventItemWriterTests extends TestCase {
 	 * Count of 'records written so far' is returned as statistics.
 	 */
 	public void testStreamContext() throws Exception {
+		writer.open(executionContext);
 		final int NUMBER_OF_RECORDS = 10;
 		for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
 			writer.write(record);
-			long writeStatistics = writer.getExecutionContext().getLong(StaxEventItemWriter.WRITE_STATISTICS_NAME);
+			writer.beforeSave();
+			long writeStatistics = executionContext.getLong(StaxEventItemWriter.WRITE_STATISTICS_NAME);
 
 			assertEquals(i, writeStatistics);
 		}
@@ -133,7 +141,7 @@ public class StaxEventItemWriterTests extends TestCase {
 				put("attribute", "value");
 			}
 		});
-		writer.open();
+		writer.open(executionContext);
 		writer.flush();
 
 		assertTrue(outputFileContent().indexOf("<testroot attribute=\"value\"") != NOT_FOUND);

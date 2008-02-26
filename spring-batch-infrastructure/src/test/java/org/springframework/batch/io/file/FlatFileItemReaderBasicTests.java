@@ -29,6 +29,7 @@ import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.io.file.transform.LineTokenizer;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
@@ -48,6 +49,8 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	// common value used for writing to a file
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
 	private String TEST_OUTPUT = "[FlatFileInputTemplate-TestData]";
+	
+	private ExecutionContext executionContext;
 
 	// simple stub instead of a realistic tokenizer
 	private LineTokenizer tokenizer = new LineTokenizer() {
@@ -72,8 +75,8 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader.setLineTokenizer(tokenizer);
 		itemReader.setFieldSetMapper(fieldSetMapper);
 		itemReader.afterPropertiesSet();
-
-		itemReader.open();
+		
+		executionContext = new ExecutionContext();
 	}
 
 	/**
@@ -91,6 +94,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	 * Regular usage of <code>read</code> method
 	 */
 	public void testRead() throws Exception {
+		itemReader.open(executionContext);
 		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
 	}
 
@@ -98,6 +102,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	 * Regular usage of <code>read</code> method
 	 */
 	public void testReadExhausted() throws Exception {
+		itemReader.open(executionContext);
 		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
 		assertEquals(null, itemReader.read());
 	}
@@ -112,6 +117,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 			}
 		});
 		try {
+			itemReader.open(executionContext);
 			itemReader.read();
 			fail("Expected ParsingException");
 		} catch (FlatFileParsingException e) {
@@ -128,6 +134,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		});
 
 		try {
+			itemReader.open(executionContext);
 			itemReader.read();
 			fail("Expected ParsingException");
 		} catch (FlatFileParsingException e) {
@@ -154,7 +161,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader.setFieldSetMapper(fieldSetMapper);
 		itemReader.close();
 		// The open does not happen automatically on a read...
-		itemReader.open();
+		itemReader.open(executionContext);
 		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
 	}
 
@@ -170,7 +177,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	}
 
 	public void testOpenTwiceHasNoEffect() throws Exception {
-		itemReader.open();
+		itemReader.open(executionContext);
 		testRead();
 	}
 
@@ -179,7 +186,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader.setEncoding("UTF-8");
 		itemReader.setResource(getInputResource(TEST_STRING));
 		itemReader.setFieldSetMapper(fieldSetMapper);
-		itemReader.open();
+		itemReader.open(executionContext);
 		testRead();
 	}
 
@@ -188,7 +195,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader.setEncoding(null);
 		itemReader.setResource(getInputResource(TEST_STRING));
 		try {
-			itemReader.open();
+			itemReader.open(executionContext);
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
@@ -201,7 +208,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader.setEncoding("foo");
 		itemReader.setResource(getInputResource(TEST_STRING));
 		try {
-			itemReader.open();
+			itemReader.open(executionContext);
 			fail("Expected BatchEnvironmentException");
 		}
 		catch (BatchEnvironmentException e) {
@@ -238,7 +245,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader.setFieldSetMapper(fieldSetMapper);
 		itemReader.setFirstLineIsHeader(true);
 		itemReader.afterPropertiesSet();
-		itemReader.open();
+		itemReader.open(executionContext);
 		
 		FieldSet fs = (FieldSet) itemReader.read();
 		assertEquals("value1", fs.readString("name1"));
@@ -261,7 +268,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader.setFieldSetMapper(fieldSetMapper);
 		itemReader.setLinesToSkip(1);
 		itemReader.afterPropertiesSet();
-		itemReader.open();
+		itemReader.open(executionContext);
 		
 		FieldSet fs = (FieldSet) itemReader.read();
 		assertEquals("one", fs.readString(0));
@@ -286,7 +293,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		testReader.afterPropertiesSet();
 		
 		try{
-			testReader.open();
+			testReader.open(executionContext);
 			fail();
 		}catch(IllegalStateException ex){
 			//expected
@@ -309,7 +316,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		
 		//replace the resource to simulate runtime resource creation
 		testReader.setResource(getInputResource(TEST_STRING));
-		testReader.open();
+		testReader.open(executionContext);
 		assertEquals(TEST_OUTPUT, testReader.read().toString());
 	}
 		

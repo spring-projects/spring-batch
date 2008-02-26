@@ -22,6 +22,7 @@ public class JdbcCursorItemReaderIntegrationTests extends AbstractDataSourceItem
 		result.setFetchSize(10);
 		result.setMaxRows(100);
 		result.setQueryTimeout(1000);
+		result.setSaveState(true);
 
 		return result;
 	}

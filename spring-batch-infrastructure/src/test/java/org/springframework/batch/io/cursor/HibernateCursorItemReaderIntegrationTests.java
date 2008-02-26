@@ -3,6 +3,7 @@ package org.springframework.batch.io.cursor;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.io.support.AbstractDataSourceItemReaderIntegrationTests;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -48,7 +49,7 @@ public class HibernateCursorItemReaderIntegrationTests extends AbstractDataSourc
 		HibernateCursorItemReader inputSource = ((HibernateCursorItemReader) reader);
 
 		// initialize and call setter => error
-		inputSource.open();
+		inputSource.open(new ExecutionContext());
 		try {
 			inputSource.setUseStatelessSession(false);
 			fail();

@@ -38,41 +38,14 @@ public class ItemStreamSupport implements ItemStream {
 	 * No-op.
 	 * @see org.springframework.batch.item.ItemStream#open()
 	 */
-	public void open() throws StreamException {
-	}
-
-	/**
-	 * No-op.
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void restoreFrom(ExecutionContext context) {
+	public void open(ExecutionContext executionContext) throws StreamException {
 	}
 
 	/**
 	 * Return empty {@link ExecutionContext}.
-	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
+	 * @see org.springframework.batch.item.ExecutionContextProvider#beforeSave()
 	 */
-	public ExecutionContext getExecutionContext() {
-		return new ExecutionContext();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
-	 */
-	public boolean isMarkSupported() {
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void mark() {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void reset() {
+	public void beforeSave() {
 	}
 
 }

@@ -29,12 +29,8 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 		}
 	}
 
-	public ExecutionContext getExecutionContext() {
-		return inputSource.getExecutionContext();
-	}
-
-	public void restoreFrom(ExecutionContext data) {
-		inputSource.restoreFrom(data);
+	public void beforeSave() {
+		inputSource.beforeSave();
 	}
 
 	public void destroy() throws Exception {
@@ -48,7 +44,8 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public void open() {
+	public void open(ExecutionContext executionContext) {
+		inputSource.open(executionContext);
 	};
 
 	public void close() {

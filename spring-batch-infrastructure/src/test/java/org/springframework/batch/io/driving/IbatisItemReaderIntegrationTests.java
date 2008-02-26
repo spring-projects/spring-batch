@@ -31,6 +31,7 @@ public class IbatisItemReaderIntegrationTests extends AbstractDataSourceItemRead
 		keyGenerator.setSqlMapClient(sqlMapClient);
 		inputSource.setSqlMapClient(sqlMapClient);
 		inputSource.setKeyGenerator(keyGenerator);
+		inputSource.setSaveState(true);
 
 		return inputSource;
 	}

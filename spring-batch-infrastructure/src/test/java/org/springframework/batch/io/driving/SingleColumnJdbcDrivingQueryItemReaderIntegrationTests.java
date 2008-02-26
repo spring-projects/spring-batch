@@ -19,7 +19,7 @@ public class SingleColumnJdbcDrivingQueryItemReaderIntegrationTests extends Abst
 		keyStrategy.setRestartSql("SELECT ID from T_FOOS where ID > ? order by ID");
 		DrivingQueryItemReader inputSource = new DrivingQueryItemReader();
 		inputSource.setKeyGenerator(keyStrategy);
-		
+		inputSource.setSaveState(true);
 		return new FooItemReader(inputSource, getJdbcTemplate());
 
 	}

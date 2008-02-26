@@ -17,7 +17,6 @@ package org.springframework.batch.io.cursor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
@@ -57,7 +56,7 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 			+ ".rowNumber";
 
 	private static final String SKIPPED_ROWS = ClassUtils.getShortName(HibernateCursorItemReader.class)
-			+ ".skippedRows";;
+			+ ".skippedRows";
 
 	private SessionFactory sessionFactory;
 
@@ -81,10 +80,14 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	private int currentProcessedRow = 0;
 
 	private boolean initialized = false;
+	
+	private ExecutionContext executionContext = new ExecutionContext();
+	
+	private String name = HibernateCursorItemReader.class.getName();
 
 	public Object read() {
 		if (!initialized) {
-			open();
+			open(new ExecutionContext());
 		}
 		if (cursor.next()) {
 			currentProcessedRow++;
@@ -123,7 +126,11 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	/**
 	 * Creates cursor for the query.
 	 */
-	public void open() {
+	public void open(ExecutionContext executionContext) {
+		this.executionContext = executionContext;
+		
+		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
+
 		if (useStatelessSession) {
 			statelessSession = sessionFactory.openStatelessSession();
 			cursor = statelessSession.createQuery(queryString).scroll();
@@ -133,6 +140,18 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 			cursor = statefulSession.createQuery(queryString).scroll();
 		}
 		initialized = true;
+		
+		if (executionContext.containsKey(getKey(RESTART_DATA_ROW_NUMBER_KEY))) {
+			currentProcessedRow = Integer.parseInt(executionContext.getString(getKey(RESTART_DATA_ROW_NUMBER_KEY)));
+			cursor.setRowNumber(currentProcessedRow - 1);
+		}
+		
+		if (executionContext.containsKey(getKey(SKIPPED_ROWS))) {
+			String[] skipped = StringUtils.commaDelimitedListToStringArray(executionContext.getString(getKey(SKIPPED_ROWS)));
+			for (int i = 0; i < skipped.length; i++) {
+				this.skippedRows.add(new Integer(skipped[i]));
+			}
+		}
 	}
 
 	/**
@@ -167,41 +186,11 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	}
 
 	/**
-	 * @return the current row number wrapped as {@link ExecutionContext}
 	 */
-	public ExecutionContext getExecutionContext() {
-		Properties props = new Properties();
-		props.setProperty(RESTART_DATA_ROW_NUMBER_KEY, "" + currentProcessedRow);
-
-		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.putString(RESTART_DATA_ROW_NUMBER_KEY, "" + currentProcessedRow);
+	public void beforeSave() {
+		executionContext.putString(getKey(RESTART_DATA_ROW_NUMBER_KEY), "" + currentProcessedRow);
 		String skipped = skippedRows.toString();
-		executionContext.putString(SKIPPED_ROWS, skipped.substring(1, skipped.length() - 1));
-		return executionContext;
-	}
-
-	/**
-	 * Sets the cursor to the received row number.
-	 */
-	public void restoreFrom(ExecutionContext data) {
-		Assert.state(!initialized, "Cannot restore when already intialized.  Call close() first before restore()");
-
-		Properties props = data.getProperties();
-		if (props.getProperty(RESTART_DATA_ROW_NUMBER_KEY) == null) {
-			return;
-		}
-		currentProcessedRow = Integer.parseInt(props.getProperty(RESTART_DATA_ROW_NUMBER_KEY));
-		open();
-		cursor.setRowNumber(currentProcessedRow - 1);
-
-		if (!props.containsKey(SKIPPED_ROWS)) {
-			return;
-		}
-
-		String[] skipped = StringUtils.commaDelimitedListToStringArray(props.getProperty(SKIPPED_ROWS));
-		for (int i = 0; i < skipped.length; i++) {
-			this.skippedRows.add(new Integer(skipped[i]));
-		}
+		executionContext.putString(getKey(SKIPPED_ROWS), skipped.substring(1, skipped.length() - 1));
 	}
 
 	/**
@@ -254,4 +243,7 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 		}
 	}
 
+	private String getKey(String key){
+		return name + "." + key;
+	}
 }

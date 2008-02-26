@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.io.file.FlatFileItemReader;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.reader.DelegatingItemReader;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.core.io.ClassPathResource;
@@ -45,7 +46,7 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		provider = new TradeItemReader(resource);
-		provider.open();
+		provider.open(new ExecutionContext());
 	}
 
 	protected static class TradeItemReader extends DelegatingItemReader {

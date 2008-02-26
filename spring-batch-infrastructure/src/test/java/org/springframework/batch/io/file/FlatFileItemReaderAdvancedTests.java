@@ -25,7 +25,6 @@ import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.io.file.transform.LineTokenizer;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.exception.StreamException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
@@ -41,6 +40,8 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 	// common value used for writing to a file
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
+	
+	private ExecutionContext executionContext;
 
 	// simple stub instead of a realistic tokenizer
 	private LineTokenizer tokenizer = new LineTokenizer() {
@@ -66,7 +67,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		reader.setFieldSetMapper(fieldSetMapper);
 		// context argument is necessary only for the FileLocator, which
 		// is mocked
-		reader.open();
+		executionContext = new ExecutionContext();
 	}
 
 	/**
@@ -88,7 +89,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 		reader.close();
 		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		reader.open();
+		reader.open(executionContext);
 
 		// read some records
 		reader.read(); // #1
@@ -123,7 +124,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 		reader.close();
 		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		reader.open();
+		reader.open(executionContext);
 
 		// read some records
 		reader.read(); // #1
@@ -142,30 +143,11 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 	}
 
-	public void testRestartFromNullData() throws Exception {
-		reader.restoreFrom(null);
-		assertEquals("[FlatFileInputTemplate-TestData]", reader.read().toString());
-	}
-
-	public void testRestartBeforeOpen() throws Exception {
-		reader = new FlatFileItemReader();
-		reader.setResource(getInputResource(TEST_STRING));
-		reader.setFieldSetMapper(fieldSetMapper);
-		// do not open the template...
-		try {
-			reader.restoreFrom(reader.getExecutionContext());
-		} catch (StreamException e) {
-			assertTrue("Message does not contain open: "+e.getMessage(), e.getMessage().contains("open"));
-		}
-		reader.open();
-		assertEquals("[FlatFileInputTemplate-TestData]", reader.read().toString());
-	}
-
 	public void testRestart() throws Exception {
 
 		reader.close();
 		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		reader.open();
+		reader.open(executionContext);
 
 		// read some records
 		reader.read();
@@ -177,24 +159,23 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		reader.read();
 
 		// get restart data
-		ExecutionContext streamContext = reader.getExecutionContext();
-		assertEquals("4", (String) streamContext.getProperties().getProperty(
-				FlatFileItemReader.READ_STATISTICS_NAME));
+		reader.beforeSave();
+		assertEquals(4, executionContext.getLong(
+				FlatFileItemReader.class.getName() + "." + FlatFileItemReader.READ_STATISTICS_NAME));
 		// close input
 		reader.close();
 
 		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 
 		// init for restart
-		reader.open();
-		reader.restoreFrom(streamContext);
+		reader.open(executionContext);
 
 		// read remaining records
 		assertEquals("[testLine5]", reader.read().toString());
 		assertEquals("[testLine6]", reader.read().toString());
 
-		ExecutionContext statistics = reader.getExecutionContext();
-		assertEquals(6, statistics.getLong(FlatFileItemReader.READ_STATISTICS_NAME));
+		reader.beforeSave();
+		assertEquals(6, executionContext.getLong(FlatFileItemReader.class.getName() + "." + FlatFileItemReader.READ_STATISTICS_NAME));
 	}
 
 }

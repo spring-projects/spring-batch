@@ -13,18 +13,10 @@ import org.springframework.batch.item.ExecutionContext;
 public interface KeyGenerator {
 
 	/**
+	 * @param executionContext TODO
 	 * @return list of keys returned by the driving query
 	 */
-	List retrieveKeys();
-
-	/**
-	 * Restore the keys list based on provided restart data.
-	 *
-	 * @param executionContext, the restart data to restore the keys list from.
-	 * @return a list of keys.
-	 * @throws IllegalArgumentException if executionContext is null.
-	 */
-	List restoreKeys(ExecutionContext executionContext);
+	List retrieveKeys(ExecutionContext executionContext);
 	
 	/**
 	 * Return the provided key as restart data.
@@ -34,5 +26,5 @@ public interface KeyGenerator {
 	 * @throws IllegalArgumentException if key is null.
 	 * @throws IllegalArgumentException if key is an incompatible type.
 	 */
-	ExecutionContext getKeyAsExecutionContext(Object key);
+	void saveState(Object key, ExecutionContext executionContext);
 }

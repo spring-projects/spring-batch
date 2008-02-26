@@ -38,7 +38,7 @@ public interface StreamManager {
 	 * @param key the key under which to add the provider
 	 * @param stream an {@link ItemStream}
 	 */
-	void register(Object key, ItemStream stream);
+	void register(ItemStream stream);
 
 	/**
 	 * Extract and aggregate the {@link ExecutionContext} from all streams under
@@ -49,7 +49,7 @@ public interface StreamManager {
 	 * @return {@link ExecutionContext} aggregating the contexts of all providers
 	 * registered under this key, or empty otherwise.
 	 */
-	ExecutionContext getExecutionContext(Object key);
+	void beforeSave();
 
 	/**
 	 * If any resources are needed for the stream to operate they need to be
@@ -58,7 +58,7 @@ public interface StreamManager {
 	 * @param key the key under which {@link ItemStream} instances might have
 	 * been registered.
 	 */
-	void close(Object key) throws StreamException;
+	void close() throws StreamException;
 
 	/**
 	 * If any resources are needed for the stream to operate they need to be
@@ -67,20 +67,12 @@ public interface StreamManager {
 	 * @param key the key under which {@link ItemStream} instances might have
 	 * been registered.
 	 */
-	void open(Object key) throws StreamException;
+	void open(ExecutionContext executionContext) throws StreamException;
 	
-	TransactionStatus getTransaction(Object key);
+	TransactionStatus getTransaction();
 	
 	void commit(TransactionStatus transaction);
 	
 	void rollback(TransactionStatus transaction);
-
-	/**
-	 * Restore the streams registered under a goven key.
-	 * 
-	 * @param key the key under which the streams are stored 
-	 * @param executionContext the context (may be null) to restore from
-	 */
-	void restoreFrom(Object key, ExecutionContext executionContext);
 
 }

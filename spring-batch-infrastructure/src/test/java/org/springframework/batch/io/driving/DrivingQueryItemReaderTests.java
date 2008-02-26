@@ -32,6 +32,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		
 		DrivingQueryItemReader inputSource = new DrivingQueryItemReader();
 		inputSource.setKeyGenerator(new MockKeyGenerator());
+		inputSource.setSaveState(true);
 		
 		return inputSource;
 	}
@@ -67,18 +68,22 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	 */
 	public void testRestart() throws Exception {
 
+		ExecutionContext executionContext = new ExecutionContext();
+		
+		getAsItemStream(itemReader).open(executionContext);
+		
 		Foo foo1 = (Foo) itemReader.read();
 		assertEquals(1, foo1.getValue());
 
 		Foo foo2 = (Foo) itemReader.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionContext streamContext = getAsRestartable(itemReader).getExecutionContext();
+		getAsItemStream(itemReader).beforeSave();
 
 		// create new input source
 		itemReader = createItemReader();
 
-		getAsRestartable(itemReader).restoreFrom(streamContext);
+		getAsItemStream(itemReader).open(executionContext);
 
 		Foo fooAfterRestart = (Foo) itemReader.read();
 		assertEquals(3, fooAfterRestart.getValue());
@@ -89,13 +94,17 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	 */
 	public void testInvalidRestore() throws Exception {
 
+		ExecutionContext executionContext = new ExecutionContext();
+		
+		getAsItemStream(itemReader).open(executionContext);
+		
 		Foo foo1 = (Foo) itemReader.read();
 		assertEquals(1, foo1.getValue());
 
 		Foo foo2 = (Foo) itemReader.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionContext streamContext = getAsRestartable(itemReader).getExecutionContext();
+		getAsItemStream(itemReader).beforeSave();
 
 		// create new input source
 		itemReader = createItemReader();
@@ -104,7 +113,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		assertEquals(1, foo.getValue());
 
 		try {
-			getAsRestartable(itemReader).restoreFrom(streamContext);
+			getAsItemStream(itemReader).open(executionContext);
 			fail();
 		}
 		catch (IllegalStateException ex) {
@@ -119,7 +128,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	public void testRestoreFromEmptyData() throws Exception {
 		ExecutionContext streamContext = new ExecutionContext(new Properties());
 
-		getAsRestartable(itemReader).restoreFrom(streamContext);
+		getAsItemStream(itemReader).open(streamContext);
 
 		Foo foo = (Foo) itemReader.read();
 		assertEquals(1, foo.getValue());
@@ -158,7 +167,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		return (InitializingBean) source;
 	}
 
-	private ItemStream getAsRestartable(ItemReader source) {
+	private ItemStream getAsItemStream(ItemReader source) {
 		return (ItemStream) source;
 	}
 	
@@ -167,6 +176,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		static ExecutionContext streamContext;
 		List keys;
 		List restartKeys;
+		static final String RESTART_KEY = "restart.keys";
 		
 		static{
 			Properties props = new Properties();
@@ -191,18 +201,21 @@ public class DrivingQueryItemReaderTests extends TestCase {
 			restartKeys.add(new Foo(5, "5", 5));
 		}
 		
-		public ExecutionContext getKeyAsExecutionContext(Object key) {
+		public ExecutionContext saveState(Object key) {
 			return streamContext;
 		}
 
-		public List restoreKeys(ExecutionContext streamContext) {
-			
-			assertEquals(MockKeyGenerator.streamContext, streamContext);
-			return restartKeys;
+		public List retrieveKeys(ExecutionContext executionContext) {
+			if(executionContext.containsKey(RESTART_KEY)){
+				return restartKeys;
+			}
+			else{
+				return keys;
+			}
 		}
 
-		public List retrieveKeys() {
-			return keys;
+		public void saveState(Object key, ExecutionContext executionContext) {
+			executionContext.put(RESTART_KEY, restartKeys);
 		}
 		
 	}

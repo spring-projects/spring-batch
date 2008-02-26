@@ -50,25 +50,13 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	}
 
 	/**
-	 * @see ItemStream#getExecutionContext()
+	 * @see ItemStream#beforeSave()
 	 * @throws IllegalStateException if the parent template is not itself
 	 * {@link ItemStream}.
 	 */
-	public ExecutionContext getExecutionContext() {
+	public void beforeSave() {
 		if (itemReader instanceof ItemStream) {
-			return ((ItemStream) itemReader).getExecutionContext();
-		}
-		return new ExecutionContext();
-	}
-
-	/**
-	 * @see ItemStream#restoreFrom(ExecutionContext)
-	 * @throws IllegalStateException if the parent template is not itself
-	 * {@link ItemStream}.
-	 */
-	public void restoreFrom(ExecutionContext data) {
-		if (itemReader instanceof ItemStream) {
-			((ItemStream) itemReader).restoreFrom(data);
+			((ItemStream) itemReader).beforeSave();
 		}
 	}
 
@@ -101,9 +89,9 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#open()
 	 */
-	public void open() throws StreamException {
+	public void open(ExecutionContext executionContext) throws StreamException {
 		if (itemReader instanceof ItemStream) {
-			((ItemStream) itemReader).open();
+			((ItemStream) itemReader).open(executionContext);
 		}
 	}
 

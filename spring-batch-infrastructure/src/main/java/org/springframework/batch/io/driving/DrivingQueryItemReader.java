@@ -18,7 +18,6 @@ package org.springframework.batch.io.driving;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
@@ -47,7 +46,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @since 1.0
  */
-public class DrivingQueryItemReader extends AbstractTransactionalIoSource implements KeyedItemReader, InitializingBean,
+public class DrivingQueryItemReader implements KeyedItemReader, InitializingBean,
 		ItemStream {
 
 	private boolean initialized = false;
@@ -61,6 +60,10 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource implem
 	private int lastCommitIndex = 0;
 
 	private KeyGenerator keyGenerator;
+	
+	private ExecutionContext executionContext = new ExecutionContext();
+	
+	private boolean saveState = false;
 
 	public DrivingQueryItemReader() {
 
@@ -86,7 +89,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource implem
 	 */
 	public Object read() {
 		if (!initialized) {
-			open();
+			open(new ExecutionContext());
 		}
 
 		if (keysIterator.hasNext()) {
@@ -133,49 +136,22 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource implem
 	 * @throws IllegalStateException if the keys list is null or initialized is
 	 * true.
 	 */
-	public void open() {
+	public void open(ExecutionContext executionContext) {
 
-		Assert.state(keys == null || initialized, "Cannot open an already opened input source"
+		Assert.state(keys == null && !initialized, "Cannot open an already opened input source"
 				+ ", call close() first.");
-		keys = keyGenerator.retrieveKeys();
+		keys = keyGenerator.retrieveKeys(executionContext);
 		keysIterator = keys.listIterator();
 		initialized = true;
+		this.executionContext = executionContext;
 	}
 
-	/**
-	 * Restore input source to previous state. If the input source has already
-	 * been initialized before calling restore (meaning, read has been called)
-	 * then an IllegalStateException will be thrown, since all input sources
-	 * should be restored before being read from, otherwise already processed
-	 * data could be returned. The {@link ExecutionContext} attempting to be
-	 * restored from must have been obtained from the <strong>same input source
-	 * as the one being restored from</strong> otherwise it is invalid.
-	 * 
-	 * @throws IllegalArgumentException if restart data or it's properties is
-	 * null.
-	 * @throws IllegalStateException if the input source has already been
-	 * initialized.
-	 */
-	public final void restoreFrom(ExecutionContext data) {
-
-		Assert.notNull(data, "ExecutionContext must not be null.");
-		Assert.notNull(data.getProperties(), "ExecutionContext properties must not be null.");
-		Assert.state(!initialized, "Cannot restore when already intialized.  Call" + " close() first before restore()");
-
-		if (data.getProperties().size() == 0) {
-			return;
+	public void beforeSave() {
+		if(saveState){
+			if(getCurrentKey() != null){
+				keyGenerator.saveState(getCurrentKey(), executionContext);
+			}
 		}
-
-		keys = keyGenerator.restoreKeys(data);
-
-		if (keys != null && keys.size() > 0) {
-			keysIterator = keys.listIterator();
-			initialized = true;
-		}
-	}
-
-	public ExecutionContext getExecutionContext() {
-		return keyGenerator.getKeyAsExecutionContext(getCurrentKey());
 	}
 
 	public void afterPropertiesSet() throws Exception {
@@ -238,4 +214,7 @@ public class DrivingQueryItemReader extends AbstractTransactionalIoSource implem
 		keysIterator = keys.listIterator(lastCommitIndex);
 	}
 
+	public void setSaveState(boolean saveState) {
+		this.saveState = saveState;
+	}
 }

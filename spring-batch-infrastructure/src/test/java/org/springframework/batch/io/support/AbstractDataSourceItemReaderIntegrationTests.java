@@ -20,6 +20,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 		AbstractTransactionalDataSourceSpringContextTests {
 
 	protected ItemReader reader;
+	protected ExecutionContext executionContext;
 
 	/**
 	 * @return configured input source ready for use
@@ -37,6 +38,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 	protected void onSetUpInTransaction() throws Exception {
 		super.onSetUpInTransaction();
 		reader = createItemReader();
+		executionContext = new ExecutionContext();
 	}
 
 	/*
@@ -79,18 +81,20 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 	 */
 	public void testRestart() throws Exception {
 
+		getAsItemStream(reader).open(executionContext);
+		
 		Foo foo1 = (Foo) reader.read();
 		assertEquals(1, foo1.getValue());
 
 		Foo foo2 = (Foo) reader.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionContext streamContext = getAsItemStream(reader).getExecutionContext();
+		getAsItemStream(reader).beforeSave();
 
 		// create new input source
 		reader = createItemReader();
 
-		getAsItemStream(reader).restoreFrom(streamContext);
+		getAsItemStream(reader).open(executionContext);
 
 		Foo fooAfterRestart = (Foo) reader.read();
 		assertEquals(3, fooAfterRestart.getValue());
@@ -101,13 +105,15 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 	 */
 	public void testInvalidRestore() throws Exception {
 
+		getAsItemStream(reader).open(executionContext);
+		
 		Foo foo1 = (Foo) reader.read();
 		assertEquals(1, foo1.getValue());
 
 		Foo foo2 = (Foo) reader.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionContext streamContext = getAsItemStream(reader).getExecutionContext();
+		getAsItemStream(reader).beforeSave();
 
 		// create new input source
 		reader = createItemReader();
@@ -116,7 +122,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 		assertEquals(1, foo.getValue());
 
 		try {
-			getAsItemStream(reader).restoreFrom(streamContext);
+			getAsItemStream(reader).open(executionContext);
 			fail();
 		}
 		catch (IllegalStateException ex) {
@@ -129,9 +135,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 	 * @throws Exception
 	 */
 	public void testRestoreFromEmptyData() throws Exception {
-		ExecutionContext streamContext = new ExecutionContext();
-
-		getAsItemStream(reader).restoreFrom(streamContext);
+		getAsItemStream(reader).beforeSave();
 
 		Foo foo = (Foo) reader.read();
 		assertEquals(1, foo.getValue());
@@ -198,6 +202,8 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 			return;
 		}
 
+		getAsItemStream(reader).open(executionContext);
+		
 		Foo foo1 = (Foo) reader.read();
 
 		commit();
@@ -212,12 +218,12 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 
 		rollback();
 
-		ExecutionContext streamContext = getAsItemStream(reader).getExecutionContext();
+		getAsItemStream(reader).beforeSave();
 
 		// create new input source
 		reader = createItemReader();
 
-		getAsItemStream(reader).restoreFrom(streamContext);
+		getAsItemStream(reader).open(executionContext);
 
 		assertEquals(foo2, reader.read());
 		Foo foo4 = (Foo) reader.read();

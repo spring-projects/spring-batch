@@ -1,9 +1,9 @@
 package org.springframework.batch.io.sql;
 
 import org.springframework.batch.io.sample.domain.Foo;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -19,7 +19,8 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 
 	protected ItemReader itemReader;
 
-
+	protected ExecutionContext executionContext;
+	
 	/**
 	 * @return input source with all necessary dependencies set
 	 */
@@ -33,6 +34,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 		super.onSetUp();
 		itemReader = createItemReader();
 		getAsInitializingBean(itemReader).afterPropertiesSet();
+		executionContext = new ExecutionContext();
 	}
 
 	protected void onTearDown()throws Exception {
@@ -45,6 +47,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 	 */
 	public void testNormalProcessing() throws Exception {
 		getAsInitializingBean(itemReader).afterPropertiesSet();
+		getAsItemStream(itemReader).open(executionContext);
 
 		Foo foo1 = (Foo) itemReader.read();
 		assertEquals(1, foo1.getValue());
@@ -69,19 +72,18 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 	 * @throws Exception
 	 */
 	public void testRestart() throws Exception {
-
+		getAsItemStream(itemReader).open(executionContext);
 		Foo foo1 = (Foo) itemReader.read();
 		assertEquals(1, foo1.getValue());
 
 		Foo foo2 = (Foo) itemReader.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionContext streamContext = getAsRestartable(itemReader).getExecutionContext();
+		getAsItemStream(itemReader).beforeSave();
 
 		// create new input source
 		itemReader = createItemReader();
-
-		getAsRestartable(itemReader).restoreFrom(streamContext);
+		getAsItemStream(itemReader).open(executionContext);
 
 		Foo fooAfterRestart = (Foo) itemReader.read();
 		assertEquals(3, fooAfterRestart.getValue());
@@ -92,13 +94,14 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 	 */
 	public void testInvalidRestore() throws Exception {
 
+		getAsItemStream(itemReader).open(executionContext);
 		Foo foo1 = (Foo) itemReader.read();
 		assertEquals(1, foo1.getValue());
 
 		Foo foo2 = (Foo) itemReader.read();
 		assertEquals(2, foo2.getValue());
 
-		ExecutionContext streamContext = getAsRestartable(itemReader).getExecutionContext();
+		getAsItemStream(itemReader).beforeSave();
 
 		// create new input source
 		itemReader = createItemReader();
@@ -107,7 +110,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 		assertEquals(1, foo.getValue());
 
 		try {
-			getAsRestartable(itemReader).restoreFrom(streamContext);
+			getAsItemStream(itemReader).open(executionContext);
 			fail();
 		}
 		catch (IllegalStateException ex) {
@@ -122,7 +125,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 	public void testRestoreFromEmptyData() throws Exception {
 		ExecutionContext streamContext = new ExecutionContext();
 
-		getAsRestartable(itemReader).restoreFrom(streamContext);
+		getAsItemStream(itemReader).open(executionContext);
 
 		Foo foo = (Foo) itemReader.read();
 		assertEquals(1, foo.getValue());
@@ -157,7 +160,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 		itemReader.reset();
 	}
 
-	private ItemStream getAsRestartable(ItemReader source) {
+	private ItemStream getAsItemStream(ItemReader source) {
 		return (ItemStream) source;
 	}
 

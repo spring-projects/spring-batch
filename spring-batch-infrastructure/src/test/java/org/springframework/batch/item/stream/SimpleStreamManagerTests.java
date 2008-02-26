@@ -16,19 +16,15 @@
 package org.springframework.batch.item.stream;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.exception.StreamException;
-import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.util.ClassUtils;
 
 /**
  * @author Dave Syer
@@ -49,7 +45,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	public void testSimpleStreamManagerPlatformTransactionManager() {
 		manager = new SimpleStreamManager();
 		try {
-			manager.getTransaction("foo");
+			manager.getTransaction();
 			fail("Expected NullPointerException");
 		}
 		catch (NullPointerException e) {
@@ -68,104 +64,8 @@ public class SimpleStreamManagerTests extends TestCase {
 				return super.doGetTransaction();
 			}
 		});
-		manager.getTransaction("foo");
+		manager.getTransaction();
 		assertEquals("bar", list.get(0));
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
-	 */
-	public void testGetStreamContextEmpty() {
-		ExecutionContext streamContext = manager.getExecutionContext("foo");
-		assertEquals(0, streamContext.entrySet().size());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
-	 */
-	public void testGetStreamContextNotEmpty() {
-		manager.register("foo", stream);
-		ExecutionContext streamContext = manager.getExecutionContext("foo");
-		assertEquals(1, streamContext.entrySet().size());
-		assertEquals("bar", streamContext.getString(ClassUtils.getQualifiedName(stream.getClass()) + ".foo"));
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
-	 */
-	public void testGetStreamContextNotEmptyAndRestore() {
-		testGetStreamContextNotEmpty();
-		ExecutionContext context = manager.getExecutionContext("foo");
-		// Register again, now with the context that was created from the same
-		// stream...
-		manager.restoreFrom("foo", context);
-		assertEquals(1, list.size());
-		// The list should have the foo= map value from the sub-context
-		assertEquals("bar", list.get(0));
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
-	 */
-	public void testGetStreamContextNotEmptyAndRestoreWithNoPrefix() {
-		ExecutionContext context = new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
-		manager.setUseClassNameAsPrefix(false);
-		manager.register("foo", stream);
-		manager.restoreFrom("foo", context);
-		assertEquals(1, list.size());
-		// The list should have the foo= map value from the sub-context
-		assertEquals("bar", list.get(0));
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
-	 */
-	public void testGetStreamContextWithNoPrefix() {
-		manager.setUseClassNameAsPrefix(false);
-		manager.register("foo", stream);
-		ExecutionContext context = manager.getExecutionContext("foo");
-		assertEquals(1, context.entrySet().size());
-		// The list should have the foo= map value from the sub-context
-		assertEquals("bar", context.getString("foo"));
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#getExecutionContext(java.lang.Object)}.
-	 */
-	public void testGetStreamContextTwoRegistrations() {
-		manager.register("foo", new ItemStreamSupport() {
-			public ExecutionContext getExecutionContext() {
-				return new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
-			}
-		});
-		manager.register("foo", new ItemStreamSupport() {
-			public ExecutionContext getExecutionContext() {
-				return new ExecutionContext(PropertiesConverter.stringToProperties("foo=spam"));
-			}
-		});
-		ExecutionContext streamContext = manager.getExecutionContext("foo");
-		assertEquals(2, streamContext.entrySet().size());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#close(java.lang.Object)}.
-	 */
-	public void testClose() {
-		manager.register("foo", new ItemStreamSupport() {
-			public void close() throws StreamException {
-				list.add("bar");
-				super.close();
-			}
-		});
-		manager.close("foo");
-		assertEquals(1, list.size());
 	}
 
 	/**
@@ -173,12 +73,12 @@ public class SimpleStreamManagerTests extends TestCase {
 	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#commit(org.springframework.transaction.TransactionStatus)}.
 	 */
 	public void testCommitWithoutMark() {
-		manager.register("foo", new ItemStreamSupport() {
+		manager.register(new ItemStreamSupport() {
 			public void mark() {
 				list.add("bar");
 			}
 		});
-		TransactionStatus status = manager.getTransaction("foo");
+		TransactionStatus status = manager.getTransaction();
 		manager.commit(status);
 		assertEquals(0, list.size());
 	}
@@ -188,47 +88,30 @@ public class SimpleStreamManagerTests extends TestCase {
 	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#rollback(org.springframework.transaction.TransactionStatus)}.
 	 */
 	public void testRollbackWithoutMark() {
-		manager.register("foo", new ItemStreamSupport() {
+		manager.register( new ItemStreamSupport() {
 			public void reset() {
 				list.add("bar");
 			}
 		});
-		TransactionStatus status = manager.getTransaction("foo");
+		TransactionStatus status = manager.getTransaction();
 		manager.rollback(status);
 		assertEquals(0, list.size());
 	}
 
-	/**
-	 * Make sure the values from registered stream are present in 
-	 * manager's execution context.
-	 */
-	public void testGetExecutionContextPreservesValues() {
-		stream = new ItemStreamSupport() {
-			public ExecutionContext getExecutionContext() {
-				ExecutionContext ctx = new ExecutionContext();
-				ctx.putString("string", "testString");
-				ctx.putDouble("double", 5.5);
-				ctx.putLong("long", 7);
-				return ctx;
-			}
-		};
-		manager.register("foo", stream);
-		ExecutionContext streamContext = stream.getExecutionContext();
-		ExecutionContext managerContext = manager.getExecutionContext("foo");
-		for (Iterator it = streamContext.entrySet().iterator(); it.hasNext();) {
-			Entry entry = (Entry) it.next();
-			assertTrue(managerContext.containsValue(entry.getValue()));
+
+	private final class StubItemStream extends ItemStreamSupport {
+		
+		private ExecutionContext executionContext;
+		
+		public void open(ExecutionContext executionContext)
+				throws StreamException {
+			this.executionContext = executionContext;
 		}
 		
-	}
-	private final class StubItemStream extends ItemStreamSupport {
-		public ExecutionContext getExecutionContext() {
-			return new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
+		public void beforeSave() {
+			executionContext.putString("foo", "bar");
 		}
 
-		public void restoreFrom(ExecutionContext context) {
-			list.add(context.getString("foo"));
-		}
 	}
 
 }

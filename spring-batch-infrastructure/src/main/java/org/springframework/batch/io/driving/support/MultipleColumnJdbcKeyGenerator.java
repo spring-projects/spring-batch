@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.io.driving.support;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.io.driving.DrivingQueryItemReader;
@@ -73,32 +72,26 @@ public class MultipleColumnJdbcKeyGenerator implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.sql.scratch.AbstractDrivingQueryItemReader#retrieveKeys()
 	 */
-	public List retrieveKeys() {
-		return jdbcTemplate.query(sql, keyMapper);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.io.driving.KeyGenerator#restoreKeys(org.springframework.batch.item.ExecutionContext)
-	 */
-	public List restoreKeys(ExecutionContext executionContext) {
-
+	public List retrieveKeys(ExecutionContext executionContext) {
+		
 		Assert.state(keyMapper != null, "KeyMapper must not be null.");
 		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty" +
 		" in order to restart.");
 
-		if (executionContext.getProperties() != null) {
+		if (executionContext.size() > 0) {
 			return jdbcTemplate.query(restartSql, keyMapper.createSetter(executionContext), keyMapper);
 		}
-
-		return new ArrayList();
+		else{
+			return jdbcTemplate.query(sql, keyMapper);
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionContext(java.lang.Object)
 	 */
-	public ExecutionContext getKeyAsExecutionContext(Object key) {
+	public void saveState(Object key, ExecutionContext executionContext) {
 		Assert.state(keyMapper != null, "Kye mapper must not be null.");
-		return keyMapper.createExecutionContext(key);
+		keyMapper.mapKeys(key, executionContext);
 	}
 
 	/**

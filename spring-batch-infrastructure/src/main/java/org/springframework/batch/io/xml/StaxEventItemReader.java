@@ -60,6 +60,8 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	private long currentRecordCount = 0;
 
 	private List skipRecords = new ArrayList();
+	
+	private ExecutionContext executionContext = new ExecutionContext();
 
 	/**
 	 * Read in the next root element from the file, and return it.
@@ -109,8 +111,10 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 		}
 	}
 
-	public void open() {
+	public void open(ExecutionContext executionContext) {
 		Assert.state(resource.exists(), "Input resource does not exist: [" + resource + "]");
+		this.executionContext = executionContext;		
+		
 		try {
 			inputStream = resource.getInputStream();
 			txReader = new DefaultTransactionalEventReader(XMLInputFactory.newInstance().createXMLEventReader(
@@ -124,7 +128,23 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 			throw new DataAccessResourceFailureException("Unable to get input stream", ioe);
 		}
 		initialized = true;
-		mark();
+		
+		if (executionContext.containsKey(READ_COUNT_STATISTICS_NAME)) {
+			long restoredRecordCount = executionContext.getLong(READ_COUNT_STATISTICS_NAME);
+			int REASONABLE_ADHOC_COMMIT_FREQUENCY = 100;
+			while (currentRecordCount <= restoredRecordCount) {
+				currentRecordCount++;
+				if (currentRecordCount % REASONABLE_ADHOC_COMMIT_FREQUENCY == 0) {
+					txReader.onCommit(); // reset the history buffer
+				}
+				if (!fragmentReader.hasNext()) {
+					throw new StreamException("Restore point must be before end of input");
+				}
+				fragmentReader.next();
+				moveCursorToNextFragment(fragmentReader);
+			}
+			mark(); // reset the history buffer
+		}
 	}
 
 	public void setResource(Resource resource) {
@@ -173,13 +193,10 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	}
 
 	/**
-	 * @return wrapped count of records read so far.
-	 * @see ItemStream#getExecutionContext()
+	 * @see ItemStream#beforeSave()
 	 */
-	public ExecutionContext getExecutionContext() {
-		ExecutionContext executionContext = new ExecutionContext();
+	public void beforeSave() {
 		executionContext.putLong(READ_COUNT_STATISTICS_NAME, currentRecordCount);
-		return executionContext;
 	}
 
 	/**
@@ -194,24 +211,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	 */
 	public void restoreFrom(ExecutionContext data) {
 
-		if (data == null || data.getProperties() == null || !data.containsKey(READ_COUNT_STATISTICS_NAME)) {
-			return;
-		}
 
-		long restoredRecordCount = data.getLong(READ_COUNT_STATISTICS_NAME);
-		int REASONABLE_ADHOC_COMMIT_FREQUENCY = 100;
-		while (currentRecordCount <= restoredRecordCount) {
-			currentRecordCount++;
-			if (currentRecordCount % REASONABLE_ADHOC_COMMIT_FREQUENCY == 0) {
-				txReader.onCommit(); // reset the history buffer
-			}
-			if (!fragmentReader.hasNext()) {
-				throw new StreamException("Restore point must be before end of input");
-			}
-			fragmentReader.next();
-			moveCursorToNextFragment(fragmentReader);
-		}
-		mark(); // reset the history buffer
 
 	}
 

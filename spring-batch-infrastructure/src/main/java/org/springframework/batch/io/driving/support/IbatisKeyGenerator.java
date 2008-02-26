@@ -1,7 +1,6 @@
 package org.springframework.batch.io.driving.support;
 
 import java.util.List;
-import java.util.Properties;
 
 import org.springframework.batch.io.driving.DrivingQueryItemReader;
 import org.springframework.batch.io.driving.KeyGenerator;
@@ -29,37 +28,31 @@ public class IbatisKeyGenerator implements KeyGenerator {
 	private String drivingQuery;
 
 	private String restartQueryId;
+	
+	private String name = IbatisKeyGenerator.class.getName();
 
 	/*
 	 * Retrieve the keys using the provided driving query id.
 	 *
 	 * @see org.springframework.batch.io.support.AbstractDrivingQueryItemReader#retrieveKeys()
 	 */
-	public List retrieveKeys() {
-		return sqlMapClientTemplate.queryForList(drivingQuery);
+	public List retrieveKeys(ExecutionContext executionContext) {
+		if(executionContext.containsKey(getKey(RESTART_KEY))){
+			Object key = executionContext.getString(getKey(RESTART_KEY));
+			return sqlMapClientTemplate.queryForList(restartQueryId, key);
+		}
+		else{
+			return sqlMapClientTemplate.queryForList(drivingQuery);
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionContext(java.lang.Object)
 	 */
-	public ExecutionContext getKeyAsExecutionContext(Object key) {
-		Properties props = new Properties();
-		props.setProperty(RESTART_KEY, key.toString());
-		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.putString(RESTART_KEY, key.toString());
-		return executionContext;
-	}
-
-	/**
-	 * Restore the keys list given the provided restart data.
-	 *
-	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#restoreKeys(org.springframework.batch.item.ExecutionContext)
-	 */
-	public List restoreKeys(ExecutionContext data) {
-
-		Properties props = data.getProperties();
-		Object key = props.getProperty(RESTART_KEY);
-		return sqlMapClientTemplate.queryForList(restartQueryId, key);
+	public void saveState(Object key, ExecutionContext executionContext) {
+		Assert.notNull(key, "Key must not be null");
+		Assert.notNull(executionContext, "ExecutionContext must be null");
+		executionContext.putString(getKey(RESTART_KEY), key.toString());
 	}
 
 	/* (non-Javadoc)
@@ -99,4 +92,12 @@ public class IbatisKeyGenerator implements KeyGenerator {
 	public final SqlMapClientTemplate getSqlMapClientTemplate() {
 		  return sqlMapClientTemplate;
 		}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	private String getKey(String key){
+		return name + "." + key;
+	}
 }

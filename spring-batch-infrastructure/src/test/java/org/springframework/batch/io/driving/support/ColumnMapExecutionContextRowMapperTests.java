@@ -20,14 +20,14 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
  */
 public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 
-	private static final String KEY = ColumnMapExecutionContextRowMapper.KEY_PREFIX;
-	
 	private ColumnMapExecutionContextRowMapper mapper;
 	
 	private Map key;
 	
 	private MockControl psControl = MockControl.createControl(PreparedStatement.class);
 	private PreparedStatement ps;
+	
+	private ExecutionContext executionContext;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -37,12 +37,14 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 		key = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(2);
 		key.put("1", new Integer(1));
 		key.put("2", new Integer(2));
+		
+		executionContext = new ExecutionContext();
 	}
 	
 	public void testCreateExecutionContextWithInvalidType() throws Exception {
 		
 		try{
-			mapper.createExecutionContext(new Object());
+			mapper.mapKeys(new Object(), executionContext);
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -52,7 +54,7 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 	public void testCreateExecutionContextWithNull(){
 		
 		try{
-			mapper.createExecutionContext(null);
+			mapper.mapKeys(null, null);
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -60,31 +62,28 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 	}
 	
 	public void testCreateExecutionContext() throws Exception {
-		ExecutionContext streamContext = mapper.createExecutionContext(key);
-		Properties props = streamContext.getProperties();
-		assertEquals("1", props.getProperty(KEY + "0"));
-		assertEquals("2", props.getProperty(KEY + "1"));
+		mapper.mapKeys(key, executionContext);
+		Properties props = executionContext.getProperties();
+		assertEquals("1", props.getProperty("1"));
+		assertEquals("2", props.getProperty("2"));
 	}
 	
 	public void testCreateExecutionContextFromEmptyKeys() throws Exception {
 		
-		ExecutionContext streamContext = mapper.createExecutionContext(new HashMap());
-		assertEquals(0, streamContext.getProperties().size());
+		mapper.mapKeys(new HashMap(), executionContext);
+		assertEquals(0, executionContext.size());
 	}
 	
 	public void testCreateSetter() throws Exception {
 		
-		Properties props = new Properties();
-		props.setProperty(KEY + "0", "1");
-		props.setProperty(KEY + "1", "2");
 		ExecutionContext streamContext = new ExecutionContext();
-		streamContext.putString(KEY + "0", "1");
-		streamContext.putString(KEY + "1", "2");
+		streamContext.putString("0", "1");
+		streamContext.putString("1", "2");
 		PreparedStatementSetter setter = mapper.createSetter(streamContext);
 		ps = (PreparedStatement)psControl.getMock();
 		
-		ps.setString(1, "1");
-		ps.setString(2, "2");
+		ps.setString(1, "2");
+		ps.setString(2, "1");
 		psControl.replay();
 		
 		setter.setValues(ps);

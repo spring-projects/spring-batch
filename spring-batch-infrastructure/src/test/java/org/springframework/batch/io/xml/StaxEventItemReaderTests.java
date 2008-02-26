@@ -37,8 +37,11 @@ public class StaxEventItemReaderTests extends TestCase {
 	private EventReaderDeserializer deserializer = new MockFragmentDeserializer();
 
 	private static final String FRAGMENT_ROOT_ELEMENT = "fragment";
+	
+	private ExecutionContext executionContext;
 
 	protected void setUp() throws Exception {
+		this.executionContext = new ExecutionContext();
 		source = createNewInputSouce();
 	}
 
@@ -83,7 +86,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	 */
 	public void testFragmentWrapping() throws Exception {
 		source.afterPropertiesSet();
-
+		source.open(executionContext);
 		// see asserts in the mock deserializer
 		assertNotNull(source.read());
 		assertNotNull(source.read());
@@ -112,13 +115,14 @@ public class StaxEventItemReaderTests extends TestCase {
 	 * Save restart data and restore from it.
 	 */
 	public void testRestart() {
+		source.open(executionContext);
 		source.read();
-		ExecutionContext streamContext = source.getExecutionContext();
-		assertEquals(1, streamContext.getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME));
+		source.beforeSave();
+		assertEquals(1, executionContext.getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME));
 		List expectedAfterRestart = (List) source.read();
 
 		source = createNewInputSouce();
-		source.restoreFrom(streamContext);
+		source.open(executionContext);
 		List afterRestart = (List) source.read();
 		assertEquals(expectedAfterRestart.size(), afterRestart.size());
 	}
@@ -131,7 +135,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		ExecutionContext context = new ExecutionContext();
 		context.putLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME, 100000);
 		try {
-			source.restoreFrom(context);
+			source.open(context);
 			fail("Expected StreamException");
 		}
 		catch (StreamException e) {
@@ -143,12 +147,13 @@ public class StaxEventItemReaderTests extends TestCase {
 
 	public void testRestoreWorksFromClosedStream() throws Exception {
 		source.close();
-		source.restoreFrom(new ExecutionContext());
+		source.beforeSave();
 	}
 	/**
 	 * Skipping marked records after rollback.
 	 */
 	public void testSkip() {
+		source.open(executionContext);
 		List first = (List) source.read();
 		source.skip();
 		List second = (List) source.read();
@@ -162,7 +167,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	 * Rollback to last commited record.
 	 */
 	public void testRollback() {
-
+		source.open(executionContext);
 		// rollback between deserializing records
 		List first = (List) source.read();
 		source.mark();
@@ -190,13 +195,16 @@ public class StaxEventItemReaderTests extends TestCase {
 	 * Statistics return the current record count. Calling read after end of
 	 * input does not increase the counter.
 	 */
-	public void testStreamContext() {
+	public void testExecutionContext() {
 		final int NUMBER_OF_RECORDS = 2;
-
+		source.open(executionContext);
+		source.beforeSave();
+		
 		for (int i = 0; i < NUMBER_OF_RECORDS; i++) {
 			long recordCount = extractRecordCount();
 			assertEquals(i, recordCount);
 			source.read();
+			source.beforeSave();
 		}
 
 		assertEquals(NUMBER_OF_RECORDS, extractRecordCount());
@@ -205,7 +213,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	}
 
 	private long extractRecordCount() {
-		return source.getExecutionContext().getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME);
+		return executionContext.getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME);
 	}
 
 	public void testCloseWithoutOpen() throws Exception {
@@ -221,7 +229,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
 		newSource.setFragmentDeserializer(deserializer);
 
-		newSource.open();
+		newSource.open(executionContext);
 
 		Object item = newSource.read();
 		assertNotNull(item);
@@ -256,7 +264,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		});
 
 		try {
-			source.open();
+			source.open(executionContext);
 		}
 		catch (DataAccessResourceFailureException ex) {
 			assertTrue(ex.getCause() instanceof IOException);
@@ -270,7 +278,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		source.afterPropertiesSet();
 
 		try {
-			source.open();
+			source.open(executionContext);
 			fail();
 		}
 		catch (IllegalStateException ex) {
@@ -284,6 +292,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		source.afterPropertiesSet();
 
 		source.setResource(new ByteArrayResource(xml.getBytes()));
+		source.open(executionContext);
 		source.read();
 	}
 
@@ -295,8 +304,6 @@ public class StaxEventItemReaderTests extends TestCase {
 
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
 		newSource.setFragmentDeserializer(deserializer);
-
-		newSource.open();
 
 		return newSource;
 	}
@@ -381,8 +388,8 @@ public class StaxEventItemReaderTests extends TestCase {
 
 		private boolean openCalled = false;
 
-		public void open() {
-			super.open();
+		public void open(ExecutionContext executionContext) {
+			super.open(executionContext);
 			openCalled = true;
 		}
 

@@ -93,6 +93,10 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	private LineTokenizer tokenizer = new DelimitedLineTokenizer();
 
 	private FieldSetMapper fieldSetMapper;
+	
+	private ExecutionContext executionContext = new ExecutionContext();
+	
+	private String name = FlatFileItemReader.class.getName();
 
 	/**
 	 * Encapsulates the state of the input source. If it is null then we are
@@ -104,9 +108,11 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	 * Initialize the reader if necessary.
 	 * @throws IllegalStateException if the resource cannot be opened
 	 */
-	public void open() throws StreamException {
+	public void open(ExecutionContext executionContext) throws StreamException {
 
 		Assert.state(resource.exists(), "Resource must exist: [" + resource + "]");
+
+		this.executionContext = executionContext;
 
 		log.debug("Opening flat file for reading: " + resource);
 
@@ -135,7 +141,19 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 				((AbstractLineTokenizer) tokenizer).setNames(names);
 			}
 		}
-
+		
+		if (executionContext.containsKey(getKey(READ_STATISTICS_NAME))) {		
+			log.debug("Initializing for restart. Restart data is: " + executionContext);
+	
+			long lineCount = executionContext.getLong(getKey(READ_STATISTICS_NAME));
+	
+			LineReader reader = getReader();
+	
+			Object record = "";
+			while (reader.getPosition() < lineCount && record != null) {
+				record = readLine();
+			}
+		}
 		mark();
 	}
 
@@ -180,47 +198,16 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	}
 
 	/**
-	 * This method initialises the reader for Restart. It opens the input file
-	 * and position the buffer reader according to information provided by the
-	 * restart data
-	 * 
-	 * @param data {@link ExecutionContext} information
-	 */
-	public void restoreFrom(ExecutionContext data) {
-
-		if (data == null || data.getProperties() == null
-				|| data.getProperties().getProperty(READ_STATISTICS_NAME) == null || getReader() == null) {
-			// do nothing
-			return;
-		}
-		log.debug("Initializing for restart. Restart data is: " + data);
-
-		int lineCount = Integer.parseInt(data.getProperties().getProperty(READ_STATISTICS_NAME));
-
-		LineReader reader = getReader();
-
-		Object record = "";
-		while (reader.getPosition() < lineCount && record != null) {
-			record = readLine();
-		}
-
-		mark();
-
-	}
-
-	/**
 	 * This method returns the execution attributes for the reader. It returns
 	 * the current Line Count which can be used to reinitialise the batch job in
 	 * case of restart.
 	 */
-	public ExecutionContext getExecutionContext() {
+	public void beforeSave() {
 		if (reader == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
-		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.putLong(READ_STATISTICS_NAME, reader.getPosition());
-		executionContext.putLong(SKIPPED_STATISTICS_NAME, skippedLines.size());
-		return executionContext;
+		executionContext.putLong(getKey(READ_STATISTICS_NAME), reader.getPosition());
+		executionContext.putLong(getKey(SKIPPED_STATISTICS_NAME), skippedLines.size());
 	}
 
 	/**
@@ -389,6 +376,10 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource, "Input resource must not be null");
 		Assert.notNull(fieldSetMapper, "FieldSetMapper must not be null.");
+	}
+	
+	private String getKey(String key){
+		return name + "." + key;
 	}
 
 }

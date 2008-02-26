@@ -28,6 +28,8 @@ import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetCreator;
 import org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -53,6 +55,8 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	// reads the output file to check the result
 	private BufferedReader reader;
+	
+	private ExecutionContext executionContext;
 
 	/**
 	 * Create temporary output file, define mock behaviour, set dependencies and
@@ -70,9 +74,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.setResource(new FileSystemResource(outputFile));
 		inputSource.setFieldSetUnmapper(new PassThroughFieldSetMapper());
 		inputSource.afterPropertiesSet();
-
-		inputSource.open();
-
+		executionContext = new ExecutionContext();
 	}
 
 	/**
@@ -105,6 +107,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteString() throws Exception {
+		inputSource.open(executionContext);
 		inputSource.write(TEST_STRING);
 		inputSource.close();
 		String lineFromFile = readLine();
@@ -198,6 +201,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	public void testRestart() throws Exception {
 
+		inputSource.open(executionContext);
 		// write some lines
 		inputSource.write("testLine1");
 		inputSource.write("testLine2");
@@ -220,25 +224,12 @@ public class FlatFileItemWriterTests extends TestCase {
 		commit();
 
 		// get restart data
-		ExecutionContext streamContext = inputSource.getExecutionContext();
+		inputSource.beforeSave();
 		// close template
 		inputSource.close();
 
-		// init for restart
-		inputSource.setBufferSize(0);
-		inputSource.open();
-
-		// try empty restart data...
-		try {
-			inputSource.restoreFrom(null);
-			assertTrue(true);
-		}
-		catch (IllegalArgumentException iae) {
-			fail("null restart data should be handled gracefully");
-		}
-
 		// init with correct data
-		inputSource.restoreFrom(streamContext);
+		inputSource.open(executionContext);
 
 		// write more lines
 		inputSource.write("testLine6");
@@ -246,7 +237,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.write("testLine8");
 
 		// get statistics
-		ExecutionContext statistics = inputSource.getExecutionContext();
+		inputSource.beforeSave();
 		// close template
 		inputSource.close();
 
@@ -256,7 +247,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		}
 
 		// 3 lines were written to the file after restart
-		assertEquals(3, statistics.getLong(FlatFileItemWriter.WRITTEN_STATISTICS_NAME));
+		assertEquals(3, executionContext.getLong(FlatFileItemWriter.class.getName() + "." + FlatFileItemWriter.WRITTEN_STATISTICS_NAME));
 
 	}
 
@@ -276,11 +267,11 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.setResource(new FileSystemResource(outputFile));
 		inputSource.setFieldSetUnmapper(new PassThroughFieldSetMapper());
 		inputSource.afterPropertiesSet();
-		inputSource.open();
-		ExecutionContext streamContext = inputSource.getExecutionContext();
-		assertNotNull(streamContext);
-		assertEquals(3, streamContext.getProperties().size());
-		assertEquals(0, streamContext.getLong(FlatFileItemWriter.RESTART_DATA_NAME));
+		inputSource.open(executionContext);
+		inputSource.beforeSave();
+		assertNotNull(executionContext);
+		assertEquals(3, executionContext.entrySet().size());
+		assertEquals(0, executionContext.getLong(FlatFileItemWriter.class.getName() + "." + FlatFileItemWriter.RESTART_DATA_NAME));
 	}
 
 	private void commit() throws Exception {
@@ -291,4 +282,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.clear();
 	}
 
+	private ItemStream getAsItemStream(ItemWriter itemWriter){
+		return (ItemStream)itemWriter;
+	}
 }

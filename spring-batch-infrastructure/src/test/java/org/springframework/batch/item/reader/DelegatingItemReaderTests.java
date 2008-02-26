@@ -37,10 +37,13 @@ public class DelegatingItemReaderTests extends TestCase {
 	private DelegatingItemReader itemProvider = new DelegatingItemReader();
 
 	private ItemReader source;
+	
+	private ExecutionContext executionContext;
 
 	// create input template and inject it to data provider
 	protected void setUp() throws Exception {
-		source = new MockItemReader(this);
+		executionContext = new ExecutionContext();
+		source = new MockItemReader(this, executionContext);
 		itemProvider.setItemReader(source);
 	}
 
@@ -73,17 +76,8 @@ public class DelegatingItemReaderTests extends TestCase {
 	 * Gets restart data from the input template
 	 */
 	public void testGetStreamContext() {
-		Properties props = itemProvider.getExecutionContext().getProperties();
-		assertEquals("foo", props.getProperty("value"));
-	}
-
-	/**
-	 * Forwared restart data to input template
-	 * @throws Exception
-	 */
-	public void testRestoreFrom() throws Exception {
-		itemProvider.restoreFrom(new ExecutionContext(PropertiesConverter.stringToProperties("value=bar")));
-		assertEquals("bar", itemProvider.read());
+		itemProvider.beforeSave();
+		assertEquals("foo", executionContext.getString("value"));
 	}
 
 	public void testSkip() throws Exception {
@@ -94,21 +88,19 @@ public class DelegatingItemReaderTests extends TestCase {
 	private static class MockItemReader extends AbstractItemReader implements ItemReader, ItemStream, Skippable {
 
 		private Object value;
+		private ExecutionContext executionContext;
 
 		public Properties getStatistics() {
 			return PropertiesConverter.stringToProperties("a=b");
 		}
 
-		public ExecutionContext getExecutionContext() {
-			return new ExecutionContext(PropertiesConverter.stringToProperties("value=foo"));
+		public void beforeSave() {
+			executionContext.putString("value", "foo");
 		}
 
-		public void restoreFrom(ExecutionContext data) {
-			value = data.getProperties().getProperty("value");
-		}
-
-		public MockItemReader(Object value) {
+		public MockItemReader(Object value, ExecutionContext executionContext) {
 			this.value = value;
+			this.executionContext = executionContext;
 		}
 
 		public Object read() {
@@ -118,7 +110,7 @@ public class DelegatingItemReaderTests extends TestCase {
 		public void close() {
 		}
 
-		public void open() {
+		public void open(ExecutionContext executionContext) {
 		}
 
 		public void skip() {

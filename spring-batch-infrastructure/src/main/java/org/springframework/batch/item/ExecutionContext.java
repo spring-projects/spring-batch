@@ -154,5 +154,9 @@ public class ExecutionContext {
 	public String toString() {
 		return map.toString();
 	}
+	
+	public int size(){
+		return map.size();
+	}
 
 }

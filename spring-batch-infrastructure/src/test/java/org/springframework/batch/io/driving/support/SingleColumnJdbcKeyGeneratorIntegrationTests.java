@@ -1,7 +1,6 @@
 package org.springframework.batch.io.driving.support;
 
 import java.util.List;
-import java.util.Properties;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -15,6 +14,8 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 
 	SingleColumnJdbcKeyGenerator keyStrategy;
 	
+	ExecutionContext executionContext;
+	
 	protected String[] getConfigLocations(){
 		return new String[] { "org/springframework/batch/io/sql/data-source-context.xml"};
 	}
@@ -27,11 +28,13 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 		"SELECT ID from T_FOOS order by ID");
 		
 		keyStrategy.setRestartSql("SELECT ID from T_FOOS where ID > ? order by ID");
+		
+		executionContext = new ExecutionContext();
 	}
 	
 	public void testRetrieveKeys(){
 		
-		List keys = keyStrategy.retrieveKeys();
+		List keys = keyStrategy.retrieveKeys(new ExecutionContext());
 		
 		for (int i = 0; i < keys.size(); i++) {
 			Long id = (Long)keys.get(i);
@@ -41,11 +44,9 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	
 	public void testRestoreKeys(){
 		
-		Properties props = new Properties();
-		props.setProperty(SingleColumnJdbcKeyGenerator.RESTART_KEY, "3");
-		ExecutionContext streamContext = new ExecutionContext(props);
+		executionContext.putString(SingleColumnJdbcKeyGenerator.RESTART_KEY, "3");
 		
-		List keys = keyStrategy.restoreKeys(streamContext);
+		List keys = keyStrategy.retrieveKeys(executionContext);
 		
 		assertEquals(2, keys.size());
 		assertEquals(new Long(4), keys.get(0));
@@ -54,17 +55,16 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	
 	public void testGetKeyAsStreamContext(){
 		
-		ExecutionContext streamContext = keyStrategy.getKeyAsExecutionContext(new Long(3));
-		Properties props = streamContext.getProperties();
+		keyStrategy.saveState(new Long(3), executionContext);
 		
-		assertEquals(1, props.size());
-		assertEquals("3", props.get(SingleColumnJdbcKeyGenerator.RESTART_KEY));
+		assertEquals(1, executionContext.size());
+		assertEquals("3", executionContext.getString(SingleColumnJdbcKeyGenerator.RESTART_KEY));
 	}
 	
 	public void testGetNullKeyAsStreamContext(){
 		
 		try{
-			keyStrategy.getKeyAsExecutionContext(null);
+			keyStrategy.saveState(null, null);
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -74,7 +74,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	public void testRestoreKeysFromNull(){
 		
 		try{
-			keyStrategy.getKeyAsExecutionContext(null);
+			keyStrategy.saveState(null, null);
 		}catch(IllegalArgumentException ex){
 			//expected
 		}

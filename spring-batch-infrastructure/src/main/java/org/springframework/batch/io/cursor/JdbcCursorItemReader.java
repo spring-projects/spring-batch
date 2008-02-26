@@ -29,7 +29,6 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
@@ -108,7 +107,7 @@ import org.springframework.util.StringUtils;
  * @author Lucas Ward
  * @author Peter Zozom
  */
-public class JdbcCursorItemReader extends AbstractTransactionalIoSource implements KeyedItemReader, InitializingBean,
+public class JdbcCursorItemReader implements KeyedItemReader, InitializingBean,
 		ItemStream, Skippable {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);
@@ -155,6 +154,12 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	private RowMapper mapper;
 
 	private boolean initialized = false;
+	
+	private ExecutionContext executionContext = new ExecutionContext();
+	
+	private boolean saveState = false;
+	
+	private String name = JdbcCursorItemReader.class.getName();
 
 	/**
 	 * Assert that mandatory properties are set.
@@ -190,7 +195,7 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	public Object read() {
 
 		if (!initialized) {
-			open();
+			open(new ExecutionContext());
 		}
 
 		Assert.state(mapper != null, "Mapper must not be null.");
@@ -380,45 +385,45 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getExecutionContext()
 	 */
-	public ExecutionContext getExecutionContext() {
-		String skipped = skippedRows.toString();
-		ExecutionContext context = new ExecutionContext();
-		context.putString(SKIPPED_ROWS, skipped.substring(1, skipped.length() - 1));
-		context.putLong(CURRENT_PROCESSED_ROW, currentProcessedRow);
-		context.putLong(SKIP_COUNT, skipCount);
-		return context;
+	public void beforeSave() {
+		if(saveState){
+			String skipped = skippedRows.toString();
+			executionContext.putString(addName(SKIPPED_ROWS), skipped.substring(1, skipped.length() - 1));
+			executionContext.putLong(addName(CURRENT_PROCESSED_ROW), currentProcessedRow);
+			executionContext.putLong(addName(SKIP_COUNT), skipCount);
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#restoreFrom(org.springframework.batch.item.ExecutionContext)
 	 */
-	public void restoreFrom(ExecutionContext data) {
+	public void open(ExecutionContext context) {
 		Assert.state(!initialized);
-
-		if (data == null)
-			return;
-
-		open();
+		Assert.isNull(rs);
+		Assert.notNull(context, "ExecutionContext must not be null");
+		executeQuery();
+		initialized = true;
+		this.executionContext = context;
 
 		// Properties restartProperties = data.getProperties();
-		if (!data.containsKey(CURRENT_PROCESSED_ROW)) {
+		if (!context.containsKey(addName(CURRENT_PROCESSED_ROW))) {
 			return;
 		}
 
 		try {
-			this.currentProcessedRow = data.getLong(CURRENT_PROCESSED_ROW);
+			this.currentProcessedRow = context.getLong(addName(CURRENT_PROCESSED_ROW));
 			rs.absolute((int) currentProcessedRow);
 		}
 		catch (SQLException se) {
 			throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);
 		}
 
-		if (!data.containsKey(SKIPPED_ROWS)) {
+		if (!context.containsKey(addName(SKIPPED_ROWS))) {
 			return;
 		}
 
-		String[] skipped = StringUtils.commaDelimitedListToStringArray(data.getString(SKIPPED_ROWS));
+		String[] skipped = StringUtils.commaDelimitedListToStringArray(context.getString(addName(SKIPPED_ROWS)));
 		for (int i = 0; i < skipped.length; i++) {
 			this.skippedRows.add(new Long(skipped[i]));
 		}
@@ -513,13 +518,6 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 		this.sql = sql;
 	}
 
-	public void open() {
-		Assert.isNull(rs);
-		executeQuery();
-		initialized = true;
-
-	}
-
 	/**
 	 * Return the item itself (which is already a key).
 	 * @see org.springframework.batch.item.ItemReader#getKey(java.lang.Object)
@@ -527,5 +525,16 @@ public class JdbcCursorItemReader extends AbstractTransactionalIoSource implemen
 	public Object getKey(Object item) {
 		return item;
 	}
-
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String addName(String key){
+		return name + "." + key;
+	}
+	
+	public void setSaveState(boolean saveState) {
+		this.saveState = saveState;
+	}
 }

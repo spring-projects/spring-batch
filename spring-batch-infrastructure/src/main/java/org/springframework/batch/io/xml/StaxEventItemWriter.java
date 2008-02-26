@@ -98,6 +98,8 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 
 	// current count of processed records
 	private long currentRecordCount = 0;
+	
+	private ExecutionContext executionContext = new ExecutionContext();
 
 	/**
 	 * Set output file.
@@ -218,8 +220,18 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	 * 
 	 * @see org.springframework.batch.item.ResourceLifecycle#open()
 	 */
-	public void open() {
-		open(0);
+	public void open(ExecutionContext executionContext) {
+		this.executionContext = executionContext;
+		long startAtPosition = 0;
+
+		// if restart data is provided, restart from provided offset
+		// otherwise start from beginning
+		if (executionContext.containsKey(RESTART_DATA_NAME)) {
+			startAtPosition = executionContext.getLong(RESTART_DATA_NAME);
+			restarted = true;
+		}
+
+		open(startAtPosition);
 	}
 
 	/*
@@ -351,17 +363,14 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 
 	/**
 	 * Get the restart data.
-	 * @return the restart data
-	 * @see org.springframework.batch.item.ItemStream#getExecutionContext()
+	 * @see org.springframework.batch.item.ItemStream#beforeSave()
 	 */
-	public ExecutionContext getExecutionContext() {
+	public void beforeSave() {
 		if (!initialized) {
 			throw new StreamException("ItemStream is not open, or may have been closed.  Cannot access context.");
 		}
-		ExecutionContext context = new ExecutionContext();
-		context.putLong(RESTART_DATA_NAME, getPosition());
-		context.putLong(WRITE_STATISTICS_NAME, currentRecordCount);
-		return context;
+		executionContext.putLong(RESTART_DATA_NAME, getPosition());
+		executionContext.putLong(WRITE_STATISTICS_NAME, currentRecordCount);
 	}
 
 	/**
@@ -370,19 +379,6 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void restoreFrom(ExecutionContext data) {
-
-		long startAtPosition = 0;
-
-		// if restart data is provided, restart from provided offset
-		// otherwise start from beginning
-		if (data != null && data.getProperties() != null && data.containsKey(RESTART_DATA_NAME)) {
-			startAtPosition = data.getLong(RESTART_DATA_NAME);
-			restarted = true;
-		}
-
-		if (!initialized) {
-			open(startAtPosition);
-		}
 
 	}
 

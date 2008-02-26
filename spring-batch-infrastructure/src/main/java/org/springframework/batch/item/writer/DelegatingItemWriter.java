@@ -80,29 +80,17 @@ public class DelegatingItemWriter implements ItemWriter, ItemStream, Initializin
 	}
 
 	/**
-	 * @return
-	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
+	 * @see org.springframework.batch.item.ExecutionContextProvider#beforeSave()
 	 */
-	public ExecutionContext getExecutionContext() {
-		return stream.getExecutionContext();
+	public void beforeSave() {
+		stream.beforeSave();
 	}
 
 	/**
 	 * @throws StreamException
 	 * @see org.springframework.batch.item.ItemStream#open()
 	 */
-	public void open() throws StreamException {
-		stream.open();
+	public void open(ExecutionContext executionContext) throws StreamException {
+		stream.open(executionContext);
 	}
-
-	/**
-	 * @param context
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void restoreFrom(ExecutionContext context) {
-		stream.restoreFrom(context);
-	}
-	
-	
-
 }

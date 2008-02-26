@@ -56,7 +56,7 @@ public interface ItemReader {
 	/**
 	 * Mark the stream so that it can be reset later and the items backed out.
 	 * After this method is called the result will be reflected in subsequent
-	 * calls to {@link ExecutionContextProvider#getExecutionContext()}.<br/>
+	 * calls to {@link ExecutionContextProvider#beforeSave()}.<br/>
 	 * 
 	 * In a multi-threaded setting implementations have to ensure that only the
 	 * state from the current thread is saved.
