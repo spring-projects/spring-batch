@@ -121,8 +121,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	/**
-	 * Insert execution attributes. A lob creator must be used, since any
-	 * attributes that don't match a provided type must be serialized into a
+	 * Insert execution attributes. A {@link LobHandler} must be provided, since
+	 * any attributes that don't match a provided type are serialized into a
 	 * blob.
 	 */
 	public void saveExecutionContext(final StepExecution stepExecution) {
@@ -367,7 +367,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	private class StepExecutionRowMapper implements RowMapper {
 
 		private final JobExecution jobExecution;
-		
+
 		private final Step step;
 
 		public StepExecutionRowMapper(JobExecution jobExecution, Step step) {
@@ -383,10 +383,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			stepExecution.setStatus(BatchStatus.getStatus(rs.getString(5)));
 			stepExecution.setCommitCount(rs.getInt(6));
 			stepExecution.setTaskCount(rs.getInt(7));
-			stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties(rs
-					.getString(8))));
 			stepExecution
 					.setExitStatus(new ExitStatus("Y".equals(rs.getString(9)), rs.getString(10), rs.getString(11)));
+			stepExecution.setExecutionContext(findExecutionContext(stepExecution));
 			return stepExecution;
 		}
 

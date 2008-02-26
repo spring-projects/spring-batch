@@ -101,8 +101,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 	private int commitInterval = 0;
 
-	private boolean saveExecutionContext = false;
-
 	/**
 	 * The {@link RepeatOperations} to use for the outer loop of the batch
 	 * processing. Should be set up by the caller through a factory. Defaults to
@@ -115,11 +113,11 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	}
 
 	/**
-	 * the {@link repeatoperations} to use for the inner loop of the batch
+	 * The {@link RepeatOperations} to use for the inner loop of the batch
 	 * processing. should be set up by the caller through a factory. defaults to
-	 * a plain {@link repeattemplate}.
+	 * a plain {@link RepeatTemplate}.
 	 * 
-	 * @param chunkoperations a {@link repeatoperations} instance.
+	 * @param chunkoperations a {@link RepeatOperations} instance.
 	 */
 	public void setChunkOperations(RepeatOperations chunkoperations) {
 		this.chunkOperations = chunkoperations;
@@ -256,7 +254,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			// the conversation in StepScope
 			stepContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
 
-			if (saveExecutionContext && isRestart && lastStepExecution != null) {
+			if (isSaveExecutionContext() && isRestart && lastStepExecution != null) {
 				stepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
 			}
 			else {
@@ -303,6 +301,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 						}
 
+						itemReader.mark();
 						itemWriter.flush();
 						streamManager.commit(transaction);
 

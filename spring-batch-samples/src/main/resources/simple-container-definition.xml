@@ -55,17 +55,19 @@
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="jobIncrementer" ref="jobIncrementer" />
 	</bean>
-	
+
 	<bean id="jobExecutionDao" lazy-init="true"
 		class="org.springframework.batch.execution.repository.dao.JdbcJobExecutionDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
-		<property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" />
+		<property name="jobExecutionIncrementer"
+			ref="jobExecutionIncrementer" />
 	</bean>
-	
+
 	<bean id="stepExecutionDao" lazy-init="true"
 		class="org.springframework.batch.execution.repository.dao.JdbcStepExecutionDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
-		<property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" />
+		<property name="stepExecutionIncrementer"
+			ref="stepExecutionIncrementer" />
 	</bean>
 
 	<bean id="mapJobDao" lazy-init="true"
@@ -80,7 +82,8 @@
 	</bean>
 
 	<bean id="simpleJob"
-		class="org.springframework.batch.execution.job.simple.SimpleJob" abstract="true">
+		class="org.springframework.batch.execution.job.simple.SimpleJob"
+		abstract="true">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="restartable" value="true" />
 	</bean>
@@ -93,15 +96,15 @@
 		<property name="saveExecutionContext" value="true" />
 	</bean>
 
-	<bean id="abstractStep" class="org.springframework.batch.execution.step.ItemOrientedStep" abstract="true">
+	<bean id="simpleStep"
+		class="org.springframework.batch.execution.step.ItemOrientedStep"
+		abstract="true">
+		
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="allowStartIfComplete" value="true" />
 		<property name="saveExecutionContext" value="true" />
-	</bean>
 
-	<bean id="simpleStep" parent="abstractStep"
-		abstract="true">
 		<property name="exceptionHandler">
 			<bean
 				class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler">
@@ -109,9 +112,11 @@
 				<property name="useParent" value="true" />
 			</bean>
 		</property>
+
 		<property name="commitInterval" value="1" />
+
 	</bean>
-	
+
 	<bean id="customEditorConfigurer"
 		class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 		<property name="customEditors">

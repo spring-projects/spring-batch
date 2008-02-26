@@ -33,7 +33,6 @@ import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
@@ -128,18 +127,32 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	}
 	
 	public void testSaveStepExecution() {
-
 		StepExecution execution = new StepExecution(step2, jobExecution, null);
 		execution.setStatus(BatchStatus.STARTED);
 		execution.setStartTime(new Date(System.currentTimeMillis()));
-		execution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("key1=0,key2=5")));
 		execution.setExitStatus(new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));
 		stepExecutionDao.saveStepExecution(execution);
 		StepExecution retrievedExecution = stepExecutionDao.getStepExecution(jobExecution, step2);
 		assertNotNull(retrievedExecution);
 		assertEquals(execution, retrievedExecution);
-		assertEquals(execution.getExecutionContext().getString("key1"), retrievedExecution.getExecutionContext().getString("key1"));
+		assertEquals(execution.getExitStatus(), retrievedExecution.getExitStatus());
+	}
+
+	public void testSaveStepExecutionAndExecutionContext() {
+		StepExecution execution = new StepExecution(step2, jobExecution, null);
+		execution.setStatus(BatchStatus.STARTED);
+		execution.setStartTime(new Date(System.currentTimeMillis()));
+		execution.setExecutionContext(executionContext);
+		execution.setExitStatus(new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION,
+				"java.lang.Exception"));
+		stepExecutionDao.saveStepExecution(execution);
+		stepExecutionDao.saveExecutionContext(execution);
+		StepExecution retrievedExecution = stepExecutionDao.getStepExecution(jobExecution, step2);
+		assertNotNull(retrievedExecution);
+		assertEquals(execution, retrievedExecution);
+		assertEquals(execution.getExecutionContext().getString("1"), retrievedExecution.getExecutionContext().getString("1"));
+		assertEquals(execution.getExecutionContext().getLong("3"), retrievedExecution.getExecutionContext().getLong("3"));
 		assertEquals(execution.getExitStatus(), retrievedExecution.getExitStatus());
 	}
 
