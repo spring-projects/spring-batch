@@ -49,7 +49,7 @@ public interface StreamManager {
 	 * @return {@link ExecutionContext} aggregating the contexts of all providers
 	 * registered under this key, or empty otherwise.
 	 */
-	void update();
+	void update(ExecutionContext executionContext);
 
 	/**
 	 * If any resources are needed for the stream to operate they need to be
@@ -58,7 +58,7 @@ public interface StreamManager {
 	 * @param key the key under which {@link ItemStream} instances might have
 	 * been registered.
 	 */
-	void close() throws StreamException;
+	void close(ExecutionContext executionContext) throws StreamException;
 
 	/**
 	 * If any resources are needed for the stream to operate they need to be

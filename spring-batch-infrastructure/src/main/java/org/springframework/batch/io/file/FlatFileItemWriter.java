@@ -79,8 +79,6 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	private Resource resource;
 
-	private ExecutionContext executionContext = new ExecutionContext();
-
 	private OutputState state = null;
 
 	private LineAggregator lineAggregator = new DelimitedLineAggregator();
@@ -149,9 +147,9 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	}
 
 	/**
-	 * @see ResourceLifecycle#close()
+	 * @see ResourceLifecycle#close(ExecutionContext)
 	 */
-	public void close() {
+	public void close(ExecutionContext executionContext) {
 		if (state != null) {
 			getOutputState().close();
 			state = null;
@@ -184,7 +182,6 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	 * @see ResourceLifecycle#open()
 	 */
 	public void open(ExecutionContext executionContext) {
-		this.executionContext = executionContext;
 		OutputState outputState = getOutputState();
 		if(executionContext.containsKey(getKey(RESTART_DATA_NAME))){
 			outputState.restoreFrom(executionContext);
@@ -192,12 +189,13 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	}
 
 	/**
-	 * @see ItemStream#update()
+	 * @see ItemStream#update(ExecutionContext)
 	 */
-	public void update() {
+	public void update(ExecutionContext executionContext) {
 		if (state == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
+		Assert.notNull(executionContext, "ExecutionContext must not be null");
 		executionContext.putLong(getKey(RESTART_DATA_NAME), state.position());
 		executionContext.putLong(getKey(WRITTEN_STATISTICS_NAME), state.linesWritten);
 		executionContext.putLong(getKey(RESTART_COUNT_STATISTICS_NAME), state.restartCount);

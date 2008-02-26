@@ -94,14 +94,14 @@ public class StaxEventItemWriterTests extends TestCase {
 		// write record
 		writer.write(record);
 		// writer.mark();
-		writer.update();
-		writer.close();
+		writer.update(executionContext);
+		writer.close(executionContext);
 
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();
 		writer.open(executionContext);
 		writer.write(record);
-		writer.close();
+		writer.close(executionContext);
 		
 		// check the output is concatenation of 'before restart' and 'after
 		// restart' writes.
@@ -124,8 +124,8 @@ public class StaxEventItemWriterTests extends TestCase {
 		final int NUMBER_OF_RECORDS = 10;
 		for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
 			writer.write(record);
-			writer.update();
-			long writeStatistics = executionContext.getLong(StaxEventItemWriter.WRITE_STATISTICS_NAME);
+			writer.update(executionContext);
+			long writeStatistics = executionContext.getLong(StaxEventItemWriter.class.getName() + "." + StaxEventItemWriter.WRITE_STATISTICS_NAME);
 
 			assertEquals(i, writeStatistics);
 		}
@@ -146,7 +146,7 @@ public class StaxEventItemWriterTests extends TestCase {
 
 		assertTrue(outputFileContent().indexOf("<testroot attribute=\"value\"") != NOT_FOUND);
 
-		writer.close();
+		writer.close(null);
 		assertTrue(outputFileContent().endsWith("</testroot>"));
 	}
 
@@ -207,6 +207,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		source.setRootTagName("root");
 		source.setVersion("1.0");
 		source.setOverwriteOutput(true);
+		source.setSaveState(true);
 
 		source.afterPropertiesSet();
 		

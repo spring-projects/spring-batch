@@ -74,7 +74,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 	 * Release resources and delete the temporary file
 	 */
 	protected void tearDown() throws Exception {
-		reader.close();
+		reader.close(null);
 	}
 
 	private Resource getInputResource(String input) {
@@ -87,7 +87,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 	 */
 	public void testSkip() throws Exception {
 
-		reader.close();
+		reader.close(null);
 		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 		reader.open(executionContext);
 
@@ -122,7 +122,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 	 */
 	public void testSkipFirstChunk() throws Exception {
 
-		reader.close();
+		reader.close(null);
 		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 		reader.open(executionContext);
 
@@ -145,7 +145,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 	public void testRestart() throws Exception {
 
-		reader.close();
+		reader.close(null);
 		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 		reader.open(executionContext);
 
@@ -159,11 +159,11 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		reader.read();
 
 		// get restart data
-		reader.update();
+		reader.update(executionContext);
 		assertEquals(4, executionContext.getLong(
 				FlatFileItemReader.class.getName() + "." + FlatFileItemReader.READ_STATISTICS_NAME));
 		// close input
-		reader.close();
+		reader.close(executionContext);
 
 		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 
@@ -174,7 +174,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		assertEquals("[testLine5]", reader.read().toString());
 		assertEquals("[testLine6]", reader.read().toString());
 
-		reader.update();
+		reader.update(executionContext);
 		assertEquals(6, executionContext.getLong(FlatFileItemReader.class.getName() + "." + FlatFileItemReader.READ_STATISTICS_NAME));
 	}
 

@@ -75,17 +75,17 @@ public class DelegatingItemWriter implements ItemWriter, ItemStream, Initializin
 
 	/**
 	 * @throws StreamException
-	 * @see org.springframework.batch.item.ItemStream#close()
+	 * @see org.springframework.batch.item.ItemStream#close(ExecutionContext)
 	 */
-	public void close() throws StreamException {
-		stream.close();
+	public void close(ExecutionContext executionContext) throws StreamException {
+		stream.close(null);
 	}
 
 	/**
-	 * @see org.springframework.batch.item.ExecutionContextProvider#update()
+	 * @see org.springframework.batch.item.ExecutionContextProvider#update(ExecutionContext)
 	 */
-	public void update() {
-		stream.update();
+	public void update(ExecutionContext executionContext) {
+		stream.update(executionContext);
 	}
 
 	/**

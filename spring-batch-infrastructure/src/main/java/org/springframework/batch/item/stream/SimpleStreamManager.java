@@ -68,11 +68,11 @@ public class SimpleStreamManager implements StreamManager {
 	 * 
 	 * @see org.springframework.batch.item.stream.StreamManager#getExecutionContext(java.lang.Object)
 	 */
-	public void update() {
+	public void update(ExecutionContext executionContext) {
 		synchronized (streams) {
 			for (Iterator it = streams.iterator(); it.hasNext();) {
 				ItemStream itemStream = (ItemStream) it.next();
-				itemStream.update();
+				itemStream.update(executionContext);
 			}
 		}
 	}
@@ -96,11 +96,11 @@ public class SimpleStreamManager implements StreamManager {
 	 * Broadcast the call to close from this {@link StreamManager}.
 	 * @throws StreamException
 	 */
-	public void close() throws StreamException {
+	public void close(ExecutionContext executionContext) throws StreamException {
 		synchronized (streams) {
 			for (Iterator it = streams.iterator(); it.hasNext();) {
 				ItemStream itemStream = (ItemStream) it.next();
-				itemStream.close();
+				itemStream.close(executionContext);
 			}
 		}
 	}

@@ -35,20 +35,23 @@ public interface ItemStream {
 	 * 
 	 * @throws IllegalArgumentException if context is null
 	 */
-	void open(ExecutionContext context) throws StreamException;
+	void open(ExecutionContext executionContext) throws StreamException;
 	
 	/**
 	 * Indicates that the execution context provided during open
 	 * is about to be saved.  If any state is remaining, but 
 	 * has not been put in the context, it should be added
 	 * here.
+	 * @param executionContext to be updated
+	 * @throws IllegalArgumentException if executionContext is null.
 	 */
-	void update();
+	void update(ExecutionContext executionContext);
 	
 	/**
 	 * If any resources are needed for the stream to operate they need to be
 	 * destroyed here. Once this method has been called all other methods
 	 * (except open) may throw an exception.
+	 * @param executionContext TODO
 	 */
-	void close() throws StreamException;
+	void close(ExecutionContext executionContext) throws StreamException;
 }

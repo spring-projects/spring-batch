@@ -81,9 +81,9 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 
 	private boolean initialized = false;
 	
-	private ExecutionContext executionContext = new ExecutionContext();
-	
 	private String name = HibernateCursorItemReader.class.getName();
+	
+	private boolean saveState = false;
 
 	public Object read() {
 		if (!initialized) {
@@ -109,7 +109,7 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	/**
 	 * Closes the result set cursor and hibernate session.
 	 */
-	public void close() {
+	public void close(ExecutionContext executionContext) {
 		initialized = false;
 		cursor.close();
 		currentProcessedRow = 0;
@@ -127,8 +127,6 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	 * Creates cursor for the query.
 	 */
 	public void open(ExecutionContext executionContext) {
-		this.executionContext = executionContext;
-		
 		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
 
 		if (useStatelessSession) {
@@ -187,10 +185,13 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 
 	/**
 	 */
-	public void update() {
-		executionContext.putString(getKey(RESTART_DATA_ROW_NUMBER_KEY), "" + currentProcessedRow);
-		String skipped = skippedRows.toString();
-		executionContext.putString(getKey(SKIPPED_ROWS), skipped.substring(1, skipped.length() - 1));
+	public void update(ExecutionContext executionContext) {
+		if(saveState){
+			Assert.notNull(executionContext, "ExecutionContext must not be null");
+			executionContext.putString(getKey(RESTART_DATA_ROW_NUMBER_KEY), "" + currentProcessedRow);
+			String skipped = skippedRows.toString();
+			executionContext.putString(getKey(SKIPPED_ROWS), skipped.substring(1, skipped.length() - 1));
+		}
 	}
 
 	/**
@@ -237,5 +238,9 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 
 	private String getKey(String key){
 		return name + "." + key;
+	}
+	
+	public void setSaveState(boolean saveState) {
+		this.saveState = saveState;
 	}
 }

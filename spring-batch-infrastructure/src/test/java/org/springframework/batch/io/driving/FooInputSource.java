@@ -29,12 +29,12 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 		}
 	}
 
-	public void update() {
-		inputSource.update();
+	public void update(ExecutionContext executionContext) {
+		inputSource.update(executionContext);
 	}
 
 	public void destroy() throws Exception {
-		inputSource.close();
+		inputSource.close(null);
 	}
 
 	public void setFooDao(FooDao fooDao) {
@@ -48,7 +48,7 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 		inputSource.open(executionContext);
 	};
 
-	public void close() {
+	public void close(ExecutionContext executionContext) {
 	}
 
 	/*

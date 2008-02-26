@@ -78,7 +78,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		Foo foo2 = (Foo) itemReader.read();
 		assertEquals(2, foo2.getValue());
 
-		getAsItemStream(itemReader).update();
+		getAsItemStream(itemReader).update(executionContext);
 
 		// create new input source
 		itemReader = createItemReader();
@@ -104,7 +104,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		Foo foo2 = (Foo) itemReader.read();
 		assertEquals(2, foo2.getValue());
 
-		getAsItemStream(itemReader).update();
+		getAsItemStream(itemReader).update(executionContext);
 
 		// create new input source
 		itemReader = createItemReader();

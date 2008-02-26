@@ -66,9 +66,9 @@ public class ResourceLineReaderTests extends TestCase {
 		Resource resource = new ByteArrayResource("a,b,c\n1,2,3".getBytes());
 		ResourceLineReader reader = new ResourceLineReader(resource);
 		reader.open();
-		reader.close();
+		reader.close(null);
 		try {
-			reader.close(); // just closing a BufferedReader twice should be fine
+			reader.close(null); // just closing a BufferedReader twice should be fine
 		} catch (Exception e) {
 			fail("Unexpected Exception "+e);
 		}
@@ -181,7 +181,7 @@ public class ResourceLineReaderTests extends TestCase {
 		Resource resource = new ByteArrayResource("1\n# 2\n3".getBytes());
 		ResourceLineReader reader = new ResourceLineReader(resource);
 		reader.read();
-		reader.close();
+		reader.close(null);
 		reader.mark();		
 	}
 

@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.springframework.batch.io.exception.BatchEnvironmentException;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.MarkFailedException;
@@ -169,11 +170,11 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 	/**
 	 * Close the reader associated with this input source.
 	 * 
-	 * @see org.springframework.batch.io.ItemReader#close()
+	 * @see org.springframework.batch.io.ItemReader#close(ExecutionContext)
 	 * @throws BatchEnvironmentException if there is an {@link IOException}
 	 * during the close operation.
 	 */
-	public synchronized void close() {
+	public synchronized void close(ExecutionContext executionContext) {
 		if (state == null) {
 			return;
 		}

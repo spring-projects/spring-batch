@@ -61,8 +61,6 @@ public class DrivingQueryItemReader implements KeyedItemReader, InitializingBean
 
 	private KeyGenerator keyGenerator;
 	
-	private ExecutionContext executionContext = new ExecutionContext();
-	
 	private boolean saveState = false;
 
 	public DrivingQueryItemReader() {
@@ -119,7 +117,7 @@ public class DrivingQueryItemReader implements KeyedItemReader, InitializingBean
 	 * Close the resource by setting the list of keys to null, allowing them to
 	 * be garbage collected.
 	 */
-	public void close() {
+	public void close(ExecutionContext executionContext) {
 		initialized = false;
 		currentIndex = 0;
 		lastCommitIndex = 0;
@@ -143,11 +141,11 @@ public class DrivingQueryItemReader implements KeyedItemReader, InitializingBean
 		keys = keyGenerator.retrieveKeys(executionContext);
 		keysIterator = keys.listIterator();
 		initialized = true;
-		this.executionContext = executionContext;
 	}
 
-	public void update() {
+	public void update(ExecutionContext executionContext) {
 		if(saveState){
+			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			if(getCurrentKey() != null){
 				keyGenerator.saveState(getCurrentKey(), executionContext);
 			}

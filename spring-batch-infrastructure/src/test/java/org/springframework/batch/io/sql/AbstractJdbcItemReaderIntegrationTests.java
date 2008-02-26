@@ -79,7 +79,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 		Foo foo2 = (Foo) itemReader.read();
 		assertEquals(2, foo2.getValue());
 
-		getAsItemStream(itemReader).update();
+		getAsItemStream(itemReader).update(executionContext);
 
 		// create new input source
 		itemReader = createItemReader();
@@ -101,7 +101,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 		Foo foo2 = (Foo) itemReader.read();
 		assertEquals(2, foo2.getValue());
 
-		getAsItemStream(itemReader).update();
+		getAsItemStream(itemReader).update(executionContext);
 
 		// create new input source
 		itemReader = createItemReader();

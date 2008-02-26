@@ -93,9 +93,7 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	private LineTokenizer tokenizer = new DelimitedLineTokenizer();
 
 	private FieldSetMapper fieldSetMapper;
-	
-	private ExecutionContext executionContext = new ExecutionContext();
-	
+		
 	private String name = FlatFileItemReader.class.getName();
 
 	/**
@@ -111,8 +109,6 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	public void open(ExecutionContext executionContext) throws StreamException {
 
 		Assert.state(resource.exists(), "Resource must exist: [" + resource + "]");
-
-		this.executionContext = executionContext;
 
 		log.debug("Opening flat file for reading: " + resource);
 
@@ -161,11 +157,11 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	 * Close and null out the reader.
 	 * @throws Exception
 	 */
-	public void close() throws StreamException {
+	public void close(ExecutionContext executionContext) throws StreamException {
 		try {
 			if (reader != null) {
 				log.debug("Closing flat file for reading: " + resource);
-				reader.close();
+				reader.close(null);
 			}
 		}
 		finally {
@@ -202,10 +198,11 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	 * the current Line Count which can be used to reinitialise the batch job in
 	 * case of restart.
 	 */
-	public void update() {
+	public void update(ExecutionContext executionContext) {
 		if (reader == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
+		Assert.notNull(executionContext, "ExecutionContext must not be null");
 		executionContext.putLong(getKey(READ_STATISTICS_NAME), reader.getPosition());
 		executionContext.putLong(getKey(SKIPPED_STATISTICS_NAME), skippedLines.size());
 	}

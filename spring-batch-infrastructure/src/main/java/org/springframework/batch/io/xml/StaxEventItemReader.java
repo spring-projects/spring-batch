@@ -61,8 +61,8 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 
 	private List skipRecords = new ArrayList();
 	
-	private ExecutionContext executionContext = new ExecutionContext();
-
+	private boolean saveState = false;
+	
 	/**
 	 * Read in the next root element from the file, and return it.
 	 * 
@@ -90,7 +90,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 		return item;
 	}
 
-	public void close() {
+	public void close(ExecutionContext executionContext) {
 		initialized = false;
 		if (fragmentReader == null && inputStream == null) {
 			return;
@@ -113,8 +113,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 
 	public void open(ExecutionContext executionContext) {
 		Assert.state(resource.exists(), "Input resource does not exist: [" + resource + "]");
-		this.executionContext = executionContext;		
-		
+
 		try {
 			inputStream = resource.getInputStream();
 			txReader = new DefaultTransactionalEventReader(XMLInputFactory.newInstance().createXMLEventReader(
@@ -193,26 +192,13 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	}
 
 	/**
-	 * @see ItemStream#update()
+	 * @see ItemStream#update(ExecutionContext)
 	 */
-	public void update() {
-		executionContext.putLong(READ_COUNT_STATISTICS_NAME, currentRecordCount);
-	}
-
-	/**
-	 * Restores the input source for the given restart data by rereading and
-	 * skipping the number of records stored in the {@link ExecutionContext}.
-	 * 
-	 * @param ExecutionContext that holds the line count from the last
-	 * commit.
-	 * @throws IllegalStateException if the ItemReader has already been
-	 * initialized or if the number of records to read and skip exceeds the
-	 * available records.
-	 */
-	public void restoreFrom(ExecutionContext data) {
-
-
-
+	public void update(ExecutionContext executionContext) {
+		if(saveState){
+			Assert.notNull(executionContext, "ExecutionContext must not be null");
+			executionContext.putLong(READ_COUNT_STATISTICS_NAME, currentRecordCount);
+		}
 	}
 
 	/**
@@ -273,4 +259,7 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 		fragmentReader.reset();
 	}
 
+	public void setSaveState(boolean saveState) {
+		this.saveState = saveState;
+	}
 }

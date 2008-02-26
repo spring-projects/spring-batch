@@ -103,11 +103,11 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testMark() {
 		manager.register(new ItemStreamSupport() {
-			public void update() {
+			public void update(ExecutionContext executionContext) {
 				list.add("bar");
 			}
 		});
-		manager.update();
+		manager.update(null);
 		assertEquals(1, list.size());
 	}
 
@@ -117,11 +117,11 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testClose() {
 		manager.register(new ItemStreamSupport() {
-			public void close() throws StreamException {
+			public void close(ExecutionContext executionContext) throws StreamException {
 				list.add("bar");
 			}
 		});
-		manager.close();
+		manager.close(null);
 		assertEquals(1, list.size());
 	}
 
@@ -131,7 +131,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testCommitWithoutMark() {
 		manager.register(new ItemStreamSupport() {
-			public void update() {
+			public void update(ExecutionContext executionContext) {
 				list.add("bar");
 			}
 		});
@@ -146,7 +146,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testRollbackWithoutMark() {
 		manager.register( new ItemStreamSupport() {
-			public void update() {
+			public void update(ExecutionContext executionContext) {
 				list.add("bar");
 			}
 		});

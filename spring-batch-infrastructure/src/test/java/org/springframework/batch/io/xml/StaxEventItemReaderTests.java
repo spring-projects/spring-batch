@@ -92,7 +92,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		assertNotNull(source.read());
 		assertNull(source.read()); // there are only two fragments
 
-		source.close();
+		source.close(executionContext);
 	}
 
 	/**
@@ -117,7 +117,8 @@ public class StaxEventItemReaderTests extends TestCase {
 	public void testRestart() {
 		source.open(executionContext);
 		source.read();
-		source.update();
+		source.update(executionContext);
+		System.out.println(executionContext);
 		assertEquals(1, executionContext.getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME));
 		List expectedAfterRestart = (List) source.read();
 
@@ -146,8 +147,8 @@ public class StaxEventItemReaderTests extends TestCase {
 	}
 
 	public void testRestoreWorksFromClosedStream() throws Exception {
-		source.close();
-		source.update();
+		source.close(executionContext);
+		source.update(executionContext);
 	}
 	/**
 	 * Skipping marked records after rollback.
@@ -198,13 +199,13 @@ public class StaxEventItemReaderTests extends TestCase {
 	public void testExecutionContext() {
 		final int NUMBER_OF_RECORDS = 2;
 		source.open(executionContext);
-		source.update();
+		source.update(executionContext);
 		
 		for (int i = 0; i < NUMBER_OF_RECORDS; i++) {
 			long recordCount = extractRecordCount();
 			assertEquals(i, recordCount);
 			source.read();
-			source.update();
+			source.update(executionContext);
 		}
 
 		assertEquals(NUMBER_OF_RECORDS, extractRecordCount());
@@ -217,7 +218,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	}
 
 	public void testCloseWithoutOpen() throws Exception {
-		source.close();
+		source.close(null);
 		// No error!
 	}
 
@@ -235,7 +236,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		assertNotNull(item);
 		assertTrue(newSource.isOpenCalled());
 
-		newSource.close();
+		newSource.close(null);
 		newSource.setOpenCalled(false);
 		// calling read again should require re-initialization because of close
 		try {
@@ -304,6 +305,7 @@ public class StaxEventItemReaderTests extends TestCase {
 
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
 		newSource.setFragmentDeserializer(deserializer);
+		newSource.setSaveState(true);
 
 		return newSource;
 	}

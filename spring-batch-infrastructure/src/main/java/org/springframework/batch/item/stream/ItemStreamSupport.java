@@ -29,9 +29,9 @@ public class ItemStreamSupport implements ItemStream {
 
 	/**
 	 * No-op.
-	 * @see org.springframework.batch.item.ItemStream#close()
+	 * @see org.springframework.batch.item.ItemStream#close(ExecutionContext)
 	 */
-	public void close() throws StreamException {
+	public void close(ExecutionContext executionContext) throws StreamException {
 	}
 
 	/**
@@ -43,9 +43,9 @@ public class ItemStreamSupport implements ItemStream {
 
 	/**
 	 * Return empty {@link ExecutionContext}.
-	 * @see org.springframework.batch.item.ExecutionContextProvider#update()
+	 * @see org.springframework.batch.item.ExecutionContextProvider#update(ExecutionContext)
 	 */
-	public void update() {
+	public void update(ExecutionContext executionContext) {
 	}
 
 }

@@ -21,9 +21,9 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.Skippable;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -76,7 +76,7 @@ public class DelegatingItemReaderTests extends TestCase {
 	 * Gets restart data from the input template
 	 */
 	public void testGetStreamContext() {
-		itemProvider.update();
+		itemProvider.update(executionContext);
 		assertEquals("foo", executionContext.getString("value"));
 	}
 
@@ -88,26 +88,24 @@ public class DelegatingItemReaderTests extends TestCase {
 	private static class MockItemReader extends AbstractItemReader implements ItemReader, ItemStream, Skippable {
 
 		private Object value;
-		private ExecutionContext executionContext;
 
 		public Properties getStatistics() {
 			return PropertiesConverter.stringToProperties("a=b");
 		}
 
-		public void update() {
+		public void update(ExecutionContext executionContext) {
 			executionContext.putString("value", "foo");
 		}
 
 		public MockItemReader(Object value, ExecutionContext executionContext) {
 			this.value = value;
-			this.executionContext = executionContext;
 		}
 
 		public Object read() {
 			return value;
 		}
 
-		public void close() {
+		public void close(ExecutionContext executionContext) {
 		}
 
 		public void open(ExecutionContext executionContext) {

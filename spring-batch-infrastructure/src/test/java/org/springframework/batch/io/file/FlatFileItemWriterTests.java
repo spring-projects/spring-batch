@@ -82,7 +82,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		if (reader != null) {
 			reader.close();
 		}
-		inputSource.close();
+		inputSource.close(null);
 		outputFile.delete();
 	}
 
@@ -107,7 +107,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	public void testWriteString() throws Exception {
 		inputSource.open(executionContext);
 		inputSource.write(TEST_STRING);
-		inputSource.close();
+		inputSource.close(null);
 		String lineFromFile = readLine();
 
 		assertEquals(TEST_STRING, lineFromFile);
@@ -125,7 +125,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		});
 		Object data = new Object();
 		inputSource.write(data);
-		inputSource.close();
+		inputSource.close(null);
 		String lineFromFile = readLine();
 		// converter not used if input is String
 		assertEquals("FOO:" + data.toString(), lineFromFile);
@@ -143,7 +143,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		});
 		Object data = new Object();
 		inputSource.write(data);
-		inputSource.close();
+		inputSource.close(null);
 		String lineFromFile = readLine();
 		// converter not used if input is String
 		assertEquals("FOO:" + data.toString(), lineFromFile);
@@ -160,7 +160,7 @@ public class FlatFileItemWriterTests extends TestCase {
 			}
 		});
 		inputSource.write(TEST_STRING);
-		inputSource.close();
+		inputSource.close(null);
 		String lineFromFile = readLine();
 		assertEquals("FOO:" + TEST_STRING, lineFromFile);
 	}
@@ -174,7 +174,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 		// AggregatorStub ignores the LineDescriptor, so we pass null
 		inputSource.write(args);
-		inputSource.close();
+		inputSource.close(null);
 		String lineFromFile = readLine();
 		assertEquals(args, lineFromFile);
 	}
@@ -183,7 +183,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.write("testLine1");
 		// rollback
 		rollback();
-		inputSource.close();
+		inputSource.close(null);
 		String lineFromFile = readLine();
 		assertEquals(null, lineFromFile);
 	}
@@ -192,7 +192,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.write("testLine1");
 		// rollback
 		commit();
-		inputSource.close();
+		inputSource.close(null);
 		String lineFromFile = readLine();
 		assertEquals("testLine1", lineFromFile);
 	}
@@ -222,9 +222,9 @@ public class FlatFileItemWriterTests extends TestCase {
 		commit();
 
 		// get restart data
-		inputSource.update();
+		inputSource.update(executionContext);
 		// close template
-		inputSource.close();
+		inputSource.close(executionContext);
 
 		// init with correct data
 		inputSource.open(executionContext);
@@ -235,9 +235,9 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.write("testLine8");
 
 		// get statistics
-		inputSource.update();
+		inputSource.update(executionContext);
 		// close template
-		inputSource.close();
+		inputSource.close(executionContext);
 
 		// verify what was written to the file
 		for (int i = 1; i < 9; i++) {
@@ -266,7 +266,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.setFieldSetUnmapper(new PassThroughFieldSetMapper());
 		inputSource.afterPropertiesSet();
 		inputSource.open(executionContext);
-		inputSource.update();
+		inputSource.update(executionContext);
 		assertNotNull(executionContext);
 		assertEquals(3, executionContext.entrySet().size());
 		assertEquals(0, executionContext.getLong(FlatFileItemWriter.class.getName() + "." + FlatFileItemWriter.RESTART_DATA_NAME));

@@ -83,7 +83,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	 * Release resources.
 	 */
 	protected void tearDown() throws Exception {
-		itemReader.close();
+		itemReader.close(null);
 	}
 
 	private Resource getInputResource(String input) {
@@ -159,7 +159,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader = new FlatFileItemReader();
 		itemReader.setResource(getInputResource(TEST_STRING));
 		itemReader.setFieldSetMapper(fieldSetMapper);
-		itemReader.close();
+		itemReader.close(null);
 		// The open does not happen automatically on a read...
 		itemReader.open(executionContext);
 		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());

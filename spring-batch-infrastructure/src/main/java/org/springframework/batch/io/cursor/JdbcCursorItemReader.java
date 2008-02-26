@@ -155,8 +155,6 @@ public class JdbcCursorItemReader implements KeyedItemReader, InitializingBean,
 
 	private boolean initialized = false;
 	
-	private ExecutionContext executionContext = new ExecutionContext();
-	
 	private boolean saveState = false;
 	
 	private String name = JdbcCursorItemReader.class.getName();
@@ -269,9 +267,9 @@ public class JdbcCursorItemReader implements KeyedItemReader, InitializingBean,
 	 * will be closed. This must be called or the connection and cursor will be
 	 * held open indefinitely!
 	 * 
-	 * @see org.springframework.batch.item.ResourceLifecycle#close()
+	 * @see org.springframework.batch.item.ResourceLifecycle#close(ExecutionContext)
 	 */
-	public void close() {
+	public void close(ExecutionContext executionContext) {
 		initialized = false;
 		JdbcUtils.closeResultSet(this.rs);
 		JdbcUtils.closeStatement(this.stmt);
@@ -312,7 +310,7 @@ public class JdbcCursorItemReader implements KeyedItemReader, InitializingBean,
 			handleWarnings(this.stmt.getWarnings());
 		}
 		catch (SQLException se) {
-			close();
+			close(null);
 			throw getExceptionTranslator().translate("Executing query", sql, se);
 		}
 
@@ -385,8 +383,9 @@ public class JdbcCursorItemReader implements KeyedItemReader, InitializingBean,
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getExecutionContext()
 	 */
-	public void update() {
+	public void update(ExecutionContext executionContext) {
 		if(saveState){
+			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			String skipped = skippedRows.toString();
 			executionContext.putString(addName(SKIPPED_ROWS), skipped.substring(1, skipped.length() - 1));
 			executionContext.putLong(addName(CURRENT_PROCESSED_ROW), currentProcessedRow);
@@ -404,7 +403,6 @@ public class JdbcCursorItemReader implements KeyedItemReader, InitializingBean,
 		Assert.notNull(context, "ExecutionContext must not be null");
 		executeQuery();
 		initialized = true;
-		this.executionContext = context;
 
 		// Properties restartProperties = data.getProperties();
 		if (!context.containsKey(addName(CURRENT_PROCESSED_ROW))) {

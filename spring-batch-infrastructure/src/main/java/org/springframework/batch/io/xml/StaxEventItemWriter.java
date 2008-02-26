@@ -101,8 +101,10 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	// current count of processed records
 	private long currentRecordCount = 0;
 	
-	private ExecutionContext executionContext = new ExecutionContext();
-
+	private String name = StaxEventItemWriter.class.getName();
+	
+	private boolean saveState = false;
+	
 	/**
 	 * Set output file.
 	 * 
@@ -223,13 +225,12 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	 * @see org.springframework.batch.item.ResourceLifecycle#open()
 	 */
 	public void open(ExecutionContext executionContext) {
-		this.executionContext = executionContext;
 		long startAtPosition = 0;
 
 		// if restart data is provided, restart from provided offset
 		// otherwise start from beginning
-		if (executionContext.containsKey(RESTART_DATA_NAME)) {
-			startAtPosition = executionContext.getLong(RESTART_DATA_NAME);
+		if (executionContext.containsKey(getKey(RESTART_DATA_NAME))) {
+			startAtPosition = executionContext.getLong(getKey(RESTART_DATA_NAME));
 			restarted = true;
 		}
 
@@ -330,9 +331,9 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	/**
 	 * Close the output source.
 	 * 
-	 * @see org.springframework.batch.item.ResourceLifecycle#close()
+	 * @see org.springframework.batch.item.ResourceLifecycle#close(ExecutionContext)
 	 */
-	public void close() {
+	public void close(ExecutionContext executionContext) {
 		initialized = false;
 		try {
 			endDocument(delegateEventWriter);
@@ -365,14 +366,18 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 
 	/**
 	 * Get the restart data.
-	 * @see org.springframework.batch.item.ItemStream#update()
+	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
-	public void update() {
+	public void update(ExecutionContext executionContext) {
 		if (!initialized) {
 			throw new StreamException("ItemStream is not open, or may have been closed.  Cannot access context.");
 		}
-		executionContext.putLong(RESTART_DATA_NAME, getPosition());
-		executionContext.putLong(WRITE_STATISTICS_NAME, currentRecordCount);
+		
+		if(saveState){
+			Assert.notNull(executionContext, "ExecutionContext must not be null");
+			executionContext.putLong(getKey(RESTART_DATA_NAME), getPosition());
+			executionContext.putLong(getKey(WRITE_STATISTICS_NAME), currentRecordCount);
+		}
 	}
 
 	/**
@@ -432,12 +437,24 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	public void clear() throws ClearFailedException {
 		currentRecordCount = lastCommitPointRecordCount;
 		// close output
-		close();
+		close(null);
 		// and reopen it - we do this because we need to reopen stream
 		// reader at specified position - calling setPosition() is not
 		// enough!
 		restarted = true;
 		open(lastCommitPointPosition);
+	}
+	
+	public void setSaveState(boolean saveState) {
+		this.saveState = saveState;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	private String getKey(String key){
+		return name + "." + key;
 	}
 
 }

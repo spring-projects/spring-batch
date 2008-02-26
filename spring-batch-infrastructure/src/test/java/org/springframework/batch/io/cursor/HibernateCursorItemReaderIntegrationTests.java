@@ -31,6 +31,7 @@ public class HibernateCursorItemReaderIntegrationTests extends AbstractDataSourc
 		inputSource.setSessionFactory(sessionFactory);
 		inputSource.setUseStatelessSession(isUseStatelessSession());
 		inputSource.afterPropertiesSet();
+		inputSource.setSaveState(true);
 
 		return inputSource;
 	}
