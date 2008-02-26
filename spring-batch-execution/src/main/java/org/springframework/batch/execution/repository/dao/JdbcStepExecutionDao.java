@@ -106,7 +106,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					executionContext.putDouble(key, rs.getDouble("DOUBLE_VAL"));
 				}
 				else if (type == AttributeType.OBJECT) {
-					executionContext.putLong(key, rs.getLong("OBJECT_VAL"));
+					executionContext.put(key, rs.getObject("OBJECT_VAL"));
 				}
 				else {
 					throw new BatchCriticalException("Invalid type found: [" + typeCd + "] for execution id: ["

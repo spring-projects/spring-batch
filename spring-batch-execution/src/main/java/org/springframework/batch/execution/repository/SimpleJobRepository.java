@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  * 
  * <p>
  * Implementation of {@link JobRepository} that stores JobInstances,
- * JobExecutions, StepInstances, and StepExecutions using the injected DAOs.
+ * JobExecutions, and StepExecutions using the injected DAOs.
  * <p>
  * 
  * @author Lucas Ward
@@ -50,7 +50,6 @@ import org.springframework.util.Assert;
  * @see JobRepository
  * @see JobInstanceDao
  * @see JobExecutionDao
- * @see StepInstanceDao
  * @see StepExecutionDao
  * 
  */
@@ -269,6 +268,9 @@ public class SimpleJobRepository implements JobRepository {
 		}
 	}
 
+	/**
+	 * @return the last execution of the step within given job instance
+	 */
 	public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
 		List jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		List stepExecutions = new ArrayList(jobExecutions.size());
@@ -292,6 +294,9 @@ public class SimpleJobRepository implements JobRepository {
 		return latest;
 	}
 
+	/**
+	 * @return number of executions of the step within given job instance
+	 */
 	public int getStepExecutionCount(JobInstance jobInstance, Step step) {
 		int count = 0;
 		List jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);

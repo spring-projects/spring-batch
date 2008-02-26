@@ -16,7 +16,10 @@
 
 package org.springframework.batch.execution.repository.dao;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.Job;
@@ -191,11 +194,15 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	}
 	
 	public void testSaveExecutionContext(){
+		
 		stepExecution.setExecutionContext(executionContext);
 		stepExecutionDao.saveExecutionContext(stepExecution);
 		ExecutionContext attributes = stepExecutionDao.findExecutionContext(stepExecution);
 		assertEquals(executionContext, attributes);
 		executionContext.putString("newString", "newString");
+		executionContext.putLong("newLong", 1);
+		executionContext.putDouble("newDouble", 2.5);
+		executionContext.put("newSerializable", "serializableValue");
 		stepExecutionDao.updateExecutionContext(stepExecution);
 		attributes = stepExecutionDao.findExecutionContext(stepExecution);
 		assertEquals(executionContext, attributes);
