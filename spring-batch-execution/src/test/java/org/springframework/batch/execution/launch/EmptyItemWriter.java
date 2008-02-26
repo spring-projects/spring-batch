@@ -22,6 +22,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.ClearFailedException;
+import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -62,11 +64,11 @@ public class EmptyItemWriter implements ItemWriter, InitializingBean {
 		return list;
 	}
 
-	public void clear() throws Exception {
+	public void clear() throws ClearFailedException {
 		//no-op
 	}
 
-	public void flush() throws Exception {
+	public void flush() throws FlushFailedException {
 		//no-op
 	}
 

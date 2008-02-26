@@ -17,15 +17,17 @@
 package org.springframework.batch.execution.configuration;
 
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.ClearFailedException;
+import org.springframework.batch.item.exception.FlushFailedException;
 
 public class StubItemWriter implements ItemWriter {
 
-	public void clear() throws Exception {
+	public void clear() throws ClearFailedException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
 
-	public void flush() throws Exception {
+	public void flush() throws FlushFailedException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
