@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.4.v200802132100]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.4.v200802202100]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -29,6 +29,14 @@
 		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerTaskletStepRerunAlways.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerTaskletStepRerunIncomplete.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerTaskletStepRerunNever.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerStepOk.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerStepMissingItemReader.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerStepMissingItemWriter.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerStepMissingTransactionManager.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerStepRerunAlways.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerStepRerunIncomplete.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerStepRerunNever.xml</config>
+		<config>src/test/resources/org/springframework/batch/execution/configuration/BatchNamespaceHandlerStepSpecificTransactionManager.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

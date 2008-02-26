@@ -38,7 +38,7 @@
 		</xs:annotation>
 		<xs:complexType>
 	 		<xs:choice minOccurs="1" maxOccurs="unbounded">
-				<xs:element name="chunk-step" type="chunkStepType">
+				<xs:element name="step" type="stepType">
 					<xs:annotation>
 						<xs:documentation><![CDATA[Defines a step that supports chunking]]></xs:documentation>
 					</xs:annotation>
@@ -58,7 +58,7 @@
 	</xs:element>
 
 	<!-- Types -->
-	 <xs:complexType name="chunkStepType">
+	 <xs:complexType name="stepType">
 		<xs:attribute name="id" type="xs:token" use="required">
 			<xs:annotation>
 				<xs:documentation><![CDATA[The unique identifier to use in this step.  The id must be unique within the context of this job.]]></xs:documentation>
@@ -80,7 +80,7 @@
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="transaction-manager" type="xs:token" use="optional"
-			default="transaction-manager">
+			default="transactionManager">
 			<xs:annotation>
 				<xs:documentation><![CDATA[The id of the transaction manager to use in this step.  This should be an implementation of Spring's PlatformTransactionManager.]]></xs:documentation>
 			</xs:annotation>

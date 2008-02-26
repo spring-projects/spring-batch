@@ -38,6 +38,8 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
+ * Creates a {@link BeanDefinitionParser} for the <code>&lt;job-repository&gt;</code> tag.
+ * 
  * @author Ben Hale
  */
 class JobRepositoryBeanDefinitionParser implements BeanDefinitionParser {
@@ -151,16 +153,17 @@ class JobRepositoryBeanDefinitionParser implements BeanDefinitionParser {
 		return incrementerDef;
 	}
 
-    private void addSequenceIncrementer(String dataSourceId, String incrementerName,
-            ConstructorArgumentValues constructorArgumentValues) {
-	    constructorArgumentValues.addGenericArgumentValue(new RuntimeBeanReference(dataSourceId));
+	private void addSequenceIncrementer(String dataSourceId, String incrementerName,
+	        ConstructorArgumentValues constructorArgumentValues) {
+		constructorArgumentValues.addGenericArgumentValue(new RuntimeBeanReference(dataSourceId));
 		constructorArgumentValues.addGenericArgumentValue(incrementerName);
-    }
-    
-    private void addTableIncrementer(String dataSourceId, String incrementerName, ConstructorArgumentValues constructorArgumentValues) {
-	    constructorArgumentValues.addGenericArgumentValue(new RuntimeBeanReference(dataSourceId));
+	}
+
+	private void addTableIncrementer(String dataSourceId, String incrementerName,
+	        ConstructorArgumentValues constructorArgumentValues) {
+		constructorArgumentValues.addGenericArgumentValue(new RuntimeBeanReference(dataSourceId));
 		constructorArgumentValues.addGenericArgumentValue(incrementerName);
 		constructorArgumentValues.addGenericArgumentValue("id");
-    }
+	}
 
 }
