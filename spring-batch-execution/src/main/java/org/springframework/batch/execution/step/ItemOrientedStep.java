@@ -444,7 +444,8 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 		}
 		catch (Exception e) {
-			if (getItemSkipPolicy().shouldSkip(e, contribution)) {
+			if (getItemSkipPolicy().shouldSkip(e, contribution.getSkipCount())) {
+				contribution.incrementSkipCount();
 				skip();
 			}
 			else {

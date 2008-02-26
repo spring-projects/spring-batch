@@ -18,7 +18,6 @@ package org.springframework.batch.execution.step;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -39,8 +38,6 @@ import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
-import org.springframework.batch.execution.step.support.LimitCheckingItemSkipPolicy;
-import org.springframework.batch.execution.step.support.SkipLimitExceededException;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -366,29 +363,6 @@ public class ItemOrientedStepTests extends TestCase {
 		itemOrientedStep.setExceptionHandler(new DefaultExceptionHandler());
 		itemOrientedStep.applyConfiguration();
 		assertEquals(1, list.size());
-	}
-
-	public void testApplyConfigurationWithZeroSkipLimit() throws Exception {
-		itemOrientedStep.setItemSkipPolicy(new LimitCheckingItemSkipPolicy(0, Collections.singletonList(Exception.class)));
-		itemOrientedStep.applyConfiguration();
-		JobExecution jobExecution = new JobExecution(jobInstance);
-		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
-		try {
-			assertEquals(false, itemOrientedStep.getItemSkipPolicy().shouldSkip(new RuntimeException(),
-				stepExecution.createStepContribution()));
-			fail("Expected SkipLimitExceededException");
-		} catch (SkipLimitExceededException e) {
-			// expected
-		}
-	}
-
-	public void testApplyConfigurationWithNonZeroSkipLimit() throws Exception {
-		itemOrientedStep.setItemSkipPolicy(new LimitCheckingItemSkipPolicy(1, Collections.singletonList(Exception.class)));
-		itemOrientedStep.applyConfiguration();
-		JobExecution jobExecution = new JobExecution(jobInstance);
-		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
-		assertEquals(true, itemOrientedStep.getItemSkipPolicy().shouldSkip(new RuntimeException(),
-				stepExecution.createStepContribution()));
 	}
 
 	public void testStreamManager() throws Exception {

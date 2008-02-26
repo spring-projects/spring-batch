@@ -26,7 +26,6 @@ import org.springframework.batch.common.ExceptionClassifier;
 import org.springframework.batch.common.SubclassExceptionClassifier;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.FlatFileParsingException;
 
@@ -76,17 +75,16 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	}
 
 	/**
-	 * Given the provided exception and StepExecution, determine whether or not
+	 * Given the provided exception and skip count, determine whether or not
 	 * processing should continue for the given exception.  If the exception
 	 * is not within the list of 'skippable exceptions', false will be returned.
 	 * If the exception is within the list, and {@link StepExecution} skipCount 
 	 * is greater than the skipLimit, then a {@link SkipLimitExceededException}
 	 * will be thrown.
 	 */
-	public boolean shouldSkip(Exception ex, StepContribution stepContribution){
+	public boolean shouldSkip(Exception ex, int skipCount){
 		if(exceptionClassifier.classify(ex).equals(SKIP)){
-			if(stepContribution.getSkipCount() < skipLimit){
-				stepContribution.incrementSkipCount();
+			if(skipCount < skipLimit){
 				return true;
 			}
 			else{

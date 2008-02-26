@@ -19,14 +19,9 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.domain.StepContribution;
-import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepSupport;
-import org.springframework.batch.execution.step.support.LimitCheckingItemSkipPolicy;
-import org.springframework.batch.execution.step.support.SkipLimitExceededException;
-import org.springframework.batch.io.exception.FlatFileParsingException;
-
 import junit.framework.TestCase;
+
+import org.springframework.batch.io.exception.FlatFileParsingException;
 
 /**
  * @author Lucas Ward
@@ -34,9 +29,7 @@ import junit.framework.TestCase;
  */
 public class SkipLimitReadFailurePolicyTests extends TestCase {
 
-	LimitCheckingItemSkipPolicy failurePolicy;
-	StepExecution stepExecution;
-	StepContribution stepContribution;
+	private LimitCheckingItemSkipPolicy failurePolicy;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -45,14 +38,11 @@ public class SkipLimitReadFailurePolicyTests extends TestCase {
 		skippableExceptions.add(FlatFileParsingException.class);
 		
 		failurePolicy = new LimitCheckingItemSkipPolicy(1, skippableExceptions);
-		stepExecution = new StepExecution(new StepSupport("stepName"), null);
-		stepExecution.setSkipCount(2);
-		stepContribution = stepExecution.createStepContribution();
 	}
 	
 	public void testLimitExceed(){		
 		try{
-			failurePolicy.shouldSkip(new FlatFileParsingException("", ""), stepContribution);
+			failurePolicy.shouldSkip(new FlatFileParsingException("", ""), 2);
 			fail();
 		}
 		catch(SkipLimitExceededException ex){
@@ -61,12 +51,11 @@ public class SkipLimitReadFailurePolicyTests extends TestCase {
 	}
 	
 	public void testNonSkippableException(){
-		assertFalse(failurePolicy.shouldSkip(new FileNotFoundException(), stepContribution));
+		assertFalse(failurePolicy.shouldSkip(new FileNotFoundException(), 2));
 	}
 	
 	public void testSkip(){
-		stepExecution.setSkipCount(0);
-		assertTrue(failurePolicy.shouldSkip(new FlatFileParsingException("",""), stepContribution));
+		assertTrue(failurePolicy.shouldSkip(new FlatFileParsingException("",""), 0));
 	}
 
 }
