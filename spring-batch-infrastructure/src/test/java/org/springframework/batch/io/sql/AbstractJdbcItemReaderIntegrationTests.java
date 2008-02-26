@@ -124,9 +124,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 	 */
 	public void testRestoreFromEmptyData() throws Exception {
 		ExecutionContext streamContext = new ExecutionContext();
-
-		getAsItemStream(itemReader).open(executionContext);
-
+		getAsItemStream(itemReader).open(streamContext);
 		Foo foo = (Foo) itemReader.read();
 		assertEquals(1, foo.getValue());
 	}

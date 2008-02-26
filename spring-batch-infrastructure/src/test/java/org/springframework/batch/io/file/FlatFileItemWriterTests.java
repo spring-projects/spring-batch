@@ -28,8 +28,6 @@ import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetCreator;
 import org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -282,7 +280,4 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.clear();
 	}
 
-	private ItemStream getAsItemStream(ItemWriter itemWriter){
-		return (ItemStream)itemWriter;
-	}
 }
