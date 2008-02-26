@@ -3,6 +3,8 @@ package org.springframework.batch.item.writer;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.ClearFailedException;
+import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.item.stream.ItemStreamSupport;
 import org.springframework.beans.factory.InitializingBean;
@@ -60,14 +62,14 @@ public class DelegatingItemWriter implements ItemWriter, ItemStream, Initializin
 	/**
 	 * Delegates to {@link ItemWriter#clear()}
 	 */
-	public void clear() throws Exception {
+	public void clear() throws ClearFailedException {
 		writer.clear();
 	}
 
 	/**
 	 * Delegates to {@link ItemWriter#flush()}
 	 */
-	public void flush() throws Exception {
+	public void flush() throws FlushFailedException {
 		writer.flush();
 	}
 

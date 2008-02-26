@@ -16,6 +16,9 @@
 
 package org.springframework.batch.item;
 
+import org.springframework.batch.item.exception.ClearFailedException;
+import org.springframework.batch.item.exception.FlushFailedException;
+
 /**
  * <p>Basic interface for generic output operations. Class implementing this
  * interface will be responsible for serializing objects as necessary.
@@ -49,16 +52,14 @@ public interface ItemWriter {
 	/**
 	 * Flush any buffers that are being held.  This will usually be performed
 	 * prior to committing any transactions.
-	 * 
-	 * @throws Exception
+	 * @throws FlushFailedException TODO
 	 */
-	public void flush() throws Exception;
+	public void flush() throws FlushFailedException;
 	
 	/**
 	 * Clear any buffers that are being held.  This will usually be performed
 	 * prior to rolling back any transactions.
-	 * 
-	 * @throws Exception
+	 * @throws ClearFailedException TODO
 	 */
-	public void clear() throws Exception;
+	public void clear() throws ClearFailedException;
 }

@@ -13,25 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.writer;
+package org.springframework.batch.item.exception;
 
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.exception.ClearFailedException;
-import org.springframework.batch.item.exception.FlushFailedException;
 
 /**
- * Abstract {@link ItemWriter} that allows for base classes to only
- * implement the close method if they need it.  Because it is likely
- * that the flush and clear methods may not need to be implemented,
- * they are provided in this class.
+ * Unchecked exception indicating that an error has occured while
+ * trying to call {@link ItemWriter#flush()}
  * 
  * @author Lucas Ward
+ *
  */
-public abstract class AbstractItemWriter implements ItemWriter{
-	
-	public void flush() throws FlushFailedException {
+public class FlushFailedException extends StreamException {
+	/**
+	 * @param message
+	 */
+	public FlushFailedException(String message) {
+		super(message);
 	}
-	
-	public void clear() throws ClearFailedException {
+
+	/**
+	 * @param msg
+	 * @param nested
+	 */
+	public FlushFailedException(String msg, Throwable nested) {
+		super(msg, nested);
 	}
+
+	/**
+	 * @param msg
+	 * @param nested
+	 */
+	public FlushFailedException(Throwable nested) {
+		super(nested);
+	}	
 }

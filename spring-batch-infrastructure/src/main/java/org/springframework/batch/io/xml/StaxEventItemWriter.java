@@ -18,6 +18,8 @@ import org.springframework.batch.io.xml.stax.NoStartEndDocumentStreamWriter;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.ClearFailedException;
+import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -422,12 +424,12 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 
 	}
 	
-	public void flush() throws Exception {
+	public void flush() throws FlushFailedException {
 		lastCommitPointPosition = getPosition();
 		lastCommitPointRecordCount = currentRecordCount;
 	}
 	
-	public void clear() throws Exception {
+	public void clear() throws ClearFailedException {
 		currentRecordCount = lastCommitPointRecordCount;
 		// close output
 		close();

@@ -20,6 +20,8 @@ import java.util.Set;
 
 import org.hibernate.SessionFactory;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.ClearFailedException;
+import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
@@ -279,7 +281,7 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemWriter#clear()
 	 */
-	public void clear() throws Exception {
+	public void clear() throws ClearFailedException {
 		if (delegate != null) {
 			delegate.clear();
 		}
@@ -290,7 +292,7 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	 * Flush the Hibernate session. The delegate flush will also be called
 	 * before finishing.
 	 */
-	public void flush() throws Exception {
+	public void flush() throws FlushFailedException {
 		if (delegate != null) {
 			delegate.flush();
 		}

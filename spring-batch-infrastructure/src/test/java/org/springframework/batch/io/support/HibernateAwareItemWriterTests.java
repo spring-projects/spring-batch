@@ -23,6 +23,8 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.ClearFailedException;
+import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
@@ -74,11 +76,11 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		public void close() throws Exception {
 		}
 
-		public void clear() throws Exception {
+		public void clear() throws ClearFailedException {
 			list.add("clear");
 		}
 
-		public void flush() throws Exception {
+		public void flush() throws FlushFailedException {
 			list.add("flush");
 		}
 	}

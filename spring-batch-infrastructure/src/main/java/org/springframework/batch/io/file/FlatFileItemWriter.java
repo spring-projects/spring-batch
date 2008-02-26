@@ -35,6 +35,8 @@ import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.ClearFailedException;
+import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.beans.factory.InitializingBean;
@@ -471,7 +473,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 
 	}
 
-	public void clear() throws Exception {
+	public void clear() throws ClearFailedException {
 		try {
 			getOutputState().reset();
 		}
@@ -480,7 +482,7 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 		}
 	}
 
-	public void flush() throws Exception {
+	public void flush() throws FlushFailedException {
 		getOutputState().mark();
 	}
 	

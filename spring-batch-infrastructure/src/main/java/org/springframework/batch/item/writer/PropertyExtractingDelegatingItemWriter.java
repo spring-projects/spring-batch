@@ -17,6 +17,8 @@
 package org.springframework.batch.item.writer;
 
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.ClearFailedException;
+import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.batch.support.AbstractMethodInvokingDelegator;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -67,10 +69,10 @@ public class PropertyExtractingDelegatingItemWriter extends AbstractMethodInvoki
 	}
 
 
-	public void clear() throws Exception {
+	public void clear() throws ClearFailedException {
 	}
 
 
-	public void flush() throws Exception {
+	public void flush() throws FlushFailedException {
 	}
 }
