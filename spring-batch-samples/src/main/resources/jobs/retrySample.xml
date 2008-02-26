@@ -21,8 +21,7 @@
 					<bean
 						class="org.springframework.batch.retry.policy.SimpleRetryPolicy">
 						<property name="maxAttempts" value="3" />
-						<property name="retryableExceptionClasses"
-							value="java.lang.Exception" />
+						<property name="retryableExceptionClasses" value="java.lang.Exception" />
 					</bean>
 				</property>
 			</bean>
