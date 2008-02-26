@@ -20,12 +20,15 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.execution.scope.SimpleStepContext;
+import org.springframework.batch.execution.scope.StepContext;
+import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
@@ -52,14 +55,14 @@ public class TaskletStep extends StepSupport implements InitializingBean {
 	private JobRepository jobRepository;
 
 	private RepeatListener[] listeners = new RepeatListener[] {};
-	
+
 	public void setListeners(RepeatListener[] listeners) {
-		this.listeners  = listeners;
+		this.listeners = listeners;
 	}
 
 	public void setListener(RepeatListener listener) {
 		listeners = new RepeatListener[] { listener };
-	}	
+	}
 
 	/**
 	 * Check mandatory properties.
@@ -113,20 +116,24 @@ public class TaskletStep extends StepSupport implements InitializingBean {
 		ExitStatus exitStatus = ExitStatus.FAILED;
 		try {
 
+			StepContext parentStepContext = StepSynchronizationManager.getContext();
+			final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext);
+			StepSynchronizationManager.register(stepContext);
+
 			// We are using the RepeatTemplate as a vehicle for the listener
 			// so it can be set up cheaply here with standard properties.
 			RepeatTemplate template = new RepeatTemplate();
 			template.setCompletionPolicy(new SimpleCompletionPolicy(1));
 
 			template.setListeners(listeners);
-			exitStatus =template.iterate(new RepeatCallback() {
+			exitStatus = template.iterate(new RepeatCallback() {
 				public ExitStatus doInIteration(RepeatContext context) throws Exception {
 					return tasklet.execute();
-				}	
+				}
 			});
-			
+
 			updateStatus(stepExecution, BatchStatus.COMPLETED);
-			
+
 		}
 		catch (Exception e) {
 			logger.error("Encountered an error running the tasklet");
@@ -136,7 +143,16 @@ public class TaskletStep extends StepSupport implements InitializingBean {
 		finally {
 			stepExecution.setExitStatus(exitStatus);
 			stepExecution.setEndTime(new Date());
-			jobRepository.saveOrUpdate(stepExecution);
+			try {
+				jobRepository.saveOrUpdate(stepExecution);
+			}
+			catch (Exception e) {
+				logger.error("Encountered error saving batch meta data.  "
+						+ "This job is now in an unknown state and should not be restarted.", e);
+			}
+			finally {
+				StepSynchronizationManager.close();
+			}
 		}
 	}
 

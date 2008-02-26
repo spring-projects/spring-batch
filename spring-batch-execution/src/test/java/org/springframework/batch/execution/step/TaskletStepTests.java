@@ -13,6 +13,7 @@ import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -61,6 +62,14 @@ public class TaskletStepTests extends TestCase {
 		assertNotNull(stepExecution.getEndTime());
 	}
 
+	public void testSuccessfulExecutionWithStepContext() throws Exception {
+		TaskletStep step = new TaskletStep(new StubTasklet(false, false, true), new JobRepositorySupport());
+		step.execute(stepExecution);
+		assertNotNull(stepExecution.getStartTime());
+		assertEquals(ExitStatus.FINISHED, stepExecution.getExitStatus());
+		assertNotNull(stepExecution.getEndTime());
+	}
+
 	public void testFailureExecution() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(true, false), new JobRepositorySupport());
 		step.execute(stepExecution);
@@ -80,7 +89,6 @@ public class TaskletStepTests extends TestCase {
 			}
 		});
 		step.execute(stepExecution);
-		System.err.println(list);
 		assertEquals(2, list.size());
 	}
 
@@ -97,15 +105,22 @@ public class TaskletStepTests extends TestCase {
 		}
 	}
 
-	private class StubTasklet implements Tasklet {
+	private class StubTasklet implements Tasklet{
 
 		private final boolean exitFailure;
 
 		private final boolean throwException;
 
+		private final boolean assertStepContext;
+
 		public StubTasklet(boolean exitFailure, boolean throwException) {
+			this(exitFailure, throwException, false);
+		}
+		
+		public StubTasklet(boolean exitFailure, boolean throwException, boolean assertStepContext) {
 			this.exitFailure = exitFailure;
 			this.throwException = throwException;
+			this.assertStepContext = assertStepContext;
 		}
 
 		public ExitStatus execute() throws Exception {
@@ -115,6 +130,10 @@ public class TaskletStepTests extends TestCase {
 
 			if (exitFailure) {
 				return ExitStatus.FAILED;
+			}
+			
+			if (assertStepContext) {
+				assertNotNull(StepSynchronizationManager.getContext());
 			}
 
 			return ExitStatus.FINISHED;
