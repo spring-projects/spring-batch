@@ -16,11 +16,8 @@
 
 package org.springframework.batch.execution.repository.dao;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
-
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
