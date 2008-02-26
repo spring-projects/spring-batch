@@ -43,7 +43,7 @@ public interface ItemStream {
 	 * has not been put in the context, it should be added
 	 * here.
 	 */
-	void beforeSave();
+	void update();
 	
 	/**
 	 * If any resources are needed for the stream to operate they need to be

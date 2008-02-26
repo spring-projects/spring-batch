@@ -18,9 +18,7 @@ package org.springframework.batch.execution.step;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -410,10 +408,9 @@ public class ItemOrientedStepTests extends TestCase {
 
 		assertEquals(false, stepExecution.getExecutionContext().containsKey("foo"));
 
-		final Map map = new HashMap();
 		itemOrientedStep.setStreamManager(new SimpleStreamManager(new ResourcelessTransactionManager()) {
 			ExecutionContext executionContext;
-			public void beforeSave() {
+			public void update() {
 				// TODO Auto-generated method stub
 				executionContext.putString("foo", "bar");
 			}
@@ -429,8 +426,6 @@ public class ItemOrientedStepTests extends TestCase {
 		// At least once in that process the statistics service was asked for
 		// statistics...
 		assertEquals("bar", stepExecution.getExecutionContext().getString("foo"));
-		// ...but nothing was registered because nothing with step scoped.
-		assertEquals(0, map.size());
 	}
 
 	private class MockRestartableItemReader extends ItemStreamSupport implements ItemReader {
@@ -452,7 +447,7 @@ public class ItemOrientedStepTests extends TestCase {
 			return restoreFromCalledWithSomeContext;
 		}
 
-		public void beforeSave() {
+		public void update() {
 			getExecutionAttributesCalled = true;
 			executionContext.putString("spam", "bucket");
 		}

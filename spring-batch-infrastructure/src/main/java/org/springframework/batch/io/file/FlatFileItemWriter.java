@@ -190,9 +190,9 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 	}
 
 	/**
-	 * @see ItemStream#beforeSave()
+	 * @see ItemStream#update()
 	 */
-	public void beforeSave() {
+	public void update() {
 		if (state == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
@@ -468,34 +468,6 @@ public class FlatFileItemWriter extends AbstractTransactionalIoSource implements
 				throw new BatchCriticalException("Current file size is smaller than size at last commit");
 			}
 		}
-
-	}
-
-	/**
-	 * Mark is supported as long as this {@link ItemStream} is used in a
-	 * single-threaded environment. The state backing the mark is a single
-	 * counter, keeping track of the current position, so multiple threads
-	 * cannot be accommodated.
-	 * 
-	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
-	 */
-	public boolean isMarkSupported() {
-		return true;
-	}
-
-	/*
-	 * To be deleted once interface changes are complete (non-Javadoc)
-	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void mark() {
-
-	}
-
-	/*
-	 * To be deleted once interface changes are complete (non-Javadoc)
-	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void reset() throws ResetFailedException {
 
 	}
 

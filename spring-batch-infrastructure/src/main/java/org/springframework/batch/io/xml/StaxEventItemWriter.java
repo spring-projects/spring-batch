@@ -363,9 +363,9 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 
 	/**
 	 * Get the restart data.
-	 * @see org.springframework.batch.item.ItemStream#beforeSave()
+	 * @see org.springframework.batch.item.ItemStream#update()
 	 */
-	public void beforeSave() {
+	public void update() {
 		if (!initialized) {
 			throw new StreamException("ItemStream is not open, or may have been closed.  Cannot access context.");
 		}
@@ -421,37 +421,10 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 		}
 
 	}
-
-	/**
-	 * Mark is supported as long as this {@link ItemStream} is used in a
-	 * single-threaded environment. The state backing the mark is a single
-	 * counter, keeping track of the current position, so multiple threads
-	 * cannot be accommodated.
-	 * 
-	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
-	 */
-	public boolean isMarkSupported() {
-		return true;
-	}
-
-	/* TODO remove once ItemStream interface is modified.
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void mark() {
-	}
 	
 	public void flush() throws Exception {
 		lastCommitPointPosition = getPosition();
 		lastCommitPointRecordCount = currentRecordCount;
-	}
-
-	/* TODO remove once ItemStream interface is modified.
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void reset() {
-
 	}
 	
 	public void clear() throws Exception {

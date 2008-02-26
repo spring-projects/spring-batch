@@ -68,11 +68,11 @@ public class SimpleStreamManager implements StreamManager {
 	 * 
 	 * @see org.springframework.batch.item.stream.StreamManager#getExecutionContext(java.lang.Object)
 	 */
-	public void beforeSave() {
-		synchronized(streams){
-			for(Iterator it = streams.iterator(); it.hasNext();){
-				ItemStream itemStream = (ItemStream)it.next();
-				itemStream.beforeSave();
+	public void update() {
+		synchronized (streams) {
+			for (Iterator it = streams.iterator(); it.hasNext();) {
+				ItemStream itemStream = (ItemStream) it.next();
+				itemStream.update();
 			}
 		}
 	}
@@ -86,7 +86,9 @@ public class SimpleStreamManager implements StreamManager {
 	 */
 	public void register(ItemStream stream) {
 		synchronized (streams) {
-			streams.add(stream);
+			if (!streams.contains(stream)) {
+				streams.add(stream);
+			}
 		}
 	}
 
@@ -95,9 +97,9 @@ public class SimpleStreamManager implements StreamManager {
 	 * @throws StreamException
 	 */
 	public void close() throws StreamException {
-		synchronized(streams){
-			for(Iterator it = streams.iterator(); it.hasNext();){
-				ItemStream itemStream = (ItemStream)it.next();
+		synchronized (streams) {
+			for (Iterator it = streams.iterator(); it.hasNext();) {
+				ItemStream itemStream = (ItemStream) it.next();
 				itemStream.close();
 			}
 		}
@@ -108,9 +110,9 @@ public class SimpleStreamManager implements StreamManager {
 	 * @throws StreamException
 	 */
 	public void open(ExecutionContext executionContext) throws StreamException {
-		synchronized(streams){
-			for(Iterator it = streams.iterator(); it.hasNext();){
-				ItemStream itemStream = (ItemStream)it.next();
+		synchronized (streams) {
+			for (Iterator it = streams.iterator(); it.hasNext();) {
+				ItemStream itemStream = (ItemStream) it.next();
 				itemStream.open(executionContext);
 			}
 		}

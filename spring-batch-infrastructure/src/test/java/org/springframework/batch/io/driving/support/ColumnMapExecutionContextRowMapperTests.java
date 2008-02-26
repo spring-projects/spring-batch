@@ -64,8 +64,8 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 	public void testCreateExecutionContext() throws Exception {
 		mapper.mapKeys(key, executionContext);
 		Properties props = executionContext.getProperties();
-		assertEquals("1", props.getProperty("1"));
-		assertEquals("2", props.getProperty("2"));
+		assertEquals("1", props.getProperty(ColumnMapExecutionContextRowMapper.KEY_PREFIX+"0"));
+		assertEquals("2", props.getProperty(ColumnMapExecutionContextRowMapper.KEY_PREFIX+"1"));
 	}
 	
 	public void testCreateExecutionContextFromEmptyKeys() throws Exception {
@@ -77,8 +77,8 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 	public void testCreateSetter() throws Exception {
 		
 		ExecutionContext streamContext = new ExecutionContext();
-		streamContext.putString("0", "1");
-		streamContext.putString("1", "2");
+		streamContext.putString(ColumnMapExecutionContextRowMapper.KEY_PREFIX+"1", "1");
+		streamContext.putString(ColumnMapExecutionContextRowMapper.KEY_PREFIX+"0", "2");
 		PreparedStatementSetter setter = mapper.createSetter(streamContext);
 		ps = (PreparedStatement)psControl.getMock();
 		

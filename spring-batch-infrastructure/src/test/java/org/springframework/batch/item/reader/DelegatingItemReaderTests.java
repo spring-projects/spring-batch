@@ -76,7 +76,7 @@ public class DelegatingItemReaderTests extends TestCase {
 	 * Gets restart data from the input template
 	 */
 	public void testGetStreamContext() {
-		itemProvider.beforeSave();
+		itemProvider.update();
 		assertEquals("foo", executionContext.getString("value"));
 	}
 
@@ -94,7 +94,7 @@ public class DelegatingItemReaderTests extends TestCase {
 			return PropertiesConverter.stringToProperties("a=b");
 		}
 
-		public void beforeSave() {
+		public void update() {
 			executionContext.putString("value", "foo");
 		}
 
@@ -115,10 +115,6 @@ public class DelegatingItemReaderTests extends TestCase {
 
 		public void skip() {
 			value = "after skip";
-		}
-
-		public boolean isMarkSupported() {
-			return false;
 		}
 
 		public void mark() {

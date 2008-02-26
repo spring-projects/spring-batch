@@ -202,7 +202,7 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	 * the current Line Count which can be used to reinitialise the batch job in
 	 * case of restart.
 	 */
-	public void beforeSave() {
+	public void update() {
 		if (reader == null) {
 			throw new StreamException("ItemStream not open or already closed.");
 		}
@@ -216,15 +216,7 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	 * counter, keeping track of the current position, so multiple threads
 	 * cannot be accommodated.
 	 * 
-	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
-	 */
-	public boolean isMarkSupported() {
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
+	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
 	public void mark() {
 		getReader().mark();

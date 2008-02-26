@@ -146,7 +146,7 @@ public class DrivingQueryItemReader implements KeyedItemReader, InitializingBean
 		this.executionContext = executionContext;
 	}
 
-	public void beforeSave() {
+	public void update() {
 		if(saveState){
 			if(getCurrentKey() != null){
 				keyGenerator.saveState(getCurrentKey(), executionContext);
@@ -190,16 +190,7 @@ public class DrivingQueryItemReader implements KeyedItemReader, InitializingBean
 	 * counter, keeping track of the current position, so multiple threads
 	 * cannot be accommodated.
 	 * 
-	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
-	 */
-	public boolean isMarkSupported() {
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#mark(org.springframework.batch.item.ExecutionContext)
+	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
 	public void mark() {
 		lastCommitIndex = currentIndex;

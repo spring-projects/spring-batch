@@ -117,7 +117,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	public void testRestart() {
 		source.open(executionContext);
 		source.read();
-		source.beforeSave();
+		source.update();
 		assertEquals(1, executionContext.getLong(StaxEventItemReader.READ_COUNT_STATISTICS_NAME));
 		List expectedAfterRestart = (List) source.read();
 
@@ -147,7 +147,7 @@ public class StaxEventItemReaderTests extends TestCase {
 
 	public void testRestoreWorksFromClosedStream() throws Exception {
 		source.close();
-		source.beforeSave();
+		source.update();
 	}
 	/**
 	 * Skipping marked records after rollback.
@@ -198,13 +198,13 @@ public class StaxEventItemReaderTests extends TestCase {
 	public void testExecutionContext() {
 		final int NUMBER_OF_RECORDS = 2;
 		source.open(executionContext);
-		source.beforeSave();
+		source.update();
 		
 		for (int i = 0; i < NUMBER_OF_RECORDS; i++) {
 			long recordCount = extractRecordCount();
 			assertEquals(i, recordCount);
 			source.read();
-			source.beforeSave();
+			source.update();
 		}
 
 		assertEquals(NUMBER_OF_RECORDS, extractRecordCount());

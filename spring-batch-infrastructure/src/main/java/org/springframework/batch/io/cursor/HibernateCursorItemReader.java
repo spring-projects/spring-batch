@@ -187,7 +187,7 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 
 	/**
 	 */
-	public void beforeSave() {
+	public void update() {
 		executionContext.putString(getKey(RESTART_DATA_ROW_NUMBER_KEY), "" + currentProcessedRow);
 		String skipped = skippedRows.toString();
 		executionContext.putString(getKey(SKIPPED_ROWS), skipped.substring(1, skipped.length() - 1));
@@ -210,15 +210,7 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 	 * counter, keeping track of the current position, so multiple threads
 	 * cannot be accommodated.
 	 * 
-	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
-	 */
-	public boolean isMarkSupported() {
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#mark(org.springframework.batch.item.ExecutionContext)
+	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
 	public void mark() {
 		lastCommitRowNumber = currentProcessedRow;

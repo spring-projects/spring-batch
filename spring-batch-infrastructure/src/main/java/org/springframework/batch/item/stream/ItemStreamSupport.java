@@ -43,9 +43,9 @@ public class ItemStreamSupport implements ItemStream {
 
 	/**
 	 * Return empty {@link ExecutionContext}.
-	 * @see org.springframework.batch.item.ExecutionContextProvider#beforeSave()
+	 * @see org.springframework.batch.item.ExecutionContextProvider#update()
 	 */
-	public void beforeSave() {
+	public void update() {
 	}
 
 }

@@ -89,7 +89,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 		Foo foo2 = (Foo) reader.read();
 		assertEquals(2, foo2.getValue());
 
-		getAsItemStream(reader).beforeSave();
+		getAsItemStream(reader).update();
 
 		// create new input source
 		reader = createItemReader();
@@ -113,7 +113,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 		Foo foo2 = (Foo) reader.read();
 		assertEquals(2, foo2.getValue());
 
-		getAsItemStream(reader).beforeSave();
+		getAsItemStream(reader).update();
 
 		// create new input source
 		reader = createItemReader();
@@ -135,7 +135,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 	 * @throws Exception
 	 */
 	public void testRestoreFromEmptyData() throws Exception {
-		getAsItemStream(reader).beforeSave();
+		getAsItemStream(reader).update();
 
 		Foo foo = (Foo) reader.read();
 		assertEquals(1, foo.getValue());
@@ -218,7 +218,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 
 		rollback();
 
-		getAsItemStream(reader).beforeSave();
+		getAsItemStream(reader).update();
 
 		// create new input source
 		reader = createItemReader();

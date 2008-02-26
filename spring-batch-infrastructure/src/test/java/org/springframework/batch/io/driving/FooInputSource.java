@@ -29,8 +29,8 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 		}
 	}
 
-	public void beforeSave() {
-		inputSource.beforeSave();
+	public void update() {
+		inputSource.update();
 	}
 
 	public void destroy() throws Exception {
@@ -49,14 +49,6 @@ class FooItemReader extends AbstractItemReader implements ItemStream, ItemReader
 	};
 
 	public void close() {
-	}
-
-	/**
-	 * True.
-	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
-	 */
-	public boolean isMarkSupported() {
-		return true;
 	}
 
 	/*

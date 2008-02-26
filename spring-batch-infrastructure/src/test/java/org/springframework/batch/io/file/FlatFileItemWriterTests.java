@@ -224,7 +224,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		commit();
 
 		// get restart data
-		inputSource.beforeSave();
+		inputSource.update();
 		// close template
 		inputSource.close();
 
@@ -237,7 +237,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.write("testLine8");
 
 		// get statistics
-		inputSource.beforeSave();
+		inputSource.update();
 		// close template
 		inputSource.close();
 
@@ -268,7 +268,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.setFieldSetUnmapper(new PassThroughFieldSetMapper());
 		inputSource.afterPropertiesSet();
 		inputSource.open(executionContext);
-		inputSource.beforeSave();
+		inputSource.update();
 		assertNotNull(executionContext);
 		assertEquals(3, executionContext.entrySet().size());
 		assertEquals(0, executionContext.getLong(FlatFileItemWriter.class.getName() + "." + FlatFileItemWriter.RESTART_DATA_NAME));

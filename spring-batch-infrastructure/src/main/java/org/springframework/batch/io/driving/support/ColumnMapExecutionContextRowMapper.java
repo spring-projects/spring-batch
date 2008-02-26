@@ -38,10 +38,11 @@ public class ColumnMapExecutionContextRowMapper extends ColumnMapRowMapper imple
 	
 	public PreparedStatementSetter createSetter(ExecutionContext executionContext) {
 		List columns = new ArrayList();
-		for (Iterator iterator = executionContext.entrySet().iterator(); iterator.hasNext();) {
-			Entry entry = (Entry) iterator.next();
-			Object column = entry.getValue();
+		int count=0;
+		while(executionContext.containsKey(KEY_PREFIX+count)) {
+			Object column = executionContext.get(KEY_PREFIX+count);
 			columns.add(column);
+			count++;
 		}
 
 		return new ArgPreparedStatementSetter(columns.toArray());
@@ -50,9 +51,11 @@ public class ColumnMapExecutionContextRowMapper extends ColumnMapRowMapper imple
 	public void mapKeys(Object key, ExecutionContext executionContext) {
 		Assert.isInstanceOf(Map.class, key, "Input to create ExecutionContext must be of type Map.");
 		Map keys = (Map) key;
+		int count = 0;
 		for (Iterator it = keys.entrySet().iterator(); it.hasNext();) {
 			Entry entry = (Entry)it.next();
-			executionContext.put(entry.getKey().toString(), entry.getValue());
+			executionContext.put(KEY_PREFIX+count, entry.getValue());
+			count++;
 		}
 	}
 

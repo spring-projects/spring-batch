@@ -50,13 +50,13 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	}
 
 	/**
-	 * @see ItemStream#beforeSave()
+	 * @see ItemStream#update()
 	 * @throws IllegalStateException if the parent template is not itself
 	 * {@link ItemStream}.
 	 */
-	public void beforeSave() {
+	public void update() {
 		if (itemReader instanceof ItemStream) {
-			((ItemStream) itemReader).beforeSave();
+			((ItemStream) itemReader).update();
 		}
 	}
 

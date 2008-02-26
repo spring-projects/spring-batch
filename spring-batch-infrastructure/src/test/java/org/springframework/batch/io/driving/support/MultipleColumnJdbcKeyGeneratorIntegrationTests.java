@@ -3,12 +3,17 @@
  */
 package org.springframework.batch.io.driving.support;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.CollectionFactory;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 /**
@@ -67,14 +72,31 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 		
 		Map key = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(1);
 		key.put("ID", new Long(3));
-		key.put("VALUE", new Integer(3));
+		key.put("VALUE", new Integer(4));
 		
+		keyStrategy.setKeyMapper(new ExecutionContextRowMapper() {
+			public PreparedStatementSetter createSetter(ExecutionContext executionContext) {
+				return null;
+			}
+			public void mapKeys(Object key, ExecutionContext executionContext) {
+				// Just slap the key as a map into the context
+				Map keys = (Map) key;
+				for (Iterator it = keys.entrySet().iterator(); it.hasNext();) {
+					Entry entry = (Entry)it.next();
+					executionContext.put(entry.getKey().toString(), entry.getValue());
+				}
+			}
+			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return null;
+			}
+		});
 		keyStrategy.saveState(key, executionContext);
 		Properties props = executionContext.getProperties();
 		
 		assertEquals(2, props.size());
-		assertEquals("3", props.get(ColumnMapExecutionContextRowMapper.KEY_PREFIX + "0"));
-		assertEquals("3", props.get(ColumnMapExecutionContextRowMapper.KEY_PREFIX + "1"));
+		System.err.println(props);
+		assertEquals("3", props.get("ID"));
+		assertEquals("4", props.get("VALUE"));
 	}
 	
 	public void testGetNullKeyAsStreamContext(){

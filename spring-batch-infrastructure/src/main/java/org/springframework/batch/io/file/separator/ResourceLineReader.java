@@ -195,21 +195,14 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 	}
 
 	/**
+	 * Mark the state for return later with reset. Uses the read-ahead limit
+	 * from an underlying {@link BufferedReader}, which means that there is a
+	 * limit to how much data can be recovered if the mark needs to be reset.<br/>
+	 * 
 	 * Mark is supported as long as this {@link ItemStream} is used in a
 	 * single-threaded environment. The state backing the mark is a single
 	 * counter, keeping track of the current position, so multiple threads
 	 * cannot be accommodated.
-	 * 
-	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
-	 */
-	public boolean isMarkSupported() {
-		return true;
-	}
-
-	/**
-	 * Mark the state for return later with reset. Uses the read-ahead limit
-	 * from an underlying {@link BufferedReader}, which means that there is a
-	 * limit to how much data can be recovered if the mark needs to be reset.
 	 * 
 	 * @see #reset()
 	 * 

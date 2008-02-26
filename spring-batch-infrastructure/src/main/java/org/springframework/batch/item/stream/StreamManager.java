@@ -49,7 +49,7 @@ public interface StreamManager {
 	 * @return {@link ExecutionContext} aggregating the contexts of all providers
 	 * registered under this key, or empty otherwise.
 	 */
-	void beforeSave();
+	void update();
 
 	/**
 	 * If any resources are needed for the stream to operate they need to be

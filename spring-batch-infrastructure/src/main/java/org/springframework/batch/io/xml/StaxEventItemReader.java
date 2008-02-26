@@ -193,9 +193,9 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	}
 
 	/**
-	 * @see ItemStream#beforeSave()
+	 * @see ItemStream#update()
 	 */
-	public void beforeSave() {
+	public void update() {
 		executionContext.putLong(READ_COUNT_STATISTICS_NAME, currentRecordCount);
 	}
 
@@ -254,16 +254,8 @@ public class StaxEventItemReader extends AbstractItemReader implements ItemReade
 	 * single-threaded environment. The state backing the mark is a single
 	 * counter, keeping track of the current position, so multiple threads
 	 * cannot be accommodated.
-	 * 
-	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
-	 */
-	public boolean isMarkSupported() {
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
+	 *
+	 * @see org.springframework.batch.item.reader.AbstractItemReader#mark()
 	 */
 	public void mark() {
 		lastCommitPointRecordCount = currentRecordCount;

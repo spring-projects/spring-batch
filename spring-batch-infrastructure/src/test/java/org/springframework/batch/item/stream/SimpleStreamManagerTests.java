@@ -34,9 +34,38 @@ public class SimpleStreamManagerTests extends TestCase {
 
 	private SimpleStreamManager manager = new SimpleStreamManager(new ResourcelessTransactionManager());
 
-	private ItemStreamSupport stream = new StubItemStream();
-
 	private List list = new ArrayList();
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#commit(org.springframework.transaction.TransactionStatus)}.
+	 */
+	public void testRegisterAndOpen() {
+		ItemStreamSupport stream = new ItemStreamSupport() {
+			public void open(ExecutionContext executionContext) throws StreamException {
+				list.add("bar");
+			}
+		};
+		manager.register(stream);
+		manager.open(null);
+		assertEquals(1, list.size());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#commit(org.springframework.transaction.TransactionStatus)}.
+	 */
+	public void testRegisterTwice() {
+		ItemStreamSupport stream = new ItemStreamSupport() {
+			public void open(ExecutionContext executionContext) throws StreamException {
+				list.add("bar");
+			}
+		};
+		manager.register(stream);
+		manager.register(stream);
+		manager.open(null);
+		assertEquals(1, list.size());
+	}
 
 	/**
 	 * Test method for
@@ -72,9 +101,37 @@ public class SimpleStreamManagerTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#commit(org.springframework.transaction.TransactionStatus)}.
 	 */
+	public void testMark() {
+		manager.register(new ItemStreamSupport() {
+			public void update() {
+				list.add("bar");
+			}
+		});
+		manager.update();
+		assertEquals(1, list.size());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#commit(org.springframework.transaction.TransactionStatus)}.
+	 */
+	public void testClose() {
+		manager.register(new ItemStreamSupport() {
+			public void close() throws StreamException {
+				list.add("bar");
+			}
+		});
+		manager.close();
+		assertEquals(1, list.size());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#commit(org.springframework.transaction.TransactionStatus)}.
+	 */
 	public void testCommitWithoutMark() {
 		manager.register(new ItemStreamSupport() {
-			public void mark() {
+			public void update() {
 				list.add("bar");
 			}
 		});
@@ -89,29 +146,13 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testRollbackWithoutMark() {
 		manager.register( new ItemStreamSupport() {
-			public void reset() {
+			public void update() {
 				list.add("bar");
 			}
 		});
 		TransactionStatus status = manager.getTransaction();
 		manager.rollback(status);
 		assertEquals(0, list.size());
-	}
-
-
-	private final class StubItemStream extends ItemStreamSupport {
-		
-		private ExecutionContext executionContext;
-		
-		public void open(ExecutionContext executionContext)
-				throws StreamException {
-			this.executionContext = executionContext;
-		}
-		
-		public void beforeSave() {
-			executionContext.putString("foo", "bar");
-		}
-
 	}
 
 }

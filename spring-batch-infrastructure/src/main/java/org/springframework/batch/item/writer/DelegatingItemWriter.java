@@ -80,10 +80,10 @@ public class DelegatingItemWriter implements ItemWriter, ItemStream, Initializin
 	}
 
 	/**
-	 * @see org.springframework.batch.item.ExecutionContextProvider#beforeSave()
+	 * @see org.springframework.batch.item.ExecutionContextProvider#update()
 	 */
-	public void beforeSave() {
-		stream.beforeSave();
+	public void update() {
+		stream.update();
 	}
 
 	/**

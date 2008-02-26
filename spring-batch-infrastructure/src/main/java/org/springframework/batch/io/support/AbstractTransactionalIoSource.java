@@ -32,26 +32,5 @@ import org.springframework.batch.item.stream.ItemStreamSupport;
  * @since 1.0
  */
 public abstract class AbstractTransactionalIoSource extends ItemStreamSupport {
-
-	/*
-	 * Called when a transaction has been committed.
-	 * 
-	 * @see TransactionSynchronization#afterCompletion
-	 */
-	public abstract void mark();
-
-	/*
-	 * Called when a transaction has been rolled back.
-	 * 
-	 * @see TransactionSynchronization#afterCompletion
-	 */
-	public abstract void reset();
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#isMarkSupported()
-	 */
-	public boolean isMarkSupported() {
-		return true;
-	}
 	
 }

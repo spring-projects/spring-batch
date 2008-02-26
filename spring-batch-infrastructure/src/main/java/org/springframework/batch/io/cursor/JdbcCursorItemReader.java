@@ -385,7 +385,7 @@ public class JdbcCursorItemReader implements KeyedItemReader, InitializingBean,
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getExecutionContext()
 	 */
-	public void beforeSave() {
+	public void update() {
 		if(saveState){
 			String skipped = skippedRows.toString();
 			executionContext.putString(addName(SKIPPED_ROWS), skipped.substring(1, skipped.length() - 1));

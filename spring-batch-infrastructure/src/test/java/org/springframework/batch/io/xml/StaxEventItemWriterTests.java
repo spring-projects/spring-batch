@@ -94,7 +94,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		// write record
 		writer.write(record);
 		// writer.mark();
-		writer.beforeSave();
+		writer.update();
 		writer.close();
 
 		// create new writer from saved restart data and continue writing
@@ -124,7 +124,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		final int NUMBER_OF_RECORDS = 10;
 		for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
 			writer.write(record);
-			writer.beforeSave();
+			writer.update();
 			long writeStatistics = executionContext.getLong(StaxEventItemWriter.WRITE_STATISTICS_NAME);
 
 			assertEquals(i, writeStatistics);

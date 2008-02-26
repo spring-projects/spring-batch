@@ -98,9 +98,9 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	private RetryTemplate template = new RetryTemplate();
 
 	private ItemReaderRetryCallback retryCallback;
-	
+
 	private int commitInterval = 0;
-	
+
 	private boolean saveExecutionContext = false;
 
 	/**
@@ -154,7 +154,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	public void setRetryPolicy(RetryPolicy retryPolicy) {
 		this.retryPolicy = retryPolicy;
 	}
-	
+
 	public void setCommitInterval(int commitInterval) {
 		this.commitInterval = commitInterval;
 	}
@@ -176,20 +176,20 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 					"ItemReader must be instance of KeyedItemReader to use the retry policy");
 			retryCallback = new ItemReaderRetryCallback((KeyedItemReader) itemReader, itemWriter);
 		}
-		
-		if(streamManager == null && transactionManager != null){
+
+		if (streamManager == null && transactionManager != null) {
 			streamManager = new SimpleStreamManager(transactionManager);
 		}
-		else if(streamManager == null && transactionManager == null){
+		else if (streamManager == null && transactionManager == null) {
 			throw new IllegalArgumentException("Either StreamManager or TransactionManager must be set");
 		}
-		
-		if(commitInterval > 0){
-			((RepeatTemplate)chunkOperations).setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
+
+		if (commitInterval > 0) {
+			((RepeatTemplate) chunkOperations).setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
 		}
-		
-		if(exceptionHandler != null){
-			((RepeatTemplate)chunkOperations).setExceptionHandler(exceptionHandler);
+
+		if (exceptionHandler != null) {
+			((RepeatTemplate) chunkOperations).setExceptionHandler(exceptionHandler);
 		}
 	}
 
@@ -256,17 +256,19 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			// the conversation in StepScope
 			stepContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
 
-			streamManager.open(stepExecution.getExecutionContext());
-
 			if (saveExecutionContext && isRestart && lastStepExecution != null) {
 				stepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
 			}
-			else{
+			else {
 				stepExecution.setExecutionContext(new ExecutionContext());
 			}
 
+			// Open the stream manager *after* the execution context is fixed in
+			// the step, otherwise it will not be the same reference that is
+			// updated by the streams. TODO: this is a little fragile - maybe
+			// StreamManager.update() should accept the context as a parameter.
 			streamManager.open(stepExecution.getExecutionContext());
-			
+
 			status = stepOperations.iterate(new RepeatCallback() {
 
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
@@ -278,7 +280,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 					interruptionPolicy.checkInterrupted(context);
 
 					ExitStatus result;
-					
+
 					TransactionStatus transaction = streamManager.getTransaction();
 
 					try {
@@ -296,7 +298,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 							// only if chunk was successful
 							stepExecution.apply(contribution);
 
-							streamManager.beforeSave();
+							streamManager.update();
 							jobRepository.saveOrUpdate(stepExecution);
 
 						}
@@ -456,10 +458,10 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 		}
 		catch (Exception e) {
-			if(getItemSkipPolicy().shouldSkip(e, contribution)){
+			if (getItemSkipPolicy().shouldSkip(e, contribution)) {
 				skip();
 			}
-			else{
+			else {
 				// Rethrow so that outer transaction is rolled back properly
 				throw e;
 			}
@@ -485,11 +487,11 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	private ExitStatus execute() throws Exception {
 
 		if (retryCallback == null) {
-			Object item = null; 
-			try{	
+			Object item = null;
+			try {
 				item = itemReader.read();
 			}
-			catch(Exception ex){
+			catch (Exception ex) {
 				getItemFailureHandler().handleReadFailure(ex);
 				throw ex;
 			}
@@ -500,7 +502,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 				itemWriter.write(item);
 			}
 			catch (Exception e) {
-	
+
 				getItemFailureHandler().handleWriteFailure(item, e);
 				// Re-throw the exception so that the surrounding transaction
 				// rolls back if there is one
@@ -534,7 +536,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			((Skippable) this.itemWriter).skip();
 		}
 	}
-	
 
 	/**
 	 * Convenience method to update the status in all relevant places.

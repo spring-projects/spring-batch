@@ -203,16 +203,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	 * {@link TransactionSynchronizationManager#bindResource(Object, Object)}),
 	 * so they are thread bound.
 	 * 
-	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
-	 */
-	public boolean isMarkSupported() {
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
+	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
 	public void mark() {
 		getBuffer().commit();
@@ -232,7 +223,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	 * 
 	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
-	public void beforeSave() {
+	public void update() {
 	}
 
 }

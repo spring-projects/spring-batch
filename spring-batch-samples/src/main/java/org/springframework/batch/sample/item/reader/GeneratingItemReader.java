@@ -67,13 +67,6 @@ public class GeneratingItemReader extends AbstractItemReaderRecoverer implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#isMarkSupported()
-	 */
-	public boolean isMarkSupported() {
-		return true;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark()
 	 */
 	public void mark() throws MarkFailedException {
@@ -96,7 +89,7 @@ public class GeneratingItemReader extends AbstractItemReaderRecoverer implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
-	public void beforeSave() {
+	public void update() {
 	}
 
 	public void open(ExecutionContext context) throws StreamException {
