@@ -48,8 +48,6 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
-import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.RetryPolicy;
@@ -166,6 +164,17 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 		Assert.notNull(itemReader, "ItemReader must be provided");
 		Assert.notNull(itemWriter, "ItemWriter must be provided");
 
+		applyConfiguration();
+	}
+
+	/**
+	 * Apply the configuration by inspecting it to see if it has any relevant
+	 * policy information.
+	 * 
+	 * @param step a step
+	 */
+	void applyConfiguration() {
+
 		ItemReaderRetryPolicy itemProviderRetryPolicy = new ItemReaderRetryPolicy(retryPolicy);
 		template.setRetryPolicy(itemProviderRetryPolicy);
 
@@ -182,34 +191,12 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			throw new IllegalArgumentException("Either StreamManager or TransactionManager must be set");
 		}
 
-		if (commitInterval > 0) {
+		if (this.chunkOperations instanceof RepeatTemplate && commitInterval > 0) {
 			((RepeatTemplate) chunkOperations).setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
 		}
 
-		if (exceptionHandler != null) {
+		if (this.chunkOperations instanceof RepeatTemplate && exceptionHandler != null) {
 			((RepeatTemplate) chunkOperations).setExceptionHandler(exceptionHandler);
-		}
-	}
-
-	/**
-	 * Apply the configuration by inspecting it to see if it has any relevant
-	 * policy information.
-	 * 
-	 * @param step a step
-	 */
-	void applyConfiguration(AbstractStep step) {
-
-		ExceptionHandler exceptionHandler = step.getExceptionHandler();
-
-		if (step.getSkipLimit() > 0 && exceptionHandler == null) {
-			SimpleLimitExceptionHandler handler = new SimpleLimitExceptionHandler();
-			handler.setLimit(step.getSkipLimit());
-			exceptionHandler = handler;
-		}
-
-		if (this.stepOperations instanceof RepeatTemplate && exceptionHandler != null) {
-			RepeatTemplate template = (RepeatTemplate) this.stepOperations;
-			template.setExceptionHandler(exceptionHandler);
 		}
 
 	}

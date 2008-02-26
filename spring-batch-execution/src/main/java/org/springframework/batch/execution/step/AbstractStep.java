@@ -42,8 +42,6 @@ import org.springframework.util.Assert;
  */
 public abstract class AbstractStep extends StepSupport implements InitializingBean {
 
-	private int skipLimit = 0;
-
 	protected ExceptionHandler exceptionHandler;
 	
 	protected RetryPolicy retryPolicy;
@@ -100,14 +98,6 @@ public abstract class AbstractStep extends StepSupport implements InitializingBe
 
 	public void setExceptionHandler(ExceptionHandler exceptionHandler) {
 		this.exceptionHandler = exceptionHandler;
-	}
-
-	public void setSkipLimit(int skipLimit) {
-		this.skipLimit = skipLimit;
-	}
-
-	public int getSkipLimit() {
-		return skipLimit;
 	}
 
 	/**

@@ -17,9 +17,15 @@ package org.springframework.batch.execution.step.support;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.batch.common.ExceptionClassifier;
+import org.springframework.batch.common.SubclassExceptionClassifier;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.FlatFileParsingException;
@@ -44,9 +50,14 @@ import org.springframework.batch.io.exception.FlatFileParsingException;
  */
 public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 
-	private final int skipLimit;
+	/**
+	 * Label for classifying skippable exceptions.
+	 */
+	private static final String SKIP = "skip";
 
-	private final List skippableExceptions;
+	private final int skipLimit;
+	
+	private ExceptionClassifier exceptionClassifier;
 
 	public LimitCheckingItemSkipPolicy(int skipLimit) {
 		this(skipLimit, new ArrayList(0));
@@ -54,7 +65,14 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 
 	public LimitCheckingItemSkipPolicy(int skipLimit, List skippableExceptions) {
 		this.skipLimit = skipLimit;
-		this.skippableExceptions = skippableExceptions;
+		SubclassExceptionClassifier exceptionClassifier = new SubclassExceptionClassifier();
+		Map typeMap = new HashMap();
+		for (Iterator iterator = skippableExceptions.iterator(); iterator.hasNext();) {
+			Class throwable = (Class) iterator.next();
+			typeMap.put(throwable, SKIP);
+		}
+		exceptionClassifier.setTypeMap(typeMap);
+		this.exceptionClassifier = exceptionClassifier;
 	}
 
 	/**
@@ -66,7 +84,7 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	 * will be thrown.
 	 */
 	public boolean shouldSkip(Exception ex, StepContribution stepContribution){
-		if(skippableExceptions.contains(ex.getClass())){
+		if(exceptionClassifier.classify(ex).equals(SKIP)){
 			if(stepContribution.getSkipCount() < skipLimit){
 				stepContribution.incrementSkipCount();
 				return true;
