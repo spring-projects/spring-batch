@@ -176,7 +176,6 @@ public class SimpleJobTests extends TestCase {
 				throw new RuntimeException("Foo");
 			}
 		});
-		step.setItemSkipPolicy(new NeverSkipItemSkipPolicy());
 		step.afterPropertiesSet();
 		job.setSteps(Collections.singletonList(step));
 

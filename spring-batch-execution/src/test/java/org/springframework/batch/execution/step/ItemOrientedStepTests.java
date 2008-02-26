@@ -38,7 +38,6 @@ import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
-import org.springframework.batch.execution.step.support.NeverSkipItemSkipPolicy;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ExecutionContext;
@@ -540,7 +539,6 @@ public class ItemOrientedStepTests extends TestCase {
 				throw new ResetFailedException("Bar");
 			}
 		});
-		itemOrientedStep.setItemSkipPolicy(new NeverSkipItemSkipPolicy());
 
 		Step step = new StepSupport("stepName");
 		JobExecution jobExecutionContext = jobInstance.createJobExecution();

@@ -22,6 +22,10 @@
 				<property name="itemReader" ref="hibernateItemReader" />
 				<property name="itemWriter" ref="hibernateOutputSource" />
 				<property name="commitInterval" value="3" />
+				
+				<property name="itemSkipPolicy">
+					<bean class="org.springframework.batch.execution.step.support.AlwaysSkipItemSkipPolicy"/>
+				</property>
 
 				<property name="chunkOperations">
 					<bean
