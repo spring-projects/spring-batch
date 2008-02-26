@@ -61,7 +61,7 @@ public class GeneratingItemReader extends AbstractItemReaderRecoverer implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#close()
 	 */
-	public void close() throws StreamException {
+	public void close(ExecutionContext executionContext) throws StreamException {
 		// TODO Auto-generated method stub
 		
 	}
@@ -89,7 +89,7 @@ public class GeneratingItemReader extends AbstractItemReaderRecoverer implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
-	public void update() {
+	public void update(ExecutionContext executionContext) {
 	}
 
 	public void open(ExecutionContext context) throws StreamException {

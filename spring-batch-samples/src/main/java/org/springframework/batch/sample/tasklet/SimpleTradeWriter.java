@@ -76,10 +76,10 @@ public class SimpleTradeWriter extends AbstractItemWriter implements ItemStream 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
-	public void update() {
+	public void update(ExecutionContext executionContext) {
 		executionContext.putLong("trade.count", tradeCount);
 	}
 
-	public void close() throws StreamException {
+	public void close(ExecutionContext executionContext) throws StreamException {
 	}
 }

@@ -43,9 +43,9 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 
 	/**
 	 * 
-	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#close()
+	 * @see org.springframework.batch.io.driving.DrivingQueryItemReader#close(ExecutionContext)
 	 */
-	public void close() {
+	public void close(ExecutionContext executionContext) {
 		initialized = false;
 		keys = null;
 		if (TransactionSynchronizationManager.hasResource(BUFFER_KEY)) {
@@ -223,7 +223,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	 * 
 	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
-	public void update() {
+	public void update(ExecutionContext executionContext) {
 	}
 
 }

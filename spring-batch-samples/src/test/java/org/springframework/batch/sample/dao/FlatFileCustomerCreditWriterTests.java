@@ -44,7 +44,7 @@ public class FlatFileCustomerCreditWriterTests extends TestCase {
 	public void testClose() throws Exception{
 		
 		//set-up outputSource mock
-		output.close();
+		output.close(null);
 		outputControl.replay();
 		
 		//call tested method

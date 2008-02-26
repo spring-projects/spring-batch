@@ -54,7 +54,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 	}
 
 	protected void onTearDownAfterTransaction() throws Exception {
-		provider.close();
+		provider.close(null);
 		getJdbcTemplate().update("DELETE FROM BATCH_STAGING");
 	}
 

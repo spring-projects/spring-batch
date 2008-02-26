@@ -66,7 +66,7 @@ public class FlatFileCustomerCreditWriter implements CustomerCreditDao,
 
 	public void close() throws Exception {
 		if (outputSource instanceof ItemStream) {
-			((ItemStream) outputSource).close();
+			((ItemStream) outputSource).close(null);
 		}
 	}
 
