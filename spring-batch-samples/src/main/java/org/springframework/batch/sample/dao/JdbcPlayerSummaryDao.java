@@ -1,6 +1,8 @@
 package org.springframework.batch.sample.dao;
 
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.ClearFailedException;
+import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.batch.sample.domain.PlayerSummary;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.util.Assert;
@@ -31,10 +33,10 @@ public class JdbcPlayerSummaryDao extends JdbcDaoSupport implements ItemWriter {
 	public void close() throws Exception {
 	}
 
-	public void clear() throws Exception {
+	public void clear() throws ClearFailedException {
 	}
 
-	public void flush() throws Exception {
+	public void flush() throws FlushFailedException {
 	}
 
 }

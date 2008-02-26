@@ -7,6 +7,8 @@ import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.execution.scope.StepContext;
 import org.springframework.batch.execution.scope.StepContextAware;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.ClearFailedException;
+import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
@@ -76,10 +78,10 @@ public class StagingItemWriter extends JdbcDaoSupport implements
 	public void close() throws Exception {
 	}
 
-	public void clear() throws Exception {
+	public void clear() throws ClearFailedException {
 	}
 
-	public void flush() throws Exception {
+	public void flush() throws FlushFailedException {
 	}
 
 }
