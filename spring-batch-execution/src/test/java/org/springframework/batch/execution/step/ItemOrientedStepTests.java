@@ -378,16 +378,12 @@ public class ItemOrientedStepTests extends TestCase {
 		assertEquals(false, stepExecution.getExecutionContext().containsKey("foo"));
 
 		itemOrientedStep.setStreamManager(new SimpleStreamManager(new ResourcelessTransactionManager()) {
-			ExecutionContext executionContext;
 
-			public void update() {
+			public void update(ExecutionContext executionContext) {
 				// TODO Auto-generated method stub
 				executionContext.putString("foo", "bar");
 			}
 
-			public void open(ExecutionContext executionContext) throws StreamException {
-				this.executionContext = executionContext;
-			}
 		});
 
 		itemOrientedStep.execute(stepExecution);
@@ -416,7 +412,7 @@ public class ItemOrientedStepTests extends TestCase {
 			return restoreFromCalledWithSomeContext;
 		}
 
-		public void update() {
+		public void update(ExecutionContext executionContext) {
 			getExecutionAttributesCalled = true;
 			executionContext.putString("spam", "bucket");
 		}
@@ -433,7 +429,7 @@ public class ItemOrientedStepTests extends TestCase {
 			this.executionContext = executionContext;
 		}
 
-		public void close() throws StreamException {
+		public void close(ExecutionContext executionContext) throws StreamException {
 		}
 
 		public void mark() throws MarkFailedException {

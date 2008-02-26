@@ -279,7 +279,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 							// only if chunk was successful
 							stepExecution.apply(contribution);
 
-							streamManager.update();
+							streamManager.update(stepExecution.getExecutionContext());
 							jobRepository.saveOrUpdate(stepExecution);
 
 						}
@@ -359,7 +359,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 			try {
 				jobRepository.saveOrUpdate(stepExecution);
-				streamManager.close();
+				streamManager.close(stepExecution.getExecutionContext());
 			}
 			catch (Exception e) {
 				logger
