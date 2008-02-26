@@ -265,6 +265,8 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 				stepExecution.setExecutionContext(new ExecutionContext());
 			}
 
+			streamManager.open(stepExecution.getExecutionContext());
+			
 			status = stepOperations.iterate(new RepeatCallback() {
 
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
@@ -277,8 +279,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 					ExitStatus result;
 					
-					streamManager.open(stepExecution.getExecutionContext());
-
 					TransactionStatus transaction = streamManager.getTransaction();
 
 					try {
