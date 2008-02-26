@@ -40,6 +40,7 @@ import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
 import org.springframework.batch.execution.step.support.LimitCheckingItemSkipPolicy;
+import org.springframework.batch.execution.step.support.SkipLimitExceededException;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -368,12 +369,17 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testApplyConfigurationWithZeroSkipLimit() throws Exception {
-		itemOrientedStep.setItemSkipPolicy(new LimitCheckingItemSkipPolicy(0));
+		itemOrientedStep.setItemSkipPolicy(new LimitCheckingItemSkipPolicy(0, Collections.singletonList(Exception.class)));
 		itemOrientedStep.applyConfiguration();
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
-		assertEquals(false, itemOrientedStep.getItemSkipPolicy().shouldSkip(new RuntimeException(),
+		try {
+			assertEquals(false, itemOrientedStep.getItemSkipPolicy().shouldSkip(new RuntimeException(),
 				stepExecution.createStepContribution()));
+			fail("Expected SkipLimitExceededException");
+		} catch (SkipLimitExceededException e) {
+			// expected
+		}
 	}
 
 	public void testApplyConfigurationWithNonZeroSkipLimit() throws Exception {
