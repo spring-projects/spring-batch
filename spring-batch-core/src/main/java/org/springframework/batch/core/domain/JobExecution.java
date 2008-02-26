@@ -37,7 +37,7 @@ public class JobExecution extends Entity {
 
 	private BatchStatus status = BatchStatus.STARTING;
 
-	private Date startTime = new Date(System.currentTimeMillis());
+	private Date startTime = null;
 
 	private Date endTime = null;
 

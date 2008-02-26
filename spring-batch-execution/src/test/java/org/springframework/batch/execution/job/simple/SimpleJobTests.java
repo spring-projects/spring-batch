@@ -133,6 +133,8 @@ public class SimpleJobTests extends TestCase {
 		job.execute(jobExecution);
 		assertEquals(2, list.size());
 		checkRepository(BatchStatus.COMPLETED);
+		assertNotNull(jobExecution.getEndTime());
+		assertNotNull(jobExecution.getStartTime());
 	}
 
 	public void testRunWithSimpleStepExecutor() throws Exception {

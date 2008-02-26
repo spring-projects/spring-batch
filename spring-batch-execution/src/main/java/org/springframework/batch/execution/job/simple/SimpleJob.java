@@ -69,6 +69,7 @@ public class SimpleJob extends JobSupport {
 				throw new JobInterruptedException("JobExecution already stopped before being executed.");
 			}
 
+			execution.setStartTime(new Date());
 			updateStatus(execution, BatchStatus.STARTING);
 
 			int startedCount = 0;

@@ -178,7 +178,8 @@ public class SimpleJobRepository implements JobRepository {
 				if (lastExecution == null) {
 					lastExecution = execution;
 				}
-				if (lastExecution.getStartTime().getTime() < execution.getStartTime().getTime()) {
+				if (execution.getStartTime() != null && lastExecution.getStartTime() != null
+						&& lastExecution.getStartTime().getTime() < execution.getStartTime().getTime()) {
 					lastExecution = execution;
 				}
 
@@ -202,7 +203,6 @@ public class SimpleJobRepository implements JobRepository {
 		return generateJobExecution(jobInstance);
 
 	}
-
 
 	private JobExecution generateJobExecution(JobInstance jobInstance) {
 		JobExecution execution = jobInstance.createJobExecution();

@@ -54,10 +54,30 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		JobParameters jobParams = new JobParameters(stringParams, longParams, dateParams);
 
 		JobExecution firstExecution = jobRepository.createJobExecution(job, jobParams);
+		firstExecution.setStartTime(new Date());
 
 		assertEquals(job, firstExecution.getJobInstance().getJob());
 
 		jobRepository.saveOrUpdate(firstExecution);
+		firstExecution.stop();
+		jobRepository.saveOrUpdate(firstExecution);
+		JobExecution secondExecution = jobRepository.createJobExecution(job, jobParams);
+
+		assertEquals(firstExecution.getJobInstance(), secondExecution.getJobInstance());
+		assertEquals(job, secondExecution.getJobInstance().getJob());
+	}
+
+	/**
+	 * Create two job executions for same job+parameters tuple. Check both
+	 * executions belong to the same job instance and job.
+	 */
+	public void testCreateAndFindWithNoStartDate() throws Exception {
+
+		JobSupport job = new JobSupport("testJob");
+		job.setRestartable(true);
+		JobParameters jobParams = new JobParameters();
+
+		JobExecution firstExecution = jobRepository.createJobExecution(job, jobParams);
 		firstExecution.stop();
 		jobRepository.saveOrUpdate(firstExecution);
 		JobExecution secondExecution = jobRepository.createJobExecution(job, jobParams);
