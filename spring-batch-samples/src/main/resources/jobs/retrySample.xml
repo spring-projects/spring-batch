@@ -25,17 +25,6 @@
 							value="java.lang.Exception" />
 					</bean>
 				</property>
-				<property name="itemSkipPolicy">
-					<bean
-						class="org.springframework.batch.execution.step.support.LimitCheckingItemSkipPolicy">
-						<constructor-arg value="5"></constructor-arg>
-						<constructor-arg>
-							<list>
-								<value>java.lang.Exception</value>
-							</list>
-						</constructor-arg>
-					</bean>
-				</property>
 			</bean>
 		</property>
 	</bean>
