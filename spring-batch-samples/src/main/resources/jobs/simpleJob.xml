@@ -13,7 +13,7 @@
 	<bean id="simpleJob" parent="simpleJob">
 		<property name="steps">
 			<list>
-				<bean id="step1" parent="chunkedStep">
+				<bean id="step1" parent="simpleStep">
 					<property name="itemReader" ref="fileItemReader" />
 					<property name="itemWriter">
 						<bean
@@ -21,7 +21,7 @@
 							<property name="tradeDao" ref="tradeDao" />
 						</bean>
 					</property>
-					<property name="chunkSize" value="2" />
+					<property name="commitInterval" value="2" />
 				</bean>
 			</list>
 		</property>

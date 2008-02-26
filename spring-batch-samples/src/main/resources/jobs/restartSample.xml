@@ -15,7 +15,7 @@
 
 	<bean id="restartSampleJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="chunkedStep">
+			<bean id="step1" parent="simpleStep">
 				<property name="itemReader">
 					<bean
 						class="org.springframework.batch.item.reader.ValidatingItemReader">
@@ -30,7 +30,7 @@
 						<property name="dao" ref="tradeDao" />
 					</bean>
 				</property>
-				<property name="chunkSize" value="2" />
+				<property name="commitInterval" value="2" />
 			</bean>
 		</property>
 	</bean>

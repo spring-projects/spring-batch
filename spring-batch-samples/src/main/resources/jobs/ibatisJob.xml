@@ -16,7 +16,7 @@
 
 	<bean id="ibatisJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="chunkedStep">
+			<bean id="step1" parent="simpleStep">
 				<property name="itemReader" ref="ibatisItemReader" />
 				<property name="itemWriter">
 					<bean

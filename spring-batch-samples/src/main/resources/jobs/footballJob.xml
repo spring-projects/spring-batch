@@ -16,8 +16,8 @@
 		<property name="startLimit" value="100" />
 		<property name="steps">
 			<list>
-				<bean id="playerload" parent="chunkedStep">
-					<property name="chunkSize" value="1"></property>
+				<bean id="playerload" parent="simpleStep">
+					<property name="commitInterval" value="1"/>
 					<property name="startLimit" value="100" />
 					<property name="allowStartIfComplete" value="false" />
 					<property name="itemReader"
@@ -35,8 +35,8 @@
 						</bean>
 					</property>
 				</bean>
-				<bean id="gameLoad" parent="chunkedStep">
-					<property name="chunkSize" value="1" />
+				<bean id="gameLoad" parent="simpleStep">
+					<property name="commitInterval" value="1" />
 					<property name="startLimit" value="100" />
 					<property name="itemReader"
 						ref="gameFileItemReader" />
@@ -48,8 +48,8 @@
 						</bean>
 					</property>
 				</bean>
-				<bean id="playerSummarization" parent="chunkedStep">
-					<property name="chunkSize" value="1" />
+				<bean id="playerSummarization" parent="simpleStep">
+					<property name="commitInterval" value="1" />
 					<property name="startLimit" value="100" />
 					<property name="itemReader"
 						ref="playerSummarizationSource" />

@@ -16,7 +16,7 @@
 
 	<bean id="xmlStaxJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="chunkedStep">
+			<bean id="step1" parent="simpleStep">
 				<property name="itemReader">
 					<bean
 						class="org.springframework.batch.io.xml.StaxEventItemReader"

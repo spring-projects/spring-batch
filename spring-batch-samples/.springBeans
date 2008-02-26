@@ -32,6 +32,7 @@
 		<config>src/main/resources/jobs/parallelJob.xml</config>
 		<config>src/main/resources/jobs/rollbackJob.xml</config>
 		<config>src/main/resources/jobs/retrySample.xml</config>
+		<config>src/main/resources/jobs/simpleJob.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

@@ -20,6 +20,7 @@ import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -31,7 +32,7 @@ import org.springframework.util.Assert;
  * 
  * @author Dave Syer
  */
-public class DelegatingItemReader extends AbstractItemReader implements Skippable, InitializingBean, ItemStream {
+public class DelegatingItemReader extends AbstractItemReader implements Skippable, InitializingBean, ItemStream, KeyedItemReader {
 
 	private ItemReader itemReader;
 
@@ -77,6 +78,13 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 	 */
 	public void setItemReader(ItemReader source) {
 		this.itemReader = source;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.KeyedItemReader#getKey(java.lang.Object)
+	 */
+	public Object getKey(Object item) {
+		return item;
 	}
 
 	public ItemReader getItemReader() {
