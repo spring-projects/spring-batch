@@ -17,9 +17,7 @@
 package org.springframework.batch.sample.tasklet;
 
 import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * Simple module implementation that will always return true to indicate that

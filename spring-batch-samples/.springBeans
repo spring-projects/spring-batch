@@ -149,15 +149,6 @@
 			</configs>
 		</configSet>
 		<configSet>
-			<name><![CDATA[simpleTasklet]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
-			</configs>
-		</configSet>
-		<configSet>
 			<name><![CDATA[hibernate]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
@@ -245,6 +236,16 @@
 				<config>src/main/resources/simple-container-definition.xml</config>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[simpleJob]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/simple-container-definition.xml</config>
+				<config>src/main/resources/jobs/simpleJob.xml</config>
 			</configs>
 		</configSet>
 	</configSets>
