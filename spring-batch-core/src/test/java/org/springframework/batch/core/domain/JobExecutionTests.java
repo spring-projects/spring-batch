@@ -72,7 +72,7 @@ public class JobExecutionTests extends TestCase {
 	 * {@link org.springframework.batch.core.domain.JobExecution#getStartTime()}.
 	 */
 	public void testGetStartTime() {
-		assertNotNull(execution.getStartTime());
+		assertNull(execution.getStartTime());
 		execution.setStartTime(new Date(0L));
 		assertEquals(0L, execution.getStartTime().getTime());
 	}
