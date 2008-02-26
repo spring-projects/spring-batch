@@ -51,11 +51,6 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 		return order;
 	}
 
-	/**
-	 * Context key for clients to use for conversation identifier.
-	 */
-	public static final String ID_KEY = "JOB_IDENTIFIER";
-
 	private String name = "step";
 
 	/*
@@ -89,8 +84,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 */
 	public String getConversationId() {
 		StepContext context = getContext();
-		Object id = context.getAttribute(ID_KEY);
-		return "" + id;
+		return context.getIdentifier();
 	}
 
 	/*

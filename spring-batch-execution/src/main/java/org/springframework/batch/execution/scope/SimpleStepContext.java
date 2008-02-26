@@ -162,5 +162,12 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 	public StepExecution getStepExecution() {
 		return stepExecution;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.execution.scope.StepContext#getIdentifier()
+	 */
+	public String getIdentifier() {
+		return "JOB_EXECUTION_ID:"+stepExecution.getJobExecutionId();
+	}
 
 }

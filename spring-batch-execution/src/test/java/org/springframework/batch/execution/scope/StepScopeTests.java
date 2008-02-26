@@ -20,6 +20,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobInstance;
+import org.springframework.batch.core.domain.JobSupport;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
@@ -41,7 +45,8 @@ public class StepScopeTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		context = new SimpleStepContext(null);
+		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(1L), null, new JobSupport()), new Long(11L));
+		context = new SimpleStepContext(jobExecution.createStepExecution(new StepSupport()));
 		StepSynchronizationManager.register(context);
 	}
 	
@@ -131,9 +136,8 @@ public class StepScopeTests extends TestCase {
 	 * {@link org.springframework.batch.execution.scope.StepScope#getConversationId()}.
 	 */
 	public void testGetConversationIdFromAttribute() {
-		context.setAttribute(StepScope.ID_KEY, "foo");
 		String id = scope.getConversationId();
-		assertEquals("foo", id);
+		assertEquals("JOB_EXECUTION_ID:11", id);
 	}
 
 	/**

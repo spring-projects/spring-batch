@@ -29,7 +29,6 @@ import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepContext;
-import org.springframework.batch.execution.scope.StepScope;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
@@ -237,9 +236,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext);
 			StepSynchronizationManager.register(stepContext);
 			possiblyRegisterStreams();
-			// Add the job identifier so that it can be used to identify
-			// the conversation in StepScope
-			stepContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
 
 			if (isSaveExecutionContext() && isRestart && lastStepExecution != null) {
 				stepExecution.setExecutionContext(lastStepExecution.getExecutionContext());

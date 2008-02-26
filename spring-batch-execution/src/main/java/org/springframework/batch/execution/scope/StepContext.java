@@ -51,4 +51,12 @@ public interface StepContext extends AttributeAccessor {
 	 */
 	void close();
 
+	/**
+	 * Identify this context so that concurrently running jobs in the same VM
+	 * can be distinguished.
+	 * 
+	 * @return a sufficiently unique identifier for this context
+	 */
+	String getIdentifier();
+
 }

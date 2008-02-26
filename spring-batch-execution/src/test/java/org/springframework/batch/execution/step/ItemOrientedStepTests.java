@@ -186,7 +186,7 @@ public class ItemOrientedStepTests extends TestCase {
 				assertNotNull(StepSynchronizationManager.getContext().getStepExecution());
 				assertEquals(stepExecution, StepSynchronizationManager.getContext().getStepExecution());
 				// StepScope can obtain id information....
-				assertNotNull(StepSynchronizationManager.getContext().getAttribute(StepScope.ID_KEY));
+				assertNotNull(StepSynchronizationManager.getContext().getIdentifier());
 			}
 		});
 
