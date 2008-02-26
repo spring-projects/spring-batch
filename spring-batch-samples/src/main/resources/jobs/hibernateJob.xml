@@ -21,18 +21,13 @@
 			<bean id="step1" parent="simpleStep">
 				<property name="itemReader" ref="hibernateItemReader" />
 				<property name="itemWriter" ref="hibernateOutputSource" />
+				<property name="commitInterval" value="3" />
 
 				<property name="chunkOperations">
 					<bean
 						class="org.springframework.batch.repeat.support.RepeatTemplate">
 						<property name="listeners"
 							ref="hibernateOutputSource" />
-						<property name="completionPolicy">
-							<bean
-								class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
-								<property name="chunkSize" value="3" />
-							</bean>
-						</property>
 					</bean>
 				</property>
 				<property name="stepOperations">

@@ -22,8 +22,8 @@ import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.execution.step.support.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.execution.step.support.DefaultItemFailureHandler;
-import org.springframework.batch.execution.step.support.NeverSkipItemSkipPolicy;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -58,7 +58,7 @@ public abstract class AbstractStep extends StepSupport implements InitializingBe
 
 	protected ItemWriter itemWriter;
 	
-	protected ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
+	protected ItemSkipPolicy itemSkipPolicy = new AlwaysSkipItemSkipPolicy();
 	
 	protected ItemFailureHandler itemFailureHandler = new DefaultItemFailureHandler();
 

@@ -31,13 +31,15 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.util.Assert;
 
 /**
- * {@link ItemWriter} that is aware of the Hibernate session and can take some responsibilities to do with chunk
- * boundaries away from a less smart {@link ItemWriter} (the delegate). A delegate is required, and will be used to do
- * the actual writing of the item.<br/>
+ * {@link ItemWriter} that is aware of the Hibernate session and can take some
+ * responsibilities to do with chunk boundaries away from a less smart
+ * {@link ItemWriter} (the delegate). A delegate is required, and will be used
+ * to do the actual writing of the item.<br/>
  * 
- * This class implements {@link RepeatListener} and it will only work if properly registered. If the delegate is also
- * a {@link RepeatListener} then it does not need to be separately registered as we make the callbacks here in the
- * right places.
+ * This class implements {@link RepeatListener} and it will only work if
+ * properly registered. If the delegate is also a {@link RepeatListener} then it
+ * does not need to be separately registered as we make the callbacks here in
+ * the right places.
  * 
  * @author Dave Syer
  * 
@@ -53,7 +55,7 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	 * Key for {@link RepeatContext} in transaction resource context.
 	 */
 	private static final String WRITER_REPEAT_CONTEXT = HibernateAwareItemWriter.class.getName()
-	        + ".WRITER_REPEAT_CONTEXT";
+			+ ".WRITER_REPEAT_CONTEXT";
 
 	private Set failed = new HashSet();
 
@@ -80,8 +82,8 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	}
 
 	/**
-	 * Set the Hibernate SessionFactory to be used internally. Will automatically create a HibernateTemplate for the
-	 * given SessionFactory.
+	 * Set the Hibernate SessionFactory to be used internally. Will
+	 * automatically create a HibernateTemplate for the given SessionFactory.
 	 * 
 	 * @see #setHibernateTemplate
 	 */
@@ -100,8 +102,8 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	}
 
 	/**
-	 * Use the delegate to actually do the writing, but flush aggressively if the item was previously part of a failed
-	 * chunk.
+	 * Use the delegate to actually do the writing, but flush aggressively if
+	 * the item was previously part of a failed chunk.
 	 * 
 	 * @throws Exception
 	 * 
@@ -114,7 +116,8 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	}
 
 	/**
-	 * Does nothing unless the delegate is also a {@link RepeatListener} in which case pass on the call to him.
+	 * Does nothing unless the delegate is also a {@link RepeatListener} in
+	 * which case pass on the call to him.
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatListener#before(org.springframework.batch.repeat.RepeatContext)
 	 */
@@ -126,10 +129,11 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	}
 
 	/**
-	 * Does nothing unless the delegate is also a {@link RepeatListener} in which case pass on the call to him.
+	 * Does nothing unless the delegate is also a {@link RepeatListener} in
+	 * which case pass on the call to him.
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatListener#after(org.springframework.batch.repeat.RepeatContext,
-	 *      org.springframework.batch.repeat.ExitStatus)
+	 * org.springframework.batch.repeat.ExitStatus)
 	 */
 	public void after(RepeatContext context, ExitStatus result) {
 		if (delegate instanceof RepeatListener) {
@@ -139,21 +143,31 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	}
 
 	/**
-	 * Flush the Hibernate session so that any batch exceptions are within the RepeatContext. If the delegate is also a
-	 * {@link RepeatListener} then it will be given the call before flushing.
+	 * If the delegate is also a {@link RepeatListener} then it will be given
+	 * the call before flushing.
 	 * 
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatListener#close(org.springframework.batch.repeat.RepeatContext)
 	 */
 	public void close(RepeatContext context) {
-
+		try {
+			flushInContext();
+		}
+		finally {
+			unsetContext();
+			if (delegate instanceof RepeatListener) {
+				RepeatListener interceptor = (RepeatListener) delegate;
+				interceptor.close(context);
+			}
+		}
 	}
 
 	/**
-	 * Does nothing unless the delegate is also a {@link RepeatListener} in which case pass on the call to him.
+	 * Does nothing unless the delegate is also a {@link RepeatListener} in
+	 * which case pass on the call to him.
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatListener#onError(org.springframework.batch.repeat.RepeatContext,
-	 *      java.lang.Throwable)
+	 * java.lang.Throwable)
 	 */
 	public void onError(RepeatContext context, Throwable e) {
 		if (delegate instanceof RepeatListener) {
@@ -163,8 +177,9 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	}
 
 	/**
-	 * Sets up the context as a transaction resource so that we can store state and refer back to it in the
-	 * {@link #write(Object)} method. If the delegate is also a {@link RepeatListener} then it will be given the call
+	 * Sets up the context as a transaction resource so that we can store state
+	 * and refer back to it in the {@link #write(Object)} method. If the
+	 * delegate is also a {@link RepeatListener} then it will be given the call
 	 * afterwards.
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatListener#open(org.springframework.batch.repeat.RepeatContext)
@@ -185,9 +200,9 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	 */
 	private Set getProcessed() {
 		Assert.state(TransactionSynchronizationManager.hasResource(WRITER_REPEAT_CONTEXT),
-		        "RepeatContext not bound to transaction.");
+				"RepeatContext not bound to transaction.");
 		Set processed = (Set) ((AttributeAccessor) TransactionSynchronizationManager.getResource(WRITER_REPEAT_CONTEXT))
-		        .getAttribute(ITEMS_PROCESSED);
+				.getAttribute(ITEMS_PROCESSED);
 		return processed;
 	}
 
@@ -221,44 +236,36 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	 * 
 	 * @return the context
 	 */
-	private void flushIfNecessary(Object output) throws Exception{
-		RepeatContext context = (RepeatContext) TransactionSynchronizationManager.getResource(WRITER_REPEAT_CONTEXT);
+	private void flushIfNecessary(Object output) throws Exception {
 		boolean flush;
 		synchronized (failed) {
 			flush = failed.contains(output);
 		}
 		if (flush) {
+			RepeatContext context = (RepeatContext) TransactionSynchronizationManager
+					.getResource(WRITER_REPEAT_CONTEXT);
 			// Force early completion to commit aggressively if we encounter a
 			// failed item (from a failed chunk but we don't know which one was
 			// the problem).
 			context.setCompleteOnly();
 			// Flush now, so that if there is a failure this record can be
 			// skipped.
-			flush();
+			flushInContext();
 		}
 
-	}
-
-	public void clear() throws Exception {
-		if(delegate != null){
-			delegate.clear();
-		}
-		hibernateTemplate.clear();
 	}
 
 	/**
-	 * Flush the Hibernate session.  The delegate flush will also be called before finishing.
+	 * 
 	 */
-	public void flush() throws Exception {
+	private void flushInContext() {
 		try {
-			if (delegate != null) {
-				delegate.flush();
-			}
 			hibernateTemplate.flush();
 			// This should happen when the transaction commits anyway, but to be
 			// sure...
 			hibernateTemplate.clear();
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			synchronized (failed) {
 				failed.addAll(getProcessed());
 			}
@@ -266,7 +273,27 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 			// should be handled within the step.
 			throw e;
 		}
-		unsetContext();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemWriter#clear()
+	 */
+	public void clear() throws Exception {
+		if (delegate != null) {
+			delegate.clear();
+		}
+		hibernateTemplate.clear();
+	}
+
+	/**
+	 * Flush the Hibernate session. The delegate flush will also be called
+	 * before finishing.
+	 */
+	public void flush() throws Exception {
+		if (delegate != null) {
+			delegate.flush();
+		}
 	}
 
 }
