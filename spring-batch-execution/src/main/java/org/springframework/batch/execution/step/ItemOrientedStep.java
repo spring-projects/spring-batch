@@ -195,8 +195,8 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			((RepeatTemplate) chunkOperations).setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
 		}
 
-		if (this.chunkOperations instanceof RepeatTemplate && exceptionHandler != null) {
-			((RepeatTemplate) chunkOperations).setExceptionHandler(exceptionHandler);
+		if (this.stepOperations instanceof RepeatTemplate && exceptionHandler != null) {
+			((RepeatTemplate) stepOperations).setExceptionHandler(exceptionHandler);
 		}
 
 	}

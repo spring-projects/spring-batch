@@ -55,7 +55,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 	}
 
 	/**
-	 * Other than TransactionInvalidException should be rethrown, ignoring the
+	 * Other than nominated exception type should be rethrown, ignoring the
 	 * exception limit.
 	 * 
 	 * @throws Exception
@@ -65,6 +65,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
+		handler.setType(IllegalArgumentException.class);
 
 		try {
 			handler.handleException(new RepeatContextSupport(null), throwable);

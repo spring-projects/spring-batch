@@ -31,6 +31,11 @@
 					</bean>
 				</property>
 				<property name="commitInterval" value="2" />
+				<property name="exceptionHandler">
+					<bean class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler">
+						<property name="limit" value="0"/>
+					</bean>
+				</property>
 			</bean>
 		</property>
 	</bean>

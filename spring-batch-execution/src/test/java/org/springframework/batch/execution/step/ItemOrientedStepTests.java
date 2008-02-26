@@ -355,7 +355,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 	public void testApplyConfigurationWithExceptionHandler() throws Exception {
 		final List list = new ArrayList();
-		itemOrientedStep.setChunkOperations(new RepeatTemplate() {
+		itemOrientedStep.setStepOperations(new RepeatTemplate() {
 			public void setExceptionHandler(ExceptionHandler exceptionHandler) {
 				list.add(exceptionHandler);
 			}

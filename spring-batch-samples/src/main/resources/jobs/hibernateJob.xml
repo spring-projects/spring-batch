@@ -34,16 +34,6 @@
 							ref="hibernateOutputSource" />
 					</bean>
 				</property>
-				<property name="stepOperations">
-					<bean
-						class="org.springframework.batch.repeat.support.RepeatTemplate">
-						<property name="exceptionHandler">
-							<bean
-								class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler"
-								p:limit="2" p:useParent="true" p:type="java.lang.Exception" />
-						</property>
-					</bean>
-				</property>
 			</bean>
 		</property>
 	</bean>

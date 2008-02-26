@@ -19,7 +19,6 @@ package org.springframework.batch.repeat.exception.handler;
 import java.util.HashMap;
 
 import org.springframework.batch.common.ExceptionClassifierSupport;
-import org.springframework.batch.io.exception.WriteFailureException;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**
@@ -32,14 +31,13 @@ import org.springframework.batch.repeat.RepeatContext;
 public class SimpleLimitExceptionHandler implements ExceptionHandler {
 
 	/**
-	 * Name of exception classifier key for the
-	 * {@link WriteFailureException}.
+	 * Name of exception classifier key for the nominated exception type.
 	 */
 	private static final String TX_INVALID = "TX_INVALID";
 
 	private RethrowOnThresholdExceptionHandler delegate = new RethrowOnThresholdExceptionHandler();
 
-	private Class type = WriteFailureException.class;
+	private Class type = Exception.class;
 
 	/**
 	 * Flag to indicate the the exception counters should be shared between
@@ -102,7 +100,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 
 	/**
 	 * Setter for the Throwable type that this handler counts. Defaults to
-	 * {@link WriteFailureException}.
+	 * {@link Exception}.
 	 * 
 	 * @param type
 	 */

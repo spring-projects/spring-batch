@@ -35,12 +35,6 @@
 								ref="tradeValidator" />
 						</bean>
 					</property>
-					<property name="itemSkipPolicy">
-						<bean
-							class="org.springframework.batch.execution.step.support.LimitCheckingItemSkipPolicy">
-							<constructor-arg value="5"/>
-						</bean>
-					</property>
 					<property name="itemWriter">
 						<bean
 							class="org.springframework.batch.sample.item.writer.TradeWriter"
