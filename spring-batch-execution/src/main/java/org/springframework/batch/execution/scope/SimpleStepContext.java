@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
 
 /**
@@ -42,29 +41,19 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 
 	private StepExecution stepExecution;
 
-	private StreamManager streamManager;
-
 	/**
 	 * Default constructor.
 	 */
 	public SimpleStepContext(StepExecution stepExecution) {
-		this(stepExecution, null, null);
-	}
-
-	/**
-	 * Default constructor.
-	 */
-	public SimpleStepContext(StepExecution stepExecution, StepContext parent) {
-		this(stepExecution, parent, null);
+		this(stepExecution, null);
 	}
 
 	/**
 	 * @param object
 	 */
-	public SimpleStepContext(StepExecution stepExecution, StepContext parent, StreamManager streamManager) {
+	public SimpleStepContext(StepExecution stepExecution, StepContext parent) {
 		super();
 		this.parent = parent;
-		this.streamManager = streamManager;
 		this.stepExecution = stepExecution;
 	}
 
@@ -116,15 +105,6 @@ public class SimpleStepContext extends SynchronizedAttributeAccessor implements 
 	public void close() {
 
 		List errors = new ArrayList();
-
-		try {
-			if (streamManager != null) {
-				streamManager.close(this);
-			}
-		}
-		catch (Exception t) {
-			errors.add(t);
-		}
 
 		Set copy;
 

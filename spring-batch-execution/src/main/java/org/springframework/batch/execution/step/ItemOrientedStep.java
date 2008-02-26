@@ -100,6 +100,8 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	private ItemReaderRetryCallback retryCallback;
 	
 	private int commitInterval = 0;
+	
+	private boolean saveExecutionContext = false;
 
 	/**
 	 * The {@link RepeatOperations} to use for the outer loop of the batch
@@ -247,20 +249,20 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			updateStatus(stepExecution, BatchStatus.STARTED);
 
 			StepContext parentStepContext = StepSynchronizationManager.getContext();
-			final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext, streamManager);
+			final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext);
 			StepSynchronizationManager.register(stepContext);
-			possiblyRegisterStreams(stepExecution);
+			possiblyRegisterStreams();
 			// Add the job identifier so that it can be used to identify
 			// the conversation in StepScope
 			stepContext.setAttribute(StepScope.ID_KEY, stepExecution.getJobExecution().getId());
 
-			final boolean saveExecutionContext = isSaveExecutionContext();
-
-			streamManager.open(stepExecution);
+			streamManager.open(stepExecution.getExecutionContext());
 
 			if (saveExecutionContext && isRestart && lastStepExecution != null) {
 				stepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
-				streamManager.restoreFrom(stepExecution, stepExecution.getExecutionContext());
+			}
+			else{
+				stepExecution.setExecutionContext(new ExecutionContext());
 			}
 
 			status = stepOperations.iterate(new RepeatCallback() {
@@ -268,30 +270,21 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
 
 					final StepContribution contribution = stepExecution.createStepContribution();
-
+					contribution.setExecutionContext(stepExecution.getExecutionContext());
 					// Before starting a new transaction, check for
 					// interruption.
 					interruptionPolicy.checkInterrupted(context);
 
 					ExitStatus result;
+					
+					streamManager.open(stepExecution.getExecutionContext());
 
-					TransactionStatus transaction = streamManager.getTransaction(stepExecution);
+					TransactionStatus transaction = streamManager.getTransaction();
 
 					try {
 						itemReader.mark();
 						result = processChunk(contribution);
 
-						// TODO: check that stepExecution can
-						// aggregate these contributions if they
-						// come in asynchronously.
-						ExecutionContext statistics; 
-						if(isSaveExecutionContext()){
-							statistics = streamManager.getExecutionContext(stepExecution);
-							contribution.setExecutionContext(statistics);
-						}
-						else{
-							statistics = new ExecutionContext();
-						}
 						contribution.incrementCommitCount();
 
 						// If the step operations are asynchronous then we need
@@ -303,9 +296,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 							// only if chunk was successful
 							stepExecution.apply(contribution);
 
-							if (saveExecutionContext) {
-								stepExecution.setExecutionContext(statistics);
-							}
+							streamManager.beforeSave();
 							jobRepository.saveOrUpdate(stepExecution);
 
 						}
@@ -384,7 +375,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 			try {
 				jobRepository.saveOrUpdate(stepExecution);
-				streamManager.close(stepExecution);
+				streamManager.close();
 			}
 			catch (Exception e) {
 				logger
@@ -404,14 +395,14 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	/**
 	 * 
 	 */
-	private void possiblyRegisterStreams(Object key) {
+	private void possiblyRegisterStreams() {
 		if (itemReader instanceof ItemStream) {
 			ItemStream stream = (ItemStream) itemReader;
-			streamManager.register(key, stream);
+			streamManager.register(stream);
 		}
 		if (itemWriter instanceof ItemStream) {
 			ItemStream stream = (ItemStream) itemWriter;
-			streamManager.register(key, stream);
+			streamManager.register(stream);
 		}
 	}
 
@@ -543,6 +534,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			((Skippable) this.itemWriter).skip();
 		}
 	}
+	
 
 	/**
 	 * Convenience method to update the status in all relevant places.

@@ -45,6 +45,7 @@ import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.MarkFailedException;
 import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.item.reader.AbstractItemReader;
@@ -112,7 +113,6 @@ public class ItemOrientedStepTests extends TestCase {
 		jobInstance = new JobInstance(new Long(0), new JobParameters(), new JobSupport("FOO"));
 
 		SimpleStreamManager streamManager = new SimpleStreamManager(transactionManager);
-		streamManager.setUseClassNameAsPrefix(false);
 		itemOrientedStep.setStreamManager(streamManager);
 
 	}
@@ -337,7 +337,6 @@ public class ItemOrientedStepTests extends TestCase {
 		}
 
 		assertFalse(tasklet.isRestoreFromCalled());
-		assertFalse(tasklet.isGetExecutionAttributesCalled());
 	}
 
 	/*
@@ -413,9 +412,15 @@ public class ItemOrientedStepTests extends TestCase {
 
 		final Map map = new HashMap();
 		itemOrientedStep.setStreamManager(new SimpleStreamManager(new ResourcelessTransactionManager()) {
-			public ExecutionContext getExecutionContext(Object key) {
+			ExecutionContext executionContext;
+			public void beforeSave() {
 				// TODO Auto-generated method stub
-				return new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar"));
+				executionContext.putString("foo", "bar");
+			}
+			
+			public void open(ExecutionContext executionContext)
+					throws StreamException {
+				this.executionContext = executionContext;
 			}
 		});
 
@@ -435,6 +440,8 @@ public class ItemOrientedStepTests extends TestCase {
 		private boolean restoreFromCalled = false;
 
 		private boolean restoreFromCalledWithSomeContext = false;
+		
+		private ExecutionContext executionContext;
 
 		public Object read() throws Exception {
 			StepSynchronizationManager.getContext().setAttribute("TASKLET_TEST", this);
@@ -445,14 +452,9 @@ public class ItemOrientedStepTests extends TestCase {
 			return restoreFromCalledWithSomeContext;
 		}
 
-		public ExecutionContext getExecutionContext() {
+		public void beforeSave() {
 			getExecutionAttributesCalled = true;
-			return new ExecutionContext(PropertiesConverter.stringToProperties("spam=bucket"));
-		}
-
-		public void restoreFrom(ExecutionContext data) {
-			restoreFromCalled = true;
-			restoreFromCalledWithSomeContext = data.getProperties().size() > 0;
+			executionContext.putString("spam", "bucket");
 		}
 
 		public boolean isGetExecutionAttributesCalled() {
@@ -463,10 +465,17 @@ public class ItemOrientedStepTests extends TestCase {
 			return restoreFromCalled;
 		}
 
-		public void open() throws StreamException {
+		public void open(ExecutionContext executionContext) throws StreamException {
+			this.executionContext = executionContext;
 		}
 
 		public void close() throws StreamException {
+		}
+
+		public void mark() throws MarkFailedException {
+		}
+
+		public void reset() throws ResetFailedException {
 		}
 
 	}
