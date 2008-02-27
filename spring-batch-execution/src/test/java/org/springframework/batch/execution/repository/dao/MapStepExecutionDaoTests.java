@@ -16,8 +16,11 @@
 
 package org.springframework.batch.execution.repository.dao;
 
+import java.util.HashMap;
+
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -25,29 +28,84 @@ import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.step.StepSupport;
+import org.springframework.batch.item.ExecutionContext;
 
 public class MapStepExecutionDaoTests extends TestCase {
 
-	MapStepExecutionDao dao = new MapStepExecutionDao();
+	private StepExecutionDao dao = new MapStepExecutionDao();
 
-	private JobInstance job;
+	private JobInstance jobInstance;
+
+	private JobExecution jobExecution;
 
 	private Step step;
 
-	// Make sure we get a new job for each test...
-	static long jobId = 100;
+	private StepExecution stepExecution;
 
 	protected void setUp() throws Exception {
 		MapStepExecutionDao.clear();
-		job = new JobInstance(new Long(jobId++), new JobParameters(), new JobSupport("testJob"));
+		jobInstance = new JobInstance(new Long(1), new JobParameters(), new JobSupport("testJob"));
+		jobExecution = new JobExecution(jobInstance, new Long(1));
 		step = new StepSupport("foo");
+		stepExecution = new StepExecution(step, jobExecution);
 	}
 
 	public void testSaveExecutionUpdatesId() throws Exception {
-		StepExecution execution = new StepExecution(step, new JobExecution(job, new Long(1)));
+		StepExecution execution = new StepExecution(step, new JobExecution(jobInstance, new Long(1)));
 		assertNull(execution.getId());
 		dao.saveStepExecution(execution);
 		assertNotNull(execution.getId());
+	}
+
+	public void testSaveAndFindExecution() {
+		stepExecution.setStatus(BatchStatus.STARTED);
+		dao.saveStepExecution(stepExecution);
+
+		StepExecution retrieved = dao.getStepExecution(jobExecution, step);
+		assertEquals(stepExecution, retrieved);
+		assertEquals(BatchStatus.STARTED, retrieved.getStatus());
+	}
+	
+	public void testUpdateExecution() {
+		stepExecution.setStatus(BatchStatus.STARTED);
+		dao.saveStepExecution(stepExecution);
+		
+		stepExecution.setStatus(BatchStatus.STOPPED);
+		dao.updateStepExecution(stepExecution);
+		
+		StepExecution retrieved = dao.getStepExecution(jobExecution, step);
+		assertEquals(stepExecution, retrieved);
+		assertEquals(BatchStatus.STOPPED, retrieved.getStatus());
+	}
+
+	public void testSaveAndFindContext() {
+		ExecutionContext ctx = new ExecutionContext(new HashMap() {
+			{
+				put("key", "value");
+			}
+		});
+		stepExecution.setExecutionContext(ctx);
+		dao.saveOrUpdateExecutionContext(stepExecution);
+
+		ExecutionContext retrieved = dao.findExecutionContext(stepExecution);
+		assertEquals(ctx, retrieved);
+	}
+	
+	public void testUpdateContext() {
+		ExecutionContext ctx = new ExecutionContext(new HashMap() {
+			{
+				put("key", "value");
+			}
+		});
+		stepExecution.setExecutionContext(ctx);
+		dao.saveOrUpdateExecutionContext(stepExecution);
+
+		ctx.putLong("longKey", 7);
+		dao.saveOrUpdateExecutionContext(stepExecution);
+		
+		ExecutionContext retrieved = dao.findExecutionContext(stepExecution);
+		assertEquals(ctx, retrieved);
+		assertEquals(7, retrieved.getLong("longKey"));
 	}
 
 }
