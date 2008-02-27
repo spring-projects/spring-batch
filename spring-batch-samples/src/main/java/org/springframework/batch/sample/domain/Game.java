@@ -1,8 +1,10 @@
 package org.springframework.batch.sample.domain;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 
-public class Game {
+public class Game implements Serializable {
 	
 	private String id;
 	private int year;

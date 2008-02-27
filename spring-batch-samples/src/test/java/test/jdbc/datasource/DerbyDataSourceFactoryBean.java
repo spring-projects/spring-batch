@@ -27,6 +27,8 @@ public class DerbyDataSourceFactoryBean extends AbstractFactoryBean {
 		ds.setDatabaseName("derbydb");
 		ds.setCreateDatabase("create");
 		dataSource = ds;
+		ds.getConnection().close();
+		ds.setCreateDatabase(null);
 
 		return ds;
 	}

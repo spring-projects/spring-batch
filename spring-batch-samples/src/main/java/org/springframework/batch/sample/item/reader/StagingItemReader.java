@@ -40,6 +40,14 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	private volatile boolean initialized = false;
 
 	private volatile Iterator keys;
+	
+	/**
+	 * Public setter for the {@link LobHandler}.
+	 * @param lobHandler the {@link LobHandler} to set (defaults to {@link DefaultLobHandler}).
+	 */
+	public void setLobHandler(LobHandler lobHandler) {
+		this.lobHandler = lobHandler;
+	}
 
 	/**
 	 * 
