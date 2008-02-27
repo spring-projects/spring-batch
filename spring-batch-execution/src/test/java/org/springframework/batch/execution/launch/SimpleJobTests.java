@@ -100,8 +100,10 @@ public class SimpleJobTests extends TestCase {
 
 		job.setSteps(new ArrayList());
 		AbstractStep step = getStep("foo", "bar");
+		step.setName("step1");
 		job.addStep(step);
 		step = getStep("spam");
+		step.setName("step2");
 		job.addStep(step);
 
 		JobInstance jobInstance = repository.createJobExecution(job, new JobParameters()).getJobInstance();
@@ -168,8 +170,8 @@ public class SimpleJobTests extends TestCase {
 	}
 
 	public void testExceptionTerminates() throws Exception {
-//		Tasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
 		AbstractStep step = getStep(new String[] { "foo", "bar", "spam" });
+		step.setName("exceptionStep");
 		step.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
 				throw new RuntimeException("Foo");

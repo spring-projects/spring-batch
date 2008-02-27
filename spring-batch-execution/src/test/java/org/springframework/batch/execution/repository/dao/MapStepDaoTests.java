@@ -44,28 +44,10 @@ public class MapStepDaoTests extends TestCase {
 	}
 
 	public void testSaveExecutionUpdatesId() throws Exception {
-		StepExecution execution = new StepExecution(step, new JobExecution(new JobInstance(new Long(1),
-				new JobParameters(), new JobSupport("jobName"))));
+		StepExecution execution = new StepExecution(step, new JobExecution(job, new Long(1)));
 		assertNull(execution.getId());
 		dao.saveStepExecution(execution);
 		assertNotNull(execution.getId());
-	}
-
-	public void testSaveExecutionContext() throws Exception {
-		// JobExecution jobExecution = new JobExecution(null);
-		// StepExecution stepExecution = new StepExecution(step, jobExecution,
-		// null);
-		// assertEquals(null, dao.findExecutionContext(stepExecution));
-		// Properties data = new Properties();
-		// data.setProperty("restart.key1", "restartData");
-		// ExecutionContext executionContext = new ExecutionContext(data);
-		// stepExecution.setExecutionContext(executionContext);
-		// dao.saveStepExecution(stepExecution);
-		// StepExecution tempExecution = dao.getStepExecution(jobExecution,
-		// step);
-		// assertEquals(tempExecution, stepExecution);
-		// assertEquals(stepExecution.getExecutionContext(),
-		// tempExecution.getExecutionContext());
 	}
 
 }

@@ -78,22 +78,4 @@ public class MapJobDaoTests extends TestCase {
 		dao.saveJobExecution(new JobExecution(job));
 		assertEquals(2, dao.getJobExecutionCount(job));
 	}
-	
-	public void testGetJobExecution(){
-		
-		JobInstance jobInstance = dao.createJobInstance(fooJob, jobParameters);
-		JobExecution jobExecution = new JobExecution(jobInstance);
-		dao.saveJobExecution(jobExecution);
-		JobExecution tempExecution = dao.getJobExecution(jobExecution.getId());
-		assertEquals(jobExecution, tempExecution);
-	}
-	
-	public void testGetNonExistantJobExecution(){
-		
-		JobInstance jobInstance = dao.createJobInstance(fooJob, jobParameters);
-		JobExecution jobExecution = new JobExecution(jobInstance);
-		dao.saveJobExecution(jobExecution);
-		assertNull(dao.getJobExecution(new Long(999999)));
-
-	}
 }

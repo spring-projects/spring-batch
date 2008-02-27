@@ -21,14 +21,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
 public class MapJobDao implements JobInstanceDao, JobExecutionDao {
 
@@ -80,8 +78,8 @@ public class MapJobDao implements JobInstanceDao, JobExecutionDao {
 		jobExecution.setId(new Long(currentId++));
 	}
 	
-	public List findJobExecutions(JobInstance job) {
-		Set executions = (Set) executionsById.get(job.getId());
+	public List findJobExecutions(JobInstance jobInstance) {
+		Set executions = (Set) executionsById.get(jobInstance.getId());
 		if( executions == null ){
 			return new ArrayList();
 		}
@@ -90,43 +88,12 @@ public class MapJobDao implements JobInstanceDao, JobExecutionDao {
 		}
 	}
 
-	public void updateJobInstance(JobInstance job) {
-		// no-op
-	}
-
 	public void updateJobExecution(JobExecution jobExecution) {
 		// no-op
 	}
 
-	public JobExecution getJobExecution(Long jobExecutionId) {
-		
-		List jobExecutions = new ArrayList();
-		
-		for(Iterator it = executionsById.entrySet().iterator();it.hasNext();){
-			Entry entry = (Entry)it.next();
-			Set executions = (Set)entry.getValue();
-			for(Iterator executionsIt = executions.iterator();executionsIt.hasNext();){
-				JobExecution jobExecution = (JobExecution)executionsIt.next();
-				if(jobExecution.getId() == jobExecutionId){
-					jobExecutions.add(jobExecution);
-				}
-			}
-		}
-		
-		if(jobExecutions.size() == 0){
-			return null;
-		}
-		else if(jobExecutions.size() == 1){
-			return (JobExecution)jobExecutions.get(0);
-		}
-		else{
-			throw new IncorrectResultSizeDataAccessException("Multiple JobExecutions found for given id"
-					, 1, jobExecutions.size());
-		}
-	}
-
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
-		// TODO Auto-generated method stub
+		// no-op
 		return null;
 	}
 

@@ -17,140 +17,70 @@
 package org.springframework.batch.execution.repository.dao;
 
 import java.util.Map;
-import java.util.Set;
+
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.util.Assert;
 
 public class MapStepDao implements StepExecutionDao {
 
-	private static Map stepsByJobId;
-	private static Map executionsById;
-	private static Map restartsById;
+	private static Map executionsByJobExecutionId;
+
+	private static Map contextsByStepExecutionId;
+
 	private static long currentId = 0;
-	
+
 	static {
-		stepsByJobId = TransactionAwareProxyFactory.createTransactionalMap();
-		executionsById = TransactionAwareProxyFactory.createTransactionalMap();
-		restartsById = TransactionAwareProxyFactory.createTransactionalMap();
+		executionsByJobExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
+		contextsByStepExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
 	}
-	
+
 	public static void clear() {
-		stepsByJobId.clear();
-		executionsById.clear();
-		restartsById.clear();
-	}
-
-	public ExecutionContext getExecutionContext(Long stepId) {
-		return (ExecutionContext) restartsById.get(stepId);
-	}
-
-//	public int getStepExecutionCount(StepInstance stepInstance) {
-//		Set executions = (Set) executionsById.get(stepInstance.getId());
-//		if (executions==null) return 0;
-//		return executions.size();	}
-
-//	public void saveStepExecution(StepExecution stepExecution) {
-//		Set executions = (Set) executionsById.get(stepExecution.getStepId());
-//		if (executions==null) {
-//			executions = TransactionAwareProxyFactory.createTransactionalSet();
-//			executionsById.put(stepExecution.getStepId(), executions);
-//		}
-//		stepExecution.setId(new Long(currentId++));
-//		executions.add(stepExecution);
-//	}
-//	
-//	public List findStepExecutions(StepInstance step, JobExecution jobExecution) {
-//		Set executions = (Set) executionsById.get(step.getId());
-//		
-//		if(executions == null){
-//			//no step executions, return empty array list.
-//			return new ArrayList();
-//		}
-//		else{
-//			return new ArrayList(executions);
-//		}
-//	}
-//	
-//	public StepExecution getStepExecution(Long stepExecutionId,
-//			StepInstance stepInstance)  {
-//		
-//		List stepExecutions = new ArrayList();
-//		
-//		for(Iterator it = executionsById.entrySet().iterator();it.hasNext();){
-//			Entry entry = (Entry)it.next();
-//			Set executions = (Set)entry.getValue();
-//			for(Iterator executionsIt = executions.iterator();executionsIt.hasNext();){
-//				Entity stepExecution = (Entity)executionsIt.next();
-//				if(stepExecution.getId() == stepExecutionId){
-//					stepExecutions.add(stepExecution);
-//				}
-//			}
-//		}
-//		
-//		if(stepExecutions.size() == 0){
-//			return null;
-//		}
-//		else if(stepExecutions.size() == 1){
-//			return (StepExecution)stepExecutions.get(0);
-//		}
-//		else{
-//			throw new IncorrectResultSizeDataAccessException("Multiple StepExecutions found for given id"
-//					, 1, stepExecutions.size());
-//		}
-//	}
-
-	public void updateStepExecution(StepExecution stepExecution) {
-		// no-op
+		executionsByJobExecutionId.clear();
 	}
 
 	public ExecutionContext findExecutionContext(StepExecution stepExecution) {
-		return null;
+		return (ExecutionContext) contextsByStepExecutionId.get(stepExecution.getId());
 	}
 
 	public void saveExecutionContext(StepExecution stepExecution) {
+		contextsByStepExecutionId.put(stepExecution.getId(), stepExecution.getExecutionContext());
 	}
 
 	public void updateExecutionContext(StepExecution stepExecution) {
+		Assert.notNull(contextsByStepExecutionId.get(stepExecution.getId()), "execution context should already be saved");
+		contextsByStepExecutionId.put(stepExecution.getId(), stepExecution.getExecutionContext());
 	}
 
 	public void saveStepExecution(StepExecution stepExecution) {
-		Set executions = (Set) executionsById.get(stepExecution.getId());
-		if (executions==null) {
-			executions = TransactionAwareProxyFactory.createTransactionalSet();
-			executionsById.put(stepExecution.getId(), executions);
+		Assert.notNull(stepExecution.getJobExecutionId());
+		Map executions = (Map) executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
+		if (executions == null) {
+			executions = TransactionAwareProxyFactory.createTransactionalMap();
+			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
 		}
 		stepExecution.setId(new Long(currentId++));
-		executions.add(stepExecution);
+		executions.put(stepExecution.getStepName(), stepExecution);
+	}
+
+	public void updateStepExecution(StepExecution stepExecution) {
+		Assert.notNull(stepExecution.getJobExecutionId());
+		Map executions = (Map) executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
+		Assert.notNull(executions, "step executions for given job execution are expected to be already saved");
+		Assert.notNull(executions.get(stepExecution.getStepName()), "step execution is expected to be already saved");
+		executions.put(stepExecution.getStepName(), stepExecution);
 	}
 
 	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {
-//		for (Iterator iterator = executionsById.entrySet().iterator(); iterator.hasNext();) {
-//			Entry entry = (Entry) iterator.next();
-//			StepExecution stepExecution = (StepExecution) entry.getValue();
-//			if (stepExecution.getJobExecution().equals(jobExecution) && stepExecution.getStepName().equals(stepName)){
-//				return stepExecution;
-//			}
-//		}
-		return null;
+		Map executions = (Map) executionsByJobExecutionId.get(jobExecution.getId());
+		if (executions == null) {
+			return null;
+		}
+
+		return (StepExecution) executions.get(step.getName());
 	}
 
-//	public StepExecution getLastStepExecution(String stepName, JobExecution jobExecution) {
-//		List executions = findStepExecutions(stepInstance, null);
-//		StepExecution lastExec = null;
-//		for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
-//			StepExecution exec = (StepExecution) iterator.next();
-//			if (lastExec == null) {
-//				lastExec = exec;
-//				continue;
-//			}
-//			if (lastExec.getStartTime().getTime() < exec.getStartTime().getTime()) {
-//				lastExec = exec;
-//			}
-//		}
-//		return lastExec;
-//	}
 }
-
