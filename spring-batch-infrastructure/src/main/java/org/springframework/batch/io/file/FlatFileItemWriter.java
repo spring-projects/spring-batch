@@ -31,7 +31,6 @@ import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetCreator;
 import org.springframework.batch.io.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.io.file.transform.LineAggregator;
-import org.springframework.batch.io.support.AbstractTransactionalIoSource;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -66,7 +65,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemWriter extends AbstractTransactionalIoSource implements ItemWriter, ItemStream,
+public class FlatFileItemWriter implements ItemWriter, ItemStream,
 		InitializingBean {
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
