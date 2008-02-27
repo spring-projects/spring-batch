@@ -3,6 +3,8 @@ package org.springframework.batch.sample;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.JobParametersBuilder;
 import org.springframework.batch.sample.dao.HibernateCreditWriter;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.orm.hibernate3.HibernateJdbcException;
@@ -48,6 +50,8 @@ public class HibernateFailureJobFunctionalTests extends
 	 * @see org.springframework.batch.sample.AbstractValidatingBatchLauncherTests#testLaunchJob()
 	 */
 	public void testLaunchJob() throws Exception {
+		JobParameters params = new JobParametersBuilder().addString("key", "failureJob").toJobParameters();
+		setJobParameters(params);
 		writer.setFailOnFlush(2);
 
 		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");

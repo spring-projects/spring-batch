@@ -65,6 +65,8 @@ public class SimpleJobTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		job.setJobRepository(repository);
+		MapJobDao.clear();
+		MapStepDao.clear();
 	}
 
 	private AbstractStep getStep(String arg) throws Exception {

@@ -87,10 +87,10 @@ public class SimpleJobRepository implements JobRepository {
 	 * <p>
 	 * There are two ways in which the method determines if a job should be
 	 * created or an existing one should be returned. The first is
-	 * restartability. The {@link Job} restartable property will be
-	 * checked first. If it is false, a new job will be created, regardless of
-	 * whether or not one exists. If it is true, the {@link JobInstanceDao} will
-	 * be checked to determine if the job already exists, if it does, it's steps
+	 * restartability. The {@link Job} restartable property will be checked
+	 * first. If it is false, a new job will be created, regardless of whether
+	 * or not one exists. If it is true, the {@link JobInstanceDao} will be
+	 * checked to determine if the job already exists, if it does, it's steps
 	 * will be populated (there must be at least 1) and a new
 	 * {@link JobExecution} will be returned. If no job instance is found, a new
 	 * one will be created.
@@ -106,9 +106,9 @@ public class SimpleJobRepository implements JobRepository {
 	 * <li>What happens then depends on how many existing job instances we
 	 * find:
 	 * <ul>
-	 * <li>If there are none, or the {@link Job} is marked restartable,
-	 * then we create a new {@link JobInstance}</li>
-	 * <li>If there is more than one and the {@link JobSupport} is not marked
+	 * <li>If there are none, or the {@link Job} is marked restartable, then we
+	 * create a new {@link JobInstance}</li>
+	 * <li>If there is more than one and the {@link Job} is not marked
 	 * as restartable, it is an error. This could be caused by a job whose
 	 * restartable flag has changed to be more strict (true not false)
 	 * <em>after</em> it has been executed at least once.</li>
@@ -136,6 +136,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * JobInstance.getJobExecutionCount() is greater than Job.getStartLimit()
 	 * @throws JobExecutionAlreadyRunningException if a job execution is found
 	 * for the given {@link JobIdentifier} that is already running
+	 * @throws CannotRestartJobInstanceException 
 	 * 
 	 */
 	public JobExecution createJobExecution(Job job, JobParameters jobParameters)
@@ -147,19 +148,19 @@ public class SimpleJobRepository implements JobRepository {
 		List jobInstances = new ArrayList();
 		JobInstance jobInstance;
 
-		// Check if a job is restartable, if not, create and return a new job
-		if (job.isRestartable()) {
+		/*
+		 * Find all jobs matching the runtime information.
+		 * 
+		 * If this method is transactional, and the isolation level is
+		 * REPEATABLE_READ or better, another launcher trying to start the same
+		 * job in another thread or process will block until this transaction
+		 * has finished.
+		 */
 
-			/*
-			 * Find all jobs matching the runtime information.
-			 * 
-			 * Always do this if the job is restartable, then if this method is
-			 * transactional, and the isolation level is REPEATABLE_READ or
-			 * better, another launcher trying to start the same job in another
-			 * thread or process will block until this transaction has finished.
-			 */
-
-			jobInstances = jobInstanceDao.findJobInstances(job, jobParameters);
+		jobInstances = jobInstanceDao.findJobInstances(job, jobParameters);
+		
+		if ((jobInstances.size() > 0) && (job.isRestartable() == false)) {
+			throw new BatchRestartException("JobInstance already exists and is not restartable");
 		}
 
 		if (jobInstances.size() == 1) {

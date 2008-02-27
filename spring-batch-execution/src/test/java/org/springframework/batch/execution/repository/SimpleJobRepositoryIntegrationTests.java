@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.repository.BatchRestartException;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
@@ -89,5 +90,26 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 
 		assertEquals(firstExecution.getJobInstance(), secondExecution.getJobInstance());
 		assertEquals(job, secondExecution.getJobInstance().getJob());
+	}
+
+	/**
+	 * Non-restartable JobInstance can be run only once - attempt to run
+	 * existing non-restartable JobInstance causes error.
+	 */
+	public void testRunNonRestartableJobInstanceTwice() throws Exception {
+		JobSupport job = new JobSupport("nonRestartableJob");
+		job.setRestartable(false);
+		JobParameters jobParameters = new JobParameters();
+		
+		JobExecution firstExecution = jobRepository.createJobExecution(job, jobParameters);
+		jobRepository.saveOrUpdate(firstExecution);
+		
+		try {
+			jobRepository.createJobExecution(job, jobParameters);
+			fail();
+		}
+		catch (BatchRestartException e) {
+			// expected
+		}
 	}
 }

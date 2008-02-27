@@ -53,12 +53,14 @@ public class StepExecutorInterruptionTests extends TestCase {
 	private ItemOrientedStep step;
 
 	public void setUp() throws Exception {
-
+		MapJobDao.clear();
+		MapStepDao.clear();
+		
 		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao);
 
 		JobSupport jobConfiguration = new JobSupport();
 		step = new ItemOrientedStep();
-		step.setName("stepName");
+		step.setName("interruptedStep");
 		jobConfiguration.addStep(step);
 		jobConfiguration.setBeanName("testJob");
 		jobRepository.createJobExecution(jobConfiguration, new JobParameters());
@@ -70,6 +72,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 			}});
 		step.afterPropertiesSet();
 	}
+
 
 	public void testInterruptChunk() throws Exception {
 

@@ -38,8 +38,14 @@ public abstract class AbstractBatchLauncherTests extends
 
 	private static final String CONTAINER_DEFINITION_LOCATION = "simple-container-definition.xml";
 
+	public AbstractBatchLauncherTests() {
+		setDependencyCheck(false);
+	}
+	
 	JobLauncher launcher;
 	private Job job;
+	
+	private JobParameters jobParameters = new JobParameters();
 
 	/*
 	 * (non-Javadoc)
@@ -74,11 +80,15 @@ public abstract class AbstractBatchLauncherTests extends
 		return job.getName();
 	}
 
+	public void setJobParameters(JobParameters jobParameters) {
+		this.jobParameters = jobParameters;
+	}
+
 	/**
 	 * @throws Exception
 	 * 
 	 */
 	public void testLaunchJob() throws Exception {
-		launcher.run(job, new JobParameters());
+		launcher.run(job, jobParameters);
 	}
 }
