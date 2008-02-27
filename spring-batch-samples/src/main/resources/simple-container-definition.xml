@@ -82,7 +82,7 @@
 	</bean>
 
 	<bean id="simpleJob"
-		class="org.springframework.batch.execution.job.simple.SimpleJob"
+		class="org.springframework.batch.execution.job.SimpleJob"
 		abstract="true">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="restartable" value="true" />
@@ -93,7 +93,6 @@
 		abstract="true">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="allowStartIfComplete" value="true" />
-		<property name="saveExecutionContext" value="true" />
 	</bean>
 
 	<bean id="simpleStep"
@@ -103,7 +102,6 @@
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="allowStartIfComplete" value="true" />
-		<property name="saveExecutionContext" value="true" />
 
 		<property name="exceptionHandler">
 			<bean

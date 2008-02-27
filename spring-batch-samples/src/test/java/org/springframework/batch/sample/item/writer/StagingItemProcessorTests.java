@@ -3,11 +3,11 @@ package org.springframework.batch.sample.item.writer;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
+import org.springframework.batch.sample.tasklet.JobSupport;
+import org.springframework.batch.sample.tasklet.StepSupport;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
 
