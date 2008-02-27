@@ -108,8 +108,8 @@ public class SimpleJobRepository implements JobRepository {
 	 * <ul>
 	 * <li>If there are none, or the {@link Job} is marked restartable, then we
 	 * create a new {@link JobInstance}</li>
-	 * <li>If there is more than one and the {@link Job} is not marked
-	 * as restartable, it is an error. This could be caused by a job whose
+	 * <li>If there is more than one and the {@link Job} is not marked as
+	 * restartable, it is an error. This could be caused by a job whose
 	 * restartable flag has changed to be more strict (true not false)
 	 * <em>after</em> it has been executed at least once.</li>
 	 * <li>If there is precisely one existing {@link JobInstance} then we check
@@ -136,7 +136,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * JobInstance.getJobExecutionCount() is greater than Job.getStartLimit()
 	 * @throws JobExecutionAlreadyRunningException if a job execution is found
 	 * for the given {@link JobIdentifier} that is already running
-	 * @throws CannotRestartJobInstanceException 
+	 * @throws CannotRestartJobInstanceException
 	 * 
 	 */
 	public JobExecution createJobExecution(Job job, JobParameters jobParameters)
@@ -163,7 +163,7 @@ public class SimpleJobRepository implements JobRepository {
 			if (!job.isRestartable()) {
 				throw new BatchRestartException("JobInstance already exists and is not restartable");
 			}
-			
+
 			jobInstance.setJobExecutionCount(jobExecutionDao.getJobExecutionCount(jobInstance));
 			if (jobInstance.getJobExecutionCount() > job.getStartLimit()) {
 				throw new BatchRestartException("Restart Max exceeded for Job: " + jobInstance.toString());
@@ -252,13 +252,20 @@ public class SimpleJobRepository implements JobRepository {
 				jobExecutionDao.saveJobExecution(jobExecution);
 			}
 			stepExecutionDao.saveStepExecution(stepExecution);
-			stepExecutionDao.saveExecutionContext(stepExecution);
 		}
 		else {
 			// existing execution, update
 			stepExecutionDao.updateStepExecution(stepExecution);
-			stepExecutionDao.updateExecutionContext(stepExecution);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdateExecutionContext(org.springframework.batch.core.domain.StepExecution)
+	 */
+	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+		saveOrUpdate(stepExecution);
+		stepExecutionDao.saveOrUpdateExecutionContext(stepExecution);
 	}
 
 	/**

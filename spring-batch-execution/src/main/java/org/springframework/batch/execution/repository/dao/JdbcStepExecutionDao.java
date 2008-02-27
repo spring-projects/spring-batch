@@ -120,38 +120,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		return executionContext;
 	}
 
-	/**
-	 * Insert execution attributes. A {@link LobHandler} must be provided, since
-	 * any attributes that don't match a provided type are serialized into a
-	 * blob.
-	 */
-	public void saveExecutionContext(final StepExecution stepExecution) {
-
-		final Long executionId = stepExecution.getId();
-		final ExecutionContext executionContext = stepExecution.getExecutionContext();
-		Assert.notNull(executionId, "ExecutionId must not be null.");
-		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
-
-		for (Iterator it = executionContext.entrySet().iterator(); it.hasNext();) {
-			Entry entry = (Entry) it.next();
-			final String key = entry.getKey().toString();
-			final Object value = entry.getValue();
-
-			if (value instanceof String) {
-				insertExecutionAttribute(executionId, key, value, AttributeType.STRING);
-			}
-			else if (value instanceof Double) {
-				insertExecutionAttribute(executionId, key, value, AttributeType.DOUBLE);
-			}
-			else if (value instanceof Long) {
-				insertExecutionAttribute(executionId, key, value, AttributeType.LONG);
-			}
-			else {
-				insertExecutionAttribute(executionId, key, value, AttributeType.OBJECT);
-			}
-		}
-	}
-
 	private void insertExecutionAttribute(final Long executionId, final String key, final Object value,
 			final AttributeType type) {
 		PreparedStatementCallback callback = new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
@@ -237,13 +205,13 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	/**
-	 * update execution attributes. A lob creator must be used, since any
-	 * attributes that don't match a provided type must be serialized into a
+	 * Save or update execution attributes. A lob creator must be used, since
+	 * any attributes that don't match a provided type must be serialized into a
 	 * blob.
 	 * 
 	 * @see {@link LobCreator}
 	 */
-	public void updateExecutionContext(final StepExecution stepExecution) {
+	public void saveOrUpdateExecutionContext(final StepExecution stepExecution) {
 
 		Long executionId = stepExecution.getId();
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
@@ -320,6 +288,10 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.execution.repository.dao.StepExecutionDao#updateStepExecution(org.springframework.batch.core.domain.StepExecution)
+	 */
 	public void updateStepExecution(StepExecution stepExecution) {
 
 		validateStepExecution(stepExecution);

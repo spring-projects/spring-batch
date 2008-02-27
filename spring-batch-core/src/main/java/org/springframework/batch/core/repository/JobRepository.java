@@ -81,17 +81,30 @@ public interface JobRepository {
 	public void saveOrUpdate(JobExecution jobExecution);
 
 	/**
-	 * Save or Update a StepExecution. If no ID is found a new instance will be
-	 * created. (saved). If an ID does exist it will be updated. It is not
-	 * advisable that an ID be assigned to a JobExecution before calling this
-	 * method. Instead, it should be left blank, to be assigned by a
-	 * JobRepository.
+	 * Save or update a {@link StepExecution}. If no ID is found a new instance
+	 * will be created (and saved). If an ID does exist it will be updated. It
+	 * is not advisable that an ID be assigned before calling this method.
+	 * Instead, it should be left blank, to be assigned by a
+	 * {@link JobRepository}. The {@link ExecutionContext} of the
+	 * {@link StepExecution} is <em>not</em> saved: see
+	 * {@link #saveExecutionContext(StepExecution)}.
 	 * 
-	 * Preconditions: StepExecution must have a valid StepId.
+	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
 	 * 
 	 * @param jobInstance
 	 */
 	public void saveOrUpdate(StepExecution stepExecution);
+
+	/**
+	 * Save the {@link ExecutionContext} of the given {@link StepExecution}.
+	 * Implementations are allowed to ensure that the {@link StepExecution} is
+	 * already saved by calling {@link #saveOrUpdate(StepExecution)} before
+	 * saving the {@link ExecutionContext}.
+	 * 
+	 * @param stepExecution the {@link StepExecution} containing the
+	 * {@link ExecutionContext} to be saved.
+	 */
+	void saveOrUpdateExecutionContext(StepExecution stepExecution);
 
 	/**
 	 * @return the last execution of step for the given job instance.
@@ -102,6 +115,5 @@ public interface JobRepository {
 	 * @return the execution count of the step within the given job instance.
 	 */
 	public int getStepExecutionCount(JobInstance jobInstance, Step step);
-
 
 }

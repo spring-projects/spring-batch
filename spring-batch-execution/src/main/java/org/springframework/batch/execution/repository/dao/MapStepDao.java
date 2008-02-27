@@ -46,12 +46,7 @@ public class MapStepDao implements StepExecutionDao {
 		return (ExecutionContext) contextsByStepExecutionId.get(stepExecution.getId());
 	}
 
-	public void saveExecutionContext(StepExecution stepExecution) {
-		contextsByStepExecutionId.put(stepExecution.getId(), stepExecution.getExecutionContext());
-	}
-
-	public void updateExecutionContext(StepExecution stepExecution) {
-		Assert.notNull(contextsByStepExecutionId.get(stepExecution.getId()), "execution context should already be saved");
+	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
 		contextsByStepExecutionId.put(stepExecution.getId(), stepExecution.getExecutionContext());
 	}
 

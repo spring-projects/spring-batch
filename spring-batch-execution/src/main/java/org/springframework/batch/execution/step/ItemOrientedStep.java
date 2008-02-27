@@ -41,7 +41,7 @@ import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.KeyedItemReader;
-import org.springframework.batch.item.exception.ResetFailedException;
+import org.springframework.batch.item.exception.CommitFailedException;
 import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
@@ -223,6 +223,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 		boolean isRestart = jobRepository.getStepExecutionCount(jobInstance, this) > 0 ? true : false;
 
 		ExitStatus status = ExitStatus.FAILED;
+		final ExceptionHolder fatalException = new ExceptionHolder();
 
 		try {
 
@@ -230,7 +231,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			// We need to save the step execution right away, before we start
 			// using its ID. It would be better to make the creation atomic in
 			// the caller.
-			updateStatus(stepExecution, BatchStatus.STARTED);
+			fatalException.setException(updateStatus(stepExecution, BatchStatus.STARTED));
 
 			StepContext parentStepContext = StepSynchronizationManager.getContext();
 			final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext);
@@ -280,14 +281,32 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 							stepExecution.apply(contribution);
 
 							streamManager.update(stepExecution.getExecutionContext());
-							jobRepository.saveOrUpdate(stepExecution);
+							try {
+								stepExecution.setStatus(BatchStatus.COMPLETED);
+								jobRepository.saveOrUpdateExecutionContext(stepExecution);
+							}
+							catch (Exception e) {
+								fatalException.setException(e);
+								stepExecution.setStatus(BatchStatus.UNKNOWN);
+								throw new CommitFailedException("Fatal error detected during commit", e);
+							}
 
 						}
 
-						itemReader.mark();
-						itemWriter.flush();
-						streamManager.commit(transaction);
+						try {
+							itemReader.mark();
+							itemWriter.flush();
+							streamManager.commit(transaction);
+						}
+						catch (Exception e) {
+							fatalException.setException(e);
+							stepExecution.setStatus(BatchStatus.UNKNOWN);
+							throw new CommitFailedException("Fatal error detected during commit", e);
+						}
 
+					}
+					catch (CommitFailedException e) {
+						throw e;
 					}
 					catch (Throwable t) {
 						/*
@@ -305,16 +324,9 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 							itemWriter.clear();
 							streamManager.rollback(transaction);
 						}
-						catch (ResetFailedException e) {
-							// The original Throwable cause is in danger of
-							// being lost here, so we log the reset
-							// failure and re-throw with cause of the rollback.
-							logger.error("Encountered reset error on rollback: "
-									+ "one of the streams may be in an inconsistent state, "
-									+ "so this step should not proceed", e);
-							throw new ResetFailedException("Encountered reset error on rollback.  "
-									+ "Consult logs for the cause of the reet failure.  "
-									+ "The cause of the original rollback is incuded here.", t);
+						catch (Exception e) {
+							fatalException.setException(e);
+							stepExecution.setStatus(BatchStatus.UNKNOWN);
 						}
 						if (t instanceof RuntimeException) {
 							throw (RuntimeException) t;
@@ -334,7 +346,11 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 				}
 			});
 
-			updateStatus(stepExecution, BatchStatus.COMPLETED);
+			fatalException.setException(updateStatus(stepExecution, BatchStatus.COMPLETED));
+		}
+		catch (CommitFailedException e) {
+			logger.error("Fatal error detected during commit.");
+			throw e;
 		}
 		catch (RuntimeException e) {
 
@@ -344,12 +360,12 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 				updateStatus(stepExecution, BatchStatus.STOPPED);
 				throw (JobInterruptedException) e.getCause();
 			}
-			else if (e instanceof ResetFailedException) {
-				updateStatus(stepExecution, BatchStatus.UNKNOWN);
-				throw (ResetFailedException) e;
+			else if (!fatalException.hasException()) {
+				updateStatus(stepExecution, BatchStatus.FAILED);
+				throw e;
 			}
 			else {
-				updateStatus(stepExecution, BatchStatus.FAILED);
+				logger.error("Fatal error detected during rollback caused by underlying exception: ", e);
 				throw e;
 			}
 
@@ -357,21 +373,45 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 		finally {
 			stepExecution.setExitStatus(status);
 			stepExecution.setEndTime(new Date(System.currentTimeMillis()));
+
 			try {
-				jobRepository.saveOrUpdate(stepExecution);
-				streamManager.close(stepExecution.getExecutionContext());
-			}
-			catch (Exception e) {
-				logger
-						.error(
-								"Failed to update step execution: probably fatal, so there is already an exception on the stack.",
-								e);
+
+				try {
+					jobRepository.saveOrUpdate(stepExecution);
+				}
+				catch (RuntimeException e) {
+					String msg = "Fatal error detected during final save of meta data";
+					logger.error(msg, e);
+					if (!fatalException.hasException()) {
+						fatalException.setException(e);
+					}
+					throw new BatchCriticalException(msg, fatalException.getException());
+				}
+
+				try {
+					streamManager.close(stepExecution.getExecutionContext());
+				}
+				catch (RuntimeException e) {
+					String msg = "Fatal error detected during close of streams. "
+							+ "The job execution completed (possibly unsuccessfully but with consistent meta-data).";
+					logger.error(msg, e);
+					if (!fatalException.hasException()) {
+						fatalException.setException(e);
+					}
+					throw new BatchCriticalException(msg, fatalException.getException());
+				}
+
 			}
 			finally {
 				// clear any registered synchronizations
-
 				StepSynchronizationManager.close();
 			}
+
+			if (fatalException.hasException()) {
+				throw new BatchCriticalException("Encountered an error saving batch meta data.", fatalException
+						.getException());
+			}
+
 		}
 
 	}
@@ -527,14 +567,44 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	 * @param stepExecution the current stepExecution
 	 * @param status the status to set
 	 */
-	private void updateStatus(StepExecution stepExecution, BatchStatus status) {
+	private Exception updateStatus(StepExecution stepExecution, BatchStatus status) {
 		stepExecution.setStatus(status);
 		try {
 			jobRepository.saveOrUpdate(stepExecution);
+			return null;
 		}
 		catch (Exception e) {
-			logger.error("Failed to update step execution with status: probably fatal.", e);
+			return e;
 		}
 
 	}
+
+	/**
+	 * @author Dave Syer
+	 * 
+	 */
+	private static class ExceptionHolder {
+
+		private Exception exception;
+
+		public boolean hasException() {
+			return exception != null;
+		}
+
+		/**
+		 * @param exception
+		 */
+		public void setException(Exception exception) {
+			this.exception = exception;
+		}
+
+		/**
+		 * @return
+		 */
+		public Exception getException() {
+			return this.exception;
+		}
+
+	}
+
 }

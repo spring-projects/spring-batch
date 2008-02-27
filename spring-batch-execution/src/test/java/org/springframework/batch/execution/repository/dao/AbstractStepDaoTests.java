@@ -117,7 +117,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 
 	public void testUpdateStepWithExecutionContext() {
 		stepExecution.setExecutionContext(executionContext);
-		stepExecutionDao.saveExecutionContext(stepExecution);
+		stepExecutionDao.saveOrUpdateExecutionContext(stepExecution);
 		ExecutionContext tempAttributes = stepExecutionDao.findExecutionContext(stepExecution);
 		assertEquals(executionContext, tempAttributes);
 	}
@@ -143,7 +143,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		execution.setExitStatus(new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));
 		stepExecutionDao.saveStepExecution(execution);
-		stepExecutionDao.saveExecutionContext(execution);
+		stepExecutionDao.saveOrUpdateExecutionContext(execution);
 		StepExecution retrievedExecution = stepExecutionDao.getStepExecution(jobExecution, step2);
 		assertNotNull(retrievedExecution);
 		assertEquals(execution, retrievedExecution);
@@ -205,14 +205,14 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	public void testSaveExecutionContext(){
 		
 		stepExecution.setExecutionContext(executionContext);
-		stepExecutionDao.saveExecutionContext(stepExecution);
+		stepExecutionDao.saveOrUpdateExecutionContext(stepExecution);
 		ExecutionContext attributes = stepExecutionDao.findExecutionContext(stepExecution);
 		assertEquals(executionContext, attributes);
 		executionContext.putString("newString", "newString");
 		executionContext.putLong("newLong", 1);
 		executionContext.putDouble("newDouble", 2.5);
 		executionContext.put("newSerializable", "serializableValue");
-		stepExecutionDao.updateExecutionContext(stepExecution);
+		stepExecutionDao.saveOrUpdateExecutionContext(stepExecution);
 		attributes = stepExecutionDao.findExecutionContext(stepExecution);
 		assertEquals(executionContext, attributes);
 	}

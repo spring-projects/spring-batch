@@ -5,6 +5,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
@@ -69,6 +70,31 @@ public class TaskletStepTests extends TestCase {
 		assertNotNull(stepExecution.getEndTime());
 	}
 
+	public void testSuccessfulExecutionWithExecutionContext() throws Exception {
+		TaskletStep step = new TaskletStep(new StubTasklet(false, false), new JobRepositorySupport() {
+			public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+				list.add(stepExecution);
+			}
+		});
+		step.execute(stepExecution);
+		assertEquals(1, list.size());
+	}
+
+	public void testSuccessfulExecutionWithFailureOnSaveOfExecutionContext() throws Exception {
+		TaskletStep step = new TaskletStep(new StubTasklet(false, false, true), new JobRepositorySupport() {
+			public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+				throw new RuntimeException("foo");
+			}
+		});
+		try {
+			step.execute(stepExecution);
+			fail("Expected BatchCriticalException");
+		} catch (BatchCriticalException e){
+			assertEquals("foo", e.getCause().getMessage());
+		}
+		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
+	}
+
 	public void testFailureExecution() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(true, false), new JobRepositorySupport());
 		step.execute(stepExecution);
@@ -97,7 +123,7 @@ public class TaskletStepTests extends TestCase {
 			step.execute(stepExecution);
 			fail();
 		}
-		catch (BatchCriticalException e) {
+		catch (RuntimeException e) {
 			assertNotNull(stepExecution.getStartTime());
 			assertEquals(ExitStatus.FAILED, stepExecution.getExitStatus());
 			assertNotNull(stepExecution.getEndTime());

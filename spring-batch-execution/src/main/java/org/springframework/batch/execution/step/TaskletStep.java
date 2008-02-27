@@ -173,6 +173,7 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 		updateStatus(stepExecution, BatchStatus.STARTED);
 
 		ExitStatus exitStatus = ExitStatus.FAILED;
+		Exception fatalException = null;
 		try {
 
 			StepContext parentStepContext = StepSynchronizationManager.getContext();
@@ -191,8 +192,19 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 				}
 			});
 
-			updateStatus(stepExecution, BatchStatus.COMPLETED);
+			try {
+				jobRepository.saveOrUpdateExecutionContext(stepExecution);
+				updateStatus(stepExecution, BatchStatus.COMPLETED);
+			} catch (Exception e) {
+				fatalException = e;
+				updateStatus(stepExecution, BatchStatus.UNKNOWN);
+			}
 
+		}
+		catch (RuntimeException e) {
+			logger.error("Encountered an error running the tasklet");
+			updateStatus(stepExecution, BatchStatus.FAILED);
+			throw e;
 		}
 		catch (Exception e) {
 			logger.error("Encountered an error running the tasklet");
@@ -206,18 +218,22 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 				jobRepository.saveOrUpdate(stepExecution);
 			}
 			catch (Exception e) {
-				logger.error("Encountered error saving batch meta data.  "
-						+ "This job is now in an unknown state and should not be restarted.", e);
+				fatalException = e;
 			}
 			finally {
 				StepSynchronizationManager.close();
+				if (fatalException!=null) {
+					logger.error("Encountered an error saving batch meta data."
+							+ "This job is now in an unknown state and should not be restarted.", fatalException);
+					throw new BatchCriticalException("Encountered an error saving batch meta data.", fatalException);
+				}
 			}
-		}
+		}		
+	
 	}
 
 	private void updateStatus(StepExecution stepExecution, BatchStatus status) {
 		stepExecution.setStatus(status);
-		jobRepository.saveOrUpdate(stepExecution);
 	}
 
 }

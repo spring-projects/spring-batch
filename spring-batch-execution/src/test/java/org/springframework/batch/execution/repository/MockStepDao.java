@@ -29,8 +29,6 @@ public class MockStepDao implements StepExecutionDao {
 
 	private List newSteps;
 
-	private int currentNewStep = 0;
-
 	public List findStepInstances(JobInstance job) {
 		return newSteps;
 	}
@@ -45,18 +43,11 @@ public class MockStepDao implements StepExecutionDao {
 		this.newSteps = steps;
 	}
 
-	public void resetCurrentNewStep() {
-		currentNewStep = 0;
-	}
-
 	public ExecutionContext findExecutionContext(StepExecution stepExecution) {
 		return null;
 	}
 
-	public void saveExecutionContext(StepExecution stepExecution) {
-	}
-
-	public void updateExecutionContext(StepExecution stepExecution) {
+	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
 	}
 
 	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {

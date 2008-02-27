@@ -37,18 +37,12 @@ public interface StepExecutionDao {
 	/**
 	 * Save the {@link ExecutionContext} of the given {@link StepExecution}.
 	 * 
-	 * @param executionId to be saved
-	 * @param executionContext to be saved.
-	 * @throws IllegalArgumentException if the executionId or attributes are
-	 * null.
+	 * @param stepExecution the {@link StepExecution} containing the
+	 * {@link ExecutionContext} to be saved.
+	 * @throws IllegalArgumentException if the attributes are null.
 	 */
-	void saveExecutionContext(StepExecution stepExecution);
+	void saveOrUpdateExecutionContext(StepExecution stepExecution);
 
-	/**
-	 * Update the ExecutionContext of given {@link StepExecution}.
-	 */
-	void updateExecutionContext(StepExecution stepExecution);
-	
 	StepExecution getStepExecution(JobExecution jobExecution, Step step);
 
 }
