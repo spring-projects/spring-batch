@@ -30,7 +30,8 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.execution.job.SimpleJob;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
-import org.springframework.batch.execution.repository.dao.MapJobDao;
+import org.springframework.batch.execution.repository.dao.MapJobExecutionDao;
+import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.step.AbstractStep;
 import org.springframework.batch.execution.step.ItemOrientedStep;
@@ -48,7 +49,7 @@ public class SimpleJobTests extends TestCase {
 
 	private List recovered = new ArrayList();
 
-	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobDao(), new MapJobDao(), new MapStepDao());
+	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(), new MapStepDao());
 
 	private List processed = new ArrayList();
 
@@ -65,7 +66,8 @@ public class SimpleJobTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		job.setJobRepository(repository);
-		MapJobDao.clear();
+		MapJobInstanceDao.clear();
+		MapJobExecutionDao.clear();
 		MapStepDao.clear();
 	}
 

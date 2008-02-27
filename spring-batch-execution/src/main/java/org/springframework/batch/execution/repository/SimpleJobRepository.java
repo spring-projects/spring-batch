@@ -145,7 +145,6 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(job, "Job must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
-		List jobInstances = new ArrayList();
 		JobInstance jobInstance;
 
 		/*
@@ -157,15 +156,14 @@ public class SimpleJobRepository implements JobRepository {
 		 * has finished.
 		 */
 
-		jobInstances = jobInstanceDao.findJobInstances(job, jobParameters);
-		
-		if ((jobInstances.size() > 0) && (job.isRestartable() == false)) {
-			throw new BatchRestartException("JobInstance already exists and is not restartable");
-		}
+		jobInstance = jobInstanceDao.getJobInstance(job, jobParameters);
 
-		if (jobInstances.size() == 1) {
-			// One job was found
-			jobInstance = (JobInstance) jobInstances.get(0);
+		// existing job instance found
+		if (jobInstance != null) {
+			if (!job.isRestartable()) {
+				throw new BatchRestartException("JobInstance already exists and is not restartable");
+			}
+			
 			jobInstance.setJobExecutionCount(jobExecutionDao.getJobExecutionCount(jobInstance));
 			if (jobInstance.getJobExecutionCount() > job.getStartLimit()) {
 				throw new BatchRestartException("Restart Max exceeded for Job: " + jobInstance.toString());
@@ -190,14 +188,9 @@ public class SimpleJobRepository implements JobRepository {
 			}
 			jobInstance.setLastExecution(lastExecution);
 		}
-		else if (jobInstances.size() == 0) {
+		else {
 			// no job found, create one
 			jobInstance = jobInstanceDao.createJobInstance(job, jobParameters);
-		}
-		else {
-			// More than one job found, throw exception
-			throw new BatchRestartException("Error restarting job, more than one JobInstance found for: "
-					+ job.toString());
 		}
 
 		return generateJobExecution(jobInstance);

@@ -158,7 +158,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * @throws IllegalArgumentException if any {@link JobIdentifier} fields are
 	 * null.
 	 */
-	public List findJobInstances(final Job job, final JobParameters jobParameters) {
+	public JobInstance getJobInstance(final Job job, final JobParameters jobParameters) {
 
 		Assert.notNull(job, "Job must not be null.");
 		Assert.hasLength(job.getName(), "Job must have a name");
@@ -172,8 +172,15 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 				return jobInstance;
 			}
 		};
-
-		return getJdbcTemplate().query(getQuery(FIND_JOBS), parameters, rowMapper);
+		
+		List instances = getJdbcTemplate().query(getQuery(FIND_JOBS), parameters, rowMapper);
+		
+		if (instances.isEmpty()) {
+			return null;
+		} else {
+			Assert.state(instances.size() == 1);
+			return (JobInstance) instances.get(0);
+		}
 	}
 
 	/**

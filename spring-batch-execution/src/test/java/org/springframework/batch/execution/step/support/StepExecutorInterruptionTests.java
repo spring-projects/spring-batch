@@ -29,7 +29,8 @@ import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JobExecutionDao;
 import org.springframework.batch.execution.repository.dao.JobInstanceDao;
-import org.springframework.batch.execution.repository.dao.MapJobDao;
+import org.springframework.batch.execution.repository.dao.MapJobExecutionDao;
+import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
 import org.springframework.batch.execution.step.ItemOrientedStep;
@@ -44,16 +45,17 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private JobRepository jobRepository;
 
-	private JobInstanceDao jobInstanceDao = new MapJobDao();
+	private JobInstanceDao jobInstanceDao = new MapJobInstanceDao();
 	
-	private JobExecutionDao jobExecutionDao = new MapJobDao();
+	private JobExecutionDao jobExecutionDao = new MapJobExecutionDao();
 
 	private StepExecutionDao stepExecutionDao = new MapStepDao();
 
 	private ItemOrientedStep step;
 
 	public void setUp() throws Exception {
-		MapJobDao.clear();
+		MapJobInstanceDao.clear();
+		MapJobExecutionDao.clear();
 		MapStepDao.clear();
 		
 		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao);

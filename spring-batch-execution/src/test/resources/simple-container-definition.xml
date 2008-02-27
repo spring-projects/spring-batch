@@ -44,13 +44,17 @@
 
 	<bean id="simpleJobRepository"
 		class="org.springframework.batch.execution.repository.SimpleJobRepository">
-		<constructor-arg ref="jobDao" />
-		<constructor-arg ref="jobDao" />
+		<constructor-arg ref="jobInstanceDao" />
+		<constructor-arg ref="jobExecutionDao" />
 		<constructor-arg ref="stepDao" />
 	</bean>
 
-	<bean id="jobDao"
-		class="org.springframework.batch.execution.repository.dao.MapJobDao" />
+	<bean id="jobInstanceDao"
+		class="org.springframework.batch.execution.repository.dao.MapJobInstanceDao" />
+	<!-- init-method="clear"/-->
+	
+	<bean id="jobExecutionDao"
+		class="org.springframework.batch.execution.repository.dao.MapJobExecutionDao" />
 	<!-- init-method="clear"/-->
 
 	<bean id="stepDao"

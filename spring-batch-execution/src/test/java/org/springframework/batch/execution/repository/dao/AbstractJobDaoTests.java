@@ -99,23 +99,22 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 
 	public void testFindNonExistentJob() {
 		// No job should be found since it hasn't been created.
-		List jobs = jobInstanceDao.findJobInstances(new JobSupport("nonexistentJob"), jobParameters);
-		assertTrue(jobs.size() == 0);
+		JobInstance jobInstance = jobInstanceDao.getJobInstance(new JobSupport("nonexistentJob"), jobParameters);
+		assertNull(jobInstance);
 	}
 
 	public void testFindJob() {
 
-		List jobs = jobInstanceDao.findJobInstances(job, jobParameters);
-		assertTrue(jobs.size() == 1);
-		JobInstance tempJob = (JobInstance) jobs.get(0);
-		assertTrue(jobInstance.equals(tempJob));
-		assertEquals(jobParameters, tempJob.getJobParameters());
+		JobInstance instance = jobInstanceDao.getJobInstance(job, jobParameters);
+		assertNotNull(instance);
+		assertTrue(jobInstance.equals(instance));
+		assertEquals(jobParameters, instance.getJobParameters());
 	}
 
 	public void testFindJobWithNullRuntime() {
 
 		try {
-			jobInstanceDao.findJobInstances(null, null);
+			jobInstanceDao.getJobInstance(null, null);
 			fail();
 		}
 		catch (IllegalArgumentException ex) {
@@ -137,14 +136,13 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 		// JobInstance
 		JobParameters tempProps = new JobParametersBuilder().addString("job.key", "testKey1").toJobParameters();
 
-		List jobs;
-		jobs = jobInstanceDao.findJobInstances(scheduledJob, jobParameters);
-		assertEquals(1, jobs.size());
-		JobInstance jobInstance = (JobInstance) jobs.get(0);
-		assertEquals(jobParameters, jobInstance.getJobParameters());
+		JobInstance instance;
+		instance = jobInstanceDao.getJobInstance(scheduledJob, jobParameters);
+		assertNotNull(instance);
+		assertEquals(jobParameters, instance.getJobParameters());
 
-		jobs = jobInstanceDao.findJobInstances(scheduledJob, tempProps);
-		assertEquals(0, jobs.size());
+		instance = jobInstanceDao.getJobInstance(scheduledJob, tempProps);
+		assertNull(instance);
 
 	}
 
@@ -231,10 +229,10 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 		// Create job.
 		jobInstance = jobInstanceDao.createJobInstance(testDefaultJob, jobParameters);
 
-		List jobs = jobInstanceDao.findJobInstances(testDefaultJob, jobParameters);
+		JobInstance instance = jobInstanceDao.getJobInstance(testDefaultJob, jobParameters);
 
-		assertEquals(1, jobs.size());
-		assertEquals(jobParameters.getString("job.key"), ((JobInstance) jobs.get(0)).getJobParameters().getString(
+		assertNotNull(instance);
+		assertEquals(jobParameters.getString("job.key"), instance.getJobParameters().getString(
 				"job.key"));
 
 	}

@@ -71,10 +71,13 @@
 			ref="stepExecutionIncrementer" />
 	</bean>
 
-	<bean id="mapJobDao" lazy-init="true"
-		class="org.springframework.batch.execution.repository.dao.MapJobDao" />
+	<bean id="mapJobInstanceDao" lazy-init="true"
+		class="org.springframework.batch.execution.repository.dao.MapJobInstanceDao" />
+		
+	<bean id="mapJobExecutionDao" lazy-init="true"
+		class="org.springframework.batch.execution.repository.dao.MapJobExecutionDao" />
 
-	<bean id="mapStepDao" lazy-init="true"
+	<bean id="mapStepExecutionDao" lazy-init="true"
 		class="org.springframework.batch.execution.repository.dao.MapStepDao" />
 
 	<bean id="jdbcTemplate"

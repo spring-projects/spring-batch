@@ -226,36 +226,12 @@ public class SimpleJobRepositoryTests extends TestCase {
 ////		assertTrue(step.getStepExecutionCount() == 1);
 	}
 
-	// Test that a restartable job that has multiple instances throws an
-	// exception.
-	public void testFindRestartableJobWithMultipleInstances() throws Exception {
-
-		List jobs = new ArrayList();
-		jobs.add(databaseJob);
-		jobs.add(new JobInstance(new Long(127), jobParameters, jobConfiguration));
-		jobInstanceDao.findJobInstances(jobConfiguration, jobParameters);
-		jobInstanceDaoControl.setReturnValue(jobs);
-		jobInstanceDaoControl.replay();
-
-		try {
-			jobRepository.createJobExecution(jobConfiguration, jobParameters);
-			fail("Expected BatchRestartException");
-		}
-		catch (BatchRestartException e) {
-			// expected
-		}
-
-		jobInstanceDaoControl.verify();
-	}
-
 	public void testRestartJobStartLimitExceeded() throws Exception {
 
 		jobConfiguration.setStartLimit(1);
 
-		List jobs = new ArrayList();
-		jobInstanceDao.findJobInstances(jobConfiguration, jobParameters);
-		jobs.add(databaseJob);
-		jobInstanceDaoControl.setReturnValue(jobs);
+		jobInstanceDao.getJobInstance(jobConfiguration, jobParameters);
+		jobInstanceDaoControl.setReturnValue(databaseJob);
 		jobExecutionDao.getJobExecutionCount(databaseJob);
 		// return a greater execution count then the start limit, should throw
 		// exception

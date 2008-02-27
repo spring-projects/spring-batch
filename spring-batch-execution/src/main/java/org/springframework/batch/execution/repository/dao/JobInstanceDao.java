@@ -37,6 +37,6 @@ public interface JobInstanceDao {
 	 * @return List of {@link JobInstance} objects matching
 	 * {@link JobIdentifier}
 	 */
-	List findJobInstances(Job job, JobParameters jobParameters);
+	JobInstance getJobInstance(Job job, JobParameters jobParameters);
 
 }
