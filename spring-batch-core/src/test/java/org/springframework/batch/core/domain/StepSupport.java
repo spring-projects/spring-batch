@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.domain;
 
+import org.springframework.batch.core.domain.JobInterruptedException;
+import org.springframework.batch.core.domain.Step;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.beans.factory.BeanNameAware;
 
@@ -32,8 +35,6 @@ public class StepSupport implements Step, BeanNameAware {
 	private int startLimit = Integer.MAX_VALUE;
 
 	private boolean allowStartIfComplete;
-
-	private boolean saveExecutionContext = false;
 
 	/**
 	 * Default constructor for {@link StepSupport}.
@@ -100,14 +101,6 @@ public class StepSupport implements Step, BeanNameAware {
 	 */
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
 		this.allowStartIfComplete = allowStartIfComplete;
-	}
-
-	public void setSaveExecutionContext(boolean saveExecutionContext) {
-		this.saveExecutionContext = saveExecutionContext;
-	}
-
-	public boolean isSaveExecutionContext() {
-		return saveExecutionContext;
 	}
 
 	/**

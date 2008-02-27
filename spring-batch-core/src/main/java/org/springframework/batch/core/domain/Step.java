@@ -40,12 +40,6 @@ public interface Step {
 	boolean isAllowStartIfComplete();
 
 	/**
-	 * Flag to indicate if restart data needs to be saved for this step.
-	 * @return true if restart data should be saved
-	 */
-	boolean isSaveExecutionContext();
-
-	/**
 	 * @return the number of times a job can be started with the same
 	 * identifier.
 	 */

@@ -15,11 +15,11 @@
  */
 package org.springframework.batch.core.repository;
 
-import org.springframework.batch.core.domain.JobSupport;
+import org.springframework.batch.core.domain.Job;
 
 /**
  * Checked exception that indicates a name clash when registering
- * {@link JobSupport} instances.
+ * {@link Job} instances.
  * 
  * @author Dave Syer
  * 

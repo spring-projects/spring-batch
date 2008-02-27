@@ -16,7 +16,6 @@
 package org.springframework.batch.core.repository;
 
 import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobSupport;
 
 /**
  * A runtime service registry interface for registering job configurations by
@@ -28,9 +27,9 @@ import org.springframework.batch.core.domain.JobSupport;
 public interface JobRegistry extends JobLocator {
 
 	/**
-	 * Registers a {@link JobSupport} at runtime.
+	 * Registers a {@link Job} at runtime.
 	 * 
-	 * @param jobConfiguration the {@link JobSupport} to be registered
+	 * @param jobConfiguration the {@link Job} to be registered
 	 * 
 	 * @throws DuplicateJobException if a configuration with the
 	 * same name has already been registered.
@@ -38,10 +37,10 @@ public interface JobRegistry extends JobLocator {
 	void register(Job jobConfiguration) throws DuplicateJobException;
 
 	/**
-	 * Unregisters a previously registered {@link JobSupport}. If it was
+	 * Unregisters a previously registered {@link Job}. If it was
 	 * not previously registered there is no error.
 	 * 
-	 * @param jobConfiguration the {@link JobSupport} to unregister.
+	 * @param jobConfiguration the {@link Job} to unregister.
 	 */
 	void unregister(Job jobConfiguration);
 }

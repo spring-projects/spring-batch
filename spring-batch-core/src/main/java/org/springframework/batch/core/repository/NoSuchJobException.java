@@ -15,11 +15,11 @@
  */
 package org.springframework.batch.core.repository;
 
-import org.springframework.batch.core.domain.JobSupport;
+import org.springframework.batch.core.domain.Job;
 
 
 /**
- * Checked exception to indicate that a required {@link JobSupport} is not
+ * Checked exception to indicate that a required {@link Job} is not
  * available.
  * 
  * @author Dave Syer

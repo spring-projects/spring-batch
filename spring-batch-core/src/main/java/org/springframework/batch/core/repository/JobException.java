@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.core.repository;
 
-import org.springframework.batch.core.domain.JobSupport;
+import org.springframework.batch.core.domain.Job;
 
 /**
- * Base class for checked exceptions related to {@link JobSupport}
+ * Base class for checked exceptions related to {@link Job}
  * creation, registration or use.
  * 
  * @author Dave Syer
