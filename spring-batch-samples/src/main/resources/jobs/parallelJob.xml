@@ -32,6 +32,8 @@
 							<aop:scoped-proxy />
 							<property name="dataSource"
 								ref="dataSource" />
+							<property name="lobHandler"
+								ref="lobHandler" />
 							<property name="incrementer">
 								<bean parent="incrementerParent">
 									<property name="incrementerName"
@@ -50,6 +52,8 @@
 							class="org.springframework.batch.sample.item.reader.StagingItemReader"
 							scope="step">
 							<aop:scoped-proxy />
+							<property name="lobHandler"
+								ref="lobHandler" />
 							<property name="dataSource"
 								ref="dataSource" />
 						</bean>

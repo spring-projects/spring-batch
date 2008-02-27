@@ -58,6 +58,8 @@
 		<property name="ignoreUnresolvablePlaceholders" value="false" />
 		<property name="order" value="1" />
 	</bean>
+	
+	<bean id="lobHandler" class="${batch.lob.handler.class}"/>
 
 	<bean id="incrementerParent"
 		class="${batch.database.incrementer.class}" abstract="true">
