@@ -27,11 +27,10 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepSupport;
+import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobDao;
 import org.springframework.batch.execution.repository.dao.MapStepDao;
@@ -277,7 +276,6 @@ public class ItemOrientedStepTests extends TestCase {
 		Step step = new StepSupport("stepName");
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
 		itemOrientedStep.setItemReader(tasklet);
-		itemOrientedStep.setSaveExecutionContext(true);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
@@ -319,7 +317,6 @@ public class ItemOrientedStepTests extends TestCase {
 		Step step = new StepSupport("stepName");
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
 		itemOrientedStep.setItemReader(tasklet);
-		itemOrientedStep.setSaveExecutionContext(false);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
 
@@ -345,7 +342,6 @@ public class ItemOrientedStepTests extends TestCase {
 				return "foo";
 			}
 		});
-		itemOrientedStep.setSaveExecutionContext(true);
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
@@ -371,7 +367,6 @@ public class ItemOrientedStepTests extends TestCase {
 				return "foo";
 			}
 		});
-		itemOrientedStep.setSaveExecutionContext(true);
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 

@@ -25,8 +25,8 @@ import org.easymock.MockControl;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.core.task.TaskExecutor;
 

@@ -22,8 +22,8 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobSupport;
-import org.springframework.batch.core.domain.StepSupport;
+import org.springframework.batch.execution.job.JobSupport;
+import org.springframework.batch.execution.step.StepSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;

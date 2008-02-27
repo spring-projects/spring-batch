@@ -10,7 +10,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<bean id="test-job"
-		class="org.springframework.batch.core.domain.JobSupport">
+		class="org.springframework.batch.execution.job.JobSupport">
 		<property name="steps">
 			<bean id="step1"
 				class="org.springframework.batch.execution.step.ItemOrientedStep">

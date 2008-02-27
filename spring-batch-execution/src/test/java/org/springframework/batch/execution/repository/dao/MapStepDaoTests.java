@@ -21,10 +21,10 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepSupport;
+import org.springframework.batch.execution.job.JobSupport;
+import org.springframework.batch.execution.step.StepSupport;
 
 public class MapStepDaoTests extends TestCase {
 

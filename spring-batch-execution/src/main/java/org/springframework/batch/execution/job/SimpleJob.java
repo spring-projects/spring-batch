@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.job.simple;
+package org.springframework.batch.execution.job;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -25,7 +25,6 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
@@ -42,7 +41,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class SimpleJob extends JobSupport {
+public class SimpleJob extends AbstractJob {
 
 	private JobRepository jobRepository;
 

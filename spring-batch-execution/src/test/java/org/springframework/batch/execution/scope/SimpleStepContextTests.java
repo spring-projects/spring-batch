@@ -21,7 +21,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepSupport;
+import org.springframework.batch.execution.step.StepSupport;
 
 /**
  * @author Dave Syer

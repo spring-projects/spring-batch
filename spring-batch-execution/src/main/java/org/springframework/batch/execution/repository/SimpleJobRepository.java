@@ -24,7 +24,6 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.BatchRestartException;
@@ -88,7 +87,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * <p>
 	 * There are two ways in which the method determines if a job should be
 	 * created or an existing one should be returned. The first is
-	 * restartability. The {@link JobSupport} restartable property will be
+	 * restartability. The {@link Job} restartable property will be
 	 * checked first. If it is false, a new job will be created, regardless of
 	 * whether or not one exists. If it is true, the {@link JobInstanceDao} will
 	 * be checked to determine if the job already exists, if it does, it's steps
@@ -107,7 +106,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * <li>What happens then depends on how many existing job instances we
 	 * find:
 	 * <ul>
-	 * <li>If there are none, or the {@link JobSupport} is marked restartable,
+	 * <li>If there are none, or the {@link Job} is marked restartable,
 	 * then we create a new {@link JobInstance}</li>
 	 * <li>If there is more than one and the {@link JobSupport} is not marked
 	 * as restartable, it is an error. This could be caused by a job whose
@@ -131,7 +130,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * or if the platform does not support the higher isolation levels).
 	 * </p>
 	 * 
-	 * @see JobRepository#createJobExecution(JobSupport, JobParameters)
+	 * @see JobRepository#createJobExecution(Job, JobParameters)
 	 * 
 	 * @throws BatchRestartException if more than one JobInstance if found or if
 	 * JobInstance.getJobExecutionCount() is greater than Job.getStartLimit()

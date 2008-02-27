@@ -237,7 +237,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			StepSynchronizationManager.register(stepContext);
 			possiblyRegisterStreams();
 
-			if (isSaveExecutionContext() && isRestart && lastStepExecution != null) {
+			if (isRestart && lastStepExecution != null) {
 				stepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
 			}
 			else {

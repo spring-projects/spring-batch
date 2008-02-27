@@ -24,7 +24,7 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.JobSupport;
+import org.springframework.batch.execution.job.JobSupport;
 
 public class MapJobDaoTests extends TestCase {
 

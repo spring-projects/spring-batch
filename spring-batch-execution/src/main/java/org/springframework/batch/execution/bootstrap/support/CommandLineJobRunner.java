@@ -20,7 +20,6 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.repository.JobLocator;
@@ -81,7 +80,7 @@ import org.springframework.util.StringUtils;
  * 
  * <p>
  * <ul>
- * <li>jobPath: the xml application context containing a {@link JobSupport}
+ * <li>jobPath: the xml application context containing a {@link Job}
  * <li>jobName: the bean id of the job.
  * <li>jobLauncherPath: the xml application context containing a
  * {@link JobLauncher}
@@ -107,7 +106,7 @@ import org.springframework.util.StringUtils;
  * none is contained in the bean factory (it searches by type) then a 
  * {@link BeanDefinitionStoreException} will be thrown.  The same exception will also
  * be thrown if there is more than one present.  Assuming the JobLauncher has been
- * set correctly, the jobName argument will be used to obtain an actual {@link JobSupport}.
+ * set correctly, the jobName argument will be used to obtain an actual {@link Job}.
  * If a {@link JobLocator} has been set, then it will be used, if not the beanFactory
  * will be asked, using the jobName as the bean id.</p>
  * 
@@ -231,7 +230,7 @@ public class CommandLineJobRunner {
 	 *            <p>
 	 *            <ul>
 	 *            <li>jobPath: the xml application context containing a
-	 *            {@link JobSupport}
+	 *            {@link Job}
 	 *            <li>jobName: the bean id of the job.
 	 *            <li>jobLauncherPath: the xml application context containing a
 	 *            {@link JobLauncher}

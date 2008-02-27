@@ -25,13 +25,13 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.batch.execution.configuration.MapJobRegistry;
+import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.launch.JobLauncher;
+import org.springframework.batch.execution.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.PropertiesConverter;
 

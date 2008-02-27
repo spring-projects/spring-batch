@@ -20,10 +20,10 @@ import java.util.Collection;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobSupport;
 import org.springframework.batch.core.repository.DuplicateJobException;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.execution.configuration.MapJobRegistry;
+import org.springframework.batch.execution.job.JobSupport;
 
 /**
  * @author Dave Syer
@@ -34,7 +34,7 @@ public class MapJobRegistryTests extends TestCase {
 	private MapJobRegistry registry = new MapJobRegistry();
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobRegistry#unregister(org.springframework.batch.core.domain.JobSupport)}.
+	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobRegistry#unregister(org.springframework.batch.execution.job.JobSupport)}.
 	 * @throws Exception 
 	 */
 	public void testUnregister() throws Exception {

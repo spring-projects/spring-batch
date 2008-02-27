@@ -18,7 +18,7 @@
 		class="org.springframework.batch.execution.configuration.MapJobRegistry" />
 
 	<bean id="test-job"
-		class="org.springframework.batch.core.domain.JobSupport">
+		class="org.springframework.batch.execution.job.JobSupport">
 		<property name="steps">
 			<bean id="step1" class="org.springframework.batch.execution.step.ItemOrientedStep">
 				<property name="itemReader" ref="itemReader" />
@@ -44,17 +44,17 @@
 
 
 	<bean id="test-job-with-name"
-		class="org.springframework.batch.core.domain.JobSupport">
+		class="org.springframework.batch.execution.job.JobSupport">
 		<property name="name" value="foo" />
 	</bean>
 
 	<bean id="test-job-with-bean-name"
-		class="org.springframework.batch.core.domain.JobSupport">
+		class="org.springframework.batch.execution.job.JobSupport">
 		<property name="beanName" value="bar" />
 	</bean>
 
 	<bean id="abstract-job"
-		class="org.springframework.batch.core.domain.JobSupport"
+		class="org.springframework.batch.execution.job.JobSupport"
 		abstract="true" />
 
 	<bean id="test-job-with-parent" parent="abstract-job" />
@@ -66,7 +66,7 @@
 		p:name="bucket" />
 
 	<bean id="parent-job"
-		class="org.springframework.batch.core.domain.JobSupport" />
+		class="org.springframework.batch.execution.job.JobSupport" />
 
 	<bean id="test-job-with-concrete-parent" parent="parent-job"
 		p:name="maps" />

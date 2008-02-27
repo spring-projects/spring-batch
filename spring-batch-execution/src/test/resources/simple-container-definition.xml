@@ -18,7 +18,7 @@
 		class="org.springframework.batch.execution.configuration.MapJobRegistry" />
 
 	<bean id="simpleJob"
-		class="org.springframework.batch.execution.job.simple.SimpleJob"
+		class="org.springframework.batch.execution.job.SimpleJob"
 		abstract="true">
 		<property name="restartable" value="true" />
 		<property name="jobRepository" ref="simpleJobRepository" />
@@ -28,7 +28,6 @@
 		class="org.springframework.batch.execution.step.ItemOrientedStep"
 		abstract="true">
 		<property name="allowStartIfComplete" value="true" />
-		<property name="saveExecutionContext" value="false" />
 		<property name="exceptionHandler">
 			<bean
 				class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler">

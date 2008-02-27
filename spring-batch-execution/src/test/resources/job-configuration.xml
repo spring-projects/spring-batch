@@ -15,7 +15,7 @@
 	</bean>
 
 	<bean id="test-job"
-		class="org.springframework.batch.core.domain.JobSupport">
+		class="org.springframework.batch.execution.job.JobSupport">
 		<property name="steps">
 			<bean id="step1"
 				class="org.springframework.batch.execution.step.ItemOrientedStep">
