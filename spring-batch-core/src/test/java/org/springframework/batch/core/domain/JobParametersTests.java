@@ -24,6 +24,8 @@ public class JobParametersTests extends TestCase {
 	Map longMap;
 
 	Map dateMap;
+	
+	Map doubleMap;
 
 	Date date1 = new Date(4321431242L);
 
@@ -43,12 +45,16 @@ public class JobParametersTests extends TestCase {
 		longMap = new HashMap();
 		longMap.put("long.key1", new Long(1));
 		longMap.put("long.key2", new Long(2));
+		
+		doubleMap = new HashMap();
+		doubleMap.put("double.key1", new Double(1.1));
+		doubleMap.put("double.key2", new Double(2.2));
 
 		dateMap = new HashMap();
 		dateMap.put("date.key1", date1);
 		dateMap.put("date.key2", date2);
 
-		return new JobParameters(stringMap, longMap, dateMap);
+		return new JobParameters(stringMap, longMap, doubleMap, dateMap);
 	}
 
 	public void testBadLongKeyException() throws Exception {
@@ -57,7 +63,7 @@ public class JobParametersTests extends TestCase {
 		badLongMap.put(new Long(0), new Long(1));
 
 		try {
-			new JobParameters(stringMap, badLongMap, dateMap);
+			new JobParameters(stringMap, badLongMap, doubleMap, dateMap);
 			fail();
 		}
 		catch (IllegalArgumentException ex) {
@@ -71,7 +77,21 @@ public class JobParametersTests extends TestCase {
 		badLongMap.put("key", "bad long");
 
 		try {
-			new JobParameters(stringMap, badLongMap, dateMap);
+			new JobParameters(stringMap, badLongMap, doubleMap, dateMap);
+			fail();
+		}
+		catch (IllegalArgumentException ex) {
+			// expected
+		}
+	}
+	
+	public void testBadDoubleConstructorException() throws Exception {
+
+		Map badDoubleMap = new HashMap();
+		badDoubleMap.put("key", "bad double");
+
+		try {
+			new JobParameters(stringMap, longMap, badDoubleMap, dateMap);
 			fail();
 		}
 		catch (IllegalArgumentException ex) {
@@ -85,7 +105,7 @@ public class JobParametersTests extends TestCase {
 		badMap.put("key", new Integer(2));
 
 		try {
-			new JobParameters(badMap, longMap, dateMap);
+			new JobParameters(badMap, longMap, doubleMap, dateMap);
 			fail();
 		}
 		catch (IllegalArgumentException ex) {
@@ -99,7 +119,7 @@ public class JobParametersTests extends TestCase {
 		badMap.put("key", new java.sql.Date(System.currentTimeMillis()));
 
 		try {
-			new JobParameters(stringMap, longMap, badMap);
+			new JobParameters(stringMap, longMap, doubleMap, badMap);
 			fail();
 		}
 		catch (IllegalArgumentException ex) {
@@ -125,6 +145,16 @@ public class JobParametersTests extends TestCase {
 	public void testGetLongParameters() {
 		assertEquals(new Long(1), parameters.getLongParameters().get("long.key1"));
 		assertEquals(new Long(2), parameters.getLongParameters().get("long.key2"));
+	}
+	
+	public void testGetDouble() {
+		assertEquals(new Double(1.1), parameters.getDouble("double.key1"));
+		assertEquals(new Double(2.2), parameters.getDouble("double.key2"));
+	}
+	
+	public void testGetDoubleParameters() {
+		assertEquals(new Double(1.1), parameters.getDoubleParameters().get("double.key1"));
+		assertEquals(new Double(2.2), parameters.getDoubleParameters().get("double.key2"));
 	}
 
 	public void testGetDate() {
@@ -184,12 +214,16 @@ public class JobParametersTests extends TestCase {
 		longMap = new HashMap();
 		longMap.put("long.key2", new Long(2));
 		longMap.put("long.key1", new Long(1));
+		
+		doubleMap = new HashMap();
+		doubleMap.put("double.key2", new Double(2.2));
+		doubleMap.put("double.key1", new Double(1.1));
 
 		dateMap = new HashMap();
 		dateMap.put("date.key2", date2);
 		dateMap.put("date.key1", date1);
 
-		JobParameters testProps = new JobParameters(stringMap, longMap, dateMap);
+		JobParameters testProps = new JobParameters(stringMap, longMap, doubleMap, dateMap);
 
 		props = testProps.getParameters();
 		stringBuilder = new StringBuilder();

@@ -46,12 +46,17 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 				put("longKey", new Long(1));
 			}
 		};
+		Map doubleParams = new HashMap() {
+			{
+				put("doubleKey", new Double(1.1));
+			}
+		};
 		Map dateParams = new HashMap() {
 			{
 				put("dateKey", new Date(1));
 			}
 		};
-		JobParameters jobParams = new JobParameters(stringParams, longParams, dateParams);
+		JobParameters jobParams = new JobParameters(stringParams, longParams, doubleParams, dateParams);
 
 		JobExecution firstExecution = jobRepository.createJobExecution(job, jobParams);
 		firstExecution.setStartTime(new Date());

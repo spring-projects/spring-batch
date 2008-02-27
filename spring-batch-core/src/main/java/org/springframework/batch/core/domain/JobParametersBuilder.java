@@ -26,6 +26,8 @@ public class JobParametersBuilder {
 	private final Map stringMap;
 
 	private final Map longMap;
+	
+	private final Map doubleMap;
 
 	private final Map dateMap;
 
@@ -36,6 +38,7 @@ public class JobParametersBuilder {
 
 		this.stringMap = new LinkedHashMap();
 		this.longMap = new LinkedHashMap();
+		this.doubleMap = new LinkedHashMap();
 		this.dateMap = new LinkedHashMap();
 	}
 
@@ -70,11 +73,24 @@ public class JobParametersBuilder {
 	 * 
 	 * @param key - parameter accessor.
 	 * @param parameter - runtime parameter
-	 * @return a refernece to this object.
+	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addLong(String key, Long parameter) {
 		Assert.notNull(parameter, "Parameter must not be null.");
 		longMap.put(key, parameter);
+		return this;
+	}
+	
+	/**
+	 * Add a new Double parameter for the given key.
+	 * 
+	 * @param key - parameter accessor.
+	 * @param parameter - runtime parameter
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addDouble(String key, Double parameter) {
+		Assert.notNull(parameter, "Parameter must not be null.");
+		doubleMap.put(key, parameter);
 		return this;
 	}
 
@@ -85,6 +101,6 @@ public class JobParametersBuilder {
 	 * @return a valid JobRuntimeParameters object.
 	 */
 	public JobParameters toJobParameters() {
-		return new JobParameters(stringMap, longMap, dateMap);
+		return new JobParameters(stringMap, longMap, doubleMap, dateMap);
 	}
 }

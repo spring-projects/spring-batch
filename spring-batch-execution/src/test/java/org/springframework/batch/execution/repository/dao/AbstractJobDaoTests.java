@@ -42,8 +42,8 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 
 	protected JobExecutionDao jobExecutionDao;
 
-	protected JobParameters jobParameters = new JobParametersBuilder().addString("job.key", "jobKey").
-		addLong("long", new Long(1)).addDate("date", new Date(7)).toJobParameters();
+	protected JobParameters jobParameters = new JobParametersBuilder().addString("job.key", "jobKey").addLong("long",
+			new Long(1)).addDate("date", new Date(7)).addDouble("double", new Double(7.7)).toJobParameters();
 
 	protected JobInstance jobInstance;
 
@@ -226,7 +226,7 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 	}
 
 	public void testJobWithDefaultJobIdentifier() throws Exception {
-		
+
 		Job testDefaultJob = new JobSupport("testDefault");
 		// Create job.
 		jobInstance = jobInstanceDao.createJobInstance(testDefaultJob, jobParameters);

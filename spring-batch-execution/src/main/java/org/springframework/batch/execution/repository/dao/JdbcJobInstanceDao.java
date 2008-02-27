@@ -32,11 +32,11 @@ import org.springframework.util.Assert;
  */
 public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements JobInstanceDao, InitializingBean {
 
-	private static final String CREATE_JOB = "INSERT into %PREFIX%JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY)"
+	private static final String CREATE_JOB_INSTANCE = "INSERT into %PREFIX%JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY)"
 			+ " values (?, ?, ?)";
 
 	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_PARAMS(JOB_INSTANCE_ID, KEY_NAME, TYPE_CD, "
-			+ "STRING_VAL, DATE_VAL, LONG_VAL) values (?, ?, ?, ?, ?, ?)";
+			+ "STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL) values (?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String FIND_JOBS = "SELECT JOB_INSTANCE_ID from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?";
 
@@ -59,7 +59,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		Long jobId = new Long(jobIncrementer.nextLongValue());
 		Object[] parameters = new Object[] { jobId, job.getName(), createJobKey(jobParameters) };
-		getJdbcTemplate().update(getQuery(CREATE_JOB), parameters,
+		getJdbcTemplate().update(getQuery(CREATE_JOB_INSTANCE), parameters,
 				new int[] { Types.INTEGER, Types.VARCHAR, Types.VARCHAR });
 
 		insertJobParameters(jobId, jobParameters);
@@ -104,6 +104,15 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 				insertParameter(jobId, ParameterType.LONG, entry.getKey().toString(), entry.getValue());
 			}
 		}
+		
+		parameters = jobParameters.getDoubleParameters();
+		
+		if (!parameters.isEmpty()) {
+			for (Iterator it = parameters.entrySet().iterator(); it.hasNext();) {
+				Entry entry = (Entry) it.next();
+				insertParameter(jobId, ParameterType.DOUBLE, entry.getKey().toString(), entry.getValue());
+			}
+		}
 
 		parameters = jobParameters.getDateParameters();
 
@@ -123,16 +132,19 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		Object[] args = new Object[0];
 		int[] argTypes = new int[] { Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.TIMESTAMP,
-				Types.INTEGER };
+				Types.INTEGER, Types.DOUBLE };
 
 		if (type == ParameterType.STRING) {
-			args = new Object[] { jobId, key, type, value, new Timestamp(0L), new Long(0) };
+			args = new Object[] { jobId, key, type, value, new Timestamp(0L), new Long(0), new Double(0) };
 		}
 		else if (type == ParameterType.LONG) {
-			args = new Object[] { jobId, key, type, "", new Timestamp(0L), value };
+			args = new Object[] { jobId, key, type, "", new Timestamp(0L), value, new Double(0) };
+		}
+		else if (type == ParameterType.DOUBLE) {
+			args = new Object[] { jobId, key, type, "", new Timestamp(0L), new Long(0), value };
 		}
 		else if (type == ParameterType.DATE) {
-			args = new Object[] { jobId, key, type, "", value, new Long(0) };
+			args = new Object[] { jobId, key, type, "", value, new Long(0), new Double(0) };
 		}
 
 		getJdbcTemplate().update(getQuery(CREATE_JOB_PARAMETERS), args, argTypes);
@@ -196,8 +208,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		public static final ParameterType DATE = new ParameterType("DATE");
 
 		public static final ParameterType LONG = new ParameterType("LONG");
+		
+		public static final ParameterType DOUBLE = new ParameterType("DOUBLE");
 
-		private static final ParameterType[] VALUES = { STRING, DATE, LONG };
+		private static final ParameterType[] VALUES = { STRING, DATE, LONG, DOUBLE };
 
 		public static ParameterType getType(String typeAsString) {
 
