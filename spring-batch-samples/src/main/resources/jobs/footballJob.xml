@@ -17,7 +17,8 @@
 		<property name="steps">
 			<list>
 				<bean id="playerload" parent="simpleStep">
-					<property name="commitInterval" value="1"/>
+					<property name="commitInterval" value="${job.commit.interval}" />
+					<property name="startLimit" value="100" />
 					<property name="itemReader"
 						ref="playerFileItemReader" />
 					<property name="itemWriter">
@@ -34,7 +35,6 @@
 					</property>
 				</bean>
 				<bean id="gameLoad" parent="simpleStep">
-					<property name="commitInterval" value="1" />
 					<property name="itemReader"
 						ref="gameFileItemReader" />
 					<property name="itemWriter">
@@ -44,9 +44,10 @@
 								ref="dataSource" />
 						</bean>
 					</property>
+					<property name="commitInterval" value="${job.commit.interval}" />
 				</bean>
 				<bean id="playerSummarization" parent="simpleStep">
-					<property name="commitInterval" value="1" />
+					<property name="commitInterval" value="${job.commit.interval}" />
 					<property name="itemReader"
 						ref="playerSummarizationSource" />
 					<property name="itemWriter">
@@ -136,6 +137,7 @@
 			<value>
 				games.file.name=games-small.csv
 				player.file.name=player-small.csv
+				job.commit.interval=2
 			</value>
 		</property>
 		<property name="systemPropertiesModeName"
