@@ -5,13 +5,18 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-1.0.xsd">
 
-	<job-repository data-source="dataSource" db-type="db2"/>
+	<config>
+		<job-repository data-source="dataSource" db-type="derby"/>
 
-	<job id="processJob">
-		<tasklet-step id="process" tasklet=""/>
-	</job>
-	
+		<job id="processJob">
+			<tasklet-step id="process" tasklet="processorTasklet"/>
+		</job>
+	</config>
+
 	<beans:bean id="dataSource"
 			class="org.springframework.batch.execution.configuration.StubDataSource"/>
+
+	<beans:bean id="processorTasklet"
+		class="org.springframework.batch.execution.configuration.TaskletTestBean"/>
 
 </beans:beans>

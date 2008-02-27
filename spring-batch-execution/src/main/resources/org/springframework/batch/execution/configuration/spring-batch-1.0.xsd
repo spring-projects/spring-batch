@@ -4,60 +4,70 @@
 	targetNamespace="http://www.springframework.org/schema/batch"
 	elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
 
-	<xs:element name="job-repository">
+	<xs:element name="config">
 		<xs:annotation>
-			<xs:documentation><![CDATA[Defines a repository for storing and retrieving metadata for jobs and steps.]]></xs:documentation>
+			<xs:documentation><![CDATA[Defines a configuration for a batch job or a group of batch jobs.  This encapsulating element sets the default configuration for all jobs and steps defined inside.]]></xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
-			<xs:attribute name="data-source" type="xs:token" use="required">
-				<xs:annotation>
-					<xs:documentation><![CDATA[The datasource to use to back this repository.]]></xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
-			<xs:attribute name="db-type" use="required">
-				<xs:annotation>
-				<xs:documentation><![CDATA[The type of database this job repository will be communicating with.]]></xs:documentation>
-				</xs:annotation>
-				<xs:simpleType>
-					<xs:restriction base="xs:token">
-						<xs:enumeration value="db2"/>
-						<xs:enumeration value="derby"/>
-						<xs:enumeration value="hsql"/>
-						<xs:enumeration value="mysql"/>
-						<xs:enumeration value="oracle"/>
-						<xs:enumeration value="postgres"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:attribute>
-		</xs:complexType>
-	</xs:element>
-
-	<xs:element name="job">
-		<xs:annotation>
-			<xs:documentation><![CDATA[Defines a uniquely identified job that is referenced at runtime.]]></xs:documentation>
-		</xs:annotation>
-		<xs:complexType>
-	 		<xs:choice minOccurs="1" maxOccurs="unbounded">
-				<xs:element name="step" type="stepType">
+			<xs:sequence>
+				<xs:element name="job-repository" type="jobRepositoryType" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation><![CDATA[Defines a step that supports chunking]]></xs:documentation>
+						<xs:documentation><![CDATA[Defines a repository for storing and retrieving metadata for jobs and steps.]]></xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="tasklet-step" type="taskletStepType">
+				<xs:element name="job" type="jobType" minOccurs="1" maxOccurs="unbounded">
 					<xs:annotation>
-						<xs:documentation><![CDATA[Defines a step that executes a tasklet]]></xs:documentation>
+						<xs:documentation><![CDATA[Defines a uniquely identified job that is referenced at runtime.]]></xs:documentation>
 					</xs:annotation>
 				</xs:element>
-			</xs:choice>
-			<xs:attribute name="id" type="xs:token" use="required">
-				<xs:annotation>
-					<xs:documentation><![CDATA[The unique identifier to use in this step.  The id must be unique within the context of this job.]]></xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
+			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 
 	<!-- Types -->
+	<xs:complexType name="jobRepositoryType">
+		<xs:attribute name="data-source" type="xs:token" use="required">
+			<xs:annotation>
+				<xs:documentation><![CDATA[The datasource to use to back this repository.]]></xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="db-type" use="required">
+			<xs:annotation>
+			<xs:documentation><![CDATA[The type of database this job repository will be communicating with.]]></xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="db2"/>
+					<xs:enumeration value="derby"/>
+					<xs:enumeration value="hsql"/>
+					<xs:enumeration value="mysql"/>
+					<xs:enumeration value="oracle"/>
+					<xs:enumeration value="postgres"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="jobType">
+ 		<xs:choice minOccurs="1" maxOccurs="unbounded">
+			<xs:element name="step" type="stepType">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Defines a step that supports chunking]]></xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tasklet-step" type="taskletStepType">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Defines a step that executes a tasklet]]></xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+		<xs:attribute name="id" type="xs:token" use="required">
+			<xs:annotation>
+				<xs:documentation><![CDATA[The unique identifier to use in this step.  The id must be unique within the context of this job.]]></xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
 	 <xs:complexType name="stepType">
 		<xs:attribute name="id" type="xs:token" use="required">
 			<xs:annotation>

@@ -20,25 +20,18 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * <code>NamespaceHandler</code> for the <code>batch-execution</code> namespace.
+ * <code>NamespaceHandler</code> for the <code>batch</code> namespace.
  * 
  * <p>
- * Provides a {@link BeanDefinitionParser} for the <code>&lt;batch:job&gt;</code> tag. A <code>job</code> tag can
- * include nested <code>chunked-step</code> and <code>tasklet-step</code> tags.
- * 
- * <p>
- * Provides a {@link BeanDefinitionParser} for the <code>&lt;batch:job-repository&gt;</code> tag.
+ * Provides a {@link BeanDefinitionParser} for the <code>&lt;batch:config&gt;</code> tag. A <code>config</code> tag
+ * must include nested <code>job-repository</code> and <code>job</code> tags.
  * 
  * @author Ben Hale
  */
 public class BatchNamespaceHandler extends NamespaceHandlerSupport {
 
-	/**
-	 * Register the {@link BeanDefinitionParser BeanDefinitionParser} for the '<code>job</code>', tag.
-	 */
 	public void init() {
-		registerBeanDefinitionParser("job", new JobBeanDefinitionParser());
-		registerBeanDefinitionParser("job-repository", new JobRepositoryBeanDefinitionParser());
+		registerBeanDefinitionParser("config", new ConfigBeanDefinitionParser());
 	}
 
 }

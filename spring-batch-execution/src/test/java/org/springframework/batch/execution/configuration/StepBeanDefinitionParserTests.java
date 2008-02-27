@@ -23,55 +23,60 @@ import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class BatchNamespaceHandlerStepTests extends TestCase {
+public class StepBeanDefinitionParserTests extends TestCase {
 
 	private static final String PACKAGE = "org/springframework/batch/execution/configuration/";
 
 	public void testStepOk() {
-		new ClassPathXmlApplicationContext(PACKAGE + "BatchNamespaceHandlerStepOk.xml");
+		new ClassPathXmlApplicationContext(PACKAGE + "StepOk.xml");
 	}
-	
+
 	public void testStepMissingIteamReader() {
 		try {
-			new ClassPathXmlApplicationContext(PACKAGE + "BatchNamespaceHandlerStepMissingItemReader.xml");
+			new ClassPathXmlApplicationContext(PACKAGE + "StepMissingItemReader.xml");
 			fail("Expected BeanDefinitionParsingException");
-		} catch (BeanDefinitionParsingException e) {	}
+		} catch (BeanDefinitionParsingException e) {
+		}
 	}
-	
+
 	public void testStepMissingItemWriter() {
 		try {
-			new ClassPathXmlApplicationContext(PACKAGE + "BatchNamespaceHandlerStepMissingItemWriter.xml");
+			new ClassPathXmlApplicationContext(PACKAGE + "StepMissingItemWriter.xml");
 			fail("Expected BeanDefinitionParsingException");
-		} catch (BeanDefinitionParsingException e) {	}
+		} catch (BeanDefinitionParsingException e) {
+		}
 	}
-	
+
 	public void testStepMissingTransactionManager() {
 		try {
-			new ClassPathXmlApplicationContext(PACKAGE + "BatchNamespaceHandlerStepMissingTransactionManager.xml");
+			new ClassPathXmlApplicationContext(PACKAGE + "StepMissingTransactionManager.xml");
 			fail("Expected BeanDefinitionParsingException");
-		} catch (BeanDefinitionParsingException e) {	}
+		} catch (BeanDefinitionParsingException e) {
+		}
 	}
-	
+
 	public void testStepSpecificTransactionManager() {
-		new ClassPathXmlApplicationContext(PACKAGE + "BatchNamespaceHandlerStepSpecificTransactionManager.xml");
+		new ClassPathXmlApplicationContext(PACKAGE + "StepSpecificTransactionManager.xml");
 	}
-	
+
 	public void testStepRerunAlways() {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext(PACKAGE + "BatchNamespaceHandlerStepRerunAlways.xml");
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(PACKAGE
+		        + "StepRerunAlways.xml");
 		ItemOrientedStep step = (ItemOrientedStep) ctx.getBean("process");
 		assertEquals(Integer.MAX_VALUE, step.getStartLimit());
 		assertTrue(step.isAllowStartIfComplete());
 	}
-	
+
 	public void testStepRerunNever() {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext(PACKAGE + "BatchNamespaceHandlerStepRerunNever.xml");
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(PACKAGE + "StepRerunNever.xml");
 		ItemOrientedStep step = (ItemOrientedStep) ctx.getBean("process");
 		assertEquals(1, step.getStartLimit());
 		assertFalse(step.isAllowStartIfComplete());
 	}
-	
+
 	public void testStepRerunIncomplete() {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext(PACKAGE + "BatchNamespaceHandlerStepRerunIncomplete.xml");
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(PACKAGE
+		        + "StepRerunIncomplete.xml");
 		ItemOrientedStep step = (ItemOrientedStep) ctx.getBean("process");
 		assertEquals(Integer.MAX_VALUE, step.getStartLimit());
 		assertFalse(step.isAllowStartIfComplete());
