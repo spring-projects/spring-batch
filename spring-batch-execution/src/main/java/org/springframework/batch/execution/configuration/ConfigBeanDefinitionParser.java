@@ -16,12 +16,17 @@
 
 package org.springframework.batch.execution.configuration;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.batch.execution.job.SimpleJob;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.execution.repository.dao.JdbcJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.JdbcStepExecutionDao;
 import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.execution.step.TaskletStep;
+import org.springframework.batch.execution.step.support.LimitCheckingItemSkipPolicy;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
@@ -50,7 +55,7 @@ import org.w3c.dom.NodeList;
 public class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 
 	private static final String JOB_REPOSITORY_ELEMENT = "job-repository";
-	
+
 	private static final String JOB_REPOSITORY_BEAN_NAME = "_jobRepository";
 
 	private static final String DATA_SOURCE_ATT = "data-source";
@@ -70,33 +75,31 @@ public class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 	private static final String DB_TYPE_POSTGRES = "postgres";
 
 	private static final String JOB_ELEMENT = "job";
-	
+
 	private static final String ID_ATT = "id";
-	
+
 	private static final String RERUN_ATT = "rerun";
-	
+
 	private static final String RERUN_ALWAYS = "always";
-	
+
 	private static final String RERUN_NEVER = "never";
-	
+
 	private static final String RERUN_INCOMPLETE = "incomplete";
 
 	private static final String STEP_ELEMENT = "step";
-	
+
 	private static final String SIZE_ATT = "size";
-	
+
 	private static final String TRANSACTION_MANAGER_ATT = "transaction-manager";
-	
+
 	private static final String ITEM_READER_ATT = "item-reader";
-	
+
 	private static final String ITEM_WRITER_ATT = "item-writer";
-	
-	private static final String INPUT_SKIP_LIMIT_ATT = "input-skip-limit";
-	
-	private static final String OUTPUT_SKIP_LIMIT_ATT = "output-skip-limit";
+
+	private static final String SKIP_LIMIT_ATT = "skip-limit";
 
 	private static final String TASKLET_STEP_ELEMENT = "tasklet-step";
-	
+
 	private static final String TASKLET_ATT = "tasklet";
 
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
@@ -218,28 +221,43 @@ public class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 	}
 
 	private void parseJob(Element jobEle, ParserContext parserContext) {
+		AbstractBeanDefinition jobDef = createJobBeanDefinition(jobEle, parserContext);
+		List steps = new ArrayList();
+
 		NodeList childNodes = jobEle.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node child = childNodes.item(i);
 			if (child.getNodeType() == Node.ELEMENT_NODE) {
 				String localName = child.getLocalName();
 				if (STEP_ELEMENT.equals(localName)) {
-					parseStep((Element) child, parserContext);
+					String id = parseStep((Element) child, parserContext);
+					steps.add(new RuntimeBeanReference(id));
 				} else if (TASKLET_STEP_ELEMENT.equals(localName)) {
-					parseTaskletStep((Element) child, parserContext);
+					String id = parseTaskletStep((Element) child, parserContext);
+					steps.add(new RuntimeBeanReference(id));
 				}
 			}
 		}
+		
+		jobDef.getPropertyValues().addPropertyValue("steps", steps);
 	}
-	
-	private void parseStep(Element stepEle, ParserContext parserContext) {
+
+	private AbstractBeanDefinition createJobBeanDefinition(Element jobEle, ParserContext parserContext) {
+		RootBeanDefinition jobDef = new RootBeanDefinition(SimpleJob.class);
+		jobDef.setSource(parserContext.extractSource(jobEle));
+		jobDef.getPropertyValues().addPropertyValue("jobRepository", JOB_REPOSITORY_BEAN_NAME);
+		return jobDef;
+	}
+
+	private String parseStep(Element stepEle, ParserContext parserContext) {
 		AbstractBeanDefinition stepDef = createStepBeanDefinition(stepEle, parserContext);
 		String id = stepEle.getAttribute(ID_ATT);
 
 		if (StringUtils.hasText(id)) {
 			parserContext.getRegistry().registerBeanDefinition(id, stepDef);
+			return id;
 		} else {
-			parserContext.getReaderContext().registerWithGeneratedName(stepDef);
+			return parserContext.getReaderContext().registerWithGeneratedName(stepDef);
 		}
 	}
 
@@ -256,7 +274,7 @@ public class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 		} else {
 			propertyValues.addPropertyValue("transactionManager", new RuntimeBeanReference(transactionManager));
 		}
-		
+
 		String itemReader = stepElement.getAttribute(ITEM_READER_ATT);
 		if (!StringUtils.hasText(itemReader)) {
 			parserContext.getReaderContext().error("'item-reader' attribute contains empty value", stepElement);
@@ -270,16 +288,10 @@ public class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			propertyValues.addPropertyValue("itemWriter", new RuntimeBeanReference(itemWriter));
 		}
 
-		if (stepElement.hasAttribute(INPUT_SKIP_LIMIT_ATT)) {
-			String inputSkipLimit = stepElement.getAttribute(INPUT_SKIP_LIMIT_ATT);
-			propertyValues.addPropertyValue("skipLimit", Integer.valueOf(inputSkipLimit));
+		if (stepElement.hasAttribute(SKIP_LIMIT_ATT)) {
+			String skipLimit = stepElement.getAttribute(SKIP_LIMIT_ATT);
+			propertyValues.addPropertyValue("skipLimit", createSkipLimitBeanDefinition(Integer.valueOf(skipLimit)));
 		}
-
-		// TODO: Create difference between input skip limit and output skip limit
-		// if (stepElement.hasAttribute(ATT_OUTPUT_SKIP_LIMIT)) {
-		// String outputSkipLimit = stepElement.getAttribute(ATT_OUTPUT_SKIP_LIMIT);
-		// propertyValues.addPropertyValue(PROP_OUTPUT_SKIP_LIMIT, Integer.valueOf(outputSkipLimit));
-		// }
 
 		String rerun = stepElement.getAttribute(RERUN_ATT);
 		setPropertiesForRerun(rerun, propertyValues);
@@ -287,15 +299,22 @@ public class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 		return stepDef;
 	}
 
-	private void parseTaskletStep(Element taskletStepEle, ParserContext parserContext) {
+	private AbstractBeanDefinition createSkipLimitBeanDefinition(Integer skipLimit) {
+		RootBeanDefinition skipLimitDef = new RootBeanDefinition(LimitCheckingItemSkipPolicy.class);
+		skipLimitDef.getConstructorArgumentValues().addGenericArgumentValue(skipLimit);
+		return skipLimitDef;
+	}
+
+	private String parseTaskletStep(Element taskletStepEle, ParserContext parserContext) {
 		AbstractBeanDefinition stepDef = createTaskletStepBeanDefinition(taskletStepEle, parserContext);
 
 		String id = taskletStepEle.getAttribute(ID_ATT);
 
 		if (StringUtils.hasText(id)) {
 			parserContext.getRegistry().registerBeanDefinition(id, stepDef);
+			return id;
 		} else {
-			parserContext.getReaderContext().registerWithGeneratedName(stepDef);
+			return parserContext.getReaderContext().registerWithGeneratedName(stepDef);
 		}
 	}
 

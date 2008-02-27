@@ -96,14 +96,9 @@
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attributeGroup ref="rerun.enum"/>
-		<xs:attribute name="input-skip-limit" type="xs:nonNegativeInteger" use="optional">
+		<xs:attribute name="skip-limit" type="xs:nonNegativeInteger" use="optional">
 			<xs:annotation>
 				<xs:documentation><![CDATA[The maximum number of items the ItemReader can skip before this step is marked as a failure.  The default is no limit.]]></xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="output-skip-limit" type="xs:nonNegativeInteger" use="optional">
-			<xs:annotation>
-				<xs:documentation><![CDATA[The maximum number of items the ItemWriter can skip before this step is marked as a failure.  The default is no limit.]]></xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
