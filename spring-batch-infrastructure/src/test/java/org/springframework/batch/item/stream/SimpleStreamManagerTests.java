@@ -129,6 +129,22 @@ public class SimpleStreamManagerTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#commit(org.springframework.transaction.TransactionStatus)}.
 	 */
+	public void testCloseUnregisters() {
+		manager.register(new ItemStreamSupport() {
+			public void open(ExecutionContext executionContext) throws StreamException {
+				list.add("bar");
+			}
+		});
+		manager.open(null);
+		manager.close(null);
+		manager.open(null);
+		assertEquals(1, list.size());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#commit(org.springframework.transaction.TransactionStatus)}.
+	 */
 	public void testCommitWithoutMark() {
 		manager.register(new ItemStreamSupport() {
 			public void update(ExecutionContext executionContext) {

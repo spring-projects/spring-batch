@@ -51,8 +51,6 @@ public class SimpleTradeWriter extends AbstractItemWriter implements ItemStream 
 	 */
 	private int tradeCount = 0;
 	
-	private ExecutionContext executionContext;
-
 	/**
 	 * The input template is read using the readAndMap method, which accepts a
 	 * FieldSetMapper. This call returns a Trade object, which is then
@@ -70,7 +68,6 @@ public class SimpleTradeWriter extends AbstractItemWriter implements ItemStream 
 	}
 	
 	public void open(ExecutionContext context) throws StreamException {
-		this.executionContext = context;
 	}
 
 	/* (non-Javadoc)

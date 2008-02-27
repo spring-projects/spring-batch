@@ -102,6 +102,7 @@ public class SimpleStreamManager implements StreamManager {
 				ItemStream itemStream = (ItemStream) it.next();
 				itemStream.close(executionContext);
 			}
+			streams.clear();
 		}
 	}
 

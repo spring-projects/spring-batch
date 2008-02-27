@@ -18,8 +18,6 @@
 			<list>
 				<bean id="playerload" parent="simpleStep">
 					<property name="commitInterval" value="1"/>
-					<property name="startLimit" value="100" />
-					<property name="allowStartIfComplete" value="false" />
 					<property name="itemReader"
 						ref="playerFileItemReader" />
 					<property name="itemWriter">
@@ -37,7 +35,6 @@
 				</bean>
 				<bean id="gameLoad" parent="simpleStep">
 					<property name="commitInterval" value="1" />
-					<property name="startLimit" value="100" />
 					<property name="itemReader"
 						ref="gameFileItemReader" />
 					<property name="itemWriter">
@@ -50,7 +47,6 @@
 				</bean>
 				<bean id="playerSummarization" parent="simpleStep">
 					<property name="commitInterval" value="1" />
-					<property name="startLimit" value="100" />
 					<property name="itemReader"
 						ref="playerSummarizationSource" />
 					<property name="itemWriter">

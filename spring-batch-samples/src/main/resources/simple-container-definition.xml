@@ -102,6 +102,7 @@
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="allowStartIfComplete" value="true" />
+		<property name="startLimit" value="100"/>
 
 		<property name="exceptionHandler">
 			<bean

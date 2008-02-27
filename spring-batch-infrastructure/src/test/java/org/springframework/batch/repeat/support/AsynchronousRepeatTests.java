@@ -91,8 +91,8 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		// Shouldn't be necessary to wait:
 		// Thread.sleep(500);
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
-		// Because of the throttling and queing internally to a TaskExecutor,
-		// more than one thread wil be used - the number used is (as of writing)
+		// Because of the throttling and queueing internally to a TaskExecutor,
+		// more than one thread will be used - the number used is (as of writing)
 		// one less than the throttle limit of the template.
 		// TODO: see if we can get it to use only one thread?
 		assertTrue(threadNames.size() >= 1);
