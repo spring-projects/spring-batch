@@ -26,9 +26,9 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.step.StepSupport;
 
-public class MapStepDaoTests extends TestCase {
+public class MapStepExecutionDaoTests extends TestCase {
 
-	MapStepDao dao = new MapStepDao();
+	MapStepExecutionDao dao = new MapStepExecutionDao();
 
 	private JobInstance job;
 
@@ -38,7 +38,7 @@ public class MapStepDaoTests extends TestCase {
 	static long jobId = 100;
 
 	protected void setUp() throws Exception {
-		MapStepDao.clear();
+		MapStepExecutionDao.clear();
 		job = new JobInstance(new Long(jobId++), new JobParameters(), new JobSupport("testJob"));
 		step = new StepSupport("foo");
 	}

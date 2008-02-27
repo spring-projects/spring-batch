@@ -78,7 +78,7 @@
 		class="org.springframework.batch.execution.repository.dao.MapJobExecutionDao" />
 
 	<bean id="mapStepExecutionDao" lazy-init="true"
-		class="org.springframework.batch.execution.repository.dao.MapStepDao" />
+		class="org.springframework.batch.execution.repository.dao.MapStepExecutionDao" />
 
 	<bean id="jdbcTemplate"
 		class="org.springframework.jdbc.core.JdbcTemplate">

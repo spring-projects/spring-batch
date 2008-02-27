@@ -25,7 +25,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.Assert;
 
-public class MapStepDao implements StepExecutionDao {
+public class MapStepExecutionDao implements StepExecutionDao {
 
 	private static Map executionsByJobExecutionId;
 
@@ -46,7 +46,12 @@ public class MapStepDao implements StepExecutionDao {
 		return (ExecutionContext) contextsByStepExecutionId.get(stepExecution.getId());
 	}
 
-	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+	public void saveExecutionContext(StepExecution stepExecution) {
+		contextsByStepExecutionId.put(stepExecution.getId(), stepExecution.getExecutionContext());
+	}
+
+	public void updateExecutionContext(StepExecution stepExecution) {
+		Assert.notNull(contextsByStepExecutionId.get(stepExecution.getId()), "execution context should already be saved");
 		contextsByStepExecutionId.put(stepExecution.getId(), stepExecution.getExecutionContext());
 	}
 
@@ -76,6 +81,11 @@ public class MapStepDao implements StepExecutionDao {
 		}
 
 		return (StepExecution) executions.get(step.getName());
+	}
+
+	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

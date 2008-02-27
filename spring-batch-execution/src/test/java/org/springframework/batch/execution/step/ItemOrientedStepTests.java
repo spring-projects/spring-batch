@@ -33,7 +33,7 @@ import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
-import org.springframework.batch.execution.repository.dao.MapStepDao;
+import org.springframework.batch.execution.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
@@ -195,7 +195,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 	public void testRepository() throws Exception {
 
-		SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(), new MapStepDao());
+		SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(), new MapStepExecutionDao());
 		itemOrientedStep.setJobRepository(repository);
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);

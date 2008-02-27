@@ -1,6 +1,7 @@
 package org.springframework.batch.execution.repository.dao;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -8,8 +9,11 @@ import java.util.Set;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
-import org.springframework.util.Assert;
 
+/**
+ * In-memory implementation of {@link JobExecutionDao}.
+ * 
+ */
 public class MapJobExecutionDao implements JobExecutionDao {
 
 	private static Map executionsByJobInstanceId = TransactionAwareProxyFactory.createTransactionalMap();
@@ -22,8 +26,9 @@ public class MapJobExecutionDao implements JobExecutionDao {
 
 	public int getJobExecutionCount(JobInstance jobInstance) {
 		Set executions = (Set) executionsByJobInstanceId.get(jobInstance.getId());
-		if (executions == null)
+		if (executions == null) {
 			return 0;
+		}
 		return executions.size();
 	}
 
@@ -48,11 +53,24 @@ public class MapJobExecutionDao implements JobExecutionDao {
 	}
 
 	public void updateJobExecution(JobExecution jobExecution) {
-		Assert.notNull(jobExecution.getJobId());
+		// no-op
 	}
 
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
-		Assert.notNull(jobInstance.getId());
-		return null;
+		Set executions = (Set) executionsByJobInstanceId.get(jobInstance.getId());
+		if (executions == null) {
+			return null;
+		}
+		JobExecution lastExec = null;
+		for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
+			JobExecution exec = (JobExecution) iterator.next();
+			if (lastExec == null) {
+				lastExec = exec;
+			}
+			if (lastExec.getStartTime().getTime() < exec.getStartTime().getTime()) {
+				lastExec = exec;
+			}
+		}
+		return lastExec;
 	}
 }

@@ -35,7 +35,7 @@ import org.springframework.batch.execution.repository.dao.JobExecutionDao;
 import org.springframework.batch.execution.repository.dao.JobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
-import org.springframework.batch.execution.repository.dao.MapStepDao;
+import org.springframework.batch.execution.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
 import org.springframework.batch.execution.step.AbstractStep;
 import org.springframework.batch.io.exception.BatchCriticalException;
@@ -43,7 +43,7 @@ import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * Tests for DefaultJobLifecycle. MapJobDao and MapStepDao are used instead of a
+ * Tests for DefaultJobLifecycle. MapJobDao and MapStepExecutionDao are used instead of a
  * mock repository to test that status is being stored correctly.
  * 
  * @author Lucas Ward
@@ -85,10 +85,10 @@ public class SimpleJobTests extends TestCase {
 
 		MapJobInstanceDao.clear();
 		MapJobExecutionDao.clear();
-		MapStepDao.clear();
+		MapStepExecutionDao.clear();
 		jobInstanceDao = new MapJobInstanceDao();
 		jobExecutionDao = new MapJobExecutionDao();
-		stepExecutionDao = new MapStepDao();
+		stepExecutionDao = new MapStepExecutionDao();
 		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao);
 		job = new SimpleJob();
 		job.setJobRepository(jobRepository);

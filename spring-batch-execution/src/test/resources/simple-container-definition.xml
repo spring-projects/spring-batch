@@ -58,7 +58,7 @@
 	<!-- init-method="clear"/-->
 
 	<bean id="stepDao"
-		class="org.springframework.batch.execution.repository.dao.MapStepDao" />
+		class="org.springframework.batch.execution.repository.dao.MapStepExecutionDao" />
 	<!-- init-method="clear"/-->
 
 	<bean
