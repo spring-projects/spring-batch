@@ -180,7 +180,7 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 		Exception fatalException = null;
 		try {
 
-			listener.open(stepExecution.getExecutionContext());
+			listener.open(stepExecution.getJobParameters());
 			exitStatus =  tasklet.execute();
 
 			try {
@@ -204,14 +204,14 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 			throw new BatchCriticalException(e);
 		}
 		finally {
-			stepExecution.setExitStatus(exitStatus);
-			stepExecution.setEndTime(new Date());
 			try {
-				listener.close();
+				exitStatus = exitStatus.and(listener.close());
 			}
 			catch (Exception e) {
 				logger.error("Encountered an error on listener close.");
 			}
+			stepExecution.setExitStatus(exitStatus);
+			stepExecution.setEndTime(new Date());
 			try {
 				jobRepository.saveOrUpdate(stepExecution);
 			}

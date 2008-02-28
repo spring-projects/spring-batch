@@ -20,8 +20,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepListener;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -71,15 +71,15 @@ public class CompositeStepListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.interceptor.CompositeStepListener#open(org.springframework.batch.item.ExecutionContext)}.
+	 * {@link org.springframework.batch.core.interceptor.CompositeStepListener#open(JobParameters)}.
 	 */
 	public void testOpen() {
 		listener.setListener(new StepListenerSupport() {
-			public void open(ExecutionContext executionContext) {
+			public void open(JobParameters jobParameters) {
 				list.add("foo");
 			}
 		});
-		listener.open(new ExecutionContext());
+		listener.open(new JobParameters());
 		assertEquals(1, list.size());
 	}
 

@@ -20,8 +20,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepListener;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -63,27 +63,26 @@ public class CompositeStepListener implements StepListener {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#close()
 	 */
 	public ExitStatus close() {
-		ExitStatus status = ExitStatus.CONTINUABLE;
+		ExitStatus status = null;
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			StepListener listener = (StepListener) iterator.next();
-			status = status.and(listener.close());
+			ExitStatus close = listener.close();
+			status = status!=null ? status.and(close): close;
 		}
 		return status;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#open(org.springframework.batch.item.ExecutionContext)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.StepListener#open(org.springframework.batch.core.domain.JobParameters)
 	 */
-	public void open(ExecutionContext executionContext) {
+	public void open(JobParameters jobParameters) {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			StepListener listener = (StepListener) iterator.next();
-			listener.open(executionContext);
+			listener.open(jobParameters);
 		}
 	}
 

@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
 public class StepExecution extends Entity {
 
 	private JobExecution jobExecution;
-	
+
 	private Step step;
 
 	private BatchStatus status = BatchStatus.STARTING;
@@ -47,9 +47,9 @@ public class StepExecution extends Entity {
 	private int commitCount = 0;
 
 	private int rollbackCount = 0;
-	
+
 	private int skipCount = 0;
-	
+
 	private int retryCount = 0;
 
 	private Date startTime = new Date(System.currentTimeMillis());
@@ -258,7 +258,7 @@ public class StepExecution extends Entity {
 	 * @see org.springframework.batch.container.common.domain.Entity#equals(java.lang.Object)
 	 */
 	public boolean equals(Object obj) {
-		//TODO make sure the equality makes sense
+		// TODO make sure the equality makes sense
 		Object jobExecutionId = getJobExecutionId();
 		if (step == null && jobExecutionId == null || !(obj instanceof StepExecution) || getId() == null) {
 			return super.equals(obj);
@@ -268,7 +268,7 @@ public class StepExecution extends Entity {
 			return jobExecutionId.equals(other.getJobExecutionId());
 		}
 		return step.getName().equals(other.getStepName())
-		        && (jobExecutionId == null || jobExecutionId.equals(other.getJobExecutionId()));
+				&& (jobExecutionId == null || jobExecutionId.equals(other.getJobExecutionId()));
 	}
 
 	/*
@@ -279,12 +279,12 @@ public class StepExecution extends Entity {
 	public int hashCode() {
 		Object jobExecutionId = getJobExecutionId();
 		return super.hashCode() + 31 * (step.getName() != null ? step.getName().hashCode() : 0) + 91
-		        * (jobExecutionId != null ? jobExecutionId.hashCode() : 0);
+				* (jobExecutionId != null ? jobExecutionId.hashCode() : 0);
 	}
 
 	public String toString() {
-		return super.toString() + ", name=" + step.getName() + ", taskCount=" + taskCount + ", commitCount=" + commitCount
-		        + ", rollbackCount=" + rollbackCount;
+		return super.toString() + ", name=" + step.getName() + ", taskCount=" + taskCount + ", commitCount="
+				+ commitCount + ", rollbackCount=" + rollbackCount;
 	}
 
 	/**
@@ -305,7 +305,7 @@ public class StepExecution extends Entity {
 	 * Accessor for the execution context information of the enclosing job.
 	 * 
 	 * @return the {@link JobExecution} that was used to start this step
-	 *         execution.
+	 * execution.
 	 */
 	public JobExecution getJobExecution() {
 		return jobExecution;
@@ -357,25 +357,38 @@ public class StepExecution extends Entity {
 	public void setTerminateOnly() {
 		this.terminateOnly = true;
 	}
-	
+
 	public void setSkipCount(int skipCount) {
 		this.skipCount = skipCount;
 	}
-	
+
 	public int getSkipCount() {
 		return skipCount;
 	}
-	
-	public void incrementSkipCount(){
+
+	public void incrementSkipCount() {
 		skipCount++;
 	}
-	
+
 	public void setRetryCount(int retryCount) {
 		this.retryCount = retryCount;
 	}
-	
+
 	public int getRetryCount() {
 		return retryCount;
+	}
+
+	/**
+	 * Convenience method to get the current job parameters.
+	 * 
+	 * @return the {@link JobParameters} from the enclosing job, or empty if
+	 * that is null
+	 */
+	public JobParameters getJobParameters() {
+		if (jobExecution == null || jobExecution.getJobInstance() == null) {
+			return new JobParameters();
+		}
+		return jobExecution.getJobInstance().getJobParameters();
 	}
 
 }

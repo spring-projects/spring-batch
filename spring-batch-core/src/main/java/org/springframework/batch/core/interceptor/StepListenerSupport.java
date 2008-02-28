@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.interceptor;
 
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepListener;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -35,7 +35,7 @@ public class StepListenerSupport implements StepListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#open(org.springframework.batch.item.ExecutionContext)
 	 */
-	public void open(ExecutionContext executionContext) {
+	public void open(JobParameters jobParameters) {
 	}
 
 }

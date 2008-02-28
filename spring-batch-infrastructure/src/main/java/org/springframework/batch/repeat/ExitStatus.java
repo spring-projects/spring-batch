@@ -126,14 +126,18 @@ public class ExitStatus implements Serializable {
 
 	/**
 	 * Create a new {@link ExitStatus} with a logical combination of the
-	 * continuable flag, and a con.
+	 * continuable flag, and a concatenation of the codes. If the input is null
+	 * we just return this.
 	 * 
 	 * @param status an {@link ExitStatus} to combine with this one.
 	 * @return a new {@link ExitStatus} with {@link #isContinuable()} the
 	 * logical and of the current value and the argument provided.
 	 */
 	public ExitStatus and(ExitStatus status) {
-		return and(status.continuable).addExitCode(status.exitCode).addExitDescription(status.exitDescription);
+		if (status == null) {
+			return this;
+		}
+		return and(status.continuable).replaceExitCode(status.exitCode).addExitDescription(status.exitDescription);
 	}
 
 	/*
@@ -168,16 +172,13 @@ public class ExitStatus implements Serializable {
 
 	/**
 	 * Add an exit code to an existing {@link ExitStatus}. If there is already
-	 * a code present the two will be concatenated with a semicolon.
+	 * a code present tit will be replaced.
 	 * 
 	 * @param code the code to add
 	 * @return a new {@link ExitStatus} with the same properties but a new exit
 	 * code.
 	 */
-	public ExitStatus addExitCode(String code) {
-		if (StringUtils.hasText(exitCode) && StringUtils.hasLength(code) && !exitCode.equals(code)) {
-			code = exitCode + "; " + code;
-		}
+	public ExitStatus replaceExitCode(String code) {
 		return new ExitStatus(continuable, code, exitDescription);
 	}
 
@@ -191,15 +192,17 @@ public class ExitStatus implements Serializable {
 	}
 
 	/**
-	 * Add an exit description to an existing {@link ExitStatus}.  If there is already
-	 * a description present the two will be concatenated with a semicolon.
+	 * Add an exit description to an existing {@link ExitStatus}. If there is
+	 * already a description present the two will be concatenated with a
+	 * semicolon.
 	 * 
 	 * @param description the description to add
 	 * @return a new {@link ExitStatus} with the same properties but a new exit
 	 * description
 	 */
 	public ExitStatus addExitDescription(String description) {
-		if (StringUtils.hasText(exitDescription) && StringUtils.hasText(description) &&!exitDescription.equals(description)) {
+		if (StringUtils.hasText(exitDescription) && StringUtils.hasText(description)
+				&& !exitDescription.equals(description)) {
 			description = exitDescription + "; " + description;
 		}
 		return new ExitStatus(continuable, exitCode, description);

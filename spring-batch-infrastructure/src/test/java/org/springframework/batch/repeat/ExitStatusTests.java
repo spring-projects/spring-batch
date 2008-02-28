@@ -101,21 +101,21 @@ public class ExitStatusTests extends TestCase {
 	}
 
 	public void testAddExitCode() throws Exception {
-		ExitStatus status = ExitStatus.CONTINUABLE.addExitCode("FOO");
+		ExitStatus status = ExitStatus.CONTINUABLE.replaceExitCode("FOO");
 		assertTrue(ExitStatus.CONTINUABLE!=status);
 		assertTrue(status.isContinuable());
-		assertEquals("CONTINUABLE; FOO", status.getExitCode());
+		assertEquals("FOO", status.getExitCode());
 	}
 
 	public void testAddExitCodeToExistingStatus() throws Exception {
-		ExitStatus status = ExitStatus.CONTINUABLE.addExitCode("FOO").addExitCode("BAR");
+		ExitStatus status = ExitStatus.CONTINUABLE.replaceExitCode("FOO").replaceExitCode("BAR");
 		assertTrue(ExitStatus.CONTINUABLE!=status);
 		assertTrue(status.isContinuable());
-		assertEquals("CONTINUABLE; FOO; BAR", status.getExitCode());
+		assertEquals("BAR", status.getExitCode());
 	}
 
 	public void testAddExitCodeToSameStatus() throws Exception {
-		ExitStatus status = ExitStatus.CONTINUABLE.addExitCode(ExitStatus.CONTINUABLE.getExitCode());
+		ExitStatus status = ExitStatus.CONTINUABLE.replaceExitCode(ExitStatus.CONTINUABLE.getExitCode());
 		assertTrue(ExitStatus.CONTINUABLE!=status);
 		assertTrue(status.isContinuable());
 		assertEquals(ExitStatus.CONTINUABLE.getExitCode(), status.getExitCode());
@@ -136,8 +136,8 @@ public class ExitStatusTests extends TestCase {
 	}
 
 	public void testAddExitCodeWithDescription() throws Exception {
-		ExitStatus status = new ExitStatus(true, "BAR", "Bar").addExitCode("FOO");
-		assertEquals("BAR; FOO", status.getExitCode());
+		ExitStatus status = new ExitStatus(true, "BAR", "Bar").replaceExitCode("FOO");
+		assertEquals("FOO", status.getExitCode());
 		assertEquals("Bar", status.getExitDescription());
 	}
 	
@@ -151,7 +151,7 @@ public class ExitStatusTests extends TestCase {
 	}
 
 	public void testSerializable() throws Exception {
-		ExitStatus status = ExitStatus.CONTINUABLE.addExitCode("FOO");
+		ExitStatus status = ExitStatus.CONTINUABLE.replaceExitCode("FOO");
 		byte[] bytes = SerializationUtils.serialize(status);
 		Object object = SerializationUtils.deserialize(bytes);
 		assertTrue(object instanceof ExitStatus);

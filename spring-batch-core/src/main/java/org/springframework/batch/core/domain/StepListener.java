@@ -15,17 +15,28 @@
  */
 package org.springframework.batch.core.domain;
 
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Lucas Ward
  * @author Dave Syer
- *
+ * 
  */
 public interface StepListener {
 
-	void open(ExecutionContext executionContext);
-	
+	/**
+	 * Initialise the state of the listener with the job parameters from the
+	 * current scope.
+	 * @param jobParameters
+	 */
+	void open(JobParameters jobParameters);
+
+	/**
+	 * Give a listener a chance to modify the exit status from a step. The value
+	 * returned will be combined with the normal exit status.
+	 * 
+	 * @return an {@link ExitStatus} to combine with the normal value. Return
+	 * null to leave the old value unchanged.
+	 */
 	ExitStatus close();
 }

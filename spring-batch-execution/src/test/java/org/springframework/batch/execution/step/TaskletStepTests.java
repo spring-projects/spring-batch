@@ -17,7 +17,6 @@ import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
 import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 public class TaskletStepTests extends TestCase {
@@ -106,7 +105,7 @@ public class TaskletStepTests extends TestCase {
 	public void testSuccessfulExecutionWithListener() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, false), new JobRepositorySupport());
 		step.setListener(new StepListenerSupport() {
-			public void open(ExecutionContext context) {
+			public void open(JobParameters context) {
 				list.add("open");
 			}
 			public ExitStatus close() {
