@@ -268,4 +268,22 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 
 		assertEquals(lastExecution, jobExecutionDao.getLastJobExecution(jobInstance));
 	}
+	
+	/**
+	 * Trying to create instance twice for the same job+parameters causes error
+	 */
+	public void testCreateDuplicateInstance() {
+		
+		jobParameters = new JobParameters();
+		
+		jobInstanceDao.createJobInstance(job, jobParameters);
+		
+		try {
+			jobInstanceDao.createJobInstance(job, jobParameters);
+			fail();
+		}
+		catch (IllegalStateException e) {
+			// expected
+		}
+	}
 }

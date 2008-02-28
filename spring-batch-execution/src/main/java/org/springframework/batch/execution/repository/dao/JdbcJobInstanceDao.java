@@ -57,6 +57,8 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		Assert.hasLength(job.getName(), "Job must have a name");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
+		Assert.state(getJobInstance(job, jobParameters) == null, "JobInstance must not already exist");
+		
 		Long jobId = new Long(jobIncrementer.nextLongValue());
 		Object[] parameters = new Object[] { jobId, job.getName(), createJobKey(jobParameters) };
 		getJdbcTemplate().update(getQuery(CREATE_JOB_INSTANCE), parameters,

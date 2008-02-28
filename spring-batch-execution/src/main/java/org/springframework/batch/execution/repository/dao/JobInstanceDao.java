@@ -1,7 +1,5 @@
 package org.springframework.batch.execution.repository.dao;
 
-import java.util.List;
-
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
@@ -18,7 +16,9 @@ public interface JobInstanceDao {
 	/**
 	 * Create a JobInstance with given name and parameters.
 	 * 
-	 * PostConditions: A valid job will be returned which has been persisted and
+	 * PreConditions: JobInstance for given name and parameters must not already exist
+	 * 
+	 * PostConditions: A valid job instancewill be returned which has been persisted and
 	 * contains an unique Id.
 	 * 
 	 * @param jobName

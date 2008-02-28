@@ -7,6 +7,7 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.util.Assert;
 
 public class MapJobInstanceDao implements JobInstanceDao {
 
@@ -20,9 +21,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 	public JobInstance createJobInstance(Job job, JobParameters jobParameters) {
 		
-		if (getJobInstance(job, jobParameters) != null) {
-			throw new IllegalArgumentException("JobInstance already exists for given job and parameters");
-		}
+		Assert.state(getJobInstance(job, jobParameters) == null, "JobInstance must not already exist");
 		
 		JobInstance jobInstance = new JobInstance(new Long(currentId++), jobParameters, job);
 		jobInstances.add(jobInstance);
