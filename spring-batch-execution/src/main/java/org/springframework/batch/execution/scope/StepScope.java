@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.execution.scope;
 
+import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -44,7 +45,8 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 		this.order = order;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.core.Ordered#getOrder()
 	 */
 	public int getOrder() {
@@ -69,6 +71,16 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 					scopedObject = objectFactory.getObject();
 					if (scopedObject instanceof StepContextAware) {
 						((StepContextAware) scopedObject).setStepContext(context);
+					}
+					if (scopedObject instanceof JobParametersAware) {
+						try {
+							JobParameters jobParameters = context.getStepExecution().getJobExecution().getJobInstance()
+									.getJobParameters();
+							((JobParametersAware) scopedObject).setJobParameters(jobParameters);
+						}
+						catch (NullPointerException e) {
+							// ignore
+						}
 					}
 					context.setAttribute(name, scopedObject);
 				}

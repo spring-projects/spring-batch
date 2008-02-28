@@ -25,9 +25,6 @@ import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.execution.scope.SimpleStepContext;
-import org.springframework.batch.execution.scope.StepContext;
-import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
@@ -53,7 +50,7 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 	private Tasklet tasklet;
 
 	private JobRepository jobRepository;
-	
+
 	private String name;
 
 	private int startLimit = Integer.MAX_VALUE;
@@ -65,9 +62,11 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 	}
 
 	/**
-	 * Set the name property if it is not already set. Because of the order of the callbacks in a Spring container the
-	 * name property will be set first if it is present. Care is needed with bean definition inheritance - if a parent
-	 * bean has a name, then its children need an explicit name as well, otherwise they will not be unique.
+	 * Set the name property if it is not already set. Because of the order of
+	 * the callbacks in a Spring container the name property will be set first
+	 * if it is present. Care is needed with bean definition inheritance - if a
+	 * parent bean has a name, then its children need an explicit name as well,
+	 * otherwise they will not be unique.
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
@@ -78,7 +77,8 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 	}
 
 	/**
-	 * Set the name property. Always overrides the default value if this object is a Spring bean.
+	 * Set the name property. Always overrides the default value if this object
+	 * is a Spring bean.
 	 * 
 	 * @see #setBeanName(java.lang.String)
 	 */
@@ -111,7 +111,6 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
 		this.allowStartIfComplete = allowStartIfComplete;
 	}
-
 
 	private RepeatListener[] listeners = new RepeatListener[] {};
 
@@ -176,10 +175,6 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 		Exception fatalException = null;
 		try {
 
-			StepContext parentStepContext = StepSynchronizationManager.getContext();
-			final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext);
-			StepSynchronizationManager.register(stepContext);
-
 			// We are using the RepeatTemplate as a vehicle for the listener
 			// so it can be set up cheaply here with standard properties.
 			RepeatTemplate template = new RepeatTemplate();
@@ -195,7 +190,8 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 			try {
 				jobRepository.saveOrUpdateExecutionContext(stepExecution);
 				updateStatus(stepExecution, BatchStatus.COMPLETED);
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				fatalException = e;
 				updateStatus(stepExecution, BatchStatus.UNKNOWN);
 			}
@@ -220,16 +216,13 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 			catch (Exception e) {
 				fatalException = e;
 			}
-			finally {
-				StepSynchronizationManager.close();
-				if (fatalException!=null) {
-					logger.error("Encountered an error saving batch meta data."
-							+ "This job is now in an unknown state and should not be restarted.", fatalException);
-					throw new BatchCriticalException("Encountered an error saving batch meta data.", fatalException);
-				}
+			if (fatalException != null) {
+				logger.error("Encountered an error saving batch meta data."
+						+ "This job is now in an unknown state and should not be restarted.", fatalException);
+				throw new BatchCriticalException("Encountered an error saving batch meta data.", fatalException);
 			}
-		}		
-	
+		}
+
 	}
 
 	private void updateStatus(StepExecution stepExecution, BatchStatus status) {

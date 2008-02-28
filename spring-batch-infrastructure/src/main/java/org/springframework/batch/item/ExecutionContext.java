@@ -27,9 +27,9 @@ import java.util.Map.Entry;
 import org.springframework.util.Assert;
 
 /**
- * Value object representing a context for an {@link ItemStream}. It is
- * essentially a thin wrapper for a map that allows for type safety on reads. It
- * also allows for dirty checking by setting a 'dirty' flag whenever any put is
+ * Object representing a context for an {@link ItemStream}. It is a thin
+ * wrapper for a map that allows optionally for type safety on reads. It also
+ * allows for dirty checking by setting a 'dirty' flag whenever any put is
  * called.
  * 
  * @author Lucas Ward
@@ -43,8 +43,8 @@ public class ExecutionContext {
 	public ExecutionContext() {
 		map = new HashMap();
 	}
-	
-	public ExecutionContext(Map map){
+
+	public ExecutionContext(Map map) {
 		this.map = map;
 	}
 
@@ -63,8 +63,8 @@ public class ExecutionContext {
 
 		put(key, new Double(value));
 	}
-	
-	public void put(String key, Object value){
+
+	public void put(String key, Object value) {
 		Assert.isInstanceOf(Serializable.class, value, "Value: [ " + value + "must be serializable.");
 		dirty = true;
 		map.put(key, value);
@@ -83,13 +83,13 @@ public class ExecutionContext {
 
 		return ((Long) readAndValidate(key, Long.class)).longValue();
 	}
-	
-	public double getDouble(String key){
-		return ((Double)readAndValidate(key, Double.class)).doubleValue();
+
+	public double getDouble(String key) {
+		return ((Double) readAndValidate(key, Double.class)).doubleValue();
 	}
-	
-	public Object get(String key){
-		
+
+	public Object get(String key) {
+
 		return map.get(key);
 	}
 
@@ -98,8 +98,8 @@ public class ExecutionContext {
 		Object value = map.get(key);
 
 		if (!type.isInstance(value)) {
-			throw new ClassCastException("Value for key=[" + key + "] is not of type: [" + type
-					+ "], it is [" + (value == null ? null : "("+value.getClass()+")"+value) + "]");
+			throw new ClassCastException("Value for key=[" + key + "] is not of type: [" + type + "], it is ["
+					+ (value == null ? null : "(" + value.getClass() + ")" + value) + "]");
 		}
 
 		return value;
@@ -135,27 +135,27 @@ public class ExecutionContext {
 
 		return props;
 	}
-	
+
 	public boolean equals(Object obj) {
-		if(obj instanceof ExecutionContext == false){
+		if (obj instanceof ExecutionContext == false) {
 			return false;
 		}
-		if(this == obj){
+		if (this == obj) {
 			return true;
 		}
-		ExecutionContext rhs = (ExecutionContext)obj;
+		ExecutionContext rhs = (ExecutionContext) obj;
 		return this.entrySet().equals(rhs.entrySet());
 	}
-	
+
 	public int hashCode() {
 		return map.hashCode();
 	}
-	
+
 	public String toString() {
 		return map.toString();
 	}
-	
-	public int size(){
+
+	public int size() {
 		return map.size();
 	}
 

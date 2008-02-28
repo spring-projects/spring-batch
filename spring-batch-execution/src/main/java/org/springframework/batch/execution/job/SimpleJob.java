@@ -29,6 +29,9 @@ import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
+import org.springframework.batch.execution.scope.SimpleStepContext;
+import org.springframework.batch.execution.scope.StepContext;
+import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -79,11 +82,23 @@ public class SimpleJob extends AbstractJob {
 				Step step = (Step) i.next();
 
 				if (shouldStart(jobInstance, step)) {
+
 					startedCount++;
 					updateStatus(execution, BatchStatus.STARTED);
 					StepExecution stepExecution = execution.createStepExecution(step);
-					step.execute(stepExecution);
+
+					StepContext parentStepContext = StepSynchronizationManager.getContext();
+					final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext);
+					StepSynchronizationManager.register(stepContext);
+					try {
+						step.execute(stepExecution);
+					} finally {
+						// clear any registered synchronizations
+						StepSynchronizationManager.close();
+					}
+
 					status = stepExecution.getExitStatus();
+
 				}
 			}
 

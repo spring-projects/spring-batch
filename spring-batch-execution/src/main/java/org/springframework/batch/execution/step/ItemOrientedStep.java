@@ -27,9 +27,6 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.execution.scope.SimpleStepContext;
-import org.springframework.batch.execution.scope.StepContext;
-import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.execution.step.support.ThreadStepInterruptionPolicy;
@@ -233,9 +230,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			// the caller.
 			fatalException.setException(updateStatus(stepExecution, BatchStatus.STARTED));
 
-			StepContext parentStepContext = StepSynchronizationManager.getContext();
-			final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext);
-			StepSynchronizationManager.register(stepContext);
 			possiblyRegisterStreams();
 
 			if (isRestart && lastStepExecution != null) {
@@ -328,8 +322,8 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 							fatalException.setException(e);
 							stepExecution.setStatus(BatchStatus.UNKNOWN);
 						}
-						
-						if(itemSkipPolicy.shouldFail(t)){
+
+						if (itemSkipPolicy.shouldFail(t)) {
 							if (t instanceof RuntimeException) {
 								throw (RuntimeException) t;
 							}
@@ -337,10 +331,10 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 								throw new RuntimeException(t);
 							}
 						}
-						else{
+						else {
 							logger.error("Exception should not cause step to fail", t);
 						}
-						
+
 						result = ExitStatus.CONTINUABLE;
 					}
 
@@ -379,40 +373,33 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 		}
 		finally {
+
 			stepExecution.setExitStatus(status);
 			stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 
 			try {
-
-				try {
-					jobRepository.saveOrUpdate(stepExecution);
-				}
-				catch (RuntimeException e) {
-					String msg = "Fatal error detected during final save of meta data";
-					logger.error(msg, e);
-					if (!fatalException.hasException()) {
-						fatalException.setException(e);
-					}
-					throw new BatchCriticalException(msg, fatalException.getException());
-				}
-
-				try {
-					streamManager.close(stepExecution.getExecutionContext());
-				}
-				catch (RuntimeException e) {
-					String msg = "Fatal error detected during close of streams. "
-							+ "The job execution completed (possibly unsuccessfully but with consistent meta-data).";
-					logger.error(msg, e);
-					if (!fatalException.hasException()) {
-						fatalException.setException(e);
-					}
-					throw new BatchCriticalException(msg, fatalException.getException());
-				}
-
+				jobRepository.saveOrUpdate(stepExecution);
 			}
-			finally {
-				// clear any registered synchronizations
-				StepSynchronizationManager.close();
+			catch (RuntimeException e) {
+				String msg = "Fatal error detected during final save of meta data";
+				logger.error(msg, e);
+				if (!fatalException.hasException()) {
+					fatalException.setException(e);
+				}
+				throw new BatchCriticalException(msg, fatalException.getException());
+			}
+
+			try {
+				streamManager.close(stepExecution.getExecutionContext());
+			}
+			catch (RuntimeException e) {
+				String msg = "Fatal error detected during close of streams. "
+						+ "The job execution completed (possibly unsuccessfully but with consistent meta-data).";
+				logger.error(msg, e);
+				if (!fatalException.hasException()) {
+					fatalException.setException(e);
+				}
+				throw new BatchCriticalException(msg, fatalException.getException());
 			}
 
 			if (fatalException.hasException()) {

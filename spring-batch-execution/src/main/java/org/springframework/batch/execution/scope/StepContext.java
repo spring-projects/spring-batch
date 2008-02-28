@@ -16,10 +16,18 @@
 package org.springframework.batch.execution.scope;
 
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.AttributeAccessor;
 
 /**
- * Interface for step-scoped context object and step-scoped services.
+ * Interface for step-scoped context object and step-scoped services. This
+ * interface extends {@link AttributeAccessor}, so there is an underlying map
+ * that can be used for storing state during a step execution. The storage is
+ * <em>volatile</em>: the attributes are not persisted and not durable across
+ * steps in a job, or across restarts of a failed job.
+ * 
+ * @see ExecutionContext for access to durable attributes that will be restored
+ * in the case of a restart.
  * 
  * @author Dave Syer
  * 

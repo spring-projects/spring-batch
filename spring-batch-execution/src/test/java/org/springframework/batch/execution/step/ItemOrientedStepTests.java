@@ -34,7 +34,6 @@ import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapStepExecutionDao;
-import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.io.exception.BatchCriticalException;
@@ -53,7 +52,6 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.DefaultExceptionHandler;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
-import org.springframework.batch.repeat.interceptor.RepeatListenerSupport;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.PropertiesConverter;
@@ -140,56 +138,6 @@ public class ItemOrientedStepTests extends TestCase {
 		assertEquals(1, processed.size());
 		assertEquals(0, stepExecution.getTaskCount().intValue());
 		assertEquals(1, contribution.getTaskCount());
-
-	}
-
-	public void testStepContextInitialized() throws Exception {
-
-		template = new RepeatTemplate();
-
-		// Only process one item:
-		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
-		itemOrientedStep.setChunkOperations(template);
-
-		final JobExecution jobExecution = new JobExecution(jobInstance);
-		final StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
-
-		itemOrientedStep.setItemReader(new AbstractItemReader() {
-			public Object read() throws Exception {
-				assertEquals(itemOrientedStep.getName(), stepExecution.getStepName());
-				assertNotNull(StepSynchronizationManager.getContext().getStepExecution());
-				return "foo";
-			}
-		});
-
-		itemOrientedStep.execute(stepExecution);
-		assertEquals(1, processed.size());
-
-	}
-
-	public void testStepContextInitializedBeforeTasklet() throws Exception {
-
-		template = new RepeatTemplate();
-
-		// Only process one chunk:
-		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
-		itemOrientedStep.setStepOperations(template);
-
-		final JobExecution jobExecution = new JobExecution(jobInstance);
-		jobExecution.setId(new Long(1));
-		final StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
-
-		template.setListener(new RepeatListenerSupport() {
-			public void open(RepeatContext context) {
-				assertNotNull(StepSynchronizationManager.getContext().getStepExecution());
-				assertEquals(stepExecution, StepSynchronizationManager.getContext().getStepExecution());
-				// StepScope can obtain id information....
-				assertNotNull(StepSynchronizationManager.getContext().getIdentifier());
-			}
-		});
-
-		itemOrientedStep.execute(stepExecution);
-		assertEquals(1, processed.size());
 
 	}
 
@@ -622,7 +570,6 @@ public class ItemOrientedStepTests extends TestCase {
 		private boolean restoreFromCalledWithSomeContext = false;
 
 		public Object read() throws Exception {
-			StepSynchronizationManager.getContext().setAttribute("TASKLET_TEST", this);
 			return "item";
 		}
 

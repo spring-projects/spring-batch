@@ -10,7 +10,6 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
 	<import resource="data-source-context.xml" />
-	<!-- import resource="alt-data-source-context.xml" /-->
 
 	<!-- register the step scope with the application context -->
 	<bean id="stepScope"
