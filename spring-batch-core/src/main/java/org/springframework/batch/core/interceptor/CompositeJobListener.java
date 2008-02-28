@@ -20,15 +20,15 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobListener;
 import org.springframework.batch.core.domain.StepListener;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Dave Syer
  * 
  */
-public class CompositeStepListener implements StepListener {
+public class CompositeJobListener implements JobListener {
 
 	private List listeners = new ArrayList();
 
@@ -37,7 +37,7 @@ public class CompositeStepListener implements StepListener {
 	 * 
 	 * @param listeners
 	 */
-	public void setListeners(StepListener[] listeners) {
+	public void setListeners(JobListener[] listeners) {
 		this.listeners = Arrays.asList(listeners);
 	}
 
@@ -48,8 +48,8 @@ public class CompositeStepListener implements StepListener {
 	 * 
 	 * @param listener
 	 */
-	public void setListener(StepListener listener) {
-		setListeners(new StepListener[] {listener});
+	public void setListener(JobListener listener) {
+		setListeners(new JobListener[] {listener});
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class CompositeStepListener implements StepListener {
 	 * 
 	 * @param stepListener
 	 */
-	public void register(StepListener stepListener) {
+	public void register(JobListener stepListener) {
 		if (!listeners.contains(stepListener)) {
 			listeners.add(stepListener);
 		}
@@ -66,36 +66,21 @@ public class CompositeStepListener implements StepListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#close()
 	 */
-	public ExitStatus afterStep() {
-		ExitStatus status = null;
+	public void afterJob() {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-			StepListener listener = (StepListener) iterator.next();
-			ExitStatus close = listener.afterStep();
-			status = status!=null ? status.and(close): close;
+			JobListener listener = (JobListener) iterator.next();
+			listener.afterJob();
 		}
-		return status;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#open(org.springframework.batch.core.domain.JobParameters)
 	 */
-	public void beforeStep(StepExecution stepExecution) {
+	public void beforeJob(JobExecution jobExecution) {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-			StepListener listener = (StepListener) iterator.next();
-			listener.beforeStep(stepExecution);
+			JobListener listener = (JobListener) iterator.next();
+			listener.beforeJob(jobExecution);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#onError(java.lang.Throwable)
-	 */
-	public ExitStatus onErrorInStep(Throwable e) {
-		ExitStatus status = null;
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-			StepListener listener = (StepListener) iterator.next();
-			ExitStatus close = listener.onErrorInStep(e);
-			status = status!=null ? status.and(close): close;
-		}
-		return status;
-	}
 }

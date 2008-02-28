@@ -28,6 +28,7 @@ import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.interceptor.JobListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
@@ -138,6 +139,19 @@ public class SimpleJobTests extends TestCase {
 		checkRepository(BatchStatus.COMPLETED);
 		assertNotNull(jobExecution.getEndTime());
 		assertNotNull(jobExecution.getStartTime());
+	}
+
+	public void testRunNormallyWithListener() throws Exception {
+		job.setListener(new JobListenerSupport() {
+			public void beforeJob(JobExecution jobExecution) {
+				list.add("before");
+			}
+			public void afterJob() {
+				list.add("after");
+			}
+		});
+		job.execute(jobExecution);
+		assertEquals(4, list.size());
 	}
 
 	public void testRunWithSimpleStepExecutor() throws Exception {

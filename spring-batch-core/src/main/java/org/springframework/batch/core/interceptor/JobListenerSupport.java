@@ -15,33 +15,25 @@
  */
 package org.springframework.batch.core.interceptor;
 
-import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepListener;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.domain.JobListener;
 
 /**
  * @author Dave Syer
  *
  */
-public class StepListenerSupport implements StepListener {
+public class JobListenerSupport implements JobListener {
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#close()
+	 * @see org.springframework.batch.core.domain.JobListener#afterJob()
 	 */
-	public ExitStatus afterStep() {
-		return null;
+	public void afterJob() {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#open(org.springframework.batch.item.ExecutionContext)
+	 * @see org.springframework.batch.core.domain.JobListener#beforeJob(org.springframework.batch.core.domain.JobExecution)
 	 */
-	public void beforeStep(StepExecution stepExecution) {
+	public void beforeJob(JobExecution jobExecution) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#onError(java.lang.Throwable)
-	 */
-	public ExitStatus onErrorInStep(Throwable e) {
-		return null;
-	}
 }

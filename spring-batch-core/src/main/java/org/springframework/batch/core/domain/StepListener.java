@@ -29,7 +29,7 @@ public interface StepListener {
 	 * the current scope.
 	 * @param stepExecution
 	 */
-	void open(StepExecution stepExecution);
+	void beforeStep(StepExecution stepExecution);
 
 	/**
 	 * The value returned will be combined with the normal exit status using
@@ -38,7 +38,7 @@ public interface StepListener {
 	 * @param e an exception thrown by the step execution
 	 * @return an exit status to be combined with the normal one, or null
 	 */
-	ExitStatus onError(Throwable e);
+	ExitStatus onErrorInStep(Throwable e);
 
 	/**
 	 * Give a listener a chance to modify the exit status from a step. The value
@@ -48,5 +48,5 @@ public interface StepListener {
 	 * @return an {@link ExitStatus} to combine with the normal value. Return
 	 * null to leave the old value unchanged.
 	 */
-	ExitStatus close();
+	ExitStatus afterStep();
 }

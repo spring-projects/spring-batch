@@ -25,8 +25,10 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
+import org.springframework.batch.core.domain.JobListener;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.interceptor.CompositeJobListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.execution.scope.SimpleStepContext;
@@ -49,6 +51,18 @@ public class SimpleJob extends AbstractJob {
 	private JobRepository jobRepository;
 
 	private ExitStatusExceptionClassifier exceptionClassifier = new SimpleExitStatusExceptionClassifier();
+
+	private CompositeJobListener listener = new CompositeJobListener();
+
+	public void setListeners(JobListener[] listeners) {
+		for (int i = 0; i < listeners.length; i++) {
+			this.listener.register(listeners[i]);
+		}
+	}
+
+	public void setListener(JobListener listener) {
+		this.listener.register(listener);
+	}
 
 	/**
 	 * Run the specified job by looping through the steps and delegating to the
@@ -73,6 +87,8 @@ public class SimpleJob extends AbstractJob {
 
 			execution.setStartTime(new Date());
 			updateStatus(execution, BatchStatus.STARTING);
+			
+			listener.beforeJob(execution);
 
 			int startedCount = 0;
 
@@ -113,6 +129,8 @@ public class SimpleJob extends AbstractJob {
 			}
 
 			updateStatus(execution, BatchStatus.COMPLETED);
+
+			listener.afterJob();
 
 		}
 		catch (JobInterruptedException e) {

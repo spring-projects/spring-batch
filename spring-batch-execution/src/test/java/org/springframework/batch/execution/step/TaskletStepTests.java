@@ -105,10 +105,10 @@ public class TaskletStepTests extends TestCase {
 	public void testSuccessfulExecutionWithListener() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, false), new JobRepositorySupport());
 		step.setListener(new StepListenerSupport() {
-			public void open(StepExecution context) {
+			public void beforeStep(StepExecution context) {
 				list.add("open");
 			}
-			public ExitStatus close() {
+			public ExitStatus afterStep() {
 				list.add("close");
 				return ExitStatus.CONTINUABLE;
 			}

@@ -182,10 +182,10 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 		Exception fatalException = null;
 		try {
 
-			listener.open(stepExecution);
+			listener.beforeStep(stepExecution);
 			exitStatus = tasklet.execute();
 			try {
-				exitStatus = exitStatus.and(listener.close());
+				exitStatus = exitStatus.and(listener.afterStep());
 			}
 			catch (Exception e) {
 				logger.error("Encountered an error on listener close.", e);
@@ -205,7 +205,7 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 			logger.error("Encountered an error running the tasklet");
 			updateStatus(stepExecution, BatchStatus.FAILED);
 			try {
-				exitStatus = exitStatus.and(listener.onError(e));
+				exitStatus = exitStatus.and(listener.onErrorInStep(e));
 			}
 			catch (Exception ex) {
 				logger.error("Encountered an error on listener close.", ex);

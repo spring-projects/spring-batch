@@ -41,17 +41,17 @@ public class CompositeStepListenerTests extends TestCase {
 	 */
 	public void testSetListeners() {
 		listener.setListeners(new StepListener[] { new StepListenerSupport() {
-			public ExitStatus close() {
+			public ExitStatus afterStep() {
 				list.add("fail");
 				return ExitStatus.FAILED;
 			}
 		}, new StepListenerSupport() {
-			public ExitStatus close() {
+			public ExitStatus afterStep() {
 				list.add("continue");
 				return ExitStatus.CONTINUABLE;
 			}
 		} });
-		assertFalse(listener.close().isContinuable());
+		assertFalse(listener.afterStep().isContinuable());
 		assertEquals(2, list.size());
 	}
 
@@ -61,41 +61,41 @@ public class CompositeStepListenerTests extends TestCase {
 	 */
 	public void testSetListener() {
 		listener.setListener(new StepListenerSupport() {
-			public ExitStatus close() {
+			public ExitStatus afterStep() {
 				list.add("fail");
 				return ExitStatus.FAILED;
 			}
 		});
-		assertFalse(listener.close().isContinuable());
+		assertFalse(listener.afterStep().isContinuable());
 		assertEquals(1, list.size());
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.interceptor.CompositeStepListener#open(StepExecution)}.
+	 * {@link org.springframework.batch.core.interceptor.CompositeStepListener#beforeStep(StepExecution)}.
 	 */
 	public void testOpen() {
 		listener.setListener(new StepListenerSupport() {
-			public void open(StepExecution stepExecution) {
+			public void beforeStep(StepExecution stepExecution) {
 				list.add("foo");
 			}
 		});
-		listener.open(new StepExecution(new StepSupport("foo"), null));
+		listener.beforeStep(new StepExecution(new StepSupport("foo"), null));
 		assertEquals(1, list.size());
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.interceptor.CompositeStepListener#open(StepExecution)}.
+	 * {@link org.springframework.batch.core.interceptor.CompositeStepListener#beforeStep(StepExecution)}.
 	 */
 	public void testOnError() {
 		listener.setListener(new StepListenerSupport() {
-			public ExitStatus onError(Throwable e) {
+			public ExitStatus onErrorInStep(Throwable e) {
 				list.add("foo");
 				return null;
 			}
 		});
-		listener.onError(new RuntimeException());
+		listener.onErrorInStep(new RuntimeException());
 		assertEquals(1, list.size());
 	}
 
