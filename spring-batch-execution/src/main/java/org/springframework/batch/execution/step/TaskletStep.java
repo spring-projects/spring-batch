@@ -208,7 +208,7 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 				exitStatus = exitStatus.and(listener.close());
 			}
 			catch (Exception e) {
-				logger.error("Encountered an error on listener close.");
+				logger.error("Encountered an error on listener close.", e);
 			}
 			stepExecution.setExitStatus(exitStatus);
 			stepExecution.setEndTime(new Date());
