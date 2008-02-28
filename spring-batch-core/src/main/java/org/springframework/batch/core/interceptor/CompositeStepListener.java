@@ -42,17 +42,6 @@ public class CompositeStepListener implements StepListener {
 	}
 
 	/**
-	 * Public setter for the listeners. The result will be as if
-	 * {@link #setListeners(StepListener[])} was called with an array of length
-	 * one.
-	 * 
-	 * @param listener
-	 */
-	public void setListener(StepListener listener) {
-		setListeners(new StepListener[] {listener});
-	}
-
-	/**
 	 * Register additional listener.
 	 * 
 	 * @param stepListener

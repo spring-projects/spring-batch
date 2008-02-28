@@ -58,7 +58,7 @@ public class CompositeJobListenerTests extends TestCase {
 	 * {@link org.springframework.batch.core.interceptor.CompositeJobListener#setListener(org.springframework.batch.core.domain.JobListener)}.
 	 */
 	public void testSetListener() {
-		listener.setListener(new JobListenerSupport() {
+		listener.register(new JobListenerSupport() {
 			public void afterJob() {
 				list.add("fail");
 			}
@@ -72,7 +72,7 @@ public class CompositeJobListenerTests extends TestCase {
 	 * {@link org.springframework.batch.core.interceptor.CompositeJobListener#beforeJob(JobExecution)}.
 	 */
 	public void testOpen() {
-		listener.setListener(new JobListenerSupport() {
+		listener.register(new JobListenerSupport() {
 			public void beforeJob(JobExecution stepExecution) {
 				list.add("foo");
 			}

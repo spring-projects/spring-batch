@@ -29,6 +29,7 @@ import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.interceptor.StepListenerSupport;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobExecutionDao;
@@ -341,6 +342,85 @@ public class ItemOrientedStepTests extends TestCase {
 				executionContext.putString("foo", "bar");
 			}
 		});
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
+
+		assertEquals(false, stepExecution.getExecutionContext().containsKey("foo"));
+
+		itemOrientedStep.execute(stepExecution);
+
+		// At least once in that process the statistics service was asked for
+		// statistics...
+		assertEquals("bar", stepExecution.getExecutionContext().getString("foo"));
+	}
+
+	public void testDirectlyInjectedItemStream() throws Exception {
+		itemOrientedStep.setListeners(new Object[] {new ItemStreamSupport() {
+			public void update(ExecutionContext executionContext) {
+				executionContext.putString("foo", "bar");
+			}
+		}});
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
+
+		assertEquals(false, stepExecution.getExecutionContext().containsKey("foo"));
+
+		itemOrientedStep.execute(stepExecution);
+
+		assertEquals("bar", stepExecution.getExecutionContext().getString("foo"));
+	}
+
+	public void testDirectlyInjectedListener() throws Exception {
+		itemOrientedStep.setListeners(new Object[] {new StepListenerSupport() {
+			public void beforeStep(StepExecution stepExecution) {
+				list.add("foo");
+			}
+			public ExitStatus afterStep() {
+				list.add("bar");
+				return null;
+			}
+		}});
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
+		itemOrientedStep.execute(stepExecution);
+		assertEquals(2, list.size());
+	}
+
+	public void testDirectlyInjectedListenerOnError() throws Exception {
+		itemOrientedStep.setListeners(new Object[] {new StepListenerSupport() {
+			public ExitStatus onErrorInStep(Throwable e) {
+				list.add(e);
+				return null;
+			}
+		}});
+		itemOrientedStep.setItemReader(new MockRestartableItemReader() {
+			public Object read() throws Exception {
+				throw new RuntimeException("FOO");
+			}
+		});
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
+		try {
+			itemOrientedStep.execute(stepExecution);
+			fail("Expected RuntimeException");
+		} catch (RuntimeException e) {
+			assertEquals("FOO", e.getMessage());
+		}
+		assertEquals(1, list.size());
+	}
+
+	public void testDirectlyInjectedStreamWhichIsAlsoReader() throws Exception {
+		MockRestartableItemReader reader = new MockRestartableItemReader() {
+			public Object read() throws Exception {
+				return "foo";
+			}
+			public void update(ExecutionContext executionContext) {
+				// TODO Auto-generated method stub
+				executionContext.putString("foo", "bar");
+			}
+		};
+		itemOrientedStep.setItemReader(reader);
+		itemOrientedStep.setListeners(new Object[] {reader});
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
 

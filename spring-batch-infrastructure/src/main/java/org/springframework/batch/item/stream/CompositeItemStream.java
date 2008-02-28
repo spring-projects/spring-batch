@@ -16,6 +16,7 @@
 package org.springframework.batch.item.stream;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -24,20 +25,28 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
 
 /**
- * Simple {@link StreamManager} that tries to resolve conflicts between key
- * names by using the class name of a stream to prefix property keys.
+ * Simple {@link ItemStream} that delegates to a list of other streams.
  * 
  * @author Dave Syer
  * 
  */
-public class SimpleStreamManager implements ItemStream {
+public class CompositeItemStream implements ItemStream {
 
 	private List streams = new ArrayList();
 
 	/**
+	 * Public setter for the listeners.
+	 * 
+	 * @param listeners
+	 */
+	public void setStreams(ItemStream[] listeners) {
+		this.streams = Arrays.asList(listeners);
+	}
+
+	/**
 	 * 
 	 */
-	public SimpleStreamManager() {
+	public CompositeItemStream() {
 		super();
 	}
 
@@ -82,7 +91,6 @@ public class SimpleStreamManager implements ItemStream {
 				ItemStream itemStream = (ItemStream) it.next();
 				itemStream.close(executionContext);
 			}
-			streams.clear();
 		}
 	}
 

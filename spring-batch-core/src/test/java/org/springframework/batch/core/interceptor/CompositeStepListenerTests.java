@@ -60,7 +60,7 @@ public class CompositeStepListenerTests extends TestCase {
 	 * {@link org.springframework.batch.core.interceptor.CompositeStepListener#setListener(org.springframework.batch.core.domain.StepListener)}.
 	 */
 	public void testSetListener() {
-		listener.setListener(new StepListenerSupport() {
+		listener.register(new StepListenerSupport() {
 			public ExitStatus afterStep() {
 				list.add("fail");
 				return ExitStatus.FAILED;
@@ -75,7 +75,7 @@ public class CompositeStepListenerTests extends TestCase {
 	 * {@link org.springframework.batch.core.interceptor.CompositeStepListener#beforeStep(StepExecution)}.
 	 */
 	public void testOpen() {
-		listener.setListener(new StepListenerSupport() {
+		listener.register(new StepListenerSupport() {
 			public void beforeStep(StepExecution stepExecution) {
 				list.add("foo");
 			}
@@ -89,7 +89,7 @@ public class CompositeStepListenerTests extends TestCase {
 	 * {@link org.springframework.batch.core.interceptor.CompositeStepListener#beforeStep(StepExecution)}.
 	 */
 	public void testOnError() {
-		listener.setListener(new StepListenerSupport() {
+		listener.register(new StepListenerSupport() {
 			public ExitStatus onErrorInStep(Throwable e) {
 				list.add("foo");
 				return null;

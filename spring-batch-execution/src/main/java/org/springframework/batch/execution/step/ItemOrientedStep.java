@@ -24,9 +24,11 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.execution.step.support.ListenerMulticaster;
 import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.execution.step.support.ThreadStepInterruptionPolicy;
@@ -39,7 +41,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.exception.CommitFailedException;
-import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -96,7 +97,20 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 	private int commitInterval = 0;
 
-	private SimpleStreamManager streamManager;
+	private ListenerMulticaster listener = new ListenerMulticaster();
+
+	/**
+	 * Register each of the objects as listeners. The {@link ItemOrientedStep}
+	 * accepts listeners of type {@link ItemStream}, {@link StepListener},
+	 * TODO: complete the list.
+	 * 
+	 * @param listeners an array of listener objects of known types.
+	 */
+	public void setListeners(Object[] listeners) {
+		for (int i = 0; i < listeners.length; i++) {
+			listener.register(listeners[i]);
+		}
+	}
 
 	/**
 	 * The {@link RepeatOperations} to use for the outer loop of the batch
@@ -183,8 +197,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			retryCallback = new ItemReaderRetryCallback((KeyedItemReader) itemReader, itemWriter);
 		}
 
-		streamManager = new SimpleStreamManager();
-
 		if (this.chunkOperations instanceof RepeatTemplate && commitInterval > 0) {
 			((RepeatTemplate) chunkOperations).setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
 		}
@@ -219,6 +231,9 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 		ExitStatus status = ExitStatus.FAILED;
 		final ExceptionHolder fatalException = new ExceptionHolder();
+		
+		// This could go in applyConfiguration(), but some unit tests do not call that
+		possiblyRegisterStreams();		
 
 		try {
 
@@ -228,8 +243,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			// the caller.
 			fatalException.setException(updateStatus(stepExecution, BatchStatus.STARTED));
 
-			possiblyRegisterStreams();
-
 			if (isRestart && lastStepExecution != null) {
 				stepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
 			}
@@ -237,11 +250,11 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 				stepExecution.setExecutionContext(new ExecutionContext());
 			}
 
-			// Open the stream manager *after* the execution context is fixed in
-			// the step, otherwise it will not be the same reference that is
-			// updated by the streams. TODO: this is a little fragile - maybe
-			// StreamManager.update() should accept the context as a parameter.
-			streamManager.open(stepExecution.getExecutionContext());
+			// Execute step level listeners *after* the execution context is
+			// fixed in the step. E.g. ItemStream instances need the the same
+			// reference to the ExecutionContext as the step execution.
+			listener.open(stepExecution.getExecutionContext());
+			listener.beforeStep(stepExecution);
 
 			status = stepOperations.iterate(new RepeatCallback() {
 
@@ -253,9 +266,10 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 					// interruption.
 					interruptionPolicy.checkInterrupted(context);
 
-					ExitStatus result;
+					ExitStatus result = ExitStatus.CONTINUABLE;
 
-					TransactionStatus transaction = transactionManager.getTransaction(new DefaultTransactionDefinition());
+					TransactionStatus transaction = transactionManager
+							.getTransaction(new DefaultTransactionDefinition());
 
 					try {
 						itemReader.mark();
@@ -272,7 +286,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 							// only if chunk was successful
 							stepExecution.apply(contribution);
 
-							streamManager.update(stepExecution.getExecutionContext());
+							listener.update(stepExecution.getExecutionContext());
 							try {
 								stepExecution.setStatus(BatchStatus.COMPLETED);
 								jobRepository.saveOrUpdateExecutionContext(stepExecution);
@@ -283,6 +297,13 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 								throw new CommitFailedException("Fatal error detected during commit", e);
 							}
 
+						}
+						
+						try {
+							result = result.and(listener.afterStep());
+						}
+						catch (RuntimeException e) {
+							logger.error("Unexpected error in listener after step.", e);
 						}
 
 						try {
@@ -311,6 +332,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 						synchronized (stepExecution) {
 							stepExecution.rollback();
 						}
+						
 						try {
 							itemReader.reset();
 							itemWriter.clear();
@@ -333,7 +355,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 							logger.error("Exception should not cause step to fail", t);
 						}
 
-						result = ExitStatus.CONTINUABLE;
 					}
 
 					// Check for interruption after transaction as well, so that
@@ -356,11 +377,18 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 			// classify exception so an exit code can be stored.
 			status = exceptionClassifier.classifyForExitCode(e);
+
 			if (e.getCause() instanceof JobInterruptedException) {
 				updateStatus(stepExecution, BatchStatus.STOPPED);
 				throw (JobInterruptedException) e.getCause();
 			}
 			else if (!fatalException.hasException()) {
+				try {
+					status = status.and(listener.onErrorInStep(e));
+				}
+				catch (RuntimeException ex) {
+					logger.error("Unexpected error in listener on error in step.", ex);
+				}
 				updateStatus(stepExecution, BatchStatus.FAILED);
 				throw e;
 			}
@@ -388,7 +416,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			}
 
 			try {
-				streamManager.close(stepExecution.getExecutionContext());
+				listener.close(stepExecution.getExecutionContext());
 			}
 			catch (RuntimeException e) {
 				String msg = "Fatal error detected during close of streams. "
@@ -410,17 +438,12 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	}
 
 	/**
-	 * 
+	 * Register the item reader and writer as listeners. If they are manually
+	 * registered anyway, it shouldn't matter.
 	 */
 	private void possiblyRegisterStreams() {
-		if (itemReader instanceof ItemStream) {
-			ItemStream stream = (ItemStream) itemReader;
-			streamManager.register(stream);
-		}
-		if (itemWriter instanceof ItemStream) {
-			ItemStream stream = (ItemStream) itemWriter;
-			streamManager.register(stream);
-		}
+		listener.register(itemReader);
+		listener.register(itemWriter);
 	}
 
 	/**

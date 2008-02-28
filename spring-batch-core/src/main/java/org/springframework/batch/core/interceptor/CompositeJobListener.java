@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobListener;
-import org.springframework.batch.core.domain.StepListener;
 
 /**
  * @author Dave Syer
@@ -39,17 +38,6 @@ public class CompositeJobListener implements JobListener {
 	 */
 	public void setListeners(JobListener[] listeners) {
 		this.listeners = Arrays.asList(listeners);
-	}
-
-	/**
-	 * Public setter for the listeners. The result will be as if
-	 * {@link #setListeners(StepListener[])} was called with an array of length
-	 * one.
-	 * 
-	 * @param listener
-	 */
-	public void setListener(JobListener listener) {
-		setListeners(new JobListener[] {listener});
 	}
 
 	/**
