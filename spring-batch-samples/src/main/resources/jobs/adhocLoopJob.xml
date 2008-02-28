@@ -20,10 +20,6 @@
 					<bean id="module"
 						class="org.springframework.batch.sample.tasklet.InfiniteLoopTasklet"/>
 				</property>
-				<property name="listener">
-					<bean
-						class="org.springframework.batch.repeat.interceptor.ApplicationEventPublisherRepeatListener" />
-				</property>
 			</bean>
 		</property>
 	</bean>
@@ -43,21 +39,7 @@
 					key="spring:service=batch,bean=notificationPublisher"
 					value-ref="notificationPublisher" />
 				<entry
-					key="spring:service=batch,bean=configurationLoader">
-					<bean
-						class="org.springframework.aop.framework.ProxyFactoryBean">
-						<property name="target" ref="loader" />
-						<property name="interfaces">
-							<list>
-								<value>
-									org.springframework.batch.sample.ExportedJobLoader
-								</value>
-							</list>
-						</property>
-						<property name="interceptorNames"
-							value="convertingMethodInterceptor" />
-					</bean>
-				</entry>
+					key="spring:service=batch,bean=configurationLoader" value-ref="loader" />
 			</map>
 		</property>
 		<property name="assembler">
@@ -77,18 +59,30 @@
 	</bean>
 
 	<bean id="notificationPublisher"
-		class="org.springframework.batch.execution.bootstrap.JobExecutionNotificationPublisher" />
+		class="org.springframework.batch.sample.advice.JobExecutionNotificationPublisher" />
 
 	<bean id="logAdvice"
 		class="org.springframework.batch.sample.advice.MethodExecutionLogAdvice" />
 
+	<bean id="eventAdvice"
+		class="org.springframework.batch.sample.advice.MethodExecutionApplicationEventAdvice" />
+
 	<aop:config>
 		<aop:aspect ref="logAdvice">
-
 			<aop:after
 				pointcut="execution( * org.springframework.batch.sample..InfiniteLoopTasklet+.execute(..))"
 				method="doBasicLogging" />
-
+		</aop:aspect>
+		<aop:aspect ref="eventAdvice">
+			<aop:before
+				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
+				method="before" />
+			<aop:after
+				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
+				method="after" />
+			<aop:after-throwing throwing="t" 
+				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
+				method="onError" />
 		</aop:aspect>
 	</aop:config>
 

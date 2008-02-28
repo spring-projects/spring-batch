@@ -55,11 +55,13 @@ public class BatchStatus implements Serializable {
 
 	public static final BatchStatus FAILED = new BatchStatus("FAILED");
 
+	public static final BatchStatus STOPPING = new BatchStatus("STOPPING");
+
 	public static final BatchStatus STOPPED = new BatchStatus("STOPPED");
 
 	public static final BatchStatus UNKNOWN = new BatchStatus("UNKNOWN");
 
-	private static final BatchStatus[] VALUES = { STARTING, STARTED, COMPLETED, FAILED, STOPPED, UNKNOWN };
+	private static final BatchStatus[] VALUES = { STARTING, STARTED, COMPLETED, FAILED, STOPPING, STOPPED, UNKNOWN };
 
 	/**
 	 * Given a string representation of a status, return the appropriate BatchStatus.

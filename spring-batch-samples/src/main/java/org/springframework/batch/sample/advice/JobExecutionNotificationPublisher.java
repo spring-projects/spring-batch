@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.bootstrap;
+package org.springframework.batch.sample.advice;
 
 import javax.management.Notification;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.repeat.interceptor.RepeatOperationsApplicationEvent;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.jmx.export.notification.NotificationPublisher;
@@ -32,11 +31,9 @@ import org.springframework.jmx.export.notification.NotificationPublisherAware;
  * @author Dave Syer
  * @since 2.1
  */
-public class JobExecutionNotificationPublisher implements ApplicationListener,
-		NotificationPublisherAware {
+public class JobExecutionNotificationPublisher implements ApplicationListener, NotificationPublisherAware {
 
-	protected static final Log logger = LogFactory
-			.getLog(JobExecutionNotificationPublisher.class);
+	protected static final Log logger = LogFactory.getLog(JobExecutionNotificationPublisher.class);
 
 	private NotificationPublisher notificationPublisher;
 
@@ -47,8 +44,7 @@ public class JobExecutionNotificationPublisher implements ApplicationListener,
 	 * 
 	 * @see org.springframework.jmx.export.notification.NotificationPublisherAware#setNotificationPublisher(org.springframework.jmx.export.notification.NotificationPublisher)
 	 */
-	public void setNotificationPublisher(
-			NotificationPublisher notificationPublisher) {
+	public void setNotificationPublisher(NotificationPublisher notificationPublisher) {
 		this.notificationPublisher = notificationPublisher;
 	}
 
@@ -60,32 +56,23 @@ public class JobExecutionNotificationPublisher implements ApplicationListener,
 	 * @see org.springframework.batch.execution.launch.SimpleJobLauncher#onApplicationEvent(org.springframework.context.ApplicationEvent)
 	 */
 	public void onApplicationEvent(ApplicationEvent applicationEvent) {
-		if (applicationEvent instanceof RepeatOperationsApplicationEvent) {
-			RepeatOperationsApplicationEvent event = (RepeatOperationsApplicationEvent) applicationEvent;
-			int type = event.getType();
-			if (type == RepeatOperationsApplicationEvent.OPEN
-					|| type == RepeatOperationsApplicationEvent.CLOSE
-					|| type == RepeatOperationsApplicationEvent.ERROR) {
-				String message = event.getMessage() + "; source="
-						+ event.getSource();
-				logger.info(message);
-				publish(message);
-			}
-			return;
+		if (applicationEvent instanceof SimpleMessageApplicationEvent) {
+			String message = applicationEvent.toString();
+			logger.info(message);
+			publish(message);
 		}
+		return;
 	}
 
 	/**
 	 * Publish the provided message to an external listener if there is one.
 	 * 
-	 * @param message
-	 *            the message to publish
+	 * @param message the message to publish
 	 */
 	private void publish(String message) {
 		if (notificationPublisher != null) {
-			Notification notification = new Notification(
-					"RepeatOperationsApplicationEvent", this,
-					notificationCount++, message);
+			Notification notification = new Notification("JobExecutionApplicationEvent", this, notificationCount++,
+					message);
 			/*
 			 * We can't create a notification with a null source, but we can set
 			 * it to null after creation(!). We want it to be null so that

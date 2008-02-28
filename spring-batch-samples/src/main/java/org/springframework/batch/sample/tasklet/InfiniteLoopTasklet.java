@@ -16,6 +16,8 @@
 
 package org.springframework.batch.sample.tasklet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -30,6 +32,7 @@ import org.springframework.batch.repeat.ExitStatus;
 public class InfiniteLoopTasklet implements Tasklet {
 
 	private int count = 0;
+	private static final Log logger = LogFactory.getLog(InfiniteLoopTasklet.class);
 
 	/**
 	 * 
@@ -39,9 +42,16 @@ public class InfiniteLoopTasklet implements Tasklet {
 	}
 
 	public ExitStatus execute() throws Exception {
-		Thread.sleep(500);
-		count++;
-		return ExitStatus.CONTINUABLE;
+		while(true) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				throw new RuntimeException("Job interrupted.");
+			}
+			count++;
+			logger.info("Executing infinite loop, at count="+count);
+		}
 	}
 
 }

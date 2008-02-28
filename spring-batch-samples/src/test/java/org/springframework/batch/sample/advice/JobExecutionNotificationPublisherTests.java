@@ -13,54 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.bootstrap;
+package org.springframework.batch.sample.advice;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.management.Notification;
 
-import org.springframework.batch.repeat.interceptor.RepeatOperationsApplicationEvent;
+import junit.framework.TestCase;
+
 import org.springframework.jmx.export.notification.NotificationPublisher;
 import org.springframework.jmx.export.notification.UnableToSendNotificationException;
 
-import junit.framework.TestCase;
-
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class JobExecutionNotificationPublisherTests extends TestCase {
 
 	JobExecutionNotificationPublisher publisher = new JobExecutionNotificationPublisher();
-	
-	public void testRepeatOperationsBeforeNotUsed() throws Exception {
-		final List list = new ArrayList();
-		publisher.setNotificationPublisher(new NotificationPublisher() {
-			public void sendNotification(Notification notification)
-					throws UnableToSendNotificationException {
-				list.add(notification);
-			}
-		});
-		publisher.onApplicationEvent(new RepeatOperationsApplicationEvent(this,
-				"foo", RepeatOperationsApplicationEvent.BEFORE) {
-		});
-		assertEquals(0, list.size());
-	}
 
 	public void testRepeatOperationsOpenUsed() throws Exception {
 		final List list = new ArrayList();
 		publisher.setNotificationPublisher(new NotificationPublisher() {
-			public void sendNotification(Notification notification)
-					throws UnableToSendNotificationException {
+			public void sendNotification(Notification notification) throws UnableToSendNotificationException {
 				list.add(notification);
 			}
 		});
-		publisher.onApplicationEvent(new RepeatOperationsApplicationEvent(this,
-				"foo", RepeatOperationsApplicationEvent.OPEN));
+		publisher.onApplicationEvent(new SimpleMessageApplicationEvent(this, "foo"));
 		assertEquals(1, list.size());
-		assertEquals("foo", ((Notification) list.get(0)).getMessage()
-				.substring(0, 3));
+		String message = ((Notification) list.get(0)).getMessage();
+		assertTrue("Message does not contain 'foo': ", message.contains("foo"));
 	}
 
 }

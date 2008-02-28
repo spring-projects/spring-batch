@@ -66,7 +66,7 @@ public class JobExecution extends Entity {
 	public JobExecution(JobInstance job) {
 		this(job, null);
 	}
-	
+
 	public Date getEndTime() {
 		return endTime;
 	}
@@ -124,7 +124,7 @@ public class JobExecution extends Entity {
 	public JobInstance getJobInstance() {
 		return jobInstance;
 	}
-	
+
 	public void setJobInstance(JobInstance jobInstance) {
 		this.jobInstance = jobInstance;
 	}
@@ -164,7 +164,16 @@ public class JobExecution extends Entity {
 	 * @return true if the end time is null
 	 */
 	public boolean isRunning() {
-		return endTime == null && !(BatchStatus.STOPPED==status);
+		return endTime == null;
+	}
+
+	/**
+	 * Test if this {@link JobExecution} indicates that it has been signalled to
+	 * stop.
+	 * @return true if the status is {@link BatchStatus#STOPPING}
+	 */
+	public boolean isStopping() {
+		return status == BatchStatus.STOPPING;
 	}
 
 	/**
@@ -177,6 +186,6 @@ public class JobExecution extends Entity {
 			StepExecution stepExecution = (StepExecution) it.next();
 			stepExecution.setTerminateOnly();
 		}
-		status = BatchStatus.STOPPED;
+		status = BatchStatus.STOPPING;
 	}
 }

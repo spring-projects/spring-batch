@@ -86,6 +86,9 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 		this.name = name;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.Step#getStartLimit()
+	 */
 	public int getStartLimit() {
 		return this.startLimit;
 	}
@@ -99,6 +102,9 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 		this.startLimit = startLimit;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.Step#isAllowStartIfComplete()
+	 */
 	public boolean isAllowStartIfComplete() {
 		return this.allowStartIfComplete;
 	}

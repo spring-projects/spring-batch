@@ -64,7 +64,8 @@ public class JobExecutionTests extends TestCase {
 	public void testIsRunningWithStoppedExecution() {
 		assertTrue(execution.isRunning());
 		execution.stop();
-		assertFalse(execution.isRunning());
+		assertTrue(execution.isRunning());
+		assertTrue(execution.isStopping());
 	}
 
 	/**

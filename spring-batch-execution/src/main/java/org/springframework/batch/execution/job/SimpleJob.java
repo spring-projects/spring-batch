@@ -67,7 +67,7 @@ public class SimpleJob extends AbstractJob {
 
 			// The job was already stopped before we even got this far. Deal
 			// with it in the same way as any other interruption.
-			if (execution.getStatus() == BatchStatus.STOPPED) {
+			if (execution.getStatus() == BatchStatus.STOPPING) {
 				throw new JobInterruptedException("JobExecution already stopped before being executed.");
 			}
 
@@ -126,7 +126,7 @@ public class SimpleJob extends AbstractJob {
 			rethrow(t);
 		}
 		finally {
-			execution.setEndTime(new Date(System.currentTimeMillis()));
+			execution.setEndTime(new Date());
 			execution.setExitStatus(status);
 			jobRepository.saveOrUpdate(execution);
 		}
