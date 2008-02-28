@@ -38,7 +38,7 @@ public class TaskExecutorLauncher {
 		// TaskExecutor. The adhocLoopJob has both, which is why it has to be
 		// included in the paths above.
 		final ApplicationContext parent = new ClassPathXmlApplicationContext(
-				"simple-container-definition.xml");
+				"adhoc-job-launcher-context.xml");
 
 		new Thread(new Runnable() {
 			public void run() {

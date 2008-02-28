@@ -122,12 +122,21 @@
 	</bean>
 
 	<aop:config>
-		<aop:aspect id="moduleLogging" ref="itemProcessorLogAdvice">
-
+		<aop:aspect id="moduleLogging" ref="logAdvice">
 			<aop:after
 				pointcut="execution( * org.springframework.batch.item.ItemWriter+.write(Object)) and args(item)"
 				method="doStronglyTypedLogging" />
-
+		</aop:aspect>
+		<aop:aspect ref="eventAdvice">
+			<aop:before
+				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
+				method="before" />
+			<aop:after
+				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
+				method="after" />
+			<aop:after-throwing throwing="t" 
+				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
+				method="onError" />
 		</aop:aspect>
 	</aop:config>
 
