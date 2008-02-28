@@ -20,8 +20,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.core.domain.StepSupport;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -71,15 +72,30 @@ public class CompositeStepListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.interceptor.CompositeStepListener#open(JobParameters)}.
+	 * {@link org.springframework.batch.core.interceptor.CompositeStepListener#open(StepExecution)}.
 	 */
 	public void testOpen() {
 		listener.setListener(new StepListenerSupport() {
-			public void open(JobParameters jobParameters) {
+			public void open(StepExecution stepExecution) {
 				list.add("foo");
 			}
 		});
-		listener.open(new JobParameters());
+		listener.open(new StepExecution(new StepSupport("foo"), null));
+		assertEquals(1, list.size());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.interceptor.CompositeStepListener#open(StepExecution)}.
+	 */
+	public void testOnError() {
+		listener.setListener(new StepListenerSupport() {
+			public ExitStatus onError(Throwable e) {
+				list.add("foo");
+				return null;
+			}
+		});
+		listener.onError(new RuntimeException());
 		assertEquals(1, list.size());
 	}
 

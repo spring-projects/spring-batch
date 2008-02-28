@@ -83,7 +83,8 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 		this.name = name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.Step#getStartLimit()
 	 */
 	public int getStartLimit() {
@@ -99,7 +100,8 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 		this.startLimit = startLimit;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.Step#isAllowStartIfComplete()
 	 */
 	public boolean isAllowStartIfComplete() {
@@ -180,8 +182,14 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 		Exception fatalException = null;
 		try {
 
-			listener.open(stepExecution.getJobParameters());
-			exitStatus =  tasklet.execute();
+			listener.open(stepExecution);
+			exitStatus = tasklet.execute();
+			try {
+				exitStatus = exitStatus.and(listener.close());
+			}
+			catch (Exception e) {
+				logger.error("Encountered an error on listener close.", e);
+			}
 
 			try {
 				jobRepository.saveOrUpdateExecutionContext(stepExecution);
@@ -193,23 +201,21 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 			}
 
 		}
-		catch (RuntimeException e) {
-			logger.error("Encountered an error running the tasklet");
-			updateStatus(stepExecution, BatchStatus.FAILED);
-			throw e;
-		}
 		catch (Exception e) {
 			logger.error("Encountered an error running the tasklet");
 			updateStatus(stepExecution, BatchStatus.FAILED);
+			try {
+				exitStatus = exitStatus.and(listener.onError(e));
+			}
+			catch (Exception ex) {
+				logger.error("Encountered an error on listener close.", ex);
+			}
+			if (e instanceof RuntimeException) {
+				throw (RuntimeException) e;
+			}
 			throw new BatchCriticalException(e);
 		}
 		finally {
-			try {
-				exitStatus = exitStatus.and(listener.close());
-			}
-			catch (Exception e) {
-				logger.error("Encountered an error on listener close.", e);
-			}
 			stepExecution.setExitStatus(exitStatus);
 			stepExecution.setEndTime(new Date());
 			try {

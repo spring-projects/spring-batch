@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -79,11 +79,23 @@ public class CompositeStepListener implements StepListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#open(org.springframework.batch.core.domain.JobParameters)
 	 */
-	public void open(JobParameters jobParameters) {
+	public void open(StepExecution stepExecution) {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			StepListener listener = (StepListener) iterator.next();
-			listener.open(jobParameters);
+			listener.open(stepExecution);
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.StepListener#onError(java.lang.Throwable)
+	 */
+	public ExitStatus onError(Throwable e) {
+		ExitStatus status = null;
+		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+			StepListener listener = (StepListener) iterator.next();
+			ExitStatus close = listener.onError(e);
+			status = status!=null ? status.and(close): close;
+		}
+		return status;
+	}
 }
