@@ -29,5 +29,7 @@ public class NeverSkipItemSkipPolicy implements ItemSkipPolicy{
 		return false;
 	}
 
-	
+	public boolean shouldFail(Throwable t) {
+		return true;
+	}
 }

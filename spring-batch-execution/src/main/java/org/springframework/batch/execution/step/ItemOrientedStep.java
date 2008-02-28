@@ -328,12 +328,20 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 							fatalException.setException(e);
 							stepExecution.setStatus(BatchStatus.UNKNOWN);
 						}
-						if (t instanceof RuntimeException) {
-							throw (RuntimeException) t;
+						
+						if(itemSkipPolicy.shouldFail(t)){
+							if (t instanceof RuntimeException) {
+								throw (RuntimeException) t;
+							}
+							else {
+								throw new RuntimeException(t);
+							}
 						}
-						else {
-							throw new RuntimeException(t);
+						else{
+							logger.error("Exception should not cause step to fail", t);
 						}
+						
+						result = ExitStatus.CONTINUABLE;
 					}
 
 					// Check for interruption after transaction as well, so that

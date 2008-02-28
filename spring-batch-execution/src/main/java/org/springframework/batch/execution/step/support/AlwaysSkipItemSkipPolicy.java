@@ -29,4 +29,8 @@ public class AlwaysSkipItemSkipPolicy implements ItemSkipPolicy {
 	public boolean shouldSkip(Exception ex, int skipCount) {
 		return true;
 	}
+
+	public boolean shouldFail(Throwable t) {
+		return true;
+	}
 }

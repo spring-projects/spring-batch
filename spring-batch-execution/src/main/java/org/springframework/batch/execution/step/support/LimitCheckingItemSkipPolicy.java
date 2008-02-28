@@ -57,6 +57,7 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	private final int skipLimit;
 	
 	private ExceptionClassifier exceptionClassifier;
+	private List failurePreventingExceptions = new ArrayList();
 
 	public LimitCheckingItemSkipPolicy(int skipLimit) {
 		this(skipLimit, new ArrayList(0));
@@ -95,5 +96,22 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 			return false;
 		}
 	}
+
+	public boolean shouldFail(Throwable t) {
+		if(failurePreventingExceptions.contains(t)){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
 	
+	/**
+	 * Set the list of exceptions that will prevent step execution from failing.
+	 * 
+	 * @param failurePreventingExceptions
+	 */
+	public void setFailurePreventingExceptions(List failurePreventingExceptions) {
+		this.failurePreventingExceptions = failurePreventingExceptions;
+	}
 }
