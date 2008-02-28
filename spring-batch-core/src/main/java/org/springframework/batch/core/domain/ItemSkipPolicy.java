@@ -33,4 +33,14 @@ public interface ItemSkipPolicy {
 	 * @throws IllegalArgumentException if the exception is null
 	 */
 	boolean shouldSkip(Exception exception, int skipCount);
+	
+	/**
+	 * Returns true or false, indicating whether or not an exception
+	 * should cause the step to fail.
+	 * 
+	 * @param t throwable encountered while reading
+	 * @return true if the step should continue processing, false otherwise
+	 * @throws IllegalArgumentException if the exception is null
+	 */
+	boolean shouldFail(Throwable t);
 }
