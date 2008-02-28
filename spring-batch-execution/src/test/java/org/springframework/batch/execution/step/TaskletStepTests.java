@@ -11,14 +11,14 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.interceptor.StepListenerSupport;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
 import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.interceptor.RepeatListenerSupport;
 
 public class TaskletStepTests extends TestCase {
 
@@ -105,12 +105,13 @@ public class TaskletStepTests extends TestCase {
 
 	public void testSuccessfulExecutionWithListener() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, false), new JobRepositorySupport());
-		step.setListener(new RepeatListenerSupport() {
-			public void open(RepeatContext context) {
+		step.setListener(new StepListenerSupport() {
+			public void open(ExecutionContext context) {
 				list.add("open");
 			}
-			public void close(RepeatContext context) {
+			public ExitStatus close() {
 				list.add("close");
+				return ExitStatus.CONTINUABLE;
 			}
 		});
 		step.execute(stepExecution);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core.interceptor;
 
+import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * @author Lucas Ward
+ * @author Dave Syer
  *
  */
-public interface StepInterceptor {
+public class StepListenerSupport implements StepListener {
 
-	void open(ExecutionContext executionContext);
-	
-	void beforeChunk();
-	
-	void afterChunk();
-	
-	ExitStatus close();
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.StepListener#close()
+	 */
+	public ExitStatus close() {
+		return ExitStatus.CONTINUABLE;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.StepListener#open(org.springframework.batch.item.ExecutionContext)
+	 */
+	public void open(ExecutionContext executionContext) {
+	}
+
 }

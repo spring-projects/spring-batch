@@ -23,15 +23,12 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.core.interceptor.CompositeStepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.RepeatCallback;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatListener;
-import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -118,14 +115,16 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 		this.allowStartIfComplete = allowStartIfComplete;
 	}
 
-	private RepeatListener[] listeners = new RepeatListener[] {};
+	private CompositeStepListener listener = new CompositeStepListener();
 
-	public void setListeners(RepeatListener[] listeners) {
-		this.listeners = listeners;
+	public void setListeners(StepListener[] listeners) {
+		for (int i = 0; i < listeners.length; i++) {
+			this.listener.register(listeners[i]);
+		}
 	}
 
-	public void setListener(RepeatListener listener) {
-		listeners = new RepeatListener[] { listener };
+	public void setListener(StepListener listener) {
+		this.listener.register(listener);
 	}
 
 	/**
@@ -181,17 +180,8 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 		Exception fatalException = null;
 		try {
 
-			// We are using the RepeatTemplate as a vehicle for the listener
-			// so it can be set up cheaply here with standard properties.
-			RepeatTemplate template = new RepeatTemplate();
-			template.setCompletionPolicy(new SimpleCompletionPolicy(1));
-
-			template.setListeners(listeners);
-			exitStatus = template.iterate(new RepeatCallback() {
-				public ExitStatus doInIteration(RepeatContext context) throws Exception {
-					return tasklet.execute();
-				}
-			});
+			listener.open(stepExecution.getExecutionContext());
+			exitStatus =  tasklet.execute();
 
 			try {
 				jobRepository.saveOrUpdateExecutionContext(stepExecution);
@@ -216,6 +206,12 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 		finally {
 			stepExecution.setExitStatus(exitStatus);
 			stepExecution.setEndTime(new Date());
+			try {
+				listener.close();
+			}
+			catch (Exception e) {
+				logger.error("Encountered an error on listener close.");
+			}
 			try {
 				jobRepository.saveOrUpdate(stepExecution);
 			}

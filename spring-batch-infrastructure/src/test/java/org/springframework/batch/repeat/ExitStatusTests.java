@@ -104,7 +104,21 @@ public class ExitStatusTests extends TestCase {
 		ExitStatus status = ExitStatus.CONTINUABLE.addExitCode("FOO");
 		assertTrue(ExitStatus.CONTINUABLE!=status);
 		assertTrue(status.isContinuable());
-		assertEquals("FOO", status.getExitCode());
+		assertEquals("CONTINUABLE; FOO", status.getExitCode());
+	}
+
+	public void testAddExitCodeToExistingStatus() throws Exception {
+		ExitStatus status = ExitStatus.CONTINUABLE.addExitCode("FOO").addExitCode("BAR");
+		assertTrue(ExitStatus.CONTINUABLE!=status);
+		assertTrue(status.isContinuable());
+		assertEquals("CONTINUABLE; FOO; BAR", status.getExitCode());
+	}
+
+	public void testAddExitCodeToSameStatus() throws Exception {
+		ExitStatus status = ExitStatus.CONTINUABLE.addExitCode(ExitStatus.CONTINUABLE.getExitCode());
+		assertTrue(ExitStatus.CONTINUABLE!=status);
+		assertTrue(status.isContinuable());
+		assertEquals(ExitStatus.CONTINUABLE.getExitCode(), status.getExitCode());
 	}
 
 	public void testAddExitDescription() throws Exception {
@@ -114,9 +128,16 @@ public class ExitStatusTests extends TestCase {
 		assertEquals("Foo", status.getExitDescription());
 	}
 
+	public void testAddExitDescriptionToSameStatus() throws Exception {
+		ExitStatus status = ExitStatus.CONTINUABLE.addExitDescription("Foo").addExitDescription("Foo");
+		assertTrue(ExitStatus.CONTINUABLE!=status);
+		assertTrue(status.isContinuable());
+		assertEquals("Foo", status.getExitDescription());
+	}
+
 	public void testAddExitCodeWithDescription() throws Exception {
 		ExitStatus status = new ExitStatus(true, "BAR", "Bar").addExitCode("FOO");
-		assertEquals("FOO", status.getExitCode());
+		assertEquals("BAR; FOO", status.getExitCode());
 		assertEquals("Bar", status.getExitDescription());
 	}
 	
@@ -136,6 +157,6 @@ public class ExitStatusTests extends TestCase {
 		assertTrue(object instanceof ExitStatus);
 		ExitStatus restored = (ExitStatus) object;
 		assertTrue(restored.isContinuable());
-		assertEquals("FOO", restored.getExitCode());
+		assertEquals(status.getExitCode(), restored.getExitCode());
 	}
 }
