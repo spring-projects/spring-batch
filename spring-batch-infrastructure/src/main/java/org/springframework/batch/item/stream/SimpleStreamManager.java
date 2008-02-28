@@ -22,9 +22,6 @@ import java.util.List;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 /**
  * Simple {@link StreamManager} that tries to resolve conflicts between key
@@ -33,19 +30,9 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
  * @author Dave Syer
  * 
  */
-public class SimpleStreamManager implements StreamManager {
+public class SimpleStreamManager implements ItemStream {
 
 	private List streams = new ArrayList();
-
-	private PlatformTransactionManager transactionManager;
-
-	/**
-	 * @param transactionManager a {@link PlatformTransactionManager}
-	 */
-	public SimpleStreamManager(PlatformTransactionManager transactionManager) {
-		this();
-		this.transactionManager = transactionManager;
-	}
 
 	/**
 	 * 
@@ -54,13 +41,6 @@ public class SimpleStreamManager implements StreamManager {
 		super();
 	}
 
-	/**
-	 * Public setter for the {@link PlatformTransactionManager}.
-	 * @param transactionManager the {@link PlatformTransactionManager} to set
-	 */
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
-		this.transactionManager = transactionManager;
-	}
 
 	/**
 	 * Simple aggregate {@link ExecutionContext} provider for the contributions
@@ -119,30 +99,4 @@ public class SimpleStreamManager implements StreamManager {
 		}
 	}
 
-	/**
-	 * Delegate to the {@link PlatformTransactionManager} to create a new
-	 * transaction.
-	 * 
-	 * @see org.springframework.batch.item.stream.StreamManager#getTransaction()
-	 */
-	public TransactionStatus getTransaction() {
-		TransactionStatus transaction = transactionManager.getTransaction(new DefaultTransactionDefinition());
-		return transaction;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.stream.StreamManager#commit(java.lang.Object)
-	 */
-	public void commit(TransactionStatus status) {
-		transactionManager.commit(status);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.stream.StreamManager#rollback(java.lang.Object)
-	 */
-	public void rollback(TransactionStatus status) {
-		transactionManager.rollback(status);
-	}
 }

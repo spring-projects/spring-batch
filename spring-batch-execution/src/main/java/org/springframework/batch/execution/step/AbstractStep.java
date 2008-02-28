@@ -26,7 +26,6 @@ import org.springframework.batch.execution.step.support.NeverSkipItemSkipPolicy;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.stream.StreamManager;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.beans.factory.BeanNameAware;
@@ -43,23 +42,21 @@ import org.springframework.util.Assert;
 public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
 
 	protected ExceptionHandler exceptionHandler;
-	
+
 	protected RetryPolicy retryPolicy;
 
 	protected JobRepository jobRepository;
 
 	protected PlatformTransactionManager transactionManager;
 
-	protected StreamManager streamManager;
-
 	protected ItemReader itemReader;
 
 	protected ItemWriter itemWriter;
-	
+
 	protected ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
-	
+
 	protected ItemFailureHandler itemFailureHandler = new DefaultItemFailureHandler();
-	
+
 	protected String name;
 
 	protected int startLimit = Integer.MAX_VALUE;
@@ -78,9 +75,11 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Set the name property if it is not already set. Because of the order of the callbacks in a Spring container the
-	 * name property will be set first if it is present. Care is needed with bean definition inheritance - if a parent
-	 * bean has a name, then its children need an explicit name as well, otherwise they will not be unique.
+	 * Set the name property if it is not already set. Because of the order of
+	 * the callbacks in a Spring container the name property will be set first
+	 * if it is present. Care is needed with bean definition inheritance - if a
+	 * parent bean has a name, then its children need an explicit name as well,
+	 * otherwise they will not be unique.
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
@@ -91,7 +90,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Set the name property. Always overrides the default value if this object is a Spring bean.
+	 * Set the name property. Always overrides the default value if this object
+	 * is a Spring bean.
 	 * 
 	 * @see #setBeanName(java.lang.String)
 	 */
@@ -135,23 +135,11 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Public getter for the {@link RetryPolicy}.
-	 * @return the {@link RetryPolicy}
-	 */
-	public RetryPolicy getRetryPolicy() {
-		return retryPolicy;
-	}
-
-	/**
 	 * Public setter for the {@link RetryPolicy}.
 	 * @param retryPolicy the {@link RetryPolicy} to set
 	 */
 	public void setRetryPolicy(RetryPolicy retryPolicy) {
 		this.retryPolicy = retryPolicy;
-	}
-
-	public ExceptionHandler getExceptionHandler() {
-		return exceptionHandler;
 	}
 
 	public void setExceptionHandler(ExceptionHandler exceptionHandler) {
@@ -177,15 +165,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Public setter for the {@link StreamManager}. Set either this or the transaction manager, but not both.
-	 * 
-	 * @param streamManager the {@link StreamManager} to set.
-	 */
-	public void setStreamManager(StreamManager streamManager) {
-		this.streamManager = streamManager;
-	}
-
-	/**
 	 * @param itemReader the itemReader to set
 	 */
 	public void setItemReader(ItemReader itemReader) {
@@ -202,17 +181,9 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
 		this.itemSkipPolicy = itemSkipPolicy;
 	}
-	
-	public ItemSkipPolicy getItemSkipPolicy() {
-		return itemSkipPolicy;
-	}
-	
+
 	public void setItemFailureHandler(ItemFailureHandler itemFailureHandler) {
 		this.itemFailureHandler = itemFailureHandler;
-	}
-	
-	public ItemFailureHandler getItemFailureHandler() {
-		return itemFailureHandler;
 	}
 
 	/**
@@ -226,10 +197,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	protected void assertMandatoryProperties() {
 		Assert.notNull(jobRepository, "JobRepository is mandatory");
-		Assert.state(transactionManager != null || streamManager != null,
-		        "Either StreamManager or TransactionManager must be set");
-		Assert.state(transactionManager == null || streamManager == null,
-		        "Only one of StreamManager or TransactionManager must be set");
+		Assert.notNull(transactionManager, "TransactionManager must be set");
 		Assert.notNull(itemReader, "ItemReader must be provided");
 		Assert.notNull(itemWriter, "ItemWriter must be provided");
 

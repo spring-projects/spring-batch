@@ -22,9 +22,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.exception.StreamException;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.transaction.TransactionException;
-import org.springframework.transaction.TransactionStatus;
 
 /**
  * @author Dave Syer
@@ -32,7 +29,7 @@ import org.springframework.transaction.TransactionStatus;
  */
 public class SimpleStreamManagerTests extends TestCase {
 
-	private SimpleStreamManager manager = new SimpleStreamManager(new ResourcelessTransactionManager());
+	private SimpleStreamManager manager = new SimpleStreamManager();
 
 	private List list = new ArrayList();
 
@@ -65,36 +62,6 @@ public class SimpleStreamManagerTests extends TestCase {
 		manager.register(stream);
 		manager.open(null);
 		assertEquals(1, list.size());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#SimpleStreamManager(org.springframework.transaction.PlatformTransactionManager)}.
-	 */
-	public void testSimpleStreamManagerPlatformTransactionManager() {
-		manager = new SimpleStreamManager();
-		try {
-			manager.getTransaction();
-			fail("Expected NullPointerException");
-		}
-		catch (NullPointerException e) {
-			// expected;
-		}
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#setTransactionManager(org.springframework.transaction.PlatformTransactionManager)}.
-	 */
-	public void testSetTransactionManager() {
-		manager.setTransactionManager(new ResourcelessTransactionManager() {
-			protected Object doGetTransaction() throws TransactionException {
-				list.add("bar");
-				return super.doGetTransaction();
-			}
-		});
-		manager.getTransaction();
-		assertEquals("bar", list.get(0));
 	}
 
 	/**
@@ -139,36 +106,6 @@ public class SimpleStreamManagerTests extends TestCase {
 		manager.close(null);
 		manager.open(null);
 		assertEquals(1, list.size());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#commit(org.springframework.transaction.TransactionStatus)}.
-	 */
-	public void testCommitWithoutMark() {
-		manager.register(new ItemStreamSupport() {
-			public void update(ExecutionContext executionContext) {
-				list.add("bar");
-			}
-		});
-		TransactionStatus status = manager.getTransaction();
-		manager.commit(status);
-		assertEquals(0, list.size());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.stream.SimpleStreamManager#rollback(org.springframework.transaction.TransactionStatus)}.
-	 */
-	public void testRollbackWithoutMark() {
-		manager.register( new ItemStreamSupport() {
-			public void update(ExecutionContext executionContext) {
-				list.add("bar");
-			}
-		});
-		TransactionStatus status = manager.getTransaction();
-		manager.rollback(status);
-		assertEquals(0, list.size());
 	}
 
 }

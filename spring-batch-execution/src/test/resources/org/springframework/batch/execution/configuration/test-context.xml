@@ -24,9 +24,6 @@
 				<property name="itemReader" ref="itemReader" />
 				<property name="itemWriter" ref="itemWriter" />
 				<property name="jobRepository" ref="jobRepository" />
-				<property name="streamManager">
-					<bean class="org.springframework.batch.item.stream.SimpleStreamManager" />
-				</property>
 			</bean>
 		</property>
 	</bean>

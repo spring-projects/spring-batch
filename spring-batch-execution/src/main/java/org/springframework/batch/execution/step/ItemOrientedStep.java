@@ -52,6 +52,7 @@ import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.Assert;
 
 /**
@@ -94,6 +95,8 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	private ItemReaderRetryCallback retryCallback;
 
 	private int commitInterval = 0;
+
+	private SimpleStreamManager streamManager;
 
 	/**
 	 * The {@link RepeatOperations} to use for the outer loop of the batch
@@ -180,12 +183,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			retryCallback = new ItemReaderRetryCallback((KeyedItemReader) itemReader, itemWriter);
 		}
 
-		if (streamManager == null && transactionManager != null) {
-			streamManager = new SimpleStreamManager(transactionManager);
-		}
-		else if (streamManager == null && transactionManager == null) {
-			throw new IllegalArgumentException("Either StreamManager or TransactionManager must be set");
-		}
+		streamManager = new SimpleStreamManager();
 
 		if (this.chunkOperations instanceof RepeatTemplate && commitInterval > 0) {
 			((RepeatTemplate) chunkOperations).setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
@@ -257,7 +255,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 					ExitStatus result;
 
-					TransactionStatus transaction = streamManager.getTransaction();
+					TransactionStatus transaction = transactionManager.getTransaction(new DefaultTransactionDefinition());
 
 					try {
 						itemReader.mark();
@@ -290,7 +288,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 						try {
 							itemReader.mark();
 							itemWriter.flush();
-							streamManager.commit(transaction);
+							transactionManager.commit(transaction);
 						}
 						catch (Exception e) {
 							fatalException.setException(e);
@@ -316,7 +314,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 						try {
 							itemReader.reset();
 							itemWriter.clear();
-							streamManager.rollback(transaction);
+							transactionManager.rollback(transaction);
 						}
 						catch (Exception e) {
 							fatalException.setException(e);
@@ -475,7 +473,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 		}
 		catch (Exception e) {
-			if (getItemSkipPolicy().shouldSkip(e, contribution.getSkipCount())) {
+			if (itemSkipPolicy.shouldSkip(e, contribution.getSkipCount())) {
 				contribution.incrementSkipCount();
 				skip();
 			}
@@ -510,7 +508,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 				item = itemReader.read();
 			}
 			catch (Exception ex) {
-				getItemFailureHandler().handleReadFailure(ex);
+				itemFailureHandler.handleReadFailure(ex);
 				throw ex;
 			}
 			if (item == null) {
@@ -521,7 +519,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			}
 			catch (Exception e) {
 
-				getItemFailureHandler().handleWriteFailure(item, e);
+				itemFailureHandler.handleWriteFailure(item, e);
 				// Re-throw the exception so that the surrounding transaction
 				// rolls back if there is one
 				throw e;

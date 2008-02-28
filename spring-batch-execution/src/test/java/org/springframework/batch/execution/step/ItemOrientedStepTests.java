@@ -46,7 +46,6 @@ import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.item.stream.ItemStreamSupport;
-import org.springframework.batch.item.stream.SimpleStreamManager;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
@@ -56,7 +55,8 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.support.DefaultTransactionStatus;
 
 public class ItemOrientedStepTests extends TestCase {
 
@@ -107,8 +107,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		jobInstance = new JobInstance(new Long(0), new JobParameters(), new JobSupport("FOO"));
 
-		SimpleStreamManager streamManager = new SimpleStreamManager(transactionManager);
-		itemOrientedStep.setStreamManager(streamManager);
+		itemOrientedStep.setTransactionManager(transactionManager);
 
 	}
 
@@ -333,24 +332,19 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testStreamManager() throws Exception {
-		itemOrientedStep.setItemReader(new AbstractItemReader() {
+		itemOrientedStep.setItemReader(new MockRestartableItemReader() {
 			public Object read() throws Exception {
 				return "foo";
+			}
+			public void update(ExecutionContext executionContext) {
+				// TODO Auto-generated method stub
+				executionContext.putString("foo", "bar");
 			}
 		});
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
 
 		assertEquals(false, stepExecution.getExecutionContext().containsKey("foo"));
-
-		itemOrientedStep.setStreamManager(new SimpleStreamManager(new ResourcelessTransactionManager()) {
-
-			public void update(ExecutionContext executionContext) {
-				// TODO Auto-generated method stub
-				executionContext.putString("foo", "bar");
-			}
-
-		});
 
 		itemOrientedStep.execute(stepExecution);
 
@@ -441,9 +435,8 @@ public class ItemOrientedStepTests extends TestCase {
 			}
 		};
 		itemOrientedStep.setItemReader(itemReader);
-		itemOrientedStep.setStreamManager(new SimpleStreamManager(transactionManager) {
-			public void rollback(TransactionStatus status) {
-				super.rollback(status);
+		itemOrientedStep.setTransactionManager(new ResourcelessTransactionManager() {
+			protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
 				// Simulate failure on rollback when stream resets
 				throw new ResetFailedException("Bar");
 			}
@@ -470,9 +463,8 @@ public class ItemOrientedStepTests extends TestCase {
 
 	public void testStatusForCommitFailedException() throws Exception {
 
-		itemOrientedStep.setStreamManager(new SimpleStreamManager(transactionManager) {
-			public void commit(TransactionStatus status) {
-				super.commit(status);
+		itemOrientedStep.setTransactionManager(new ResourcelessTransactionManager() {
+			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
 				// Simulate failure on rollback when stream resets
 				throw new RuntimeException("Bar");
 			}
@@ -531,7 +523,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 	public void testStatusForCloseFailedException() throws Exception {
 
-		itemOrientedStep.setStreamManager(new SimpleStreamManager(transactionManager) {
+		itemOrientedStep.setItemReader(new MockRestartableItemReader() {
 			public void close(ExecutionContext executionContext) throws StreamException {
 				super.close(executionContext);
 				// Simulate failure on rollback when stream resets
