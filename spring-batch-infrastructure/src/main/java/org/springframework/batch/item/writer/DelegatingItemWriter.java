@@ -1,12 +1,8 @@
 package org.springframework.batch.item.writer;
 
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ClearFailedException;
 import org.springframework.batch.item.exception.FlushFailedException;
-import org.springframework.batch.item.exception.StreamException;
-import org.springframework.batch.item.stream.ItemStreamSupport;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -16,12 +12,10 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class DelegatingItemWriter implements ItemWriter, ItemStream, InitializingBean {
+public class DelegatingItemWriter implements ItemWriter, InitializingBean {
 
 	private ItemWriter writer;
 	
-	private ItemStream stream;
-
 	/**
 	 * Calls {@link #doProcess(Object)} and then writes the result to the
 	 * delegate {@link ItemWriter}.
@@ -48,11 +42,6 @@ public class DelegatingItemWriter implements ItemWriter, ItemStream, Initializin
 	 */
 	public void setDelegate(ItemWriter writer) {
 		this.writer = writer;
-		if (writer instanceof ItemStream) {
-			this.stream = (ItemStream) writer;
-		} else {
-			this.stream = new ItemStreamSupport();
-		}
 	}
 
 	public void afterPropertiesSet() throws Exception {
@@ -73,26 +62,4 @@ public class DelegatingItemWriter implements ItemWriter, ItemStream, Initializin
 		writer.flush();
 	}
 
-	/**
-	 * @throws StreamException
-	 * @see org.springframework.batch.item.ItemStream#close(ExecutionContext)
-	 */
-	public void close(ExecutionContext executionContext) throws StreamException {
-		stream.close(null);
-	}
-
-	/**
-	 * @see org.springframework.batch.item.ExecutionContextProvider#update(ExecutionContext)
-	 */
-	public void update(ExecutionContext executionContext) {
-		stream.update(executionContext);
-	}
-
-	/**
-	 * @throws StreamException
-	 * @see org.springframework.batch.item.ItemStream#open()
-	 */
-	public void open(ExecutionContext executionContext) throws StreamException {
-		stream.open(executionContext);
-	}
 }
