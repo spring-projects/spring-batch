@@ -23,11 +23,12 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.BatchListener;
 import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.ItemFailureHandler;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.execution.job.SimpleJob;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobExecutionDao;
@@ -149,17 +150,19 @@ public class SimpleJobTests extends TestCase {
 				throw new RuntimeException("Error!");
 			}
 		});
-		step.setItemFailureHandler(new ItemFailureHandler(){
+		
+		step.setListeners(new BatchListener[]{new ItemListenerSupport(){
 
-			public void handleReadFailure(Exception ex) {
+			public void onReadError(Exception ex) {
 				recovered.add(ex);
 			}
 
-			public void handleWriteFailure(Object item, Exception ex) {
+			public void onWriteError(Exception ex, Object item) {
 				recovered.add(ex);
 			}
 			
-		});
+		}});
+		
 		step.afterPropertiesSet();
 		job.setSteps(Collections.singletonList(step));
 
@@ -195,4 +198,5 @@ public class SimpleJobTests extends TestCase {
 		}
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 	}
+	
 }

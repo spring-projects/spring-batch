@@ -15,15 +15,16 @@
  */
 package org.springframework.batch.execution.step.support;
 
+import org.springframework.batch.core.domain.BatchListener;
 import org.springframework.batch.core.domain.ChunkListener;
 import org.springframework.batch.core.domain.ItemReadListener;
 import org.springframework.batch.core.domain.ItemWriteListener;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepListener;
-import org.springframework.batch.core.interceptor.CompositeChunkListener;
-import org.springframework.batch.core.interceptor.CompositeItemReadListener;
-import org.springframework.batch.core.interceptor.CompositeItemWriteListener;
-import org.springframework.batch.core.interceptor.CompositeStepListener;
+import org.springframework.batch.execution.listener.CompositeChunkListener;
+import org.springframework.batch.execution.listener.CompositeItemReadListener;
+import org.springframework.batch.execution.listener.CompositeItemWriteListener;
+import org.springframework.batch.execution.listener.CompositeStepListener;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
@@ -83,7 +84,7 @@ public class ListenerMulticaster implements ItemStream, StepListener, ChunkListe
 
 	/**
 	 * @return
-	 * @see org.springframework.batch.core.interceptor.CompositeStepListener#afterStep()
+	 * @see org.springframework.batch.execution.listener.CompositeStepListener#afterStep()
 	 */
 	public ExitStatus afterStep() {
 		return stepListener.afterStep();
@@ -91,7 +92,7 @@ public class ListenerMulticaster implements ItemStream, StepListener, ChunkListe
 
 	/**
 	 * @param stepExecution
-	 * @see org.springframework.batch.core.interceptor.CompositeStepListener#beforeStep(org.springframework.batch.core.domain.StepExecution)
+	 * @see org.springframework.batch.execution.listener.CompositeStepListener#beforeStep(org.springframework.batch.core.domain.StepExecution)
 	 */
 	public void beforeStep(StepExecution stepExecution) {
 		stepListener.beforeStep(stepExecution);
@@ -100,7 +101,7 @@ public class ListenerMulticaster implements ItemStream, StepListener, ChunkListe
 	/**
 	 * @param e
 	 * @return
-	 * @see org.springframework.batch.core.interceptor.CompositeStepListener#onErrorInStep(java.lang.Throwable)
+	 * @see org.springframework.batch.execution.listener.CompositeStepListener#onErrorInStep(java.lang.Throwable)
 	 */
 	public ExitStatus onErrorInStep(Throwable e) {
 		return stepListener.onErrorInStep(e);

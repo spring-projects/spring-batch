@@ -22,6 +22,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.BatchListener;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
@@ -29,7 +30,7 @@ import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.interceptor.StepListenerSupport;
+import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.MapJobExecutionDao;
@@ -371,7 +372,7 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testDirectlyInjectedListener() throws Exception {
-		itemOrientedStep.setListeners(new Object[] {new StepListenerSupport() {
+		itemOrientedStep.setListeners(new BatchListener[] {new StepListenerSupport() {
 			public void beforeStep(StepExecution stepExecution) {
 				list.add("foo");
 			}

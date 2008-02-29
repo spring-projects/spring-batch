@@ -17,10 +17,10 @@ package org.springframework.batch.execution.step.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.domain.ItemFailureHandler;
+import org.springframework.batch.core.listener.ItemListenerSupport;
 
 /**
- * Default implementation of the {@link ItemFailureHandler} interface that
+ * Default implementation of the {@link ItemListenerSupport} class that
  * writes all exceptions via commons logging. Since generics can't be used to
  * ensure the list contains exceptions, any non exceptions will be logged out by
  * calling toString on the object.
@@ -28,7 +28,7 @@ import org.springframework.batch.core.domain.ItemFailureHandler;
  * @author Lucas Ward
  * 
  */
-public class DefaultItemFailureHandler implements ItemFailureHandler {
+public class DefaultItemFailureHandler extends ItemListenerSupport {
 
 	protected static final Log logger = LogFactory
 			.getLog(DefaultItemFailureHandler.class);
@@ -38,7 +38,7 @@ public class DefaultItemFailureHandler implements ItemFailureHandler {
 	 * 
 	 * @see org.springframework.batch.core.domain.ItemFailureLog#log(java.util.List)
 	 */
-	public void handleReadFailure(Exception ex) {
+	public void onReadError(Exception ex) {
 		try {
 			logger.error("Error encountered while reading", ex);
 		} catch (Exception exception) {
@@ -47,7 +47,7 @@ public class DefaultItemFailureHandler implements ItemFailureHandler {
 		}
 	}
 
-	public void handleWriteFailure(Object item, Exception ex) {
+	public void onWriteError(Exception ex, Object item) {
 		try {
 			logger.error("Error encountered while writing item: [ " + item + "]", ex);
 		} catch (Exception exception) {

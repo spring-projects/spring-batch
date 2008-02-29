@@ -15,13 +15,11 @@
  */
 package org.springframework.batch.execution.step;
 
-import org.springframework.batch.core.domain.ItemFailureHandler;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.execution.step.support.DefaultItemFailureHandler;
 import org.springframework.batch.execution.step.support.NeverSkipItemSkipPolicy;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.ItemReader;
@@ -54,8 +52,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	protected ItemWriter itemWriter;
 
 	protected ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
-
-	protected ItemFailureHandler itemFailureHandler = new DefaultItemFailureHandler();
 
 	protected String name;
 
@@ -180,10 +176,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
 		this.itemSkipPolicy = itemSkipPolicy;
-	}
-
-	public void setItemFailureHandler(ItemFailureHandler itemFailureHandler) {
-		this.itemFailureHandler = itemFailureHandler;
 	}
 
 	/**
