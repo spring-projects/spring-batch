@@ -273,8 +273,9 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 					try {
 						itemReader.mark();
+						listener.beforeChunk();
 						result = processChunk(contribution);
-
+						listener.afterChunk();
 						contribution.incrementCommitCount();
 
 						// If the step operations are asynchronous then we need
@@ -528,21 +529,25 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 		if (retryCallback == null) {
 			Object item = null;
 			try {
+				listener.beforeRead();
 				item = itemReader.read();
+				listener.afterRead(item);
 			}
 			catch (Exception ex) {
-				itemFailureHandler.handleReadFailure(ex);
+				listener.onReadError(ex);
 				throw ex;
 			}
 			if (item == null) {
 				return ExitStatus.FINISHED;
 			}
 			try {
+				listener.beforeWrite(item);
 				itemWriter.write(item);
+				listener.afterWrite();
 			}
 			catch (Exception e) {
 
-				itemFailureHandler.handleWriteFailure(item, e);
+				listener.onWriteError(e, item);
 				// Re-throw the exception so that the surrounding transaction
 				// rolls back if there is one
 				throw e;

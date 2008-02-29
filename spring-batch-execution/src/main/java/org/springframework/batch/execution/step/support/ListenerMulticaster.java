@@ -15,8 +15,14 @@
  */
 package org.springframework.batch.execution.step.support;
 
+import org.springframework.batch.core.domain.ChunkListener;
+import org.springframework.batch.core.domain.ItemReadListener;
+import org.springframework.batch.core.domain.ItemWriteListener;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.core.interceptor.CompositeChunkListener;
+import org.springframework.batch.core.interceptor.CompositeItemReadListener;
+import org.springframework.batch.core.interceptor.CompositeItemWriteListener;
 import org.springframework.batch.core.interceptor.CompositeStepListener;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
@@ -28,11 +34,17 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * 
  */
-public class ListenerMulticaster implements ItemStream, StepListener {
+public class ListenerMulticaster implements ItemStream, StepListener, ChunkListener, ItemReadListener, ItemWriteListener {
 
 	private CompositeItemStream stream = new CompositeItemStream();
 
 	private CompositeStepListener stepListener = new CompositeStepListener();
+	
+	private CompositeChunkListener chunkListener = new CompositeChunkListener();
+	
+	private CompositeItemReadListener itemReadListener = new CompositeItemReadListener();
+	
+	private CompositeItemWriteListener itemWriteListener = new CompositeItemWriteListener();
 
 	/**
 	 * Register each of the objects as listeners. Once registered, calls to the
@@ -57,6 +69,15 @@ public class ListenerMulticaster implements ItemStream, StepListener {
 		}
 		if (listener instanceof ItemStream) {
 			this.stream.register((ItemStream) listener);
+		}
+		if(listener instanceof ChunkListener){
+			this.chunkListener.register((ChunkListener)listener);
+		}
+		if(listener instanceof ItemReadListener){
+			this.itemReadListener.register((ItemReadListener)listener);
+		}
+		if(listener instanceof ItemWriteListener){
+			this.itemWriteListener.register((ItemWriteListener)listener);
 		}
 	}
 
@@ -109,6 +130,38 @@ public class ListenerMulticaster implements ItemStream, StepListener {
 	 */
 	public void update(ExecutionContext executionContext) {
 		stream.update(executionContext);
+	}
+
+	public void afterChunk() {
+		chunkListener.afterChunk();
+	}
+
+	public void beforeChunk() {
+		chunkListener.beforeChunk();
+	}
+
+	public void afterRead(Object item) {
+		itemReadListener.afterRead(item);
+	}
+
+	public void beforeRead() {
+		itemReadListener.beforeRead();
+	}
+
+	public void onReadError(Exception ex) {
+		itemReadListener.onReadError(ex);
+	}
+
+	public void afterWrite() {
+		itemWriteListener.afterWrite();
+	}
+
+	public void beforeWrite(Object item) {
+		itemWriteListener.beforeWrite(item);
+	}
+
+	public void onWriteError(Exception ex, Object item) {
+		itemWriteListener.onWriteError(ex, item);
 	}
 
 }
