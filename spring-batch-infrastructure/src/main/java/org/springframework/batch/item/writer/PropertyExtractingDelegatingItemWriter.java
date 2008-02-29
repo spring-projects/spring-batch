@@ -42,8 +42,7 @@ public class PropertyExtractingDelegatingItemWriter extends AbstractMethodInvoki
 	 */
 	public void write(Object item) throws Exception {
 		// helper for extracting property values from a bean
-		BeanWrapper beanWrapper = new BeanWrapperImpl();
-		beanWrapper.setWrappedInstance(item);
+		BeanWrapper beanWrapper = new BeanWrapperImpl(item);
 		
 		Object[] methodArguments = new Object[fieldsUsedAsTargetMethodArguments.length];
 		for (int i = 0; i < fieldsUsedAsTargetMethodArguments.length; i++) {

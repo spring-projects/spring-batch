@@ -188,6 +188,15 @@ public class StepExecutionProxyResource extends StepListenerSupport implements R
 	}
 
 	/**
+	 * @see org.springframework.core.io.Resource#isReadable()
+	 */
+	public boolean isReadable() {
+		Assert.state(delegate != null, "The delegate resource has not been initialised. "
+				+ "Remember to register this object as a StepListener.");
+		return delegate.isReadable();
+	}
+
+	/**
 	 * Public setter for the {@link JobParametersFactory} used to translate
 	 * {@link JobParameters} into {@link Properties}. Defaults to a
 	 * {@link DefaultJobParametersFactory}.
