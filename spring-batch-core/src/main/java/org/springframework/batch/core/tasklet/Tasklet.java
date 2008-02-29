@@ -16,39 +16,41 @@
 
 package org.springframework.batch.core.tasklet;
 
-import org.springframework.batch.core.domain.Step;
+import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 
+import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
+
 /**
- * The primary interface describing the touch-point between the batch developer
- * and a spring-batch execution. The execute method will be called to indicate
- * to the developer that it is time to execute business logic. The value
- * returned from this method will indicate whether or not processing should
- * continue. It is important to note that in the vast majority of cases this
- * class should not be directly implemented by batch developers for processing.
- * Most batch processing is significantly more complex than simple execute and
- * should logically be broken into a minimum of two processes (read and write).
- * However, many architecture teams may find creating their own implementations
- * of this interface useful for differentiating different batch job types, or
- * for creating more flexibility within their batch jobs.
+ * Interface for encapsulating processing logic that is not natural to split
+ * into read-(transform)-write phases, such as invoking a system command or a
+ * stored procedure.
  * 
- * @see Step
+ * As framework has no visibility inside the {@link #execute()} method,
+ * developers should consider implementing {@link StepListener} and check the
+ * {@link StepExecution#isTerminateOnly()} value for long lasting processes to
+ * enable prompt termination of processing on user request.
+ * 
+ * It is expected the read-(transform)-write separation will be appropriate for
+ * most cases and developers should implement {@link ItemReader} and
+ * {@link ItemWriter} interfaces then (typically extending or composing provided
+ * implementations).
+ * 
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Robert Kasanicky
  * 
  */
 public interface Tasklet {
 
 	/**
-	 * Primary batch processing driver. All processing of batch business data
-	 * should be handled within this method. Any processing which intends to
-	 * control the flow of the batch lifecycle by throwing exceptions (such as
-	 * BatchCriticalExeception) should throw them within this method. Doing so
-	 * outside of this method will prevent the architecture from gracefully
-	 * shutting down and providing such features as transaction rollback.
+	 * Encapsulates execution logic of {@link Step}, which is unnatural to
+	 * separate into read-(transform)-write phases.
 	 * 
-	 * @return ExitStatus indicating whether the processing should continue (i.e.
-	 * false when data are exhausted).
+	 * @return ExitStatus indicating success or failure
 	 * @see org.springframework.batch.repeat.ExitStatus
 	 */
 	public ExitStatus execute() throws Exception;

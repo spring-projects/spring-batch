@@ -18,38 +18,48 @@ package org.springframework.batch.core.domain;
 
 import org.springframework.util.Assert;
 
-
-
 /**
- * Batch domain object representing a job instance. A job instance is defined as
- * a logical container for steps with unique identification of the unit as a
- * whole. A job can be executed many times with the same instance, usually if it
- * fails and is restarted, or if it is launched on an ad-hoc basis "on demand".
+ * Batch domain object representing a uniquely identifiable job run - it's
+ * identity is given by the pair {@link Job} and {@link JobParameters}.
+ * JobInstance can be restarted multiple times in case of execution failure and
+ * it's lifecycle ends with first successful execution.
+ * 
+ * Trying to execute an existing JobIntance that has already completed
+ * successfully will result in error. Error will be raised also for an attempt
+ * to restart a failed JobInstance if the Job ({@link JobInstance#getJob()}) is not
+ * restartable.
+ * 
+ * @see Job
+ * @see JobParameters
+ * @see JobExecution
  * 
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Robert Kasanicky
+ * 
  */
 public class JobInstance extends Entity {
 
 	private JobParameters jobParameters;
-	
+
 	private Job job;
 
 	private int jobExecutionCount;
-	
+
 	private JobExecution lastExecution;
 
-	public JobInstance(Long id, JobParameters jobParameters, Job job){
+	public JobInstance(Long id, JobParameters jobParameters, Job job) {
 		super(id);
 		Assert.notNull(job);
-		this.jobParameters = jobParameters==null ? new JobParameters() : jobParameters;
+		this.jobParameters = jobParameters == null ? new JobParameters()
+				: jobParameters;
 		this.job = job;
 	}
-	
+
 	public void setLastExecution(JobExecution lastExecution) {
 		this.lastExecution = lastExecution;
 	}
-	
+
 	public JobExecution getLastExecution() {
 		return lastExecution;
 	}
@@ -73,20 +83,20 @@ public class JobInstance extends Entity {
 	 * @return the job name. (Equivalent to getJob().getName())
 	 */
 	public String getJobName() {
-		return job==null ? null : job.getName();
+		return job == null ? null : job.getName();
 	}
-	
+
 	public JobExecution createJobExecution() {
 		JobExecution newExecution = new JobExecution(this);
 		this.setLastExecution(newExecution);
 		return newExecution;
 	}
-	
+
 	public String toString() {
-		return super.toString()+", JobParameters=["+ jobParameters +"]" +
-			", Job=[" + job + "]";
+		return super.toString() + ", JobParameters=[" + jobParameters + "]"
+				+ ", Job=[" + job + "]";
 	}
-	
+
 	public Job getJob() {
 		return job;
 	}
