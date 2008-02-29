@@ -3,10 +3,8 @@ package org.springframework.batch.sample.item.reader;
 import java.math.BigDecimal;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.MarkFailedException;
 import org.springframework.batch.item.exception.ResetFailedException;
-import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.item.reader.AbstractItemReaderRecoverer;
 import org.springframework.batch.sample.domain.Trade;
 
@@ -15,7 +13,7 @@ import org.springframework.batch.sample.domain.Trade;
  * 
  * @author Robert Kasanicky
  */
-public class GeneratingItemReader extends AbstractItemReaderRecoverer implements ItemStream {
+public class GeneratingItemReader extends AbstractItemReaderRecoverer {
 
 	private int limit = 1;
 	
@@ -59,14 +57,6 @@ public class GeneratingItemReader extends AbstractItemReaderRecoverer implements
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#close()
-	 */
-	public void close(ExecutionContext executionContext) throws StreamException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark()
 	 */
 	public void mark() throws MarkFailedException {
@@ -84,15 +74,6 @@ public class GeneratingItemReader extends AbstractItemReaderRecoverer implements
 	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void restoreFrom(ExecutionContext context) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
-	 */
-	public void update(ExecutionContext executionContext) {
-	}
-
-	public void open(ExecutionContext context) throws StreamException {
 	}
 
 }

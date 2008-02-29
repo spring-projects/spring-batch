@@ -14,6 +14,7 @@
 	<bean id="restartSampleJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
+				<property name="listener" ref="fileItemReader"/>
 				<property name="itemReader">
 					<bean
 						class="org.springframework.batch.item.reader.ValidatingItemReader">

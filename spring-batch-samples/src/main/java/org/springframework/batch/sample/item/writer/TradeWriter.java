@@ -64,10 +64,4 @@ public class TradeWriter extends AbstractItemWriter {
     public void setDao(TradeDao dao) {
         this.dao = dao;
     }
-
-	public void close() {
-	}
-
-	public void init() {
-	}
 }

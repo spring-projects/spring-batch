@@ -9,43 +9,46 @@
  			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 	<import resource="../simple-container-definition.xml" />
-	
+
 	<import resource="tradeJobIo.xml" />
 
 	<bean id="tradeJob" parent="simpleJob">
 		<property name="steps">
 			<list>
 				<bean id="step1" parent="simpleStep">
-							<property name="itemReader">
-								<bean
-									class="org.springframework.batch.item.reader.ValidatingItemReader">
-									<property name="itemReader"
-										ref="fileInputTemplate" />
-									<property name="validator"
-										ref="tradeValidator" />
-								</bean>
-							</property>
-							<property name="itemWriter">
-								<bean
-									class="org.springframework.batch.sample.item.writer.TradeWriter"
-									p:dao-ref="tradeDao" />
-							</property>
+					<property name="listener" ref="fileInputTemplate" />
+					<property name="itemReader">
+						<bean
+							class="org.springframework.batch.item.reader.ValidatingItemReader">
+							<property name="itemReader"
+								ref="fileInputTemplate" />
+							<property name="validator"
+								ref="tradeValidator" />
+						</bean>
+					</property>
+					<property name="itemWriter">
+						<bean
+							class="org.springframework.batch.sample.item.writer.TradeWriter"
+							p:dao-ref="tradeDao" />
+					</property>
 				</bean>
 				<bean id="step2" parent="simpleStep">
-							<property name="itemReader" ref="tradeSqlItemReader" />
-							<property name="itemWriter">
-								<bean
-									class="org.springframework.batch.sample.item.writer.CustomerUpdateWriter"
-									p:dao-ref="customerDao" />
-							</property>
+					<property name="itemReader"
+						ref="tradeSqlItemReader" />
+					<property name="itemWriter">
+						<bean
+							class="org.springframework.batch.sample.item.writer.CustomerUpdateWriter"
+							p:dao-ref="customerDao" />
+					</property>
 				</bean>
 				<bean id="step3" parent="simpleStep">
-							<property name="itemReader" ref="customerSqlItemReader" />
-							<property name="itemWriter">
-								<bean
-									class="org.springframework.batch.sample.item.writer.CustomerCreditUpdateWriter"
-									p:writer-ref="customerReportOutputSource" />
-							</property>
+					<property name="itemReader"
+						ref="customerSqlItemReader" />
+					<property name="itemWriter">
+						<bean
+							class="org.springframework.batch.sample.item.writer.CustomerCreditUpdateWriter"
+							p:writer-ref="customerReportOutputSource" />
+					</property>
 				</bean>
 			</list>
 		</property>
@@ -62,7 +65,8 @@
 		</property>
 	</bean>
 
-	<bean id="customerSqlItemReader" class="org.springframework.batch.io.cursor.JdbcCursorItemReader">
+	<bean id="customerSqlItemReader"
+		class="org.springframework.batch.io.cursor.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
 			value="SELECT id, name, credit FROM customer " />

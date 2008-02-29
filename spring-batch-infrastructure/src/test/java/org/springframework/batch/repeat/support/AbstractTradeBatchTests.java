@@ -22,7 +22,6 @@ import org.springframework.batch.io.file.FlatFileItemReader;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.reader.DelegatingItemReader;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -49,20 +48,15 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 		provider.open(new ExecutionContext());
 	}
 
-	protected static class TradeItemReader extends DelegatingItemReader {
+	protected static class TradeItemReader extends FlatFileItemReader {
 
 		protected TradeItemReader(Resource resource) throws Exception {
 			super();
-			FlatFileItemReader inputSource = new FlatFileItemReader();
-			inputSource.setResource(resource);
-			inputSource.setFieldSetMapper(new TradeMapper());
-			inputSource.afterPropertiesSet();
-			setItemReader(inputSource);
+			setResource(resource);
+			setFieldSetMapper(new TradeMapper());
+			afterPropertiesSet();
 		}
 
-		public synchronized Object read() throws Exception {
-			return super.read();
-		}
 	}
 
 	protected static class TradeMapper implements FieldSetMapper{

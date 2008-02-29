@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -7,7 +8,7 @@
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 	<import resource="../simple-container-definition.xml" />
-	
+
 	<import resource="multilineOrderInputDescriptors.xml" />
 	<import resource="multilineOrderOutputDescriptors.xml" />
 	<import resource="multilineOrderIo.xml" />
@@ -15,46 +16,72 @@
 	<bean id="multilineOrderJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
-						<property name="itemReader">
-							<bean class="org.springframework.batch.sample.item.reader.OrderItemReader">
-								<property name="itemReader" ref="fileInputTemplate" />
-								<property name="headerMapper" ref="headerFieldSetMapper" />
-								<property name="customerMapper" ref="customerFieldSetMapper" />
-								<property name="addressMapper" ref="addressFieldSetMapper" />
-								<property name="billingMapper" ref="billingFieldSetMapper" />
-								<property name="itemMapper" ref="orderItemFieldSetMapper" />
-								<property name="shippingMapper" ref="shippingFieldSetMapper" />
-								<property name="validator" ref="validator" />
-							</bean>
-						</property>
-						<property name="itemWriter">
-							<bean class="org.springframework.batch.sample.item.writer.OrderWriter">
-								<property name="delegate">
-									<bean class="org.springframework.batch.sample.dao.FlatFileOrderWriter">
-										<property name="delegate" ref="flatFileOutputSource" />
-										<property name="transformer">
-											<bean class="org.springframework.batch.sample.dao.OrderTransformer">
-												<property name="aggregators" ref="outputDescriptors" />
-											</bean>
-										</property>
-									</bean>
-								</property>
-							</bean>
-						</property>
+				<property name="listeners">
+					<list>
+						<ref bean="orderWriter" />
+						<ref bean="fileInputTemplate" />
+					</list>
+				</property>
+				<property name="itemReader">
+					<bean
+						class="org.springframework.batch.sample.item.reader.OrderItemReader">
+						<property name="itemReader"
+							ref="fileInputTemplate" />
+						<property name="headerMapper"
+							ref="headerFieldSetMapper" />
+						<property name="customerMapper"
+							ref="customerFieldSetMapper" />
+						<property name="addressMapper"
+							ref="addressFieldSetMapper" />
+						<property name="billingMapper"
+							ref="billingFieldSetMapper" />
+						<property name="itemMapper"
+							ref="orderItemFieldSetMapper" />
+						<property name="shippingMapper"
+							ref="shippingFieldSetMapper" />
+						<property name="validator" ref="validator" />
+					</bean>
+				</property>
+				<property name="itemWriter">
+					<bean
+						class="org.springframework.batch.sample.item.writer.OrderWriter">
+						<property name="delegate" ref="orderWriter" />
+					</bean>
+				</property>
 			</bean>
 		</property>
 	</bean>
 
-	<bean id="headerFieldSetMapper" class="org.springframework.batch.sample.mapping.HeaderFieldSetMapper" />
-	<bean id="customerFieldSetMapper" class="org.springframework.batch.sample.mapping.CustomerFieldSetMapper" />
-	<bean id="addressFieldSetMapper" class="org.springframework.batch.sample.mapping.AddressFieldSetMapper" />
-	<bean id="billingFieldSetMapper" class="org.springframework.batch.sample.mapping.BillingFieldSetMapper" />
-	<bean id="orderItemFieldSetMapper" class="org.springframework.batch.sample.mapping.OrderItemFieldSetMapper" />
-	<bean id="shippingFieldSetMapper" class="org.springframework.batch.sample.mapping.ShippingFieldSetMapper" />
+	<bean id="orderWriter"
+		class="org.springframework.batch.sample.dao.FlatFileOrderWriter">
+		<property name="delegate" ref="flatFileOutputSource" />
+		<property name="transformer">
+			<bean
+				class="org.springframework.batch.sample.dao.OrderTransformer">
+				<property name="aggregators" ref="outputDescriptors" />
+			</bean>
+		</property>
+	</bean>
 
-	<bean id="validator" class="org.springframework.batch.item.validator.SpringValidator">
+
+	<bean id="headerFieldSetMapper"
+		class="org.springframework.batch.sample.mapping.HeaderFieldSetMapper" />
+	<bean id="customerFieldSetMapper"
+		class="org.springframework.batch.sample.mapping.CustomerFieldSetMapper" />
+	<bean id="addressFieldSetMapper"
+		class="org.springframework.batch.sample.mapping.AddressFieldSetMapper" />
+	<bean id="billingFieldSetMapper"
+		class="org.springframework.batch.sample.mapping.BillingFieldSetMapper" />
+	<bean id="orderItemFieldSetMapper"
+		class="org.springframework.batch.sample.mapping.OrderItemFieldSetMapper" />
+	<bean id="shippingFieldSetMapper"
+		class="org.springframework.batch.sample.mapping.ShippingFieldSetMapper" />
+
+	<bean id="validator"
+		class="org.springframework.batch.item.validator.SpringValidator">
 		<property name="validator">
-			<bean id="orderValidator" class="org.springmodules.validation.valang.ValangValidator">
+			<bean id="orderValidator"
+				class="org.springmodules.validation.valang.ValangValidator">
 				<property name="valang">
 					<value>
 						<![CDATA[
@@ -131,13 +158,16 @@
 	</bean>
 	<!-- "{" <key> : <rule> : <message> : [ <error_code> [ : <error_parameters> ] ] "}" -->
 
-	<bean id="fileInputLocator" class="org.springframework.core.io.ClassPathResource">
+	<bean id="fileInputLocator"
+		class="org.springframework.core.io.ClassPathResource">
 		<constructor-arg type="java.lang.String"
 			value="data/multilineOrderJob/input/20070122.teststream.multilineOrderStep.txt" />
 	</bean>
 
-	<bean id="fileOutputLocator" class="org.springframework.core.io.FileSystemResource">
-		<constructor-arg type="java.lang.String" value="target/test-outputs/20070122.teststream.multilineOrderStep.TEMP.txt" />
+	<bean id="fileOutputLocator"
+		class="org.springframework.core.io.FileSystemResource">
+		<constructor-arg type="java.lang.String"
+			value="target/test-outputs/20070122.teststream.multilineOrderStep.TEMP.txt" />
 	</bean>
 
 </beans>

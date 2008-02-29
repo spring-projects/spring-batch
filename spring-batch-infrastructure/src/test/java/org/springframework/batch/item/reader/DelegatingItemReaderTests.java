@@ -16,15 +16,12 @@
 
 package org.springframework.batch.item.reader;
 
-import java.util.Properties;
-
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * Unit test for {@link DelegatingItemReader}
@@ -72,14 +69,6 @@ public class DelegatingItemReaderTests extends TestCase {
 		assertSame("domain object is provided by the input template", this, result);
 	}
 
-	/**
-	 * Gets restart data from the input template
-	 */
-	public void testGetStreamContext() {
-		itemProvider.update(executionContext);
-		assertEquals("foo", executionContext.getString("value"));
-	}
-
 	public void testSkip() throws Exception {
 		itemProvider.skip();
 		assertEquals("after skip", itemProvider.read());
@@ -88,10 +77,6 @@ public class DelegatingItemReaderTests extends TestCase {
 	private static class MockItemReader extends AbstractItemReader implements ItemReader, ItemStream, Skippable {
 
 		private Object value;
-
-		public Properties getStatistics() {
-			return PropertiesConverter.stringToProperties("a=b");
-		}
 
 		public void update(ExecutionContext executionContext) {
 			executionContext.putString("value", "foo");
