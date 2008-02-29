@@ -35,7 +35,7 @@ Spring Batch Features and Roadmap
   * ItemWriter abstraction and implementations for flat files and xml
   (the Sql case is just a regular Jdbc Dao).
 
-  * ItemReader and ItenWriter implementations are generally Skippable.
+  * ItemReader and ItemWriter implementations are generally Skippable.
   Skippable means that they can be asked by clients to mark items as
   skipped, and not provide or process them next time they arrive.
 

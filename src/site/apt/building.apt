@@ -40,11 +40,31 @@ mvn -o install -P fast
   is the quickest way to update your local repo (assuming the tests
   are OK).  It is equivalent of setting <<<-Dmaven.test.skip=true>>>.
 
+* Running Individual Tests
+
+  The standard way to do this with Maven is -Dtest= with the class name (not fully qualified), e.g. 
+
++---
+$ mvn test -Dtest=FootballJobFunctionalTests
++---
+
+  In the samples you can also add additional system properties, which will be used to override bean properties.  This can be done with an argLine property, e.g.
+
++---
+$ mvn test -Dtest=FootballJobFunctionalTests -DargLine='-Dplayer.file.name=player.csv -Dgames.file.name=games.csv'
++---
+
+  or by specifying forkMode=never (in which case the test is run in the same process as Maven):
+
++---
+$ mvn test -DforkMode=never -Dtest=FootballJobFunctionalTests -Dplayer.file.name=player.csv  -Dgames.file.name=games.csv -Djob.commit.interval=50
++---
+
 * Eclipse IDE
 
   Our policy is to commit Eclipse (and only Eclipse) meta data to
   source control.  This will work out of the box for you if you use
-  the (excellent) Q4 Eclipse-plugin
+  the (excellent) Q4E Eclipse-plugin
   (http://q4e.googlecode.com/svn/trunk/updatesite).  With this plugin,
   each of the reactor modules at the top level builds independently
   and feeds changes into other projects in your workspace.  It is not
