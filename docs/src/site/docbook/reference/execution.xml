@@ -96,4 +96,37 @@
 
     <para></para>
   </section>
+
+  <section>
+    <title>Configuration
+      <para>
+        <programlisting>
+        &lt;property name="itemProvider"&gt;
+                &lt;bean class="org.springframework.batch.sample.item.provider.PlayerItemProvider"&gt;
+                        &lt;property name="inputSource" ref="playerFileInputSource" /&gt;
+                        &lt;property name="fieldSetMapper"&gt;
+                                &lt;bean class="org.springframework.batch.sample.mapping.PlayerMapper" /&gt;
+                        &lt;/property&gt;
+                &lt;/bean&gt;
+        &lt;/property&gt;
+        </programlisting>
+      </para>
+
+      <para>The LineTokenizer is just one additional property to the
+      InputSource as seen here:</para>
+
+      <para>
+        <programlisting>
+                &lt;property name="tokenizer"&gt;
+                        &lt;bean
+                                class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer"&gt;
+                                &lt;property name="names"
+                                        value="ID,lastName,firstName,position,birthYear,debutYear" /&gt;
+                        &lt;/bean&gt;
+                &lt;/property&gt;
+        </programlisting>
+      </para>
+     
+    </section>
+
 </chapter>

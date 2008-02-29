@@ -10,17 +10,15 @@
 
     <para>Spring Batch is a Pipe and Filters architecture. The Spring Batch
     Infrastructure implements key services that enable a high volume of
-    throughput. These include: <itemizedlist>
+    throughput . These include: <itemizedlist>
         <listitem>
-          <para>Input and Output Resource Faciltities - the management of
-          input items including reading, validating and mapping raw input to
-          objects.</para>
-        </listitem>
-
-        <listitem>
-          <para>Item Providers and Processors - strategy interfaces for
-          providing and processing the data for a given batch stage
-          execution.</para>
+          <para>I/O infrastructure components - I/O Compoments are grouped
+          into a few simple concepts but provide a high degree of robustness
+          in record at a time processing. The key interfaces in this regard
+          are Item Readers and Item Writers. An <emphasis
+          role="bold">ItemReader</emphasis> is responsible for providing data
+          to the pipe. An <emphasis role="bold">ItemWriter</emphasis> is a
+          basic interface for generic output operatrions.</para>
         </listitem>
 
         <listitem>
@@ -52,6 +50,7 @@
         </listitem>
       </itemizedlist></para>
 
+    <!--
     <para><mediaobject>
         <imageobject role="fo">
           <imagedata align="center"
@@ -61,13 +60,14 @@
 
         <imageobject role="html">
           <imagedata align="center"
-                     fileref="../../resources/reference/images/PipeAndFilter.jpg"
+                     fileref="../../../../target/site/reference/html/images/PipeAndFilter.jpg"
                      format="JPG" />
         </imageobject>
 
         <caption><para>Figure 1: Spring Batch Pipe and Filter
         Design</para></caption>
       </mediaobject></para>
+-->
 
     <para>The Batch Lifecycle is simple. Data comes in one side of the pipe.
     It is then parsed, validated and transformed and handed off for business
@@ -80,73 +80,190 @@
   </section>
 
   <section>
-    <title id="infrastructure.1">Input and Output Sources</title>
+    <title id="infrastructure.1">Item Readers</title>
 
-    <para><itemizedlist>
-        <listitem>
-          <para>Input Source - This is an interface responsible for reading
-          records from an input stream and also possibly for mapping these
-          records to objects. It is the responsibility of the implementing
-          class to decide which technology to use for mapping and configuring
-          an input source.</para>
-        </listitem>
+    <para>Although a simple concept, <emphasis
+    role="bold">ItemReader</emphasis>s are the means for providing data from
+    many different types of input sources. The table provide below list an
+    inventory of ItemReaders currently available. In addition it is easy to
+    create a custom ItemReader.</para>
 
-        <listitem>
-          <para>Ouput Source - this is the interface for the generation output
-          operations and works conversely from the input source for
-          serializing processed data to the appropriate targeted output
-          source, which includes files, databases or queues.</para>
-        </listitem>
-      </itemizedlist></para>
+    <table>
+      <title></title>
 
-    <para>The Input Source is a basic interface for generic input operations.
+      <tgroup cols="3">
+        <colspec align="center" />
+
+        <thead>
+          <row>
+            <entry align="center">Item Reader</entry>
+
+            <entry align="center">Type of Item Provided</entry>
+
+            <entry align="center">Description</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry align="left">ListItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Provides the items from a list, one at a
+            time</entry>
+          </row>
+
+          <row>
+            <entry align="left">ValidatingItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">A simple extension of DelegatingItemReader
+            that provides for validation before returning input.</entry>
+          </row>
+
+          <row>
+            <entry align="left">AggregateItemReader</entry>
+
+            <entry align="left">java.util.Collection</entry>
+
+            <entry align="left">An ItemReader that delivers a list as its
+            item, storing up objects from the injected ItemReader until they
+            are ready to be packed out as a collection. This ItemReader should
+            mark the beginning and end of records with the constant values in
+            FieldSetMapper AggregateItemReader#<emphasis
+            role="bold">BEGIN_RECORD</emphasis> and
+            AggregateItemReader#<emphasis
+            role="bold">END_RECORD</emphasis></entry>
+          </row>
+
+          <row>
+            <entry align="left">DelegatingItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Extends AbstractMethodInvokingDelegator, which
+            enables dynamically calling of a custom method of the injected
+            object. Provides a convenient API for dynamic method invocation
+            shielding subclasses from the low-level details and exception
+            handling.</entry>
+          </row>
+
+          <row>
+            <entry align="left">FlatFileItemReader</entry>
+
+            <entry align="left">java.lang.String</entry>
+
+            <entry align="left">Reads from a flat file, includes ItemStream
+            and Skippable functionality. See section on Read from a
+            File</entry>
+          </row>
+
+          <row>
+            <entry align="left">StaxEventItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Reads via StAX. See HOWTO - Read from a
+            File</entry>
+          </row>
+
+          <row>
+            <entry align="left">JdbcCursorItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Reads from a database cursor via JDBC. See
+            HOWTO - Read from a Database</entry>
+          </row>
+
+          <row>
+            <entry align="left">DrivingQueryItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Base class for operations that read from a
+            database based on a single driving query. Configured by injecting
+            a KeyGenerator object. See HOWTO - Read from a Database</entry>
+          </row>
+
+          <row>
+            <entry align="left">HibernateCursorItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Reads from a cursor based on an HQL query. See
+            section on Reading from a Database</entry>
+          </row>
+
+          <row>
+            <entry align="left">IbatisDrivingQueryItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Reads via iBATIS based on a driving query. See
+            HOWTO - Read from a Database</entry>
+          </row>
+
+          <row>
+            <entry align="left">JmsItemReader</entry>
+
+            <entry align="left">javax.jms.Message</entry>
+
+            <entry align="left">Given a Spring JmsOperations object and a JMS
+            Destination or destination name to send errors, provides items
+            received through the injected JmsOperations receive()
+            method</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <para>The Item Reader is a basic interface for generic input operations.
     Subclasses implementing this interface will be responsible for reading
-    records from input stream and also possibly for mapping these records to
+    records from an item stream and also possibly for mapping these records to
     objects. Generally it is the responsibility of implementing class to
     decide which technology to use for mapping and how it should be
     configured. A picture of the I/O hierarhcy is helpful in understanding
     their place within the spring batch infrastructure.</para>
 
+    <!--
     <para><mediaobject>
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="../../../../target/site/reference/images/io-design.jpg"
+                     fileref="../../resources/reference/images/io-design.jpg"
                      format="JPG" />
         </imageobject>
 
         <imageobject role="html">
           <imagedata align="center"
-                     fileref="../../../../target/site/reference/images/io-design.jpg"
+                     fileref="../../resources/reference/images/io-design.jpg"
                      format="JPG" />
         </imageobject>
 
         <caption><para>Figure 2: Input/Output Sources</para></caption>
       </mediaobject></para>
+-->
 
-    <para>A description of input and output resources that spring batch
-    supports are the following:</para>
+    <para>A description of ItemReaders and ItemWriters types that spring batch
+    supports are roughly divided into four areas of which one is for
+    simplifying the use of processing Items in memory:</para>
 
     <para><itemizedlist>
         <listitem>
-          <para>File - File Sources read and write lines of data from a flat
-          file that typically describe records with fields of data defined by
-          fixed positions in the file or delimited by some special character
-          (e.g. a comma). There is a line tokenizer associated with input
-          sources and a line aggregator associated with the output
-          source.</para>
+          <para>List Item Reader - allows for processing in memory collections
+          of Items. The ListItemReader is useful for testing but would
+          probably not be used in typical batch scenarios</para>
         </listitem>
 
         <listitem>
-          <para>SQL - a database resource accessed that returns resultsets
-          that can be mapped to objects for processing. The default SQL Input
-          Sources invoke a RowMapper to return objects, keep track of the
-          current row if restart is required, basic statistics, and some
-          transaction enhancements that will be explained later.</para>
-
-          <para>Note: There is no SQL Output Source because there is no state
-          to manage whereas the SQL Input Source requires state to monitor
-          skips, the current position in the input source, restart data,
-          etc.</para>
+          <para>File Item Readers- File Item Readers read lines of data from a
+          flat file that typically describe records with fields of data
+          defined by fixed positions in the file or delimited by some special
+          character (e.g. a comma). There is a line tokenizer associated with
+          input sources and a line aggregator associated with the output
+          source.</para>
         </listitem>
 
         <listitem>
@@ -157,37 +274,429 @@
           restart, skip, statistics and transaction features by implementing
           the corresponding interfaces.</para>
         </listitem>
+
+        <listitem>
+          <para>SQL - a database resource accessed that returns resultsets
+          that can be mapped to objects for processing. The default SQL Input
+          Sources invoke a RowMapper to return objects, keep track of the
+          current row if restart is required, basic statistics, and some
+          transaction enhancements that will be explained later.</para>
+        </listitem>
+
+        <listitem>
+          <para>JMS - An ItemReader for JMS uses a JmsTemplate. The template
+          should have a default destination, which will be used to provide
+          items in read(). If a recovery step is needed, set the error
+          destination and the item will be sent there if processing fails in
+          an external retry.</para>
+        </listitem>
       </itemizedlist></para>
 
+    <para>An <emphasis role="bold">ItemReader</emphasis> interface is a very
+    simple abstraction for defining the set of inputs that a step in a batch
+    job will use. The next sections will describe how to create custom Item
+    Readers and what the basic properties and behaviors of Item
+    Readers.</para>
+
     <section>
-       
+      <title id="infrastructure.1.1">List Item Readers and Common Custom Item
+      Reader Behavior</title>
 
-      <title id="infrastructure.1.1">Flat File Sources</title>
+      <para>The <emphasis role="bold">ListItemReader</emphasis>, as mentioned
+      above, is useful for testing and probably not too useful as something
+      used in typical batch processing. One instructive use is to see how
+      narrow the responsiblity of ItemReaders are. They simply provide a
+      method that allows us to continue reading items until the items are
+      exhausted much like an iterator. In addition,, it is expected that
+      projects will create custom Item Readers. As a means of illustrating the
+      standard properties and behaviors of other framework-provided
+      ItemReaders like mapping unstructured items into objects through the use
+      of tokenizing we will extend the ListItemReader to supporting mapping.
+      The ItemReader interface defines a single method called <emphasis
+      role="bold">read()</emphasis>. The <emphasis
+      role="bold">read()</emphasis> method returns the next object to be
+      provided, much like an iterator. The definition of this method will
+      contain the logic that decides what object to return, performs any
+      object construction or other work that needs to occur, and finally
+      returns the object. We inherit this behavior from ListItemReader. We
+      will add two methods, <emphasis role="bold">
+      setFieldSetMapper()</emphasis>, to enable the mapping behavior and
+      <emphasis role="bold">setTokenizer()</emphasis>, to enabling parsing of
+      List Items. It this example the items in the list are a simple array of
+      delimited strings..</para>
 
-       
+      <para>Here is our custom list item Reader that supplies mapping or
+      binding behavior as follows: <programlisting>
+        protected static class ListPlayerReader extends ListItemReader {
+                private FieldSetMapper fieldSetMapper;
+                private LineTokenizer tokenizer = null;
+                
+                public ListPlayerReader(List list) {
+                        super(list);
+                }
 
-      <para>Flat File Input Sources - Flat File Input Sources are basic input
-      sources that read data from a file and return it as structured tuples in
-      the form of FieldSet instances. Flat File Input Sources are further
-      refined as both fixed length and delimited formats.</para>
+                public void setFieldSetMapper(FieldSetMapper fieldSetMapper) {
+                        this.fieldSetMapper = fieldSetMapper;
+                }
+                
+                public void setTokenizer(LineTokenizer tokenizer) {
+                        this.tokenizer = tokenizer; 
+                }
 
-       
+                
+        }
+        </programlisting></para>
 
-      <para />
+      <para>We will tag it as an Player Reader for reasons you'll see next as
+      we map Player objects from input strings. In this example we have
+      inherited the read() behavior that allows us to read from a List in
+      memory and provided a way to map arbitrary streams into objects and
+      added the ability to map FieldSets to objects. We will see how to take
+      advantage of this next.</para>
 
-       
+      <section>
+        <title id="infrastructure.1.2">Understanding Field Set Mappers</title>
 
+        <para>A FieldSet is Spring Batch’s abstraction for enabling the
+        binding of fields from a file data source. It allows developers to
+        work with file input in much the same way as they would work with
+        database input. A FieldSet is conceptually very similar to a Jdbc
+        Result Set. FieldSets only require one argument, a list of tokens.
+        Optionally you can also configure in the names of the fields so that
+        the fields may be accessed either by index or name as patterned after
+        the JdbcResultSet. In code it means it's as simple as:</para>
+
+        <para>Field set mappers used by the flat file reader classes implement
+        the FieldSetMapper interface. This interface defines a single method,
+        mapLine, which takes a FieldSet object and maps its contents to some
+        Object. This object may be a custom DTO or domain object, or it could
+        be as simple as an array, depending on your needs. The field set
+        mapper is used in conjunction with the tokenizer to translate a line
+        of data from a resource into an object of the desired type.</para>
+
+        <para>For example, suppose our file or list consists of players has
+        the following fields and the start of the data looks like the
+        following: <programlisting>
+         ID,lastName,firstName,position,birthYear,debutYear
+        "AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996",
+        "AbduRa00,Abdullah,Rabih,rb,1975,1999",
+        "AberWa00,Abercrombie,Walter,rb,1959,1982",
+        "AbraDa00,Abramowicz,Danny,wr,1945,1967",
+        "AdamBo00,Adams,Bob,te,1946,1969",
+        "AdamCh00,Adams,Charlie,wr,1979,2003"
+        </programlisting></para>
+
+        <para>We want to map this data to the following Player object:
+        <programlisting>
+          public class Player implements Serializable {
+        
+          private String ID; 
+          private String lastName; 
+          private String firstName; 
+          private String position; 
+          private int birthYear; 
+          private int debutYear;
+        
+          public String toString() {
+                
+                return "PLAYER:ID=" + ID + ",Last Name=" + lastName + 
+                ",First Name=" + firstName + ",Position=" + position + 
+                ",Birth Year=" + birthYear + ",DebutYear=" + 
+                debutYear;
+          }
+
+          // setters and getters...
+          }
+          </programlisting></para>
+
+        <para>Now by adding an PlayerFieldSetMapper that creates a Player for
+        each FieldSet Item and accessing the data within a record, we have
+        mapping logic that looks like the following:</para>
+
+        <para><programlisting>
+        protected static class PlayerFieldSetMapper implements FieldSetMapper {
+                public Object mapLine(FieldSet fieldSet) {
+                        Player player = new Player();
+
+                        player.setID(fieldSet.readString(0));
+                        player.setLastName(fieldSet.readString(1));
+                        player.setFirstName(fieldSet.readString(2)); 
+                        player.setPosition(fieldSet.readString(3));
+                        player.setBirthYear(fieldSet.readInt(4));
+                        player.setDebutYear(fieldSet.readInt(5));
+
+                        return player;
+                }
+        }
+      </programlisting></para>
+      </section>
+
+      <section>
+         
+
+        <title id="infrastructure.1.3">Configuring and Using
+        LineTokenizers</title>
+
+         
+
+        <para>To separate the structure of the raw records, LineTokenizer, or
+        one of it subclasses, is used to parse data obtained from the an
+        ItemReader, most typically a file. Flat File Item Readers, as
+        mentioned above, typically process records in two forms, fixed and
+        delimited. A fixed length input record is where the fields are
+        assigned fixed locations within a line of a file. An example would be:
+        <programlisting>
+        12345678901234567890123456789012345678901234567890
+        AbduKa00Abdul-Jabbar    Karim    rb19741996
+        AbduRa00Abdullah        Rabih    rb19751999
+        AberWa00Abercrombie     Walter   rb19591982
+        AbraDa00Abramowicz      Danny    wr19451967
+        AdamBo00Adams           Bob      te19461969
+        AdamCh00Adams           Charlie  wr19792003
+        </programlisting></para>
+
+         
+
+        <para>One can see that each field in the record starts at the same
+        position in the record. It's fixed from a starting position to an end
+        of position for each field, which may include a user defined end
+        position such as EOL.</para>
+
+         On the other hand a delimited record format might look like the following: 
+
+        <para>
+          <programlisting>
+        AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996
+        AbduRa00,Abdullah,Rabih,rb,1975,1999
+        AberWa00,Abercrombie,Walter,rb,1959,1982
+        AbraDa00,Abramowicz,Danny,wr,1945,1967
+        AdamBo00,Adams,Bob,te,1946,1969
+        AdamCh00,Adams,Charlie,wr,1979,2003
+        </programlisting>
+        </para>
+
+         
+
+        <para>Here, rather than fix fields to positions within a line or
+        record, fields are simply separated by some predefined symbol. We
+        illustrate with commas in this example as it is a very familiar format
+        to developers who have experience with to exported csv files from
+        spreadsheets.</para>
+
+         
+
+        <para>Neither of these formats are particularly self describing but
+        are still very much in use in flat file exchanges between system
+        interfaces. Both formats share in common the requirement to read in a
+        line of data (a String) and parse it into tokens that can be mapped to
+        an object (or objects) to be passed to the ItemProcessor. As you can
+        see, there are two required dependencies of the input source; the
+        first is a resource to read in, which is the file to process. The
+        second dependency is a LineTokenizer, which will be discused
+        below.</para>
+
+         
+
+        <para>The interface for a LineTokenizer is very simple, given a
+        string; it will return a FieldSet that wraps the results from
+        tokenizing the provided string. The tokens are created through a
+        <emphasis>LineTokenizer</emphasis> and a
+        <emphasis>FieldSetMapper</emphasis> is used to map the
+        <emphasis>FieldSet</emphasis> to an object. The framework provides a
+        few convenience classes, the <emphasis>FieldSetInputSource</emphasis>
+        and the <emphasis>SimpleFlatFileInputSource</emphasis>. They provide a
+        convenient way to read the FieldSet. The <emphasis>FieldSet</emphasis>
+        is configured as a property for an Item Provider, which wraps an Input
+        Source. You can see this in the following example:</para>
+
+         
+
+        <para>And, as you can see, the field names will get passed in the the
+        mapper. The actual mapping provided by the developer would then look
+        as simple as:</para>
+
+         
+
+        <para>
+          <programlisting>
+public class PlayerMapper implements FieldSetMapper {
+        public Object mapLine(FieldSet fs) {
+                if(fs == null){
+                        return null;
+                }
+                
+                Player player = new player();
+                player.setID(fs.readString("ID"));
+                player.setLastName(fs.readString("lastName"));
+                player.setFirstName(fs.readString("firstName"));
+                player.setPosition(fs.readString("position"));
+                player.setDebutYear(fs.readInt("debutYear"));
+                player.setBirthYear(fs.readInt("birthYear"));
+                
+                return player;
+        }
+}       
+        </programlisting>
+        </para>
+
+         
+      </section>
+    </section>
+
+    <section>
+      <title id="infrastructure.1.2">Flat File Item Readers</title>
+
+      <para>One of the most common tasks performed in batch jobs involve
+      reading from some type of file. A flat file is basically any type of
+      file that contains at most two-dimensional (tabular) data. Flat files
+      include several formats of file. Some common types of flat files one
+      might encounter are:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Fixed Width Files</para>
+        </listitem>
+
+        <listitem>
+          <para>Delimited Files (e.g.Fixed Width Files Comma-Separated
+          Values).</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Reading flat files in the Spring Batch framework is facilitated by
+      the class <emphasis role="bold">FlatFileItemReader</emphasis>, which
+      provides basic functionality for reading and parsing flat files. In
+      addition, there are default implementations of the <emphasis
+      role="bold">Skippable</emphasis> and <emphasis role="bold">
+      ItemStream</emphasis> interfaces that solve the majority of file
+      processing needs.</para>
+
+      <section>
+        <title id="infrastructure.1.2.1">Flat File Item Reader
+        Properties</title>
+
+        <para>The <emphasis role="bold">FlatFileItemReader</emphasis> reader
+        class has several properties. The three most important of these
+        properties are <emphasis role="bold">resource</emphasis>, <emphasis
+        role="bold">fieldSetMapper</emphasis> and <emphasis
+        role="bold">tokenizer</emphasis>, which define the resource from which
+        data will be read and the method by which the read data will be
+        converted to distinct fields. We explored <emphasis
+        role="bold">fieldSetMapper</emphasis> and <emphasis
+        role="bold">tokenizer</emphasis> while reviewing how to create a
+        custom ItemReader. We'll revisit these properties in light of how we
+        use them with the <emphasis role="bold">FlatFileItemReader</emphasis>.
+        In addition, we'll explore integration with the file system via the
+        resource property. The <emphasis role="bold">resource</emphasis>
+        property represents a Spring Core <emphasis
+        role="bold">Resource</emphasis>. Documentation explaining how to
+        create beans of this type can be found in <ulink
+        url="http://static.springframework.org/spring/docs/2.5.x/reference/resources.html"><citetitle>Spring
+        Framework, Chapter 4.Resources</citetitle></ulink>. Therefore, this
+        guide will not go into the details of creating <emphasis
+        role="bold">Resource</emphasis> objects except to make a couple of
+        points on the locating files to process within a batch environment.
+        Tokenizers and field set mappers will be discussed a bit
+        later.&gt;</para>
+
+        <para>As mentioned, the location of the file is defined by the
+        resource property. There are only a few methods exposed through a
+        resource service. A resource is used to help locate, open, and close
+        resources. It can be as simple as: <programlisting>
+        Resource resource = new FileSystemResource("resources/trades.csv");
+        </programlisting></para>
+
+        <para>In complex batch environments the directory structures are often
+        managed by the EAI infrastructure where drop zones for external
+        interfaces are established for moving files from ftp locations to
+        batch processing locations and vice versa. File moving utilities are
+        beyond the scope of the spring batch architecture but it is not
+        unusual for batch job streams to include file moving utilities as
+        steps in the job stream. It's sufficient to know that the batch
+        architecture only needs to know how to locate the files to be
+        processed. Spring Batch begins the process of feeding the data into
+        the pipe from this starting point.</para>
+
+        <para>The flat file reader uses a ResourceLineReader object to read
+        from the file. Optionally, you can specify a <emphasis
+        role="bold">RecordSeparatorPolicy</emphasis> through property
+        recordSeparatorPolicy. This can be used to configure more low-level
+        features, such as what constitutes the end of a line and whether to
+        continue quoted strings over newlines, among other things.</para>
+
+        <para>The other properties in the flat file readers allow you to
+        further specify how your data will be interpreted: <table>
+            <title>Flat File Item Reader Properties</title>
+
+            <tgroup cols="3">
+              <colspec align="center" />
+
+              <thead>
+                <row>
+                  <entry align="center">Property</entry>
+
+                  <entry align="center">Type</entry>
+
+                  <entry align="center">Description</entry>
+                </row>
+              </thead>
+
+              <tbody>
+                <row>
+                  <entry align="left">encoding</entry>
+
+                  <entry align="left">String</entry>
+
+                  <entry align="left">Specifies what text encoding to use -
+                  default is "ISO-8859-1"</entry>
+                </row>
+
+                <row>
+                  <entry align="left">comments</entry>
+
+                  <entry align="left">String[]</entry>
+
+                  <entry align="left">Specifies line prefixes that indicate
+                  comment rows</entry>
+                </row>
+
+                <row>
+                  <entry align="left">linesToSkip</entry>
+
+                  <entry align="left">int</entry>
+
+                  <entry align="left">Number of lines to ignore at the top of
+                  the file</entry>
+                </row>
+
+                <row>
+                  <entry align="left">firstLineIsHeader</entry>
+
+                  <entry align="left">boolean</entry>
+
+                  <entry align="left">Indicates that the first line of the
+                  file is a header containing field names. If the column names
+                  have not been set yet and the tokenizer extends
+                  AbstractLineTokenizer, field names will be set automatically
+                  from this line</entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table></para>
+      </section>
+
+      <!--
       <para>
         <mediaobject>
           <imageobject role="fo">
             <imagedata align="center"
-                       fileref="../../../../target/site/reference/images/flatfile-input-source-diagram.jpg"
+                       fileref="../../resources/reference/images/flatfile-input-source-diagram.jpg"
                        format="JPG" />
           </imageobject>
 
           <imageobject role="html">
             <imagedata align="center"
-                       fileref="../../../../target/site/reference/images/flatfile-input-source-diagram.jpg"
+                       fileref="../../resources/reference/images/io-design.jpg"
                        format="JPG" />
           </imageobject>
 
@@ -196,207 +705,10 @@
           </caption>
         </mediaobject>
       </para>
-
-       
-
-      <para>The location of the file is defined by the resource property.
-      There are only a few methods exposed through a resource service. A
-      resource is used to help locate, open, and close resources. It can be as
-      simple as: <programlisting>
-	Resource resource = new FileSystemResource("resources/trades.csv");
-	</programlisting></para>
-
-       
-
-      <para>In complex batch environments the directory structures are often
-      managed by the EAI infrastructure where drop zones for external
-      interfaces are established for moving files from ftp locations to batch
-      processing locations and vice versa. File moving utilities are beyond
-      the scope of the batch architecture but its not unusual for batch job
-      streams to include file moving utilities as steps in the job stream.
-      It's sufficient to know that the batch architecture only needs to know
-      how to find the files to be processed and it begins the process of
-      feeding the data into the pipe from this starting point.</para>
-
-       
-
-      <para>To separate the structure of the file, LineTokenizer, or one of it
-      subclasses, is used to parse data obtained from the file. Flat File
-      Input Sources, as mentioned above, typically come in two forms, fixed
-      and delimited. A fixed length input record is where the fields are
-      assigned fixed locations within a line of a file. An example would be:
-      <programlisting>
-	12345678901234567890123456789012345678901234567890
-	AbduKa00Abdul-Jabbar    Karim    rb19741996
-	AbduRa00Abdullah        Rabih    rb19751999
-	AberWa00Abercrombie     Walter   rb19591982
-	AbraDa00Abramowicz      Danny    wr19451967
-	AdamBo00Adams           Bob      te19461969
-	AdamCh00Adams           Charlie  wr19792003
-	</programlisting></para>
-
-       On the other hand a delimited record format might look like the following: 
-
-      <para>
-        <programlisting>
-	AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996
-	AbduRa00,Abdullah,Rabih,rb,1975,1999
-	AberWa00,Abercrombie,Walter,rb,1959,1982
-	AbraDa00,Abramowicz,Danny,wr,1945,1967
-	AdamBo00,Adams,Bob,te,1946,1969
-	AdamCh00,Adams,Charlie,wr,1979,2003
-	</programlisting>
-      </para>
-
-       
-
-      <para>Neither of these formats are particularly self describing but are
-      still very much in use in flat file exchanges between system interfaces.
-      Both formats share in common the requirement to read in a line of data
-      (a String) and parse it into tokens that can be mapped to an object (or
-      objects) to be passed to the ItemProcessor. As you can see, there are
-      two required dependencies of the input source; the first is a resource
-      to read in, which is the file to process. The second dependency is a
-      LineTokenizer, which will be discused below.</para>
-
-       
+-->
     </section>
-
-    <section>
-      <title id="infrastructure.1.2">Configuring and using FieldSets</title>
-
-      <para>A FieldSet is Spring Batch’s abstraction for typing fields from a
-      flat file data source. It allows developers to work with file input in
-      much the same way as they would work with database input. A FieldSet is
-      conceptually very similar to a Jdbc Result Set. FieldSets only require
-      one argument, a list of tokens. Optionally you can also configure in the
-      names of the fields so that the fields may be accessed either by index
-      or name as patterned after the JdbcResultSet. In code it means it's as
-      simple as:</para>
-
-      <para><programlisting>
-		tokens = new String[] { "TestString", "true", "C", "10", "-472", "354224", "543", "124.3", "424.3", "324",
-				null, "2007-10-12", "12-10-2007", "" };
-		names = new String[] { "String", "Boolean", "Char", "Byte", "Short", "Integer", "Long", "Float", "Double",
-				"BigDecimal", "Null", "Date", "DatePattern", "BlankInput" };
-
-		fieldSet = new FieldSet(tokens, names);
-		assertTrue(fieldSet.getFieldCount() == 14);		    
-	</programlisting></para>
-    </section>
-
-    <section>
-      <title id="infrastructure.1.3">Configuring and Using
-      LineTokenizers</title>
-
-      <para>The interface for a LineTokenizer is very simple, given a string;
-      it will return a FieldSet that wraps the results from tokenizing the
-      provided string. The tokens are created through a
-      <emphasis>LineTokenizer</emphasis> and a
-      <emphasis>FieldSetMapper</emphasis> is used to map a the
-      <emphasis>FieldSet</emphasis> to an object. The framework provides a few
-      convenience classes, the <emphasis>FieldSetInputSource</emphasis> and
-      the <emphasis>SimpleFlatFileInputSource</emphasis>. They provide a
-      convenient way to read the FieldSet. The <emphasis>FieldSet</emphasis>
-      is configured as a property for an Item Provider, which wraps an Input
-      Source. You can see this in the following example:</para>
-
-      <para><programlisting>
-	&lt;property name="itemProvider"&gt;
-		&lt;bean class="org.springframework.batch.sample.item.provider.PlayerItemProvider"&gt;
-			&lt;property name="inputSource" ref="playerFileInputSource" /&gt;
-			&lt;property name="fieldSetMapper"&gt;
-				&lt;bean class="org.springframework.batch.sample.mapping.PlayerMapper" /&gt;
-			&lt;/property&gt;
-		&lt;/bean&gt;
-	&lt;/property&gt;
-	</programlisting></para>
-
-      <para>The LineTokenizer is just one additional property to the
-      InputSource as seen here:</para>
-
-      <para><programlisting>
-		&lt;property name="tokenizer"&gt;
-			&lt;bean
-				class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer"&gt;
-				&lt;property name="names"
-					value="ID,lastName,firstName,position,birthYear,debutYear" /&gt;
-			&lt;/bean&gt;
-		&lt;/property&gt;
-	</programlisting></para>
-
-      <para>And, as you can see, the field names will get passed in the the
-      mapper. The actual mapping provided by the developer would then look as
-      simple as:</para>
-
-      <para><programlisting>
-public class PlayerMapper implements FieldSetMapper {
-	public Object mapLine(FieldSet fs) {
-		if(fs == null){
-			return null;
-		}
-		
-		Player player = new player();
-		player.setID(fs.readString("ID"));
-		player.setLastName(fs.readString("lastName"));
-		player.setFirstName(fs.readString("firstName"));
-		player.setPosition(fs.readString("position"));
-		player.setDebutYear(fs.readInt("debutYear"));
-		player.setBirthYear(fs.readInt("birthYear"));
-		
-		return player;
-	}
-}	
-	</programlisting></para>
-    </section>
-
-    <section>
-      <title id="infrastructure.1.4">Output Sources</title>
-
-      <para>The output source is similar in functionality to the input source
-      with the exception that the operations are reversed. They still need to
-      be located, opened and closed but they differ in the case that we write
-      to output sources. In the case of databases or queues these may be
-      inserts, updates or sends. The format of the serialization of the output
-      source is specific for every batch job.</para>
-    </section>
-  </section>
-
-  <section>
-    <title id="infrastructure.2.2">SQL Sources</title>
-
-    <para>SQL input sources can be configured for various reasons, for
-    example:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>a staging table for large volumes of sorted data that was loaded
-        from flat files</para>
-      </listitem>
-
-      <listitem>
-        <para>the beginning of an outbound collection of data targeted for an
-        external flat file interface</para>
-      </listitem>
-
-      <listitem>
-        <para>the target of a triggered event like "collect all cases that can
-        be automatically closed"</para>
-
-        <para>Spring Batch supports two approaches for accessing a SQL Input
-        Source; 1) a cursor driven input source and 2) an indexed based Input
-        Query. The cursor driven input source is named because it utilizes a
-        jdbc cursor to stream over the SQL input source whereas an indexed
-        based input query is designed for easy division of the input into
-        ranges.</para>
-
-        <para></para>
-      </listitem>
-    </itemizedlist>
-  </section>
-
-  <section>
-    <title id="infrastructure.2.3">XML Input and Output</title>
+ <section>
+    <title id="infrastructure.2.3">XML Item Readers and Writers</title>
 
     <para>Spring Batch provides transactional infrastructure for both reading
     XML records and mapping them to Java objects as well as writing Java
@@ -436,7 +748,52 @@ public class PlayerMapper implements FieldSetMapper {
     xmlStaxJob. //TODO inline the example once it is not subject to change +
     show sample input file</para>
 
-    <para></para>
+  </section>
+  </section>
+
+    <section>
+      <title id="infrastructure.1.4">Item Writers</title>
+
+      <para>The Item Writers are similar in functionality to the input source
+      with the exception that the operations are reversed. They still need to
+      be located, opened and closed but they differ in the case that we write
+      to output sources. In the case of databases or queues these may be
+      inserts, updates or sends. The format of the serialization of the output
+      source is specific for every batch job.</para>
+    </section>
+
+ 
+  <section>
+    <title id="infrastructure.2.2">SQL Sources</title>
+
+    <para>SQL input sources can be configured for various reasons, for
+    example:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>a staging table for large volumes of sorted data that was loaded
+        from flat files</para>
+      </listitem>
+
+      <listitem>
+        <para>the beginning of an outbound collection of data targeted for an
+        external flat file interface</para>
+      </listitem>
+
+      <listitem>
+        <para>the target of a triggered event like "collect all cases that can
+        be automatically closed"</para>
+
+        <para>Spring Batch supports two approaches for accessing a SQL Input
+        Source; 1) a cursor driven input source and 2) an indexed based Input
+        Query. The cursor driven input source is named because it utilizes a
+        jdbc cursor to stream over the SQL input source whereas an indexed
+        based input query is designed for easy division of the input into
+        ranges.</para>
+
+        <para></para>
+      </listitem>
+    </itemizedlist>
   </section>
 
   <section>
@@ -472,7 +829,8 @@ public class PlayerMapper implements FieldSetMapper {
     as a queue or database. A common scenario when a batch job is a datastream
     coming from a flat file interface is to have a file or files as input
     sources and a database resource as the output source. In this case the
-    repeat templates can be used like the following: <mediaobject>
+    repeat templates can be used like the following:<!--
+      <mediaobject>
         <imageobject role="fo">
           <imagedata align="center"
                      fileref="../../../../target/site/reference/images/RepeatTemplate.png"
@@ -487,7 +845,8 @@ public class PlayerMapper implements FieldSetMapper {
 
         <caption><para>Figure 2: Simple Batch Pseduo code for Repeat
         Templates</para></caption>
-      </mediaobject></para>
+      </mediaobject>
+--></para>
 
     <para>In this batch scenario an outer RepeatTemplate initialies the
     continuous flow, a TransactionTemplate wraps the input and output
@@ -503,17 +862,17 @@ public class PlayerMapper implements FieldSetMapper {
     quickly as possible. The repeat template can process records irrespective
     of the batch architecture. A simple example would be: <programlisting>
 	    
-		RepeatTemplate template = new RepeatTemplate();
-		Resource resource = new FileSystemResource("resources/trades.csv");
-		TradeProcessor executor = new TradeProcessor();
-		TradeItemProvider provider = null;
-		try {
-			provider = new TradeItemProvider(resource);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		template.iterate(new ItemProviderRepeatCallback(provider, executor));
+                RepeatTemplate template = new RepeatTemplate();
+                Resource resource = new FileSystemResource("resources/trades.csv");
+                TradeProcessor executor = new TradeProcessor();
+                TradeItemProvider provider = null;
+                try {
+                        provider = new TradeItemProvider(resource);
+                } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
+                template.iterate(new ItemProviderRepeatCallback(provider, executor));
 </programlisting></para>
 
     <para>A RepeatTemplate has an exception policy that can be
