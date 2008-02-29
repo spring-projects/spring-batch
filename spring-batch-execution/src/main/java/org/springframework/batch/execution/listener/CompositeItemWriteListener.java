@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.domain.ChunkListener;
-import org.springframework.batch.core.domain.ItemReadListener;
 import org.springframework.batch.core.domain.ItemWriteListener;
 
 /**

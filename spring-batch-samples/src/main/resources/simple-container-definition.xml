@@ -11,10 +11,6 @@
 
 	<import resource="data-source-context.xml" />
 
-	<!-- register the step scope with the application context -->
-	<bean id="stepScope"
-		class="org.springframework.batch.execution.scope.StepScope" />
-
 	<bean id="jobConfigurationRegistryBeanPostProcessor" abstract="true"
 		class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
 		<property name="jobConfigurationRegistry"

@@ -11,9 +11,6 @@
 
 	<import resource="../simple-container-definition.xml" />
 	
-	<bean parent="stepScope" />
-	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
-
 	<bean id="fixedLengthImportJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
@@ -46,9 +43,7 @@
 	</bean>
 
 	<bean id="fileInputTemplate" parent="testInputTemplate"
-		autowire-candidate="false" scope="step">
-		<aop:scoped-proxy />
-	</bean>
+		autowire-candidate="false"/>
 
 	<bean id="fixedFileDescriptor"
 		class="org.springframework.batch.io.file.transform.FixedLengthTokenizer">

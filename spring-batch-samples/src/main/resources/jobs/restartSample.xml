@@ -11,10 +11,6 @@
 
 	<import resource="../simple-container-definition.xml" />
 	
-	<bean parent="stepScope" />
-	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
-	<bean parent="customEditorConfigurer" />
-
 	<bean id="restartSampleJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
@@ -50,9 +46,7 @@
 	</bean>
 
 	<bean id="fileItemReader"
-		class="org.springframework.batch.io.file.FlatFileItemReader"
-		scope="step">
-		<aop:scoped-proxy />
+		class="org.springframework.batch.io.file.FlatFileItemReader">
 		<property name="resource" ref="fileLocator" />
 		<property name="lineTokenizer" ref="fixedFileDescriptor" />
 		<property name="fieldSetMapper" ref="fieldSetMapper" />

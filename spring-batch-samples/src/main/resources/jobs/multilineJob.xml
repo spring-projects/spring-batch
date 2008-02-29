@@ -8,9 +8,6 @@
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 	<import resource="../simple-container-definition.xml" />
-	
-	<bean parent="stepScope" />
-	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
 	<bean id="multilineJob" parent="simpleJob">
 		<property name="steps">
@@ -24,9 +21,7 @@
 				</property>
 				<property name="itemWriter">
 					<bean
-						class="org.springframework.batch.io.file.FlatFileItemWriter"
-						scope="step">
-						<aop:scoped-proxy />
+						class="org.springframework.batch.io.file.FlatFileItemWriter">
 						<property name="resource"
 							value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
 							<property name="fieldSetUnmapper">
@@ -39,9 +34,7 @@
 	</bean>
 
 	<bean id="fileItemReader"
-		class="org.springframework.batch.io.file.FlatFileItemReader"
-		scope="step">
-		<aop:scoped-proxy />
+		class="org.springframework.batch.io.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/multilineJob/input/20070122.teststream.multilineStep.txt" />
 		<property name="lineTokenizer" ref="fixedFileDescriptor" />
@@ -78,11 +71,5 @@
 		<property name="names" value="ISIN,Quantity,Price,Customer" />
 		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
 	</bean>
-
-	<bean parent="customEditorConfigurer" />
-
-	<!-- register the step scope with the application context -->
-	<bean class="org.springframework.batch.execution.scope.StepScope" />
-
 
 </beans>

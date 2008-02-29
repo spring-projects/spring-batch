@@ -9,9 +9,7 @@
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 	<bean id="fileInputTemplate"
-		class="org.springframework.batch.io.file.FlatFileItemReader"
-		scope="step">
-		<aop:scoped-proxy />
+		class="org.springframework.batch.io.file.FlatFileItemReader">
 		<property name="resource" ref="fileInputLocator" />
 		<property name="lineTokenizer" ref="orderFileDescriptor" />
 		<property name="fieldSetMapper">
@@ -24,9 +22,7 @@
 		class="org.springframework.batch.item.writer.ItemTransformerItemWriter">
 		<property name="delegate">
 			<bean
-				class="org.springframework.batch.io.file.FlatFileItemWriter"
-				scope="step">
-				<aop:scoped-proxy />
+				class="org.springframework.batch.io.file.FlatFileItemWriter">
 				<property name="resource" ref="fileOutputLocator" />
 				<property name="fieldSetUnmapper">
 					<bean

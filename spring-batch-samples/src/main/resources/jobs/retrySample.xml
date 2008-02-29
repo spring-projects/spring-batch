@@ -11,9 +11,6 @@
 
 	<import resource="../simple-container-definition.xml" />
 	
-	<bean parent="stepScope" />
-	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
-
 	<bean id="retrySample" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
@@ -35,10 +32,9 @@
 		<property name="limit" value="10" />
 	</bean>
 
-	<bean id="itemGenerator" parent="testGenerator" scope="step" autowire-candidate="false">
-		<aop:scoped-proxy/>
-	</bean>
+	<bean id="itemGenerator" parent="testGenerator" autowire-candidate="false"/>
 
 	<bean id="itemWriter"
 		class="org.springframework.batch.sample.item.writer.RetrySampleItemWriter" />
+
 </beans>

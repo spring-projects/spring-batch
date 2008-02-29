@@ -38,7 +38,6 @@ import org.springframework.batch.execution.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
-import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.AbstractStep;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.item.reader.AbstractItemReader;
@@ -265,21 +264,6 @@ public class SimpleJobTests extends TestCase {
 		assertEquals(ExitStatusExceptionClassifier.JOB_INTERRUPTED, exitStatus.getExitCode());
 		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().contains(
 				"JobInterruptedException"));
-	}
-
-	public void testStepContextInitialized() throws Exception {
-
-		stepConfiguration1.setCallback(new Runnable() {
-			public void run() {
-				assertNotNull(StepSynchronizationManager.getContext().getStepExecution());	
-				list.add("asserted context");
-			};
-		});
-
-		job.execute(jobExecution);
-		assertEquals(2, list.size());
-		assertTrue(list.contains("asserted context"));
-
 	}
 
 	/*

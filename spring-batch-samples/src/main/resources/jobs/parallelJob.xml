@@ -10,9 +10,6 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<import resource="../simple-container-definition.xml" />
-	
-	<bean parent="stepScope" />
-	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
 	<bean id="parallelJob" parent="simpleJob">
 		<property name="steps">

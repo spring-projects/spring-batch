@@ -12,9 +12,6 @@
 	<description>Example for iBATIS integration.</description>
 
 	<import resource="../simple-container-definition.xml" />
-	
-	<bean parent="stepScope" />
-	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
 	<bean id="ibatisJob" parent="simpleJob">
 		<property name="steps">
@@ -25,9 +22,7 @@
 						class="org.springframework.batch.sample.item.writer.CustomerCreditIncreaseWriter">
 						<property name="customerCreditDao">
 							<bean
-								class="org.springframework.batch.sample.dao.IbatisCustomerCreditWriter"
-								scope="step">
-								<aop:scoped-proxy />
+								class="org.springframework.batch.sample.dao.IbatisCustomerCreditWriter">
 								<property name="sqlMapClient"
 									ref="sqlMapClient" />
 								<property name="statementId"
@@ -41,9 +36,7 @@
 	</bean>
 
 	<bean id="ibatisItemReader"
-		class="org.springframework.batch.io.driving.IbatisDrivingQueryItemReader"
-		scope="step">
-		<aop:scoped-proxy />
+		class="org.springframework.batch.io.driving.IbatisDrivingQueryItemReader">
 		<property name="detailsQueryId" value="getCustomerCreditById" />
 		<property name="sqlMapClient" ref="sqlMapClient" />
 		<property name="keyGenerator" ref="ibatisKeyGenerator" />
@@ -60,13 +53,5 @@
 		<property name="configLocation" value="ibatis-config.xml" />
 		<property name="dataSource" ref="dataSource" />
 	</bean>
-
-
-
-
-	<bean parent="customEditorConfigurer" />
-
-	<!-- register the step scope with the application context -->
-	<bean class="org.springframework.batch.execution.scope.StepScope" />
 
 </beans>

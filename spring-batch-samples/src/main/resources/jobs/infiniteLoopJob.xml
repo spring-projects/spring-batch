@@ -11,9 +11,6 @@
 
 	<import resource="../simple-container-definition.xml" />
 	
-	<bean parent="stepScope"/>
-	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
-	
 	<bean id="jobLauncher" class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="taskExecutor">

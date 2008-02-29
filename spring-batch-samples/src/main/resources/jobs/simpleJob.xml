@@ -8,9 +8,6 @@
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 	<import resource="../simple-container-definition.xml" />
-	
-	<bean parent="stepScope"/>
-	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
 
 	<bean id="simpleSample" parent="simpleJob">
 		<property name="steps">
@@ -40,16 +37,15 @@
 	</bean>
 
 	<!-- This input source is injected into the test case to verify the output - not used by the job at all -->
-	<bean id="testInputTemplate" class="org.springframework.batch.io.file.FlatFileItemReader">
+	<bean id="testInputTemplate"
+		class="org.springframework.batch.io.file.FlatFileItemReader">
 		<property name="resource" ref="fileLocator" />
 		<property name="lineTokenizer" ref="tradeTokenizer" />
 		<property name="fieldSetMapper" ref="tradeMapper" />
 	</bean>
 
 	<bean id="fileItemReader" parent="testInputTemplate"
-		autowire-candidate="false" scope="step">
-		<aop:scoped-proxy />
-	</bean>
+		autowire-candidate="false" />
 
 	<bean id="tradeMapper"
 		class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
@@ -78,7 +74,5 @@
 
 		</aop:aspect>
 	</aop:config>
-
-	<bean parent="customEditorConfigurer" />
 
 </beans>

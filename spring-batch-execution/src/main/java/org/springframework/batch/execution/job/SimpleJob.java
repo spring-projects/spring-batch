@@ -31,9 +31,6 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.execution.listener.CompositeJobListener;
-import org.springframework.batch.execution.scope.SimpleStepContext;
-import org.springframework.batch.execution.scope.StepContext;
-import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -87,7 +84,7 @@ public class SimpleJob extends AbstractJob {
 
 			execution.setStartTime(new Date());
 			updateStatus(execution, BatchStatus.STARTING);
-			
+
 			listener.beforeJob(execution);
 
 			int startedCount = 0;
@@ -103,15 +100,7 @@ public class SimpleJob extends AbstractJob {
 					updateStatus(execution, BatchStatus.STARTED);
 					StepExecution stepExecution = execution.createStepExecution(step);
 
-					StepContext parentStepContext = StepSynchronizationManager.getContext();
-					final StepContext stepContext = new SimpleStepContext(stepExecution, parentStepContext);
-					StepSynchronizationManager.register(stepContext);
-					try {
-						step.execute(stepExecution);
-					} finally {
-						// clear any registered synchronizations
-						StepSynchronizationManager.close();
-					}
+					step.execute(stepExecution);
 
 					status = stepExecution.getExitStatus();
 
@@ -190,8 +179,8 @@ public class SimpleJob extends AbstractJob {
 		}
 		else {
 			// start max has been exceeded, throw an exception.
-			throw new BatchCriticalException("Maximum start limit exceeded for step: " + step.getName()
-					+ "StartMax: " + step.getStartLimit());
+			throw new BatchCriticalException("Maximum start limit exceeded for step: " + step.getName() + "StartMax: "
+					+ step.getStartLimit());
 		}
 	}
 

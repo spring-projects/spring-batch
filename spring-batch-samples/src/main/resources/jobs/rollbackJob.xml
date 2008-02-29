@@ -13,9 +13,6 @@
 	<import resource="tradeJobIo.xml" />
 	<!--import resource="tradeJobAop.xml" /-->
 
-	<bean parent="stepScope" />
-	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
-
 	<bean id="tradeJob" parent="simpleJob">
 		<property name="steps">
 			<list>
@@ -56,9 +53,7 @@
 	</bean>
 
 	<bean id="tradeSqlItemReader"
-		class="org.springframework.batch.io.cursor.JdbcCursorItemReader"
-		scope="step">
-		<aop:scoped-proxy />
+		class="org.springframework.batch.io.cursor.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
 			value="SELECT id, quantity, price, customer from TRADE" />
@@ -69,9 +64,7 @@
 	</bean>
 
 	<bean id="customerSqlItemReader"
-		class="org.springframework.batch.io.cursor.JdbcCursorItemReader"
-		scope="step">
-		<aop:scoped-proxy />
+		class="org.springframework.batch.io.cursor.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
 			value="SELECT id, name, credit FROM customer " />

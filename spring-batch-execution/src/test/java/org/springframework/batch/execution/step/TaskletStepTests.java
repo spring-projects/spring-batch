@@ -14,7 +14,6 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.job.JobSupport;
-import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
 import org.springframework.batch.io.exception.BatchCriticalException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -63,6 +62,7 @@ public class TaskletStepTests extends TestCase {
 
 	public void testSuccessfulExecutionWithStepContext() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, false, true), new JobRepositorySupport());
+		step.afterPropertiesSet();
 		step.execute(stepExecution);
 		assertNotNull(stepExecution.getStartTime());
 		assertEquals(ExitStatus.FINISHED, stepExecution.getExitStatus());
@@ -85,6 +85,7 @@ public class TaskletStepTests extends TestCase {
 				throw new RuntimeException("foo");
 			}
 		});
+		step.afterPropertiesSet();
 		try {
 			step.execute(stepExecution);
 			fail("Expected BatchCriticalException");
@@ -130,13 +131,15 @@ public class TaskletStepTests extends TestCase {
 		}
 	}
 
-	private class StubTasklet implements Tasklet{
+	private class StubTasklet extends StepListenerSupport implements Tasklet {
 
 		private final boolean exitFailure;
 
 		private final boolean throwException;
 
 		private final boolean assertStepContext;
+		
+		private StepExecution stepExecution;
 
 		public StubTasklet(boolean exitFailure, boolean throwException) {
 			this(exitFailure, throwException, false);
@@ -158,10 +161,14 @@ public class TaskletStepTests extends TestCase {
 			}
 			
 			if (assertStepContext) {
-				assertNotNull(StepSynchronizationManager.getContext());
+				assertNotNull(this.stepExecution);
 			}
 
 			return ExitStatus.FINISHED;
+		}
+		
+		public void beforeStep(StepExecution stepExecution) {
+			this.stepExecution = stepExecution;
 		}
 
 	}

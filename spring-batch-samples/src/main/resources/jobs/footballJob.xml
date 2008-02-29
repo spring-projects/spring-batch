@@ -11,9 +11,6 @@
 
 	<import resource="../simple-container-definition.xml" />
 	
-	<bean parent="stepScope" />
-	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
-
 	<bean id="footballJob" parent="simpleJob">
 		<property name="startLimit" value="100" />
 		<property name="steps">
@@ -65,9 +62,7 @@
 	</bean>
 
 	<bean id="playerFileItemReader"
-		class="org.springframework.batch.io.file.FlatFileItemReader"
-		scope="step">
-		<aop:scoped-proxy />
+		class="org.springframework.batch.io.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/footballjob/input/${player.file.name}" />
 		<property name="lineTokenizer">
@@ -84,9 +79,7 @@
 	</bean>
 
 	<bean id="gameFileItemReader"
-		class="org.springframework.batch.io.file.FlatFileItemReader"
-		scope="step">
-		<aop:scoped-proxy />
+		class="org.springframework.batch.io.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/footballjob/input/${games.file.name}" />
 		<property name="lineTokenizer">
@@ -103,9 +96,7 @@
 	</bean>
 
 	<bean id="playerSummarizationSource"
-		class="org.springframework.batch.io.cursor.JdbcCursorItemReader"
-		scope="step">
-		<aop:scoped-proxy />
+		class="org.springframework.batch.io.cursor.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="mapper">
 			<bean

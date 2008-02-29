@@ -13,9 +13,6 @@
 
 	<import resource="../simple-container-definition.xml" />
 	
-	<bean parent="stepScope" />
-	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
-
 	<bean id="hibernateJob" parent="simpleJob">
 		<!-- set restartable=false so that this job can be used by more than one test -->
 		<property name="restartable" value="false" />
@@ -59,13 +56,9 @@
 	</bean>
 
 	<bean id="hibernateItemReader"
-		class="org.springframework.batch.io.cursor.HibernateCursorItemReader"
-		scope="step">
-		<aop:scoped-proxy />
+		class="org.springframework.batch.io.cursor.HibernateCursorItemReader">
 		<property name="queryString" value="from CustomerCredit" />
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-
-	<bean parent="customEditorConfigurer" />
 
 </beans>

@@ -24,8 +24,7 @@
 
 	<bean
 		class="org.springframework.batch.sample.dao.FlatFileCustomerCreditWriter"
-		id="customerReportOutputSource" scope="step">
-		<aop:scoped-proxy />
+		id="customerReportOutputSource">
 		<property name="outputSource">
 			<bean
 				class="org.springframework.batch.io.file.FlatFileItemWriter"
@@ -40,8 +39,7 @@
 	</bean>
 
 	<bean class="org.springframework.batch.io.file.FlatFileItemReader"
-		id="fileInputTemplate" scope="step">
-		<aop:scoped-proxy />
+		id="fileInputTemplate">
 		<property name="resource" ref="fileLocator" />
 		<property name="lineTokenizer" ref="tradeFileDescriptor" />
 		<property name="fieldSetMapper">

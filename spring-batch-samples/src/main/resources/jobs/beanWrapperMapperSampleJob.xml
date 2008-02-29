@@ -11,9 +11,6 @@
 
 	<import resource="../simple-container-definition.xml" />
 	
-	<bean parent="stepScope" />
-	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
-
 	<bean id="beanWrapperMapperJob" parent="simpleJob">
 		<property name="steps">
 			<list>
@@ -121,10 +118,5 @@
 	<bean id="person"
 		class="org.springframework.batch.sample.domain.Person"
 		scope="prototype" />
-
-	<bean parent="customEditorConfigurer" />
-
-	<!-- register the step scope with the application context -->
-	<bean class="org.springframework.batch.execution.scope.StepScope" />
 
 </beans>

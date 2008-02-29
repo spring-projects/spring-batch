@@ -12,9 +12,6 @@
 	<import resource="multilineOrderOutputDescriptors.xml" />
 	<import resource="multilineOrderIo.xml" />
 
-	<bean parent="stepScope"/>
-	<bean parent="jobConfigurationRegistryBeanPostProcessor"/>
-
 	<bean id="multilineOrderJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
@@ -142,7 +139,5 @@
 	<bean id="fileOutputLocator" class="org.springframework.core.io.FileSystemResource">
 		<constructor-arg type="java.lang.String" value="target/test-outputs/20070122.teststream.multilineOrderStep.TEMP.txt" />
 	</bean>
-
-	<bean parent="customEditorConfigurer"/>
 
 </beans>

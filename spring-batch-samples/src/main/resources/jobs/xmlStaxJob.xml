@@ -13,17 +13,12 @@
 
 	<import resource="../simple-container-definition.xml" />
 	
-	<bean parent="stepScope" />
-	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
-
 	<bean id="xmlStaxJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
 				<property name="itemReader">
 					<bean
-						class="org.springframework.batch.io.xml.StaxEventItemReader"
-						scope="step">
-						<aop:scoped-proxy />
+						class="org.springframework.batch.io.xml.StaxEventItemReader">
 						<property name="fragmentRootElementName"
 							value="trade" />
 						<property name="resource"
@@ -48,8 +43,7 @@
 	</bean>
 
 	<bean class="org.springframework.batch.io.xml.StaxEventItemWriter"
-		id="tradeStaxWriter" scope="step">
-		<aop:scoped-proxy />
+		id="tradeStaxWriter">
 		<property name="resource"
 			value="file:target/test-outputs/20070918.testStream.xmlFileStep.output.xml" />
 		<property name="serializer" ref="tradeMarshallingSerializer" />
@@ -76,8 +70,5 @@
 		<entry key="price" value="java.math.BigDecimal" />
 		<entry key="customer" value="java.lang.String" />
 	</util:map>
-
-	<!-- register the step scope with the application context -->
-	<bean class="org.springframework.batch.execution.scope.StepScope" />
 
 </beans>
