@@ -24,7 +24,7 @@
 					key="spring:service=batch,bean=notificationPublisher"
 					value-ref="notificationPublisher" />
 				<entry
-					key="spring:service=batch,bean=configurationLoader"
+					key="spring:service=batch,bean=jobLoader"
 					value-ref="loader" />
 			</map>
 		</property>

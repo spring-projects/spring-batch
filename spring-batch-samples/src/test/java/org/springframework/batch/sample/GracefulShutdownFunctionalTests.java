@@ -29,10 +29,6 @@ import org.springframework.batch.core.domain.JobParameters;
  */
 public class GracefulShutdownFunctionalTests extends AbstractBatchLauncherTests {
 
-	protected String[] getConfigLocations(){
-		return new String[] {"jobs/infiniteLoopJob.xml"};
-	}
-
 	public void testLaunchJob() throws Exception {
 
 		final JobParameters jobParameters = new JobParameters();

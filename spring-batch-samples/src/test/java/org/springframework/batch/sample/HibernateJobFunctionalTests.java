@@ -7,7 +7,4 @@ package org.springframework.batch.sample;
  */
 public class HibernateJobFunctionalTests extends AbstractCustomerCreditIncreaseTests {
 
-	protected String[] getConfigLocations() {
-		return new String[] {"jobs/hibernateJob.xml"};
-	}
 }

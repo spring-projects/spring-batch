@@ -11,8 +11,6 @@
 
 	<description>Example for iBATIS integration.</description>
 
-	<import resource="../simple-container-definition.xml" />
-
 	<bean id="ibatisJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">

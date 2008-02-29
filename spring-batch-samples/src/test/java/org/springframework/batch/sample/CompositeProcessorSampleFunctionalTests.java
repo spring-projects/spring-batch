@@ -33,11 +33,6 @@ public class CompositeProcessorSampleFunctionalTests extends AbstractValidatingB
 	
 	private int before;
 	
-//	@Override
-	protected String[] getConfigLocations() {
-		return new String[]{"jobs/compositeProcessorSampleJob.xml"};
-	}
-
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.sample.AbstractLifecycleSpringContextTests#validatePreConditions()
 	 */

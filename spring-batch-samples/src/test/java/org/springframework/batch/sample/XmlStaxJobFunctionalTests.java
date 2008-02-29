@@ -26,11 +26,6 @@ public class XmlStaxJobFunctionalTests extends AbstractValidatingBatchLauncherTe
 	
 	private static final String OUTPUT_FILE = "target/test-outputs/20070918.testStream.xmlFileStep.output.xml";
 	private static final String EXPECTED_OUTPUT_FILE = "src/main/resources/data/staxJob/output/expected-output.xml";
-	
-//	@Override
-	protected String[] getConfigLocations() {
-		return new String[]{"jobs/xmlStaxJob.xml"};
-	}
 
 	/**
 	 * Output should be the same as input

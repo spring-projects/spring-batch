@@ -19,10 +19,6 @@ public class RollbackJobFunctionalTests extends AbstractValidatingBatchLauncherT
 		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	protected String[] getConfigLocations() {
-		return new String[] {"jobs/rollbackJob.xml"};
-	}
-
 	protected void onSetUp() throws Exception {
 		before = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 	}

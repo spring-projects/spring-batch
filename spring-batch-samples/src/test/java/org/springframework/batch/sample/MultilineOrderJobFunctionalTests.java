@@ -48,11 +48,6 @@ public class MultilineOrderJobFunctionalTests extends AbstractValidatingBatchLau
 	
 	private Resource fileOutputLocator = new FileSystemResource("target/test-outputs/20070122.teststream.multilineOrderStep.TEMP.txt");
 	
-//	@Override
-	protected String[] getConfigLocations() {
-		return new String[] {"jobs/multilineOrderJob.xml"};
-	}
-
 	/**
 	 * Read the output file and compare it with expected string
 	 * @throws IOException 

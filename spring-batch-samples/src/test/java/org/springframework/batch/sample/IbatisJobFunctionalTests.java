@@ -8,8 +8,4 @@ package org.springframework.batch.sample;
  */
 public class IbatisJobFunctionalTests extends AbstractCustomerCreditIncreaseTests{
 
-	protected String[] getConfigLocations() {
-		return new String[] {"jobs/ibatisJob.xml"};
-	}
-
 }

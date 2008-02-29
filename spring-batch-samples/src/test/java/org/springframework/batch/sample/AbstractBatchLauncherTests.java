@@ -19,9 +19,8 @@ package org.springframework.batch.sample;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.execution.launch.JobLauncher;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+import org.springframework.util.ClassUtils;
 
 /**
  * Abstract unit test for running functional tests by getting context locations
@@ -41,20 +40,19 @@ public abstract class AbstractBatchLauncherTests extends
 		setDependencyCheck(false);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.test.AbstractSingleSpringContextTests#getConfigLocations()
+	 */
+	protected String[] getConfigLocations() {
+		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), ClassUtils.getShortName(getClass())
+				+ "-context.xml") };
+	}
+
 	JobLauncher launcher;
 	private Job job;
 	
 	private JobParameters jobParameters = new JobParameters();
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.test.AbstractSingleSpringContextTests#createApplicationContext(java.lang.String[])
-	 */
-	protected ConfigurableApplicationContext createApplicationContext(
-			String[] locations) {
-		return new ClassPathXmlApplicationContext(locations);
-	}
 
 	public void setLauncher(JobLauncher bootstrap) {
 		this.launcher = bootstrap;

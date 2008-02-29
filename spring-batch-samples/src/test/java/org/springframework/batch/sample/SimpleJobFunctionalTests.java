@@ -21,9 +21,5 @@ package org.springframework.batch.sample;
  * the test is reused, only the job config location is overridden
  */
 public class SimpleJobFunctionalTests extends FixedLengthImportJobFunctionalTests {
-	
-	protected String[] getConfigLocations() {
-		return new String[]{"jobs/simpleJob.xml"};
-	}
 
 }

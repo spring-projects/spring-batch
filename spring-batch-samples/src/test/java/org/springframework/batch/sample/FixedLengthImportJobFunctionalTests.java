@@ -52,10 +52,6 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 		inputSource.setResource(fileLocator);
 	}
 
-	protected String[] getConfigLocations() {
-		return new String[] {"jobs/fixedLengthImportJob.xml"};
-	}
-
 	/**
 	 * Check that records have been correctly written to database
 	 * @throws Exception 

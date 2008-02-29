@@ -6,10 +6,6 @@ public class DelegatingJobFunctionalTests extends AbstractValidatingBatchLaunche
 
 	private PersonService personService;
 	
-	protected String[] getConfigLocations() {
-		return new String[] {"jobs/delegatingJob.xml"};
-	}
-	
 	protected void validatePostConditions() throws Exception {
 		assertTrue(personService.getReturnedCount() > 0);
 		assertEquals(personService.getReturnedCount(), personService.getReceivedCount());

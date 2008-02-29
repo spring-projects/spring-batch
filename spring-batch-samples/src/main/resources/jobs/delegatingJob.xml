@@ -15,8 +15,6 @@
 		integrated into a batch job.
 	</description>
 
-	<import resource="../simple-container-definition.xml" />
-	
 	<bean
 		class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
 		<property name="jobConfigurationRegistry"

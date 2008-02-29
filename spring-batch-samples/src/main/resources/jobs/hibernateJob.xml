@@ -11,8 +11,6 @@
 
 	<description>Example for Hibernate integration.</description>
 
-	<import resource="../simple-container-definition.xml" />
-
 	<bean id="hibernateJob" parent="simpleJob">
 		<!-- set restartable=false so that this job can be used by more than one test -->
 		<property name="restartable" value="false" />

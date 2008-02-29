@@ -11,8 +11,6 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-	<import resource="../simple-container-definition.xml" />
-	
 	<bean id="xmlStaxJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">

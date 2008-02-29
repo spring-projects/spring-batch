@@ -14,10 +14,6 @@ public class RetrySampleFunctionalTests extends AbstractValidatingBatchLauncherT
 	
 	private RetrySampleItemWriter itemProcessor;
 	
-	protected String[] getConfigLocations() {
-		return new String[] {"jobs/retrySample.xml"};
-	}
-	
 	protected void validatePostConditions() throws Exception {
 		//items processed = items read + 2 exceptions
 		assertEquals(itemGenerator.getLimit()+2, itemProcessor.getCounter());

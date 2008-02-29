@@ -33,7 +33,7 @@ public interface JobLocator {
 	 * unique
 	 * @return a {@link Job} identified by the given name
 	 * 
-	 * @throws NoSuchJobException if the required configuratio can
+	 * @throws NoSuchJobException if the required configuration can
 	 * not be found.
 	 */
 	Job getJob(String name) throws NoSuchJobException;

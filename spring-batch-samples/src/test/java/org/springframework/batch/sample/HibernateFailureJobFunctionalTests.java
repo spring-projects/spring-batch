@@ -40,10 +40,6 @@ public class HibernateFailureJobFunctionalTests extends
 		writer.setFailOnFlush(-1);
 	}
 
-	protected String[] getConfigLocations() {
-		return new String[] { "jobs/hibernateJob.xml" };
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 

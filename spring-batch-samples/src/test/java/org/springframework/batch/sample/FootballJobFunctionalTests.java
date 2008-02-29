@@ -14,10 +14,6 @@ public class FootballJobFunctionalTests extends
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	protected String[] getConfigLocations() {
-		return new String[] { "jobs/footballJob.xml" };
-	}
-
 	protected void validatePostConditions() throws Exception {
 		int count = jdbcTemplate.queryForInt("SELECT COUNT(*) from PLAYER_SUMMARY");
 		assertTrue(count>0);

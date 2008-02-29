@@ -15,10 +15,6 @@ public class ParallelJobFunctionalTests extends
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	protected String[] getConfigLocations() {
-		return new String[] { "jobs/parallelJob.xml" };
-	}
-
 	protected void validatePostConditions() throws Exception {
 		int count;
 		count = jdbcTemplate.queryForInt(

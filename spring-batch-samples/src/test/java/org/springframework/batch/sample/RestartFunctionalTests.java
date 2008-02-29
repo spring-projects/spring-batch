@@ -28,8 +28,6 @@ import org.springframework.jdbc.core.JdbcOperations;
  */
 public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 
-	private static final String JOB_FILE = "jobs/restartSample.xml";
-
 	//auto-injected attributes
 	private JdbcOperations jdbcTemplate;
 
@@ -40,10 +38,6 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 	 */
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
-	}
-	
-	protected String[] getConfigLocations(){
-		return new String[]{JOB_FILE};
 	}
 	
 	/* (non-Javadoc)

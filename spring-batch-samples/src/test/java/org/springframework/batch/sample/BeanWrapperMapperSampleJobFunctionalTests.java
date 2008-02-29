@@ -19,10 +19,6 @@ package org.springframework.batch.sample;
 
 public class BeanWrapperMapperSampleJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 	
-	protected String[] getConfigLocations() {
-		return new String[]{"jobs/beanWrapperMapperSampleJob.xml"};
-	}
-
 	protected void validatePostConditions() {
 		// nothing to check, the job writes no output
 	}

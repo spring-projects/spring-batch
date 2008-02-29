@@ -10,8 +10,6 @@
 	<!-- The tasklet used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from
 		multiple environments. -->
 
-	<import resource="../simple-container-definition.xml" />
-	
 	<bean id="loopJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="taskletStep">

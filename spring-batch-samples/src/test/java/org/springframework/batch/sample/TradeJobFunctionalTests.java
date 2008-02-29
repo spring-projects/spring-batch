@@ -52,10 +52,6 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 		this.jdbcTemplate = jdbcTemplate;
 	}
 	
-	protected String[] getConfigLocations() {
-		return new String[] {"jobs/tradeJob.xml"};
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.springframework.test.AbstractSingleSpringContextTests#onSetUp()
 	 */

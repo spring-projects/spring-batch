@@ -7,8 +7,6 @@
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-	<import resource="../simple-container-definition.xml" />
-
 	<bean id="simpleSample" parent="simpleJob">
 		<property name="steps">
 			<list>
