@@ -22,11 +22,10 @@ import org.hibernate.SessionFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ClearFailedException;
 import org.springframework.batch.item.exception.FlushFailedException;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
+import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.AttributeAccessor;
 import org.springframework.orm.hibernate3.HibernateOperations;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -46,18 +45,12 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, InitializingBean {
+public class HibernateAwareItemWriter implements ItemWriter, InitializingBean {
 
 	/**
 	 * Key for items processed in the current transaction {@link RepeatContext}.
 	 */
 	private static final String ITEMS_PROCESSED = HibernateAwareItemWriter.class.getName() + ".ITEMS_PROCESSED";
-
-	/**
-	 * Key for {@link RepeatContext} in transaction resource context.
-	 */
-	private static final String WRITER_REPEAT_CONTEXT = HibernateAwareItemWriter.class.getName()
-			+ ".WRITER_REPEAT_CONTEXT";
 
 	private Set failed = new HashSet();
 
@@ -112,87 +105,10 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	 * @see org.springframework.batch.io.OutputSource#write(java.lang.Object)
 	 */
 	public void write(Object output) throws Exception {
+		bindTransactionResources();
 		getProcessed().add(output);
 		delegate.write(output);
 		flushIfNecessary(output);
-	}
-
-	/**
-	 * Does nothing unless the delegate is also a {@link RepeatListener} in
-	 * which case pass on the call to him.
-	 * 
-	 * @see org.springframework.batch.repeat.RepeatListener#before(org.springframework.batch.repeat.RepeatContext)
-	 */
-	public void before(RepeatContext context) {
-		if (delegate instanceof RepeatListener) {
-			RepeatListener interceptor = (RepeatListener) delegate;
-			interceptor.before(context);
-		}
-	}
-
-	/**
-	 * Does nothing unless the delegate is also a {@link RepeatListener} in
-	 * which case pass on the call to him.
-	 * 
-	 * @see org.springframework.batch.repeat.RepeatListener#after(org.springframework.batch.repeat.RepeatContext,
-	 * org.springframework.batch.repeat.ExitStatus)
-	 */
-	public void after(RepeatContext context, ExitStatus result) {
-		if (delegate instanceof RepeatListener) {
-			RepeatListener interceptor = (RepeatListener) delegate;
-			interceptor.after(context, result);
-		}
-	}
-
-	/**
-	 * If the delegate is also a {@link RepeatListener} then it will be given
-	 * the call before flushing.
-	 * 
-	 * 
-	 * @see org.springframework.batch.repeat.RepeatListener#close(org.springframework.batch.repeat.RepeatContext)
-	 */
-	public void close(RepeatContext context) {
-		try {
-			flushInContext();
-		}
-		finally {
-			unsetContext();
-			if (delegate instanceof RepeatListener) {
-				RepeatListener interceptor = (RepeatListener) delegate;
-				interceptor.close(context);
-			}
-		}
-	}
-
-	/**
-	 * Does nothing unless the delegate is also a {@link RepeatListener} in
-	 * which case pass on the call to him.
-	 * 
-	 * @see org.springframework.batch.repeat.RepeatListener#onError(org.springframework.batch.repeat.RepeatContext,
-	 * java.lang.Throwable)
-	 */
-	public void onError(RepeatContext context, Throwable e) {
-		if (delegate instanceof RepeatListener) {
-			RepeatListener interceptor = (RepeatListener) delegate;
-			interceptor.onError(context, e);
-		}
-	}
-
-	/**
-	 * Sets up the context as a transaction resource so that we can store state
-	 * and refer back to it in the {@link #write(Object)} method. If the
-	 * delegate is also a {@link RepeatListener} then it will be given the call
-	 * afterwards.
-	 * 
-	 * @see org.springframework.batch.repeat.RepeatListener#open(org.springframework.batch.repeat.RepeatContext)
-	 */
-	public void open(RepeatContext context) {
-		this.setContext(context);
-		getProcessed().clear();
-		if (delegate instanceof RepeatListener) {
-			RepeatListener interceptor = (RepeatListener) delegate;
-			interceptor.open(context);
-		}
 	}
 
 	/**
@@ -201,10 +117,9 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	 * @return the processed
 	 */
 	private Set getProcessed() {
-		Assert.state(TransactionSynchronizationManager.hasResource(WRITER_REPEAT_CONTEXT),
-				"RepeatContext not bound to transaction.");
-		Set processed = (Set) ((AttributeAccessor) TransactionSynchronizationManager.getResource(WRITER_REPEAT_CONTEXT))
-				.getAttribute(ITEMS_PROCESSED);
+		Assert.state(TransactionSynchronizationManager.hasResource(ITEMS_PROCESSED),
+				"Processed items not bound to transaction.");
+		Set processed = (Set) TransactionSynchronizationManager.getResource(ITEMS_PROCESSED);
 		return processed;
 	}
 
@@ -213,22 +128,21 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 	 * 
 	 * @param context the context to set
 	 */
-	private void setContext(RepeatContext context) {
-		if (TransactionSynchronizationManager.hasResource(WRITER_REPEAT_CONTEXT)) {
+	private void bindTransactionResources() {
+		if (TransactionSynchronizationManager.hasResource(ITEMS_PROCESSED)) {
 			return;
 		}
-		TransactionSynchronizationManager.bindResource(WRITER_REPEAT_CONTEXT, context);
-		context.setAttribute(ITEMS_PROCESSED, new HashSet());
+		TransactionSynchronizationManager.bindResource(ITEMS_PROCESSED, new HashSet());
 	}
 
 	/**
 	 * Remove the transaction resource associated with this context.
 	 */
-	private void unsetContext() {
-		if (!TransactionSynchronizationManager.hasResource(WRITER_REPEAT_CONTEXT)) {
+	private void unbindTransactionResources() {
+		if (!TransactionSynchronizationManager.hasResource(ITEMS_PROCESSED)) {
 			return;
 		}
-		TransactionSynchronizationManager.unbindResource(WRITER_REPEAT_CONTEXT);
+		TransactionSynchronizationManager.unbindResource(ITEMS_PROCESSED);
 	}
 
 	/**
@@ -244,23 +158,21 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 			flush = failed.contains(output);
 		}
 		if (flush) {
-			RepeatContext context = (RepeatContext) TransactionSynchronizationManager
-					.getResource(WRITER_REPEAT_CONTEXT);
+			RepeatContext context = RepeatSynchronizationManager.getContext();
 			// Force early completion to commit aggressively if we encounter a
 			// failed item (from a failed chunk but we don't know which one was
 			// the problem).
 			context.setCompleteOnly();
 			// Flush now, so that if there is a failure this record can be
 			// skipped.
-			flushInContext();
+			doHibernateFlush();
 		}
-
 	}
 
 	/**
-	 * 
+	 * Flush the hibernate session from within a repeat context.
 	 */
-	private void flushInContext() {
+	private void doHibernateFlush() {
 		try {
 			hibernateTemplate.flush();
 			// This should happen when the transaction commits anyway, but to be
@@ -277,25 +189,28 @@ public class HibernateAwareItemWriter implements ItemWriter, RepeatListener, Ini
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Call the delegate clear() method, and then clear the hibernate session.
+	 * 
 	 * @see org.springframework.batch.item.ItemWriter#clear()
 	 */
 	public void clear() throws ClearFailedException {
-		if (delegate != null) {
-			delegate.clear();
-		}
+		unbindTransactionResources();
 		hibernateTemplate.clear();
+		delegate.clear();
 	}
 
 	/**
-	 * Flush the Hibernate session. The delegate flush will also be called
-	 * before finishing.
+	 * Flush the Hibernate session and record failures if there are any. The
+	 * delegate flush will also be called.
+	 * 
+	 * @see org.springframework.batch.item.ItemWriter#flush()
 	 */
 	public void flush() throws FlushFailedException {
-		if (delegate != null) {
-			delegate.flush();
-		}
+		bindTransactionResources();
+		doHibernateFlush();
+		unbindTransactionResources();
+		delegate.flush();
 	}
 
 }

@@ -25,11 +25,15 @@ import org.springframework.batch.execution.listener.CompositeChunkListener;
 import org.springframework.batch.execution.listener.CompositeItemReadListener;
 import org.springframework.batch.execution.listener.CompositeItemWriteListener;
 import org.springframework.batch.execution.listener.CompositeStepListener;
+import org.springframework.batch.execution.listener.RepeatListenerItemReadListenerAdapter;
+import org.springframework.batch.execution.listener.RepeatListenerItemWriteListenerAdapter;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.item.stream.CompositeItemStream;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatListener;
+import org.springframework.batch.repeat.interceptor.CompositeRepeatListener;
 
 /**
  * @author Dave Syer
@@ -47,6 +51,17 @@ public class ListenerMulticaster implements ItemStream, StepListener, ChunkListe
 	private CompositeItemReadListener itemReadListener = new CompositeItemReadListener();
 
 	private CompositeItemWriteListener itemWriteListener = new CompositeItemWriteListener();
+
+	private CompositeRepeatListener repeatListener = new CompositeRepeatListener();
+	
+	/**
+	 * Initialise the listener instance.
+	 */
+	public ListenerMulticaster() {
+		super();
+		itemWriteListener.register(new RepeatListenerItemWriteListenerAdapter(repeatListener));
+		itemReadListener.register(new RepeatListenerItemReadListenerAdapter(repeatListener));
+	}
 
 	/**
 	 * Register each of the objects as listeners. Once registered, calls to the
@@ -81,6 +96,9 @@ public class ListenerMulticaster implements ItemStream, StepListener, ChunkListe
 		}
 		if (listener instanceof ItemWriteListener) {
 			this.itemWriteListener.register((ItemWriteListener) listener);
+		}
+		if (listener instanceof RepeatListener) {
+			this.repeatListener.register((RepeatListener) listener);
 		}
 	}
 

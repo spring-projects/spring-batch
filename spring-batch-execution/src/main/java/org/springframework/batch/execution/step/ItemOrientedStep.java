@@ -295,7 +295,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 							listener.update(stepExecution.getExecutionContext());
 							try {
-								stepExecution.setStatus(BatchStatus.COMPLETED);
 								jobRepository.saveOrUpdateExecutionContext(stepExecution);
 							}
 							catch (Exception e) {

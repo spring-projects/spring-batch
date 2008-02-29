@@ -12,7 +12,7 @@
 	<description>Example for Hibernate integration.</description>
 
 	<import resource="../simple-container-definition.xml" />
-	
+
 	<bean id="hibernateJob" parent="simpleJob">
 		<!-- set restartable=false so that this job can be used by more than one test -->
 		<property name="restartable" value="false" />
@@ -21,18 +21,12 @@
 				<property name="itemReader" ref="hibernateItemReader" />
 				<property name="itemWriter" ref="hibernateOutputSource" />
 				<property name="commitInterval" value="3" />
-				
+
 				<property name="itemSkipPolicy">
-					<bean class="org.springframework.batch.execution.step.support.AlwaysSkipItemSkipPolicy"/>
+					<bean
+						class="org.springframework.batch.execution.step.support.AlwaysSkipItemSkipPolicy" />
 				</property>
 
-				<property name="chunkOperations">
-					<bean
-						class="org.springframework.batch.repeat.support.RepeatTemplate">
-						<property name="listeners"
-							ref="hibernateOutputSource" />
-					</bean>
-				</property>
 			</bean>
 		</property>
 	</bean>
