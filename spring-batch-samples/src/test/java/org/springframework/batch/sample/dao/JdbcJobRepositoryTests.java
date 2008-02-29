@@ -44,7 +44,10 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 
 	protected void onSetUpBeforeTransaction() throws Exception {
 		startNewTransaction();
+		getJdbcTemplate().update("DELETE FROM BATCH_STEP_EXECUTION_CONTEXT");
+		getJdbcTemplate().update("DELETE FROM BATCH_STEP_EXECUTION");
 		getJdbcTemplate().update("DELETE FROM BATCH_JOB_EXECUTION");
+		getJdbcTemplate().update("DELETE FROM BATCH_JOB_PARAMS");
 		getJdbcTemplate().update("DELETE FROM BATCH_JOB_INSTANCE");
 		setComplete();
 		endTransaction();
