@@ -25,7 +25,7 @@ import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * @author Dave Syer
+ * @author Lucas Ward
  * 
  */
 public class CompositeStepListener implements StepListener {

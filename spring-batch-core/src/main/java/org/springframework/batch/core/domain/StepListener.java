@@ -18,6 +18,8 @@ package org.springframework.batch.core.domain;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
+ * Listener interface for the lifecycle of a {@link Step}.
+ * 
  * @author Lucas Ward
  * @author Dave Syer
  * 

@@ -15,21 +15,37 @@
  */
 package org.springframework.batch.core.domain;
 
-/**
- * @author Lucas Ward
- *
- */
-public interface ChunkInterceptor {
+import org.springframework.batch.item.ItemWriter;
 
-	void beforeRead();
-	
-	void afterRead(Object item);
-	
-	void onReadError(Exception ex);
-	
+/**
+ * Listener interface around the writing of an item.
+ * 
+ * @author Lucas Ward
+ * 
+ */
+public interface ItemWriteListener {
+
+	/**
+	 * Called before {@link ItemWriter#write(Object)}
+	 * 
+	 * @param item to be written
+	 */
 	void beforeWrite(Object item);
 
+	/**
+	 * Called after {@link ItemWriter#write(Object)  If  the item is last in a
+	 * chunk, this will be called before any transaction is committed, and
+	 * before {@link ChunkListener#afterChunk()}
+	 */
 	void afterWrite();
-	
-	void onWriterError(Exception ex, Object item);
+
+	/**
+	 * Called if an error occurs while trying to write.
+	 * 
+	 * @param ex
+	 *            thrown from {@link ItemWriter}
+	 * @param item
+	 *            attempted to be written.
+	 */
+	void onWriteError(Exception ex, Object item);
 }
