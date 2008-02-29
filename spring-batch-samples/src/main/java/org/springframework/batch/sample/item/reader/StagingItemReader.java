@@ -9,12 +9,13 @@ import java.util.List;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.execution.scope.StepContext;
-import org.springframework.batch.execution.scope.StepContextAware;
+import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.exception.StreamException;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.sample.item.writer.StagingItemWriter;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowMapper;
@@ -24,14 +25,14 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
-public class StagingItemReader extends JdbcDaoSupport implements ItemStream, KeyedItemReader, StepContextAware {
+public class StagingItemReader extends JdbcDaoSupport implements ItemStream, KeyedItemReader, StepListener {
 
 	// Key for buffer in transaction synchronization manager
 	private static final String BUFFER_KEY = StagingItemReader.class.getName() + ".BUFFER";
 
 	private static Log logger = LogFactory.getLog(StagingItemReader.class);
 
-	private StepContext stepContext;
+	private StepExecution stepExecution;
 
 	private LobHandler lobHandler = new DefaultLobHandler();
 
@@ -76,15 +77,6 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 		}
 	}
 
-	/**
-	 * Callback for injection of the step context.
-	 * 
-	 * @param stepContext the stepContext to set
-	 */
-	public void setStepContext(StepContext stepContext) {
-		this.stepContext = stepContext;
-	}
-
 	private List retrieveKeys() {
 
 		synchronized (lock) {
@@ -93,7 +85,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 
 			"SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID",
 
-			new Object[] { stepContext.getStepExecution().getJobExecution().getJobId(), StagingItemWriter.NEW },
+			new Object[] { stepExecution.getJobExecution().getJobId(), StagingItemWriter.NEW },
 
 			new RowMapper() {
 				public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -232,6 +224,27 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Key
 	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
 	 */
 	public void update(ExecutionContext executionContext) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.StepListener#afterStep()
+	 */
+	public ExitStatus afterStep() {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.StepListener#beforeStep(org.springframework.batch.core.domain.StepExecution)
+	 */
+	public void beforeStep(StepExecution stepExecution) {
+		this.stepExecution = stepExecution;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.StepListener#onErrorInStep(java.lang.Throwable)
+	 */
+	public ExitStatus onErrorInStep(Throwable e) {
+		return null;
 	}
 
 }

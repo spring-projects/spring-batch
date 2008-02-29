@@ -268,8 +268,8 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			// Execute step level listeners *after* the execution context is
 			// fixed in the step. E.g. ItemStream instances need the the same
 			// reference to the ExecutionContext as the step execution.
-			listener.open(stepExecution.getExecutionContext());
 			listener.beforeStep(stepExecution);
+			listener.open(stepExecution.getExecutionContext());
 
 			status = stepOperations.iterate(new RepeatCallback() {
 

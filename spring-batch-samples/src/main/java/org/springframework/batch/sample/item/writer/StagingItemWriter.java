@@ -5,11 +5,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.apache.commons.lang.SerializationUtils;
-import org.springframework.batch.execution.scope.StepContext;
-import org.springframework.batch.execution.scope.StepContextAware;
+import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ClearFailedException;
 import org.springframework.batch.item.exception.FlushFailedException;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
@@ -18,7 +19,7 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
-public class StagingItemWriter extends JdbcDaoSupport implements StepContextAware, ItemWriter {
+public class StagingItemWriter extends JdbcDaoSupport implements StepListener, ItemWriter {
 
 	public static final String NEW = "N";
 
@@ -28,7 +29,7 @@ public class StagingItemWriter extends JdbcDaoSupport implements StepContextAwar
 
 	private DataFieldMaxValueIncrementer incrementer;
 
-	private StepContext stepContext;
+	private StepExecution stepExecution;
 
 	private LobHandler lobHandler = new DefaultLobHandler();
 
@@ -53,15 +54,6 @@ public class StagingItemWriter extends JdbcDaoSupport implements StepContextAwar
 	}
 
 	/**
-	 * Callback for injection of the step context.
-	 * 
-	 * @param stepContext the stepContext to set
-	 */
-	public void setStepContext(StepContext stepContext) {
-		this.stepContext = stepContext;
-	}
-
-	/**
 	 * Setter for the key generator for the staging table.
 	 * 
 	 * @param incrementer the {@link DataFieldMaxValueIncrementer} to set
@@ -77,7 +69,7 @@ public class StagingItemWriter extends JdbcDaoSupport implements StepContextAwar
 	 */
 	public void write(Object data) {
 		final long id = incrementer.nextLongValue();
-		final long jobId = stepContext.getStepExecution().getJobExecution().getJobId().longValue();
+		final long jobId = stepExecution.getJobExecution().getJobId().longValue();
 		final byte[] blob = SerializationUtils.serialize((Serializable) data);
 		getJdbcTemplate()
 				.update("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",
@@ -99,6 +91,27 @@ public class StagingItemWriter extends JdbcDaoSupport implements StepContextAwar
 	}
 
 	public void flush() throws FlushFailedException {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.StepListener#afterStep()
+	 */
+	public ExitStatus afterStep() {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.StepListener#beforeStep(org.springframework.batch.core.domain.StepExecution)
+	 */
+	public void beforeStep(StepExecution stepExecution) {
+		this.stepExecution = stepExecution;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.StepListener#onErrorInStep(java.lang.Throwable)
+	 */
+	public ExitStatus onErrorInStep(Throwable e) {
+		return null;
 	}
 
 }

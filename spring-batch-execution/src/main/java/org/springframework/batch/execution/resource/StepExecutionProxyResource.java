@@ -17,18 +17,20 @@
 package org.springframework.batch.execution.resource;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Map.Entry;
 
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.batch.execution.bootstrap.support.DefaultJobParametersFactory;
-import org.springframework.batch.execution.scope.StepContext;
-import org.springframework.batch.execution.scope.StepContextAware;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.Resource;
@@ -38,10 +40,10 @@ import org.springframework.util.StringUtils;
 
 /**
  * Strategy for locating different resources on the file system. For each unique
- * step, the same file handle will be returned. A unique step is defined as
- * having the same job identifier and step name. An external file mover (such as
- * an EAI solution) should rename and move any input files to conform to the
- * patter defined by the file pattern.<br/>
+ * step execution, the same file handle will be returned. A unique step is
+ * defined as having the same job instance and step name. An external file mover
+ * (such as an EAI solution) should rename and move any input files to conform
+ * to the pattern defined here.<br/>
  * 
  * If no pattern is passed in, then following default is used:
  * 
@@ -61,17 +63,19 @@ import org.springframework.util.StringUtils;
  * implementation of the Spring Core Resource abstractions, it would need to
  * start with a double forward slash "//" to resolve to an absolute directory.<br/>
  * 
- * It doesn't make much sense to use this factory unless it is step scoped, but
- * note that it is thread safe only if it is step scoped and its mutators are
- * not used except for configuration.
+ * To use this resource it must be initialised with a {@link StepExecution}.
+ * The best way to do that is to register it as a listener in the step that is
+ * going to need it. It is to enable this usage that the resource implements
+ * {@link StepListener}.
  * 
  * @author Tomas Slanina
  * @author Lucas Ward
  * @author Dave Syer
  * 
- * @see FactoryBean
+ * @see Resource
  */
-public class BatchResourceFactoryBean extends AbstractFactoryBean implements ResourceLoaderAware, StepContextAware {
+public class StepExecutionProxyResource extends StepListenerSupport implements Resource, ResourceLoaderAware,
+		StepListener {
 
 	private static final String JOB_NAME_PATTERN = "%JOB_NAME%";
 
@@ -81,15 +85,107 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 
 	private String filePattern = DEFAULT_PATTERN;
 
-	private String jobName = null;
-
-	private String stepName = "";
-
 	private JobParametersFactory jobParametersFactory = new DefaultJobParametersFactory();
 
 	private ResourceLoader resourceLoader = new FileSystemResourceLoader();
 
-	private Properties properties;
+	private Resource delegate;
+
+	/**
+	 * @param relativePath
+	 * @return
+	 * @throws IOException
+	 * @see org.springframework.core.io.Resource#createRelative(java.lang.String)
+	 */
+	public Resource createRelative(String relativePath) throws IOException {
+		Assert.state(delegate != null, "The delegate resource has not been initialised. "
+				+ "Remember to register this object as a StepListener.");
+		return delegate.createRelative(relativePath);
+	}
+
+	/**
+	 * @return
+	 * @see org.springframework.core.io.Resource#exists()
+	 */
+	public boolean exists() {
+		Assert.state(delegate != null, "The delegate resource has not been initialised. "
+				+ "Remember to register this object as a StepListener.");
+		return delegate.exists();
+	}
+
+	/**
+	 * @return
+	 * @see org.springframework.core.io.Resource#getDescription()
+	 */
+	public String getDescription() {
+		Assert.state(delegate != null, "The delegate resource has not been initialised. "
+				+ "Remember to register this object as a StepListener.");
+		return delegate.getDescription();
+	}
+
+	/**
+	 * @return
+	 * @throws IOException
+	 * @see org.springframework.core.io.Resource#getFile()
+	 */
+	public File getFile() throws IOException {
+		Assert.state(delegate != null, "The delegate resource has not been initialised. "
+				+ "Remember to register this object as a StepListener.");
+		return delegate.getFile();
+	}
+
+	/**
+	 * @return
+	 * @see org.springframework.core.io.Resource#getFilename()
+	 */
+	public String getFilename() {
+		Assert.state(delegate != null, "The delegate resource has not been initialised. "
+				+ "Remember to register this object as a StepListener.");
+		return delegate.getFilename();
+	}
+
+	/**
+	 * @return
+	 * @throws IOException
+	 * @see org.springframework.core.io.InputStreamSource#getInputStream()
+	 */
+	public InputStream getInputStream() throws IOException {
+		Assert.state(delegate != null, "The delegate resource has not been initialised. "
+				+ "Remember to register this object as a StepListener.");
+		return delegate.getInputStream();
+	}
+
+	/**
+	 * @return
+	 * @throws IOException
+	 * @see org.springframework.core.io.Resource#getURI()
+	 */
+	public URI getURI() throws IOException {
+		Assert.state(delegate != null, "The delegate resource has not been initialised. "
+				+ "Remember to register this object as a StepListener.");
+		return delegate.getURI();
+	}
+
+	/**
+	 * @return
+	 * @throws IOException
+	 * @see org.springframework.core.io.Resource#getURL()
+	 */
+	public URL getURL() throws IOException {
+		Assert.state(delegate != null, "The delegate resource has not been initialised. "
+				+ "Remember to register this object as a StepListener.");
+		return delegate.getURL();
+	}
+
+	/**
+	 * @return
+	 * @see org.springframework.core.io.Resource#isOpen()
+	 */
+	public boolean isOpen() {
+		Assert.state(delegate != null, "The delegate resource has not been initialised. "
+				+ "Remember to register this object as a StepListener.");
+		return delegate.isOpen();
+	}
 
 	/**
 	 * Public setter for the {@link JobParametersFactory} used to translate
@@ -120,34 +216,6 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 	}
 
 	/**
-	 * Collect the properties of the enclosing {@link StepExecution} that will
-	 * be needed to create a file name.
-	 * 
-	 * @see org.springframework.batch.execution.scope.StepContextAware#setStepScopeContext(org.springframework.core.AttributeAccessor)
-	 */
-	public void setStepContext(StepContext context) {
-		Assert.state(context.getStepExecution() != null, "The StepContext does not have an execution.");
-		StepExecution execution = context.getStepExecution();
-		stepName = execution.getStepName();
-		jobName = execution.getJobExecution().getJobInstance().getJobName();
-		properties = jobParametersFactory.getProperties(execution.getJobExecution().getJobInstance().getJobParameters());
-	}
-
-	/**
-	 * Returns the Resource representing the file defined by the file pattern.
-	 * 
-	 * @see FactoryBean#getObject()
-	 * @return a resource representing the file on the file system.
-	 */
-	protected Object createInstance() {
-		return resourceLoader.getResource(createFileName());
-	}
-
-	public Class getObjectType() {
-		return Resource.class;
-	}
-
-	/**
 	 * helper method for <code>createFileName()</code>
 	 */
 	private String replacePattern(String string, String pattern, String replacement) {
@@ -168,8 +236,11 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 	 * 
 	 * Deliberate package access, so that the method can be accessed by unit
 	 * tests
+	 * @param jobName
+	 * @param stepName
+	 * @param properties
 	 */
-	private String createFileName() {
+	private String createFileName(String jobName, String stepName, Properties properties) {
 		Assert.notNull(filePattern, "filename pattern is null");
 
 		String fileName = filePattern;
@@ -190,6 +261,20 @@ public class BatchResourceFactoryBean extends AbstractFactoryBean implements Res
 
 	public void setFilePattern(String filePattern) {
 		this.filePattern = replacePattern(filePattern, "\\", File.separator);
+	}
+
+	/**
+	 * Collect the properties of the enclosing {@link StepExecution} that will
+	 * be needed to create a file name.
+	 * 
+	 * @see org.springframework.batch.core.domain.StepListener#beforeStep(org.springframework.batch.core.domain.StepExecution)
+	 */
+	public void beforeStep(StepExecution execution) {
+		String stepName = execution.getStepName();
+		String jobName = execution.getJobExecution().getJobInstance().getJobName();
+		Properties properties = jobParametersFactory.getProperties(execution.getJobExecution().getJobInstance()
+				.getJobParameters());
+		delegate = resourceLoader.getResource(createFileName(jobName, stepName, properties));
 	}
 
 }

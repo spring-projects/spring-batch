@@ -4,12 +4,7 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.execution.scope.SimpleStepContext;
-import org.springframework.batch.execution.scope.StepContext;
-import org.springframework.batch.execution.scope.StepSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.sample.item.writer.StagingItemWriter;
 import org.springframework.batch.sample.tasklet.JobSupport;
 import org.springframework.batch.sample.tasklet.StepSupport;
@@ -20,7 +15,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 
 	private StagingItemWriter writer;
 
-	private StagingItemReader provider;
+	private StagingItemReader reader;
 
 	private Long jobId = new Long(11);
 
@@ -28,8 +23,8 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 		this.writer = writer;
 	}
 
-	public void setProvider(StagingItemReader provider) {
-		this.provider = provider;
+	public void setProvider(StagingItemReader reader) {
+		this.reader = reader;
 	}
 
 	protected String[] getConfigLocations() {
@@ -37,12 +32,14 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 				"staging-test-context.xml") };
 	}
 
-	protected void prepareTestInstance() throws Exception {
-		StepContext stepScopeContext = new SimpleStepContext(new StepExecution(new StepSupport("stepName"),
-				new JobExecution(new JobInstance(jobId, new JobParameters(), new JobSupport("testJob")))));
-		StepSynchronizationManager.register(stepScopeContext);
-		RepeatSynchronizationManager.register(new RepeatContextSupport(null));
-		super.prepareTestInstance();
+	/* (non-Javadoc)
+	 * @see org.springframework.test.AbstractTransactionalSpringContextTests#onSetUpBeforeTransaction()
+	 */
+	protected void onSetUpBeforeTransaction() throws Exception {
+		StepExecution stepExecution = new StepExecution(new StepSupport("stepName"),
+				new JobExecution(new JobInstance(jobId, new JobParameters(), new JobSupport("testJob"))));
+		reader.beforeStep(stepExecution);
+		writer.beforeStep(stepExecution);
 	}
 
 	protected void onSetUpInTransaction() throws Exception {
@@ -50,11 +47,11 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 		writer.write("BAR");
 		writer.write("SPAM");
 		writer.write("BUCKET");
-		provider.open(new ExecutionContext());
+		reader.open(new ExecutionContext());
 	}
 
 	protected void onTearDownAfterTransaction() throws Exception {
-		provider.close(null);
+		reader.close(null);
 		getJdbcTemplate().update("DELETE FROM BATCH_STAGING");
 	}
 
@@ -66,7 +63,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 				new Object[] { new Long(id) }, String.class);
 		assertEquals(StagingItemWriter.NEW, before);
 
-		Object item = provider.read();
+		Object item = reader.read();
 		assertEquals("FOO", item);
 
 		String after = (String) getJdbcTemplate().queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
@@ -89,7 +86,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 
 	public void testProviderRollsBackMultipleTimes() throws Exception {
 
-		provider.mark();
+		reader.mark();
 		setComplete();
 		endTransaction();
 		startNewTransaction();
@@ -98,34 +95,34 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 				new Object[] { jobId, StagingItemWriter.NEW });
 		assertEquals(4, count);
 
-		Object item = provider.read();
+		Object item = reader.read();
 		assertEquals("FOO", item);
-		item = provider.read();
+		item = reader.read();
 		assertEquals("BAR", item);
 
-		provider.reset();
+		reader.reset();
 		endTransaction();
 		startNewTransaction();
 
-		item = provider.read();
+		item = reader.read();
 		assertEquals("FOO", item);
-		item = provider.read();
+		item = reader.read();
 		assertEquals("BAR", item);
-		item = provider.read();
+		item = reader.read();
 		assertEquals("SPAM", item);
 
-		provider.reset();
+		reader.reset();
 		endTransaction();
 		startNewTransaction();
 
-		item = provider.read();
+		item = reader.read();
 		assertEquals("FOO", item);
 
 	}
 
 	public void testProviderRollsBackProcessIndicator() throws Exception {
 
-		provider.mark();
+		reader.mark();
 		setComplete();
 		endTransaction();
 		startNewTransaction();
@@ -138,10 +135,10 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 				new Object[] { new Long(id) }, String.class);
 		assertEquals(StagingItemWriter.NEW, before);
 
-		Object item = provider.read();
+		Object item = reader.read();
 		assertEquals("FOO", item);
 
-		provider.reset();
+		reader.reset();
 		endTransaction();
 		startNewTransaction();
 		// After a rollback we have to resynchronize the TX to simulate a real
@@ -151,7 +148,7 @@ public class StagingItemReaderTests extends AbstractTransactionalDataSourceSprin
 				new Object[] { new Long(id) }, String.class);
 		assertEquals(StagingItemWriter.NEW, after);
 
-		item = provider.read();
+		item = reader.read();
 		assertEquals("FOO", item);
 	}
 }

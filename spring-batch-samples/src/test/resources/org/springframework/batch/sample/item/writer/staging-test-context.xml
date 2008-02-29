@@ -12,8 +12,7 @@
 		class="org.springframework.batch.execution.scope.StepScope" />
 
 	<bean id="processor"
-		class="org.springframework.batch.sample.item.writer.StagingItemWriter"
-		scope="step">
+		class="org.springframework.batch.sample.item.writer.StagingItemWriter">
 		<property name="incrementer">
 			<bean id="jobIncrementer" parent="incrementerParent">
 				<property name="incrementerName"
@@ -24,8 +23,7 @@
 	</bean>
 
 	<bean id="provider"
-		class="org.springframework.batch.sample.item.reader.StagingItemReader"
-		scope="step">
+		class="org.springframework.batch.sample.item.reader.StagingItemReader">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 

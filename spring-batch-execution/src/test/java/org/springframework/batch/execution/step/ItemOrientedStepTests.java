@@ -30,6 +30,7 @@ import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
@@ -387,6 +388,20 @@ public class ItemOrientedStepTests extends TestCase {
 		assertEquals(2, list.size());
 	}
 
+	public void testListenerCalledBeforeStreamOpened() throws Exception {
+		itemOrientedStep.setListeners(new BatchListener[] {new MockRestartableItemReader() {
+			public void beforeStep(StepExecution stepExecution) {
+				list.add("foo");
+			}
+			public void open(ExecutionContext executionContext) throws StreamException {
+				assertEquals(1, list.size());
+			}
+		}});
+		StepExecution stepExecution = new StepExecution(itemOrientedStep, new JobExecution(jobInstance));
+		itemOrientedStep.execute(stepExecution);
+		assertEquals(1, list.size());
+	}
+
 	public void testDirectlyInjectedListenerOnError() throws Exception {
 		itemOrientedStep.setListeners(new Object[] {new StepListenerSupport() {
 			public ExitStatus onErrorInStep(Throwable e) {
@@ -634,7 +649,7 @@ public class ItemOrientedStepTests extends TestCase {
 		}
 	}
 
-	private class MockRestartableItemReader extends ItemStreamSupport implements ItemReader {
+	private class MockRestartableItemReader extends ItemStreamSupport implements ItemReader, StepListener {
 
 		private boolean getExecutionAttributesCalled = false;
 
@@ -663,16 +678,21 @@ public class ItemOrientedStepTests extends TestCase {
 			return restoreFromCalled;
 		}
 
-		public void open(ExecutionContext executionContext) throws StreamException {
-		}
-
-		public void close(ExecutionContext executionContext) throws StreamException {
-		}
-
 		public void mark() throws MarkFailedException {
 		}
 
 		public void reset() throws ResetFailedException {
+		}
+
+		public ExitStatus afterStep() {
+			return null;
+		}
+
+		public void beforeStep(StepExecution stepExecution) {
+		}
+
+		public ExitStatus onErrorInStep(Throwable e) {
+			return null;
 		}
 
 	}

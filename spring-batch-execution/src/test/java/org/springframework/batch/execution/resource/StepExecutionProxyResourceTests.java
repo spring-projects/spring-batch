@@ -26,26 +26,26 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
 import org.springframework.batch.core.domain.Step;
+import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.execution.job.JobSupport;
-import org.springframework.batch.execution.scope.SimpleStepContext;
 import org.springframework.batch.execution.step.StepSupport;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
 /**
- * Unit tests for {@link BatchResourceFactoryBean}
+ * Unit tests for {@link StepExecutionProxyResource}
  * 
  * @author robert.kasanicky
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class BatchResourceFactoryBeanTests extends TestCase {
+public class StepExecutionProxyResourceTests extends TestCase {
 
 	/**
 	 * Object under test
 	 */
-	private BatchResourceFactoryBean resourceFactory = new BatchResourceFactoryBean();
+	private StepExecutionProxyResource resource = new StepExecutionProxyResource();
 
 	private char pathsep = File.separatorChar;
 
@@ -53,7 +53,7 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 	private JobInstance jobInstance;
 
-	private Step step;
+	private StepExecution stepExecution;
 
 	/**
 	 * mock step context
@@ -63,10 +63,9 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 
 		jobInstance = new JobInstance(new Long(0), new JobParameters(), new JobSupport("testJob"));
 		JobExecution jobExecution = jobInstance.createJobExecution();
-		step = new StepSupport("bar");
-		resourceFactory.setStepContext(new SimpleStepContext(jobExecution.createStepExecution(step)));
-
-		resourceFactory.afterPropertiesSet();
+		Step step = new StepSupport("bar");
+		stepExecution = jobExecution.createStepExecution(step);
+		resource.beforeStep(stepExecution);
 
 	}
 
@@ -77,15 +76,10 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		doTestPathName("bar.txt", path);
 	}
 
-	public void testObjectType() throws Exception {
-		assertEquals(Resource.class, resourceFactory.getObjectType());
-	}
-
 	public void testNullFilePattern() throws Exception {
-		resourceFactory = new BatchResourceFactoryBean();
-		resourceFactory.setFilePattern(null);
+		resource.setFilePattern(null);
 		try {
-			resourceFactory.getObject();
+			resource.beforeStep(stepExecution);
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
@@ -94,7 +88,8 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 	}
 
 	public void testNonStandardFilePattern() throws Exception {
-		resourceFactory.setFilePattern("foo/data/%JOB_NAME%/" + "%STEP_NAME%-job");
+		resource.setFilePattern("foo/data/%JOB_NAME%/" + "%STEP_NAME%-job");
+		resource.beforeStep(stepExecution);
 		doTestPathName("bar-job", "foo" + pathsep + "data" + pathsep);
 	}
 
@@ -102,27 +97,24 @@ public class BatchResourceFactoryBeanTests extends TestCase {
 		jobInstance = new JobInstance(new Long(0), new JobParametersBuilder().addString("job.key", "spam")
 				.toJobParameters(), new JobSupport("testJob"));
 		JobExecution jobExecution = jobInstance.createJobExecution();
-		step = new StepSupport("bar");
-		resourceFactory.setStepContext(new SimpleStepContext(jobExecution.createStepExecution(step)));
-		resourceFactory.setFilePattern("foo/data/%JOB_NAME%/%job.key%-foo");
+		Step step = new StepSupport("bar");
+		resource.setFilePattern("foo/data/%JOB_NAME%/%job.key%-foo");
+		resource.beforeStep(jobExecution.createStepExecution(step));
 		doTestPathName("spam-foo", "foo" + pathsep + "data" + pathsep);
 	}
 
 	public void testResoureLoaderAware() throws Exception {
-		resourceFactory = new BatchResourceFactoryBean();
-		resourceFactory.setSingleton(false);
-		resourceFactory.setResourceLoader(new DefaultResourceLoader() {
+		resource = new StepExecutionProxyResource();
+		resource.setResourceLoader(new DefaultResourceLoader() {
 			public Resource getResource(String location) {
 				return new ByteArrayResource("foo".getBytes());
 			}
 		});
-		Resource resource = (Resource) resourceFactory.getObject();
-		assertNotNull(resource);
+		resource.beforeStep(stepExecution);
 		assertTrue(resource.exists());
 	}
 
 	private void doTestPathName(String filename, String path) throws Exception, IOException {
-		Resource resource = (Resource) resourceFactory.getObject();
 		String returnedPath = resource.getFile().getAbsolutePath();
 		String absolutePath = new File(path + jobInstance.getJobName() + pathsep + filename).getAbsolutePath();
 		assertEquals(absolutePath, returnedPath);
