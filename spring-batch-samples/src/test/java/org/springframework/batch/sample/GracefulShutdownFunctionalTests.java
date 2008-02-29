@@ -22,7 +22,7 @@ import org.springframework.batch.core.domain.JobParameters;
 
 /**
  * Functional test for graceful shutdown.  A batch container is started in a new thread,
- * then it's stopped via the Lifecycle interface.  
+ * then it's stopped using {@link JobExecution#stop()}.  
  * 
  * @author Lucas Ward
  *
@@ -39,7 +39,7 @@ public class GracefulShutdownFunctionalTests extends AbstractBatchLauncherTests 
 		
 		JobExecution jobExecution = launcher.run(getJob(), jobParameters);
 		
-		Thread.sleep(500);
+		Thread.sleep(1000);
 
 		assertEquals(BatchStatus.STARTED, jobExecution.getStatus());
 		assertTrue(jobExecution.isRunning());
@@ -49,16 +49,11 @@ public class GracefulShutdownFunctionalTests extends AbstractBatchLauncherTests 
 		int count = 0;
 		while(jobExecution.isRunning() && count <= 10){
 			logger.info("Checking for end time in JobExecution: count="+count);
-			Thread.sleep(10);
+			Thread.sleep(100);
 			count++;
 		}
-		if (count>10) {
-			// TODO: fix this
-			// fail("Timed out waiting for job to end.");
-		}
 		
-		// TODO: fix this
-		// assertFalse(jobExecution.isRunning());
+		assertFalse("Timed out waiting for job to end.", jobExecution.isRunning());
 
 	}
 	

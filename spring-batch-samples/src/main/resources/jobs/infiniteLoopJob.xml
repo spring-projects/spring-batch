@@ -20,12 +20,41 @@
 
 	<bean id="infiniteLoopJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="taskletStep">
+			<!--bean id="step1" parent="taskletStep">
 				<property name="tasklet">
 					<bean id="module" class="org.springframework.batch.sample.tasklet.InfiniteLoopTasklet"/>
+				</property>
+			</bean-->
+			<bean id="infiniteStep" parent="simpleStep">
+				<property name="chunkOperations">
+					<bean class="org.springframework.batch.repeat.support.RepeatTemplate" />
+				</property>
+				<property name="interruptionPolicy">
+					<bean class="org.springframework.batch.sample.step.support.NoopStepInterruptionPolicy" />
+				</property>
+				<property name="itemReader">
+					<bean id="reader" class="org.springframework.batch.sample.item.reader.InfiniteItemReader" />
+				</property>
+				<property name="itemWriter">
+					<bean id="writer" class="org.springframework.batch.sample.item.writer.DummyItemWriter" />
 				</property>
 			</bean>
 		</property>
 	</bean>
+	
+	<bean id="jobInterruptAdvice" class="org.springframework.batch.sample.advice.DefaultJobInterruptionAdvice" />
+	
+	<aop:config>
+		<aop:aspect id="interruptChecker" ref="jobInterruptAdvice" >
+			
+			<aop:after-returning method="setJobExecution"
+				pointcut="execution(* org.springframework.batch.core.repository.JobRepository.createJobExecution(..))" 
+				returning="jobExecution" />
+			
+			<aop:before method="checkInterrupt" 
+				pointcut="execution(* org.springframework.batch.repeat.RepeatOperations.iterate(..))"/>
+				
+		</aop:aspect>
+	 </aop:config>
 
 </beans>
