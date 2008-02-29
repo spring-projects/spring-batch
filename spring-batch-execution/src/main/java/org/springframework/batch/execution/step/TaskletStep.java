@@ -119,12 +119,26 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 
 	private CompositeStepListener listener = new CompositeStepListener();
 
+	/**
+	 * Register each of the objects as listeners. The {@link TaskletStep}
+	 * accepts listeners of type {@link StepListener}. If the {@link Tasklet}
+	 * itself implements this interface it will be registered automatically, but
+	 * its injected dependencies will not be. This is a good way to get access
+	 * to job parameters and execution context if the tasklet is parameterised.
+	 * 
+	 * @param listeners an array of listener objects of known types.
+	 */
 	public void setListeners(StepListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
 			this.listener.register(listeners[i]);
 		}
 	}
 
+	/**
+	 * Register the objects as a listener.
+	 * @see #setListeners(Object[])
+	 * @param listener the listener to set
+	 */
 	public void setListener(StepListener listener) {
 		this.listener.register(listener);
 	}
@@ -136,6 +150,9 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jobRepository, "JobRepository is mandatory for TaskletStep");
 		Assert.notNull(tasklet, "Tasklet is mandatory for TaskletStep");
+		if (tasklet instanceof StepListener) {
+			listener.register((StepListener) tasklet);
+		}
 	}
 
 	/**

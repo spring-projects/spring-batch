@@ -25,7 +25,6 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
@@ -102,8 +101,13 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 	/**
 	 * Register each of the objects as listeners. The {@link ItemOrientedStep}
-	 * accepts listeners of type {@link ItemStream}, {@link StepListener},
-	 * TODO: complete the list.
+	 * accepts listeners of type {@link ItemStream} and {@link BatchListener}.
+	 * The {@link ItemReader} and {@link ItemWriter} are automatically
+	 * registered, but it doesn't hurt to also register them here. Injected
+	 * dependencies of the reader and writer are not automatically registered,
+	 * so if you implement {@link ItemWriter} using delegation to another object
+	 * which itself is a {@link BatchListener}, you need to register the
+	 * delegate here.
 	 * 
 	 * @param listeners an array of listener objects of known types.
 	 */
@@ -111,6 +115,15 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 		for (int i = 0; i < listeners.length; i++) {
 			listener.register(listeners[i]);
 		}
+	}
+	
+	/**
+	 * Register the objects as a listener.
+	 * @see #setListeners(Object[]) 
+	 * @param listener the listener to set
+	 */
+	public void setListener(Object listener) {
+		this.listener.register(listener);
 	}
 
 	/**
@@ -232,9 +245,10 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 		ExitStatus status = ExitStatus.FAILED;
 		final ExceptionHolder fatalException = new ExceptionHolder();
-		
-		// This could go in applyConfiguration(), but some unit tests do not call that
-		possiblyRegisterStreams();		
+
+		// This could go in applyConfiguration(), but some unit tests do not
+		// call that
+		possiblyRegisterStreams();
 
 		try {
 
@@ -300,7 +314,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 							}
 
 						}
-						
+
 						try {
 							result = result.and(listener.afterStep());
 						}
@@ -334,7 +348,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 						synchronized (stepExecution) {
 							stepExecution.rollback();
 						}
-						
+
 						try {
 							itemReader.reset();
 							itemWriter.clear();
