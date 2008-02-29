@@ -5,9 +5,6 @@
 	</formats>
 	<componentDescriptors>
 		<componentDescriptor>src/assembly/docs.xml</componentDescriptor>
-		<componentDescriptor>
-			src/assembly/parent.xml
-		</componentDescriptor>
 	</componentDescriptors>
 	<includeBaseDirectory>true</includeBaseDirectory>
 	<moduleSets>
@@ -23,13 +20,38 @@
 					org.springframework.batch:spring-batch-infrastructure
 				</include>
 			</includes>
-			<binaries>
-				<includeDependencies>false</includeDependencies>
-				<outputFileNameMapping>
-					dist/${artifactId}-${version}.${extension}
-				</outputFileNameMapping>
-				<unpack>false</unpack>
-			</binaries>
+			<sources>
+				<includeModuleDirectory>false</includeModuleDirectory>
+				<fileSets>
+					<fileSet>
+						<directory>target</directory>
+						<outputDirectory>dist</outputDirectory>
+						<includes>
+							<include>*.jar</include>
+						</includes>
+					</fileSet>
+				</fileSets>
+			</sources>
+		</moduleSet>	
+		<moduleSet>
+			<includes>
+				<include>
+					org.springframework.batch:spring-batch-samples
+				</include>
+			</includes>
+			<sources>
+				<outputDirectoryMapping>
+					samples/${artifactId}
+				</outputDirectoryMapping>
+				<fileSets>
+					<fileSet>
+						<excludes>
+							<exclude>bin/**</exclude>
+							<exclude>target/**</exclude>
+						</excludes>
+					</fileSet>
+				</fileSets>
+			</sources>
 		</moduleSet>
 		<moduleSet>
 			<includes>
@@ -43,46 +65,6 @@
 					org.springframework.batch:spring-batch-infrastructure
 				</include>
 			</includes>
-			<binaries>
-				<includeDependencies>false</includeDependencies>
-				<outputFileNameMapping>
-					dist/${artifactId}-${version}-sources.${extension}
-				</outputFileNameMapping>
-				<unpack>false</unpack>
-				<includes>
-					<include>
-						target/${artifactId}-${version}-sources.${extension}
-					</include>
-				</includes>
-				<dependencySets>
-					<dependencySet>
-						<outputFileNameMapping>
-							sources/lib/${groupId}/${artifactId}-${version}.${extension}
-						</outputFileNameMapping>
-						<scope>runtime</scope>
-						<excludes>
-							<exclude>
-								org.springframework.batch:spring-batch
-							</exclude>
-							<exclude>
-								org.springframework.batch:spring-batch-core
-							</exclude>
-							<exclude>
-								org.springframework.batch:spring-batch-execution
-							</exclude>
-							<exclude>
-								org.springframework.batch:spring-batch-infrastructure
-							</exclude>
-						</excludes>
-					</dependencySet>
-					<dependencySet>
-						<outputFileNameMapping>
-							sources/lib/${groupId}/${artifactId}-${version}.${extension}
-						</outputFileNameMapping>
-						<scope>provided</scope>
-					</dependencySet>
-				</dependencySets>
-			</binaries>
 			<sources>
 				<outputDirectoryMapping>
 					sources/${artifactId}
@@ -100,19 +82,23 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:spring-batch-samples
+					org.springframework.batch:spring-batch-core
+				</include>
+				<include>
+					org.springframework.batch:spring-batch-execution
+				</include>
+				<include>
+					org.springframework.batch:spring-batch-infrastructure
 				</include>
 			</includes>
 			<binaries>
-				<includeDependencies>true</includeDependencies>
-				<outputFileNameMapping>
-					samples/${artifactId}-${version}.${extension}
-				</outputFileNameMapping>
+				<includeDependencies>false</includeDependencies>
+				<outputDirectory>sources</outputDirectory>
 				<unpack>false</unpack>
 				<dependencySets>
 					<dependencySet>
 						<outputFileNameMapping>
-							samples/lib/${groupId}/${artifactId}-${version}.${extension}
+							lib/${groupId}/${version}/${artifactId}-${version}.${extension}
 						</outputFileNameMapping>
 						<scope>runtime</scope>
 						<excludes>
@@ -132,31 +118,86 @@
 					</dependencySet>
 					<dependencySet>
 						<outputFileNameMapping>
-							samples/lib/${groupId}/${artifactId}-${version}.${extension}
+							lib/${groupId}/${version}/${artifactId}-${version}.${extension}
 						</outputFileNameMapping>
 						<scope>provided</scope>
 					</dependencySet>
+				</dependencySets>
+			</binaries>
+		</moduleSet>	
+		<moduleSet>
+			<includes>
+				<include>
+					org.springframework.batch:spring-batch-samples
+				</include>
+			</includes>
+			<binaries>
+				<includeDependencies>true</includeDependencies>
+				<outputDirectory>samples</outputDirectory>
+				<unpack>false</unpack>
+				<dependencySets>
 					<dependencySet>
 						<outputFileNameMapping>
-							samples/lib/${groupId}/${artifactId}-${version}.${extension}
+							lib/${groupId}/${version}/${artifactId}-${version}.${extension}
+						</outputFileNameMapping>
+						<scope>runtime</scope>
+						<excludes>
+							<exclude>
+								org.springframework.batch:spring-batch
+							</exclude>
+							<exclude>
+								org.springframework.batch:spring-batch-core
+							</exclude>
+							<exclude>
+								org.springframework.batch:spring-batch-execution
+							</exclude>
+							<exclude>
+								org.springframework.batch:spring-batch-infrastructure
+							</exclude>
+						</excludes>
+					</dependencySet>
+					<dependencySet>
+						<outputFileNameMapping>
+							lib/${groupId}/${version}/${artifactId}-${version}.${extension}
+						</outputFileNameMapping>
+						<scope>provided</scope>
+						<excludes>
+							<exclude>
+								org.springframework.batch:spring-batch
+							</exclude>
+							<exclude>
+								org.springframework.batch:spring-batch-core
+							</exclude>
+							<exclude>
+								org.springframework.batch:spring-batch-execution
+							</exclude>
+							<exclude>
+								org.springframework.batch:spring-batch-infrastructure
+							</exclude>
+						</excludes>
+					</dependencySet>
+					<dependencySet>
+						<outputFileNameMapping>
+							lib/${groupId}/${version}/${artifactId}-${version}.${extension}
 						</outputFileNameMapping>
 						<scope>test</scope>
+						<excludes>
+							<exclude>
+								org.springframework.batch:spring-batch
+							</exclude>
+							<exclude>
+								org.springframework.batch:spring-batch-core
+							</exclude>
+							<exclude>
+								org.springframework.batch:spring-batch-execution
+							</exclude>
+							<exclude>
+								org.springframework.batch:spring-batch-infrastructure
+							</exclude>
+						</excludes>
 					</dependencySet>
 				</dependencySets>
 			</binaries>
-			<sources>
-				<outputDirectoryMapping>
-					samples/${artifactId}
-				</outputDirectoryMapping>
-				<fileSets>
-					<fileSet>
-						<excludes>
-							<exclude>bin/**</exclude>
-							<exclude>target/**</exclude>
-						</excludes>
-					</fileSet>
-				</fileSets>
-			</sources>
 		</moduleSet>
 	</moduleSets>
 </assembly>

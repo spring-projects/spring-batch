@@ -32,7 +32,7 @@
 					</fileSet>
 				</fileSets>
 			</sources>
-		</moduleSet>
+		</moduleSet>	
 		<moduleSet>
 			<includes>
 				<include>
@@ -45,15 +45,9 @@
 				</outputDirectoryMapping>
 				<fileSets>
 					<fileSet>
-						<includes>
-							<include>pom.xml</include>
-						</includes>
 						<excludes>
 							<exclude>bin/**</exclude>
 							<exclude>target/**</exclude>
-							<exclude>**/clover.license</exclude>
-							<exclude>*.xml</exclude>
-							<exclude>derby*/**</exclude>
 						</excludes>
 					</fileSet>
 				</fileSets>
