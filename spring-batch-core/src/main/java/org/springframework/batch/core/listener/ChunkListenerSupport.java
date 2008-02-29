@@ -13,35 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core.listener;
 
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.core.domain.ChunkListener;
 
 /**
- * Listener interface around the reading of an item.
+ * Basic support implementation of {@link ChunkListener}
  * 
  * @author Lucas Ward
  *
  */
-public interface ItemReadListener extends BatchListener {
+public class ChunkListenerSupport implements ChunkListener {
 
-	/**
-	 * Called before {@link ItemReader#read()}
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.ChunkListener#afterChunk()
 	 */
-	void beforeRead();
-	
-	/**
-	 * Called after {@link ItemReader#read()}
-	 * 
-	 * @param item returned from read()
+	public void afterChunk() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.ChunkListener#beforeChunk()
 	 */
-	void afterRead(Object item);
-	
-	/**
-	 * Called if an error occurs while trying to write.
-	 * 
-	 * @param ex thrown from {@link ItemWriter}
-	 */
-	void onReadError(Exception ex);
+	public void beforeChunk() {
+	}
+
 }

@@ -23,7 +23,7 @@ import org.springframework.batch.item.ItemWriter;
  * @author Lucas Ward
  * 
  */
-public interface ItemWriteListener {
+public interface ItemWriteListener extends BatchListener {
 
 	/**
 	 * Called before {@link ItemWriter#write(Object)}

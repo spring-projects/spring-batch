@@ -23,7 +23,7 @@ package org.springframework.batch.core.domain;
  * @author Lucas Ward
  *
  */
-public interface ChunkListener {
+public interface ChunkListener extends BatchListener {
 
 	void beforeChunk();
 	

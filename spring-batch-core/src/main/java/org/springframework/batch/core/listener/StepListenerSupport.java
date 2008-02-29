@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.interceptor;
+package org.springframework.batch.core.listener;
 
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepListener;

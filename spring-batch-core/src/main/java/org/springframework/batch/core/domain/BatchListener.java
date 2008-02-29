@@ -15,33 +15,15 @@
  */
 package org.springframework.batch.core.domain;
 
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
-
 /**
- * Listener interface around the reading of an item.
+ * Marker interface that acts as a parent to all Batch
+ * domain listeners, such as: {@link StepListener}, 
+ * {@link ChunkListener}, {@link ItemReadListener} and
+ * {@link ItemWriteListener}
  * 
  * @author Lucas Ward
  *
  */
-public interface ItemReadListener extends BatchListener {
+public interface BatchListener {
 
-	/**
-	 * Called before {@link ItemReader#read()}
-	 */
-	void beforeRead();
-	
-	/**
-	 * Called after {@link ItemReader#read()}
-	 * 
-	 * @param item returned from read()
-	 */
-	void afterRead(Object item);
-	
-	/**
-	 * Called if an error occurs while trying to write.
-	 * 
-	 * @param ex thrown from {@link ItemWriter}
-	 */
-	void onReadError(Exception ex);
 }

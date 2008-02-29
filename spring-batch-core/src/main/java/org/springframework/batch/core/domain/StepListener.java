@@ -24,7 +24,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * 
  */
-public interface StepListener {
+public interface StepListener extends BatchListener {
 
 	/**
 	 * Initialise the state of the listener with the {@link StepExecution} from
