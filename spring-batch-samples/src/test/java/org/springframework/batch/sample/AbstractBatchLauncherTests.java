@@ -19,7 +19,6 @@ package org.springframework.batch.sample;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.execution.launch.JobLauncher;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
@@ -36,7 +35,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 public abstract class AbstractBatchLauncherTests extends
 		AbstractDependencyInjectionSpringContextTests {
 
-	private static final String CONTAINER_DEFINITION_LOCATION = "simple-container-definition.xml";
+//	private static final String CONTAINER_DEFINITION_LOCATION = "simple-container-definition.xml";
 
 	public AbstractBatchLauncherTests() {
 		setDependencyCheck(false);
@@ -54,9 +53,7 @@ public abstract class AbstractBatchLauncherTests extends
 	 */
 	protected ConfigurableApplicationContext createApplicationContext(
 			String[] locations) {
-		ApplicationContext parent = new ClassPathXmlApplicationContext(
-				CONTAINER_DEFINITION_LOCATION);
-		return new ClassPathXmlApplicationContext(locations, parent);
+		return new ClassPathXmlApplicationContext(locations);
 	}
 
 	public void setLauncher(JobLauncher bootstrap) {

@@ -11,6 +11,8 @@
 
 	<description>Example for Hibernate integration.</description>
 
+	<import resource="../simple-container-definition.xml" />
+	
 	<bean parent="stepScope" />
 	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 

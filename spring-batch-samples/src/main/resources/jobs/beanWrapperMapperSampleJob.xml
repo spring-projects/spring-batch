@@ -9,6 +9,8 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
+	<import resource="../simple-container-definition.xml" />
+	
 	<bean parent="stepScope" />
 	<bean parent="jobConfigurationRegistryBeanPostProcessor" />
 
@@ -49,15 +51,14 @@
 
 	<bean id="fileInputTemplate"
 		class="org.springframework.batch.io.file.FlatFileItemReader">
-		<property name="resource" ref="fileLocator" />
+		<property name="resource" value="classpath:data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 		<property name="lineTokenizer" ref="fixedFileDescriptor" />
 		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 
 	<bean id="fileInputTemplate2"
-		class="org.springframework.batch.io.file.FlatFileItemReader"
-		scope="step">
-		<property name="resource" ref="fileLocator2" />
+		class="org.springframework.batch.io.file.FlatFileItemReader">
+		<property name="resource" value="classpath:data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportPersonDataStep.txt" />
 		<property name="lineTokenizer" ref="fixedFileDescriptor2" />
 		<property name="fieldSetMapper" ref="fieldSetMapper2" />
 		<!--		<property name="validator" ref="fixedValidator" />-->
@@ -101,20 +102,6 @@
 				<property name="incrementerName" value="TRADE_SEQ" />
 			</bean>
 		</property>
-	</bean>
-
-
-
-	<bean id="fileLocator"
-		class="org.springframework.core.io.ClassPathResource">
-		<constructor-arg type="java.lang.String"
-			value="data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportTradeDataStep.txt" />
-	</bean>
-
-	<bean id="fileLocator2"
-		class="org.springframework.core.io.ClassPathResource">
-		<constructor-arg type="java.lang.String"
-			value="data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportPersonDataStep.txt" />
 	</bean>
 
 	<bean id="fieldSetMapper"

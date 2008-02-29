@@ -32,17 +32,15 @@ import org.springframework.batch.repeat.ExitStatus;
 public class CommandLineJobRunnerTests extends TestCase {
 
 	private static final String JOB = "org/springframework/batch/execution/bootstrap/support/job.xml";
-	private static final String TEST_BATCH_ENVIRONMENT = "org/springframework/batch/execution/bootstrap/support/test-environment.xml";
 	private static final String JOB_NAME = "test-job";
 	
 	private String jobPath = JOB;
-	private String environmentPath = TEST_BATCH_ENVIRONMENT;
 	private String jobName = JOB_NAME;
 	private String jobKey = "job.Key=myKey";
 	private String scheduleDate = "schedule.Date=01/23/2008";
 	private String vendorId = "vendor.id=33243243";
 	
-	private String[] args = new String[]{jobPath, jobName, environmentPath, jobKey, scheduleDate, vendorId};
+	private String[] args = new String[]{jobPath, jobName, jobKey, scheduleDate, vendorId};
 	
 	private JobExecution jobExecution;
 	
@@ -84,7 +82,7 @@ public class CommandLineJobRunnerTests extends TestCase {
 	
 	public void testWithNoParameters(){
 		
-		String[] args = new String[]{jobPath, jobName, environmentPath};
+		String[] args = new String[]{jobPath, jobName};
 		CommandLineJobRunner.main(args);
 		assertEquals(new JobParameters(), StubJobLauncher.jobParameters);
 	}

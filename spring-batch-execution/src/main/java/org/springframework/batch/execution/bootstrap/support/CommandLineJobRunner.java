@@ -185,15 +185,13 @@ public class CommandLineJobRunner {
 
 	/*
 	 * Start a job by obtaining a combined classpath using the job launcher and
-	 * job paths.  If a JobLocator has been set, then use it to obtain an actual
-	 * job, if not ask the context for it. 
+	 * job paths. If a JobLocator has been set, then use it to obtain an actual
+	 * job, if not ask the context for it.
 	 */
-	int start(String jobPath, String jobLauncherPath, String jobName,
-			String[] parameters) {
+	int start(String jobPath, String jobName, String[] parameters) {
 
 		try {
-			ApplicationContext context = new ClassPathXmlApplicationContext(
-					new String[] { jobPath, jobLauncherPath });
+			ApplicationContext context = new ClassPathXmlApplicationContext(jobPath);
 			context.getAutowireCapableBeanFactory().autowireBeanProperties(
 					this, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 
@@ -219,9 +217,9 @@ public class CommandLineJobRunner {
 	}
 
 	/**
-	 * Launch a batch job using a {@link CommandLineJobRunner}. Creates a
-	 * new Spring context for the job execution, and uses a common parent for
-	 * all such contexts. No exception are thrown from this method, rather
+	 * Launch a batch job using a {@link CommandLineJobRunner}. Creates a new
+	 * Spring context for the job execution, and uses a common parent for all
+	 * such contexts. No exception are thrown from this method, rather
 	 * exceptions are logged and an integer returned through the exit status in
 	 * a {@link JvmSystemExiter} (which can be overridden by defining one in the
 	 * Spring context).
@@ -243,19 +241,18 @@ public class CommandLineJobRunner {
 
 		CommandLineJobRunner command = new CommandLineJobRunner();
 
-		if (args.length < 3) {
-			logger.error("At least 3 arguments are required: JobPath, JobName, and JobLauncherPath.");
+		if (args.length < 2) {
+			logger
+					.error("At least 2 arguments are required: JobPath and JobName.");
 			command.exit(1);
 		}
 
 		String jobPath = args[0];
 		String jobName = args[1];
-		String jobLauncherPath = args[2];
-		String[] parameters = new String[args.length - 3];
-		System.arraycopy(args, 2, parameters, 0, args.length - 3);
+		String[] parameters = new String[args.length - 2];
+		System.arraycopy(args, 2, parameters, 0, args.length - 2);
 
-		int result = command.start(jobPath, jobLauncherPath, jobName,
-				parameters);
+		int result = command.start(jobPath, jobName, parameters);
 		command.exit(result);
 	}
 
