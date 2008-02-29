@@ -16,28 +16,27 @@
 
 package org.springframework.batch.core.tasklet;
 
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
-
 /**
  * Interface for encapsulating processing logic that is not natural to split
  * into read-(transform)-write phases, such as invoking a system command or a
- * stored procedure.
+ * stored procedure.<br/>
  * 
- * As framework has no visibility inside the {@link #execute()} method,
- * developers should consider implementing {@link StepListener} and check the
- * {@link StepExecution#isTerminateOnly()} value for long lasting processes to
- * enable prompt termination of processing on user request.
+ * Since the batch framework has no visibility inside the {@link #execute()}
+ * method, developers should consider implementing {@link StepListener} and
+ * check the {@link StepExecution#isTerminateOnly()} value for long lasting
+ * processes to enable prompt termination of processing on user request.<br/>
  * 
  * It is expected the read-(transform)-write separation will be appropriate for
  * most cases and developers should implement {@link ItemReader} and
  * {@link ItemWriter} interfaces then (typically extending or composing provided
- * implementations).
+ * implementations).<br/>
  * 
  * @author Lucas Ward
  * @author Dave Syer
