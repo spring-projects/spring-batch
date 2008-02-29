@@ -36,8 +36,7 @@ public class XmlStaxJobFunctionalTests extends AbstractValidatingBatchLauncherTe
 	 * Output should be the same as input
 	 */
 	protected void validatePostConditions() throws Exception {
-		applicationContext.close(); //make sure the output file is closed
-		
+	
 		XMLUnit.setIgnoreWhitespace(true);
 		XMLAssert.assertXMLEqual(new FileReader(EXPECTED_OUTPUT_FILE), new FileReader(OUTPUT_FILE));
 	}
