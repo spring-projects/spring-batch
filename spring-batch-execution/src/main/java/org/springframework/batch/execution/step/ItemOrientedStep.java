@@ -116,15 +116,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			listener.register(listeners[i]);
 		}
 	}
-	
-	/**
-	 * Register the objects as a listener.
-	 * @see #setListeners(Object[]) 
-	 * @param listener the listener to set
-	 */
-	public void setListener(Object listener) {
-		this.listener.register(listener);
-	}
 
 	/**
 	 * The {@link RepeatOperations} to use for the outer loop of the batch

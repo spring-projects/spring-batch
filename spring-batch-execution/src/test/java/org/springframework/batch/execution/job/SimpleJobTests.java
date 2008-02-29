@@ -141,14 +141,14 @@ public class SimpleJobTests extends TestCase {
 	}
 
 	public void testRunNormallyWithListener() throws Exception {
-		job.setListener(new JobListenerSupport() {
+		job.setListeners(new JobListenerSupport[] {new JobListenerSupport() {
 			public void beforeJob(JobExecution jobExecution) {
 				list.add("before");
 			}
 			public void afterJob() {
 				list.add("after");
 			}
-		});
+		}});
 		job.execute(jobExecution);
 		assertEquals(4, list.size());
 	}

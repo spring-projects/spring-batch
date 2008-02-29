@@ -57,10 +57,6 @@ public class SimpleJob extends AbstractJob {
 		}
 	}
 
-	public void setListener(JobListener listener) {
-		this.listener.register(listener);
-	}
-
 	/**
 	 * Run the specified job by looping through the steps and delegating to the
 	 * {@link Step}.

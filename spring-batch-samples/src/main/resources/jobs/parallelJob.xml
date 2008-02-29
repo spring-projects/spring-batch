@@ -18,7 +18,7 @@
 					<property name="commitInterval" value="2" />
 					<property name="startLimit" value="100" />
 					<property name="allowStartIfComplete" value="false" />
-					<property name="listener" ref="fileInputTemplate"/>
+					<property name="listeners" ref="fileInputTemplate"/>
 					<property name="itemReader">
 						<bean
 							class="org.springframework.batch.item.reader.ValidatingItemReader">

@@ -15,7 +15,7 @@
 		<property name="steps">
 			<list>
 				<bean id="step1" parent="simpleStep">
-					<property name="listener" ref="fileInputTemplate" />
+					<property name="listeners" ref="fileInputTemplate" />
 					<property name="itemReader">
 						<bean
 							class="org.springframework.batch.item.reader.ValidatingItemReader">

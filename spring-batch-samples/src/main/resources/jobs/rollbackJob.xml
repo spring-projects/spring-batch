@@ -25,7 +25,7 @@
 						<bean
 							class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler" p:limit="5"/>
 					</property>
-					<property name="listener" ref="fileInputTemplate" />
+					<property name="listeners" ref="fileInputTemplate" />
 					<property name="itemReader">
 						<bean
 							class="org.springframework.batch.item.reader.ValidatingItemReader">
