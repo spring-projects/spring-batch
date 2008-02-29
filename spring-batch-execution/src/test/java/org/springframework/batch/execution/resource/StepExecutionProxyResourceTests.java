@@ -94,11 +94,11 @@ public class StepExecutionProxyResourceTests extends TestCase {
 	}
 
 	public void testNonStandardFilePatternWithJobParameters() throws Exception {
+		resource.setFilePattern("foo/data/%JOB_NAME%/%job.key%-foo");
 		jobInstance = new JobInstance(new Long(0), new JobParametersBuilder().addString("job.key", "spam")
 				.toJobParameters(), new JobSupport("testJob"));
 		JobExecution jobExecution = jobInstance.createJobExecution();
 		Step step = new StepSupport("bar");
-		resource.setFilePattern("foo/data/%JOB_NAME%/%job.key%-foo");
 		resource.beforeStep(jobExecution.createStepExecution(step));
 		doTestPathName("spam-foo", "foo" + pathsep + "data" + pathsep);
 	}
