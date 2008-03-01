@@ -36,12 +36,17 @@ public class DefaultJobLoader implements JobLoader,
 
 	public Map getConfigurations() {
 		Map result = new HashMap(configurations);
-		for (Iterator iterator = registry.getJobConfigurations().iterator(); iterator
+		for (Iterator iterator = registry.getJobNames().iterator(); iterator
 				.hasNext();) {
-			Job configuration = (Job) iterator.next();
-			String name = configuration.getName();
-			if (!configurations.containsKey(name)) {
-				result.put(name, "<unknown path>: " + configuration);
+			try {
+				Job configuration = (Job) registry.getJob((String) iterator.next());
+				String name = configuration.getName();
+				if (!configurations.containsKey(name)) {
+					result.put(name, "<unknown path>: " + configuration);
+				}
+			}
+			catch (NoSuchJobException e) {
+				throw new IllegalStateException("Registry could not locate its own job (NoSuchJobException).");
 			}
 		}
 		return result;

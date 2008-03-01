@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.sample;
 
+import org.springframework.batch.core.repository.JobRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -23,11 +24,16 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * 
  */
 public class TaskExecutorLauncher {
+	
+	private JobRegistry registry;
+	
+	private void register(String[] paths) {
+		// registry.register(jobConfiguration)
+	}
 
 	public static void main(String[] args) throws Exception {
 
-		// Paths to individual job configurations. Each one must include the
-		// step scope and the jobConfigurationRegistryBeanPostProcessor.
+		// Paths to individual job configurations.
 		final String[] paths = new String[] { "jobs/adhocLoopJob.xml",
 				"jobs/footballJob.xml" };
 
@@ -39,6 +45,8 @@ public class TaskExecutorLauncher {
 		// included in the paths above.
 		final ApplicationContext parent = new ClassPathXmlApplicationContext(
 				"adhoc-job-launcher-context.xml");
+//		parent.getAutowireCapableBeanFactory().autowireBeanProperties(
+//				this, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 
 		new Thread(new Runnable() {
 			public void run() {

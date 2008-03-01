@@ -15,13 +15,7 @@
 		integrated into a batch job.
 	</description>
 
-	<bean
-		class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
-		<property name="jobConfigurationRegistry"
-			ref="jobConfigurationRegistry" />
-	</bean>
-
-	<bean id="jobConfiguration" parent="simpleJob">
+	<bean id="delegateJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
 				<property name="itemReader">

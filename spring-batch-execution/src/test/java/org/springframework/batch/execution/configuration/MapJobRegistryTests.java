@@ -81,16 +81,16 @@ public class MapJobRegistryTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobRegistry#getJobConfigurations()}.
+	 * Test method for {@link org.springframework.batch.execution.configuration.MapJobRegistry#getJobNames()}.
 	 * @throws Exception 
 	 */
 	public void testGetJobConfigurations() throws Exception {
 		Job configuration = new JobSupport("foo");
 		registry.register(configuration);
 		registry.register(new JobSupport("bar"));
-		Collection configurations = registry.getJobConfigurations();
+		Collection configurations = registry.getJobNames();
 		assertEquals(2, configurations.size());
-		assertTrue(configurations.contains(configuration));
+		assertTrue(configurations.contains(configuration.getName()));
 	}
 
 }

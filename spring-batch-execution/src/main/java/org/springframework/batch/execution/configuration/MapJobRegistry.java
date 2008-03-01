@@ -88,9 +88,9 @@ public class MapJobRegistry implements ListableJobRegistry {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.container.common.configuration.ListableJobConfigurationRegistry#getJobConfigurations()
 	 */
-	public Collection getJobConfigurations() {
+	public Collection getJobNames() {
 		synchronized (map) {
-			return Collections.unmodifiableCollection(new HashSet(map.values()));
+			return Collections.unmodifiableCollection(new HashSet(map.keySet()));
 		}
 	}
 
