@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.execution.configuration;
 
+import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.repository.JobFactory;
 
 /**
  * A {@link JobFactory} that just keeps a reference to a {@link Job}. It never
@@ -43,7 +43,7 @@ public class ReferenceJobFactory implements JobFactory {
 	/**
 	 * Just return the instance passed in on initialization.
 	 * 
-	 * @see org.springframework.batch.core.repository.JobFactory#createJob()
+	 * @see org.springframework.batch.core.configuration.JobFactory#createJob()
 	 */
 	public Job createJob() {
 		return job;
@@ -52,7 +52,7 @@ public class ReferenceJobFactory implements JobFactory {
 	/**
 	 * Returns the job name as passed in on initialization.
 	 * 
-	 * @see org.springframework.batch.core.repository.JobFactory#getJobName()
+	 * @see org.springframework.batch.core.configuration.JobFactory#getJobName()
 	 */
 	public String getJobName() {
 		return name;

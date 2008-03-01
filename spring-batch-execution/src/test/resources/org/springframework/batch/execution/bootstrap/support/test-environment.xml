@@ -7,14 +7,14 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean id="simpleContainerLauncher" class="org.springframework.batch.execution.bootstrap.support.CommandLineJobRunnerTests$StubJobLauncher" />
+	<bean id="simpleContainerLauncher" class="org.springframework.batch.execution.bootstrap.CommandLineJobRunnerTests$StubJobLauncher" />
 
-	<bean class="org.springframework.batch.execution.bootstrap.support.SimpleJvmExitCodeMapper" />
+	<bean class="org.springframework.batch.execution.bootstrap.SimpleJvmExitCodeMapper" />
 
 	<bean
-		class="org.springframework.batch.execution.bootstrap.support.CommandLineJobRunnerTests$StubSystemExiter" />
+		class="org.springframework.batch.execution.bootstrap.CommandLineJobRunnerTests$StubSystemExiter" />
 		
 	<bean
-		class="org.springframework.batch.execution.bootstrap.support.CommandLineJobRunnerTests$StubExceptionClassifier" />
+		class="org.springframework.batch.execution.bootstrap.CommandLineJobRunnerTests$StubExceptionClassifier" />
 
 </beans>

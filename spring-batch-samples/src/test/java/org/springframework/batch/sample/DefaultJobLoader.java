@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.springframework.batch.core.configuration.ListableJobRegistry;
 import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.repository.ListableJobRegistry;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;

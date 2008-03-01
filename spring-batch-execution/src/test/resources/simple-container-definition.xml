@@ -62,7 +62,7 @@
 	<!-- init-method="clear"/-->
 
 	<bean
-		class="org.springframework.batch.execution.bootstrap.support.SimpleJvmExitCodeMapper" />
+		class="org.springframework.batch.execution.bootstrap.SimpleJvmExitCodeMapper" />
 
 	<bean
 		class="org.springframework.beans.factory.config.CustomEditorConfigurer">
@@ -93,6 +93,6 @@
 	</bean>
 
 	<bean
-		class="org.springframework.batch.execution.bootstrap.support.CommandLineJobRunnerTests$StubSystemExiter" />
+		class="org.springframework.batch.execution.bootstrap.CommandLineJobRunnerTests$StubSystemExiter" />
 
 </beans>

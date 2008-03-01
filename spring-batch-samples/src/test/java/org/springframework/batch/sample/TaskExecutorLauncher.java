@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.sample;
 
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.repository.DuplicateJobException;
-import org.springframework.batch.core.repository.JobRegistry;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;

@@ -33,7 +33,7 @@ import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.item.stream.CompositeItemStream;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatListener;
-import org.springframework.batch.repeat.interceptor.CompositeRepeatListener;
+import org.springframework.batch.repeat.listener.CompositeRepeatListener;
 
 /**
  * @author Dave Syer

@@ -30,7 +30,7 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.core.runtime.JobParametersFactory;
-import org.springframework.batch.execution.bootstrap.support.DefaultJobParametersFactory;
+import org.springframework.batch.execution.bootstrap.DefaultJobParametersFactory;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.Resource;

@@ -19,8 +19,8 @@ import java.util.Collection;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.repository.DuplicateJobException;
-import org.springframework.batch.core.repository.JobFactory;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.execution.job.JobSupport;
 

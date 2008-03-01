@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.sample;
 
+import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.repository.JobFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -50,7 +50,7 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory {
 	 * Create a {@link ClassPathXmlApplicationContext} from the path provided
 	 * and pull out a bean with the name given during initialization.
 	 * 
-	 * @see org.springframework.batch.core.repository.JobFactory#createJob()
+	 * @see org.springframework.batch.core.configuration.JobFactory#createJob()
 	 */
 	public Job createJob() {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { path }, parent);
@@ -62,7 +62,7 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory {
 	 * usually the name of the job as well, but it needn't be. The important
 	 * thing is that the job can be located by this name.
 	 * 
-	 * @see org.springframework.batch.core.repository.JobFactory#getJobName()
+	 * @see org.springframework.batch.core.configuration.JobFactory#getJobName()
 	 */
 	public String getJobName() {
 		return beanName;
