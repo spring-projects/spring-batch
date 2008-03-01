@@ -11,7 +11,7 @@
 
 	<import resource="data-source-context.xml" />
 
-	<bean id="jobConfigurationRegistryBeanPostProcessor" abstract="true"
+	<bean id="jobConfigurationRegistryBeanPostProcessor"
 		class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
 		<property name="jobConfigurationRegistry"
 			ref="jobConfigurationRegistry" />
