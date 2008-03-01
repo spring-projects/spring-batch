@@ -18,6 +18,8 @@ package org.springframework.batch.sample.tasklet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -29,8 +31,9 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Lucas Ward
  * 
  */
-public class InfiniteLoopTasklet implements Tasklet {
+public class InfiniteLoopTasklet extends StepListenerSupport implements Tasklet {
 
+	private StepExecution stepExecution;
 	private int count = 0;
 	private static final Log logger = LogFactory.getLog(InfiniteLoopTasklet.class);
 
@@ -42,7 +45,7 @@ public class InfiniteLoopTasklet implements Tasklet {
 	}
 
 	public ExitStatus execute() throws Exception {
-		while(true) {
+		while(!stepExecution.isTerminateOnly()) {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -52,6 +55,14 @@ public class InfiniteLoopTasklet implements Tasklet {
 			count++;
 			logger.info("Executing infinite loop, at count="+count);
 		}
+		return ExitStatus.FAILED;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeStep(org.springframework.batch.core.domain.StepExecution)
+	 */
+	public void beforeStep(StepExecution stepExecution) {
+		this.stepExecution = stepExecution;
 	}
 
 }

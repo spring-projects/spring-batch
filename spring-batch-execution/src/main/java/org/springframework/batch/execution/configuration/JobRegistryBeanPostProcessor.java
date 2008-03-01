@@ -45,7 +45,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 	// It doesn't make sense for this to have a default value...
 	private JobRegistry jobConfigurationRegistry = null;
 
-	private Collection jobConfigurations = new HashSet();
+	private Collection jobNames = new HashSet();
 
 	/**
 	 * Injection setter for {@link JobRegistry}.
@@ -71,11 +71,11 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
-		for (Iterator iter = jobConfigurations.iterator(); iter.hasNext();) {
-			Job jobConfiguration = (Job) iter.next();
-			jobConfigurationRegistry.unregister(jobConfiguration);
+		for (Iterator iter = jobNames.iterator(); iter.hasNext();) {
+			String name = (String) iter.next();
+			jobConfigurationRegistry.unregister(name);
 		}
-		jobConfigurations.clear();
+		jobNames.clear();
 	}
 
 	/**
@@ -88,10 +88,10 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 	 */
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean instanceof Job) {
-			Job jobConfiguration = (Job) bean;
+			Job job = (Job) bean;
 			try {
-				jobConfigurationRegistry.register(jobConfiguration);
-				jobConfigurations.add(jobConfiguration);
+				jobConfigurationRegistry.register(new ReferenceJobFactory(job));
+				jobNames.add(job.getName());
 			}
 			catch (DuplicateJobException e) {
 				throw new FatalBeanException("Cannot register job configuration", e);

@@ -15,48 +15,75 @@
  */
 package org.springframework.batch.sample;
 
+import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.repository.DuplicateJobException;
 import org.springframework.batch.core.repository.JobRegistry;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.io.ResourceLoader;
 
 /**
  * @author Dave Syer
  * 
  */
-public class TaskExecutorLauncher {
-	
+public class TaskExecutorLauncher implements ResourceLoaderAware {
+
 	private JobRegistry registry;
-	
-	private void register(String[] paths) {
-		// registry.register(jobConfiguration)
+
+	private ResourceLoader resourceLoader;
+
+	private ApplicationContext parentContext = null;
+
+	/**
+	 * Public setter for the {@link JobRegistry}.
+	 * @param registry the registry to set
+	 */
+	public void setRegistry(JobRegistry registry) {
+		this.registry = registry;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.context.ResourceLoaderAware#setResourceLoader(org.springframework.core.io.ResourceLoader)
+	 */
+	public void setResourceLoader(ResourceLoader resourceLoader) {
+		this.resourceLoader = resourceLoader;
+	}
+
+	private void register(String[] paths) throws DuplicateJobException {
+		for (int i = 0; i < paths.length; i++) {
+			String path = paths[i];
+			ConfigurableListableBeanFactory beanFactory = new XmlBeanFactory(resourceLoader.getResource(path),
+					parentContext.getAutowireCapableBeanFactory());
+			String[] names = beanFactory.getBeanNamesForType(Job.class);
+			for (int j = 0; j < names.length; j++) {
+				registry.register(new ClassPathXmlApplicationContextJobFactory(names[j], path, parentContext));
+			}
+		}
 	}
 
 	public static void main(String[] args) throws Exception {
 
-		// Paths to individual job configurations.
-		final String[] paths = new String[] { "jobs/adhocLoopJob.xml",
-				"jobs/footballJob.xml" };
-
-		// The simple execution environment will be used as a parent
-		// context for each of the job contexts. The standard version of this
-		// from the Spring Batch samples does not have an MBean for the
-		// JobLauncher, nor does the JobLauncher have an asynchronous
-		// TaskExecutor. The adhocLoopJob has both, which is why it has to be
-		// included in the paths above.
-		final ApplicationContext parent = new ClassPathXmlApplicationContext(
-				"adhoc-job-launcher-context.xml");
-//		parent.getAutowireCapableBeanFactory().autowireBeanProperties(
-//				this, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+		final TaskExecutorLauncher launcher = new TaskExecutorLauncher();
 
 		new Thread(new Runnable() {
 			public void run() {
-				for (int i = 0; i < paths.length; i++) {
-					String path = paths[i];
-					new ClassPathXmlApplicationContext(new String[] { path },
-							parent);
-				}
+				launcher.run();
 			};
 		}).start();
+
+		while (launcher.parentContext == null) {
+			Thread.sleep(100L);
+		}
+
+		// Paths to individual job configurations.
+		final String[] paths = new String[] { "jobs/adhocLoopJob.xml", "jobs/footballJob.xml" };
+
+		launcher.register(paths);
 
 		System.out
 				.println("Started application.  "
@@ -64,4 +91,20 @@ public class TaskExecutorLauncher {
 		System.in.read();
 
 	}
+
+	private void run() {
+
+		/*
+		 * A simple execution environment with an MBean for the JobLauncher,
+		 * which has an asynchronous TaskExecutor. This will be used as the
+		 * parent context for loading job configurations.
+		 */
+		final ApplicationContext parent = new ClassPathXmlApplicationContext("adhoc-job-launcher-context.xml");
+		parent.getAutowireCapableBeanFactory().autowireBeanProperties(this,
+				AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+		parent.getAutowireCapableBeanFactory().initializeBean(this, "taskExecutorLauncher");
+		this.parentContext = parent;
+
+	}
+
 }

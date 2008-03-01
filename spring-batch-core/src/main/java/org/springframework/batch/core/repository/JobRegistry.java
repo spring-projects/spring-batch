@@ -29,18 +29,18 @@ public interface JobRegistry extends JobLocator {
 	/**
 	 * Registers a {@link Job} at runtime.
 	 * 
-	 * @param job the {@link Job} to be registered
+	 * @param jobFactory the {@link Job} to be registered
 	 * 
-	 * @throws DuplicateJobException if a configuration with the
-	 * same name has already been registered.
+	 * @throws DuplicateJobException if a factory with the same job name has
+	 * already been registered.
 	 */
-	void register(Job job) throws DuplicateJobException;
+	void register(JobFactory jobFactory) throws DuplicateJobException;
 
 	/**
-	 * Unregisters a previously registered {@link Job}. If it was
-	 * not previously registered there is no error.
+	 * Unregisters a previously registered {@link Job}. If it was not
+	 * previously registered there is no error.
 	 * 
-	 * @param job the {@link Job} to unregister.
+	 * @param jobName the {@link Job} to unregister.
 	 */
-	void unregister(Job job);
+	void unregister(String jobName);
 }

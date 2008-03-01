@@ -29,6 +29,7 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.batch.execution.configuration.MapJobRegistry;
+import org.springframework.batch.execution.configuration.ReferenceJobFactory;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.batch.execution.step.StepSupport;
@@ -117,7 +118,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testGetStatisticsWithContent() throws Exception {
-		jobLocator.register(new JobSupport("foo"));
+		jobLocator.register(new ReferenceJobFactory(new JobSupport("foo")));
 		launcher.run("foo");
 		Properties props = launcher.getStatistics();
 		assertNotNull(props);
@@ -130,7 +131,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testIsRunning() throws Exception {
-		jobLocator.register(new JobSupport("foo"));
+		jobLocator.register(new ReferenceJobFactory(new JobSupport("foo")));
 		launcher.run("foo");
 		assertTrue(launcher.isRunning());
 	}
@@ -141,7 +142,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testAlreadyRunning() throws Exception {
-		jobLocator.register(new JobSupport("foo"));
+		jobLocator.register(new ReferenceJobFactory(new JobSupport("foo")));
 		launcher.setLauncher(new JobLauncher() {
 			public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException {
 				throw new JobExecutionAlreadyRunningException("Bad!");
@@ -166,7 +167,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testRunJobWithParameters() throws Exception {
-		jobLocator.register(new JobSupport("foo"));
+		jobLocator.register(new ReferenceJobFactory(new JobSupport("foo")));
 		String value = launcher.run("foo", "bar=spam,bucket=crap");
 		assertTrue(launcher.isRunning());
 		assertTrue("Return value was not a JobExecution: " + value, value.contains("JobExecution"));
@@ -178,7 +179,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testRunJobWithParametersAndFactory() throws Exception {
-		jobLocator.register(new JobSupport("foo"));
+		jobLocator.register(new ReferenceJobFactory(new JobSupport("foo")));
 		launcher.setJobParametersFactory(new JobParametersFactory() {
 			public JobParameters getJobParameters(Properties properties) {
 				return new JobParametersBuilder().addString("foo", "spam").toJobParameters();
@@ -198,7 +199,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testStop() throws Exception {
-		jobLocator.register(new JobSupport("foo"));
+		jobLocator.register(new ReferenceJobFactory(new JobSupport("foo")));
 		launcher.run("foo");
 		assertTrue(launcher.isRunning());
 		launcher.stop();
