@@ -13,28 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.bootstrap;
+package org.springframework.batch.execution.launch.support;
 
 /**
- * Implementation of the {@link SystemExiter} interface that calls the standards
- * System.exit method. It should be noted that there will be no unit tests for
- * this class, since there is only one line of actual code, that would only be
- * testable by mocking System or Runtime.
+ * Interface for exiting the JVM.  This abstraction is only
+ * useful in order to allow classes that make System.exit calls
+ * to be testable, since calling System.exit during a unit 
+ * test would cause the entire jvm to finish.
  * 
  * @author Lucas Ward
- * @author Dave Syer
- * 
+ *
  */
-public class JvmSystemExiter implements SystemExiter {
+public interface SystemExiter {
 
 	/**
-	 * Delegate call to System.exit() with the argument provided. Do not use
-	 * this at home children!
+	 * Terminate the currently running Java Virtual Machine.
 	 * 
-	 * @see org.springframework.batch.execution.bootstrap.SystemExiter#exit(int)
+	 * @param status exit status.
+	 * @throws SecurityException
+	 * 		if a security manager exists and its <code>checkExit</code>
+     *        	method doesn't allow exit with the specified status.
+     * @see System.exit
 	 */
-	public void exit(int status) {
-		System.exit(status);
-	}
-
+	void exit(int status);
 }

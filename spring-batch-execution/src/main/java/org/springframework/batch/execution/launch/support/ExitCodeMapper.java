@@ -1,4 +1,4 @@
-package org.springframework.batch.execution.bootstrap;
+package org.springframework.batch.execution.launch.support;
 
 
 /**

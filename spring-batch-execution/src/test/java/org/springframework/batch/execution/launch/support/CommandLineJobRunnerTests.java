@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.bootstrap;
+package org.springframework.batch.execution.launch.support;
 
 import junit.framework.TestCase;
 
@@ -22,9 +22,9 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
-import org.springframework.batch.execution.bootstrap.CommandLineJobRunner;
-import org.springframework.batch.execution.bootstrap.SystemExiter;
 import org.springframework.batch.execution.launch.JobLauncher;
+import org.springframework.batch.execution.launch.support.CommandLineJobRunner;
+import org.springframework.batch.execution.launch.support.SystemExiter;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**

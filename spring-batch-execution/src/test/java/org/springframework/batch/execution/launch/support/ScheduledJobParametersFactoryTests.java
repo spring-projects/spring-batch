@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.bootstrap;
+package org.springframework.batch.execution.launch.support;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
-import org.springframework.batch.execution.bootstrap.ScheduledJobParametersFactory;
+import org.springframework.batch.execution.launch.support.ScheduledJobParametersFactory;
 import org.springframework.util.StringUtils;
 
 /**

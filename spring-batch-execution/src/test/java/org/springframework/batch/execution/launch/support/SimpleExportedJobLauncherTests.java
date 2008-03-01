@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.bootstrap;
+package org.springframework.batch.execution.launch.support;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +28,11 @@ import org.springframework.batch.core.domain.JobParametersBuilder;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.runtime.JobParametersFactory;
-import org.springframework.batch.execution.bootstrap.SimpleExportedJobLauncher;
 import org.springframework.batch.execution.configuration.MapJobRegistry;
 import org.springframework.batch.execution.configuration.ReferenceJobFactory;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.launch.JobLauncher;
+import org.springframework.batch.execution.launch.support.SimpleExportedJobLauncher;
 import org.springframework.batch.execution.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.PropertiesConverter;
@@ -66,7 +66,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.bootstrap.SimpleExportedJobLauncher#afterPropertiesSet()}.
+	 * {@link org.springframework.batch.execution.launch.support.SimpleExportedJobLauncher#afterPropertiesSet()}.
 	 * @throws Exception
 	 */
 	public void testAfterPropertiesSet() throws Exception {
@@ -83,7 +83,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.bootstrap.SimpleExportedJobLauncher#afterPropertiesSet()}.
+	 * {@link org.springframework.batch.execution.launch.support.SimpleExportedJobLauncher#afterPropertiesSet()}.
 	 * @throws Exception
 	 */
 	public void testAfterPropertiesSetWithLauncher() throws Exception {
@@ -105,7 +105,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.bootstrap.SimpleExportedJobLauncher#getStatistics()}.
+	 * {@link org.springframework.batch.execution.launch.support.SimpleExportedJobLauncher#getStatistics()}.
 	 */
 	public void testGetStatistics() {
 		Properties props = launcher.getStatistics();
@@ -115,7 +115,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.bootstrap.SimpleExportedJobLauncher#getStatistics()}.
+	 * {@link org.springframework.batch.execution.launch.support.SimpleExportedJobLauncher#getStatistics()}.
 	 * @throws Exception
 	 */
 	public void testGetStatisticsWithContent() throws Exception {
@@ -128,7 +128,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.bootstrap.SimpleExportedJobLauncher#isRunning()}.
+	 * {@link org.springframework.batch.execution.launch.support.SimpleExportedJobLauncher#isRunning()}.
 	 * @throws Exception
 	 */
 	public void testIsRunning() throws Exception {
@@ -139,7 +139,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.bootstrap.SimpleExportedJobLauncher#isRunning()}.
+	 * {@link org.springframework.batch.execution.launch.support.SimpleExportedJobLauncher#isRunning()}.
 	 * @throws Exception
 	 */
 	public void testAlreadyRunning() throws Exception {
@@ -155,7 +155,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.bootstrap.SimpleExportedJobLauncher#run(java.lang.String)}.
+	 * {@link org.springframework.batch.execution.launch.support.SimpleExportedJobLauncher#run(java.lang.String)}.
 	 */
 	public void testRunNonExistentJob() {
 		String value = launcher.run("foo");
@@ -164,7 +164,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.bootstrap.SimpleExportedJobLauncher#run(java.lang.String)}.
+	 * {@link org.springframework.batch.execution.launch.support.SimpleExportedJobLauncher#run(java.lang.String)}.
 	 * @throws Exception 
 	 */
 	public void testRunJobWithParameters() throws Exception {
@@ -176,7 +176,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.bootstrap.SimpleExportedJobLauncher#run(java.lang.String)}.
+	 * {@link org.springframework.batch.execution.launch.support.SimpleExportedJobLauncher#run(java.lang.String)}.
 	 * @throws Exception 
 	 */
 	public void testRunJobWithParametersAndFactory() throws Exception {
@@ -196,7 +196,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.bootstrap.SimpleExportedJobLauncher#stop()}.
+	 * {@link org.springframework.batch.execution.launch.support.SimpleExportedJobLauncher#stop()}.
 	 * @throws Exception 
 	 */
 	public void testStop() throws Exception {
