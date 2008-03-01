@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchListener;
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.StepContribution;
@@ -29,6 +30,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.step.support.ListenerMulticaster;
+import org.springframework.batch.execution.step.support.NeverSkipItemSkipPolicy;
 import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.execution.step.support.ThreadStepInterruptionPolicy;
@@ -45,6 +47,7 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.RetryPolicy;
@@ -52,6 +55,7 @@ import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
 import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.Assert;
@@ -106,6 +110,18 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			return item;
 		}
 	};
+
+	private ExceptionHandler exceptionHandler;
+
+	private JobRepository jobRepository;
+
+	private PlatformTransactionManager transactionManager;
+
+	private ItemReader itemReader;
+
+	protected ItemWriter itemWriter;
+
+	private ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
 
 	/**
 	 * Public setter for the {@link ItemKeyGenerator}. If it is not injected
@@ -178,15 +194,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	 */
 	public void setExceptionClassifier(ExitStatusExceptionClassifier exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
-	}
-
-	/**
-	 * Public setter for the retryPolicy.
-	 * 
-	 * @param retyPolicy the retryPolicy to set
-	 */
-	public void setRetryPolicy(RetryPolicy retryPolicy) {
-		this.retryPolicy = retryPolicy;
 	}
 
 	public void setCommitInterval(int commitInterval) {
@@ -640,6 +647,64 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			return e;
 		}
 
+	}
+
+	/**
+	 * Set the name property. Always overrides the default value if this object
+	 * is a Spring bean.
+	 * 
+	 * @see #setBeanName(java.lang.String)
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * Public setter for the {@link RetryPolicy}.
+	 * @param retryPolicy the {@link RetryPolicy} to set
+	 */
+	public void setRetryPolicy(RetryPolicy retryPolicy) {
+		this.retryPolicy = retryPolicy;
+	}
+
+	public void setExceptionHandler(ExceptionHandler exceptionHandler) {
+		this.exceptionHandler = exceptionHandler;
+	}
+
+	/**
+	 * Public setter for {@link JobRepository}.
+	 * 
+	 * @param jobRepository is a mandatory dependence (no default).
+	 */
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
+	}
+
+	/**
+	 * Public setter for the {@link PlatformTransactionManager}.
+	 * 
+	 * @param transactionManager the transaction manager to set
+	 */
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
+	}
+
+	/**
+	 * @param itemReader the itemReader to set
+	 */
+	public void setItemReader(ItemReader itemReader) {
+		this.itemReader = itemReader;
+	}
+
+	/**
+	 * @param itemWriter the itemWriter to set
+	 */
+	public void setItemWriter(ItemWriter itemWriter) {
+		this.itemWriter = itemWriter;
+	}
+
+	public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
+		this.itemSkipPolicy = itemSkipPolicy;
 	}
 
 	/**

@@ -177,7 +177,7 @@ public class SimpleJobTests extends TestCase {
 	}
 
 	public void testExceptionTerminates() throws Exception {
-		AbstractStep step = getStep(new String[] { "foo", "bar", "spam" });
+		ItemOrientedStep step = getStep(new String[] { "foo", "bar", "spam" });
 		step.setName("exceptionStep");
 		step.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {

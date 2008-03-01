@@ -15,21 +15,11 @@
  */
 package org.springframework.batch.execution.step;
 
-import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.execution.step.support.NeverSkipItemSkipPolicy;
 import org.springframework.batch.io.exception.InfrastructureException;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
-import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.util.Assert;
 
 /**
  * A {@link Step} implementation that provides common behaviour to subclasses.
@@ -37,21 +27,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Ben Hale
  */
-public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
-
-	protected ExceptionHandler exceptionHandler;
-
-	protected RetryPolicy retryPolicy;
-
-	protected JobRepository jobRepository;
-
-	protected PlatformTransactionManager transactionManager;
-
-	protected ItemReader itemReader;
-
-	protected ItemWriter itemWriter;
-
-	protected ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
+public abstract class AbstractStep implements Step, BeanNameAware {
 
 	protected String name;
 
@@ -128,71 +104,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 */
 	public AbstractStep(String name) {
 		this.name = name;
-	}
-
-	/**
-	 * Public setter for the {@link RetryPolicy}.
-	 * @param retryPolicy the {@link RetryPolicy} to set
-	 */
-	public void setRetryPolicy(RetryPolicy retryPolicy) {
-		this.retryPolicy = retryPolicy;
-	}
-
-	public void setExceptionHandler(ExceptionHandler exceptionHandler) {
-		this.exceptionHandler = exceptionHandler;
-	}
-
-	/**
-	 * Public setter for {@link JobRepository}.
-	 * 
-	 * @param jobRepository is a mandatory dependence (no default).
-	 */
-	public void setJobRepository(JobRepository jobRepository) {
-		this.jobRepository = jobRepository;
-	}
-
-	/**
-	 * Public setter for the {@link PlatformTransactionManager}.
-	 * 
-	 * @param transactionManager the transaction manager to set
-	 */
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
-		this.transactionManager = transactionManager;
-	}
-
-	/**
-	 * @param itemReader the itemReader to set
-	 */
-	public void setItemReader(ItemReader itemReader) {
-		this.itemReader = itemReader;
-	}
-
-	/**
-	 * @param itemWriter the itemWriter to set
-	 */
-	public void setItemWriter(ItemWriter itemWriter) {
-		this.itemWriter = itemWriter;
-	}
-
-	public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
-		this.itemSkipPolicy = itemSkipPolicy;
-	}
-
-	/**
-	 * Assert that all mandatory properties are set (the {@link JobRepository}).
-	 * 
-	 * @throws Exception
-	 */
-	public void afterPropertiesSet() throws Exception {
-		assertMandatoryProperties();
-	}
-
-	protected void assertMandatoryProperties() {
-		Assert.notNull(jobRepository, "JobRepository is mandatory");
-		Assert.notNull(transactionManager, "TransactionManager must be set");
-		Assert.notNull(itemReader, "ItemReader must be provided");
-		Assert.notNull(itemWriter, "ItemWriter must be provided");
-
 	}
 
 	public abstract void execute(StepExecution stepExecution) throws JobInterruptedException, InfrastructureException;

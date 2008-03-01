@@ -40,83 +40,13 @@ import org.springframework.util.Assert;
  * 
  * @author Ben Hale
  */
-public class TaskletStep implements Step, InitializingBean, BeanNameAware {
+public class TaskletStep extends AbstractStep implements Step, InitializingBean, BeanNameAware {
 
 	private static final Log logger = LogFactory.getLog(TaskletStep.class);
 
 	private Tasklet tasklet;
 
 	private JobRepository jobRepository;
-
-	private String name;
-
-	private int startLimit = Integer.MAX_VALUE;
-
-	private boolean allowStartIfComplete;
-
-	public String getName() {
-		return this.name;
-	}
-
-	/**
-	 * Set the name property if it is not already set. Because of the order of
-	 * the callbacks in a Spring container the name property will be set first
-	 * if it is present. Care is needed with bean definition inheritance - if a
-	 * parent bean has a name, then its children need an explicit name as well,
-	 * otherwise they will not be unique.
-	 * 
-	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
-	 */
-	public void setBeanName(String name) {
-		if (this.name == null) {
-			this.name = name;
-		}
-	}
-
-	/**
-	 * Set the name property. Always overrides the default value if this object
-	 * is a Spring bean.
-	 * 
-	 * @see #setBeanName(java.lang.String)
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.Step#getStartLimit()
-	 */
-	public int getStartLimit() {
-		return this.startLimit;
-	}
-
-	/**
-	 * Public setter for the startLimit.
-	 * 
-	 * @param startLimit the startLimit to set
-	 */
-	public void setStartLimit(int startLimit) {
-		this.startLimit = startLimit;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.Step#isAllowStartIfComplete()
-	 */
-	public boolean isAllowStartIfComplete() {
-		return this.allowStartIfComplete;
-	}
-
-	/**
-	 * Public setter for the shouldAllowStartIfComplete.
-	 * 
-	 * @param allowStartIfComplete the shouldAllowStartIfComplete to set
-	 */
-	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
-		this.allowStartIfComplete = allowStartIfComplete;
-	}
-
 	private CompositeStepListener listener = new CompositeStepListener();
 
 	/**

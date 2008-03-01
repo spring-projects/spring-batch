@@ -22,6 +22,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.BatchStatus;
+import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
@@ -39,9 +40,15 @@ import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
 import org.springframework.batch.execution.step.AbstractStep;
+import org.springframework.batch.execution.step.support.NeverSkipItemSkipPolicy;
 import org.springframework.batch.io.exception.InfrastructureException;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
+import org.springframework.batch.retry.RetryPolicy;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * Tests for DefaultJobLifecycle. MapJobDao and MapStepExecutionDao are used instead of a
@@ -288,6 +295,13 @@ public class SimpleJobTests extends TestCase {
 
 		private Runnable runnable;
 		private Exception exception;
+		protected ExceptionHandler exceptionHandler;
+		protected RetryPolicy retryPolicy;
+		protected JobRepository jobRepository;
+		protected PlatformTransactionManager transactionManager;
+		protected ItemReader itemReader;
+		protected ItemWriter itemWriter;
+		protected ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
 
 		/**
 		 * @param string
@@ -321,6 +335,64 @@ public class SimpleJobTests extends TestCase {
 				runnable.run();
 			}
 			stepExecution.setExitStatus(ExitStatus.FINISHED);
+		}
+
+		/**
+		 * Set the name property. Always overrides the default value if this object
+		 * is a Spring bean.
+		 * 
+		 * @see #setBeanName(java.lang.String)
+		 */
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		/**
+		 * Public setter for the {@link RetryPolicy}.
+		 * @param retryPolicy the {@link RetryPolicy} to set
+		 */
+		public void setRetryPolicy(RetryPolicy retryPolicy) {
+			this.retryPolicy = retryPolicy;
+		}
+
+		public void setExceptionHandler(ExceptionHandler exceptionHandler) {
+			this.exceptionHandler = exceptionHandler;
+		}
+
+		/**
+		 * Public setter for {@link JobRepository}.
+		 * 
+		 * @param jobRepository is a mandatory dependence (no default).
+		 */
+		public void setJobRepository(JobRepository jobRepository) {
+			this.jobRepository = jobRepository;
+		}
+
+		/**
+		 * Public setter for the {@link PlatformTransactionManager}.
+		 * 
+		 * @param transactionManager the transaction manager to set
+		 */
+		public void setTransactionManager(PlatformTransactionManager transactionManager) {
+			this.transactionManager = transactionManager;
+		}
+
+		/**
+		 * @param itemReader the itemReader to set
+		 */
+		public void setItemReader(ItemReader itemReader) {
+			this.itemReader = itemReader;
+		}
+
+		/**
+		 * @param itemWriter the itemWriter to set
+		 */
+		public void setItemWriter(ItemWriter itemWriter) {
+			this.itemWriter = itemWriter;
+		}
+
+		public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
+			this.itemSkipPolicy = itemSkipPolicy;
 		}
 
 	}
