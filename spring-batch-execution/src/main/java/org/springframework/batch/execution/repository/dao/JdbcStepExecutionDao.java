@@ -16,7 +16,7 @@ import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
@@ -108,7 +108,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					executionContext.put(key, rs.getObject("OBJECT_VAL"));
 				}
 				else {
-					throw new BatchCriticalException("Invalid type found: [" + typeCd + "] for execution id: ["
+					throw new InfrastructureException("Invalid type found: [" + typeCd + "] for execution id: ["
 							+ executionId + "]");
 				}
 			}

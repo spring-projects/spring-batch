@@ -21,7 +21,7 @@ import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.step.support.NeverSkipItemSkipPolicy;
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
@@ -195,5 +195,5 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	}
 
-	public abstract void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException;
+	public abstract void execute(StepExecution stepExecution) throws JobInterruptedException, InfrastructureException;
 }

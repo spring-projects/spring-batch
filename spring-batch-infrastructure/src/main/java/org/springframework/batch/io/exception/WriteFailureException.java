@@ -25,7 +25,7 @@ import org.springframework.batch.item.ItemWriter;
  * 
  *  @author Lucas Ward
  */
-public class WriteFailureException extends BatchCriticalException {
+public class WriteFailureException extends InfrastructureException {
 	private static final long serialVersionUID = -1933213086873834098L;
 	
 	private final Object item;

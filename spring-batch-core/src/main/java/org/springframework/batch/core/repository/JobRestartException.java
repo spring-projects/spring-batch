@@ -15,16 +15,27 @@
  */
 package org.springframework.batch.core.repository;
 
-import junit.framework.TestCase;
-
 /**
+ * An exception indicating an illegal attempt to restart a job.
+ * 
  * @author Dave Syer
- *
+ * 
  */
-public class NoSuchBatchDomainObjectExceptionTests extends TestCase {
+public class JobRestartException extends JobException {
 
-	public void testCreateException() throws Exception {
-		NoSuchBatchDomainObjectException e = new NoSuchBatchDomainObjectException("Foo");
-		assertEquals("Foo", e.getMessage());
+	/**
+	 * @param string the message
+	 */
+	public JobRestartException(String string) {
+		super(string);
 	}
+
+	/**
+	 * @param msg the cause
+	 * @param t the message
+	 */
+	public JobRestartException(String msg, Throwable t) {
+		super(msg, t);
+	}
+
 }

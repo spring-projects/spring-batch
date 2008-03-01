@@ -10,7 +10,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.RowMapper;
@@ -147,7 +146,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		// is invalid and
 		// an exception should be thrown.
 		if (getJdbcTemplate().queryForInt(getQuery(CHECK_JOB_EXECUTION_EXISTS), new Object[] { jobExecution.getId() }) != 1) {
-			throw new NoSuchBatchDomainObjectException("Invalid JobExecution, ID " + jobExecution.getId()
+			throw new NoSuchObjectException("Invalid JobExecution, ID " + jobExecution.getId()
 					+ " not found.");
 		}
 

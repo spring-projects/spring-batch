@@ -24,7 +24,7 @@ import org.springframework.batch.item.ItemReader;
  * 
  * @author Lucas Ward
  */
-public class ReadFailureException extends BatchCriticalException {
+public class ReadFailureException extends InfrastructureException {
 	
 	private static final long serialVersionUID = 4113323182216735223L;
 

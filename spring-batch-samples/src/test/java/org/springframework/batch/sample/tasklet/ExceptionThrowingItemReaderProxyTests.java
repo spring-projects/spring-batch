@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
@@ -40,7 +40,7 @@ public class ExceptionThrowingItemReaderProxyTests extends TestCase {
 			try {
 				itemReader.read();
 				assertTrue(i < ITER_COUNT);
-			} catch (BatchCriticalException bce) {
+			} catch (InfrastructureException bce) {
 				assertEquals(ITER_COUNT,i);
 			}
 		}

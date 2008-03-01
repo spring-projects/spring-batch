@@ -18,7 +18,7 @@ package org.springframework.batch.execution.step;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**
@@ -110,7 +110,7 @@ public class StepSupport implements Step, BeanNameAware {
 	 * 
 	 * @see org.springframework.batch.core.domain.Step#execute(org.springframework.batch.core.domain.StepExecution)
 	 */
-	public void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException {
+	public void execute(StepExecution stepExecution) throws JobInterruptedException, InfrastructureException {
 		throw new UnsupportedOperationException(
 		        "Cannot process a StepExecution.  Use a smarter subclass of StepSupport.");
 	}

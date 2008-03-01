@@ -161,7 +161,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 		jobIds.add(execution.getJobId());
 	}
 
-	private JobExecution doConcurrentStart() throws InterruptedException, JobExecutionAlreadyRunningException {
+	private JobExecution doConcurrentStart() throws Exception {
 		new Thread(new Runnable() {
 			public void run() {
 				try {

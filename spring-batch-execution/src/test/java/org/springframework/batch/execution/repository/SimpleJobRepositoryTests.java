@@ -28,7 +28,7 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.repository.BatchRestartException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.repository.dao.JobExecutionDao;
 import org.springframework.batch.execution.repository.dao.JobInstanceDao;
@@ -243,7 +243,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 			jobRepository.createJobExecution(jobConfiguration, jobParameters);
 			fail();
 		}
-		catch (BatchRestartException ex) {
+		catch (JobRestartException ex) {
 			// expected
 		}
 

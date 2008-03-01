@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.io.exception;
+package org.springframework.batch.execution.repository.dao;
 
-import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.io.exception.BatchEnvironmentException;
+/**
+ * This exception identifies that a batch domain object is invalid, which
+ * is generally caused by an invalid ID. (An ID which doesn't exist in the database).
+ * 
+ * @author Lucas Ward
+ * @author Dave Syer
+ *
+ */
+public class NoSuchObjectException extends RuntimeException {
 
-public class BatchEnvironmentExceptionTests extends AbstractExceptionTests {
+	private static final long serialVersionUID = 4399621765157283111L;
 
-	public Exception getException(String msg) throws Exception {
-		return new BatchEnvironmentException(msg);
+	public NoSuchObjectException(String message){
+		super(message);
 	}
-
-	public Exception getException(Throwable t) throws Exception {
-		return new BatchCriticalException(t);
-	}
-
-	public Exception getException(String msg, Throwable t) throws Exception {
-		return new BatchEnvironmentException(msg, t);
-	}
-	
 }

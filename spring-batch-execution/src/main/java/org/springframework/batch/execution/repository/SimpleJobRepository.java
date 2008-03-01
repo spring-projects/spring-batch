@@ -26,7 +26,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.repository.BatchRestartException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.repository.dao.JobExecutionDao;
@@ -132,15 +132,9 @@ public class SimpleJobRepository implements JobRepository {
 	 * 
 	 * @see JobRepository#createJobExecution(Job, JobParameters)
 	 * 
-	 * @throws BatchRestartException if more than one JobInstance if found or if
-	 * JobInstance.getJobExecutionCount() is greater than Job.getStartLimit()
-	 * @throws JobExecutionAlreadyRunningException if a job execution is found
-	 * for the given {@link JobIdentifier} that is already running
-	 * @throws CannotRestartJobInstanceException
-	 * 
 	 */
 	public JobExecution createJobExecution(Job job, JobParameters jobParameters)
-			throws JobExecutionAlreadyRunningException {
+			throws JobExecutionAlreadyRunningException, JobRestartException {
 
 		Assert.notNull(job, "Job must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
@@ -161,12 +155,12 @@ public class SimpleJobRepository implements JobRepository {
 		// existing job instance found
 		if (jobInstance != null) {
 			if (!job.isRestartable()) {
-				throw new BatchRestartException("JobInstance already exists and is not restartable");
+				throw new JobRestartException("JobInstance already exists and is not restartable");
 			}
 
 			jobInstance.setJobExecutionCount(jobExecutionDao.getJobExecutionCount(jobInstance));
 			if (jobInstance.getJobExecutionCount() > job.getStartLimit()) {
-				throw new BatchRestartException("Restart Max exceeded for Job: " + jobInstance.toString());
+				throw new JobRestartException("Restart Max exceeded for Job: " + jobInstance.toString());
 			}
 			List executions = jobExecutionDao.findJobExecutions(jobInstance);
 			JobExecution lastExecution = null;

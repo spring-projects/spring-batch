@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.execution.step.support;
 
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 
 /**
  * Exception indicating that the skip limit for a particular {@Step} has
@@ -24,7 +24,7 @@ import org.springframework.batch.io.exception.BatchCriticalException;
  * @author Ben Hale
  * @author Lucas Ward
  */
-public class SkipLimitExceededException extends BatchCriticalException {
+public class SkipLimitExceededException extends InfrastructureException {
 
 	private final int skipLimit;
 	

@@ -21,9 +21,9 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.file.separator.ResourceLineReader;
 import org.springframework.batch.io.file.separator.SuffixRecordSeparatorPolicy;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -43,7 +43,7 @@ public class ResourceLineReaderTests extends TestCase {
 			reader.read();
 			fail("Expected InputException");
 		}
-		catch (BatchEnvironmentException e) {
+		catch (StreamException e) {
 			// expected
 			assertTrue(e.getMessage().startsWith("Unable to read"));
 		}

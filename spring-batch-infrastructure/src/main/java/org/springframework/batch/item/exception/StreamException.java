@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.exception;
 
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 
 /**
  * Exception representing any errors encountered while processing
@@ -24,7 +24,7 @@ import org.springframework.batch.io.exception.BatchCriticalException;
  * @author Dave Syer
  * @author Lucas Ward
  */
-public class StreamException extends BatchCriticalException {
+public class StreamException extends InfrastructureException {
 
 	/**
 	 * @param message

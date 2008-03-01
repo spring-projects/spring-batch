@@ -39,7 +39,7 @@ import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.execution.repository.dao.StepExecutionDao;
 import org.springframework.batch.execution.step.AbstractStep;
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -193,7 +193,7 @@ public class SimpleJobTests extends TestCase {
 		try {
 			job.execute(jobExecution);
 		}
-		catch (BatchCriticalException e) {
+		catch (InfrastructureException e) {
 			assertEquals(exception, e.getCause());
 		}
 		assertEquals(0, list.size());
@@ -223,7 +223,7 @@ public class SimpleJobTests extends TestCase {
 			job.execute(jobExecution);
 			fail("Expected BatchCriticalException");
 		}
-		catch (BatchCriticalException ex) {
+		catch (InfrastructureException ex) {
 			// expected
 			assertTrue("Wrong message in exception: " + ex.getMessage(), ex.getMessage()
 					.indexOf("start limit exceeded") >= 0);
@@ -255,7 +255,7 @@ public class SimpleJobTests extends TestCase {
 		try {
 			job.execute(jobExecution);
 		}
-		catch (BatchCriticalException e) {
+		catch (InfrastructureException e) {
 			assertTrue(e.getCause() instanceof JobInterruptedException);
 		}
 		assertEquals(0, list.size());
@@ -310,7 +310,7 @@ public class SimpleJobTests extends TestCase {
 			this.runnable = runnable;
 		}
 
-		public void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException {
+		public void execute(StepExecution stepExecution) throws JobInterruptedException, InfrastructureException {
 			if (exception instanceof RuntimeException) {
 				throw (RuntimeException)exception;
 			}

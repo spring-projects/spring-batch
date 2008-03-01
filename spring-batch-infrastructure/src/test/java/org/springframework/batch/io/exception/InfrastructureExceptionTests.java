@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.repository;
+package org.springframework.batch.io.exception;
 
-/**
- * This exception identifies that a batch domain object is invalid, which
- * is generally caused by an invalid ID. (An ID which doesn't exist in the database).
- * 
- * @author Lucas Ward
- * @author Dave Syer
- *
- */
-public class NoSuchBatchDomainObjectException extends RuntimeException {
 
-	private static final long serialVersionUID = 4399621765157283111L;
+public class InfrastructureExceptionTests extends AbstractExceptionTests {
 
-	public NoSuchBatchDomainObjectException(String message){
-		super(message);
+	public Exception getException(String msg) throws Exception {
+		return new InfrastructureException(msg);
 	}
+
+	public Exception getException(Throwable t) throws Exception {
+		return new InfrastructureException(t);
+	}
+
+	public Exception getException(String msg, Throwable t) throws Exception {
+		return new InfrastructureException(msg, t);
+	}
+
 }

@@ -25,12 +25,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.MarkFailedException;
 import org.springframework.batch.item.exception.ResetFailedException;
+import org.springframework.batch.item.exception.StreamException;
 import org.springframework.batch.item.stream.ItemStreamSupport;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -120,9 +120,6 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 	 * 
 	 * @return a String.
 	 * 
-	 * @throws BatchEnvironmentException if there is an IOException while
-	 * accessing the input resource.
-	 * 
 	 * @see org.springframework.batch.item.reader.support.ItemReader#read()
 	 */
 	public synchronized Object read() {
@@ -170,9 +167,7 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 	/**
 	 * Close the reader associated with this input source.
 	 * 
-	 * @see org.springframework.batch.io.ItemReader#close(ExecutionContext)
-	 * @throws BatchEnvironmentException if there is an {@link IOException}
-	 * during the close operation.
+	 * @see org.springframework.batch.item.stream.ItemStreamSupport#close(org.springframework.batch.item.ExecutionContext)
 	 */
 	public synchronized void close(ExecutionContext executionContext) {
 		if (state == null) {
@@ -260,7 +255,7 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 				}
 			}
 			catch (IOException e) {
-				throw new BatchEnvironmentException("Unable to read from resource '" + resource + "' at line "
+				throw new StreamException("Unable to read from resource '" + resource + "' at line "
 						+ currentLineCount, e);
 			}
 			return line;
@@ -275,7 +270,7 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 				mark();
 			}
 			catch (IOException e) {
-				throw new BatchEnvironmentException("Could not open resource", e);
+				throw new StreamException("Could not open resource", e);
 			}
 		}
 
@@ -291,7 +286,7 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 				reader.close();
 			}
 			catch (IOException e) {
-				throw new BatchEnvironmentException("Could not close reader", e);
+				throw new StreamException("Could not close reader", e);
 			}
 			finally {
 				currentLineCount = 0;

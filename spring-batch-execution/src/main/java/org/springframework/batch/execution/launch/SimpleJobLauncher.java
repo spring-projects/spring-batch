@@ -21,6 +21,7 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.InitializingBean;
@@ -30,8 +31,8 @@ import org.springframework.util.Assert;
 
 /**
  * Simple implementation of the {@link JobLauncher} interface. The Spring Core
- * {@link TaskExecutor} interface is used to launch a {@link Job}. This
- * means that the type of executor set is very important. If a
+ * {@link TaskExecutor} interface is used to launch a {@link Job}. This means
+ * that the type of executor set is very important. If a
  * {@link SyncTaskExecutor} is used, then the job will be processed
  * <strong>within the same thread that called the launcher.</strong> Care
  * should be taken to ensure any users of this class understand fully whether or
@@ -40,9 +41,9 @@ import org.springframework.util.Assert;
  * 
  * There is only one required dependency of this Launcher, a
  * {@link JobRepository}. The JobRepository is used to obtain a valid
- * JobExecution. The Repository must be used because the provided
- * {@link Job} could be a restart of an existing {@link JobInstance},
- * and only the Repository can reliably recreate it.
+ * JobExecution. The Repository must be used because the provided {@link Job}
+ * could be a restart of an existing {@link JobInstance}, and only the
+ * Repository can reliably recreate it.
  * 
  * @author Lucas Ward
  * @since 1.0
@@ -67,9 +68,11 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	 * execution.
 	 * @return JobExecutionAlreadyRunningException if the JobInstance already
 	 * exists and has an execution already running.
+	 * @throws JobRestartException if the execution would be a re-start, but a
+	 * re-start is either not allowed or not needed.
 	 */
 	public JobExecution run(final Job job, final JobParameters jobParameters)
-			throws JobExecutionAlreadyRunningException {
+			throws JobExecutionAlreadyRunningException, JobRestartException {
 
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");

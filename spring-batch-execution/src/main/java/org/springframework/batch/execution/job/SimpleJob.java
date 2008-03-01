@@ -32,7 +32,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.execution.listener.CompositeJobListener;
 import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -63,7 +63,7 @@ public class SimpleJob extends AbstractJob {
 	 * 
 	 * @see org.springframework.batch.core.domain.Job#execute(org.springframework.batch.core.domain.JobExecution)
 	 */
-	public void execute(JobExecution execution) throws BatchCriticalException {
+	public void execute(JobExecution execution) throws InfrastructureException {
 
 		JobInstance jobInstance = execution.getJobInstance();
 		jobInstance.setLastExecution(execution);
@@ -158,7 +158,7 @@ public class SimpleJob extends AbstractJob {
 		}
 
 		if (stepStatus == BatchStatus.UNKNOWN) {
-			throw new BatchCriticalException("Cannot restart step from UNKNOWN status.  "
+			throw new InfrastructureException("Cannot restart step from UNKNOWN status.  "
 					+ "The last execution ended with a failure that could not be rolled back, "
 					+ "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
 		}
@@ -175,7 +175,7 @@ public class SimpleJob extends AbstractJob {
 		}
 		else {
 			// start max has been exceeded, throw an exception.
-			throw new BatchCriticalException("Maximum start limit exceeded for step: " + step.getName() + "StartMax: "
+			throw new InfrastructureException("Maximum start limit exceeded for step: " + step.getName() + "StartMax: "
 					+ step.getStartLimit());
 		}
 	}
@@ -188,7 +188,7 @@ public class SimpleJob extends AbstractJob {
 			throw (RuntimeException) t;
 		}
 		else {
-			throw new BatchCriticalException(t);
+			throw new InfrastructureException(t);
 		}
 	}
 

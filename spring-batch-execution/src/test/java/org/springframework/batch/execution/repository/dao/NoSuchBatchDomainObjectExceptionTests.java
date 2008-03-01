@@ -13,29 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.repository;
+package org.springframework.batch.execution.repository.dao;
 
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.execution.repository.dao.NoSuchObjectException;
+
+import junit.framework.TestCase;
 
 /**
  * @author Dave Syer
  *
  */
-public class BatchRestartException extends BatchCriticalException {
+public class NoSuchBatchDomainObjectExceptionTests extends TestCase {
 
-	/**
-	 * @param string the message
-	 */
-	public BatchRestartException(String string) {
-		super(string);
+	public void testCreateException() throws Exception {
+		NoSuchObjectException e = new NoSuchObjectException("Foo");
+		assertEquals("Foo", e.getMessage());
 	}
-
-	/**
-	 * @param msg the cause
-	 * @param t the message
-	 */
-	public BatchRestartException(String msg, Throwable t) {
-		super(msg, t);
-	}
-
 }

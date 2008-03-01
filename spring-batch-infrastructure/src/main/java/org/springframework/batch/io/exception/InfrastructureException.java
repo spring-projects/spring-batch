@@ -17,20 +17,13 @@
 package org.springframework.batch.io.exception;
 
 /**
- * BatchCritcalException - Indiates to the framework that a critical error has
- * occured and batch processing should immeadiately stop. However, in most cases
- * status should still be persisted indicating that an error foced the job to
- * terminate. Any framework code that catches a BatchCriticalException will
- * rethrow the exception. This allows any code that creates a critical exception
- * to be able to add an error code that will still be accesible at the very
- * beginning of the call chain. (usually a launcher that kicked off the
- * JobController). Error code values 0 - 2000 a reserved for framework classes.
- * Anything greater than 2000 can be used by application code.
+ * Indicates to the framework that a critical error has occurred and processing
+ * should immediately stop.
  * 
  * @author Lucas Ward
  * 
  */
-public class BatchCriticalException extends RuntimeException {
+public class InfrastructureException extends RuntimeException {
 	private static final long serialVersionUID = 8838982304219248527L;
 
 	/**
@@ -39,7 +32,7 @@ public class BatchCriticalException extends RuntimeException {
 	 * @param msg the exception message.
 	 * 
 	 */
-	public BatchCriticalException(String msg) {
+	public InfrastructureException(String msg) {
 		super(msg);
 	}
 
@@ -49,7 +42,7 @@ public class BatchCriticalException extends RuntimeException {
 	 * @param msg the exception message.
 	 * 
 	 */
-	public BatchCriticalException(String msg, Throwable nested) {
+	public InfrastructureException(String msg, Throwable nested) {
 		super(msg, nested);
 	}
 
@@ -57,7 +50,7 @@ public class BatchCriticalException extends RuntimeException {
 	 * Constructs a new instance with a nested exception. The error code is
 	 * defaulted to 1 and the message is empty.
 	 */
-	public BatchCriticalException(Throwable nested) {
+	public InfrastructureException(Throwable nested) {
 		super(nested);
 	}
 
@@ -65,7 +58,7 @@ public class BatchCriticalException extends RuntimeException {
 	 * Constructs a new instance, the error code is defaulted to one and the
 	 * message is empty.
 	 */
-	public BatchCriticalException() {
+	public InfrastructureException() {
 		super();
 	}
 

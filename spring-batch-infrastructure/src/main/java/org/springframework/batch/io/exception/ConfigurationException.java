@@ -22,28 +22,28 @@ package org.springframework.batch.io.exception;
  * 
  * @author Kerry O'Brien
  */
-public class BatchConfigurationException extends BatchCriticalException {
+public class ConfigurationException extends InfrastructureException {
 	private static final long serialVersionUID = 759498454063502984L;
 
 	/**
 	 * @param msg
 	 * @param ex
 	 */
-	public BatchConfigurationException(String msg, Throwable ex) {
+	public ConfigurationException(String msg, Throwable ex) {
 		super(msg, ex);
 	}
 
 	/**
 	 * @param msg
 	 */
-	public BatchConfigurationException(String msg) {
+	public ConfigurationException(String msg) {
 		super(msg);
 	}
 
 	/**
 	 * @param nested
 	 */
-	public BatchConfigurationException(Throwable nested) {
+	public ConfigurationException(Throwable nested) {
 		super(nested);
 	}
 }

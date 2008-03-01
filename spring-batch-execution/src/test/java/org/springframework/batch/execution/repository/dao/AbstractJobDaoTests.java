@@ -26,7 +26,6 @@ import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
-import org.springframework.batch.core.repository.NoSuchBatchDomainObjectException;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -174,7 +173,7 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 			jobExecutionDao.updateJobExecution(execution);
 			fail("Expected NoSuchBatchDomainObjectException");
 		}
-		catch (NoSuchBatchDomainObjectException ex) {
+		catch (NoSuchObjectException ex) {
 			// expected
 		}
 	}

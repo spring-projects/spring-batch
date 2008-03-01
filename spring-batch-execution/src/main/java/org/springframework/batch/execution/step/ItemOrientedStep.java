@@ -33,7 +33,7 @@ import org.springframework.batch.execution.step.support.SimpleExitStatusExceptio
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.execution.step.support.ThreadStepInterruptionPolicy;
 import org.springframework.batch.io.Skippable;
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
@@ -227,7 +227,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	 * execution
 	 * @see StepExecutor#execute(StepExecution)
 	 */
-	public void execute(final StepExecution stepExecution) throws BatchCriticalException, JobInterruptedException {
+	public void execute(final StepExecution stepExecution) throws InfrastructureException, JobInterruptedException {
 
 		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
 		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, this);
@@ -418,7 +418,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 				if (!fatalException.hasException()) {
 					fatalException.setException(e);
 				}
-				throw new BatchCriticalException(msg, fatalException.getException());
+				throw new InfrastructureException(msg, fatalException.getException());
 			}
 
 			try {
@@ -431,11 +431,11 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 				if (!fatalException.hasException()) {
 					fatalException.setException(e);
 				}
-				throw new BatchCriticalException(msg, fatalException.getException());
+				throw new InfrastructureException(msg, fatalException.getException());
 			}
 
 			if (fatalException.hasException()) {
-				throw new BatchCriticalException("Encountered an error saving batch meta data.", fatalException
+				throw new InfrastructureException("Encountered an error saving batch meta data.", fatalException
 						.getException());
 			}
 

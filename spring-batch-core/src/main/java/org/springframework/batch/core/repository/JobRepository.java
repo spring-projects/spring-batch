@@ -61,10 +61,12 @@ public interface JobRepository {
 	 * @throws JobExecutionAlreadyRunningException if there is a
 	 * {@link JobExecution} alrady running for the job instance that would
 	 * otherwise be returned
+	 * @throws JobRestartException if more than one JobInstance if found or if
+	 * JobInstance.getJobExecutionCount() is greater than Job.getStartLimit()
 	 * 
 	 */
 	public JobExecution createJobExecution(Job job, JobParameters jobParameters)
-			throws JobExecutionAlreadyRunningException;
+			throws JobExecutionAlreadyRunningException, JobRestartException;
 
 	/**
 	 * Save or Update a {@link JobExecution}. If no ID is found a new instance

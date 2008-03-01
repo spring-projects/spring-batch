@@ -21,14 +21,14 @@ import org.springframework.batch.core.AbstractExceptionTests;
  * @author Dave Syer
  * 
  */
-public class BatchRestartExceptionTests extends AbstractExceptionTests {
+public class JobRestartExceptionTests extends AbstractExceptionTests {
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
 	public Exception getException(String msg) throws Exception {
-		return new BatchRestartException(msg);
+		return new JobRestartException(msg);
 	}
 
 	/*
@@ -37,7 +37,7 @@ public class BatchRestartExceptionTests extends AbstractExceptionTests {
 	 * java.lang.Throwable)
 	 */
 	public Exception getException(String msg, Throwable t) throws Exception {
-		return new BatchRestartException(msg, t);
+		return new JobRestartException(msg, t);
 	}
 
 }

@@ -21,7 +21,6 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.exception.BatchEnvironmentException;
 import org.springframework.batch.io.exception.FlatFileParsingException;
 import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
@@ -211,7 +210,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 			itemReader.open(executionContext);
 			fail("Expected BatchEnvironmentException");
 		}
-		catch (BatchEnvironmentException e) {
+		catch (StreamException e) {
 			// expected
 			assertEquals("foo", e.getCause().getMessage());
 		}

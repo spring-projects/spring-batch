@@ -39,7 +39,7 @@ import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -255,7 +255,7 @@ public class ItemOrientedStepTests extends TestCase {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected BatchCriticalException");
 		}
-		catch (BatchCriticalException e) {
+		catch (InfrastructureException e) {
 			assertEquals("foo", e.getCause().getMessage());
 		}
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
@@ -548,7 +548,7 @@ public class ItemOrientedStepTests extends TestCase {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected BatchCriticalException");
 		}
-		catch (BatchCriticalException ex) {
+		catch (InfrastructureException ex) {
 			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertTrue("Message does not contain ResetFailedException: " + msg, msg.contains("ResetFailedException"));
@@ -576,7 +576,7 @@ public class ItemOrientedStepTests extends TestCase {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected BatchCriticalException");
 		}
-		catch (BatchCriticalException ex) {
+		catch (InfrastructureException ex) {
 			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertEquals("", msg);
@@ -637,7 +637,7 @@ public class ItemOrientedStepTests extends TestCase {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected BatchCriticalException");
 		}
-		catch (BatchCriticalException ex) {
+		catch (InfrastructureException ex) {
 			// The job actually completeed, but teh streams couldn't be closed.
 			assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();

@@ -16,13 +16,13 @@
 
 package org.springframework.batch.core.domain;
 
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 
 /**
  * Exception to indicate the the job has been interrupted. The exception state
  * indicated is not normally recoverable by batch application clients, but
  * internally it is useful to force a check. The exception will often be wrapped
- * in a runtime exception (usually {@link BatchCriticalException} before
+ * in a runtime exception (usually {@link InfrastructureException} before
  * reaching the client.
  * 
  * @author Lucas Ward

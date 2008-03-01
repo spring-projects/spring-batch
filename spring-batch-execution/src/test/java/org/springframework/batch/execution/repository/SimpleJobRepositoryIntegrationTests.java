@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.repository.BatchRestartException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
@@ -108,7 +108,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 			jobRepository.createJobExecution(job, jobParameters);
 			fail();
 		}
-		catch (BatchRestartException e) {
+		catch (JobRestartException e) {
 			// expected
 		}
 	}

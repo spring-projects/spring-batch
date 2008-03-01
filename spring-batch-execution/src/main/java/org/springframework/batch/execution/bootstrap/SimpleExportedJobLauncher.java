@@ -25,6 +25,7 @@ import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.core.runtime.JobParametersFactory;
@@ -159,6 +160,9 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 			execution = launcher.run(job, jobParameters);
 		}
 		catch (JobExecutionAlreadyRunningException e) {
+			return e.getClass().getName() + ": " + e.getMessage();
+		}
+		catch (JobRestartException e) {
 			return e.getClass().getName() + ": " + e.getMessage();
 		}
 

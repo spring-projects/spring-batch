@@ -27,7 +27,7 @@ import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.listener.CompositeStepListener;
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
@@ -191,7 +191,7 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 		this.jobRepository = jobRepository;
 	}
 
-	public void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException {
+	public void execute(StepExecution stepExecution) throws JobInterruptedException, InfrastructureException {
 		stepExecution.setStartTime(new Date());
 		updateStatus(stepExecution, BatchStatus.STARTED);
 
@@ -230,7 +230,7 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 			if (e instanceof RuntimeException) {
 				throw (RuntimeException) e;
 			}
-			throw new BatchCriticalException(e);
+			throw new InfrastructureException(e);
 		}
 		finally {
 			stepExecution.setExitStatus(exitStatus);
@@ -244,7 +244,7 @@ public class TaskletStep implements Step, InitializingBean, BeanNameAware {
 			if (fatalException != null) {
 				logger.error("Encountered an error saving batch meta data."
 						+ "This job is now in an unknown state and should not be restarted.", fatalException);
-				throw new BatchCriticalException("Encountered an error saving batch meta data.", fatalException);
+				throw new InfrastructureException("Encountered an error saving batch meta data.", fatalException);
 			}
 		}
 

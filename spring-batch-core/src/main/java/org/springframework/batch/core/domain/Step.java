@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.domain;
 
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 
 /**
  * Batch domain interface representing the configuration of a step. As with the
@@ -57,9 +57,9 @@ public interface Step {
 	 * @param stepExecution an entity representing the step to be executed
 	 * 
 	 * @throws JobInterruptedException if the step is interrupted externally
-	 * @throws BatchCriticalException if there is a problem that needs to be
+	 * @throws InfrastructureException if there is a problem that needs to be
 	 * signalled to the caller
 	 */
-	void execute(StepExecution stepExecution) throws JobInterruptedException, BatchCriticalException;
+	void execute(StepExecution stepExecution) throws JobInterruptedException, InfrastructureException;
 
 }

@@ -15,7 +15,7 @@ import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
-import org.springframework.batch.io.exception.BatchCriticalException;
+import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.repeat.ExitStatus;
 
 public class TaskletStepTests extends TestCase {
@@ -89,7 +89,7 @@ public class TaskletStepTests extends TestCase {
 		try {
 			step.execute(stepExecution);
 			fail("Expected BatchCriticalException");
-		} catch (BatchCriticalException e){
+		} catch (InfrastructureException e){
 			assertEquals("foo", e.getCause().getMessage());
 		}
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
@@ -118,7 +118,7 @@ public class TaskletStepTests extends TestCase {
 		assertEquals(2, list.size());
 	}
 
-	public void testExceptionExecution() throws JobInterruptedException, BatchCriticalException {
+	public void testExceptionExecution() throws JobInterruptedException, InfrastructureException {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, true), new JobRepositorySupport());
 		try {
 			step.execute(stepExecution);

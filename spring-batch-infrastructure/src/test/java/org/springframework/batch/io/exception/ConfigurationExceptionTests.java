@@ -16,20 +16,20 @@
 
 package org.springframework.batch.io.exception;
 
-import org.springframework.batch.io.exception.BatchConfigurationException;
+import org.springframework.batch.io.exception.ConfigurationException;
 
-public class BatchConfigurationExceptionTests extends AbstractExceptionTests {
+public class ConfigurationExceptionTests extends AbstractExceptionTests {
 
 	public Exception getException(String msg) throws Exception {
-		return new BatchConfigurationException(msg);
+		return new ConfigurationException(msg);
 	}
 
 	public Exception getException(Throwable t) throws Exception {
-		return new BatchConfigurationException(t);
+		return new ConfigurationException(t);
 	}
 
 	public Exception getException(String msg, Throwable t) throws Exception {
-		return new BatchConfigurationException(msg, t);
+		return new ConfigurationException(msg, t);
 	}
 	
 }

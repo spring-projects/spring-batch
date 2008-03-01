@@ -19,7 +19,7 @@ package org.springframework.batch.io.file.transform;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.io.exception.BatchConfigurationException;
+import org.springframework.batch.io.exception.ConfigurationException;
 import org.springframework.util.StringUtils;
 
 /**
@@ -70,7 +70,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 */
 	public DelimitedLineTokenizer(char delimiter) {
 		if (delimiter == DEFAULT_QUOTE_CHARACTER) {
-			throw new BatchConfigurationException("'" + DEFAULT_QUOTE_CHARACTER
+			throw new ConfigurationException("'" + DEFAULT_QUOTE_CHARACTER
 					+ "' is not allowed as delimiter for tokenizers.");
 		}
 

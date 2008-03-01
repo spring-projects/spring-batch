@@ -25,8 +25,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
 
-import org.springframework.batch.io.exception.BatchCriticalException;
-import org.springframework.batch.io.exception.BatchEnvironmentException;
+import org.springframework.batch.io.exception.ConfigurationException;
+import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetCreator;
 import org.springframework.batch.io.file.transform.DelimitedLineAggregator;
@@ -258,7 +258,7 @@ public class FlatFileItemWriter implements ItemWriter, ItemStream,
 				pos = fileChannel.position();
 			}
 			catch (IOException e) {
-				throw new BatchCriticalException("An Error occured while trying to get filechannel position", e);
+				throw new InfrastructureException("An Error occured while trying to get filechannel position", e);
 			}
 
 			return pos;
@@ -308,7 +308,7 @@ public class FlatFileItemWriter implements ItemWriter, ItemStream,
 				fileChannel.close();
 			}
 			catch (IOException ioe) {
-				throw new BatchEnvironmentException("Unable to close the the ItemWriter", ioe);
+				throw new StreamException("Unable to close the the ItemWriter", ioe);
 			}
 		}
 
@@ -328,7 +328,7 @@ public class FlatFileItemWriter implements ItemWriter, ItemStream,
 				linesWritten++;
 			}
 			catch (IOException e) {
-				throw new BatchCriticalException("An Error occured while trying to write to FlatFileItemWriter", e);
+				throw new InfrastructureException("An Error occured while trying to write to FlatFileItemWriter", e);
 			}
 		}
 
@@ -341,7 +341,7 @@ public class FlatFileItemWriter implements ItemWriter, ItemStream,
 				fileChannel.position(lastMarkedByteOffsetPosition);
 			}
 			catch (IOException e) {
-				throw new BatchCriticalException("An Error occured while truncating output file", e);
+				throw new InfrastructureException("An Error occured while truncating output file", e);
 			}
 		}
 
@@ -375,7 +375,7 @@ public class FlatFileItemWriter implements ItemWriter, ItemStream,
 							file.delete();
 						}
 						else {
-							throw new BatchEnvironmentException("Resource already exists: " + resource);
+							throw new StreamException("Resource already exists: " + resource);
 						}
 					}
 					String parent = file.getParent();
@@ -395,7 +395,7 @@ public class FlatFileItemWriter implements ItemWriter, ItemStream,
 				fileChannel = (new FileOutputStream(file.getAbsolutePath(), true)).getChannel();
 			}
 			catch (FileNotFoundException fnfe) {
-				throw new BatchEnvironmentException("Bad filename property parameter " + file, fnfe);
+				throw new ConfigurationException("Bad filename property parameter " + file, fnfe);
 			}
 
 			outputBufferedWriter = getBufferedWriter(fileChannel, encoding, bufferSize);
@@ -429,7 +429,7 @@ public class FlatFileItemWriter implements ItemWriter, ItemStream,
 				return outputBufferedWriter;
 			}
 			catch (UnsupportedCharsetException ucse) {
-				throw new BatchEnvironmentException("Bad encoding configuration for output file " + fileChannel, ucse);
+				throw new StreamException("Bad encoding configuration for output file " + fileChannel, ucse);
 			}
 		}
 
@@ -441,7 +441,7 @@ public class FlatFileItemWriter implements ItemWriter, ItemStream,
 		 * truncates the file to that reset position, and set the cursor to
 		 * start writing at that point.
 		 */
-		public void reset() throws BatchCriticalException {
+		public void reset() throws InfrastructureException {
 			checkFileSize();
 			getOutputState().truncate();
 		}
@@ -460,11 +460,11 @@ public class FlatFileItemWriter implements ItemWriter, ItemStream,
 				size = fileChannel.size();
 			}
 			catch (IOException e) {
-				throw new BatchCriticalException("An Error occured while checking file size", e);
+				throw new InfrastructureException("An Error occured while checking file size", e);
 			}
 
 			if (size < lastMarkedByteOffsetPosition) {
-				throw new BatchCriticalException("Current file size is smaller than size at last commit");
+				throw new InfrastructureException("Current file size is smaller than size at last commit");
 			}
 		}
 
@@ -474,7 +474,7 @@ public class FlatFileItemWriter implements ItemWriter, ItemStream,
 		try {
 			getOutputState().reset();
 		}
-		catch (BatchCriticalException e) {
+		catch (InfrastructureException e) {
 			throw new ResetFailedException(e);
 		}
 	}
