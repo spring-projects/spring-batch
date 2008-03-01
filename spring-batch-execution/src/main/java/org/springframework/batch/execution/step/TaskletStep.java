@@ -50,6 +50,21 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 	private CompositeStepListener listener = new CompositeStepListener();
 
 	/**
+	 * Set the name property if it is not already set. Because of the order of
+	 * the callbacks in a Spring container the name property will be set first
+	 * if it is present. Care is needed with bean definition inheritance - if a
+	 * parent bean has a name, then its children need an explicit name as well,
+	 * otherwise they will not be unique.
+	 * 
+	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
+	 */
+	public void setBeanName(String name) {
+		if (this.name == null) {
+			this.name = name;
+		}
+	}
+
+	/**
 	 * Register each of the objects as listeners. The {@link TaskletStep}
 	 * accepts listeners of type {@link StepListener}. If the {@link Tasklet}
 	 * itself implements this interface it will be registered automatically, but

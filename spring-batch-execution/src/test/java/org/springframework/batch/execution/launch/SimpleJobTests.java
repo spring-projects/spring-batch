@@ -36,6 +36,7 @@ import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.execution.step.AbstractStep;
 import org.springframework.batch.execution.step.ItemOrientedStep;
+import org.springframework.batch.execution.step.support.SimpleStepFactoryBean;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
@@ -81,10 +82,19 @@ public class SimpleJobTests extends TestCase {
 	}
 	
 	private ItemOrientedStep getStep(String[] args) throws Exception {
-		ItemOrientedStep step = new ItemOrientedStep();
+		SimpleStepFactoryBean factory = new SimpleStepFactoryBean();
+		factory.setSingleton(false);
+
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
 		provider = new ListItemReader(items);
+		
+		factory.setItemReader(provider);
+		factory.setItemWriter(processor);
+		factory.setJobRepository(repository);
+		factory.setTransactionManager(new ResourcelessTransactionManager());
+		factory.setBeanName("stepName");
+		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
 //		step.setItemRecoverer(new ItemRecoverer() {
 //			public boolean recover(Object item, Throwable cause) {
 //				recovered.add(item);
@@ -92,12 +102,6 @@ public class SimpleJobTests extends TestCase {
 //				return true;
 //			}
 //		});
-		step.setItemReader(provider);
-		step.setItemWriter(processor);
-		step.setJobRepository(repository);
-		step.setTransactionManager(new ResourcelessTransactionManager());
-		step.setName("stepName");
-		step.afterPropertiesSet();
 		return step;
 	}
 
@@ -163,7 +167,6 @@ public class SimpleJobTests extends TestCase {
 			
 		}});
 		
-		step.afterPropertiesSet();
 		job.setSteps(Collections.singletonList(step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
@@ -184,7 +187,6 @@ public class SimpleJobTests extends TestCase {
 				throw new RuntimeException("Foo");
 			}
 		});
-		step.afterPropertiesSet();
 		job.setSteps(Collections.singletonList(step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());

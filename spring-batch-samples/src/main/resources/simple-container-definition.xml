@@ -95,7 +95,7 @@
 	</bean>
 
 	<bean id="simpleStep"
-		class="org.springframework.batch.execution.step.ItemOrientedStep"
+		class="org.springframework.batch.execution.step.support.SimpleStepFactoryBean"
 		abstract="true">
 		
 		<property name="transactionManager" ref="transactionManager" />

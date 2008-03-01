@@ -20,10 +20,11 @@
 	<bean id="test-job"
 		class="org.springframework.batch.execution.job.JobSupport">
 		<property name="steps">
-			<bean id="step1" class="org.springframework.batch.execution.step.ItemOrientedStep">
+			<bean id="step1" class="org.springframework.batch.execution.step.support.SimpleStepFactoryBean">
 				<property name="itemReader" ref="itemReader" />
 				<property name="itemWriter" ref="itemWriter" />
 				<property name="jobRepository" ref="jobRepository" />
+				<property name="transactionManager" ref="transactionManager"/>
 			</bean>
 		</property>
 	</bean>
@@ -39,6 +40,8 @@
 	<bean id="jobRepository"
 		class="org.springframework.batch.execution.step.support.JobRepositorySupport" />
 
+	<bean id="transactionManager"
+		class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
 
 	<bean id="test-job-with-name"
 		class="org.springframework.batch.execution.job.JobSupport">

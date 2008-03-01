@@ -37,7 +37,6 @@ import org.springframework.batch.execution.step.support.ThreadStepInterruptionPo
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemStream;
@@ -47,18 +46,14 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
-import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
-import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.util.Assert;
 
 /**
  * Simple implementation of executing the step as a set of chunks, each chunk
@@ -80,7 +75,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Ben Hale
  */
-public class ItemOrientedStep extends AbstractStep implements InitializingBean {
+public class ItemOrientedStep extends AbstractStep {
 
 	private static final Log logger = LogFactory.getLog(ItemOrientedStep.class);
 
@@ -93,25 +88,11 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	// default to checking current thread for interruption.
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
 
-	private RetryPolicy retryPolicy = null;
-
-	private RetryTemplate template = new RetryTemplate();
+	private RetryOperations retryOperations = new RetryTemplate();
 
 	private ItemReaderRetryCallback retryCallback;
 
-	private int commitInterval = 0;
-
 	private ListenerMulticaster listener = new ListenerMulticaster();
-
-	private ItemKeyGenerator itemKeyGenerator;
-
-	private ItemKeyGenerator defaultKeyGenerator = new ItemKeyGenerator() {
-		public Object getKey(Object item) {
-			return item;
-		}
-	};
-
-	private ExceptionHandler exceptionHandler;
 
 	private JobRepository jobRepository;
 
@@ -119,20 +100,54 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 
 	private ItemReader itemReader;
 
-	protected ItemWriter itemWriter;
+	private ItemWriter itemWriter;
 
 	private ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
 
 	/**
-	 * Public setter for the {@link ItemKeyGenerator}. If it is not injected
-	 * but the reader or writer implement {@link ItemKeyGenerator}, one of
-	 * those will be used instead (preferring the reader to the writer if both
-	 * would be appropriate).
-	 * 
-	 * @param itemKeyGenerator the {@link ItemKeyGenerator} to set
+	 * @param name
 	 */
-	public void setItemKeyGenerator(ItemKeyGenerator itemKeyGenerator) {
-		this.itemKeyGenerator = itemKeyGenerator;
+	public ItemOrientedStep(String name) {
+		super(name);
+	}
+
+	/**
+	 * Public setter for {@link JobRepository}.
+	 * 
+	 * @param jobRepository is a mandatory dependence (no default).
+	 */
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
+	}
+
+	/**
+	 * Public setter for the {@link PlatformTransactionManager}.
+	 * 
+	 * @param transactionManager the transaction manager to set
+	 */
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
+	}
+
+	/**
+	 * @param itemReader the itemReader to set
+	 */
+	public void setItemReader(ItemReader itemReader) {
+		this.itemReader = itemReader;
+	}
+
+	/**
+	 * @param itemWriter the itemWriter to set
+	 */
+	public void setItemWriter(ItemWriter itemWriter) {
+		this.itemWriter = itemWriter;
+	}
+
+	/**
+	 * @param itemSkipPolicy
+	 */
+	public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
+		this.itemSkipPolicy = itemSkipPolicy;
 	}
 
 	/**
@@ -169,10 +184,26 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	 * processing. should be set up by the caller through a factory. defaults to
 	 * a plain {@link RepeatTemplate}.
 	 * 
-	 * @param chunkoperations a {@link RepeatOperations} instance.
+	 * @param chunkOperations a {@link RepeatOperations} instance.
 	 */
-	public void setChunkOperations(RepeatOperations chunkoperations) {
-		this.chunkOperations = chunkoperations;
+	public void setChunkOperations(RepeatOperations chunkOperations) {
+		this.chunkOperations = chunkOperations;
+	}
+
+	/**
+	 * Public setter for the {@link RetryOperations}.
+	 * @param retryOperations the {@link RetryOperations} to set
+	 */
+	public void setRetryOperations(RetryOperations retryOperations) {
+		this.retryOperations = retryOperations;
+	}
+
+	/**
+	 * Public setter for the ItemReaderRetryCallback. TODO: get rid of this.
+	 * @param retryCallback the retryCallback to set
+	 */
+	public void setRetryCallback(ItemReaderRetryCallback retryCallback) {
+		this.retryCallback = retryCallback;
 	}
 
 	/**
@@ -194,66 +225,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	 */
 	public void setExceptionClassifier(ExitStatusExceptionClassifier exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
-	}
-
-	public void setCommitInterval(int commitInterval) {
-		this.commitInterval = commitInterval;
-	}
-
-	/**
-	 * Check mandatory properties (reader and writer).
-	 * 
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
-	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(itemReader, "ItemReader must be provided");
-		Assert.notNull(itemWriter, "ItemWriter must be provided");
-
-		applyConfiguration();
-	}
-
-	/**
-	 * Apply the configuration by inspecting it to see if it has any relevant
-	 * policy information.
-	 * 
-	 * @param step a step
-	 */
-	void applyConfiguration() {
-
-		ItemReaderRetryPolicy itemProviderRetryPolicy = new ItemReaderRetryPolicy(retryPolicy);
-		template.setRetryPolicy(itemProviderRetryPolicy);
-
-		itemKeyGenerator = getKeyGenerator();
-
-		if (retryPolicy != null) {
-			retryCallback = new ItemReaderRetryCallback(itemReader, itemKeyGenerator, itemWriter);
-		}
-
-		if (this.chunkOperations instanceof RepeatTemplate && commitInterval > 0) {
-			((RepeatTemplate) chunkOperations).setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
-		}
-
-		if (this.stepOperations instanceof RepeatTemplate && exceptionHandler != null) {
-			((RepeatTemplate) stepOperations).setExceptionHandler(exceptionHandler);
-		}
-
-	}
-
-	/**
-	 * @return
-	 */
-	private ItemKeyGenerator getKeyGenerator() {
-		if (itemKeyGenerator != null) {
-			return itemKeyGenerator;
-		}
-		if (itemReader instanceof ItemKeyGenerator) {
-			return (ItemKeyGenerator) itemReader;
-		}
-		if (itemWriter instanceof ItemKeyGenerator) {
-			return (ItemKeyGenerator) itemWriter;
-		}
-		return defaultKeyGenerator;
-
 	}
 
 	/**
@@ -604,7 +575,7 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			return ExitStatus.CONTINUABLE;
 		}
 
-		return new ExitStatus(template.execute(retryCallback) != null);
+		return new ExitStatus(retryOperations.execute(retryCallback) != null);
 
 	}
 
@@ -647,64 +618,6 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 			return e;
 		}
 
-	}
-
-	/**
-	 * Set the name property. Always overrides the default value if this object
-	 * is a Spring bean.
-	 * 
-	 * @see #setBeanName(java.lang.String)
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * Public setter for the {@link RetryPolicy}.
-	 * @param retryPolicy the {@link RetryPolicy} to set
-	 */
-	public void setRetryPolicy(RetryPolicy retryPolicy) {
-		this.retryPolicy = retryPolicy;
-	}
-
-	public void setExceptionHandler(ExceptionHandler exceptionHandler) {
-		this.exceptionHandler = exceptionHandler;
-	}
-
-	/**
-	 * Public setter for {@link JobRepository}.
-	 * 
-	 * @param jobRepository is a mandatory dependence (no default).
-	 */
-	public void setJobRepository(JobRepository jobRepository) {
-		this.jobRepository = jobRepository;
-	}
-
-	/**
-	 * Public setter for the {@link PlatformTransactionManager}.
-	 * 
-	 * @param transactionManager the transaction manager to set
-	 */
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
-		this.transactionManager = transactionManager;
-	}
-
-	/**
-	 * @param itemReader the itemReader to set
-	 */
-	public void setItemReader(ItemReader itemReader) {
-		this.itemReader = itemReader;
-	}
-
-	/**
-	 * @param itemWriter the itemWriter to set
-	 */
-	public void setItemWriter(ItemWriter itemWriter) {
-		this.itemWriter = itemWriter;
-	}
-
-	public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
-		this.itemSkipPolicy = itemSkipPolicy;
 	}
 
 	/**

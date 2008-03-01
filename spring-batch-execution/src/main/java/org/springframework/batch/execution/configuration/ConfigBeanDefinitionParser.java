@@ -24,9 +24,9 @@ import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.execution.repository.dao.JdbcJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.JdbcStepExecutionDao;
-import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.execution.step.TaskletStep;
 import org.springframework.batch.execution.step.support.LimitCheckingItemSkipPolicy;
+import org.springframework.batch.execution.step.support.SimpleStepFactoryBean;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
@@ -262,7 +262,7 @@ public class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 	}
 
 	private AbstractBeanDefinition createStepBeanDefinition(Element stepElement, ParserContext parserContext) {
-		RootBeanDefinition stepDef = new RootBeanDefinition(ItemOrientedStep.class);
+		RootBeanDefinition stepDef = new RootBeanDefinition(SimpleStepFactoryBean.class);
 		stepDef.setSource(parserContext.extractSource(stepElement));
 		MutablePropertyValues propertyValues = stepDef.getPropertyValues();
 

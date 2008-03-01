@@ -52,8 +52,6 @@ import org.springframework.batch.item.stream.ItemStreamSupport;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.exception.handler.DefaultExceptionHandler;
-import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.PropertiesConverter;
@@ -86,13 +84,11 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	private AbstractStep getStep(String[] strings) throws Exception {
-		ItemOrientedStep step = new ItemOrientedStep();
-		step.setName("stepName");
+		ItemOrientedStep step = new ItemOrientedStep("stepName");
 		step.setItemWriter(processor);
 		step.setItemReader(getReader(strings));
 		step.setJobRepository(new JobRepositorySupport());
 		step.setTransactionManager(transactionManager);
-		step.afterPropertiesSet();
 		return step;
 	}
 
@@ -320,18 +316,6 @@ public class ItemOrientedStepTests extends TestCase {
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
 
 		itemOrientedStep.execute(stepExecution);
-	}
-
-	public void testApplyConfigurationWithExceptionHandler() throws Exception {
-		final List list = new ArrayList();
-		itemOrientedStep.setStepOperations(new RepeatTemplate() {
-			public void setExceptionHandler(ExceptionHandler exceptionHandler) {
-				list.add(exceptionHandler);
-			}
-		});
-		itemOrientedStep.setExceptionHandler(new DefaultExceptionHandler());
-		itemOrientedStep.applyConfiguration();
-		assertEquals(1, list.size());
 	}
 
 	public void testStreamManager() throws Exception {

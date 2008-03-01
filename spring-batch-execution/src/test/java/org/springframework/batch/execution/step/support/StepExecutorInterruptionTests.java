@@ -61,8 +61,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao);
 
 		JobSupport jobConfiguration = new JobSupport();
-		step = new ItemOrientedStep();
-		step.setName("interruptedStep");
+		step = new ItemOrientedStep("interruptedStep");
 		jobConfiguration.addStep(step);
 		jobConfiguration.setBeanName("testJob");
 		jobRepository.createJobExecution(jobConfiguration, new JobParameters());
@@ -72,7 +71,6 @@ public class StepExecutorInterruptionTests extends TestCase {
 		step.setItemWriter(new AbstractItemWriter(){
 			public void write(Object item) throws Exception {
 			}});
-		step.afterPropertiesSet();
 	}
 
 

@@ -24,12 +24,6 @@
 				</property>
 			</bean-->
 			<bean id="infiniteStep" parent="simpleStep">
-				<property name="chunkOperations">
-					<bean class="org.springframework.batch.repeat.support.RepeatTemplate" />
-				</property>
-				<property name="interruptionPolicy">
-					<bean class="org.springframework.batch.sample.step.support.NoopStepInterruptionPolicy" />
-				</property>
 				<property name="itemReader">
 					<bean id="reader" class="org.springframework.batch.sample.item.reader.InfiniteItemReader" />
 				</property>

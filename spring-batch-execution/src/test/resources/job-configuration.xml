@@ -18,7 +18,7 @@
 		class="org.springframework.batch.execution.job.JobSupport">
 		<property name="steps">
 			<bean id="step1"
-				class="org.springframework.batch.execution.step.ItemOrientedStep">
+				class="org.springframework.batch.execution.step.support.SimpleStepFactoryBean">
 				<property name="itemReader">
 					<bean
 						class="org.springframework.batch.item.reader.ListItemReader">
