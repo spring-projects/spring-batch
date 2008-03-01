@@ -19,6 +19,7 @@ package org.springframework.batch.container.jms;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
@@ -48,16 +49,24 @@ public class BatchMessageListenerContainerTests extends TestCase {
 				return ExitStatus.CONTINUABLE; // means we can continue to operate, but no message is received
 			}
 		};
-		container = new BatchMessageListenerContainer(template);
+		container = getContainer(template);
 		boolean received = doExecute(null, null);
 		assertEquals(1, count);
 		assertFalse("Message received", received);
 	}
 
+	private BatchMessageListenerContainer getContainer(RepeatTemplate template) {
+		MockControl connectionFactoryControl = MockControl.createControl(ConnectionFactory.class);
+		ConnectionFactory connectionFactory = (ConnectionFactory) connectionFactoryControl.getMock();
+		BatchMessageListenerContainer container = new BatchMessageListenerContainer(template);
+		container.setConnectionFactory(connectionFactory);
+		return container;
+	}
+
 	public void testReceiveAndExecuteWithCallback() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		container = new BatchMessageListenerContainer(template);
+		container = getContainer(template);
 
 		MockControl sessionControl = MockControl.createNiceControl(Session.class);
 		MockControl consumerControl = MockControl.createControl(MessageConsumer.class);
@@ -87,7 +96,7 @@ public class BatchMessageListenerContainerTests extends TestCase {
 	public void testReceiveAndExecuteWithCallbackReturningNull() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		container = new BatchMessageListenerContainer(template);
+		container = getContainer(template);
 
 		MockControl sessionControl = MockControl.createNiceControl(Session.class);
 		MockControl consumerControl = MockControl.createControl(MessageConsumer.class);
@@ -114,7 +123,7 @@ public class BatchMessageListenerContainerTests extends TestCase {
 	public void testTransactionalReceiveAndExecuteWithCallbackThrowingException() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		container = new BatchMessageListenerContainer(template);
+		container = getContainer(template);
 		container.setSessionTransacted(true);
 		boolean received = doTestWithException(new IllegalStateException("No way!"), true, 2);
 		assertFalse("Message received", received);
@@ -123,7 +132,7 @@ public class BatchMessageListenerContainerTests extends TestCase {
 	public void testNonTransactionalReceiveAndExecuteWithCallbackThrowingException() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		container = new BatchMessageListenerContainer(template);
+		container = getContainer(template);
 		container.setSessionTransacted(false);
 		boolean received = doTestWithException(new IllegalStateException("No way!"), false, 2);
 		assertTrue("Message not received", received);
@@ -132,7 +141,7 @@ public class BatchMessageListenerContainerTests extends TestCase {
 	public void testNonTransactionalReceiveAndExecuteWithCallbackThrowingError() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		container = new BatchMessageListenerContainer(template);
+		container = getContainer(template);
 		container.setSessionTransacted(false);
 		try {
 			boolean received = doTestWithException(new RuntimeException("No way!"), false, 2);

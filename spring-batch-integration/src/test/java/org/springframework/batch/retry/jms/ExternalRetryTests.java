@@ -21,7 +21,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.item.KeyedItemReader;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.reader.AbstractItemReaderRecoverer;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
@@ -41,7 +41,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 	private RetryTemplate retryTemplate;
 
-	private KeyedItemReader provider;
+	private ItemReader provider;
 
 	private JdbcTemplate jdbcTemplate;
 

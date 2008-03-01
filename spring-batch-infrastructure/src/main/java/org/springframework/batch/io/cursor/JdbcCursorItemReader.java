@@ -30,8 +30,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemKeyGenerator;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
@@ -107,7 +108,7 @@ import org.springframework.util.StringUtils;
  * @author Lucas Ward
  * @author Peter Zozom
  */
-public class JdbcCursorItemReader implements KeyedItemReader, InitializingBean,
+public class JdbcCursorItemReader implements ItemReader, ItemKeyGenerator, InitializingBean,
 		ItemStream, Skippable {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);

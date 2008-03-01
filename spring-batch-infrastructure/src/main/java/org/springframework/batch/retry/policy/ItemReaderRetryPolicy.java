@@ -19,8 +19,9 @@ package org.springframework.batch.retry.policy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.FailedItemIdentifier;
+import org.springframework.batch.item.ItemKeyGenerator;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
-import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
@@ -32,11 +33,11 @@ import org.springframework.batch.retry.synch.RetrySynchronizationManager;
 import org.springframework.util.Assert;
 
 /**
- * A {@link RetryPolicy} that detects an {@link ItemReaderRetryCallback} when
- * it opens a new context, and uses it to make sure the item is in place for
- * later decisions about how to retry or backoff. The callback should be an
- * instance of {@link ItemReaderRetryCallback} otherwise an exception will be
- * thrown when the context is created.
+ * A {@link RetryPolicy} that detects an {@link ItemReaderRetryCallback} when it
+ * opens a new context, and uses it to make sure the item is in place for later
+ * decisions about how to retry or backoff. The callback should be an instance
+ * of {@link ItemReaderRetryCallback} otherwise an exception will be thrown when
+ * the context is created.
  * 
  * @author Dave Syer
  * 
@@ -45,9 +46,7 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	public static final String EXHAUSTED = ItemReaderRetryPolicy.class
-			.getName()
-			+ ".EXHAUSTED";
+	public static final String EXHAUSTED = ItemReaderRetryPolicy.class.getName() + ".EXHAUSTED";
 
 	private RetryPolicy delegate;
 
@@ -103,14 +102,12 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback)
 	 * 
-	 * @throws IllegalStateException
-	 *             if the callback is not of the required type.
+	 * @throws IllegalStateException if the callback is not of the required
+	 * type.
 	 */
 	public RetryContext open(RetryCallback callback) {
-		Assert.state(callback instanceof ItemReaderRetryCallback,
-				"Callback must be ItemProviderRetryCallback");
-		ItemReaderRetryContext context = new ItemReaderRetryContext(
-				(ItemReaderRetryCallback) callback);
+		Assert.state(callback instanceof ItemReaderRetryCallback, "Callback must be ItemProviderRetryCallback");
+		ItemReaderRetryContext context = new ItemReaderRetryContext((ItemReaderRetryCallback) callback);
 		context.open(callback);
 		return context;
 	}
@@ -120,10 +117,9 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * implemented by subclasses), and remove the current item from the history.
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#registerThrowable(org.springframework.batch.retry.RetryContext,
-	 *      java.lang.Throwable)
+	 * java.lang.Throwable)
 	 */
-	public void registerThrowable(RetryContext context, Throwable throwable)
-			throws TerminatedRetryException {
+	public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
 		((RetryPolicy) context).registerThrowable(context, throwable);
 		// The throwable is stored in the delegate context.
 	}
@@ -137,23 +133,25 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 		return ((RetryPolicy) context).handleRetryExhausted(context);
 	}
 
-	private class ItemReaderRetryContext extends RetryContextSupport
-			implements RetryPolicy {
+	private class ItemReaderRetryContext extends RetryContextSupport implements RetryPolicy {
 
 		private Object item;
 
 		// The delegate context...
 		private RetryContext delegateContext;
 
-		private KeyedItemReader reader;
+		private ItemReader reader;
 
 		private ItemRecoverer recoverer;
+
+		private ItemKeyGenerator keyGenerator;
 
 		public ItemReaderRetryContext(ItemReaderRetryCallback callback) {
 			super(RetrySynchronizationManager.getContext());
 			item = callback.next(this);
 			this.reader = callback.getReader();
 			this.recoverer = callback.getRecoverer();
+			this.keyGenerator = callback.getKeyGenerator();
 		}
 
 		public boolean canRetry(RetryContext context) {
@@ -165,9 +163,8 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 		}
 
 		public RetryContext open(RetryCallback callback) {
-			if (hasFailed(reader, item)) {
-				this.delegateContext = retryContextCache.get(reader
-						.getKey(item));
+			if (hasFailed(reader, keyGenerator, item)) {
+				this.delegateContext = retryContextCache.get(keyGenerator.getKey(item));
 			}
 			if (this.delegateContext == null) {
 				// Only create a new context if we don't know the history of
@@ -178,37 +175,31 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 			return null;
 		}
 
-		public void registerThrowable(RetryContext context, Throwable throwable)
-				throws TerminatedRetryException {
-			retryContextCache.put(reader.getKey(item), this.delegateContext);
+		public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
+			retryContextCache.put(keyGenerator.getKey(item), this.delegateContext);
 			delegate.registerThrowable(this.delegateContext, throwable);
 		}
 
 		public boolean isExternal() {
 			// Not called...
-			throw new UnsupportedOperationException(
-					"Not supported - this code should be unreachable.");
+			throw new UnsupportedOperationException("Not supported - this code should be unreachable.");
 		}
 
 		public boolean shouldRethrow(RetryContext context) {
 			// Not called...
-			throw new UnsupportedOperationException(
-					"Not supported - this code should be unreachable.");
+			throw new UnsupportedOperationException("Not supported - this code should be unreachable.");
 		}
 
-		public Object handleRetryExhausted(RetryContext context)
-				throws Exception {
+		public Object handleRetryExhausted(RetryContext context) throws Exception {
 			// If there is no going back, then we can remove the history
-			retryContextCache.remove(reader.getKey(item));
+			retryContextCache.remove(keyGenerator.getKey(item));
 			RepeatSynchronizationManager.setCompleteOnly();
 			if (recoverer != null) {
-				boolean success = recoverer.recover(item, context
-						.getLastThrowable());
+				boolean success = recoverer.recover(item, context.getLastThrowable());
 				if (!success) {
 					int count = context.getRetryCount();
-					logger.error(
-							"Could not recover from error after retry exhausted after ["
-							+ count + "] attempts.", context.getLastThrowable());
+					logger.error("Could not recover from error after retry exhausted after [" + count + "] attempts.",
+							context.getLastThrowable());
 				}
 			}
 			return item;
@@ -235,15 +226,16 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * decision is delegated to the provider. Otherwise we just check the cache
 	 * for the item key.
 	 * 
-	 * @param provider
+	 * @param reader
+	 * @param keyGenerator
 	 * @param item
 	 * @return
 	 */
-	protected boolean hasFailed(KeyedItemReader provider, Object item) {
-		if (provider instanceof FailedItemIdentifier) {
-			return ((FailedItemIdentifier) provider).hasFailed(item);
+	protected boolean hasFailed(ItemReader reader, ItemKeyGenerator keyGenerator, Object item) {
+		if (reader instanceof FailedItemIdentifier) {
+			return ((FailedItemIdentifier) reader).hasFailed(item);
 		}
-		return retryContextCache.containsKey(provider.getKey(item));
+		return retryContextCache.containsKey(keyGenerator.getKey(item));
 	}
 
 }

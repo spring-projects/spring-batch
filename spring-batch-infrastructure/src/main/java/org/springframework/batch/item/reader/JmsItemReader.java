@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.FailedItemIdentifier;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.KeyedItemReader;
+import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.exception.UnexpectedInputException;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsOperations;
@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class JmsItemReader extends AbstractItemReader implements KeyedItemReader, FailedItemIdentifier {
+public class JmsItemReader extends AbstractItemReader implements ItemKeyGenerator, FailedItemIdentifier {
 
 	protected Log logger = LogFactory.getLog(getClass());
 

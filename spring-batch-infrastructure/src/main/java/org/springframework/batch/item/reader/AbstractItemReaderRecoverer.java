@@ -16,14 +16,14 @@
 package org.springframework.batch.item.reader;
 
 import org.springframework.batch.item.ItemRecoverer;
-import org.springframework.batch.item.KeyedItemReader;
+import org.springframework.batch.item.ItemKeyGenerator;
 
 
 /**
  * @author Dave Syer
  *
  */
-public abstract class AbstractItemReaderRecoverer extends AbstractItemReader implements KeyedItemReader, ItemRecoverer {
+public abstract class AbstractItemReaderRecoverer extends AbstractItemReader implements ItemKeyGenerator, ItemRecoverer {
 	public Object getKey(Object item) {
 		return item;
 	}

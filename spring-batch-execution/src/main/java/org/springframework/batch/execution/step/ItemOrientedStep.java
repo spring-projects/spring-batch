@@ -35,11 +35,11 @@ import org.springframework.batch.execution.step.support.ThreadStepInterruptionPo
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.item.exception.CommitFailedException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
@@ -98,6 +98,26 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 	private int commitInterval = 0;
 
 	private ListenerMulticaster listener = new ListenerMulticaster();
+
+	private ItemKeyGenerator itemKeyGenerator;
+
+	private ItemKeyGenerator defaultKeyGenerator = new ItemKeyGenerator() {
+		public Object getKey(Object item) {
+			return item;
+		}
+	};
+
+	/**
+	 * Public setter for the {@link ItemKeyGenerator}. If it is not injected
+	 * but the reader or writer implement {@link ItemKeyGenerator}, one of
+	 * those will be used instead (preferring the reader to the writer if both
+	 * would be appropriate).
+	 * 
+	 * @param itemKeyGenerator the {@link ItemKeyGenerator} to set
+	 */
+	public void setItemKeyGenerator(ItemKeyGenerator itemKeyGenerator) {
+		this.itemKeyGenerator = itemKeyGenerator;
+	}
 
 	/**
 	 * Register each of the objects as listeners. The {@link ItemOrientedStep}
@@ -196,10 +216,10 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 		ItemReaderRetryPolicy itemProviderRetryPolicy = new ItemReaderRetryPolicy(retryPolicy);
 		template.setRetryPolicy(itemProviderRetryPolicy);
 
+		itemKeyGenerator = getKeyGenerator();
+
 		if (retryPolicy != null) {
-			Assert.state(itemReader instanceof KeyedItemReader,
-					"ItemReader must be instance of KeyedItemReader to use the retry policy");
-			retryCallback = new ItemReaderRetryCallback((KeyedItemReader) itemReader, itemWriter);
+			retryCallback = new ItemReaderRetryCallback(itemReader, itemKeyGenerator, itemWriter);
 		}
 
 		if (this.chunkOperations instanceof RepeatTemplate && commitInterval > 0) {
@@ -209,6 +229,23 @@ public class ItemOrientedStep extends AbstractStep implements InitializingBean {
 		if (this.stepOperations instanceof RepeatTemplate && exceptionHandler != null) {
 			((RepeatTemplate) stepOperations).setExceptionHandler(exceptionHandler);
 		}
+
+	}
+
+	/**
+	 * @return
+	 */
+	private ItemKeyGenerator getKeyGenerator() {
+		if (itemKeyGenerator != null) {
+			return itemKeyGenerator;
+		}
+		if (itemReader instanceof ItemKeyGenerator) {
+			return (ItemKeyGenerator) itemReader;
+		}
+		if (itemWriter instanceof ItemKeyGenerator) {
+			return (ItemKeyGenerator) itemWriter;
+		}
+		return defaultKeyGenerator;
 
 	}
 

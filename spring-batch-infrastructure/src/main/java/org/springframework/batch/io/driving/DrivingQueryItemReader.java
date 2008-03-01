@@ -19,8 +19,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemKeyGenerator;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -46,7 +47,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @since 1.0
  */
-public class DrivingQueryItemReader implements KeyedItemReader, InitializingBean,
+public class DrivingQueryItemReader implements ItemReader, ItemKeyGenerator, InitializingBean,
 		ItemStream {
 
 	private boolean initialized = false;

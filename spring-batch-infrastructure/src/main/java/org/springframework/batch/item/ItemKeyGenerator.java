@@ -22,7 +22,7 @@ package org.springframework.batch.item;
  * @author Dave Syer
  * 
  */
-public interface KeyedItemReader extends ItemReader {
+public interface ItemKeyGenerator {
 
 	/**
 	 * Get a unique identifier for the item that can be used to cache it between

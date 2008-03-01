@@ -18,7 +18,7 @@ package org.springframework.batch.item.reader;
 
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.KeyedItemReader;
+import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
  * 
  * @author Dave Syer
  */
-public class DelegatingItemReader extends AbstractItemReader implements Skippable, InitializingBean, KeyedItemReader {
+public class DelegatingItemReader extends AbstractItemReader implements Skippable, InitializingBean, ItemKeyGenerator {
 
 	private ItemReader itemReader;
 

@@ -18,10 +18,10 @@ package org.springframework.batch.retry.callback;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.KeyedItemReader;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
@@ -42,32 +42,56 @@ import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
  */
 public class ItemReaderRetryCallback implements RetryCallback {
 
-	private final static Log logger = LogFactory
-			.getLog(ItemReaderRetryCallback.class);
+	private final static Log logger = LogFactory.getLog(ItemReaderRetryCallback.class);
 
-	public static final String ITEM = ItemReaderRetryCallback.class.getName()
-			+ ".ITEM";
+	public static final String ITEM = ItemReaderRetryCallback.class.getName() + ".ITEM";
 
-	private KeyedItemReader provider;
+	private ItemReader reader;
 
 	private ItemWriter writer;
 
 	private ItemRecoverer recoverer;
 
-	public ItemReaderRetryCallback(KeyedItemReader provider,
-			ItemWriter writer) {
+	private ItemKeyGenerator keyGenerator;
+
+	private ItemKeyGenerator defaultKeyGenerator = new ItemKeyGenerator() {
+		public Object getKey(Object item) {
+			return item;
+		}
+	};
+
+	public ItemReaderRetryCallback(ItemReader reader, ItemWriter writer) {
+		this(reader, null, writer);
+	}
+
+	public ItemReaderRetryCallback(ItemReader reader, ItemKeyGenerator keyGenerator, ItemWriter writer) {
 		super();
-		this.provider = provider;
+		this.reader = reader;
 		this.writer = writer;
+		this.keyGenerator = keyGenerator;
 	}
 
 	/**
-	 * Setter for injecting optional recovery handler.
+	 * Setter for injecting optional recovery handler. If it is not injected but
+	 * the reader or writer implement {@link ItemRecoverer}, one of those will
+	 * be used instead (preferring the reader to the writer if both would be
+	 * appropriate).
 	 * 
 	 * @param recoveryHandler
 	 */
 	public void setRecoverer(ItemRecoverer recoverer) {
 		this.recoverer = recoverer;
+	}
+
+	/**
+	 * Public setter for the {@link ItemKeyGenerator}. If it is not injected
+	 * but the reader or writer implement {@link ItemKeyGenerator}, one of
+	 * those will be used instead (preferring the reader to the writer if both
+	 * would be appropriate).
+	 * @param keyGenerator the keyGenerator to set
+	 */
+	public void setKeyGenerator(ItemKeyGenerator keyGenerator) {
+		this.keyGenerator = keyGenerator;
 	}
 
 	public Object doWithRetry(RetryContext context) throws Throwable {
@@ -82,10 +106,10 @@ public class ItemReaderRetryCallback implements RetryCallback {
 		Object item = context.getAttribute(ITEM);
 		if (item == null) {
 			try {
-				item = provider.read();
-			} catch (Exception e) {
-				throw new ExhaustedRetryException(
-						"Unexpected end of item provider", e);
+				item = reader.read();
+			}
+			catch (Exception e) {
+				throw new ExhaustedRetryException("Unexpected end of item provider", e);
 			}
 			if (item == null) {
 				// This is probably not fatal: in a batch we want to
@@ -107,9 +131,31 @@ public class ItemReaderRetryCallback implements RetryCallback {
 	}
 
 	/**
-	 * Accessor for the {@link ItemRecoverer}. If the handler is null but
-	 * the {@link ItemReader} is an instanceof {@link ItemRecoverer},
-	 * then it will be returned instead.
+	 * Accessor for the {@link ItemRecoverer}. If the handler is null but the
+	 * {@link ItemReader} is an instance of {@link ItemRecoverer}, then it will
+	 * be returned instead. If none of those strategies works then a default
+	 * implementation of {@link ItemKeyGenerator} will be used that just returns
+	 * the item.
+	 * 
+	 * @return the {@link ItemRecoverer}.
+	 */
+	public ItemKeyGenerator getKeyGenerator() {
+		if (keyGenerator != null) {
+			return keyGenerator;
+		}
+		if (reader instanceof ItemKeyGenerator) {
+			return (ItemKeyGenerator) reader;
+		}
+		if (writer instanceof ItemKeyGenerator) {
+			return (ItemKeyGenerator) writer;
+		}
+		return defaultKeyGenerator;
+	}
+
+	/**
+	 * Accessor for the {@link ItemRecoverer}. If the handler is null but the
+	 * {@link ItemReader} is an instance of {@link ItemRecoverer}, then it will
+	 * be returned instead.
 	 * 
 	 * @return the {@link ItemRecoverer}.
 	 */
@@ -117,8 +163,11 @@ public class ItemReaderRetryCallback implements RetryCallback {
 		if (recoverer != null) {
 			return recoverer;
 		}
-		if (provider instanceof ItemRecoverer) {
-			return (ItemRecoverer) provider;
+		if (reader instanceof ItemRecoverer) {
+			return (ItemRecoverer) reader;
+		}
+		if (writer instanceof ItemRecoverer) {
+			return (ItemRecoverer) writer;
 		}
 		return null;
 	}
@@ -128,8 +177,8 @@ public class ItemReaderRetryCallback implements RetryCallback {
 	 * 
 	 * @return the {@link ItemReader} instance.
 	 */
-	public KeyedItemReader getReader() {
-		return provider;
+	public ItemReader getReader() {
+		return reader;
 	}
 
 }

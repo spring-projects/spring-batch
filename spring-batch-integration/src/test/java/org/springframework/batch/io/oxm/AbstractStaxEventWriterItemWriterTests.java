@@ -14,6 +14,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.springframework.batch.io.oxm.domain.Trade;
 import org.springframework.batch.io.xml.StaxEventItemWriter;
 import org.springframework.batch.io.xml.oxm.MarshallingEventWriterSerializer;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -58,6 +59,8 @@ public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 
 		MarshallingEventWriterSerializer mapper = new MarshallingEventWriterSerializer(getMarshaller());
 		writer.setSerializer(mapper);
+		
+		writer.open(new ExecutionContext());
 	}
 
 	protected void tearDown() throws Exception {
