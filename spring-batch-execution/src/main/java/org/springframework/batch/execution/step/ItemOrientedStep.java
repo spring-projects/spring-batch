@@ -19,17 +19,17 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.domain.BatchListener;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
-import org.springframework.batch.execution.step.support.ListenerMulticaster;
+import org.springframework.batch.execution.listener.CompositeStepListener;
 import org.springframework.batch.execution.step.support.NeverSkipItemSkipPolicy;
 import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
@@ -95,7 +95,7 @@ public class ItemOrientedStep extends AbstractStep {
 
 	private CompositeItemStream stream = new CompositeItemStream();
 
-	private ListenerMulticaster listener = new ListenerMulticaster();
+	private CompositeStepListener listener = new CompositeStepListener();
 
 	private JobRepository jobRepository;
 
@@ -166,25 +166,41 @@ public class ItemOrientedStep extends AbstractStep {
 	 */
 	public void setStreams(ItemStream[] streams) {
 		for (int i = 0; i < streams.length; i++) {
-			stream.register(streams[i]);
+			registerStream(streams[i]);
 		}
 	}
 
 	/**
-	 * Register each of the objects as listeners. The {@link ItemOrientedStep}
-	 * accepts listeners of type {@link BatchListener}. The {@link ItemReader}
-	 * and {@link ItemWriter} are automatically registered, but it doesn't hurt
-	 * to also register them here. Injected dependencies of the reader and
-	 * writer are not automatically registered, so if you implement
-	 * {@link ItemWriter} using delegation to another object which itself is a
-	 * {@link BatchListener}, you need to register the delegate here.
+	 * Register a single {@link ItemStream} for callbacks to the stream
+	 * interface.
+	 * @param stream
+	 */
+	public void registerStream(ItemStream stream) {
+		this.stream.register(stream);
+	}
+
+	/**
+	 * Register each of the objects as listeners. If the {@link Tasklet} itself
+	 * implements this interface it will be registered automatically, but its
+	 * injected dependencies will not be. This is a good way to get access to
+	 * job parameters and execution context if the tasklet is parameterised.
 	 * 
 	 * @param listeners an array of listener objects of known types.
 	 */
-	public void setListeners(BatchListener[] listeners) {
+	public void setStepListeners(StepListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
-			listener.register(listeners[i]);
+			registerStepListener(listeners[i]);
 		}
+	}
+
+	/**
+	 * Register a step listener for callbacks at the appropriate stages in a
+	 * step execution.
+	 * 
+	 * @param listener a {@link StepListener}
+	 */
+	public void registerStepListener(StepListener listener) {
+		this.listener.register(listener);
 	}
 
 	/**
@@ -314,9 +330,7 @@ public class ItemOrientedStep extends AbstractStep {
 					try {
 
 						itemReader.mark();
-						listener.beforeChunk();
 						result = processChunk(contribution);
-						listener.afterChunk();
 						contribution.incrementCommitCount();
 
 						// If the step operations are asynchronous then we need
@@ -481,14 +495,14 @@ public class ItemOrientedStep extends AbstractStep {
 		if (itemReader instanceof ItemStream) {
 			stream.register((ItemStream) itemReader);
 		}
-		if (itemReader instanceof BatchListener) {
-			listener.register((BatchListener) itemReader);
+		if (itemReader instanceof StepListener) {
+			listener.register((StepListener) itemReader);
 		}
 		if (itemWriter instanceof ItemStream) {
 			stream.register((ItemStream) itemWriter);
 		}
-		if (itemWriter instanceof BatchListener) {
-			listener.register((BatchListener) itemWriter);
+		if (itemWriter instanceof StepListener) {
+			listener.register((StepListener) itemWriter);
 		}
 	}
 
@@ -572,31 +586,11 @@ public class ItemOrientedStep extends AbstractStep {
 	private ExitStatus execute() throws Exception {
 
 		if (retryCallback == null) {
-			Object item = null;
-			try {
-				listener.beforeRead();
-				item = itemReader.read();
-				listener.afterRead(item);
-			}
-			catch (Exception ex) {
-				listener.onReadError(ex);
-				throw ex;
-			}
+			Object item = itemReader.read();
 			if (item == null) {
 				return ExitStatus.FINISHED;
 			}
-			try {
-				listener.beforeWrite(item);
-				itemWriter.write(item);
-				listener.afterWrite();
-			}
-			catch (Exception e) {
-
-				listener.onWriteError(e, item);
-				// Re-throw the exception so that the surrounding transaction
-				// rolls back if there is one
-				throw e;
-			}
+			itemWriter.write(item);
 			return ExitStatus.CONTINUABLE;
 		}
 

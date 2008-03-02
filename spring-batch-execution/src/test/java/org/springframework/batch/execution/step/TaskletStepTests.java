@@ -11,6 +11,7 @@ import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.job.JobSupport;
@@ -25,8 +26,8 @@ public class TaskletStepTests extends TestCase {
 	private List list = new ArrayList();
 
 	protected void setUp() throws Exception {
-		stepExecution = new StepExecution(new StepSupport("stepName"), new JobExecution(new JobInstance(
-				new Long(0L), new JobParameters(), new JobSupport("testJob")), new Long(12)));
+		stepExecution = new StepExecution(new StepSupport("stepName"), new JobExecution(new JobInstance(new Long(0L),
+				new JobParameters(), new JobSupport("testJob")), new Long(12)));
 	}
 
 	public void testTaskletMandatory() throws Exception {
@@ -89,7 +90,8 @@ public class TaskletStepTests extends TestCase {
 		try {
 			step.execute(stepExecution);
 			fail("Expected BatchCriticalException");
-		} catch (InfrastructureException e){
+		}
+		catch (InfrastructureException e) {
 			assertEquals("foo", e.getCause().getMessage());
 		}
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
@@ -105,15 +107,16 @@ public class TaskletStepTests extends TestCase {
 
 	public void testSuccessfulExecutionWithListener() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, false), new JobRepositorySupport());
-		step.setListener(new StepListenerSupport() {
+		step.setStepListeners(new StepListener[] { new StepListenerSupport() {
 			public void beforeStep(StepExecution context) {
 				list.add("open");
 			}
+
 			public ExitStatus afterStep() {
 				list.add("close");
 				return ExitStatus.CONTINUABLE;
 			}
-		});
+		} });
 		step.execute(stepExecution);
 		assertEquals(2, list.size());
 	}
@@ -138,13 +141,13 @@ public class TaskletStepTests extends TestCase {
 		private final boolean throwException;
 
 		private final boolean assertStepContext;
-		
+
 		private StepExecution stepExecution;
 
 		public StubTasklet(boolean exitFailure, boolean throwException) {
 			this(exitFailure, throwException, false);
 		}
-		
+
 		public StubTasklet(boolean exitFailure, boolean throwException, boolean assertStepContext) {
 			this.exitFailure = exitFailure;
 			this.throwException = throwException;
@@ -159,14 +162,14 @@ public class TaskletStepTests extends TestCase {
 			if (exitFailure) {
 				return ExitStatus.FAILED;
 			}
-			
+
 			if (assertStepContext) {
 				assertNotNull(this.stepExecution);
 			}
 
 			return ExitStatus.FINISHED;
 		}
-		
+
 		public void beforeStep(StepExecution stepExecution) {
 			this.stepExecution = stepExecution;
 		}

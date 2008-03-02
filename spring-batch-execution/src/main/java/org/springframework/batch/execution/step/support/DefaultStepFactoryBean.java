@@ -17,8 +17,16 @@ package org.springframework.batch.execution.step.support;
 
 import org.springframework.batch.core.domain.BatchListener;
 import org.springframework.batch.core.domain.Step;
+import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.execution.step.ItemOrientedStep;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.reader.DelegatingItemReader;
+import org.springframework.batch.item.writer.DelegatingItemWriter;
+import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
+import org.springframework.batch.repeat.listener.RepeatListenerSupport;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.core.task.TaskExecutor;
@@ -34,6 +42,8 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 	private boolean alwaysSkip = false;
 
 	private BatchListener[] listeners = new BatchListener[0];
+
+	private ListenerMulticaster listener = new ListenerMulticaster();
 
 	private TaskExecutor taskExecutor;
 
@@ -59,7 +69,7 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 	public void setListeners(BatchListener[] listeners) {
 		this.listeners = listeners;
 	}
-	
+
 	/**
 	 * Public setter for the {@link TaskExecutor}. If this is set, then it will
 	 * be used to execute the chunk processing inside the {@link Step}.
@@ -77,9 +87,74 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 	protected void applyConfiguration(ItemOrientedStep step) {
 
 		super.applyConfiguration(step);
-		step.setListeners(listeners);
+		for (int i = 0; i < listeners.length; i++) {
+			BatchListener listener = listeners[i];
+			if (listener instanceof StepListener) {
+				step.registerStepListener((StepListener) listener);
+			}
+			else {
+				this.listener.register(listener);
+			}
+		}
+
+		ItemReader itemReader = getItemReader();
+		ItemWriter itemWriter = getItemWriter();
+
+		// Since we are going to wrap these things with listener callbacks we
+		// need to register them here because the step will not know we did
+		// that.
+		if (itemReader instanceof ItemStream) {
+			step.registerStream((ItemStream) itemReader);
+		}
+		if (itemReader instanceof StepListener) {
+			step.registerStepListener((StepListener) itemReader);
+		}
+		if (itemWriter instanceof ItemStream) {
+			step.registerStream((ItemStream) itemWriter);
+		}
+		if (itemWriter instanceof StepListener) {
+			step.registerStepListener((StepListener) itemWriter);
+		}
+
+		step.setItemReader(new DelegatingItemReader(itemReader) {
+			public Object read() throws Exception {
+				try {
+					listener.beforeRead();
+					Object item = super.read();
+					listener.afterRead(item);
+					return item;
+				}
+				catch (Exception e) {
+					listener.onReadError(e);
+					throw e;
+				}
+			}
+		});
+
+		step.setItemWriter(new DelegatingItemWriter(itemWriter) {
+			public void write(Object item) throws Exception {
+				try {
+					listener.beforeWrite(item);
+					super.write(item);
+					listener.afterWrite();
+				}
+				catch (Exception e) {
+					listener.onWriteError(e, item);
+					throw e;
+				}
+			}
+		});
 
 		RepeatTemplate stepOperations = new RepeatTemplate();
+		stepOperations.setListener(new RepeatListenerSupport() {
+			public void open(RepeatContext context) {
+				listener.beforeChunk();
+			}
+
+			public void close(RepeatContext context) {
+				listener.afterChunk();
+			}
+		});
 
 		if (taskExecutor != null) {
 			TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();

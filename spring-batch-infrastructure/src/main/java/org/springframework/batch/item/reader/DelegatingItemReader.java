@@ -31,6 +31,21 @@ import org.springframework.util.Assert;
 public class DelegatingItemReader extends AbstractItemReader implements Skippable, InitializingBean {
 
 	private ItemReader itemReader;
+	
+	/**
+	 * Default constructor.
+	 */
+	public DelegatingItemReader() {
+		super();
+	}
+
+	/**
+	 * Convenience constructor for setting mandatory property.
+	 */
+	public DelegatingItemReader(ItemReader itemReader) {
+		this();
+		this.itemReader = itemReader;
+	}
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(itemReader, "ItemReader must not be null.");

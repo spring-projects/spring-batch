@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.execution.launch;
+package org.springframework.batch.execution.step.support;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,8 +36,7 @@ import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.execution.step.AbstractStep;
 import org.springframework.batch.execution.step.ItemOrientedStep;
-import org.springframework.batch.execution.step.support.AbstractStepFactoryBean;
-import org.springframework.batch.execution.step.support.SimpleStepFactoryBean;
+import org.springframework.batch.execution.step.support.DefaultStepFactoryBean;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
@@ -48,11 +47,12 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
-public class SimpleJobTests extends TestCase {
+public class DefaultStepFactoryBeanTests extends TestCase {
 
 	private List recovered = new ArrayList();
 
-	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(), new MapStepExecutionDao());
+	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
+			new MapStepExecutionDao());
 
 	private List processed = new ArrayList();
 
@@ -74,45 +74,44 @@ public class SimpleJobTests extends TestCase {
 		MapStepExecutionDao.clear();
 	}
 
-	private AbstractStep getStep(String arg) throws Exception {
+	private DefaultStepFactoryBean getStep(String arg) throws Exception {
 		return getStep(new String[] { arg });
 	}
 
-	private AbstractStep getStep(String arg0, String arg1) throws Exception {
+	private DefaultStepFactoryBean getStep(String arg0, String arg1) throws Exception {
 		return getStep(new String[] { arg0, arg1 });
 	}
-	
-	private ItemOrientedStep getStep(String[] args) throws Exception {
-		AbstractStepFactoryBean factory = new SimpleStepFactoryBean();
+
+	private DefaultStepFactoryBean getStep(String[] args) throws Exception {
+		DefaultStepFactoryBean factory = new DefaultStepFactoryBean();
 		factory.setSingleton(false);
 
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
 		provider = new ListItemReader(items);
-		
+
 		factory.setItemReader(provider);
 		factory.setItemWriter(processor);
 		factory.setJobRepository(repository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setBeanName("stepName");
-		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
-//		step.setItemRecoverer(new ItemRecoverer() {
-//			public boolean recover(Object item, Throwable cause) {
-//				recovered.add(item);
-//				assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
-//				return true;
-//			}
-//		});
-		return step;
+		// step.setItemRecoverer(new ItemRecoverer() {
+		// public boolean recover(Object item, Throwable cause) {
+		// recovered.add(item);
+		// assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
+		// return true;
+		// }
+		// });
+		return factory;
 	}
 
 	public void testSimpleJob() throws Exception {
 
 		job.setSteps(new ArrayList());
-		AbstractStep step = getStep("foo", "bar");
+		AbstractStep step = (AbstractStep) getStep("foo", "bar").getObject();
 		step.setName("step1");
 		job.addStep(step);
-		step = getStep("spam");
+		step = (AbstractStep) getStep("spam").getObject();
 		step.setName("step2");
 		job.addStep(step);
 
@@ -126,7 +125,7 @@ public class SimpleJobTests extends TestCase {
 		assertTrue(processed.contains("foo"));
 	}
 
-	public void testSimpleJobWithRecovery() throws Exception {
+	public void testSimpleJobWithItemListeners() throws Exception {
 
 		final List throwables = new ArrayList();
 
@@ -144,30 +143,25 @@ public class SimpleJobTests extends TestCase {
 		 * is recovered ("skipped") on the second attempt (see retry policy
 		 * definition above)...
 		 */
-		ItemOrientedStep step = getStep(new String[] { "foo", "bar", "spam" });
-		
-		
-//		Tasklet module = getTasklet(new String[] { "foo", "bar", "spam" });
-//		RepeatOperationsStep step = new RepeatOperationsStep();
-		step.setChunkOperations(chunkOperations);
-		step.setItemWriter(new AbstractItemWriter() {
+		DefaultStepFactoryBean factory = getStep(new String[] { "foo", "bar", "spam" });
+
+		factory.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
 				throw new RuntimeException("Error!");
 			}
 		});
-		
-		step.setListeners(new BatchListener[]{new ItemListenerSupport(){
-
+		factory.setListeners(new BatchListener[] { new ItemListenerSupport() {
 			public void onReadError(Exception ex) {
 				recovered.add(ex);
 			}
-
 			public void onWriteError(Exception ex, Object item) {
 				recovered.add(ex);
 			}
-			
-		}});
-		
+		} });
+
+		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+		step.setChunkOperations(chunkOperations);
+
 		job.setSteps(Collections.singletonList(step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
@@ -179,9 +173,11 @@ public class SimpleJobTests extends TestCase {
 		assertEquals(null, provider.read());
 		assertEquals(3, recovered.size());
 	}
+	
+	// TODO: test recovery and stateful retry 
 
 	public void testExceptionTerminates() throws Exception {
-		ItemOrientedStep step = getStep(new String[] { "foo", "bar", "spam" });
+		ItemOrientedStep step = (ItemOrientedStep) getStep(new String[] { "foo", "bar", "spam" }).getObject();
 		step.setName("exceptionStep");
 		step.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
@@ -201,5 +197,5 @@ public class SimpleJobTests extends TestCase {
 		}
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 	}
-	
+
 }

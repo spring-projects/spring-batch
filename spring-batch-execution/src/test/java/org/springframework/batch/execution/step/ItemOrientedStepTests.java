@@ -22,7 +22,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.BatchListener;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
@@ -358,7 +357,7 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testDirectlyInjectedListener() throws Exception {
-		itemOrientedStep.setListeners(new BatchListener[] {new StepListenerSupport() {
+		itemOrientedStep.registerStepListener(new StepListenerSupport() {
 			public void beforeStep(StepExecution stepExecution) {
 				list.add("foo");
 			}
@@ -366,7 +365,7 @@ public class ItemOrientedStepTests extends TestCase {
 				list.add("bar");
 				return null;
 			}
-		}});
+		});
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
 		itemOrientedStep.execute(stepExecution);
@@ -374,26 +373,28 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testListenerCalledBeforeStreamOpened() throws Exception {
-		itemOrientedStep.setListeners(new BatchListener[] {new MockRestartableItemReader() {
+		MockRestartableItemReader reader = new MockRestartableItemReader() {
 			public void beforeStep(StepExecution stepExecution) {
 				list.add("foo");
 			}
 			public void open(ExecutionContext executionContext) throws StreamException {
 				assertEquals(1, list.size());
 			}
-		}});
+		};
+		itemOrientedStep.setStreams(new ItemStream[] {reader});
+		itemOrientedStep.registerStepListener(reader);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, new JobExecution(jobInstance));
 		itemOrientedStep.execute(stepExecution);
 		assertEquals(1, list.size());
 	}
 
 	public void testDirectlyInjectedListenerOnError() throws Exception {
-		itemOrientedStep.setListeners(new StepListener[] {new StepListenerSupport() {
+		itemOrientedStep.registerStepListener(new StepListenerSupport() {
 			public ExitStatus onErrorInStep(Throwable e) {
 				list.add(e);
 				return null;
 			}
-		}});
+		});
 		itemOrientedStep.setItemReader(new MockRestartableItemReader() {
 			public Object read() throws Exception {
 				throw new RuntimeException("FOO");

@@ -17,13 +17,28 @@ public class DelegatingItemWriter implements ItemWriter, InitializingBean {
 	private ItemWriter writer;
 	
 	/**
+	 * Default constructor.
+	 */
+	public DelegatingItemWriter() {
+		super();
+	}
+	
+	/**
+	 * @param itemWriter
+	 */
+	public DelegatingItemWriter(ItemWriter itemWriter) {
+		this();
+		this.writer = itemWriter;
+	}
+
+	/**
 	 * Calls {@link #doProcess(Object)} and then writes the result to the
 	 * delegate {@link ItemWriter}.
 	 * @throws Exception 
 	 * 
 	 * @see ItemWriter#process(java.lang.Object)
 	 */
-	final public void write(Object item) throws Exception {
+	public void write(Object item) throws Exception {
 		Object result = doProcess(item);
 		writer.write(result);
 	}
