@@ -14,13 +14,8 @@
 	<bean id="tradeJob" parent="simpleJob">
 		<property name="steps">
 			<list>
-				<bean id="step1" parent="simpleStep"
-					class="org.springframework.batch.execution.step.support.KitchenSinkStepFactoryBean">
-					<property name="exceptionHandler">
-						<bean
-							class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler"
-							p:limit="5" />
-					</property>
+				<bean id="step1" parent="defaultStep">
+					<property name="alwaysSkip" value="true" />
 					<property name="listeners" ref="fileInputTemplate" />
 					<property name="itemReader">
 						<bean

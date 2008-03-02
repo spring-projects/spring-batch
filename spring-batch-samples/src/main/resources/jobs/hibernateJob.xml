@@ -15,25 +15,11 @@
 		<!-- set restartable=false so that this job can be used by more than one test -->
 		<property name="restartable" value="false" />
 		<property name="steps">
-			<bean id="step1" parent="defaultStep"
-				class="org.springframework.batch.execution.step.support.KitchenSinkStepFactoryBean">
+			<bean id="step1" parent="defaultStep">
+				<property name="alwaysSkip" value="true" />
 				<property name="itemReader" ref="hibernateItemReader" />
 				<property name="itemWriter" ref="hibernateOutputSource" />
 				<property name="commitInterval" value="3" />
-
-				<property name="exceptionHandler">
-					<bean
-						class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler">
-						<property name="limit" value="5" />
-						<property name="useParent" value="true" />
-					</bean>
-				</property>
-
-				<property name="itemSkipPolicy">
-					<bean
-						class="org.springframework.batch.execution.step.support.AlwaysSkipItemSkipPolicy" />
-				</property>
-
 			</bean>
 		</property>
 	</bean>

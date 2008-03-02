@@ -45,12 +45,20 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * Set this flag to true if you want to count exceptions for the whole
 	 * (outer) loop in a typical container.
 	 * 
-	 * @param useParent
-	 *            true if the parent context should be used to store the
-	 *            counters.
+	 * @param useParent true if the parent context should be used to store the
+	 * counters.
 	 */
 	public void setUseParent(boolean useParent) {
 		delegate.setUseParent(useParent);
+	}
+
+	/**
+	 * Convenience constructor for the {@link SimpleLimitExceptionHandler} to
+	 * set the limit.
+	 */
+	public SimpleLimitExceptionHandler(int limit) {
+		this();
+		setLimit(limit);
 	}
 
 	/**
@@ -76,10 +84,9 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * @see #setLimit(int)
 	 * 
 	 * @see org.springframework.batch.repeat.exception.handler.ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
-	 *      Throwable)
+	 * Throwable)
 	 */
-	public void handleException(RepeatContext context, Throwable throwable)
-			throws RuntimeException {
+	public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
 		delegate.handleException(context, throwable);
 	}
 
