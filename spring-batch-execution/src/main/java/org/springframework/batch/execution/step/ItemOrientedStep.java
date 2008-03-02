@@ -180,10 +180,11 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Register each of the objects as listeners. If the {@link Tasklet} itself
-	 * implements this interface it will be registered automatically, but its
-	 * injected dependencies will not be. This is a good way to get access to
-	 * job parameters and execution context if the tasklet is parameterised.
+	 * Register each of the objects as listeners. If the {@link ItemReader} or
+	 * {@link ItemWriter} themselves implements this interface they will be
+	 * registered automatically, but their injected dependencies will not be.
+	 * This is a good way to get access to job parameters and execution context
+	 * if the tasklet is parameterised.
 	 * 
 	 * @param listeners an array of listener objects of known types.
 	 */
