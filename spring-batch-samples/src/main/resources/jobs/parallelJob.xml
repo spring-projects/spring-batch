@@ -12,10 +12,10 @@
 	<bean id="parallelJob" parent="simpleJob">
 		<property name="steps">
 			<list>
-				<bean id="staging" parent="simpleStep">
+				<bean id="staging" parent="defaultStep">
 					<property name="commitInterval" value="2" />
 					<property name="startLimit" value="100" />
-					<property name="listeners" ref="fileInputTemplate"/>
+					<property name="listeners" ref="fileInputTemplate" />
 					<property name="itemReader">
 						<bean
 							class="org.springframework.batch.item.reader.ValidatingItemReader">
@@ -41,15 +41,10 @@
 						</bean>
 					</property>
 				</bean>
-				<bean id="loading" parent="simpleStep">
-					<property name="stepOperations">
+				<bean id="loading" parent="simpleStep" class="org.springframework.batch.execution.step.support.KitchenSinkStepFactoryBean">
+					<property name="taskExecutor">
 						<bean
-							class="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate">
-							<property name="taskExecutor">
-								<bean
-									class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
-							</property>
-						</bean>
+							class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
 					</property>
 					<property name="itemReader">
 						<bean

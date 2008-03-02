@@ -16,16 +16,18 @@
 package org.springframework.batch.execution.step.support;
 
 import org.springframework.batch.core.domain.ItemSkipPolicy;
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.item.ItemKeyGenerator;
-import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
 import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * @author Dave Syer
@@ -39,9 +41,9 @@ public class KitchenSinkStepFactoryBean extends AbstractStepFactoryBean {
 
 	private ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
 
-	private RepeatOperations stepOperations = new RepeatTemplate();
+	private TaskExecutor taskExecutor;
 
-	private RetryPolicy retryPolicy = null;
+	private RetryPolicy retryPolicy;
 
 	private ExceptionHandler exceptionHandler;
 
@@ -71,11 +73,13 @@ public class KitchenSinkStepFactoryBean extends AbstractStepFactoryBean {
 	}
 
 	/**
-	 * Public setter for the RepeatOperations.
-	 * @param stepOperations the stepOperations to set
+	 * Public setter for the {@link TaskExecutor}. If this is set, then it will
+	 * be used to execute the chunk processing inside the {@link Step}.
+	 * 
+	 * @param taskExecutor the taskExecutor to set
 	 */
-	public void setStepOperations(RepeatOperations stepOperations) {
-		this.stepOperations = stepOperations;
+	public void setTaskExecutor(TaskExecutor taskExecutor) {
+		this.taskExecutor = taskExecutor;
 	}
 
 	/**
@@ -111,9 +115,9 @@ public class KitchenSinkStepFactoryBean extends AbstractStepFactoryBean {
 	 * 
 	 */
 	protected void applyConfiguration(ItemOrientedStep step) {
-		
+
 		super.applyConfiguration(step);
-		
+
 		step.setListeners(listeners);
 		step.setItemSkipPolicy(itemSkipPolicy);
 
@@ -133,7 +137,15 @@ public class KitchenSinkStepFactoryBean extends AbstractStepFactoryBean {
 			step.setChunkOperations(chunkOperations);
 		}
 
-		if (exceptionHandler != null && stepOperations instanceof RepeatTemplate) {
+		RepeatTemplate stepOperations = new RepeatTemplate();
+
+		if (taskExecutor != null) {
+			TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
+			repeatTemplate.setTaskExecutor(taskExecutor);
+			stepOperations = repeatTemplate;
+		}
+
+		if (exceptionHandler != null) {
 			((RepeatTemplate) stepOperations).setExceptionHandler(exceptionHandler);
 			step.setStepOperations(stepOperations);
 		}

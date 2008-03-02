@@ -11,7 +11,7 @@
 
 	<bean id="restartSampleJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="simpleStep">
+			<bean id="step1" parent="defaultStep">
 				<property name="listeners" ref="fileItemReader"/>
 				<property name="itemReader">
 					<bean
@@ -28,11 +28,6 @@
 					</bean>
 				</property>
 				<property name="commitInterval" value="2" />
-				<property name="exceptionHandler">
-					<bean class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler">
-						<property name="limit" value="0"/>
-					</bean>
-				</property>
 			</bean>
 		</property>
 	</bean>

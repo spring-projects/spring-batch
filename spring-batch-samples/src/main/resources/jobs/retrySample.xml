@@ -11,15 +11,22 @@
 
 	<bean id="retrySample" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="simpleStep">
+			<bean id="step1" parent="simpleStep"
+				class="org.springframework.batch.execution.step.support.KitchenSinkStepFactoryBean">
 				<property name="itemReader" ref="itemGenerator" />
 				<property name="itemWriter" ref="itemWriter" />
 				<property name="retryPolicy">
 					<bean
 						class="org.springframework.batch.retry.policy.SimpleRetryPolicy">
 						<property name="maxAttempts" value="3" />
-						<property name="retryableExceptionClasses" value="java.lang.Exception" />
+						<property name="retryableExceptionClasses"
+							value="java.lang.Exception" />
 					</bean>
+				</property>
+				<property name="exceptionHandler">
+					<bean
+						class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler"
+						p:limit="5" />
 				</property>
 			</bean>
 		</property>
@@ -30,7 +37,8 @@
 		<property name="limit" value="10" />
 	</bean>
 
-	<bean id="itemGenerator" parent="testGenerator" autowire-candidate="false"/>
+	<bean id="itemGenerator" parent="testGenerator"
+		autowire-candidate="false" />
 
 	<bean id="itemWriter"
 		class="org.springframework.batch.sample.item.writer.RetrySampleItemWriter" />

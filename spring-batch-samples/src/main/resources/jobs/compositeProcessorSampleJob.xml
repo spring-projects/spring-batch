@@ -11,7 +11,7 @@
 
 	<bean id="compositeProcessorJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="simpleStep">
+			<bean id="step1" parent="defaultStep">
 				<property name="listeners" ref="fileInputTemplate" />
 				<property name="itemReader">
 					<bean

@@ -68,7 +68,7 @@
 
 	<bean id="mapJobInstanceDao" lazy-init="true"
 		class="org.springframework.batch.execution.repository.dao.MapJobInstanceDao" />
-		
+
 	<bean id="mapJobExecutionDao" lazy-init="true"
 		class="org.springframework.batch.execution.repository.dao.MapJobExecutionDao" />
 
@@ -95,24 +95,17 @@
 	</bean>
 
 	<bean id="simpleStep"
-		class="org.springframework.batch.execution.step.support.KitchenSinkStepFactoryBean"
+		class="org.springframework.batch.execution.step.support.SimpleStepFactoryBean"
 		abstract="true">
-		
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
-		<property name="startLimit" value="100"/>
-
-		<property name="exceptionHandler">
-			<bean
-				class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler">
-				<property name="limit" value="5" />
-				<property name="useParent" value="true" />
-			</bean>
-		</property>
-
+		<property name="startLimit" value="100" />
 		<property name="commitInterval" value="1" />
-
 	</bean>
+
+	<bean id="defaultStep" parent="simpleStep"
+		class="org.springframework.batch.execution.step.support.DefaultStepFactoryBean"
+		abstract="true" />
 
 	<bean id="customEditorConfigurer"
 		class="org.springframework.beans.factory.config.CustomEditorConfigurer">
@@ -161,7 +154,7 @@
 			<aop:after
 				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
 				method="after" />
-			<aop:after-throwing throwing="t" 
+			<aop:after-throwing throwing="t"
 				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
 				method="onError" />
 		</aop:aspect>
