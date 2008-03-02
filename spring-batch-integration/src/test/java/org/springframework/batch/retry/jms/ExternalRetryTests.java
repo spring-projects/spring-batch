@@ -22,7 +22,8 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.reader.AbstractItemReaderRecoverer;
+import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
 import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
@@ -68,7 +69,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		getMessages(); // drain queue
 		jdbcTemplate.execute("delete from T_FOOS");
 		jmsTemplate.convertAndSend("queue", "foo");
-		provider = new AbstractItemReaderRecoverer() {
+		provider = new ItemReaderRecoverer() {
 			public Object read() {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
@@ -230,4 +231,9 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		}
 		return msgs;
 	}
+	
+	private abstract class ItemReaderRecoverer extends AbstractItemReader implements ItemRecoverer {
+
+	}	
+
 }

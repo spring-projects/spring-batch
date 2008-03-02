@@ -29,6 +29,10 @@
 					<bean
 						class="org.springframework.batch.execution.launch.EmptyItemWriter" />
 				</property>
+				<property name="jobRepository"
+					ref="simpleJobRepository" />
+				<property name="transactionManager"
+					ref="transactionManager" />
 			</bean>
 		</property>
 	</bean>

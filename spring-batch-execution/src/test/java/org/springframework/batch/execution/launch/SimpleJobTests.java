@@ -36,6 +36,7 @@ import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.execution.step.AbstractStep;
 import org.springframework.batch.execution.step.ItemOrientedStep;
+import org.springframework.batch.execution.step.support.AbstractStepFactoryBean;
 import org.springframework.batch.execution.step.support.SimpleStepFactoryBean;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -82,7 +83,7 @@ public class SimpleJobTests extends TestCase {
 	}
 	
 	private ItemOrientedStep getStep(String[] args) throws Exception {
-		SimpleStepFactoryBean factory = new SimpleStepFactoryBean();
+		AbstractStepFactoryBean factory = new SimpleStepFactoryBean();
 		factory.setSingleton(false);
 
 		List items = TransactionAwareProxyFactory.createTransactionalList();

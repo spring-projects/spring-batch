@@ -2,10 +2,10 @@ package org.springframework.batch.sample.item.reader;
 
 import java.math.BigDecimal;
 
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.exception.MarkFailedException;
 import org.springframework.batch.item.exception.ResetFailedException;
-import org.springframework.batch.item.reader.AbstractItemReaderRecoverer;
 import org.springframework.batch.sample.domain.Trade;
 
 /**
@@ -13,7 +13,7 @@ import org.springframework.batch.sample.domain.Trade;
  * 
  * @author Robert Kasanicky
  */
-public class GeneratingItemReader extends AbstractItemReaderRecoverer {
+public class GeneratingItemReader implements ItemReader, ItemRecoverer {
 
 	private int limit = 1;
 	
@@ -68,12 +68,6 @@ public class GeneratingItemReader extends AbstractItemReaderRecoverer {
 	 */
 	public void reset() throws ResetFailedException {
 		this.counter = this.marked;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void restoreFrom(ExecutionContext context) {
 	}
 
 }

@@ -30,7 +30,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.ResetFailedException;
@@ -48,68 +47,62 @@ import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * Simple input source that opens a Sql Cursor and continually retrieves the
+ * Simple input source that opens a JDBC cursor and continually retrieves the
  * next row in the ResultSet. It is extremely important to note that the
  * JdbcDriver used must be version 3.0 or higher. This is because earlier
  * versions do not support holding a ResultSet open over commits.
  * </p>
  * 
  * <p>
- * Each call to read() will call the provided RowMapper, (NOTE: Calling read()
- * without setting a RowMapper will result in an IllegalStateException!) passing
- * in the ResultSet. If this is the first call to read(), the provided query
- * will be run in order to open the cursor. There is currently no wrapping of
- * the ResultSet to suppress calls to next(). However, if the RowMapper
- * increments the current row, the next call to read will verify that the
- * current row is at the expected position and throw a DataAccessException if it
- * is not. This means that, in theory, a RowMapper could read ahead, as long as
- * it returns the row back to it's correct position before returning. The reason
- * for such strictness on the ResultSet is due to the need to maintain strict
- * control for Transactions, restartability and skippability. This ensures that
- * each call to read() returns the ResultSet at the correct line, regardless of
+ * Each call to {@link #read()} will call the provided RowMapper, passing in the
+ * ResultSet. There is currently no wrapping of the ResultSet to suppress calls
+ * to next(). However, if the RowMapper (mistakenly) increments the current row,
+ * the next call to read will verify that the current row is at the expected
+ * position and throw a DataAccessException if it is not. This means that, in
+ * theory, a RowMapper could read ahead, as long as it returns the row back to
+ * the correct position before returning. The reason for such strictness on the
+ * ResultSet is due to the need to maintain control for transactions,
+ * restartability and skippability. This ensures that each call to
+ * {@link #read()} returns the ResultSet at the correct line, regardless of
  * rollbacks, restarts, or skips.
  * </p>
  * 
  * <p>
- * {@link ExecutionContext}: The current row is returned as restart data,
- * and when restored from that same data, the cursor is opened and the current
- * row set to the value within the restart data. There are also two statistics
- * returned by this input source: the current line being processed and the
- * number of lines that have been skipped.
+ * {@link ExecutionContext}: The current row is returned as restart data, and
+ * when restored from that same data, the cursor is opened and the current row
+ * set to the value within the restart data. Two values are stored: the current
+ * line being processed and the number of lines that have been skipped.
  * </p>
  * 
  * <p>
- * Transactions: At first glance, it may appear odd that Spring's
- * TransactionSynchronization abstraction is used for something that is reading
- * from the database, however, it is important because the same resultset is
- * held open regardless of commits or roll backs. This means that when a
- * transaction is committed, the input source is notified so that it can save
- * it's current row number. Later, if the transaction is rolled back, the
- * current row can be moved back to the same row number as it was on when commit
- * was called.
+ * Transactions: The same ResultSet is held open regardless of commits or roll
+ * backs in a surrounding transaction. This means that when such a transaction
+ * is committed, the input source is notified through the {@link #mark()} and
+ * {@link #reset()} so that it can save it's current row number. Later, if the
+ * transaction is rolled back, the current row can be moved back to the same row
+ * number as it was on when commit was called.
  * </p>
  * 
  * <p>
- * Calling skip will indicate to the input source that a record is bad and
- * should not be represented to the user if the transaction is rolled back. For
- * example, if row 2 is read in, and found to be bad, calling skip will inform
- * the Input Source. If reading is then continued, and a rollback is necessary
- * because of an error on output, the input source will be returned to row 1.
- * Calling read while on row 1 will move the current row to 3, not 2, because 2
- * has been marked as skipped.
+ * Calling skip will indicate that a record is bad and should not be
+ * re-presented to the user if the transaction is rolled back. For example, if
+ * row 2 is read in, and found to be bad, calling skip will inform the
+ * {@link ItemReader}. If reading is then continued, and a rollback is
+ * necessary because of an error on output, the input source will be returned to
+ * row 1. Calling read while on row 1 will move the current row to 3, not 2,
+ * because 2 has been marked as skipped.
  * </p>
  * 
  * <p>
- * Calling close on this Input Source will cause all resources it is currently
- * using to be freed. (Connection, resultset, etc). If read() is called on the
- * same instance again, the cursor will simply be reopened starting at row 0.
+ * Calling close on this {@link ItemStream} will cause all resources it is
+ * currently using to be freed. (Connection, ResultSet, etc). It is then illegal
+ * to call {@link #read()} again until it has been opened.
  * </p>
  * 
  * @author Lucas Ward
  * @author Peter Zozom
  */
-public class JdbcCursorItemReader implements ItemReader, ItemKeyGenerator, InitializingBean,
-		ItemStream, Skippable {
+public class JdbcCursorItemReader implements ItemReader, InitializingBean, ItemStream, Skippable {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);
 
@@ -155,9 +148,9 @@ public class JdbcCursorItemReader implements ItemReader, ItemKeyGenerator, Initi
 	private RowMapper mapper;
 
 	private boolean initialized = false;
-	
+
 	private boolean saveState = false;
-	
+
 	private String name = JdbcCursorItemReader.class.getName();
 
 	/**
@@ -385,7 +378,7 @@ public class JdbcCursorItemReader implements ItemReader, ItemKeyGenerator, Initi
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getExecutionContext()
 	 */
 	public void update(ExecutionContext executionContext) {
-		if(saveState){
+		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			String skipped = skippedRows.toString();
 			executionContext.putString(addName(SKIPPED_ROWS), skipped.substring(1, skipped.length() - 1));
@@ -517,22 +510,14 @@ public class JdbcCursorItemReader implements ItemReader, ItemKeyGenerator, Initi
 		this.sql = sql;
 	}
 
-	/**
-	 * Return the item itself (which is already a key).
-	 * @see org.springframework.batch.item.ItemReader#getKey(java.lang.Object)
-	 */
-	public Object getKey(Object item) {
-		return item;
-	}
-	
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	public String addName(String key){
+
+	public String addName(String key) {
 		return name + "." + key;
 	}
-	
+
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}

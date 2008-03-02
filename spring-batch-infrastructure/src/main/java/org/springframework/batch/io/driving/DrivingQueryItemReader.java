@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.beans.factory.InitializingBean;
@@ -47,7 +46,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @since 1.0
  */
-public class DrivingQueryItemReader implements ItemReader, ItemKeyGenerator, InitializingBean,
+public class DrivingQueryItemReader implements ItemReader, InitializingBean,
 		ItemStream {
 
 	private boolean initialized = false;
@@ -172,15 +171,6 @@ public class DrivingQueryItemReader implements ItemReader, ItemKeyGenerator, Ini
 
 	protected void transactionRolledBack() {
 		reset();
-	}
-
-	/**
-	 * Return the item itself (which is already a key).
-	 * 
-	 * @see org.springframework.batch.item.ItemReader#getKey(java.lang.Object)
-	 */
-	public Object getKey(Object item) {
-		return item;
 	}
 
 	/**

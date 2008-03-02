@@ -12,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
@@ -26,7 +25,7 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
-public class StagingItemReader extends JdbcDaoSupport implements ItemStream, ItemReader, ItemKeyGenerator, StepListener {
+public class StagingItemReader extends JdbcDaoSupport implements ItemStream, ItemReader, StepListener {
 
 	// Key for buffer in transaction synchronization manager
 	private static final String BUFFER_KEY = StagingItemReader.class.getName() + ".BUFFER";
@@ -98,10 +97,6 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 
 		}
 
-	}
-
-	public Object getKey(Object item) {
-		return item;
 	}
 
 	public Object read() throws Exception {

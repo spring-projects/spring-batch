@@ -22,7 +22,8 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.reader.AbstractItemReaderRecoverer;
+import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
@@ -80,7 +81,7 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 		jdbcTemplate.execute("delete from T_FOOS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
-		provider = new AbstractItemReaderRecoverer() {
+		provider = new ItemReaderRecoverer() {
 			public Object read() {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
@@ -138,7 +139,7 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 							repeatTemplate.iterate(new RepeatCallback() {
 
 								public ExitStatus doInIteration(RepeatContext context) throws Exception {
-									return new ExitStatus(retryTemplate.execute(callback)!=null);
+									return new ExitStatus(retryTemplate.execute(callback) != null);
 								}
 
 							});
@@ -192,5 +193,9 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 				msgs.add(next);
 		}
 		return msgs;
+	}
+
+	private abstract class ItemReaderRecoverer extends AbstractItemReader implements ItemRecoverer {
+
 	}
 }
