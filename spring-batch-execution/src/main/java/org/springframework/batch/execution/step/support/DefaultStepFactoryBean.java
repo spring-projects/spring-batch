@@ -116,7 +116,7 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 			step.registerStepListener((StepListener) itemWriter);
 		}
 
-		step.setItemReader(new DelegatingItemReader(itemReader) {
+		itemReader = new DelegatingItemReader(itemReader) {
 			public Object read() throws Exception {
 				try {
 					listener.beforeRead();
@@ -129,9 +129,12 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 					throw e;
 				}
 			}
-		});
+		};
+		// In case it is used by subclasses:
+		setItemReader(itemReader);
+		step.setItemReader(itemReader);
 
-		step.setItemWriter(new DelegatingItemWriter(itemWriter) {
+		itemWriter = new DelegatingItemWriter(itemWriter) {
 			public void write(Object item) throws Exception {
 				try {
 					listener.beforeWrite(item);
@@ -143,7 +146,10 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 					throw e;
 				}
 			}
-		});
+		};
+		// In case it is used by subclasses:
+		setItemWriter(itemWriter);
+		step.setItemWriter(itemWriter);
 
 		RepeatTemplate stepOperations = new RepeatTemplate();
 		stepOperations.setListener(new RepeatListenerSupport() {
