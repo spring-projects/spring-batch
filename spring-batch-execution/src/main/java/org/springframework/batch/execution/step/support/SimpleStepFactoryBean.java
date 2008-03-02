@@ -15,7 +15,9 @@
  */
 package org.springframework.batch.execution.step.support;
 
+import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.execution.step.ItemOrientedStep;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
@@ -27,6 +29,8 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 
 	private int commitInterval = 0;
 
+	private ItemStream[] streams = new ItemStream[0];
+
 	/**
 	 * Set the commit interval.
 	 * 
@@ -37,12 +41,25 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	}
 
 	/**
+	 * The streams to inject into the {@link Step}. Any instance of
+	 * {@link ItemStream} can be used, and will then receive callbacks at the
+	 * appropriate stage in the step.
+	 * 
+	 * @param streams an array of listeners
+	 */
+	public void setStreams(ItemStream[] streams) {
+		this.streams = streams;
+	}
+
+	/**
 	 * @param step
 	 * 
 	 */
 	protected void applyConfiguration(ItemOrientedStep step) {
 
 		super.applyConfiguration(step);
+
+		step.setStreams(streams);
 
 		if (commitInterval > 0) {
 			RepeatTemplate chunkOperations = new RepeatTemplate();

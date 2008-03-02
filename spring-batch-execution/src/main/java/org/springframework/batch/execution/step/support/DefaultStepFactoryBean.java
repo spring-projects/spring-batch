@@ -18,7 +18,6 @@ package org.springframework.batch.execution.step.support;
 import org.springframework.batch.core.domain.BatchListener;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.execution.step.ItemOrientedStep;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
@@ -34,7 +33,7 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 
 	private boolean alwaysSkip = false;
 
-	private Object[] listeners = new Object[0];
+	private BatchListener[] listeners = new BatchListener[0];
 
 	private TaskExecutor taskExecutor;
 
@@ -52,15 +51,15 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 
 	/**
 	 * The listeners to inject into the {@link Step}. Any instance of
-	 * {@link BatchListener} or {@link ItemStream} can be used, and will then
-	 * receive callbacks at the appropriate stage in the step.
+	 * {@link BatchListener} can be used, and will then receive callbacks at the
+	 * appropriate stage in the step.
 	 * 
 	 * @param listeners an array of listeners
 	 */
-	public void setListeners(Object[] listeners) {
+	public void setListeners(BatchListener[] listeners) {
 		this.listeners = listeners;
 	}
-
+	
 	/**
 	 * Public setter for the {@link TaskExecutor}. If this is set, then it will
 	 * be used to execute the chunk processing inside the {@link Step}.

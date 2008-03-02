@@ -9,8 +9,8 @@
 
 	<bean id="multilineJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="defaultStep">
-				<property name="listeners" ref="fileItemReader"/>
+			<bean id="step1" parent="simpleStep">
+				<property name="streams" ref="fileItemReader"/>
 				<property name="itemReader">
 					<bean
 						class="org.springframework.batch.item.reader.AggregateItemReader">

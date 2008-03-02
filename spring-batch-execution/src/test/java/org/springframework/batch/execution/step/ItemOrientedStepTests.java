@@ -42,6 +42,7 @@ import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.MarkFailedException;
 import org.springframework.batch.item.exception.ResetFailedException;
@@ -341,7 +342,7 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testDirectlyInjectedItemStream() throws Exception {
-		itemOrientedStep.setListeners(new Object[] {new ItemStreamSupport() {
+		itemOrientedStep.setStreams(new ItemStream[] {new ItemStreamSupport() {
 			public void update(ExecutionContext executionContext) {
 				executionContext.putString("foo", "bar");
 			}
@@ -387,7 +388,7 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testDirectlyInjectedListenerOnError() throws Exception {
-		itemOrientedStep.setListeners(new Object[] {new StepListenerSupport() {
+		itemOrientedStep.setListeners(new StepListener[] {new StepListenerSupport() {
 			public ExitStatus onErrorInStep(Throwable e) {
 				list.add(e);
 				return null;
@@ -420,7 +421,7 @@ public class ItemOrientedStepTests extends TestCase {
 			}
 		};
 		itemOrientedStep.setItemReader(reader);
-		itemOrientedStep.setListeners(new Object[] {reader});
+		itemOrientedStep.setStreams(new ItemStream[] {reader});
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
 

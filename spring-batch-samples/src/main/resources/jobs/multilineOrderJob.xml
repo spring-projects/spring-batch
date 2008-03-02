@@ -13,10 +13,10 @@
 
 	<bean id="multilineOrderJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="defaultStep">
-				<property name="listeners">
+			<bean id="step1" parent="simpleStep">
+				<property name="streams">
 					<list>
-						<ref bean="orderWriter" />
+						<ref bean="flatFileOutput" />
 						<ref bean="fileInputTemplate" />
 					</list>
 				</property>
@@ -52,7 +52,7 @@
 
 	<bean id="orderWriter"
 		class="org.springframework.batch.sample.dao.FlatFileOrderWriter">
-		<property name="delegate" ref="flatFileOutputSource" />
+		<property name="delegate" ref="flatFileTransformerOutput" />
 		<property name="transformer">
 			<bean
 				class="org.springframework.batch.sample.dao.OrderTransformer">

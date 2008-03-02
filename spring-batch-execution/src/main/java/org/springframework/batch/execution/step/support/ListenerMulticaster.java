@@ -25,20 +25,15 @@ import org.springframework.batch.execution.listener.CompositeChunkListener;
 import org.springframework.batch.execution.listener.CompositeItemReadListener;
 import org.springframework.batch.execution.listener.CompositeItemWriteListener;
 import org.springframework.batch.execution.listener.CompositeStepListener;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.exception.StreamException;
-import org.springframework.batch.item.stream.CompositeItemStream;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Dave Syer
  * 
  */
-public class ListenerMulticaster implements ItemStream, StepListener, ChunkListener, ItemReadListener,
+public class ListenerMulticaster implements StepListener, ChunkListener, ItemReadListener,
 		ItemWriteListener {
-
-	private CompositeItemStream stream = new CompositeItemStream();
 
 	private CompositeStepListener stepListener = new CompositeStepListener();
 
@@ -62,7 +57,7 @@ public class ListenerMulticaster implements ItemStream, StepListener, ChunkListe
 	 * @param listeners an array of listener objects of types known to the
 	 * multicaster.
 	 */
-	public void setListeners(Object[] listeners) {
+	public void setListeners(BatchListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
 			register(listeners[i]);
 		}
@@ -73,12 +68,9 @@ public class ListenerMulticaster implements ItemStream, StepListener, ChunkListe
 	 * implemented. Any {@link BatchListener} can be provided, or an
 	 * {@link ItemStream}. Other types will be ignored.
 	 */
-	public void register(Object listener) {
+	public void register(BatchListener listener) {
 		if (listener instanceof StepListener) {
 			this.stepListener.register((StepListener) listener);
-		}
-		if (listener instanceof ItemStream) {
-			this.stream.register((ItemStream) listener);
 		}
 		if (listener instanceof ChunkListener) {
 			this.chunkListener.register((ChunkListener) listener);
@@ -114,32 +106,6 @@ public class ListenerMulticaster implements ItemStream, StepListener, ChunkListe
 	 */
 	public ExitStatus onErrorInStep(Throwable e) {
 		return stepListener.onErrorInStep(e);
-	}
-
-	/**
-	 * @param executionContext
-	 * @throws StreamException
-	 * @see org.springframework.batch.item.stream.CompositeItemStream#close(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void close(ExecutionContext executionContext) throws StreamException {
-		stream.close(executionContext);
-	}
-
-	/**
-	 * @param executionContext
-	 * @throws StreamException
-	 * @see org.springframework.batch.item.stream.CompositeItemStream#open(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void open(ExecutionContext executionContext) throws StreamException {
-		stream.open(executionContext);
-	}
-
-	/**
-	 * @param executionContext
-	 * @see org.springframework.batch.item.stream.CompositeItemStream#update(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void update(ExecutionContext executionContext) {
-		stream.update(executionContext);
 	}
 
 	/**

@@ -18,21 +18,21 @@
 		</property>
 	</bean>
 
-	<bean id="flatFileOutputSource"
+	<bean id="flatFileTransformerOutput"
 		class="org.springframework.batch.item.writer.ItemTransformerItemWriter">
-		<property name="delegate">
-			<bean
-				class="org.springframework.batch.io.file.FlatFileItemWriter">
-				<property name="resource" ref="fileOutputLocator" />
-				<property name="fieldSetUnmapper">
-					<bean
-						class="org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper" />
-				</property>
-			</bean>
-		</property>
+		<property name="delegate" ref="flatFileOutput"/>
 		<property name="itemTransformer">
 			<bean
 				class="org.springframework.batch.io.file.transform.RecursiveCollectionItemTransformer" />
+		</property>
+	</bean>
+
+	<bean id="flatFileOutput"
+		class="org.springframework.batch.io.file.FlatFileItemWriter">
+		<property name="resource" ref="fileOutputLocator" />
+		<property name="fieldSetUnmapper">
+			<bean
+				class="org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper" />
 		</property>
 	</bean>
 

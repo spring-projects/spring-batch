@@ -16,7 +16,7 @@
 			<list>
 				<bean id="step1" parent="defaultStep">
 					<property name="alwaysSkip" value="true" />
-					<property name="listeners" ref="fileInputTemplate" />
+					<property name="streams" ref="fileInputTemplate" />
 					<property name="itemReader">
 						<bean
 							class="org.springframework.batch.item.reader.ValidatingItemReader">

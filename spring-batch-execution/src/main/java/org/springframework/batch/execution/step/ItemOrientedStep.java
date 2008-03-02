@@ -42,6 +42,7 @@ import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.CommitFailedException;
+import org.springframework.batch.item.stream.CompositeItemStream;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -91,6 +92,8 @@ public class ItemOrientedStep extends AbstractStep {
 	private RetryOperations retryOperations = new RetryTemplate();
 
 	private ItemReaderRetryCallback retryCallback;
+
+	private CompositeItemStream stream = new CompositeItemStream();
 
 	private ListenerMulticaster listener = new ListenerMulticaster();
 
@@ -151,18 +154,34 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Register each of the objects as listeners. The {@link ItemOrientedStep}
-	 * accepts listeners of type {@link ItemStream} and {@link BatchListener}.
-	 * The {@link ItemReader} and {@link ItemWriter} are automatically
+	 * Register each of the streams for callbacks at the appropriate time in the
+	 * step. The {@link ItemReader} and {@link ItemWriter} are automatically
 	 * registered, but it doesn't hurt to also register them here. Injected
 	 * dependencies of the reader and writer are not automatically registered,
 	 * so if you implement {@link ItemWriter} using delegation to another object
-	 * which itself is a {@link BatchListener}, you need to register the
-	 * delegate here.
+	 * which itself is a {@link ItemStream}, you need to register the delegate
+	 * here.
+	 * 
+	 * @param streams an array of {@link ItemStream} objects.
+	 */
+	public void setStreams(ItemStream[] streams) {
+		for (int i = 0; i < streams.length; i++) {
+			stream.register(streams[i]);
+		}
+	}
+
+	/**
+	 * Register each of the objects as listeners. The {@link ItemOrientedStep}
+	 * accepts listeners of type {@link BatchListener}. The {@link ItemReader}
+	 * and {@link ItemWriter} are automatically registered, but it doesn't hurt
+	 * to also register them here. Injected dependencies of the reader and
+	 * writer are not automatically registered, so if you implement
+	 * {@link ItemWriter} using delegation to another object which itself is a
+	 * {@link BatchListener}, you need to register the delegate here.
 	 * 
 	 * @param listeners an array of listener objects of known types.
 	 */
-	public void setListeners(Object[] listeners) {
+	public void setListeners(BatchListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
 			listener.register(listeners[i]);
 		}
@@ -275,7 +294,7 @@ public class ItemOrientedStep extends AbstractStep {
 			// fixed in the step. E.g. ItemStream instances need the the same
 			// reference to the ExecutionContext as the step execution.
 			listener.beforeStep(stepExecution);
-			listener.open(stepExecution.getExecutionContext());
+			stream.open(stepExecution.getExecutionContext());
 
 			status = stepOperations.iterate(new RepeatCallback() {
 
@@ -309,7 +328,7 @@ public class ItemOrientedStep extends AbstractStep {
 							// only if chunk was successful
 							stepExecution.apply(contribution);
 
-							listener.update(stepExecution.getExecutionContext());
+							stream.update(stepExecution.getExecutionContext());
 							try {
 								jobRepository.saveOrUpdateExecutionContext(stepExecution);
 							}
@@ -433,7 +452,7 @@ public class ItemOrientedStep extends AbstractStep {
 			}
 
 			try {
-				listener.close(stepExecution.getExecutionContext());
+				stream.close(stepExecution.getExecutionContext());
 			}
 			catch (RuntimeException e) {
 				String msg = "Fatal error detected during close of streams. "
@@ -455,12 +474,22 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Register the item reader and writer as listeners. If they are manually
-	 * registered anyway, it shouldn't matter.
+	 * Register the item reader and writer as listeners and streams. If they are
+	 * manually registered anyway, it shouldn't matter.
 	 */
 	private void possiblyRegisterStreams() {
-		listener.register(itemReader);
-		listener.register(itemWriter);
+		if (itemReader instanceof ItemStream) {
+			stream.register((ItemStream) itemReader);
+		}
+		if (itemReader instanceof BatchListener) {
+			listener.register((BatchListener) itemReader);
+		}
+		if (itemWriter instanceof ItemStream) {
+			stream.register((ItemStream) itemWriter);
+		}
+		if (itemWriter instanceof BatchListener) {
+			listener.register((BatchListener) itemWriter);
+		}
 	}
 
 	/**
