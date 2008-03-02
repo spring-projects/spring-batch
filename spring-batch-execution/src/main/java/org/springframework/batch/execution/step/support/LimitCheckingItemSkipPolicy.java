@@ -30,19 +30,25 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.exception.FlatFileParsingException;
 
 /**
- * <p>{@link ItemSkipPolicy} that determines whether or not reading should
- * continue based upon how many items have been skipped.  This is extremely
- * useful behavior, as it allows you to skip records, but will throw a
- * {@link SkipLimitExceededException} if a set limit has been exceeded.  For example,
- * it is generally advisable to skip {@link FlatFileParsingException}s, however, if 
- * the vast majority of records are causing exceptions, the file is likely bad.</p>
+ * <p>
+ * {@link ItemSkipPolicy} that determines whether or not reading should continue
+ * based upon how many items have been skipped. This is extremely useful
+ * behavior, as it allows you to skip records, but will throw a
+ * {@link SkipLimitExceededException} if a set limit has been exceeded. For
+ * example, it is generally advisable to skip {@link FlatFileParsingException}s,
+ * however, if the vast majority of records are causing exceptions, the file is
+ * likely bad.
+ * </p>
  * 
- * <p>Furthermore, it is also likely that you only want to skip certain exceptions.  
- * {@link FlatFileParsingException} is a good example of an exception you will likely
- * want to skip, but a {@link FileNotFoundException} should cause immediate termination
- * of the {@link Step}.  Because it would be impossible for a general purpose policy to
- * determine all the types of exceptions that should be skipped from those that shouldn't,
- * a list must be passed in, with all of the exceptions that are 'skippable'</p>
+ * <p>
+ * Furthermore, it is also likely that you only want to skip certain exceptions.
+ * {@link FlatFileParsingException} is a good example of an exception you will
+ * likely want to skip, but a {@link FileNotFoundException} should cause
+ * immediate termination of the {@link Step}. Because it would be impossible
+ * for a general purpose policy to determine all the types of exceptions that
+ * should be skipped from those that shouldn't, a list must be passed in, with
+ * all of the exceptions that are 'skippable'
+ * </p>
  * 
  * @author Ben Hale
  * @author Lucas Ward
@@ -55,9 +61,8 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	private static final String SKIP = "skip";
 
 	private final int skipLimit;
-	
+
 	private ExceptionClassifier exceptionClassifier;
-	private List failurePreventingExceptions = new ArrayList();
 
 	public LimitCheckingItemSkipPolicy(int skipLimit) {
 		this(skipLimit, new ArrayList(0));
@@ -77,41 +82,24 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 
 	/**
 	 * Given the provided exception and skip count, determine whether or not
-	 * processing should continue for the given exception.  If the exception
-	 * is not within the list of 'skippable exceptions', false will be returned.
-	 * If the exception is within the list, and {@link StepExecution} skipCount 
-	 * is greater than the skipLimit, then a {@link SkipLimitExceededException}
+	 * processing should continue for the given exception. If the exception is
+	 * not within the list of 'skippable exceptions', false will be returned. If
+	 * the exception is within the list, and {@link StepExecution} skipCount is
+	 * greater than the skipLimit, then a {@link SkipLimitExceededException}
 	 * will be thrown.
 	 */
-	public boolean shouldSkip(Exception ex, int skipCount){
-		if(exceptionClassifier.classify(ex).equals(SKIP)){
-			if(skipCount < skipLimit){
+	public boolean shouldSkip(Throwable t, int skipCount) {
+		if (exceptionClassifier.classify(t).equals(SKIP)) {
+			if (skipCount < skipLimit) {
 				return true;
 			}
-			else{
-				throw new SkipLimitExceededException(skipLimit, ex);
+			else {
+				throw new SkipLimitExceededException(skipLimit, t);
 			}
 		}
-		else{
+		else {
 			return false;
 		}
 	}
 
-	public boolean shouldFail(Throwable t) {
-		if(failurePreventingExceptions.contains(t)){
-			return false;
-		}
-		else{
-			return true;
-		}
-	}
-	
-	/**
-	 * Set the list of exceptions that will prevent step execution from failing.
-	 * 
-	 * @param failurePreventingExceptions
-	 */
-	public void setFailurePreventingExceptions(List failurePreventingExceptions) {
-		this.failurePreventingExceptions = failurePreventingExceptions;
-	}
 }

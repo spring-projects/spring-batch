@@ -41,7 +41,7 @@
 						</bean>
 					</property>
 				</bean>
-				<bean id="loading" parent="simpleStep" class="org.springframework.batch.execution.step.support.KitchenSinkStepFactoryBean">
+				<bean id="loading" parent="defaultStep">
 					<property name="taskExecutor">
 						<bean
 							class="org.springframework.core.task.SimpleAsyncTaskExecutor" />

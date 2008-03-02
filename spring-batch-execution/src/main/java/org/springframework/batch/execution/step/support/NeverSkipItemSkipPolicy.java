@@ -25,11 +25,8 @@ import org.springframework.batch.core.domain.ItemSkipPolicy;
  */
 public class NeverSkipItemSkipPolicy implements ItemSkipPolicy{
 
-	public boolean shouldSkip(Exception ex, int skipCount) {
+	public boolean shouldSkip(Throwable t, int skipCount) {
 		return false;
 	}
 
-	public boolean shouldFail(Throwable t) {
-		return true;
-	}
 }

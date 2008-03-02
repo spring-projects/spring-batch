@@ -25,7 +25,7 @@ import org.springframework.batch.core.domain.Step;
  */
 public class SimpleStepFactoryBeanTests extends TestCase {
 
-	private AbstractStepFactoryBean factory = new KitchenSinkStepFactoryBean();
+	private AbstractStepFactoryBean factory = new StatefulRetryStepFactoryBean();
 	
 	public void testType() throws Exception {
 		assertEquals(Step.class, factory.getObjectType());

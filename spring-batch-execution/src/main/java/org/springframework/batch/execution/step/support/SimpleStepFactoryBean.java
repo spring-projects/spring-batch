@@ -16,7 +16,6 @@
 package org.springframework.batch.execution.step.support;
 
 import org.springframework.batch.execution.step.ItemOrientedStep;
-import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
@@ -28,8 +27,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 
 	private int commitInterval = 0;
 
-	private boolean alwaysSkip = false;
-
 	/**
 	 * Set the commit interval.
 	 * 
@@ -37,18 +34,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	 */
 	public void setCommitInterval(int commitInterval) {
 		this.commitInterval = commitInterval;
-	}
-
-	/**
-	 * Public setter for the flag that determines skip policy. If this flag is
-	 * true then an exception in chunk processing will cause the item to be
-	 * skipped and no exceptions propagated. If it is false then all exceptions
-	 * will be propagated from the chunk and cause the step to abort.
-	 * 
-	 * @param alwaysSkip the value to set. Default is false.
-	 */
-	public void setAlwaysSkip(boolean alwaysSkip) {
-		this.alwaysSkip = alwaysSkip;
 	}
 
 	/**
@@ -63,20 +48,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 			RepeatTemplate chunkOperations = new RepeatTemplate();
 			chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
 			step.setChunkOperations(chunkOperations);
-		}
-
-		if (alwaysSkip) {
-			// If we always skip (not the default) then we are prepared to
-			// absorb all exceptions at the step level because the failed items
-			// will never re-appear after a rollback.
-			step.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
-			RepeatTemplate stepOperations = new RepeatTemplate();
-			stepOperations.setExceptionHandler(new SimpleLimitExceptionHandler(Integer.MAX_VALUE));
-			step.setStepOperations(stepOperations);
-		}
-		else {
-			// This is the default in ItemOrientedStep anyway...
-			step.setItemSkipPolicy(new NeverSkipItemSkipPolicy());
 		}
 
 	}

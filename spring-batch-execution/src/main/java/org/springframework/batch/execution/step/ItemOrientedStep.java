@@ -293,6 +293,7 @@ public class ItemOrientedStep extends AbstractStep {
 							.getTransaction(new DefaultTransactionDefinition());
 
 					try {
+
 						itemReader.mark();
 						listener.beforeChunk();
 						result = processChunk(contribution);
@@ -364,16 +365,11 @@ public class ItemOrientedStep extends AbstractStep {
 							stepExecution.setStatus(BatchStatus.UNKNOWN);
 						}
 
-						if (itemSkipPolicy.shouldFail(t)) {
-							if (t instanceof RuntimeException) {
-								throw (RuntimeException) t;
-							}
-							else {
-								throw new RuntimeException(t);
-							}
+						if (t instanceof RuntimeException) {
+							throw (RuntimeException) t;
 						}
 						else {
-							logger.error("Exception should not cause step to fail", t);
+							throw new RuntimeException(t);
 						}
 
 					}
@@ -517,7 +513,7 @@ public class ItemOrientedStep extends AbstractStep {
 
 		}
 		catch (Exception e) {
-			if (itemSkipPolicy.shouldSkip(e, contribution.getSkipCount())) {
+			if (retryCallback == null && itemSkipPolicy.shouldSkip(e, contribution.getSkipCount())) {
 				contribution.incrementSkipCount();
 				skip();
 			}

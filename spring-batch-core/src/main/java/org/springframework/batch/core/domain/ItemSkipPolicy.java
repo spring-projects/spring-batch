@@ -27,20 +27,11 @@ public interface ItemSkipPolicy {
 	 * Returns true or false, indicating whether or not reading should
 	 * continue for the current step execution with the given throwable.
 	 * 
-	 * @param exception throwable encountered while reading
+	 * @param t throwable encountered while reading
 	 * @param skipCount currently running count of skips
 	 * @return true if reading should continue, false otherwise.
 	 * @throws IllegalArgumentException if the exception is null
 	 */
-	boolean shouldSkip(Exception exception, int skipCount);
+	boolean shouldSkip(Throwable t, int skipCount);
 	
-	/**
-	 * Returns true or false, indicating whether or not an exception
-	 * should cause the step to fail.
-	 * 
-	 * @param t throwable encountered while reading
-	 * @return true if the step should continue processing, false otherwise
-	 * @throws IllegalArgumentException if the exception is null
-	 */
-	boolean shouldFail(Throwable t);
 }

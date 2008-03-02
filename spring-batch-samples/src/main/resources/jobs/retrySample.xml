@@ -11,8 +11,8 @@
 
 	<bean id="retrySample" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="simpleStep"
-				class="org.springframework.batch.execution.step.support.KitchenSinkStepFactoryBean">
+			<bean id="step1" parent="defaultStep"
+				class="org.springframework.batch.execution.step.support.StatefulRetryStepFactoryBean">
 				<property name="itemReader" ref="itemGenerator" />
 				<property name="itemWriter" ref="itemWriter" />
 				<property name="retryPolicy">
@@ -22,11 +22,6 @@
 						<property name="retryableExceptionClasses"
 							value="java.lang.Exception" />
 					</bean>
-				</property>
-				<property name="exceptionHandler">
-					<bean
-						class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler"
-						p:limit="5" />
 				</property>
 			</bean>
 		</property>

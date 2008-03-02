@@ -28,8 +28,8 @@ public class SkipLimitExceededException extends InfrastructureException {
 
 	private final int skipLimit;
 	
-	public SkipLimitExceededException(int skipLimit, Exception ex) {
-		super("Skip limit of '" + skipLimit + "' exceeded", ex);
+	public SkipLimitExceededException(int skipLimit, Throwable t) {
+		super("Skip limit of '" + skipLimit + "' exceeded", t);
 		this.skipLimit = skipLimit;
 	}
 	
