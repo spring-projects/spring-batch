@@ -38,33 +38,10 @@
 			<tx:method name="*" />
 		</tx:attributes>
 	</tx:advice>
-
+	
 	<bean id="jobRepository"
-		class="org.springframework.batch.execution.repository.SimpleJobRepository">
-		<constructor-arg ref="jobInstanceDao" />
-		<constructor-arg ref="jobExecutionDao" />
-		<constructor-arg ref="stepExecutionDao" />
-	</bean>
-
-	<bean id="jobInstanceDao" lazy-init="true"
-		class="org.springframework.batch.execution.repository.dao.JdbcJobInstanceDao">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
-		<property name="jobIncrementer" ref="jobIncrementer" />
-	</bean>
-
-	<bean id="jobExecutionDao" lazy-init="true"
-		class="org.springframework.batch.execution.repository.dao.JdbcJobExecutionDao">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
-		<property name="jobExecutionIncrementer"
-			ref="jobExecutionIncrementer" />
-	</bean>
-
-	<bean id="stepExecutionDao" lazy-init="true"
-		class="org.springframework.batch.execution.repository.dao.JdbcStepExecutionDao">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
-		<property name="stepExecutionIncrementer"
-			ref="stepExecutionIncrementer" />
-	</bean>
+		class="org.springframework.batch.execution.repository.JobRepositoryFactoryBean"
+		p:databaseType="hsql" p:dataSource-ref="dataSource" />
 
 	<bean id="mapJobInstanceDao" lazy-init="true"
 		class="org.springframework.batch.execution.repository.dao.MapJobInstanceDao" />

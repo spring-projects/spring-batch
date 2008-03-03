@@ -62,36 +62,9 @@
 	<bean id="lobHandler" class="${batch.lob.handler.class}"/>
 
 	<bean id="incrementerParent"
-		class="${batch.database.incrementer.class}" abstract="true">
+		class="${batch.database.incrementer.class}">
 		<property name="dataSource" ref="dataSource" />
-	</bean>
-
-	<bean id="jobIncrementer" parent="incrementerParent">
-		<property name="incrementerName" value="BATCH_JOB_SEQ" />
-	</bean>
-
-	<bean id="jobExecutionIncrementer" parent="incrementerParent">
-		<property name="incrementerName"
-			value="BATCH_JOB_EXECUTION_SEQ" />
-	</bean>
-
-	<bean id="stepIncrementer" parent="incrementerParent">
-		<property name="incrementerName" value="BATCH_STEP_SEQ" />
-	</bean>
-
-	<bean id="stepExecutionIncrementer" parent="incrementerParent">
-		<property name="incrementerName"
-			value="BATCH_STEP_EXECUTION_SEQ" />
-	</bean>
-
-	<bean id="partitionIncrementer" parent="incrementerParent">
-		<property name="incrementerName" value="BATCH_PARTITION_SEQ" />
-	</bean>
-
-	<bean id="partitionInstanceIncrementer"
-		parent="incrementerParent">
-		<property name="incrementerName"
-			value="BATCH_PARTITION_EXECUTION_SEQ" />
+		<property name="incrementerName" value="ID" />
 	</bean>
 
 	<!--import resource="alt-data-source-context.xml" /-->

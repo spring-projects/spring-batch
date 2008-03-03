@@ -19,7 +19,7 @@ public class JdbcTradeWriterTests extends AbstractTransactionalDataSourceSpringC
 		
 		JdbcTradeDao writer = new JdbcTradeDao();
 		
-		AbstractDataFieldMaxValueIncrementer incrementer = (AbstractDataFieldMaxValueIncrementer)applicationContext.getBean("jobIncrementer");
+		AbstractDataFieldMaxValueIncrementer incrementer = (AbstractDataFieldMaxValueIncrementer)applicationContext.getBean("incrementerParent");
 		incrementer.setIncrementerName("TRADE_SEQ");
 		
 		writer.setIncrementer(incrementer);
