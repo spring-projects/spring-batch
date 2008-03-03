@@ -27,13 +27,10 @@
 		</property>
 	</bean>
 
-	<bean id="testGenerator"
+	<bean id="itemGenerator"
 		class="org.springframework.batch.sample.item.reader.GeneratingItemReader">
 		<property name="limit" value="10" />
 	</bean>
-
-	<bean id="itemGenerator" parent="testGenerator"
-		autowire-candidate="false" />
 
 	<bean id="itemWriter"
 		class="org.springframework.batch.sample.item.writer.RetrySampleItemWriter" />

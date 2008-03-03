@@ -52,6 +52,8 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 	private ItemProcessor itemProcessor;
 
+	private RepeatTemplate stepOperations;
+
 	/**
 	 * Set the commit interval.
 	 * 
@@ -94,6 +96,15 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	 */
 	public void setListeners(BatchListener[] listeners) {
 		this.listeners = listeners;
+	}
+
+	/**
+	 * Protected getter for the step operations to make them available in
+	 * subclasses.
+	 * @return the step operations
+	 */
+	protected RepeatTemplate getStepOperations() {
+		return stepOperations;
 	}
 
 	/**
@@ -172,7 +183,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 		StepListener[] stepListeners = helper.getStepListeners(listeners);
 		itemReader = helper.getItemReader(itemReader, listeners);
 		itemWriter = helper.getItemWriter(itemWriter, listeners);
-		RepeatTemplate stepOperations = new RepeatTemplate();
+		stepOperations = new RepeatTemplate();
 		stepOperations = (RepeatTemplate) helper.getStepOperations(stepOperations, listeners);
 
 		// In case they are used by subclasses:
@@ -185,10 +196,11 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 			TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
 			repeatTemplate.setTaskExecutor(taskExecutor);
 			stepOperations = repeatTemplate;
-			step.setStepOperations(stepOperations);
 		}
 
-		KitchenSinkItemProcessor itemProcessor = new KitchenSinkItemProcessor(itemReader, itemWriter);
+		step.setStepOperations(stepOperations);
+
+		ItemSkipPolicyItemProcessor itemProcessor = new ItemSkipPolicyItemProcessor(itemReader, itemWriter);
 
 		if (skipLimit > 0) {
 			/*
@@ -209,4 +221,5 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 		step.setItemProcessor(itemProcessor);
 
 	}
+	
 }

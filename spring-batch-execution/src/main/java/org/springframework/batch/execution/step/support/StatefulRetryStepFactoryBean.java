@@ -16,10 +16,15 @@
 package org.springframework.batch.execution.step.support;
 
 import org.springframework.batch.core.domain.Step;
+import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
+import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
 import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
@@ -74,25 +79,25 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 	 */
 	protected void applyConfiguration(ItemOrientedStep step) {
 
-		// Ensure exception handler always rethrows. N.B. no skips ever actually
-		// take place.
-		if (retryPolicy != null) {
-			// TODO: actually we need to co-ordinate the retry policy with the
-			// exception handler limit, so this is a hack for now.
-			super.setSkipLimit(Integer.MAX_VALUE);
-		}
-
 		super.applyConfiguration(step);
 
 		if (retryPolicy != null) {
+
+			// TODO: actually we need to co-ordinate the retry policy with the
+			// exception handler limit, so this is a hack for now.
+			getStepOperations().setExceptionHandler(new SimpleLimitExceptionHandler(Integer.MAX_VALUE));
+
 			ItemReaderRetryCallback retryCallback = new ItemReaderRetryCallback(getItemReader(), getKeyGenerator(),
 					getItemWriter());
 			ItemReaderRetryPolicy itemProviderRetryPolicy = new ItemReaderRetryPolicy(retryPolicy);
+
 			RetryTemplate retryTemplate = new RetryTemplate();
 			retryTemplate.setRetryPolicy(itemProviderRetryPolicy);
-			KitchenSinkItemProcessor itemProcessor = (KitchenSinkItemProcessor) getItemProcessor();
-			itemProcessor.setRetryOperations(retryTemplate);
-			itemProcessor.setRetryCallback(retryCallback);
+
+			StatefulRetryItemProcessor itemProcessor = new StatefulRetryItemProcessor(getItemReader(), getItemWriter(), retryTemplate, retryCallback);
+			
+			step.setItemProcessor(itemProcessor);
+			
 		}
 
 	}
@@ -115,4 +120,48 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 
 	}
 
+	private static class StatefulRetryItemProcessor extends SimpleItemProcessor {
+
+		final private RetryOperations retryOperations;
+
+		final private ItemReaderRetryCallback retryCallback;
+
+		/**
+		 * @param itemReader
+		 * @param itemWriter
+		 * @param retryCallback 
+		 * @param retryTemplate 
+		 */
+		public StatefulRetryItemProcessor(ItemReader itemReader, ItemWriter itemWriter, RetryOperations retryTemplate, ItemReaderRetryCallback retryCallback) {
+			super(itemReader, itemWriter);
+			this.retryOperations = retryTemplate;
+			this.retryCallback = retryCallback;
+		}
+
+		/**
+		 * Execute the business logic, delegating to the reader and writer.
+		 * Subclasses could extend the behaviour as long as they always return
+		 * the value of this method call in their superclass.<br/>
+		 * 
+		 * Read from the {@link ItemReader} and process (if not null) with the
+		 * {@link ItemWriter}. The call to {@link ItemWriter} is wrapped in a
+		 * stateful retry. In that case the {@link ItemRecoverer} is used (if
+		 * provided) in the case of an exception to apply alternate processing
+		 * to the item. If the stateful retry is in place then the recovery will
+		 * happen in the next transaction automatically, otherwise it might be
+		 * necessary for clients to make the recover method transactional with
+		 * appropriate propagation behaviour (probably REQUIRES_NEW because the
+		 * call will happen in the context of a transaction that is about to
+		 * rollback).<br/>
+		 * 
+		 * @param contribution the current step
+		 * @return {@link ExitStatus#CONTINUABLE} if there is more processing to
+		 * do
+		 * @throws Exception if there is an error
+		 */
+		public ExitStatus process(StepContribution contribution) throws Exception {
+			return new ExitStatus(retryOperations.execute(retryCallback) != null);
+		}
+
+	}
 }
