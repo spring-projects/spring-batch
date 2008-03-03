@@ -44,8 +44,6 @@ public class JobInstance extends Entity {
 
 	private Job job;
 
-	private int jobExecutionCount;
-
 	private JobExecution lastExecution;
 
 	public JobInstance(Long id, JobParameters jobParameters, Job job) {
@@ -62,14 +60,6 @@ public class JobInstance extends Entity {
 
 	public JobExecution getLastExecution() {
 		return lastExecution;
-	}
-
-	public int getJobExecutionCount() {
-		return jobExecutionCount;
-	}
-
-	public void setJobExecutionCount(int jobExecutionCount) {
-		this.jobExecutionCount = jobExecutionCount;
 	}
 
 	/**

@@ -34,8 +34,6 @@ public interface Job {
 
 	List getSteps();
 
-	int getStartLimit();
-
 	boolean isRestartable();
 
 	/**

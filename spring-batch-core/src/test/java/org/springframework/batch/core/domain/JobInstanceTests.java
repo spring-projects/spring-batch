@@ -33,15 +33,6 @@ public class JobInstanceTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getJobExecutionCount()}.
-	 */
-	public void testGetJobExecutionCount() {
-		assertEquals(0, instance.getJobExecutionCount());
-		instance.setJobExecutionCount(22);
-		assertEquals(22, instance.getJobExecutionCount());
-	}
-	
-	/**
 	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getIdentifier()}.
 	 */
 	public void testGetName() {
