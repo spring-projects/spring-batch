@@ -1,0 +1,49 @@
+			 ------
+                         Spring Batch Upgrade
+                         ------
+                         Robert Kasanicky
+                         ------
+                         March 2008
+
+Updating Spring Batch jobs from 1.0.0.m4 to 1.0.0.m5 framework
+
+  This is a description of what needed to be done to migrate the samples from m4 to the m5 release.
+
+* JOB CONFIGURATION
+
+  * Tasklet's role has changed - no longer called iteratively, dedicated for tasks that are not natural to split into read-write phases (e.g. calling stored procedure or system command). Readers and writers are now typically injected into (ItemOriented)Step. See Tasklet and TaskletStep javadoc for more details.
+
+  * Step scope removed - lifecycle of readers and writers explicitly handled by Step - use Step's 'streams' property to register streams instead of using step scope.
+
+  * One applicaton context for job rather than parent container and child job context. CommandLineJobRunner requires only one xml file location.
+
+  * SimpleFlatFileItemReader and DefaultFlatFileItemReader merged into FlatFileItemReader
+
+  * LineAggregator is now inverse to LineTokenizer - method signature changed to 'String aggregate(FieldSet)'.
+
+
+* CONTAINER CONFIGURATION
+
+  * Modularized repository daos - JobInstanceDao, JobExecutionDao and StepExecutionDao instead of JobDao and StepDao.
+
+  * Step creation handled by factories.
+
+
+* VARIOUS
+
+  * ItemStream now has single 'open(ExecutionContext)' rather than 'open()' and 'restoreFrom(ExecutionContext)'.
+
+  * ItemStream no longer has mark() and reset() methods - moved to ItemReader. ItemWriter uses more intuitive clear() and flush().
+
+  * Interceptors renamed to Listeners e.g. RepeatInterceptor is now RepeatListener.
+
+  * StepContext merged into ExecutionContext (previously ExecutionAttributes). Single ExecutionContext is now shared between ItemStreams instead of separate contexts being composed before save and decomposed after load. ItemStreams now have names to distinguish context keys of multiple ItemStreams of the same class.
+
+  * Domain-oriented listeners introduced - JobListener, StepListener, ChunkListener, ItemReadListener, ItemWriteListener.
+
+  * StepInstance removed from domain model.
+
+  * Database schema normalized.
+
+  * JobInstance identity is now given by Job and JobParameters pair - identical JobInstances with different IDs no longer allowed (see JobInstance javadoc for more details).
+
