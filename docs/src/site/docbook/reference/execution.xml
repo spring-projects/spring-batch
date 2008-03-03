@@ -98,7 +98,7 @@
   </section>
 
   <section>
-    <title>Configuration
+    <title>Configuration</title>
       <para>
         <programlisting>
         &lt;property name="itemProvider"&gt;
