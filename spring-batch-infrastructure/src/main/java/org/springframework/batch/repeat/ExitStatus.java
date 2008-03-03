@@ -49,6 +49,11 @@ public class ExitStatus implements Serializable {
 	 * Convenient constant value representing finished processing.
 	 */
 	public static final ExitStatus FINISHED = new ExitStatus(false, "COMPLETED");
+	
+	/**
+	 * Convenient constant value representing interrupted processing.
+	 */
+	public static final ExitStatus INTERRUPTED = new ExitStatus(false, "INTERRUPTED");
 
 	/**
 	 * Convenient constant value representing job that did no processing (e.g.

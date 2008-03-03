@@ -60,6 +60,15 @@ public class ExitStatusTests extends TestCase {
 	public void testEqualsWithSameProperties() throws Exception {
 		assertEquals(ExitStatus.CONTINUABLE, new ExitStatus(true, "CONTINUABLE"));
 	}
+	
+	public void testEqualsSelf(){
+		ExitStatus status = new ExitStatus(true, "test");
+		assertEquals(status, status);
+	}
+	
+	public void testEquals(){
+		assertEquals(new ExitStatus(true, "test"), new ExitStatus(true, "test"));
+	}
 
 	/**
 	 * Test equality of exit statuses.
