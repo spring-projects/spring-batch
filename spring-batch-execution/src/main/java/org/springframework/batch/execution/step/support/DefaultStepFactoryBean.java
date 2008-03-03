@@ -19,7 +19,7 @@ import org.springframework.batch.core.domain.BatchListener;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.execution.step.ItemOrientedStep;
-import org.springframework.batch.execution.step.ItemProcessor;
+import org.springframework.batch.execution.step.ItemHandler;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -50,7 +50,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 	private TaskExecutor taskExecutor;
 
-	private ItemProcessor itemProcessor;
+	private ItemHandler itemHandler;
 
 	private RepeatTemplate stepOperations;
 
@@ -121,16 +121,16 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	 * Public getter for the ItemProcessor.
 	 * @return the itemProcessor
 	 */
-	protected ItemProcessor getItemProcessor() {
-		return itemProcessor;
+	protected ItemHandler getItemProcessor() {
+		return itemHandler;
 	}
 
 	/**
 	 * Public setter for the ItemProcessor.
-	 * @param itemProcessor the itemProcessor to set
+	 * @param itemHandler the itemProcessor to set
 	 */
-	protected void setItemProcessor(ItemProcessor itemProcessor) {
-		this.itemProcessor = itemProcessor;
+	protected void setItemProcessor(ItemHandler itemHandler) {
+		this.itemHandler = itemHandler;
 	}
 
 	/**
@@ -200,7 +200,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 		step.setStepOperations(stepOperations);
 
-		ItemSkipPolicyItemProcessor itemProcessor = new ItemSkipPolicyItemProcessor(itemReader, itemWriter);
+		ItemSkipPolicyItemHandler itemProcessor = new ItemSkipPolicyItemHandler(itemReader, itemWriter);
 
 		if (skipLimit > 0) {
 			/*

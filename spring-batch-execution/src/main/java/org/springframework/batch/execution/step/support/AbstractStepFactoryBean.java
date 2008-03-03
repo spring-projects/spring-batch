@@ -157,7 +157,7 @@ public abstract class AbstractStepFactoryBean extends AbstractFactoryBean implem
 		Assert.notNull(jobRepository, "JobRepository must be provided");
 		Assert.notNull(transactionManager, "TransactionManager must be provided");
 		
-		step.setItemProcessor(new SimpleItemProcessor(itemReader, itemWriter));
+		step.setItemProcessor(new SimpleItemHandler(itemReader, itemWriter));
 		step.setTransactionManager(transactionManager);
 		step.setJobRepository(jobRepository);
 		step.setStartLimit(startLimit);

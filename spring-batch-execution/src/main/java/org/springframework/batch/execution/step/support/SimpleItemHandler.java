@@ -16,7 +16,7 @@
 package org.springframework.batch.execution.step.support;
 
 import org.springframework.batch.core.domain.StepContribution;
-import org.springframework.batch.execution.step.ItemProcessor;
+import org.springframework.batch.execution.step.ItemHandler;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ClearFailedException;
@@ -26,14 +26,14 @@ import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * Simplest possible implementation of {@link ItemProcessor} with no skipping or
+ * Simplest possible implementation of {@link ItemHandler} with no skipping or
  * recovering. Just delegates all calls to the provided {@link ItemReader} and
  * {@link ItemWriter}.
  * 
  * @author Dave Syer
  * 
  */
-public class SimpleItemProcessor implements ItemProcessor {
+public class SimpleItemHandler implements ItemHandler {
 
 	private ItemReader itemReader;
 
@@ -43,7 +43,7 @@ public class SimpleItemProcessor implements ItemProcessor {
 	 * @param itemReader
 	 * @param itemWriter
 	 */
-	public SimpleItemProcessor(ItemReader itemReader, ItemWriter itemWriter) {
+	public SimpleItemHandler(ItemReader itemReader, ItemWriter itemWriter) {
 		super();
 		this.itemReader = itemReader;
 		this.itemWriter = itemWriter;
@@ -69,14 +69,14 @@ public class SimpleItemProcessor implements ItemProcessor {
 	 * Read from the {@link ItemReader} and process (if not null) with the
 	 * {@link ItemWriter}.
 	 * 
-	 * @see org.springframework.batch.execution.step.ItemProcessor#process(org.springframework.batch.core.domain.StepContribution)
+	 * @see org.springframework.batch.execution.step.ItemHandler#handle(org.springframework.batch.core.domain.StepContribution)
 	 */
-	public ExitStatus process(StepContribution contribution) throws Exception {
-		Object item = read();
+	public ExitStatus handle(StepContribution contribution) throws Exception {
+		Object item = itemReader.read();
 		if (item == null) {
 			return ExitStatus.FINISHED;
 		}
-		write(item);
+		itemWriter.write(item);
 		return ExitStatus.CONTINUABLE;
 	}
 
@@ -86,15 +86,6 @@ public class SimpleItemProcessor implements ItemProcessor {
 	 */
 	public void mark() throws MarkFailedException {
 		itemReader.mark();
-	}
-
-	/**
-	 * @return
-	 * @throws Exception
-	 * @see org.springframework.batch.item.ItemReader#read()
-	 */
-	public Object read() throws Exception {
-		return itemReader.read();
 	}
 
 	/**
@@ -119,15 +110,6 @@ public class SimpleItemProcessor implements ItemProcessor {
 	 */
 	public void flush() throws FlushFailedException {
 		itemWriter.flush();
-	}
-
-	/**
-	 * @param item
-	 * @throws Exception
-	 * @see org.springframework.batch.item.ItemWriter#write(java.lang.Object)
-	 */
-	public void write(Object item) throws Exception {
-		itemWriter.write(item);
 	}
 
 }

@@ -26,7 +26,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * 
  */
-public class ItemSkipPolicyItemProcessor extends SimpleItemProcessor {
+public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 
 	private ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
 
@@ -34,7 +34,7 @@ public class ItemSkipPolicyItemProcessor extends SimpleItemProcessor {
 	 * @param itemReader
 	 * @param itemWriter
 	 */
-	public ItemSkipPolicyItemProcessor(ItemReader itemReader, ItemWriter itemWriter) {
+	public ItemSkipPolicyItemHandler(ItemReader itemReader, ItemWriter itemWriter) {
 		super(itemReader, itemWriter);
 	}
 
@@ -60,12 +60,12 @@ public class ItemSkipPolicyItemProcessor extends SimpleItemProcessor {
 	 * @return {@link ExitStatus#CONTINUABLE} if there is more processing to do
 	 * @throws Exception if there is an error
 	 */
-	public ExitStatus process(StepContribution contribution) throws Exception {
+	public ExitStatus handle(StepContribution contribution) throws Exception {
 		ExitStatus exitStatus = ExitStatus.CONTINUABLE;
 
 		try {
 
-			exitStatus = super.process(contribution);
+			exitStatus = super.handle(contribution);
 
 		}
 		catch (Exception e) {

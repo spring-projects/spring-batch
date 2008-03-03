@@ -18,6 +18,10 @@ package org.springframework.batch.execution.step;
 import org.springframework.batch.core.domain.StepContribution;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.exception.ClearFailedException;
+import org.springframework.batch.item.exception.FlushFailedException;
+import org.springframework.batch.item.exception.MarkFailedException;
+import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -28,7 +32,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * 
  */
-public interface ItemProcessor extends ItemReader, ItemWriter {
+public interface ItemHandler {
 
 	/**
 	 * Given the current context in the form of a step contribution, do whatever
@@ -41,6 +45,34 @@ public interface ItemProcessor extends ItemReader, ItemWriter {
 	 * @return an {@link ExitStatus} indicating whether processing is
 	 * continuable.
 	 */
-	ExitStatus process(StepContribution contribution) throws Exception;
+	ExitStatus handle(StepContribution contribution) throws Exception;
+
+	/**
+	 * Implementations should delegate to an {@link ItemReader}.
+	 * 
+	 * @see org.springframework.batch.item.ItemReader#mark()
+	 */
+	void mark() throws MarkFailedException;
+
+	/**
+	 * Implementations should delegate to an {@link ItemReader}.
+	 * 
+	 * @see org.springframework.batch.item.ItemReader#reset()
+	 */
+	void reset() throws ResetFailedException;
+
+	/**
+	 * Implementations should delegate to an {@link ItemWriter}.
+	 * 
+	 * @see org.springframework.batch.item.ItemWriter#flush()
+	 */
+	public void flush() throws FlushFailedException;
+
+	/**
+	 * Implementations should delegate to an {@link ItemWriter}.
+	 * 
+	 * @see org.springframework.batch.item.ItemWriter#clear()
+	 */
+	public void clear() throws ClearFailedException;
 
 }

@@ -74,13 +74,13 @@ public class StepExecutorInterruptionTests extends TestCase {
 			public void write(Object item) throws Exception {
 			}
 		};
-		step.setItemProcessor(new SimpleItemProcessor(new ItemReaderAdapter(), itemWriter));
+		step.setItemProcessor(new SimpleItemHandler(new ItemReaderAdapter(), itemWriter));
 	}
 
 	public void testInterruptChunk() throws Exception {
 
 		final StepExecution stepExecution = new StepExecution(step, jobExecution);
-		step.setItemProcessor(new SimpleItemProcessor(new AbstractItemReader() {
+		step.setItemProcessor(new SimpleItemHandler(new AbstractItemReader() {
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
 				double foo = 1;

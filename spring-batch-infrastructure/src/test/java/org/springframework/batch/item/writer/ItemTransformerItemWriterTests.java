@@ -12,7 +12,7 @@ import org.springframework.batch.item.writer.ItemTransformerItemWriter;
  * 
  * @author Robert Kasanicky
  */
-public class TransformerWriterItemProcessorTests extends TestCase {
+public class ItemTransformerItemWriterTests extends TestCase {
 
 	private ItemTransformerItemWriter processor = new ItemTransformerItemWriter();
 

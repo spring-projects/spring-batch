@@ -94,7 +94,7 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 			RetryTemplate retryTemplate = new RetryTemplate();
 			retryTemplate.setRetryPolicy(itemProviderRetryPolicy);
 
-			StatefulRetryItemProcessor itemProcessor = new StatefulRetryItemProcessor(getItemReader(), getItemWriter(), retryTemplate, retryCallback);
+			StatefulRetryItemHandler itemProcessor = new StatefulRetryItemHandler(getItemReader(), getItemWriter(), retryTemplate, retryCallback);
 			
 			step.setItemProcessor(itemProcessor);
 			
@@ -120,7 +120,7 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 
 	}
 
-	private static class StatefulRetryItemProcessor extends SimpleItemProcessor {
+	private static class StatefulRetryItemHandler extends SimpleItemHandler {
 
 		final private RetryOperations retryOperations;
 
@@ -132,7 +132,7 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 		 * @param retryCallback 
 		 * @param retryTemplate 
 		 */
-		public StatefulRetryItemProcessor(ItemReader itemReader, ItemWriter itemWriter, RetryOperations retryTemplate, ItemReaderRetryCallback retryCallback) {
+		public StatefulRetryItemHandler(ItemReader itemReader, ItemWriter itemWriter, RetryOperations retryTemplate, ItemReaderRetryCallback retryCallback) {
 			super(itemReader, itemWriter);
 			this.retryOperations = retryTemplate;
 			this.retryCallback = retryCallback;
@@ -159,7 +159,7 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 		 * do
 		 * @throws Exception if there is an error
 		 */
-		public ExitStatus process(StepContribution contribution) throws Exception {
+		public ExitStatus handle(StepContribution contribution) throws Exception {
 			return new ExitStatus(retryOperations.execute(retryCallback) != null);
 		}
 

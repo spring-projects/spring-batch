@@ -89,7 +89,7 @@ public class ItemOrientedStep extends AbstractStep {
 
 	private PlatformTransactionManager transactionManager;
 
-	private ItemProcessor itemProcessor;
+	private ItemHandler itemHandler;
 
 	/**
 	 * @param name
@@ -117,11 +117,11 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 	
 	/**
-	 * Public setter for the {@link ItemProcessor}.
-	 * @param itemProcessor the {@link ItemProcessor} to set
+	 * Public setter for the {@link ItemHandler}.
+	 * @param itemHandler the {@link ItemHandler} to set
 	 */
-	public void setItemProcessor(ItemProcessor itemProcessor) {
-		this.itemProcessor = itemProcessor;
+	public void setItemProcessor(ItemHandler itemHandler) {
+		this.itemHandler = itemHandler;
 	}
 
 	/**
@@ -281,7 +281,7 @@ public class ItemOrientedStep extends AbstractStep {
 
 					try {
 
-						itemProcessor.mark();
+						itemHandler.mark();
 						result = processChunk(contribution);
 						contribution.incrementCommitCount();
 
@@ -307,8 +307,8 @@ public class ItemOrientedStep extends AbstractStep {
 						}
 
 						try {
-							itemProcessor.mark();
-							itemProcessor.flush();
+							itemHandler.mark();
+							itemHandler.flush();
 							transactionManager.commit(transaction);
 						}
 						catch (Exception e) {
@@ -334,8 +334,8 @@ public class ItemOrientedStep extends AbstractStep {
 						}
 
 						try {
-							itemProcessor.reset();
-							itemProcessor.clear();
+							itemHandler.reset();
+							itemHandler.clear();
 							transactionManager.rollback(transaction);
 						}
 						catch (Exception e) {
@@ -457,7 +457,7 @@ public class ItemOrientedStep extends AbstractStep {
 				}
 				// check for interruption before each item as well
 				interruptionPolicy.checkInterrupted(context);
-				ExitStatus exitStatus = itemProcessor.process(contribution);
+				ExitStatus exitStatus = itemHandler.handle(contribution);
 				contribution.incrementTaskCount();
 				// check for interruption after each item as well
 				interruptionPolicy.checkInterrupted(context);
