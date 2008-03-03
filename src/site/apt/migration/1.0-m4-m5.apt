@@ -13,9 +13,9 @@ Updating Spring Batch jobs from 1.0.0.m4 to 1.0.0.m5 framework
 
   * Tasklet's role has changed - It is no longer called iteratively, but is now dedicated for tasks that are not natural to split into read-write phases (e.g. calling stored procedure or system command). Readers and writers are now typically injected into (ItemOriented)Step. See Tasklet and TaskletStep javadoc for more details.
 
-  * Step scope removed - lifecycle of readers and writers explicitly handled by Step.
+  * Step scope removed - lifecycle of readers and writers explicitly handled by Step.  They need to be registered for the lifecycle callbacks with the step.  This is automatic if using one of the new step factory beans, but only for the directly injected reader and writer.  Any indirect dependencies need to be registered separately (using the streams property of the factory bean).
 
-  * One applicaton context for job rather than parent container and child job context. CommandLineJobRunner requires only one xml file location.
+  * When launching from command line there is one applicaton context for job rather than parent container and child job context. CommandLineJobRunner requires only one xml file location.  It is recommended to use a new ApplicationContext per job execution for other use cases involving launching multiple jobs in a single VM.  The JMX demo in the samples shows this in practice.
 
   * SimpleFlatFileItemReader and DefaultFlatFileItemReader merged into FlatFileItemReader
 
