@@ -16,6 +16,10 @@
 
 package org.springframework.batch.retry.support;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.retry.RetryCallback;
@@ -80,12 +84,14 @@ public class RetryTemplate implements RetryOperations {
 	}
 
 	/**
-	 * Setter for single listener if there is only one.
+	 * Register an additional listener.
 	 * @param listener
 	 * @see #setListeners(RetryListener[])
 	 */
-	public void setListener(RetryListener listener) {
-		this.listeners = new RetryListener[] { listener };
+	public void registerListener(RetryListener listener) {
+		List list = new ArrayList(Arrays.asList(listeners));
+		list.add(listener);
+		listeners = (RetryListener[]) list.toArray(new RetryListener[list.size()]);
 	}
 
 	/**

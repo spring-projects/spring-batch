@@ -58,7 +58,7 @@ public class CompositeStepListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.listener.CompositeStepListener#setListener(org.springframework.batch.core.domain.StepListener)}.
+	 * {@link org.springframework.batch.execution.listener.CompositeStepListener#registerListener(org.springframework.batch.core.domain.StepListener)}.
 	 */
 	public void testSetListener() {
 		listener.register(new StepListenerSupport() {

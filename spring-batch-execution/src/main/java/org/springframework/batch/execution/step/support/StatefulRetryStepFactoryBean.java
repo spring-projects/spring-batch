@@ -34,9 +34,6 @@ import org.springframework.batch.retry.support.RetryTemplate;
  * limit given by the {@link RetryPolicy}. When the retry is exhausted instead
  * of the item being skipped it is handled by an {@link ItemRecoverer}.<br/>
  * 
- * TODO: make sure listeners are called, and add item listener callbacks to the
- * recovery path.
- * 
  * TODO: checking for null retry callback is a sucky way of determining if a
  * stateful retry has been requested.
  * 

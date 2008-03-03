@@ -25,7 +25,6 @@ import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.exception.TerminatedRetryException;
-import org.springframework.batch.retry.listener.RetryListenerSupport;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 
@@ -62,7 +61,7 @@ public class RetryListenerTests extends TestCase {
 	}
 
 	public void testOpenCanVetoRetry() throws Exception {
-		template.setListener(new RetryListenerSupport() {
+		template.registerListener(new RetryListenerSupport() {
 			public boolean open(RetryContext context, RetryCallback callback) {
 				list.add("1");
 				return false;
@@ -140,7 +139,7 @@ public class RetryListenerTests extends TestCase {
 	}
 
 	public void testCloseInterceptorsAfterRetry() throws Exception {
-		template.setListener(new RetryListenerSupport() {
+		template.registerListener(new RetryListenerSupport() {
 			public void close(RetryContext context, RetryCallback callback, Throwable t) {
 				list.add("" + count);
 				// The last attempt should have been successful:

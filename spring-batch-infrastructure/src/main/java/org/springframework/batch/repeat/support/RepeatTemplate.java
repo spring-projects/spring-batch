@@ -16,7 +16,10 @@
 
 package org.springframework.batch.repeat.support;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,15 +50,15 @@ import org.springframework.util.Assert;
  * finish when exceptions are received. This is not the default behaviour.<br/>
  * 
  * Clients that want to take some business action when an exception is thrown by
- * the {@link RepeatCallback} can consider using a custom
- * {@link RepeatListener} instead of trying to customise the
- * {@link CompletionPolicy}. This is generally a friendlier interface to
- * implement, and the {@link RepeatListener#after(RepeatContext, ExitStatus)}
- * method is passed in the result of the callback, which would be an instance of
- * {@link Throwable} if the business processing had thrown an exception. If the
- * exception is not to be propagated to the caller, then a non-default
- * {@link CompletionPolicy} needs to be provided as well, but that could be off
- * the shelf, with the business action implemented only in the interceptor.
+ * the {@link RepeatCallback} can consider using a custom {@link RepeatListener}
+ * instead of trying to customise the {@link CompletionPolicy}. This is
+ * generally a friendlier interface to implement, and the
+ * {@link RepeatListener#after(RepeatContext, ExitStatus)} method is passed in
+ * the result of the callback, which would be an instance of {@link Throwable}
+ * if the business processing had thrown an exception. If the exception is not
+ * to be propagated to the caller, then a non-default {@link CompletionPolicy}
+ * needs to be provided as well, but that could be off the shelf, with the
+ * business action implemented only in the interceptor.
  * 
  * @author Dave Syer
  * 
@@ -70,12 +73,25 @@ public class RepeatTemplate implements RepeatOperations {
 
 	private ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
 
+	/**
+	 * Set the listeners for this template, registering them for callbacks at
+	 * appropriate times in the iteration.
+	 * 
+	 * @param listeners
+	 */
 	public void setListeners(RepeatListener[] listeners) {
 		this.listeners = listeners;
 	}
 
-	public void setListener(RepeatListener listener) {
-		listeners = new RepeatListener[] { listener };
+	/**
+	 * Register an additional listener.
+	 * 
+	 * @param listener
+	 */
+	public void registerListener(RepeatListener listener) {
+		List list = new ArrayList(Arrays.asList(listeners));
+		list.add(listener);
+		listeners = (RepeatListener[]) list.toArray(new RepeatListener[list.size()]);
 	}
 
 	/**
@@ -87,8 +103,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @see DefaultExceptionHandler
 	 * @see #setCompletionPolicy(CompletionPolicy)
 	 * 
-	 * @param exceptionHandler
-	 *            the {@link ExceptionHandler} to use.
+	 * @param exceptionHandler the {@link ExceptionHandler} to use.
 	 */
 	public void setExceptionHandler(ExceptionHandler exceptionHandler) {
 		this.exceptionHandler = exceptionHandler;
@@ -103,10 +118,8 @@ public class RepeatTemplate implements RepeatOperations {
 	 * 
 	 * @see #setExceptionHandler(ExceptionHandler)
 	 * 
-	 * @param terminationPolicy
-	 *            a TerminationPolicy.
-	 * @throws IllegalArgumentException
-	 *             if the argument is null
+	 * @param terminationPolicy a TerminationPolicy.
+	 * @throws IllegalArgumentException if the argument is null
 	 */
 	public void setCompletionPolicy(CompletionPolicy terminationPolicy) {
 		Assert.notNull(terminationPolicy);
@@ -129,7 +142,8 @@ public class RepeatTemplate implements RepeatOperations {
 			// This works with an asynchronous TaskExecutor: the
 			// interceptors have to wait for the child processes.
 			result = executeInternal(callback);
-		} finally {
+		}
+		finally {
 			RepeatSynchronizationManager.clear();
 			if (outer != null) {
 				RepeatSynchronizationManager.register(outer);
@@ -143,11 +157,10 @@ public class RepeatTemplate implements RepeatOperations {
 	 * Internal convenience method to loop over interceptors and batch
 	 * callbacks.
 	 * 
-	 * @param callback
-	 *            the callback to process each element of the loop.
+	 * @param callback the callback to process each element of the loop.
 	 * 
 	 * @return the aggregate of {@link ContinuationPolicy#canContinue(Object)}
-	 *         for all the results from the callback.
+	 * for all the results from the callback.
 	 * 
 	 */
 	private ExitStatus executeInternal(final RepeatCallback callback) {
@@ -193,15 +206,15 @@ public class RepeatTemplate implements RepeatOperations {
 				// Check that we are still running...
 				if (running) {
 
-					logger.debug("Batch operation about to start at count="
-							+ context.getStartedCount());
+					logger.debug("Batch operation about to start at count=" + context.getStartedCount());
 
 					try {
 
 						result = getNextResult(context, callback, state);
 						executeAfterInterceptors(context, result);
 
-					} catch (Throwable throwable) {
+					}
+					catch (Throwable throwable) {
 
 						// An exception alone is not sufficient grounds for not
 						// continuing
@@ -213,22 +226,19 @@ public class RepeatTemplate implements RepeatOperations {
 								interceptor.onError(context, throwable);
 								// This is not an error - only log at debug
 								// level.
-								logger.debug("Exception intercepted ("
-										+ (i + 1) + " of "
-										+ listeners.length + ")", throwable);
+								logger.debug("Exception intercepted (" + (i + 1) + " of " + listeners.length + ")",
+										throwable);
 							}
-							exceptionHandler
-									.handleException(context, throwable);
+							exceptionHandler.handleException(context, throwable);
 
-						} catch (Throwable handled) {
+						}
+						catch (Throwable handled) {
 							throwables.add(handled);
 						}
 					}
 
 					// N.B. the order may be important here:
-					if (isComplete(context, result)
-							|| isMarkedComplete(context)
-							|| !throwables.isEmpty()) {
+					if (isComplete(context, result) || isMarkedComplete(context) || !throwables.isEmpty()) {
 						running = false;
 					}
 				}
@@ -254,14 +264,16 @@ public class RepeatTemplate implements RepeatOperations {
 					rethrow((Throwable) throwables.iterator().next());
 				}
 
-			} finally {
+			}
+			finally {
 
 				try {
 					for (int i = listeners.length; i-- > 0;) {
 						RepeatListener interceptor = listeners[i];
 						interceptor.close(context);
 					}
-				} finally {
+				}
+				finally {
 					// TODO: extend this to the completion policy?
 					context.close();
 				}
@@ -283,8 +295,7 @@ public class RepeatTemplate implements RepeatOperations {
 			throw (RuntimeException) next;
 		}
 		;
-		throw new RepeatException(
-				"Rethrowing exception that is no RuntimeException.", next);
+		throw new RepeatException("Rethrowing exception that is no RuntimeException.", next);
 	}
 
 	/**
@@ -294,8 +305,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * an accumulation of Throwable instances for processing at the end of the
 	 * batch.
 	 * 
-	 * @param context
-	 *            the current {@link RepeatContext}
+	 * @param context the current {@link RepeatContext}
 	 * @return a {@link RepeatInternalState} instance.
 	 */
 	protected RepeatInternalState createInternalState(RepeatContext context) {
@@ -306,23 +316,20 @@ public class RepeatTemplate implements RepeatOperations {
 	 * Get the next completed result, possibly executing several callbacks until
 	 * one finally finishes.
 	 * 
-	 * @param context
-	 *            current BatchContext.
-	 * @param callback
-	 *            the callback to execute.
-	 * @param state
-	 *            maintained by the implementation.
+	 * @param context current BatchContext.
+	 * @param callback the callback to execute.
+	 * @param state maintained by the implementation.
 	 * @return a finished result.
 	 * 
 	 * @see {@link #isComplete(RepeatContext)}
 	 */
-	protected ExitStatus getNextResult(RepeatContext context,
-			RepeatCallback callback, RepeatInternalState state)
+	protected ExitStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
 			throws Throwable {
 		try {
 			update(context);
 			return callback.doInIteration(context);
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			throw t;
 		}
 	}
@@ -331,10 +338,9 @@ public class RepeatTemplate implements RepeatOperations {
 	 * If necessary, wait for results to come back from remote or concurrent
 	 * processes. By default does nothing and returns true.
 	 * 
-	 * @param state
-	 *            the internal state.
+	 * @param state the internal state.
 	 * @return true if {@link #canContinue(Object)} is true for all results
-	 *         retrieved.
+	 * retrieved.
 	 */
 	protected boolean waitForResults(RepeatInternalState state) {
 		// no-op by default
@@ -344,8 +350,7 @@ public class RepeatTemplate implements RepeatOperations {
 	/**
 	 * Check return value from batch operation.
 	 * 
-	 * @param value
-	 *            the last callback result.
+	 * @param value the last callback result.
 	 * @return true if the value is {@link ExitStatus#CONTINUABLE}.
 	 */
 	protected final boolean canContinue(ExitStatus value) {
@@ -367,13 +372,10 @@ public class RepeatTemplate implements RepeatOperations {
 	/**
 	 * Convenience method to execute after interceptors on a callback result.
 	 * 
-	 * @param context
-	 *            the current batch context.
-	 * @param value
-	 *            the result of the callback to process.
+	 * @param context the current batch context.
+	 * @param value the result of the callback to process.
 	 */
-	protected void executeAfterInterceptors(final RepeatContext context,
-			ExitStatus value) {
+	protected void executeAfterInterceptors(final RepeatContext context, ExitStatus value) {
 
 		// Don't re-throw exceptions here: let the exception handler deal with
 		// that...
@@ -392,13 +394,12 @@ public class RepeatTemplate implements RepeatOperations {
 	 * Delegate to the {@link CompletionPolicy}.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext,
-	 *      ExitStatus)
+	 * ExitStatus)
 	 */
 	public boolean isComplete(RepeatContext context, ExitStatus result) {
 		boolean complete = completionPolicy.isComplete(context, result);
 		if (complete) {
-			logger
-					.debug("Batch is complete according to policy and result value.");
+			logger.debug("Batch is complete according to policy and result value.");
 		}
 		return complete;
 	}
@@ -411,8 +412,7 @@ public class RepeatTemplate implements RepeatOperations {
 	public boolean isComplete(RepeatContext context) {
 		boolean complete = completionPolicy.isComplete(context);
 		if (complete) {
-			logger
-					.debug("Batch is complete according to policy alone not including result.");
+			logger.debug("Batch is complete according to policy alone not including result.");
 		}
 		return complete;
 	}

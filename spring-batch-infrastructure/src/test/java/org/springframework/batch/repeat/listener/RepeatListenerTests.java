@@ -63,7 +63,7 @@ public class RepeatListenerTests extends TestCase {
 	public void testBeforeInterceptorCanVeto() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List calls = new ArrayList();
-		template.setListener(new RepeatListenerSupport() {
+		template.registerListener(new RepeatListenerSupport() {
 			public void before(RepeatContext context) {
 				calls.add("1");
 				context.setCompleteOnly();
@@ -130,7 +130,7 @@ public class RepeatListenerTests extends TestCase {
 	public void testSingleOpenInterceptor() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List calls = new ArrayList();
-		template.setListener(new RepeatListenerSupport() {
+		template.registerListener(new RepeatListenerSupport() {
 			public void open(RepeatContext context) {
 				calls.add("1");
 			}

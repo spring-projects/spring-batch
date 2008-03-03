@@ -22,37 +22,36 @@ import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
+import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
-import org.springframework.core.task.TaskExecutor;
 
 /**
- * Adds listeners to {@link SimpleStepFactoryBean}.
+ * Extends a {@link SimpleStepFactoryBean} allowing registration of listeners
+ * and also direct injection of the {@link RepeatOperations} needed at step and
+ * chunk level.
  * 
  * @author Dave Syer
  * 
  */
-public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
+public class RepeatOperationsStepFactoryBean extends AbstractStepFactoryBean {
 
-	private boolean alwaysSkip = false;
+	private ItemStream[] streams = new ItemStream[0];
 
 	private BatchListener[] listeners = new BatchListener[0];
 
-	private ListenerMulticaster listener = new ListenerMulticaster();
+	private RepeatOperations chunkOperations = new RepeatTemplate();
 
-	private TaskExecutor taskExecutor;
+	private RepeatOperations stepOperations = new RepeatTemplate();
 
 	/**
-	 * Public setter for a flag that determines skip policy. If this flag is
-	 * true then an exception in chunk processing will cause the item to be
-	 * skipped and no exceptions propagated. If it is false then all exceptions
-	 * will be propagated from the chunk and cause the step to abort.
+	 * The streams to inject into the {@link Step}. Any instance of
+	 * {@link ItemStream} can be used, and will then receive callbacks at the
+	 * appropriate stage in the step.
 	 * 
-	 * @param alwaysSkip the value to set. Default is false.
+	 * @param streams an array of listeners
 	 */
-	public void setAlwaysSkip(boolean alwaysSkip) {
-		this.alwaysSkip = alwaysSkip;
+	public void setStreams(ItemStream[] streams) {
+		this.streams = streams;
 	}
 
 	/**
@@ -67,13 +66,25 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 	}
 
 	/**
-	 * Public setter for the {@link TaskExecutor}. If this is set, then it will
-	 * be used to execute the chunk processing inside the {@link Step}.
+	 * The {@link RepeatOperations} to use for the outer loop of the batch
+	 * processing. Should be set up by the caller through a factory. Defaults to
+	 * a plain {@link RepeatTemplate}.
 	 * 
-	 * @param taskExecutor the taskExecutor to set
+	 * @param stepOperations a {@link RepeatOperations} instance.
 	 */
-	public void setTaskExecutor(TaskExecutor taskExecutor) {
-		this.taskExecutor = taskExecutor;
+	public void setStepOperations(RepeatOperations stepOperations) {
+		this.stepOperations = stepOperations;
+	}
+
+	/**
+	 * The {@link RepeatOperations} to use for the inner loop of the batch
+	 * processing. should be set up by the caller through a factory. defaults to
+	 * a plain {@link RepeatTemplate}.
+	 * 
+	 * @param chunkOperations a {@link RepeatOperations} instance.
+	 */
+	public void setChunkOperations(RepeatOperations chunkOperations) {
+		this.chunkOperations = chunkOperations;
 	}
 
 	/**
@@ -83,22 +94,17 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 	protected void applyConfiguration(ItemOrientedStep step) {
 
 		super.applyConfiguration(step);
-		for (int i = 0; i < listeners.length; i++) {
-			BatchListener listener = listeners[i];
-			if (listener instanceof StepListener) {
-				step.registerStepListener((StepListener) listener);
-			}
-			else {
-				this.listener.register(listener);
-			}
-		}
+
+		step.setStreams(streams);
 
 		ItemReader itemReader = getItemReader();
 		ItemWriter itemWriter = getItemWriter();
 
-		// Since we are going to wrap these things with listener callbacks we
-		// need to register them here because the step will not know we did
-		// that.
+		/*
+		 * Since we are going to wrap these things with listener callbacks we
+		 * need to register them here because the step will not know we did
+		 * that.
+		 */
 		if (itemReader instanceof ItemStream) {
 			step.registerStream((ItemStream) itemReader);
 		}
@@ -117,8 +123,7 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 		StepListener[] stepListeners = helper.getStepListeners(listeners);
 		itemReader = helper.getItemReader(itemReader, listeners);
 		itemWriter = helper.getItemWriter(itemWriter, listeners);
-		RepeatTemplate stepOperations = new RepeatTemplate();
-		stepOperations = (RepeatTemplate) helper.getStepOperations(stepOperations, listeners);
+		RepeatOperations stepOperations = helper.getStepOperations(this.stepOperations, listeners);
 
 		// In case they are used by subclasses:
 		setItemReader(itemReader);
@@ -128,24 +133,9 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 		step.setItemReader(itemReader);
 		step.setItemWriter(itemWriter);
 
-		if (taskExecutor != null) {
-			TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
-			repeatTemplate.setTaskExecutor(taskExecutor);
-			stepOperations = repeatTemplate;
-		}
-
-		if (alwaysSkip) {
-			// If we always skip (not the default) then we are prepared to
-			// absorb all exceptions at the step level because the failed items
-			// will never re-appear after a rollback.
-			step.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
-			stepOperations.setExceptionHandler(new SimpleLimitExceptionHandler(Integer.MAX_VALUE));
-			step.setStepOperations(stepOperations);
-		}
-		else {
-			// This is the default in ItemOrientedStep anyway...
-			step.setItemSkipPolicy(new NeverSkipItemSkipPolicy());
-		}
+		step.setChunkOperations(chunkOperations);
+		step.setStepOperations(stepOperations);
 
 	}
+
 }

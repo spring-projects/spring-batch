@@ -107,6 +107,22 @@ public abstract class AbstractStepFactoryBean extends AbstractFactoryBean implem
 	}
 
 	/**
+	 * Protected getter for the {@link ItemReader} for subclasses to use.
+	 * @return the itemReader
+	 */
+	protected ItemReader getItemReader() {
+		return itemReader;
+	}
+
+	/**
+	 * Protected getter for the {@link ItemWriter} for subclasses to use
+	 * @return the itemWriter
+	 */
+	protected ItemWriter getItemWriter() {
+		return itemWriter;
+	}
+
+	/**
 	 * Public setter for {@link JobRepository}.
 	 * 
 	 * @param jobRepository is a mandatory dependence (no default).
@@ -152,22 +168,6 @@ public abstract class AbstractStepFactoryBean extends AbstractFactoryBean implem
 
 	public Class getObjectType() {
 		return Step.class;
-	}
-
-	/**
-	 * Public getter for the ItemReader.
-	 * @return the itemReader
-	 */
-	public ItemReader getItemReader() {
-		return itemReader;
-	}
-
-	/**
-	 * Public getter for the ItemWriter.
-	 * @return the itemWriter
-	 */
-	public ItemWriter getItemWriter() {
-		return itemWriter;
 	}
 
 }
