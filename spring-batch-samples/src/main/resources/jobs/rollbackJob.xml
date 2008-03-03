@@ -15,7 +15,7 @@
 		<property name="steps">
 			<list>
 				<bean id="step1" parent="simpleStep">
-					<property name="alwaysSkip" value="true" />
+					<property name="skipLimit" value="5" />
 					<property name="streams" ref="fileInputTemplate" />
 					<property name="itemReader">
 						<bean

@@ -38,7 +38,7 @@ import org.springframework.core.task.TaskExecutor;
  */
 public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
-	private boolean alwaysSkip = false;
+	private int skipLimit = 0;
 
 	private int commitInterval = 0;
 
@@ -49,7 +49,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	private ListenerMulticaster listener = new ListenerMulticaster();
 
 	private TaskExecutor taskExecutor;
-	
+
 	private ItemProcessor itemProcessor;
 
 	/**
@@ -73,15 +73,16 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	}
 
 	/**
-	 * Public setter for a flag that determines skip policy. If this flag is
-	 * true then an exception in chunk processing will cause the item to be
-	 * skipped and no exceptions propagated. If it is false then all exceptions
-	 * will be propagated from the chunk and cause the step to abort.
+	 * Public setter for a limit that determines skip policy. If this value is
+	 * positive then an exception in chunk processing will cause the item to be
+	 * skipped and no exception propagated until the limit is reached. If it is
+	 * zero then all exceptions will be propagated from the chunk and cause the
+	 * step to abort.
 	 * 
-	 * @param alwaysSkip the value to set. Default is false.
+	 * @param skipLimit the value to set. Default is 0 (never skip).
 	 */
-	public void setAlwaysSkip(boolean alwaysSkip) {
-		this.alwaysSkip = alwaysSkip;
+	public void setSkipLimit(int skipLimit) {
+		this.skipLimit = skipLimit;
 	}
 
 	/**
@@ -189,14 +190,14 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 		KitchenSinkItemProcessor itemProcessor = new KitchenSinkItemProcessor(itemReader, itemWriter);
 
-		if (alwaysSkip) {
-			// If we always skip (not the default) then we are prepared
-			// to
-			// absorb all exceptions at the step level because the
-			// failed items
-			// will never re-appear after a rollback.
-			itemProcessor.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
-			stepOperations.setExceptionHandler(new SimpleLimitExceptionHandler(Integer.MAX_VALUE));
+		if (skipLimit > 0) {
+			/*
+			 * If there is a skip limit (not the default) then we are prepared
+			 * to absorb exceptions at the step level because the failed items
+			 * will never re-appear after a rollback.
+			 */
+			itemProcessor.setItemSkipPolicy(new LimitCheckingItemSkipPolicy(skipLimit));
+			stepOperations.setExceptionHandler(new SimpleLimitExceptionHandler(skipLimit));
 			step.setStepOperations(stepOperations);
 		}
 		else {

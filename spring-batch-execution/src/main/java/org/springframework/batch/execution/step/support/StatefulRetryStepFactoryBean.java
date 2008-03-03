@@ -74,9 +74,12 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 	 */
 	protected void applyConfiguration(ItemOrientedStep step) {
 
-		// Ensure exception handler always rethrows
+		// Ensure exception handler always rethrows. N.B. no skips ever actually
+		// take place.
 		if (retryPolicy != null) {
-			super.setAlwaysSkip(true);
+			// TODO: actually we need to co-ordinate the retry policy with the
+			// exception handler limit, so this is a hack for now.
+			super.setSkipLimit(Integer.MAX_VALUE);
 		}
 
 		super.applyConfiguration(step);
