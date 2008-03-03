@@ -350,7 +350,7 @@ public class ItemOrientedStep extends AbstractStep {
 							catch (Exception e) {
 								fatalException.setException(e);
 								stepExecution.setStatus(BatchStatus.UNKNOWN);
-								throw new CommitFailedException("Fatal error detected during commit", e);
+								throw new CommitFailedException("Fatal error detected during save of step execution context", e);
 							}
 
 						}

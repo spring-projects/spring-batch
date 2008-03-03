@@ -26,9 +26,9 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
 /**
- * Extends a {@link SimpleStepFactoryBean} allowing registration of listeners
- * and also direct injection of the {@link RepeatOperations} needed at step and
- * chunk level.
+ * Factory bean for {@link Step} implementations allowing registration of
+ * listeners and also direct injection of the {@link RepeatOperations} needed at
+ * step and chunk level.
  * 
  * @author Dave Syer
  * 

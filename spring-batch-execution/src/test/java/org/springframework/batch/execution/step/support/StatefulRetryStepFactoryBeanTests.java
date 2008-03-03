@@ -23,7 +23,7 @@ import org.springframework.batch.core.domain.Step;
  * @author Dave Syer
  *
  */
-public class SimpleStepFactoryBeanTests extends TestCase {
+public class StatefulRetryStepFactoryBeanTests extends TestCase {
 
 	private AbstractStepFactoryBean factory = new StatefulRetryStepFactoryBean();
 	

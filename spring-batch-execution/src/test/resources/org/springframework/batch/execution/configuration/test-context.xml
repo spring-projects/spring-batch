@@ -20,7 +20,7 @@
 	<bean id="test-job"
 		class="org.springframework.batch.execution.job.JobSupport">
 		<property name="steps">
-			<bean id="step1" class="org.springframework.batch.execution.step.support.SimpleStepFactoryBean">
+			<bean id="step1" class="org.springframework.batch.execution.step.support.DefaultStepFactoryBean">
 				<property name="itemReader" ref="itemReader" />
 				<property name="itemWriter" ref="itemWriter" />
 				<property name="jobRepository" ref="jobRepository" />

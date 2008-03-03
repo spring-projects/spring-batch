@@ -12,7 +12,7 @@
 	<bean id="parallelJob" parent="simpleJob">
 		<property name="steps">
 			<list>
-				<bean id="staging" parent="defaultStep">
+				<bean id="staging" parent="simpleStep">
 					<property name="commitInterval" value="2" />
 					<property name="startLimit" value="100" />
 					<property name="streams" ref="fileInputTemplate" />
@@ -41,7 +41,7 @@
 						</bean>
 					</property>
 				</bean>
-				<bean id="loading" parent="defaultStep">
+				<bean id="loading" parent="simpleStep">
 					<property name="taskExecutor">
 						<bean
 							class="org.springframework.core.task.SimpleAsyncTaskExecutor" />

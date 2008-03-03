@@ -95,17 +95,13 @@
 	</bean>
 
 	<bean id="simpleStep"
-		class="org.springframework.batch.execution.step.support.SimpleStepFactoryBean"
+		class="org.springframework.batch.execution.step.support.DefaultStepFactoryBean"
 		abstract="true">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="startLimit" value="100" />
 		<property name="commitInterval" value="1" />
 	</bean>
-
-	<bean id="defaultStep" parent="simpleStep"
-		class="org.springframework.batch.execution.step.support.DefaultStepFactoryBean"
-		abstract="true" />
 
 	<bean id="customEditorConfigurer"
 		class="org.springframework.beans.factory.config.CustomEditorConfigurer">

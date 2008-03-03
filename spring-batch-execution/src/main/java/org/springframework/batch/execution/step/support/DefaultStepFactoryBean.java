@@ -23,25 +23,51 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
+import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.core.task.TaskExecutor;
 
 /**
- * Adds listeners to {@link SimpleStepFactoryBean}.
+ * Most common configuration options for simple steps should be found here. Use
+ * this factory bean instead of creating a {@link Step} implementation manually.
  * 
  * @author Dave Syer
  * 
  */
-public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
+public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 	private boolean alwaysSkip = false;
+
+	private int commitInterval = 0;
+
+	private ItemStream[] streams = new ItemStream[0];
 
 	private BatchListener[] listeners = new BatchListener[0];
 
 	private ListenerMulticaster listener = new ListenerMulticaster();
 
 	private TaskExecutor taskExecutor;
+
+	/**
+	 * Set the commit interval.
+	 * 
+	 * @param commitInterval
+	 */
+	public void setCommitInterval(int commitInterval) {
+		this.commitInterval = commitInterval;
+	}
+
+	/**
+	 * The streams to inject into the {@link Step}. Any instance of
+	 * {@link ItemStream} can be used, and will then receive callbacks at the
+	 * appropriate stage in the step.
+	 * 
+	 * @param streams an array of listeners
+	 */
+	public void setStreams(ItemStream[] streams) {
+		this.streams = streams;
+	}
 
 	/**
 	 * Public setter for a flag that determines skip policy. If this flag is
@@ -83,6 +109,15 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 	protected void applyConfiguration(ItemOrientedStep step) {
 
 		super.applyConfiguration(step);
+
+		step.setStreams(streams);
+
+		if (commitInterval > 0) {
+			RepeatTemplate chunkOperations = new RepeatTemplate();
+			chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
+			step.setChunkOperations(chunkOperations);
+		}
+
 		for (int i = 0; i < listeners.length; i++) {
 			BatchListener listener = listeners[i];
 			if (listener instanceof StepListener) {

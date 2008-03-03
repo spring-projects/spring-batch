@@ -15,27 +15,6 @@
 		<config>src/test/resources/beanRefContext.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/bootstrap/support/job.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/bootstrap/support/test-environment.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/JobRepoDb2.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/JobRepoDerby.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/JobRepoHsql.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/JobRepoMissingDataSource.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/JobRepoMySql.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/JobRepoOk.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/JobRepoOracle.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/JobRepoPostgres.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/StepMissingItemReader.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/StepMissingItemWriter.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/StepMissingTransactionManager.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/StepOk.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/StepRerunAlways.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/StepRerunIncomplete.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/StepRerunNever.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/StepSpecificTransactionManager.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/TaskletStepMissingTasklet.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/TaskletStepOk.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/TaskletStepRerunAlways.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/TaskletStepRerunIncomplete.xml</config>
-		<config>src/test/resources/org/springframework/batch/execution/configuration/TaskletStepRerunNever.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
