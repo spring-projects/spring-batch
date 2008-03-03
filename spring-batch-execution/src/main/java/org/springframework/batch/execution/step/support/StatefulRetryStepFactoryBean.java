@@ -85,10 +85,11 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 			ItemReaderRetryCallback retryCallback = new ItemReaderRetryCallback(getItemReader(), getKeyGenerator(),
 					getItemWriter());
 			ItemReaderRetryPolicy itemProviderRetryPolicy = new ItemReaderRetryPolicy(retryPolicy);
-			RetryTemplate template = new RetryTemplate();
-			template.setRetryPolicy(itemProviderRetryPolicy);
-			step.setRetryOperations(template);
-			step.setRetryCallback(retryCallback);
+			RetryTemplate retryTemplate = new RetryTemplate();
+			retryTemplate.setRetryPolicy(itemProviderRetryPolicy);
+			KitchenSinkItemProcessor itemProcessor = (KitchenSinkItemProcessor) getItemProcessor();
+			itemProcessor.setRetryOperations(retryTemplate);
+			itemProcessor.setRetryCallback(retryCallback);
 		}
 
 	}

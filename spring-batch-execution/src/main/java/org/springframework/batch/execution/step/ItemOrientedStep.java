@@ -20,7 +20,6 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.ItemSkipPolicy;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.StepContribution;
@@ -30,15 +29,12 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.listener.CompositeStepListener;
-import org.springframework.batch.execution.step.support.NeverSkipItemSkipPolicy;
 import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.execution.step.support.ThreadStepInterruptionPolicy;
-import org.springframework.batch.io.Skippable;
 import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.CommitFailedException;
@@ -48,10 +44,6 @@ import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.retry.RetryOperations;
-import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
-import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -89,10 +81,6 @@ public class ItemOrientedStep extends AbstractStep {
 	// default to checking current thread for interruption.
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
 
-	private RetryOperations retryOperations = new RetryTemplate();
-
-	private ItemReaderRetryCallback retryCallback;
-
 	private CompositeItemStream stream = new CompositeItemStream();
 
 	private CompositeStepListener listener = new CompositeStepListener();
@@ -101,11 +89,7 @@ public class ItemOrientedStep extends AbstractStep {
 
 	private PlatformTransactionManager transactionManager;
 
-	private ItemReader itemReader;
-
-	private ItemWriter itemWriter;
-
-	private ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
+	private ItemProcessor itemProcessor;
 
 	/**
 	 * @param name
@@ -131,26 +115,13 @@ public class ItemOrientedStep extends AbstractStep {
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
-
+	
 	/**
-	 * @param itemReader the itemReader to set
+	 * Public setter for the {@link ItemProcessor}.
+	 * @param itemProcessor the {@link ItemProcessor} to set
 	 */
-	public void setItemReader(ItemReader itemReader) {
-		this.itemReader = itemReader;
-	}
-
-	/**
-	 * @param itemWriter the itemWriter to set
-	 */
-	public void setItemWriter(ItemWriter itemWriter) {
-		this.itemWriter = itemWriter;
-	}
-
-	/**
-	 * @param itemSkipPolicy
-	 */
-	public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
-		this.itemSkipPolicy = itemSkipPolicy;
+	public void setItemProcessor(ItemProcessor itemProcessor) {
+		this.itemProcessor = itemProcessor;
 	}
 
 	/**
@@ -227,22 +198,6 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Public setter for the {@link RetryOperations}.
-	 * @param retryOperations the {@link RetryOperations} to set
-	 */
-	public void setRetryOperations(RetryOperations retryOperations) {
-		this.retryOperations = retryOperations;
-	}
-
-	/**
-	 * Public setter for the ItemReaderRetryCallback. TODO: get rid of this.
-	 * @param retryCallback the retryCallback to set
-	 */
-	public void setRetryCallback(ItemReaderRetryCallback retryCallback) {
-		this.retryCallback = retryCallback;
-	}
-
-	/**
 	 * Setter for the {@link StepInterruptionPolicy}. The policy is used to
 	 * check whether an external request has been made to interrupt the job
 	 * execution.
@@ -288,10 +243,6 @@ public class ItemOrientedStep extends AbstractStep {
 		ExitStatus status = ExitStatus.FAILED;
 		final ExceptionHolder fatalException = new ExceptionHolder();
 
-		// This could go in applyConfiguration(), but some unit tests do not
-		// call that
-		possiblyRegisterStreams();
-
 		try {
 
 			stepExecution.setStartTime(new Date(System.currentTimeMillis()));
@@ -330,7 +281,7 @@ public class ItemOrientedStep extends AbstractStep {
 
 					try {
 
-						itemReader.mark();
+						itemProcessor.mark();
 						result = processChunk(contribution);
 						contribution.incrementCommitCount();
 
@@ -356,8 +307,8 @@ public class ItemOrientedStep extends AbstractStep {
 						}
 
 						try {
-							itemReader.mark();
-							itemWriter.flush();
+							itemProcessor.mark();
+							itemProcessor.flush();
 							transactionManager.commit(transaction);
 						}
 						catch (Exception e) {
@@ -383,8 +334,8 @@ public class ItemOrientedStep extends AbstractStep {
 						}
 
 						try {
-							itemReader.reset();
-							itemWriter.clear();
+							itemProcessor.reset();
+							itemProcessor.clear();
 							transactionManager.rollback(transaction);
 						}
 						catch (Exception e) {
@@ -489,25 +440,6 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Register the item reader and writer as listeners and streams. If they are
-	 * manually registered anyway, it shouldn't matter.
-	 */
-	private void possiblyRegisterStreams() {
-		if (itemReader instanceof ItemStream) {
-			stream.register((ItemStream) itemReader);
-		}
-		if (itemReader instanceof StepListener) {
-			listener.register((StepListener) itemReader);
-		}
-		if (itemWriter instanceof ItemStream) {
-			stream.register((ItemStream) itemWriter);
-		}
-		if (itemWriter instanceof StepListener) {
-			listener.register((StepListener) itemWriter);
-		}
-	}
-
-	/**
 	 * Execute a bunch of identical business logic operations all within a
 	 * transaction. The transaction is programmatically started and stopped
 	 * outside this method, so subclasses that override do not need to create a
@@ -517,7 +449,7 @@ public class ItemOrientedStep extends AbstractStep {
 	 * business logic.
 	 * @return true if there is more data to process.
 	 */
-	ExitStatus processChunk(final StepContribution contribution) {
+	protected ExitStatus processChunk(final StepContribution contribution) {
 		ExitStatus result = chunkOperations.iterate(new RepeatCallback() {
 			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
 				if (contribution.isTerminateOnly()) {
@@ -525,7 +457,7 @@ public class ItemOrientedStep extends AbstractStep {
 				}
 				// check for interruption before each item as well
 				interruptionPolicy.checkInterrupted(context);
-				ExitStatus exitStatus = doProcessing(contribution);
+				ExitStatus exitStatus = itemProcessor.process(contribution);
 				contribution.incrementTaskCount();
 				// check for interruption after each item as well
 				interruptionPolicy.checkInterrupted(context);
@@ -533,92 +465,6 @@ public class ItemOrientedStep extends AbstractStep {
 			}
 		});
 		return result;
-	}
-
-	/**
-	 * Execute the business logic, delegating to the given {@link Tasklet}.
-	 * Subclasses could extend the behaviour as long as they always return the
-	 * value of this method call in their superclass.<br/>
-	 * 
-	 * If there is an exception and the {@link Tasklet} implements
-	 * {@link Skippable} then the skip method is called.
-	 * 
-	 * @param tasklet the unit of business logic to execute
-	 * @param contribution the current step
-	 * @return boolean if there is more processing to do
-	 * @throws Exception if there is an error
-	 */
-	private ExitStatus doProcessing(StepContribution contribution) throws Exception {
-		ExitStatus exitStatus = ExitStatus.CONTINUABLE;
-
-		try {
-
-			exitStatus = execute();
-
-		}
-		catch (Exception e) {
-			if (retryCallback == null && itemSkipPolicy.shouldSkip(e, contribution.getSkipCount())) {
-				contribution.incrementSkipCount();
-				skip();
-			}
-			else {
-				// Rethrow so that outer transaction is rolled back properly
-				throw e;
-			}
-		}
-
-		return exitStatus;
-	}
-
-	/**
-	 * Read from the {@link ItemReader} and process (if not null) with the
-	 * {@link ItemWriter}. The call to {@link ItemWriter} is wrapped in a
-	 * stateful retry, if a {@link RetryPolicy} is provided. The
-	 * {@link ItemRecoverer} is used (if provided) in the case of an exception
-	 * to apply alternate processing to the item. If the stateful retry is in
-	 * place then the recovery will happen in the next transaction
-	 * automatically, otherwise it might be necessary for clients to make the
-	 * recover method transactional with appropriate propagation behaviour
-	 * (probably REQUIRES_NEW because the call will happen in the context of a
-	 * transaction that is about to rollback).
-	 * 
-	 * @see org.springframework.batch.core.tasklet.Tasklet#execute()
-	 */
-	private ExitStatus execute() throws Exception {
-
-		if (retryCallback == null) {
-			Object item = itemReader.read();
-			if (item == null) {
-				return ExitStatus.FINISHED;
-			}
-			itemWriter.write(item);
-			return ExitStatus.CONTINUABLE;
-		}
-
-		return new ExitStatus(retryOperations.execute(retryCallback) != null);
-
-	}
-
-	/**
-	 * Mark the current item as skipped if possible. If there is a retry policy
-	 * in action there is no need to take any action now because it will be
-	 * covered by the retry in the next transaction. Otherwise if the reader and /
-	 * or writer are {@link Skippable} then delegate to them in that order.
-	 * 
-	 * @see org.springframework.batch.io.Skippable#skip()
-	 */
-	private void skip() {
-		if (retryCallback != null) {
-			// No need to skip because the recoverer will take any action
-			// necessary.
-			return;
-		}
-		if (this.itemReader instanceof Skippable) {
-			((Skippable) this.itemReader).skip();
-		}
-		if (this.itemWriter instanceof Skippable) {
-			((Skippable) this.itemWriter).skip();
-		}
 	}
 
 	/**

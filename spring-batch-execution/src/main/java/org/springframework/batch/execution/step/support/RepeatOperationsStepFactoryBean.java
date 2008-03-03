@@ -130,8 +130,7 @@ public class RepeatOperationsStepFactoryBean extends AbstractStepFactoryBean {
 		setItemWriter(itemWriter);
 
 		step.setStepListeners(stepListeners);
-		step.setItemReader(itemReader);
-		step.setItemWriter(itemWriter);
+		step.setItemProcessor(new SimpleItemProcessor(itemReader, itemWriter));
 
 		step.setChunkOperations(chunkOperations);
 		step.setStepOperations(stepOperations);

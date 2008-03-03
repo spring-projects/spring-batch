@@ -19,6 +19,7 @@ import org.springframework.batch.core.domain.BatchListener;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepListener;
 import org.springframework.batch.execution.step.ItemOrientedStep;
+import org.springframework.batch.execution.step.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -48,6 +49,8 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	private ListenerMulticaster listener = new ListenerMulticaster();
 
 	private TaskExecutor taskExecutor;
+	
+	private ItemProcessor itemProcessor;
 
 	/**
 	 * Set the commit interval.
@@ -100,6 +103,22 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
+	}
+
+	/**
+	 * Public getter for the ItemProcessor.
+	 * @return the itemProcessor
+	 */
+	protected ItemProcessor getItemProcessor() {
+		return itemProcessor;
+	}
+
+	/**
+	 * Public setter for the ItemProcessor.
+	 * @param itemProcessor the itemProcessor to set
+	 */
+	protected void setItemProcessor(ItemProcessor itemProcessor) {
+		this.itemProcessor = itemProcessor;
 	}
 
 	/**
@@ -160,8 +179,6 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 		setItemWriter(itemWriter);
 
 		step.setStepListeners(stepListeners);
-		step.setItemReader(itemReader);
-		step.setItemWriter(itemWriter);
 
 		if (taskExecutor != null) {
 			TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
@@ -170,18 +187,25 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 			step.setStepOperations(stepOperations);
 		}
 
+		KitchenSinkItemProcessor itemProcessor = new KitchenSinkItemProcessor(itemReader, itemWriter);
+
 		if (alwaysSkip) {
-			// If we always skip (not the default) then we are prepared to
-			// absorb all exceptions at the step level because the failed items
+			// If we always skip (not the default) then we are prepared
+			// to
+			// absorb all exceptions at the step level because the
+			// failed items
 			// will never re-appear after a rollback.
-			step.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
+			itemProcessor.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
 			stepOperations.setExceptionHandler(new SimpleLimitExceptionHandler(Integer.MAX_VALUE));
 			step.setStepOperations(stepOperations);
 		}
 		else {
 			// This is the default in ItemOrientedStep anyway...
-			step.setItemSkipPolicy(new NeverSkipItemSkipPolicy());
+			itemProcessor.setItemSkipPolicy(new NeverSkipItemSkipPolicy());
 		}
+
+		setItemProcessor(itemProcessor);
+		step.setItemProcessor(itemProcessor);
 
 	}
 }

@@ -177,13 +177,14 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 	// TODO: test recovery and stateful retry 
 
 	public void testExceptionTerminates() throws Exception {
-		ItemOrientedStep step = (ItemOrientedStep) getStep(new String[] { "foo", "bar", "spam" }).getObject();
-		step.setName("exceptionStep");
-		step.setItemWriter(new AbstractItemWriter() {
+		DefaultStepFactoryBean factory = getStep(new String[] { "foo", "bar", "spam" });
+		factory.setBeanName("exceptionStep");
+		factory.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
 				throw new RuntimeException("Foo");
 			}
 		});
+		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
 		job.setSteps(Collections.singletonList(step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());

@@ -37,6 +37,7 @@ import org.springframework.batch.execution.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
+import org.springframework.batch.execution.step.support.SimpleItemProcessor;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.item.ExecutionContext;
@@ -65,7 +66,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 	private List list = new ArrayList();
 
-	ItemWriter processor = new AbstractItemWriter() {
+	ItemWriter itemWriter = new AbstractItemWriter() {
 		public void write(Object data) throws Exception {
 			processed.add((String) data);
 		}
@@ -85,8 +86,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 	private AbstractStep getStep(String[] strings) throws Exception {
 		ItemOrientedStep step = new ItemOrientedStep("stepName");
-		step.setItemWriter(processor);
-		step.setItemReader(getReader(strings));
+		step.setItemProcessor(new SimpleItemProcessor(getReader(strings), itemWriter));
 		step.setJobRepository(new JobRepositorySupport());
 		step.setTransactionManager(transactionManager);
 		return step;
@@ -168,7 +168,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		};
 
-		itemOrientedStep.setItemReader(itemReader);
+		itemOrientedStep.setItemProcessor(new SimpleItemProcessor(itemReader, itemWriter));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
 
@@ -198,7 +198,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		};
 
-		itemOrientedStep.setItemReader(itemReader);
+		itemOrientedStep.setItemProcessor(new SimpleItemProcessor(itemReader, itemWriter));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
 
@@ -217,7 +217,8 @@ public class ItemOrientedStepTests extends TestCase {
 	 */
 	public void testNonRestartedJob() throws Exception {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
-		itemOrientedStep.setItemReader(tasklet);
+		itemOrientedStep.setItemProcessor(new SimpleItemProcessor(tasklet, itemWriter));
+		itemOrientedStep.registerStream(tasklet);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
 
@@ -287,7 +288,7 @@ public class ItemOrientedStepTests extends TestCase {
 	 */
 	public void testNoSaveExecutionAttributesRestartableJob() {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
-		itemOrientedStep.setItemReader(tasklet);
+		itemOrientedStep.setItemProcessor(new SimpleItemProcessor(tasklet, itemWriter));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
 
@@ -307,11 +308,11 @@ public class ItemOrientedStepTests extends TestCase {
 	 * Restartable.
 	 */
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
-		itemOrientedStep.setItemReader(new AbstractItemReader() {
+		itemOrientedStep.setItemProcessor(new SimpleItemProcessor(new AbstractItemReader() {
 			public Object read() throws Exception {
 				return "foo";
 			}
-		});
+		}, itemWriter));
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
 
@@ -319,7 +320,7 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testStreamManager() throws Exception {
-		itemOrientedStep.setItemReader(new MockRestartableItemReader() {
+		MockRestartableItemReader reader = new MockRestartableItemReader() {
 			public Object read() throws Exception {
 				return "foo";
 			}
@@ -327,7 +328,9 @@ public class ItemOrientedStepTests extends TestCase {
 				// TODO Auto-generated method stub
 				executionContext.putString("foo", "bar");
 			}
-		});
+		};
+		itemOrientedStep.setItemProcessor(new SimpleItemProcessor(reader, itemWriter));
+		itemOrientedStep.registerStream(reader);
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
 
@@ -419,11 +422,11 @@ public class ItemOrientedStepTests extends TestCase {
 				return null;
 			}
 		});
-		itemOrientedStep.setItemReader(new MockRestartableItemReader() {
+		itemOrientedStep.setItemProcessor(new SimpleItemProcessor(new MockRestartableItemReader() {
 			public Object read() throws Exception {
 				throw new RuntimeException("FOO");
 			}
-		});
+		}, itemWriter));
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
 		try {
@@ -445,7 +448,7 @@ public class ItemOrientedStepTests extends TestCase {
 				executionContext.putString("foo", "bar");
 			}
 		};
-		itemOrientedStep.setItemReader(reader);
+		itemOrientedStep.setItemProcessor(new SimpleItemProcessor(reader, itemWriter));
 		itemOrientedStep.setStreams(new ItemStream[] {reader});
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
@@ -485,7 +488,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		};
 
-		itemOrientedStep.setItemReader(itemReader);
+		itemOrientedStep.setItemProcessor(new SimpleItemProcessor(itemReader, itemWriter));
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
@@ -513,7 +516,7 @@ public class ItemOrientedStepTests extends TestCase {
 				throw new RuntimeException("Foo");
 			}
 		};
-		itemOrientedStep.setItemReader(itemReader);
+		itemOrientedStep.setItemProcessor(new SimpleItemProcessor(itemReader, itemWriter));
 
 		JobExecution jobExecutionContext = jobInstance.createJobExecution();
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
@@ -540,7 +543,7 @@ public class ItemOrientedStepTests extends TestCase {
 				throw new RuntimeException("Foo");
 			}
 		};
-		itemOrientedStep.setItemReader(itemReader);
+		itemOrientedStep.setItemProcessor(new SimpleItemProcessor(itemReader, itemWriter));
 		itemOrientedStep.setTransactionManager(new ResourcelessTransactionManager() {
 			protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
 				// Simulate failure on rollback when stream resets
@@ -629,13 +632,15 @@ public class ItemOrientedStepTests extends TestCase {
 
 	public void testStatusForCloseFailedException() throws Exception {
 
-		itemOrientedStep.setItemReader(new MockRestartableItemReader() {
+		MockRestartableItemReader itemReader = new MockRestartableItemReader() {
 			public void close(ExecutionContext executionContext) throws StreamException {
 				super.close(executionContext);
 				// Simulate failure on rollback when stream resets
 				throw new RuntimeException("Bar");
 			}
-		});
+		};
+		itemOrientedStep.setItemProcessor(new SimpleItemProcessor(itemReader, itemWriter));
+		itemOrientedStep.registerStream(itemReader);
 
 		JobExecution jobExecutionContext = jobInstance.createJobExecution();
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
@@ -645,10 +650,10 @@ public class ItemOrientedStepTests extends TestCase {
 
 		try {
 			itemOrientedStep.execute(stepExecution);
-			fail("Expected BatchCriticalException");
+			fail("Expected InfrastructureException");
 		}
 		catch (InfrastructureException ex) {
-			// The job actually completeed, but teh streams couldn't be closed.
+			// The job actually completeed, but the streams couldn't be closed.
 			assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertEquals("", msg);

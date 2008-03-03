@@ -45,20 +45,22 @@ public class StepExecutorInterruptionTests extends TestCase {
 	private JobRepository jobRepository;
 
 	private JobInstanceDao jobInstanceDao = new MapJobInstanceDao();
-	
+
 	private JobExecutionDao jobExecutionDao = new MapJobExecutionDao();
 
 	private StepExecutionDao stepExecutionDao = new MapStepExecutionDao();
 
 	private ItemOrientedStep step;
-	
+
 	private JobExecution jobExecution;
+
+	private AbstractItemWriter itemWriter;
 
 	public void setUp() throws Exception {
 		MapJobInstanceDao.clear();
 		MapJobExecutionDao.clear();
 		MapStepExecutionDao.clear();
-		
+
 		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao);
 
 		JobSupport jobConfiguration = new JobSupport();
@@ -68,32 +70,32 @@ public class StepExecutorInterruptionTests extends TestCase {
 		jobExecution = jobRepository.createJobExecution(jobConfiguration, new JobParameters());
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
-		step.setItemReader(new ItemReaderAdapter());
-		step.setItemWriter(new AbstractItemWriter(){
+		itemWriter = new AbstractItemWriter() {
 			public void write(Object item) throws Exception {
-			}});
+			}
+		};
+		step.setItemProcessor(new SimpleItemProcessor(new ItemReaderAdapter(), itemWriter));
 	}
-
 
 	public void testInterruptChunk() throws Exception {
 
 		final StepExecution stepExecution = new StepExecution(step, jobExecution);
-		step.setItemReader(new AbstractItemReader() {
+		step.setItemProcessor(new SimpleItemProcessor(new AbstractItemReader() {
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
 				double foo = 1;
 				for (int i = 2; i < 250; i++) {
 					foo = foo * i;
 				}
-				
-				if(foo != 1){
+
+				if (foo != 1) {
 					return new Double(foo);
 				}
-				else{
+				else {
 					return null;
 				}
 			}
-		});
+		}, itemWriter));
 
 		Thread processingThread = new Thread() {
 			public void run() {
