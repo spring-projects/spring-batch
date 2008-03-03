@@ -7,13 +7,13 @@
 
 Updating Spring Batch jobs from 1.0.0.m4 to 1.0.0.m5 framework
 
-  This is a description of what needed to be done to migrate the samples from m4 to the m5 release.
+  The following is a description of what is needed to migrate the samples from m4 to the m5 release.
 
 * JOB CONFIGURATION
 
-  * Tasklet's role has changed - no longer called iteratively, dedicated for tasks that are not natural to split into read-write phases (e.g. calling stored procedure or system command). Readers and writers are now typically injected into (ItemOriented)Step. See Tasklet and TaskletStep javadoc for more details.
+  * Tasklet's role has changed - It is no longer called iteratively, but is now dedicated for tasks that are not natural to split into read-write phases (e.g. calling stored procedure or system command). Readers and writers are now typically injected into (ItemOriented)Step. See Tasklet and TaskletStep javadoc for more details.
 
-  * Step scope removed - lifecycle of readers and writers explicitly handled by Step - use Step's 'streams' property to register streams instead of using step scope.
+  * Step scope removed - lifecycle of readers and writers explicitly handled by Step.
 
   * One applicaton context for job rather than parent container and child job context. CommandLineJobRunner requires only one xml file location.
 
@@ -43,7 +43,7 @@ Updating Spring Batch jobs from 1.0.0.m4 to 1.0.0.m5 framework
 
   * StepInstance removed from domain model.
 
-  * Database schema normalized.
+  * Database schema updated.
 
   * JobInstance identity is now given by Job and JobParameters pair - identical JobInstances with different IDs no longer allowed (see JobInstance javadoc for more details).
 
