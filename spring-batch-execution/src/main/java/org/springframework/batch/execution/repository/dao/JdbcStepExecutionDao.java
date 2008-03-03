@@ -75,6 +75,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	private static final String GET_STEP_EXECUTION = "SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
 			+ " TASK_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%STEP_EXECUTION where STEP_NAME = ? and JOB_EXECUTION_ID = ?";
 
+	private static final String CURRENT_VERSION_STEP_EXECUTION = "SELECT VERSION FROM %PREFIX%STEP_EXECUTION WHERE STEP_EXECUTION_ID=?";
+
 	private static final int EXIT_MESSAGE_LENGTH = 250;
 
 	private LobHandler lobHandler = new DefaultLobHandler();
@@ -177,15 +179,14 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		Object[] parameters = new Object[] { stepExecution.getId(), stepExecution.getVersion(),
 				stepExecution.getStepName(), stepExecution.getJobExecutionId(), stepExecution.getStartTime(),
 				stepExecution.getEndTime(), stepExecution.getStatus().toString(), stepExecution.getCommitCount(),
-				stepExecution.getTaskCount(),
-				stepExecution.getExitStatus().isContinuable() ? "Y" : "N", stepExecution.getExitStatus().getExitCode(),
-				stepExecution.getExitStatus().getExitDescription() };
+				stepExecution.getTaskCount(), stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
+				stepExecution.getExitStatus().getExitCode(), stepExecution.getExitStatus().getExitDescription() };
 		getJdbcTemplate().update(
 				getQuery(SAVE_STEP_EXECUTION),
 				parameters,
 				new int[] { Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP,
-						Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.CHAR,
-						Types.VARCHAR, Types.VARCHAR });
+						Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.CHAR, Types.VARCHAR,
+						Types.VARCHAR });
 	}
 
 	/**
@@ -319,13 +320,15 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					getQuery(UPDATE_STEP_EXECUTION),
 					parameters,
 					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
-							Types.CHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
-							Types.INTEGER });
+							Types.CHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER });
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
+				int curentVersion = getJdbcTemplate().queryForInt(
+						getQuery(CURRENT_VERSION_STEP_EXECUTION),
+						new Object[] { stepExecution.getId() });
 				throw new OptimisticLockingFailureException("Attempt to update step execution id="
-						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion() + ")");
+						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion() + "), where current version is "+curentVersion);
 			}
 
 			stepExecution.incrementVersion();
@@ -352,8 +355,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			stepExecution.setStatus(BatchStatus.getStatus(rs.getString(5)));
 			stepExecution.setCommitCount(rs.getInt(6));
 			stepExecution.setTaskCount(rs.getInt(7));
-			stepExecution
-					.setExitStatus(new ExitStatus("Y".equals(rs.getString(8)), rs.getString(9), rs.getString(10)));
+			stepExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(8)), rs.getString(9), rs.getString(10)));
 			stepExecution.setExecutionContext(findExecutionContext(stepExecution));
 			return stepExecution;
 		}
@@ -405,6 +407,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			return null;
 		}
 	}
+
 	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {
 		List executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION),
 				new Object[] { step.getName(), jobExecution.getId() }, new StepExecutionRowMapper(jobExecution, step));
