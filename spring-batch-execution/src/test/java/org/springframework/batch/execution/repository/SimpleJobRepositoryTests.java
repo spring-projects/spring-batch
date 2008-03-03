@@ -28,7 +28,6 @@ import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.repository.dao.JobExecutionDao;
 import org.springframework.batch.execution.repository.dao.JobInstanceDao;
@@ -224,30 +223,6 @@ public class SimpleJobRepositoryTests extends TestCase {
 //		step = (String) it.next();
 //		assertTrue(step.equals(databaseStep2));
 ////		assertTrue(step.getStepExecutionCount() == 1);
-	}
-
-	public void testRestartJobStartLimitExceeded() throws Exception {
-
-		jobConfiguration.setStartLimit(1);
-
-		jobInstanceDao.getJobInstance(jobConfiguration, jobParameters);
-		jobInstanceDaoControl.setReturnValue(databaseJob);
-		jobExecutionDao.getJobExecutionCount(databaseJob);
-		// return a greater execution count then the start limit, should throw
-		// exception
-		jobExecutionDaoControl.setReturnValue(2);
-		jobExecutionDaoControl.replay();
-		jobInstanceDaoControl.replay();
-
-		try {
-			jobRepository.createJobExecution(jobConfiguration, jobParameters);
-			fail();
-		}
-		catch (JobRestartException ex) {
-			// expected
-		}
-
-		jobExecutionDaoControl.verify();
 	}
 
 	public void testCreateNonRestartableJob() throws Exception {

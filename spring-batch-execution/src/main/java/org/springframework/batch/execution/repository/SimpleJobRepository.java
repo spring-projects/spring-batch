@@ -158,10 +158,6 @@ public class SimpleJobRepository implements JobRepository {
 				throw new JobRestartException("JobInstance already exists and is not restartable");
 			}
 
-			jobInstance.setJobExecutionCount(jobExecutionDao.getJobExecutionCount(jobInstance));
-			if (jobInstance.getJobExecutionCount() > job.getStartLimit()) {
-				throw new JobRestartException("Restart Max exceeded for Job: " + jobInstance.toString());
-			}
 			List executions = jobExecutionDao.findJobExecutions(jobInstance);
 			JobExecution lastExecution = null;
 			// check for running executions and find the last started

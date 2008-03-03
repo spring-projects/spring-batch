@@ -41,8 +41,6 @@ public abstract class AbstractJob implements BeanNameAware, Job {
 
 	private boolean restartable = false;
 
-	private int startLimit = Integer.MAX_VALUE;
-
 	/**
 	 * Default constructor.
 	 */
@@ -107,17 +105,6 @@ public abstract class AbstractJob implements BeanNameAware, Job {
 
 	public void addStep(Step step) {
 		this.steps.add(step);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.IJob#getStartLimit()
-	 */
-	public int getStartLimit() {
-		return startLimit;
-	}
-
-	public void setStartLimit(int startLimit) {
-		this.startLimit = startLimit;
 	}
 
 	public void setRestartable(boolean restartable) {
