@@ -20,7 +20,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobInterruptedException;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.StepExecution;
@@ -52,6 +51,8 @@ public class StepExecutorInterruptionTests extends TestCase {
 	private StepExecutionDao stepExecutionDao = new MapStepExecutionDao();
 
 	private ItemOrientedStep step;
+	
+	private JobExecution jobExecution;
 
 	public void setUp() throws Exception {
 		MapJobInstanceDao.clear();
@@ -64,7 +65,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		step = new ItemOrientedStep("interruptedStep");
 		jobConfiguration.addStep(step);
 		jobConfiguration.setBeanName("testJob");
-		jobRepository.createJobExecution(jobConfiguration, new JobParameters());
+		jobExecution = jobRepository.createJobExecution(jobConfiguration, new JobParameters());
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
 		step.setItemReader(new ItemReaderAdapter());
@@ -76,8 +77,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	public void testInterruptChunk() throws Exception {
 
-		JobExecution jobExecutionContext = new JobExecution(new JobInstance(new Long(0L), new JobParameters(), new JobSupport("testJob")));
-		final StepExecution stepExecution = new StepExecution(step, jobExecutionContext);
+		final StepExecution stepExecution = new StepExecution(step, jobExecution);
 		step.setItemReader(new AbstractItemReader() {
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())

@@ -318,50 +318,6 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobRepository.saveOrUpdate(jobExecution);
 	}
 
-	public void testUpdateStepExecution() {
-		StepExecution stepExecution = new StepExecution(new StepSupport("stepName"), null, new Long(1));
-		stepExecution.setId(new Long(11));
-		ExecutionContext executionContext = new ExecutionContext();
-		stepExecution.setExecutionContext(executionContext);
-		stepExecutionDao.updateStepExecution(stepExecution);
-		stepExecutionDaoControl.replay();
-		jobRepository.saveOrUpdate(stepExecution);
-		stepExecutionDaoControl.verify();
-	}
-
-	public void testUpdateExecutionContext() {
-		StepExecution stepExecution = new StepExecution(new StepSupport("stepName"), null, new Long(1));
-		stepExecution.setId(new Long(11));
-		ExecutionContext executionContext = new ExecutionContext();
-		stepExecution.setExecutionContext(executionContext);
-		stepExecutionDao.updateStepExecution(stepExecution);
-		stepExecutionDao.saveOrUpdateExecutionContext(stepExecution);
-		stepExecutionDaoControl.replay();
-		jobRepository.saveOrUpdateExecutionContext(stepExecution);
-		stepExecutionDaoControl.verify();
-	}
-
-	public void testSaveExistingStepExecution() {
-		StepExecution stepExecution = new StepExecution(new StepSupport("stepName"), new JobExecution(null), null);
-		ExecutionContext executionContext = new ExecutionContext();
-		stepExecution.setExecutionContext(executionContext);
-		stepExecutionDao.saveStepExecution(stepExecution);
-		stepExecutionDaoControl.replay();
-		jobRepository.saveOrUpdate(stepExecution);
-		stepExecutionDaoControl.verify();
-	}
-
-	public void testSaveExistingExecutionContext() {
-		StepExecution stepExecution = new StepExecution(new StepSupport("stepName"), new JobExecution(null), null);
-		ExecutionContext executionContext = new ExecutionContext();
-		stepExecution.setExecutionContext(executionContext);
-		stepExecutionDao.saveStepExecution(stepExecution);
-		stepExecutionDao.saveOrUpdateExecutionContext(stepExecution);
-		stepExecutionDaoControl.replay();
-		jobRepository.saveOrUpdateExecutionContext(stepExecution);
-		stepExecutionDaoControl.verify();
-	}
-
 	public void testSaveOrUpdateStepExecutionException() {
 
 		StepExecution stepExecution = new StepExecution(new StepSupport("stepName"), null, null);

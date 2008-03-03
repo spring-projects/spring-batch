@@ -238,13 +238,9 @@ public class SimpleJobRepository implements JobRepository {
 
 		Assert.notNull(stepExecution, "StepExecution cannot be null.");
 		Assert.notNull(stepExecution.getStepName(), "StepExecution's step name cannot be null.");
-
+		Assert.notNull(stepExecution.getJobExecutionId(), "StepExecution must belong to persisted JobExecution");
+		
 		if (stepExecution.getId() == null) {
-			// new execution, obtain id and insert
-			JobExecution jobExecution = stepExecution.getJobExecution();
-			if (jobExecution.getId() == null) {
-				jobExecutionDao.saveJobExecution(jobExecution);
-			}
 			stepExecutionDao.saveStepExecution(stepExecution);
 		}
 		else {

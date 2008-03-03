@@ -144,8 +144,8 @@ public class ItemOrientedStepTests extends TestCase {
 		SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(), new MapStepExecutionDao());
 		itemOrientedStep.setJobRepository(repository);
 
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
-		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
+		JobExecution jobExecution = repository.createJobExecution(jobInstance.getJob(), jobInstance.getJobParameters());
+		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
 
 		itemOrientedStep.execute(stepExecution);
 		assertEquals(1, processed.size());
