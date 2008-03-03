@@ -31,7 +31,6 @@ import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.listener.JobListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.execution.repository.SimpleJobRepository;
 import org.springframework.batch.execution.repository.dao.JobExecutionDao;
 import org.springframework.batch.execution.repository.dao.JobInstanceDao;
@@ -132,6 +131,36 @@ public class SimpleJobTests extends TestCase {
 		stepExecution2 = new StepExecution(step2, jobExecution, null);
 
 	}
+	
+	//Test to ensure the exit status returned by the last step is returned
+	public void testExitStatusReturned(){
+		
+		final ExitStatus customStatus = new ExitStatus(true, "test");
+		
+		Step testStep = new Step(){
+
+			public void execute(StepExecution stepExecution)
+					throws JobInterruptedException {
+				stepExecution.setExitStatus(customStatus);
+			}
+
+			public String getName() {
+				return "test";
+			}
+
+			public int getStartLimit() {
+				return 1;
+			}
+
+			public boolean isAllowStartIfComplete() {
+				return false;
+			}};
+		List steps = new ArrayList();
+		steps.add(testStep);
+		job.setSteps(steps);
+		job.execute(jobExecution);
+		assertEquals(customStatus, jobExecution.getExitStatus());
+	}
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
@@ -204,7 +233,7 @@ public class SimpleJobTests extends TestCase {
 			assertEquals(exception, e.getCause());
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.STOPPED, new ExitStatus(false, ExitStatusExceptionClassifier.JOB_INTERRUPTED));
+		checkRepository(BatchStatus.STOPPED, ExitStatus.INTERRUPTED);
 	}
 
 	public void testFailed() throws Exception {
@@ -219,7 +248,7 @@ public class SimpleJobTests extends TestCase {
 			assertEquals(exception, e);
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.FAILED, new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION));
+		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
 
 	public void testStepShouldNotStart() throws Exception {
@@ -266,11 +295,9 @@ public class SimpleJobTests extends TestCase {
 			assertTrue(e.getCause() instanceof JobInterruptedException);
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.STOPPED, new ExitStatus(false, ExitStatusExceptionClassifier.JOB_INTERRUPTED));
+		checkRepository(BatchStatus.STOPPED, ExitStatus.NOOP);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
-		assertEquals(ExitStatusExceptionClassifier.JOB_INTERRUPTED, exitStatus.getExitCode());
-		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().contains(
-				"JobInterruptedException"));
+		assertEquals(ExitStatus.NOOP.getExitCode(), exitStatus.getExitCode());
 	}
 
 	/*
@@ -326,9 +353,11 @@ public class SimpleJobTests extends TestCase {
 
 		public void execute(StepExecution stepExecution) throws JobInterruptedException, InfrastructureException {
 			if (exception instanceof RuntimeException) {
+				stepExecution.setExitStatus(ExitStatus.FAILED);
 				throw (RuntimeException)exception;
 			}
 			if (exception instanceof JobInterruptedException) {
+				stepExecution.setExitStatus(ExitStatus.INTERRUPTED);
 				throw (JobInterruptedException)exception;
 			}
 			if (runnable!=null) {

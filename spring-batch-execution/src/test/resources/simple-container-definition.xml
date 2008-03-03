@@ -28,13 +28,6 @@
 		class="org.springframework.batch.execution.step.ItemOrientedStep"
 		abstract="true">
 		<property name="allowStartIfComplete" value="true" />
-		<property name="exceptionHandler">
-			<bean
-				class="org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler">
-				<property name="limit" value="5" />
-				<property name="useParent" value="true" />
-			</bean>
-		</property>
 		<property name="jobRepository" ref="jobRegistry" />
 		<property name="transactionManager" ref="transactionManager" />
 	</bean>

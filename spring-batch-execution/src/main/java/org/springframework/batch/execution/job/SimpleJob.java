@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.common.ExceptionClassifier;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
@@ -29,9 +28,7 @@ import org.springframework.batch.core.domain.JobListener;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.execution.listener.CompositeJobListener;
-import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -46,8 +43,6 @@ import org.springframework.batch.repeat.ExitStatus;
 public class SimpleJob extends AbstractJob {
 
 	private JobRepository jobRepository;
-
-	private ExitStatusExceptionClassifier exceptionClassifier = new SimpleExitStatusExceptionClassifier();
 
 	private CompositeJobListener listener = new CompositeJobListener();
 
@@ -68,7 +63,9 @@ public class SimpleJob extends AbstractJob {
 		JobInstance jobInstance = execution.getJobInstance();
 		jobInstance.setLastExecution(execution);
 
-		ExitStatus status = ExitStatus.FAILED;
+		StepExecution currentStepExecution = null;
+		int startedCount = 0;
+		List steps = getSteps();
 
 		try {
 
@@ -83,9 +80,7 @@ public class SimpleJob extends AbstractJob {
 
 			listener.beforeJob(execution);
 
-			int startedCount = 0;
-
-			List steps = getSteps();
+			
 			for (Iterator i = steps.iterator(); i.hasNext();) {
 
 				Step step = (Step) i.next();
@@ -94,22 +89,10 @@ public class SimpleJob extends AbstractJob {
 
 					startedCount++;
 					updateStatus(execution, BatchStatus.STARTED);
-					StepExecution stepExecution = execution.createStepExecution(step);
+					currentStepExecution = execution.createStepExecution(step);
 
-					step.execute(stepExecution);
-
-					status = stepExecution.getExitStatus();
-
-				}
-			}
-
-			if (startedCount == 0) {
-				if (steps.size() > 0) {
-					status = ExitStatus.NOOP
-							.addExitDescription("All steps already completed.  No processing was done.");
-				}
-				else {
-					status = ExitStatus.NOOP.addExitDescription("No steps configured for this job.");
+					step.execute(currentStepExecution);
+					
 				}
 			}
 
@@ -119,16 +102,28 @@ public class SimpleJob extends AbstractJob {
 
 		}
 		catch (JobInterruptedException e) {
-			updateStatus(execution, BatchStatus.STOPPED);
-			status = exceptionClassifier.classifyForExitCode(e);
+			execution.setStatus(BatchStatus.STOPPED);
 			rethrow(e);
 		}
 		catch (Throwable t) {
-			updateStatus(execution, BatchStatus.FAILED);
-			status = exceptionClassifier.classifyForExitCode(t);
+			execution.setStatus(BatchStatus.FAILED);
 			rethrow(t);
 		}
 		finally {
+			ExitStatus status = ExitStatus.FAILED;
+			if (startedCount == 0) {
+				if (steps.size() > 0) {
+					status = ExitStatus.NOOP
+							.addExitDescription("All steps already completed.  No processing was done.");
+				}
+				else {
+					status = ExitStatus.NOOP.addExitDescription("No steps configured for this job.");
+				}
+			}
+			else if(currentStepExecution != null){
+				status = currentStepExecution.getExitStatus();
+			}
+			
 			execution.setEndTime(new Date());
 			execution.setExitStatus(status);
 			jobRepository.saveOrUpdate(execution);
@@ -201,15 +196,5 @@ public class SimpleJob extends AbstractJob {
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
-	}
-
-	/**
-	 * Public setter for injecting an {@link ExceptionClassifier} that can
-	 * translate exceptions to {@link ExitStatus}.
-	 * 
-	 * @param exceptionClassifier
-	 */
-	public void setExceptionClassifier(ExitStatusExceptionClassifier exceptionClassifier) {
-		this.exceptionClassifier = exceptionClassifier;
 	}
 }

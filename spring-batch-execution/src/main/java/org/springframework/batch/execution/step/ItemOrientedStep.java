@@ -356,13 +356,6 @@ public class ItemOrientedStep extends AbstractStep {
 						}
 
 						try {
-							result = result.and(listener.afterStep());
-						}
-						catch (RuntimeException e) {
-							logger.error("Unexpected error in listener after step.", e);
-						}
-
-						try {
 							itemReader.mark();
 							itemWriter.flush();
 							transactionManager.commit(transaction);
@@ -451,6 +444,13 @@ public class ItemOrientedStep extends AbstractStep {
 		}
 		finally {
 
+			try {
+				status = status.and(listener.afterStep());
+			}
+			catch (RuntimeException e) {
+				logger.error("Unexpected error in listener after step.", e);
+			}
+			
 			stepExecution.setExitStatus(status);
 			stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 
@@ -483,7 +483,7 @@ public class ItemOrientedStep extends AbstractStep {
 				throw new InfrastructureException("Encountered an error saving batch meta data.", fatalException
 						.getException());
 			}
-
+			
 		}
 
 	}

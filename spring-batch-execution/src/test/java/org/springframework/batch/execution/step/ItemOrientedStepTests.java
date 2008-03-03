@@ -387,6 +387,30 @@ public class ItemOrientedStepTests extends TestCase {
 		itemOrientedStep.execute(stepExecution);
 		assertEquals(1, list.size());
 	}
+	
+	public void testAfterStep() throws Exception{
+		
+		final ExitStatus customStatus = new ExitStatus(true, "custom code");
+		
+		itemOrientedStep.setStepListeners(new StepListener[] {new StepListenerSupport() {
+			public ExitStatus afterStep() {
+				list.add("afterStepCalled");
+				return customStatus;
+			}
+		}});
+		
+		RepeatTemplate stepTemplate = new RepeatTemplate();
+		stepTemplate.setCompletionPolicy(new SimpleCompletionPolicy(5));
+		itemOrientedStep.setStepOperations(stepTemplate);
+		
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
+		itemOrientedStep.execute(stepExecution);
+		assertEquals(1, list.size());
+		ExitStatus returnedStatus = stepExecution.getExitStatus();
+		assertEquals(customStatus.getExitCode(), returnedStatus.getExitCode());
+		assertEquals(customStatus.getExitDescription(), returnedStatus.getExitDescription());
+	}
 
 	public void testDirectlyInjectedListenerOnError() throws Exception {
 		itemOrientedStep.registerStepListener(new StepListenerSupport() {
