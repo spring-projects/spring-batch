@@ -8,7 +8,7 @@
 				correct?
 			</question>
 			<answer>
-				We expect m3, m4, rc1 before 1.0 final, so realistically
+				We expect rc1 before 1.0 final, so realistically
 				not soon. You can track the progress and planning in
 				JIRA
 				(http://opensource.atlassian.com/projects/spring/browse/BATCH).
@@ -27,8 +27,8 @@
 			</question>
 			<answer>
 				<p>
-					We are still in the milestone release phase (1.0-m4
-					is in the pipeline). This means that we are still
+					We are still in the milestone release phase (1.0-m5
+					is just out). This means that we are still
 					adding functionality that we want to be part of a
 					1.0 release. We do not rule out changes to package
 					and interface names in this phase, but that said we
@@ -62,14 +62,14 @@
 			</question>
 			<answer>
 				Multi-threaded execution in a single VM is perfectly
-				possible with 1.0 - but we recommend exercising caution
-				in the analysis of such requirements (is it really
-				necessary?). Several people have tried it and there are
-				some issues with restartability (plus the usual
-				documentation requests), but otherwise it should work.
-				With a little more effort starting in m4 it should work
-				even better, but we aren't planning to solve the
-				restartability problem until after 1.0.
+				possible with 1.0 - but we recommend exercising
+				caution in the analysis of such requirements (is it
+				really necessary?). Several people have tried it and
+				it works as long as the step is intrinsically
+				restartable (idempotent effectively).  The parellel
+				job sample shows how it might work in practice - this
+				uses a "process indicator" pattern to mark input
+				records as complete, inside the business transaction.
 			</answer>
 		</faq>
 		<faq id="layers">
