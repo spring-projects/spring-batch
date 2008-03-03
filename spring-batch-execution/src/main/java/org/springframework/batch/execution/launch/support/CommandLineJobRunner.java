@@ -98,7 +98,7 @@ import org.springframework.util.StringUtils;
  * <p>
  * <code>
  * java org.springframework.batch.execution.bootstrap.support.CommandLineJobRunner testJob.xml 
- * testJob standard-job-launcher.xml schedule.date=2008/01/24 vendor.id=3902483920 
+ * testJob schedule.date=2008/01/24 vendor.id=3902483920 
  * <code></p>
  * 
  * <p>Once arguments have been successfully parsed, autowiring will be used to set 
