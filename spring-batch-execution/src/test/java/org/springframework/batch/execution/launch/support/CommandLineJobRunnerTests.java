@@ -29,72 +29,73 @@ import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Lucas Ward
- *
+ * 
  */
 public class CommandLineJobRunnerTests extends TestCase {
 
 	private static final String JOB = "org/springframework/batch/execution/bootstrap/support/job.xml";
+
 	private static final String JOB_NAME = "test-job";
-	
+
 	private String jobPath = JOB;
+
 	private String jobName = JOB_NAME;
+
 	private String jobKey = "job.Key=myKey";
+
 	private String scheduleDate = "schedule.Date=01/23/2008";
+
 	private String vendorId = "vendor.id=33243243";
-	
-	private String[] args = new String[]{jobPath, jobName, jobKey, scheduleDate, vendorId};
-	
-	private JobExecution jobExecution;
-	
-	/* (non-Javadoc)
+
+	private String[] args = new String[] { jobPath, jobName, jobKey, scheduleDate, vendorId };
+
+	/*
+	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		
-		jobExecution = new JobExecution(null, new Long(1));
+		JobExecution jobExecution = new JobExecution(null, new Long(1));
 		ExitStatus exitStatus = ExitStatus.FINISHED;
 		jobExecution.setExitStatus(exitStatus);
+		StubJobLauncher.jobExecution = jobExecution;
+		StubExceptionClassifier.exception = null;
 	}
 
-	public void testMain(){
-		
-		StubJobLauncher.jobExecution = jobExecution;
-		
+	public void testMain() {
 		CommandLineJobRunner.main(args);
-		
 		assertEquals(0, StubSystemExiter.getStatus());
 	}
-	
-	public void testJobAlreadyRunning(){
-		
+
+	public void testJobAlreadyRunning() {
 		StubJobLauncher.throwExecutionRunningException = true;
-		
 		CommandLineJobRunner.main(args);
-		
 		assertTrue(StubExceptionClassifier.exception instanceof JobExecutionAlreadyRunningException);
 	}
-	
-	//can't test because it will cause the system to exit.
-//	public void testInvalidArgs(){
-//		
-//		String[] args = new String[]{jobPath, jobName};
-//		CommandLineJobRunner.main(args);
-//	}
-	
-	public void testWithNoParameters(){
-		
-		String[] args = new String[]{jobPath, jobName};
+
+	// can't test because it will cause the system to exit.
+	// public void testInvalidArgs(){
+	//		
+	// String[] args = new String[]{jobPath, jobName};
+	// CommandLineJobRunner.main(args);
+	// }
+
+	public void testWithNoParameters() throws Throwable {
+		String[] args = new String[] { jobPath, jobName };
 		CommandLineJobRunner.main(args);
+		if (StubExceptionClassifier.exception != null) {
+			throw StubExceptionClassifier.exception;
+		}
+		assertEquals(0, StubSystemExiter.status);
 		assertEquals(new JobParameters(), StubJobLauncher.jobParameters);
 	}
-	
+
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		
+
 		StubJobLauncher.tearDown();
 	}
-	
+
 	public static class StubSystemExiter implements SystemExiter {
 
 		public static int status;
@@ -107,36 +108,37 @@ public class CommandLineJobRunnerTests extends TestCase {
 			return status;
 		}
 	}
-	
-	public static class StubJobLauncher implements JobLauncher{
+
+	public static class StubJobLauncher implements JobLauncher {
 
 		public static JobExecution jobExecution;
+
 		public static boolean throwExecutionRunningException = false;
+
 		public static JobParameters jobParameters;
-		
-		public JobExecution run(Job job, JobParameters jobParameters)
-				throws JobExecutionAlreadyRunningException {
-		
+
+		public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException {
+
 			StubJobLauncher.jobParameters = jobParameters;
-			
-			if(throwExecutionRunningException){
+
+			if (throwExecutionRunningException) {
 				throw new JobExecutionAlreadyRunningException("");
 			}
-			
+
 			return jobExecution;
 		}
-		
-		public static void tearDown(){
+
+		public static void tearDown() {
 			jobExecution = null;
 			throwExecutionRunningException = false;
 			jobParameters = null;
 		}
 	}
-	
-	public static class StubExceptionClassifier implements ExitStatusExceptionClassifier{
+
+	public static class StubExceptionClassifier implements ExitStatusExceptionClassifier {
 
 		public static Throwable exception;
-		
+
 		public Object classify(Throwable throwable) {
 			return null;
 		}
@@ -149,6 +151,6 @@ public class CommandLineJobRunnerTests extends TestCase {
 			exception = throwable;
 			return ExitStatus.FAILED;
 		}
-		
+
 	}
 }
