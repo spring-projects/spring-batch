@@ -132,6 +132,7 @@ public class DefaultStepFactoryBean extends SimpleStepFactoryBean {
 			TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
 			repeatTemplate.setTaskExecutor(taskExecutor);
 			stepOperations = repeatTemplate;
+			step.setStepOperations(stepOperations);
 		}
 
 		if (alwaysSkip) {
