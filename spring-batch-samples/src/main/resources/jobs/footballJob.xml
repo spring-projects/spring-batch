@@ -10,7 +10,6 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<bean id="footballJob" parent="simpleJob">
-		<property name="startLimit" value="100" />
 		<property name="steps">
 			<list>
 				<bean id="playerload" parent="simpleStep">
