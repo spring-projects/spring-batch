@@ -37,11 +37,6 @@ import org.springframework.util.Assert;
  * {@link ItemWriter} (the delegate). A delegate is required, and will be used
  * to do the actual writing of the item.<br/>
  * 
- * This class implements {@link RepeatListener} and it will only work if
- * properly registered. If the delegate is also a {@link RepeatListener} then it
- * does not need to be separately registered as we make the callbacks here in
- * the right places.
- * 
  * @author Dave Syer
  * 
  */
