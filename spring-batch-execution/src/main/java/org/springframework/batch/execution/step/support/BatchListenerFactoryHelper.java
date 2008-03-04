@@ -30,6 +30,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.DelegatingItemReader;
 import org.springframework.batch.item.writer.DelegatingItemWriter;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.listener.RepeatListenerSupport;
@@ -116,7 +117,7 @@ class BatchListenerFactoryHelper {
 	 * @param listeners
 	 * @return
 	 */
-	public RepeatOperations getStepOperations(RepeatOperations stepOperations, BatchListener[] listeners) {
+	public RepeatOperations addChunkListeners(RepeatOperations stepOperations, BatchListener[] listeners) {
 
 		final CompositeChunkListener multicaster = new CompositeChunkListener();
 
@@ -140,11 +141,10 @@ class BatchListenerFactoryHelper {
 
 			RepeatTemplate stepTemplate = (RepeatTemplate) stepOperations;
 			stepTemplate.registerListener(new RepeatListenerSupport() {
-				public void open(RepeatContext context) {
+				public void before(RepeatContext context) {
 					multicaster.beforeChunk();
 				}
-
-				public void close(RepeatContext context) {
+				public void after(RepeatContext context, ExitStatus result) {
 					multicaster.afterChunk();
 				}
 			});

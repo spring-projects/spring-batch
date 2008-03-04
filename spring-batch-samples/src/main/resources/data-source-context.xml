@@ -61,12 +61,6 @@
 	
 	<bean id="lobHandler" class="${batch.lob.handler.class}"/>
 
-	<bean id="incrementerParent"
-		class="${batch.database.incrementer.class}">
-		<property name="dataSource" ref="dataSource" />
-		<property name="incrementerName" value="ID" />
-	</bean>
-
 	<!--import resource="alt-data-source-context.xml" /-->
 
 </beans>

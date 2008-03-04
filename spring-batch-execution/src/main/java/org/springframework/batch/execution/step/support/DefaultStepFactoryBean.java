@@ -184,7 +184,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 		itemReader = helper.getItemReader(itemReader, listeners);
 		itemWriter = helper.getItemWriter(itemWriter, listeners);
 		stepOperations = new RepeatTemplate();
-		stepOperations = (RepeatTemplate) helper.getStepOperations(stepOperations, listeners);
+		stepOperations = (RepeatTemplate) helper.addChunkListeners(stepOperations, listeners);
 
 		// In case they are used by subclasses:
 		setItemReader(itemReader);

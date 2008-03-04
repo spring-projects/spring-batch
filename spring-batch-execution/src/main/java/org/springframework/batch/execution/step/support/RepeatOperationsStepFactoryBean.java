@@ -123,7 +123,7 @@ public class RepeatOperationsStepFactoryBean extends AbstractStepFactoryBean {
 		StepListener[] stepListeners = helper.getStepListeners(listeners);
 		itemReader = helper.getItemReader(itemReader, listeners);
 		itemWriter = helper.getItemWriter(itemWriter, listeners);
-		RepeatOperations stepOperations = helper.getStepOperations(this.stepOperations, listeners);
+		RepeatOperations stepOperations = helper.addChunkListeners(this.stepOperations, listeners);
 
 		// In case they are used by subclasses:
 		setItemReader(itemReader);
