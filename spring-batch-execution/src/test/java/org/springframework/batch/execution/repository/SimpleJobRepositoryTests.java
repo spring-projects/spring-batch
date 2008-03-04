@@ -105,12 +105,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 		jobConfiguration.setSteps(stepConfigurations);
 
-		databaseJob = new JobInstance(new Long(1), jobParameters, jobConfiguration) {
-			public JobExecution createJobExecution() {
-				jobExecution = super.createJobExecution();
-				return jobExecution;
-			}
-		};
+		databaseJob = new JobInstance(new Long(1), jobParameters, jobConfiguration);
 
 		databaseStep1 = "dbStep1";
 		databaseStep2 = "dbStep2";

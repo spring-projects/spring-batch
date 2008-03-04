@@ -139,8 +139,6 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(job, "Job must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
-		JobInstance jobInstance;
-
 		/*
 		 * Find all jobs matching the runtime information.
 		 * 
@@ -150,7 +148,7 @@ public class SimpleJobRepository implements JobRepository {
 		 * has finished.
 		 */
 
-		jobInstance = jobInstanceDao.getJobInstance(job, jobParameters);
+		JobInstance jobInstance = jobInstanceDao.getJobInstance(job, jobParameters);
 
 		// existing job instance found
 		if (jobInstance != null) {
@@ -159,40 +157,29 @@ public class SimpleJobRepository implements JobRepository {
 			}
 
 			List executions = jobExecutionDao.findJobExecutions(jobInstance);
-			JobExecution lastExecution = null;
+			
 			// check for running executions and find the last started
 			for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
 				JobExecution execution = (JobExecution) iterator.next();
-				if (lastExecution == null) {
-					lastExecution = execution;
-				}
-				if (execution.getStartTime() != null && lastExecution.getStartTime() != null
-						&& lastExecution.getStartTime().getTime() < execution.getStartTime().getTime()) {
-					lastExecution = execution;
-				}
-
 				if (execution.isRunning()) {
 					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "
 							+ jobInstance);
 				}
 			}
-			jobInstance.setLastExecution(lastExecution);
 		}
 		else {
 			// no job found, create one
 			jobInstance = jobInstanceDao.createJobInstance(job, jobParameters);
 		}
-
-		return generateJobExecution(jobInstance);
-
-	}
-
-	private JobExecution generateJobExecution(JobInstance jobInstance) {
-		JobExecution execution = jobInstance.createJobExecution();
+		
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		
 		// Save the JobExecution so that it picks up an ID (useful for clients
 		// monitoring asynchronous executions):
-		saveOrUpdate(execution);
-		return execution;
+		saveOrUpdate(jobExecution);
+		
+		return jobExecution;
+
 	}
 
 	/**

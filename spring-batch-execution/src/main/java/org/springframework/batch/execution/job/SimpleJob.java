@@ -61,7 +61,6 @@ public class SimpleJob extends AbstractJob {
 	public void execute(JobExecution execution) throws InfrastructureException {
 
 		JobInstance jobInstance = execution.getJobInstance();
-		jobInstance.setLastExecution(execution);
 
 		StepExecution currentStepExecution = null;
 		int startedCount = 0;

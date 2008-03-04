@@ -518,7 +518,7 @@ public class ItemOrientedStepTests extends TestCase {
 		};
 		itemOrientedStep.setItemProcessor(new SimpleItemHandler(itemReader, itemWriter));
 
-		JobExecution jobExecutionContext = jobInstance.createJobExecution();
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
 
 		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
@@ -551,7 +551,7 @@ public class ItemOrientedStepTests extends TestCase {
 			}
 		});
 
-		JobExecution jobExecutionContext = jobInstance.createJobExecution();
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
 
 		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
@@ -579,7 +579,7 @@ public class ItemOrientedStepTests extends TestCase {
 			}
 		});
 
-		JobExecution jobExecutionContext = jobInstance.createJobExecution();
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
 
 		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
@@ -611,7 +611,7 @@ public class ItemOrientedStepTests extends TestCase {
 			}
 		});
 
-		JobExecution jobExecutionContext = jobInstance.createJobExecution();
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
 
 		try {
@@ -642,7 +642,7 @@ public class ItemOrientedStepTests extends TestCase {
 		itemOrientedStep.setItemProcessor(new SimpleItemHandler(itemReader, itemWriter));
 		itemOrientedStep.registerStream(itemReader);
 
-		JobExecution jobExecutionContext = jobInstance.createJobExecution();
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
 
 		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));

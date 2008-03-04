@@ -20,6 +20,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.domain.JobExecution;
 import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.execution.job.JobSupport;
@@ -32,7 +33,7 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
  * 
  */
 public class JdbcJobDaoQueryTests extends TestCase {
-	
+
 	JdbcJobExecutionDao jobExecutionDao;
 
 	List list = new ArrayList();
@@ -42,7 +43,7 @@ public class JdbcJobDaoQueryTests extends TestCase {
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
-		
+
 		jobExecutionDao = new JdbcJobExecutionDao();
 		jobExecutionDao.setJobExecutionIncrementer(new DataFieldMaxValueIncrementer() {
 
@@ -69,7 +70,10 @@ public class JdbcJobDaoQueryTests extends TestCase {
 				return 1;
 			}
 		});
-		jobExecutionDao.saveJobExecution(new JobInstance(new Long(11), new JobParameters(), new JobSupport("testJob")).createJobExecution());
+		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), new JobSupport(
+				"testJob")));
+		
+		jobExecutionDao.saveJobExecution(jobExecution);
 		assertEquals(1, list.size());
 		String query = (String) list.get(0);
 		assertTrue("Query did not contain FOO_:" + query, query.indexOf("FOO_") >= 0);

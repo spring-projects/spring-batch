@@ -24,13 +24,6 @@ import junit.framework.TestCase;
 public class JobInstanceTests extends TestCase {
 
 	private JobInstance instance = new JobInstance(new Long(11), new JobParameters(), new JobSupport("job"));
-	
-	public void testLastExecution(){
-		JobExecution lastExecution = new JobExecution();
-		assertNull(instance.getLastExecution());
-		instance.setLastExecution(lastExecution);
-		assertEquals(lastExecution, instance.getLastExecution());
-	}
 
 	/**
 	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getIdentifier()}.
@@ -42,12 +35,6 @@ public class JobInstanceTests extends TestCase {
 	
 	public void testGetJob(){
 		assertEquals("job", instance.getJob().getName());
-	}
-
-	public void testCreateJobExecution(){
-		JobExecution execution = instance.createJobExecution();
-		assertNotNull(execution);
-		assertEquals(execution, instance.getLastExecution());
 	}
 
 	public void testCreateWithNulls(){

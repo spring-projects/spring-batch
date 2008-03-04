@@ -62,7 +62,7 @@ public class StepExecutionProxyResourceTests extends TestCase {
 	protected void setUp() throws Exception {
 
 		jobInstance = new JobInstance(new Long(0), new JobParameters(), new JobSupport("testJob"));
-		JobExecution jobExecution = jobInstance.createJobExecution();
+		JobExecution jobExecution = new JobExecution(jobInstance);
 		Step step = new StepSupport("bar");
 		stepExecution = jobExecution.createStepExecution(step);
 		resource.beforeStep(stepExecution);
@@ -97,7 +97,7 @@ public class StepExecutionProxyResourceTests extends TestCase {
 		resource.setFilePattern("foo/data/%JOB_NAME%/%job.key%-foo");
 		jobInstance = new JobInstance(new Long(0), new JobParametersBuilder().addString("job.key", "spam")
 				.toJobParameters(), new JobSupport("testJob"));
-		JobExecution jobExecution = jobInstance.createJobExecution();
+		JobExecution jobExecution = new JobExecution(jobInstance);
 		Step step = new StepSupport("bar");
 		resource.beforeStep(jobExecution.createStepExecution(step));
 		doTestPathName("spam-foo", "foo" + pathsep + "data" + pathsep);

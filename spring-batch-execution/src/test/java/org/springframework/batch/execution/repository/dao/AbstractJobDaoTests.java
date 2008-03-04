@@ -81,7 +81,6 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 		jobExecution.setStartTime(jobExecutionStartTime);
 		jobExecution.setStatus(BatchStatus.STARTED);
 		jobExecutionDao.saveJobExecution(jobExecution);
-		jobInstance.setLastExecution(jobExecution);
 	}
 
 	public void testVersionIsNotNullForJob() throws Exception {
