@@ -70,8 +70,9 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 				return "RuntimeException";
 			}
 		});
-		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
+		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(2)));
 		// No exception...
+		handler.handleException(context, new RuntimeException("Foo"));
 		handler.handleException(context, new RuntimeException("Foo"));
 		try {
 			handler.handleException(context, new RuntimeException("Foo"));
