@@ -62,6 +62,23 @@ public interface FieldSet {
 	String readString(String name);
 
 	/**
+	 * Read the {@link String} value at index '<code>index</code>' including
+	 * trailing whitespace (don't trim).
+	 * 
+	 * @param index the field index.
+	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 */
+	String readRawString(int index);
+
+	/**
+	 * Read the {@link String} value from column with given '<code>name</code>'
+	 * including trailing whitespace (don't trim).
+	 * 
+	 * @param name the field name.
+	 */
+	String readRawString(String name);
+
+	/**
 	 * Read the '<code>boolean</code>' value at index '<code>index</code>'.
 	 * 
 	 * @param index the field index.

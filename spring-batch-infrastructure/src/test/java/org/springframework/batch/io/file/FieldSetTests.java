@@ -441,4 +441,13 @@ public class FieldSetTests extends TestCase {
 		long value = fs.readLong(0);
 		assertEquals(value, 9);
 	}
+	
+	public void testReadRawString() {
+		String name = "fieldName";
+		String value = " string with trailing whitespace   ";
+		FieldSet fs = new DefaultFieldSet(new String[] { value }, new String[]{ name });
+		
+		assertEquals(value, fs.readRawString(0));
+		assertEquals(value, fs.readRawString(name));
+	}
 }

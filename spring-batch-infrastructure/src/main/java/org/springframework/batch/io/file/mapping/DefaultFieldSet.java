@@ -95,6 +95,22 @@ public class DefaultFieldSet implements FieldSet {
 	public String readString(String name) {
 		return readString(indexOf(name));
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.io.file.mapping.IFieldSet#readRawString(int)
+	 */
+	public String readRawString(int index) {
+		return tokens[index];
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.io.file.mapping.IFieldSet#readRawString(java.lang.String)
+	 */
+	public String readRawString(String name) {
+		return readRawString(indexOf(name));
+	}
 
 	/*
 	 * (non-Javadoc)
