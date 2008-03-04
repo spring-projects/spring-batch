@@ -109,7 +109,7 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 			StatefulRetryItemHandler itemProcessor = new StatefulRetryItemHandler(getItemReader(), getItemWriter(),
 					retryTemplate, retryCallback);
 
-			step.setItemProcessor(itemProcessor);
+			step.setItemHandler(itemProcessor);
 
 		}
 

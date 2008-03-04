@@ -29,7 +29,9 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.listener.CompositeStepListener;
+import org.springframework.batch.execution.step.support.DefaultStepExecutionSynchronizerSynchronizer;
 import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
+import org.springframework.batch.execution.step.support.StepExecutionSynchronizer;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.execution.step.support.ThreadStepInterruptionPolicy;
 import org.springframework.batch.io.exception.InfrastructureException;
@@ -47,8 +49,6 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 
 /**
  * Simple implementation of executing the step as a set of chunks, each chunk
@@ -93,6 +93,8 @@ public class ItemOrientedStep extends AbstractStep {
 
 	private ItemHandler itemHandler;
 
+	private StepExecutionSynchronizer synchronizer = new DefaultStepExecutionSynchronizerSynchronizer();
+
 	/**
 	 * @param name
 	 */
@@ -122,7 +124,7 @@ public class ItemOrientedStep extends AbstractStep {
 	 * Public setter for the {@link ItemHandler}.
 	 * @param itemHandler the {@link ItemHandler} to set
 	 */
-	public void setItemProcessor(ItemHandler itemHandler) {
+	public void setItemHandler(ItemHandler itemHandler) {
 		this.itemHandler = itemHandler;
 	}
 
@@ -221,6 +223,16 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
+	 * Mostly useful for testing, but could be used to remove dependence on
+	 * backport concurrency utilities. Public setter for the
+	 * {@link StepExecutionSynchronizer}.
+	 * @param synchronizer the {@link StepExecutionSynchronizer} to set
+	 */
+	public void setSynchronizer(StepExecutionSynchronizer synchronizer) {
+		this.synchronizer = synchronizer;
+	}
+
+	/**
 	 * Process the step and update its context so that progress can be monitored
 	 * by the caller. The step is broken down into chunks, each one executing in
 	 * a transaction. The step and its execution and execution context are all
@@ -266,8 +278,6 @@ public class ItemOrientedStep extends AbstractStep {
 			listener.beforeStep(stepExecution);
 			stream.open(stepExecution.getExecutionContext());
 
-			final Semaphore semaphore = new Semaphore(1);
-
 			status = stepOperations.iterate(new RepeatCallback() {
 
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
@@ -292,7 +302,13 @@ public class ItemOrientedStep extends AbstractStep {
 						// If the step operations are asynchronous then we need
 						// to synchronize changes to the step execution (at a
 						// minimum).
-						semaphore.acquire();
+						try {
+							synchronizer.lock(stepExecution);
+						}
+						catch (InterruptedException e) {
+							stepExecution.setStatus(BatchStatus.STOPPED);
+							Thread.currentThread().interrupt();
+						}
 
 						// Apply the contribution to the step
 						// only if chunk was successful
@@ -332,9 +348,7 @@ public class ItemOrientedStep extends AbstractStep {
 						 * commit (e.g. Hibernate flush) so this catch block
 						 * comes outside the transaction.
 						 */
-						synchronized (stepExecution) {
-							stepExecution.rollback();
-						}
+						stepExecution.rollback();
 
 						try {
 							itemHandler.reset();
@@ -350,12 +364,12 @@ public class ItemOrientedStep extends AbstractStep {
 							throw (RuntimeException) t;
 						}
 						else {
-							throw new RuntimeException(t);
+							throw new RuntimeException(t);							
 						}
 
 					}
 					finally {
-						semaphore.release();
+						synchronizer.release(stepExecution);
 					}
 
 					// Check for interruption after transaction as well, so that

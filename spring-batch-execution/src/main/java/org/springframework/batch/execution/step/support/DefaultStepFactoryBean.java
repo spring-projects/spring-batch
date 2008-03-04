@@ -218,7 +218,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 		}
 
 		setItemProcessor(itemProcessor);
-		step.setItemProcessor(itemProcessor);
+		step.setItemHandler(itemProcessor);
 
 	}
 	

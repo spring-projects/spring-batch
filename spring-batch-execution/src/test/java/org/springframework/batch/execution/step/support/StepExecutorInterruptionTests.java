@@ -31,7 +31,6 @@ import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.item.reader.AbstractItemReader;
-import org.springframework.batch.item.reader.ItemReaderAdapter;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -45,12 +44,15 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private AbstractItemWriter itemWriter;
 
+	private StepExecution stepExecution;
+
 	public void setUp() throws Exception {
 		MapJobInstanceDao.clear();
 		MapJobExecutionDao.clear();
 		MapStepExecutionDao.clear();
 
-		JobRepository jobRepository = new SimpleJobRepository(new MapJobInstanceDao(),  new MapJobExecutionDao(), new MapStepExecutionDao());
+		JobRepository jobRepository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
+				new MapStepExecutionDao());
 
 		JobSupport jobConfiguration = new JobSupport();
 		step = new ItemOrientedStep("interruptedStep");
@@ -63,13 +65,85 @@ public class StepExecutorInterruptionTests extends TestCase {
 			public void write(Object item) throws Exception {
 			}
 		};
-		step.setItemProcessor(new SimpleItemHandler(new ItemReaderAdapter(), itemWriter));
+		step.setItemHandler(new SimpleItemHandler(new AbstractItemReader() {
+			public Object read() throws Exception {
+				return null;
+			}
+		}, itemWriter));
+		stepExecution = new StepExecution(step, jobExecution);
 	}
 
 	public void testInterruptChunk() throws Exception {
 
-		final StepExecution stepExecution = new StepExecution(step, jobExecution);
-		step.setItemProcessor(new SimpleItemHandler(new AbstractItemReader() {
+		Thread processingThread = createThread(stepExecution);
+
+		processingThread.start();
+		Thread.sleep(100);
+		processingThread.interrupt();
+
+		int count = 0;
+		while (processingThread.isAlive() && count < 1000) {
+			Thread.sleep(20);
+			count++;
+		}
+
+		assertTrue("Timed out waiting for step to be interrupted.", count < 1000);
+		assertFalse(processingThread.isAlive());
+		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
+
+	}
+
+	public void testInterruptStep() throws Exception {
+		RepeatTemplate template = new RepeatTemplate();
+		// N.B, If we don't set the completion policy it might run forever
+		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
+		step.setChunkOperations(template);
+		testInterruptChunk();
+	}
+
+	public void testInterruptOnInterruptedException() throws Exception {
+
+		Thread processingThread = createThread(stepExecution);
+
+		step.setItemHandler(new SimpleItemHandler(new AbstractItemReader() {
+			public Object read() throws Exception {
+				return null;
+			}
+		}, itemWriter));
+
+		// This simulates the unlikely sounding, but in practice all too common
+		// in Bamboo situation where the thread is interrupted before the lock
+		// is taken.
+		step.setSynchronizer(new StepExecutionSynchronizer() {
+			public void lock(StepExecution stepExecution) throws InterruptedException {
+				Thread.currentThread().interrupt();
+				throw new InterruptedException();
+			}
+
+			public void release(StepExecution stepExecution) {
+			}
+		});
+
+		processingThread.start();
+		Thread.sleep(100);
+
+		int count = 0;
+		while (processingThread.isAlive() && count < 1000) {
+			Thread.sleep(20);
+			count++;
+		}
+
+		assertTrue("Timed out waiting for step to be interrupted.", count < 1000);
+		assertFalse(processingThread.isAlive());
+		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
+
+	}
+
+	/**
+	 * @return
+	 */
+	private Thread createThread(final StepExecution stepExecution) {
+		step.setItemHandler(new SimpleItemHandler(new AbstractItemReader() {
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
 				double foo = 1;
@@ -96,29 +170,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 				}
 			}
 		};
-
-		processingThread.start();
-
-		Thread.sleep(100);
-
-		processingThread.interrupt();
-
-		int count = 0;
-		while (processingThread.isAlive() && count < 1000) {
-			Thread.sleep(20);
-			count++;
-		}
-
-		assertFalse(processingThread.isAlive());
-		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
-	}
-
-	public void testInterruptStep() throws Exception {
-		RepeatTemplate template = new RepeatTemplate();
-		// N.B, If we don't set the completion policy it might run forever
-		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		step.setChunkOperations(template);
-		testInterruptChunk();
+		return processingThread;
 	}
 
 }

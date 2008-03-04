@@ -86,7 +86,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 	private AbstractStep getStep(String[] strings) throws Exception {
 		ItemOrientedStep step = new ItemOrientedStep("stepName");
-		step.setItemProcessor(new SimpleItemHandler(getReader(strings), itemWriter));
+		step.setItemHandler(new SimpleItemHandler(getReader(strings), itemWriter));
 		step.setJobRepository(new JobRepositorySupport());
 		step.setTransactionManager(transactionManager);
 		return step;
@@ -168,7 +168,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		};
 
-		itemOrientedStep.setItemProcessor(new SimpleItemHandler(itemReader, itemWriter));
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
 
@@ -198,7 +198,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		};
 
-		itemOrientedStep.setItemProcessor(new SimpleItemHandler(itemReader, itemWriter));
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
 
@@ -217,7 +217,7 @@ public class ItemOrientedStepTests extends TestCase {
 	 */
 	public void testNonRestartedJob() throws Exception {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
-		itemOrientedStep.setItemProcessor(new SimpleItemHandler(tasklet, itemWriter));
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(tasklet, itemWriter));
 		itemOrientedStep.registerStream(tasklet);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
@@ -288,7 +288,7 @@ public class ItemOrientedStepTests extends TestCase {
 	 */
 	public void testNoSaveExecutionAttributesRestartableJob() {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
-		itemOrientedStep.setItemProcessor(new SimpleItemHandler(tasklet, itemWriter));
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(tasklet, itemWriter));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
 
@@ -308,7 +308,7 @@ public class ItemOrientedStepTests extends TestCase {
 	 * Restartable.
 	 */
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
-		itemOrientedStep.setItemProcessor(new SimpleItemHandler(new AbstractItemReader() {
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(new AbstractItemReader() {
 			public Object read() throws Exception {
 				return "foo";
 			}
@@ -329,7 +329,7 @@ public class ItemOrientedStepTests extends TestCase {
 				executionContext.putString("foo", "bar");
 			}
 		};
-		itemOrientedStep.setItemProcessor(new SimpleItemHandler(reader, itemWriter));
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(reader, itemWriter));
 		itemOrientedStep.registerStream(reader);
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
@@ -422,7 +422,7 @@ public class ItemOrientedStepTests extends TestCase {
 				return null;
 			}
 		});
-		itemOrientedStep.setItemProcessor(new SimpleItemHandler(new MockRestartableItemReader() {
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(new MockRestartableItemReader() {
 			public Object read() throws Exception {
 				throw new RuntimeException("FOO");
 			}
@@ -448,7 +448,7 @@ public class ItemOrientedStepTests extends TestCase {
 				executionContext.putString("foo", "bar");
 			}
 		};
-		itemOrientedStep.setItemProcessor(new SimpleItemHandler(reader, itemWriter));
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(reader, itemWriter));
 		itemOrientedStep.setStreams(new ItemStream[] {reader});
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
@@ -488,7 +488,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		};
 
-		itemOrientedStep.setItemProcessor(new SimpleItemHandler(itemReader, itemWriter));
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
@@ -516,7 +516,7 @@ public class ItemOrientedStepTests extends TestCase {
 				throw new RuntimeException("Foo");
 			}
 		};
-		itemOrientedStep.setItemProcessor(new SimpleItemHandler(itemReader, itemWriter));
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
@@ -543,7 +543,7 @@ public class ItemOrientedStepTests extends TestCase {
 				throw new RuntimeException("Foo");
 			}
 		};
-		itemOrientedStep.setItemProcessor(new SimpleItemHandler(itemReader, itemWriter));
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
 		itemOrientedStep.setTransactionManager(new ResourcelessTransactionManager() {
 			protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
 				// Simulate failure on rollback when stream resets
@@ -639,7 +639,7 @@ public class ItemOrientedStepTests extends TestCase {
 				throw new RuntimeException("Bar");
 			}
 		};
-		itemOrientedStep.setItemProcessor(new SimpleItemHandler(itemReader, itemWriter));
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
 		itemOrientedStep.registerStream(itemReader);
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
