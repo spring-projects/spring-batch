@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>pom.xml</name>
+			<type>1</type>
+			<locationURI>PARENT/pom.xml</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>
