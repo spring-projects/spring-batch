@@ -22,6 +22,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.util.Assert;
 
 /**
@@ -139,6 +140,9 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean,
 		Assert.state(keys == null && !initialized, "Cannot open an already opened input source"
 				+ ", call close() first.");
 		keys = keyGenerator.retrieveKeys(executionContext);
+		if(keys == null || keys.size() == 0){
+			throw new DataRetrievalFailureException("KeyGenerator must return at least 1 key");
+		}
 		keysIterator = keys.listIterator();
 		initialized = true;
 	}

@@ -11,12 +11,13 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
 public class DrivingQueryItemReaderTests extends TestCase {
 	
-	ItemReader itemReader;
+	DrivingQueryItemReader itemReader;
 	
 	static {
 		TransactionSynchronizationManager.initSynchronization();
@@ -28,7 +29,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		itemReader = createItemReader();
 	}
 	
-	private ItemReader createItemReader() throws Exception{
+	private DrivingQueryItemReader createItemReader() throws Exception{
 		
 		DrivingQueryItemReader inputSource = new DrivingQueryItemReader();
 		inputSource.setKeyGenerator(new MockKeyGenerator());
@@ -152,6 +153,26 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		rollback();
 
 		assertEquals(foo2, itemReader.read());
+	}
+	
+	public void testRetriveZeroKeys(){
+		
+		itemReader.setKeyGenerator(new KeyGenerator(){
+
+			public List retrieveKeys(ExecutionContext executionContext) {
+				return new ArrayList();
+			}
+
+			public void saveState(Object key, ExecutionContext executionContext) {
+			}});
+		
+		try{
+			itemReader.open(new ExecutionContext());
+			fail();
+		}
+		catch(DataRetrievalFailureException ex){
+			//expected
+		}
 	}
 
 
