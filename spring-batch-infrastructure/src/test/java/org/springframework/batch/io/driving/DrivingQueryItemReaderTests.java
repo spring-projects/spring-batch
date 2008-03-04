@@ -7,11 +7,11 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.sample.domain.Foo;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.exception.NoWorkFoundException;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
@@ -170,7 +170,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 			itemReader.open(new ExecutionContext());
 			fail();
 		}
-		catch(DataRetrievalFailureException ex){
+		catch(NoWorkFoundException ex){
 			//expected
 		}
 	}
