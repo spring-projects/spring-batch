@@ -48,6 +48,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
+
 /**
  * Simple implementation of executing the step as a set of chunks, each chunk
  * surrounded by a transaction. The structure is therefore that of two nested
@@ -115,7 +117,7 @@ public class ItemOrientedStep extends AbstractStep {
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
-	
+
 	/**
 	 * Public setter for the {@link ItemHandler}.
 	 * @param itemHandler the {@link ItemHandler} to set
@@ -264,6 +266,8 @@ public class ItemOrientedStep extends AbstractStep {
 			listener.beforeStep(stepExecution);
 			stream.open(stepExecution.getExecutionContext());
 
+			final Semaphore semaphore = new Semaphore(1);
+
 			status = stepOperations.iterate(new RepeatCallback() {
 
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
@@ -288,22 +292,21 @@ public class ItemOrientedStep extends AbstractStep {
 						// If the step operations are asynchronous then we need
 						// to synchronize changes to the step execution (at a
 						// minimum).
-						synchronized (stepExecution) {
+						semaphore.acquire();
 
-							// Apply the contribution to the step
-							// only if chunk was successful
-							stepExecution.apply(contribution);
+						// Apply the contribution to the step
+						// only if chunk was successful
+						stepExecution.apply(contribution);
 
-							stream.update(stepExecution.getExecutionContext());
-							try {
-								jobRepository.saveOrUpdateExecutionContext(stepExecution);
-							}
-							catch (Exception e) {
-								fatalException.setException(e);
-								stepExecution.setStatus(BatchStatus.UNKNOWN);
-								throw new CommitFailedException("Fatal error detected during save of step execution context", e);
-							}
-
+						stream.update(stepExecution.getExecutionContext());
+						try {
+							jobRepository.saveOrUpdateExecutionContext(stepExecution);
+						}
+						catch (Exception e) {
+							fatalException.setException(e);
+							stepExecution.setStatus(BatchStatus.UNKNOWN);
+							throw new CommitFailedException(
+									"Fatal error detected during save of step execution context", e);
 						}
 
 						try {
@@ -350,6 +353,9 @@ public class ItemOrientedStep extends AbstractStep {
 							throw new RuntimeException(t);
 						}
 
+					}
+					finally {
+						semaphore.release();
 					}
 
 					// Check for interruption after transaction as well, so that
@@ -401,7 +407,7 @@ public class ItemOrientedStep extends AbstractStep {
 			catch (RuntimeException e) {
 				logger.error("Unexpected error in listener after step.", e);
 			}
-			
+
 			stepExecution.setExitStatus(status);
 			stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 
@@ -434,7 +440,7 @@ public class ItemOrientedStep extends AbstractStep {
 				throw new InfrastructureException("Encountered an error saving batch meta data.", fatalException
 						.getException());
 			}
-			
+
 		}
 
 	}
