@@ -44,7 +44,14 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 	private List list;
 
 	private JobExecution jobExecution = new JobExecution(new JobInstance(new Long(0L), new JobParameters(),
-			new JobSupport("job")));;
+			new JobSupport("job")));
+	
+	protected void setUp() throws Exception {
+		factory.setItemReader(new ListItemReader(new ArrayList()));
+		factory.setItemWriter(new EmptyItemWriter());
+		factory.setJobRepository(new JobRepositorySupport());
+		factory.setTransactionManager(new ResourcelessTransactionManager());
+	}
 
 	public void testType() throws Exception {
 		assertEquals(Step.class, factory.getObjectType());
@@ -69,8 +76,6 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 				return ExitStatus.FINISHED;
 			}
 		});
-
-		factory.setSingleton(false);
 
 		Step step = (Step) factory.getObject();
 		step.execute(new StepExecution(step, jobExecution));

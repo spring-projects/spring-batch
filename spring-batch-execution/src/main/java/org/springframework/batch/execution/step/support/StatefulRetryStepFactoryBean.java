@@ -39,9 +39,6 @@ import org.springframework.batch.retry.support.RetryTemplate;
  * limit given by the {@link RetryPolicy}. When the retry is exhausted instead
  * of the item being skipped it is handled by an {@link ItemRecoverer}.<br/>
  * 
- * TODO: checking for null retry callback is a sucky way of determining if a
- * stateful retry has been requested.
- * 
  * @author Dave Syer
  * 
  */
@@ -50,6 +47,8 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 	private RetryPolicy retryPolicy;
 
 	private ItemKeyGenerator itemKeyGenerator;
+
+	private ItemRecoverer itemRecoverer;
 
 	/**
 	 * Public setter for the {@link RetryPolicy}.
@@ -74,6 +73,18 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 	}
 
 	/**
+	 * Public setter for the {@link ItemRecoverer}. If this is set the
+	 * {@link ItemRecoverer#recover(Object, Throwable)} will be called when
+	 * retry is exhausted, and within the business transaction (which will not
+	 * roll back because of any other item-related errors).
+	 * 
+	 * @param itemRecoverer the {@link ItemRecoverer} to set
+	 */
+	public void setItemRecoverer(ItemRecoverer itemRecoverer) {
+		this.itemRecoverer = itemRecoverer;
+	}
+
+	/**
 	 * @param step
 	 * 
 	 */
@@ -87,36 +98,20 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 			// exception handler limit, so this is a hack for now.
 			getStepOperations().setExceptionHandler(new SimpleLimitExceptionHandler(Integer.MAX_VALUE));
 
-			ItemReaderRetryCallback retryCallback = new ItemReaderRetryCallback(getItemReader(), getKeyGenerator(),
+			ItemReaderRetryCallback retryCallback = new ItemReaderRetryCallback(getItemReader(), itemKeyGenerator,
 					getItemWriter());
+			retryCallback.setRecoverer(itemRecoverer);
 			ItemReaderRetryPolicy itemProviderRetryPolicy = new ItemReaderRetryPolicy(retryPolicy);
 
 			RetryTemplate retryTemplate = new RetryTemplate();
 			retryTemplate.setRetryPolicy(itemProviderRetryPolicy);
 
-			StatefulRetryItemHandler itemProcessor = new StatefulRetryItemHandler(getItemReader(), getItemWriter(), retryTemplate, retryCallback);
-			
+			StatefulRetryItemHandler itemProcessor = new StatefulRetryItemHandler(getItemReader(), getItemWriter(),
+					retryTemplate, retryCallback);
+
 			step.setItemProcessor(itemProcessor);
-			
-		}
 
-	}
-
-	/**
-	 * @return an {@link ItemKeyGenerator} or null if none is found.
-	 */
-	private ItemKeyGenerator getKeyGenerator() {
-
-		if (itemKeyGenerator != null) {
-			return itemKeyGenerator;
 		}
-		if (getItemReader() instanceof ItemKeyGenerator) {
-			return (ItemKeyGenerator) getItemReader();
-		}
-		if (getItemWriter() instanceof ItemKeyGenerator) {
-			return (ItemKeyGenerator) getItemWriter();
-		}
-		return null;
 
 	}
 
@@ -129,10 +124,11 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 		/**
 		 * @param itemReader
 		 * @param itemWriter
-		 * @param retryCallback 
-		 * @param retryTemplate 
+		 * @param retryCallback
+		 * @param retryTemplate
 		 */
-		public StatefulRetryItemHandler(ItemReader itemReader, ItemWriter itemWriter, RetryOperations retryTemplate, ItemReaderRetryCallback retryCallback) {
+		public StatefulRetryItemHandler(ItemReader itemReader, ItemWriter itemWriter, RetryOperations retryTemplate,
+				ItemReaderRetryCallback retryCallback) {
 			super(itemReader, itemWriter);
 			this.retryOperations = retryTemplate;
 			this.retryCallback = retryCallback;

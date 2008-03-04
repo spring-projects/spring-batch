@@ -15,8 +15,12 @@
  */
 package org.springframework.batch.core.domain;
 
-
 /**
+ * Provide callbacks at specific points in the lifecycle of a {@link Job}.
+ * Implementations can be stateful if they are careful to either ensure thread
+ * safety, or to use one instance of a listener per job, assuming that job
+ * instances themselves are not used by more than one thread.
+ * 
  * @author Dave Syer
  * 
  */
@@ -30,7 +34,7 @@ public interface JobListener {
 	void beforeJob(JobExecution jobExecution);
 
 	/**
-	 * 
+	 * Callback after successful completion of a job.
 	 */
 	void afterJob();
 }

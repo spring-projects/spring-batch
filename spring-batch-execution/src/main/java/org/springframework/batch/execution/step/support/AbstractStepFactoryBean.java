@@ -21,7 +21,7 @@ import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.config.AbstractFactoryBean;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public abstract class AbstractStepFactoryBean extends AbstractFactoryBean implements BeanNameAware {
+public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAware {
 
 	private String name;
 
@@ -48,6 +48,8 @@ public abstract class AbstractStepFactoryBean extends AbstractFactoryBean implem
 	private PlatformTransactionManager transactionManager;
 
 	private JobRepository jobRepository;
+
+	private boolean singleton = true;
 
 	/**
 	 * 
@@ -140,7 +142,12 @@ public abstract class AbstractStepFactoryBean extends AbstractFactoryBean implem
 		this.transactionManager = transactionManager;
 	}
 
-	protected Object createInstance() throws Exception {
+	/**
+	 * Create a {@link Step} from the configuration provided.
+	 * 
+	 * @see org.springframework.beans.factory.FactoryBean#getObject()
+	 */
+	public final Object getObject() throws Exception {
 		ItemOrientedStep step = new ItemOrientedStep(getName());
 		applyConfiguration(step);
 		return step;
@@ -156,7 +163,7 @@ public abstract class AbstractStepFactoryBean extends AbstractFactoryBean implem
 		Assert.notNull(getItemWriter(), "ItemWriter must be provided");
 		Assert.notNull(jobRepository, "JobRepository must be provided");
 		Assert.notNull(transactionManager, "TransactionManager must be provided");
-		
+
 		step.setItemProcessor(new SimpleItemHandler(itemReader, itemWriter));
 		step.setTransactionManager(transactionManager);
 		step.setJobRepository(jobRepository);
@@ -167,6 +174,25 @@ public abstract class AbstractStepFactoryBean extends AbstractFactoryBean implem
 
 	public Class getObjectType() {
 		return Step.class;
+	}
+
+	/**
+	 * Returns true by default, but in most cases a {@link Step} should not be
+	 * treated as thread safe. Clients are recommended to create a new step for
+	 * each job execution.
+	 * 
+	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
+	 */
+	public boolean isSingleton() {
+		return this.singleton;
+	}
+
+	/**
+	 * Public setter for the singleton flag.
+	 * @param singleton the value to set. Defaults to true.
+	 */
+	public void setSingleton(boolean singleton) {
+		this.singleton = singleton;
 	}
 
 }

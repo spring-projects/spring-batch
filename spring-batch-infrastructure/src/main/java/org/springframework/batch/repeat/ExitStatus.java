@@ -49,7 +49,7 @@ public class ExitStatus implements Serializable {
 	 * Convenient constant value representing finished processing.
 	 */
 	public static final ExitStatus FINISHED = new ExitStatus(false, "COMPLETED");
-	
+
 	/**
 	 * Convenient constant value representing interrupted processing.
 	 */
@@ -131,8 +131,11 @@ public class ExitStatus implements Serializable {
 
 	/**
 	 * Create a new {@link ExitStatus} with a logical combination of the
-	 * continuable flag, and a concatenation of the codes. If the input is null
-	 * we just return this.
+	 * continuable flag, and a concatenation of the descriptions. The exit code
+	 * is only replaced if the result is continuable or the input is not
+	 * continuable.<br/>
+	 * 
+	 * If the input is null just return this.
 	 * 
 	 * @param status an {@link ExitStatus} to combine with this one.
 	 * @return a new {@link ExitStatus} with {@link #isContinuable()} the
@@ -142,7 +145,11 @@ public class ExitStatus implements Serializable {
 		if (status == null) {
 			return this;
 		}
-		return and(status.continuable).replaceExitCode(status.exitCode).addExitDescription(status.exitDescription);
+		ExitStatus result = and(status.continuable).addExitDescription(status.exitDescription);
+		if (result.continuable || !status.continuable) {
+			result = result.replaceExitCode(status.exitCode);
+		}
+		return result;
 	}
 
 	/*

@@ -26,7 +26,6 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.domain.BatchListener;
 import org.springframework.batch.core.domain.BatchStatus;
 import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInstance;
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.execution.job.SimpleJob;
@@ -36,7 +35,6 @@ import org.springframework.batch.execution.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.execution.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.execution.step.AbstractStep;
 import org.springframework.batch.execution.step.ItemOrientedStep;
-import org.springframework.batch.execution.step.support.DefaultStepFactoryBean;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
@@ -84,7 +82,6 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 
 	private DefaultStepFactoryBean getStep(String[] args) throws Exception {
 		DefaultStepFactoryBean factory = new DefaultStepFactoryBean();
-		factory.setSingleton(false);
 
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
@@ -95,13 +92,6 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 		factory.setJobRepository(repository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setBeanName("stepName");
-		// step.setItemRecoverer(new ItemRecoverer() {
-		// public boolean recover(Object item, Throwable cause) {
-		// recovered.add(item);
-		// assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
-		// return true;
-		// }
-		// });
 		return factory;
 	}
 
@@ -115,12 +105,10 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 		step.setName("step2");
 		job.addStep(step);
 
-		JobInstance jobInstance = repository.createJobExecution(job, new JobParameters()).getJobInstance();
+		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
 
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
-
-		job.execute(jobExecutionContext);
-		assertEquals(BatchStatus.COMPLETED, jobExecutionContext.getStatus());
+		job.execute(jobExecution);
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(3, processed.size());
 		assertTrue(processed.contains("foo"));
 	}
@@ -154,6 +142,7 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 			public void onReadError(Exception ex) {
 				recovered.add(ex);
 			}
+
 			public void onWriteError(Exception ex, Object item) {
 				recovered.add(ex);
 			}
@@ -173,8 +162,6 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 		assertEquals(null, provider.read());
 		assertEquals(3, recovered.size());
 	}
-	
-	// TODO: test recovery and stateful retry 
 
 	public void testExceptionTerminates() throws Exception {
 		DefaultStepFactoryBean factory = getStep(new String[] { "foo", "bar", "spam" });

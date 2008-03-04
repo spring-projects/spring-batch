@@ -79,8 +79,6 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	ExecutionContext executionContext;
 
-	private JobExecution jobExecution;
-
 	public void setUp() throws Exception {
 
 		jobExecutionDao = (JobExecutionDao) jobExecutionDaoControl.getMock();

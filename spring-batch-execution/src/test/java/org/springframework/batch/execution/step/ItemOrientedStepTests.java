@@ -393,7 +393,7 @@ public class ItemOrientedStepTests extends TestCase {
 	
 	public void testAfterStep() throws Exception{
 		
-		final ExitStatus customStatus = new ExitStatus(true, "custom code");
+		final ExitStatus customStatus = new ExitStatus(false, "custom code");
 		
 		itemOrientedStep.setStepListeners(new StepListener[] {new StepListenerSupport() {
 			public ExitStatus afterStep() {

@@ -21,12 +21,13 @@ import junit.framework.TestCase;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class ExitStatusTests extends TestCase {
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, int)}.
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, int)}.
 	 */
 	public void testExitStatusBooleanInt() {
 		ExitStatus status = new ExitStatus(true, "10");
@@ -35,7 +36,8 @@ public class ExitStatusTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, int)}.
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, int)}.
 	 */
 	public void testExitStatusConstantsContinuable() {
 		ExitStatus status = ExitStatus.CONTINUABLE;
@@ -44,14 +46,15 @@ public class ExitStatusTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, int)}.
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, int)}.
 	 */
 	public void testExitStatusConstantsFinished() {
 		ExitStatus status = ExitStatus.FINISHED;
 		assertFalse(status.isContinuable());
 		assertEquals("COMPLETED", status.getExitCode());
 	}
-	
+
 	/**
 	 * Test equality of exit statuses.
 	 * 
@@ -60,13 +63,13 @@ public class ExitStatusTests extends TestCase {
 	public void testEqualsWithSameProperties() throws Exception {
 		assertEquals(ExitStatus.CONTINUABLE, new ExitStatus(true, "CONTINUABLE"));
 	}
-	
-	public void testEqualsSelf(){
+
+	public void testEqualsSelf() {
 		ExitStatus status = new ExitStatus(true, "test");
 		assertEquals(status, status);
 	}
-	
-	public void testEquals(){
+
+	public void testEquals() {
 		assertEquals(new ExitStatus(true, "test"), new ExitStatus(true, "test"));
 	}
 
@@ -89,57 +92,93 @@ public class ExitStatusTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.repeat.ExitStatus#and(boolean)}.
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.ExitStatus#and(boolean)}.
 	 */
 	public void testAndBoolean() {
 		assertTrue(ExitStatus.CONTINUABLE.and(true).isContinuable());
 		assertFalse(ExitStatus.CONTINUABLE.and(false).isContinuable());
-	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}.
-	 */
-	public void testAndExitStatus() {
-		assertTrue(ExitStatus.CONTINUABLE.and(ExitStatus.CONTINUABLE.isContinuable()).isContinuable());
-		assertFalse(ExitStatus.CONTINUABLE.and(ExitStatus.FINISHED.isContinuable()).isContinuable());
-		assertTrue(ExitStatus.FINISHED.and(ExitStatus.CONTINUABLE.isContinuable()).getExitCode() 
-				== ExitStatus.FINISHED.getExitCode());
 		ExitStatus status = new ExitStatus(false, "CUSTOM_CODE", "CUSTOM_DESCRIPTION");
 		assertTrue(status.and(true).getExitCode() == "CUSTOM_CODE");
 		assertTrue(status.and(true).getExitDescription() == "CUSTOM_DESCRIPTION");
 	}
 
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}.
+	 */
+	public void testAndExitStatusStillContinuable() {
+		assertTrue(ExitStatus.CONTINUABLE.and(ExitStatus.CONTINUABLE).isContinuable());
+		assertFalse(ExitStatus.CONTINUABLE.and(ExitStatus.FINISHED).isContinuable());
+		assertTrue(ExitStatus.CONTINUABLE.and(ExitStatus.CONTINUABLE).getExitCode() == ExitStatus.CONTINUABLE
+				.getExitCode());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}.
+	 */
+	public void testAndExitStatusWhenFinishedAddedToContinuable() {
+		assertEquals(ExitStatus.FINISHED.getExitCode(), ExitStatus.CONTINUABLE.and(ExitStatus.FINISHED).getExitCode());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}.
+	 */
+	public void testAndExitStatusWhenContinuableAddedToFinished() {
+		assertEquals(ExitStatus.FINISHED.getExitCode(), ExitStatus.FINISHED.and(ExitStatus.CONTINUABLE).getExitCode());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}.
+	 */
+	public void testAndExitStatusWhenCustomContinuableAddedToContinuable() {
+		assertEquals("CUSTOM", ExitStatus.CONTINUABLE.and(ExitStatus.CONTINUABLE.replaceExitCode("CUSTOM"))
+				.getExitCode());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}.
+	 */
+	public void testAndExitStatusWhenCustomContinuableAddedToFinished() {
+		assertEquals(ExitStatus.FINISHED.getExitCode(), ExitStatus.FINISHED.and(ExitStatus.CONTINUABLE.replaceExitCode("CUSTOM"))
+				.getExitCode());
+	}
+
 	public void testAddExitCode() throws Exception {
 		ExitStatus status = ExitStatus.CONTINUABLE.replaceExitCode("FOO");
-		assertTrue(ExitStatus.CONTINUABLE!=status);
+		assertTrue(ExitStatus.CONTINUABLE != status);
 		assertTrue(status.isContinuable());
 		assertEquals("FOO", status.getExitCode());
 	}
 
 	public void testAddExitCodeToExistingStatus() throws Exception {
 		ExitStatus status = ExitStatus.CONTINUABLE.replaceExitCode("FOO").replaceExitCode("BAR");
-		assertTrue(ExitStatus.CONTINUABLE!=status);
+		assertTrue(ExitStatus.CONTINUABLE != status);
 		assertTrue(status.isContinuable());
 		assertEquals("BAR", status.getExitCode());
 	}
 
 	public void testAddExitCodeToSameStatus() throws Exception {
 		ExitStatus status = ExitStatus.CONTINUABLE.replaceExitCode(ExitStatus.CONTINUABLE.getExitCode());
-		assertTrue(ExitStatus.CONTINUABLE!=status);
+		assertTrue(ExitStatus.CONTINUABLE != status);
 		assertTrue(status.isContinuable());
 		assertEquals(ExitStatus.CONTINUABLE.getExitCode(), status.getExitCode());
 	}
 
 	public void testAddExitDescription() throws Exception {
 		ExitStatus status = ExitStatus.CONTINUABLE.addExitDescription("Foo");
-		assertTrue(ExitStatus.CONTINUABLE!=status);
+		assertTrue(ExitStatus.CONTINUABLE != status);
 		assertTrue(status.isContinuable());
 		assertEquals("Foo", status.getExitDescription());
 	}
 
 	public void testAddExitDescriptionToSameStatus() throws Exception {
 		ExitStatus status = ExitStatus.CONTINUABLE.addExitDescription("Foo").addExitDescription("Foo");
-		assertTrue(ExitStatus.CONTINUABLE!=status);
+		assertTrue(ExitStatus.CONTINUABLE != status);
 		assertTrue(status.isContinuable());
 		assertEquals("Foo", status.getExitDescription());
 	}
@@ -149,12 +188,12 @@ public class ExitStatusTests extends TestCase {
 		assertEquals("FOO", status.getExitCode());
 		assertEquals("Bar", status.getExitDescription());
 	}
-	
+
 	public void testRunningIsRunning() throws Exception {
 		assertTrue(ExitStatus.RUNNING.isRunning());
 		assertTrue(new ExitStatus(true, "RUNNING").isRunning());
 	}
-	
+
 	public void testUnkownIsRunning() throws Exception {
 		assertTrue(ExitStatus.UNKNOWN.isRunning());
 	}
