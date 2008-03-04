@@ -68,7 +68,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 					trade = (Trade)inputSource.read();
 				}
 				catch (Exception e) {
-					throw new IllegalStateException(e);
+					throw new IllegalStateException(e.getMessage());
 				}
 				assertEquals(trade.getIsin(), rs.getString(2));
 				assertEquals(trade.getQuantity(),rs.getLong(3));

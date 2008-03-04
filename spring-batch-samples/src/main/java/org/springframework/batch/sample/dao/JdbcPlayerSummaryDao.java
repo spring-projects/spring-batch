@@ -20,12 +20,12 @@ public class JdbcPlayerSummaryDao extends JdbcDaoSupport implements ItemWriter {
 		
 		PlayerSummary summary = (PlayerSummary)output;
 		
-		Object[] args = new Object[]{summary.getId(), Integer.valueOf(summary.getYear()),
-				Integer.valueOf(summary.getCompletes()), Integer.valueOf(summary.getAttempts()),
-				Integer.valueOf(summary.getPassingYards()), Integer.valueOf(summary.getPassingTd()),
-				Integer.valueOf(summary.getInterceptions()), Integer.valueOf(summary.getRushes()),
-				Integer.valueOf(summary.getRushYards()), Integer.valueOf(summary.getReceptions()),
-				Integer.valueOf(summary.getReceptionYards()), Integer.valueOf(summary.getTotalTd()) };
+		Object[] args = new Object[]{summary.getId(), new Integer(summary.getYear()),
+				new Integer(summary.getCompletes()), new Integer(summary.getAttempts()),
+				new Integer(summary.getPassingYards()), new Integer(summary.getPassingTd()),
+				new Integer(summary.getInterceptions()), new Integer(summary.getRushes()),
+				new Integer(summary.getRushYards()), new Integer(summary.getReceptions()),
+				new Integer(summary.getReceptionYards()), new Integer(summary.getTotalTd()) };
 		
 		getJdbcTemplate().update(INSERT_SUMMARY, args);
 	}

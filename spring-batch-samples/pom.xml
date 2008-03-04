@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-samples</artifactId>
 	<packaging>jar</packaging>
@@ -65,10 +67,10 @@
 					<groupId>commons-validator</groupId>
 					<artifactId>commons-validator</artifactId>
 				</exclusion>
-	        	<exclusion>
+				<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring</artifactId>
-	        	</exclusion>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -103,20 +105,20 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-	        <groupId>org.springframework.ws</groupId>
+			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-oxm</artifactId>
-	        <version>1.0.0</version>
-	        <optional>true</optional>
-	        <exclusions>
-	        	<exclusion>
+			<version>1.0.0</version>
+			<optional>true</optional>
+			<exclusions>
+				<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring-beans</artifactId>
-	        	</exclusion>
-	        	<exclusion>
+				</exclusion>
+				<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring-core</artifactId>
-	        	</exclusion>
-	        </exclusions>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>geronimo-spec</groupId>
@@ -181,7 +183,7 @@
 			<version>10.2.1.6</version>
 			<scope>test</scope>
 		</dependency>
-<!-- Spring Dependencies -->
+		<!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
@@ -196,6 +198,14 @@
 			<artifactId>spring-web</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- JMX for Java 1.4 -->
+		<dependency>
+			<groupId>mx4j</groupId>
+			<artifactId>mx4j</artifactId>
+			<version>3.0.2</version>
+			<scope>optional</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -209,91 +219,143 @@
 						<phase>generate-sources</phase>
 						<configuration>
 							<tasks>
-								<typedef resource="foundrylogic/vpp/typedef.properties" />
-								<taskdef resource="foundrylogic/vpp/taskdef.properties" />
+								<typedef
+									resource="foundrylogic/vpp/typedef.properties" />
+								<taskdef
+									resource="foundrylogic/vpp/taskdef.properties" />
 								<!-- Reference script for HSQLDB - N.B. not under source control, but packagaed in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<vppcopy
+									todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
-											<property key="includes" value="src/main/sql" />
-											<property file="${basedir}/src/main/sql/hsqldb.properties" />
+											<property key="includes"
+												value="src/main/sql" />
+											<property
+												file="${basedir}/src/main/sql/hsqldb.properties" />
 										</context>
 										<engine>
-											<property key="velocimacro.library" value="src/main/sql/hsqldb.vpp" />
+											<property
+												key="velocimacro.library" value="src/main/sql/hsqldb.vpp" />
 										</engine>
 									</config>
-									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
-									<mapper type="glob" from="*.sql.vpp" to="*-hsqldb.sql" />
+									<fileset
+										dir="${basedir}/src/main/sql"
+										includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp"
+										to="*-hsqldb.sql" />
 								</vppcopy>
 								<!-- Reference script for DB2 - N.B. not under source control, but packagaed in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<vppcopy
+									todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
-											<property key="includes" value="src/main/sql" />
-											<property file="${basedir}/src/main/sql/db2.properties" />
+											<property key="includes"
+												value="src/main/sql" />
+											<property
+												file="${basedir}/src/main/sql/db2.properties" />
 										</context>
 										<engine>
-											<property key="velocimacro.library" value="src/main/sql/db2.vpp" />
+											<property
+												key="velocimacro.library" value="src/main/sql/db2.vpp" />
 										</engine>
 									</config>
-									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
-									<mapper type="glob" from="*.sql.vpp" to="*-db2.sql" />
+									<fileset
+										dir="${basedir}/src/main/sql"
+										includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp"
+										to="*-db2.sql" />
 								</vppcopy>
 								<!-- Reference script for Derby - N.B. not under source control, but packagaed in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<vppcopy
+									todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
-											<property key="includes" value="src/main/sql" />
-											<property file="${basedir}/src/main/sql/derby.properties" />
+											<property key="includes"
+												value="src/main/sql" />
+											<property
+												file="${basedir}/src/main/sql/derby.properties" />
 										</context>
 										<engine>
-											<property key="velocimacro.library" value="src/main/sql/derby.vpp" />
+											<property
+												key="velocimacro.library" value="src/main/sql/derby.vpp" />
 										</engine>
 									</config>
-									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
-									<mapper type="glob" from="*.sql.vpp" to="*-derby.sql" />
+									<fileset
+										dir="${basedir}/src/main/sql"
+										includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp"
+										to="*-derby.sql" />
 								</vppcopy>
 								<!-- Reference script for Oracle - N.B. not under source control, but packagaed in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<vppcopy
+									todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
-											<property key="includes" value="src/main/sql" />
-											<property file="${basedir}/src/main/sql/oracle10g.properties" />
+											<property key="includes"
+												value="src/main/sql" />
+											<property
+												file="${basedir}/src/main/sql/oracle10g.properties" />
 										</context>
 										<engine>
-											<property key="velocimacro.library" value="src/main/sql/oracle10g.vpp" />
+											<property
+												key="velocimacro.library"
+												value="src/main/sql/oracle10g.vpp" />
 										</engine>
 									</config>
-									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
-									<mapper type="glob" from="*.sql.vpp" to="*-oracle10g.sql" />
+									<fileset
+										dir="${basedir}/src/main/sql"
+										includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp"
+										to="*-oracle10g.sql" />
 								</vppcopy>
 								<!-- Reference script for PostgreSQL - N.B. not under source control, but packagaed in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<vppcopy
+									todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
-											<property key="includes" value="src/main/sql" />
-											<property file="${basedir}/src/main/sql/postgresql.properties" />
+											<property key="includes"
+												value="src/main/sql" />
+											<property
+												file="${basedir}/src/main/sql/postgresql.properties" />
 										</context>
 										<engine>
-											<property key="velocimacro.library" value="src/main/sql/postgresql.vpp" />
+											<property
+												key="velocimacro.library"
+												value="src/main/sql/postgresql.vpp" />
 										</engine>
 									</config>
-									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
-									<mapper type="glob" from="*.sql.vpp" to="*-postgresql.sql" />
+									<fileset
+										dir="${basedir}/src/main/sql"
+										includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp"
+										to="*-postgresql.sql" />
 								</vppcopy>
 								<!-- Reference script for MySQL - N.B. not under source control, but packaged in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<vppcopy
+									todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
-											<property key="includes" value="src/main/sql" />
-											<property file="${basedir}/src/main/sql/mysql.properties" />
+											<property key="includes"
+												value="src/main/sql" />
+											<property
+												file="${basedir}/src/main/sql/mysql.properties" />
 										</context>
 										<engine>
-											<property key="velocimacro.library" value="src/main/sql/mysql.vpp" />
+											<property
+												key="velocimacro.library" value="src/main/sql/mysql.vpp" />
 										</engine>
 									</config>
-									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
-									<mapper type="glob" from="*.sql.vpp" to="*-mysql.sql" />
+									<fileset
+										dir="${basedir}/src/main/sql"
+										includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp"
+										to="*-mysql.sql" />
 								</vppcopy>
 							</tasks>
 						</configuration>

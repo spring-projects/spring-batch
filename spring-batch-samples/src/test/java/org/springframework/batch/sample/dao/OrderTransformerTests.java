@@ -54,7 +54,7 @@ public class OrderTransformerTests extends TestCase {
 		order.setBillingAddress(new Address());
 		order.setBilling(new BillingInfo());
 		order.setLineItems(Collections.EMPTY_LIST);
-		order.setTotalPrice(BigDecimal.TEN);
+		order.setTotalPrice(new BigDecimal(10));
 		Object result = converter.transform(order);
 		assertTrue(result instanceof Collection);
 	}

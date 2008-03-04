@@ -43,7 +43,7 @@ public class JobExecutionNotificationPublisherTests extends TestCase {
 		publisher.onApplicationEvent(new SimpleMessageApplicationEvent(this, "foo"));
 		assertEquals(1, list.size());
 		String message = ((Notification) list.get(0)).getMessage();
-		assertTrue("Message does not contain 'foo': ", message.contains("foo"));
+		assertTrue("Message does not contain 'foo': ", message.indexOf("foo") > 0);
 	}
 
 }
