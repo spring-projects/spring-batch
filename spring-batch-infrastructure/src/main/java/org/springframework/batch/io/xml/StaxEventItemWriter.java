@@ -50,10 +50,10 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	private static final String DEFAULT_ROOT_TAG_NAME = "root";
 
 	// restart data property name
-	public static final String RESTART_DATA_NAME = "position";
+	private static final String RESTART_DATA_NAME = "position";
 
 	// restart data property name
-	public static final String WRITE_STATISTICS_NAME = "record.count";
+	private static final String WRITE_STATISTICS_NAME = "record.count";
 
 	// file system resource
 	private Resource resource;

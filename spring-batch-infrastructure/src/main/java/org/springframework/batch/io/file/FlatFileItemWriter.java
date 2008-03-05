@@ -71,11 +71,11 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-	public static final String WRITTEN_STATISTICS_NAME = "written";
+	private static final String WRITTEN_STATISTICS_NAME = "written";
 
-	public static final String RESTART_COUNT_STATISTICS_NAME = "restart.count";
+	private static final String RESTART_COUNT_STATISTICS_NAME = "restart.count";
 
-	public static final String RESTART_DATA_NAME = "current.count";
+	private static final String RESTART_DATA_NAME = "current.count";
 
 	private Resource resource;
 

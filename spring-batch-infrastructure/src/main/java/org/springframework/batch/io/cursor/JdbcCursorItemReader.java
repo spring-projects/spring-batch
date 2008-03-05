@@ -109,11 +109,11 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 
 	public static final int VALUE_NOT_SET = -1;
 
-	private static final String CURRENT_PROCESSED_ROW = "lastProcessedRowNum";
+	private static final String CURRENT_PROCESSED_ROW = "last.processed.row.number";
 
-	private static final String SKIPPED_ROWS = "skippedRows";
+	private static final String SKIPPED_ROWS = "skipped.rows";
 
-	private static final String SKIP_COUNT = "skippedRrecordCount";
+	private static final String SKIP_COUNT = "skipped.record.count";
 
 	private Connection con;
 

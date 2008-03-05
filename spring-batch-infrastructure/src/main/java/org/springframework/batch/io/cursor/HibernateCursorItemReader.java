@@ -51,9 +51,9 @@ import org.springframework.util.StringUtils;
  */
 public class HibernateCursorItemReader  extends ExecutionContextUserSupport implements ItemReader, ItemStream, Skippable, InitializingBean {
 
-	private static final String RESTART_DATA_ROW_NUMBER_KEY = "rowNumber";
+	private static final String RESTART_DATA_ROW_NUMBER_KEY = "row.number";
 
-	private static final String SKIPPED_ROWS = "skippedRows";
+	private static final String SKIPPED_ROWS = "skipped.rows";
 
 	private SessionFactory sessionFactory;
 

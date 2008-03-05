@@ -125,7 +125,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
 			writer.write(record);
 			writer.update(executionContext);
-			long writeStatistics = executionContext.getLong(StaxEventItemWriter.class.getSimpleName() + "." + StaxEventItemWriter.WRITE_STATISTICS_NAME);
+			long writeStatistics = executionContext.getLong(StaxEventItemWriter.class.getSimpleName() + ".record.count");
 
 			assertEquals(i, writeStatistics);
 		}

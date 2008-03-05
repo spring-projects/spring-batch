@@ -39,7 +39,7 @@ import org.springframework.util.Assert;
 public class StaxEventItemReader extends ExecutionContextUserSupport implements ItemReader, Skippable, ItemStream,
 		InitializingBean {
 
-	public static final String READ_COUNT_STATISTICS_NAME = "readCount";
+	private static final String READ_COUNT_STATISTICS_NAME = "read.count";
 
 	private FragmentEventReader fragmentReader;
 

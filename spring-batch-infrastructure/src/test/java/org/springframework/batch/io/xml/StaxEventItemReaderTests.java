@@ -119,7 +119,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		source.read();
 		source.update(executionContext);
 		System.out.println(executionContext);
-		assertEquals(1, executionContext.getLong(StaxEventItemReader.class.getSimpleName() + "." + StaxEventItemReader.READ_COUNT_STATISTICS_NAME));
+		assertEquals(1, executionContext.getLong(StaxEventItemReader.class.getSimpleName() + ".read.count"));
 		List expectedAfterRestart = (List) source.read();
 
 		source = createNewInputSouce();
@@ -134,7 +134,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	 */
 	public void testInvalidRestore() {
 		ExecutionContext context = new ExecutionContext();
-		context.putLong(StaxEventItemReader.class.getSimpleName() + "." + StaxEventItemReader.READ_COUNT_STATISTICS_NAME, 100000);
+		context.putLong(StaxEventItemReader.class.getSimpleName() + ".read.count", 100000);
 		try {
 			source.open(context);
 			fail("Expected StreamException");
@@ -214,7 +214,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	}
 
 	private long extractRecordCount() {
-		return executionContext.getLong(StaxEventItemReader.class.getSimpleName() + "." + StaxEventItemReader.READ_COUNT_STATISTICS_NAME);
+		return executionContext.getLong(StaxEventItemReader.class.getSimpleName() + ".read.count");
 	}
 
 	public void testCloseWithoutOpen() throws Exception {

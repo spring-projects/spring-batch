@@ -68,9 +68,9 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 
 	private static Log log = LogFactory.getLog(FlatFileItemReader.class);
 
-	public static final String READ_STATISTICS_NAME = "lines.read.count";
+	private static final String READ_STATISTICS_NAME = "lines.read.count";
 
-	public static final String SKIPPED_STATISTICS_NAME = "skipped.lines.count";
+	private static final String SKIPPED_STATISTICS_NAME = "skipped.lines.count";
 
 	// default encoding for input files
 	public static final String DEFAULT_CHARSET = "ISO-8859-1";

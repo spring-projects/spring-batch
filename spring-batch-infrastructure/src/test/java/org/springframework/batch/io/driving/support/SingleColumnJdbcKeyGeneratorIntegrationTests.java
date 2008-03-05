@@ -44,7 +44,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	
 	public void testRestoreKeys(){
 		
-		executionContext.putString(SingleColumnJdbcKeyGenerator.RESTART_KEY, "3");
+		executionContext.putString("key", "3");
 		
 		List keys = keyStrategy.retrieveKeys(executionContext);
 		
@@ -58,7 +58,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 		keyStrategy.saveState(new Long(3), executionContext);
 		
 		assertEquals(1, executionContext.size());
-		assertEquals("3", executionContext.getString(SingleColumnJdbcKeyGenerator.RESTART_KEY));
+		assertEquals("3", executionContext.getString("key"));
 	}
 	
 	public void testGetNullKeyAsStreamContext(){

@@ -52,7 +52,7 @@ import org.springframework.util.StringUtils;
  */
 public class SingleColumnJdbcKeyGenerator extends ExecutionContextUserSupport implements KeyGenerator {
 
-	public static final String RESTART_KEY = "key";
+	private static final String RESTART_KEY = "key";
 
 	private JdbcTemplate jdbcTemplate;
 

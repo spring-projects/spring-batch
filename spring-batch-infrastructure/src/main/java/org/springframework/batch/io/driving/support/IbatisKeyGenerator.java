@@ -22,7 +22,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  */
 public class IbatisKeyGenerator extends ExecutionContextUserSupport implements KeyGenerator {
 
-	public static final String RESTART_KEY = "keyIndex";
+	private static final String RESTART_KEY = "key.index";
 
 	private SqlMapClientTemplate sqlMapClientTemplate;
 

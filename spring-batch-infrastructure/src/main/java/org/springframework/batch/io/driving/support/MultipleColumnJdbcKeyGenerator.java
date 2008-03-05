@@ -20,7 +20,6 @@ import java.util.List;
 import org.springframework.batch.io.driving.DrivingQueryItemReader;
 import org.springframework.batch.io.driving.KeyGenerator;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -37,9 +36,7 @@ import org.springframework.util.StringUtils;
  * @see DrivingQueryItemReader
  * @since 1.0
  */
-public class MultipleColumnJdbcKeyGenerator extends ExecutionContextUserSupport implements KeyGenerator {
-
-	public static final String RESTART_KEY = "key";
+public class MultipleColumnJdbcKeyGenerator implements KeyGenerator {
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -50,7 +47,6 @@ public class MultipleColumnJdbcKeyGenerator extends ExecutionContextUserSupport 
 	private String restartSql;
 
 	public MultipleColumnJdbcKeyGenerator() {
-		setName(MultipleColumnJdbcKeyGenerator.class.getSimpleName());
 	}
 
 	/**

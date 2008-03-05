@@ -245,7 +245,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		}
 
 		// 3 lines were written to the file after restart
-		assertEquals(3, executionContext.getLong(FlatFileItemWriter.class.getSimpleName() + "." + FlatFileItemWriter.WRITTEN_STATISTICS_NAME));
+		assertEquals(3, executionContext.getLong(FlatFileItemWriter.class.getSimpleName() + ".written"));
 
 	}
 
@@ -269,7 +269,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.update(executionContext);
 		assertNotNull(executionContext);
 		assertEquals(3, executionContext.entrySet().size());
-		assertEquals(0, executionContext.getLong(FlatFileItemWriter.class.getSimpleName() + "." + FlatFileItemWriter.RESTART_DATA_NAME));
+		assertEquals(0, executionContext.getLong(FlatFileItemWriter.class.getSimpleName() + ".current.count"));
 	}
 
 	private void commit() throws Exception {
