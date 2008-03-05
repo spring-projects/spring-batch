@@ -714,50 +714,88 @@
       </para>
 -->
     </section>
-
   </section>
-    <section>
-      <title id="infrastructure.2.3">XML Item Readers and Writers</title>
 
-      <para>Spring Batch provides transactional infrastructure for both
-      reading XML records and mapping them to Java objects as well as writing
-      Java objects as XML records.</para>
+  <section>
+    <title id="infrastructure.2.3">XML Item Readers and Writers</title>
+
+    <para>Spring Batch provides transactional infrastructure for both reading
+    XML records and mapping them to Java objects as well as writing Java
+    objects as XML records.</para>
+
+    <note>
+      <title>Constraints on streaming XML</title>
 
       <para>StAX API is used for I/O as other standard XML APIs do not fit
       batch processing requirements (DOM loads the whole input into memory at
       once and SAX controls the parsing process allowing the user only to
       provide callbacks).</para>
+    </note>
 
-      <para>Spring Batch is not tied to any particular OXM technology. Typical
-      use is to delegate OXM to Spring WS which provides uniform abstraction
-      for the most popular OXM technologies. However dependency on Spring WS
-      is optional and you can choose to implement Spring Batch specific
-      interfaces if desired.</para>
+    <para>Spring Batch is not tied to any particular OXM technology. Typical
+    use is to delegate <ulink
+    url="http://static.springframework.org/spring-ws/site/reference/html/oxm.html"><citetitle>OXM
+    to Spring WS</citetitle></ulink>, which provides uniform abstraction for
+    the most popular OXM technologies. However dependency on Spring WS is
+    optional and you can choose to implement Spring Batch specific interfaces
+    if desired. The relationship to the technologies that OXM supports can be
+    shown as the following:</para>
 
-      <para>Lets take a closer look how XML input and output work in batch. It
-      is assumed the XML resource is a collection of 'fragments' corresponding
-      to individual records. Note that OXM tools are designed to work with
-      standalone XML documents rather than XML fragments cut out of an XML
-      document, therefore the Spring Batch infrastructure needs to work around
-      this fact (as described below).</para>
+    <para><mediaobject>
+        <imageobject role="fo">
+          <imagedata align="center"
+                     fileref="../../../../target/site/reference/images/oxm-fragments.png"
+                     format="PNG" />
+        </imageobject>
 
-      <para>On input the reader reads the XML resource until it recognizes a
-      new fragment is about to start (by matching the tag name by default).
-      The reader creates a standalone XML document from the fragment (or at
-      least makes it appear so) and passes the document to a deserializer
-      (typically a wrapper around Spring WS Unmarshaller) to map the XML to a
-      Java object.</para>
+        <imageobject role="html">
+          <imagedata align="center"
+                     fileref="../../resources/reference/images/oxm-fragments.png"
+                     format="PNG" />
+        </imageobject>
 
-      <para>Output works symetrically to input. Java object is passed to a
-      serializer (typically a wrapper around Spring WS Marshaller) which
-      writes to output using a custom event writer that filters the
-      StartDocument and EndDocument events produced for each fragment by the
-      OXM tools.</para>
+        <caption><para>Figure X: OXM Binding</para></caption>
+      </mediaobject></para>
 
-      <para>For example configuration of XML input and output see the sample
-      xmlStaxJob. //TODO inline the example once it is not subject to change +
-      show sample input file</para>
-    </section>
+    <para>Lets take a closer look how XML input and output work in batch. It
+    is assumed the XML resource is a collection of 'fragments' corresponding
+    to individual records. Note that OXM tools are designed to work with
+    standalone XML documents rather than XML fragments cut out of an XML
+    document, therefore the Spring Batch infrastructure needs to work around
+    this fact (as described below).</para>
+
+    <para>On input the reader reads the XML resource until it recognizes a new
+    fragment is about to start (by matching the tag name by default). The
+    reader creates a standalone XML document from the fragment (or at least
+    makes it appear so) and passes the document to a deserializer (typically a
+    wrapper around Spring WS Unmarshaller) to map the XML to a Java
+    object.</para>
+
+    <para><mediaobject>
+        <imageobject role="fo">
+          <imagedata align="center"
+                     fileref="../../../../target/site/reference/images/xmlinput.png"
+                     format="PNG" />
+        </imageobject>
+
+        <imageobject role="html">
+          <imagedata align="center"
+                     fileref="../../resources/reference/images/xmlinput.PNG"
+                     format="PNG" />
+        </imageobject>
+
+        <caption><para>Figure X: XML Inputs</para></caption>
+      </mediaobject></para>
+
+    <para>Output works symetrically to input. Java object is passed to a
+    serializer (typically a wrapper around Spring WS Marshaller) which writes
+    to output using a custom event writer that filters the StartDocument and
+    EndDocument events produced for each fragment by the OXM tools.</para>
+
+    <para>For example configuration of XML input and output see the sample
+    xmlStaxJob. //TODO inline the example once it is not subject to change +
+    show sample input file</para>
+  </section>
 
   <section>
     <title id="infrastructure.1.4">Item Writers</title>
