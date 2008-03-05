@@ -57,7 +57,7 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 
 	public void testAfterInitializationWithCorrectType() throws Exception {
 		MapJobRegistry registry = new MapJobRegistry();
-		processor.setJobConfigurationRegistry(registry);
+		processor.setJobRegistry(registry);
 		JobSupport configuration = new JobSupport();
 		configuration.setBeanName("foo");
 		assertEquals(configuration, processor.postProcessAfterInitialization(
@@ -67,7 +67,7 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 
 	public void testAfterInitializationWithDuplicate() throws Exception {
 		MapJobRegistry registry = new MapJobRegistry();
-		processor.setJobConfigurationRegistry(registry);
+		processor.setJobRegistry(registry);
 		JobSupport configuration = new JobSupport();
 		configuration.setBeanName("foo");
 		processor.postProcessAfterInitialization(configuration, "bar");
@@ -82,7 +82,7 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 
 	public void testUnregisterOnDestroy() throws Exception {
 		MapJobRegistry registry = new MapJobRegistry();
-		processor.setJobConfigurationRegistry(registry);
+		processor.setJobRegistry(registry);
 		JobSupport configuration = new JobSupport();
 		configuration.setBeanName("foo");
 		assertEquals(configuration, processor.postProcessAfterInitialization(

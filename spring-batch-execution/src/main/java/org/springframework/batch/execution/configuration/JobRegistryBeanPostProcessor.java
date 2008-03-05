@@ -50,10 +50,10 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 	/**
 	 * Injection setter for {@link JobRegistry}.
 	 * 
-	 * @param jobConfigurationRegistry the jobConfigurationRegistry to set
+	 * @param jobRegistry the jobConfigurationRegistry to set
 	 */
-	public void setJobConfigurationRegistry(JobRegistry jobConfigurationRegistry) {
-		this.jobConfigurationRegistry = jobConfigurationRegistry;
+	public void setJobRegistry(JobRegistry jobRegistry) {
+		this.jobConfigurationRegistry = jobRegistry;
 	}
 
 	/**
