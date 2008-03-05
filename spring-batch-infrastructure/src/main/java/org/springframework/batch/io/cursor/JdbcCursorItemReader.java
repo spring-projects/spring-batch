@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.ResetFailedException;
@@ -102,17 +103,17 @@ import org.springframework.util.StringUtils;
  * @author Lucas Ward
  * @author Peter Zozom
  */
-public class JdbcCursorItemReader implements ItemReader, InitializingBean, ItemStream, Skippable {
+public class JdbcCursorItemReader extends ExecutionContextUserSupport implements ItemReader, InitializingBean, ItemStream, Skippable {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);
 
 	public static final int VALUE_NOT_SET = -1;
 
-	private static final String CURRENT_PROCESSED_ROW = "sqlCursorInput.lastProcessedRowNum";
+	private static final String CURRENT_PROCESSED_ROW = "lastProcessedRowNum";
 
-	private static final String SKIPPED_ROWS = "sqlCursorInput.skippedRows";
+	private static final String SKIPPED_ROWS = "skippedRows";
 
-	private static final String SKIP_COUNT = "sqlCursorInput.skippedRrecordCount";
+	private static final String SKIP_COUNT = "skippedRrecordCount";
 
 	private Connection con;
 
@@ -150,8 +151,10 @@ public class JdbcCursorItemReader implements ItemReader, InitializingBean, ItemS
 	private boolean initialized = false;
 
 	private boolean saveState = false;
-
-	private String name = JdbcCursorItemReader.class.getName();
+	
+	public JdbcCursorItemReader() {
+		setName(JdbcCursorItemReader.class.getSimpleName());
+	}
 
 	/**
 	 * Assert that mandatory properties are set.
@@ -381,9 +384,9 @@ public class JdbcCursorItemReader implements ItemReader, InitializingBean, ItemS
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			String skipped = skippedRows.toString();
-			executionContext.putString(addName(SKIPPED_ROWS), skipped.substring(1, skipped.length() - 1));
-			executionContext.putLong(addName(CURRENT_PROCESSED_ROW), currentProcessedRow);
-			executionContext.putLong(addName(SKIP_COUNT), skipCount);
+			executionContext.putString(getKey(SKIPPED_ROWS), skipped.substring(1, skipped.length() - 1));
+			executionContext.putLong(getKey(CURRENT_PROCESSED_ROW), currentProcessedRow);
+			executionContext.putLong(getKey(SKIP_COUNT), skipCount);
 		}
 	}
 
@@ -399,23 +402,23 @@ public class JdbcCursorItemReader implements ItemReader, InitializingBean, ItemS
 		initialized = true;
 
 		// Properties restartProperties = data.getProperties();
-		if (!context.containsKey(addName(CURRENT_PROCESSED_ROW))) {
+		if (!context.containsKey(getKey(CURRENT_PROCESSED_ROW))) {
 			return;
 		}
 
 		try {
-			this.currentProcessedRow = context.getLong(addName(CURRENT_PROCESSED_ROW));
+			this.currentProcessedRow = context.getLong(getKey(CURRENT_PROCESSED_ROW));
 			rs.absolute((int) currentProcessedRow);
 		}
 		catch (SQLException se) {
 			throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);
 		}
 
-		if (!context.containsKey(addName(SKIPPED_ROWS))) {
+		if (!context.containsKey(getKey(SKIPPED_ROWS))) {
 			return;
 		}
 
-		String[] skipped = StringUtils.commaDelimitedListToStringArray(context.getString(addName(SKIPPED_ROWS)));
+		String[] skipped = StringUtils.commaDelimitedListToStringArray(context.getString(getKey(SKIPPED_ROWS)));
 		for (int i = 0; i < skipped.length; i++) {
 			this.skippedRows.add(new Long(skipped[i]));
 		}
@@ -508,14 +511,6 @@ public class JdbcCursorItemReader implements ItemReader, InitializingBean, ItemS
 	 */
 	public void setSql(String sql) {
 		this.sql = sql;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String addName(String key) {
-		return name + "." + key;
 	}
 
 	public void setSaveState(boolean saveState) {

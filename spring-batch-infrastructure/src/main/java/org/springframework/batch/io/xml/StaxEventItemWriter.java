@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamException;
 import org.springframework.batch.io.support.FileUtils;
 import org.springframework.batch.io.xml.stax.NoStartEndDocumentStreamWriter;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ClearFailedException;
@@ -37,7 +38,7 @@ import org.springframework.util.CollectionUtils;
  * @author Peter Zozom
  * 
  */
-public class StaxEventItemWriter implements ItemWriter, ItemStream, InitializingBean {
+public class StaxEventItemWriter extends ExecutionContextUserSupport implements ItemWriter, ItemStream, InitializingBean {
 
 	// default encoding
 	private static final String DEFAULT_ENCODING = "UTF-8";
@@ -49,10 +50,10 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	private static final String DEFAULT_ROOT_TAG_NAME = "root";
 
 	// restart data property name
-	public static final String RESTART_DATA_NAME = "staxstreamoutputsource.position";
+	public static final String RESTART_DATA_NAME = "position";
 
 	// restart data property name
-	public static final String WRITE_STATISTICS_NAME = "staxstreamoutputsource.record.count";
+	public static final String WRITE_STATISTICS_NAME = "record.count";
 
 	// file system resource
 	private Resource resource;
@@ -101,9 +102,11 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	// current count of processed records
 	private long currentRecordCount = 0;
 	
-	private String name = StaxEventItemWriter.class.getName();
-	
 	private boolean saveState = false;
+	
+	public StaxEventItemWriter() {
+		setName(StaxEventItemWriter.class.getSimpleName());
+	}
 	
 	/**
 	 * Set output file.
@@ -447,14 +450,6 @@ public class StaxEventItemWriter implements ItemWriter, ItemStream, Initializing
 	
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	private String getKey(String key){
-		return name + "." + key;
 	}
 
 }

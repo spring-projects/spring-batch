@@ -161,7 +161,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		// get restart data
 		reader.update(executionContext);
 		assertEquals(4, executionContext.getLong(
-				FlatFileItemReader.class.getName() + "." + FlatFileItemReader.READ_STATISTICS_NAME));
+				FlatFileItemReader.class.getSimpleName() + "." + FlatFileItemReader.READ_STATISTICS_NAME));
 		// close input
 		reader.close(executionContext);
 
@@ -175,7 +175,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		assertEquals("[testLine6]", reader.read().toString());
 
 		reader.update(executionContext);
-		assertEquals(6, executionContext.getLong(FlatFileItemReader.class.getName() + "." + FlatFileItemReader.READ_STATISTICS_NAME));
+		assertEquals(6, executionContext.getLong(FlatFileItemReader.class.getSimpleName() + "." + FlatFileItemReader.READ_STATISTICS_NAME));
 	}
 
 }

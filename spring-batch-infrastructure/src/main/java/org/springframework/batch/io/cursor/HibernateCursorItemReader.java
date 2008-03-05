@@ -24,12 +24,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.reader.AbstractItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -50,13 +49,11 @@ import org.springframework.util.StringUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader extends AbstractItemStreamItemReader implements Skippable, InitializingBean {
+public class HibernateCursorItemReader  extends ExecutionContextUserSupport implements ItemReader, ItemStream, Skippable, InitializingBean {
 
-	private static final String RESTART_DATA_ROW_NUMBER_KEY = ClassUtils.getShortName(HibernateCursorItemReader.class)
-			+ ".rowNumber";
+	private static final String RESTART_DATA_ROW_NUMBER_KEY = "rowNumber";
 
-	private static final String SKIPPED_ROWS = ClassUtils.getShortName(HibernateCursorItemReader.class)
-			+ ".skippedRows";
+	private static final String SKIPPED_ROWS = "skippedRows";
 
 	private SessionFactory sessionFactory;
 
@@ -81,9 +78,12 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 
 	private boolean initialized = false;
 	
-	private String name = HibernateCursorItemReader.class.getName();
-	
 	private boolean saveState = false;
+	
+	
+	public HibernateCursorItemReader() {
+		setName(HibernateCursorItemReader.class.getSimpleName());
+	}
 
 	public Object read() {
 		if (!initialized) {
@@ -234,10 +234,6 @@ public class HibernateCursorItemReader extends AbstractItemStreamItemReader impl
 			// come back to the committed row.
 			cursor.setRowNumber(lastCommitRowNumber - 1);
 		}
-	}
-
-	private String getKey(String key){
-		return name + "." + key;
 	}
 	
 	public void setSaveState(boolean saveState) {

@@ -17,6 +17,7 @@ import org.springframework.batch.io.xml.stax.DefaultTransactionalEventReader;
 import org.springframework.batch.io.xml.stax.FragmentEventReader;
 import org.springframework.batch.io.xml.stax.TransactionalEventReader;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
@@ -35,10 +36,10 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReader implements ItemReader, Skippable, ItemStream,
+public class StaxEventItemReader extends ExecutionContextUserSupport implements ItemReader, Skippable, ItemStream,
 		InitializingBean {
 
-	public static final String READ_COUNT_STATISTICS_NAME = "StaxEventReaderItemReader.readCount";
+	public static final String READ_COUNT_STATISTICS_NAME = "readCount";
 
 	private FragmentEventReader fragmentReader;
 
@@ -61,6 +62,10 @@ public class StaxEventItemReader implements ItemReader, Skippable, ItemStream,
 	private List skipRecords = new ArrayList();
 	
 	private boolean saveState = false;
+	
+	public StaxEventItemReader() {
+		setName(StaxEventItemReader.class.getSimpleName());
+	}
 	
 	/**
 	 * Read in the next root element from the file, and return it.
@@ -127,8 +132,8 @@ public class StaxEventItemReader implements ItemReader, Skippable, ItemStream,
 		}
 		initialized = true;
 		
-		if (executionContext.containsKey(READ_COUNT_STATISTICS_NAME)) {
-			long restoredRecordCount = executionContext.getLong(READ_COUNT_STATISTICS_NAME);
+		if (executionContext.containsKey(getKey(READ_COUNT_STATISTICS_NAME))) {
+			long restoredRecordCount = executionContext.getLong(getKey(READ_COUNT_STATISTICS_NAME));
 			int REASONABLE_ADHOC_COMMIT_FREQUENCY = 100;
 			while (currentRecordCount <= restoredRecordCount) {
 				currentRecordCount++;
@@ -196,7 +201,7 @@ public class StaxEventItemReader implements ItemReader, Skippable, ItemStream,
 	public void update(ExecutionContext executionContext) {
 		if(saveState){
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			executionContext.putLong(READ_COUNT_STATISTICS_NAME, currentRecordCount);
+			executionContext.putLong(getKey(READ_COUNT_STATISTICS_NAME), currentRecordCount);
 		}
 	}
 

@@ -33,6 +33,7 @@ import org.springframework.batch.io.file.transform.AbstractLineTokenizer;
 import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.io.file.transform.LineTokenizer;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.exception.StreamException;
@@ -63,7 +64,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, InitializingBean {
+public class FlatFileItemReader extends ExecutionContextUserSupport implements ItemReader, Skippable, ItemStream, InitializingBean {
 
 	private static Log log = LogFactory.getLog(FlatFileItemReader.class);
 
@@ -93,14 +94,16 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	private LineTokenizer tokenizer = new DelimitedLineTokenizer();
 
 	private FieldSetMapper fieldSetMapper;
-		
-	private String name = FlatFileItemReader.class.getName();
 
 	/**
 	 * Encapsulates the state of the input source. If it is null then we are
 	 * uninitialized.
 	 */
 	private LineReader reader;
+	
+	public FlatFileItemReader() {
+		setName(FlatFileItemReader.class.getSimpleName());
+	}
 
 	/**
 	 * Initialize the reader if necessary.
@@ -365,10 +368,6 @@ public class FlatFileItemReader implements ItemReader, Skippable, ItemStream, In
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource, "Input resource must not be null");
 		Assert.notNull(fieldSetMapper, "FieldSetMapper must not be null.");
-	}
-	
-	private String getKey(String key){
-		return name + "." + key;
 	}
 
 }

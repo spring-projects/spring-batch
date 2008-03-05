@@ -17,9 +17,9 @@ package org.springframework.batch.io.driving.support;
 
 import java.util.List;
 
-import org.apache.commons.lang.ClassUtils;
 import org.springframework.batch.io.driving.KeyGenerator;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
@@ -50,9 +50,9 @@ import org.springframework.util.StringUtils;
  * @author Lucas Ward
  * @since 1.0
  */
-public class SingleColumnJdbcKeyGenerator implements KeyGenerator {
+public class SingleColumnJdbcKeyGenerator extends ExecutionContextUserSupport implements KeyGenerator {
 
-	public static final String RESTART_KEY = ClassUtils.getShortClassName(SingleColumnJdbcKeyGenerator.class) + ".key";
+	public static final String RESTART_KEY = "key";
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -63,7 +63,7 @@ public class SingleColumnJdbcKeyGenerator implements KeyGenerator {
 	private RowMapper keyMapper = new SingleColumnRowMapper();
 
 	public SingleColumnJdbcKeyGenerator() {
-		super();
+		setName(SingleColumnJdbcKeyGenerator.class.getSimpleName());
 	}
 
 	/**

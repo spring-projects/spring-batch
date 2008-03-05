@@ -32,6 +32,7 @@ import org.springframework.batch.io.file.mapping.FieldSetCreator;
 import org.springframework.batch.io.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.io.file.transform.LineAggregator;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ClearFailedException;
@@ -65,7 +66,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemWriter implements ItemWriter, ItemStream,
+public class FlatFileItemWriter extends ExecutionContextUserSupport implements ItemWriter, ItemStream,
 		InitializingBean {
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -84,7 +85,9 @@ public class FlatFileItemWriter implements ItemWriter, ItemStream,
 
 	private FieldSetCreator fieldSetCreator;
 	
-	private String name = FlatFileItemWriter.class.getName();
+	public FlatFileItemWriter() {
+		setName(FlatFileItemWriter.class.getSimpleName());
+	}
 	
 	/**
 	 * Assert that mandatory properties (resource) are set.
@@ -483,11 +486,4 @@ public class FlatFileItemWriter implements ItemWriter, ItemStream,
 		getOutputState().mark();
 	}
 	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	private String getKey(String key){
-		return name + "." + key;
-	}
 }
