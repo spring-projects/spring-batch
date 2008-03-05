@@ -9,14 +9,12 @@ import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.validator.Validator;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;
 import org.springframework.batch.sample.domain.Customer;
 import org.springframework.batch.sample.domain.LineItem;
 import org.springframework.batch.sample.domain.Order;
 import org.springframework.batch.sample.domain.ShippingInfo;
-import org.springframework.batch.sample.item.reader.OrderItemReader;
 
 public class OrderItemReaderTests extends TestCase {
 
@@ -25,8 +23,6 @@ public class OrderItemReaderTests extends TestCase {
 	private ItemReader input;
 	private MockControl mapperControl;
 	private FieldSetMapper mapper;
-	private MockControl validatorControl;
-	private Validator validator;
 
 	public void setUp() {
 
@@ -110,16 +106,8 @@ public class OrderItemReaderTests extends TestCase {
 		mapperControl.setReturnValue(item,3);
 		mapperControl.replay();
 
-		//create mock validator
-		validatorControl = MockControl.createControl(Validator.class);
-		validator = (Validator)validatorControl.getMock();
-		validator.validate(null);
-		validatorControl.setMatcher(MockControl.ALWAYS_MATCHER);
-		validatorControl.setVoidCallable(1);
-		validatorControl.replay();
 
-		//set-up provider: set mappers and validator
-		provider.setValidator(validator);
+		//set-up provider: set mappers 
 		provider.setAddressMapper(mapper);
 		provider.setBillingMapper(mapper);
 		provider.setCustomerMapper(mapper);
@@ -158,7 +146,6 @@ public class OrderItemReaderTests extends TestCase {
 		//verify method calls on input source, mapper and validator
 		inputControl.verify();
 		mapperControl.verify();
-		validatorControl.verify();
 	}
 
 }

@@ -24,7 +24,6 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.io.file.mapping.FieldSet;
 import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.reader.DelegatingItemReader;
-import org.springframework.batch.item.validator.Validator;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;
 import org.springframework.batch.sample.domain.Customer;
@@ -55,8 +54,6 @@ public class OrderItemReader extends DelegatingItemReader {
 
 	private FieldSetMapper shippingMapper;
 
-	private Validator validator;
-
 	/**
 	 * @throws Exception
 	 * @see org.springframework.batch.item.ItemReader#read()
@@ -68,11 +65,8 @@ public class OrderItemReader extends DelegatingItemReader {
 			process((FieldSet) super.read());
 		}
 
-		if (order != null) {
-			log.info("Mapped: " + order);
-			validator.validate(order);
-		}
-
+		log.info("Mapped: " + order);
+		
 		Object result = order;
 		order = null;
 
@@ -202,10 +196,6 @@ public class OrderItemReader extends DelegatingItemReader {
 
 	public void setShippingMapper(FieldSetMapper shippingMapper) {
 		this.shippingMapper = shippingMapper;
-	}
-
-	public void setValidator(Validator validator) {
-		this.validator = validator;
 	}
 
 }
