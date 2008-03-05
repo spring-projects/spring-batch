@@ -121,7 +121,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	 * Public getter for the ItemProcessor.
 	 * @return the itemProcessor
 	 */
-	protected ItemHandler getItemProcessor() {
+	protected ItemHandler getItemHandler() {
 		return itemHandler;
 	}
 
@@ -129,7 +129,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	 * Public setter for the ItemProcessor.
 	 * @param itemHandler the itemProcessor to set
 	 */
-	protected void setItemProcessor(ItemHandler itemHandler) {
+	protected void setItemHandler(ItemHandler itemHandler) {
 		this.itemHandler = itemHandler;
 	}
 
@@ -142,12 +142,6 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 		super.applyConfiguration(step);
 
 		step.setStreams(streams);
-
-		if (commitInterval > 0) {
-			RepeatTemplate chunkOperations = new RepeatTemplate();
-			chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
-			step.setChunkOperations(chunkOperations);
-		}
 
 		for (int i = 0; i < listeners.length; i++) {
 			BatchListener listener = listeners[i];
@@ -180,11 +174,17 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 		BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
 
+		if (commitInterval > 0) {
+			RepeatTemplate chunkOperations = new RepeatTemplate();
+			chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
+			helper.addChunkListeners(chunkOperations, listeners);
+			step.setChunkOperations(chunkOperations);
+		}
+
 		StepListener[] stepListeners = helper.getStepListeners(listeners);
 		itemReader = helper.getItemReader(itemReader, listeners);
 		itemWriter = helper.getItemWriter(itemWriter, listeners);
 		stepOperations = new RepeatTemplate();
-		stepOperations = (RepeatTemplate) helper.addChunkListeners(stepOperations, listeners);
 
 		// In case they are used by subclasses:
 		setItemReader(itemReader);
@@ -217,7 +217,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 			itemProcessor.setItemSkipPolicy(new NeverSkipItemSkipPolicy());
 		}
 
-		setItemProcessor(itemProcessor);
+		setItemHandler(itemProcessor);
 		step.setItemHandler(itemProcessor);
 
 	}
