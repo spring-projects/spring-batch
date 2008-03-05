@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample;
+package org.springframework.batch.sample.launch;
 
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.repository.DuplicateJobException;
+import org.springframework.batch.sample.ClassPathXmlApplicationContextJobFactory;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;

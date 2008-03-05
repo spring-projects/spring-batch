@@ -13,7 +13,7 @@
 
 	<bean id="jobConfigurationRegistryBeanPostProcessor"
 		class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
-		<property name="jobConfigurationRegistry"
+		<property name="jobRegistry"
 			ref="jobConfigurationRegistry" />
 	</bean>
 
