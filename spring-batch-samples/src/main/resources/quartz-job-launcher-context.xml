@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       	http://www.springframework.org/schema/aop
+ 		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	<import resource="simple-container-definition.xml" />
+
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+				<property name="jobDetail" ref="jobDetail" />
+				<property name="cronExpression" value="0/10 * * * * ?" />
+			</bean>
+	</property>
+	</bean>
+
+	<bean id="jobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass" value="org.springframework.batch.sample.quartz.JobLauncherDetails" />
+		<property name="group" value="quartz-batch" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="jobName" value="footballJob"/>
+				<entry key="jobLocator" value-ref="jobConfigurationRegistry"/>
+				<entry key="jobLauncher" value-ref="jobLauncher"/>
+			</map>
+		</property>
+	</bean>
+
+
+	<bean id="jobLauncher" class="org.springframework.batch.execution.launch.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="taskExecutor">
+			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+		</property>
+	</bean>
+
+</beans>
