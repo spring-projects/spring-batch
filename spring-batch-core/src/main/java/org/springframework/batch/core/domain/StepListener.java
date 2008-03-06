@@ -50,5 +50,5 @@ public interface StepListener extends BatchListener {
 	 * @return an {@link ExitStatus} to combine with the normal value. Return
 	 * null to leave the old value unchanged.
 	 */
-	ExitStatus afterStep();
+	ExitStatus afterStep(StepExecution stepExecution);
 }

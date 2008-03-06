@@ -94,9 +94,9 @@ public class StagingItemWriter extends JdbcDaoSupport implements StepListener, I
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#afterStep()
+	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution)
 	 */
-	public ExitStatus afterStep() {
+	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
 

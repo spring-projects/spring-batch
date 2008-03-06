@@ -364,7 +364,7 @@ public class ItemOrientedStepTests extends TestCase {
 			public void beforeStep(StepExecution stepExecution) {
 				list.add("foo");
 			}
-			public ExitStatus afterStep() {
+			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("bar");
 				return null;
 			}
@@ -396,7 +396,7 @@ public class ItemOrientedStepTests extends TestCase {
 		final ExitStatus customStatus = new ExitStatus(false, "custom code");
 		
 		itemOrientedStep.setStepListeners(new StepListener[] {new StepListenerSupport() {
-			public ExitStatus afterStep() {
+			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("afterStepCalled");
 				return customStatus;
 			}
@@ -699,7 +699,7 @@ public class ItemOrientedStepTests extends TestCase {
 		public void reset() throws ResetFailedException {
 		}
 
-		public ExitStatus afterStep() {
+		public ExitStatus afterStep(StepExecution stepExecution) {
 			return null;
 		}
 

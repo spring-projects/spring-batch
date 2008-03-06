@@ -112,7 +112,7 @@ public class TaskletStepTests extends TestCase {
 				list.add("open");
 			}
 
-			public ExitStatus afterStep() {
+			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("close");
 				return ExitStatus.CONTINUABLE;
 			}

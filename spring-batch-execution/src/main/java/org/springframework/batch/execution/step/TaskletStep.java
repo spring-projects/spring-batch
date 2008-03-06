@@ -138,7 +138,7 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 			listener.beforeStep(stepExecution);
 			exitStatus = tasklet.execute();
 			try {
-				exitStatus = exitStatus.and(listener.afterStep());
+				exitStatus = exitStatus.and(listener.afterStep(stepExecution));
 			}
 			catch (Exception e) {
 				logger.error("Encountered an error on listener close.", e);

@@ -42,17 +42,17 @@ public class CompositeStepListenerTests extends TestCase {
 	 */
 	public void testSetListeners() {
 		listener.setListeners(new StepListener[] { new StepListenerSupport() {
-			public ExitStatus afterStep() {
+			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("fail");
 				return ExitStatus.FAILED;
 			}
 		}, new StepListenerSupport() {
-			public ExitStatus afterStep() {
+			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("continue");
 				return ExitStatus.CONTINUABLE;
 			}
 		} });
-		assertFalse(listener.afterStep().isContinuable());
+		assertFalse(listener.afterStep(null).isContinuable());
 		assertEquals(2, list.size());
 	}
 
@@ -62,12 +62,12 @@ public class CompositeStepListenerTests extends TestCase {
 	 */
 	public void testSetListener() {
 		listener.register(new StepListenerSupport() {
-			public ExitStatus afterStep() {
+			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("fail");
 				return ExitStatus.FAILED;
 			}
 		});
-		assertFalse(listener.afterStep().isContinuable());
+		assertFalse(listener.afterStep(null).isContinuable());
 		assertEquals(1, list.size());
 	}
 

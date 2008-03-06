@@ -26,9 +26,9 @@ import org.springframework.batch.repeat.ExitStatus;
 public class StepListenerSupport implements StepListener {
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#close()
+	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution stepExecution)
 	 */
-	public ExitStatus afterStep() {
+	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
 

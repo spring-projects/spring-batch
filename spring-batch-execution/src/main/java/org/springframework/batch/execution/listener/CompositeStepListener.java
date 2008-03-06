@@ -55,11 +55,11 @@ public class CompositeStepListener implements StepListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#close()
 	 */
-	public ExitStatus afterStep() {
+	public ExitStatus afterStep(StepExecution stepExecution) {
 		ExitStatus status = null;
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			StepListener listener = (StepListener) iterator.next();
-			ExitStatus close = listener.afterStep();
+			ExitStatus close = listener.afterStep(stepExecution);
 			status = status!=null ? status.and(close): close;
 		}
 		return status;

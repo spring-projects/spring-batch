@@ -416,7 +416,7 @@ public class ItemOrientedStep extends AbstractStep {
 		finally {
 
 			try {
-				status = status.and(listener.afterStep());
+				status = status.and(listener.afterStep(stepExecution));
 			}
 			catch (RuntimeException e) {
 				logger.error("Unexpected error in listener after step.", e);

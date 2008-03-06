@@ -33,9 +33,9 @@ public class BatchListenerSupport implements StepListener, ChunkListener,
 		ItemReadListener, ItemWriteListener {
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#afterStep()
+	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution stepExecution)
 	 */
-	public ExitStatus afterStep() {
+	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
 

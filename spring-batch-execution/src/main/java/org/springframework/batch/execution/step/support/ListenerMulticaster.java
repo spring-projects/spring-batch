@@ -87,8 +87,8 @@ public class ListenerMulticaster implements StepListener, ChunkListener, ItemRea
 	 * @return
 	 * @see org.springframework.batch.execution.listener.CompositeStepListener#afterStep()
 	 */
-	public ExitStatus afterStep() {
-		return stepListener.afterStep();
+	public ExitStatus afterStep(StepExecution stepExecution) {
+		return stepListener.afterStep(stepExecution);
 	}
 
 	/**

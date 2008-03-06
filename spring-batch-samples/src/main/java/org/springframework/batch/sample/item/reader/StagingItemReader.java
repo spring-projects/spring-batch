@@ -223,9 +223,9 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#afterStep()
+	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution)
 	 */
-	public ExitStatus afterStep() {
+	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
 
