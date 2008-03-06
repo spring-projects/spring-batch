@@ -29,7 +29,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.listener.CompositeStepListener;
-import org.springframework.batch.execution.step.support.DefaultStepExecutionSynchronizerSynchronizer;
+import org.springframework.batch.execution.step.support.DefaultStepExecutionSynchronizer;
 import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.execution.step.support.StepExecutionSynchronizer;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
@@ -93,7 +93,7 @@ public class ItemOrientedStep extends AbstractStep {
 
 	private ItemHandler itemHandler;
 
-	private StepExecutionSynchronizer synchronizer = new DefaultStepExecutionSynchronizerSynchronizer();
+	private StepExecutionSynchronizer synchronizer = new DefaultStepExecutionSynchronizer();
 
 	/**
 	 * @param name
