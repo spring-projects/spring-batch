@@ -23,7 +23,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
@@ -49,15 +48,16 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 	private ItemKeyGenerator itemKeyGenerator;
 
 	private ItemRecoverer itemRecoverer;
-	
+
 	private int retryLimit;
-	
+
 	private Class[] retryableExceptionClasses;
-	
+
 	private BackOffPolicy backOffPolicy;
 
 	/**
-	 * Public setter for the retry limit.  Each item can be retried up to this limit.
+	 * Public setter for the retry limit. Each item can be retried up to this
+	 * limit.
 	 * @param retryLimit the retry limit to set
 	 */
 	public void setRetryLimit(int retryLimit) {
@@ -114,16 +114,16 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 
 		super.applyConfiguration(step);
 
-		if (retryLimit>0) {
-			
+		if (retryLimit > 0) {
+
 			SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy(retryLimit);
-			if (retryableExceptionClasses!=null) {
+			if (retryableExceptionClasses != null) {
 				retryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
 			}
 
-			// TODO: actually we need to co-ordinate the retry policy with the
-			// exception handler limit, so this is a hack for now.
-			getStepOperations().setExceptionHandler(new SimpleLimitExceptionHandler(Integer.MAX_VALUE));
+			// Co-ordinate the retry policy with the exception handler:
+			getStepOperations()
+					.setExceptionHandler(new SimpleRetryExceptionHandler(retryPolicy, getExceptionHandler()));
 
 			ItemReaderRetryCallback retryCallback = new ItemReaderRetryCallback(getItemReader(), itemKeyGenerator,
 					getItemWriter());
@@ -132,7 +132,7 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 
 			RetryTemplate retryTemplate = new RetryTemplate();
 			retryTemplate.setRetryPolicy(itemProviderRetryPolicy);
-			if (backOffPolicy!=null) {
+			if (backOffPolicy != null) {
 				retryTemplate.setBackOffPolicy(backOffPolicy);
 			}
 

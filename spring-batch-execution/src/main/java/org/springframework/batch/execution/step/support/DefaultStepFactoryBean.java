@@ -23,6 +23,7 @@ import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
 import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -53,6 +54,8 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	private ItemHandler itemHandler;
 
 	private RepeatTemplate stepOperations;
+
+	private SimpleLimitExceptionHandler exceptionHandler;
 
 	/**
 	 * Set the commit interval.
@@ -105,6 +108,22 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	 */
 	protected RepeatTemplate getStepOperations() {
 		return stepOperations;
+	}
+
+	/**
+	 * Public setter for the SimpleLimitExceptionHandler.
+	 * @param exceptionHandler the exceptionHandler to set
+	 */
+	public void setExceptionHandler(SimpleLimitExceptionHandler exceptionHandler) {
+		this.exceptionHandler = exceptionHandler;
+	}
+
+	/**
+	 * Protected getter for the {@link ExceptionHandler}.
+	 * @return the {@link ExceptionHandler}
+	 */
+	protected ExceptionHandler getExceptionHandler() {
+		return exceptionHandler;
 	}
 
 	/**
@@ -209,7 +228,8 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 			 * will never re-appear after a rollback.
 			 */
 			itemProcessor.setItemSkipPolicy(new LimitCheckingItemSkipPolicy(skipLimit));
-			stepOperations.setExceptionHandler(new SimpleLimitExceptionHandler(skipLimit));
+			setExceptionHandler(new SimpleLimitExceptionHandler(skipLimit));
+			stepOperations.setExceptionHandler(getExceptionHandler());
 			step.setStepOperations(stepOperations);
 		}
 		else {
