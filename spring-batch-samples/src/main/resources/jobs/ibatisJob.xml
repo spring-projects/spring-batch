@@ -20,7 +20,7 @@
 						class="org.springframework.batch.sample.item.writer.CustomerCreditIncreaseWriter">
 						<property name="customerCreditDao">
 							<bean
-								class="org.springframework.batch.sample.dao.IbatisCustomerCreditWriter">
+								class="org.springframework.batch.sample.dao.IbatisCustomerCreditDao">
 								<property name="sqlMapClient"
 									ref="sqlMapClient" />
 								<property name="statementId"

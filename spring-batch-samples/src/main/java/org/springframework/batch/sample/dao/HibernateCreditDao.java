@@ -29,7 +29,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * @author Dave Syer
  * 
  */
-public class HibernateCreditWriter extends HibernateDaoSupport implements
+public class HibernateCreditDao extends HibernateDaoSupport implements
 		CustomerCreditDao, RepeatListener {
 
 	private int failOnFlush = -1;

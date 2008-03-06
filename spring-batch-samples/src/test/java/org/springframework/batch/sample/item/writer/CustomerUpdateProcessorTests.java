@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.sample.dao.JdbcCustomerDebitWriter;
+import org.springframework.batch.sample.dao.JdbcCustomerDebitDao;
 import org.springframework.batch.sample.domain.CustomerDebit;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.batch.sample.item.writer.CustomerUpdateWriter;
@@ -19,7 +19,7 @@ public class CustomerUpdateProcessorTests extends TestCase {
 		trade.setPrice(new BigDecimal(123.0));
 		
 		//create dao
-		JdbcCustomerDebitWriter dao = new JdbcCustomerDebitWriter() {
+		JdbcCustomerDebitDao dao = new JdbcCustomerDebitDao() {
 			public void write(CustomerDebit customerDebit) {
 				assertEquals("testCustomerName", customerDebit.getName());
 				assertEquals(new BigDecimal(123.0), customerDebit.getDebit());

@@ -22,7 +22,7 @@ import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
  * @author Lucas Ward
  *
  */
-public class IbatisCustomerCreditWriter extends SqlMapClientDaoSupport
+public class IbatisCustomerCreditDao extends SqlMapClientDaoSupport
 		implements CustomerCreditDao {
 
 	String statementId;

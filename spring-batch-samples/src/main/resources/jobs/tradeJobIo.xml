@@ -19,11 +19,11 @@
 	</bean>
 
 	<bean
-		class="org.springframework.batch.sample.dao.JdbcCustomerDebitWriter"
+		class="org.springframework.batch.sample.dao.JdbcCustomerDebitDao"
 		id="customerDao" p:jdbcTemplate-ref="jdbcTemplate" />
 
 	<bean
-		class="org.springframework.batch.sample.dao.FlatFileCustomerCreditWriter"
+		class="org.springframework.batch.sample.dao.FlatFileCustomerCreditDao"
 		id="customerReportOutputSource">
 		<property name="outputSource">
 			<bean

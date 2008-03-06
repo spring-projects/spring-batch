@@ -25,7 +25,7 @@ import org.springframework.jdbc.core.JdbcOperations;
  * 
  * @author Robert Kasanicky
  */
-public class JdbcCustomerDebitWriter implements CustomerDebitWriter {
+public class JdbcCustomerDebitDao implements CustomerDebitDao {
 	
     private static final String UPDATE_CREDIT = "UPDATE customer SET credit= credit-? WHERE name=?";
     

@@ -18,7 +18,7 @@ package org.springframework.batch.sample.dao;
 
 import org.springframework.batch.sample.domain.CustomerDebit;
 
-public interface CustomerDebitWriter {
+public interface CustomerDebitDao {
 	
 	void write(CustomerDebit customerDebit);
 }

@@ -8,7 +8,7 @@ import org.springframework.batch.sample.domain.CustomerDebit;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
-public class JdbcCustomerDebitWriterTests extends AbstractTransactionalDataSourceSpringContextTests {
+public class JdbcCustomerDebitDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
 
 	protected String[] getConfigLocations() {
 		return new String[] { "data-source-context.xml" };
@@ -20,7 +20,7 @@ public class JdbcCustomerDebitWriterTests extends AbstractTransactionalDataSourc
 		jdbcTemplate.execute("INSERT INTO customer VALUES (99, 0, 'testName', 100)");
 
 		//create writer and set jdbcTemplate
-		JdbcCustomerDebitWriter writer = new JdbcCustomerDebitWriter();
+		JdbcCustomerDebitDao writer = new JdbcCustomerDebitDao();
 		writer.setJdbcTemplate(jdbcTemplate);
 
 		//create customer debit

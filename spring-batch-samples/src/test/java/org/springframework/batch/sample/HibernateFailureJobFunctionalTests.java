@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.batch.core.domain.JobParameters;
 import org.springframework.batch.core.domain.JobParametersBuilder;
-import org.springframework.batch.sample.dao.HibernateCreditWriter;
+import org.springframework.batch.sample.dao.HibernateCreditDao;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.orm.hibernate3.HibernateJdbcException;
 
@@ -18,15 +18,15 @@ import org.springframework.orm.hibernate3.HibernateJdbcException;
 public class HibernateFailureJobFunctionalTests extends
 		HibernateJobFunctionalTests {
 
-	private HibernateCreditWriter writer;
+	private HibernateCreditDao writer;
 
 	/**
-	 * Public setter for the {@link HibernateCreditWriter} property.
+	 * Public setter for the {@link HibernateCreditDao} property.
 	 * 
 	 * @param writer
 	 *            the writer to set
 	 */
-	public void setWriter(HibernateCreditWriter writer) {
+	public void setWriter(HibernateCreditDao writer) {
 		this.writer = writer;
 	}
 

@@ -28,7 +28,7 @@ import org.springframework.beans.factory.DisposableBean;
  * @see CustomerCreditDao
  * @author Robert Kasanicky
  */
-public class FlatFileCustomerCreditWriter implements CustomerCreditDao,
+public class FlatFileCustomerCreditDao implements CustomerCreditDao,
 		DisposableBean {
 
 	private ItemWriter outputSource;

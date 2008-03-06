@@ -10,11 +10,11 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.CustomerCredit;
 
-public class FlatFileCustomerCreditWriterTests extends TestCase {
+public class FlatFileCustomerCreditDaoTests extends TestCase {
 
 	private MockControl outputControl;
 	private ResourceLifecycleItemWriter output;
-	private FlatFileCustomerCreditWriter writer;
+	private FlatFileCustomerCreditDao writer;
 	
 	public void setUp() throws Exception {
 		super.setUp();
@@ -24,7 +24,7 @@ public class FlatFileCustomerCreditWriterTests extends TestCase {
 		output = (ResourceLifecycleItemWriter)outputControl.getMock();
 		
 		//create new writer
-		writer = new FlatFileCustomerCreditWriter();
+		writer = new FlatFileCustomerCreditDao();
 		writer.setOutputSource(output);
 	}
 
