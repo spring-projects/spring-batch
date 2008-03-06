@@ -33,8 +33,8 @@ public class StaxEventItemWriterTests extends TestCase {
 	
 	private ExecutionContext executionContext;
 
-	// test record for writing to output
-	private Object record = new Object() {
+	// test item for writing to output
+	private Object item = new Object() {
 		public String toString() {
 			return TEST_STRING;
 		}
@@ -51,17 +51,31 @@ public class StaxEventItemWriterTests extends TestCase {
 	}
 
 	/**
-	 * Write should pass its argument and StaxResult object to Serializer
+	 * Flush should pass buffered items to Serializer.
 	 */
-	public void testWrite() throws Exception {
+	public void testFlush() throws Exception {
 		writer.open(executionContext);
-		Marshaller marshaller = new InputCheckMarshaller();
+		InputCheckMarshaller marshaller = new InputCheckMarshaller();
 		MarshallingEventWriterSerializer serializer = new MarshallingEventWriterSerializer(marshaller);
 		writer.setSerializer(serializer);
 
 		// see asserts in the marshaller
-		writer.write(record);
+		writer.write(item);
+		assertFalse(marshaller.wasCalled);
+		
+		writer.flush();
+		assertTrue(marshaller.wasCalled);
 
+	}
+	
+	public void testClear() throws Exception {
+		writer.open(executionContext);
+		writer.write(item);
+		writer.write(item);
+		writer.clear();
+		//writer.write(item);
+		writer.flush();
+		assertFalse(outputFileContent().contains(TEST_STRING));
 	}
 
 	/**
@@ -69,19 +83,19 @@ public class StaxEventItemWriterTests extends TestCase {
 	 */
 	public void testRollback() throws Exception {
 		writer.open(executionContext);
-		writer.write(record);
+		writer.write(item);
 		// rollback
 		writer.clear();
 		assertEquals("", outputFileContent());
 	}
 
 	/**
-	 * Commited output is written to the output file.
+	 * Item is written to the output file only after flush.
 	 */
-	public void testCommit() throws Exception {
+	public void testWriteAndFlush() throws Exception {
 		writer.open(executionContext);
-		writer.write(record);
-		// commit
+		writer.write(item);
+		assertEquals("", outputFileContent());
 		writer.flush();
 		assertTrue(outputFileContent().contains(TEST_STRING));
 	}
@@ -91,8 +105,8 @@ public class StaxEventItemWriterTests extends TestCase {
 	 */
 	public void testRestart() throws Exception {
 		writer.open(executionContext);
-		// write record
-		writer.write(record);
+		// write item
+		writer.write(item);
 		writer.flush();
 		writer.update(executionContext);
 		writer.close(executionContext);
@@ -100,7 +114,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();
 		writer.open(executionContext);
-		writer.write(record);
+		writer.write(item);
 		writer.close(executionContext);
 		
 		// check the output is concatenation of 'before restart' and 'after
@@ -123,7 +137,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.open(executionContext);
 		final int NUMBER_OF_RECORDS = 10;
 		for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
-			writer.write(record);
+			writer.write(item);
 			writer.update(executionContext);
 			long writeStatistics = executionContext.getLong(StaxEventItemWriter.class.getSimpleName() + ".record.count");
 
@@ -154,9 +168,13 @@ public class StaxEventItemWriterTests extends TestCase {
 	 * Checks the received parameters.
 	 */
 	private class InputCheckMarshaller implements Marshaller {
+		
+		boolean wasCalled = false;
+		
 		public void marshal(Object graph, Result result) {
+			wasCalled = true;
 			assertTrue(result instanceof StaxResult);
-			assertSame(record, graph);
+			assertSame(item, graph);
 		}
 
 		public boolean supports(Class clazz) {

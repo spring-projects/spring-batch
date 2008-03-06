@@ -23,7 +23,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ClearFailedException;
 import org.springframework.batch.item.exception.FlushFailedException;
-import org.springframework.batch.item.exception.StreamException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -37,7 +36,7 @@ import org.springframework.util.CollectionUtils;
  * This item writer also provides restart, statistics and transaction features
  * by implementing corresponding interfaces.
  * 
- * Output is buffered until {@link #flush()} is called - only then the actual
+ * Output is buffered until {@link #flush()} is wasCalled - only then the actual
  * writing to file takes place.
  * 
  * @author Peter Zozom
@@ -79,9 +78,6 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 
 	// root element attributes
 	private Map rootElementAttributes = null;
-
-	// signalizes that output source has been initialized
-	private boolean initialized = false;
 
 	// signalizes that marshalling was restarted
 	private boolean restarted = false;
@@ -220,10 +216,6 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 		this.overwriteOutput = overwriteOutput;
 	}
 
-	protected FileChannel getChannel() {
-		return channel;
-	}
-
 	/**
 	 * @throws Exception
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
@@ -251,7 +243,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 		open(startAtPosition);
 	}
 
-	/*
+	/**
 	 * Helper method for opening output source at given file position
 	 */
 	private void open(long position) {
@@ -283,8 +275,6 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", xse);
 		}
 
-		initialized = true;
-
 	}
 
 	/**
@@ -299,7 +289,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * @param writer XML event writer
 	 * @throws XMLStreamException
 	 */
-	protected void startDocument(XMLEventWriter writer) throws XMLStreamException {
+	private void startDocument(XMLEventWriter writer) throws XMLStreamException {
 
 		XMLEventFactory factory = XMLEventFactory.newInstance();
 
@@ -328,14 +318,14 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * @param writer XML event writer
 	 * @throws XMLStreamException
 	 */
-	protected void endDocument(XMLEventWriter writer) throws XMLStreamException {
+	private void endDocument(XMLEventWriter writer) throws XMLStreamException {
 
 		// writer.writeEndDocument(); <- this doesn't work after restart
 		// we need to write end tag of the root element manually
 		writer.flush();
 		ByteBuffer bbuf = ByteBuffer.wrap(("</" + getRootTagName() + ">").getBytes());
 		try {
-			getChannel().write(bbuf);
+			channel.write(bbuf);
 		}
 		catch (IOException ioe) {
 			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", ioe);
@@ -348,7 +338,6 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * @see org.springframework.batch.item.ResourceLifecycle#close(ExecutionContext)
 	 */
 	public void close(ExecutionContext executionContext) {
-		initialized = false;
 		flush();
 		try {
 			endDocument(delegateEventWriter);
@@ -364,15 +353,13 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	}
 
 	/**
-	 * Write the value object to XML stream.
+	 * Write the value object to internal buffer.
 	 * 
 	 * @param item the value object
-	 * @see org.springframework.batch.item.ItemWriter#write(java.lang.Object)
+	 * @see #flush()
 	 */
 	public void write(Object item) {
-
-		Assert.state(initialized, "ItemStream must be open before it can be used.");
-
+		
 		currentRecordCount++;
 		buffer.add(item);
 	}
@@ -382,24 +369,12 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
 	public void update(ExecutionContext executionContext) {
-		if (!initialized) {
-			throw new StreamException("ItemStream is not open, or may have been closed.  Cannot access context.");
-		}
 
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.putLong(getKey(RESTART_DATA_NAME), getPosition());
 			executionContext.putLong(getKey(WRITE_STATISTICS_NAME), currentRecordCount);
 		}
-	}
-
-	/**
-	 * Restore processing from provided restart data.
-	 * @param data the restart data
-	 * @see org.springframework.batch.item.ItemStream#restoreFrom(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void restoreFrom(ExecutionContext data) {
-
 	}
 
 	/*
@@ -443,7 +418,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	}
 
 	/**
-	 * Writes buffered items to file and marks restore point.
+	 * Writes buffered items to XML stream and marks restore point.
 	 */
 	public void flush() throws FlushFailedException {
 
