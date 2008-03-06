@@ -23,7 +23,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ClearFailedException;
 import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.orm.hibernate3.HibernateOperations;

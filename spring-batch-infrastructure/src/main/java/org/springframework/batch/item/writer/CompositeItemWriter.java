@@ -10,7 +10,7 @@ import org.springframework.batch.item.ItemWriter;
  * 
  * @author Robert Kasanicky
  */
-public class CompositeItemWriter extends AbstractItemWriter implements ItemWriter {
+public class CompositeItemWriter extends AbstractItemWriter {
 
 	private List delegates;
 
