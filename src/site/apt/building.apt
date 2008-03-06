@@ -90,6 +90,21 @@ $ mvn -P snapshots dependency:tree
   We use the "snapshots" profile here so that we get a snapshot of the
   dependency plugin (older versions did not have the tree goal, but
   newer versions are not stable enough to use in production).
+
+* Subversion and Line Endings
+
+  Please use
+
++---
+*.xml = svn:eol-style=LF
+*.sql = svn:eol-style=LF
+*.txt = svn:eol-style=LF
+*.java = svn:eol-style=LF
+*.apt = svn:eol-style=LF
+*.properties = svn:eol-style=LF
++---
+
+  in your <<<~/.subversion>>> (or <<<c:\Documents and Settings\<uid>\Application Data\Subversion/config>>>).  If anyone forgets to do that then the property can be recursively set using Tortoise (type in the property key and value and use the recursive checkbox).
  
 * Documentation
 
