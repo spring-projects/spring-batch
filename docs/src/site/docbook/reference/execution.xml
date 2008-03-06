@@ -2,105 +2,101 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="execution">
-  <title>The Batch Execution Environment</title>
+	<title>The Batch Execution Environment</title>
 
-  <section>
-    <title>Introduction</title>
+	<section>
+		<title>Introduction</title>
 
-    <para>The "execution" layer is fertile ground for collaboration and
-    contributions from the community and from projects in the field. There is
-    lifecycle support for starting and stopping jobs. The vision for this is
-    that there can be multiple implementations of this interface providing
-    different architectural patterns, and delivering different levels of
-    scalability and robustness, without changing either the business logic or
-    the job configuration. The initial 1.0 release of Spring Batch will have a
-    single implementation for the Simple Batch Execution Service.</para>
+		<para>
+			The "execution" layer is fertile ground for collaboration and contributions from the community and from
+			projects in the field. There is lifecycle support for starting and stopping jobs. The vision for this is
+			that there can be multiple implementations of this interface providing different architectural patterns, and
+			delivering different levels of scalability and robustness, without changing either the business logic or the
+			job configuration. The 1.0 release of Spring Batch has an implementation of the core API that is targeted at
+			a single VM.
+		</para>
 
-    <para>The Execution Environment is responsible for providing
-    implementations of the core domain concepts. This includes: <itemizedlist>
-        <listitem>
-          <para>Run Tier - Implement the bootstraping and launching of the
-          Execution Environment.</para>
-        </listitem>
+		<para>
+			The execution environment is responsible for providing implementations of the core domain concepts. This
+			includes:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>Run Tier - Implement the bootstrapping and launching of the Execution Environment.</para>
+			</listitem>
 
-        <listitem>
-          <para>Job Tier - Implement the Job Configuration and Job Execution
-          strategies.</para>
-        </listitem>
+			<listitem>
+				<para>Job Tier - Implement the Job and Step strategies.</para>
+			</listitem>
 
-        <listitem>
-          <para>Application Tier - Impleement the Step Configuration and Step
-          Executor strategies.</para>
-        </listitem>
+			<listitem>
+				<para>Application Tier - Implement the ItemReader and ItemWriter (or Tasklet) strategies.</para>
+			</listitem>
 
-        <listitem>
-          <para>Data Tier - Implement a Repository solution for storing the
-          persistence state of the batch domain.</para>
-        </listitem>
-      </itemizedlist> <para>We will describe the flow of the simple batch
-    execution envrionment that is provided with spring-batch to clarify the
-    sequence of processing in the batch environment. The simple batch
-    execution environment is a concrete implementation of the core interfaces.
-    The Simple Batch Execution Environment can be described in the following
-    way.</para> <orderedlist>
-        <listitem>
-          <para>In the Run Tier, asingle Java Project may have one or more
-          Jobs. Jobs are configured with the JobConfiguration bean.</para>
-        </listitem>
+			<listitem>
+				<para>
+					Data Tier - Implement a Repository solution for storing the persistence state of the batch domain.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			We will describe the flow of the simple batch execution envrionment that is provided with spring-batch to
+			clarify the sequence of processing in the batch environment. The simple batch execution environment is a
+			concrete implementation of the core interfaces. The flow of a job through the execution environment is as
+			follows.
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					In the Run Tier, a single Java Project may have one or more Jobs. Jobs are configured with the Job
+					bean.
+				</para>
+			</listitem>
 
-        <listitem>
-          <para>A single Job must contain at least one Step.Steps are
-          configured with the StepConfiguration bean. If more than one step is
-          configured for a Job, then they are executed serially and after the
-          previous step (all of its items / records) is complete.</para>
-        </listitem>
+			<listitem>
+				<para>
+					A single Job must contain at least one Step. Steps are configured with various flavours of Step
+					FactoryBean. If more than one step is configured for a Job, then they are executed serially and
+					after the previous step (all of its items / records) is complete. A Job is also responsible for
+					providing registered JobListener instances with callbacks before and after the job execution.
+				</para>
+			</listitem>
 
-        <listitem>
-          <para>Steps are executed by StepExecutor classes, being the
-          DefaultStepExecutor the most simple for it.</para>
-        </listitem>
+			<listitem>
+				<para>
+					Steps are responsible for executing business logic and recording progress in a StepExecution.
+				</para>
+			</listitem>
 
-        <listitem>
-          <para>Steps in turn are divided into two “cycles” or “iterators”;
-          the “stepOperations” iterator and the “chunkOperations” iterator.
-          The StepOperations of the Step cycles while there is data to be
-          processed (i.e. a CompletionPolicy returns true) whereas the
-          chunkOperations executes for every cycle of the stepOperations and
-          it is used as Transaction controlling mechanism. The idea is that
-          the chunkOperations iterator executes the number of “commit size”
-          defined in the configuration unless another CompletionPolicy is
-          defined. After “# of records per Commit” cycles, it returns control
-          to the StepOperations which in turn calls again the ChunkOperations
-          if there are more records to be processed. Programmers should only
-          define chunkOperations and not stepOperations, unless a parallel
-          execution strategy is chosen.</para>
-        </listitem>
+			<listitem>
+				<para>
+					Steps are also responsible for managing the lifecycle of ItemStreams that contribute input or output
+					to the business logic. ItemStreams can be registered with a Step using the factory beans. Any
+					ItemReader or ItemWRiter injected directly into the factory bean will also be registered
+					automatically.
+				</para>
+			</listitem>
 
-        <listitem>
-          <para>The RepeatTemplate class (implementator of the chunk and step
-          Operations) requires a Tasklet. A Tasklet is responsible for doing
-          something in each cycle of the "stepOperations". Simple tasklets may
-          fetch and process data in the same class but typicallyIdevelopers
-          will use the ItemProviderProcessTasklet that separates fetching data
-          from processing it in the ItemProvider and ItemProcessor interfaces.
-          If using DB access it's also common to use an
-          InputSourceItemProvider as ItemProvider and an
-          OutputSourceItemProcessor as ItemProcessor. There are even more
-          specialized classes for working the Jdbc (databases).</para>
-        </listitem>
-      </orderedlist></para>
-  </section>
+			<listitem>
+				<para>
+					Steps are also responsible for providing callbacks to the BatchListener family of listeners. These
+					provide a way for application developers to add additional behaviour to a step, e.g. if a checksum
+					or footer has to be added to an output file.
+				</para>
+			</listitem>
 
-  <section>
-    <title>Simple Batch Execution Environment</title>
+		</orderedlist>
+	</section>
 
-    <para></para>
-  </section>
+	<section>
+		<title>Simple Batch Execution Environment</title>
+		<para></para>
+	</section>
 
-  <section>
-    <title>Configuration</title>
-      <para>
-        <programlisting>
+	<section>
+		<title>Configuration</title>
+		<para>
+			<programlisting>
         &lt;property name="itemProvider"&gt;
                 &lt;bean class="org.springframework.batch.sample.item.provider.PlayerItemProvider"&gt;
                         &lt;property name="inputSource" ref="playerFileInputSource" /&gt;
