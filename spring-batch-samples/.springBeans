@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.3.v200802061800]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.2.v200712142013]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
-	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
 		<config>src/main/resources/jobs/fixedLengthImportJob.xml</config>
 		<config>src/main/resources/jobs/multilineJob.xml</config>
@@ -17,7 +16,6 @@
 		<config>src/main/resources/jobs/tradeJobIo.xml</config>
 		<config>src/main/resources/jobs/restartSample.xml</config>
 		<config>src/main/resources/data-source-context.xml</config>
-		<config>src/main/resources/simple-container-definition.xml</config>
 		<config>src/main/resources/jobs/beanWrapperMapperSampleJob.xml</config>
 		<config>src/main/resources/jobs/adhocLoopJob.xml</config>
 		<config>src/main/resources/jobs/infiniteLoopJob.xml</config>
@@ -43,7 +41,6 @@
 				<config>src/main/resources/jobs/adhocLoopJob.xml</config>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -54,7 +51,6 @@
 				<config>src/main/resources/jobs/beanWrapperMapperSampleJob.xml</config>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -65,7 +61,6 @@
 				<config>src/main/resources/jobs/fixedLengthImportJob.xml</config>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -76,7 +71,6 @@
 				<config>src/main/resources/jobs/infiniteLoopJob.xml</config>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -87,7 +81,6 @@
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
 				<config>src/main/resources/jobs/multilineJob.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -98,7 +91,6 @@
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
 				<config>src/main/resources/jobs/restartSample.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -110,7 +102,6 @@
 				<config>src/main/resources/data-source-context-init.xml</config>
 				<config>src/main/resources/jobs/tradeJob.xml</config>
 				<config>src/main/resources/jobs/tradeJobIo.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -124,7 +115,6 @@
 				<config>src/main/resources/jobs/multilineOrderIo.xml</config>
 				<config>src/main/resources/jobs/multilineOrderJob.xml</config>
 				<config>src/main/resources/jobs/multilineOrderOutputDescriptors.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -134,7 +124,6 @@
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 				<config>src/main/resources/jobs/xmlStaxJob.xml</config>
 			</configs>
 		</configSet>
@@ -144,7 +133,6 @@
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 				<config>src/main/resources/jobs/footballJob.xml</config>
 			</configs>
 		</configSet>
@@ -155,7 +143,6 @@
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/jobs/hibernateJob.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -165,7 +152,6 @@
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/jobs/ibatisJob.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -175,7 +161,6 @@
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/jobs/parallelJob.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -183,7 +168,6 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
-				<config>src/main/resources/simple-container-definition.xml</config>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
 				<config>src/main/resources/jobs/compositeProcessorSampleJob.xml</config>
@@ -196,7 +180,6 @@
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/jobs/delegatingJob.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -205,7 +188,6 @@
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -223,7 +205,6 @@
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/jobs/rollbackJob.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 				<config>src/main/resources/jobs/tradeJobIo.xml</config>
 			</configs>
 		</configSet>
@@ -233,7 +214,6 @@
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/main/resources/jobs/retrySample.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
 			</configs>
@@ -244,7 +224,6 @@
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/simple-container-definition.xml</config>
 				<config>src/main/resources/jobs/simpleJob.xml</config>
 			</configs>
 		</configSet>

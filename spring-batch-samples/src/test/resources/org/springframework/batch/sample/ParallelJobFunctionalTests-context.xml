@@ -4,7 +4,7 @@
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-	<import resource="classpath:/simple-container-definition.xml" />
+	<import resource="classpath:/simple-job-launcher-context.xml" />
 	<import resource="classpath:/jobs/parallelJob.xml" />
 
 </beans>

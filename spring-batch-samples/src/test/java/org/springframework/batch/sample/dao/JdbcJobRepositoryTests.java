@@ -34,7 +34,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 	}
 
 	protected String[] getConfigLocations() {
-		return new String[] { "simple-container-definition.xml" };
+		return new String[] { "simple-job-launcher-context.xml" };
 	}
 
 	protected void onSetUpInTransaction() throws Exception {

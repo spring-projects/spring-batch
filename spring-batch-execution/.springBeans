@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.3.v200802061800]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.2.v200712142013]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
-	<enableImports><![CDATA[true]]></enableImports>
 	<configs>
-		<config>src/test/resources/simple-container-definition.xml</config>
-		<config>src/test/resources/job-configuration.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/repository/dao/data-source-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/repository/dao/sql-dao-test.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/configuration/test-context.xml</config>
-		<config>src/test/resources/beanRefContext.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/bootstrap/support/job.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/bootstrap/support/test-environment.xml</config>
 	</configs>
@@ -22,8 +18,6 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
-				<config>src/test/resources/job-configuration.xml</config>
-				<config>src/test/resources/simple-container-definition.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
