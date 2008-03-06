@@ -36,7 +36,7 @@ import org.springframework.util.CollectionUtils;
  * This item writer also provides restart, statistics and transaction features
  * by implementing corresponding interfaces.
  * 
- * Output is buffered until {@link #flush()} is wasCalled - only then the actual
+ * Output is buffered until {@link #flush()} is called - only then the actual
  * writing to file takes place.
  * 
  * @author Peter Zozom
