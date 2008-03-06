@@ -1,72 +1,96 @@
-<?xml version='1.0'?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.0/docbookx.dtd">
-<chapter id="glossary">
-	<title>Glossary</title>
-  <section>
-    <title>Glossary Items</title>
-    <para></para>
-	  <orderedlist numeration="arabic">
-	    <listitem>
-	      <para><emphasis role="bold">Batch</emphasis>: An accumulation of 
-	      business transactions over time.</para>
-	    </listitem>
-	    <listitem>
-	      <para><emphasis role="bold">Batch Application Style</emphasis>: 
-	      Term used to designate batch as an application style in its own 
-	      right similar to online, Web or SOA. It has standard elements of 
-	      input, validation, transformation of information to business 
-	      model, business processing and output. In addition, it requires 
-	      monitoring at a macro level.</para>
-	    </listitem>
-	    <listitem>
-	      <para><emphasis role="bold">Batch Processing</emphasis>: The 
-	      handling of a batch of many business transactions that have 
-	      accumulated over a period of time (e.g. an hour, day, week, 
-	      month, or year). It is the application of a process, or set of 
-	      processes, to many data entities or objects in a repetitive and 
-	      predictable fashion with either no manual element, or a separate 
-	      manual element for error processing.</para>
-	    </listitem>
-    <listitem>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glossary PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<glossary>
+  <glossdiv>
+    <title>Spring Batch Glossary</title>
 
-      <para><emphasis role="bold">Batch Window</emphasis>: The time 
-      frame within which a batch job must complete. This can be 
-      constrained by other systems coming online, other dependent jobs 
-      needing to execute or other factors specific to the batch 
-      environment.</para>
+    <glossentry>
+      <glossterm>Batch</glossterm>
+      <glossdef>
+	<para>An accumulation of business transactions over
+	      time.
+	</para>
+      </glossdef>
+    </glossentry>
 
-    </listitem>
+    <glossentry>
+      <glossterm>Batch Application Style</glossterm>
+      <glossdef>
+	<para>
+	  Term used to designate batch as an application style in its
+	      own right similar to online, Web or SOA. It has standard
+	      elements of input, validation, transformation of
+	      information to business model, business processing and
+	      output. In addition, it requires monitoring at a macro
+	      level.
+	</para>
+      </glossdef>
+    </glossentry>
 
-    <listitem>
+    <glossentry>
+      <glossterm>Batch Processing</glossterm>
+      <glossdef>
+	<para>
+	  The handling of a batch of many business transactions that
+	  have accumulated over a period of time (e.g. an hour, day,
+	  week, month, or year). It is the application of a process,
+	  or set of processes, to many data entities or objects in a
+	  repetitive and predictable fashion with either no manual
+	  element, or a separate manual element for error processing.
+	</para>
+      </glossdef>
+    </glossentry>
 
-      <para><emphasis role="bold">Step Controller</emphasis>: It is the 
-      main batch task or Unit of Work controller. It initializes the 
-      tasklet, and controls the transaction environment based on commit 
-      interval setting, etc.</para>
+    <glossentry>
+      <glossterm>Batch Window</glossterm>
+      <glossdef>
+	<para>
+	  The time frame within which a batch job must complete. This
+	  can be constrained by other systems coming online, other
+	  dependent jobs needing to execute or other factors specific
+	  to the batch environment.
+	</para>
+      </glossdef>
+    </glossentry>
 
-    </listitem>
+    <glossentry>
+      <glossterm>Step Controller</glossterm>
+      <glossdef>
+	<para>
+	  It is the main batch task or Unit of Work controller. It
+	  initializes the tasklet, and controls the transaction
+	  environment based on commit interval setting, etc.
+	</para>
+      </glossdef>
+    </glossentry>
 
-    <listitem>
+    <glossentry>
+      <glossterm>Tasklet</glossterm>
+      <glossdef>
+	<para>
+	  The main application program created by application developer to process 
+	  the business logic for each LUW.
+	</para>
+      </glossdef>
+    </glossentry>
 
-      <para><emphasis role="bold">Tasklet</emphasis>: The main 
-      application program created by application developer to process 
-      the business logic for each LUW.</para>
+    <glossentry>
+      <glossterm>Batch Job Type</glossterm>
+      <glossdef>
+	<para>
+	  Job Types describe application of jobs for particular type
+	  of processing.  Common areas are interface processing
+	  (typically flat files), forms processing (either for online
+	  pdf generation or print formats), report processing. 
+	</para>
+      </glossdef>
+    </glossentry>
 
-    </listitem>
-
-    <listitem>
-
-      <para><emphasis role="bold">Batch Job Type</emphasis>: Job Types 
-      describe application of jobs for particular type of processing. 
-      Common areas are interface processing (typically flat files), 
-      forms processing (either for online pdf generation or print 
-      formats), report processing. s</para>
-
-    </listitem>
-
-    <listitem>
-
-      <para><emphasis role="bold">Driving Query</emphasis>: A driving 
+    <glossentry>
+      <glossterm>Driving Query</glossterm>
+      <glossdef>
+	<para>A driving 
       query identifies the set of work for a job to do; the job then 
       breaks that work into individual units of work. For instance, 
       identify all financial transactions that have a status of 
@@ -75,110 +99,151 @@
       each record ID then becomes a unit of work. A driving query may 
       involve a join (if the criteria for selection falls across two or 
       more tables) or it may work with a single table.</para>
+      </glossdef>
 
-    </listitem>
+    </glossentry>
 
-    <listitem>
+    <glossentry>
 
-      <para><emphasis role="bold">Logicial Unit of Work 
-      (LUW)</emphasis>: A batch job iterates through a driving query 
+      <glossterm>Logicial Unit of Work 
+      (LUW)</glossterm>
+      <glossdef>
+	<para>A batch job iterates through a driving query 
       (or another input source such as a file) to perform the set of 
       work that the job must accomplish. Each iteration of work 
       performed is a unit of work.</para>
+      </glossdef>
 
-    </listitem>
+    </glossentry>
 
-    <listitem>
+    <glossentry>
 
-      <para><emphasis role="bold">Commit Interval</emphasis>: A set of 
+      <glossterm>Commit Interval</glossterm>
+      <glossdef>
+	<para>A set of 
       LUWs constitute a commit interval.</para>
+      </glossdef>
 
-    </listitem>
+    </glossentry>
 
-    <listitem>
+    <glossentry>
 
-      <para><emphasis role="bold">Partitioning</emphasis>: Splitting a 
+      <glossterm>Partitioning</glossterm>
+      <glossdef>
+	<para>Splitting a 
       job into multiple threads where each thread is responsible for a 
       subset of the overall data to be processed. The threads of 
       execution may be within the same JVM or they may span JVMs in a 
       clustered environment that supports workload balancing.</para>
+      </glossdef>
 
-    </listitem>
+    </glossentry>
 
-    <listitem>
+    <glossentry>
 
-      <para><emphasis role="bold">Staging Table</emphasis>: A table 
+      <glossterm>Staging Table</glossterm>
+      <glossdef>
+	<para>A table 
       that holds temporary data while it is being processed.</para>
+      </glossdef>
 
-    </listitem>
+    </glossentry>
 
-    <listitem>
+    <glossentry>
 
-      <para><emphasis role="bold">Restartable</emphasis>: - a job that 
+      <glossterm>Restartable</glossterm>
+      <glossdef>
+	<para>- a job that 
       can be executed again and will assume the same identity as when 
       run initially. In othewords, it is has the same job instance 
       id.</para>
+      </glossdef>
 
-    </listitem>
+    </glossentry>
 
-    <listitem>
+    <glossentry>
 
-      <para><emphasis role="bold">Rerunnable</emphasis> - a job that is restartable and manages it&apos;s own state in terms of previous run&apos;s record 
-      processing. Note&gt;&gt;: Rerunnable is tied to the driving query. If the driving query can be formed so that it will limit the 
-      processed rows when the job is restarted than re-runnable = true. This is managed by the application architecture. Often times a 
-      condition is added to the where statement to limit the rows returned by the driving query with something like &quot;and 
-      processedFlag != true&quot;.</para>
+      <glossterm>Rerunnable</glossterm>
+      <glossdef>
+	<para>
+	  a job that is restartable and manages it&apos;s own state in
+	  terms of previous run&apos;s record processing. Note&gt;&gt;
+	  Rerunnable is tied to the driving query. If the driving
+	  query can be formed so that it will limit the processed rows
+	  when the job is restarted than re-runnable = true. This is
+	  managed by the application architecture. Often times a
+	  condition is added to the where statement to limit the rows
+	  returned by the driving query with something like &quot;and
+	  processedFlag != true&quot;.
+	  <note>
+	    <title>Understanding Rerunnable</title>
+	    <para>
+	      If re-runnable = false the architecture assumes responsibility for
+	      tracking which rows have been processed. There is a default strategy
+	      for tracking the last record processed by partition.  Most batch jobs
+	      only have one partition.  The option is only valid for a restartable
+	      job.  The reason being is that the architecture will have to persist
+	      the restart data, which is only available on a restartable job as the
+	      restart data is saved and made available from the execution of the
+	      last run if restartable = true. In pseudo code it is the following:
+	      </para>
+	    <para>
+	      StartOver ::= restartable = false.  Restartable ::= true | false If
+	      (Restartable) re-runnable ::= true | false We don't persist restart
+	      information for a non-restartable job.  As you can see, it doesn't
+	      make sense. Rerunnable has always confused the best of us and we're
+	      open to suggestions on how to better explain it.
+	    </para>
+	  </note>
+	</para>
+      </glossdef>
 
-<programlisting><![CDATA[
-Note:  If re-runnable = false the architecture assumes responsibility for tracking which rows have been processed. There is a default strategy 
-for tracking the last record processed by partition.  Most batch jobs only have one partition.  The option is only valid for a restartable job. 
-The reason being is that the architecture will have to persist the restart data, which is only available on a restartable job as the restart data is
-saved and made available from the execution of the last run if restartable = true.  
-
-In pseudo code it is the following:
-    StartOver ::=  restartable = false.  Restartable ::= true | false
-    If (Restartable)
-        re-runnable ::= true | false
-
-We don't persist restart information for a non-restartable job.  As you can see, it doesn't make sense. Rerunnable has always confused the best 
-of us and we're open to suggestions on how to better explain it. 
-]]></programlisting>
-    </listitem>
+    </glossentry>
     
-    <listitem>
+    <glossentry>
 
-      <para><emphasis role="bold">Repeat</emphasis>: One of the most basic units of batch processing, that defines repeatability calling a 
-      portion of code until it is finished, and while there is no error.  Typically a batch process would be repeatable as long as there is input. 
-      </para>
+      <glossterm>Repeat</glossterm>
+      <glossdef>
+	<para>One of the most basic units of batch processing, that
+      defines repeatability calling a portion of code until it is
+      finished, and while there is no error.  Typically a batch
+      process would be repeatable as long as there is input.
+	</para>
+      </glossdef>
+    </glossentry>
+    <glossentry>
 
-    </listitem>
-    
-    <listitem>
-
-      <para><emphasis role="bold">Retry</emphasis>: Simplifies the execution of operations with retry semantics most frequently associated
+      <glossterm>Retry</glossterm>
+      <glossdef>
+	<para>Simplifies the execution of operations with retry semantics most frequently associated
       with handling transactional output exceptions. Retry is slightly different from repeat, rather than continually calling a block of code, 
       retry is stateful, and continually calls the same block of code with the same input, until it either succeeds, or some type of retry limit 
       has been exceeded. It is only generally useful if the operation is non-deterministic meaning that a retry on a subsequent invocation might
       succeed because something in the environment has improved.
       </para>
+      </glossdef>
 
-    </listitem>
+    </glossentry>
 
-    <listitem>
+    <glossentry>
 
-      <para><emphasis role="bold">Recover</emphasis>: Recover operations handle an exception in such a way that a repeat process is able to 
+      <glossterm>Recover</glossterm>
+      <glossdef>
+	<para>Recover operations handle an exception in such a way that a repeat process is able to 
       continue. 
       </para>
+      </glossdef>
 
-    </listitem>
-    <listitem>
+    </glossentry>
+    <glossentry>
 
-      <para><emphasis role="bold">Skip</emphasis>: Skip is a recovery strategy often used on file input sources as the strategy for ignoring
+      <glossterm>Skip</glossterm>
+      <glossdef>
+	<para>Skip is a recovery strategy often used on file input sources as the strategy for ignoring
       bad input records that failed validation.  
       </para>
+      </glossdef>
 
-    </listitem>    
-  </orderedlist>
-</section>
-</chapter>
-
+    </glossentry>
+  </glossdiv>
+</glossary>

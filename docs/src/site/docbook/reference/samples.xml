@@ -435,8 +435,8 @@
     the data from the input source and maps the line to the Trade object.
     <para>
         <programlisting>
-		trade = (Trade) tradeFieldSetMapper.mapLine(inputSource.readFieldSet());
-	</programlisting>
+                trade = (Trade) tradeFieldSetMapper.mapLine(inputSource.readFieldSet());
+        </programlisting>
       </para> If data exists and an object is returned it is simply passed to
     the output source. If there is no data to read an ExitStatus with the
     status of FINISHED is returned from the Tasklet.</para>
@@ -507,88 +507,88 @@
 
     <programlisting>
   &lt;import resource="BatchArchConfig.xml" /&gt;
-	&lt;bean id="simpleTaskletJob" parent="Job"&gt;
-		&lt;property name="name" value="fixedLengthImportJob" /&gt;
-		&lt;property name="steps"&gt;
-			&lt;list&gt;
-				&lt;bean id="tradeStep" parent="Step"&gt;
-					&lt;property name="name" value="ImportTradeDataStep" /&gt;
-					&lt;property name="module"&gt;
-						&lt;bean class="com.accenture.adsj.refapp.batch.module.SimpleTradeTasklet"&gt;
-							&lt;property name="inputTemplate" ref="fileInputTemplate" /&gt;
-							&lt;property name="tradeDbWriter" ref="tradeWriter" /&gt;
-						&lt;/bean&gt;
-					&lt;/property&gt;
-					&lt;property name="commitFrequency" value="5" /&gt;
-					&lt;property name="startPolicy"&gt;
-						&lt;bean class="org.springframework.batch.container.conf.StartPolicy"&gt;
-							&lt;property name="ignoreComplete" value="true" /&gt;
-							&lt;property name="restartEnabled" value="true" /&gt;
-							&lt;property name="startlimit" value="12" /&gt;
-						&lt;/bean&gt;
-					&lt;/property&gt;
-					&lt;property name="exceptionPolicy"&gt;
-						&lt;bean class="org.springframework.batch.container.conf.ExceptionPolicy"&gt;
-							&lt;property name="totalExceptionLimit" value="20" /&gt;
-							&lt;property name="transactionInvalidExceptionLimit" value="20" /&gt;
-							&lt;property name="transactionValidExceptionLimit" value="5" /&gt;
-						&lt;/bean&gt;
-					&lt;/property&gt;
-				&lt;/bean&gt;
-			&lt;/list&gt;
-		&lt;/property&gt;
-	&lt;/bean&gt;
-	&lt;bean id="tradeWriter" class="com.accenture.adsj.refapp.batch.dao.DbTradeWriter"&gt;
-		&lt;property name="jdbcTemplate" ref="jdbcTemplate" /&gt;
-		&lt;property name="incrementer"&gt;
-			&lt;bean parent="incrementerParent"&gt;
-				&lt;property name="incrementerName" value="TRADE_SEQ" /&gt;
-			&lt;/bean&gt;
-		&lt;/property&gt;
-	&lt;/bean&gt;
-	&lt;bean id="fileInputTemplate" class="org.springframework.batch.container.io.file.support.FlatFileInputTemplate"&gt;
-		&lt;property name="name" value="FileInputSource" /&gt;
-		&lt;property name="fileLocatorStrategy" ref="fileLocator" /&gt;
-		&lt;property name="tokenizer"&gt;
-			&lt;bean class="org.springframework.batch.container.io.file.support.FixedLineTokenizer"&gt;
-				&lt;property name="fileDescriptor" ref="fixedFileDescriptor" /&gt;
-			&lt;/bean&gt;
-		&lt;/property&gt;
-	&lt;/bean&gt;
+        &lt;bean id="simpleTaskletJob" parent="Job"&gt;
+                &lt;property name="name" value="fixedLengthImportJob" /&gt;
+                &lt;property name="steps"&gt;
+                        &lt;list&gt;
+                                &lt;bean id="tradeStep" parent="Step"&gt;
+                                        &lt;property name="name" value="ImportTradeDataStep" /&gt;
+                                        &lt;property name="module"&gt;
+                                                &lt;bean class="com.accenture.adsj.refapp.batch.module.SimpleTradeTasklet"&gt;
+                                                        &lt;property name="inputTemplate" ref="fileInputTemplate" /&gt;
+                                                        &lt;property name="tradeDbWriter" ref="tradeWriter" /&gt;
+                                                &lt;/bean&gt;
+                                        &lt;/property&gt;
+                                        &lt;property name="commitFrequency" value="5" /&gt;
+                                        &lt;property name="startPolicy"&gt;
+                                                &lt;bean class="org.springframework.batch.container.conf.StartPolicy"&gt;
+                                                        &lt;property name="ignoreComplete" value="true" /&gt;
+                                                        &lt;property name="restartEnabled" value="true" /&gt;
+                                                        &lt;property name="startlimit" value="12" /&gt;
+                                                &lt;/bean&gt;
+                                        &lt;/property&gt;
+                                        &lt;property name="exceptionPolicy"&gt;
+                                                &lt;bean class="org.springframework.batch.container.conf.ExceptionPolicy"&gt;
+                                                        &lt;property name="totalExceptionLimit" value="20" /&gt;
+                                                        &lt;property name="transactionInvalidExceptionLimit" value="20" /&gt;
+                                                        &lt;property name="transactionValidExceptionLimit" value="5" /&gt;
+                                                &lt;/bean&gt;
+                                        &lt;/property&gt;
+                                &lt;/bean&gt;
+                        &lt;/list&gt;
+                &lt;/property&gt;
+        &lt;/bean&gt;
+        &lt;bean id="tradeWriter" class="com.accenture.adsj.refapp.batch.dao.DbTradeWriter"&gt;
+                &lt;property name="jdbcTemplate" ref="jdbcTemplate" /&gt;
+                &lt;property name="incrementer"&gt;
+                        &lt;bean parent="incrementerParent"&gt;
+                                &lt;property name="incrementerName" value="TRADE_SEQ" /&gt;
+                        &lt;/bean&gt;
+                &lt;/property&gt;
+        &lt;/bean&gt;
+        &lt;bean id="fileInputTemplate" class="org.springframework.batch.container.io.file.support.FlatFileInputTemplate"&gt;
+                &lt;property name="name" value="FileInputSource" /&gt;
+                &lt;property name="fileLocatorStrategy" ref="fileLocator" /&gt;
+                &lt;property name="tokenizer"&gt;
+                        &lt;bean class="org.springframework.batch.container.io.file.support.FixedLineTokenizer"&gt;
+                                &lt;property name="fileDescriptor" ref="fixedFileDescriptor" /&gt;
+                        &lt;/bean&gt;
+                &lt;/property&gt;
+        &lt;/bean&gt;
 
 &lt;bean id="fixedFileDescriptor" class="org.springframework.batch.container.io.support.DefaultFileDescriptor"&gt;
-	&lt;property name="recordDescriptors"&gt;
-		&lt;bean class="org.springframework.batch.container.io.support.DefaultRecordDescriptor"&gt;
-			&lt;property name="fieldDescriptors"&gt;
-				&lt;list&gt;
-					&lt;bean class="org.springframework.batch.container.io.support.DefaultFieldDescriptor"&gt;
-						&lt;property name="name" value="ISIN" /&gt;
-						&lt;property name="length" value="12" /&gt;
-					&lt;/bean&gt;
-					&lt;bean class="org.springframework.batch.container.io.support.DefaultFieldDescriptor"&gt;
-						&lt;property name="name" value="Quantity" /&gt;
-						&lt;property name="length" value="3" /&gt;
-					&lt;/bean&gt;
-					&lt;bean class="org.springframework.batch.container.io.support.DefaultFieldDescriptor"&gt;
-						&lt;property name="name" value="Price" /&gt;
-						&lt;property name="length" value="5" /&gt;
-					&lt;/bean&gt;
-					&lt;bean class="org.springframework.batch.container.io.support.DefaultFieldDescriptor"&gt;
-						&lt;property name="name" value="Customer" /&gt;
-						&lt;property name="length" value="9" /&gt;
-					&lt;/bean&gt;
-				&lt;/list&gt;
-			&lt;/property&gt;
-		&lt;/bean&gt;
-	&lt;/property&gt;
+        &lt;property name="recordDescriptors"&gt;
+                &lt;bean class="org.springframework.batch.container.io.support.DefaultRecordDescriptor"&gt;
+                        &lt;property name="fieldDescriptors"&gt;
+                                &lt;list&gt;
+                                        &lt;bean class="org.springframework.batch.container.io.support.DefaultFieldDescriptor"&gt;
+                                                &lt;property name="name" value="ISIN" /&gt;
+                                                &lt;property name="length" value="12" /&gt;
+                                        &lt;/bean&gt;
+                                        &lt;bean class="org.springframework.batch.container.io.support.DefaultFieldDescriptor"&gt;
+                                                &lt;property name="name" value="Quantity" /&gt;
+                                                &lt;property name="length" value="3" /&gt;
+                                        &lt;/bean&gt;
+                                        &lt;bean class="org.springframework.batch.container.io.support.DefaultFieldDescriptor"&gt;
+                                                &lt;property name="name" value="Price" /&gt;
+                                                &lt;property name="length" value="5" /&gt;
+                                        &lt;/bean&gt;
+                                        &lt;bean class="org.springframework.batch.container.io.support.DefaultFieldDescriptor"&gt;
+                                                &lt;property name="name" value="Customer" /&gt;
+                                                &lt;property name="length" value="9" /&gt;
+                                        &lt;/bean&gt;
+                                &lt;/list&gt;
+                        &lt;/property&gt;
+                &lt;/bean&gt;
+        &lt;/property&gt;
 &lt;/bean&gt;
 &lt;bean id="tradeLineMapper" class="com.accenture.adsj.refapp.batch.mapping.TradeRowMapper" /&gt;
 &lt;bean class="com.accenture.adsj.refapp.batch.advice.LogAdvice" id="logAdvice" /&gt;
 &lt;aop:config&gt;
-	&lt;aop:aspect id="logging" ref="logAdvice"&gt;
-		&lt;aop:around pointcut-ref="pointcut" method="doBasicLogging" /&gt;
-		&lt;aop:pointcut id="pointcut" expression="execution(* org.springframework.batch.container.dao.*.*(..))" /&gt;
-	&lt;/aop:aspect&gt;
+        &lt;aop:aspect id="logging" ref="logAdvice"&gt;
+                &lt;aop:around pointcut-ref="pointcut" method="doBasicLogging" /&gt;
+                &lt;aop:pointcut id="pointcut" expression="execution(* org.springframework.batch.container.dao.*.*(..))" /&gt;
+        &lt;/aop:aspect&gt;
 &lt;/aop:config&gt;
  &lt;/beans&gt;
 
@@ -806,13 +806,13 @@
     src/main/resources/data/footballjob/input/. Each line within this file
     represents a player, with a unique id, the player’s name, position, etc:
     <programlisting>
-	AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996
-	AbduRa00,Abdullah,Rabih,rb,1975,1999
-	AberWa00,Abercrombie,Walter,rb,1959,1982
-	AbraDa00,Abramowicz,Danny,wr,1945,1967
-	AdamBo00,Adams,Bob,te,1946,1969
-	AdamCh00,Adams,Charlie,wr,1979,2003
-	</programlisting></para>
+        AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996
+        AbduRa00,Abdullah,Rabih,rb,1975,1999
+        AberWa00,Abercrombie,Walter,rb,1959,1982
+        AbraDa00,Abramowicz,Danny,wr,1945,1967
+        AdamBo00,Adams,Bob,te,1946,1969
+        AdamCh00,Adams,Charlie,wr,1979,2003
+        </programlisting></para>
 
     <para>One of the first noticeable characteristics of the file is that each
     data element is separated by a comma, a format most are familiar with
@@ -828,13 +828,13 @@
 
     <para>The second file, ‘games.csv’ is formatted the same as the previous
     example, and resides in the same directory: <programlisting>
-	AbduKa00,1996,mia,10,nwe,0,0,0,0,0,29,104,,16,2
-	AbduKa00,1996,mia,11,clt,0,0,0,0,0,18,70,,11,2
-	AbduKa00,1996,mia,12,oti,0,0,0,0,0,18,59,,0,0
-	AbduKa00,1996,mia,13,pit,0,0,0,0,0,16,57,,0,0
-	AbduKa00,1996,mia,14,rai,0,0,0,0,0,18,39,,7,0
-	AbduKa00,1996,mia,15,nyg,0,0,0,0,0,17,96,,14,0
-	</programlisting></para>
+        AbduKa00,1996,mia,10,nwe,0,0,0,0,0,29,104,,16,2
+        AbduKa00,1996,mia,11,clt,0,0,0,0,0,18,70,,11,2
+        AbduKa00,1996,mia,12,oti,0,0,0,0,0,18,59,,0,0
+        AbduKa00,1996,mia,13,pit,0,0,0,0,0,16,57,,0,0
+        AbduKa00,1996,mia,14,rai,0,0,0,0,0,18,39,,7,0
+        AbduKa00,1996,mia,15,nyg,0,0,0,0,0,17,96,,14,0
+        </programlisting></para>
 
     <para>Each line in the file represents an individual player’s performance
     in a particular game, containing such statistics as passing yards,
@@ -882,14 +882,14 @@
     file which can be found in the jobs folder under src/main/resources. When
     you drill down into the footballjob you will see that the configuration
     has a list of steps: <programlisting>
-	&lt;property name="steps"&gt;
-	    &lt;list&gt;
-		&lt;bean id="playerload"&gt; ... &lt;/bean&gt;
-		&lt;bean id="gameLoad"&gt; ... &lt;/bean
-		&lt;bean id="playerSummarization"&gt; ... &lt;/bean&gt;
-	    &lt;/list&gt;
-	&lt;/property&gt;
-	</programlisting></para>
+        &lt;property name="steps"&gt;
+            &lt;list&gt;
+                &lt;bean id="playerload"&gt; ... &lt;/bean&gt;
+                &lt;bean id="gameLoad"&gt; ... &lt;/bean
+                &lt;bean id="playerSummarization"&gt; ... &lt;/bean&gt;
+            &lt;/list&gt;
+        &lt;/property&gt;
+        </programlisting></para>
 
     <para>The step is run until there is no more input to process, which in
     this case would mean that each file has been completely processed. To
@@ -907,16 +907,16 @@
 
     <para>Now that we’ve discussed the entire flow of the batch job, we can
     dive deeper into the first step: playerLoad: <programlisting>
-	&lt;bean id="playerload"	class="org.springframework.batch...SimpleStepConfiguration"&gt;
-		&lt;property name="commitInterval" value="100" /&gt;
-		&lt;property name="tasklet"&gt;
-			&lt;bean class="org.springframework...RestartableItemProviderTasklet"&gt;
-				&lt;property name="itemProvider"&gt;...&lt;/property&gt;
-				&lt;property name="itemProcessor"&gt;...&lt;/property&gt;
-			&lt;/bean&gt;
-		&lt;/property&gt;
-	&lt;/bean&gt;
-	</programlisting></para>
+        &lt;bean id="playerload"        class="org.springframework.batch...SimpleStepConfiguration"&gt;
+                &lt;property name="commitInterval" value="100" /&gt;
+                &lt;property name="tasklet"&gt;
+                        &lt;bean class="org.springframework...RestartableItemProviderTasklet"&gt;
+                                &lt;property name="itemProvider"&gt;...&lt;/property&gt;
+                                &lt;property name="itemProcessor"&gt;...&lt;/property&gt;
+                        &lt;/bean&gt;
+                &lt;/property&gt;
+        &lt;/bean&gt;
+        </programlisting></para>
 
     <para>The root bean in this case is a StepConfiguration, which can be
     considered a ‘blueprint’ of sorts that tells the execution environment
@@ -978,17 +978,17 @@
 class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"&gt;
   &lt;property name="resource"&gt;
     &lt;bean class="org.springframework.core.io.ClassPathResource"&gt;
-	&lt;constructor-arg value="data/footballjob/input/player.csv" /&gt;
+        &lt;constructor-arg value="data/footballjob/input/player.csv" /&gt;
     &lt;/bean&gt;
   &lt;/property&gt;
   &lt;property name="tokenizer"&gt;
     &lt;bean class = "org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer"&gt;
       &lt;property name="names"
-	  value="ID,lastName,firstName,position,birthYear,debutYear" /&gt;
+          value="ID,lastName,firstName,position,birthYear,debutYear" /&gt;
     &lt;/bean&gt;
   &lt;/property&gt;
 &lt;/bean&gt;
-	</programlisting></para>
+        </programlisting></para>
 
     <para>There are two required dependencies of the input source; the first
     is a resource to read in, which is the file to process. The second
@@ -1008,24 +1008,24 @@ class="org.springframework.batch.io.file.support.DefaultFlatFileInputSource"&gt;
     You can see this below: <programlisting>
 public class PlayerMapper implements FieldSetMapper {
 
-	public Object mapLine(FieldSet fs) {
-		
-		if(fs == null){
-			return null;
-		}
-		
-		Player player = new Player();
-		player.setID(fs.readString("ID"));
-		player.setLastName(fs.readString("lastName"));
-		player.setFirstName(fs.readString("firstName"));
-		player.setPosition(fs.readString("position"));
-		player.setDebutYear(fs.readInt("debutYear"));
-		player.setBirthYear(fs.readInt("birthYear"));
-		
-		return player;
-	}
+        public Object mapLine(FieldSet fs) {
+                
+                if(fs == null){
+                        return null;
+                }
+                
+                Player player = new Player();
+                player.setID(fs.readString("ID"));
+                player.setLastName(fs.readString("lastName"));
+                player.setFirstName(fs.readString("firstName"));
+                player.setPosition(fs.readString("position"));
+                player.setDebutYear(fs.readInt("debutYear"));
+                player.setBirthYear(fs.readInt("birthYear"));
+                
+                return player;
+        }
 }
-	</programlisting></para>
+        </programlisting></para>
 
     <para>The flow of the ItemProvider, in this case, starts with a call to
     readFieldSet on the InputSource. The next line in the file is read in as a
@@ -1048,23 +1048,23 @@ public class PlayerMapper implements FieldSetMapper {
     returns a domain object to the processor. However, in this case, the input
     source is the database, not a file: <programlisting>
 &lt;bean id="playerSummarizationSource"
-	class="org.springframework.batch.io.sql.SqlCursorInputSource"&gt;
-	&lt;property name="dataSource" ref="dataSource" /&gt;
-	&lt;property name="mapper"&gt;
-		&lt;bean class="sample.mapping.PlayerSummaryMapper" /&gt;
-	&lt;/property&gt;
-	&lt;property name="sql"&gt;
-		&lt;value&gt;
-			SELECT games.player_id, games.year, SUM(COMPLETES),
-			SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
-			SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),
-			SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)
-			from games, players where players.player_id =
-			games.player_id group by games.player_id, games.year
-		&lt;/value&gt;
-	&lt;/property&gt;
+        class="org.springframework.batch.io.sql.SqlCursorInputSource"&gt;
+        &lt;property name="dataSource" ref="dataSource" /&gt;
+        &lt;property name="mapper"&gt;
+                &lt;bean class="sample.mapping.PlayerSummaryMapper" /&gt;
+        &lt;/property&gt;
+        &lt;property name="sql"&gt;
+                &lt;value&gt;
+                        SELECT games.player_id, games.year, SUM(COMPLETES),
+                        SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
+                        SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),
+                        SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)
+                        from games, players where players.player_id =
+                        games.player_id group by games.player_id, games.year
+                &lt;/value&gt;
+        &lt;/property&gt;
 &lt;/bean&gt;
-	</programlisting></para>
+        </programlisting></para>
 
     <para>The SqlCursorInputSource has three dependences: <itemizedlist>
         <listitem>

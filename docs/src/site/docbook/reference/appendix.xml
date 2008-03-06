@@ -5,8 +5,137 @@
   <title>List of ItemReaders</title>
 
   <section>
-    <title></title>
+    <title>Item Readers</title>
+    <table>
+      <title>Available Item Readers</title>
 
-    <para></para>
+      <tgroup cols="3">
+        <colspec align="center" />
+
+        <thead>
+          <row>
+            <entry align="center">Item Reader</entry>
+
+            <entry align="center">Type of Item Provided</entry>
+
+            <entry align="center">Description</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry align="left">ListItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Provides the items from a list, one at a
+            time</entry>
+          </row>
+
+          <row>
+            <entry align="left">ValidatingItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">A simple extension of DelegatingItemReader
+            that provides for validation before returning input.</entry>
+          </row>
+
+          <row>
+            <entry align="left">AggregateItemReader</entry>
+
+            <entry align="left">java.util.Collection</entry>
+
+            <entry align="left">An ItemReader that delivers a list as its
+            item, storing up objects from the injected ItemReader until they
+            are ready to be packed out as a collection. This ItemReader should
+            mark the beginning and end of records with the constant values in
+            FieldSetMapper AggregateItemReader#<emphasis
+            role="bold">BEGIN_RECORD</emphasis> and
+            AggregateItemReader#<emphasis
+            role="bold">END_RECORD</emphasis></entry>
+          </row>
+
+          <row>
+            <entry align="left">DelegatingItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Extends AbstractMethodInvokingDelegator, which
+            enables dynamically calling of a custom method of the injected
+            object. Provides a convenient API for dynamic method invocation
+            shielding subclasses from the low-level details and exception
+            handling.</entry>
+          </row>
+
+          <row>
+            <entry align="left">FlatFileItemReader</entry>
+
+            <entry align="left">java.lang.String</entry>
+
+            <entry align="left">Reads from a flat file, includes ItemStream
+            and Skippable functionality. See section on Read from a
+            File</entry>
+          </row>
+
+          <row>
+            <entry align="left">StaxEventItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Reads via StAX. See HOWTO - Read from a
+            File</entry>
+          </row>
+
+          <row>
+            <entry align="left">JdbcCursorItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Reads from a database cursor via JDBC. See
+            HOWTO - Read from a Database</entry>
+          </row>
+
+          <row>
+            <entry align="left">DrivingQueryItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Base class for operations that read from a
+            database based on a single driving query. Configured by injecting
+            a KeyGenerator object. See HOWTO - Read from a Database</entry>
+          </row>
+
+          <row>
+            <entry align="left">HibernateCursorItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Reads from a cursor based on an HQL query. See
+            section on Reading from a Database</entry>
+          </row>
+
+          <row>
+            <entry align="left">IbatisDrivingQueryItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Reads via iBATIS based on a driving query. See
+            HOWTO - Read from a Database</entry>
+          </row>
+
+          <row>
+            <entry align="left">JmsItemReader</entry>
+
+            <entry align="left">javax.jms.Message</entry>
+
+            <entry align="left">Given a Spring JmsOperations object and a JMS
+            Destination or destination name to send errors, provides items
+            received through the injected JmsOperations receive()
+            method</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
   </section>
 </appendix>
