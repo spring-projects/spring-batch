@@ -181,7 +181,7 @@ public class SimpleJobTests extends TestCase {
 			public void beforeJob(JobExecution jobExecution) {
 				list.add("before");
 			}
-			public void afterJob() {
+			public void afterJob(JobExecution jobExecution) {
 				list.add("after");
 			}
 		}});

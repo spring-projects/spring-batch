@@ -54,10 +54,10 @@ public class CompositeJobListener implements JobListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#close()
 	 */
-	public void afterJob() {
+	public void afterJob(JobExecution jobExecution) {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			JobListener listener = (JobListener) iterator.next();
-			listener.afterJob();
+			listener.afterJob(jobExecution);
 		}
 	}
 

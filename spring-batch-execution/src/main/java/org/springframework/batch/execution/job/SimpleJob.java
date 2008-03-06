@@ -110,7 +110,7 @@ public class SimpleJob extends AbstractJob {
 
 			updateStatus(execution, BatchStatus.COMPLETED);
 
-			listener.afterJob();
+			listener.afterJob(execution);
 
 		}
 		catch (JobInterruptedException e) {

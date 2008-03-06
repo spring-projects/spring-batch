@@ -43,15 +43,15 @@ public class CompositeJobListenerTests extends TestCase {
 	 */
 	public void testSetListeners() {
 		listener.setListeners(new JobListener[] { new JobListenerSupport() {
-			public void afterJob() {
+			public void afterJob(JobExecution jobExecution) {
 				list.add("fail");
 			}
 		}, new JobListenerSupport() {
-			public void afterJob() {
+			public void afterJob(JobExecution jobExecution) {
 				list.add("continue");
 			}
 		} });
-		listener.afterJob();
+		listener.afterJob(null);
 		assertEquals(2, list.size());
 	}
 
@@ -61,11 +61,11 @@ public class CompositeJobListenerTests extends TestCase {
 	 */
 	public void testSetListener() {
 		listener.register(new JobListenerSupport() {
-			public void afterJob() {
+			public void afterJob(JobExecution jobExecution) {
 				list.add("fail");
 			}
 		});
-		listener.afterJob();
+		listener.afterJob(null);
 		assertEquals(1, list.size());
 	}
 

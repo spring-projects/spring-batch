@@ -36,5 +36,5 @@ public interface JobListener {
 	/**
 	 * Callback after successful completion of a job.
 	 */
-	void afterJob();
+	void afterJob(JobExecution jobExecution);
 }

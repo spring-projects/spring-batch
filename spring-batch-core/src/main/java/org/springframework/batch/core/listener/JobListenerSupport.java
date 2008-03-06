@@ -27,7 +27,7 @@ public class JobListenerSupport implements JobListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.JobListener#afterJob()
 	 */
-	public void afterJob() {
+	public void afterJob(JobExecution jobExecution) {
 	}
 
 	/* (non-Javadoc)
