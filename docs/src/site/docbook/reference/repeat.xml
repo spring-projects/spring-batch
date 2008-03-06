@@ -24,7 +24,10 @@
     as a queue or database. A common scenario when a batch job is a datastream
     coming from a flat file interface is to have a file or files as input
     sources and a database resource as the output source. In this case the
-    repeat templates can be used like the following:<!--
+    repeat templates can be used like the following:
+    </para>
+
+    <para>
       <mediaobject>
         <imageobject role="fo">
           <imagedata align="center"
@@ -38,10 +41,12 @@
                      format="PNG" />
         </imageobject>
 
-        <caption><para>Figure 2: Simple Batch Pseduo code for Repeat
-        Templates</para></caption>
+        <caption>
+	  <para>Figure 2: Simple Batch Pseduo code for Repeat
+            Templates</para>
+	</caption>
       </mediaobject>
---></para>
+    </para>
 
     <para>In this batch scenario an outer RepeatTemplate initialies the
     continuous flow, a TransactionTemplate wraps the input and output
@@ -55,21 +60,23 @@
     the business processing is within the RepeatTemplates. It's only job is to
     keep the flow moving from the Item Provider to the Item Processor as
     quickly as possible. The repeat template can process records irrespective
-    of the batch architecture. A simple example would be: <programlisting>
-	    
-                RepeatTemplate template = new RepeatTemplate();
-                Resource resource = new FileSystemResource("resources/trades.csv");
-                TradeProcessor executor = new TradeProcessor();
-                TradeItemProvider provider = null;
-                try {
-                        provider = new TradeItemProvider(resource);
-                } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                }
-                template.iterate(new ItemProviderRepeatCallback(provider, executor));
-</programlisting></para>
-
+    of the batch architecture. A simple example would be: 
+<!--
+      <programlisting>
+         RepeatTemplate template = new RepeatTemplate();
+         Resource resource = new FileSystemResource("resources/trades.csv");
+         TradeProcessor executor = new TradeProcessor();
+         TradeItemProvider provider = null;
+            try {
+               provider = new TradeItemProvider(resource);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+          template.iterate(new ItemProviderRepeatCallback(provider, executor));
+      </programlisting>
+-->
+    </para>
     <para>A RepeatTemplate has an exception policy that can be
     leveraged</para>
   </section>
