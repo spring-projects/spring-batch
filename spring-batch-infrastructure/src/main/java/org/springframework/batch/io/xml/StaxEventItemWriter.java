@@ -5,7 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLEventFactory;
@@ -32,13 +34,18 @@ import org.springframework.util.CollectionUtils;
  * An implementation of {@link ItemWriter} which uses StAX and
  * {@link EventWriterSerializer} for serializing object to XML.
  * 
- * This output source also provides restart, statistics and transaction features
+ * This item writer also provides restart, statistics and transaction features
  * by implementing corresponding interfaces.
  * 
+ * Output is buffered until {@link #flush()} is called - only then the actual
+ * writing to file takes place.
+ * 
  * @author Peter Zozom
+ * @author Robert Kasanicky
  * 
  */
-public class StaxEventItemWriter extends ExecutionContextUserSupport implements ItemWriter, ItemStream, InitializingBean {
+public class StaxEventItemWriter extends ExecutionContextUserSupport implements ItemWriter, ItemStream,
+		InitializingBean {
 
 	// default encoding
 	private static final String DEFAULT_ENCODING = "UTF-8";
@@ -101,13 +108,17 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 
 	// current count of processed records
 	private long currentRecordCount = 0;
-	
+
 	private boolean saveState = false;
-	
+
+	// holds the list of items for writing before they are actually written on
+	// #flush()
+	private List buffer = new ArrayList();
+
 	public StaxEventItemWriter() {
 		setName(StaxEventItemWriter.class.getSimpleName());
 	}
-	
+
 	/**
 	 * Set output file.
 	 * 
@@ -332,12 +343,13 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	}
 
 	/**
-	 * Close the output source.
+	 * Flush and close the output source.
 	 * 
 	 * @see org.springframework.batch.item.ResourceLifecycle#close(ExecutionContext)
 	 */
 	public void close(ExecutionContext executionContext) {
 		initialized = false;
+		flush();
 		try {
 			endDocument(delegateEventWriter);
 			eventWriter.close();
@@ -354,17 +366,15 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	/**
 	 * Write the value object to XML stream.
 	 * 
-	 * @param output the value object
+	 * @param item the value object
 	 * @see org.springframework.batch.item.ItemWriter#write(java.lang.Object)
 	 */
-	public void write(Object output) {
+	public void write(Object item) {
 
-		if (!initialized) {
-			throw new StreamException("ItemStream must be open before it can be used.");
-		}
+		Assert.state(initialized, "ItemStream must be open before it can be used.");
 
 		currentRecordCount++;
-		serializer.serializeObject(eventWriter, output);
+		buffer.add(item);
 	}
 
 	/**
@@ -375,8 +385,8 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 		if (!initialized) {
 			throw new StreamException("ItemStream is not open, or may have been closed.  Cannot access context.");
 		}
-		
-		if(saveState){
+
+		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.putLong(getKey(RESTART_DATA_NAME), getPosition());
 			executionContext.putLong(getKey(WRITE_STATISTICS_NAME), currentRecordCount);
@@ -413,7 +423,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 		return position;
 	}
 
-	/*
+	/**
 	 * Set the file channel position.
 	 * 
 	 * @param newPosition new file channel position
@@ -431,23 +441,30 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 		}
 
 	}
-	
+
+	/**
+	 * Writes buffered items to file and marks restore point.
+	 */
 	public void flush() throws FlushFailedException {
+
+		for (Iterator iterator = buffer.listIterator(); iterator.hasNext();) {
+			Object item = iterator.next();
+			serializer.serializeObject(eventWriter, item);
+		}
+		buffer.clear();
+
 		lastCommitPointPosition = getPosition();
 		lastCommitPointRecordCount = currentRecordCount;
 	}
-	
+
+	/**
+	 * Clear the output buffer
+	 */
 	public void clear() throws ClearFailedException {
 		currentRecordCount = lastCommitPointRecordCount;
-		// close output
-		close(null);
-		// and reopen it - we do this because we need to reopen stream
-		// reader at specified position - calling setPosition() is not
-		// enough!
-		restarted = true;
-		open(lastCommitPointPosition);
+		buffer.clear();
 	}
-	
+
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}

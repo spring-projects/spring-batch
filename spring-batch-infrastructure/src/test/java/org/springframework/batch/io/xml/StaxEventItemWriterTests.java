@@ -21,7 +21,7 @@ import org.springframework.util.Assert;
 import org.springframework.xml.transform.StaxResult;
 
 /**
- * Tests for {@link StaxStreamWriterOutputSource}.
+ * Tests for {@link StaxEventItemWriter}.
  */
 public class StaxEventItemWriterTests extends TestCase {
 
@@ -40,7 +40,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		}
 	};
 
-	private static final String TEST_STRING = "StaxEventWriterOutputSourceTests-testString";
+	private static final String TEST_STRING = StaxEventItemWriter.class.getSimpleName() + "-testString";
 
 	private static final int NOT_FOUND = -1;
 
@@ -93,7 +93,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.open(executionContext);
 		// write record
 		writer.write(record);
-		// writer.mark();
+		writer.flush();
 		writer.update(executionContext);
 		writer.close(executionContext);
 
