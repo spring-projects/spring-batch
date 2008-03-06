@@ -18,8 +18,8 @@ package org.springframework.batch.execution.step.support;
 import org.springframework.batch.core.domain.BatchListener;
 import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepListener;
-import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.execution.step.ItemHandler;
+import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -86,7 +86,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	public void setSkipLimit(int skipLimit) {
 		this.skipLimit = skipLimit;
 	}
-
+	
 	/**
 	 * The listeners to inject into the {@link Step}. Any instance of
 	 * {@link BatchListener} can be used, and will then receive callbacks at the

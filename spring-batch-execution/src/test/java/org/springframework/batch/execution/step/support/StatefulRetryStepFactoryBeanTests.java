@@ -38,7 +38,6 @@ import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.item.writer.AbstractItemWriter;
-import org.springframework.batch.retry.policy.AlwaysRetryPolicy;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -120,7 +119,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 			}
 		};
 		factory.setItemReader(provider);
-		factory.setRetryPolicy(new AlwaysRetryPolicy());
+		factory.setRetryLimit(10);
 		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
 
 		step.execute(new StepExecution(step, jobExecution));

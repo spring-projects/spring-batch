@@ -40,7 +40,7 @@ public interface RetryPolicy {
 	/**
 	 * @param context the current context.
 	 * @return true if the policy determines that the last exception should be
-	 * rethrown.
+	 * re-thrown.
 	 */
 	boolean shouldRethrow(RetryContext context);
 
@@ -57,7 +57,7 @@ public interface RetryPolicy {
 	RetryContext open(RetryCallback callback);
 
 	/**
-	 * @param status a retry status crated by the {@link #open(RetryCallback)}
+	 * @param status a retry status created by the {@link #open(RetryCallback)}
 	 * method of this manager.
 	 */
 	void close(RetryContext context);
