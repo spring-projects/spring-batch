@@ -40,6 +40,10 @@ import org.springframework.batch.retry.support.RetryTemplate;
  * limit given by the {@link RetryPolicy}. When the retry is exhausted instead
  * of the item being skipped it is handled by an {@link ItemRecoverer}.<br/>
  * 
+ * The skipLimit property is still used to control the overall exception
+ * handling policy. Only exhausted retries count against the exception handler,
+ * instead of counting all exceptions.
+ * 
  * @author Dave Syer
  * 
  */
