@@ -88,6 +88,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 			String key = (String) iterator.next();
 			TransactionSynchronizationManager.unbindResource(key);			
 		}
+		RepeatSynchronizationManager.clear();
 	}
 
 	/**

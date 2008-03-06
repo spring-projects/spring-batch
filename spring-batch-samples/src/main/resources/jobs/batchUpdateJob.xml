@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+	<description>Example for SQL Batch Update integration.</description>
+
+	<bean id="batchUpdateJob" parent="simpleJob">
+		<!-- set restartable=false so that this job can be used by more than one test -->
+		<property name="restartable" value="false" />
+		<property name="steps">
+			<bean id="step1" parent="simpleStep">
+				<property name="skipLimit" value="5" />
+				<property name="itemReader" ref="itemReader" />
+				<property name="itemWriter" ref="itemWriter" />
+				<property name="commitInterval" value="3" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="itemWriter" class="org.springframework.batch.sample.item.writer.BatchSqlCustomerCreditIncreaseWriter">
+		<property name="delegate">
+			<bean class="org.springframework.batch.io.support.BatchSqlUpdateItemWriter">
+				<property name="jdbcTemplate" ref="jdbcTemplate" />
+				<property name="sql"><value><![CDATA[UPDATE CUSTOMER SET CREDIT=? WHERE ID=?]]></value></property>
+				<property name="itemPreparedStatementSetter">
+					<bean class="org.springframework.batch.sample.item.writer.CustomerCreditUpdatePreparedStatementSetter"/>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="itemReader" class="org.springframework.batch.io.cursor.JdbcCursorItemReader">
+		<property name="dataSource" ref="dataSource" />
+		<property name="sql" value="SELECT id, name, credit FROM customer " />
+		<property name="mapper">
+			<bean class="org.springframework.batch.sample.mapping.CustomerCreditRowMapper" />
+		</property>
+	</bean>
+
+</beans>

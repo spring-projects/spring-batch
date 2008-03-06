@@ -122,8 +122,6 @@
 	<bean id="fieldSetMapper"
 		class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
 
-	<bean parent="customEditorConfigurer" />
-
 	<aop:config>
 		<aop:aspect id="moduleLogging" ref="logAdvice">
 			<aop:after
