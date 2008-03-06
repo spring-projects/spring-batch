@@ -23,8 +23,12 @@ import org.springframework.batch.core.domain.Step;
 import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.Assert;
 
+/**
+ * In-memory implementation of {@link StepExecutionDao}.
+ */
 public class MapStepExecutionDao implements StepExecutionDao {
 
 	private static Map executionsByJobExecutionId;
@@ -47,21 +51,37 @@ public class MapStepExecutionDao implements StepExecutionDao {
 	}
 
 	public void saveStepExecution(StepExecution stepExecution) {
-		Assert.notNull(stepExecution.getJobExecutionId());
+		Assert.state(stepExecution.getId() == null);
+		Assert.state(stepExecution.getVersion() == null);
+		Assert.notNull(stepExecution.getJobExecutionId(), "JobExecution must be saved already.");
+
 		Map executions = (Map) executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		if (executions == null) {
 			executions = TransactionAwareProxyFactory.createTransactionalMap();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
 		}
+		stepExecution.incrementVersion();
 		stepExecution.setId(new Long(currentId++));
 		executions.put(stepExecution.getStepName(), stepExecution);
 	}
 
 	public void updateStepExecution(StepExecution stepExecution) {
+
 		Assert.notNull(stepExecution.getJobExecutionId());
+
 		Map executions = (Map) executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		Assert.notNull(executions, "step executions for given job execution are expected to be already saved");
-		Assert.notNull(executions.get(stepExecution.getStepName()), "step execution is expected to be already saved");
+
+		StepExecution persistedExecution = (StepExecution) executions.get(stepExecution.getStepName());
+		Assert.notNull(persistedExecution, "step execution is expected to be already saved");
+
+		if (!persistedExecution.getVersion().equals(stepExecution.getVersion())) {
+			throw new OptimisticLockingFailureException("Attempt to update step execution id=" + stepExecution.getId()
+					+ " with wrong version (" + stepExecution.getVersion() + "), where current version is "
+					+ persistedExecution.getVersion());
+		}
+
+		stepExecution.incrementVersion();
 		executions.put(stepExecution.getStepName(), stepExecution);
 	}
 

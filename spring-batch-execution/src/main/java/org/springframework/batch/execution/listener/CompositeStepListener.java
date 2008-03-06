@@ -78,11 +78,11 @@ public class CompositeStepListener implements StepListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#onError(java.lang.Throwable)
 	 */
-	public ExitStatus onErrorInStep(Throwable e) {
+	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 		ExitStatus status = null;
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			StepListener listener = (StepListener) iterator.next();
-			ExitStatus close = listener.onErrorInStep(e);
+			ExitStatus close = listener.onErrorInStep(stepExecution, e);
 			status = status!=null ? status.and(close): close;
 		}
 		return status;

@@ -91,12 +91,12 @@ public class CompositeStepListenerTests extends TestCase {
 	 */
 	public void testOnError() {
 		listener.register(new StepListenerSupport() {
-			public ExitStatus onErrorInStep(Throwable e) {
+			public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 				list.add("foo");
 				return null;
 			}
 		});
-		listener.onErrorInStep(new RuntimeException());
+		listener.onErrorInStep(null, new RuntimeException());
 		assertEquals(1, list.size());
 	}
 

@@ -104,8 +104,8 @@ public class ListenerMulticaster implements StepListener, ChunkListener, ItemRea
 	 * @return
 	 * @see org.springframework.batch.execution.listener.CompositeStepListener#onErrorInStep(java.lang.Throwable)
 	 */
-	public ExitStatus onErrorInStep(Throwable e) {
-		return stepListener.onErrorInStep(e);
+	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
+		return stepListener.onErrorInStep(stepExecution, e);
 	}
 
 	/**

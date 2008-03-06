@@ -29,6 +29,7 @@ import org.springframework.batch.core.domain.StepExecution;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 public class MapStepExecutionDaoTests extends TestCase {
 
@@ -65,14 +66,14 @@ public class MapStepExecutionDaoTests extends TestCase {
 		assertEquals(stepExecution, retrieved);
 		assertEquals(BatchStatus.STARTED, retrieved.getStatus());
 	}
-	
+
 	public void testUpdateExecution() {
 		stepExecution.setStatus(BatchStatus.STARTED);
 		dao.saveStepExecution(stepExecution);
-		
+
 		stepExecution.setStatus(BatchStatus.STOPPED);
 		dao.updateStepExecution(stepExecution);
-		
+
 		StepExecution retrieved = dao.getStepExecution(jobExecution, step);
 		assertEquals(stepExecution, retrieved);
 		assertEquals(BatchStatus.STOPPED, retrieved.getStatus());
@@ -90,7 +91,7 @@ public class MapStepExecutionDaoTests extends TestCase {
 		ExecutionContext retrieved = dao.findExecutionContext(stepExecution);
 		assertEquals(ctx, retrieved);
 	}
-	
+
 	public void testUpdateContext() {
 		ExecutionContext ctx = new ExecutionContext(new HashMap() {
 			{
@@ -102,10 +103,38 @@ public class MapStepExecutionDaoTests extends TestCase {
 
 		ctx.putLong("longKey", 7);
 		dao.saveOrUpdateExecutionContext(stepExecution);
-		
+
 		ExecutionContext retrieved = dao.findExecutionContext(stepExecution);
 		assertEquals(ctx, retrieved);
 		assertEquals(7, retrieved.getLong("longKey"));
+	}
+
+	public void testConcurrentModificationException() {
+		jobInstance = new JobInstance(new Long(1), new JobParameters(), new JobSupport("testJob"));
+		jobExecution = new JobExecution(jobInstance, new Long(1));
+		step = new StepSupport("foo");
+
+		StepExecution exec1 = new StepExecution(step, jobExecution);
+		dao.saveStepExecution(exec1);
+
+		StepExecution exec2 = new StepExecution(step, jobExecution);
+		exec2.setId(exec1.getId());
+
+		exec2.incrementVersion();
+		assertEquals(new Integer(0), exec1.getVersion());
+		assertEquals(exec1.getVersion(), exec2.getVersion());
+
+		dao.updateStepExecution(exec1);
+		assertEquals(new Integer(1), exec1.getVersion());
+
+		try {
+			dao.updateStepExecution(exec2);
+			fail();
+		}
+		catch (OptimisticLockingFailureException e) {
+			// expected
+		}
+
 	}
 
 }

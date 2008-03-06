@@ -399,7 +399,7 @@ public class ItemOrientedStep extends AbstractStep {
 			}
 			else if (!fatalException.hasException()) {
 				try {
-					status = status.and(listener.onErrorInStep(e));
+					status = status.and(listener.onErrorInStep(stepExecution, e));
 				}
 				catch (RuntimeException ex) {
 					logger.error("Unexpected error in listener on error in step.", ex);

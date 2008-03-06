@@ -417,7 +417,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 	public void testDirectlyInjectedListenerOnError() throws Exception {
 		itemOrientedStep.registerStepListener(new StepListenerSupport() {
-			public ExitStatus onErrorInStep(Throwable e) {
+			public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 				list.add(e);
 				return null;
 			}
@@ -706,7 +706,7 @@ public class ItemOrientedStepTests extends TestCase {
 		public void beforeStep(StepExecution stepExecution) {
 		}
 
-		public ExitStatus onErrorInStep(Throwable e) {
+		public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 			return null;
 		}
 

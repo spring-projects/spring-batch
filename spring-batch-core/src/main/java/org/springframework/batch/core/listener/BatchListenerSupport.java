@@ -48,7 +48,7 @@ public class BatchListenerSupport implements StepListener, ChunkListener,
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#onErrorInStep(java.lang.Throwable)
 	 */
-	public ExitStatus onErrorInStep(Throwable e) {
+	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 		return null;
 	}
 

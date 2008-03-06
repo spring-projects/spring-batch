@@ -158,7 +158,7 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 			logger.error("Encountered an error running the tasklet");
 			updateStatus(stepExecution, BatchStatus.FAILED);
 			try {
-				exitStatus = exitStatus.and(listener.onErrorInStep(e));
+				exitStatus = exitStatus.and(listener.onErrorInStep(stepExecution, e));
 			}
 			catch (Exception ex) {
 				logger.error("Encountered an error on listener close.", ex);

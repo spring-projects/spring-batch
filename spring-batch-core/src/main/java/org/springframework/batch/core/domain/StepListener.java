@@ -38,9 +38,10 @@ public interface StepListener extends BatchListener {
 	 * {@link ExitStatus#and(ExitStatus)}.
 	 * 
 	 * @param e an exception thrown by the step execution
+	 * 
 	 * @return an exit status to be combined with the normal one, or null
 	 */
-	ExitStatus onErrorInStep(Throwable e);
+	ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e);
 
 	/**
 	 * Give a listener a chance to modify the exit status from a step. The value
