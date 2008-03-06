@@ -22,8 +22,6 @@ import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
 
-
-
 public class TradeWriter extends AbstractItemWriter {
     private static Log log = LogFactory.getLog(TradeWriter.class);
     private TradeDao dao;
