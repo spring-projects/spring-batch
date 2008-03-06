@@ -104,6 +104,17 @@
     </glossentry>
 
     <glossentry>
+      <glossterm>Item</glossterm>
+      <glossdef>
+	<para>
+	  An item represents the smallest ammount of complete data for processing.  In the most 
+	  simple terms this might mean a line in a file, a row in a database table, or a particular 
+	  element in an XML file.
+	</para>
+      </glossdef>
+    </glossentry>
+
+    <glossentry>
 
       <glossterm>Logicial Unit of Work 
       (LUW)</glossterm>

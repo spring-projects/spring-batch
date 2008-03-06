@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<chapter>
+  <title>Repeat</title>
+
+  <section>
+    <title>Repeat Templates</title>
+
+    <para>One of the most fundamental concepts in the batch architecture is
+    the Repeat Template. The Repeat Template is responsible for repeatedly
+    invoking an operation on the Input Provider pulling input items from an
+    input source until there are no more items to be processed. One
+    interesting analogy used by Dierk Koenig in the book "Groovy in Action" is
+    a boiler vs. a continuous-flow heater. In this analogy he illustrates how
+    XML parsers can typically be divided into those that read the entire input
+    before process begins like DOM Parsers vs. those that stream over the
+    input like SAX parsers. Spring Batch is a continuous-flow heater and uses
+    the RepeatTemplate as the mechanism to keep the hot water or input stream
+    in constant flow.</para>
+
+    <para>Many times batch processes are not only working on non-transaction
+    input sources like files but the output is a transactional resource such
+    as a queue or database. A common scenario when a batch job is a datastream
+    coming from a flat file interface is to have a file or files as input
+    sources and a database resource as the output source. In this case the
+    repeat templates can be used like the following:<!--
+      <mediaobject>
+        <imageobject role="fo">
+          <imagedata align="center"
+                     fileref="../../../../target/site/reference/images/RepeatTemplate.png"
+                     format="PNG" />
+        </imageobject>
+
+        <imageobject role="html">
+          <imagedata align="center"
+                     fileref="../../../../target/site/reference/images/RepeatTemplate.png"
+                     format="PNG" />
+        </imageobject>
+
+        <caption><para>Figure 2: Simple Batch Pseduo code for Repeat
+        Templates</para></caption>
+      </mediaobject>
+--></para>
+
+    <para>In this batch scenario an outer RepeatTemplate initialies the
+    continuous flow, a TransactionTemplate wraps the input and output
+    resources and an inner RepeatTemplate manages the commit interval or
+    chunks of data to be processed. The Business Logic occurs in the input and
+    output of single items. Of course this is a simplistic view of how batch
+    really works. Input can be quite complex with multiple files and
+    complicated validation scenarios. Conversely, the output source can also
+    be quite complex in determining how the records will be stored in the
+    database. Spring Batch makes no assumptions about how simple or complex
+    the business processing is within the RepeatTemplates. It's only job is to
+    keep the flow moving from the Item Provider to the Item Processor as
+    quickly as possible. The repeat template can process records irrespective
+    of the batch architecture. A simple example would be: <programlisting>
+	    
+                RepeatTemplate template = new RepeatTemplate();
+                Resource resource = new FileSystemResource("resources/trades.csv");
+                TradeProcessor executor = new TradeProcessor();
+                TradeItemProvider provider = null;
+                try {
+                        provider = new TradeItemProvider(resource);
+                } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
+                template.iterate(new ItemProviderRepeatCallback(provider, executor));
+</programlisting></para>
+
+    <para>A RepeatTemplate has an exception policy that can be
+    leveraged</para>
+  </section>
+</chapter>

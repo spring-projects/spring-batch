@@ -31,12 +31,10 @@
 	</bookinfo>
 	<xi:include href="spring-batch-intro.xml"/>
 	<xi:include href="core.xml"/>
-	<xi:include href="infrastructure.xml"/>
+	<xi:include href="readersAndWriters.xml"/>
 	<xi:include href="execution.xml"/>
-	<xi:include href="application.xml"/>
-	<xi:include href="samples.xml"/>
-	<xi:include href="batch-job-testing.xml"/>
-	<xi:include href="batch-performance-testing.xml"/>
+	<xi:include href="repeat.xml"/>
+	<xi:include href="retry.xml"/>
 	<xi:include href="appendix.xml"/>
         <xi:include href="glossary.xml"/>  
 </book>
