@@ -34,8 +34,8 @@ import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Simple implementation of (@link Job} interface providing the ability to run a
- * {@link JobExecution}. Sequentially executes a job by iterating it's life of
- * steps.
+ * {@link JobExecution}. Sequentially executes a job by iterating through its
+ * list of steps.
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -46,10 +46,24 @@ public class SimpleJob extends AbstractJob {
 
 	private CompositeJobListener listener = new CompositeJobListener();
 
-	public void setListeners(JobListener[] listeners) {
+	/**
+	 * Public setter for injecting {@link JobListener}s. They will all be given
+	 * the {@link JobListener} callbacks at the appropriate point in the job.
+	 * 
+	 * @param listeners the listeners to set.
+	 */
+	public void setJobListeners(JobListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
 			this.listener.register(listeners[i]);
 		}
+	}
+	
+	/**
+	 * Register a single listener for the {@link JobListener} callbacks.
+	 * @param listener a {@link JobListener}
+	 */
+	public void registerListener(JobListener listener) {
+		this.listener.register(listener);
 	}
 
 	/**
@@ -79,7 +93,6 @@ public class SimpleJob extends AbstractJob {
 
 			listener.beforeJob(execution);
 
-			
 			for (Iterator i = steps.iterator(); i.hasNext();) {
 
 				Step step = (Step) i.next();
@@ -91,7 +104,7 @@ public class SimpleJob extends AbstractJob {
 					currentStepExecution = execution.createStepExecution(step);
 
 					step.execute(currentStepExecution);
-					
+
 				}
 			}
 
@@ -119,10 +132,10 @@ public class SimpleJob extends AbstractJob {
 					status = ExitStatus.NOOP.addExitDescription("No steps configured for this job.");
 				}
 			}
-			else if(currentStepExecution != null){
+			else if (currentStepExecution != null) {
 				status = currentStepExecution.getExitStatus();
 			}
-			
+
 			execution.setEndTime(new Date());
 			execution.setExitStatus(status);
 			jobRepository.saveOrUpdate(execution);

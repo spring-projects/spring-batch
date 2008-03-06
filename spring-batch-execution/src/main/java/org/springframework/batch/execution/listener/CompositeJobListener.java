@@ -43,11 +43,11 @@ public class CompositeJobListener implements JobListener {
 	/**
 	 * Register additional listener.
 	 * 
-	 * @param stepListener
+	 * @param jobListener
 	 */
-	public void register(JobListener stepListener) {
-		if (!listeners.contains(stepListener)) {
-			listeners.add(stepListener);
+	public void register(JobListener jobListener) {
+		if (!listeners.contains(jobListener)) {
+			listeners.add(jobListener);
 		}
 	}
 

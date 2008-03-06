@@ -177,7 +177,7 @@ public class SimpleJobTests extends TestCase {
 	}
 
 	public void testRunNormallyWithListener() throws Exception {
-		job.setListeners(new JobListenerSupport[] {new JobListenerSupport() {
+		job.setJobListeners(new JobListenerSupport[] {new JobListenerSupport() {
 			public void beforeJob(JobExecution jobExecution) {
 				list.add("before");
 			}
