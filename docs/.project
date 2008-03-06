@@ -1,3 +1,28 @@
+<<<<<<< .mine
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>docs</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.devzuz.q.maven.jdt.core.mavenIncrementalBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.devzuz.q.maven.jdt.core.mavenNature</nature>
+	</natures>
+</projectDescription>
+=======
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>docs</name>
@@ -27,3 +52,4 @@
 		<nature>org.codehaus.groovy.eclipse.groovyNature</nature>
 	</natures>
 </projectDescription>
+>>>>>>> .r10743

@@ -9,8 +9,8 @@
 
     <para>To any experienced batch architect, the overall concepts of batch
     processing described above should be familiar and comfortable. There are
-    “Jobs” and “Steps” and a developer supplied processing unit that Spring
-    Batch refers to as the “Tasklet.” The following diagram is only a slight
+    “Jobs” and “Steps” and a developer supplied processing units called
+    ItemReaders and ItemWriters. The following diagram is only a slight
     variation of the batch reference architecture that has been used for
     decades. JCL and COBOL developers are likely to be as comfortable with the
     concepts as C++, C# and Java developers. However, because of the Spring
@@ -113,7 +113,7 @@
         </listitem>
       </itemizedlist>In addition the components describe the batch interaction
     and services stereotypes that are the domain language and interfaces
-    implemented by developers in constructing a batch solution. As he diagram
+    implemented by developers in constructing a batch solution. As the diagram
     illustrates, custom applicaton archifacts, generally created by the
     developer, are the following:</para>
 
@@ -140,11 +140,11 @@
 
     <itemizedlist>
       <listitem>
-        <para>Define how the batch jobs will be launched</para>
+        <para>Define how batch jobs will be launched</para>
       </listitem>
 
       <listitem>
-        <para>Define the Job Execution Environment</para>
+        <para>Job construction and Configuration</para>
       </listitem>
 
       <listitem>
@@ -190,11 +190,7 @@
     configuration.</para>
 
     <section>
-       
-
       <title id="s.2.1.1">Job</title>
-
-       
 
       <para>The job could be described as the heart of the Spring Batch
       framework. It is represented by a Spring bean that implements the
@@ -202,9 +198,7 @@
       information necessary to define the operations performed by a job. A job
       configuration is typically contained within a Spring XML configuration
       file and the job's name is determined by the "id" attribute associated
-      with the job configuration bean. The job configuration contains:</para>
-
-       
+      with the job configuration bean. The job configuration contains</para>
 
       <itemizedlist>
         <listitem>
@@ -225,31 +219,13 @@
         </listitem>
       </itemizedlist>
 
-       A default simple implementation of the 
-
-      <emphasis role="bold">Job</emphasis>
-
-       interface is provided by Spring Batch in the form of the JobSupport class. Jobs can be defined by creating beans from subclasses of 
-
-      <emphasis role="bold">JobSupport</emphasis>
-
-       . The 
-
-      <emphasis role="bold">JobSupport</emphasis>
-
-       class, however, does not provide much in the way of functionality. The provided 
-
-      <emphasis role="bold">SimpleJob</emphasis>
-
-       class creates some standard functionality on top of 
-
-      <emphasis role="bold">JobSupport</emphasis>
-
-       , namely a standard execution logic that all jobs should utilize. In general, all job configurations should be defined using a bean of type 
-
-      <emphasis role="bold">SimpleJob</emphasis>
-
-       . 
+      <para>A default simple implementation of the <emphasis
+      role="bold">Job</emphasis> interface is provided by Spring Batch in the
+      form of the SimpleJob class which creates some standard functionality on
+      top of <emphasis role="bold">Job</emphasis>, namely a standard execution
+      logic that all jobs should utilize. In general, all job configurations
+      should be defined using a bean of type <emphasis
+      role="bold">SimpleJob</emphasis>.</para>
     </section>
 
     <section>
@@ -261,12 +237,12 @@
       time "foo" is supposed to run would be an instance of the "foo" job.
       Each instance would be uniquely identified as each one represents a
       distinct batch need. Further, each instance might have attempted several
-      times to complete its work. Each attempt is represented by a [#Job
-      Execution], described below. A job instance is not considered to be
-      complete until an associated job execution completes successfully. As
-      such, a single job instance may have many executions. To keep track of
-      this, every job instance provides a reference to the last execution
-      attempt.</para>
+      times to complete its work. Each attempt is represented by a <link
+      linkend="s.3.3">JobExecution</link>, described below. A job instance is
+      not considered to be complete until an associated job execution
+      completes successfully. As such, a single job instance may have many
+      executions. To keep track of this, every job instance provides a
+      reference to the last execution attempt.</para>
 
       <para>For example, a unique instance might be identified by just a job
       name, or by the combination of a job name and a scheduled date. Using
@@ -282,6 +258,13 @@
       Instances|#Step Instance] and a set of job parameters, represented by
       the <emphasis role="bold">JobParameters</emphasis> that uniquely
       identifies this job instance.</para>
+    </section>
+
+    <section>
+      <title id="s.2.1.3">Job Parameters</title>
+
+      <para>Job Parameters represent parameters to a job that   
+      </para>
     </section>
 
     <section>
@@ -305,11 +288,11 @@
       <para>Job executions are represented by objects of the <emphasis
       role="bold">JobExecution</emphasis> class. These job executions are
       created by an implementation of the <emphasis
-      role="bold">JobExecutorFacade</emphasis> interface from a given
+      role="bold">JobRepository</emphasis> interface from a given
       <emphasis role="bold">JobInstance</emphasis> corresponding to a unique
       <emphasis role="bold">JobParameters</emphasis> object. Each job
-      execution contains a reference to its corresponding job instance,
-      related Step Executions and step/chunk context data.</para>
+      execution contains a reference to its corresponding job instance and
+      related Step Executions.</para>
     </section>
   </section>
 
@@ -319,15 +302,20 @@
     <para>This section describes stereotypes relating to the concept of a
     batch step. A step is an entity that encapsulates a single, independent
     phase of a batch job. Therefore, every batch job is composed entirely of
-    one or more batch steps.</para>
+    one or more batch steps.  Steps should be thought of as unique processing streams that
+    will be executed in sequence.  For example, if you have one step that loads a file into a database,
+    another that reads from the database, validates the data, preforms processing, and then
+    writes to another table, and another that reads from that table and writes out to a file.  Each
+    of these steps will be performed completely before moving on to the next step.  The file will
+    be completely read into the database before step 2 can begin.</para>
 
     <section>
-      <title id="s.2.1.1">Step Configuration</title>
+      <title id="s.2.1.1">Step</title>
 
-      <para>The step bean contains all of the information necessary to define
-      a discrete set of business logic within a job configuration. This is a
+      <para>A batch step contains all of the information necessary to define
+      a discrete set of business logic within a job. This is a
       necessarily vague description because the contents of any given step
-      configuration are at the discretion of the developer writing jobs. A
+      are at the discretion of the developer writing jobs. A
       step can be as narrowly defined as a single line of code or as broadly
       defined as necessary to complete the entire work of your job. There are
       several factors that will affect the breadth of your step
@@ -352,53 +340,15 @@
         </listitem>
       </itemizedlist>
 
-      <para>Step configurations are defined by instantiating implementations
-      of the <emphasis role="bold">Step</emphasis> interface. Additionally,
-      the utility class <emphasis role="bold">StepSupport</emphasis> and its
-      abstract subclass, <emphasis role="bold">AbstractStep</emphasis> provide
-      a basic implementation of <emphasis role="bold">Step</emphasis> with
-      default functionality that should be common to any concrete Step
-      implementation. Generally, all step configuration implementations should
-      extend from these classes.</para>
-
-      <para>Two step implementation classes are available in the Spring Batch
+      <para>Steps are defined by instantiating implementations
+      of the <emphasis role="bold">Step</emphasis> interface. Two step implementation 
+      classes are available in the Spring Batch
       framework, and they are each discussed in detail in other sections of
       this guide. For most situations, the <emphasis
-      role="bold">SimpleStep</emphasis> implementation is sufficient, but
+      role="bold">ItemOrientedStep</emphasis> implementation is sufficient, but
       custom control flow behavior and transaction management behavior can
       also be configured by using a <emphasis
       role="bold">RepeatOperationsStep</emphasis>.</para>
-    </section>
-
-    <section>
-      <title id="s.2.1.2">Step Instance</title>
-
-      <para>A step instance, represented by the <emphasis
-      role="bold">StepInstance</emphasis> class, represents the business
-      concept of a single step within a job invocation. That is to say, every
-      job instance contains one or more step instances.</para>
-
-      <para>For example, suppose we have a job instance called
-      "foo-01-01-2008" that is an instance of a job configuration containing
-      three steps. Suppose these steps are named "step1", "step2" and "step3."
-      There will be corresponding "foo-01-01-2008#step1",
-      "foo-01-01-2008#step2" and "foo-01-01-2008#step3" step instances, which
-      will be distinct from the step instances of any other job instance (e.g.
-      those of "foo-01-02-2008").</para>
-
-      <note>
-        <title />
-
-        The step instance naming here is for clarity, this is not necessarily how the instance will be named internally within the framework.
-      </note>
-
-      <para>Each step instance will contain the current status of the batch
-      execution and a reference to its corresponding <emphasis
-      role="bold">JobInstance</emphasis>. Additionally, a step instance keeps
-      track of how many attempts are made to run the corresponding step. Each
-      attempt to run a step will create a <emphasis
-      role="bold">StepExecution</emphasis>, so a single job instance might
-      have several corresponding step executions.</para>
     </section>
 
     <section>
@@ -418,58 +368,33 @@
       <para>Step executions are represented by objects of the <emphasis
       role="bold">StepExecution</emphasis> class. These step executions are
       created by an implementation of the <emphasis
-      role="bold">JobExecutor</emphasis> interface from a given <emphasis
-      role="bold">StepInstance</emphasis> and <emphasis
+      role="bold">Job</emphasis> interface from a given <emphasis
       role="bold">JobExecution</emphasis>. Each step execution contains a
-      reference to its corresponding step instance and job execution, and
+      reference to its corresponding step and job execution, and
       transaction related data such as commit and rollback count and start and
       end times. Additionally, each step execution will contain a set of
       execution attributes, which will contain statistics and restart
       data.</para>
-
-    </section>
-
-    <section>
-      <title id="s.2.1.4">Chunk</title>
-      <para>
-	Each step execution is divided into one or more transactions. These 
-	individual transactions are sometimes referred to as "chunks." Each 
-	chunk may represent one or many individual operations within a step 
-	execution, depending on configuration. Although chunk-based processing 
-	is an important feature of Spring Batch, there is no domain object that 
-	directly corresponds to a chunk, as chunks are implicitly created through 
-	the opening and closing of transactions.
-      </para>
-    </section>
-
-    <section>
-      <title id="s.2.1.5">Step Contribution</title>
-      <para>
-	A step contribution represents the metadata for an uncommitted portion, or chunk, 
-	of a step execution that is being "buffered" until a transaction boundary is reached 
-	and the operations within the chunk are successfully committed. Each step contribution 
-	is created by the enclosing step execution, and each contribution is later "applied" 
-	by the enclosing step executor, allowing metadata to be applied only after each processed 
-	chunk succeeds.
-      </para>
     </section>
 
     <section>
       <title id="s.2.1.6">Tasklets</title>
 
       <para>A tasklet represents the execution of a logical unit of work, as
-      defined by its implementation of the Spring Batch provided _Tasklet_
+      defined by its implementation of the Spring Batch provided Tasklet
       interface. Tasklets are used when defining step configurations to
       specify the work done by the step. Subsequently, the logic in a tasklet
       is atomic in terms of transactions. A transaction will never commit
       until an entire tasklet execution is complete (unless an exception
       occurs - a transaction might either commit or rollback if that behavior
-      is specified in the step's exception management strategy).</para>
+      is specified in the step's exception management strategy).  There is a
+      specific implementation of the Step interface, TaskletStep, that works
+      directly with a Tasklet.</para>
     </section>
   </section>
 
   <section>
-    <title id="s.5">Item-Oriented Processing Stereotypes</title>
+    <title id="s.5">Processing Stereotypes</title>
 
     <para>A powerful batch processing paradigm implemented by the Spring Batch
     framework is the concept of item-oriented processing. That is, doing work
@@ -478,66 +403,39 @@
     processing might entail, such as file or database operations.</para>
 
     <section>
-    <title id="s.5.1">Reader and Writer Stereotypes</title>
-      
-    <para>There are two basic stereotypes that represent the first-class
-    participants in item-oriented processing, item providers and item
-    processors. They are each represented by a simple interface provided by
-    the Spring Batch framework, which allows free reign over their
-    implementations and improves our ability to leverage the Spring
-    framework's dependency injection capabilities.</para>
+      <title id="s.5.1">Reader and Writer Stereotypes</title>
 
-    <section>
-      <title id="s.5.1.1">Item Readers</title>
+      <para>There are two basic stereotypes that represent the first-class
+      participants in item-oriented processing, item providers and item
+      processors. They are each represented by a simple interface provided by
+      the Spring Batch framework, which allows free reign over their
+      implementations and improves our ability to leverage the Spring
+      framework's dependency injection capabilities.</para>
 
-      <para>An item reader is an object that is used to retrieve the inputs
-      for a step, one at a time. When the item reader has exhausted the items
-      it can provide, it will indicate this in a meaningful way (generally by
-      returning null). When coupled with an item processor, this forms a
-      complete item-oriented process, as each item taken from the provider is
-      then processed by the writer.</para>
-    </section>
+      <section>
+        <title id="s.5.1.1">Item Reader</title>
 
-    <section>
-      <title id="s.5.1.2">Item Writers/Processors</title>
+        <para>An item reader is an object that is used to retrieve the inputs
+        for a step, one at a time. When the item reader has exhausted the
+        items it can provide, it will indicate this in a meaningful way
+        (generally by returning null). When coupled with an item processor,
+        this forms a complete item-oriented process, as each item taken from
+        the provider is then processed by the writer.</para>
+      </section>
 
-      <para>An item writer is an object that is used to perform processing
-      for a step, one item at a time. Generally, an item writer has no
-      knowledge of the input it will receive next, only the item that that was
-      passed in its current invocation. As a result, item writers will
-      generally make no assumptions about the input they receive an treat
-      every item the same way and keep track of its own state between
-      invocations. When coupled with an item provider, this forms a complete
-      item-oriented process, as each item taken from the provider is then
-      processed by the processor.</para>
-    </section>
-  </section>
-  </section>
+      <section>
+        <title id="s.5.1.2">Item Writer</title>
 
-  <section>
-    <title id="s.5.2">Support Stereotypes</title>
-
-    <para>While item readers and writers serve as the main entry points
-    for item-oriented processing, they might be supplemented by a number of support
-    classes that perform specific tasks within the reader / writer
-    lifecycle. These support stereotypes are useful for dividing the work of
-    item readers and writers into reusable pieces, as well as abstracting
-    away the details of processing, such as interaction with external systems.
-    Additionally, they give us another opportunity to leverage the powerful
-    configuration features of the Spring framework, as we can switch between
-    several beans implementing these support interfaces without changing the
-    driving item reader or writer.</para>
-
-    <section>
-      <title id="s.2.4.2">Item Transformers</title>
-
-      <para>An item transformer is a class that is capable of taking an object
-      and changing it somehow before processing occurs. For instance, an item
-      transformer my alter an object by changing its properties or by
-      replacing it with another object entirely, such as a wrapper or
-      derivative object. It can also be defined as an adaptor, allowing an
-      object of one type to be converted for use as an object of a second
-      type.</para>
+        <para>An item writer is an object that is used to perform processing
+        for a step, one item at a time. Generally, an item writer has no
+        knowledge of the input it will receive next, only the item that that
+        was passed in its current invocation. As a result, item writers will
+        generally make no assumptions about the input they receive an treat
+        every item the same way and keep track of its own state between
+        invocations. When coupled with an item provider, this forms a complete
+        item-oriented process, as each item taken from the provider is then
+        processed by the processor.</para>
+      </section>
     </section>
   </section>
 

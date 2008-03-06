@@ -27,7 +27,11 @@
     productivity, POJO-based development approach, and general ease of use
     capabilities people have come to know from the Spring Framework, while
     making it easy for developers to access and leverage more advance
-    enterprise services when necessary.</para>
+    enterprise services when necessary. Spring Batch is not a scheduling
+    framework. There are many good enterprise schedulers available in both the
+    commerical and open source spaces such as Quartz, Tivoli, Control-M, etc.
+    It is intended to work in conjunction with a scheduler, not replace a
+    scheduler.</para>
 
     <para>Spring Batch provides reusable functions that are essential in
     processing large volumes of records, including logging/tracing,
@@ -37,10 +41,6 @@
     jobs though optimization and partitioning techniques. Simple as well as
     complex, high-volume batch jobs can leverage the framework in a highly
     scalable manner to process significant volumes of information.</para>
-
-    <para>Spring Batch is part of the <ulink
-    url="http://www.springframework.org/sub-projects">Spring
-    Portfolio</ulink>.</para>
 
     <section>
       <title id="s.1.1">Spring Batch Architecture</title>
@@ -117,42 +117,6 @@
     </section>
 
     <section>
-      <title id="s.1.3">Roadmap</title>
-
-      <para>Once the framework is released it can be used immediately to
-      simplify batch optimisations and automatic retries. The framework is
-      oriented around application developers not needing to know any details
-      of the framework - there are a few application developer interfaces that
-      can be used for convenient construction of data processing pipelines,
-      but apart from that we support as close to a POJO programming model as
-      is practical. This is similar to the approach taken in Spring Core in
-      the area of DAO implementation.</para>
-
-      <para>A Partitioned Batch Execution Environment is also being developed
-      that will provide an alternate scaling solution. This execution
-      environment will provide more advance technical services and features to
-      enable extremely high-volume and high performance batch jobs though
-      proven optimization and partitioning techniques. Proven scaling
-      techniques will be provided as partitioned strategies allowing users to
-      spread the load across a pool of clustered J2EE application servers.
-      There are also discussions to leverage grid technologies as an alternate
-      scaling solution.</para>
-
-      <para>Matt Welsh's work shows that <ulink
-      url="http://www.eecs.harvard.edu/~mdw/proj/seda/">SEDA</ulink> has
-      enormous benefits over more rigid processing architectures, and
-      messaging environments provde a lot of resilience out of the box. So we
-      also want to provide a more SEDA flavoured execution environment, as
-      well as supporting the more traditional ETL style approach. There might
-      be a tie in with Mule and/or other ESB tools here, giving the benefit of
-      a very scalable architecture, where the choice of transport and
-      distribution strategy can be made as late as possible. The same
-      application code could be used in principle for a standalone tool
-      processing a small amount of data, and a massive enterprise-scale
-      bulk-processing engine.</para>
-    </section>
-
-    <section>
       <title id="s.1.4">Background</title>
 
       <para>While open source software projects and associated communities
@@ -165,9 +129,9 @@
       in-house solutions developed within client enterprise IT
       functions.</para>
 
-      <para>Interface21 and Accenture are collaborating to change this.
+      <para>SpringSource and Accenture have collaborated to change this.
       Accenture's hands-on industry and technical experience in implementing
-      batch architectures, Interface21's depth of technical experience, and
+      batch architectures, SpringSource's depth of technical experience, and
       Spring's proven programming model together mark a natural and powerful
       partnership to create high-quality, market relevant software aimed at
       filling an important gap in enterprise Java. Both companies are also
@@ -175,18 +139,18 @@
       developing Spring-based batch architecture solutions. This has provided
       some useful additional detail and real-life constraints helping to
       ensure the solution can be applied to the real-world problems posed by
-      clients. For these reasons and many more, Interface21 and Accenture have
-      teamed to collaborate on the development of Spring Batch.</para>
+      clients. For these reasons and many more, SpringSource and Accenture
+      have teamed to collaborate on the development of Spring Batch.</para>
 
-      <para>Accenture is contributing previously proprietary batch processing
+      <para>Accenture has contributed previously proprietary batch processing
       architecture frameworks -- based upon decades worth of experience in
       building batch architectures with the last several generations of
       platforms (i.e., COBOL/Mainframe, C++/Unix, and now Java/anywhere) -- to
       the Spring Batch project along with committer resources to drive
       support, enhancements, and the future roadmap.</para>
 
-      <para>The collaborative effort between Accenture and Interface21 aims to
-      promote the standardization of software processing approaches,
+      <para>The collaborative effort between Accenture and SpringSource aims
+      to promote the standardization of software processing approaches,
       frameworks, and tools that can be consistently leveraged by enterprise
       users when creating batch applications. Companies and government
       agencies desiring to deliver standard, proven solutions to their

@@ -30,8 +30,8 @@
 		</legalnotice>
 	</bookinfo>
 	<xi:include href="spring-batch-intro.xml"/>
-	<xi:include href="infrastructure.xml"/>
 	<xi:include href="core.xml"/>
+	<xi:include href="infrastructure.xml"/>
 	<xi:include href="execution.xml"/>
 	<xi:include href="application.xml"/>
 	<xi:include href="samples.xml"/>
