@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:p="http://www.springframework.org/schema/p"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
@@ -13,34 +11,28 @@
 
 	<bean id="jobConfigurationRegistryBeanPostProcessor"
 		class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
-		<property name="jobRegistry"
-			ref="jobConfigurationRegistry" />
+		<property name="jobRegistry" ref="jobConfigurationRegistry" />
 	</bean>
 
-	<bean id="jobLauncher"
-		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
+	<bean id="jobLauncher" class="org.springframework.batch.execution.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
-	<bean id="jobConfigurationRegistry"
-		class="org.springframework.batch.execution.configuration.MapJobRegistry" />
+	<bean id="jobConfigurationRegistry" class="org.springframework.batch.execution.configuration.MapJobRegistry" />
 
 	<aop:config>
-		<aop:advisor
-			pointcut="execution(* org.springframework.batch.execution..*Repository+.*(..))"
+		<aop:advisor pointcut="execution(* org.springframework.batch.execution..*Repository+.*(..))"
 			advice-ref="txAdvice" />
 	</aop:config>
 
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
-			<tx:method name="*Create*" propagation="REQUIRES_NEW"
-				isolation="SERIALIZABLE" />
+			<tx:method name="*Create*" propagation="REQUIRES_NEW" isolation="SERIALIZABLE" />
 			<tx:method name="*" />
 		</tx:attributes>
 	</tx:advice>
-	
-	<bean id="jobRepository"
-		class="org.springframework.batch.execution.repository.JobRepositoryFactoryBean"
+
+	<bean id="jobRepository" class="org.springframework.batch.execution.repository.JobRepositoryFactoryBean"
 		p:databaseType="hsql" p:dataSource-ref="dataSource" />
 
 	<bean id="mapJobInstanceDao" lazy-init="true"
@@ -52,27 +44,21 @@
 	<bean id="mapStepExecutionDao" lazy-init="true"
 		class="org.springframework.batch.execution.repository.dao.MapStepExecutionDao" />
 
-	<bean id="jdbcTemplate"
-		class="org.springframework.jdbc.core.JdbcTemplate">
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="simpleJob"
-		class="org.springframework.batch.execution.job.SimpleJob"
-		abstract="true">
+	<bean id="simpleJob" class="org.springframework.batch.execution.job.SimpleJob" abstract="true">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="restartable" value="true" />
 	</bean>
 
-	<bean id="taskletStep"
-		class="org.springframework.batch.execution.step.TaskletStep"
-		abstract="true">
+	<bean id="taskletStep" class="org.springframework.batch.execution.step.TaskletStep" abstract="true">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="allowStartIfComplete" value="true" />
 	</bean>
 
-	<bean id="simpleStep"
-		class="org.springframework.batch.execution.step.support.DefaultStepFactoryBean"
+	<bean id="simpleStep" class="org.springframework.batch.execution.step.support.DefaultStepFactoryBean"
 		abstract="true">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
@@ -80,22 +66,17 @@
 		<property name="commitInterval" value="1" />
 	</bean>
 
-	<bean id="customEditorConfigurer"
-		class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+	<bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 		<property name="customEditors">
 			<map>
 				<entry key="int[]">
-					<bean
-						class="org.springframework.batch.support.IntArrayPropertyEditor" />
+					<bean class="org.springframework.batch.support.IntArrayPropertyEditor" />
 				</entry>
-				<entry
-					key="org.springframework.batch.io.file.transform.Range[]">
-					<bean
-						class="org.springframework.batch.io.file.transform.RangeArrayPropertyEditor" />
+				<entry key="org.springframework.batch.io.file.transform.Range[]">
+					<bean class="org.springframework.batch.io.file.transform.RangeArrayPropertyEditor" />
 				</entry>
 				<entry key="java.util.Date">
-					<bean
-						class="org.springframework.beans.propertyeditors.CustomDateEditor">
+					<bean class="org.springframework.beans.propertyeditors.CustomDateEditor">
 						<constructor-arg>
 							<bean class="java.text.SimpleDateFormat">
 								<constructor-arg value="yyyyMMdd" />
@@ -108,27 +89,19 @@
 		</property>
 	</bean>
 
-	<bean id="logAdvice"
-		class="org.springframework.batch.sample.advice.ProcessorLogAdvice" />
+	<bean id="logAdvice" class="org.springframework.batch.sample.advice.ProcessorLogAdvice" />
 
-	<bean id="eventAdvice"
-		class="org.springframework.batch.sample.advice.MethodExecutionApplicationEventAdvice" />
+	<bean id="eventAdvice" class="org.springframework.batch.sample.advice.MethodExecutionApplicationEventAdvice" />
 
 	<aop:config>
 		<aop:aspect ref="logAdvice">
-			<aop:after
-				pointcut="execution( * org.springframework.batch.sample..InfiniteLoopTasklet+.execute(..))"
+			<aop:after pointcut="execution( * org.springframework.batch.sample..InfiniteLoopTasklet+.execute(..))"
 				method="doBasicLogging" />
 		</aop:aspect>
 		<aop:aspect ref="eventAdvice">
-			<aop:before
-				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
-				method="before" />
-			<aop:after
-				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
-				method="after" />
-			<aop:after-throwing throwing="t"
-				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
+			<aop:before pointcut="execution( * org.springframework.batch..Step+.execute(..))" method="before" />
+			<aop:after pointcut="execution( * org.springframework.batch..Step+.execute(..))" method="after" />
+			<aop:after-throwing throwing="t" pointcut="execution( * org.springframework.batch..Step+.execute(..))"
 				method="onError" />
 		</aop:aspect>
 	</aop:config>

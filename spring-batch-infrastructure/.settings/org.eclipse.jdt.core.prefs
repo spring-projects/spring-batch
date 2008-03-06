@@ -1,6 +1,8 @@
-#Tue Mar 04 12:26:32 GMT 2008
+#Thu Mar 06 17:21:58 GMT 2008
 eclipse.preferences.version=1
 instance/org.eclipse.core.net/org.eclipse.core.net.hasMigrated=true
+org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.4
 org.eclipse.jdt.core.compiler.compliance=1.4
 org.eclipse.jdt.core.compiler.problem.assertIdentifier=error
 org.eclipse.jdt.core.compiler.problem.enumIdentifier=warning
+org.eclipse.jdt.core.compiler.source=1.4

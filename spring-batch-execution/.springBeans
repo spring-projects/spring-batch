@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.2.v200712142013]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.3.v200802061800]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
+	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
 		<config>src/test/resources/org/springframework/batch/execution/repository/dao/data-source-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/execution/repository/dao/sql-dao-test.xml</config>
@@ -13,13 +14,6 @@
 		<config>src/test/resources/org/springframework/batch/execution/bootstrap/support/test-environment.xml</config>
 	</configs>
 	<configSets>
-		<configSet>
-			<name><![CDATA[bootstrap]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-			</configs>
-		</configSet>
 		<configSet>
 			<name><![CDATA[sqltest]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>

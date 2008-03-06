@@ -38,11 +38,4 @@
 		<property name="incrementerName" value="BATCH_STEP_EXECUTION_SEQ" />
 	</bean>
 
-	<bean id="partitionIncrementer" parent="incrementerParent">
-		<property name="incrementerName" value="BATCH_PARTITION_SEQ" />
-	</bean>
-
-	<bean id="partitionExecutionIncrementer" parent="incrementerParent">
-		<property name="incrementerName" value="BATCH_PARTITION_EXECUTION_SEQ" />
-	</bean>
 </beans>
