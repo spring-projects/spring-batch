@@ -25,7 +25,13 @@ package org.springframework.batch.core.domain;
  */
 public interface ChunkListener extends BatchListener {
 
+	/**
+	 * Callback before the chunk is executed, but inside the transaction.
+	 */
 	void beforeChunk();
 	
+	/**
+	 * Callback after the chunk is executed, but inside the transaction.
+	 */
 	void afterChunk();
 }
