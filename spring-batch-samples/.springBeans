@@ -32,6 +32,7 @@
 		<config>src/main/resources/jobs/retrySample.xml</config>
 		<config>src/main/resources/jobs/simpleJob.xml</config>
 		<config>src/main/resources/simple-job-launcher-context.xml</config>
+		<config>src/main/resources/jobs/batchUpdateJob.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -242,6 +243,17 @@
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
 				<config>src/main/resources/jobs/xmlStaxJob.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[batchUpdate]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/batchUpdateJob.xml</config>
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>
