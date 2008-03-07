@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.database;
 
-import org.springframework.batch.io.sample.domain.Foo;
+import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**

@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.item.transform.CompositeItemTransformer;
-import org.springframework.batch.item.transform.ItemTransformer;
 
 /**
  * Tests for {@link CompositeItemTransformer}.

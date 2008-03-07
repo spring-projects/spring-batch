@@ -3,7 +3,7 @@ package org.springframework.batch.item.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.batch.io.sample.domain.Foo;
+import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 

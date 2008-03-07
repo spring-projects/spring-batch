@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.execution.step;
 
+import org.springframework.batch.core.InfrastructureException;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**

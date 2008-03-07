@@ -17,7 +17,7 @@
 package org.springframework.batch.sample.tasklet;
 
 
-import org.springframework.batch.io.exception.InfrastructureException;
+import org.springframework.batch.core.InfrastructureException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.reader.DelegatingItemReader;
 

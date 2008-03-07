@@ -1,4 +1,4 @@
-package org.springframework.batch.io.sample.domain;
+package org.springframework.batch.item.sample;
 
 import java.util.ArrayList;
 import java.util.List;

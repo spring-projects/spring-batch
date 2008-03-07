@@ -12,9 +12,6 @@ import java.util.Properties;
 import java.util.Map.Entry;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.database.support.ColumnMapExecutionContextRowMapper;
-import org.springframework.batch.item.database.support.ExecutionContextRowMapper;
-import org.springframework.batch.item.database.support.MultipleColumnJdbcKeyGenerator;
 import org.springframework.core.CollectionFactory;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;

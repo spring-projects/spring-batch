@@ -19,7 +19,6 @@ package org.springframework.batch.support;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.springframework.batch.io.exception.DynamicMethodInvocationException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.MethodInvoker;

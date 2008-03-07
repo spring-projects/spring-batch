@@ -18,7 +18,6 @@ package org.springframework.batch.core;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**

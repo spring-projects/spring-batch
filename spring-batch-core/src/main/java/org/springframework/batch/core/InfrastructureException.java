@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.io.exception;
+package org.springframework.batch.core;
 
 /**
  * Indicates to the framework that a critical error has occurred and processing

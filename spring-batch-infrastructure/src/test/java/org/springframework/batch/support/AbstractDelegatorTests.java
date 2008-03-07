@@ -2,9 +2,8 @@ package org.springframework.batch.support;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.exception.DynamicMethodInvocationException;
-import org.springframework.batch.io.sample.domain.Foo;
-import org.springframework.batch.io.sample.domain.FooService;
+import org.springframework.batch.item.sample.Foo;
+import org.springframework.batch.item.sample.FooService;
 import org.springframework.util.Assert;
 
 /**

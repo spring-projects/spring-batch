@@ -16,7 +16,6 @@
 
 package org.springframework.batch.item.validator;
 
-import org.springframework.batch.io.exception.ValidationException;
 
 /**
  * Interface used to validate objects.

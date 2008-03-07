@@ -4,7 +4,7 @@
 
 <sqlMap namespace="Foo">
 
-  <resultMap id="fooResult" class="org.springframework.batch.io.sample.domain.Foo">
+  <resultMap id="fooResult" class="org.springframework.batch.item.sample.Foo">
   	 <result property="id" column="ID" />
      <result property="name" column="NAME" />
      <result property="value" column="VALUE" />
@@ -26,15 +26,15 @@
   	select ID from T_FOOS where ID > #id#
   </select>
 
-  <insert id="insertFoo" parameterClass="org.springframework.batch.io.sample.domain.Foo">
+  <insert id="insertFoo" parameterClass="org.springframework.batch.item.sample.Foo">
   	insert INTO T_WRITE_FOOS (ID, NAME, VALUE) VALUES (#id#, #name#, #value#)
   </insert>
 
-  <update id="updateFoo" parameterClass="org.springframework.batch.io.sample.domain.Foo">
+  <update id="updateFoo" parameterClass="org.springframework.batch.item.sample.Foo">
   	update T_WRITE_FOOS set NAME = #name#, VALUE = #value# where ID = #id#
   </update>
 
-  <delete id="deleteFoo" parameterClass="org.springframework.batch.io.sample.domain.Foo">
+  <delete id="deleteFoo" parameterClass="org.springframework.batch.item.sample.Foo">
   	delete from T_WRITE_FOOS where ID = #id#
   </delete>
 

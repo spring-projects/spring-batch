@@ -27,7 +27,7 @@ import org.springframework.batch.common.SubclassExceptionClassifier;
 import org.springframework.batch.core.ItemSkipPolicy;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.io.exception.FlatFileParsingException;
+import org.springframework.batch.item.file.FlatFileParseException;
 
 /**
  * <p>
@@ -35,14 +35,14 @@ import org.springframework.batch.io.exception.FlatFileParsingException;
  * based upon how many items have been skipped. This is extremely useful
  * behavior, as it allows you to skip records, but will throw a
  * {@link SkipLimitExceededException} if a set limit has been exceeded. For
- * example, it is generally advisable to skip {@link FlatFileParsingException}s,
+ * example, it is generally advisable to skip {@link FlatFileParseException}s,
  * however, if the vast majority of records are causing exceptions, the file is
  * likely bad.
  * </p>
  * 
  * <p>
  * Furthermore, it is also likely that you only want to skip certain exceptions.
- * {@link FlatFileParsingException} is a good example of an exception you will
+ * {@link FlatFileParseException} is a good example of an exception you will
  * likely want to skip, but a {@link FileNotFoundException} should cause
  * immediate termination of the {@link Step}. Because it would be impossible
  * for a general purpose policy to determine all the types of exceptions that

@@ -21,7 +21,6 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.exception.FlatFileParsingException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ReaderNotOpenException;
@@ -120,7 +119,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 			itemReader.open(executionContext);
 			itemReader.read();
 			fail("Expected ParsingException");
-		} catch (FlatFileParsingException e) {
+		} catch (FlatFileParseException e) {
 			assertEquals(e.getInput(), TEST_STRING);
 			assertEquals(e.getLineNumber(), 1);
 		}
@@ -137,7 +136,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 			itemReader.open(executionContext);
 			itemReader.read();
 			fail("Expected ParsingException");
-		} catch (FlatFileParsingException e) {
+		} catch (FlatFileParseException e) {
 			assertEquals(e.getInput(), TEST_STRING);
 			assertEquals(e.getLineNumber(), 1);
 		}

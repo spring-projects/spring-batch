@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.support.FileUtils;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 

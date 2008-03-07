@@ -1,7 +1,6 @@
 package org.springframework.batch.item.database;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 
 /**
  * Tests for {@link JdbcCursorItemReader}

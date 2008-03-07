@@ -1,7 +1,6 @@
 package org.springframework.batch.item.database;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.database.IbatisDrivingQueryItemReader;
 import org.springframework.batch.item.database.support.IbatisKeyGenerator;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.orm.ibatis.SqlMapClientFactoryBean;

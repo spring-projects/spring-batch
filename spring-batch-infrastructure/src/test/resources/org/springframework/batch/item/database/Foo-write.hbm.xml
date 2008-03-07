@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-	<class name="org.springframework.batch.io.sample.domain.Foo" table="T_WRITE_FOOS">
+	<class name="org.springframework.batch.item.sample.Foo" table="T_WRITE_FOOS">
         <id name="id" column="ID">
             <generator class="increment"/>
         </id>

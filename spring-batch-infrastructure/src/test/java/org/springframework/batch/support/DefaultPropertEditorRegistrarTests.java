@@ -21,8 +21,6 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.support.DefaultPropertyEditorRegistrar;
-import org.springframework.batch.support.IntArrayPropertyEditor;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.beans.propertyeditors.PropertiesEditor;

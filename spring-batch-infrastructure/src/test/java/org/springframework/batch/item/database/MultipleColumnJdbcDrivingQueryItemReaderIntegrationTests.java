@@ -16,7 +16,6 @@
 package org.springframework.batch.item.database;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.database.DrivingQueryItemReader;
 import org.springframework.batch.item.database.support.MultipleColumnJdbcKeyGenerator;
 
 /**

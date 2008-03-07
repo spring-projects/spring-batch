@@ -14,21 +14,34 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.io.exception;
+package org.springframework.batch.item.validator;
 
+import org.springframework.batch.item.ItemReaderException;
 
 /**
  * This exception should be thrown when there are validation errors.
+ * 
+ * @author Ben Hale
  */
-public class ValidationException extends ReadFailureException {
-	private static final long serialVersionUID = 7926495144451758088L;
+public class ValidationException extends ItemReaderException {
 
-	public ValidationException(String message) {
-		super(message);
-	}
-
+	/**
+	 * Create a new {@link ValidationException} based on a message and another exception.
+	 * 
+	 * @param message the message for this exception
+	 * @param cause the other exception
+	 */
 	public ValidationException(String message, Throwable cause) {
 		super(message, cause);
+	}
+
+	/**
+	 * Create a new {@link ValidationException} based on a message.
+	 * 
+	 * @param message the message for this exception
+	 */
+	public ValidationException(String message) {
+		super(message);
 	}
 
 }

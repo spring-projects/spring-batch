@@ -1,4 +1,4 @@
-package org.springframework.batch.io.exception;
+package org.springframework.batch.support;
 
 import org.springframework.util.MethodInvoker;
 

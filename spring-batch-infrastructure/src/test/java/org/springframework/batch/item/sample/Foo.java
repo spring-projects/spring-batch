@@ -1,4 +1,4 @@
-package org.springframework.batch.io.sample.domain;
+package org.springframework.batch.item.sample;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;

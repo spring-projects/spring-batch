@@ -6,6 +6,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.InfrastructureException;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
@@ -16,7 +17,6 @@ import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.step.support.JobRepositorySupport;
-import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.repeat.ExitStatus;
 
 public class TaskletStepTests extends TestCase {

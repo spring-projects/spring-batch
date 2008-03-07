@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.exception.InfrastructureException;
+import org.springframework.batch.core.InfrastructureException;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;

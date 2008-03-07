@@ -3,8 +3,7 @@ package org.springframework.batch.item.adapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.io.sample.domain.FooService;
-import org.springframework.batch.item.adapter.ItemReaderAdapter;
+import org.springframework.batch.item.sample.FooService;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
@@ -23,8 +22,7 @@ public class ItemReaderAdapterTests extends AbstractDependencyInjectionSpringCon
 	}
 
 	/**
-	 * Regular usage scenario - items are retrieved from the service injected
-	 * invoker points to.
+	 * Regular usage scenario - items are retrieved from the service injected invoker points to.
 	 */
 	public void testNext() throws Exception {
 		List returnedItems = new ArrayList();

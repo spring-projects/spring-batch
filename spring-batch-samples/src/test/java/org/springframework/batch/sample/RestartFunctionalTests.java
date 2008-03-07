@@ -16,8 +16,8 @@
 
 package org.springframework.batch.sample;
 
+import org.springframework.batch.core.InfrastructureException;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.jdbc.core.JdbcOperations;
 
 /**

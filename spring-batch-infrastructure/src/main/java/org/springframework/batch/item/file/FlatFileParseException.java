@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.io.exception;
+package org.springframework.batch.item.file;
+
+import org.springframework.batch.item.ParseException;
 
 /**
  * Exception thrown when errors are encountered
@@ -23,35 +25,29 @@ package org.springframework.batch.io.exception;
  * an error table.
  *
  * @author Lucas Ward
- *
+ * @author Ben Hale
  */
-public class FlatFileParsingException extends ParsingException {
-
-	private static final long serialVersionUID = 2529197834044942724L;
+public class FlatFileParseException extends ParseException {
 
 	private String input;
+	
 	private int lineNumber;
 
-	public FlatFileParsingException(String message, String input) {
+	public FlatFileParseException(String message, String input) {
 		super(message);
 		this.input = input;
 	}
 
-	public FlatFileParsingException(String message, String input, int lineNumber) {
+	public FlatFileParseException(String message, String input, int lineNumber) {
 		super(message);
 		this.input = input;
 		this.lineNumber = lineNumber;
 	}
 
-	public FlatFileParsingException(String message, Throwable cause, String input, int lineNumber) {
+	public FlatFileParseException(String message, Throwable cause, String input, int lineNumber) {
 		super(message, cause);
 		this.input = input;
 		this.lineNumber = lineNumber;
-	}
-
-	public FlatFileParsingException(Throwable cause, String input) {
-		super(cause);
-		this.input = input;
 	}
 
 	public String getInput() {

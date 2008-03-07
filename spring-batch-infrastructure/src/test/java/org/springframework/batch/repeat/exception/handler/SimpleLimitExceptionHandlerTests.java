@@ -22,7 +22,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.exception.WriteFailureException;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
@@ -45,8 +44,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 		}
 	}
 
-	public void testInitializeWithNullContextAndNullException()
-			throws Exception {
+	public void testInitializeWithNullContextAndNullException() throws Exception {
 		try {
 			handler.handleException(null, null);
 		} catch (NullPointerException e) {
@@ -55,8 +53,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 	}
 
 	/**
-	 * Other than nominated exception type should be rethrown, ignoring the
-	 * exception limit.
+	 * Other than nominated exception type should be rethrown, ignoring the exception limit.
 	 * 
 	 * @throws Exception
 	 */
@@ -71,15 +68,13 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 			handler.handleException(new RepeatContextSupport(null), throwable);
 			fail("Exception swallowed.");
 		} catch (RuntimeException expected) {
-			assertTrue("Exception is rethrown, ignoring the exception limit",
-					true);
+			assertTrue("Exception is rethrown, ignoring the exception limit", true);
 			assertSame(expected, throwable);
 		}
 	}
 
 	/**
-	 * TransactionInvalidException should only be rethrown below the exception
-	 * limit.
+	 * TransactionInvalidException should only be rethrown below the exception limit.
 	 * 
 	 * @throws Exception
 	 */
@@ -89,16 +84,14 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 		handler.setType(RuntimeException.class);
 
 		try {
-			handler.handleException(new RepeatContextSupport(null),
-					new RuntimeException("foo"));
+			handler.handleException(new RepeatContextSupport(null), new RuntimeException("foo"));
 		} catch (RuntimeException expected) {
 			fail("Unexpected exception.");
 		}
 	}
 
 	/**
-	 * TransactionInvalidException should only be rethrown below the exception
-	 * limit.
+	 * TransactionInvalidException should only be rethrown below the exception limit.
 	 * 
 	 * @throws Exception
 	 */
@@ -122,13 +115,11 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 	}
 
 	/**
-	 * TransactionInvalidException should only be rethrown below the exception
-	 * limit.
+	 * TransactionInvalidException should only be rethrown below the exception limit.
 	 * 
 	 * @throws Exception
 	 */
-	public void testLimitedExceptionThrownFromSiblingsWhenUsingParent()
-			throws Exception {
+	public void testLimitedExceptionThrownFromSiblingsWhenUsingParent() throws Exception {
 		Throwable throwable = new RuntimeException("foo");
 
 		final int MORE_THAN_ZERO = 1;
@@ -150,9 +141,8 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 	}
 
 	/**
-	 * TransactionInvalidExceptions are swallowed until the exception limit is
-	 * exceeded. After the limit is exceeded exceptions are rethrown as
-	 * BatchCriticalExceptions
+	 * TransactionInvalidExceptions are swallowed until the exception limit is exceeded. After the limit is exceeded
+	 * exceptions are rethrown as BatchCriticalExceptions
 	 */
 	public void testExceptionNotThrownBelowLimit() throws Exception {
 
@@ -162,7 +152,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 		List throwables = new ArrayList() {
 			{
 				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
-					add(new WriteFailureException("below exception limit"));
+					add(new RuntimeException("below exception limit"));
 				}
 			}
 		};
@@ -184,9 +174,8 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 	}
 
 	/**
-	 * TransactionInvalidExceptions are swallowed until the exception limit is
-	 * exceeded. After the limit is exceeded exceptions are rethrown as
-	 * BatchCriticalExceptions
+	 * TransactionInvalidExceptions are swallowed until the exception limit is exceeded. After the limit is exceeded
+	 * exceptions are rethrown as BatchCriticalExceptions
 	 */
 	public void testExceptionThrownAboveLimit() throws Exception {
 
@@ -196,13 +185,12 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 		List throwables = new ArrayList() {
 			{
 				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
-					add(new WriteFailureException("below exception limit"));
+					add(new RuntimeException("below exception limit"));
 				}
 			}
 		};
 
-		throwables
-				.add(new WriteFailureException("above exception limit"));
+		throwables.add(new RuntimeException("above exception limit"));
 
 		RepeatContextSupport context = new RepeatContextSupport(null);
 
@@ -214,7 +202,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 				assertTrue("exceptions up to limit are swallowed", true);
 
 			}
-		} catch (WriteFailureException expected) {
+		} catch (RuntimeException expected) {
 			assertEquals("above exception limit", expected.getMessage());
 		}
 

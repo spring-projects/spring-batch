@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.io.sample.domain;
+package org.springframework.batch.item.sample;
 
 import java.util.Date;
 import java.util.List;

@@ -8,6 +8,6 @@
 		<property name="fieldsUsedAsTargetMethodArguments" value="name,value" />
 	</bean>
 	
-	<bean id="fooService" class="org.springframework.batch.io.sample.domain.FooService" />
+	<bean id="fooService" class="org.springframework.batch.item.sample.FooService" />
 
 </beans>

@@ -16,7 +16,6 @@
 
 package org.springframework.batch.core;
 
-import org.springframework.batch.io.exception.InfrastructureException;
 
 /**
  * Exception to indicate the the job has been interrupted. The exception state

@@ -13,28 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.io.exception;
+package org.springframework.batch.item;
 
 /**
- * Exception indicating that an error has been encountered
- * parsing io, typically from a file.
- *
+ * Exception indicating that an error has been encountered parsing io, typically from a file.
+ * 
  * @author Lucas Ward
- *
+ * @author Ben Hale
  */
-public class ParsingException extends RuntimeException {
+public class ParseException extends ItemReaderException {
 
-	private static final long serialVersionUID = 2953386084409312312L;
-
-	public ParsingException(String message) {
-		super(message);
-	}
-
-	public ParsingException(String message, Throwable cause) {
+	/**
+	 * Create a new {@link ParseException} based on a message and another exception.
+	 * 
+	 * @param message the message for this exception
+	 * @param cause the other exception
+	 */
+	public ParseException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public ParsingException(Throwable cause) {
-		super(cause);
+	/**
+	 * Create a new {@link ParseException} based on a message.
+	 * 
+	 * @param message the message for this exception
+	 */
+	public ParseException(String message) {
+		super(message);
 	}
+
 }

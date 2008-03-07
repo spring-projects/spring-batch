@@ -3,7 +3,7 @@ package org.springframework.batch.sample.item.writer;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.io.exception.InfrastructureException;
+import org.springframework.batch.core.InfrastructureException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.Order;
 import org.springframework.batch.sample.item.writer.OrderWriter;

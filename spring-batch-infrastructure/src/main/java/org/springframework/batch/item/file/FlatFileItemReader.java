@@ -22,7 +22,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.io.exception.FlatFileParsingException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.ItemReader;
@@ -188,7 +187,7 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 			} catch (RuntimeException ex) {
 				// add current line count to message and re-throw
 				int lineCount = getReader().getPosition();
-				throw new FlatFileParsingException("Parsing error at line: " + lineCount + " in resource=" + path
+				throw new FlatFileParseException("Parsing error at line: " + lineCount + " in resource=" + path
 				        + ", input=[" + line + "]", ex, line, lineCount);
 			}
 		}

@@ -21,7 +21,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.exception.FlatFileParsingException;
+import org.springframework.batch.item.file.FlatFileParseException;
 
 /**
  * @author Lucas Ward
@@ -35,14 +35,14 @@ public class SkipLimitReadFailurePolicyTests extends TestCase {
 		super.setUp();
 		
 		List skippableExceptions = new ArrayList();
-		skippableExceptions.add(FlatFileParsingException.class);
+		skippableExceptions.add(FlatFileParseException.class);
 		
 		failurePolicy = new LimitCheckingItemSkipPolicy(1, skippableExceptions);
 	}
 	
 	public void testLimitExceed(){		
 		try{
-			failurePolicy.shouldSkip(new FlatFileParsingException("", ""), 2);
+			failurePolicy.shouldSkip(new FlatFileParseException("", ""), 2);
 			fail();
 		}
 		catch(SkipLimitExceededException ex){
@@ -55,7 +55,7 @@ public class SkipLimitReadFailurePolicyTests extends TestCase {
 	}
 	
 	public void testSkip(){
-		assertTrue(failurePolicy.shouldSkip(new FlatFileParsingException("",""), 0));
+		assertTrue(failurePolicy.shouldSkip(new FlatFileParseException("",""), 0));
 	}
 
 }

@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.execution.step.support;
 
-import org.springframework.batch.io.exception.InfrastructureException;
+import org.springframework.batch.core.InfrastructureException;
 
 /**
  * Exception indicating that the skip limit for a particular {@Step} has

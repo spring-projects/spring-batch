@@ -25,8 +25,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
 
-import org.springframework.batch.io.exception.ConfigurationException;
-import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ExecutionContextUserSupport;
@@ -34,6 +32,8 @@ import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetCreator;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
@@ -191,7 +191,13 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 			throw new ItemStreamException("ItemStream not open or already closed.");
 		}
 		Assert.notNull(executionContext, "ExecutionContext must not be null");
-		executionContext.putLong(getKey(RESTART_DATA_NAME), state.position());
+
+		try {
+			executionContext.putLong(getKey(RESTART_DATA_NAME), state.position());
+		} catch (IOException e) {
+			throw new ItemStreamException("ItemStream does not return current position properly", e);
+		}
+
 		executionContext.putLong(getKey(WRITTEN_STATISTICS_NAME), state.linesWritten);
 		executionContext.putLong(getKey(RESTART_COUNT_STATISTICS_NAME), state.restartCount);
 	}
@@ -240,19 +246,15 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		/**
 		 * Return the byte offset position of the cursor in the output file as a long integer.
 		 */
-		public long position() {
+		public long position() throws IOException {
 			long pos = 0;
 
 			if (fileChannel == null) {
 				return 0;
 			}
 
-			try {
-				outputBufferedWriter.flush();
-				pos = fileChannel.position();
-			} catch (IOException e) {
-				throw new InfrastructureException("An Error occured while trying to get filechannel position", e);
-			}
+			outputBufferedWriter.flush();
+			pos = fileChannel.position();
 
 			return pos;
 
@@ -308,38 +310,37 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		 * @param data
 		 * @param offset
 		 * @param length
+		 * @throws IOException
 		 */
-		public void write(String line) {
+		public void write(String line) throws IOException {
 			if (!initialized) {
 				initializeBufferedWriter();
 			}
 
-			try {
-				outputBufferedWriter.write(line);
-				outputBufferedWriter.flush();
-				linesWritten++;
-			} catch (IOException e) {
-				throw new InfrastructureException("An Error occured while trying to write to FlatFileItemWriter", e);
-			}
+			outputBufferedWriter.write(line);
+			outputBufferedWriter.flush();
+			linesWritten++;
 		}
 
 		/**
 		 * Truncate the output at the last known good point.
+		 * 
+		 * @throws IOException
 		 */
-		public void truncate() {
-			try {
-				fileChannel.truncate(lastMarkedByteOffsetPosition);
-				fileChannel.position(lastMarkedByteOffsetPosition);
-			} catch (IOException e) {
-				throw new InfrastructureException("An Error occured while truncating output file", e);
-			}
+		public void truncate() throws IOException {
+			fileChannel.truncate(lastMarkedByteOffsetPosition);
+			fileChannel.position(lastMarkedByteOffsetPosition);
 		}
 
 		/**
 		 * Mark the current position.
 		 */
 		public void mark() {
-			lastMarkedByteOffsetPosition = this.position();
+			try {
+				lastMarkedByteOffsetPosition = this.position();
+			} catch (IOException e) {
+				throw new MarkFailedException("Unable to get position for mark", e);
+			}
 		}
 
 		/**
@@ -381,12 +382,12 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 			try {
 				fileChannel = (new FileOutputStream(file.getAbsolutePath(), true)).getChannel();
 			} catch (FileNotFoundException fnfe) {
-				throw new ConfigurationException("Bad filename property parameter " + file, fnfe);
+				throw new ItemStreamException("Bad filename property parameter " + file, fnfe);
 			}
 
 			outputBufferedWriter = getBufferedWriter(fileChannel, encoding, bufferSize);
 
-			// in case of restarting reset position to last commited point
+			// in case of restarting reset position to last committed point
 			if (restarted) {
 				this.reset();
 			}
@@ -423,9 +424,13 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		 * moved to (if it is, throws an environment exception), then it truncates the file to that reset position, and
 		 * set the cursor to start writing at that point.
 		 */
-		public void reset() throws InfrastructureException {
+		public void reset() throws ResetFailedException {
 			checkFileSize();
-			getOutputState().truncate();
+			try {
+				getOutputState().truncate();
+			} catch (IOException e) {
+				throw new ResetFailedException("Unable to truncate file", e);
+			}
 		}
 
 		/**
@@ -440,11 +445,11 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 				outputBufferedWriter.flush();
 				size = fileChannel.size();
 			} catch (IOException e) {
-				throw new InfrastructureException("An Error occured while checking file size", e);
+				throw new ResetFailedException("An Error occured while checking file size", e);
 			}
 
 			if (size < lastMarkedByteOffsetPosition) {
-				throw new InfrastructureException("Current file size is smaller than size at last commit");
+				throw new ResetFailedException("Current file size is smaller than size at last commit");
 			}
 		}
 
@@ -453,7 +458,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	public void clear() throws ClearFailedException {
 		try {
 			getOutputState().reset();
-		} catch (InfrastructureException e) {
+		} catch (Exception e) {
 			throw new ClearFailedException("Could not reset the state of the writer", e);
 		}
 	}

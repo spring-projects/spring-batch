@@ -1,7 +1,6 @@
 package org.springframework.batch.item.database;
 
 import org.hibernate.Session;
-import org.springframework.batch.item.database.HibernateCursorItemReader;
 
 /**
  * Tests for {@link HibernateCursorItemReader} using standard hibernate {@link Session}.

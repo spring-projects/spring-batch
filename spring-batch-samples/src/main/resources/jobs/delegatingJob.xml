@@ -20,7 +20,7 @@
 			<bean id="step1" parent="simpleStep">
 				<property name="itemReader">
 					<bean
-						class="org.springframework.batch.item.reader.ItemReaderAdapter">
+						class="org.springframework.batch.item.adapter.ItemReaderAdapter">
 						<property name="targetObject"
 							ref="delegatingObject" />
 						<property name="targetMethod" value="getData" />
@@ -28,7 +28,7 @@
 				</property>
 				<property name="itemWriter">
 					<bean
-						class="org.springframework.batch.item.writer.PropertyExtractingDelegatingItemWriter">
+						class="org.springframework.batch.item.adapter.PropertyExtractingDelegatingItemWriter">
 						<property name="targetObject"
 							ref="delegatingObject" />
 						<property name="targetMethod"

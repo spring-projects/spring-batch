@@ -14,56 +14,36 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.io.sample.domain;
+package org.springframework.batch.item.sample;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * An XML line-item.
+ * An XML shipper.
  * 
  * This is a complex type.
  */
-public class LineItem {
-	private String description;
+public class Shipper {
+	private String name;
 
-	private double perUnitOunces;
+	private double perOunceRate;
 
-	private double price;
-
-	private int quantity;
-
-	public String getDescription() {
-		return description;
+	public String getName() {
+		return name;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public double getPerUnitOunces() {
-		return perUnitOunces;
+	public double getPerOunceRate() {
+		return perOunceRate;
 	}
 
-	public void setPerUnitOunces(double perUnitOunces) {
-		this.perUnitOunces = perUnitOunces;
-	}
-
-	public double getPrice() {
-		return price;
-	}
-
-	public void setPrice(double price) {
-		this.price = price;
-	}
-
-	public int getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
+	public void setPerOunceRate(double perOunceRate) {
+		this.perOunceRate = perOunceRate;
 	}
 
 	public boolean equals(Object obj) {

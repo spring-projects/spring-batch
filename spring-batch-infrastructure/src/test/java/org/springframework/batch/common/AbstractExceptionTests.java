@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.io.exception;
+package org.springframework.batch.common;
 
 import junit.framework.TestCase;
 

@@ -41,7 +41,7 @@ public interface ItemReader {
 	 * 
 	 * @throws Exception if an underlying resource is unavailable.
 	 */
-	Object read() throws Exception, UnexpectedInputException, NoWorkFoundException;
+	Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException;
 
 	/**
 	 * Mark the stream so that it can be reset later and the items backed out.<br/>

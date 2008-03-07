@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.io.exception;
+package org.springframework.batch.item.file;
+
+import org.springframework.batch.common.AbstractExceptionTests;
 
 
-public class TransactionInvalidExceptionTests extends AbstractExceptionTests {
+public class FlatFileParseExceptionTests extends AbstractExceptionTests {
 
 	public Exception getException(String msg) throws Exception {
-		return new WriteFailureException(msg);
-	}
-
-	public Exception getException(Throwable t) throws Exception {
-		return new WriteFailureException(t);
+		return new FlatFileParseException(msg, "bar");
 	}
 
 	public Exception getException(String msg, Throwable t) throws Exception {
-		return new WriteFailureException(msg, t);
+		return new FlatFileParseException(msg, t, "bar", 100);
 	}
-
-	public void testNothing() throws Exception {
-		// fool coverage tools...
+	
+	public void testMessageInputLineCount() throws Exception {
+		FlatFileParseException exception = new FlatFileParseException("foo", "bar", 100);
+		assertEquals("foo", exception.getMessage());
+		assertEquals("bar", exception.getInput());
+		assertEquals(100, exception.getLineNumber());
 	}
+	
 }

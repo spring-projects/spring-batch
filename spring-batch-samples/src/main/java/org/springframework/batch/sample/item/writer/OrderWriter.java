@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.io.exception.InfrastructureException;
+import org.springframework.batch.core.InfrastructureException;
 import org.springframework.batch.item.writer.DelegatingItemWriter;
 import org.springframework.batch.sample.domain.Order;
 
