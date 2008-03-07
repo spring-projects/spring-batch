@@ -152,61 +152,6 @@
   </section>
 
   <section>
-    <title id="infrastructure.1.1">List Item Readers and Common Custom Item
-    Reader Behavior</title>
-
-    <para>The <emphasis role="bold">ListItemReader</emphasis>, as mentioned
-    above, is useful for testing and probably not too useful as something used
-    in typical batch processing. One instructive use is to see how narrow the
-    responsiblity of ItemReaders are. They simply provide a method that allows
-    us to continue reading items until the items are exhausted much like an
-    iterator. In addition,, it is expected that projects will create custom
-    Item Readers. As a means of illustrating the standard properties and
-    behaviors of other framework-provided ItemReaders like mapping
-    unstructured items into objects through the use of tokenizing we will
-    extend the ListItemReader to supporting mapping. The ItemReader interface
-    defines a single method called <emphasis role="bold">read()</emphasis>.
-    The <emphasis role="bold">read()</emphasis> method returns the next object
-    to be provided, much like an iterator. The definition of this method will
-    contain the logic that decides what object to return, performs any object
-    construction or other work that needs to occur, and finally returns the
-    object. We inherit this behavior from ListItemReader. We will add two
-    methods, <emphasis role="bold"> setFieldSetMapper()</emphasis>, to enable
-    the mapping behavior and <emphasis role="bold">setTokenizer()</emphasis>,
-    to enabling parsing of List Items. It this example the items in the list
-    are a simple array of delimited strings..</para>
-
-    <para>Here is our custom list item Reader that supplies mapping or binding
-    behavior as follows: <programlisting>
-        protected static class ListPlayerReader extends ListItemReader {
-                private FieldSetMapper fieldSetMapper;
-                private LineTokenizer tokenizer = null;
-                
-                public ListPlayerReader(List list) {
-                        super(list);
-                }
-
-                public void setFieldSetMapper(FieldSetMapper fieldSetMapper) {
-                        this.fieldSetMapper = fieldSetMapper;
-                }
-                
-                public void setTokenizer(LineTokenizer tokenizer) {
-                        this.tokenizer = tokenizer; 
-                }
-
-                
-        }
-        </programlisting></para>
-
-    <para>We will tag it as an Player Reader for reasons you'll see next as we
-    map Player objects from input strings. In this example we have inherited
-    the read() behavior that allows us to read from a List in memory and
-    provided a way to map arbitrary streams into objects and added the ability
-    to map FieldSets to objects. We will see how to take advantage of this
-    next.</para>
-  </section>
-
-  <section>
     <title id="infrastructure.1.2">Flat Files</title>
 
     <para>One of the most common mechanisms for interchanging bulk data has
@@ -517,8 +462,8 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         <programlisting>FlatFileItemReader itemReader = new FlatFileItemReader();
 itemReader.setResource = new FileSystemResource("resources/players.csv");
 //DelimitedLineTokenizer defaults to comma as it's delimiter
-itemReader.setLineTokenizer = new DelimitedLineTokenizer();
-itemReader.setFieldSetMapper = new PlayerFieldSetMapper();
+itemReader.setLineTokenizer(new DelimitedLineTokenizer());
+itemReader.setFieldSetMapper(new PlayerFieldSetMapper());
 itemReader.read();
 </programlisting>
 
@@ -567,7 +512,7 @@ itemReader.read();
       </section>
 
       <section>
-        <title>BeanWrapperFieldSetMapper</title>
+        <title>Automapping FieldSets to Domain Objects</title>
 
         <para>For many, having to write a specific FieldSetMapper is equally
         as cumbersome as writing a specific RowMapper for a JdbcTemplate.
@@ -595,7 +540,7 @@ itemReader.read();
       </section>
 
       <section>
-        <title>FixedLengthLineTokenizer</title>
+        <title>Fixed Length file formats</title>
 
         <para>So far only delimited files have been discussed in much detail,
         however, they respresent only half of the file reading picture. Many
@@ -648,7 +593,7 @@ UK21341EAH4521535.11customer5</programlisting>
       </section>
 
       <section>
-        <title>PrefixMatchingCompositeLineTokenizer</title>
+        <title>Multiple record types within a single file</title>
 
         <para>All of the file reading examples up to this point have all made
         a key assumption for simplicity's sake: one record equals one line.
@@ -820,38 +765,13 @@ FOT;2;2;267.34</programlisting>
     <note>
       <title>Constraints on streaming XML</title>
 
-      <para>StAX API is used for I/O as other standard XML APIs do not fit
-      batch processing requirements (DOM loads the whole input into memory at
-      once and SAX controls the parsing process allowing the user only to
-      provide callbacks).</para>
+      <para>The StAX API is used for I/O as other standard XML parsing APIs do
+      not fit batch processing requirements (DOM loads the whole input into
+      memory at once and SAX controls the parsing process allowing the user
+      only to provide callbacks).</para>
     </note>
 
-    <para>Spring Batch is not tied to any particular OXM technology. Typical
-    use is to delegate <ulink
-    url="http://static.springframework.org/spring-ws/site/reference/html/oxm.html"><citetitle>OXM
-    to Spring WS</citetitle></ulink>, which provides uniform abstraction for
-    the most popular OXM technologies. However dependency on Spring WS is
-    optional and you can choose to implement Spring Batch specific interfaces
-    if desired. The relationship to the technologies that OXM supports can be
-    shown as the following:</para>
-
-    <para><mediaobject>
-        <imageobject role="fo">
-          <imagedata align="center"
-                     fileref="../../../../target/site/reference/images/oxm-fragments.png"
-                     format="PNG" />
-        </imageobject>
-
-        <imageobject role="html">
-          <imagedata align="center"
-                     fileref="../../resources/reference/images/oxm-fragments.png"
-                     format="PNG" />
-        </imageobject>
-
-        <caption><para>Figure X: OXM Binding</para></caption>
-      </mediaobject></para>
-
-    <para>Lets take a closer look how XML input and output work in batch. It
+    <para>Lets take a closer look how XML input and output works in batch. It
     is assumed the XML resource is a collection of 'fragments' corresponding
     to individual records. Note that OXM tools are designed to work with
     standalone XML documents rather than XML fragments cut out of an XML
@@ -874,11 +794,37 @@ FOT;2;2;267.34</programlisting>
         <caption><para>Figure X: XML Inputs</para></caption>
       </mediaobject></para>
 
-    <para>
-      The StaxEventItemReader configuration provides a typical setup for the processing of records from an XML input stream.  First, lets examine a set of xml records that the StaxEventItemReader can process.  
-      </para>
-    <para>
-      <programlisting>
+    <para>Spring Batch uses Object/XML Mapping (OXM) to bind fragments to
+    objects. However, Spring Batch is not tied to any particular OXM
+    technology. Typical use is to delegate <ulink
+    url="http://static.springframework.org/spring-ws/site/reference/html/oxm.html"><citetitle>OXM
+    to Spring WS</citetitle></ulink>, which provides uniform abstraction for
+    the most popular OXM technologies. The dependency on Spring WS is optional
+    and you can choose to implement Spring Batch specific interfaces if
+    desired. The relationship to the technologies that OXM supports can be
+    shown as the following:</para>
+
+    <para><mediaobject>
+        <imageobject role="fo">
+          <imagedata align="center"
+                     fileref="../../../../target/site/reference/images/oxm-fragments.png"
+                     format="PNG" />
+        </imageobject>
+
+        <imageobject role="html">
+          <imagedata align="center"
+                     fileref="../../resources/reference/images/oxm-fragments.png"
+                     format="PNG" />
+        </imageobject>
+
+        <caption><para>Figure X: OXM Binding</para></caption>
+      </mediaobject></para>
+
+    <para>The StaxEventItemReader configuration provides a typical setup for
+    the processing of records from an XML input stream. First, lets examine a
+    set of xml records that the StaxEventItemReader can process.</para>
+
+    <para><programlisting>
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;records&gt;
   &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
@@ -899,63 +845,31 @@ FOT;2;2;267.34</programlisting>
     &lt;price&gt;99.99&lt;/price&gt;
     &lt;customer&gt;Customer3&lt;/customer&gt;
   &lt;/trade&gt;
-  &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
-    &lt;isin&gt;XYZ0001&lt;/isin&gt;
-    &lt;quantity&gt;5&lt;/quantity&gt;
-    &lt;price&gt;11.39&lt;/price&gt;
-    &lt;customer&gt;Customer1&lt;/customer&gt;
-  &lt;/trade&gt;
-  &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
-    &lt;isin&gt;XYZ0002&lt;/isin&gt;
-    &lt;quantity&gt;2&lt;/quantity&gt;
-    &lt;price&gt;72.99&lt;/price&gt;
-    &lt;customer&gt;Customer2c&lt;/customer&gt;
-  &lt;/trade&gt;
-  &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
-    &lt;isin&gt;XYZ0003&lt;/isin&gt;
-    &lt;quantity&gt;9&lt;/quantity&gt;
-    &lt;price&gt;99.99&lt;/price&gt;
-    &lt;customer&gt;Customer3&lt;/customer&gt;
-  &lt;/trade&gt;
-    &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
-    &lt;isin&gt;XYZ0001&lt;/isin&gt;
-    &lt;quantity&gt;5&lt;/quantity&gt;
-    &lt;price&gt;11.39&lt;/price&gt;
-    &lt;customer&gt;Customer1&lt;/customer&gt;
-  &lt;/trade&gt;
-  &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
-    &lt;isin&gt;XYZ0002&lt;/isin&gt;
-    &lt;quantity&gt;2&lt;/quantity&gt;
-    &lt;price&gt;72.99&lt;/price&gt;
-    &lt;customer&gt;Customer2c&lt;/customer&gt;
-  &lt;/trade&gt;
-  &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
-    &lt;isin&gt;XYZ0003&lt;/isin&gt;
-    &lt;quantity&gt;9&lt;/quantity&gt;
-    &lt;price&gt;99.99&lt;/price&gt;
-    &lt;customer&gt;Customer3&lt;/customer&gt;
-  &lt;/trade&gt;  
 &lt;/records&gt;
-</programlisting>
-    </para>
+</programlisting></para>
 
-    <para>
-      To be able to process the XML records we need the following:
+    <para>To be able to process the XML records we need the following:
     <itemizedlist>
-      <listitem>
-        <para>Root Element Name - this is name of the root element of the fragment that constitutes the object to be mapped in.  The example configuration
-	demonstrates this with the value of trade.  </para>
-      </listitem>
-      <listitem>
-	<para>Resource - This is a Spring Resource that in the case of this example will abstract the details of opening a file for reading content.</para>
-      </listitem>
-      <listitem>
-	<para>Fragment Deserializer - this is the UnMarshalling facility provided by Spring OXM for mapping the XML fragment to an object. </para>
-      </listitem>
-    </itemizedlist>
-    </para>
-    <para>
-      <programlisting>&lt;property name="itemReader"&gt;
+        <listitem>
+          <para>Root Element Name - this is name of the root element of the
+          fragment that constitutes the object to be mapped. The example
+          configuration demonstrates this with the value of trade.</para>
+        </listitem>
+
+        <listitem>
+          <para>Resource - This is a Spring Resource that in the case of this
+          example will abstract the details of opening a file for reading
+          content.</para>
+        </listitem>
+
+        <listitem>
+          <para>Fragment Deserializer - this is the UnMarshalling facility
+          provided by Spring OXM for mapping the XML fragment to an
+          object.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para><programlisting>&lt;property name="itemReader"&gt;
      &lt;bean class="org.springframework.batch.io.xml.StaxEventItemReader"&gt;
          &lt;property name="fragmentRootElementName"  value="trade" /&gt;
          &lt;property name="resource" value="data/staxJob/input/20070918.testStream.xmlFileStep.xml" /&gt;
@@ -970,18 +884,17 @@ FOT;2;2;267.34</programlisting>
          &lt;/property&gt;
      &lt;/bean&gt;
 &lt;/property&gt;
-    </programlisting>
-    </para>
+    </programlisting></para>
 
-    <para>Notice that it requires an alias passed in as a map with the
-    first key and value being the name of the fragment and the object
-    type that it will be mapped. Then, similar to a FieldSet, the
-    names of the other elements that map to fields within the object
-    type are described as key/value pairs in the map. In the
-    configuration file we can use a spring configuration utility to
-    described the required alias as follows:</para>
-    <para>
-      <programlisting>
+    <para>Notice that in this example we have chosen to use an
+    XStreamMarshaller that requires an alias passed in as a map with the first
+    key and value being the name of the fragment (i.e. root element) and the
+    object type to bind. Then, similar to a FieldSet, the names of the other
+    elements that map to fields within the object type are described as
+    key/value pairs in the map. In the configuration file we can use a spring
+    configuration utility to describe the required alias as follows:</para>
+
+    <para><programlisting>
         &lt;util:map id="aliases"&gt;
                 &lt;entry key="trade"
                         value="org.springframework.batch.sample.domain.Trade" /&gt;
@@ -990,49 +903,49 @@ FOT;2;2;267.34</programlisting>
                 &lt;entry key="price" value="java.math.BigDecimal" /&gt;
                 &lt;entry key="customer" value="java.lang.String" /&gt;
         &lt;/util:map&gt;
-        </programlisting>
-      </para>
+        </programlisting></para>
 
     <para>On input the reader reads the XML resource until it recognizes a new
     fragment is about to start (by matching the tag name by default). The
     reader creates a standalone XML document from the fragment (or at least
     makes it appear so) and passes the document to a deserializer (typically a
-    wrapper around Spring WS Unmarshaller) to map the XML to a Java
+    wrapper around a Spring WS Unmarshaller) to map the XML to a Java
     object.</para>
 
-    <para>
-      In summary, if you were to see this in scripted code like Java the injection provided by the spring configuration would look something like the following:
-    </para>
-    <para>
-      <programlisting>
-      def xmlStaxEventItemReader = new StaxEventItemReader()
-      resource = new ByteArrayResource(xmlResource.getBytes()) 
+    <para>In summary, if you were to see this in scripted code like Java the
+    injection provided by the spring configuration would look something like
+    the following:</para>
 
-      def aliases = ["trade":"org.springframework.batch.sample.domain.Trade",
-               "isin":"java.lang.String",
-               "quantity":"long",
-               "price":"java.math.BigDecimal",
-               "customer":"java.lang.String"]
-      def marshaller = new XStreamMarshaller()
-      marshaller.setAliases(aliases)
-      xmlStaxEventItemReader.setFragmentDeserializer(new UnmarshallingEventReaderDeserializer(marshaller))
-      xmlStaxEventItemReader.setResource(resource)
-      xmlStaxEventItemReader.setFragmentRootElementName("trade")
-      def executionContext = new ExecutionContext()
-      xmlStaxEventItemReader.open(executionContext);
+    <para><programlisting>
+      StaxEventItemReader xmlStaxEventItemReader = new StaxEventItemReader()
+      Resource resource = new ByteArrayResource(xmlResource.getBytes()) 
 
-      def hasNext = true
+      Map aliases = new HashMap();
+      aliases.put("trade","org.springframework.batch.sample.domain.Trade");
+      aliases.put("isin","java.lang.String");
+      aliases.put("quantity","long");
+      aliases.put("price","java.math.BigDecimal");
+      aliases.put("customer","java.lang.String");
+      Marshaller marshaller = new XStreamMarshaller();
+      marshaller.setAliases(aliases);
+      xmlStaxEventItemReader.setFragmentDeserializer(new UnmarshallingEventReaderDeserializer(marshaller));
+      xmlStaxEventItemReader.setResource(resource);
+      xmlStaxEventItemReader.setFragmentRootElementName("trade");
+      xmlStaxEventItemReader.open(new ExecutionContext());
+
+      boolean hasNext = true
+      
       while (hasNext) {
-        trade = xmlStaxEventItemReader.read()
+        trade = xmlStaxEventItemReader.read();
         if (trade == null) {
-                hasNext = false
+                hasNext = false;
         } else {
-                println trade
+                println trade;
         }
       }
 
-      </programlisting>
-    </para>
+</programlisting></para>
+
     <para>Output works symetrically to input. Java object is passed to a
     serializer (typically a wrapper around Spring WS Marshaller) which writes
     to output using a custom event writer that filters the StartDocument and
@@ -1041,6 +954,18 @@ FOT;2;2;267.34</programlisting>
     <para>For example configuration of XML input and output see the sample
     xmlStaxJob. //TODO inline the example once it is not subject to change +
     show sample input file</para>
+
+    <section>
+      <title>StaxEventItemReader</title>
+
+      <para></para>
+    </section>
+
+    <section>
+      <title>StaxEventItemWriter</title>
+
+      <para></para>
+    </section>
   </section>
 
   <section>
@@ -1078,5 +1003,60 @@ FOT;2;2;267.34</programlisting>
     <title id="infrastructure.5">Validating Input</title>
 
     <para></para>
+  </section>
+
+  <section>
+    <title id="infrastructure.1.1">Creating Custom ItemReaders and ItemWriters
+    </title>
+
+    <para>The <emphasis role="bold">ListItemReader</emphasis>, as mentioned
+    above, is useful for testing and probably not too useful as something used
+    in typical batch processing. One instructive use is to see how narrow the
+    responsiblity of ItemReaders are. They simply provide a method that allows
+    us to continue reading items until the items are exhausted much like an
+    iterator. In addition,, it is expected that projects will create custom
+    Item Readers. As a means of illustrating the standard properties and
+    behaviors of other framework-provided ItemReaders like mapping
+    unstructured items into objects through the use of tokenizing we will
+    extend the ListItemReader to supporting mapping. The ItemReader interface
+    defines a single method called <emphasis role="bold">read()</emphasis>.
+    The <emphasis role="bold">read()</emphasis> method returns the next object
+    to be provided, much like an iterator. The definition of this method will
+    contain the logic that decides what object to return, performs any object
+    construction or other work that needs to occur, and finally returns the
+    object. We inherit this behavior from ListItemReader. We will add two
+    methods, <emphasis role="bold"> setFieldSetMapper()</emphasis>, to enable
+    the mapping behavior and <emphasis role="bold">setTokenizer()</emphasis>,
+    to enabling parsing of List Items. It this example the items in the list
+    are a simple array of delimited strings..</para>
+
+    <para>Here is our custom list item Reader that supplies mapping or binding
+    behavior as follows: <programlisting>
+        protected static class ListPlayerReader extends ListItemReader {
+                private FieldSetMapper fieldSetMapper;
+                private LineTokenizer tokenizer = null;
+                
+                public ListPlayerReader(List list) {
+                        super(list);
+                }
+
+                public void setFieldSetMapper(FieldSetMapper fieldSetMapper) {
+                        this.fieldSetMapper = fieldSetMapper;
+                }
+                
+                public void setTokenizer(LineTokenizer tokenizer) {
+                        this.tokenizer = tokenizer; 
+                }
+
+                
+        }
+        </programlisting></para>
+
+    <para>We will tag it as an Player Reader for reasons you'll see next as we
+    map Player objects from input strings. In this example we have inherited
+    the read() behavior that allows us to read from a List in memory and
+    provided a way to map arbitrary streams into objects and added the ability
+    to map FieldSets to objects. We will see how to take advantage of this
+    next.</para>
   </section>
 </chapter>
