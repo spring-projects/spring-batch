@@ -19,7 +19,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.springframework.batch.core.domain.JobInterruptedException;
+import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
+import org.springframework.batch.execution.launch.support.ExitCodeMapper;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -53,6 +55,8 @@ public class SimpleExitStatusExceptionClassifier implements
 		if (throwable instanceof JobInterruptedException) {
 			exitStatus = new ExitStatus(false, JOB_INTERRUPTED,
 					JobInterruptedException.class.getName());
+		} else if( throwable instanceof NoSuchJobException ) {
+			exitStatus = new ExitStatus(false, ExitCodeMapper.NO_SUCH_JOB);
 		} else {
 			String message = "";
 			if (throwable!=null) {

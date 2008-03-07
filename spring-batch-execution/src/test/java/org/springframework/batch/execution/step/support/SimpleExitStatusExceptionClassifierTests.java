@@ -17,7 +17,9 @@ package org.springframework.batch.execution.step.support;
 
 
 import org.springframework.batch.core.domain.JobInterruptedException;
+import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
+import org.springframework.batch.execution.launch.support.ExitCodeMapper;
 import org.springframework.batch.execution.step.support.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -73,5 +75,14 @@ public class SimpleExitStatusExceptionClassifierTests extends TestCase {
 		assertEquals(exitStatus.getExitCode(), ExitStatusExceptionClassifier.JOB_INTERRUPTED);
 		assertEquals(exitStatus.getExitDescription(), 
 				JobInterruptedException.class.getName());
+	}
+	
+	/**
+	 * a NoSuchJobException should lead to the related constant
+	 */
+	public void testClassifyNoSuchJobException() {
+		ExitStatus exitStatus = (ExitStatus)classifier.classifyForExitCode(new NoSuchJobException(""));
+		assertEquals(exitStatus.getExitCode(), ExitCodeMapper.NO_SUCH_JOB);
+		assertEquals(exitStatus.getExitDescription(), "");
 	}
 }
