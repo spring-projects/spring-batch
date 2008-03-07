@@ -21,8 +21,8 @@ import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.file.mapping.FieldSetMapper;
 
 /**
  * An {@link ItemReader} that delivers a list as its item, storing up objects

@@ -18,7 +18,7 @@ package org.springframework.batch.sample.item.writer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.springframework.batch.io.support.ItemPreparedStatementSetter;
+import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.batch.sample.domain.CustomerCredit;
 
 /**

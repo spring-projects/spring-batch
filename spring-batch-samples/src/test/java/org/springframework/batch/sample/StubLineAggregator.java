@@ -16,8 +16,8 @@
 
 package org.springframework.batch.sample;
 
-import org.springframework.batch.io.file.mapping.FieldSet;
-import org.springframework.batch.io.file.transform.LineAggregator;
+import org.springframework.batch.item.file.mapping.FieldSet;
+import org.springframework.batch.item.file.transform.LineAggregator;
 
 
 /**

@@ -21,10 +21,10 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.item.AbstractItemReader;
+import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
-import org.springframework.batch.item.reader.AbstractItemReader;
-import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
 import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;

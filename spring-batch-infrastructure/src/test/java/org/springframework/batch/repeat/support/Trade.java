@@ -18,7 +18,7 @@ package org.springframework.batch.repeat.support;
 
 import java.math.BigDecimal;
 
-import org.springframework.batch.io.file.mapping.FieldSet;
+import org.springframework.batch.item.file.mapping.FieldSet;
 
 /**
  * @author Rob Harrop

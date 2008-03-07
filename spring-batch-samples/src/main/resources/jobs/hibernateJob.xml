@@ -27,7 +27,7 @@
 
 	<!-- This is a framework class that needs a delegate and also needs to be registered as a RepeatInterceptor in the chunk -->
 	<bean id="hibernateOutputSource"
-		class="org.springframework.batch.io.support.HibernateAwareItemWriter">
+		class="org.springframework.batch.item.database.HibernateAwareItemWriter">
 		<property name="sessionFactory" ref="sessionFactory" />
 		<property name="delegate" ref="hibernateCreditWriter" />
 	</bean>
@@ -43,7 +43,7 @@
 	</bean>
 
 	<bean id="hibernateItemReader"
-		class="org.springframework.batch.io.cursor.HibernateCursorItemReader">
+		class="org.springframework.batch.item.database.HibernateCursorItemReader">
 		<property name="queryString" value="from CustomerCredit" />
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>

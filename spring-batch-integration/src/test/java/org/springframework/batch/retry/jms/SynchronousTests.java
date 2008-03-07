@@ -19,8 +19,8 @@ package org.springframework.batch.retry.jms;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.reader.JmsItemReader;
-import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;

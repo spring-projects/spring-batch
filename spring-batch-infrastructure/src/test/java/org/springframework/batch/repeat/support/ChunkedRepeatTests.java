@@ -16,8 +16,8 @@
 
 package org.springframework.batch.repeat.support;
 
+import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;

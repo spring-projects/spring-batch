@@ -1,8 +1,8 @@
 package org.springframework.batch.sample.mapping;
 
-import org.springframework.batch.io.file.mapping.DefaultFieldSet;
-import org.springframework.batch.io.file.mapping.FieldSet;
-import org.springframework.batch.io.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.file.mapping.DefaultFieldSet;
+import org.springframework.batch.item.file.mapping.FieldSet;
+import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.BillingInfo;
 
 public class BillingFieldSetMapperTests extends AbstractFieldSetMapperTests{

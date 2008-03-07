@@ -4,7 +4,7 @@
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
 	<bean id="orderFileDescriptor"
-		class="org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer">
+		class="org.springframework.batch.item.file.transform.PrefixMatchingCompositeLineTokenizer">
 		<property name="tokenizers">
 			<map>
 				<entry key="HEA" value-ref="headerRecordDescriptor" />
@@ -22,12 +22,12 @@
 	</bean>
 
 	<bean id="defaultLineDescriptor"
-		class="org.springframework.batch.io.file.transform.FixedLengthTokenizer">
+		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
 		<property name="columns" value="1-120" />
 	</bean>
 
 	<bean id="parentLineDescriptor" abstract="true"
-		class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer">
+		class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
 		<property name="delimiter" value=";"/>
 	</bean>
 

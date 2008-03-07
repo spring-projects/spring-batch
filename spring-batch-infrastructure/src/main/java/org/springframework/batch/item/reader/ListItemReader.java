@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.aop.support.AopUtils;
+import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.ItemReader;
 
 /**

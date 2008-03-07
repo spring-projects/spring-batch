@@ -17,7 +17,7 @@
 					<property name="streams" ref="fileInputTemplate" />
 					<property name="itemReader">
 						<bean
-							class="org.springframework.batch.item.reader.ValidatingItemReader">
+							class="org.springframework.batch.item.validator.ValidatingItemReader">
 							<property name="itemReader"
 								ref="fileInputTemplate" />
 							<property name="validator"
@@ -53,7 +53,7 @@
 	</bean>
 
 	<bean id="tradeSqlItemReader"
-		class="org.springframework.batch.io.cursor.JdbcCursorItemReader">
+		class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
 			value="SELECT id, quantity, price, customer from TRADE" />
@@ -64,7 +64,7 @@
 	</bean>
 
 	<bean id="customerSqlItemReader"
-		class="org.springframework.batch.io.cursor.JdbcCursorItemReader">
+		class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
 			value="SELECT id, name, credit FROM customer " />

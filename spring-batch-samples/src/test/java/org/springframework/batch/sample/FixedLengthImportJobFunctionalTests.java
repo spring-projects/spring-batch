@@ -21,9 +21,9 @@ import java.io.FileReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.batch.io.file.FlatFileItemReader;
-import org.springframework.batch.io.file.transform.LineTokenizer;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.batch.sample.mapping.TradeFieldSetMapper;
 import org.springframework.core.io.ClassPathResource;

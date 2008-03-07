@@ -18,10 +18,11 @@ package org.springframework.batch.item.reader;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.Skippable;
+import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.Skippable;
 
 /**
  * Unit test for {@link DelegatingItemReader}

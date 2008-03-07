@@ -17,9 +17,9 @@ package org.springframework.batch.execution.step.support;
 
 import org.springframework.batch.core.ItemSkipPolicy;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.io.Skippable;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.Skippable;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -88,7 +88,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	 * Mark the current item as skipped if possible. If the reader and / or
 	 * writer are {@link Skippable} then delegate to them in that order.
 	 * 
-	 * @see org.springframework.batch.io.Skippable#skip()
+	 * @see org.springframework.batch.item.Skippable#skip()
 	 */
 	private void skip() {
 		if (getItemReader() instanceof Skippable) {

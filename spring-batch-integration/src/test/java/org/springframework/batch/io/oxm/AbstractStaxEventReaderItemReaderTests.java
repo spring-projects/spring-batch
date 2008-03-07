@@ -7,9 +7,9 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.oxm.domain.Trade;
-import org.springframework.batch.io.xml.StaxEventItemReader;
-import org.springframework.batch.io.xml.oxm.UnmarshallingEventReaderDeserializer;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.xml.StaxEventItemReader;
+import org.springframework.batch.item.xml.oxm.UnmarshallingEventReaderDeserializer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;

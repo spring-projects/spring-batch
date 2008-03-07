@@ -23,11 +23,11 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.FailedItemIdentifier;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.reader.ListItemReader;
-import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;

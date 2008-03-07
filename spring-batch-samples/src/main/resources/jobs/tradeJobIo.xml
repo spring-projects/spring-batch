@@ -27,18 +27,18 @@
 		id="customerReportOutputSource">
 		<property name="outputSource">
 			<bean
-				class="org.springframework.batch.io.file.FlatFileItemWriter"
+				class="org.springframework.batch.item.file.FlatFileItemWriter"
 				id="customerFlatFileOutputSource">
 				<property name="resource" ref="customerFileLocator" />
 				<property name="fieldSetUnmapper">
 					<bean
-						class="org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper" />
+						class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
 				</property>
 			</bean>
 		</property>
 	</bean>
 
-	<bean class="org.springframework.batch.io.file.FlatFileItemReader"
+	<bean class="org.springframework.batch.item.file.FlatFileItemReader"
 		id="fileInputTemplate">
 		<property name="resource" ref="fileLocator" />
 		<property name="lineTokenizer" ref="tradeFileDescriptor" />
@@ -49,7 +49,7 @@
 	</bean>
 
 	<bean id="tradeFileDescriptor"
-		class="org.springframework.batch.io.file.transform.DelimitedLineTokenizer">
+		class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
 		<property name="names" value="ISIN, Quantity, Price, Customer" />
 	</bean>
 

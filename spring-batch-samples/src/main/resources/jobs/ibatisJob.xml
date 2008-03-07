@@ -34,14 +34,14 @@
 	</bean>
 
 	<bean id="ibatisItemReader"
-		class="org.springframework.batch.io.driving.IbatisDrivingQueryItemReader">
+		class="org.springframework.batch.item.database.IbatisDrivingQueryItemReader">
 		<property name="detailsQueryId" value="getCustomerCreditById" />
 		<property name="sqlMapClient" ref="sqlMapClient" />
 		<property name="keyGenerator" ref="ibatisKeyGenerator" />
 	</bean>
 
 	<bean id="ibatisKeyGenerator"
-		class="org.springframework.batch.io.driving.support.IbatisKeyGenerator">
+		class="org.springframework.batch.item.database.support.IbatisKeyGenerator">
 		<property name="drivingQueryId" value="getAllCustomerCreditIds" />
 		<property name="sqlMapClient" ref="sqlMapClient" />
 	</bean>

@@ -16,8 +16,8 @@
 
 package org.springframework.batch.sample.dao;
 
+import org.springframework.batch.item.transform.ItemTransformer;
 import org.springframework.batch.item.writer.DelegatingItemWriter;
-import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.batch.sample.item.writer.OrderWriter;
 
 

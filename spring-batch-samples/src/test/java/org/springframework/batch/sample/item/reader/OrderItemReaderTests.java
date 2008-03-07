@@ -5,10 +5,10 @@ import java.util.Iterator;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.io.file.mapping.DefaultFieldSet;
-import org.springframework.batch.io.file.mapping.FieldSet;
-import org.springframework.batch.io.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.file.mapping.DefaultFieldSet;
+import org.springframework.batch.item.file.mapping.FieldSet;
+import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;
 import org.springframework.batch.sample.domain.Customer;

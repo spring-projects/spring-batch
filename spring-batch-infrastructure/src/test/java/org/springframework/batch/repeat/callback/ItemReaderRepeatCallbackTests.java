@@ -22,8 +22,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
-import org.springframework.batch.item.writer.AbstractItemWriter;
 
 public class ItemReaderRepeatCallbackTests extends TestCase {
 

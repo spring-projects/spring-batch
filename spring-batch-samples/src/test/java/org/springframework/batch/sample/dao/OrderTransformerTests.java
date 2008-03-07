@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.file.transform.DelimitedLineAggregator;
+import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;
 import org.springframework.batch.sample.domain.Customer;

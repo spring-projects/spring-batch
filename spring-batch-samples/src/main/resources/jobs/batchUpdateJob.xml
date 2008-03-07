@@ -24,7 +24,7 @@
 
 	<bean id="itemWriter" class="org.springframework.batch.sample.item.writer.BatchSqlCustomerCreditIncreaseWriter">
 		<property name="delegate">
-			<bean class="org.springframework.batch.io.support.BatchSqlUpdateItemWriter">
+			<bean class="org.springframework.batch.item.database.BatchSqlUpdateItemWriter">
 				<property name="jdbcTemplate" ref="jdbcTemplate" />
 				<property name="sql"><value><![CDATA[UPDATE CUSTOMER SET CREDIT=? WHERE ID=?]]></value></property>
 				<property name="itemPreparedStatementSetter">
@@ -34,7 +34,7 @@
 		</property>
 	</bean>
 
-	<bean id="itemReader" class="org.springframework.batch.io.cursor.JdbcCursorItemReader">
+	<bean id="itemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql" value="SELECT id, name, credit FROM customer " />
 		<property name="mapper">

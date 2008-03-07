@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.3.v200802061800]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.4.v200802202100]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
 	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
-		<config>src/test/resources/org/springframework/batch/io/sql/data-source-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/retry/aop/retry-transaction-test.xml</config>
+		<config>src/test/resources/org/springframework/batch/item/database/data-source-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/item/file/mapping/bean-wrapper.xml</config>
+		<config>src/test/resources/org/springframework/batch/item/reader/delegating-item-provider.xml</config>
+		<config>src/test/resources/org/springframework/batch/item/writer/delegating-item-writer.xml</config>
+		<config>src/test/resources/org/springframework/batch/item/writer/pe-delegating-item-writer.xml</config>
 	</configs>
 	<configSets>
 	</configSets>

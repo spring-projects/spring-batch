@@ -2,10 +2,10 @@ package org.springframework.batch.sample.item.writer;
 
 import java.math.BigDecimal;
 
-import org.springframework.batch.io.support.BatchSqlUpdateItemWriter;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.BatchSqlUpdateItemWriter;
 import org.springframework.batch.sample.domain.CustomerCredit;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -52,7 +52,7 @@ public class BatchSqlCustomerCreditIncreaseWriter implements ItemWriter, Initial
 
 	/**
 	 * @throws ClearFailedException
-	 * @see org.springframework.batch.io.support.BatchSqlUpdateItemWriter#clear()
+	 * @see org.springframework.batch.item.database.BatchSqlUpdateItemWriter#clear()
 	 */
 	public void clear() throws ClearFailedException {
 		delegate.clear();
@@ -60,7 +60,7 @@ public class BatchSqlCustomerCreditIncreaseWriter implements ItemWriter, Initial
 
 	/**
 	 * @throws FlushFailedException
-	 * @see org.springframework.batch.io.support.BatchSqlUpdateItemWriter#flush()
+	 * @see org.springframework.batch.item.database.BatchSqlUpdateItemWriter#flush()
 	 */
 	public void flush() throws FlushFailedException {
 		delegate.flush();

@@ -17,10 +17,10 @@
 package org.springframework.batch.sample.tasklet;
 
 import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.util.Assert;

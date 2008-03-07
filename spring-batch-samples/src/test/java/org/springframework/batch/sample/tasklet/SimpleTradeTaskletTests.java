@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.file.FlatFileItemReader;
+import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
 
