@@ -41,6 +41,6 @@ public interface RepeatOperations {
 	 * indication of whether the {@link RepeatOperations} can continue
 	 * processing if this method is called again.
 	 */
-	ExitStatus iterate(RepeatCallback callback);
+	ExitStatus iterate(RepeatCallback callback) throws RepeatException;
 
 }

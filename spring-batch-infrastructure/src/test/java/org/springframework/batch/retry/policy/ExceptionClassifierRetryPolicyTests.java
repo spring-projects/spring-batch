@@ -22,9 +22,9 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.common.ExceptionClassifierSupport;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.synch.RetrySynchronizationManager;
+import org.springframework.batch.support.ExceptionClassifierSupport;
 
 public class ExceptionClassifierRetryPolicyTests extends TestCase {
 

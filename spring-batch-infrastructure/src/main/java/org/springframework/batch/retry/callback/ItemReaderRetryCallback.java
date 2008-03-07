@@ -22,11 +22,11 @@ import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.exception.ExhaustedRetryException;
-import org.springframework.batch.retry.exception.RetryException;
 import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
 
 /**

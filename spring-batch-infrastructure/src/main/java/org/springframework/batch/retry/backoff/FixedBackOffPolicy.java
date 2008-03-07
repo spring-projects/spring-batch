@@ -16,7 +16,6 @@
 
 package org.springframework.batch.retry.backoff;
 
-import org.springframework.batch.retry.exception.BackOffInterruptedException;
 
 /**
  * Implementation of {@link BackOffPolicy} that pauses for a fixed period of

@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.batch.repeat.exception.AbstractExceptionTests;
+import org.springframework.batch.repeat.AbstractExceptionTests;
 
 public class UnexpectedInputExceptionTests extends AbstractExceptionTests {
 

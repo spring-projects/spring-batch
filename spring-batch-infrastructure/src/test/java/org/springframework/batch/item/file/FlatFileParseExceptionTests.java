@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item.file;
 
-import org.springframework.batch.common.AbstractExceptionTests;
+import org.springframework.batch.support.AbstractExceptionTests;
 
 
 public class FlatFileParseExceptionTests extends AbstractExceptionTests {

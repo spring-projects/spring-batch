@@ -27,11 +27,11 @@ import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
+import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.backoff.BackOffContext;
+import org.springframework.batch.retry.backoff.BackOffInterruptedException;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.backoff.NoBackOffPolicy;
-import org.springframework.batch.retry.exception.BackOffInterruptedException;
-import org.springframework.batch.retry.exception.TerminatedRetryException;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.synch.RetrySynchronizationManager;
 

@@ -21,7 +21,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
-import org.springframework.batch.support.AbstractMethodInvokingDelegator;
 
 /**
  * Invokes a custom method on a delegate plain old Java object which itself

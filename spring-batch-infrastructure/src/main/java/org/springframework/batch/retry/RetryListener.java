@@ -16,7 +16,6 @@
 
 package org.springframework.batch.retry;
 
-import org.springframework.batch.retry.exception.TerminatedRetryException;
 
 /**
  * Interface for listener that can be used to add behaviour to a retry.

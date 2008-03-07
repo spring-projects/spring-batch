@@ -16,7 +16,6 @@
 
 package org.springframework.batch.retry;
 
-import org.springframework.batch.retry.exception.TerminatedRetryException;
 
 /**
  * A {@link RetryPolicy} is responsible for allocating and managing resources
@@ -81,5 +80,5 @@ public interface RetryPolicy {
 	 * 
 	 * @throws Exception if there is no recovery path.
 	 */
-	Object handleRetryExhausted(RetryContext context) throws Exception;
+	Object handleRetryExhausted(RetryContext context) throws Exception, ExhaustedRetryException;
 }

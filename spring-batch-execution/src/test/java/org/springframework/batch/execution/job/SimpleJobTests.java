@@ -46,7 +46,7 @@ import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
+import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.transaction.PlatformTransactionManager;
 

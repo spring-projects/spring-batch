@@ -40,7 +40,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
+import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;

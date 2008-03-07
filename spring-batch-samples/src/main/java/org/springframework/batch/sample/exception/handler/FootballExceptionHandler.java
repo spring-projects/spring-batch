@@ -3,7 +3,7 @@ package org.springframework.batch.sample.exception.handler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.exception.handler.ExceptionHandler;
+import org.springframework.batch.repeat.exception.ExceptionHandler;
 
 public class FootballExceptionHandler implements ExceptionHandler {
 

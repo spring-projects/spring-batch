@@ -22,12 +22,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.common.ExceptionClassifier;
-import org.springframework.batch.common.SubclassExceptionClassifier;
 import org.springframework.batch.core.ItemSkipPolicy;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.file.FlatFileParseException;
+import org.springframework.batch.support.ExceptionClassifier;
+import org.springframework.batch.support.SubclassExceptionClassifier;
 
 /**
  * <p>

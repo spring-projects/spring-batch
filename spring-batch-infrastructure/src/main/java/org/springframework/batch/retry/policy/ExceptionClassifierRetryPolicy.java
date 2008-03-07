@@ -20,14 +20,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.springframework.batch.common.ExceptionClassifier;
-import org.springframework.batch.common.ExceptionClassifierSupport;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
+import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.retry.exception.TerminatedRetryException;
 import org.springframework.batch.retry.synch.RetrySynchronizationManager;
+import org.springframework.batch.support.ExceptionClassifier;
+import org.springframework.batch.support.ExceptionClassifierSupport;
 import org.springframework.util.Assert;
 
 /**

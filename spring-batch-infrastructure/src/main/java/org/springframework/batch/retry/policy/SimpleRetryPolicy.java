@@ -16,12 +16,12 @@
 
 package org.springframework.batch.retry.policy;
 
-import org.springframework.batch.common.BinaryExceptionClassifier;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.context.RetryContextSupport;
 import org.springframework.batch.retry.synch.RetrySynchronizationManager;
+import org.springframework.batch.support.BinaryExceptionClassifier;
 
 /**
  * 

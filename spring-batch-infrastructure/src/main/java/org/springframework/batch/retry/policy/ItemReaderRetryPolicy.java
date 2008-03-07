@@ -26,9 +26,9 @@ import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
+import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
 import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.retry.exception.TerminatedRetryException;
 import org.springframework.batch.retry.synch.RetrySynchronizationManager;
 import org.springframework.util.Assert;
 

@@ -25,9 +25,9 @@ import junit.framework.TestCase;
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.retry.ListItemReaderRecoverer;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryException;
+import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.retry.exception.RetryException;
-import org.springframework.batch.retry.exception.TerminatedRetryException;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 

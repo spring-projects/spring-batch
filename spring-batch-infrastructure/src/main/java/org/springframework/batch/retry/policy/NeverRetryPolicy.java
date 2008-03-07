@@ -19,8 +19,8 @@ package org.springframework.batch.retry.policy;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
+import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.retry.exception.TerminatedRetryException;
 import org.springframework.batch.retry.synch.RetrySynchronizationManager;
 
 /**

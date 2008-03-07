@@ -20,7 +20,7 @@ import javax.sql.DataSource;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.support.DataFieldMaxValueIncrementerFactory;
+import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 

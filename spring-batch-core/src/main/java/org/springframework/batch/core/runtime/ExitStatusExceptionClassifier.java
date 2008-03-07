@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.runtime;
 
-import org.springframework.batch.common.ExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.support.ExceptionClassifier;
 
 /**
  * Extension of the {@link ExceptionClassifier} that explicitly deals with

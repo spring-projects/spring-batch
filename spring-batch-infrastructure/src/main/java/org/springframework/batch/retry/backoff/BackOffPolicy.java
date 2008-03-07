@@ -17,7 +17,6 @@
 package org.springframework.batch.retry.backoff;
 
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.exception.BackOffInterruptedException;
 
 /**
  * Strategy interface to control back off between attempts in a single

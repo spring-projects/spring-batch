@@ -17,7 +17,6 @@
 package org.springframework.batch.retry.backoff;
 
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.exception.BackOffInterruptedException;
 
 /**
  * Simple base class for {@link BackOffPolicy} implementations that maintain no

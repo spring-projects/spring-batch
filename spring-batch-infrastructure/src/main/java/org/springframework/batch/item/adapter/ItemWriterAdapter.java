@@ -19,7 +19,6 @@ package org.springframework.batch.item.adapter;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.support.AbstractMethodInvokingDelegator;
 
 
 /**

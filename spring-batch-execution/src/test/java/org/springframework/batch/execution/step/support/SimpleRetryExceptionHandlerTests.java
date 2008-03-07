@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.batch.repeat.exception.handler.SimpleLimitExceptionHandler;
+import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;

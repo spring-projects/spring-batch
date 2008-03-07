@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.batch.common.AbstractExceptionTests;
+import org.springframework.batch.support.AbstractExceptionTests;
 
 public class MarkFailedExceptionTests extends AbstractExceptionTests {
 
