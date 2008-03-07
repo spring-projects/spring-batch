@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.execution.configuration;
 
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.JobFactory;
-import org.springframework.batch.core.domain.Job;
 
 /**
  * A {@link JobFactory} that just keeps a reference to a {@link Job}. It never

@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobListener;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobListener;
 
 /**
  * @author Dave Syer

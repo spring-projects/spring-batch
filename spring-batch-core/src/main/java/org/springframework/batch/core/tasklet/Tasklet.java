@@ -16,9 +16,9 @@
 
 package org.springframework.batch.core.tasklet;
 
-import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;

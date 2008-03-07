@@ -20,13 +20,13 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobInterruptedException;
-import org.springframework.batch.core.domain.JobListener;
-import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.JobListener;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.listener.CompositeJobListener;
 import org.springframework.batch.io.exception.InfrastructureException;
@@ -70,7 +70,7 @@ public class SimpleJob extends AbstractJob {
 	 * Run the specified job by looping through the steps and delegating to the
 	 * {@link Step}.
 	 * 
-	 * @see org.springframework.batch.core.domain.Job#execute(org.springframework.batch.core.domain.JobExecution)
+	 * @see org.springframework.batch.core.Job#execute(org.springframework.batch.core.JobExecution)
 	 */
 	public void execute(JobExecution execution) throws InfrastructureException {
 

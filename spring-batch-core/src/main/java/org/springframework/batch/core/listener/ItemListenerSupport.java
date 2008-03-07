@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.springframework.batch.core.domain.ItemReadListener;
-import org.springframework.batch.core.domain.ItemWriteListener;
+import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
 
 /**
  * Basic no-op implementation of both the {@link ItemWriteListener} and

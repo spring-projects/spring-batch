@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.repository;
 
-import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.Job;
 
 /**
  * Checked exception that indicates a name clash when registering

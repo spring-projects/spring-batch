@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.springframework.batch.core.domain.BatchListener;
-import org.springframework.batch.core.domain.ChunkListener;
-import org.springframework.batch.core.domain.ItemReadListener;
-import org.springframework.batch.core.domain.ItemWriteListener;
-import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.core.BatchListener;
+import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**

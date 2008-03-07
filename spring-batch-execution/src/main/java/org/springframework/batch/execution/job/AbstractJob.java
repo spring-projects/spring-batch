@@ -19,8 +19,8 @@ package org.springframework.batch.execution.job;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.Step;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.ClassUtils;
 

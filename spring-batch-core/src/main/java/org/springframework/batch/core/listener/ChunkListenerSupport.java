@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.springframework.batch.core.domain.ChunkListener;
+import org.springframework.batch.core.ChunkListener;
 
 /**
  * Basic support implementation of {@link ChunkListener}

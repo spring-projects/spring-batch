@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.configuration;
 
-import org.springframework.batch.core.domain.Job;
+import org.springframework.batch.core.Job;
 
 /**
  * Strategy for creating a single job.

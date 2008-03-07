@@ -18,8 +18,8 @@ package org.springframework.batch.core.runtime;
 
 import java.util.Properties;
 
-import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.JobParametersBuilder;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 
 /**
  * A factory for {@link JobParameters} instances. A job can be
