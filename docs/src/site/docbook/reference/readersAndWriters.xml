@@ -209,12 +209,12 @@
   <section>
     <title id="infrastructure.1.2">Flat Files</title>
 
-    <para>Since the beginning of batch processing, one of the most common
-    mechanisms for interchanging bulk data has been the flat file. Unlike XML,
-    which has an aggreed upon standard for defining how it is structured
-    (XSD), the person reading a flat file must understand ahead of time
-    exactly how the file is structured. In general, all flat files fall into
-    two general types: Delimited and Fixed Length.</para>
+    <para>One of the most common mechanisms for interchanging bulk data has
+    always been the flat file. Unlike XML, which has an aggreed upon standard
+    for defining how it is structured (XSD), anyone reading a flat file must
+    understand ahead of time exactly how the file is structured. In general,
+    all flat files fall into two general types: Delimited and Fixed
+    Length.</para>
 
     <section>
       <title>The FieldSet</title>
@@ -222,7 +222,7 @@
       <para>When working with flat files in Spring Batch, regardless of
       whether it is for input or output, one of the most important classes is
       the FieldSet. Many architectures and libraries contain abstractions for
-      helping you read in from a file, but they usually return a String or
+      helping you read in from a file, but they usually return a String or an
       array of Strings. This really only gets you halfway there. A FieldSet is
       Spring Batch’s abstraction for enabling the binding of fields from a
       file resource. It allows developers to work with file input in much the
@@ -267,16 +267,14 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
       role="bold">fieldSetMapper</emphasis> and <emphasis
       role="bold">tokenizer</emphasis>, which define the resource from which
       data will be read and the method by which the read data will be
-      converted to distinct fields. We explored <emphasis
+      converted to distinct fields. The <emphasis
       role="bold">fieldSetMapper</emphasis> and <emphasis
-      role="bold">tokenizer</emphasis> while reviewing how to create a custom
-      <emphasis role="bold">ItemReader</emphasis>. We'll revisit these
-      properties in light of how we use them with the <emphasis
-      role="bold">FlatFileItemReader</emphasis>. In addition, we'll explore
-      integration with the file system via the resource property. The
-      <emphasis role="bold">resource</emphasis> property represents a Spring
-      Core <emphasis role="bold">Resource</emphasis>. Documentation explaining
-      how to create beans of this type can be found in <ulink
+      role="bold">tokenizer</emphasis> interfaces will be explored more in the
+      next sections. In addition, we'll explore integration with the file
+      system via the resource property. The <emphasis
+      role="bold">resource</emphasis> property represents a Spring Core
+      <emphasis role="bold">Resource</emphasis>. Documentation explaining how
+      to create beans of this type can be found in <ulink
       url="http://static.springframework.org/spring/docs/2.5.x/reference/resources.html"><citetitle>Spring
       Framework, Chapter 4.Resources</citetitle></ulink>. Therefore, this
       guide will not go into the details of creating <emphasis
@@ -304,10 +302,11 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
 
       <para>The flat file reader uses a ResourceLineReader object to read from
       the file. Optionally, you can specify a <emphasis
-      role="bold">RecordSeparatorPolicy</emphasis> through property
-      recordSeparatorPolicy. This can be used to configure more low-level
-      features, such as what constitutes the end of a line and whether to
-      continue quoted strings over newlines, among other things.</para>
+      role="bold">RecordSeparatorPolicy</emphasis> through the
+      recordSeparatorPolicy property. This can be used to configure more
+      low-level features, such as what constitutes the end of a line and
+      whether to continue quoted strings over newlines, among other
+      things.</para>
 
       <para>The other properties in the flat file readers allow you to further
       specify how your data will be interpreted: <table>
@@ -370,38 +369,106 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         </table></para>
 
       <section>
-        <title>The FieldSet</title>
+        <title>FieldSetMapper</title>
 
-        <para>A FieldSet is Spring Batch’s abstraction for enabling the
-        binding of fields from a file data source. It allows developers to
-        work with file input in much the same way as they would work with
-        database input. A FieldSet is conceptually very similar to a Jdbc
-        Result Set. FieldSets only require one argument, a list of tokens.
-        Optionally you can also configure in the names of the fields so that
-        the fields may be accessed either by index or name as patterned after
-        the JdbcResultSet. In code it means it's as simple as:</para>
-
-        <para>Field set mappers used by the flat file reader classes implement
-        the FieldSetMapper interface. This interface defines a single method,
+        <para>Field set mappers used by the FlatFileItemReader implement the
+        FieldSetMapper interface. This interface defines a single method,
         mapLine, which takes a FieldSet object and maps its contents to some
         Object. This object may be a custom DTO or domain object, or it could
-        be as simple as an array, depending on your needs. The field set
-        mapper is used in conjunction with the tokenizer to translate a line
-        of data from a resource into an object of the desired type.</para>
+        be as simple as an array, depending on your needs. The <emphasis
+        role="bold">FieldSetMapper</emphasis> is used in conjunction with the
+        tokenizer to translate a line of data from a resource into an object
+        of the desired type:</para>
 
-        <para>For example, suppose our file or list consists of players has
-        the following fields and the start of the data looks like the
-        following: <programlisting>
-         ID,lastName,firstName,position,birthYear,debutYear
-        "AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996",
-        "AbduRa00,Abdullah,Rabih,rb,1975,1999",
-        "AberWa00,Abercrombie,Walter,rb,1959,1982",
-        "AbraDa00,Abramowicz,Danny,wr,1945,1967",
-        "AdamBo00,Adams,Bob,te,1946,1969",
-        "AdamCh00,Adams,Charlie,wr,1979,2003"
-        </programlisting></para>
+        <programlisting>public interface FieldSetMapper {
+  
+  public Object mapLine(FieldSet fs);
 
-        <para>We want to map this data to the following Player object:
+}</programlisting>
+
+        <para>As you can see, the pattern used is exatly the same as RowMapper
+        used by JdbcTemplate.</para>
+      </section>
+
+      <section>
+        <title>LineTokenizer</title>
+
+        <para>Because there can be many formats of flat file data, which all
+        need to be converted to a FieldSet so that a FieldSetMapper can create
+        a useful domain object from them, an abstraction for turning a line of
+        input into a FieldSet is necessary. In Spring Batch, this is called
+        the LineTokenizer:</para>
+
+        <programlisting>public interface LineTokenizer {
+  
+  FieldSet tokenize(String line);
+
+}
+</programlisting>
+
+        <para>The contract of a LineTokenizer is such that, given a line of
+        input (in theory the String could encompass more than one line) a
+        FieldSet representing the line will be returned. This will then be
+        based to a FieldSetMapper. Spring Batch contains the following
+        LineTokenizers:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>DelmitedLineTokenizer - Used for files that separate records
+            by a delimiter. The most common is a comma, but pipes or
+            semicolons are often used as well</para>
+          </listitem>
+
+          <listitem>
+            <para>FixedLengthTokenizer - Used for tokenizing files where each
+            record is separated by a 'fixed width' that must be defined per
+            record.</para>
+          </listitem>
+
+          <listitem>
+            <para>PrefixMatchingCompositeLineTokenizer - Tokenizer that
+            determines which among a list of Tokenizers should be used on a
+            particular line by checking against a prefix.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
+        <title>Simple Delimited File Reading Example</title>
+
+        <para>Now that the basic interfaces for reading in flat files have
+        been defined, a simple example explaining how they work together is
+        helpful. In it's most simple form, the flow when reading a line form a
+        file is this:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>Read one line from the file.</para>
+          </listitem>
+
+          <listitem>
+            <para>Pass the string line into the LineTokenizer#tokenize()
+            method, in order to retrieve a FieldSet</para>
+          </listitem>
+
+          <listitem>
+            <para>Pass the FieldSet returned from tokenizing to a
+            FieldSetMapper, returning the result from the ItemReader#read()
+            method</para>
+          </listitem>
+        </orderedlist>
+
+        <para>The following example will be used to illustrate this using an
+        actual domain scenario. This particular batch job reads in football
+        players from the following file:<programlisting>ID,lastName,firstName,position,birthYear,debutYear
+"AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996",
+"AbduRa00,Abdullah,Rabih,rb,1975,1999",
+"AberWa00,Abercrombie,Walter,rb,1959,1982",
+"AbraDa00,Abramowicz,Danny,wr,1945,1967",
+"AdamBo00,Adams,Bob,te,1946,1969",
+"AdamCh00,Adams,Charlie,wr,1979,2003"        </programlisting></para>
+
+        <para>We want to map this data to the following Player domain object:
         <programlisting>
           public class Player implements Serializable {
         
@@ -424,16 +491,8 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
           }
           </programlisting></para>
 
-        <para>We can now inject a fieldset mapper into the ListPlayerReader,
-        for example, that can take advantage of a PlayerFieldSetMapper for
-        transforming a line that consists of one item separated by delimiters
-        into a domain object - <emphasis role="bold">Player</emphasis> in this
-        case. We inject programmatically by invoking the following:</para>
-
-        <para><programlisting>        itemReader.setFieldSetMapper(fieldSetMapper);</programlisting></para>
-
-        <para>and define the fieldSetMapper class in the following
-        declaration:</para>
+        <para>In order to map a FieldSet into our Player object, we need to
+        create a FieldSetMapper that returns players:</para>
 
         <para><programlisting>
         protected static class PlayerFieldSetMapper implements FieldSetMapper {
@@ -452,41 +511,301 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         }
       </programlisting></para>
 
-        <para>There is one additional preference that can be used that is
-        similar in function to the jdbc fieldset. The names of the fields can
-        be injected into the Tokenizer to increase the readability of the
-        mapping function. We can expose this behavior by adding the following.
-        First, we tell the tokenizer what the names of the fields in the
-        fieldset are:</para>
+        <para>We can then read in from the filed by correctly constructing our
+        FlatFileItemReader and calling read():</para>
+
+        <programlisting>FlatFileItemReader itemReader = new FlatFileItemReader();
+itemReader.setResource = new FileSystemResource("resources/players.csv");
+//DelimitedLineTokenizer defaults to comma as it's delimiter
+itemReader.setLineTokenizer = new DelimitedLineTokenizer();
+itemReader.setFieldSetMapper = new PlayerFieldSetMapper();
+itemReader.read();
+</programlisting>
+
+        <para>Each call to read will return a new Player object from each line
+        in the file. When the end of the file is reached, null will be
+        returned.</para>
+      </section>
+
+      <section>
+        <title>Mapping fields by name</title>
+
+        <para>There is one additional functionality that is similar in
+        function to a JDBC ResultSet. The names of the fields can be injected
+        into the Tokenizer to increase the readability of the mapping
+        function. We can expose this behavior by adding the following. First,
+        we tell the tokenizer what the names of the fields in the fieldset
+        are:</para>
 
         <para><programlisting>
-            tokenizer.setNames(new String[] {"ID", "lastName","firstName","position","birthYear","debutYear"}); 
+    tokenizer.setNames(new String[] {"ID", "lastName","firstName","position","birthYear","debutYear"}); 
           </programlisting></para>
 
         <para>and provide a mapper that uses this information as
         follows:</para>
 
         <para><programlisting>
-            public class PlayerMapper implements FieldSetMapper {
-                public Object mapLine(FieldSet fs) {
+    public class PlayerMapper implements FieldSetMapper {
+        public Object mapLine(FieldSet fs) {
                         
-                        if(fs == null){
-                                return null;
-                        }
+           if(fs == null){
+              return null;
+           }
                         
-                        Player player = new Player();
-                        player.setID(fs.readString("ID"));
-                        player.setLastName(fs.readString("lastName"));
-                        player.setFirstName(fs.readString("firstName"));
-                        player.setPosition(fs.readString("position"));
-                        player.setDebutYear(fs.readInt("debutYear"));
-                        player.setBirthYear(fs.readInt("birthYear"));
+           Player player = new Player();
+           player.setID(fs.readString("ID"));
+           player.setLastName(fs.readString("lastName"));
+           player.setFirstName(fs.readString("firstName"));
+           player.setPosition(fs.readString("position"));
+           player.setDebutYear(fs.readInt("debutYear"));
+           player.setBirthYear(fs.readInt("birthYear"));
                         
-                        return player;
-                }
-
+           return player;
         }
-          </programlisting></para>
+
+   }        </programlisting></para>
+      </section>
+
+      <section>
+        <title>BeanWrapperFieldSetMapper</title>
+
+        <para>For many, having to write a specific FieldSetMapper is equally
+        as cumbersome as writing a specific RowMapper for a JdbcTemplate.
+        Spring Batch makes this easier by providing a FieldSetMapper that
+        automatically maps fields by matching a field name with a setter using
+        the JavaBean spec. Again using the footbal example, the FieldSetMapper
+        configuration looks like the following:</para>
+
+        <programlisting>&lt;bean id="fieldSetMapper"
+      class="org.springframework.batch.io.file.mapping.BeanWrapperFieldSetMapper"&gt;
+  &lt;property name="prototypeBeanName" value="player" /&gt;
+&lt;/bean&gt;
+
+&lt;bean id="person"
+      class="org.springframework.batch.sample.domain.Player"
+      scope="prototype" /&gt;</programlisting>
+
+        <para>For each entry in the FieldSet, the mapper will look for a
+        corresponding setter on a new instance of the Player object (for this
+        reason, prototype scope is required) in the same way the Spring
+        container will look for setters matching a property name. Each
+        available field in the FieldSet will be mapped, and the resultant
+        Player object will be returned, only there was no code
+        required.</para>
+      </section>
+
+      <section>
+        <title>FixedLengthLineTokenizer</title>
+
+        <para>So far only delimited files have been discussed in much detail,
+        however, they respresent only half of the file reading picture. Many
+        organizations that use flat files use fixed length formats. An example
+        field length file is below:</para>
+
+        <programlisting>UK21341EAH4121131.11customer1
+UK21341EAH4221232.11customer2
+UK21341EAH4321333.11customer3
+UK21341EAH4421434.11customer4
+UK21341EAH4521535.11customer5</programlisting>
+
+        <para>While this looks like one large field, it actually represent 4
+        distinct fields:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>ISIN: Unique identifier for the item being order - 12
+            characters long.</para>
+          </listitem>
+
+          <listitem>
+            <para>Quantity: Number of this item being ordered - 3 characters
+            long.</para>
+          </listitem>
+
+          <listitem>
+            <para>Price: Price of the item - 4 characters long.</para>
+          </listitem>
+
+          <listitem>
+            <para>Customer: Id of the customer ordering the item - 8
+            characters long.</para>
+          </listitem>
+        </orderedlist>
+
+        <para>When configuring the FixedLengthLineTokenizer, each of these
+        lengths must be provided in the form of ranges:</para>
+
+        <programlisting>&lt;bean id="fixedLengthLineTokenizer"
+      class="org.springframework.batch.io.file.transform.FixedLengthTokenizer"&gt;
+  &lt;property name="names" value="ISIN, Quantity, Price, Customer" /&gt;
+  &lt;property name="columns" value="1-12, 13-15, 16-20, 21-29" /&gt;
+&lt;/bean&gt;</programlisting>
+
+        <para>This LineTokenizer will return the same FieldSet as if a
+        dlimiter had been used, allowing the same approachs above to be used
+        such as the BeanWrapperFieldSetMapper, in a way that is ignorant of
+        how the actual line was parsed.</para>
+      </section>
+
+      <section>
+        <title>PrefixMatchingCompositeLineTokenizer</title>
+
+        <para>All of the file reading examples up to this point have all made
+        a key assumption for simplicity's sake: one record equals one line.
+        However, this may not always be the case. It's very common that a file
+        might have records spanning multiple lines with multiple formats. The
+        following excerpt from a file illustrates this:</para>
+
+        <programlisting>HEA;0013100345;2007-02-15
+NCU;Smith;Peter;;T;20014539;F
+BAD;;Oak Street 31/A;;Small Town;00235;IL;US
+SAD;Smith, Elizabeth;Elm Street 17;;Some City;30011;FL;United States
+BIN;VISA;VISA-12345678903
+LIT;1044391041;37.49;0;0;4.99;2.99;1;45.47
+LIT;2134776319;221.99;5;0;7.99;2.99;1;221.87
+SIN;UPS;EXP;DELIVER ONLY ON WEEKDAYS
+FOT;2;2;267.34</programlisting>
+
+        <para>Everything between the line starting with 'HEA' and the line
+        starting with 'FOT' is considered one record. The
+        PrefixMatchingCompositeLineTokenizer makes this easier by matching the
+        prefix in a line with a particular tokenizer:</para>
+
+        <programlisting>&lt;bean id="orderFileDescriptor"
+      class="org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer"&gt;
+  &lt;property name="tokenizers"&gt;
+   &lt;map&gt;
+    &lt;entry key="HEA" value-ref="headerRecordDescriptor" /&gt;
+    &lt;entry key="FOT" value-ref="footerRecordDescriptor" /&gt;
+    &lt;entry key="BCU" value-ref="businessCustomerLineDescriptor" /&gt;
+    &lt;entry key="NCU" value-ref="customerLineDescriptor" /&gt;
+    &lt;entry key="BAD" value-ref="billingAddressLineDescriptor" /&gt;
+    &lt;entry key="SAD" value-ref="shippingAddressLineDescriptor" /&gt;
+    &lt;entry key="BIN" value-ref="billingLineDescriptor" /&gt;
+    &lt;entry key="SIN" value-ref="shippingLineDescriptor" /&gt;
+    &lt;entry key="LIT" value-ref="itemLineDescriptor" /&gt;
+    &lt;entry key="" value-ref="defaultLineDescriptor" /&gt;
+   &lt;/map&gt;
+  &lt;/property&gt;
+&lt;/bean&gt;</programlisting>
+
+        <para>This ensures that the line will be parsed correctly, which is
+        especially important for fixed length input, with the correct field
+        names. Any users of the FlatFileItemReader in this scenario must
+        continue calling read() until the footer for the record is returned,
+        allowing them to return a complete order as one 'item'.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>FlatFileItemWriter</title>
+
+      <para>Writing out to flat files has the same problems and issues that
+      reading in from a file must overcome. It must be able to write out in
+      either dlimited or fixed length formats in a transactional
+      mannger.</para>
+
+      <section>
+        <title>LineAggregator</title>
+
+        <para>Just like file reading's LineTokenizer interface is necessary to
+        take a string and split it into tokens, file writing must have a way
+        to aggregate multiple fields into a single string for writing to a
+        file. In Spring Batch this is the LineAggregator:</para>
+
+        <programlisting>public interface LineAggregator {
+
+ public String aggregate(FieldSet fieldSet);
+}
+</programlisting>
+
+        <para>The LineAggregator is exactly the opposite of a LineTokenizer.
+        LineTokenizer takes a string and returns a FieldSet, wheras
+        LineAggreator takes a FieldSet and returns a string. As with reading
+        there are two types: DelimitedLineAggregator and
+        FixedLengthLineAggregator.</para>
+      </section>
+
+      <section>
+        <title>FieldSetCreator</title>
+
+        <para>Because the LineAggregator interface uses a FieldSet as it's
+        mechanism for converting to a string, there needs to be an interface
+        that describes how to convert from an object into a FieldSet:</para>
+
+        <programlisting>public interface FieldSetCreator {
+
+  FieldSet mapItem(Object data);
+
+}</programlisting>
+
+        <para>As with LineTokenizer and LineAggregator, FieldSetCreator is the
+        polar opposite of FieldSetMapper. FieldSetMapper takes a FieldSet and
+        returns a mapped object, whereas a FieldSetCreator takes an Object and
+        returns a FieldSet.</para>
+      </section>
+
+      <section>
+        <title>Simple Delimited File Writing Example</title>
+
+        <para>Now that both the LineAggregator and FieldSetCreator interfaces
+        have been defined, the basic flow of writing can be explained:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>The object to be written is passed to the FieldSetCreator in
+            order to obtain a FieldSet.</para>
+          </listitem>
+
+          <listitem>
+            <para>The returned FieldSet is passed to the LineAggregator</para>
+          </listitem>
+
+          <listitem>
+            <para>The returned string is written to the configured
+            file.</para>
+          </listitem>
+        </orderedlist>
+
+        <para>The following excerpt from the FlatFileItemWriter expresses this
+        in code:</para>
+
+        <programlisting>public void write(Object data) throws Exception {
+  FieldSet fieldSet = fieldSetCreator.mapItem(data);
+  getOutputState().write(lineAggregator.aggregate(fieldSet) + LINE_SEPARATOR);
+}</programlisting>
+
+        <para>A simple configuration with the smallest ammount of setters
+        would look like the following:</para>
+
+        <programlisting>&lt;bean id="itemWriter"
+      class="org.springframework.batch.io.file.FlatFileItemWriter"&gt;
+  &lt;property name="resource"
+            value="file:target/test-outputs/20070122.testStream.multilineStep.txt" /&gt;
+  &lt;property name="fieldSetCreator"&gt;
+    &lt;bean class="org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper"/&gt;
+  &lt;/property&gt;
+&lt;/bean&gt;</programlisting>
+      </section>
+
+      <section>
+        <title>Handling file creation</title>
+
+        <para>FlatFileItemReader has a very simple relationship with file
+        resources. When the reader is initialized, it opens the file if it
+        exists, and throws an exception if it does not. File writing isn't
+        quite so simple. At first glance it seems like a similiar straight
+        forward contract should exist for FlatFileItemWriter, if the file
+        already exists, throw an exception, if it does not, create it and
+        start writing. Job restart throws a bit of a kink into this. In the
+        normal restart scenario, the contract is reversed, if the file exists
+        start writing to it from the last known good position, if it does not,
+        throw an exception. However, what happens if the file name for this
+        job is always the same? In this case, you would want to delete the
+        file if it exists, unless it's a restart. Because of this possibility,
+        the FlatFileItemWriter contains the property, shouldDeleteIfExists.
+        Setting this property to true will cause an existing file with the
+        same name to be deleted when the writer is opened.</para>
       </section>
     </section>
   </section>
@@ -601,10 +920,6 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         ranges</para>
       </listitem>
     </itemizedlist>
-  </section>
-
-  <section>
-    <para />
   </section>
 
   <section>
