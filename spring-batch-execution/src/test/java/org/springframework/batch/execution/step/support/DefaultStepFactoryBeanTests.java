@@ -23,10 +23,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.BatchListener;
-import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.BatchListener;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.execution.job.SimpleJob;
 import org.springframework.batch.execution.repository.SimpleJobRepository;

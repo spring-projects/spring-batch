@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.sample;
 
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.JobFactory;
-import org.springframework.batch.core.domain.Job;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

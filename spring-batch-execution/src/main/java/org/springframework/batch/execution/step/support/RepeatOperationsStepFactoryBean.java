@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.execution.step.support;
 
-import org.springframework.batch.core.domain.BatchListener;
-import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.core.BatchListener;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.execution.step.ItemOrientedStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;

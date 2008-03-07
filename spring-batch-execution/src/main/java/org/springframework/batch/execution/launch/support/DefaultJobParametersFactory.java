@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.JobParametersBuilder;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.util.StringUtils;
 
@@ -125,7 +125,7 @@ public class DefaultJobParametersFactory implements JobParametersFactory {
 	 * Use the same suffixes to create properties (omitting the string suffix
 	 * because it is the default).
 	 * 
-	 * @see org.springframework.batch.core.runtime.JobParametersFactory#getProperties(org.springframework.batch.core.domain.JobParameters)
+	 * @see org.springframework.batch.core.runtime.JobParametersFactory#getProperties(org.springframework.batch.core.JobParameters)
 	 */
 	public Properties getProperties(JobParameters params) {
 

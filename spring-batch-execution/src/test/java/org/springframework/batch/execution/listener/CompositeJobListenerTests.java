@@ -20,9 +20,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobListener;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobListener;
 import org.springframework.batch.core.listener.JobListenerSupport;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.listener.CompositeJobListener;
@@ -39,7 +39,7 @@ public class CompositeJobListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.listener.CompositeJobListener#setListeners(org.springframework.batch.core.domain.JobListener[])}.
+	 * {@link org.springframework.batch.execution.listener.CompositeJobListener#setListeners(org.springframework.batch.core.JobListener[])}.
 	 */
 	public void testSetListeners() {
 		listener.setListeners(new JobListener[] { new JobListenerSupport() {
@@ -57,7 +57,7 @@ public class CompositeJobListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.listener.CompositeJobListener#registerListener(org.springframework.batch.core.domain.JobListener)}.
+	 * {@link org.springframework.batch.execution.listener.CompositeJobListener#registerListener(org.springframework.batch.core.JobListener)}.
 	 */
 	public void testSetListener() {
 		listener.register(new JobListenerSupport() {

@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.sample.tasklet.JobSupport;
 import org.springframework.batch.sample.tasklet.StepSupport;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;

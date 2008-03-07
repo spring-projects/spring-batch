@@ -19,11 +19,11 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.JobInterruptedException;
-import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.execution.listener.CompositeStepListener;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core;
 
 import java.util.Collections;
 import java.util.Date;

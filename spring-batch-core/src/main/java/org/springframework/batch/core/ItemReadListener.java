@@ -13,20 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step.support;
+package org.springframework.batch.core;
 
-import org.springframework.batch.core.ItemSkipPolicy;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 
 /**
- * {@link ItemSkipPolicy} implementation that always returns false,
- * indicating that an item should not be skipped.
+ * Listener interface around the reading of an item.
  * 
  * @author Lucas Ward
+ *
  */
-public class NeverSkipItemSkipPolicy implements ItemSkipPolicy{
+public interface ItemReadListener extends BatchListener {
 
-	public boolean shouldSkip(Throwable t, int skipCount) {
-		return false;
-	}
-
+	/**
+	 * Called before {@link ItemReader#read()}
+	 */
+	void beforeRead();
+	
+	/**
+	 * Called after {@link ItemReader#read()}
+	 * 
+	 * @param item returned from read()
+	 */
+	void afterRead(Object item);
+	
+	/**
+	 * Called if an error occurs while trying to write.
+	 * 
+	 * @param ex thrown from {@link ItemWriter}
+	 */
+	void onReadError(Exception ex);
 }

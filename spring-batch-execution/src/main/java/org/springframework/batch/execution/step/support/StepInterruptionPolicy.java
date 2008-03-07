@@ -16,8 +16,8 @@
 
 package org.springframework.batch.execution.step.support;
 
-import org.springframework.batch.core.domain.JobInterruptedException;
-import org.springframework.batch.core.domain.Step;
+import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**

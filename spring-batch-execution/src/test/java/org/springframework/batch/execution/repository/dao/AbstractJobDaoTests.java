@@ -20,12 +20,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.JobParametersBuilder;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;

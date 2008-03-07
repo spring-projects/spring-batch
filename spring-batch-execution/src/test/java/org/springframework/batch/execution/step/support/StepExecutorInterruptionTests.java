@@ -18,11 +18,11 @@ package org.springframework.batch.execution.step.support;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInterruptedException;
-import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.repository.SimpleJobRepository;

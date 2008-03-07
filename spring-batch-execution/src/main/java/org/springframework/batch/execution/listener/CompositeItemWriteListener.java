@@ -20,8 +20,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.core.domain.ChunkListener;
-import org.springframework.batch.core.domain.ItemWriteListener;
+import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.ItemWriteListener;
 
 /**
  * @author Lucas Ward

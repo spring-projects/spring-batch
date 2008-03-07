@@ -1,8 +1,8 @@
 package org.springframework.batch.execution.repository.dao;
 
-import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
 
 /**
  * Data Access Object for job instances.

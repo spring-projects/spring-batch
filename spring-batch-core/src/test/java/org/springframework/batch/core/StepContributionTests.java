@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
@@ -31,7 +33,7 @@ public class StepContributionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepContribution#incrementTaskCount()}.
+	 * {@link org.springframework.batch.core.StepContribution#incrementTaskCount()}.
 	 */
 	public void testIncrementTaskCount() {
 		assertEquals(0, contribution.getTaskCount());
@@ -41,7 +43,7 @@ public class StepContributionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepContribution#setExecutionContext(ExecutionContext)}.
+	 * {@link org.springframework.batch.core.StepContribution#setExecutionContext(ExecutionContext)}.
 	 */
 	public void testSetExecutionContext() {
 		assertEquals(null, contribution.getExecutionContext());
@@ -53,7 +55,7 @@ public class StepContributionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepContribution#incrementCommitCount()}.
+	 * {@link org.springframework.batch.core.StepContribution#incrementCommitCount()}.
 	 */
 	public void testIncrementCommitCount() {
 		assertEquals(0, contribution.getCommitCount());
@@ -63,7 +65,7 @@ public class StepContributionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepContribution#isTerminateOnly()}.
+	 * {@link org.springframework.batch.core.StepContribution#isTerminateOnly()}.
 	 */
 	public void testIsTerminateOnly() {
 		assertFalse(contribution.isTerminateOnly());

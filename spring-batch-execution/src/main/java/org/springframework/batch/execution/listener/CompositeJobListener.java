@@ -20,8 +20,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobListener;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobListener;
 
 /**
  * @author Dave Syer

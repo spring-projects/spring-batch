@@ -2,10 +2,10 @@ package org.springframework.batch.execution.repository.dao;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.JobParametersBuilder;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.execution.job.JobSupport;
 
 public class MapJobInstanceDaoTests extends TestCase {

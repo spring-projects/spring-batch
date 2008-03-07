@@ -16,9 +16,9 @@
 
 package org.springframework.batch.sample;
 
-import org.springframework.batch.core.domain.BatchStatus;
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 
 /**
  * Functional test for graceful shutdown.  A batch container is started in a new thread,

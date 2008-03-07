@@ -18,7 +18,7 @@ package org.springframework.batch.execution.launch.support;
 
 import java.util.Properties;
 
-import org.springframework.batch.core.domain.JobExecution;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.execution.launch.JobLauncher;
 
 /**

@@ -13,31 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.execution.step.support;
+package org.springframework.batch.core;
 
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.JobExecutionException;
 
 /**
- * Strategy for blocking while a step execution is being updated.
- *  
  * @author Dave Syer
  *
  */
-public interface StepExecutionSynchronizer {
+public class JobExecutionExceptionTests extends AbstractExceptionTests {
 
-	/**
-	 * Lock the step execution, blocking if it has been locked by another thread.
-	 * 
-	 * @param stepExecution the {@link StepExecution} that is in progress
-	 * @throws InterruptedException if the thread is interrupted while waiting
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
-	void lock(StepExecution stepExecution) throws InterruptedException;
+	public Exception getException(String msg) throws Exception {
+		return new JobExecutionException(msg);
+	}
 
-	/**
-	 * Release the lock.  Use this in a finally block.
-	 * 
-	 * @param stepExecution
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String, java.lang.Throwable)
 	 */
-	void release(StepExecution stepExecution);
+	public Exception getException(String msg, Throwable t) throws Exception {
+		return new JobExecutionException(msg, t);
+	}
 
 }

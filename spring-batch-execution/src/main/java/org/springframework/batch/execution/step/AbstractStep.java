@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.execution.step;
 
-import org.springframework.batch.core.domain.JobInterruptedException;
-import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.io.exception.InfrastructureException;
 
 /**

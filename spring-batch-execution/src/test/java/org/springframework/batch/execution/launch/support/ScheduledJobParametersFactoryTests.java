@@ -22,8 +22,8 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.JobParametersBuilder;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.execution.launch.support.ScheduledJobParametersFactory;
 import org.springframework.util.StringUtils;
 

@@ -1,13 +1,15 @@
 /**
  * 
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.springframework.batch.core.JobParameters;
 
 import junit.framework.TestCase;
 

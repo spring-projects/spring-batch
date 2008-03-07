@@ -3,8 +3,8 @@ package org.springframework.batch.sample;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.JobParametersBuilder;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.sample.dao.HibernateCreditDao;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.orm.hibernate3.HibernateJdbcException;

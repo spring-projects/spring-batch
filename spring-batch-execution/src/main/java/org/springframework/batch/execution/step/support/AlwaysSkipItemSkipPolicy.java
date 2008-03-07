@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.execution.step.support;
 
-import org.springframework.batch.core.domain.ItemSkipPolicy;
+import org.springframework.batch.core.ItemSkipPolicy;
 
 /**
  * Implementation of the {@link ItemSkipPolicy} interface that

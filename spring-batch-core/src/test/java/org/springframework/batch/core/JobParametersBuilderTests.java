@@ -1,10 +1,13 @@
 /**
  * 
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core;
 
 import java.util.Date;
 import java.util.Iterator;
+
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 
 import junit.framework.TestCase;
 

@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.execution.step;
 
-import org.springframework.batch.core.domain.StepContribution;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ClearFailedException;

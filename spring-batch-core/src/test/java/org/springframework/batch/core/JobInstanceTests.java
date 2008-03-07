@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core;
+
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
 
 import junit.framework.TestCase;
 
@@ -26,7 +29,7 @@ public class JobInstanceTests extends TestCase {
 	private JobInstance instance = new JobInstance(new Long(11), new JobParameters(), new JobSupport("job"));
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.domain.JobInstance#getIdentifier()}.
+	 * Test method for {@link org.springframework.batch.core.JobInstance#getIdentifier()}.
 	 */
 	public void testGetName() {
 		instance = new JobInstance(new Long(1), new JobParameters(), new JobSupport("foo"));

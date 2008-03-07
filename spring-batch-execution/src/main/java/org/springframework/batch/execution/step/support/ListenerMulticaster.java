@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.execution.step.support;
 
-import org.springframework.batch.core.domain.BatchListener;
-import org.springframework.batch.core.domain.ChunkListener;
-import org.springframework.batch.core.domain.ItemReadListener;
-import org.springframework.batch.core.domain.ItemWriteListener;
-import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.core.BatchListener;
+import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.execution.listener.CompositeChunkListener;
 import org.springframework.batch.execution.listener.CompositeItemReadListener;
 import org.springframework.batch.execution.listener.CompositeItemWriteListener;
@@ -93,7 +93,7 @@ public class ListenerMulticaster implements StepListener, ChunkListener, ItemRea
 
 	/**
 	 * @param stepExecution
-	 * @see org.springframework.batch.execution.listener.CompositeStepListener#beforeStep(org.springframework.batch.core.domain.StepExecution)
+	 * @see org.springframework.batch.execution.listener.CompositeStepListener#beforeStep(org.springframework.batch.core.StepExecution)
 	 */
 	public void beforeStep(StepExecution stepExecution) {
 		stepListener.beforeStep(stepExecution);

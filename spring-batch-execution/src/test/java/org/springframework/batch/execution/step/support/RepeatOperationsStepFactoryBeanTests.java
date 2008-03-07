@@ -20,11 +20,11 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.execution.launch.EmptyItemWriter;
 import org.springframework.batch.item.reader.ListItemReader;

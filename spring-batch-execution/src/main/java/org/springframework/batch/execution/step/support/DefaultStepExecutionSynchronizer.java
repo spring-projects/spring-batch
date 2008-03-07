@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.execution.step.support;
 
-import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.StepExecution;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 

@@ -16,7 +16,7 @@
 package org.springframework.batch.execution.listener;
 
 import org.easymock.MockControl;
-import org.springframework.batch.core.domain.ChunkListener;
+import org.springframework.batch.core.ChunkListener;
 
 import junit.framework.TestCase;
 

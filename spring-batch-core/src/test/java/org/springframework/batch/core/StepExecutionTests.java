@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -21,6 +21,14 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Entity;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.PropertiesConverter;
@@ -37,7 +45,7 @@ public class StepExecutionTests extends TestCase {
 	private StepExecution blankExecution = new StepExecution(new StepSupport("blank"), new JobExecution());
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#JobExecution()}.
+	 * {@link org.springframework.batch.core.JobExecution#JobExecution()}.
 	 */
 	public void testStepExecution() {
 		assertNull(new StepExecution().getId());
@@ -45,7 +53,7 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#JobExecution()}.
+	 * {@link org.springframework.batch.core.JobExecution#JobExecution()}.
 	 */
 	public void testStepExecutionWithNullId() {
 		assertNull(new StepExecution(new StepSupport("stepName"), new JobExecution()).getId());
@@ -53,7 +61,7 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getEndTime()}.
+	 * {@link org.springframework.batch.core.JobExecution#getEndTime()}.
 	 */
 	public void testGetEndTime() {
 		assertNull(execution.getEndTime());
@@ -63,7 +71,7 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getStartTime()}.
+	 * {@link org.springframework.batch.core.JobExecution#getStartTime()}.
 	 */
 	public void testGetStartTime() {
 		assertNotNull(execution.getStartTime());
@@ -73,7 +81,7 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getStatus()}.
+	 * {@link org.springframework.batch.core.JobExecution#getStatus()}.
 	 */
 	public void testGetStatus() {
 		assertEquals(BatchStatus.STARTING, execution.getStatus());
@@ -83,7 +91,7 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
+	 * {@link org.springframework.batch.core.JobExecution#getJobId()}.
 	 */
 	public void testGetJobId() {
 		assertEquals(23, execution.getJobExecutionId().longValue());
@@ -91,7 +99,7 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getExitStatus()}.
+	 * {@link org.springframework.batch.core.JobExecution#getExitStatus()}.
 	 */
 	public void testGetExitCode() {
 		assertEquals(ExitStatus.UNKNOWN, execution.getExitStatus());
@@ -101,7 +109,7 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepExecution#incrementCommitCount()}.
+	 * {@link org.springframework.batch.core.StepExecution#incrementCommitCount()}.
 	 */
 	public void testIncrementCommitCount() {
 		int before = execution.getCommitCount().intValue();
@@ -112,7 +120,7 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepExecution#incrementTaskCount()}.
+	 * {@link org.springframework.batch.core.StepExecution#incrementTaskCount()}.
 	 */
 	public void testIncrementLuwCount() {
 		int before = execution.getTaskCount().intValue();
@@ -123,7 +131,7 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepExecution#rollback()}.
+	 * {@link org.springframework.batch.core.StepExecution#rollback()}.
 	 */
 	public void testIncrementRollbackCount() {
 		int before = execution.getRollbackCount().intValue();
@@ -134,7 +142,7 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepExecution#getCommitCount()}.
+	 * {@link org.springframework.batch.core.StepExecution#getCommitCount()}.
 	 */
 	public void testGetCommitCount() {
 		execution.setCommitCount(123);
@@ -143,7 +151,7 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepExecution#getTaskCount()}.
+	 * {@link org.springframework.batch.core.StepExecution#getTaskCount()}.
 	 */
 	public void testGetTaskCount() {
 		execution.setTaskCount(123);
@@ -152,7 +160,7 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.StepExecution#getRollbackCount()}.
+	 * {@link org.springframework.batch.core.StepExecution#getRollbackCount()}.
 	 */
 	public void testGetRollbackCount() {
 		execution.setRollbackCount(123);

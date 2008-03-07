@@ -3,9 +3,9 @@ package org.springframework.batch.execution.repository.dao;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobInstance;
-import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.Assert;
 

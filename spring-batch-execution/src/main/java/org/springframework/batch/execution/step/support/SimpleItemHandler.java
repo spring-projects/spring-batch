@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.execution.step.support;
 
-import org.springframework.batch.core.domain.StepContribution;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.execution.step.ItemHandler;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -69,7 +69,7 @@ public class SimpleItemHandler implements ItemHandler {
 	 * Read from the {@link ItemReader} and process (if not null) with the
 	 * {@link ItemWriter}.
 	 * 
-	 * @see org.springframework.batch.execution.step.ItemHandler#handle(org.springframework.batch.core.domain.StepContribution)
+	 * @see org.springframework.batch.execution.step.ItemHandler#handle(org.springframework.batch.core.StepContribution)
 	 */
 	public ExitStatus handle(StepContribution contribution) throws Exception {
 		Object item = itemReader.read();

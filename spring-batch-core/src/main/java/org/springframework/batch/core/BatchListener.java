@@ -13,25 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core;
 
 /**
- * Listener interface for the lifecycle of a chunk.  A chunk
- * can be through of as a collection of items that will be 
- * committed together.
+ * Marker interface that acts as a parent to all Batch
+ * domain listeners, such as: {@link StepListener}, 
+ * {@link ChunkListener}, {@link ItemReadListener} and
+ * {@link ItemWriteListener}
  * 
  * @author Lucas Ward
  *
  */
-public interface ChunkListener extends BatchListener {
+public interface BatchListener {
 
-	/**
-	 * Callback before the chunk is executed, but inside the transaction.
-	 */
-	void beforeChunk();
-	
-	/**
-	 * Callback after the chunk is executed, but inside the transaction.
-	 */
-	void afterChunk();
 }

@@ -17,7 +17,7 @@ package org.springframework.batch.execution.step.support;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.JobInterruptedException;
+import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.execution.step.support.ThreadStepInterruptionPolicy;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;

@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core;
+
 
 /**
- * @author Dave Syer
- *
+ * Policy for determining whether or not an item should be skipped.
+ * 
+ * @author Lucas Ward
  */
-public class JobExecutionException extends Exception {
+public interface ItemSkipPolicy {
 
-	public JobExecutionException(String msg) {
-		super(msg);
-	}
-
-	public JobExecutionException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
+	/**
+	 * Returns true or false, indicating whether or not reading should
+	 * continue for the current step execution with the given throwable.
+	 * 
+	 * @param t throwable encountered while reading
+	 * @param skipCount currently running count of skips
+	 * @return true if reading should continue, false otherwise.
+	 * @throws IllegalArgumentException if the exception is null
+	 */
+	boolean shouldSkip(Throwable t, int skipCount);
+	
 }

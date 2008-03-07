@@ -24,9 +24,9 @@ import java.util.Map;
 
 import org.springframework.batch.common.ExceptionClassifier;
 import org.springframework.batch.common.SubclassExceptionClassifier;
-import org.springframework.batch.core.domain.ItemSkipPolicy;
-import org.springframework.batch.core.domain.Step;
-import org.springframework.batch.core.domain.StepExecution;
+import org.springframework.batch.core.ItemSkipPolicy;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.io.exception.FlatFileParsingException;
 
 /**

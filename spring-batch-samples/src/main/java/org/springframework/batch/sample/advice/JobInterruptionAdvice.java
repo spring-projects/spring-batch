@@ -1,6 +1,6 @@
 package org.springframework.batch.sample.advice;
 
-import org.springframework.batch.core.domain.JobInterruptedException;
+import org.springframework.batch.core.JobInterruptedException;
 
 /**
  * Interface for monitors that check whether a job was interrupted by user.

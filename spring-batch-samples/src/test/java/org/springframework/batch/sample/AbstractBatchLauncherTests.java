@@ -16,8 +16,8 @@
 
 package org.springframework.batch.sample;
 
-import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.execution.launch.JobLauncher;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 import org.springframework.util.ClassUtils;

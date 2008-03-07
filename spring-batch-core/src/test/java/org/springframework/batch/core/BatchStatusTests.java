@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
+import org.springframework.batch.core.BatchStatus;
 
 import junit.framework.TestCase;
 
@@ -30,7 +32,7 @@ public class BatchStatusTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.BatchStatus#toString()}.
+	 * {@link org.springframework.batch.core.BatchStatus#toString()}.
 	 */
 	public void testToString() {
 		assertEquals("FAILED", BatchStatus.FAILED.toString());
@@ -38,7 +40,7 @@ public class BatchStatusTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.BatchStatus#getStatus(java.lang.String)}.
+	 * {@link org.springframework.batch.core.BatchStatus#getStatus(java.lang.String)}.
 	 */
 	public void testGetStatus() {
 		assertEquals(BatchStatus.FAILED, BatchStatus.getStatus(BatchStatus.FAILED.toString()));
@@ -46,7 +48,7 @@ public class BatchStatusTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.BatchStatus#getStatus(java.lang.String)}.
+	 * {@link org.springframework.batch.core.BatchStatus#getStatus(java.lang.String)}.
 	 */
 	public void testGetStatusWrongCode() {
 		try {
@@ -60,7 +62,7 @@ public class BatchStatusTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.BatchStatus#getStatus(java.lang.String)}.
+	 * {@link org.springframework.batch.core.BatchStatus#getStatus(java.lang.String)}.
 	 */
 	public void testGetStatusNullCode() {
 		assertNull(BatchStatus.getStatus(null));

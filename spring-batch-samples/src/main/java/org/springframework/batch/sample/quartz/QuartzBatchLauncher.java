@@ -18,8 +18,8 @@ package org.springframework.batch.sample.quartz;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.domain.Job;
 import org.springframework.batch.core.repository.DuplicateJobException;
 import org.springframework.batch.sample.ClassPathXmlApplicationContextJobFactory;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;

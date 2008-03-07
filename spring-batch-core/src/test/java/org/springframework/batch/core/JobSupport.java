@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.Step;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.ClassUtils;

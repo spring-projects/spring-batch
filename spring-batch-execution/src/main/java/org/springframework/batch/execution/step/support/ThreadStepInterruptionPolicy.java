@@ -18,7 +18,7 @@ package org.springframework.batch.execution.step.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.domain.JobInterruptedException;
+import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**

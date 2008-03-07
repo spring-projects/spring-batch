@@ -22,9 +22,9 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.job.JobSupport;
 import org.springframework.batch.repeat.ExitStatus;

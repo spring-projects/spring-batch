@@ -5,8 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.apache.commons.lang.SerializationUtils;
-import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.exception.ClearFailedException;
 import org.springframework.batch.item.exception.FlushFailedException;

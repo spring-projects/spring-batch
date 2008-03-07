@@ -18,7 +18,7 @@ package org.springframework.batch.execution.listener;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.core.domain.ItemReadListener;
+import org.springframework.batch.core.ItemReadListener;
 
 /**
  * @author Lucas Ward

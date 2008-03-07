@@ -25,9 +25,9 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import org.springframework.batch.core.domain.JobParameters;
-import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.batch.execution.launch.support.DefaultJobParametersFactory;
@@ -276,7 +276,7 @@ public class StepExecutionProxyResource extends StepListenerSupport implements R
 	 * Collect the properties of the enclosing {@link StepExecution} that will
 	 * be needed to create a file name.
 	 * 
-	 * @see org.springframework.batch.core.domain.StepListener#beforeStep(org.springframework.batch.core.domain.StepExecution)
+	 * @see org.springframework.batch.core.StepListener#beforeStep(org.springframework.batch.core.StepExecution)
 	 */
 	public void beforeStep(StepExecution execution) {
 		String stepName = execution.getStepName();

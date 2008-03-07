@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core;
 
 import java.util.Collection;
 import java.util.Date;

@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core;
 
 import java.util.Date;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -31,7 +36,7 @@ public class JobExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#JobExecution()}.
+	 * {@link org.springframework.batch.core.JobExecution#JobExecution()}.
 	 */
 	public void testJobExecution() {
 		assertNull(new JobExecution().getId());
@@ -39,7 +44,7 @@ public class JobExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getEndTime()}.
+	 * {@link org.springframework.batch.core.JobExecution#getEndTime()}.
 	 */
 	public void testGetEndTime() {
 		assertNull(execution.getEndTime());
@@ -49,7 +54,7 @@ public class JobExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getEndTime()}.
+	 * {@link org.springframework.batch.core.JobExecution#getEndTime()}.
 	 */
 	public void testIsRunning() {
 		assertTrue(execution.isRunning());
@@ -59,7 +64,7 @@ public class JobExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getEndTime()}.
+	 * {@link org.springframework.batch.core.JobExecution#getEndTime()}.
 	 */
 	public void testIsRunningWithStoppedExecution() {
 		assertTrue(execution.isRunning());
@@ -70,7 +75,7 @@ public class JobExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getStartTime()}.
+	 * {@link org.springframework.batch.core.JobExecution#getStartTime()}.
 	 */
 	public void testGetStartTime() {
 		assertNull(execution.getStartTime());
@@ -80,7 +85,7 @@ public class JobExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getStatus()}.
+	 * {@link org.springframework.batch.core.JobExecution#getStatus()}.
 	 */
 	public void testGetStatus() {
 		assertEquals(BatchStatus.STARTING, execution.getStatus());
@@ -90,7 +95,7 @@ public class JobExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
+	 * {@link org.springframework.batch.core.JobExecution#getJobId()}.
 	 */
 	public void testGetJobId() {
 		assertEquals(11, execution.getJobId().longValue());
@@ -100,7 +105,7 @@ public class JobExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
+	 * {@link org.springframework.batch.core.JobExecution#getJobId()}.
 	 */
 	public void testGetJobIdForNullJob() {
 		execution = new JobExecution(null);
@@ -109,7 +114,7 @@ public class JobExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getJobId()}.
+	 * {@link org.springframework.batch.core.JobExecution#getJobId()}.
 	 */
 	public void testGetJob() {
 		assertNotNull(execution.getJobInstance());
@@ -117,7 +122,7 @@ public class JobExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.domain.JobExecution#getExitStatus()}.
+	 * {@link org.springframework.batch.core.JobExecution#getExitStatus()}.
 	 */
 	public void testGetExitCode() {
 		assertEquals(ExitStatus.UNKNOWN, execution.getExitStatus());

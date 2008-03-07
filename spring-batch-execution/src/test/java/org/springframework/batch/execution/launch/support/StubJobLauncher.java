@@ -1,8 +1,8 @@
 package org.springframework.batch.execution.launch.support;
 
-import org.springframework.batch.core.domain.Job;
-import org.springframework.batch.core.domain.JobExecution;
-import org.springframework.batch.core.domain.JobParameters;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.execution.launch.JobLauncher;
 

@@ -20,8 +20,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.domain.StepExecution;
-import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.execution.step.StepSupport;
 import org.springframework.batch.repeat.ExitStatus;
@@ -38,7 +38,7 @@ public class CompositeStepListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.listener.CompositeStepListener#setListeners(org.springframework.batch.core.domain.StepListener[])}.
+	 * {@link org.springframework.batch.execution.listener.CompositeStepListener#setListeners(org.springframework.batch.core.StepListener[])}.
 	 */
 	public void testSetListeners() {
 		listener.setListeners(new StepListener[] { new StepListenerSupport() {
@@ -58,7 +58,7 @@ public class CompositeStepListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.listener.CompositeStepListener#registerListener(org.springframework.batch.core.domain.StepListener)}.
+	 * {@link org.springframework.batch.execution.listener.CompositeStepListener#registerListener(org.springframework.batch.core.StepListener)}.
 	 */
 	public void testSetListener() {
 		listener.register(new StepListenerSupport() {

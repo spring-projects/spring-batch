@@ -18,11 +18,11 @@ package org.springframework.batch.execution.step.support;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.domain.BatchListener;
-import org.springframework.batch.core.domain.ChunkListener;
-import org.springframework.batch.core.domain.ItemReadListener;
-import org.springframework.batch.core.domain.ItemWriteListener;
-import org.springframework.batch.core.domain.StepListener;
+import org.springframework.batch.core.BatchListener;
+import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.execution.listener.CompositeChunkListener;
 import org.springframework.batch.execution.listener.CompositeItemReadListener;
 import org.springframework.batch.execution.listener.CompositeItemWriteListener;

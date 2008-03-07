@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.domain;
+package org.springframework.batch.core;
 
 /**
- * Marker interface that acts as a parent to all Batch
- * domain listeners, such as: {@link StepListener}, 
- * {@link ChunkListener}, {@link ItemReadListener} and
- * {@link ItemWriteListener}
- * 
- * @author Lucas Ward
+ * @author Dave Syer
  *
  */
-public interface BatchListener {
+public class JobExecutionException extends Exception {
 
+	public JobExecutionException(String msg) {
+		super(msg);
+	}
+
+	public JobExecutionException(String msg, Throwable cause) {
+		super(msg, cause);
+	}
 }

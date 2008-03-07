@@ -18,7 +18,7 @@ package org.springframework.batch.execution.step.support;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.springframework.batch.core.domain.JobInterruptedException;
+import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.execution.launch.support.ExitCodeMapper;
