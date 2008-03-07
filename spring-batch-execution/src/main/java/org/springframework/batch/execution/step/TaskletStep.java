@@ -20,7 +20,7 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -127,7 +127,7 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 		this.jobRepository = jobRepository;
 	}
 
-	public void execute(StepExecution stepExecution) throws JobInterruptedException, InfrastructureException {
+	public void execute(StepExecution stepExecution) throws JobInterruptedException, UnexpectedJobExecutionException {
 		stepExecution.setStartTime(new Date());
 		updateStatus(stepExecution, BatchStatus.STARTED);
 
@@ -166,7 +166,7 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 			if (e instanceof RuntimeException) {
 				throw (RuntimeException) e;
 			}
-			throw new InfrastructureException(e);
+			throw new UnexpectedJobExecutionException(e);
 		}
 		finally {
 			stepExecution.setExitStatus(exitStatus);
@@ -180,7 +180,7 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 			if (fatalException != null) {
 				logger.error("Encountered an error saving batch meta data."
 						+ "This job is now in an unknown state and should not be restarted.", fatalException);
-				throw new InfrastructureException("Encountered an error saving batch meta data.", fatalException);
+				throw new UnexpectedJobExecutionException("Encountered an error saving batch meta data.", fatalException);
 			}
 		}
 

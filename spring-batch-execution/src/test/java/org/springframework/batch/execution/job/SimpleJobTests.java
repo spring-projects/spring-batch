@@ -22,7 +22,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.ItemSkipPolicy;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
@@ -230,7 +230,7 @@ public class SimpleJobTests extends TestCase {
 		stepConfiguration1.setProcessException(exception);
 		try {
 			job.execute(jobExecution);
-		} catch (InfrastructureException e) {
+		} catch (UnexpectedJobExecutionException e) {
 			assertEquals(exception, e.getCause());
 		}
 		assertEquals(0, list.size());
@@ -258,7 +258,7 @@ public class SimpleJobTests extends TestCase {
 		try {
 			job.execute(jobExecution);
 			fail("Expected BatchCriticalException");
-		} catch (InfrastructureException ex) {
+		} catch (UnexpectedJobExecutionException ex) {
 			// expected
 			assertTrue("Wrong message in exception: " + ex.getMessage(), ex.getMessage()
 			        .indexOf("start limit exceeded") >= 0);
@@ -289,7 +289,7 @@ public class SimpleJobTests extends TestCase {
 		jobExecution.stop();
 		try {
 			job.execute(jobExecution);
-		} catch (InfrastructureException e) {
+		} catch (UnexpectedJobExecutionException e) {
 			assertTrue(e.getCause() instanceof JobInterruptedException);
 		}
 		assertEquals(0, list.size());
@@ -349,7 +349,7 @@ public class SimpleJobTests extends TestCase {
 			this.runnable = runnable;
 		}
 
-		public void execute(StepExecution stepExecution) throws JobInterruptedException, InfrastructureException {
+		public void execute(StepExecution stepExecution) throws JobInterruptedException, UnexpectedJobExecutionException {
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
 				throw (RuntimeException) exception;

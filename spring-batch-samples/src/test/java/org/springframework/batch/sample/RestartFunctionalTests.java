@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample;
 
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.jdbc.core.JdbcOperations;
 
@@ -63,7 +63,7 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 			runJob();
 			fail("First run of the job is expected to fail.");
 		}
-		catch (InfrastructureException expected) {
+		catch (UnexpectedJobExecutionException expected) {
 			//expected
 			assertTrue("Not planned exception: "+expected.getMessage(), expected.getMessage().toLowerCase().indexOf("planned")>=0);
 		}

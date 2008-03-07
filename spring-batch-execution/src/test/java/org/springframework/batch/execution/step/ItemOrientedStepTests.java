@@ -23,7 +23,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
@@ -252,7 +252,7 @@ public class ItemOrientedStepTests extends TestCase {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected BatchCriticalException");
 		}
-		catch (InfrastructureException e) {
+		catch (UnexpectedJobExecutionException e) {
 			assertEquals("foo", e.getCause().getMessage());
 		}
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
@@ -561,7 +561,7 @@ public class ItemOrientedStepTests extends TestCase {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected BatchCriticalException");
 		}
-		catch (InfrastructureException ex) {
+		catch (UnexpectedJobExecutionException ex) {
 			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertTrue("Message does not contain ResetFailedException: " + msg, msg.contains("ResetFailedException"));
@@ -589,7 +589,7 @@ public class ItemOrientedStepTests extends TestCase {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected BatchCriticalException");
 		}
-		catch (InfrastructureException ex) {
+		catch (UnexpectedJobExecutionException ex) {
 			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertEquals("", msg);
@@ -652,7 +652,7 @@ public class ItemOrientedStepTests extends TestCase {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected InfrastructureException");
 		}
-		catch (InfrastructureException ex) {
+		catch (UnexpectedJobExecutionException ex) {
 			// The job actually completeed, but the streams couldn't be closed.
 			assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();

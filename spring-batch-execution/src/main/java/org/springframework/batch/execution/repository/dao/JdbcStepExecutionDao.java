@@ -13,7 +13,7 @@ import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -110,7 +110,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					executionContext.put(key, rs.getObject("OBJECT_VAL"));
 				}
 				else {
-					throw new InfrastructureException("Invalid type found: [" + typeCd + "] for execution id: ["
+					throw new UnexpectedJobExecutionException("Invalid type found: [" + typeCd + "] for execution id: ["
 							+ executionId + "]");
 				}
 			}

@@ -17,7 +17,7 @@
 package org.springframework.batch.sample.tasklet;
 
 
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.reader.DelegatingItemReader;
 
@@ -49,7 +49,7 @@ public class ExceptionThrowingItemReaderProxy extends DelegatingItemReader {
 		
 		counter++;
 		if (counter == throwExceptionOnRecordNumber) {
-			throw new InfrastructureException("Planned failure on count="+counter);
+			throw new UnexpectedJobExecutionException("Planned failure on count="+counter);
 		}
 		
 		return super.read();

@@ -3,7 +3,7 @@ package org.springframework.batch.sample.item.writer;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.Order;
 import org.springframework.batch.sample.item.writer.OrderWriter;
@@ -46,7 +46,7 @@ public class OrderWriterTests extends TestCase {
 		try {
 			processor.write(this);
 			fail("Batch critical exception was expected");
-		} catch (InfrastructureException bce) {
+		} catch (UnexpectedJobExecutionException bce) {
 			assertTrue(true);
 		}
 		writerControl.verify();

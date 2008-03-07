@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.execution.step;
 
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -90,5 +90,5 @@ public abstract class AbstractStep implements Step {
 		this.name = name;
 	}
 
-	public abstract void execute(StepExecution stepExecution) throws JobInterruptedException, InfrastructureException;
+	public abstract void execute(StepExecution stepExecution) throws JobInterruptedException, UnexpectedJobExecutionException;
 }

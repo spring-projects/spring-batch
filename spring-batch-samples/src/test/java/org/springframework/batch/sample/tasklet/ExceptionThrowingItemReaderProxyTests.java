@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
@@ -40,7 +40,7 @@ public class ExceptionThrowingItemReaderProxyTests extends TestCase {
 			try {
 				itemReader.read();
 				assertTrue(i < ITER_COUNT);
-			} catch (InfrastructureException bce) {
+			} catch (UnexpectedJobExecutionException bce) {
 				assertEquals(ITER_COUNT,i);
 			}
 		}

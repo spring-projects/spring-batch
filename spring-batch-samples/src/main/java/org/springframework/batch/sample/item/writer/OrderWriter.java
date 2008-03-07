@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.writer.DelegatingItemWriter;
 import org.springframework.batch.sample.domain.Order;
 
@@ -25,7 +25,7 @@ import org.springframework.batch.sample.domain.Order;
 public class OrderWriter extends DelegatingItemWriter {
     public Object doProcess(Object data) {
         if (!(data instanceof Order)) {
-            throw new InfrastructureException("OrderProcessor can process only Order objects");
+            throw new UnexpectedJobExecutionException("OrderProcessor can process only Order objects");
         }
         return data;
     }

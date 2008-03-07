@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.sample.tasklet;
 
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -110,7 +110,7 @@ public class StepSupport implements Step, BeanNameAware {
 	 * 
 	 * @see org.springframework.batch.core.Step#execute(org.springframework.batch.core.StepExecution)
 	 */
-	public void execute(StepExecution stepExecution) throws JobInterruptedException, InfrastructureException {
+	public void execute(StepExecution stepExecution) throws JobInterruptedException, UnexpectedJobExecutionException {
 		throw new UnsupportedOperationException(
 		        "Cannot process a StepExecution.  Use a smarter subclass of StepSupport.");
 	}

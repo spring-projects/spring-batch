@@ -19,7 +19,7 @@ package org.springframework.batch.execution.job;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.Step;
@@ -136,7 +136,7 @@ public class JobSupport implements BeanNameAware, Job {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.Job#run(org.springframework.batch.core.domain.JobExecution)
 	 */
-	public void execute(JobExecution execution) throws InfrastructureException {
+	public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
 		throw new UnsupportedOperationException("JobSupport does not provide an implementation of run().  Use a smarter subclass.");
 	}
 

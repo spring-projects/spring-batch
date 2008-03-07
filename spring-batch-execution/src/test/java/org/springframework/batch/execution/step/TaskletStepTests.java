@@ -6,7 +6,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
@@ -91,7 +91,7 @@ public class TaskletStepTests extends TestCase {
 			step.execute(stepExecution);
 			fail("Expected BatchCriticalException");
 		}
-		catch (InfrastructureException e) {
+		catch (UnexpectedJobExecutionException e) {
 			assertEquals("foo", e.getCause().getMessage());
 		}
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
@@ -121,7 +121,7 @@ public class TaskletStepTests extends TestCase {
 		assertEquals(2, list.size());
 	}
 
-	public void testExceptionExecution() throws JobInterruptedException, InfrastructureException {
+	public void testExceptionExecution() throws JobInterruptedException, UnexpectedJobExecutionException {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, true), new JobRepositorySupport());
 		try {
 			step.execute(stepExecution);

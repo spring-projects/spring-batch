@@ -23,7 +23,7 @@ package org.springframework.batch.core;
  * @author Lucas Ward
  * 
  */
-public class InfrastructureException extends RuntimeException {
+public class UnexpectedJobExecutionException extends RuntimeException {
 	private static final long serialVersionUID = 8838982304219248527L;
 
 	/**
@@ -32,7 +32,7 @@ public class InfrastructureException extends RuntimeException {
 	 * @param msg the exception message.
 	 * 
 	 */
-	public InfrastructureException(String msg) {
+	public UnexpectedJobExecutionException(String msg) {
 		super(msg);
 	}
 
@@ -42,7 +42,7 @@ public class InfrastructureException extends RuntimeException {
 	 * @param msg the exception message.
 	 * 
 	 */
-	public InfrastructureException(String msg, Throwable nested) {
+	public UnexpectedJobExecutionException(String msg, Throwable nested) {
 		super(msg, nested);
 	}
 
@@ -50,7 +50,7 @@ public class InfrastructureException extends RuntimeException {
 	 * Constructs a new instance with a nested exception. The error code is
 	 * defaulted to 1 and the message is empty.
 	 */
-	public InfrastructureException(Throwable nested) {
+	public UnexpectedJobExecutionException(Throwable nested) {
 		super(nested);
 	}
 
@@ -58,7 +58,7 @@ public class InfrastructureException extends RuntimeException {
 	 * Constructs a new instance, the error code is defaulted to one and the
 	 * message is empty.
 	 */
-	public InfrastructureException() {
+	public UnexpectedJobExecutionException() {
 		super();
 	}
 

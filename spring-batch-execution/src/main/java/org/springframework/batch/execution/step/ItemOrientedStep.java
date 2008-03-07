@@ -20,7 +20,7 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.InfrastructureException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
@@ -230,7 +230,7 @@ public class ItemOrientedStep extends AbstractStep {
 	 * @throws RuntimeException if there is an exception during a chunk execution
 	 * @see StepExecutor#execute(StepExecution)
 	 */
-	public void execute(final StepExecution stepExecution) throws InfrastructureException, JobInterruptedException {
+	public void execute(final StepExecution stepExecution) throws UnexpectedJobExecutionException, JobInterruptedException {
 
 		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
 		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, this);
@@ -398,7 +398,7 @@ public class ItemOrientedStep extends AbstractStep {
 				if (!fatalException.hasException()) {
 					fatalException.setException(e);
 				}
-				throw new InfrastructureException(msg, fatalException.getException());
+				throw new UnexpectedJobExecutionException(msg, fatalException.getException());
 			}
 
 			try {
@@ -410,11 +410,11 @@ public class ItemOrientedStep extends AbstractStep {
 				if (!fatalException.hasException()) {
 					fatalException.setException(e);
 				}
-				throw new InfrastructureException(msg, fatalException.getException());
+				throw new UnexpectedJobExecutionException(msg, fatalException.getException());
 			}
 
 			if (fatalException.hasException()) {
-				throw new InfrastructureException("Encountered an error saving batch meta data.", fatalException
+				throw new UnexpectedJobExecutionException("Encountered an error saving batch meta data.", fatalException
 				        .getException());
 			}
 
