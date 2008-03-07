@@ -13,37 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.exception;
-
+package org.springframework.batch.item;
 
 /**
+ * An exception class thrown when an {@link ItemReader} fails to reset its state based on the previous mark.
+ * 
  * @author Dave Syer
- *
+ * @author Ben Hale
  */
-public class ResetFailedException extends StreamException {
+public class ResetFailedException extends ItemReaderException {
 
 	/**
-	 * @param message
+	 * Create a new {@link ResetFailedException} based on a message.
+	 * 
+	 * @param message the message for this exception
 	 */
 	public ResetFailedException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
-	 * @param msg
-	 * @param nested
+	 * Create a new {@link ResetFailedException} based on a message and another exception.
+	 * 
+	 * @param message the message for this exception
+	 * @param cause the other exception
 	 */
 	public ResetFailedException(String msg, Throwable nested) {
 		super(msg, nested);
-	}
-
-	/**
-	 * @param msg
-	 * @param nested
-	 */
-	public ResetFailedException(Throwable nested) {
-		super(nested);
 	}
 
 }

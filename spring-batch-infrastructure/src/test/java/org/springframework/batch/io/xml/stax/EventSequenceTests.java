@@ -3,8 +3,6 @@ package org.springframework.batch.io.xml.stax;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.XMLEvent;
 
-import org.springframework.batch.io.xml.stax.EventSequence;
-
 import junit.framework.TestCase;
 
 /**

@@ -1,8 +1,8 @@
 package org.springframework.batch.sample.dao;
 
+import org.springframework.batch.item.ClearFailedException;
+import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.exception.ClearFailedException;
-import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.batch.sample.domain.Game;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.util.Assert;

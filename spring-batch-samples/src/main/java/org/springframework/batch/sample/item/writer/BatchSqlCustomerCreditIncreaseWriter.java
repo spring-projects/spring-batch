@@ -3,9 +3,9 @@ package org.springframework.batch.sample.item.writer;
 import java.math.BigDecimal;
 
 import org.springframework.batch.io.support.BatchSqlUpdateItemWriter;
+import org.springframework.batch.item.ClearFailedException;
+import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.exception.ClearFailedException;
-import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.batch.sample.domain.CustomerCredit;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;

@@ -19,7 +19,6 @@ package org.springframework.batch.item.validator;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.exception.ValidationException;
-import org.springframework.batch.item.validator.SpringValidator;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 

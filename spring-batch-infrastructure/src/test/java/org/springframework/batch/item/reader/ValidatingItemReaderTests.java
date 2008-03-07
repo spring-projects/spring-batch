@@ -20,8 +20,6 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.batch.io.exception.ValidationException;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.reader.AbstractItemReader;
-import org.springframework.batch.item.reader.ValidatingItemReader;
 import org.springframework.batch.item.validator.Validator;
 
 /**

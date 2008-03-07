@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.exception;
+package org.springframework.batch.item;
 
+import org.springframework.batch.io.exception.AbstractExceptionTests;
 
-/**
- * Used to signal an unexpected end of an input or message stream. This is an
- * abnormal condition, not just the end of the data - e.g. if a resource becomes
- * unavailable, or a stream becomes unreadable.
- * 
- * @author Dave Syer
- */
-public class UnexpectedInputException extends StreamException {
+public class MarkFailedExceptionTests extends AbstractExceptionTests {
 
-	/**
-	 * Generated serial UID.
-	 */
-	private static final long serialVersionUID = -8325588758094208905L;
-
-	public UnexpectedInputException(String message, Throwable cause) {
-		super(message, cause);
+	public Exception getException(String msg) throws Exception {
+		return new MarkFailedException(msg);
 	}
+
+	public Exception getException(String msg, Throwable t) throws Exception {
+		return new MarkFailedException(msg, t);
+	}
+
 }

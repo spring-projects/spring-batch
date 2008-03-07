@@ -20,7 +20,8 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.exception.StreamException;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -75,7 +76,7 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 	 */
 	public Object read() {
 		if (!initialized) {
-			throw new StreamException("ItemStream must be open before it can be read.");
+			throw new ReaderNotOpenException("Reader must be open before it can be read.");
 		}
 		Object item = null;
 
@@ -141,7 +142,7 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 					txReader.onCommit(); // reset the history buffer
 				}
 				if (!fragmentReader.hasNext()) {
-					throw new StreamException("Restore point must be before end of input");
+					throw new ItemStreamException("Restore point must be before end of input");
 				}
 				fragmentReader.next();
 				moveCursorToNextFragment(fragmentReader);

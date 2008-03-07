@@ -18,8 +18,6 @@ package org.springframework.batch.support;
 
 import java.util.Properties;
 
-import org.springframework.batch.support.PropertiesConverter;
-
 import junit.framework.TestCase;
 
 /**

@@ -7,7 +7,6 @@ import javax.xml.stream.events.XMLEvent;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.io.xml.stax.NoStartEndDocumentStreamWriter;
 
 /**
  * Tests for {@link NoStartEndDocumentStreamWriter}

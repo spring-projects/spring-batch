@@ -13,38 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.exception;
-
-import org.springframework.batch.item.ItemWriter;
+package org.springframework.batch.item;
 
 /**
- * Unchecked exception indicating that an error has occured while
- * trying to call {@link ItemWriter#flush()}
+ * Exception indicating that an {@link ItemReader} found no work to process while initializing.
  * 
  * @author Lucas Ward
- *
+ * @author Ben Hale
  */
-public class FlushFailedException extends StreamException {
+public class NoWorkFoundException extends ItemReaderException {
+
 	/**
-	 * @param message
+	 * Create a new {@link NoWorkFoundException} based on a message.
+	 * 
+	 * @param message the message for this exception
 	 */
-	public FlushFailedException(String message) {
+	public NoWorkFoundException(String message) {
 		super(message);
 	}
 
 	/**
-	 * @param msg
-	 * @param nested
+	 * Create a new {@link NoWorkFoundException} based on a message and another exception.
+	 * 
+	 * @param message the message for this exception
+	 * @param cause the other exception
 	 */
-	public FlushFailedException(String msg, Throwable nested) {
+	public NoWorkFoundException(String msg, Throwable nested) {
 		super(msg, nested);
 	}
-
-	/**
-	 * @param msg
-	 * @param nested
-	 */
-	public FlushFailedException(Throwable nested) {
-		super(nested);
-	}	
 }

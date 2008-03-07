@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.exception.StreamException;
+import org.springframework.batch.item.ItemStreamException;
 
 /**
  * @author Dave Syer
@@ -40,7 +40,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testRegisterAndOpen() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
-			public void open(ExecutionContext executionContext) throws StreamException {
+			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				list.add("bar");
 			}
 		};
@@ -55,7 +55,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testRegisterTwice() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
-			public void open(ExecutionContext executionContext) throws StreamException {
+			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				list.add("bar");
 			}
 		};
@@ -85,7 +85,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testClose() {
 		manager.register(new ItemStreamSupport() {
-			public void close(ExecutionContext executionContext) throws StreamException {
+			public void close(ExecutionContext executionContext) throws ItemStreamException {
 				list.add("bar");
 			}
 		});
@@ -99,7 +99,7 @@ public class SimpleStreamManagerTests extends TestCase {
 	 */
 	public void testCloseDoesNotUnregister() {
 		manager.setStreams(new ItemStream[] { new ItemStreamSupport() {
-			public void open(ExecutionContext executionContext) throws StreamException {
+			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				list.add("bar");
 			}
 		} });

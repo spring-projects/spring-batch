@@ -16,8 +16,6 @@
 
 package org.springframework.batch.io.file.separator;
 
-import org.springframework.batch.io.file.separator.SuffixRecordSeparatorPolicy;
-
 import junit.framework.TestCase;
 
 public class SuffixRecordSeparatorPolicyTests extends TestCase {

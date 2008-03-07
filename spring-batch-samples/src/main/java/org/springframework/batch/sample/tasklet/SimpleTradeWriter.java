@@ -19,7 +19,7 @@ package org.springframework.batch.sample.tasklet;
 import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.exception.StreamException;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.writer.AbstractItemWriter;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
@@ -67,7 +67,7 @@ public class SimpleTradeWriter extends AbstractItemWriter implements ItemStream 
 		this.tradeDao = tradeDao;
 	}
 	
-	public void open(ExecutionContext context) throws StreamException {
+	public void open(ExecutionContext context) throws ItemStreamException {
 	}
 
 	/* (non-Javadoc)
@@ -77,6 +77,6 @@ public class SimpleTradeWriter extends AbstractItemWriter implements ItemStream 
 		executionContext.putLong("trade.count", tradeCount);
 	}
 
-	public void close(ExecutionContext executionContext) throws StreamException {
+	public void close(ExecutionContext executionContext) throws ItemStreamException {
 	}
 }

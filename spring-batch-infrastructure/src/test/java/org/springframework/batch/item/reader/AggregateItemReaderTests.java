@@ -7,7 +7,6 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.reader.AggregateItemReader;
 
 public class AggregateItemReaderTests extends TestCase {
 

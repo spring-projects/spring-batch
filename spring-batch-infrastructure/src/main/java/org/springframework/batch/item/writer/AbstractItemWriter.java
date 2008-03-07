@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.item.writer;
 
+import org.springframework.batch.item.ClearFailedException;
+import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.exception.ClearFailedException;
-import org.springframework.batch.item.exception.FlushFailedException;
 
 /**
  * Abstract {@link ItemWriter} that allows for base classes to only

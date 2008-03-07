@@ -13,39 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.exception;
-
-import org.springframework.batch.item.ItemWriter;
+package org.springframework.batch.item;
 
 /**
- * Unchecked exception indicating that an error has occured while
- * trying to call {@link ItemWriter#clear()}
+ * Exception indicating that an {@link ItemReader} needed to be opened before read.
  * 
- * @author Lucas Ward
- *
+ * @author Ben Hale
  */
-public class ClearFailedException extends StreamException {
+public class ReaderNotOpenException extends ItemReaderException {
 
 	/**
-	 * @param message
+	 * Create a new {@link ReaderNotOpenException} based on a message.
+	 * 
+	 * @param message the message for this exception
 	 */
-	public ClearFailedException(String message) {
+	public ReaderNotOpenException(String message) {
 		super(message);
 	}
 
 	/**
-	 * @param msg
-	 * @param nested
+	 * Create a new {@link ReaderNotOpenException} based on a message and another exception.
+	 * 
+	 * @param message the message for this exception
+	 * @param cause the other exception
 	 */
-	public ClearFailedException(String msg, Throwable nested) {
+	public ReaderNotOpenException(String msg, Throwable nested) {
 		super(msg, nested);
 	}
-
-	/**
-	 * @param msg
-	 * @param nested
-	 */
-	public ClearFailedException(Throwable nested) {
-		super(nested);
-	}	
 }

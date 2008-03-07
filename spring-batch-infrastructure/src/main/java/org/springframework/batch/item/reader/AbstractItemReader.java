@@ -17,8 +17,8 @@
 package org.springframework.batch.item.reader;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.exception.MarkFailedException;
-import org.springframework.batch.item.exception.ResetFailedException;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.batch.item.ResetFailedException;
 
 /**
  * Base class for {@link ItemReader} implementations.

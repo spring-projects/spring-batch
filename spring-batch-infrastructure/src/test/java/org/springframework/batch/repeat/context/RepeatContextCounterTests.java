@@ -19,8 +19,6 @@ package org.springframework.batch.repeat.context;
 import junit.framework.TestCase;
 
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.context.RepeatContextCounter;
-import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 public class RepeatContextCounterTests extends TestCase {
 	

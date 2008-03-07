@@ -3,8 +3,8 @@ package org.springframework.batch.sample.item.reader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.exception.MarkFailedException;
-import org.springframework.batch.item.exception.ResetFailedException;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.batch.item.ResetFailedException;
 
 
 /**

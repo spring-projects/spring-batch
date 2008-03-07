@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.io.file.transform;
 
-import org.springframework.batch.io.file.mapping.FieldSet;
-
 import junit.framework.TestCase;
+
+import org.springframework.batch.io.file.mapping.FieldSet;
 
 /**
  * @author Dave Syer

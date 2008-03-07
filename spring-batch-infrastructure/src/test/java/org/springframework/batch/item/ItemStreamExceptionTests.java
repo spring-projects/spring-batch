@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.exception;
+package org.springframework.batch.item;
 
-import org.springframework.batch.item.exception.UnexpectedInputException;
-import org.springframework.batch.repeat.exception.AbstractExceptionTests;
+import org.springframework.batch.io.exception.AbstractExceptionTests;
 
-public class UnexpectedInputExceptionTests extends AbstractExceptionTests {
+public class ItemStreamExceptionTests extends AbstractExceptionTests {
 
 	public Exception getException(String msg) throws Exception {
-		return new UnexpectedInputException(msg, null);
+		return new ItemStreamException(msg);
+	}
+
+	public Exception getException(Throwable t) throws Exception {
+		return new ItemStreamException(t);
 	}
 
 	public Exception getException(String msg, Throwable t) throws Exception {
-		return new UnexpectedInputException(msg, t);
+		return new ItemStreamException(msg, t);
 	}
 
 }

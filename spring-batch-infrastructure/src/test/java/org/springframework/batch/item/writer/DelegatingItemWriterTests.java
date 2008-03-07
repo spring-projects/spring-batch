@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.item.writer;
 
+import junit.framework.TestCase;
+
 import org.easymock.MockControl;
 import org.springframework.batch.item.ItemWriter;
-
-import junit.framework.TestCase;
 
 /**
  * @author Lucas Ward

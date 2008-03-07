@@ -22,7 +22,6 @@ import javax.xml.stream.events.XMLEvent;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.io.xml.stax.AbstractEventReaderWrapper;
 
 import com.bea.xml.stream.events.StartDocumentEvent;
 

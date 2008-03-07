@@ -29,7 +29,8 @@ import org.springframework.batch.io.file.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.io.file.transform.LineTokenizer;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.exception.StreamException;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -148,8 +149,8 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader.setFieldSetMapper(fieldSetMapper);
 		try {
 			itemReader.read();
-			fail("Expected StreamException");
-		} catch (StreamException e) {
+			fail("Expected ReaderNotOpenException");
+		} catch (ReaderNotOpenException e) {
 			assertTrue(e.getMessage().contains("open"));
 		}
 	}
@@ -210,7 +211,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 			itemReader.open(executionContext);
 			fail("Expected BatchEnvironmentException");
 		}
-		catch (StreamException e) {
+		catch (ItemStreamException e) {
 			// expected
 			assertEquals("foo", e.getCause().getMessage());
 		}

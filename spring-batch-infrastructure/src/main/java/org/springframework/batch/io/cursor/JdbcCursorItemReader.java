@@ -33,7 +33,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.exception.ResetFailedException;
+import org.springframework.batch.item.ResetFailedException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -48,62 +48,52 @@ import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * Simple input source that opens a JDBC cursor and continually retrieves the
- * next row in the ResultSet. It is extremely important to note that the
- * JdbcDriver used must be version 3.0 or higher. This is because earlier
- * versions do not support holding a ResultSet open over commits.
+ * Simple input source that opens a JDBC cursor and continually retrieves the next row in the ResultSet. It is extremely
+ * important to note that the JdbcDriver used must be version 3.0 or higher. This is because earlier versions do not
+ * support holding a ResultSet open over commits.
  * </p>
  * 
  * <p>
- * Each call to {@link #read()} will call the provided RowMapper, passing in the
- * ResultSet. There is currently no wrapping of the ResultSet to suppress calls
- * to next(). However, if the RowMapper (mistakenly) increments the current row,
- * the next call to read will verify that the current row is at the expected
- * position and throw a DataAccessException if it is not. This means that, in
- * theory, a RowMapper could read ahead, as long as it returns the row back to
- * the correct position before returning. The reason for such strictness on the
- * ResultSet is due to the need to maintain control for transactions,
- * restartability and skippability. This ensures that each call to
- * {@link #read()} returns the ResultSet at the correct line, regardless of
- * rollbacks, restarts, or skips.
+ * Each call to {@link #read()} will call the provided RowMapper, passing in the ResultSet. There is currently no
+ * wrapping of the ResultSet to suppress calls to next(). However, if the RowMapper (mistakenly) increments the current
+ * row, the next call to read will verify that the current row is at the expected position and throw a
+ * DataAccessException if it is not. This means that, in theory, a RowMapper could read ahead, as long as it returns the
+ * row back to the correct position before returning. The reason for such strictness on the ResultSet is due to the need
+ * to maintain control for transactions, restartability and skippability. This ensures that each call to {@link #read()}
+ * returns the ResultSet at the correct line, regardless of rollbacks, restarts, or skips.
  * </p>
  * 
  * <p>
- * {@link ExecutionContext}: The current row is returned as restart data, and
- * when restored from that same data, the cursor is opened and the current row
- * set to the value within the restart data. Two values are stored: the current
+ * {@link ExecutionContext}: The current row is returned as restart data, and when restored from that same data, the
+ * cursor is opened and the current row set to the value within the restart data. Two values are stored: the current
  * line being processed and the number of lines that have been skipped.
  * </p>
  * 
  * <p>
- * Transactions: The same ResultSet is held open regardless of commits or roll
- * backs in a surrounding transaction. This means that when such a transaction
- * is committed, the input source is notified through the {@link #mark()} and
- * {@link #reset()} so that it can save it's current row number. Later, if the
- * transaction is rolled back, the current row can be moved back to the same row
- * number as it was on when commit was called.
+ * Transactions: The same ResultSet is held open regardless of commits or roll backs in a surrounding transaction. This
+ * means that when such a transaction is committed, the input source is notified through the {@link #mark()} and
+ * {@link #reset()} so that it can save it's current row number. Later, if the transaction is rolled back, the current
+ * row can be moved back to the same row number as it was on when commit was called.
  * </p>
  * 
  * <p>
- * Calling skip will indicate that a record is bad and should not be
- * re-presented to the user if the transaction is rolled back. For example, if
- * row 2 is read in, and found to be bad, calling skip will inform the
- * {@link ItemReader}. If reading is then continued, and a rollback is
- * necessary because of an error on output, the input source will be returned to
- * row 1. Calling read while on row 1 will move the current row to 3, not 2,
- * because 2 has been marked as skipped.
+ * Calling skip will indicate that a record is bad and should not be re-presented to the user if the transaction is
+ * rolled back. For example, if row 2 is read in, and found to be bad, calling skip will inform the {@link ItemReader}.
+ * If reading is then continued, and a rollback is necessary because of an error on output, the input source will be
+ * returned to row 1. Calling read while on row 1 will move the current row to 3, not 2, because 2 has been marked as
+ * skipped.
  * </p>
  * 
  * <p>
- * Calling close on this {@link ItemStream} will cause all resources it is
- * currently using to be freed. (Connection, ResultSet, etc). It is then illegal
- * to call {@link #read()} again until it has been opened.
+ * Calling close on this {@link ItemStream} will cause all resources it is currently using to be freed. (Connection,
+ * ResultSet, etc). It is then illegal to call {@link #read()} again until it has been opened.
  * </p>
  * 
  * @author Lucas Ward
  * @author Peter Zozom
  */
-public class JdbcCursorItemReader extends ExecutionContextUserSupport implements ItemReader, InitializingBean, ItemStream, Skippable {
+public class JdbcCursorItemReader extends ExecutionContextUserSupport implements ItemReader, InitializingBean,
+        ItemStream, Skippable {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);
 
@@ -151,7 +141,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	private boolean initialized = false;
 
 	private boolean saveState = false;
-	
+
 	public JdbcCursorItemReader() {
 		setName(JdbcCursorItemReader.class.getSimpleName());
 	}
@@ -159,8 +149,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	/**
 	 * Assert that mandatory properties are set.
 	 * 
-	 * @throws IllegalArgumentException if either data source or sql properties
-	 * not set.
+	 * @throws IllegalArgumentException if either data source or sql properties not set.
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource, "DataSOurce must be provided");
@@ -177,11 +166,10 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/**
-	 * Increment the cursor to the next row, validating the cursor position and
-	 * passing the resultset to the RowMapper. If read has not been called on
-	 * this instance before, the cursor will be opened. If there are skipped
-	 * records for this commit scope, an internal list of skipped records will
-	 * be checked to ensure that only a valid row is given to the mapper.
+	 * Increment the cursor to the next row, validating the cursor position and passing the resultset to the RowMapper.
+	 * If read has not been called on this instance before, the cursor will be opened. If there are skipped records for
+	 * this commit scope, an internal list of skipped records will be checked to ensure that only a valid row is given
+	 * to the mapper.
 	 * 
 	 * @returns Object returned by RowMapper
 	 * @throws DataAccessException
@@ -198,8 +186,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		try {
 			if (!rs.next()) {
 				return null;
-			}
-			else {
+			} else {
 				currentProcessedRow++;
 				if (!skippedRows.isEmpty()) {
 					// while is necessary to handle successive skips.
@@ -217,8 +204,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 
 				return mappedResult;
 			}
-		}
-		catch (SQLException se) {
+		} catch (SQLException se) {
 			throw getExceptionTranslator().translate("Trying to process next row", sql, se);
 		}
 
@@ -229,8 +215,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/**
-	 * Mark the current row. Calling reset will cause the result set to be set
-	 * to the current row when mark was called.
+	 * Mark the current row. Calling reset will cause the result set to be set to the current row when mark was called.
 	 */
 	public void mark() {
 		lastCommittedRow = currentProcessedRow;
@@ -247,22 +232,19 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 			currentProcessedRow = lastCommittedRow;
 			if (currentProcessedRow > 0) {
 				rs.absolute((int) currentProcessedRow);
-			}
-			else {
+			} else {
 				rs.beforeFirst();
 			}
 
-		}
-		catch (SQLException se) {
-			throw new ResetFailedException(getExceptionTranslator().translate(
-					"Attempted to move ResultSet to last committed row", sql, se));
+		} catch (SQLException se) {
+			throw new ResetFailedException("Illegal modification of the result set cursor", getExceptionTranslator()
+			        .translate("Attempted to move ResultSet to last committed row", sql, se));
 		}
 	}
 
 	/**
-	 * Close this input source. The ResultSet, Statement and Connection created
-	 * will be closed. This must be called or the connection and cursor will be
-	 * held open indefinitely!
+	 * Close this input source. The ResultSet, Statement and Connection created will be closed. This must be called or
+	 * the connection and cursor will be held open indefinitely!
 	 * 
 	 * @see org.springframework.batch.item.ResourceLifecycle#close(ExecutionContext)
 	 */
@@ -288,11 +270,10 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/*
-	 * Executes the provided SQL query. The statement is created with
-	 * 'READ_ONLY' and 'HOLD_CUSORS_OVER_COMMIT' set to true. This is extremely
-	 * important, since a non read-only cursor may lock tables that shouldn't be
-	 * locked, and not holding the cursor open over a commit would require it to
-	 * be reopened after each commit, which would destroy performance.
+	 * Executes the provided SQL query. The statement is created with 'READ_ONLY' and 'HOLD_CUSORS_OVER_COMMIT' set to
+	 * true. This is extremely important, since a non read-only cursor may lock tables that shouldn't be locked, and not
+	 * holding the cursor open over a commit would require it to be reopened after each commit, which would destroy
+	 * performance.
 	 */
 	private void executeQuery() {
 
@@ -301,12 +282,11 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		try {
 			this.con = dataSource.getConnection();
 			this.stmt = this.con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY,
-					ResultSet.HOLD_CURSORS_OVER_COMMIT);
+			        ResultSet.HOLD_CURSORS_OVER_COMMIT);
 			applyStatementSettings(this.stmt);
 			this.rs = this.stmt.executeQuery(sql);
 			handleWarnings(this.stmt.getWarnings());
-		}
-		catch (SQLException se) {
+		} catch (SQLException se) {
 			close(null);
 			throw getExceptionTranslator().translate("Executing query", sql, se);
 		}
@@ -314,10 +294,8 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/*
-	 * Prepare the given JDBC Statement (or PreparedStatement or
-	 * CallableStatement), applying statement settings such as fetch size, max
-	 * rows, and query timeout. @param stmt the JDBC Statement to prepare
-	 * @throws SQLException
+	 * Prepare the given JDBC Statement (or PreparedStatement or CallableStatement), applying statement settings such as
+	 * fetch size, max rows, and query timeout. @param stmt the JDBC Statement to prepare @throws SQLException
 	 * 
 	 * @see #setFetchSize
 	 * @see #setMaxRows
@@ -337,16 +315,14 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/*
-	 * Return the exception translator for this instance. <p>Creates a default
-	 * SQLErrorCodeSQLExceptionTranslator for the specified DataSource if none
-	 * is set.
+	 * Return the exception translator for this instance. <p>Creates a default SQLErrorCodeSQLExceptionTranslator for
+	 * the specified DataSource if none is set.
 	 */
 	protected SQLExceptionTranslator getExceptionTranslator() {
 		if (exceptionTranslator == null) {
 			if (dataSource != null) {
 				exceptionTranslator = new SQLErrorCodeSQLExceptionTranslator(dataSource);
-			}
-			else {
+			} else {
 				exceptionTranslator = new SQLStateSQLExceptionTranslator();
 			}
 		}
@@ -354,11 +330,10 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/*
-	 * Throw a SQLWarningException if we're not ignoring warnings, else log the
-	 * warnings (at debug level).
+	 * Throw a SQLWarningException if we're not ignoring warnings, else log the warnings (at debug level).
 	 * 
-	 * @param warning the warnings object from the current statement. May be
-	 * <code>null</code>, in which case this method does nothing.
+	 * @param warning the warnings object from the current statement. May be <code>null</code>, in which case this
+	 * method does nothing.
 	 * 
 	 * @see org.springframework.jdbc.SQLWarningException
 	 */
@@ -367,17 +342,17 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 			SQLWarning warningToLog = warnings;
 			while (warningToLog != null) {
 				log.debug("SQLWarning ignored: SQL state '" + warningToLog.getSQLState() + "', error code '"
-						+ warningToLog.getErrorCode() + "', message [" + warningToLog.getMessage() + "]");
+				        + warningToLog.getErrorCode() + "', message [" + warningToLog.getMessage() + "]");
 				warningToLog = warningToLog.getNextWarning();
 			}
-		}
-		else if (warnings != null) {
+		} else if (warnings != null) {
 			throw new SQLWarningException("Warning not ignored", warnings);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getExecutionContext()
 	 */
 	public void update(ExecutionContext executionContext) {
@@ -392,6 +367,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#restoreFrom(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void open(ExecutionContext context) {
@@ -409,8 +385,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		try {
 			this.currentProcessedRow = context.getLong(getKey(CURRENT_PROCESSED_ROW));
 			rs.absolute((int) currentProcessedRow);
-		}
-		catch (SQLException se) {
+		} catch (SQLException se) {
 			throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);
 		}
 
@@ -425,10 +400,9 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/**
-	 * Skip the current row. If the transaction is rolled back, this row will
-	 * not be represented to the RowMapper when read() is called. For example,
-	 * if you read in row 2, find the data to be bad, and call skip(), then
-	 * continue processing and find
+	 * Skip the current row. If the transaction is rolled back, this row will not be represented to the RowMapper when
+	 * read() is called. For example, if you read in row 2, find the data to be bad, and call skip(), then continue
+	 * processing and find
 	 */
 	public void skip() {
 		skippedRows.add(new Long(currentProcessedRow));
@@ -436,10 +410,9 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/**
-	 * Gives the JDBC driver a hint as to the number of rows that should be
-	 * fetched from the database when more rows are needed for this
-	 * <code>ResultSet</code> object. If the fetch size specified is zero, the
-	 * JDBC driver ignores the value.
+	 * Gives the JDBC driver a hint as to the number of rows that should be fetched from the database when more rows are
+	 * needed for this <code>ResultSet</code> object. If the fetch size specified is zero, the JDBC driver ignores the
+	 * value.
 	 * 
 	 * @param fetchSize the number of rows to fetch
 	 * @see ResultSet#setFetchSize(int)
@@ -449,8 +422,8 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/**
-	 * Sets the limit for the maximum number of rows that any
-	 * <code>ResultSet</code> object can contain to the given number.
+	 * Sets the limit for the maximum number of rows that any <code>ResultSet</code> object can contain to the given
+	 * number.
 	 * 
 	 * @param maxRows the new max rows limit; zero means there is no limit
 	 * @see Statement#setMaxRows(int)
@@ -460,13 +433,10 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/**
-	 * Sets the number of seconds the driver will wait for a
-	 * <code>Statement</code> object to execute to the given number of
-	 * seconds. If the limit is exceeded, an <code>SQLException</code> is
-	 * thrown.
+	 * Sets the number of seconds the driver will wait for a <code>Statement</code> object to execute to the given
+	 * number of seconds. If the limit is exceeded, an <code>SQLException</code> is thrown.
 	 * 
-	 * @param queryTimeout seconds the new query timeout limit in seconds; zero
-	 * means there is no limit
+	 * @param queryTimeout seconds the new query timeout limit in seconds; zero means there is no limit
 	 * @see Statement#setQueryTimeout(int)
 	 */
 	public void setQueryTimeout(int queryTimeout) {
@@ -474,8 +444,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/**
-	 * Set whether SQLWarnings should be ignored (only logged) or exception
-	 * should be thrown.
+	 * Set whether SQLWarnings should be ignored (only logged) or exception should be thrown.
 	 * 
 	 * @param ignoreWarnings if TRUE, warnings are ignored
 	 */
@@ -484,8 +453,8 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/**
-	 * Allow verification of cursor position after current row is processed by
-	 * RowMapper or RowCallbackHandler. Default value is TRUE.
+	 * Allow verification of cursor position after current row is processed by RowMapper or RowCallbackHandler. Default
+	 * value is TRUE.
 	 * 
 	 * @param verifyCursorPosition if true, cursor position is verified
 	 */
@@ -503,9 +472,8 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/**
-	 * Set the sql statement to be used when creating the cursor. This statement
-	 * should be a complete and valid Sql statement, as it will be run directly
-	 * without any modification.
+	 * Set the sql statement to be used when creating the cursor. This statement should be a complete and valid Sql
+	 * statement, as it will be run directly without any modification.
 	 * 
 	 * @param sql
 	 */

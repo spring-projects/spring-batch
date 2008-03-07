@@ -23,7 +23,6 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
 import org.springframework.core.AttributeAccessorSupport;
 
 public class SynchronizedAttributeAccessorTests extends TestCase {

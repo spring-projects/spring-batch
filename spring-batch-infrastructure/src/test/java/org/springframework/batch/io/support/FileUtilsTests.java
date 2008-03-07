@@ -5,10 +5,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import junit.framework.TestCase;
+
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
-
-import junit.framework.TestCase;
 
 /**
  * Tests for {@link FileUtils}

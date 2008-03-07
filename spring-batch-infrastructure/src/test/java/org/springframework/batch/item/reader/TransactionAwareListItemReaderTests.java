@@ -22,7 +22,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.transaction.PlatformTransactionManager;

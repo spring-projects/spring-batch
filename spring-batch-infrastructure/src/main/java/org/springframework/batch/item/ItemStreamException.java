@@ -13,40 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.exception;
-
-import org.springframework.batch.io.exception.InfrastructureException;
+package org.springframework.batch.item;
 
 /**
- * Exception representing any errors encountered while processing
- * a stream.
+ * Exception representing any errors encountered while processing a stream.
  * 
  * @author Dave Syer
  * @author Lucas Ward
  */
-public class StreamException extends InfrastructureException {
+public class ItemStreamException extends RuntimeException {
 
 	/**
 	 * @param message
 	 */
-	public StreamException(String message) {
+	public ItemStreamException(String message) {
 		super(message);
 	}
-	
+
 	/**
 	 * Constructs a new instance with a message and nested exception.
 	 * 
 	 * @param msg the exception message.
 	 * 
 	 */
-	public StreamException(String msg, Throwable nested) {
+	public ItemStreamException(String msg, Throwable nested) {
 		super(msg, nested);
 	}
 
 	/**
 	 * Constructs a new instance with a nested exception and empty message.
 	 */
-	public StreamException(Throwable nested) {
+	public ItemStreamException(Throwable nested) {
 		super(nested);
 	}
 }

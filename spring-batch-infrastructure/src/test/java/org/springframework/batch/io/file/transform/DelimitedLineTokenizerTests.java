@@ -19,8 +19,6 @@ package org.springframework.batch.io.file.transform;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.file.mapping.FieldSet;
-import org.springframework.batch.io.file.transform.AbstractLineTokenizer;
-import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
 
 public class DelimitedLineTokenizerTests extends TestCase {
 

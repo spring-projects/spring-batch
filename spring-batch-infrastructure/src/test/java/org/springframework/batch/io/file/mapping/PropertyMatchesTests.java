@@ -16,8 +16,6 @@
 
 package org.springframework.batch.io.file.mapping;
 
-import org.springframework.batch.io.file.mapping.PropertyMatches;
-
 import junit.framework.TestCase;
 
 public class PropertyMatchesTests extends TestCase {

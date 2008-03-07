@@ -16,12 +16,10 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.batch.item.exception.StreamException;
-
 /**
  * <p>
- * Marker interface defining a contract for periodically storing state and
- * restoring from that state should an error occur.
+ * Marker interface defining a contract for periodically storing state and restoring from that state should an error
+ * occur.
  * <p>
  * 
  * @author Dave Syer
@@ -35,23 +33,22 @@ public interface ItemStream {
 	 * 
 	 * @throws IllegalArgumentException if context is null
 	 */
-	void open(ExecutionContext executionContext) throws StreamException;
-	
+	void open(ExecutionContext executionContext) throws ItemStreamException;
+
 	/**
-	 * Indicates that the execution context provided during open
-	 * is about to be saved.  If any state is remaining, but 
-	 * has not been put in the context, it should be added
-	 * here.
+	 * Indicates that the execution context provided during open is about to be saved. If any state is remaining, but
+	 * has not been put in the context, it should be added here.
+	 * 
 	 * @param executionContext to be updated
 	 * @throws IllegalArgumentException if executionContext is null.
 	 */
-	void update(ExecutionContext executionContext);
-	
+	void update(ExecutionContext executionContext) throws ItemStreamException;
+
 	/**
-	 * If any resources are needed for the stream to operate they need to be
-	 * destroyed here. Once this method has been called all other methods
-	 * (except open) may throw an exception.
+	 * If any resources are needed for the stream to operate they need to be destroyed here. Once this method has been
+	 * called all other methods (except open) may throw an exception.
+	 * 
 	 * @param executionContext TODO
 	 */
-	void close(ExecutionContext executionContext) throws StreamException;
+	void close(ExecutionContext executionContext) throws ItemStreamException;
 }

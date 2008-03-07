@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.repeat;
 
-import org.apache.commons.lang.SerializationUtils;
-
 import junit.framework.TestCase;
+
+import org.apache.commons.lang.SerializationUtils;
 
 /**
  * @author Dave Syer

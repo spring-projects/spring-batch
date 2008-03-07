@@ -18,10 +18,10 @@ package org.springframework.batch.io.file.transform;
 import java.util.Arrays;
 import java.util.Collections;
 
+import junit.framework.TestCase;
+
 import org.springframework.batch.item.writer.ItemTransformer;
 import org.springframework.util.StringUtils;
-
-import junit.framework.TestCase;
 
 /**
  * @author Dave Syer

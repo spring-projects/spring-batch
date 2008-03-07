@@ -4,8 +4,6 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.writer.ItemTransformer;
-import org.springframework.batch.item.writer.ItemTransformerItemWriter;
 
 /**
  * Tests for {@link ItemTransformerItemWriter}.

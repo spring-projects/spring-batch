@@ -24,7 +24,6 @@ import javax.xml.stream.events.XMLEvent;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.io.xml.stax.AbstractEventWriterWrapper;
 
 import com.bea.xml.stream.events.StartDocumentEvent;
 import com.bea.xml.stream.util.NamespaceContextImpl;

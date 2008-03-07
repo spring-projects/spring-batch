@@ -17,12 +17,12 @@ package org.springframework.batch.execution.step.support;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.execution.step.ItemHandler;
+import org.springframework.batch.item.ClearFailedException;
+import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.exception.ClearFailedException;
-import org.springframework.batch.item.exception.FlushFailedException;
-import org.springframework.batch.item.exception.MarkFailedException;
-import org.springframework.batch.item.exception.ResetFailedException;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**

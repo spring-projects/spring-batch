@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.batch.item.exception.ClearFailedException;
-import org.springframework.batch.item.exception.FlushFailedException;
 
 /**
  * <p>Basic interface for generic output operations. Class implementing this

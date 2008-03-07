@@ -2,8 +2,6 @@ package org.springframework.batch.io.file.transform;
 
 import java.util.List;
 
-import org.springframework.batch.io.file.transform.AbstractLineTokenizer;
-
 import junit.framework.TestCase;
 
 /**

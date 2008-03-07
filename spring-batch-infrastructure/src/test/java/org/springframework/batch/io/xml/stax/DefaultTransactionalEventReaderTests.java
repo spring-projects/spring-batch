@@ -6,7 +6,6 @@ import javax.xml.stream.XMLInputFactory;
 import junit.framework.TestCase;
 
 import org.springframework.batch.io.xml.EventHelper;
-import org.springframework.batch.io.xml.stax.DefaultTransactionalEventReader;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 

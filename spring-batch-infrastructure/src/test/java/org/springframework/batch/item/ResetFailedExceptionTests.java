@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.exception;
+package org.springframework.batch.item;
 
 import org.springframework.batch.io.exception.AbstractExceptionTests;
-
 
 public class ResetFailedExceptionTests extends AbstractExceptionTests {
 
 	public Exception getException(String msg) throws Exception {
 		return new ResetFailedException(msg);
-	}
-
-	public Exception getException(Throwable t) throws Exception {
-		return new ResetFailedException(t);
 	}
 
 	public Exception getException(String msg, Throwable t) throws Exception {

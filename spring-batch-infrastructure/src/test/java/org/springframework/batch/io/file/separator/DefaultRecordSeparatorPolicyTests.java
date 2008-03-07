@@ -16,8 +16,6 @@
 
 package org.springframework.batch.io.file.separator;
 
-import org.springframework.batch.io.file.separator.DefaultRecordSeparatorPolicy;
-
 import junit.framework.TestCase;
 
 public class DefaultRecordSeparatorPolicyTests extends TestCase {

@@ -23,8 +23,6 @@ import junit.framework.TestCase;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.batch.repeat.listener.CompositeRepeatListener;
-import org.springframework.batch.repeat.listener.RepeatListenerSupport;
 
 /**
  * @author Dave Syer

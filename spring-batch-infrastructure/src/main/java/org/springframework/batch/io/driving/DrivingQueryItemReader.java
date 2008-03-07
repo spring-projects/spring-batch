@@ -21,7 +21,7 @@ import java.util.List;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.exception.NoWorkFoundException;
+import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 

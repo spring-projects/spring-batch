@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.exception.StreamException;
+import org.springframework.batch.item.ItemStreamException;
 
 /**
  * Simple {@link ItemStream} that delegates to a list of other streams.
@@ -83,9 +83,9 @@ public class CompositeItemStream implements ItemStream {
 
 	/**
 	 * Broadcast the call to close from this {@link StreamManager}.
-	 * @throws StreamException
+	 * @throws ItemStreamException
 	 */
-	public void close(ExecutionContext executionContext) throws StreamException {
+	public void close(ExecutionContext executionContext) throws ItemStreamException {
 		synchronized (streams) {
 			for (Iterator it = streams.iterator(); it.hasNext();) {
 				ItemStream itemStream = (ItemStream) it.next();
@@ -96,9 +96,9 @@ public class CompositeItemStream implements ItemStream {
 
 	/**
 	 * Broadcast the call to open from this {@link StreamManager}.
-	 * @throws StreamException
+	 * @throws ItemStreamException
 	 */
-	public void open(ExecutionContext executionContext) throws StreamException {
+	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		synchronized (streams) {
 			for (Iterator it = streams.iterator(); it.hasNext();) {
 				ItemStream itemStream = (ItemStream) it.next();

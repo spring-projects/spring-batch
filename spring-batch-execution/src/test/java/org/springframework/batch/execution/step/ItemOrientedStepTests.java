@@ -44,9 +44,9 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.exception.MarkFailedException;
-import org.springframework.batch.item.exception.ResetFailedException;
-import org.springframework.batch.item.exception.StreamException;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.batch.item.ResetFailedException;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.reader.AbstractItemReader;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.item.stream.ItemStreamSupport;
@@ -380,7 +380,7 @@ public class ItemOrientedStepTests extends TestCase {
 			public void beforeStep(StepExecution stepExecution) {
 				list.add("foo");
 			}
-			public void open(ExecutionContext executionContext) throws StreamException {
+			public void open(ExecutionContext executionContext) throws ItemStreamException {
 				assertEquals(1, list.size());
 			}
 		};
@@ -633,7 +633,7 @@ public class ItemOrientedStepTests extends TestCase {
 	public void testStatusForCloseFailedException() throws Exception {
 
 		MockRestartableItemReader itemReader = new MockRestartableItemReader() {
-			public void close(ExecutionContext executionContext) throws StreamException {
+			public void close(ExecutionContext executionContext) throws ItemStreamException {
 				super.close(executionContext);
 				// Simulate failure on rollback when stream resets
 				throw new RuntimeException("Bar");

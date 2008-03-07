@@ -18,9 +18,9 @@ package org.springframework.batch.repeat.callback;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
 public class NestedRepeatCallbackTests extends TestCase {

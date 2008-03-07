@@ -17,7 +17,7 @@ package org.springframework.batch.item.stream;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.exception.StreamException;
+import org.springframework.batch.item.ItemStreamException;
 
 /**
  * Empty method implementation of {@link ItemStream}.
@@ -31,14 +31,14 @@ public class ItemStreamSupport implements ItemStream {
 	 * No-op.
 	 * @see org.springframework.batch.item.ItemStream#close(ExecutionContext)
 	 */
-	public void close(ExecutionContext executionContext) throws StreamException {
+	public void close(ExecutionContext executionContext) throws ItemStreamException {
 	}
 
 	/**
 	 * No-op.
 	 * @see org.springframework.batch.item.ItemStream#open()
 	 */
-	public void open(ExecutionContext executionContext) throws StreamException {
+	public void open(ExecutionContext executionContext) throws ItemStreamException {
 	}
 
 	/**

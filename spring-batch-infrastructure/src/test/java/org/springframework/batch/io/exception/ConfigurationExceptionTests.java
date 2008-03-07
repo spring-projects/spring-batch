@@ -16,7 +16,6 @@
 
 package org.springframework.batch.io.exception;
 
-import org.springframework.batch.io.exception.ConfigurationException;
 
 public class ConfigurationExceptionTests extends AbstractExceptionTests {
 

@@ -25,7 +25,6 @@ import javax.jms.Queue;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.item.reader.JmsItemReader;
 import org.springframework.jms.core.JmsOperations;
 
 public class JmsItemReaderTests extends TestCase {

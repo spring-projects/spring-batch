@@ -26,7 +26,7 @@ import org.springframework.batch.item.FailedItemIdentifier;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
-import org.springframework.batch.item.exception.UnexpectedInputException;
+import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;

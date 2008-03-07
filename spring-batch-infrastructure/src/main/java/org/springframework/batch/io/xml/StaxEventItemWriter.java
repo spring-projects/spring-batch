@@ -17,12 +17,12 @@ import javax.xml.stream.XMLStreamException;
 
 import org.springframework.batch.io.support.FileUtils;
 import org.springframework.batch.io.xml.stax.NoStartEndDocumentStreamWriter;
+import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ExecutionContextUserSupport;
+import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.exception.ClearFailedException;
-import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;

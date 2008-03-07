@@ -26,7 +26,6 @@ import javax.xml.transform.Result;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.io.xml.oxm.MarshallingEventWriterSerializer;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;

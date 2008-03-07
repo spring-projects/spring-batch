@@ -15,7 +15,8 @@ import javax.xml.stream.events.XMLEvent;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.exception.StreamException;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -139,7 +140,7 @@ public class StaxEventItemReaderTests extends TestCase {
 			source.open(context);
 			fail("Expected StreamException");
 		}
-		catch (StreamException e) {
+		catch (ItemStreamException e) {
 			// expected
 			String message = e.getMessage();
 			assertTrue("Wrong message: "+message, message.contains("must be before"));
@@ -241,9 +242,9 @@ public class StaxEventItemReaderTests extends TestCase {
 		// calling read again should require re-initialization because of close
 		try {
 			item = newSource.read();
-			fail("Expected StreamException");
+			fail("Expected ReaderNotOpenException");
 		}
-		catch (StreamException e) {
+		catch (ReaderNotOpenException e) {
 			// expected
 		}
 	}

@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item;
 
-import org.springframework.batch.item.exception.MarkFailedException;
-import org.springframework.batch.item.exception.ResetFailedException;
 import org.springframework.batch.item.reader.AbstractItemReader;
 
 /**
@@ -51,7 +49,7 @@ public interface ItemReader {
 	 * 
 	 * @throws Exception if an underlying resource is unavailable.
 	 */
-	Object read() throws Exception;
+	Object read() throws Exception, UnexpectedInputException, NoWorkFoundException;
 
 	/**
 	 * Mark the stream so that it can be reset later and the items backed out.<br/>

@@ -13,34 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.exception;
+package org.springframework.batch.item;
 
 /**
+ * An exception class thrown when an {@link ItemReader} fails to mark its current state for future retry.
+ * 
  * @author Dave Syer
- *
+ * @author Ben Hale
  */
-public class CommitFailedException extends StreamException {
+public class MarkFailedException extends ItemReaderException {
+
 	/**
-	 * @param message
+	 * Create a new {@link MarkFailedException} based on a message.
+	 * 
+	 * @param message the message for this exception
 	 */
-	public CommitFailedException(String message) {
+	public MarkFailedException(String message) {
 		super(message);
 	}
 
 	/**
-	 * @param msg
-	 * @param nested
+	 * Create a new {@link MarkFailedException} based on a message and another exception.
+	 * 
+	 * @param message the message for this exception
+	 * @param cause the other exception
 	 */
-	public CommitFailedException(String msg, Throwable nested) {
+	public MarkFailedException(String msg, Throwable nested) {
 		super(msg, nested);
 	}
-
-	/**
-	 * @param msg
-	 * @param nested
-	 */
-	public CommitFailedException(Throwable nested) {
-		super(nested);
-	}	
 
 }

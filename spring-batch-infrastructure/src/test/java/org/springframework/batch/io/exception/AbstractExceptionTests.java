@@ -25,19 +25,12 @@ public abstract class AbstractExceptionTests extends TestCase {
 		assertEquals("foo", exception.getMessage());
 	}
 
-	public void testExceptionThrowable() throws Exception {
-		Exception exception = getException(new RuntimeException("foo"));
-		assertEquals("foo", exception.getCause().getMessage());
-	}
-
 	public void testExceptionStringThrowable() throws Exception {
 		Exception exception = getException("foo", new IllegalStateException());
 		assertEquals("foo", exception.getMessage().substring(0, 3));
 	}
 
 	public abstract Exception getException(String msg) throws Exception;
-
-	public abstract Exception getException(Throwable t) throws Exception;
 
 	public abstract Exception getException(String msg, Throwable t) throws Exception;
 

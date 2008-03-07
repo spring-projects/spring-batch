@@ -16,8 +16,6 @@
 
 package org.springframework.batch.retry.listener;
 
-import org.springframework.batch.retry.listener.RetryListenerSupport;
-
 import junit.framework.TestCase;
 
 public class RetryListenerSupportTests extends TestCase {

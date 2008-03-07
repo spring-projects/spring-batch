@@ -16,8 +16,8 @@
 package org.springframework.batch.execution.step.support;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.exception.MarkFailedException;
-import org.springframework.batch.item.exception.ResetFailedException;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.batch.item.ResetFailedException;
 
 public class MockItemReader implements ItemReader {
 

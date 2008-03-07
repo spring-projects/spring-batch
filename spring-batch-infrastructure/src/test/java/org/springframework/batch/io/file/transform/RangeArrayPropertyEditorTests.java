@@ -1,8 +1,5 @@
 package org.springframework.batch.io.file.transform;
 
-import org.springframework.batch.io.file.transform.Range;
-import org.springframework.batch.io.file.transform.RangeArrayPropertyEditor;
-
 import junit.framework.TestCase;
 
 public class RangeArrayPropertyEditorTests extends TestCase {

@@ -8,7 +8,6 @@ import javax.xml.stream.XMLInputFactory;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.io.xml.oxm.UnmarshallingEventReaderDeserializer;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;

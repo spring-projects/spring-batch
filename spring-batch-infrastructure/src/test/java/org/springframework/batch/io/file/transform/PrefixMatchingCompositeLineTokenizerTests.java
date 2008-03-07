@@ -25,8 +25,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 import org.springframework.batch.io.file.mapping.FieldSet;
-import org.springframework.batch.io.file.transform.DelimitedLineTokenizer;
-import org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer;
 
 public class PrefixMatchingCompositeLineTokenizerTests extends TestCase {
 

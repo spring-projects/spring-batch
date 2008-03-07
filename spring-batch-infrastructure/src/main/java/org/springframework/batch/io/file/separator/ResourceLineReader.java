@@ -28,9 +28,10 @@ import java.util.Iterator;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.exception.MarkFailedException;
-import org.springframework.batch.item.exception.ResetFailedException;
-import org.springframework.batch.item.exception.StreamException;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.batch.item.ResetFailedException;
+import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.stream.ItemStreamSupport;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -38,22 +39,17 @@ import org.springframework.util.Assert;
 /**
  * An input source that reads lines one by one from a resource. <br/>
  * 
- * A line can consist of multiple lines in the input resource, according to the
- * {@link RecordSeparatorPolicy} in force. By default a line is either
- * terminated by a newline (as per {@link BufferedReader#readLine()}), or can
- * be continued onto the next line if a field surrounded by quotes (\") contains
- * a newline.<br/>
+ * A line can consist of multiple lines in the input resource, according to the {@link RecordSeparatorPolicy} in force.
+ * By default a line is either terminated by a newline (as per {@link BufferedReader#readLine()}), or can be continued
+ * onto the next line if a field surrounded by quotes (\") contains a newline.<br/>
  * 
- * Comment lines can be indicated using a line prefix (or collection of
- * prefixes) and they will be ignored. The default is "#", so lines starting
- * with a pound sign will be ignored.<br/>
+ * Comment lines can be indicated using a line prefix (or collection of prefixes) and they will be ignored. The default
+ * is "#", so lines starting with a pound sign will be ignored.<br/>
  * 
- * All the public methods that interact with the underlying resource (open,
- * close, read etc.) are synchronized on this.<br/>
+ * All the public methods that interact with the underlying resource (open, close, read etc.) are synchronized on this.<br/>
  * 
- * Package private because this is not intended to be a public API - used
- * internally by the flat file input sources. That makes abuses of the fact that
- * it is stateful easier to control.<br/>
+ * Package private because this is not intended to be a public API - used internally by the flat file input sources.
+ * That makes abuses of the fact that it is stateful easier to control.<br/>
  * 
  * @author Dave Syer
  * @author Rob Harrop
@@ -89,24 +85,22 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 	}
 
 	/**
-	 * Setter for the {@link RecordSeparatorPolicy}. Default value is a
-	 * {@link DefaultRecordSeparatorPolicy}. Ideally should not be changed once
-	 * a reader is in use, but it would not be fatal if it was.
+	 * Setter for the {@link RecordSeparatorPolicy}. Default value is a {@link DefaultRecordSeparatorPolicy}. Ideally
+	 * should not be changed once a reader is in use, but it would not be fatal if it was.
 	 * 
 	 * @param recordSeparatorPolicy the new {@link RecordSeparatorPolicy}
 	 */
 	public void setRecordSeparatorPolicy(RecordSeparatorPolicy recordSeparatorPolicy) {
 		/*
-		 * The rest of the code accesses the policy in synchronized blocks,
-		 * copying the reference before using it. So in principle it can be
-		 * changed in flight - the results might not be what the user expected!
+		 * The rest of the code accesses the policy in synchronized blocks, copying the reference before using it. So in
+		 * principle it can be changed in flight - the results might not be what the user expected!
 		 */
 		this.recordSeparatorPolicy = recordSeparatorPolicy;
 	}
 
 	/**
-	 * Setter for comment prefixes. Can be used to ignore header lines as well
-	 * by using e.g. the first couple of column names as a prefix.
+	 * Setter for comment prefixes. Can be used to ignore header lines as well by using e.g. the first couple of column
+	 * names as a prefix.
 	 * 
 	 * @param comments an array of comment line prefixes.
 	 */
@@ -115,8 +109,7 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 	}
 
 	/**
-	 * Read the next line from the input resource, ignoring comments, and
-	 * according to the {@link RecordSeparatorPolicy}.
+	 * Read the next line from the input resource, ignoring comments, and according to the {@link RecordSeparatorPolicy}.
 	 * 
 	 * @return a String.
 	 * 
@@ -154,8 +147,7 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 	}
 
 	/**
-	 * A no-op because the oobject is initialized with all it needs to open in
-	 * the constructor.
+	 * A no-op because the oobject is initialized with all it needs to open in the constructor.
 	 * 
 	 * @see org.springframework.batch.item.ResourceLifecycle#open()
 	 */
@@ -175,8 +167,7 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 		}
 		try {
 			state.close();
-		}
-		finally {
+		} finally {
 			state = null;
 		}
 	}
@@ -191,14 +182,11 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 	}
 
 	/**
-	 * Mark the state for return later with reset. Uses the read-ahead limit
-	 * from an underlying {@link BufferedReader}, which means that there is a
-	 * limit to how much data can be recovered if the mark needs to be reset.<br/>
+	 * Mark the state for return later with reset. Uses the read-ahead limit from an underlying {@link BufferedReader},
+	 * which means that there is a limit to how much data can be recovered if the mark needs to be reset.<br/>
 	 * 
-	 * Mark is supported as long as this {@link ItemStream} is used in a
-	 * single-threaded environment. The state backing the mark is a single
-	 * counter, keeping track of the current position, so multiple threads
-	 * cannot be accommodated.
+	 * Mark is supported as long as this {@link ItemStream} is used in a single-threaded environment. The state backing
+	 * the mark is a single counter, keeping track of the current position, so multiple threads cannot be accommodated.
 	 * 
 	 * @see #reset()
 	 * 
@@ -213,8 +201,7 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 	 * 
 	 * @see #mark()
 	 * 
-	 * @throws ResetFailedException if the reset is unsuccessful, e.g. if
-	 * the read-ahead limit was breached.
+	 * @throws ResetFailedException if the reset is unsuccessful, e.g. if the read-ahead limit was breached.
 	 */
 	public synchronized void reset() throws ResetFailedException {
 		getState().reset();
@@ -253,10 +240,9 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 					}
 					currentLineCount++;
 				}
-			}
-			catch (IOException e) {
-				throw new StreamException("Unable to read from resource '" + resource + "' at line "
-						+ currentLineCount, e);
+			} catch (IOException e) {
+				throw new UnexpectedInputException("Unable to read from resource '" + resource + "' at line "
+				        + currentLineCount, e);
 			}
 			return line;
 		}
@@ -268,9 +254,8 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 			try {
 				reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), encoding));
 				mark();
-			}
-			catch (IOException e) {
-				throw new StreamException("Could not open resource", e);
+			} catch (IOException e) {
+				throw new ItemStreamException("Could not open resource", e);
 			}
 		}
 
@@ -284,11 +269,9 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 			}
 			try {
 				reader.close();
-			}
-			catch (IOException e) {
-				throw new StreamException("Could not close reader", e);
-			}
-			finally {
+			} catch (IOException e) {
+				throw new ItemStreamException("Could not close reader", e);
+			} finally {
 				currentLineCount = 0;
 				markedLineCount = -1;
 			}
@@ -309,15 +292,13 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 			try {
 				reader.mark(READ_AHEAD_LIMIT);
 				markedLineCount = currentLineCount;
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				throw new MarkFailedException("Could not mark reader", e);
 			}
 		}
 
 		/**
-		 * Reset the reader and line counters to the last marked position if
-		 * possible.
+		 * Reset the reader and line counters to the last marked position if possible.
 		 */
 		public void reset() throws ResetFailedException {
 
@@ -327,8 +308,7 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 			try {
 				this.reader.reset();
 				currentLineCount = markedLineCount;
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				throw new ResetFailedException("Could not reset reader", e);
 			}
 

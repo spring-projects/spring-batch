@@ -19,9 +19,9 @@ package org.springframework.batch.repeat.support;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.callback.ItemReaderRepeatCallback;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 

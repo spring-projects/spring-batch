@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.exception;
 
-/**
- * Exception indicating that an {@link ItemReader} found
- * no work to process while initializing.
- * 
- * @author Lucas Ward
- *
- */
-public class NoWorkFoundException extends StreamException {
+package org.springframework.batch.item;
 
-	public NoWorkFoundException(String msg) {
-		super(msg);
+import org.springframework.batch.repeat.exception.AbstractExceptionTests;
+
+public class UnexpectedInputExceptionTests extends AbstractExceptionTests {
+
+	public Exception getException(String msg) throws Exception {
+		return new UnexpectedInputException(msg, null);
 	}
+
+	public Exception getException(String msg, Throwable t) throws Exception {
+		return new UnexpectedInputException(msg, t);
+	}
+
 }

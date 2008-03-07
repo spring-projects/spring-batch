@@ -21,9 +21,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.springframework.batch.item.ClearFailedException;
+import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.exception.ClearFailedException;
-import org.springframework.batch.item.exception.FlushFailedException;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.beans.factory.InitializingBean;

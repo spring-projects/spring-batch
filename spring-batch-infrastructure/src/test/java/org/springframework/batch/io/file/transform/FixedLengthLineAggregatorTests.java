@@ -16,11 +16,9 @@
 
 package org.springframework.batch.io.file.transform;
 
-import org.springframework.batch.io.file.mapping.DefaultFieldSet;
-import org.springframework.batch.io.file.transform.FixedLengthLineAggregator;
-import org.springframework.batch.io.file.transform.Range;
-
 import junit.framework.TestCase;
+
+import org.springframework.batch.io.file.mapping.DefaultFieldSet;
 
 /**
  * Unit tests for {@link FixedLengthLineAggregator}
