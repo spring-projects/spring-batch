@@ -41,7 +41,7 @@ public class JobLauncherDetails extends QuartzJobBean {
 	/**
 	 * Special key in job data map for the name of a job to run.
 	 */
-	private static final String JOB_NAME = "jobName";
+	static final String JOB_NAME = "jobName";
 
 	private static Log log = LogFactory.getLog(JobLauncherDetails.class);
 
@@ -93,7 +93,6 @@ public class JobLauncherDetails extends QuartzJobBean {
 	private JobParameters getJobParametersFromJobMap(Map jobDataMap) {
 
 		JobParametersBuilder builder = new JobParametersBuilder();
-		JobParameters jobParameters = builder.toJobParameters();
 
 		for (Iterator iterator = jobDataMap.entrySet().iterator(); iterator.hasNext();) {
 			Entry entry = (Entry) iterator.next();
@@ -116,7 +115,7 @@ public class JobLauncherDetails extends QuartzJobBean {
 			}
 		}
 
-		return jobParameters;
+		return builder.toJobParameters();
 
 	}
 

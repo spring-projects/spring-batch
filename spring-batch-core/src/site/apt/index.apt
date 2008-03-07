@@ -14,19 +14,17 @@ Overview of the Spring Batch Core
 dependencies to infrastructure indicated schematically.
 
   The figure above shows the central parts of the core domain and its
-  main touch points with the batch application develepor
-  (<<<*Configuration>>>).  To launch a job there is a
-  <<<JobExecutor>>> interface and a facade for it that can be used to
-  simplify the launching for dumb clients like JMX or a command line.
+  main touch points with the batch application develepor (<<<Job>>>
+  and <<<Step>>>).  To launch a job there is a <<<JobLauncher>>>
+  interface that can be used to simplify the launching for dumb
+  clients like JMX or a command line.
 
-  A <<<JobConfiguration>>> is composed of a list of
-  <<<StepConfiguration>>>s, each of which is executed in turn by the
-  <<<JobExecutor>>>, delegating to a <<<StepExecutor>>>.  The
-  <<<StepExecutor>>> is a central strategy in the Spring Batch Core.
-  Implementations of <<<StepExecutor>>> are responsible for sharing
-  the work specified by the <<<StepConfiguration>>> out, but in ways
-  that the configuration doesn't need to be aware of.  For instance,
-  the same <<<StepConfiguration>>> might be used in a simple
+  A <<<Job>>> is composed of a list of <<<Step>>>s, each of which is
+  executed in turn by the <<<Job>>>.  The <<<Step>>> is a central
+  strategy in the Spring Batch Core.  Implementations of <<<Step>>>
+  are responsible for sharing the work out, but in ways that the
+  configuration doesn't need to be aware of.  For instance, the same
+  or very similar <<<Step>>> configuration might be used in a simple
   in-process sequential executor, or in a multi-threaded
   implementation, or one that delegates to remote calls to a
   distributed system.
@@ -46,10 +44,10 @@ extended to include the datababase entities and identifier strategy.
     repository (usually a database).  A new <<<JobExecution>>> is also
     created to track the progress of this particular execution.
 
-    * If the job was previously launched the <<<Job>>>
-    has a flag indicating whether or not to continue and launch a new
-    execution (was this expected?).  The decision is parameterised to
-    depend on whether or not the job failed last time it was executed.
+    * If the job was previously launched the <<<Job>>> has a flag
+    indicating whether or not to continue and launch a new execution
+    (was this expected?).  The decision depends on whether or not the
+    job failed last time it was executed.
 
     If the there was a previous failure - maybe the operator has fixed
     some bad input and wants to run it again - then we might want to
@@ -58,13 +56,14 @@ extended to include the datababase entities and identifier strategy.
     case a new <<<JobExecution>>> is created and stored to monitor
     this execution of the <<<JobInstance>>>.
 
-Overview of the Spring Batch Simple Batch Execution Container
+Overview of the Spring Batch Launch Environment
  
-  The diagram below provides an overview of the high level components, technical services, and basic operations required by a batch architecture.   This architecture framework is a blueprint that has been proven through decades of implementations on the last several generations of platforms (COBOL/Mainframe, C++/Unix, and now Java/anywhere).  The Simple Batch Execution Container provides a physical implementation of the layers, components and technical services commonly found in robust, maintainable systems used to address the creation of simple to complex batch applications, with the infrastructure and extensions to address very complex processing needs.  The materials below will walk through the details of the diagram.
+  The diagram below provides an overview of the high level components, technical services, and basic operations required by a batch architecture.   This architecture framework is a blueprint that has been proven through decades of implementations on the last several generations of platforms (COBOL/Mainframe, C++/Unix, and now Java/anywhere).  Simple Batch provides a physical implementation of the layers, components and technical services commonly found in robust, maintainable systems used to address the creation of simple to complex batch applications, with the infrastructure and extensions to address very complex processing needs.  The materials below will walk through the details of the diagram.
   
-[images/simple-batch-execution-container.jpg] Simple Batch Execution Container high level flow and interaction of the architecture.
+[images/simple-batch-execution-container.jpg] Simple Batch Launch Environment high level flow and interaction of the architecture.
 
- Tiers
+* Tiers
+
   The application style is organized into four logical tiers, which include Run, Job, Application, and Data tiers.  The primary goal for organizing an application according to the tiers is to embed what is known as "separation of concerns" within the system.  Effective separation of concerns results in reducing the impact of change to the system.  
 
   * <<Run Tier:>> The Run Tier is concerned with the scheduling and launching of the application. A vendor product is typically used in this tier to allow time-based and interdependent scheduling of batch jobs as well as providing parallel processing capabilities.
@@ -73,42 +72,4 @@ Overview of the Spring Batch Simple Batch Execution Container
  
   * <<Application Tier:>> The Application Tier contains components required to execute the program.  It contains specific modules that address the required batch functionality and enforces policies around a module execution (e.g., commit intervals, capture of statistics, etc.)
  
-  * <<Data Tier:>> The Data Tier provides the integration with the physical data sources that might include databases, files, or queues.  <<Note>>: In some cases the Job tier can be completely missing and in other cases one Job Script can start several Batch Job instances.
-
-High Level Processing Flow
-
-  The diagram above illustrates the flow and architecture components in a typical batch run execution.
-
-  Standard interaction is described as follows:
-  
-  <<1.>> In the Run tier, a Scheduler starts a batch application by invoking a Job Script. The Scheduler identifies what batch process it wants to run by passing the name of the batch process and any required additional parameters to the Job Script.
-  
-  <<2.>> The Job Script initializes the program and executes any job specific scripts prior to calling the Batch Launcher.
-  
-  <<3.>> The Batch Launcher starts the Batch Execution Container based upon any environment settings  established in the script. (NOTE: A Batch Execution Container is not a Java EE container)
-  
-  <<3.1>> The Batch Container starts and controls the batch execution.  It initializes the Job execution environment with static configuration items such as database settings, logging levels and creates a Job based on the Job Configuration created by a Batch Developer.
-  
-  <<4>> Based on configuration provided by a Batch Developer, the Job sequentially executes steps after checking policies to ensure that each step should be started.  The status of the job and step (start time, end time, status such as "started" or "completed") is stored at various points during the process.
-  
-  <<5.1>> In order to maintain data integrity, at the application tier, the Step acts as a controller to ensure that either an entire group of actions completes successfully or that none of the actions completes. This group of actions is referred to as a logical unit of work (LUW). The Step controls the overall execution of the Tasklet, ensuring that transaction are committed at the appropriate time, and restart and statistics information is stored appropriately.  The first thing the Step is responsible for is the initialization of the data required to begin processing.  The Step will interact with other architecture components, such as the Input Source, to setup the data required to be processed.
-  
-  <<5.1.1>> The Input Source provides services to access various data sources. It provides location transparency to the Batch Tasklet and hides the physical location details of the data. 
-  
-  <<5.2>> Once the data is initialized by the Input Source, the Step will call into the Tasklet to begin processing. The Tasklet contains the business logic to define the LUW and the Step repeatedly calls the Tasklets LUW to finish the business function. The Step does this by first invoking the execute method on the Tasklet in order to acquire a single record/set of data for processing.
-  
-  <<5.2.1>> Before a record is returned to the Tasklet, it may be validated by any number of validation Frameworks that can be provided to an input source. A single record/set of data is gathered by interacting with the Input Source.
-  
-  <<5.3>> Once a record/set has been obtained, the step calls the module to begin processing.
-  
-  <<5.3.1>> The Tasklet executes its internal business logic by calling other Business Logic components as necessary.  Based on the business service, it can requests or persists objects from the data access components.  
-  
-  <<5.3.3>> Data Access components can be leveraged retrieve or persist domain objects.  
-  
-  <<5.3.4>> Once the business logic has been executed, the resulting output record is written out by utilizing the Output Source interface.  The Step will repeatedly call steps 4.2 \-> 4.4 for every record provided by the Input Source.
-  
-  <<5.4>> Once all of the records are processed, the Step calls the Tasklet to perform any clean up activities such as closing connections, exporting files, etc. 
-  
-  <<5.4.1>> The Step is responsible for committing data associated with the remaining logical units of work as well as performing any finalization and administrative functions (e.g. closing database connections).
-  
-  Once the Step has completed finalization the control is passed back to the Job, where any necessary logging or clean up is executed for application termination and wrap-up -- provided there are no additional Steps to execute.
+  * <<Data Tier:>> The Data Tier provides the integration with the physical data sources that might include databases, files, or queues.  <<Note>>: In some cases the Job tier can be completely missing and in other cases one job script can start several batch job instances.
