@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
 
 /**
  * Tests for {@link AbstractMethodInvokingDelegator}
- * 
+ *
  * @author Robert Kasanicky
  */
 public class AbstractDelegatorTests extends TestCase {

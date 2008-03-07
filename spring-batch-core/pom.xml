@@ -47,18 +47,27 @@
 		</dependency>
 		<!-- optional dependency from infrastructure -->
 		<dependency>
-			<groupId>backport-util-concurrent</groupId>
-			<artifactId>backport-util-concurrent</artifactId>
-			<version>3.0</version>
+			<groupId>hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>easymock</groupId>
+			<artifactId>easymock</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>easymock</groupId>
-			<artifactId>easymock</artifactId>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<!-- Spring Dependencies -->
 		<dependency>
@@ -67,12 +76,28 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-context-support</artifactId>
-			<scope>test</scope>
+			<artifactId>spring-context</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>backport-util-concurrent</groupId>
+			<artifactId>backport-util-concurrent</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -81,6 +106,119 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-sql</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<tasks>
+								<typedef resource="foundrylogic/vpp/typedef.properties" />
+								<taskdef resource="foundrylogic/vpp/taskdef.properties" />
+								<!-- Scripts for DAO tests - N.B. under source control. -->
+								<vppcopy todir="${basedir}/src/test/resources/org/springframework/batch/execution/repository/dao" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/hsqldb.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/hsqldb.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="*.sql.vpp" excludes="schema*" />
+									<mapper type="glob" from="*.sql.vpp" to="*.sql" />
+								</vppcopy>
+								<!-- Reference script for HSQLDB - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/hsqldb.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/hsqldb.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-hsqldb.sql" />
+								</vppcopy>
+								<!-- Reference script for DB2 - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/db2.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/db2.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-db2.sql" />
+								</vppcopy>
+								<!-- Reference script for Derby - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/derby.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/derby.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-derby.sql" />
+								</vppcopy>
+								<!-- Reference script for Oracle - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/oracle10g.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/oracle10g.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-oracle10g.sql" />
+								</vppcopy>
+								<!-- Reference script for PostgreSQL - N.B. not under source control, but packagaed in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/postgresql.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/postgresql.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-postgresql.sql" />
+								</vppcopy>
+								<!-- Reference script for MySQL - N.B. not under source control, but packaged in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/mysql.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/mysql.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-mysql.sql" />
+								</vppcopy>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
