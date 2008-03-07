@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core;
 
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 /**
@@ -39,7 +40,7 @@ public class BatchStatus implements Serializable {
 		this.name = name;
 	}
 
-	private Object readResolve() throws java.io.ObjectStreamException {
+	private Object readResolve() throws ObjectStreamException {
 		return getStatus(name);
 	}
 

@@ -15,13 +15,9 @@
  */
 package org.springframework.batch.core;
 
-import org.springframework.batch.io.exception.InfrastructureException;
-
 /**
- * Batch domain interface representing the configuration of a step. As with the
- * (@link Job), a {@link Step} is meant to explicitly represent a the
- * configuration of a step by a developer, but also the ability to execute the
- * step.
+ * Batch domain interface representing the configuration of a step. As with the (@link Job), a {@link Step} is meant to
+ * explicitly represent a the configuration of a step by a developer, but also the ability to execute the step.
  * 
  * @author Dave Syer
  * 
@@ -34,32 +30,26 @@ public interface Step {
 	String getName();
 
 	/**
-	 * @return true if a step that is already marked as complete can be started
-	 * again.
+	 * @return true if a step that is already marked as complete can be started again.
 	 */
 	boolean isAllowStartIfComplete();
 
 	/**
-	 * @return the number of times a job can be started with the same
-	 * identifier.
+	 * @return the number of times a job can be started with the same identifier.
 	 */
 	int getStartLimit();
 
 	/**
-	 * Process the step and assign progress and status meta information to the
-	 * {@link StepExecution} provided. The {@link Step} is responsible for
-	 * setting the meta information and also saving it if required by the
+	 * Process the step and assign progress and status meta information to the {@link StepExecution} provided. The
+	 * {@link Step} is responsible for setting the meta information and also saving it if required by the
 	 * implementation.<br/>
 	 * 
-	 * It is not safe to re-use an instance of {@link Step} to process multiple
-	 * concurrent executions.
+	 * It is not safe to re-use an instance of {@link Step} to process multiple concurrent executions.
 	 * 
 	 * @param stepExecution an entity representing the step to be executed
 	 * 
 	 * @throws JobInterruptedException if the step is interrupted externally
-	 * @throws InfrastructureException if there is a problem that needs to be
-	 * signalled to the caller
 	 */
-	void execute(StepExecution stepExecution) throws JobInterruptedException, InfrastructureException;
+	void execute(StepExecution stepExecution) throws JobInterruptedException;
 
 }

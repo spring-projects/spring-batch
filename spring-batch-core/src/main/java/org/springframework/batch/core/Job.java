@@ -17,8 +17,6 @@ package org.springframework.batch.core;
 
 import java.util.List;
 
-import org.springframework.batch.io.exception.InfrastructureException;
-
 /**
  * Batch domain object representing a job. Job is an explicit abstraction
  * representing the configuration of a job specified by a developer. It should
@@ -41,8 +39,8 @@ public interface Job {
 	 * and statistics as necessary.
 	 * 
 	 * @param execution a {@link JobExecution}
-	 * @throws InfrastructureException
+	 * @throws JobExecutionException
 	 */
-	void execute(JobExecution execution) throws InfrastructureException;
+	void execute(JobExecution execution) throws JobExecutionException;
 
 }
