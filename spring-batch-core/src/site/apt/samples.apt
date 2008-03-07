@@ -1,0 +1,266 @@
+                                    ------
+                                    Sample Container Applications
+                                    ------
+                                    Wayne Lund
+                                    ------
+                                    May 2007
+
+Overview of Batch Reference Applications
+
+  There is considerable variability in the types of input and output formats in batch jobs. There is also a number of options to consider in terms of how the types of strategies that will be used to handle skips, recovery, and statistics. However, when approaching a new batch job there are a few standard questions to answer to help determine how the job will be written and how to utilize the services offered by the spring batch framework. Consider the following:
+
+  * How do I configure this batch job? In the reference applications the pattern is to follow the convention of <nameOf>Job.xml. Each section with identify the XML definition.
+  
+  * What is the input source? Each sample batch job will identify its input source.
+  
+  * What is my output source? Each sample batch job will identify its output source.
+  
+  * How are records read and validated from the input source? This refers to the input type and its format (e.g. flat file with fixed position, comma separated or XML, etc.)
+  
+  * What is the policy of the job if a input record fails the validation step? The most important aspect is whether the record can be skipped so that processing can be continued.
+  
+  * How will I process the data and write to the output source? How and what business logic is being applied to the processing of a record.
+  
+  * How do I recover from an exception while operating on the output source? There are numerous recovery strategies that can be applied to handling errors on transactional targets. The reference applications will provide a feeling for some of the choices.
+  
+  * Can I restart the job and if so which strategy will I use to restart the job? The reference applications will show some of the options available to jobs and what the decision criteria is for the respective choices.
+
+
+  [Samples] Reference Applications Table of Features
+
+
+*--------------*-----------------*--------------------*-----------*------------------------*-----------------*------------------*---------------------*-----------*------*---------*-------------------*
+| Job / Feature | delimited input | fixed-length input | xml input | db driving query input | db cursor input | delimited output | fixed-length output | db output | skip | restart | quartz scheduling |
+*--------------*-----------------*--------------------*-----------*------------------------*-----------------*------------------*---------------------*-----------*------*---------*-------------------*
+| simpleTaskletJob | | | | | | | | | | | |
+*--------------*-----------------*--------------------*-----------*------------------------*-----------------*------------------*---------------------*-----------*------*---------*-------------------*
+| fixedLengthImport | | | | | | | | | | | |
+*--------------*-----------------*--------------------*-----------*------------------------*-----------------*------------------*---------------------*-----------*------*---------*-------------------*
+| multi-line order | | | | | | | | | | | |
+*--------------*-----------------*--------------------*-----------*------------------------*-----------------*------------------*---------------------*-----------*------*---------*-------------------*
+| quartzBatch | | | | | | | | | | | |
+*--------------*-----------------*--------------------*-----------*------------------------*-----------------*------------------*---------------------*-----------*------*---------*-------------------*
+| simple skip sample | | | | | | | | | | | |
+*--------------*-----------------*--------------------*-----------*------------------------*-----------------*------------------*---------------------*-----------*------*---------*-------------------*
+| Skip And Restart Sample | | | | | | | | | | | |
+*--------------*-----------------*--------------------*-----------*------------------------*-----------------*------------------*---------------------*-----------*------*---------*-------------------*
+| SQL Cursor Trade Job | | | | | | | | | | | |
+*--------------*-----------------*--------------------*-----------*------------------------*-----------------*------------------*---------------------*-----------*------*---------*-------------------*
+| Trade Job | | | | | | | | | | | |
+*--------------*-----------------*--------------------*-----------*------------------------*-----------------*------------------*---------------------*-----------*------*---------*-------------------*
+| XML Job | | | | | | | | | | | |                        
+*--------------*-----------------*--------------------*-----------*------------------------*-----------------*------------------*---------------------*-----------*------*---------*-------------------*
+
+{Simple Tasklet Job}
+
+  The goal is to show the simplest use of the batch framework with a single job with a single step&nbsp;where the module processes&nbsp;one input source to one output source.
+
+  <<Description:>> This job is defined by simpleTaskletJob.xml file. Job itself is defined by element simpleTaskletJob. Each job consists of several steps, these steps are defined in steps property. In this example we have only one step. Each step defines module that is responsible for . In this case processing will be handled by SimpleTradeTasklet class. Each module must implement execute() method. All processing of business data should be handled by this method. In this example execute() method tries to read the data from defined input source using read() method and if the data exists, it is processed using process() method. If there is no data to read, method returns false to signal, that there is nothing for further processing.
+
+  <<Method read()>> gets the data from the input template defined and maps it to an object using mapper defined in XML definition. This sample uses FlatFileInputTemplate class as input template. This template reads the whole line from the file and pass it to tokenizer which knows the structure of the line.  Location of the file is defined by fileLocatorStrategy property, structurte of the line is defined by fixedFileDescriptor. Result of parsing the line is stored in FieldSet, which is used by mapper to create value object. In our example we use DefaultLineMapper which creates an instance of Trade class.
+
+  <<Method process()>> is quite simple - just writes trade object using DbTradeWriter class. This class writes values obtained from an object to the database.
+
+  <<Specific information:>> This job has whole logic implemented in Tasklet. It is not using Data provider as well as Tasklet processor, which is typical way how to handle data. 
+
+
+  <<XML definition:>> simpleTaskletJob.xml
+
+  \[Note:  we need to document Spring IDE in setup and installation so we can use to describe the project.  Also, if we could also publish we can provide links to the graphics from docs. This is a sample only\].
+
+  Visualization of the spring configuration through Spring-IDE exposes the structure of a job configuration.  The following is the visualization of the Simple Tasklet Job configuration. See {{{http://springide.org/blog/}Spring IDE}}.
+
+[images/simple-module-job-configuration.jpg]Spring IDE Graph of Simple Tasklet Job Configuration.
+
+  [Figure:]\ Simple Tasklet Job Configuration
+
+  For simplicity we are only displaying the job configuration itself and leaving out the details of the supporting container configuration.  The source view of the configuration is as follows:
+
+  []
+--------------------------------------------------------------------------------------  
+  <import resource="BatchArchConfig.xml" />
+	<bean id="simpleTaskletJob" parent="Job">
+		<property name="name" value="fixedLengthImportJob" />
+		<property name="steps">
+			<list>
+				<bean id="tradeStep" parent="Step">
+					<property name="name" value="ImportTradeDataStep" />
+					<property name="module">
+						<bean class="com.accenture.adsj.refapp.batch.module.SimpleTradeTasklet">
+							<property name="inputTemplate" ref="fileInputTemplate" />
+							<property name="tradeDbWriter" ref="tradeWriter" />
+						</bean>
+					</property>
+					<property name="commitFrequency" value="5" />
+					<property name="startPolicy">
+						<bean class="org.springframework.batch.container.conf.StartPolicy">
+							<property name="ignoreComplete" value="true" />
+							<property name="restartEnabled" value="true" />
+							<property name="startlimit" value="12" />
+						</bean>
+					</property>
+					<property name="exceptionPolicy">
+						<bean class="org.springframework.batch.container.conf.ExceptionPolicy">
+							<property name="totalExceptionLimit" value="20" />
+							<property name="transactionInvalidExceptionLimit" value="20" />
+							<property name="transactionValidExceptionLimit" value="5" />
+						</bean>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	<bean id="tradeWriter" class="com.accenture.adsj.refapp.batch.dao.DbTradeWriter">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="incrementer">
+			<bean parent="incrementerParent">
+				<property name="incrementerName" value="TRADE_SEQ" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="fileInputTemplate" class="org.springframework.batch.container.io.file.support.FlatFileInputTemplate">
+		<property name="name" value="FileInputSource" />
+		<property name="fileLocatorStrategy" ref="fileLocator" />
+		<property name="tokenizer">
+			<bean class="org.springframework.batch.container.io.file.support.FixedLineTokenizer">
+				<property name="fileDescriptor" ref="fixedFileDescriptor" />
+			</bean>
+		</property>
+	</bean>
+
+<bean id="fixedFileDescriptor" class="org.springframework.batch.container.io.support.DefaultFileDescriptor">
+	<property name="recordDescriptors">
+		<bean class="org.springframework.batch.container.io.support.DefaultRecordDescriptor">
+			<property name="fieldDescriptors">
+				<list>
+					<bean class="org.springframework.batch.container.io.support.DefaultFieldDescriptor">
+						<property name="name" value="ISIN" />
+						<property name="length" value="12" />
+					</bean>
+					<bean class="org.springframework.batch.container.io.support.DefaultFieldDescriptor">
+						<property name="name" value="Quantity" />
+						<property name="length" value="3" />
+					</bean>
+					<bean class="org.springframework.batch.container.io.support.DefaultFieldDescriptor">
+						<property name="name" value="Price" />
+						<property name="length" value="5" />
+					</bean>
+					<bean class="org.springframework.batch.container.io.support.DefaultFieldDescriptor">
+						<property name="name" value="Customer" />
+						<property name="length" value="9" />
+					</bean>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+<bean id="tradeLineMapper" class="com.accenture.adsj.refapp.batch.mapping.TradeRowMapper" />
+<bean class="com.accenture.adsj.refapp.batch.advice.LogAdvice" id="logAdvice" />
+<aop:config>
+	<aop:aspect id="logging" ref="logAdvice">
+		<aop:around pointcut-ref="pointcut" method="doBasicLogging" />
+		<aop:pointcut id="pointcut" expression="execution(* org.springframework.batch.container.dao.*.*(..))" />
+	</aop:aspect>
+</aop:config>
+ </beans>
+-----------------------------------------------------------------------------------------------------------------------
+
+  You should take the time to make sure you understand the relationship of the xml configuration with the visualization as provided by Spring IDE.  \[Note: this will be updated when we use the namespace handler\].
+
+ 
+ <<Input source:>> file with fixed row structure
+
+  In this example we are using a simple fixed length record structure that can be found in the project at <REFAPP_INSTALL_HOME>/testBatchRoot/job_data/simpleTaskletJob/input/20070122.teststream.ImportTradeDataStep.txt. There's generally a considerable amount of thought that goes into architecting the folder structures for batch file management. See [provide a link to DefaultFileStrategy]. The only point to note here is the ImportTradeDataStep matches the name of the step in the configuration and the fixed length records look like:
+
+  []
+
+------------------------------------------------------------------------------------
+  20070122.teststream.ImportTradeDataStep.txt
+  
+  UK21341EAH4597898.34customer1
+  UK21341EAH4611218.12customer2
+  UK21341EAH4724512.78customer2
+  UK21341EAH48108109.25customer3
+  UK21341EAH49854123.39customer4
+------------------------------------------------------------------------------------
+
+
+  Looking back to the configuration file you will see where this is documented in the propery of the DefaultRecordDescriptor. You can see the following:
+
+*--------------*-----------------*
+|| FieldName | Length ||
+*--------------*-----------------*
+| ISIN | 12 |
+*--------------*-----------------*
+| Quantity | 3 |
+*--------------*-----------------*
+| Price | 5 |
+*--------------*-----------------*
+| Customer | 9 |
+*--------------*-----------------*
+
+  <<Output target:>> database
+
+  <<Data Provider:>> data provider is not used, all functionality is implemented directly in Tasklet.
+
+  <<Tasklet processor:>>  module processor is not used, all functionality is implemented directly in Tasklet.
+
+Fixed Length Import Job
+
+  The goal is to demonstrate a typical scenarion of importing data from a fixed-length file to database 
+
+  <<Description:>> This job shows a more typical scenario, when reading input data and processing the data is cleanly separated. The data provider is responsible for reading input and mapping each record to a domain object, which is then passed to the module processor. The module processor handles the processing of the domain objects, in this case it only writes them to database.
+
+  <<XML definition:>> fixedLengthImportJob.xml
+
+  <<Input source:>>  file with fixed row structure
+
+  <<Output target:>> database
+
+  <<Data Provider:>> DefaultFlatFileDataProvider which uses the injected FlatFileInputTemplate to read input and the DefaultLineMapper to map each line to an object according to the file descriptor.
+
+  <<Tasklet processor:>>  module processor does not do any special processing, it just writes the data to database using a DAO object (called OutputSource in this case, because it is specialized for writing to database, it has no methods for reading data).
+
+Multiline Order Job
+
+  The goal is to demostrate how to handle a more complex file input format, where a record meant for processing inludes nested records and spans multiple lines
+
+  <<XML definition:>> multilineOrderJob.xml
+
+  <<Input source:>>  file with multiline records
+
+  <<Output target:>> file with multiline records
+
+  <<Data Provider:>> OrderDataProvider is an example of a non-default programmatic data provider. It reads input until it detects that the multiline record has finished and encapsulates the record in a single domain object.
+
+  <<Tasklet processor:>>  module processor passes the object to a an injected 'report service' which in this case writes the output to a file do demonstrate how to use the FlatFileOutputTemplate for writing multiline output according to a file descriptor. 
+
+Quartz Batch
+
+  The goal is to demonstrate how to schedule job execution using Quartz scheduler
+
+  <<XML definition:>> quartzBatch.xml
+
+  <<Description:>> First, declares launcher beans. Each launcher bean is able to launch a job using injected arguments. Second, triggers are declared saying when the launchers should be run. Last, there is the scheduler bean, where the triggers are registered.
+
+Simple Skip Sample
+
+
+Skip And Restart Sample
+
+
+SQL Cursor Trade Job
+
+
+Trade Job
+
+  The goal is to show a reasonably complex scenario, that would resemble the real-life usage of the framework.
+
+  <<Description:>>  This job has 3 steps. First, data about trades is imported from a file to database. Second, the data about trades is read from the database and credit on customer accounts is decreased appropriately. Last, a report about customers is exported to a file.
+
+  <<XML definition:>> tradeJob.xml - the job definition, tradeJobIo.xml - input and output configuration, tradeJobAop.xml - optional AOP logging
+
+  <<Description:>>  This job has 3 steps. First, data about trades is imported from a file to database. Second, the data about trades is read from the database and credit on customer accounts is decreased appropriately. Last, a report about customers is exported to a file.
+
+
+XML Job
