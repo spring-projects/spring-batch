@@ -969,34 +969,251 @@ FOT;2;2;267.34</programlisting>
   </section>
 
   <section>
-    <title id="infrastructure.2.2">SQL Sources</title>
+    <title id="infrastructure.2.2">Database</title>
 
-    <para>SQL input sources can be configured for various reasons, for
-    example:</para>
+    <para>Like most enterprise application styles, a database is the central
+    storage mechanism for batch. However, batch differs from other application
+    styles due to the sheer size of the datasets that must be worked with. The
+    Spring Core JdbcTemplate illustrates this problem well. If you use
+    JdbcTemplate with a RowMapper, the RowMapper will be called once for every
+    result returned from the provided query. This causes few issues in
+    scenarios where the dataset is small, but the large datasets often
+    necessary for batch processing would cause any JVM to crash quickly. If
+    the sql statement returns 1 million rows, the RowMapper will be called 1
+    million times. Spring Batch provides two types of solutions for this
+    problem: Cursor and DrivingQuery ItemReaders.</para>
 
-    <itemizedlist>
-      <listitem>
-        <para>a staging table for large volumes of sorted data that was loaded
-        from flat files</para>
-      </listitem>
+    <section>
+      <title>Cursor Based ItemReaders</title>
 
-      <listitem>
-        <para>the beginning of an outbound collection of data targeted for an
-        external flat file interface</para>
-      </listitem>
+      <para>Using a database cursor is generally the default approach of most
+      batch developers. This is because it is the database's solution to the
+      problem of 'streaming' relational data. The Java ResultSet class is
+      essentially an object orientated mechanism for manipulating a cursor. A
+      ResultSet maintains a cursor to the current row of data. Calling next()
+      on a ResultSet moves this cursor to the next row. Spring Batch cursor
+      based ItemReaders open the a cursor on initialization, and move the
+      cursor forward one row for every call to read(), returning a mapped
+      object that can be used for processing. The close() method will then be
+      called to ensure all resources are freed up. The Spring core
+      JdbcTemplate gets around this problem by using the callback pattern to
+      completely map all rows in a ResultSet and close before returning
+      control back to the method caller. However, in batch this must wait
+      until the step is complete.</para>
 
-      <listitem>
-        <para>the target of a triggered event like "collect all cases that can
-        be automatically closed"</para>
+      <section>
+        <title>JdbcCursorItemReader</title>
 
-        <para>Spring Batch supports two approaches for accessing a SQL Input
-        Source; 1) a cursor driven input source and 2) an indexed based Input
-        Query. The cursor driven input source is named because it utilizes a
-        jdbc cursor to stream over the SQL input source whereas an indexed
-        based input query is designed for easy division of the input into
-        ranges</para>
-      </listitem>
-    </itemizedlist>
+        <para>JdbcCursorItemReader is the jdbc implementation of the cursor
+        based technique. It works directly with a ResultSet and requires a SQL
+        statement to run against a connection obtained from a DataSource. The
+        following database schema will be used as an example:</para>
+
+        <programlisting>CREATE TABLE CUSTOMER (
+ ID BIGINT IDENTITY PRIMARY KEY,  
+ NAME VARCHAR(45),
+ CREDIT FLOAT
+);</programlisting>
+
+        <para>Many people prefer to use a domain object for each row, so we'll
+        use an implementation of the RowMapper interface to map a
+        CustomerCredit object:</para>
+
+        <programlisting>public class CustomerCreditRowMapper implements RowMapper {
+
+ public static final String ID_COLUMN = "id";
+ public static final String NAME_COLUMN = "name";
+ public static final String CREDIT_COLUMN = "credit";
+
+ public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+        CustomerCredit customerCredit = new CustomerCredit();
+
+        customerCredit.setId(rs.getInt(ID_COLUMN));
+        customerCredit.setName(rs.getString(NAME_COLUMN));
+        customerCredit.setCredit(rs.getBigDecimal(CREDIT_COLUMN));
+
+        return customerCredit;
+ }
+
+}</programlisting>
+
+        <para>Because JdbcTemplate is so familiar to users of Spring, and the
+        JdbcCursorItemReader shares key interfaces with it, it's useful to see
+        an example of how to read in this data with JdbcTemplate, in order to
+        contrast it with the item reader. For the purposes of this example,
+        let's assume there are 1,000 rows in the CUSTOMER database. The first
+        example will be using JdbcTemplate:</para>
+
+        <programlisting>//For simplicity sake, assume a dataSource has already been obtained
+JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+List customerCredits = jdbcTemplate.query("SELECT ID, NAME, CREDIT from CUSTOMER", new CustomerCreditRowMapper());</programlisting>
+
+        <para>After running this code snippet the customerCredits list will
+        contain 1,000 CustomerCredit objects. In the query method, a
+        connection will be obtained from the DataSource, the provided SQL will
+        be run against it, and RowMapper.mapRow() will be called for each row
+        in the ResultSet. Let's constrast this with the approach of the
+        JdbcCursorItemReader:</para>
+
+        <programlisting>JdbcCursorItemReader itemReader = new JdbcCursorItemReader();
+itemReader.setDataSource(dataSource);
+itemReader.setSql("SELECT ID, NAME, CREDIT from CUSTOMER");
+itemReader.setMapper(new CustomerCreditRowMapper());
+int counter = 0;
+ExecutionContext executionContext = new ExecutionContext();
+itemReader.open(executionContext);
+Object customerCredit = new Object();
+while(customerCredit != null){
+  customerCredit = itemReader.read();
+  counter++;
+}
+itemReader.close(executionContext);</programlisting>
+
+        <para>After running this code snippet the counter will equal 1,000. If
+        the code above had put the returned customerCredit into a list, the
+        result would have been exactly the same as with the JdbcTemplate
+        example. However, the big advantage of the item reader is that it
+        allows items to be 'streamed'. The read() method can be called once,
+        and the item written out via an ItemWriter, and then the next item
+        obtained via read(). This allows item reading and writing to be done
+        in 'chunks' and committed periodically, which is the essence of high
+        performance batch processing.</para>
+
+        <section>
+          <title>Additional Properties</title>
+
+          <para>Because there are so many varying options for opening a cursor
+          in java, there are many properties on the JdbcCustorItemReader that
+          can be set:</para>
+
+          <table>
+            <title>JdbcCursorItemReader Properties</title>
+
+            <tgroup cols="2">
+              <tbody>
+                <row>
+                  <entry>ignoreWarnings</entry>
+
+                  <entry>Determines whether or not SQLWarnings are logged or
+                  cause an exception - default is true</entry>
+                </row>
+
+                <row>
+                  <entry>fetchSize</entry>
+
+                  <entry>Gives the JDBC driver a hint as to the number of rows
+                  that should be fetched from the database when more rows are
+                  needed by the ResultSet object used by the ItemReader. By
+                  default, no hint is given.</entry>
+                </row>
+
+                <row>
+                  <entry>maxRows</entry>
+
+                  <entry>Sets the limits for the maximum number of rows the
+                  underlying ResultSet can hold at any one time.</entry>
+                </row>
+
+                <row>
+                  <entry>queryTimeout</entry>
+
+                  <entry>Sets the number of seconds the driver will wait for a
+                  Statement object to execute to the given number of seconds.
+                  If the limit is exceeded, a DataAccessEception is thrown.
+                  (consult your driver vendor documentation for
+                  details).</entry>
+                </row>
+
+                <row>
+                  <entry>verifyCursorPosition</entry>
+
+                  <entry>Because the same ResultSet held by the ItemReader is
+                  passed to the RowMapper, it's possible for users to call
+                  ResultSet.next() themselves, which could cause issues with
+                  the reader's internal count. Settings this value to true
+                  will cause an exception to be thrown if the cursor position
+                  is not the same after the RowMapper call as it was
+                  before.</entry>
+                </row>
+
+                <row>
+                  <entry>saveState</entry>
+
+                  <entry>Indicates whether or not the reader's state should be
+                  saved in the ExecutionContext provided by
+                  ItemStream#update(ExecutionContext) The default value is
+                  false.</entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+        </section>
+      </section>
+
+      <section>
+        <title>HibernateCursorItemReader</title>
+
+        <para>Just as normal Spring users make important decisions about
+        whether or not to use ORM solutions, which affects whether or not they
+        use a JdbcTemplate or a HibernateTemplate, Spring Batch users have the
+        same options. HibernateCursorItemReader is the Hibernate
+        implementation of the cursor technique. Hibernate's usage in batch has
+        been fairly controversial. This has largely been because hibernate was
+        originally developed to support online application styles. However,
+        that doesn't mean it can't be used for batch processing. The easiest
+        approach for solving this problem is to use a StatelessSession rather
+        than a standard session. This removes all of the caching and dirty
+        checking hibernate employs that can cause issues when using it in a
+        batch scenario. For more information on the differences between
+        Stateless and normal hibernate sessions, refer to the documentation of
+        your specific hibernate release. The HibernateCursorItemReader allows
+        you to declare an HQL statement and pass in a sessionFactory, which
+        will pass back one item per call to read() in the same basic fashion
+        as the JdbcCursorItemReader. Below is an example configuration using
+        the same 'customer credit' example as the jdbc reader:</para>
+
+        <programlisting>HibernateCursorItemReader itemReader = new HibernateCursorItemReader();
+itemReader.setQueryString("from CustomerCredit");
+//For simplicity sake, assume sessionFactory already obtained.
+itemReader.setSessionFactory(sessionFactory);
+itemReader.setUseStatelessSession(true);
+int counter = 0;
+ExecutionContext executionContext = new ExecutionContext();
+itemReader.open(executionContext);
+Object customerCredit = new Object();
+while(customerCredit != null){
+  customerCredit = itemReader.read();
+  counter++;
+}
+itemReader.close(executionContext);
+</programlisting>
+
+        <para>This configured ItemReader will return CustomerCredit objects in
+        the exact same manner as described by the JdbcCursorItemReader,
+        assuming hibernate mapping files have been created correctly for the
+        Customer table. The 'useStatelessSession' property default to true,
+        but has been added here to draw attention to the ability to switch it
+        on or off.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>Driving Query Based ItemReaders</title>
+
+      <para></para>
+
+      <section>
+        <title>KeyCollector</title>
+
+        <para></para>
+      </section>
+    </section>
+
+    <section>
+      <title>Database ItemWriters</title>
+
+      <para></para>
+    </section>
   </section>
 
   <section>
