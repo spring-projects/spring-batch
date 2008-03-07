@@ -1,9 +1,10 @@
-package org.springframework.batch.item.reader;
+package org.springframework.batch.item.adapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.io.sample.domain.FooService;
+import org.springframework.batch.item.adapter.ItemReaderAdapter;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
@@ -11,7 +12,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
  * 
  * @author Robert Kasanicky
  */
-public class DelegatingItemReaderIntegrationTests extends AbstractDependencyInjectionSpringContextTests {
+public class ItemReaderAdapterTests extends AbstractDependencyInjectionSpringContextTests {
 
 	private ItemReaderAdapter provider;
 

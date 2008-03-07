@@ -113,7 +113,7 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 	 * 
 	 * @return a String.
 	 * 
-	 * @see org.springframework.batch.item.reader.support.ItemReader#read()
+	 * @see org.springframework.batch.item.adapter.support.ItemReader#read()
 	 */
 	public synchronized Object read() {
 		// Make a copy of the recordSeparatorPolicy reference, in case it is

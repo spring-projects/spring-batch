@@ -1,27 +1,29 @@
-package org.springframework.batch.item.writer;
+package org.springframework.batch.item.adapter;
 
 import java.util.List;
 
 import org.springframework.batch.io.sample.domain.Foo;
 import org.springframework.batch.io.sample.domain.FooService;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.adapter.ItemWriterAdapter;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
- * Tests for {@link PropertyExtractingDelegatingItemWriter}
+ * Tests for {@link ItemWriterAdapter}.
  * 
  * @author Robert Kasanicky
  */
-public class PropertyExtractingDelegatingItemProccessorIntegrationTests 
-	extends AbstractDependencyInjectionSpringContextTests {
-	
-	private PropertyExtractingDelegatingItemWriter processor;
+public class ItemWriterAdapterTests extends AbstractDependencyInjectionSpringContextTests {
+
+	private ItemWriter processor;
 	
 	private FooService fooService;
 	
+
 	protected String getConfigPath() {
-		return "pe-delegating-item-writer.xml";
+		return "delegating-item-writer.xml";
 	}
-	
+
 	/**
 	 * Regular usage scenario - input object should be passed to
 	 * the service the injected invoker points to.
@@ -33,26 +35,23 @@ public class PropertyExtractingDelegatingItemProccessorIntegrationTests
 		}
 		
 		List input = fooService.getGeneratedFoos();
-		List processed = fooService.getProcessedFooNameValuePairs();
+		List processed = fooService.getProcessedFoos();
 		assertEquals(input.size(), processed.size());
-		assertFalse(fooService.getProcessedFooNameValuePairs().isEmpty());
+		assertFalse(fooService.getProcessedFoos().isEmpty());
 		
 		for (int i = 0; i < input.size(); i++) {
-			Foo inputFoo = (Foo) input.get(i);
-			Foo outputFoo = (Foo) processed.get(i);
-			assertEquals(inputFoo.getName(), outputFoo.getName());
-			assertEquals(inputFoo.getValue(), outputFoo.getValue());
-			assertEquals(0, outputFoo.getId());
+			assertSame(input.get(i), processed.get(i));
 		}
 		
 	}
-
-	public void setProcessor(PropertyExtractingDelegatingItemWriter processor) {
+	
+	//setter for auto-injection
+	public void setProcessor(ItemWriter processor) {
 		this.processor = processor;
 	}
 
+	//setter for auto-injection
 	public void setFooService(FooService fooService) {
 		this.fooService = fooService;
 	}
-
 }
