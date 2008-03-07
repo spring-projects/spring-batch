@@ -16,6 +16,7 @@
 package org.springframework.batch.core.repository;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecutionException;
 
 
 /**
@@ -25,9 +26,7 @@ import org.springframework.batch.core.Job;
  * @author Dave Syer
  * 
  */
-public class NoSuchJobException extends JobException {
-
-	private static final long serialVersionUID = -8044082897778706564L;
+public class NoSuchJobException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.

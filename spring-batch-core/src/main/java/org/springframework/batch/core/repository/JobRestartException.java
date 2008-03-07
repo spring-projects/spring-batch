@@ -15,13 +15,15 @@
  */
 package org.springframework.batch.core.repository;
 
+import org.springframework.batch.core.JobExecutionException;
+
 /**
  * An exception indicating an illegal attempt to restart a job.
  * 
  * @author Dave Syer
  * 
  */
-public class JobRestartException extends JobException {
+public class JobRestartException extends JobExecutionException {
 
 	/**
 	 * @param string the message

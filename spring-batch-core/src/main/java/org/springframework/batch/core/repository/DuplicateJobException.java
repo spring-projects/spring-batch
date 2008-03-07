@@ -16,6 +16,7 @@
 package org.springframework.batch.core.repository;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecutionException;
 
 /**
  * Checked exception that indicates a name clash when registering
@@ -24,7 +25,7 @@ import org.springframework.batch.core.Job;
  * @author Dave Syer
  * 
  */
-public class DuplicateJobException extends JobException {
+public class DuplicateJobException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.

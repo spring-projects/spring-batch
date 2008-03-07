@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ItemSkipPolicy;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
@@ -50,8 +51,8 @@ import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Tests for DefaultJobLifecycle. MapJobDao and MapStepExecutionDao are used instead of a
- * mock repository to test that status is being stored correctly.
+ * Tests for DefaultJobLifecycle. MapJobDao and MapStepExecutionDao are used instead of a mock repository to test that
+ * status is being stored correctly.
  * 
  * @author Lucas Ward
  */
@@ -60,9 +61,9 @@ public class SimpleJobTests extends TestCase {
 	private JobRepository jobRepository;
 
 	private JobInstanceDao jobInstanceDao;
-	
+
 	private JobExecutionDao jobExecutionDao;
-	
+
 	private StepExecutionDao stepExecutionDao;
 
 	private List list = new ArrayList();
@@ -82,9 +83,9 @@ public class SimpleJobTests extends TestCase {
 	private JobParameters jobParameters = new JobParameters();
 
 	private SimpleJob job;
-	
+
 	private Step step1;
-	
+
 	private Step step2;
 
 	protected void setUp() throws Exception {
@@ -131,16 +132,15 @@ public class SimpleJobTests extends TestCase {
 		stepExecution2 = new StepExecution(step2, jobExecution, null);
 
 	}
-	
-	//Test to ensure the exit status returned by the last step is returned
-	public void testExitStatusReturned(){
-		
-		final ExitStatus customStatus = new ExitStatus(true, "test");
-		
-		Step testStep = new Step(){
 
-			public void execute(StepExecution stepExecution)
-					throws JobInterruptedException {
+	// Test to ensure the exit status returned by the last step is returned
+	public void testExitStatusReturned() throws JobExecutionException {
+
+		final ExitStatus customStatus = new ExitStatus(true, "test");
+
+		Step testStep = new Step() {
+
+			public void execute(StepExecution stepExecution) throws JobInterruptedException {
 				stepExecution.setExitStatus(customStatus);
 			}
 
@@ -154,7 +154,8 @@ public class SimpleJobTests extends TestCase {
 
 			public boolean isAllowStartIfComplete() {
 				return false;
-			}};
+			}
+		};
 		List steps = new ArrayList();
 		steps.add(testStep);
 		job.setSteps(steps);
@@ -177,14 +178,15 @@ public class SimpleJobTests extends TestCase {
 	}
 
 	public void testRunNormallyWithListener() throws Exception {
-		job.setJobListeners(new JobListenerSupport[] {new JobListenerSupport() {
+		job.setJobListeners(new JobListenerSupport[] { new JobListenerSupport() {
 			public void beforeJob(JobExecution jobExecution) {
 				list.add("before");
 			}
+
 			public void afterJob(JobExecution jobExecution) {
 				list.add("after");
 			}
-		}});
+		} });
 		job.execute(jobExecution);
 		assertEquals(4, list.size());
 	}
@@ -228,8 +230,7 @@ public class SimpleJobTests extends TestCase {
 		stepConfiguration1.setProcessException(exception);
 		try {
 			job.execute(jobExecution);
-		}
-		catch (InfrastructureException e) {
+		} catch (InfrastructureException e) {
 			assertEquals(exception, e.getCause());
 		}
 		assertEquals(0, list.size());
@@ -243,8 +244,7 @@ public class SimpleJobTests extends TestCase {
 		stepConfiguration1.setProcessException(exception);
 		try {
 			job.execute(jobExecution);
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals(exception, e);
 		}
 		assertEquals(0, list.size());
@@ -258,11 +258,10 @@ public class SimpleJobTests extends TestCase {
 		try {
 			job.execute(jobExecution);
 			fail("Expected BatchCriticalException");
-		}
-		catch (InfrastructureException ex) {
+		} catch (InfrastructureException ex) {
 			// expected
 			assertTrue("Wrong message in exception: " + ex.getMessage(), ex.getMessage()
-					.indexOf("start limit exceeded") >= 0);
+			        .indexOf("start limit exceeded") >= 0);
 		}
 	}
 
@@ -272,26 +271,25 @@ public class SimpleJobTests extends TestCase {
 		job.execute(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
 		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().indexOf(
-				"No steps configured") >= 0);
+		        "No steps configured") >= 0);
 	}
 
-//	public void testNoStepsExecuted() throws Exception {
-//		StepExecution completedExecution = new StepExecution("completedExecution", jobExecution);
-//		completedExecution.setStatus(BatchStatus.COMPLETED);
-//
-//		job.execute(jobExecution);
-//		ExitStatus exitStatus = jobExecution.getExitStatus();
-//		assertEquals(ExitStatus.NOOP.getExitCode(), exitStatus.getExitCode());
-//		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().contains(
-//				"steps already completed"));
-//	}
+	// public void testNoStepsExecuted() throws Exception {
+	// StepExecution completedExecution = new StepExecution("completedExecution", jobExecution);
+	// completedExecution.setStatus(BatchStatus.COMPLETED);
+	//
+	// job.execute(jobExecution);
+	// ExitStatus exitStatus = jobExecution.getExitStatus();
+	// assertEquals(ExitStatus.NOOP.getExitCode(), exitStatus.getExitCode());
+	// assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().contains(
+	// "steps already completed"));
+	// }
 
 	public void testNotExecutedIfAlreadyStopped() throws Exception {
 		jobExecution.stop();
 		try {
 			job.execute(jobExecution);
-		}
-		catch (InfrastructureException e) {
+		} catch (InfrastructureException e) {
 			assertTrue(e.getCause() instanceof JobInterruptedException);
 		}
 		assertEquals(0, list.size());
@@ -354,21 +352,20 @@ public class SimpleJobTests extends TestCase {
 		public void execute(StepExecution stepExecution) throws JobInterruptedException, InfrastructureException {
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
-				throw (RuntimeException)exception;
+				throw (RuntimeException) exception;
 			}
 			if (exception instanceof JobInterruptedException) {
 				stepExecution.setExitStatus(ExitStatus.INTERRUPTED);
-				throw (JobInterruptedException)exception;
+				throw (JobInterruptedException) exception;
 			}
-			if (runnable!=null) {
+			if (runnable != null) {
 				runnable.run();
 			}
 			stepExecution.setExitStatus(ExitStatus.FINISHED);
 		}
 
 		/**
-		 * Set the name property. Always overrides the default value if this object
-		 * is a Spring bean.
+		 * Set the name property. Always overrides the default value if this object is a Spring bean.
 		 * 
 		 * @see #setBeanName(java.lang.String)
 		 */
@@ -378,6 +375,7 @@ public class SimpleJobTests extends TestCase {
 
 		/**
 		 * Public setter for the {@link RetryPolicy}.
+		 * 
 		 * @param retryPolicy the {@link RetryPolicy} to set
 		 */
 		public void setRetryPolicy(RetryPolicy retryPolicy) {

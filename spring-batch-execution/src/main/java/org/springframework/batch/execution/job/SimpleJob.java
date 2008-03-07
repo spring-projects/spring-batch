@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobListener;
@@ -33,9 +34,8 @@ import org.springframework.batch.io.exception.InfrastructureException;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * Simple implementation of (@link Job} interface providing the ability to run a
- * {@link JobExecution}. Sequentially executes a job by iterating through its
- * list of steps.
+ * Simple implementation of (@link Job} interface providing the ability to run a {@link JobExecution}. Sequentially
+ * executes a job by iterating through its list of steps.
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -47,8 +47,8 @@ public class SimpleJob extends AbstractJob {
 	private CompositeJobListener listener = new CompositeJobListener();
 
 	/**
-	 * Public setter for injecting {@link JobListener}s. They will all be given
-	 * the {@link JobListener} callbacks at the appropriate point in the job.
+	 * Public setter for injecting {@link JobListener}s. They will all be given the {@link JobListener} callbacks at
+	 * the appropriate point in the job.
 	 * 
 	 * @param listeners the listeners to set.
 	 */
@@ -57,9 +57,10 @@ public class SimpleJob extends AbstractJob {
 			this.listener.register(listeners[i]);
 		}
 	}
-	
+
 	/**
 	 * Register a single listener for the {@link JobListener} callbacks.
+	 * 
 	 * @param listener a {@link JobListener}
 	 */
 	public void registerListener(JobListener listener) {
@@ -67,12 +68,11 @@ public class SimpleJob extends AbstractJob {
 	}
 
 	/**
-	 * Run the specified job by looping through the steps and delegating to the
-	 * {@link Step}.
+	 * Run the specified job by looping through the steps and delegating to the {@link Step}.
 	 * 
 	 * @see org.springframework.batch.core.Job#execute(org.springframework.batch.core.JobExecution)
 	 */
-	public void execute(JobExecution execution) throws InfrastructureException {
+	public void execute(JobExecution execution) throws JobExecutionException {
 
 		JobInstance jobInstance = execution.getJobInstance();
 
@@ -112,27 +112,22 @@ public class SimpleJob extends AbstractJob {
 
 			listener.afterJob(execution);
 
-		}
-		catch (JobInterruptedException e) {
+		} catch (JobInterruptedException e) {
 			execution.setStatus(BatchStatus.STOPPED);
 			rethrow(e);
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			execution.setStatus(BatchStatus.FAILED);
 			rethrow(t);
-		}
-		finally {
+		} finally {
 			ExitStatus status = ExitStatus.FAILED;
 			if (startedCount == 0) {
 				if (steps.size() > 0) {
 					status = ExitStatus.NOOP
-							.addExitDescription("All steps already completed.  No processing was done.");
-				}
-				else {
+					        .addExitDescription("All steps already completed.  No processing was done.");
+				} else {
 					status = ExitStatus.NOOP.addExitDescription("No steps configured for this job.");
 				}
-			}
-			else if (currentStepExecution != null) {
+			} else if (currentStepExecution != null) {
 				status = currentStepExecution.getExitStatus();
 			}
 
@@ -149,25 +144,24 @@ public class SimpleJob extends AbstractJob {
 	}
 
 	/*
-	 * Given a step and configuration, return true if the step should start,
-	 * false if it should not, and throw an exception if the job should finish.
+	 * Given a step and configuration, return true if the step should start, false if it should not, and throw an
+	 * exception if the job should finish.
 	 */
-	private boolean shouldStart(JobInstance jobInstance, Step step) {
+	private boolean shouldStart(JobInstance jobInstance, Step step) throws JobExecutionException {
 
 		BatchStatus stepStatus;
 		// if the last execution is null, the step has never been executed.
 		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step);
 		if (lastStepExecution == null) {
 			stepStatus = BatchStatus.STARTING;
-		}
-		else {
+		} else {
 			stepStatus = lastStepExecution.getStatus();
 		}
 
 		if (stepStatus == BatchStatus.UNKNOWN) {
-			throw new InfrastructureException("Cannot restart step from UNKNOWN status.  "
-					+ "The last execution ended with a failure that could not be rolled back, "
-					+ "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
+			throw new JobExecutionException("Cannot restart step from UNKNOWN status.  "
+			        + "The last execution ended with a failure that could not be rolled back, "
+			        + "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
 		}
 
 		if (stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) {
@@ -179,11 +173,10 @@ public class SimpleJob extends AbstractJob {
 		if (jobRepository.getStepExecutionCount(jobInstance, step) < step.getStartLimit()) {
 			// step start count is less than start max, return true
 			return true;
-		}
-		else {
+		} else {
 			// start max has been exceeded, throw an exception.
 			throw new InfrastructureException("Maximum start limit exceeded for step: " + step.getName() + "StartMax: "
-					+ step.getStartLimit());
+			        + step.getStartLimit());
 		}
 	}
 
@@ -193,16 +186,14 @@ public class SimpleJob extends AbstractJob {
 	private static void rethrow(Throwable t) throws RuntimeException {
 		if (t instanceof RuntimeException) {
 			throw (RuntimeException) t;
-		}
-		else {
+		} else {
 			throw new InfrastructureException(t);
 		}
 	}
 
 	/**
-	 * Public setter for the {@link JobRepository} that is needed to manage the
-	 * state of the batch meta domain (jobs, steps, executions) during the life
-	 * of a job.
+	 * Public setter for the {@link JobRepository} that is needed to manage the state of the batch meta domain (jobs,
+	 * steps, executions) during the life of a job.
 	 * 
 	 * @param jobRepository
 	 */
