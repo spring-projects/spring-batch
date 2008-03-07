@@ -15,7 +15,6 @@
 	<modules>
 		<module>spring-batch-infrastructure</module>
 		<module>spring-batch-core</module>
-		<module>spring-batch-execution</module>
 		<module>spring-batch-samples</module>
 		<module>spring-batch-integration</module>
 		<module>docs</module>
@@ -609,9 +608,6 @@
 						</link>
 						<link>
 							http://static.springframework.org/spring-batch/spring-batch-core/apidocs/
-						</link>
-						<link>
-							http://static.springframework.org/spring-batch/spring-batch-execution/apidocs/
 						</link>
 					</links>
 					<aggregate>true</aggregate>

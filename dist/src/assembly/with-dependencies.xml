@@ -14,9 +14,6 @@
 					org.springframework.batch:spring-batch-core
 				</include>
 				<include>
-					org.springframework.batch:spring-batch-execution
-				</include>
-				<include>
 					org.springframework.batch:spring-batch-infrastructure
 				</include>
 			</includes>
@@ -59,9 +56,6 @@
 					org.springframework.batch:spring-batch-core
 				</include>
 				<include>
-					org.springframework.batch:spring-batch-execution
-				</include>
-				<include>
 					org.springframework.batch:spring-batch-infrastructure
 				</include>
 			</includes>
@@ -85,9 +79,6 @@
 					org.springframework.batch:spring-batch-core
 				</include>
 				<include>
-					org.springframework.batch:spring-batch-execution
-				</include>
-				<include>
 					org.springframework.batch:spring-batch-infrastructure
 				</include>
 			</includes>
@@ -107,9 +98,6 @@
 							</exclude>
 							<exclude>
 								org.springframework.batch:spring-batch-core
-							</exclude>
-							<exclude>
-								org.springframework.batch:spring-batch-execution
 							</exclude>
 							<exclude>
 								org.springframework.batch:spring-batch-infrastructure
@@ -149,9 +137,6 @@
 								org.springframework.batch:spring-batch-core
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-execution
-							</exclude>
-							<exclude>
 								org.springframework.batch:spring-batch-infrastructure
 							</exclude>
 						</excludes>
@@ -169,9 +154,6 @@
 								org.springframework.batch:spring-batch-core
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-execution
-							</exclude>
-							<exclude>
 								org.springframework.batch:spring-batch-infrastructure
 							</exclude>
 						</excludes>
@@ -187,9 +169,6 @@
 							</exclude>
 							<exclude>
 								org.springframework.batch:spring-batch-core
-							</exclude>
-							<exclude>
-								org.springframework.batch:spring-batch-execution
 							</exclude>
 							<exclude>
 								org.springframework.batch:spring-batch-infrastructure

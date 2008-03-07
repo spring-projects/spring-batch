@@ -19,7 +19,6 @@
 	<modules>
 		<module>../spring-batch-infrastructure</module>
 		<module>../spring-batch-core</module>
-		<module>../spring-batch-execution</module>
 		<module>../spring-batch-samples</module>
 	</modules>
 

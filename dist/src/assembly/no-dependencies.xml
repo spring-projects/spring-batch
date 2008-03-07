@@ -14,9 +14,6 @@
 					org.springframework.batch:spring-batch-core
 				</include>
 				<include>
-					org.springframework.batch:spring-batch-execution
-				</include>
-				<include>
 					org.springframework.batch:spring-batch-infrastructure
 				</include>
 			</includes>

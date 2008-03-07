@@ -15,7 +15,7 @@ Milestone Builds
 
 * Maven Artifacts
 
-  You can browse the {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}repository}} with a web browser.  You can see the internal and external project dependencies in the <<<spring-batch-*/*.pom>>> files.  You will probably need <<<spring-batch-execution>>>, <<<spring-batch-core>>> and <<<spring-batch-infrastructure>>>.  Source code is packaged in a separate jar file in the same directory, and the samples are also bundled in the same way.
+  You can browse the {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}repository}} with a web browser.  You can see the internal and external project dependencies in the <<<spring-batch-*/*.pom>>> files.  You will probably need <<<spring-batch-core>>> and <<<spring-batch-infrastructure>>>.  Source code is packaged in a separate jar file in the same directory, and the samples are also bundled in the same way.
 
   The builds consist of a set of jar artifacts deployed to a Maven2 repository. To use it, just add the following repository to your POM (inside a \<repositories\> element at the top level):
 
@@ -37,15 +37,7 @@ Milestone Builds
 </dependency>
 +---------------
 
-  The Execution module has dependencies on Core and Infrastructure, so you only need to include that to build and run jobs with Spring Batch.  I.e.
-
-+---------------
-<dependency>
-    <groupId>org.springframework.batch</groupId>
-    <artifactId>spring-batch-execution</artifactId>
-    <version>1.0.0.m5</version>
-</dependency>
-+---------------
+  The Core module has dependencies on Infrastructure, so you only need to include that to build and run jobs with Spring Batch.  I.e.
 
 Snapshot Builds
 
