@@ -31,6 +31,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.execution.listener.CompositeJobListener;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -102,6 +103,16 @@ public class SimpleJob extends AbstractJob {
 					startedCount++;
 					updateStatus(execution, BatchStatus.STARTED);
 					currentStepExecution = execution.createStepExecution(step);
+
+					StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step);
+
+					boolean isRestart = jobRepository.getStepExecutionCount(jobInstance, step) > 0 ? true : false;
+
+					if (isRestart && lastStepExecution != null) {
+						currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
+					} else {
+						currentStepExecution.setExecutionContext(new ExecutionContext());
+					}
 
 					step.execute(currentStepExecution);
 

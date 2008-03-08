@@ -20,12 +20,11 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.tasklet.Tasklet;
@@ -35,7 +34,6 @@ import org.springframework.batch.execution.step.support.SimpleExitStatusExceptio
 import org.springframework.batch.execution.step.support.StepExecutionSynchronizer;
 import org.springframework.batch.execution.step.support.StepInterruptionPolicy;
 import org.springframework.batch.execution.step.support.ThreadStepInterruptionPolicy;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -232,11 +230,6 @@ public class ItemOrientedStep extends AbstractStep {
 	 */
 	public void execute(final StepExecution stepExecution) throws UnexpectedJobExecutionException, JobInterruptedException {
 
-		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
-		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, this);
-
-		boolean isRestart = jobRepository.getStepExecutionCount(jobInstance, this) > 0 ? true : false;
-
 		ExitStatus status = ExitStatus.FAILED;
 		final ExceptionHolder fatalException = new ExceptionHolder();
 
@@ -247,12 +240,6 @@ public class ItemOrientedStep extends AbstractStep {
 			// using its ID. It would be better to make the creation atomic in
 			// the caller.
 			fatalException.setException(updateStatus(stepExecution, BatchStatus.STARTED));
-
-			if (isRestart && lastStepExecution != null) {
-				stepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
-			} else {
-				stepExecution.setExecutionContext(new ExecutionContext());
-			}
 
 			// Execute step level listeners *after* the execution context is
 			// fixed in the step. E.g. ItemStream instances need the the same
