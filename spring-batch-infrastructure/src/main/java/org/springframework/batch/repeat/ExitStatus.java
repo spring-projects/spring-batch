@@ -29,12 +29,6 @@ import org.springframework.util.StringUtils;
 public class ExitStatus implements Serializable {
 
 	/**
-	 * Convenient constant value for when we detect that processing is underway.
-	 * Used mainly by asynchronous launchers.
-	 */
-	public static final ExitStatus RUNNING = new ExitStatus(true, "RUNNING");
-
-	/**
 	 * Convenient constant value representing unknown state - assumed
 	 * continuable.
 	 */
@@ -49,11 +43,6 @@ public class ExitStatus implements Serializable {
 	 * Convenient constant value representing finished processing.
 	 */
 	public static final ExitStatus FINISHED = new ExitStatus(false, "COMPLETED");
-
-	/**
-	 * Convenient constant value representing interrupted processing.
-	 */
-	public static final ExitStatus INTERRUPTED = new ExitStatus(false, "INTERRUPTED");
 
 	/**
 	 * Convenient constant value representing job that did no processing (e.g.

@@ -234,7 +234,7 @@ public class SimpleJobTests extends TestCase {
 			assertEquals(exception, e.getCause());
 		}
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.STOPPED, ExitStatus.INTERRUPTED);
+		checkRepository(BatchStatus.STOPPED, ExitStatus.FAILED);
 	}
 
 	public void testFailed() throws Exception {
@@ -355,7 +355,7 @@ public class SimpleJobTests extends TestCase {
 				throw (RuntimeException) exception;
 			}
 			if (exception instanceof JobInterruptedException) {
-				stepExecution.setExitStatus(ExitStatus.INTERRUPTED);
+				stepExecution.setExitStatus(ExitStatus.FAILED);
 				throw (JobInterruptedException) exception;
 			}
 			if (runnable != null) {
