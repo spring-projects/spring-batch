@@ -245,34 +245,34 @@
       setup of the required properties. </para>
 
       <programlisting>StaxEventItemWriter staxItemWriter = new StaxEventItemWriter()
-FileSystemResource resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", "xml"))
+     FileSystemResource resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", "xml"))
 
-Map aliases = new HashMap();
-aliases.put("trade","org.springframework.batch.sample.domain.Trade");
-aliases.put("isin","java.lang.String");
-aliases.put("quantity","long");
-aliases.put("price","java.math.BigDecimal");
-aliases.put("customer","java.lang.String");
-XStreamMarshaller marshaller = new XStreamMarshaller()
-marshaller.setAliases(aliases)
+     Map aliases = new HashMap();
+     aliases.put("trade","org.springframework.batch.sample.domain.Trade");
+     aliases.put("isin","java.lang.String");
+     aliases.put("quantity","long");
+     aliases.put("price","java.math.BigDecimal");
+     aliases.put("customer","java.lang.String");
+     XStreamMarshaller marshaller = new XStreamMarshaller()
+     marshaller.setAliases(aliases)
 
-MarshallingEventWriterSerializer tradeMarshallingSerializer = new MarshallingEventWriterSerializer(marshaller)
+     MarshallingEventWriterSerializer tradeMarshallingSerializer = new MarshallingEventWriterSerializer(marshaller)
 
-staxItemWriter.setResource(resource)
-staxItemWriter.setSerializer(tradeMarshallingSerializer)
-staxItemWriter.setRootTagName("trades")
-staxItemWriter.setOverwriteOutput(true)
+     staxItemWriter.setResource(resource)
+     staxItemWriter.setSerializer(tradeMarshallingSerializer)
+     staxItemWriter.setRootTagName("trades")
+     staxItemWriter.setOverwriteOutput(true)
 
-ExecutionContext executionContext = new ExecutionContext()
-staxItemWriter.open(executionContext)
-Trade trade = new Trade()
-trade.isin = "XYZ0001"
-trade.quantity =5 
-trade.price = 11.39 
-trade.customer = "Customer1"
-println trade
-staxItemWriter.write(trade)
-staxItemWriter.flush()</programlisting>
+     ExecutionContext executionContext = new ExecutionContext()
+     staxItemWriter.open(executionContext)
+     Trade trade = new Trade()
+     trade.isin = "XYZ0001"
+     trade.quantity =5 
+     trade.price = 11.39 
+     trade.customer = "Customer1"
+     println trade
+     staxItemWriter.write(trade)
+     staxItemWriter.flush()</programlisting>
 
       <para>For a complete example configuration of XML input and output and a
       corresponding Job see the sample xmlStaxJob.</para>
