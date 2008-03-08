@@ -73,7 +73,8 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	private String createJobKey(JobParameters jobParameters) {
 
 		Map props = jobParameters.getParameters();
-		StringBuffer stringBuffer = new StringBuffer();
+		// Start with non-empty string for Oracle:
+		StringBuffer stringBuffer = new StringBuffer("key:");
 		for (Iterator it = props.entrySet().iterator(); it.hasNext();) {
 			Entry entry = (Entry) it.next();
 			stringBuffer.append(entry.toString() + ";");
