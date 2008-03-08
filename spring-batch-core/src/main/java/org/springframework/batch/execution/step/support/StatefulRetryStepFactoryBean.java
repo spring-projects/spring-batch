@@ -23,6 +23,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
@@ -59,6 +60,8 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 
 	private BackOffPolicy backOffPolicy;
 
+	private RetryListener[] retryListeners;
+
 	/**
 	 * Public setter for the retry limit. Each item can be retried up to this
 	 * limit.
@@ -82,6 +85,14 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 	 */
 	public void setBackOffPolicy(BackOffPolicy backOffPolicy) {
 		this.backOffPolicy = backOffPolicy;
+	}
+
+	/**
+	 * Public setter for the {@link RetryListener}s.
+	 * @param retryListeners the {@link RetryListener}s to set
+	 */
+	public void setRetryListeners(RetryListener[] retryListeners) {
+		this.retryListeners = retryListeners;
 	}
 
 	/**
@@ -135,6 +146,9 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 			ItemReaderRetryPolicy itemProviderRetryPolicy = new ItemReaderRetryPolicy(retryPolicy);
 
 			RetryTemplate retryTemplate = new RetryTemplate();
+			if (retryListeners!=null) {
+				retryTemplate.setListeners(retryListeners);
+			}
 			retryTemplate.setRetryPolicy(itemProviderRetryPolicy);
 			if (backOffPolicy != null) {
 				retryTemplate.setBackOffPolicy(backOffPolicy);
