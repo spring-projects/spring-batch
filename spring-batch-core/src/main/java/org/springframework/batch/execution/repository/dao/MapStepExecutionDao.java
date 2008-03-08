@@ -51,8 +51,8 @@ public class MapStepExecutionDao implements StepExecutionDao {
 	}
 
 	public void saveStepExecution(StepExecution stepExecution) {
-		Assert.state(stepExecution.getId() == null);
-		Assert.state(stepExecution.getVersion() == null);
+		Assert.isTrue(stepExecution.getId() == null);
+		Assert.isTrue(stepExecution.getVersion() == null);
 		Assert.notNull(stepExecution.getJobExecutionId(), "JobExecution must be saved already.");
 
 		Map executions = (Map) executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
@@ -60,8 +60,8 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			executions = TransactionAwareProxyFactory.createTransactionalMap();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
 		}
-		stepExecution.incrementVersion();
 		stepExecution.setId(new Long(currentId++));
+		stepExecution.incrementVersion();
 		executions.put(stepExecution.getStepName(), stepExecution);
 	}
 
@@ -75,14 +75,16 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		StepExecution persistedExecution = (StepExecution) executions.get(stepExecution.getStepName());
 		Assert.notNull(persistedExecution, "step execution is expected to be already saved");
 
-		if (!persistedExecution.getVersion().equals(stepExecution.getVersion())) {
-			throw new OptimisticLockingFailureException("Attempt to update step execution id=" + stepExecution.getId()
-					+ " with wrong version (" + stepExecution.getVersion() + "), where current version is "
-					+ persistedExecution.getVersion());
-		}
+		synchronized (stepExecution) {
+			if (!persistedExecution.getVersion().equals(stepExecution.getVersion())) {
+				throw new OptimisticLockingFailureException("Attempt to update step execution id="
+						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion()
+						+ "), where current version is " + persistedExecution.getVersion());
+			}
 
-		stepExecution.incrementVersion();
-		executions.put(stepExecution.getStepName(), stepExecution);
+			stepExecution.incrementVersion();
+			executions.put(stepExecution.getStepName(), stepExecution);
+		}
 	}
 
 	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {

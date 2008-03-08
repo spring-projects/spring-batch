@@ -9,6 +9,9 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.Assert;
 
+/**
+ * In-memory implementation of {@link JobInstanceDao}.
+ */
 public class MapJobInstanceDao implements JobInstanceDao {
 
 	private static Collection jobInstances = TransactionAwareProxyFactory.createTransactionalList();
@@ -24,6 +27,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		Assert.state(getJobInstance(job, jobParameters) == null, "JobInstance must not already exist");
 		
 		JobInstance jobInstance = new JobInstance(new Long(currentId++), jobParameters, job);
+		jobInstance.incrementVersion();
 		jobInstances.add(jobInstance);
 		
 		return jobInstance;

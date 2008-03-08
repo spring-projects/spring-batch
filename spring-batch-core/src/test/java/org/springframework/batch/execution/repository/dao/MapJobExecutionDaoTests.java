@@ -38,11 +38,13 @@ public class MapJobExecutionDaoTests extends TestCase {
 	/**
 	 * Saving sets id to the entity.
 	 */
-	public void testSaveAddsId() {
+	public void testSaveAddsIdAndVersion() {
 		
 		assertNull(execution.getId());
+		assertNull(execution.getVersion());
 		dao.saveJobExecution(execution);
 		assertNotNull(execution.getId());
+		assertNotNull(execution.getVersion());
 	}
 
 	/**

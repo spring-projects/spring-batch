@@ -4,66 +4,71 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.util.Assert;
 
 /**
  * In-memory implementation of {@link JobExecutionDao}.
  * 
  */
 public class MapJobExecutionDao implements JobExecutionDao {
-
-	private static Map executionsByJobInstanceId = TransactionAwareProxyFactory.createTransactionalMap();
+	
+	private static Map executionsById = TransactionAwareProxyFactory.createTransactionalMap();
 
 	private static long currentId;
 
 	public static void clear() {
-		executionsByJobInstanceId.clear();
+		executionsById.clear();
 	}
 
 	public int getJobExecutionCount(JobInstance jobInstance) {
-		Set executions = (Set) executionsByJobInstanceId.get(jobInstance.getId());
-		if (executions == null) {
-			return 0;
+		int count = 0;
+		for (Iterator iterator = executionsById.values().iterator(); iterator.hasNext();) {
+			JobExecution exec = (JobExecution) iterator.next();
+			if (exec.getJobInstance().equals(jobInstance)) {
+				count++;
+			}
 		}
-		return executions.size();
+		return count;
 	}
 
 	public void saveJobExecution(JobExecution jobExecution) {
-		Set executions = (Set) executionsByJobInstanceId.get(jobExecution.getJobId());
-		if (executions == null) {
-			executions = TransactionAwareProxyFactory.createTransactionalSet();
-			executionsByJobInstanceId.put(jobExecution.getJobId(), executions);
-		}
-		executions.add(jobExecution);
-		jobExecution.setId(new Long(currentId++));
+		Assert.isTrue(jobExecution.getId() == null);
+		Long newId = new Long(currentId++);
+		jobExecution.setId(newId);
+		jobExecution.incrementVersion();
+		executionsById.put(newId, jobExecution);
 	}
 
 	public List findJobExecutions(JobInstance jobInstance) {
-		Set executions = (Set) executionsByJobInstanceId.get(jobInstance.getId());
-		if (executions == null) {
-			return new ArrayList();
+		List executions = new ArrayList();
+		for (Iterator iterator = executionsById.values().iterator(); iterator.hasNext();) {
+			JobExecution exec = (JobExecution) iterator.next();
+			if (exec.getJobInstance().equals(jobInstance)) {
+				executions.add(exec);
+			}
 		}
-		else {
-			return new ArrayList(executions);
-		}
+		return executions;
 	}
 
 	public void updateJobExecution(JobExecution jobExecution) {
-		// no-op
+		Long id = jobExecution.getId();
+		Assert.notNull(id, "JobExecution is expected to have an id (should be saved already)");
+		Assert.notNull(executionsById.get(id), "JobExecution must already be saved");
+		jobExecution.incrementVersion();
+		executionsById.put(id, jobExecution);
 	}
 
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
-		Set executions = (Set) executionsByJobInstanceId.get(jobInstance.getId());
-		if (executions == null) {
-			return null;
-		}
 		JobExecution lastExec = null;
-		for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
+		for (Iterator iterator = executionsById.values().iterator(); iterator.hasNext();) {
 			JobExecution exec = (JobExecution) iterator.next();
+			if (!exec.getJobInstance().equals(jobInstance)) {
+				continue;
+			}
 			if (lastExec == null) {
 				lastExec = exec;
 			}

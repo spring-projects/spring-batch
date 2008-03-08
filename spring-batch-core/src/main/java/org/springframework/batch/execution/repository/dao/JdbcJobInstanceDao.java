@@ -32,8 +32,8 @@ import org.springframework.util.Assert;
  */
 public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements JobInstanceDao, InitializingBean {
 
-	private static final String CREATE_JOB_INSTANCE = "INSERT into %PREFIX%JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY)"
-			+ " values (?, ?, ?)";
+	private static final String CREATE_JOB_INSTANCE = "INSERT into %PREFIX%JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)"
+			+ " values (?, ?, ?, ?)";
 
 	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_PARAMS(JOB_INSTANCE_ID, KEY_NAME, TYPE_CD, "
 			+ "STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL) values (?, ?, ?, ?, ?, ?, ?)";
@@ -60,21 +60,23 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		Assert.state(getJobInstance(job, jobParameters) == null, "JobInstance must not already exist");
 		
 		Long jobId = new Long(jobIncrementer.nextLongValue());
-		Object[] parameters = new Object[] { jobId, job.getName(), createJobKey(jobParameters) };
+		
+		JobInstance jobInstance = new JobInstance(jobId, jobParameters, job);
+		jobInstance.incrementVersion();
+		
+		Object[] parameters = new Object[] { jobId, job.getName(), createJobKey(jobParameters), jobInstance.getVersion() };
 		getJdbcTemplate().update(getQuery(CREATE_JOB_INSTANCE), parameters,
-				new int[] { Types.INTEGER, Types.VARCHAR, Types.VARCHAR });
+				new int[] { Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER });
 
 		insertJobParameters(jobId, jobParameters);
 
-		JobInstance jobInstance = new JobInstance(jobId, jobParameters, job);
 		return jobInstance;
 	}
 
 	private String createJobKey(JobParameters jobParameters) {
 
 		Map props = jobParameters.getParameters();
-		// Start with non-empty string for Oracle:
-		StringBuffer stringBuffer = new StringBuffer("key:");
+		StringBuffer stringBuffer = new StringBuffer();
 		for (Iterator it = props.entrySet().iterator(); it.hasNext();) {
 			Entry entry = (Entry) it.next();
 			stringBuffer.append(entry.toString() + ";");

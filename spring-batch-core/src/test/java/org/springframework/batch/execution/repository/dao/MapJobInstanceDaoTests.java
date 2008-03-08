@@ -42,9 +42,9 @@ public class MapJobInstanceDaoTests extends TestCase {
 	 * Trying to create instance twice for the same job+parameters causes error
 	 */
 	public void testCreateDuplicateInstance() {
-		
+
 		dao.createJobInstance(fooJob, fooParams);
-		
+
 		try {
 			dao.createJobInstance(fooJob, fooParams);
 			fail();
@@ -52,5 +52,16 @@ public class MapJobInstanceDaoTests extends TestCase {
 		catch (IllegalStateException e) {
 			// expected
 		}
+	}
+
+	public void testCreationAddsVersion() {
+		
+		JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), new JobSupport("testVersionAndId"));
+		
+		assertNull(jobInstance.getVersion());
+
+		jobInstance = dao.createJobInstance(new JobSupport("testVersion"), new JobParameters());
+
+		assertNotNull(jobInstance.getVersion());
 	}
 }

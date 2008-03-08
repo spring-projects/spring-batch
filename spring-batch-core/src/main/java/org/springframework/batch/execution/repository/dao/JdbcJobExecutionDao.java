@@ -39,12 +39,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			+ "where JOB_INSTANCE_ID = ?";
 
 	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, "
-			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE) values (?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, VERSION) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?";
 
 	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
-			+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ? where JOB_EXECUTION_ID = ?";
+			+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ? where JOB_EXECUTION_ID = ?";
 
 	private static final String FIND_JOB_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
 			+ " where JOB_INSTANCE_ID = ?";
@@ -90,16 +90,18 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		validateJobExecution(jobExecution);
 
+		jobExecution.incrementVersion();
+
 		jobExecution.setId(new Long(jobExecutionIncrementer.nextLongValue()));
 		Object[] parameters = new Object[] { jobExecution.getId(), jobExecution.getJobId(),
 				jobExecution.getStartTime(), jobExecution.getEndTime(), jobExecution.getStatus().toString(),
 				jobExecution.getExitStatus().isContinuable() ? "Y" : "N", jobExecution.getExitStatus().getExitCode(),
-				jobExecution.getExitStatus().getExitDescription() };
+				jobExecution.getExitStatus().getExitDescription(), jobExecution.getVersion() };
 		getJdbcTemplate().update(
 				getQuery(SAVE_JOB_EXECUTION),
 				parameters,
 				new int[] { Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.CHAR,
-						Types.VARCHAR, Types.VARCHAR });
+						Types.VARCHAR, Types.VARCHAR, Types.INTEGER });
 	}
 
 	/**
@@ -128,6 +130,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		validateJobExecution(jobExecution);
 
+		jobExecution.incrementVersion();
+
 		String exitDescription = jobExecution.getExitStatus().getExitDescription();
 		if (exitDescription != null && exitDescription.length() > EXIT_MESSAGE_LENGTH) {
 			exitDescription = exitDescription.substring(0, EXIT_MESSAGE_LENGTH);
@@ -135,7 +139,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		}
 		Object[] parameters = new Object[] { jobExecution.getStartTime(), jobExecution.getEndTime(),
 				jobExecution.getStatus().toString(), jobExecution.getExitStatus().isContinuable() ? "Y" : "N",
-				jobExecution.getExitStatus().getExitCode(), exitDescription, jobExecution.getId() };
+				jobExecution.getExitStatus().getExitCode(), exitDescription, jobExecution.getVersion(),
+				jobExecution.getId() };
 
 		if (jobExecution.getId() == null) {
 			throw new IllegalArgumentException("JobExecution ID cannot be null.  JobExecution must be saved "
@@ -146,15 +151,14 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		// is invalid and
 		// an exception should be thrown.
 		if (getJdbcTemplate().queryForInt(getQuery(CHECK_JOB_EXECUTION_EXISTS), new Object[] { jobExecution.getId() }) != 1) {
-			throw new NoSuchObjectException("Invalid JobExecution, ID " + jobExecution.getId()
-					+ " not found.");
+			throw new NoSuchObjectException("Invalid JobExecution, ID " + jobExecution.getId() + " not found.");
 		}
 
 		getJdbcTemplate().update(
 				getQuery(UPDATE_JOB_EXECUTION),
 				parameters,
 				new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.CHAR, Types.VARCHAR, Types.VARCHAR,
-						Types.INTEGER });
+						Types.INTEGER, Types.INTEGER });
 	}
 
 	/**

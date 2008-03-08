@@ -31,6 +31,9 @@ import org.springframework.batch.execution.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.dao.OptimisticLockingFailureException;
 
+/**
+ * Tests for {@link MapStepExecutionDao}.
+ */
 public class MapStepExecutionDaoTests extends TestCase {
 
 	private StepExecutionDao dao = new MapStepExecutionDao();
@@ -51,11 +54,12 @@ public class MapStepExecutionDaoTests extends TestCase {
 		stepExecution = new StepExecution(step, jobExecution);
 	}
 
-	public void testSaveExecutionUpdatesId() throws Exception {
-		StepExecution execution = new StepExecution(step, new JobExecution(jobInstance, new Long(1)));
-		assertNull(execution.getId());
-		dao.saveStepExecution(execution);
-		assertNotNull(execution.getId());
+	public void testSaveExecutionAssignsIdAndVersion() throws Exception {
+		assertNull(stepExecution.getId());
+		assertNull(stepExecution.getVersion());
+		dao.saveStepExecution(stepExecution);
+		assertNotNull(stepExecution.getId());
+		assertNotNull(stepExecution.getVersion());
 	}
 
 	public void testSaveAndFindExecution() {
@@ -65,14 +69,54 @@ public class MapStepExecutionDaoTests extends TestCase {
 		StepExecution retrieved = dao.getStepExecution(jobExecution, step);
 		assertEquals(stepExecution, retrieved);
 		assertEquals(BatchStatus.STARTED, retrieved.getStatus());
+
+		assertNull(dao.getStepExecution(jobExecution, new StepSupport("not-existing step")));
 	}
 
+	public void testGetForNotExistingJobExecution() {
+		assertNull(dao.getStepExecution(new JobExecution(jobInstance, new Long(777)), step));
+	}
+
+	/**
+	 * To-be-saved execution must not already have an id.
+	 */
+	public void testSaveExecutionWithIdAlreadySet() {
+		stepExecution.setId(new Long(7));
+		try {
+			dao.saveStepExecution(stepExecution);
+			fail();
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
+
+	/**
+	 * To-be-saved execution must not already have a version.
+	 */
+	public void testSaveExecutionWithVersionAlreadySet() {
+		stepExecution.incrementVersion();
+		try {
+			dao.saveStepExecution(stepExecution);
+			fail();
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
+
+	/**
+	 * Update and retrieve updated StepExecution - make sure the update is
+	 * reflected as expected and version number has been incremented
+	 */
 	public void testUpdateExecution() {
 		stepExecution.setStatus(BatchStatus.STARTED);
 		dao.saveStepExecution(stepExecution);
+		Integer versionAfterSave = stepExecution.getVersion();
 
 		stepExecution.setStatus(BatchStatus.STOPPED);
 		dao.updateStepExecution(stepExecution);
+		assertEquals(versionAfterSave.intValue() + 1, stepExecution.getVersion().intValue());
 
 		StepExecution retrieved = dao.getStepExecution(jobExecution, step);
 		assertEquals(stepExecution, retrieved);
@@ -109,6 +153,10 @@ public class MapStepExecutionDaoTests extends TestCase {
 		assertEquals(7, retrieved.getLong("longKey"));
 	}
 
+	/**
+	 * Exception should be raised when the version of update argument doesn't
+	 * match the version of persisted entity.
+	 */
 	public void testConcurrentModificationException() {
 		jobInstance = new JobInstance(new Long(1), new JobParameters(), new JobSupport("testJob"));
 		jobExecution = new JobExecution(jobInstance, new Long(1));

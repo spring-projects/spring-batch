@@ -284,4 +284,32 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 			// expected
 		}
 	}
+	
+	public void testCreationAddsVersion() {
+		
+		jobInstance = jobInstanceDao.createJobInstance(new JobSupport("testVersion"), new JobParameters());
+		
+		assertNotNull(jobInstance.getVersion());
+	}
+	
+	public void testSaveAddsVersionAndId() {
+		
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		
+		assertNull(jobExecution.getId());
+		assertNull(jobExecution.getVersion());
+		
+		jobExecutionDao.saveJobExecution(jobExecution);
+		
+		assertNotNull(jobExecution.getId());
+		assertNotNull(jobExecution.getVersion());
+	}
+	
+	public void testUpdateIncrementsVersion() {
+		int version = jobExecution.getVersion().intValue();
+		
+		jobExecutionDao.updateJobExecution(jobExecution);
+		
+		assertEquals(version + 1, jobExecution.getVersion().intValue());
+	}
 }
