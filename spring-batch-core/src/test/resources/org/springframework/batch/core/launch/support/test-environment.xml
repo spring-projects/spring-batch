@@ -13,8 +13,5 @@
 
 	<bean
 		class="org.springframework.batch.core.launch.support.CommandLineJobRunnerTests$StubSystemExiter" />
-		
-	<bean
-		class="org.springframework.batch.core.launch.support.CommandLineJobRunnerTests$StubExceptionClassifier" />
 
 </beans>

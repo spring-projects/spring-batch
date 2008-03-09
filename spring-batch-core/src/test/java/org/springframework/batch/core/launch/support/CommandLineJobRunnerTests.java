@@ -21,10 +21,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.CommandLineJobRunner;
-import org.springframework.batch.core.launch.support.SystemExiter;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.ClassUtils;
 
@@ -61,7 +58,6 @@ public class CommandLineJobRunnerTests extends TestCase {
 		ExitStatus exitStatus = ExitStatus.FINISHED;
 		jobExecution.setExitStatus(exitStatus);
 		StubJobLauncher.jobExecution = jobExecution;
-		StubExceptionClassifier.exception = null;
 	}
 
 	public void testMain() {
@@ -69,10 +65,10 @@ public class CommandLineJobRunnerTests extends TestCase {
 		assertEquals(0, StubSystemExiter.getStatus());
 	}
 
-	public void testJobAlreadyRunning() {
+	public void testJobAlreadyRunning() throws Throwable {
 		StubJobLauncher.throwExecutionRunningException = true;
 		CommandLineJobRunner.main(args);
-		assertTrue(StubExceptionClassifier.exception instanceof JobExecutionAlreadyRunningException);
+		assertEquals(1, StubSystemExiter.status);
 	}
 
 	// can't test because it will cause the system to exit.
@@ -85,9 +81,6 @@ public class CommandLineJobRunnerTests extends TestCase {
 	public void testWithNoParameters() throws Throwable {
 		String[] args = new String[] { jobPath, jobName };
 		CommandLineJobRunner.main(args);
-		if (StubExceptionClassifier.exception != null) {
-			throw StubExceptionClassifier.exception;
-		}
 		assertEquals(0, StubSystemExiter.status);
 		assertEquals(new JobParameters(), StubJobLauncher.jobParameters);
 	}
@@ -137,22 +130,4 @@ public class CommandLineJobRunnerTests extends TestCase {
 		}
 	}
 
-	public static class StubExceptionClassifier implements ExitStatusExceptionClassifier {
-
-		public static Throwable exception;
-
-		public Object classify(Throwable throwable) {
-			return null;
-		}
-
-		public Object getDefault() {
-			return null;
-		}
-
-		public ExitStatus classifyForExitCode(Throwable throwable) {
-			exception = throwable;
-			return ExitStatus.FAILED;
-		}
-
-	}
 }
