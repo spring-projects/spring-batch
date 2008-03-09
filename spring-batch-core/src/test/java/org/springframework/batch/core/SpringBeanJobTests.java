@@ -18,6 +18,7 @@ package org.springframework.batch.core;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.job.JobSupport;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.ChildBeanDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;

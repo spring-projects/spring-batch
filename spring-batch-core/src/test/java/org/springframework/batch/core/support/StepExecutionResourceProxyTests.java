@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.resource;
+package org.springframework.batch.core.support;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,25 +28,25 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.resource.StepExecutionProxyResource;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.core.support.StepExecutionResourceProxy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
 /**
- * Unit tests for {@link StepExecutionProxyResource}
+ * Unit tests for {@link StepExecutionResourceProxy}
  * 
  * @author robert.kasanicky
  * @author Lucas Ward
  * @author Dave Syer
  */
-public class StepExecutionProxyResourceTests extends TestCase {
+public class StepExecutionResourceProxyTests extends TestCase {
 
 	/**
 	 * Object under test
 	 */
-	private StepExecutionProxyResource resource = new StepExecutionProxyResource();
+	private StepExecutionResourceProxy resource = new StepExecutionResourceProxy();
 
 	private char pathsep = File.separatorChar;
 
@@ -105,7 +105,7 @@ public class StepExecutionProxyResourceTests extends TestCase {
 	}
 
 	public void testResoureLoaderAware() throws Exception {
-		resource = new StepExecutionProxyResource();
+		resource = new StepExecutionResourceProxy();
 		resource.setResourceLoader(new DefaultResourceLoader() {
 			public Resource getResource(String location) {
 				return new ByteArrayResource("foo".getBytes());

@@ -20,8 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.springframework.batch.core.BatchStatus;
-
 import junit.framework.TestCase;
 
 /**

@@ -21,7 +21,6 @@ import java.io.StringWriter;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.repository.NoSuchJobException;
-import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**

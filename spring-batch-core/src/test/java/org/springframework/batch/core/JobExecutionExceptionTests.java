@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core;
 
-import org.springframework.batch.core.JobExecutionException;
 
 /**
  * @author Dave Syer

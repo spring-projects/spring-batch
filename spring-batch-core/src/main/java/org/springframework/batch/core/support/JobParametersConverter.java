@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.runtime;
+package org.springframework.batch.core.support;
 
 import java.util.Properties;
 
@@ -22,34 +22,30 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 
 /**
- * A factory for {@link JobParameters} instances. A job can be
- * executed with many possible runtime parameters, which identify the instance
- * of the job. This factory allows job identifiers to be created with different
- * properties according to the {@link JobParameters} strategy required. For
- * example some projects or jobs need a schedule date as part of the
- * {@link JobParameters} and some do not (e.g. for an ad-hoc execution a simple
- * label might be enough).
+ * A factory for {@link JobParameters} instances. A job can be executed with
+ * many possible runtime parameters, which identify the instance of the job.
+ * This converter allows job parameters to be to and from Properties.
  * 
  * @author Dave Syer
  * 
  * @see JobParametersBuilder
  * 
  */
-public interface JobParametersFactory {
+public interface JobParametersConverter {
 
 	/**
-	 * Get a new {@link JobParameters} instance.  If given null, or an empty
+	 * Get a new {@link JobParameters} instance. If given null, or an empty
 	 * properties, an empty JobParameters will be returned.
 	 * 
-	 * @param properties
-	 *            the runtime parameters in the form of String literals.
-	 * @return a {@link JobParameters} properties converted to the correct types.
+	 * @param properties the runtime parameters in the form of String literals.
+	 * @return a {@link JobParameters} properties converted to the correct
+	 * types.
 	 */
 	public JobParameters getJobParameters(Properties properties);
 
 	/**
-	 * The inverse operation: get a {@link Properties} instance.  If given
-	 * null or empty JobParameters, an empty Properties should be returned.
+	 * The inverse operation: get a {@link Properties} instance. If given null
+	 * or empty JobParameters, an empty Properties should be returned.
 	 * 
 	 * @param params
 	 * @return a representation of the parameters as properties

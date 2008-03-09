@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.launch.support;
+package org.springframework.batch.core.support;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -25,16 +25,16 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.runtime.DefaultJobParametersFactory;
+import org.springframework.batch.core.support.DefaultJobParametersConverter;
 import org.springframework.util.StringUtils;
 
 /**
  * @author Dave Syer
  * 
  */
-public class DefaultJobParametersFactoryTests extends TestCase {
+public class DefaultJobParametersConverterTests extends TestCase {
 
-	DefaultJobParametersFactory factory = new DefaultJobParametersFactory();
+	DefaultJobParametersConverter factory = new DefaultJobParametersConverter();
 
 	DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 

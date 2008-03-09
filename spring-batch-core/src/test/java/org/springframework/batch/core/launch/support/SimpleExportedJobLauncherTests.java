@@ -32,8 +32,8 @@ import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleExportedJobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.core.support.JobParametersConverter;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.PropertiesConverter;
 
@@ -181,7 +181,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 	 */
 	public void testRunJobWithParametersAndFactory() throws Exception {
 		jobLocator.register(new ReferenceJobFactory(new JobSupport("foo")));
-		launcher.setJobParametersFactory(new JobParametersFactory() {
+		launcher.setJobParametersFactory(new JobParametersConverter() {
 			public JobParameters getJobParameters(Properties properties) {
 				return new JobParametersBuilder().addString("foo", "spam").toJobParameters();
 			}

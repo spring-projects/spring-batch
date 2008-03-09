@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core;
 
-import org.springframework.batch.core.Entity;
-
 import junit.framework.TestCase;
 
 /**

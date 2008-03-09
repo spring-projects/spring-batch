@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.resource;
+package org.springframework.batch.core.support;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,8 +29,6 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.StepListenerSupport;
-import org.springframework.batch.core.runtime.DefaultJobParametersFactory;
-import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.Resource;
@@ -61,11 +59,12 @@ import org.springframework.util.StringUtils;
  * 
  * Note that the default pattern does not start with a separator. Because of the
  * implementation of the Spring Core Resource abstractions, it would need to
- * start with a double forward slash "//" to resolve to an absolute directory.<br/>
+ * start with a double forward slash "//" to resolve to an absolute directory
+ * (or else use a full URL with the file: prefix).<br/>
  * 
  * To use this resource it must be initialised with a {@link StepExecution}.
  * The best way to do that is to register it as a listener in the step that is
- * going to need it. It is to enable this usage that the resource implements
+ * going to need it. For this reason the resource implements
  * {@link StepListener}.
  * 
  * @author Tomas Slanina
@@ -74,7 +73,7 @@ import org.springframework.util.StringUtils;
  * 
  * @see Resource
  */
-public class StepExecutionProxyResource extends StepListenerSupport implements Resource, ResourceLoaderAware,
+public class StepExecutionResourceProxy extends StepListenerSupport implements Resource, ResourceLoaderAware,
 		StepListener {
 
 	private static final String JOB_NAME_PATTERN = "%JOB_NAME%";
@@ -85,7 +84,7 @@ public class StepExecutionProxyResource extends StepListenerSupport implements R
 
 	private String filePattern = DEFAULT_PATTERN;
 
-	private JobParametersFactory jobParametersFactory = new DefaultJobParametersFactory();
+	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 
 	private ResourceLoader resourceLoader = new FileSystemResourceLoader();
 
@@ -197,13 +196,13 @@ public class StepExecutionProxyResource extends StepListenerSupport implements R
 	}
 
 	/**
-	 * Public setter for the {@link JobParametersFactory} used to translate
+	 * Public setter for the {@link JobParametersConverter} used to translate
 	 * {@link JobParameters} into {@link Properties}. Defaults to a
-	 * {@link DefaultJobParametersFactory}.
-	 * @param jobParametersFactory the {@link JobParametersFactory} to set
+	 * {@link DefaultJobParametersConverter}.
+	 * @param jobParametersConverter the {@link JobParametersConverter} to set
 	 */
-	public void setJobParametersFactory(JobParametersFactory jobParametersFactory) {
-		this.jobParametersFactory = jobParametersFactory;
+	public void setJobParametersFactory(JobParametersConverter jobParametersConverter) {
+		this.jobParametersConverter = jobParametersConverter;
 	}
 
 	/**
@@ -281,7 +280,7 @@ public class StepExecutionProxyResource extends StepListenerSupport implements R
 	public void beforeStep(StepExecution execution) {
 		String stepName = execution.getStepName();
 		String jobName = execution.getJobExecution().getJobInstance().getJobName();
-		Properties properties = jobParametersFactory.getProperties(execution.getJobExecution().getJobInstance()
+		Properties properties = jobParametersConverter.getProperties(execution.getJobExecution().getJobInstance()
 				.getJobParameters());
 		delegate = resourceLoader.getResource(createFileName(jobName, stepName, properties));
 	}

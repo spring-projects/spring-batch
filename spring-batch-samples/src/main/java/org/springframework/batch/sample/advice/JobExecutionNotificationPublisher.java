@@ -53,7 +53,7 @@ public class JobExecutionNotificationPublisher implements ApplicationListener, N
 	 * close we log the event at INFO level and send a JMX notification if we
 	 * are also an MBean.
 	 * 
-	 * @see org.springframework.batch.core.launch.SimpleJobLauncher#onApplicationEvent(org.springframework.context.ApplicationEvent)
+	 * @see org.springframework.batch.core.launch.support.SimpleJobLauncher#onApplicationEvent(org.springframework.context.ApplicationEvent)
 	 */
 	public void onApplicationEvent(ApplicationEvent applicationEvent) {
 		if (applicationEvent instanceof SimpleMessageApplicationEvent) {

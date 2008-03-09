@@ -29,8 +29,8 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.NoSuchJobException;
-import org.springframework.batch.core.runtime.DefaultJobParametersFactory;
-import org.springframework.batch.core.runtime.JobParametersFactory;
+import org.springframework.batch.core.support.DefaultJobParametersConverter;
+import org.springframework.batch.core.support.JobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -47,7 +47,7 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 
 	private Map registry = new HashMap();
 
-	private JobParametersFactory jobParametersFactory = new DefaultJobParametersFactory();
+	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 	
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
@@ -75,10 +75,10 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 	
 	/**
 	 * Public setter for the JobParametersFactory.
-	 * @param jobParametersFactory the jobParametersFactory to set
+	 * @param jobParametersConverter the jobParametersFactory to set
 	 */
-	public void setJobParametersFactory(JobParametersFactory jobParametersFactory) {
-		this.jobParametersFactory = jobParametersFactory;
+	public void setJobParametersFactory(JobParametersConverter jobParametersConverter) {
+		this.jobParametersConverter = jobParametersConverter;
 	}
 
 	/*
@@ -153,7 +153,7 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 
 		JobParameters jobParameters = new JobParameters();
 		if (params != null) {
-			jobParameters = jobParametersFactory.getJobParameters(PropertiesConverter.stringToProperties(params));
+			jobParameters = jobParametersConverter.getJobParameters(PropertiesConverter.stringToProperties(params));
 		}
 
 		JobExecution execution;

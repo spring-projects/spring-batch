@@ -14,7 +14,7 @@
 		<property name="jobRegistry" ref="jobConfigurationRegistry" />
 	</bean>
 
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.SimpleJobLauncher">
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 

@@ -29,7 +29,7 @@ import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.support.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.support.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.support.dao.StepExecutionDao;
-import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
+import org.springframework.batch.core.step.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.runtime;
+package org.springframework.batch.core.support;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -31,7 +31,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.util.StringUtils;
 
 /**
- * Factory for {@link JobParameters} instances using a simple naming convention
+ * Converter for {@link JobParameters} instances using a simple naming convention
  * for property keys. Key names ending with "(&lt;type&gt;)" where type is one
  * of string, date, long are converted to the corresponding type. The default
  * type is string. E.g.
@@ -47,7 +47,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * 
  */
-public class DefaultJobParametersFactory implements JobParametersFactory {
+public class DefaultJobParametersConverter implements JobParametersConverter {
 
 	public static String DATE_TYPE = "(date)";
 
@@ -66,7 +66,7 @@ public class DefaultJobParametersFactory implements JobParametersFactory {
 	 * @throws IllegalArgumentException if a number or date is passed in that
 	 * cannot be parsed, or cast to the correct type.
 	 * 
-	 * @see org.springframework.batch.core.runtime.JobParametersFactory#getJobParameters(java.util.Properties)
+	 * @see org.springframework.batch.core.support.JobParametersConverter#getJobParameters(java.util.Properties)
 	 */
 	public JobParameters getJobParameters(Properties props) {
 
@@ -124,7 +124,7 @@ public class DefaultJobParametersFactory implements JobParametersFactory {
 	 * Use the same suffixes to create properties (omitting the string suffix
 	 * because it is the default).
 	 * 
-	 * @see org.springframework.batch.core.runtime.JobParametersFactory#getProperties(org.springframework.batch.core.JobParameters)
+	 * @see org.springframework.batch.core.support.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
 	public Properties getProperties(JobParameters params) {
 

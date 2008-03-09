@@ -15,10 +15,9 @@
  */
 package org.springframework.batch.core;
 
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-
 import junit.framework.TestCase;
+
+import org.springframework.batch.core.job.JobSupport;
 
 /**
  * @author dsyer
