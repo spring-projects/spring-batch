@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.step.support;
+package org.springframework.batch.core.step;
 
 import junit.framework.TestCase;
 
@@ -30,8 +30,7 @@ import org.springframework.batch.core.repository.support.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.support.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.support.dao.MapStepExecutionDao;
 import org.springframework.batch.core.step.ItemOrientedStep;
-import org.springframework.batch.core.step.support.SimpleItemHandler;
-import org.springframework.batch.core.step.support.StepExecutionSynchronizer;
+import org.springframework.batch.core.step.SimpleItemHandler;
 import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;

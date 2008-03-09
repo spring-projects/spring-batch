@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.support;
+package org.springframework.batch.core.step;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.step.support.SimpleRetryExceptionHandler;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
@@ -52,7 +51,7 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.step.support.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}.
+	 * {@link org.springframework.batch.core.step.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}.
 	 */
 	public void testRethrowWhenRetryExhausted() {
 
@@ -77,7 +76,7 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.step.support.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}.
+	 * {@link org.springframework.batch.core.step.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}.
 	 */
 	public void testNoRethrowWhenRetryNotExhausted() {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.step.support;
+package org.springframework.batch.core.step;
 
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;

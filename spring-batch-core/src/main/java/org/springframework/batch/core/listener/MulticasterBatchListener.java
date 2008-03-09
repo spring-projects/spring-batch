@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.support;
+package org.springframework.batch.core.listener;
 
 import org.springframework.batch.core.BatchListener;
 import org.springframework.batch.core.ChunkListener;
@@ -21,10 +21,6 @@ import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.listener.CompositeChunkListener;
-import org.springframework.batch.core.listener.CompositeItemReadListener;
-import org.springframework.batch.core.listener.CompositeItemWriteListener;
-import org.springframework.batch.core.listener.CompositeStepListener;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -32,7 +28,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * 
  */
-public class ListenerMulticaster implements StepListener, ChunkListener, ItemReadListener,
+public class MulticasterBatchListener implements StepListener, ChunkListener, ItemReadListener,
 		ItemWriteListener {
 
 	private CompositeStepListener stepListener = new CompositeStepListener();
@@ -46,13 +42,13 @@ public class ListenerMulticaster implements StepListener, ChunkListener, ItemRea
 	/**
 	 * Initialise the listener instance.
 	 */
-	public ListenerMulticaster() {
+	public MulticasterBatchListener() {
 		super();
 	}
 
 	/**
 	 * Register each of the objects as listeners. Once registered, calls to the
-	 * {@link ListenerMulticaster} broadcast to the individual listeners.
+	 * {@link MulticasterBatchListener} broadcast to the individual listeners.
 	 * 
 	 * @param listeners an array of listener objects of types known to the
 	 * multicaster.

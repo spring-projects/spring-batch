@@ -10,7 +10,7 @@
 	<bean id="retrySample" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep"
-				class="org.springframework.batch.core.step.support.StatefulRetryStepFactoryBean">
+				class="org.springframework.batch.core.step.StatefulRetryStepFactoryBean">
 				<property name="itemReader" ref="itemGenerator" />
 				<property name="itemWriter" ref="itemWriter" />
 				<property name="retryLimit" value="3" />

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.support;
+package org.springframework.batch.core.step;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.EmptyItemWriter;
-import org.springframework.batch.core.step.support.RepeatOperationsStepFactoryBean;
+import org.springframework.batch.core.step.RepeatOperationsStepFactoryBean;
 import org.springframework.batch.item.reader.ListItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;

@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.support;
+package org.springframework.batch.core.step;
 
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.step.ItemHandler;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemReader;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2008 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.support;
+package org.springframework.batch.core.step;
 
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.ItemSkipPolicy;
 
 /**
- * Exception indicating that the skip limit for a particular {@Step} has
- * been exceeded.
+ * Implementation of the {@link ItemSkipPolicy} interface that
+ * will always return that an item should be skipped.
  * 
  * @author Ben Hale
  * @author Lucas Ward
  */
-public class SkipLimitExceededException extends UnexpectedJobExecutionException {
+public class AlwaysSkipItemSkipPolicy implements ItemSkipPolicy {
 
-	private final int skipLimit;
-	
-	public SkipLimitExceededException(int skipLimit, Throwable t) {
-		super("Skip limit of '" + skipLimit + "' exceeded", t);
-		this.skipLimit = skipLimit;
+	public boolean shouldSkip(Throwable t, int skipCount) {
+		return true;
 	}
-	
-	public int getSkipLimit() {
-	    return skipLimit;
-    }
+
 }

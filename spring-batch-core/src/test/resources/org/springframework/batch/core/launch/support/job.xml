@@ -15,7 +15,7 @@
 		class="org.springframework.batch.core.job.JobSupport">
 		<property name="steps">
 			<bean id="step1"
-				class="org.springframework.batch.core.step.support.DefaultStepFactoryBean">
+				class="org.springframework.batch.core.step.DefaultStepFactoryBean">
 				<property name="itemReader">
 					<bean
 						class="org.springframework.batch.item.reader.ListItemReader">
@@ -28,7 +28,7 @@
 				</property>
 				<property name="jobRepository">
 					<bean
-						class="org.springframework.batch.core.step.support.JobRepositorySupport" />
+						class="org.springframework.batch.core.step.JobRepositorySupport" />
 				</property>
 				<property name="transactionManager">
 					<bean

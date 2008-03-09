@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.support;
+package org.springframework.batch.core.step;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +33,7 @@ import org.springframework.batch.core.repository.support.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.support.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.support.dao.MapStepExecutionDao;
 import org.springframework.batch.core.step.ItemOrientedStep;
-import org.springframework.batch.core.step.support.StatefulRetryStepFactoryBean;
+import org.springframework.batch.core.step.StatefulRetryStepFactoryBean;
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;

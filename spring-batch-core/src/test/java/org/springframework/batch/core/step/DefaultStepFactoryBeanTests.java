@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.step.support;
+package org.springframework.batch.core.step;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,8 +34,8 @@ import org.springframework.batch.core.repository.support.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.support.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.support.dao.MapStepExecutionDao;
 import org.springframework.batch.core.step.AbstractStep;
+import org.springframework.batch.core.step.DefaultStepFactoryBean;
 import org.springframework.batch.core.step.ItemOrientedStep;
-import org.springframework.batch.core.step.support.DefaultStepFactoryBean;
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;

@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.support;
+package org.springframework.batch.core.step;
 
 import org.springframework.batch.core.BatchListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.step.ItemOrientedStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;

@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.support;
+package org.springframework.batch.core.step;
 
 import org.springframework.batch.core.BatchListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.step.ItemHandler;
-import org.springframework.batch.core.step.ItemOrientedStep;
+import org.springframework.batch.core.listener.MulticasterBatchListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -47,7 +46,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 	private BatchListener[] listeners = new BatchListener[0];
 
-	private ListenerMulticaster listener = new ListenerMulticaster();
+	private MulticasterBatchListener listener = new MulticasterBatchListener();
 
 	private TaskExecutor taskExecutor;
 
