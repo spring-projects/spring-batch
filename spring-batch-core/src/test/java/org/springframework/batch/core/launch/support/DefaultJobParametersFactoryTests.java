@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.launch.support.DefaultJobParametersFactory;
+import org.springframework.batch.core.runtime.DefaultJobParametersFactory;
 import org.springframework.util.StringUtils;
 
 /**

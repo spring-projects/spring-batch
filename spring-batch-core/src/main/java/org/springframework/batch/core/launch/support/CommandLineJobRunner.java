@@ -24,6 +24,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.runtime.DefaultJobParametersFactory;
 import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.BeanDefinitionStoreException;

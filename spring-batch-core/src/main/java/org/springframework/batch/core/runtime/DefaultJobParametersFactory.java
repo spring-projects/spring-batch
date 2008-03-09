@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.launch.support;
+package org.springframework.batch.core.runtime;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -28,7 +28,6 @@ import java.util.Map.Entry;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.runtime.JobParametersFactory;
 import org.springframework.util.StringUtils;
 
 /**
