@@ -10,15 +10,15 @@
 	<import resource="data-source-context.xml" />
 
 	<bean id="jobConfigurationRegistryBeanPostProcessor"
-		class="org.springframework.batch.execution.configuration.JobRegistryBeanPostProcessor">
+		class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
 		<property name="jobRegistry" ref="jobConfigurationRegistry" />
 	</bean>
 
-	<bean id="jobLauncher" class="org.springframework.batch.execution.launch.SimpleJobLauncher">
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
-	<bean id="jobConfigurationRegistry" class="org.springframework.batch.execution.configuration.MapJobRegistry" />
+	<bean id="jobConfigurationRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 
 	<aop:config>
 		<aop:advisor pointcut="execution(* org.springframework.batch.execution..*Repository+.*(..))"
@@ -32,33 +32,33 @@
 		</tx:attributes>
 	</tx:advice>
 
-	<bean id="jobRepository" class="org.springframework.batch.execution.repository.JobRepositoryFactoryBean"
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
 		p:databaseType="hsql" p:dataSource-ref="dataSource" />
 
 	<bean id="mapJobInstanceDao" lazy-init="true"
-		class="org.springframework.batch.execution.repository.dao.MapJobInstanceDao" />
+		class="org.springframework.batch.core.repository.support.dao.MapJobInstanceDao" />
 
 	<bean id="mapJobExecutionDao" lazy-init="true"
-		class="org.springframework.batch.execution.repository.dao.MapJobExecutionDao" />
+		class="org.springframework.batch.core.repository.support.dao.MapJobExecutionDao" />
 
 	<bean id="mapStepExecutionDao" lazy-init="true"
-		class="org.springframework.batch.execution.repository.dao.MapStepExecutionDao" />
+		class="org.springframework.batch.core.repository.support.dao.MapStepExecutionDao" />
 
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="simpleJob" class="org.springframework.batch.execution.job.SimpleJob" abstract="true">
+	<bean id="simpleJob" class="org.springframework.batch.core.job.SimpleJob" abstract="true">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="restartable" value="true" />
 	</bean>
 
-	<bean id="taskletStep" class="org.springframework.batch.execution.step.TaskletStep" abstract="true">
+	<bean id="taskletStep" class="org.springframework.batch.core.step.TaskletStep" abstract="true">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="allowStartIfComplete" value="true" />
 	</bean>
 
-	<bean id="simpleStep" class="org.springframework.batch.execution.step.support.DefaultStepFactoryBean"
+	<bean id="simpleStep" class="org.springframework.batch.core.step.DefaultStepFactoryBean"
 		abstract="true">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />

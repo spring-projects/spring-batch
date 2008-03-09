@@ -1,30 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
-	<configExtensions>
-		<configExtension>xml</configExtension>
-	</configExtensions>
+	<version>1</version>
+	<pluginVersion><![CDATA[2.0.3.v200802061800]]></pluginVersion>
+	<configSuffixes>
+		<configSuffix><![CDATA[xml]]></configSuffix>
+	</configSuffixes>
+	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
+		<config>src/test/resources/org/springframework/batch/core/configuration/support/test-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/launch/support/job.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/launch/support/test-environment.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/repository/support/dao/data-source-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/repository/support/dao/sql-dao-test.xml</config>
 	</configs>
 	<configSets>
-		<configSet>
-			<name><![CDATA[sqlDaoTest]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-			</configs>
-		</configSet>
-		<configSet>
-			<name><![CDATA[hibernateDaoTest]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-			</configs>
-		</configSet>
 		<configSet>
 			<name><![CDATA[launcher]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/test/resources/org/springframework/batch/core/launch/support/job.xml</config>
+				<config>src/test/resources/org/springframework/batch/core/launch/support/test-environment.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[sqlDaoTest]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/test/resources/org/springframework/batch/core/repository/support/dao/data-source-context.xml</config>
+				<config>src/test/resources/org/springframework/batch/core/repository/support/dao/sql-dao-test.xml</config>
 			</configs>
 		</configSet>
 	</configSets>
