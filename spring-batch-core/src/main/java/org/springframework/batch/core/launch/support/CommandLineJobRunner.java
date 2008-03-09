@@ -24,9 +24,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.runtime.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.runtime.JobParametersFactory;
-import org.springframework.batch.core.step.support.SimpleExitStatusExceptionClassifier;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -121,8 +120,6 @@ public class CommandLineJobRunner {
 
 	private ExitCodeMapper exitCodeMapper = new SimpleJvmExitCodeMapper();
 
-	private ExitStatusExceptionClassifier exceptionClassifier = new SimpleExitStatusExceptionClassifier();
-
 	private JobLauncher launcher;
 
 	private JobLocator jobLocator;
@@ -139,16 +136,6 @@ public class CommandLineJobRunner {
 	 */
 	public void setLauncher(JobLauncher launcher) {
 		this.launcher = launcher;
-	}
-
-	/**
-	 * Injection setter for the {@link ExitStatusExceptionClassifier}
-	 * 
-	 * @param exceptionClassifier
-	 */
-	public void setExceptionClassifier(
-			ExitStatusExceptionClassifier exceptionClassifier) {
-		this.exceptionClassifier = exceptionClassifier;
 	}
 
 	/**
@@ -211,8 +198,7 @@ public class CommandLineJobRunner {
 					.getExitCode());
 		} catch (Throwable e) {
 			logger.error("Job Terminated in error:", e);
-			return exitCodeMapper.getExitCode(exceptionClassifier
-					.classifyForExitCode(e).getExitCode());
+			return exitCodeMapper.getExitCode(ExitStatus.FAILED.getExitCode());
 		}
 	}
 
