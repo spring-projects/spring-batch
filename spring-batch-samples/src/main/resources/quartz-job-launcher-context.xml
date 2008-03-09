@@ -30,7 +30,7 @@
 	</bean>
 
 
-	<bean id="jobLauncher" class="org.springframework.batch.execution.launch.SimpleJobLauncher">
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="taskExecutor">
 			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />

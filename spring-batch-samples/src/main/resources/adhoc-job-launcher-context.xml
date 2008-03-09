@@ -7,14 +7,14 @@
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-	<import resource="simple-container-definition.xml" />
+	<import resource="simple-job-launcher-context.xml" />
 
 	<bean class="org.springframework.jmx.export.MBeanExporter">
 		<property name="beans">
 			<map>
 				<entry key="spring:service=batch,bean=jobLauncher">
 					<bean
-						class="org.springframework.batch.execution.bootstrap.support.SimpleExportedJobLauncher">
+						class="org.springframework.batch.core.launch.support.SimpleExportedJobLauncher">
 						<property name="launcher" ref="jobLauncher" />
 						<property name="jobLocator"
 							ref="jobConfigurationRegistry" />
@@ -35,7 +35,7 @@
 					<map>
 						<entry
 							key="spring:service=batch,bean=jobLauncher"
-							value="org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher" />
+							value="org.springframework.batch.core.launch.support.ExportedJobLauncher" />
 						<entry key="spring:service=batch,bean=jobLoader"
 							value="org.springframework.batch.sample.JobLoader" />
 					</map>
@@ -48,7 +48,7 @@
 		class="org.springframework.batch.sample.advice.JobExecutionNotificationPublisher" />
 
 	<bean id="jobLauncher"
-		class="org.springframework.batch.execution.launch.SimpleJobLauncher">
+		class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="taskExecutor">
 			<bean

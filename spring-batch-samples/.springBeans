@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.4.v200802202100]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.3.v200802061800]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -35,6 +35,9 @@
 		<config>src/main/resources/simple-job-launcher-context.xml</config>
 		<config>src/main/resources/jobs/batchUpdateJob.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/item/writer/staging-test-context.xml</config>
+		<config>src/main/resources/adhoc-job-launcher-context.xml</config>
+		<config>src/main/resources/alt-data-source-context.xml</config>
+		<config>src/main/resources/quartz-job-launcher-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -259,6 +262,26 @@
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/test/resources/org/springframework/batch/sample/item/writer/staging-test-context.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[quartzLauncher]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/quartz-job-launcher-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[jmxLauncher]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/adhoc-job-launcher-context.xml</config>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>
 	</configSets>

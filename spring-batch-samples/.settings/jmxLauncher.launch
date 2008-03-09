@@ -2,7 +2,7 @@
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <stringAttribute key="bad_container_name" value="\spring-batch-samples\.settings\j"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/spring-batch-samples/src/test/java/org/springframework/batch/sample/TaskExecutorLauncher.java"/>
+<listEntry value="/spring-batch-samples/src/main/java/org/springframework/batch/sample/launch/TaskExecutorLauncher.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>

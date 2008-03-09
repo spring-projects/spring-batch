@@ -15,9 +15,14 @@
  */
 package org.springframework.batch.sample;
 
+import java.util.List;
+
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -54,7 +59,8 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory {
 	 */
 	public Job createJob() {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { path }, parent);
-		return (Job) context.getBean(beanName, Job.class);
+		Job job = (Job) context.getBean(beanName, Job.class);
+		return new ContextClosingJob(job, context);
 	}
 
 	/**
@@ -67,5 +73,57 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory {
 	public String getJobName() {
 		return beanName;
 	}
+	
+	/**
+	 * @author Dave Syer
+	 *
+	 */
+	private static class ContextClosingJob implements Job {
+		private Job delegate;
+		private ConfigurableApplicationContext context;
+		/**
+		 * @param delegate
+		 * @param context
+		 */
+		public ContextClosingJob(Job delegate, ConfigurableApplicationContext context) {
+			super();
+			this.delegate = delegate;
+			this.context = context;
+		}
+		/**
+		 * @param execution
+		 * @throws JobExecutionException
+		 * @see org.springframework.batch.core.Job#execute(org.springframework.batch.core.JobExecution)
+		 */
+		public void execute(JobExecution execution) throws JobExecutionException {
+			try {
+				delegate.execute(execution);
+			} finally {
+				context.close();
+			}
+		}
+		/**
+		 * @return
+		 * @see org.springframework.batch.core.Job#getName()
+		 */
+		public String getName() {
+			return delegate.getName();
+		}
+		/**
+		 * @return
+		 * @see org.springframework.batch.core.Job#getSteps()
+		 */
+		public List getSteps() {
+			return delegate.getSteps();
+		}
+		/**
+		 * @return
+		 * @see org.springframework.batch.core.Job#isRestartable()
+		 */
+		public boolean isRestartable() {
+			return delegate.isRestartable();
+		}
+
+	}	
 
 }
