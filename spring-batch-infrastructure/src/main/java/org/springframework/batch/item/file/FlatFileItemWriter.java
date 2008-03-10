@@ -112,7 +112,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	 * 
 	 * @param fieldSetCreator the {@link FieldSetCreator} to set
 	 */
-	public void setFieldSetUnmapper(FieldSetCreator fieldSetCreator) {
+	public void setFieldSetCreator(FieldSetCreator fieldSetCreator) {
 		this.fieldSetCreator = fieldSetCreator;
 	}
 

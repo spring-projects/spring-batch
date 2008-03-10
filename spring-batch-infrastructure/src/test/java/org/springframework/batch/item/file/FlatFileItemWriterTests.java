@@ -70,7 +70,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		outputFile = File.createTempFile("flatfile-output-", ".tmp");
 
 		inputSource.setResource(new FileSystemResource(outputFile));
-		inputSource.setFieldSetUnmapper(new PassThroughFieldSetMapper());
+		inputSource.setFieldSetCreator(new PassThroughFieldSetMapper());
 		inputSource.afterPropertiesSet();
 		executionContext = new ExecutionContext();
 	}
@@ -118,7 +118,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteWithConverter() throws Exception {
-		inputSource.setFieldSetUnmapper(new FieldSetCreator() {
+		inputSource.setFieldSetCreator(new FieldSetCreator() {
 			public FieldSet mapItem(Object data) {
 				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
@@ -136,7 +136,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteWithConverterAndInfiniteLoop() throws Exception {
-		inputSource.setFieldSetUnmapper(new FieldSetCreator() {
+		inputSource.setFieldSetCreator(new FieldSetCreator() {
 			public FieldSet mapItem(Object data) {
 				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
@@ -154,7 +154,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteWithConverterAndString() throws Exception {
-		inputSource.setFieldSetUnmapper(new FieldSetCreator() {
+		inputSource.setFieldSetCreator(new FieldSetCreator() {
 			public FieldSet mapItem(Object data) {
 				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
@@ -263,7 +263,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	public void testDefaultStreamContext() throws Exception {
 		inputSource = new FlatFileItemWriter();
 		inputSource.setResource(new FileSystemResource(outputFile));
-		inputSource.setFieldSetUnmapper(new PassThroughFieldSetMapper());
+		inputSource.setFieldSetCreator(new PassThroughFieldSetMapper());
 		inputSource.afterPropertiesSet();
 		inputSource.open(executionContext);
 		inputSource.update(executionContext);
