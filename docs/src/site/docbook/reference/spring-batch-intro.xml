@@ -51,7 +51,7 @@
       end-user developers. <mediaobject>
           <imageobject role="fo">
             <imagedata align="center"
-                       fileref="../../resources/reference/images/ExecutionEnvironment.png"
+                       fileref="../../../../target/site/reference/html-single/images/spring-batch-layers.PNG"
                        format="PNG" />
           </imageobject>
 
