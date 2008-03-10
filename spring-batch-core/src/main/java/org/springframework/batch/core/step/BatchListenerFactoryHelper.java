@@ -30,7 +30,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.reader.DelegatingItemReader;
 import org.springframework.batch.item.writer.DelegatingItemWriter;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.listener.RepeatListenerSupport;
@@ -113,11 +112,11 @@ class BatchListenerFactoryHelper {
 	}
 
 	/**
-	 * @param stepOperations
+	 * @param chunkOperations
 	 * @param listeners
 	 * @return
 	 */
-	public RepeatOperations addChunkListeners(RepeatOperations stepOperations, BatchListener[] listeners) {
+	public RepeatOperations addChunkListeners(RepeatOperations chunkOperations, BatchListener[] listeners) {
 
 		final CompositeChunkListener multicaster = new CompositeChunkListener();
 
@@ -135,23 +134,23 @@ class BatchListenerFactoryHelper {
 
 		if (hasChunkListener) {
 
-			Assert.state(stepOperations instanceof RepeatTemplate,
-					"Step operations is injected but not a RepeatTemplate, so chunk listeners cannot also be registered. "
+			Assert.state(chunkOperations instanceof RepeatTemplate,
+					"Chunk operations is injected but not a RepeatTemplate, so chunk listeners cannot also be registered. "
 							+ "Either inject a RepeatTemplate, or remove the ChunkListener.");
 
-			RepeatTemplate stepTemplate = (RepeatTemplate) stepOperations;
+			RepeatTemplate stepTemplate = (RepeatTemplate) chunkOperations;
 			stepTemplate.registerListener(new RepeatListenerSupport() {
-				public void before(RepeatContext context) {
+				public void open(RepeatContext context) {
 					multicaster.beforeChunk();
 				}
-				public void after(RepeatContext context, ExitStatus result) {
+				public void close(RepeatContext context) {
 					multicaster.afterChunk();
 				}
 			});
 
 		}
 
-		return stepOperations;
+		return chunkOperations;
 
 	}
 

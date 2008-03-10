@@ -217,10 +217,9 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 		assertNull(reader.read());
 		assertEquals(items.length, written.size());
 		
-		int expectedBeforeCount = (items.length / commitInterval ) + 1;
-		int expectedAdfterCount = (items.length / commitInterval);
-		assertEquals(expectedAdfterCount , chunkListener.afterCount);
-		assertEquals(expectedBeforeCount, chunkListener.beforeCount);
+		int expectedListenerCallCount = (items.length / commitInterval ) + 1;
+		assertEquals(expectedListenerCallCount, chunkListener.afterCount);
+		assertEquals(expectedListenerCallCount, chunkListener.beforeCount);
 	}
 
 }

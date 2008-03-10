@@ -192,12 +192,11 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 		BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
 
-		stepOperations = new RepeatTemplate();
 		
 		if (commitInterval > 0) {
 			RepeatTemplate chunkOperations = new RepeatTemplate();
 			chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
-			helper.addChunkListeners(stepOperations, listeners);
+			helper.addChunkListeners(chunkOperations, listeners);
 			step.setChunkOperations(chunkOperations);
 		}
 
@@ -212,6 +211,8 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 		step.setStepListeners(stepListeners);
 
+		stepOperations = new RepeatTemplate();
+		
 		if (taskExecutor != null) {
 			TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
 			repeatTemplate.setTaskExecutor(taskExecutor);
