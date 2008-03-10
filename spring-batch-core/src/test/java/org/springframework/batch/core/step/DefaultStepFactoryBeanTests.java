@@ -25,6 +25,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.BatchListener;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.job.SimpleJob;
@@ -33,9 +34,6 @@ import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.repository.support.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.support.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.support.dao.MapStepExecutionDao;
-import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.core.step.DefaultStepFactoryBean;
-import org.springframework.batch.core.step.ItemOrientedStep;
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -53,15 +51,15 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
 			new MapStepExecutionDao());
 
-	private List processed = new ArrayList();
+	private List written = new ArrayList();
 
-	private ItemWriter processor = new AbstractItemWriter() {
+	private ItemWriter writer = new AbstractItemWriter() {
 		public void write(Object data) throws Exception {
-			processed.add((String) data);
+			written.add((String) data);
 		}
 	};
 
-	private ItemReader provider;
+	private ItemReader reader;
 
 	private SimpleJob job = new SimpleJob();;
 
@@ -86,10 +84,10 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
-		provider = new ListItemReader(items);
+		reader = new ListItemReader(items);
 
-		factory.setItemReader(provider);
-		factory.setItemWriter(processor);
+		factory.setItemReader(reader);
+		factory.setItemWriter(writer);
 		factory.setJobRepository(repository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setBeanName("stepName");
@@ -110,8 +108,8 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(3, processed.size());
-		assertTrue(processed.contains("foo"));
+		assertEquals(3, written.size());
+		assertTrue(written.contains("foo"));
 	}
 
 	public void testSimpleJobWithItemListeners() throws Exception {
@@ -158,9 +156,9 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 		job.execute(jobExecution);
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(0, processed.size());
+		assertEquals(0, written.size());
 		// provider should be exhausted
-		assertEquals(null, provider.read());
+		assertEquals(null, reader.read());
 		assertEquals(3, recovered.size());
 	}
 
@@ -185,6 +183,44 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 			// expected
 		}
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+	}
+	
+	public void testChunkListeners() throws Exception {
+		String[] items = new String[] { "1", "2", "3", "4", "5", "6", "7" };
+		int commitInterval = 3;
+		
+		DefaultStepFactoryBean factory = getStep(items);
+		class CountingChunkListener implements ChunkListener {
+			int beforeCount = 0;
+			int afterCount = 0;
+			
+			public void afterChunk() {
+				afterCount++;
+			}
+
+			public void beforeChunk() {
+				beforeCount++;
+			}
+		}
+		CountingChunkListener chunkListener = new CountingChunkListener();
+		factory.setListeners(new BatchListener[]{ chunkListener });
+		factory.setCommitInterval(commitInterval);
+		
+		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+
+		job.setSteps(Collections.singletonList(step));
+
+		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
+		job.execute(jobExecution);
+
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertNull(reader.read());
+		assertEquals(items.length, written.size());
+		
+		int expectedBeforeCount = (items.length / commitInterval ) + 1;
+		int expectedAdfterCount = (items.length / commitInterval);
+		assertEquals(expectedAdfterCount , chunkListener.afterCount);
+		assertEquals(expectedBeforeCount, chunkListener.beforeCount);
 	}
 
 }

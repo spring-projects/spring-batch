@@ -192,17 +192,19 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 		BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
 
+		stepOperations = new RepeatTemplate();
+		
 		if (commitInterval > 0) {
 			RepeatTemplate chunkOperations = new RepeatTemplate();
 			chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
-			helper.addChunkListeners(chunkOperations, listeners);
+			helper.addChunkListeners(stepOperations, listeners);
 			step.setChunkOperations(chunkOperations);
 		}
 
 		StepListener[] stepListeners = helper.getStepListeners(listeners);
 		itemReader = helper.getItemReader(itemReader, listeners);
 		itemWriter = helper.getItemWriter(itemWriter, listeners);
-		stepOperations = new RepeatTemplate();
+		
 
 		// In case they are used by subclasses:
 		setItemReader(itemReader);
