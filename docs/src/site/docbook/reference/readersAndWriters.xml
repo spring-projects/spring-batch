@@ -993,7 +993,7 @@ FOT;2;2;267.34</programlisting>
 
       <para>To summarize with a Java example, the following code illustrates
       all of the points discussed. The code demonstrates the programmatic
-      setup of the required properties. </para>
+      setup of the required properties.</para>
 
       <programlisting>StaxEventItemWriter staxItemWriter = new StaxEventItemWriter()
      FileSystemResource resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", "xml"))
@@ -1030,7 +1030,6 @@ FOT;2;2;267.34</programlisting>
     </section>
   </section>
 
-
   <section>
     <title id="infrastructure.2.2">Database</title>
 
@@ -1062,7 +1061,23 @@ FOT;2;2;267.34</programlisting>
       JdbcTemplate gets around this problem by using the callback pattern to
       completely map all rows in a ResultSet and close before returning
       control back to the method caller. However, in batch this must wait
-      until the step is complete.</para>
+      until the step is complete. Below is a generic diagram of how a cursor
+      based ItemReader works, and while a SQL statement is used as an example
+      since it is so widely known, any technolog could implement the basic
+      approach:</para>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="../../resources/reference/images/cursorExample.png" />
+        </imageobject>
+      </mediaobject>
+
+      <para>The example illustrates the basic pattern. Given a 'FOO' table,
+      which has three columns: ID, NAME, and BAR, select all rows with an ID
+      greater than one but less than 7. This puts the beginning of the cursor
+      (row 1) on ID 2. The result of this row should be a completely mapped
+      Foo object, calling read() again, moves the cursor to the next row,
+      which is the Foo with an ID of 3.</para>
 
       <section>
         <title>JdbcCursorItemReader</title>
@@ -1263,13 +1278,246 @@ itemReader.close(executionContext);
     <section>
       <title>Driving Query Based ItemReaders</title>
 
-      <para></para>
+      <para>In the previous section, Cursor based database input was
+      discussed. However, this isn't the only option. Many database vendors,
+      such as DB2, have extremely pessimistic locking strategies that can
+      cause issues if the table being read also needs to be used by other
+      portions of the online application. Furthermore, opening cursors over
+      extremely large datasets can cause issues on certain vendors. Therefore,
+      many projects prefer to use a 'Driving Query' approach to reading in
+      data. This approach works by iterating over keys, rather than the entire
+      object that needs to be returned, as the following example
+      illustrates:</para>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="../../resources/reference/images/drivingQueryExample.png" />
+        </imageobject>
+      </mediaobject>
+
+      <para>As you can see, this example uses the same 'FOO' table as was used
+      in the cursor based example. However, rather than selecting the entire
+      row, only the ID's were selected in the SQL statement. So, rather than a
+      FOO object being returned from read(), an Integer will be returned. This
+      number can then be used to query for the 'details', which is a complete
+      Foo object:</para>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="../../resources/reference/images/drivingQueryJob.png" />
+        </imageobject>
+      </mediaobject>
+
+      <para>As you can see, an existing DAO can be used to obtain a full 'Foo'
+      object using the key obtained from the driving query. In Spring Batch,
+      driving query style input is implemented with a DrivingQueryItemReader,
+      which has only one dependency: a KeyCollector</para>
 
       <section>
         <title>KeyCollector</title>
 
+        <para>As the previous example illustrates, the DrivingQueryItemReader
+        is fairly simple. It simply iteratoes over a list of keys. However,
+        the real complication is how those keys are obtained. The KeyCollector
+        interface abstracts this:</para>
+
+        <programlisting>  public interface KeyCollector {
+
+   List retrieveKeys(ExecutionContext executionContext);
+
+   void updateContext(Object key, ExecutionContext executionContext);
+  }</programlisting>
+
+        <para>The primary method in this interface is the retrieveKeys()
+        method. It is expected that this method will return the keys to be
+        processed regardless of whether or not it is a restart scenario. For
+        example, if a job starts processing keys 1 through 1,000, and fails
+        after processing key 500, upon restarting keys 500 through 1,000
+        should be returned. This functionality is made possible by the
+        saveState method, which saves the provided key (which should be the
+        current key being processed) in the provided ExecutionContext. The
+        retrieveKeys method can then use this value to retrieve a subset of
+        the original keys:</para>
+
+        <programlisting>  ExecutionContext executionContext = new ExecutionContext();
+  List keys = keyStrategy.retrieveKeys(executionContext);
+  //Assume keys contains 1 through 1,000
+  keyStrategy.updateContext(new Long(500), executionContext);
+  keys = keyStrategy.retrieveKeys(executionContext);
+  //keys should now contains 500 through 1,000</programlisting>
+
+        <para>This generalization illustrates the KeyCollector contract. If we
+        assume that initially calling retrieveKeys returned 1,000 keys (1
+        through 1,000), calling updateContext() with key 500 should mean that
+        calling retrieveKeys again with the same execution context will return
+        500 keys (501 through 1,000).</para>
+      </section>
+
+      <section>
+        <title>SingleColumnJdbcKeyCollector</title>
+
+        <para>The most common driving query scenario is that of a input that
+        has only one column that represents it's key. This is implemented as
+        the SingleColumnJdbcKeyCollector class, which has the following
+        options:</para>
+
+        <table>
+          <title>SinglecolumnJdbcKeyCollector properties</title>
+
+          <tgroup cols="2">
+            <tbody>
+              <row>
+                <entry>jdbcTemplate</entry>
+
+                <entry>The JdbcTemplate to be used to query the
+                database</entry>
+              </row>
+
+              <row>
+                <entry>sql</entry>
+
+                <entry>The sql statement to query the database with. It should
+                return only one value.</entry>
+              </row>
+
+              <row>
+                <entry>restartSql</entry>
+
+                <entry>The sql statement to use in the case of restart.
+                Because only one key will be used, this query should require
+                only one argument.</entry>
+              </row>
+
+              <row>
+                <entry>keyMapper</entry>
+
+                <entry>The RowMapper implementation to be used to map the keys
+                to objects. By default, this is a Spring Core
+                SingleColumnRowMapper, which maps them to well known types
+                such as Integer, String, etc. For more information, check the
+                documentation of your specific Spring release.</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+
+        <para>The following code helps illustrate how to setup and use a
+        SingleColumnJdbcKeyCollector:</para>
+
+        <programlisting>  SingleColumnJdbcKeyCollector keyCollector = new SingleColumnJdbcKeyCollector(getJdbcTemplate(),
+  "SELECT ID from T_FOOS order by ID");
+
+  keyCollector.setRestartSql("SELECT ID from T_FOOS where ID &gt; ? order by ID");
+
+  ExecutionContext executionContext = new ExecutionContext();
+
+  List keys = keyStrategy.retrieveKeys(new ExecutionContext());
+
+  for (int i = 0; i &lt; keys.size(); i++) {
+    System.out.println(keys.get(i));
+  }</programlisting>
+
+        <para>If this code were run in the proper environment with the correct
+        database tables setup, then it would output the following:</para>
+
+        <programlisting>1
+2
+3
+4
+5</programlisting>
+
+        <para>Now, let's modify the code slightly to show what would happen if
+        the code were started again after a restart, having failed after
+        processing key 3 successfully:</para>
+
+        <programlisting>  SingleColumnJdbcKeyCollector keyCollector = new SingleColumnJdbcKeyCollector(getJdbcTemplate(),
+  "SELECT ID from T_FOOS order by ID");
+
+  keyCollector.setRestartSql("SELECT ID from T_FOOS where ID &gt; ? order by ID");
+
+  ExecutionContext executionContext = new ExecutionContext();  
+
+  keyStrategy.updateContext(new Long(3), executionContext);
+  
+  List keys = keyStrategy.retrieveKeys(executionContext);
+
+  for (int i = 0; i &lt; keys.size(); i++) {
+    System.out.println(keys.get(i));
+  }</programlisting>
+
+        <para>Running this code snippet would result in the following:</para>
+
+        <programlisting>4
+5</programlisting>
+
+        <para>The key difference between the two examples is the following
+        line:</para>
+
+        <programlisting>  keyStrategy.updateContext(new Long(3), executionContext);</programlisting>
+
+        <para>This tells the key collector to update the provided
+        ExecutionContext with the key of three. This will normally be called
+        by the DrivingQueryItemReader, but is called directly for simplicities
+        sake. By calling retrieveKeys with the ExecutionContext that was
+        updated to contain 3, the argument of 3 will be passed to the
+        restartSql:</para>
+
+        <programlisting>  keyCollector.setRestartSql("SELECT ID from T_FOOS where ID &gt; ? order by ID");</programlisting>
+
+        <para>This will cause only keys 4 and 5 to be returned, since they are
+        the only ones with an ID greater than 3.</para>
+      </section>
+
+      <section>
+        <title>Mapping multiple column keys</title>
+
+        <para>The SingleColumnJdbcKeyCollector is extremely useful for
+        generating keys, but only if one column uniquely identifies your
+        record. What if more than one column is required to be able to
+        uniquely identify your record? This should be a minority scenario, but
+        it is still possible. In this case, the MultipleColumnJdbcKeyCollector
+        should be used. It allows for mapping multiple columns by sacrificing
+        simplicity. The properties needed to use the multiple column collector
+        are the same as the single column version except one difference:
+        instead of a regular RowMaper, an ExecutionContextRowMapper must be
+        provided. Just like the single column version, it requires a normal
+        sql statement and a restart sql statement. However, because the
+        restart sql statement will require more than one argument, there needs
+        to be more complex handling of how keys are mapped to an execution
+        context. An ExecutionContextRowMapper provides this:</para>
+
+        <programlisting>public interface ExecutionContextRowMapper extends RowMapper {
+
+  public void mapKeys(Object key, ExecutionContext executionContext);
+
+ public PreparedStatementSetter createSetter(ExecutionContext executionContext);
+}
+</programlisting>
+
+        <para>The ExecutionContextRowMapper interface extends the standard
+        RowMapper interface to allow for multiple keys to be stored in an
+        ExecutionContext, and a PreparedStatementSetter be created so that
+        arguments to a the restart sql statement can be set for the key
+        returned.</para>
+
+        <para>By default a implementation of the ExecutionContextRowMapper
+        that uses a Map will be used. It is recommended that this
+        implementation not be overriden. However, if a specific type of key
+        needs to be returned, then a new implementation can be
+        provided.</para>
+      </section>
+
+      <section>
+        <title>iBatisKeyCollector</title>
+
         <para></para>
       </section>
+    </section>
+
+    <section>
+      <title>Reusing Existing DAOs</title>
+
+      <para></para>
     </section>
 
     <section>
@@ -1286,8 +1534,8 @@ itemReader.close(executionContext);
   </section>
 
   <section>
-    <title id="infrastructure.1.1">Creating Custom ItemReaders and ItemWriters
-    </title>
+    <title id="infrastructure.1.1">Creating Custom ItemReaders and
+    ItemWriters</title>
 
     <para>The <emphasis role="bold">ListItemReader</emphasis>, as mentioned
     above, is useful for testing and probably not too useful as something used
