@@ -23,7 +23,7 @@
 						class="org.springframework.batch.item.file.FlatFileItemWriter">
 						<property name="resource"
 							value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
-							<property name="fieldSetUnmapper">
+							<property name="fieldSetCreator">
 								<bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper"/>
 							</property>
 					</bean>

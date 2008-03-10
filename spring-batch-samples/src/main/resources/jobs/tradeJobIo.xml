@@ -30,7 +30,7 @@
 				class="org.springframework.batch.item.file.FlatFileItemWriter"
 				id="customerFlatFileOutputSource">
 				<property name="resource" ref="customerFileLocator" />
-				<property name="fieldSetUnmapper">
+				<property name="fieldSetCreator">
 					<bean
 						class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
 				</property>
