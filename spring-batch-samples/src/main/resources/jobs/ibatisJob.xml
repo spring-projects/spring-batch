@@ -37,7 +37,7 @@
 		class="org.springframework.batch.item.database.IbatisDrivingQueryItemReader">
 		<property name="detailsQueryId" value="getCustomerCreditById" />
 		<property name="sqlMapClient" ref="sqlMapClient" />
-		<property name="keyGenerator" ref="ibatisKeyGenerator" />
+		<property name="keyCollector" ref="ibatisKeyGenerator" />
 	</bean>
 
 	<bean id="ibatisKeyGenerator"
