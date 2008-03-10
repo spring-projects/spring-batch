@@ -133,6 +133,27 @@ public class TaskletStepTests extends TestCase {
 			assertNotNull(stepExecution.getEndTime());
 		}
 	}
+	
+	/**
+	 * When job is interrupted the {@link JobInterruptedException} should be propagated up.
+	 */
+	public void testJobInterrupted() throws Exception {
+		TaskletStep step = new TaskletStep(
+				new Tasklet(){
+					public ExitStatus execute() throws Exception {
+						throw new JobInterruptedException("Interrupted while executing tasklet");
+					}
+				}, 
+				new JobRepositorySupport());
+		
+		try {
+			step.execute(stepExecution);
+			fail();
+		}
+		catch (JobInterruptedException expected) {
+			assertEquals("Interrupted while executing tasklet", expected.getMessage());
+		}
+	}
 
 	private class StubTasklet extends StepListenerSupport implements Tasklet {
 

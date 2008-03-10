@@ -163,6 +163,9 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 			catch (Exception ex) {
 				logger.error("Encountered an error on listener close.", ex);
 			}
+			if (e instanceof JobInterruptedException) {
+				throw (JobInterruptedException) e;
+			}
 			if (e instanceof RuntimeException) {
 				throw (RuntimeException) e;
 			}
