@@ -21,16 +21,17 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * </p>Extension of the ColumnMapRowMapper that converts a column map to {@link ExecutionContext} and allows
+ * </p>Extension of the {@link ColumnMapRowMapper} that converts a column map to {@link ExecutionContext} and allows
  * {@link ExecutionContext} to be converted back as a PreparedStatementSetter.  This is useful in a restart 
  * scenario, as it allows for the standard functionality of the ColumnMapRowMapper to be used to 
  * create a map representing the columns returned by a query.  It should be noted that this column ordering
- * is preserved in the map using a link list version of Map. 
+ * is preserved in the map using a link list version of Map.</p>
  * 
  * 
  * @author Lucas Ward
  * @author Dave Syer
  * @see ExecutionContextRowMapper
+ * @see ColumnMapRowMapper
  */
 public class ColumnMapExecutionContextRowMapper extends ColumnMapRowMapper implements ExecutionContextRowMapper {
 	

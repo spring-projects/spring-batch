@@ -19,14 +19,14 @@ import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.DrivingQueryItemReader;
-import org.springframework.batch.item.database.KeyGenerator;
+import org.springframework.batch.item.database.KeyCollector;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * Jdbc implementation of the {@link KeyGenerator} interface that works for
+ * Jdbc implementation of the {@link KeyCollector} interface that works for
  * composite keys. (i.e. keys represented by multiple columns) A sql query to be
  * used to return the keys and a {@link ExecutionContextRowMapper} to map each
  * row in the resultset to an Object must be set in order to work correctly.
@@ -34,9 +34,9 @@ import org.springframework.util.StringUtils;
  * 
  * @author Lucas Ward
  * @see DrivingQueryItemReader
- * @since 1.0
+ * @see ExecutionContextRowMapper
  */
-public class MultipleColumnJdbcKeyGenerator implements KeyGenerator {
+public class MultipleColumnJdbcKeyCollector implements KeyCollector {
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -46,7 +46,7 @@ public class MultipleColumnJdbcKeyGenerator implements KeyGenerator {
 
 	private String restartSql;
 
-	public MultipleColumnJdbcKeyGenerator() {
+	public MultipleColumnJdbcKeyCollector() {
 	}
 
 	/**
@@ -57,11 +57,10 @@ public class MultipleColumnJdbcKeyGenerator implements KeyGenerator {
 	 * @param keyMapper - RowMapper that maps each row of the ResultSet to an
 	 * object.
 	 */
-	public MultipleColumnJdbcKeyGenerator(JdbcTemplate jdbcTemplate, String sql) {
+	public MultipleColumnJdbcKeyCollector(JdbcTemplate jdbcTemplate, String sql) {
 		this();
 		Assert.notNull(jdbcTemplate, "The JdbcTemplate must not be null.");
-		Assert.hasText(sql, "The DrivingQuery must not be null or empty.");
-		Assert.notNull(keyMapper, "The key RowMapper must not be null.");
+		Assert.hasText(sql, "The sql statement must not be null or empty.");
 		this.jdbcTemplate = jdbcTemplate;
 		this.sql = sql;
 	}
@@ -90,6 +89,7 @@ public class MultipleColumnJdbcKeyGenerator implements KeyGenerator {
 	 */
 	public void saveState(Object key, ExecutionContext executionContext) {
 		Assert.state(keyMapper != null, "Key mapper must not be null.");
+		Assert.notNull(key, "The key must not be null");
 		keyMapper.mapKeys(key, executionContext);
 	}
 

@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.database;
 
-import org.springframework.batch.item.database.support.IbatisKeyGenerator;
+import org.springframework.batch.item.database.support.IbatisKeyCollector;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -25,7 +25,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * objects.  An iBatis query id must be set to map and return each 'detail record'.
  *
  * @author Lucas Ward
- * @see IbatisKeyGenerator
+ * @see IbatisKeyCollector
  */
 public class IbatisDrivingQueryItemReader extends DrivingQueryItemReader {
 

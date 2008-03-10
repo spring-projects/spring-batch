@@ -16,7 +16,7 @@
 package org.springframework.batch.item.database;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.database.support.MultipleColumnJdbcKeyGenerator;
+import org.springframework.batch.item.database.support.MultipleColumnJdbcKeyCollector;
 
 /**
  * @author Lucas Ward
@@ -27,14 +27,14 @@ public class MultipleColumnJdbcDrivingQueryItemReaderIntegrationTests extends
 
 	protected ItemReader createItemReader() throws Exception {
 
-		MultipleColumnJdbcKeyGenerator keyGenerator =
-			new MultipleColumnJdbcKeyGenerator(getJdbcTemplate(),
+		MultipleColumnJdbcKeyCollector keyGenerator =
+			new MultipleColumnJdbcKeyCollector(getJdbcTemplate(),
 					"SELECT ID, VALUE from T_FOOS order by ID, VALUE");
 
 		keyGenerator.setRestartSql("SELECT ID, VALUE from T_FOOS where ID > ? and VALUE > ? order by ID");
 		DrivingQueryItemReader inputSource = new DrivingQueryItemReader();
 		inputSource.setSaveState(true);
-		inputSource.setKeyGenerator(keyGenerator);
+		inputSource.setKeyCollector(keyGenerator);
 		FooItemReader fooItemReader = new FooItemReader(inputSource, getJdbcTemplate());
 		fooItemReader.setFooDao(new CompositeKeyFooDao(getJdbcTemplate()));
 		return fooItemReader;

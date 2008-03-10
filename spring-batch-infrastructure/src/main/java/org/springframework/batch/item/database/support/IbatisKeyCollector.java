@@ -5,22 +5,24 @@ import java.util.List;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.database.DrivingQueryItemReader;
-import org.springframework.batch.item.database.KeyGenerator;
+import org.springframework.batch.item.database.KeyCollector;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 import org.springframework.util.Assert;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
- * {@link KeyGenerator} based on iBATIS ORM framework. It is functionally
- * similar to {@link SingleColumnJdbcKeyGenerator} but does not make assumptions
- * about the primary key structure.
+ * {@link KeyCollector} based on iBATIS ORM framework. It is functionally
+ * similar to {@link SingleColumnJdbcKeyCollector} but does not make assumptions
+ * about the primary key structure.  A separate restart query is necessary to 
+ * ensure that only the required keys remaining for processing are returned, rather
+ * than the entire original list.</p>
  * 
  * @author Robert Kasanicky
  * @author Lucas Ward
  * @see DrivingQueryItemReader
  */
-public class IbatisKeyGenerator extends ExecutionContextUserSupport implements KeyGenerator {
+public class IbatisKeyCollector extends ExecutionContextUserSupport implements KeyCollector {
 
 	private static final String RESTART_KEY = "key.index";
 
@@ -30,18 +32,18 @@ public class IbatisKeyGenerator extends ExecutionContextUserSupport implements K
 
 	private String restartQueryId;
 
-	public IbatisKeyGenerator() {
-		setName(IbatisKeyGenerator.class.getSimpleName());
+	public IbatisKeyCollector() {
+		setName(IbatisKeyCollector.class.getSimpleName());
 	}
 
 	/*
 	 * Retrieve the keys using the provided driving query id.
 	 * 
-	 * @see org.springframework.batch.io.support.AbstractDrivingQueryItemReader#retrieveKeys()
+	 * @see KeyCollector#retrieveKeys()
 	 */
 	public List retrieveKeys(ExecutionContext executionContext) {
 		if (executionContext.containsKey(getKey(RESTART_KEY))) {
-			Object key = executionContext.getString(getKey(RESTART_KEY));
+			Object key = executionContext.get(getKey(RESTART_KEY));
 			return sqlMapClientTemplate.queryForList(restartQueryId, key);
 		}
 		else {
@@ -51,12 +53,12 @@ public class IbatisKeyGenerator extends ExecutionContextUserSupport implements K
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionContext(java.lang.Object)
+	 * @see KeyCollector#saveState(Object, ExecutionContext)
 	 */
 	public void saveState(Object key, ExecutionContext executionContext) {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(executionContext, "ExecutionContext must be null");
-		executionContext.putString(getKey(RESTART_KEY), key.toString());
+		executionContext.put(getKey(RESTART_KEY), key);
 	}
 
 	/*

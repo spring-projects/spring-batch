@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ExecutionContextUserSupport;
-import org.springframework.batch.item.database.KeyGenerator;
+import org.springframework.batch.item.database.KeyCollector;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
@@ -28,7 +28,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * Jdbc {@link KeyGenerator} implementation that only works for a single column
+ * Jdbc {@link KeyCollector} implementation that only works for a single column
  * key. A sql query must be passed in which will be used to return a list of
  * keys. Each key will be mapped by a {@link RowMapper} that returns a mapped
  * key. By default, the {@link SingleColumnRowMapper} is used, and will convert
@@ -36,7 +36,7 @@ import org.springframework.util.StringUtils;
  * only one column should be mapped to an object and returned as a key. If
  * multiple columns are returned as a key in this strategy, then restart will
  * not function properly. Instead a strategy that supports keys comprised of
- * multiple columns should be used.
+ * multiple columns should be used.</p>
  * 
  * <p>
  * Restartability: Because the key is only one column, restart is made much more
@@ -48,9 +48,9 @@ import org.springframework.util.StringUtils;
  * </p>
  * 
  * @author Lucas Ward
- * @since 1.0
+ * @see SingleColumnRowMapper
  */
-public class SingleColumnJdbcKeyGenerator extends ExecutionContextUserSupport implements KeyGenerator {
+public class SingleColumnJdbcKeyCollector extends ExecutionContextUserSupport implements KeyCollector {
 
 	private static final String RESTART_KEY = "key";
 
@@ -62,8 +62,8 @@ public class SingleColumnJdbcKeyGenerator extends ExecutionContextUserSupport im
 
 	private RowMapper keyMapper = new SingleColumnRowMapper();
 
-	public SingleColumnJdbcKeyGenerator() {
-		setName(SingleColumnJdbcKeyGenerator.class.getSimpleName());
+	public SingleColumnJdbcKeyCollector() {
+		setName(SingleColumnJdbcKeyCollector.class.getSimpleName());
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class SingleColumnJdbcKeyGenerator extends ExecutionContextUserSupport im
 	 * @throws IllegalArgumentException if jdbcTemplate is null.
 	 * @throws IllegalArgumentException if sql string is empty or null.
 	 */
-	public SingleColumnJdbcKeyGenerator(JdbcTemplate jdbcTemplate, String sql) {
+	public SingleColumnJdbcKeyCollector(JdbcTemplate jdbcTemplate, String sql) {
 		this();
 		Assert.notNull(jdbcTemplate, "JdbcTemplate must not be null.");
 		Assert.hasText(sql, "The sql statement must not be null or empty.");
@@ -89,12 +89,12 @@ public class SingleColumnJdbcKeyGenerator extends ExecutionContextUserSupport im
 	 */
 	public List retrieveKeys(ExecutionContext executionContext) {
 		
-		Assert.notNull(executionContext, "The restart data must not be null.");
+		Assert.notNull(executionContext, "The ExecutionContext must not be null");
 
 		if (executionContext.containsKey(RESTART_KEY)) {
-			Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty"
+			Assert.state(StringUtils.hasText(restartSql), "The restart sql query must not be null or empty"
 					+ " in order to restart.");
-			return jdbcTemplate.query(restartSql, new Object[] { executionContext.getString(RESTART_KEY) }, keyMapper);
+			return jdbcTemplate.query(restartSql, new Object[] { executionContext.get(RESTART_KEY) }, keyMapper);
 		}
 		else{
 			return jdbcTemplate.query(sql, keyMapper);
@@ -104,12 +104,13 @@ public class SingleColumnJdbcKeyGenerator extends ExecutionContextUserSupport im
 	/**
 	 * Get the restart data representing the last processed key.
 	 * 
-	 * @see KeyGenerator#saveState(Object)
+	 * @see KeyCollector#saveState(Object)
 	 * @throws IllegalArgumentException if key is null.
 	 */
 	public void saveState(Object key, ExecutionContext executionContext) {
 		Assert.notNull(key, "The key must not be null.");
-		executionContext.putString(RESTART_KEY, key.toString());
+		Assert.notNull(executionContext, "The ExecutionContext must not be null");
+		executionContext.put(RESTART_KEY, key);
 	}
 
 	/*

@@ -12,7 +12,7 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  */
 public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	SingleColumnJdbcKeyGenerator keyStrategy;
+	SingleColumnJdbcKeyCollector keyStrategy;
 	
 	ExecutionContext executionContext;
 	
@@ -24,7 +24,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	protected void onSetUpBeforeTransaction() throws Exception {
 		super.onSetUpBeforeTransaction();
 		
-		keyStrategy = new SingleColumnJdbcKeyGenerator(getJdbcTemplate(),
+		keyStrategy = new SingleColumnJdbcKeyCollector(getJdbcTemplate(),
 		"SELECT ID from T_FOOS order by ID");
 		
 		keyStrategy.setRestartSql("SELECT ID from T_FOOS where ID > ? order by ID");

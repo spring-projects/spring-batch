@@ -32,7 +32,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	private DrivingQueryItemReader createItemReader() throws Exception{
 		
 		DrivingQueryItemReader inputSource = new DrivingQueryItemReader();
-		inputSource.setKeyGenerator(new MockKeyGenerator());
+		inputSource.setKeyCollector(new MockKeyGenerator());
 		inputSource.setSaveState(true);
 		
 		return inputSource;
@@ -157,7 +157,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	
 	public void testRetriveZeroKeys(){
 		
-		itemReader.setKeyGenerator(new KeyGenerator(){
+		itemReader.setKeyCollector(new KeyCollector(){
 
 			public List retrieveKeys(ExecutionContext executionContext) {
 				return new ArrayList();
@@ -192,7 +192,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		return (ItemStream) source;
 	}
 	
-	private static class MockKeyGenerator implements KeyGenerator{
+	private static class MockKeyGenerator implements KeyCollector{
 
 		static ExecutionContext streamContext;
 		List keys;

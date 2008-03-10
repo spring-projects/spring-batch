@@ -1,7 +1,7 @@
 package org.springframework.batch.item.database;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.database.support.IbatisKeyGenerator;
+import org.springframework.batch.item.database.support.IbatisKeyCollector;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
 
@@ -23,13 +23,13 @@ public class IbatisItemReaderIntegrationTests extends AbstractDataSourceItemRead
 		SqlMapClient sqlMapClient = (SqlMapClient) factory.getObject();
 
 		IbatisDrivingQueryItemReader inputSource = new IbatisDrivingQueryItemReader();
-		IbatisKeyGenerator keyGenerator = new IbatisKeyGenerator();
+		IbatisKeyCollector keyGenerator = new IbatisKeyCollector();
 		keyGenerator.setDrivingQueryId("getAllFooIds");
 		inputSource.setDetailsQueryId("getFooById");
 		keyGenerator.setRestartQueryId("getAllFooIdsRestart");
 		keyGenerator.setSqlMapClient(sqlMapClient);
 		inputSource.setSqlMapClient(sqlMapClient);
-		inputSource.setKeyGenerator(keyGenerator);
+		inputSource.setKeyCollector(keyGenerator);
 		inputSource.setSaveState(true);
 
 		return inputSource;

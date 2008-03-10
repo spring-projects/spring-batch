@@ -22,7 +22,7 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  */
 public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
 	
-	MultipleColumnJdbcKeyGenerator keyStrategy;
+	MultipleColumnJdbcKeyCollector keyStrategy;
 	
 	ExecutionContext executionContext;
 	
@@ -33,7 +33,7 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 	protected void onSetUpBeforeTransaction() throws Exception {
 		super.onSetUpBeforeTransaction();
 		
-		keyStrategy = new MultipleColumnJdbcKeyGenerator(getJdbcTemplate(),
+		keyStrategy = new MultipleColumnJdbcKeyCollector(getJdbcTemplate(),
 		"SELECT ID, VALUE from T_FOOS order by ID");
 		
 		keyStrategy.setRestartSql("SELECT ID, VALUE from T_FOOS where ID > ? and VALUE > ? order by ID");

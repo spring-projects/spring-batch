@@ -28,10 +28,26 @@ import org.springframework.util.Assert;
 /**
  * <p>
  * Convenience class for driving query input sources. Input Sources of this type
- * use a 'driving query' to return back a list of keys. Upon each call to read,
- * a new key is returned. To use the input source, inject a key generation
- * strategy.
- * </p>
+ * use a 'driving query' to return back a list of keys.  A key can be defined
+ * as anything that can uniquely identify a record so that a more detailed
+ * record can be retrieved for each object.  This allows a much smaller footprint
+ * to be stored in memory for processing.  The following 'Customer' example table
+ * will help illustrate this:
+ * 
+ * <pre>
+ * CREATE TABLE CUSTOMER (
+ *   ID BIGINT IDENTITY PRIMARY KEY,  
+ *   NAME VARCHAR(45),
+ *   CREDIT FLOAT
+ * );
+ * </pre>
+ * 
+ * <p>A cursor based solution would simply open up a cursor over ID, NAME, and CREDIT,
+ * and move it from one to the next.  This can cause issues on databases with 
+ * pessimistic locking strategies.  A 'driving query' approach would be to
+ * return only the ID of the customer, then use a separate DAO to retrieve the
+ * name and credit for each ID.  This means that there will be a call to a 
+ * separate DAO for each call to {@link ItemReader#read()}.</p>
  * 
  * <p>
  * Mutability: Because this base class cannot guarantee that the keys returned
@@ -45,7 +61,6 @@ import org.springframework.util.Assert;
  * 
  * 
  * @author Lucas Ward
- * @since 1.0
  */
 public class DrivingQueryItemReader implements ItemReader, InitializingBean,
 		ItemStream {
@@ -60,7 +75,7 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean,
 
 	private int lastCommitIndex = 0;
 
-	private KeyGenerator keyGenerator;
+	private KeyCollector keyGenerator;
 	
 	private boolean saveState = false;
 
@@ -165,16 +180,8 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean,
 	 * 
 	 * @param keyGenerator
 	 */
-	public void setKeyGenerator(KeyGenerator keyGenerator) {
+	public void setKeyCollector(KeyCollector keyGenerator) {
 		this.keyGenerator = keyGenerator;
-	}
-
-	protected void transactionCommitted() {
-		mark();
-	}
-
-	protected void transactionRolledBack() {
-		reset();
 	}
 
 	/**
