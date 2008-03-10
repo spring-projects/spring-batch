@@ -56,13 +56,13 @@
     <mediaobject>
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="../../resources/reference/images/simple-batch-execution-env.jpg"
+                   fileref="../../resources/reference/images/simple-batch-execution-env.png"
                    format="JPG" />
       </imageobject>
 
       <imageobject role="html">
         <imagedata align="center"
-                   fileref="../../resources/reference/images/simple-batch-execution-env.jpg"
+                   fileref="../../resources/reference/images/simple-batch-execution-env.png"
                    format="JPG" />
       </imageobject>
 
