@@ -41,7 +41,7 @@
 	</bean>
 
 	<bean id="ibatisKeyGenerator"
-		class="org.springframework.batch.item.database.support.IbatisKeyGenerator">
+		class="org.springframework.batch.item.database.support.IbatisKeyCollector">
 		<property name="drivingQueryId" value="getAllCustomerCreditIds" />
 		<property name="sqlMapClient" ref="sqlMapClient" />
 	</bean>
