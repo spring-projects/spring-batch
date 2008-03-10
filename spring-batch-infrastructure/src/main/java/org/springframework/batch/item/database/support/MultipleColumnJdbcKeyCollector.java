@@ -87,7 +87,7 @@ public class MultipleColumnJdbcKeyCollector implements KeyCollector {
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionContext(java.lang.Object)
 	 */
-	public void saveState(Object key, ExecutionContext executionContext) {
+	public void updateContext(Object key, ExecutionContext executionContext) {
 		Assert.state(keyMapper != null, "Key mapper must not be null.");
 		Assert.notNull(key, "The key must not be null");
 		keyMapper.mapKeys(key, executionContext);

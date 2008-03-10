@@ -40,31 +40,39 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 			Long id = (Long)keys.get(i);
 			assertEquals(new Long(i + 1), id);
 		}
+		for (int i = 0; i < keys.size(); i++) {
+			System.out.println(keys.get(i));
+		}
+	
 	}
 	
 	public void testRestoreKeys(){
 		
-		executionContext.putString("key", "3");
+		keyStrategy.updateContext(new Long(3), executionContext);
 		
 		List keys = keyStrategy.retrieveKeys(executionContext);
 		
 		assertEquals(2, keys.size());
 		assertEquals(new Long(4), keys.get(0));
 		assertEquals(new Long(5), keys.get(1));
+		
+		for (int i = 0; i < keys.size(); i++) {
+			System.out.println(keys.get(i));
+		}
 	}
 	
 	public void testGetKeyAsStreamContext(){
 		
-		keyStrategy.saveState(new Long(3), executionContext);
+		keyStrategy.updateContext(new Long(3), executionContext);
 		
 		assertEquals(1, executionContext.size());
-		assertEquals("3", executionContext.getString("key"));
+		assertEquals(new Long(3), executionContext.get("key"));
 	}
 	
 	public void testGetNullKeyAsStreamContext(){
 		
 		try{
-			keyStrategy.saveState(null, null);
+			keyStrategy.updateContext(null, null);
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -74,7 +82,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	public void testRestoreKeysFromNull(){
 		
 		try{
-			keyStrategy.saveState(null, null);
+			keyStrategy.updateContext(null, null);
 		}catch(IllegalArgumentException ex){
 			//expected
 		}

@@ -163,7 +163,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 				return new ArrayList();
 			}
 
-			public void saveState(Object key, ExecutionContext executionContext) {
+			public void updateContext(Object key, ExecutionContext executionContext) {
 			}});
 		
 		try{
@@ -235,7 +235,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 			}
 		}
 
-		public void saveState(Object key, ExecutionContext executionContext) {
+		public void updateContext(Object key, ExecutionContext executionContext) {
 			executionContext.put(RESTART_KEY, restartKeys);
 		}
 		

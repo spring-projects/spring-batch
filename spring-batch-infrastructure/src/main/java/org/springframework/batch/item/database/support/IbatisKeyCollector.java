@@ -55,7 +55,7 @@ public class IbatisKeyCollector extends ExecutionContextUserSupport implements K
 	 * (non-Javadoc)
 	 * @see KeyCollector#saveState(Object, ExecutionContext)
 	 */
-	public void saveState(Object key, ExecutionContext executionContext) {
+	public void updateContext(Object key, ExecutionContext executionContext) {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(executionContext, "ExecutionContext must be null");
 		executionContext.put(getKey(RESTART_KEY), key);

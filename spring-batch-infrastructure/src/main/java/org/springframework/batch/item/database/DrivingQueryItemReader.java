@@ -166,7 +166,7 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean,
 		if(saveState){
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			if(getCurrentKey() != null){
-				keyGenerator.saveState(getCurrentKey(), executionContext);
+				keyGenerator.updateContext(getCurrentKey(), executionContext);
 			}
 		}
 	}

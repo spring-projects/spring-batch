@@ -90,7 +90,7 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 				return null;
 			}
 		});
-		keyStrategy.saveState(key, executionContext);
+		keyStrategy.updateContext(key, executionContext);
 		Properties props = executionContext.getProperties();
 		
 		assertEquals(2, props.size());
@@ -102,7 +102,7 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 	public void testGetNullKeyAsStreamContext(){
 		
 		try{
-			keyStrategy.saveState(null, null);
+			keyStrategy.updateContext(null, null);
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected

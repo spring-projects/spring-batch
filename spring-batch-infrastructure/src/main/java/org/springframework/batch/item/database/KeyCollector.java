@@ -43,5 +43,5 @@ public interface KeyCollector {
 	 * @throws IllegalArgumentException if key is null.
 	 * @throws IllegalArgumentException if key is an incompatible type.
 	 */
-	void saveState(Object key, ExecutionContext executionContext);
+	void updateContext(Object key, ExecutionContext executionContext);
 }
