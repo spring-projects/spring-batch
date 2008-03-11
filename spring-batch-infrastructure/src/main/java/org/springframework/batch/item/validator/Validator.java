@@ -28,6 +28,7 @@ public interface Validator {
 	 * Method used to validate if the value is valid.
 	 * 
 	 * @param value object to be validated
+	 * @throws Exception if value is not valid.
 	 */
 	void validate(Object value) throws ValidationException;
 }
