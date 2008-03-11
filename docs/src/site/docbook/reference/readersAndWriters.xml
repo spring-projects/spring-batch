@@ -9,8 +9,8 @@
 
     <para>All batch processing can be described in its most simple form as
     reading in large ammounts of data, performing some type of calculation or
-    transformation, and writing the result back out. Spring Batch provides two
-    key interfaces to help perform bulk reading and writing: ItemReader and
+    transformation, and writing the result out. Spring Batch provides two key
+    interfaces to help perform bulk reading and writing: ItemReader and
     ItemWriter</para>
   </section>
 
@@ -36,19 +36,11 @@
         </listitem>
 
         <listitem>
-          <para>SQL - A database resource accessed that returns resultsets
-          that can be mapped to objects for processing. The default SQL Input
-          Sources invoke a RowMapper to return objects, keep track of the
-          current row if restart is required, basic statistics, and some
-          transaction enhancements that will be explained later.</para>
-        </listitem>
-
-        <listitem>
-          <para>JMS - An ItemReader for JMS using JmsTemplate. The template
-          should have a default destination, which will be used to provide
-          items in read(). If a recovery step is needed, set the error
-          destination and the item will be sent there if processing fails in
-          an external retry.</para>
+          <para>Database - A database resource accessed that returns
+          resultsets that can be mapped to objects for processing. The default
+          SQL Input Sources invoke a RowMapper to return objects, keep track
+          of the current row if restart is required, basic statistics, and
+          some transaction enhancements that will be explained later.</para>
         </listitem>
       </itemizedlist>There are many more possbilities, but we'll focus on the
     basic ones for this chapter. A complete list of all available ItemReaders
@@ -74,11 +66,11 @@
     mapped to a useable domain object (i.e. Trade or Foo, etc) but there is no
     requirement in the contract to do so.</para>
 
-    <para>mark() and reset() are important methods due to the transactional
-    nature of batch processing. Mark() will be called before reading begins.
-    Calling reset() at anytime will position the ItemReader to its position
-    when Mark() was last called. The semantics are very similar to
-    java.io.Reader.</para>
+    <para>The mark() and reset() methods are important due to the
+    transactional nature of batch processing. Mark() will be called before
+    reading begins. Calling reset() at anytime will position the ItemReader to
+    its position when mark() was last called. The semantics are very similar
+    to java.io.Reader.</para>
   </section>
 
   <section>
@@ -1250,20 +1242,20 @@ itemReader.close(executionContext);</programlisting>
         as the JdbcCursorItemReader. Below is an example configuration using
         the same 'customer credit' example as the jdbc reader:</para>
 
-        <programlisting>HibernateCursorItemReader itemReader = new HibernateCursorItemReader();
-itemReader.setQueryString("from CustomerCredit");
-//For simplicity sake, assume sessionFactory already obtained.
-itemReader.setSessionFactory(sessionFactory);
-itemReader.setUseStatelessSession(true);
-int counter = 0;
-ExecutionContext executionContext = new ExecutionContext();
-itemReader.open(executionContext);
-Object customerCredit = new Object();
-while(customerCredit != null){
-  customerCredit = itemReader.read();
-  counter++;
-}
-itemReader.close(executionContext);
+        <programlisting>  HibernateCursorItemReader itemReader = new HibernateCursorItemReader();
+  itemReader.setQueryString("from CustomerCredit");
+  //For simplicity sake, assume sessionFactory already obtained.
+  itemReader.setSessionFactory(sessionFactory);
+  itemReader.setUseStatelessSession(true);
+  int counter = 0;
+  ExecutionContext executionContext = new ExecutionContext();
+  itemReader.open(executionContext);
+  Object customerCredit = new Object();
+  while(customerCredit != null){
+    customerCredit = itemReader.read();
+    counter++;
+  }
+  itemReader.close(executionContext);
 </programlisting>
 
         <para>This configured ItemReader will return CustomerCredit objects in
@@ -1510,81 +1502,443 @@ itemReader.close(executionContext);
       <section>
         <title>iBatisKeyCollector</title>
 
-        <para></para>
+        <para>Jdbc is not the only option available for key collectors, iBatis
+        can be used as well. The usage of iBatis doesn't change the basic
+        requirements of a KeyCollector: query, restart query, and dataSource.
+        However, because iBatis is used, both queries are simply iBatis query
+        ids, and the data source is a SqlMapClient.</para>
       </section>
-    </section>
-
-    <section>
-      <title>Reusing Existing DAOs</title>
-
-      <para></para>
     </section>
 
     <section>
       <title>Database ItemWriters</title>
 
-      <para></para>
+      <para>While both Flat Files and XML have specific ItemWriters, there is
+      no exact equivalent in the database world. This is because transactions
+      give all the functionality that is needed. ItemWriters are necessary for
+      files because they must act like as if they're transactional, keeping
+      track of written items and flushing or clearing at the appropriate
+      times. Databases have no need for this functionality, since the write is
+      already contained in a transaction. Users can create their own DAO's
+      that implement the ItemWriter interface or use one from a custom
+      ItemWriter that's written for generic processing concerns, either way,
+      they should work without any issues. The one exception to this is
+      buffered output. This is most common when using hibernate as an
+      ItemWriter, but could have the same issues when using Jdbc batch mode.
+      Buffering database output doesn't have any inherent flaws, assuming
+      there are no errors in the data. However, any errors while writing out
+      can cause issues because there is no way to know which individual item
+      caused an exception. An example would be a record that causes a
+      DataIntegrityViolationException, perhaps because of a primary key
+      violation. If items are buffered before being written out, this error
+      will not be thrown until the buffer is flushed just before a commit. For
+      example, let's assume that 20 items will be written per chunk, and the
+      15th item will have the DataIntegrityViolationException. As far as the
+      Step is concerned, all 20 item will be written out successfully, since
+      there's no way to know that and error will occur until they are actually
+      written out. Once ItemWriter#flush() is called, the buffer will be
+      emptied and the exception will be hit. At this point, there's nothing
+      the Step can do, the transaction must be rolled back. Normally, this
+      exception will cause the Item to be skipped (depending upon the
+      skip/retry policies), and then it won't be written out again. However,
+      in this scenario, there's no way for it to know which item caused the
+      issue, the whole buffer was being written out when the failure happened.
+      Because this is a common enough use case, especially when using
+      Hibernate, Spring Batch provides a common implementation to help:
+      HibernateAwareItemWriter. The HibernateAwareItemWriter solves the
+      problem in a straightforward way: if a chunk fails the first time, on
+      subsequent runs it will be flushed and the transaction committed after
+      each itme. This effectively lowers the commit interval to one for the
+      length of the chunk. Doing so allows for items to be skipped reliably.
+      The following example illustrates how to configure the
+      HibernateAwareItemWriter:</para>
+
+      <programlisting>  &lt;bean id="hibernateItemWriter"
+        class="org.springframework.batch.item.database.HibernateAwareItemWriter"&gt;
+    &lt;property name="sessionFactory" ref="sessionFactory" /&gt;
+    &lt;property name="delegate" ref="customerCreditWriter" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="customerCreditWriter"
+        class="org.springframework.batch.sample.dao.HibernateCreditDao"&gt;
+    &lt;property name="sessionFactory" ref="sessionFactory" /&gt;
+  &lt;/bean&gt;
+
+</programlisting>
     </section>
+  </section>
+
+  <section>
+    <title>Reusing Existing Services</title>
+
+    <para>Batch systems are often used in conjunction with other application
+    styles. The most common is an online system, but it may also support
+    integration or even a thick client application by moving necessary bulk
+    data that each application style uses. For this reason, it is common that
+    many users want to reuse existing DAOs or other services within their
+    batch jobs. The Spring container itself makes this fairly easy by allowing
+    any necessary class to be injected. However, there may be cases where the
+    existing service needs to act as an ItemReader or ItemWriter, either to
+    satisfy the dependency of another Spring Batch class, or because it truly
+    is the main ItemReader for a step. It's fairly trivial to write an adaptor
+    class for each service that needs wrapping, but because it's such a common
+    concern, Spring Batch provides implementations: ItemReaderAdapter and
+    ItemWriterAdapter. Both classes implement the standard Spring method
+    invoking delegator pattern and are fairly simple to set up. Below is an
+    example of the reader:</para>
+
+    <programlisting>  &lt;bean id="itemReader" class="org.springframework.batch.item.adapter.ItemReaderAdapter"&gt;
+    &lt;property name="targetObject" ref="fooService" /&gt;
+    &lt;property name="targetMethod" value="generateFoo" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="fooService" class="org.springframework.batch.item.sample.FooService" /&gt;</programlisting>
+
+    <para>One important point to note is that the contract of the targetMethod
+    must be the same as the contract for read(). That is, when exhausted it
+    will return null, otherwise an Object. Anything else will prevent the
+    framework from correctly knowing when processing should end, either
+    causing an infinite loop or incorrect failure, depending upon the
+    implementation of the ItemWriter. The ItemWriter implementation is equally
+    as simple:</para>
+
+    <programlisting>  &lt;bean id="itemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter"&gt;
+    &lt;property name="targetObject" ref="fooService" /&gt;
+    &lt;property name="targetMethod" value="processFoo" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="fooService" class="org.springframework.batch.item.sample.FooService" /&gt;
+</programlisting>
   </section>
 
   <section>
     <title id="infrastructure.5">Validating Input</title>
 
-    <para></para>
+    <para>During the course of this chapter, multiple approaches to parsing
+    input have been discussed. Each major implementation will throw exception
+    if it is not 'well-formed'. The FixedLengthTokenizer will throw an
+    exception if a range of data is missing. Similarly, attempting to access
+    an index in a RowMapper of FieldSetMapper that doesn't exist or is in a
+    different format than the one expected will cause an exception to be
+    thrown. All of these types of exceptions will be thrown before
+    ItemReader#read() returns. However, they don't address the issue of
+    whether or not the returned item is valid. For example, if one of the
+    fields is an age, it obviously cannot be negative. It will parse
+    correctly, because it existed and is a number, but it won't cause an
+    exception. Since there are already a plethora of Validation frameworks,
+    Spring Batch does not attempt to provide yet another, but rather provides
+    a very simple interface that can be implemented by any number of
+    frameworks:</para>
+
+    <programlisting>  public interface Validator {
+  
+    void validate(Object value) throws ValidationException;
+
+  }</programlisting>
+
+    <para>The contract is that the validate() method will throw an exception
+    if the object is invalid, and return normally if it is valid. Spring Batch
+    provides an out-of-the box ItemReader that delegates to another ItemReader
+    and validates the returned item:</para>
+
+    <programlisting>  &lt;bean class="org.springframework.batch.item.validator.ValidatingItemReader"&gt;
+    &lt;property name="itemReader"&gt;
+      &lt;bean class="org.springframework.batch.sample.item.reader.OrderItemReader" /&gt;
+    &lt;/property&gt;
+    &lt;property name="validator" ref="validator" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="validator"
+        class="org.springframework.batch.item.validator.SpringValidator"&gt;
+    &lt;property name="validator"&gt;
+      &lt;bean id="orderValidator"
+            class="org.springmodules.validation.valang.ValangValidator"&gt;
+        &lt;property name="valang"&gt;
+          &lt;value&gt;
+            &lt;![CDATA[
+              { orderId : ? &gt; 0 AND ? &lt;= 9999999999 : 'Incorrect order ID' : 'error.order.id' }
+              { totalLines : ? = size(lineItems) : 'Bad count of order lines' : 'error.order.lines.badcount'}
+              { customer.registered : customer.businessCustomer = FALSE OR ? = TRUE : 'Business customer must be registered' : 'error.customer.registration'}
+              { customer.companyName : customer.businessCustomer = FALSE OR ? HAS TEXT : 'Company name for business customer is mandatory' :'error.customer.companyname'}
+          ]]&gt;
+          &lt;/value&gt;
+        &lt;/property&gt;
+      &lt;/bean&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;
+</programlisting>
+
+    <para>This simple example shows a simple ValangValidator that is used to
+    validate an order object. The intent is not to show Valang funtionality as
+    much as to show how a validator could be added.</para>
   </section>
 
   <section>
     <title id="infrastructure.1.1">Creating Custom ItemReaders and
     ItemWriters</title>
 
-    <para>The <emphasis role="bold">ListItemReader</emphasis>, as mentioned
-    above, is useful for testing and probably not too useful as something used
-    in typical batch processing. One instructive use is to see how narrow the
-    responsiblity of ItemReaders are. They simply provide a method that allows
-    us to continue reading items until the items are exhausted much like an
-    iterator. In addition,, it is expected that projects will create custom
-    Item Readers. As a means of illustrating the standard properties and
-    behaviors of other framework-provided ItemReaders like mapping
-    unstructured items into objects through the use of tokenizing we will
-    extend the ListItemReader to supporting mapping. The ItemReader interface
-    defines a single method called <emphasis role="bold">read()</emphasis>.
-    The <emphasis role="bold">read()</emphasis> method returns the next object
-    to be provided, much like an iterator. The definition of this method will
-    contain the logic that decides what object to return, performs any object
-    construction or other work that needs to occur, and finally returns the
-    object. We inherit this behavior from ListItemReader. We will add two
-    methods, <emphasis role="bold"> setFieldSetMapper()</emphasis>, to enable
-    the mapping behavior and <emphasis role="bold">setTokenizer()</emphasis>,
-    to enabling parsing of List Items. It this example the items in the list
-    are a simple array of delimited strings..</para>
+    <para>So far in this chapter the basic contracts that exist for reading
+    and writing in Spring Batch and some common implementations have been
+    discussed. However, these are all fairly generic, and there are many
+    potential scenarios that may not be covered by out of the box
+    implementations. This section will show, using a simple example, how to
+    create a custom ItemReader and ItemWriter implementation and implement
+    their contracts correctly. Each one will also implement ItemStream, in
+    order to illustrate how to make a reader or writer restartable. </para>
 
-    <para>Here is our custom list item Reader that supplies mapping or binding
-    behavior as follows: <programlisting>
-        protected static class ListPlayerReader extends ListItemReader {
-                private FieldSetMapper fieldSetMapper;
-                private LineTokenizer tokenizer = null;
-                
-                public ListPlayerReader(List list) {
-                        super(list);
-                }
+    <section>
+      <title>Custom Restartable ItemReader Example</title>
 
-                public void setFieldSetMapper(FieldSetMapper fieldSetMapper) {
-                        this.fieldSetMapper = fieldSetMapper;
-                }
-                
-                public void setTokenizer(LineTokenizer tokenizer) {
-                        this.tokenizer = tokenizer; 
-                }
+      <para>For the purpose of this example, a simple ItemReader
+      implementation that reads from a provided list will be created. We'll
+      start out by implementing the most basic contract of ItemReader,
+      read():</para>
 
-                
-        }
-        </programlisting></para>
+      <programlisting>  public class CustomItemReader implements ItemReader{
 
-    <para>We will tag it as an Player Reader for reasons you'll see next as we
-    map Player objects from input strings. In this example we have inherited
-    the read() behavior that allows us to read from a List in memory and
-    provided a way to map arbitrary streams into objects and added the ability
-    to map FieldSets to objects. We will see how to take advantage of this
-    next.</para>
+    List items;
+
+    public CustomItemReader(List items) {
+      this.items = items;
+    }
+
+    public Object read() throws Exception, UnexpectedInputException,
+       NoWorkFoundException, ParseException {
+
+      if (!items.isEmpty()) {
+        return items.remove(0);
+      }
+      return null;
+    }
+
+    public void mark() throws MarkFailedException { };
+
+    public void reset() throws ResetFailedException { };
+  }</programlisting>
+
+      <para>This very simple class takes a list of items, and returns one at a
+      time, removing it from the list. When the list empty, it returns null,
+      thus satisfying the most basic requirements of an ItemReader, as
+      illustrated below:</para>
+
+      <programlisting>  List items = new ArrayList();
+  items.add("1");
+  items.add("2");
+  items.add("3");
+
+  ItemReader itemReader = new CustomItemReader(items);
+  assertEquals("1", itemReader.read());
+  assertEquals("2", itemReader.read());
+  assertEquals("3", itemReader.read());
+  assertNull(itemReader.read());</programlisting>
+
+      <para>This most basic ItemReader will work, but what happens if the
+      transaction needs to be rolled back? This will usually caused by an
+      error in the ItemWriter, since the ItmReader generally won't do anything
+      that invalidates the transaction, but without supporting it, there would
+      be erroneous results. ItemReaders are notified about rollbacks via the
+      mark() and reset() methods. In the example above they're empty, but
+      we'll need to add code to them in order to support the rollback
+      scenario:</para>
+
+      <programlisting>  public class CustomItemReader implements ItemReader{
+
+    List items;
+    int currentIndex = 0;
+    int lastMarkedIndex = 0;
+
+    public CustomItemReader(List items) {
+      this.items = items;
+    }
+
+    public Object read() throws Exception, UnexpectedInputException,
+       NoWorkFoundException, ParseException {
+
+      if (currentIndex &lt; items.size()) {
+        return items.get(currentIndex++);
+      }
+      return null;
+    }
+
+    public void mark() throws MarkFailedException {
+      lastMarkedIndex = currentIndex;
+    };
+
+    public void reset() throws ResetFailedException {
+      currentIndex = lastMarkedIndex;
+    };
+  }</programlisting>
+
+      <para>The CustomItemReader has now been modified to keep track of where
+      it is currently, and where it was when mark() was last called. This
+      allows the new ItemReader to fulfill the basic contract that calling
+      reset() returns the ItemReader to the state it was in when mark() was
+      last called:</para>
+
+      <programlisting>  //Assume same setup as last example, a list with "1", "2", and "3"
+  itemReader.mark();
+  assertEquals("1", itemReader.read());
+  assertEquals("2", itemReader.read());
+  itemReader.reset();
+  assertEquals("1", itemReader.read());</programlisting>
+
+      <para>In most real world scenarios, there will likely be some kind of
+      underlying resource that will require tracking. In the case of a file,
+      mark() will hold the current location within the file, and reset will
+      move it back. The JdbcCursorItemReader, for example, holds on to the
+      current row number, and on reset moves the cursor back by calling
+      ResultSet#absolute(int), which moves the current cursor to the row
+      number supplied. The CustomItemReader now completely adheres to the
+      entire ItemReader contract. Read will return the appropriates items,
+      returning null when empty, and reset() returns the ItemReader back to
+      it's state as of the last call to mark(), allowing for correct support
+      of a rollback. (It's assumed a Step implementation will call mark() and
+      reset()) The final challenge now is to make the ItemReader restartable.
+      Currently, if the power goes out, and processing begins again, the
+      ItemReader must start at the beginning. This is actually valid in many
+      scenarios, but due to the large datasets often used in batch, it's
+      generally preferable that a batch job starts off at where it left off.
+      In Spring Batch, this is implemented with the ItemStream
+      interface:</para>
+
+      <programlisting>  public class CustomItemReader implements ItemReader, ItemStream{
+
+    List items;
+    int currentIndex = 0;
+    int lastMarkedIndex = 0;
+    private static String CURRENT_INDEX = "current.index";
+
+    public CustomItemReader(List items) {
+      this.items = items;
+    }
+
+    public Object read() throws Exception, UnexpectedInputException,
+        NoWorkFoundException, ParseException {
+
+      if (currentIndex &lt; items.size()) {
+        return items.get(currentIndex++);
+      }
+      return null; 
+    }
+
+    public void mark() throws MarkFailedException {
+      lastMarkedIndex = currentIndex;
+    };
+
+    public void reset() throws ResetFailedException {
+      currentIndex = lastMarkedIndex;
+    }
+
+    public void open(ExecutionContext executionContext) throws ItemStreamTException {
+      if(executionContext.containsKey(CURRENT_INDEX)){
+        currentIndex = new Long(executionContext.getLong(CURRENT_INDEX)).intValue();
+      }
+      else{
+        currentIndex = 0;
+        lastMarkedIndex = 0;
+      }
+    }
+
+    public void update(ExecutionContext executionContext) throws ItemStreamException {
+      executionContext.putLong(CURRENT_INDEX, new Long(currentIndex).longValue());
+    };
+
+    public void close(ExecutionContext executionContext) throws ItemStreamException {}
+  }</programlisting>
+
+      <para>On each call to ItemStream#update(), the current index of the
+      ItemReader will be stored in the provided ExecutionContext with a key of
+      'current.index'. When ItemStream#open() is called, the ExecutionContext
+      is checked to see if it contains an entry with that key, and if so the
+      current index is moved to that location. This is a fairly trivial
+      example, but it still meets the general contract:</para>
+
+      <programlisting>  ExecutionContext executionContext = new ExecutionContext();
+  ((ItemStream)itemReader).open(executionContext);
+  assertEquals("1", itemReader.read());
+  ((ItemStream)itemReader).update(executionContext);
+
+  List items = new ArrayList();
+  items.add("1");
+  items.add("2");
+  items.add("3");
+  itemReader = new CustomItemReader(items);
+
+  ((ItemStream)itemReader).open(executionContext);
+  assertEquals("2", itemReader.read());</programlisting>
+
+      <para>Most ItemReaders have much more sophisticated restart logic. The
+      DrivingQueryItemReader, for example, only loads up the remaining keys to
+      be processed, rather than loading all of them and then moving to the
+      correct index. It's also worth noting that the key used within the
+      ExecutionContext should not be trivial. That is because the same
+      ExecutionContext is used for all ItemStreams within a Step. In most
+      cases, simply prepending the key with the class name should be enough to
+      garuntee uniqueness. However, in the rare cases where two of the same
+      type of ItemStream are used in the same step (which can happen if two
+      files are need for output) then a more unique name will be needed. For
+      this reason, many of the Spring Batch ItemReader and ItemWriters have a
+      setName() property that allows this key name to be overriden.</para>
+    </section>
+
+    <section>
+      <title>Custom ItemWriter Example</title>
+
+      <para>Implementing a Custom ItemWriter is similar in many ways to the
+      ItemReader example above, but differs in enough ways as to warrant its
+      own example. However, adding restartability is essentially the same, so
+      it won't be covered in this example. As with the ItemReader example, a
+      List will be used in order to keep the example as simple as possible:
+      </para>
+
+      <programlisting>  public class CustomItemWriter implements ItemWriter{
+
+    List output = new ArrayList();
+
+    public void write(Object item) throws Exception {
+      output.add(item);
+    }
+
+    public void clear() throws ClearFailedException { }
+
+    public void flush() throws FlushFailedException { }
+  }</programlisting>
+
+      <para>The example is extremely simple, but it's worth showing to
+      illustrate an ItemWriter that doesn't respond to rollbacks and commits
+      (i.e. clear() and flush()). If your potential writer is such that it
+      doesn't need to care about rollback or commit, likely because it's
+      writing to a database, then there is little value to the ItemWriter
+      interface in that scenario other than using it to meet another class's
+      requirement for an implementation of the ItemWriter interface. In that
+      case, the ItemWriterAdapter would be a better solution. However, if it
+      does need to be transactional, then flush() and clear() should be
+      implemented to allow for a buffering solution:</para>
+
+      <programlisting>  public class CustomItemWriter implements ItemWriter{
+
+    List output = new ArrayList();
+    List buffer = new ArrayList();
+
+    public void write(Object item) throws Exception {
+      buffer.add(item);
+    }
+  
+    public void clear() throws ClearFailedException {
+      buffer.clear();
+    }
+
+    public void flush() throws FlushFailedException {
+      for(Iterator it = buffer.iterator(); it.hasNext();){
+        output.add(it.next());
+      }
+    }
+  }</programlisting>
+
+      <para>The ItemWriter buffers all output, only writing to the actual
+      output (in this case by added to a list) when ItemWriter#flush() is
+      called. The contents of the buffer are thrown away when
+      ItemStream#clear() is called.</para>
+    </section>
   </section>
 </chapter>
