@@ -127,20 +127,24 @@
 </programlisting>
 
     <para>Before describing each method, it's worth breifly mentioning the
-    ExecutionContext. An ExecutionContext is created for Each StepExecution to
-    allow users to store the state of a particular execution, with the
-    expectation that it will be returned if the same JobInstance is started
-    again. For those familiar with Quartz, the semantics are very similar to a
-    Quartz JobDataMap. Open() should be called before any calls to read or
-    write and is expected to open any resources such as files or obtain
-    connections. As mentioned before, if expected data is found in the
-    ExecutionContext, it may be used to start the ItemReader or ItemWriter at
-    a location other than its initial state. Converely, close will be called
-    to ensure any resources allocated during open will be released safely.
-    Update() is called primarily to ensure that any state currently being held
-    is loaded into the provided ExecutionContext. In most cases, this method
-    will be called before committing, to ensure that the current state is
-    persisted in the database before commit.</para>
+    ExecutionContext. Clients of an ItemReader that is also an ItemStream
+    should call open() before any calls to read, to open any resources such as
+    files or obtain connections. A similar restriction applies to an
+    ItemWriter that is also an ItemStream. As mentioned before, if expected
+    data is found in the ExecutionContext, it may be used to start the
+    ItemReader or ItemWriter at a location other than its initial state.
+    Converely, close will be called to ensure any resources allocated during
+    open will be released safely. Update() is called primarily to ensure that
+    any state currently being held is loaded into the provided
+    ExecutionContext. This method will be called before committing, to ensure
+    that the current state is persisted in the database before commit.</para>
+
+    <para>In the special case where the client of an ItemStream is a Step
+    (from the Spring Batch Core), an ExecutionContext is created for each
+    StepExecution to allow users to store the state of a particular execution,
+    with the expectation that it will be returned if the same JobInstance is
+    started again. For those familiar with Quartz, the semantics are very
+    similar to a Quartz JobDataMap.</para>
   </section>
 
   <section>
@@ -398,12 +402,12 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         <para>The following example will be used to illustrate this using an
         actual domain scenario. This particular batch job reads in football
         players from the following file:<programlisting>ID,lastName,firstName,position,birthYear,debutYear
-"AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996",
-"AbduRa00,Abdullah,Rabih,rb,1975,1999",
-"AberWa00,Abercrombie,Walter,rb,1959,1982",
-"AbraDa00,Abramowicz,Danny,wr,1945,1967",
-"AdamBo00,Adams,Bob,te,1946,1969",
-"AdamCh00,Adams,Charlie,wr,1979,2003"        </programlisting></para>
+AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996
+AbduRa00,Abdullah,Rabih,rb,1975,1999
+AberWa00,Abercrombie,Walter,rb,1959,1982
+AbraDa00,Abramowicz,Danny,wr,1945,1967
+AdamBo00,Adams,Bob,te,1946,1969
+AdamCh00,Adams,Charlie,wr,1979,2003        </programlisting></para>
 
         <para>We want to map this data to the following Player domain object:
         <programlisting>
@@ -790,14 +794,14 @@ FOT;2;2;267.34</programlisting>
       </mediaobject></para>
 
     <para>Spring Batch uses Object/XML Mapping (OXM) to bind fragments to
-    objects. However, Spring Batch is not tied to any particular OXM
-    technology. Typical use is to delegate <ulink
-    url="http://static.springframework.org/spring-ws/site/reference/html/oxm.html"><citetitle>OXM
-    to Spring WS</citetitle></ulink>, which provides uniform abstraction for
-    the most popular OXM technologies. The dependency on Spring WS is optional
-    and you can choose to implement Spring Batch specific interfaces if
-    desired. The relationship to the technologies that OXM supports can be
-    shown as the following:</para>
+    objects. However, Spring Batch is not tied to any particular xml binding
+    technology. Typical use is to delegate to <ulink
+    url="http://static.springframework.org/spring-ws/site/reference/html/oxm.html"><citetitle>Spring
+    OXM</citetitle></ulink>, which provides uniform abstraction for the most
+    popular OXM technologies. The dependency on Spring OXM is optional and you
+    can choose to implement Spring Batch specific interfaces if desired. The
+    relationship to the technologies that OXM supports can be shown as the
+    following:</para>
 
     <para><mediaobject>
         <imageobject role="fo">
@@ -1684,7 +1688,7 @@ itemReader.close(executionContext);</programlisting>
     implementations. This section will show, using a simple example, how to
     create a custom ItemReader and ItemWriter implementation and implement
     their contracts correctly. Each one will also implement ItemStream, in
-    order to illustrate how to make a reader or writer restartable. </para>
+    order to illustrate how to make a reader or writer restartable.</para>
 
     <section>
       <title>Custom Restartable ItemReader Example</title>
@@ -1888,8 +1892,8 @@ itemReader.close(executionContext);</programlisting>
       ItemReader example above, but differs in enough ways as to warrant its
       own example. However, adding restartability is essentially the same, so
       it won't be covered in this example. As with the ItemReader example, a
-      List will be used in order to keep the example as simple as possible:
-      </para>
+      List will be used in order to keep the example as simple as
+      possible:</para>
 
       <programlisting>  public class CustomItemWriter implements ItemWriter{
 
