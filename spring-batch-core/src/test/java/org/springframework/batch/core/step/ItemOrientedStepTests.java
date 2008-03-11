@@ -572,7 +572,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		itemOrientedStep.setTransactionManager(new ResourcelessTransactionManager() {
 			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
-				// Simulate failure on rollback when stream resets
+				// Simulate failure on commit
 				throw new RuntimeException("Bar");
 			}
 		});

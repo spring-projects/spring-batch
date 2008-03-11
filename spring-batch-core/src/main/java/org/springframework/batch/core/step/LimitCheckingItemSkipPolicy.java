@@ -16,7 +16,7 @@
 package org.springframework.batch.core.step;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -65,7 +65,7 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	private ExceptionClassifier exceptionClassifier;
 
 	public LimitCheckingItemSkipPolicy(int skipLimit) {
-		this(skipLimit, new ArrayList(0));
+		this(skipLimit, Collections.singletonList(Exception.class));
 	}
 
 	public LimitCheckingItemSkipPolicy(int skipLimit, List skippableExceptions) {

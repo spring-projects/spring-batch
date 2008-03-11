@@ -42,16 +42,20 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 /**
- * Simple implementation of executing the step as a set of chunks, each chunk surrounded by a transaction. The structure
- * is therefore that of two nested loops, with transaction boundary around the whole inner loop. The outer loop is
- * controlled by the step operations ({@link #setStepOperations(RepeatOperations)}), and the inner loop by the chunk
- * operations ({@link #setChunkOperations(RepeatOperations)}). The inner loop should always be executed in a single
- * thread, so the chunk operations should not do any concurrent execution. N.B. usually that means that the chunk
- * operations should be a {@link RepeatTemplate} (which is the default).<br/>
+ * Simple implementation of executing the step as a set of chunks, each chunk
+ * surrounded by a transaction. The structure is therefore that of two nested
+ * loops, with transaction boundary around the whole inner loop. The outer loop
+ * is controlled by the step operations ({@link #setStepOperations(RepeatOperations)}),
+ * and the inner loop by the chunk operations ({@link #setChunkOperations(RepeatOperations)}).
+ * The inner loop should always be executed in a single thread, so the chunk
+ * operations should not do any concurrent execution. N.B. usually that means
+ * that the chunk operations should be a {@link RepeatTemplate} (which is the
+ * default).<br/>
  * 
- * Clients can use interceptors in the step operations to intercept or listen to the iteration on a step-wide basis, for
- * instance to get a callback when the step is complete. Those that want callbacks at the level of an individual tasks,
- * can specify interceptors for the chunk operations.
+ * Clients can use interceptors in the step operations to intercept or listen to
+ * the iteration on a step-wide basis, for instance to get a callback when the
+ * step is complete. Those that want callbacks at the level of an individual
+ * tasks, can specify interceptors for the chunk operations.
  * 
  * @author Dave Syer
  * @author Lucas Ward
@@ -117,10 +121,13 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Register each of the streams for callbacks at the appropriate time in the step. The {@link ItemReader} and
-	 * {@link ItemWriter} are automatically registered, but it doesn't hurt to also register them here. Injected
-	 * dependencies of the reader and writer are not automatically registered, so if you implement {@link ItemWriter}
-	 * using delegation to another object which itself is a {@link ItemStream}, you need to register the delegate here.
+	 * Register each of the streams for callbacks at the appropriate time in the
+	 * step. The {@link ItemReader} and {@link ItemWriter} are automatically
+	 * registered, but it doesn't hurt to also register them here. Injected
+	 * dependencies of the reader and writer are not automatically registered,
+	 * so if you implement {@link ItemWriter} using delegation to another object
+	 * which itself is a {@link ItemStream}, you need to register the delegate
+	 * here.
 	 * 
 	 * @param streams an array of {@link ItemStream} objects.
 	 */
@@ -131,7 +138,8 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Register a single {@link ItemStream} for callbacks to the stream interface.
+	 * Register a single {@link ItemStream} for callbacks to the stream
+	 * interface.
 	 * 
 	 * @param stream
 	 */
@@ -140,9 +148,11 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Register each of the objects as listeners. If the {@link ItemReader} or {@link ItemWriter} themselves implements
-	 * this interface they will be registered automatically, but their injected dependencies will not be. This is a good
-	 * way to get access to job parameters and execution context if the tasklet is parameterised.
+	 * Register each of the objects as listeners. If the {@link ItemReader} or
+	 * {@link ItemWriter} themselves implements this interface they will be
+	 * registered automatically, but their injected dependencies will not be.
+	 * This is a good way to get access to job parameters and execution context
+	 * if the tasklet is parameterised.
 	 * 
 	 * @param listeners an array of listener objects of known types.
 	 */
@@ -153,7 +163,8 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Register a step listener for callbacks at the appropriate stages in a step execution.
+	 * Register a step listener for callbacks at the appropriate stages in a
+	 * step execution.
 	 * 
 	 * @param listener a {@link StepListener}
 	 */
@@ -162,8 +173,9 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * The {@link RepeatOperations} to use for the outer loop of the batch processing. Should be set up by the caller
-	 * through a factory. Defaults to a plain {@link RepeatTemplate}.
+	 * The {@link RepeatOperations} to use for the outer loop of the batch
+	 * processing. Should be set up by the caller through a factory. Defaults to
+	 * a plain {@link RepeatTemplate}.
 	 * 
 	 * @param stepOperations a {@link RepeatOperations} instance.
 	 */
@@ -172,8 +184,9 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * The {@link RepeatOperations} to use for the inner loop of the batch processing. should be set up by the caller
-	 * through a factory. defaults to a plain {@link RepeatTemplate}.
+	 * The {@link RepeatOperations} to use for the inner loop of the batch
+	 * processing. should be set up by the caller through a factory. defaults to
+	 * a plain {@link RepeatTemplate}.
 	 * 
 	 * @param chunkOperations a {@link RepeatOperations} instance.
 	 */
@@ -182,8 +195,9 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Setter for the {@link StepInterruptionPolicy}. The policy is used to check whether an external request has been
-	 * made to interrupt the job execution.
+	 * Setter for the {@link StepInterruptionPolicy}. The policy is used to
+	 * check whether an external request has been made to interrupt the job
+	 * execution.
 	 * 
 	 * @param interruptionPolicy a {@link StepInterruptionPolicy}
 	 */
@@ -192,8 +206,8 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Setter for the {@link ExitStatusExceptionClassifier} that will be used to classify any exception that causes a
-	 * job to fail.
+	 * Setter for the {@link ExitStatusExceptionClassifier} that will be used to
+	 * classify any exception that causes a job to fail.
 	 * 
 	 * @param exceptionClassifier
 	 */
@@ -202,8 +216,9 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Mostly useful for testing, but could be used to remove dependence on backport concurrency utilities. Public
-	 * setter for the {@link StepExecutionSynchronizer}.
+	 * Mostly useful for testing, but could be used to remove dependence on
+	 * backport concurrency utilities. Public setter for the
+	 * {@link StepExecutionSynchronizer}.
 	 * 
 	 * @param synchronizer the {@link StepExecutionSynchronizer} to set
 	 */
@@ -212,17 +227,22 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Process the step and update its context so that progress can be monitored by the caller. The step is broken down
-	 * into chunks, each one executing in a transaction. The step and its execution and execution context are all given
-	 * an up to date {@link BatchStatus}, and the {@link JobRepository} is used to store the result. Various reporting
-	 * information are also added to the current context (the {@link RepeatContext} governing the step execution, which
-	 * would normally be available to the caller somehow through the step's {@link JobExecutionContext}.<br/>
+	 * Process the step and update its context so that progress can be monitored
+	 * by the caller. The step is broken down into chunks, each one executing in
+	 * a transaction. The step and its execution and execution context are all
+	 * given an up to date {@link BatchStatus}, and the {@link JobRepository}
+	 * is used to store the result. Various reporting information are also added
+	 * to the current context (the {@link RepeatContext} governing the step
+	 * execution, which would normally be available to the caller somehow
+	 * through the step's {@link JobExecutionContext}.<br/>
 	 * 
 	 * @throws JobInterruptedException if the step or a chunk is interrupted
-	 * @throws RuntimeException if there is an exception during a chunk execution
+	 * @throws RuntimeException if there is an exception during a chunk
+	 * execution
 	 * @see StepExecutor#execute(StepExecution)
 	 */
-	public void execute(final StepExecution stepExecution) throws UnexpectedJobExecutionException, JobInterruptedException {
+	public void execute(final StepExecution stepExecution) throws UnexpectedJobExecutionException,
+			JobInterruptedException {
 
 		ExitStatus status = ExitStatus.FAILED;
 		final ExceptionHolder fatalException = new ExceptionHolder();
@@ -254,7 +274,7 @@ public class ItemOrientedStep extends AbstractStep {
 					ExitStatus result = ExitStatus.CONTINUABLE;
 
 					TransactionStatus transaction = transactionManager
-					        .getTransaction(new DefaultTransactionDefinition());
+							.getTransaction(new DefaultTransactionDefinition());
 
 					try {
 
@@ -267,7 +287,8 @@ public class ItemOrientedStep extends AbstractStep {
 						// minimum).
 						try {
 							synchronizer.lock(stepExecution);
-						} catch (InterruptedException e) {
+						}
+						catch (InterruptedException e) {
 							stepExecution.setStatus(BatchStatus.STOPPED);
 							Thread.currentThread().interrupt();
 						}
@@ -276,33 +297,36 @@ public class ItemOrientedStep extends AbstractStep {
 						// only if chunk was successful
 						stepExecution.apply(contribution);
 
+						// Attempt to flush before the step execution and stream
+						// state are updated
+						itemHandler.flush();
+
 						stream.update(stepExecution.getExecutionContext());
 						try {
 							jobRepository.saveOrUpdateExecutionContext(stepExecution);
-						} catch (Exception e) {
+						}
+						catch (Exception e) {
 							fatalException.setException(e);
 							stepExecution.setStatus(BatchStatus.UNKNOWN);
 							throw new CommitFailedException(
-							        "Fatal error detected during save of step execution context", e);
+									"Fatal error detected during save of step execution context", e);
 						}
 
 						try {
 							itemHandler.mark();
-							itemHandler.flush();
 							transactionManager.commit(transaction);
-						} catch (Exception e) {
+						}
+						catch (Exception e) {
 							fatalException.setException(e);
 							stepExecution.setStatus(BatchStatus.UNKNOWN);
 							throw new CommitFailedException("Fatal error detected during commit", e);
 						}
 
-					} catch (CommitFailedException e) {
-						throw e;
-					} catch (Throwable t) {
+					}
+					catch (Throwable t) {
 						/*
-						 * Any exception thrown within the transaction template will automatically cause the transaction
-						 * to rollback. We need to include exceptions during an attempted commit (e.g. Hibernate flush)
-						 * so this catch block comes outside the transaction.
+						 * Any exception thrown within the transaction should
+						 * automatically cause the transaction to rollback.
 						 */
 						stepExecution.rollback();
 
@@ -310,18 +334,28 @@ public class ItemOrientedStep extends AbstractStep {
 							itemHandler.reset();
 							itemHandler.clear();
 							transactionManager.rollback(transaction);
-						} catch (Exception e) {
-							fatalException.setException(e);
-							stepExecution.setStatus(BatchStatus.UNKNOWN);
+						}
+						catch (Exception e) {
+							/*
+							 * If we already failed to commit, it doesn't help
+							 * to do this again - it's better to allow the
+							 * CommitFailedException to propagate
+							 */
+							if (!fatalException.hasException()) {
+								fatalException.setException(e);
+								stepExecution.setStatus(BatchStatus.UNKNOWN);
+							}
 						}
 
 						if (t instanceof RuntimeException) {
 							throw (RuntimeException) t;
-						} else {
+						}
+						else {
 							throw new RuntimeException(t);
 						}
 
-					} finally {
+					}
+					finally {
 						synchronizer.release(stepExecution);
 					}
 
@@ -336,10 +370,12 @@ public class ItemOrientedStep extends AbstractStep {
 			});
 
 			fatalException.setException(updateStatus(stepExecution, BatchStatus.COMPLETED));
-		} catch (CommitFailedException e) {
+		}
+		catch (CommitFailedException e) {
 			logger.error("Fatal error detected during commit.");
 			throw e;
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 
 			// classify exception so an exit code can be stored.
 			status = exceptionClassifier.classifyForExitCode(e);
@@ -347,24 +383,29 @@ public class ItemOrientedStep extends AbstractStep {
 			if (e.getCause() instanceof JobInterruptedException) {
 				updateStatus(stepExecution, BatchStatus.STOPPED);
 				throw (JobInterruptedException) e.getCause();
-			} else if (!fatalException.hasException()) {
+			}
+			else if (!fatalException.hasException()) {
 				try {
 					status = status.and(listener.onErrorInStep(stepExecution, e));
-				} catch (RuntimeException ex) {
+				}
+				catch (RuntimeException ex) {
 					logger.error("Unexpected error in listener on error in step.", ex);
 				}
 				updateStatus(stepExecution, BatchStatus.FAILED);
 				throw e;
-			} else {
+			}
+			else {
 				logger.error("Fatal error detected during rollback caused by underlying exception: ", e);
 				throw e;
 			}
 
-		} finally {
+		}
+		finally {
 
 			try {
 				status = status.and(listener.afterStep(stepExecution));
-			} catch (RuntimeException e) {
+			}
+			catch (RuntimeException e) {
 				logger.error("Unexpected error in listener after step.", e);
 			}
 
@@ -373,7 +414,8 @@ public class ItemOrientedStep extends AbstractStep {
 
 			try {
 				jobRepository.saveOrUpdate(stepExecution);
-			} catch (RuntimeException e) {
+			}
+			catch (RuntimeException e) {
 				String msg = "Fatal error detected during final save of meta data";
 				logger.error(msg, e);
 				if (!fatalException.hasException()) {
@@ -384,9 +426,10 @@ public class ItemOrientedStep extends AbstractStep {
 
 			try {
 				stream.close(stepExecution.getExecutionContext());
-			} catch (RuntimeException e) {
+			}
+			catch (RuntimeException e) {
 				String msg = "Fatal error detected during close of streams. "
-				        + "The job execution completed (possibly unsuccessfully but with consistent meta-data).";
+						+ "The job execution completed (possibly unsuccessfully but with consistent meta-data).";
 				logger.error(msg, e);
 				if (!fatalException.hasException()) {
 					fatalException.setException(e);
@@ -395,8 +438,8 @@ public class ItemOrientedStep extends AbstractStep {
 			}
 
 			if (fatalException.hasException()) {
-				throw new UnexpectedJobExecutionException("Encountered an error saving batch meta data.", fatalException
-				        .getException());
+				throw new UnexpectedJobExecutionException("Encountered an error saving batch meta data.",
+						fatalException.getException());
 			}
 
 		}
@@ -404,11 +447,13 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Execute a bunch of identical business logic operations all within a transaction. The transaction is
-	 * programmatically started and stopped outside this method, so subclasses that override do not need to create a
+	 * Execute a bunch of identical business logic operations all within a
+	 * transaction. The transaction is programmatically started and stopped
+	 * outside this method, so subclasses that override do not need to create a
 	 * transaction.
 	 * 
-	 * @param step the current step containing the {@link Tasklet} with the business logic.
+	 * @param step the current step containing the {@link Tasklet} with the
+	 * business logic.
 	 * @return true if there is more data to process.
 	 */
 	protected ExitStatus processChunk(final StepContribution contribution) {
@@ -441,7 +486,8 @@ public class ItemOrientedStep extends AbstractStep {
 		try {
 			jobRepository.saveOrUpdate(stepExecution);
 			return null;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			return e;
 		}
 
