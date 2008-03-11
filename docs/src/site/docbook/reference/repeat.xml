@@ -80,6 +80,80 @@ template.iterate(new RepeatCallback() {
       if you want to count the number of occurrences of an even in the
       iteration and remember it across subsequent calls.</para>
     </section>
+
+    <section>
+      <title>ExitStatus</title>
+
+      <para><classname>ExitStatus</classname> is used by Spring Batch to
+      indicate whether processing has finished, and if so whether or not is
+      was successful. It is also used to carry textual information about the
+      end state of a batch or iteration, in the form of an exit code and a
+      description of the status in freeform text. These are the properties of
+      an <classname>ExitStatus</classname>:</para>
+
+      <table>
+        <title>ExitStatus properties</title>
+
+        <tgroup cols="3">
+          <tbody>
+            <row>
+              <entry>Property Name</entry>
+
+              <entry>Type</entry>
+
+              <entry>Description</entry>
+            </row>
+
+            <row>
+              <entry>continuable</entry>
+
+              <entry>boolean</entry>
+
+              <entry>true if there is more work to do</entry>
+            </row>
+
+            <row>
+              <entry>exitCode</entry>
+
+              <entry>String</entry>
+
+              <entry>Short code describing the exit status, e.g. CONTINUABLE,
+              FINISHED, FAILED</entry>
+            </row>
+
+            <row>
+              <entry>exitDescription</entry>
+
+              <entry>String</entry>
+
+              <entry>Long description of the exit status, could be a stack
+              trace for example.</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+
+      <para><classname>ExitStatus</classname> values are designed to be
+      flexible, so that they can be created with any code and description the
+      user needs. Spring Batch comes with some standard values out of the box,
+      to support common use cases, but users are free to create their own
+      values, as long as the semantics of teh <code>continuable</code>
+      property are honoured.</para>
+
+      <para>ExitStatus values can also be combined with valrious operators
+      built into the class as methods. You can add an exit code, or
+      description, or combine the continuable values with logical AND using
+      methods in ExitStatus. You can also combine two ExitStatus values with
+      the and method taking ExitStatus as a parameter. The effect of this is
+      to do a logical AND on the continuable flag, concatenate the
+      descriptions and replace the exit code with the new value, as long as
+      the result is continuable, or the input is not continuable. This has the
+      effect of maintaining the semantics of the continuable flag, but not
+      making any "surprising" changes to the exit code (e.g. it never becomes
+      CONTINUABLE when it was already FINISHED, unless someone does something
+      wilful, like pass in a value that is not continuable, but with a code of
+      CONTINUABLE).</para>
+    </section>
   </section>
 
   <section>
