@@ -26,13 +26,11 @@ import org.springframework.util.PropertiesPersister;
 import org.springframework.util.StringUtils;
 
 /**
- * Utility to convert a Properties object to a String and back. Ideally this
- * utility should have been used to convert to string in order to convert that
- * string back to a Properties Object. Attempting to convert a string obtained
- * by calling Properties.toString() will return an invalid Properties object.
- * The format of Properties is that used by {@link PropertiesPersister} from the
- * Spring Core, so a String in the correct format for a Spring property editor
- * is fine (key=value pairs separated by new lines).
+ * Utility to convert a Properties object to a String and back. Ideally this utility should have been used to convert to
+ * string in order to convert that string back to a Properties Object. Attempting to convert a string obtained by
+ * calling Properties.toString() will return an invalid Properties object. The format of Properties is that used by
+ * {@link PropertiesPersister} from the Spring Core, so a String in the correct format for a Spring property editor is
+ * fine (key=value pairs separated by new lines).
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -48,11 +46,9 @@ public final class PropertiesConverter {
 	};
 
 	/**
-	 * Parse a String to a Properties object. If string is null, an empty
-	 * Properties object will be returned. The input String is a set of
-	 * name=value pairs, delimited by either newline or comma (for brevity). If
-	 * the input String contains a newline it is assumed that the separator is
-	 * newline, otherwise comma.
+	 * Parse a String to a Properties object. If string is null, an empty Properties object will be returned. The input
+	 * String is a set of name=value pairs, delimited by either newline or comma (for brevity). If the input String
+	 * contains a newline it is assumed that the separator is newline, otherwise comma.
 	 * 
 	 * @param stringToParse String to parse.
 	 * @return Properties parsed from each string.
@@ -65,9 +61,9 @@ public final class PropertiesConverter {
 			return new Properties();
 		}
 
-		if (!stringToParse.contains("\n")) {
+		if (!contains(stringToParse, "\n")) {
 			return StringUtils.splitArrayElementsIntoProperties(StringUtils
-					.commaDelimitedListToStringArray(stringToParse), "=");
+			        .commaDelimitedListToStringArray(stringToParse), "=");
 		}
 
 		StringReader stringReader = new StringReader(stringToParse);
@@ -78,20 +74,18 @@ public final class PropertiesConverter {
 			propertiesPersister.load(properties, stringReader);
 			// Exception is only thrown by StringReader after it is closed,
 			// so never in this case.
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			throw new IllegalStateException("Error while trying to parse String to java.util.Properties,"
-					+ " given String: " + properties);
+			        + " given String: " + properties);
 		}
 
 		return properties;
 	}
 
 	/**
-	 * Convert Properties object to String. This is only necessary for
-	 * compatibility with converting the String back to a properties object. If
-	 * an empty properties object is passed in, a blank string is returned,
-	 * otherwise it's string representation is returned.
+	 * Convert Properties object to String. This is only necessary for compatibility with converting the String back to
+	 * a properties object. If an empty properties object is passed in, a blank string is returned, otherwise it's
+	 * string representation is returned.
 	 * 
 	 * @param propertiesToParse
 	 * @return String representation of properties object
@@ -108,12 +102,15 @@ public final class PropertiesConverter {
 
 		try {
 			propertiesPersister.store(propertiesToParse, stringWriter, null);
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			// Exception is never thrown by StringWriter
 			throw new IllegalStateException("Error while trying to convert properties to string");
 		}
 
 		return stringWriter.toString();
+	}
+
+	private static boolean contains(String str, String searchStr) {
+		return str.indexOf(searchStr) != -1;
 	}
 }

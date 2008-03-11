@@ -58,19 +58,19 @@ public abstract class AbstractStaxEventReaderItemReaderTests extends TestCase {
 		Trade trade1 = (Trade) results.get(0);
 		assertEquals("XYZ0001", trade1.getIsin());
 		assertEquals(5, trade1.getQuantity());
-		assertEquals(BigDecimal.valueOf(11.39), trade1.getPrice());
+		assertEquals(new BigDecimal("11.39"), trade1.getPrice());
 		assertEquals("Customer1", trade1.getCustomer());
 
 		Trade trade2 = (Trade) results.get(1);
 		assertEquals("XYZ0002", trade2.getIsin());
 		assertEquals(2, trade2.getQuantity());
-		assertEquals(BigDecimal.valueOf(72.99), trade2.getPrice());
+		assertEquals(new BigDecimal("72.99"), trade2.getPrice());
 		assertEquals("Customer2", trade2.getCustomer());
 
 		Trade trade3 = (Trade) results.get(2);
 		assertEquals("XYZ0003", trade3.getIsin());
 		assertEquals(9, trade3.getQuantity());
-		assertEquals(BigDecimal.valueOf(99.99), trade3.getPrice());
+		assertEquals(new BigDecimal("99.99"), trade3.getPrice());
 		assertEquals("Customer3", trade3.getCustomer());
 	}
 

@@ -28,14 +28,11 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.util.Assert;
 
 /**
- * A {@link MethodInterceptor} that can be used to automatically repeat calls to
- * a method on a service. The injected {@link RepeatOperations} is used to
- * control the completion of the loop. By default it will repeat until the
- * target method returns null. Be careful when injecting a bespoke
- * {@link RepeatOperations} that the loop will actually terminate, because the
- * default policy for a vanilla {@link RepeatTemplate} will never complete if
- * the return type of the target method is void (the value returned is always
- * not-null, representing the {@link Void#TYPE}).
+ * A {@link MethodInterceptor} that can be used to automatically repeat calls to a method on a service. The injected
+ * {@link RepeatOperations} is used to control the completion of the loop. By default it will repeat until the target
+ * method returns null. Be careful when injecting a bespoke {@link RepeatOperations} that the loop will actually
+ * terminate, because the default policy for a vanilla {@link RepeatTemplate} will never complete if the return type of
+ * the target method is void (the value returned is always not-null, representing the {@link Void#TYPE}).
  * 
  * @author Dave Syer
  */
@@ -47,8 +44,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	 * Setter for the {@link RepeatOperations}.
 	 * 
 	 * @param batchTempate
-	 * @throws IllegalArgumentException
-	 *             if the argument is null.
+	 * @throws IllegalArgumentException if the argument is null.
 	 */
 	public void setRepeatOperations(RepeatOperations batchTempate) {
 		Assert.notNull(batchTempate, "'repeatOperations' cannot be null.");
@@ -56,8 +52,8 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	}
 
 	/**
-	 * Invoke the proceeding method call repeatedly, according to the properties
-	 * of the injected {@link RepeatOperations}.
+	 * Invoke the proceeding method call repeatedly, according to the properties of the injected
+	 * {@link RepeatOperations}.
 	 * 
 	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
 	 */
@@ -65,22 +61,19 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 
 		repeatOperations.iterate(new RepeatCallback() {
 
-			public ExitStatus doInIteration(RepeatContext context)
-					throws Exception {
+			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				try {
 
 					MethodInvocation clone = invocation;
 					if (invocation instanceof ProxyMethodInvocation) {
-						clone = ((ProxyMethodInvocation) invocation)
-								.invocableClone();
+						clone = ((ProxyMethodInvocation) invocation).invocableClone();
 					} else {
 						throw new IllegalStateException(
-								"MethodInvocation of the wrong type detected - this should not happen with Spring AOP, so please raise an issue if you see this exception");
+						        "MethodInvocation of the wrong type detected - this should not happen with Spring AOP, so please raise an issue if you see this exception");
 					}
 
 					// N.B. discards return value if there is one
-					if (clone.getMethod().getGenericReturnType().equals(
-							Void.TYPE)) {
+					if (clone.getMethod().getReturnType().equals(Void.TYPE)) {
 						clone.proceed();
 						return ExitStatus.CONTINUABLE;
 					}
@@ -89,8 +82,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 					if (e instanceof Exception) {
 						throw (Exception) e;
 					} else {
-						throw new RepeatException(
-								"Unexpected error in batch interceptor", e);
+						throw new RepeatException("Unexpected error in batch interceptor", e);
 					}
 				}
 			}

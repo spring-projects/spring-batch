@@ -92,7 +92,7 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 			DefaultExceptionHandler.rethrow(throwable);
 		} else {
 			throw new IllegalStateException(
-			        "Unclassified exception encountered.  Did you mean to classifiy this as 'rethrow'?", throwable);
+			        "Unclassified exception encountered.  Did you mean to classifiy this as 'rethrow'?");
 		}
 
 	}

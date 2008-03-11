@@ -8,6 +8,7 @@ import org.springframework.batch.item.database.DrivingQueryItemReader;
 import org.springframework.batch.item.database.KeyCollector;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -33,7 +34,7 @@ public class IbatisKeyCollector extends ExecutionContextUserSupport implements K
 	private String restartQueryId;
 
 	public IbatisKeyCollector() {
-		setName(IbatisKeyCollector.class.getSimpleName());
+		setName(ClassUtils.getShortName(IbatisKeyCollector.class));
 	}
 
 	/*

@@ -30,11 +30,11 @@ import org.springframework.batch.item.file.mapping.FieldSetCreator;
 import org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.ClassUtils;
 
 /**
- * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be
- * in separate TestCase classes with different <code>setUp</code> and
- * <code>tearDown</code> methods
+ * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be in separate TestCase classes with
+ * different <code>setUp</code> and <code>tearDown</code> methods
  * 
  * @author robert.kasanicky
  * @author Dave Syer
@@ -53,12 +53,11 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	// reads the output file to check the result
 	private BufferedReader reader;
-	
+
 	private ExecutionContext executionContext;
 
 	/**
-	 * Create temporary output file, define mock behaviour, set dependencies and
-	 * initialize the object under test
+	 * Create temporary output file, define mock behaviour, set dependencies and initialize the object under test
 	 */
 	protected void setUp() throws Exception {
 
@@ -87,9 +86,8 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	/*
-	 * Read a line from the output file, if the reader has not been created,
-	 * recreate. This method is only necessary because running the tests in a
-	 * UNIX environment locks the file if it's open for writing.
+	 * Read a line from the output file, if the reader has not been created, recreate. This method is only necessary
+	 * because running the tests in a UNIX environment locks the file if it's open for writing.
 	 */
 	private String readLine() throws IOException {
 
@@ -102,6 +100,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
+	 * 
 	 * @throws Exception
 	 */
 	public void testWriteString() throws Exception {
@@ -115,6 +114,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
+	 * 
 	 * @throws Exception
 	 */
 	public void testWriteWithConverter() throws Exception {
@@ -133,6 +133,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
+	 * 
 	 * @throws Exception
 	 */
 	public void testWriteWithConverterAndInfiniteLoop() throws Exception {
@@ -151,6 +152,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
+	 * 
 	 * @throws Exception
 	 */
 	public void testWriteWithConverterAndString() throws Exception {
@@ -167,6 +169,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	/**
 	 * Regular usage of <code>write(String[], LineDescriptor)</code> method
+	 * 
 	 * @throws Exception
 	 */
 	public void testWriteRecord() throws Exception {
@@ -245,7 +248,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		}
 
 		// 3 lines were written to the file after restart
-		assertEquals(3, executionContext.getLong(FlatFileItemWriter.class.getSimpleName() + ".written"));
+		assertEquals(3, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
 
 	}
 
@@ -254,8 +257,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		try {
 			inputSource.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
@@ -269,7 +271,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.update(executionContext);
 		assertNotNull(executionContext);
 		assertEquals(3, executionContext.entrySet().size());
-		assertEquals(0, executionContext.getLong(FlatFileItemWriter.class.getSimpleName() + ".current.count"));
+		assertEquals(0, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".current.count"));
 	}
 
 	private void commit() throws Exception {

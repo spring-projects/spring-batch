@@ -13,7 +13,7 @@ import org.springframework.batch.sample.domain.CustomerCredit;
  */
 public class CustomerCreditIncreaseWriter extends AbstractItemWriter {
 
-	public static final BigDecimal FIXED_AMOUNT = new BigDecimal(1000);
+	public static final BigDecimal FIXED_AMOUNT = new BigDecimal("1000");
 	
 	private CustomerCreditDao customerCreditDao;
 	

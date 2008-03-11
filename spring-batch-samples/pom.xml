@@ -203,8 +203,14 @@
 		<dependency>
 			<groupId>mx4j</groupId>
 			<artifactId>mx4j</artifactId>
-			<version>3.0.2</version>
-			<scope>optional</scope>
+			<version>3.0.1</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.8.1</version>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 

@@ -199,7 +199,7 @@ public class JobParametersTests extends TestCase {
 	public void testToStringOrder() {
 
 		Map props = parameters.getParameters();
-		StringBuilder stringBuilder = new StringBuilder();
+		StringBuffer stringBuilder = new StringBuffer();
 		for (Iterator it = props.entrySet().iterator(); it.hasNext();) {
 			Entry entry = (Entry) it.next();
 			stringBuilder.append(entry.toString() + ";");
@@ -226,7 +226,7 @@ public class JobParametersTests extends TestCase {
 		JobParameters testProps = new JobParameters(stringMap, longMap, doubleMap, dateMap);
 
 		props = testProps.getParameters();
-		stringBuilder = new StringBuilder();
+		stringBuilder = new StringBuffer();
 		for (Iterator it = props.entrySet().iterator(); it.hasNext();) {
 			Entry entry = (Entry) it.next();
 			stringBuilder.append(entry.toString() + ";");

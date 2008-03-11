@@ -40,11 +40,12 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.core.runtime.JobParametersFactory#getJobParameters(java.util.Properties)
 	 */
 	public JobParameters getJobParameters(Properties props) {
 
-		if(props == null || props.isEmpty()){
+		if (props == null || props.isEmpty()) {
 			return new JobParameters();
 		}
 
@@ -56,14 +57,11 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 				Date scheduleDate;
 				try {
 					scheduleDate = dateFormat.parse(entry.getValue().toString());
-				}
-				catch (ParseException ex) {
-					throw new IllegalArgumentException("Date format is invalid: [" + entry.getValue() + "]",
-							ex);
+				} catch (ParseException ex) {
+					throw new IllegalArgumentException("Date format is invalid: [" + entry.getValue() + "]");
 				}
 				propertiesBuilder.addDate(entry.getKey().toString(), scheduleDate);
-			}
-			else {
+			} else {
 				propertiesBuilder.addString(entry.getKey().toString(), entry.getValue().toString());
 			}
 		}
@@ -72,17 +70,16 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 	}
 
 	/**
-	 * Convert schedule date to Date, and assume all other parameters can be
-	 * represented by their default string value.
+	 * Convert schedule date to Date, and assume all other parameters can be represented by their default string value.
 	 * 
 	 * @see org.springframework.batch.core.support.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
 	public Properties getProperties(JobParameters params) {
-		
-		if(params == null || params.isEmpty()){
+
+		if (params == null || params.isEmpty()) {
 			return new Properties();
 		}
-		
+
 		Map parameters = params.getParameters();
 		Properties result = new Properties();
 		for (Iterator iterator = parameters.keySet().iterator(); iterator.hasNext();) {
@@ -91,7 +88,7 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 			if (key.equals(SCHEDULE_DATE_KEY)) {
 				result.setProperty(key, dateFormat.format(value));
 			} else {
-				result.setProperty(key,""+value);
+				result.setProperty(key, "" + value);
 			}
 		}
 		return result;
@@ -99,6 +96,7 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 
 	/**
 	 * Public setter for injecting a date format.
+	 * 
 	 * @param dateFormat a {@link DateFormat}, defaults to "yyyy/MM/dd"
 	 */
 	public void setDateFormat(DateFormat dateFormat) {

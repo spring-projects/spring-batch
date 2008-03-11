@@ -31,9 +31,8 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.util.StringUtils;
 
 /**
- * Converter for {@link JobParameters} instances using a simple naming convention
- * for property keys. Key names ending with "(&lt;type&gt;)" where type is one
- * of string, date, long are converted to the corresponding type. The default
+ * Converter for {@link JobParameters} instances using a simple naming convention for property keys. Key names ending
+ * with "(&lt;type&gt;)" where type is one of string, date, long are converted to the corresponding type. The default
  * type is string. E.g.
  * 
  * <pre>
@@ -41,8 +40,8 @@ import org.springframework.util.StringUtils;
  * department.id(long)=2345
  * </pre>
  * 
- * The literal values are converted to the correct type using the default Spring
- * strategies, augmented if necessary by the custom editors provided.
+ * The literal values are converted to the correct type using the default Spring strategies, augmented if necessary by
+ * the custom editors provided.
  * 
  * @author Dave Syer
  * 
@@ -60,11 +59,10 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	private NumberFormat numberFormat = new DecimalFormat("#");
 
 	/**
-	 * Check for suffix on keys and use those to decide how to convert the
-	 * value.
+	 * Check for suffix on keys and use those to decide how to convert the value.
 	 * 
-	 * @throws IllegalArgumentException if a number or date is passed in that
-	 * cannot be parsed, or cast to the correct type.
+	 * @throws IllegalArgumentException if a number or date is passed in that cannot be parsed, or cast to the correct
+	 *             type.
 	 * 
 	 * @see org.springframework.batch.core.support.JobParametersConverter#getJobParameters(java.util.Properties)
 	 */
@@ -84,35 +82,28 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 				Date date;
 				try {
 					date = dateFormat.parse(value);
-				}
-				catch (ParseException ex) {
+				} catch (ParseException ex) {
 					String suffix = (dateFormat instanceof SimpleDateFormat) ? ", use "
-							+ ((SimpleDateFormat) dateFormat).toPattern() : "";
-					throw new IllegalArgumentException("Date format is invalid: [" + value + "]" + suffix, ex);
+					        + ((SimpleDateFormat) dateFormat).toPattern() : "";
+					throw new IllegalArgumentException("Date format is invalid: [" + value + "]" + suffix);
 				}
 				propertiesBuilder.addDate(StringUtils.replace(key, DATE_TYPE, ""), date);
-			}
-			else if (key.endsWith(LONG_TYPE)) {
+			} else if (key.endsWith(LONG_TYPE)) {
 				Long result;
 				try {
 					result = (Long) numberFormat.parse(value);
-				}
-				catch (ParseException ex) {
+				} catch (ParseException ex) {
 					String suffix = (numberFormat instanceof DecimalFormat) ? ", use "
-							+ ((DecimalFormat) numberFormat).toPattern() : "";
-					throw new IllegalArgumentException(
-							"Number format is invalid: [" + value + "], use " + suffix, ex);
-				}
-				catch (ClassCastException ex) {
+					        + ((DecimalFormat) numberFormat).toPattern() : "";
+					throw new IllegalArgumentException("Number format is invalid: [" + value + "], use " + suffix);
+				} catch (ClassCastException ex) {
 					throw new IllegalArgumentException("Number format is invalid: [" + value
-							+ "], use a format with no decimal places", ex);
+					        + "], use a format with no decimal places");
 				}
 				propertiesBuilder.addLong(StringUtils.replace(key, LONG_TYPE, ""), result);
-			}
-			else if (StringUtils.endsWithIgnoreCase(key, STRING_TYPE)) {
+			} else if (StringUtils.endsWithIgnoreCase(key, STRING_TYPE)) {
 				propertiesBuilder.addString(StringUtils.replace(key, STRING_TYPE, ""), value);
-			}
-			else {
+			} else {
 				propertiesBuilder.addString(key.toString(), value.toString());
 			}
 		}
@@ -121,8 +112,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	}
 
 	/**
-	 * Use the same suffixes to create properties (omitting the string suffix
-	 * because it is the default).
+	 * Use the same suffixes to create properties (omitting the string suffix because it is the default).
 	 * 
 	 * @see org.springframework.batch.core.support.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
@@ -139,11 +129,9 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			Object value = parameters.get(key);
 			if (value instanceof Date) {
 				result.setProperty(key + DATE_TYPE, dateFormat.format(value));
-			}
-			else if (value instanceof Long) {
+			} else if (value instanceof Long) {
 				result.setProperty(key + LONG_TYPE, numberFormat.format(value));
-			}
-			else {
+			} else {
 				result.setProperty(key, "" + value);
 			}
 		}
@@ -152,6 +140,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 
 	/**
 	 * Public setter for injecting a date format.
+	 * 
 	 * @param dateFormat a {@link DateFormat}, defaults to "yyyy/MM/dd"
 	 */
 	public void setDateFormat(DateFormat dateFormat) {
@@ -159,8 +148,8 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	}
 
 	/**
-	 * Public setter for the {@link NumberFormat}. Used to parse longs, so must
-	 * not contain decimal place (e.g. use "#" or "#,###").
+	 * Public setter for the {@link NumberFormat}. Used to parse longs, so must not contain decimal place (e.g. use "#"
+	 * or "#,###").
 	 * 
 	 * @param numberFormat the {@link NumberFormat} to set
 	 */

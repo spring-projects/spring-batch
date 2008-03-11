@@ -95,7 +95,7 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 				list.add(message.toString());
 				String text = ((TextMessage) message).getText();
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-						Integer.valueOf(list.size()), text });
+						new Integer(list.size()), text });
 			}
 		});
 

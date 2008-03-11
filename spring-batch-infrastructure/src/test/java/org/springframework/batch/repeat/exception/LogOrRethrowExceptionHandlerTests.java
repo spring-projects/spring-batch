@@ -107,7 +107,6 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 			fail("Expected IllegalStateException");
 		} catch (IllegalStateException e) {
 			assertTrue(e.getMessage().toLowerCase().indexOf("unclassified")>=0);
-			assertEquals("Foo", e.getCause().getMessage());
 		}
 	}
 

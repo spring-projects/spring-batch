@@ -30,7 +30,7 @@ public class DatasourceTests extends AbstractTransactionalDataSourceSpringContex
 		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);
 
-		jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] { Integer.valueOf(0),
-				"foo" });
+		jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] { new Integer(0),
+		        "foo" });
 	}
 }

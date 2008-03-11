@@ -503,8 +503,8 @@ public class ItemOrientedStepTests extends TestCase {
 		} catch (JobInterruptedException ex) {
 			assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertTrue("Message does not contain JobInterruptedException: " + msg, msg
-			        .contains("JobInterruptedException"));
+			assertTrue("Message does not contain JobInterruptedException: " + msg, contains(msg,
+			        "JobInterruptedException"));
 		}
 	}
 
@@ -562,7 +562,7 @@ public class ItemOrientedStepTests extends TestCase {
 		} catch (UnexpectedJobExecutionException ex) {
 			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertTrue("Message does not contain ResetFailedException: " + msg, msg.contains("ResetFailedException"));
+			assertTrue("Message does not contain ResetFailedException: " + msg, contains(msg, "ResetFailedException"));
 			// The original rollback was caused by this one:
 			assertEquals("Bar", ex.getCause().getMessage());
 		}
@@ -591,7 +591,7 @@ public class ItemOrientedStepTests extends TestCase {
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertEquals("", msg);
 			msg = ex.getMessage();
-			assertTrue("Message does not contain 'saving': " + msg, msg.contains("saving"));
+			assertTrue("Message does not contain 'saving': " + msg, contains(msg, "saving"));
 			// The original rollback was caused by this one:
 			assertEquals("Bar", ex.getCause().getMessage());
 		}
@@ -620,7 +620,7 @@ public class ItemOrientedStepTests extends TestCase {
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertEquals("", msg);
 			msg = ex.getMessage();
-			assertTrue("Message does not contain 'final': " + msg, msg.contains("final"));
+			assertTrue("Message does not contain 'final': " + msg, contains(msg, "final"));
 			// The original rollback was caused by this one:
 			assertEquals("Bar", ex.getCause().getMessage());
 		}
@@ -648,15 +648,19 @@ public class ItemOrientedStepTests extends TestCase {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected InfrastructureException");
 		} catch (UnexpectedJobExecutionException ex) {
-			// The job actually completeed, but the streams couldn't be closed.
+			// The job actually completed, but the streams couldn't be closed.
 			assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertEquals("", msg);
 			msg = ex.getMessage();
-			assertTrue("Message does not contain 'close': " + msg, msg.contains("close"));
+			assertTrue("Message does not contain 'close': " + msg, contains(msg, "close"));
 			// The original rollback was caused by this one:
 			assertEquals("Bar", ex.getCause().getMessage());
 		}
+	}
+
+	private boolean contains(String str, String searchStr) {
+		return str.indexOf(searchStr) != -1;
 	}
 
 	private class MockRestartableItemReader extends ItemStreamSupport implements ItemReader, StepListener {

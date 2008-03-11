@@ -70,8 +70,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 	List list = new ArrayList();
 
 	/**
-	 * Message processing is successful on the second attempt without having to
-	 * receive the message again.
+	 * Message processing is successful on the second attempt without having to receive the message again.
 	 * 
 	 * @throws Exception
 	 */
@@ -80,11 +79,9 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		assertInitialState();
 
 		/*
-		 * We either want the JMS receive to be outside a transaction, or we
-		 * need the database transaction in the retry to be PROPAGATION_NESTED.
-		 * Otherwise JMS will roll back when the retry callback is eventually
-		 * successful because of the previous exception.
-		 * PROPAGATION_REQUIRES_NEW is wrong because it doesn't allow the outer
+		 * We either want the JMS receive to be outside a transaction, or we need the database transaction in the retry
+		 * to be PROPAGATION_NESTED. Otherwise JMS will roll back when the retry callback is eventually successful
+		 * because of the previous exception. PROPAGATION_REQUIRES_NEW is wrong because it doesn't allow the outer
 		 * transaction to fail and rollback the inner one.
 		 */
 		final String text = (String) jmsTemplate.receiveAndConvert("queue");
@@ -100,7 +97,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 						list.add(text);
 						System.err.println("Inserting: [" + list.size() + "," + text + "]");
 						jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-								Integer.valueOf(list.size()), text });
+						        new Integer(list.size()), text });
 						if (list.size() == 1) {
 							throw new RuntimeException("Rollback!");
 						}
@@ -129,8 +126,8 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 	}
 
 	/**
-	 * Message processing is successful on the second attempt without having to
-	 * receive the message again - uses JmsItemProvider internally.
+	 * Message processing is successful on the second attempt without having to receive the message again - uses
+	 * JmsItemProvider internally.
 	 * 
 	 * @throws Exception
 	 */
@@ -154,7 +151,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 						list.add(text);
 						System.err.println("Inserting: [" + list.size() + "," + text + "]");
 						jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-								Integer.valueOf(list.size()), text });
+						        new Integer(list.size()), text });
 						if (list.size() == 1) {
 							throw new RuntimeException("Rollback!");
 						}
@@ -184,8 +181,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 	}
 
 	/**
-	 * Message processing is successful on the second attempt without having to
-	 * receive the message again.
+	 * Message processing is successful on the second attempt without having to receive the message again.
 	 * 
 	 * @throws Exception
 	 */
@@ -194,11 +190,9 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		assertInitialState();
 
 		/*
-		 * We either want the JMS receive to be outside a transaction, or we
-		 * need the database transaction in the retry to be PROPAGATION_NESTED.
-		 * Otherwise JMS will roll back when the retry callback is eventually
-		 * successful because of the previous exception.
-		 * PROPAGATION_REQUIRES_NEW is wrong because it doesn't allow the outer
+		 * We either want the JMS receive to be outside a transaction, or we need the database transaction in the retry
+		 * to be PROPAGATION_NESTED. Otherwise JMS will roll back when the retry callback is eventually successful
+		 * because of the previous exception. PROPAGATION_REQUIRES_NEW is wrong because it doesn't allow the outer
 		 * transaction to fail and rollback the inner one.
 		 */
 		final String text = (String) jmsTemplate.receiveAndConvert("queue");
@@ -214,7 +208,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 						list.add(text);
 						System.err.println("Inserting: [" + list.size() + "," + text + "]");
 						jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-								Integer.valueOf(list.size()), text });
+						        new Integer(list.size()), text });
 						return text;
 
 					}
@@ -243,8 +237,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 	}
 
 	/**
-	 * Message processing is successful on the second attempt but must receive
-	 * the message again.
+	 * Message processing is successful on the second attempt but must receive the message again.
 	 * 
 	 * @throws Exception
 	 */
@@ -269,7 +262,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 						final String text = (String) jmsTemplate.receiveAndConvert("queue");
 						list.add(text);
 						jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-								Integer.valueOf(list.size()), text });
+						        new Integer(list.size()), text });
 						if (list.size() == 1) {
 							throw new RuntimeException("Rollback!");
 						}
@@ -321,7 +314,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 							final String text = (String) jmsTemplate.receiveAndConvert("queue");
 							list.add(text);
 							jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)",
-									new Object[] { Integer.valueOf(list.size()), text });
+							        new Object[] { new Integer(list.size()), text });
 							throw new RuntimeException("Rollback!");
 
 						}
@@ -332,8 +325,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 
 			fail("Expected RuntimeException");
 
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals("Rollback!", e.getMessage());
 			// expected
 		}

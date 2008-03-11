@@ -41,6 +41,7 @@ import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * This class represents a {@link ItemReader}, that reads lines from text file, tokenizes them to structured tuples ({@link FieldSet}s)
@@ -100,7 +101,7 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	private LineReader reader;
 
 	public FlatFileItemReader() {
-		setName(FlatFileItemReader.class.getSimpleName());
+		setName(ClassUtils.getShortName(FlatFileItemReader.class));
 	}
 
 	/**
@@ -258,9 +259,8 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 			throw e;
 		} catch (ItemReaderException e) {
 			throw e;
-		}
-		catch (Exception e) {
-			throw new IllegalStateException(e);
+		} catch (Exception e) {
+			throw new IllegalStateException();
 		}
 	}
 

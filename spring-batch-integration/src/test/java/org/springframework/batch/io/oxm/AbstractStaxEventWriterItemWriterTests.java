@@ -19,6 +19,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;
+import org.springframework.util.ClassUtils;
 
 public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 
@@ -30,12 +31,13 @@ public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 
 	protected Resource expected = new ClassPathResource("expected-output.xml", getClass());
 
-
-	protected List objects = new ArrayList() {{
-		add(new Trade("isin1", 1, new BigDecimal(1.0), "customer1"));
-		add(new Trade("isin2", 2, new BigDecimal(2.0), "customer2"));
-		add(new Trade("isin3", 3, new BigDecimal(3.0), "customer3"));
-	}};
+	protected List objects = new ArrayList() {
+		{
+			add(new Trade("isin1", 1, new BigDecimal(1.0), "customer1"));
+			add(new Trade("isin2", 2, new BigDecimal(2.0), "customer2"));
+			add(new Trade("isin3", 3, new BigDecimal(3.0), "customer3"));
+		}
+	};
 
 	/**
 	 * Write list of domain objects and check the output file.
@@ -50,16 +52,15 @@ public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 
 	}
 
-
 	protected void setUp() throws Exception {
-		//File outputFile = File.createTempFile("AbstractStaxStreamWriterOutputSourceTests", "xml");
-		outputFile = File.createTempFile(this.getClass().getSimpleName(), ".xml");
+		// File outputFile = File.createTempFile("AbstractStaxStreamWriterOutputSourceTests", "xml");
+		outputFile = File.createTempFile(ClassUtils.getShortName(this.getClass()), ".xml");
 		resource = new FileSystemResource(outputFile);
 		writer.setResource(resource);
 
 		MarshallingEventWriterSerializer mapper = new MarshallingEventWriterSerializer(getMarshaller());
 		writer.setSerializer(mapper);
-		
+
 		writer.open(new ExecutionContext());
 	}
 

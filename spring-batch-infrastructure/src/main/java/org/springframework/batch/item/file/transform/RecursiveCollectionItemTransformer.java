@@ -96,12 +96,12 @@ public class RecursiveCollectionItemTransformer implements ItemTransformer {
 
 	private static class TransformHolder {
 
-		StringBuilder builder = new StringBuilder();
+		StringBuffer builder = new StringBuffer();
 
 		TransformHolder() {
 		}
 
-		TransformHolder(StringBuilder builder) {
+		TransformHolder(StringBuffer builder) {
 			this.builder = builder;
 		}
 	}

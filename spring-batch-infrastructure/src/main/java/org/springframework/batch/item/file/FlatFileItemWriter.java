@@ -42,6 +42,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * This class is an output target that writes data to a file or stream. The writer also provides restart, statistics and
@@ -81,7 +82,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	private FieldSetCreator fieldSetCreator;
 
 	public FlatFileItemWriter() {
-		setName(FlatFileItemWriter.class.getSimpleName());
+		setName(ClassUtils.getShortName(FlatFileItemWriter.class));
 	}
 
 	/**

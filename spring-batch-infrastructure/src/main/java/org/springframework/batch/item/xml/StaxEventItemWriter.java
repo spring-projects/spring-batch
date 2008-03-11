@@ -27,24 +27,23 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 
 /**
- * An implementation of {@link ItemWriter} which uses StAX and
- * {@link EventWriterSerializer} for serializing object to XML.
+ * An implementation of {@link ItemWriter} which uses StAX and {@link EventWriterSerializer} for serializing object to
+ * XML.
  * 
- * This item writer also provides restart, statistics and transaction features
- * by implementing corresponding interfaces.
+ * This item writer also provides restart, statistics and transaction features by implementing corresponding interfaces.
  * 
- * Output is buffered until {@link #flush()} is called - only then the actual
- * writing to file takes place.
+ * Output is buffered until {@link #flush()} is called - only then the actual writing to file takes place.
  * 
  * @author Peter Zozom
  * @author Robert Kasanicky
  * 
  */
 public class StaxEventItemWriter extends ExecutionContextUserSupport implements ItemWriter, ItemStream,
-		InitializingBean {
+        InitializingBean {
 
 	// default encoding
 	private static final String DEFAULT_ENCODING = "UTF-8";
@@ -112,7 +111,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	private List buffer = new ArrayList();
 
 	public StaxEventItemWriter() {
-		setName(StaxEventItemWriter.class.getSimpleName());
+		setName(ClassUtils.getShortName(StaxEventItemWriter.class));
 	}
 
 	/**
@@ -179,8 +178,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	}
 
 	/**
-	 * Set the tag name of the root element. If not set, default name is used
-	 * ("root").
+	 * Set the tag name of the root element. If not set, default name is used ("root").
 	 * 
 	 * @param rootTagName the tag name to be used for the root element
 	 */
@@ -207,8 +205,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	}
 
 	/**
-	 * Set "overwrite" flag for the output file. Flag is ignored when output
-	 * file processing is restarted.
+	 * Set "overwrite" flag for the output file. Flag is ignored when output file processing is restarted.
 	 * 
 	 * @param shouldDeleteIfExists
 	 */
@@ -257,8 +254,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 			os = new FileOutputStream(file, true);
 			channel = os.getChannel();
 			setPosition(position);
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", ioe);
 		}
 
@@ -270,8 +266,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 			if (!restarted) {
 				startDocument(delegateEventWriter);
 			}
-		}
-		catch (XMLStreamException xse) {
+		} catch (XMLStreamException xse) {
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", xse);
 		}
 
@@ -283,8 +278,8 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * <li>xml declaration - defines encoding and XML version</li>
 	 * <li>opening tag of the root element and its attributes</li>
 	 * </ul>
-	 * If this is not sufficient for you, simply override this method. Encoding,
-	 * version and root tag name can be retrieved with corresponding getters.
+	 * If this is not sufficient for you, simply override this method. Encoding, version and root tag name can be
+	 * retrieved with corresponding getters.
 	 * 
 	 * @param writer XML event writer
 	 * @throws XMLStreamException
@@ -312,8 +307,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	}
 
 	/**
-	 * Finishes the XML document. It closes any start tag and writes
-	 * corresponding end tags.
+	 * Finishes the XML document. It closes any start tag and writes corresponding end tags.
 	 * 
 	 * @param writer XML event writer
 	 * @throws XMLStreamException
@@ -326,8 +320,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 		ByteBuffer bbuf = ByteBuffer.wrap(("</" + getRootTagName() + ">").getBytes());
 		try {
 			channel.write(bbuf);
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", ioe);
 		}
 	}
@@ -343,11 +336,9 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 			endDocument(delegateEventWriter);
 			eventWriter.close();
 			channel.close();
-		}
-		catch (XMLStreamException xse) {
+		} catch (XMLStreamException xse) {
 			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", xse);
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", ioe);
 		}
 	}
@@ -359,13 +350,14 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * @see #flush()
 	 */
 	public void write(Object item) {
-		
+
 		currentRecordCount++;
 		buffer.add(item);
 	}
 
 	/**
 	 * Get the restart data.
+	 * 
 	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
 	public void update(ExecutionContext executionContext) {
@@ -378,8 +370,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	}
 
 	/*
-	 * Get the actual position in file channel. This method flushes any buffered
-	 * data before position is read.
+	 * Get the actual position in file channel. This method flushes any buffered data before position is read.
 	 * 
 	 * @return byte offset in file channel
 	 */
@@ -390,8 +381,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 		try {
 			eventWriter.flush();
 			position = channel.position();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);
 		}
 
@@ -407,11 +397,10 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 
 		try {
 			Assert.state(channel.size() >= lastCommitPointPosition,
-					"Current file size is smaller than size at last commit");
+			        "Current file size is smaller than size at last commit");
 			channel.truncate(newPosition);
 			channel.position(newPosition);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);
 		}
 

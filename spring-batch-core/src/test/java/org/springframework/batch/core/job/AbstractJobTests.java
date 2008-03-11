@@ -17,10 +17,9 @@ package org.springframework.batch.core.job;
 
 import java.util.Collections;
 
-import org.springframework.batch.core.step.StepSupport;
-
-
 import junit.framework.TestCase;
+
+import org.springframework.batch.core.step.StepSupport;
 
 /**
  * @author Dave Syer
@@ -31,8 +30,7 @@ public class AbstractJobTests extends TestCase {
 	JobSupport job = new JobSupport("job");
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.job.AbstractJob#JobConfiguration()}.
+	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#JobConfiguration()}.
 	 */
 	public void testJobConfiguration() {
 		job = new JobSupport();
@@ -40,8 +38,7 @@ public class AbstractJobTests extends TestCase {
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.job.AbstractJob#setBeanName(java.lang.String)}.
+	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#setBeanName(java.lang.String)}.
 	 */
 	public void testSetBeanName() {
 		job.setBeanName("foo");
@@ -49,8 +46,7 @@ public class AbstractJobTests extends TestCase {
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.job.AbstractJob#setBeanName(java.lang.String)}.
+	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#setBeanName(java.lang.String)}.
 	 */
 	public void testSetBeanNameWithNullName() {
 		job = new JobSupport(null);
@@ -60,8 +56,7 @@ public class AbstractJobTests extends TestCase {
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.job.AbstractJob#setStepNames(java.util.List)}.
+	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#setStepNames(java.util.List)}.
 	 */
 	public void testSetSteps() {
 		job.setSteps(Collections.singletonList(new StepSupport("step")));
@@ -78,8 +73,7 @@ public class AbstractJobTests extends TestCase {
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.job.AbstractJob#setStartLimit(int)}.
+	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#setStartLimit(int)}.
 	 */
 	public void testSetStartLimit() {
 		assertEquals(Integer.MAX_VALUE, job.getStartLimit());
@@ -88,28 +82,30 @@ public class AbstractJobTests extends TestCase {
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.job.AbstractJob#setRestartable(boolean)}.
+	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#setRestartable(boolean)}.
 	 */
 	public void testSetRestartable() {
 		assertFalse(job.isRestartable());
 		job.setRestartable(true);
 		assertTrue(job.isRestartable());
 	}
-	
+
 	public void testToString() throws Exception {
 		String value = job.toString();
-		assertTrue("Should contain name: "+value, value.indexOf("name=")>=0);
+		assertTrue("Should contain name: " + value, value.indexOf("name=") >= 0);
 	}
-	
+
 	public void testRunNotSupported() throws Exception {
 		try {
 			job.execute(null);
 		} catch (UnsupportedOperationException e) {
 			// expected
 			String message = e.getMessage();
-			assertTrue("Message should contain JobSupport: "+message, message.contains("JobSupport"));
+			assertTrue("Message should contain JobSupport: " + message, contains(message, "JobSupport"));
 		}
 	}
 
+	private boolean contains(String str, String searchStr) {
+		return str.indexOf(searchStr) != -1;
+	}
 }

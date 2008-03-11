@@ -27,7 +27,7 @@ public class TaskletStepTests extends TestCase {
 
 	protected void setUp() throws Exception {
 		stepExecution = new StepExecution(new StepSupport("stepName"), new JobExecution(new JobInstance(new Long(0L),
-				new JobParameters(), new JobSupport("testJob")), new Long(12)));
+		        new JobParameters(), new JobSupport("testJob")), new Long(12)));
 	}
 
 	public void testTaskletMandatory() throws Exception {
@@ -35,10 +35,9 @@ public class TaskletStepTests extends TestCase {
 		step.setJobRepository(new JobRepositorySupport());
 		try {
 			step.afterPropertiesSet();
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message should contain 'tasklet': " + message, message.toLowerCase().contains("tasklet"));
+			assertTrue("Message should contain 'tasklet': " + message, contains(message.toLowerCase(), "tasklet"));
 		}
 	}
 
@@ -46,10 +45,9 @@ public class TaskletStepTests extends TestCase {
 		TaskletStep step = new TaskletStep();
 		try {
 			step.afterPropertiesSet();
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message should contain 'tasklet': " + message, message.toLowerCase().contains("tasklet"));
+			assertTrue("Message should contain 'tasklet': " + message, contains(message.toLowerCase(), "tasklet"));
 		}
 	}
 
@@ -90,8 +88,7 @@ public class TaskletStepTests extends TestCase {
 		try {
 			step.execute(stepExecution);
 			fail("Expected BatchCriticalException");
-		}
-		catch (UnexpectedJobExecutionException e) {
+		} catch (UnexpectedJobExecutionException e) {
 			assertEquals("foo", e.getCause().getMessage());
 		}
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
@@ -126,31 +123,27 @@ public class TaskletStepTests extends TestCase {
 		try {
 			step.execute(stepExecution);
 			fail();
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertNotNull(stepExecution.getStartTime());
 			assertEquals(ExitStatus.FAILED, stepExecution.getExitStatus());
 			assertNotNull(stepExecution.getEndTime());
 		}
 	}
-	
+
 	/**
 	 * When job is interrupted the {@link JobInterruptedException} should be propagated up.
 	 */
 	public void testJobInterrupted() throws Exception {
-		TaskletStep step = new TaskletStep(
-				new Tasklet(){
-					public ExitStatus execute() throws Exception {
-						throw new JobInterruptedException("Interrupted while executing tasklet");
-					}
-				}, 
-				new JobRepositorySupport());
-		
+		TaskletStep step = new TaskletStep(new Tasklet() {
+			public ExitStatus execute() throws Exception {
+				throw new JobInterruptedException("Interrupted while executing tasklet");
+			}
+		}, new JobRepositorySupport());
+
 		try {
 			step.execute(stepExecution);
 			fail();
-		}
-		catch (JobInterruptedException expected) {
+		} catch (JobInterruptedException expected) {
 			assertEquals("Interrupted while executing tasklet", expected.getMessage());
 		}
 	}
@@ -197,4 +190,7 @@ public class TaskletStepTests extends TestCase {
 
 	}
 
+	private boolean contains(String str, String searchStr) {
+		return str.indexOf(searchStr) != -1;
+	}
 }

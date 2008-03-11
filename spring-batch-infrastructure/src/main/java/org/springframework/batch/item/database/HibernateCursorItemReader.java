@@ -29,27 +29,27 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.Skippable;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
  * {@link ItemReader} for reading database records built on top of Hibernate.
  * 
- * It executes the HQL {@link #queryString} when initialized and iterates over
- * the result set as {@link #read()} method is called, returning an object
- * corresponding to current row.
+ * It executes the HQL {@link #queryString} when initialized and iterates over the result set as {@link #read()} method
+ * is called, returning an object corresponding to current row.
  * 
- * Input source can be configured to use either {@link StatelessSession}
- * sufficient for simple mappings without the need to cascade to associated
- * objects or standard hibernate {@link Session} for more advanced mappings or
- * when caching is desired.
+ * Input source can be configured to use either {@link StatelessSession} sufficient for simple mappings without the need
+ * to cascade to associated objects or standard hibernate {@link Session} for more advanced mappings or when caching is
+ * desired.
  * 
- * When stateful session is used it will be cleared after successful commit
- * without being flushed (no inserts or updates are expected).
+ * When stateful session is used it will be cleared after successful commit without being flushed (no inserts or updates
+ * are expected).
  * 
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader  extends ExecutionContextUserSupport implements ItemReader, ItemStream, Skippable, InitializingBean {
+public class HibernateCursorItemReader extends ExecutionContextUserSupport implements ItemReader, ItemStream,
+        Skippable, InitializingBean {
 
 	private static final String RESTART_DATA_ROW_NUMBER_KEY = "row.number";
 
@@ -77,12 +77,11 @@ public class HibernateCursorItemReader  extends ExecutionContextUserSupport impl
 	private int currentProcessedRow = 0;
 
 	private boolean initialized = false;
-	
+
 	private boolean saveState = false;
-	
-	
+
 	public HibernateCursorItemReader() {
-		setName(HibernateCursorItemReader.class.getSimpleName());
+		setName(ClassUtils.getShortName(HibernateCursorItemReader.class));
 	}
 
 	public Object read() {
@@ -117,8 +116,7 @@ public class HibernateCursorItemReader  extends ExecutionContextUserSupport impl
 		skipCount = 0;
 		if (useStatelessSession) {
 			statelessSession.close();
-		}
-		else {
+		} else {
 			statefulSession.close();
 		}
 	}
@@ -132,20 +130,20 @@ public class HibernateCursorItemReader  extends ExecutionContextUserSupport impl
 		if (useStatelessSession) {
 			statelessSession = sessionFactory.openStatelessSession();
 			cursor = statelessSession.createQuery(queryString).scroll();
-		}
-		else {
+		} else {
 			statefulSession = sessionFactory.openSession();
 			cursor = statefulSession.createQuery(queryString).scroll();
 		}
 		initialized = true;
-		
+
 		if (executionContext.containsKey(getKey(RESTART_DATA_ROW_NUMBER_KEY))) {
 			currentProcessedRow = Integer.parseInt(executionContext.getString(getKey(RESTART_DATA_ROW_NUMBER_KEY)));
 			cursor.setRowNumber(currentProcessedRow - 1);
 		}
-		
+
 		if (executionContext.containsKey(getKey(SKIPPED_ROWS))) {
-			String[] skipped = StringUtils.commaDelimitedListToStringArray(executionContext.getString(getKey(SKIPPED_ROWS)));
+			String[] skipped = StringUtils.commaDelimitedListToStringArray(executionContext
+			        .getString(getKey(SKIPPED_ROWS)));
 			for (int i = 0; i < skipped.length; i++) {
 				this.skippedRows.add(new Integer(skipped[i]));
 			}
@@ -174,9 +172,8 @@ public class HibernateCursorItemReader  extends ExecutionContextUserSupport impl
 	/**
 	 * Can be set only in uninitialized state.
 	 * 
-	 * @param useStatelessSession <code>true</code> to use
-	 * {@link StatelessSession} <code>false</code> to use standard hibernate
-	 * {@link Session}
+	 * @param useStatelessSession <code>true</code> to use {@link StatelessSession} <code>false</code> to use
+	 *            standard hibernate {@link Session}
 	 */
 	public void setUseStatelessSession(boolean useStatelessSession) {
 		Assert.state(!initialized);
@@ -186,7 +183,7 @@ public class HibernateCursorItemReader  extends ExecutionContextUserSupport impl
 	/**
 	 */
 	public void update(ExecutionContext executionContext) {
-		if(saveState){
+		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.putString(getKey(RESTART_DATA_ROW_NUMBER_KEY), "" + currentProcessedRow);
 			String skipped = skippedRows.toString();
@@ -195,10 +192,8 @@ public class HibernateCursorItemReader  extends ExecutionContextUserSupport impl
 	}
 
 	/**
-	 * Skip the current row. If the transaction is rolled back, this row will
-	 * not be represented when read() is called. For example, if you read in row
-	 * 2, find the data to be bad, and call skip(), then continue processing and
-	 * find
+	 * Skip the current row. If the transaction is rolled back, this row will not be represented when read() is called.
+	 * For example, if you read in row 2, find the data to be bad, and call skip(), then continue processing and find
 	 */
 	public void skip() {
 		skippedRows.add(new Integer(currentProcessedRow));
@@ -206,10 +201,8 @@ public class HibernateCursorItemReader  extends ExecutionContextUserSupport impl
 	}
 
 	/**
-	 * Mark is supported as long as this {@link ItemStream} is used in a
-	 * single-threaded environment. The state backing the mark is a single
-	 * counter, keeping track of the current position, so multiple threads
-	 * cannot be accommodated.
+	 * Mark is supported as long as this {@link ItemStream} is used in a single-threaded environment. The state backing
+	 * the mark is a single counter, keeping track of the current position, so multiple threads cannot be accommodated.
 	 * 
 	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
@@ -222,20 +215,20 @@ public class HibernateCursorItemReader  extends ExecutionContextUserSupport impl
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() {
 		currentProcessedRow = lastCommitRowNumber;
 		if (lastCommitRowNumber == 0) {
 			cursor.beforeFirst();
-		}
-		else {
+		} else {
 			// Set the cursor so that next time it is advanced it will
 			// come back to the committed row.
 			cursor.setRowNumber(lastCommitRowNumber - 1);
 		}
 	}
-	
+
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}

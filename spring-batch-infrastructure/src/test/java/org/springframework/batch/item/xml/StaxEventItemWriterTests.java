@@ -18,6 +18,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.xml.transform.StaxResult;
 
 /**
@@ -30,7 +31,7 @@ public class StaxEventItemWriterTests extends TestCase {
 
 	// output file
 	private Resource resource;
-	
+
 	private ExecutionContext executionContext;
 
 	// test item for writing to output
@@ -40,7 +41,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		}
 	};
 
-	private static final String TEST_STRING = StaxEventItemWriter.class.getSimpleName() + "-testString";
+	private static final String TEST_STRING = ClassUtils.getShortName(StaxEventItemWriter.class) + "-testString";
 
 	private static final int NOT_FOUND = -1;
 
@@ -62,20 +63,20 @@ public class StaxEventItemWriterTests extends TestCase {
 		// see asserts in the marshaller
 		writer.write(item);
 		assertFalse(marshaller.wasCalled);
-		
+
 		writer.flush();
 		assertTrue(marshaller.wasCalled);
 
 	}
-	
+
 	public void testClear() throws Exception {
 		writer.open(executionContext);
 		writer.write(item);
 		writer.write(item);
 		writer.clear();
-		//writer.write(item);
+		// writer.write(item);
 		writer.flush();
-		assertFalse(outputFileContent().contains(TEST_STRING));
+		assertFalse(contains(outputFileContent(), TEST_STRING));
 	}
 
 	/**
@@ -97,7 +98,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.write(item);
 		assertEquals("", outputFileContent());
 		writer.flush();
-		assertTrue(outputFileContent().contains(TEST_STRING));
+		assertTrue(contains(outputFileContent(), TEST_STRING));
 	}
 
 	/**
@@ -116,7 +117,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.open(executionContext);
 		writer.write(item);
 		writer.close(executionContext);
-		
+
 		// check the output is concatenation of 'before restart' and 'after
 		// restart' writes.
 		String outputFile = outputFileContent();
@@ -139,7 +140,8 @@ public class StaxEventItemWriterTests extends TestCase {
 		for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
 			writer.write(item);
 			writer.update(executionContext);
-			long writeStatistics = executionContext.getLong(StaxEventItemWriter.class.getSimpleName() + ".record.count");
+			long writeStatistics = executionContext.getLong(ClassUtils.getShortName(StaxEventItemWriter.class)
+			        + ".record.count");
 
 			assertEquals(i, writeStatistics);
 		}
@@ -168,9 +170,9 @@ public class StaxEventItemWriterTests extends TestCase {
 	 * Checks the received parameters.
 	 */
 	private class InputCheckMarshaller implements Marshaller {
-		
+
 		boolean wasCalled = false;
-		
+
 		public void marshal(Object graph, Result result) {
 			wasCalled = true;
 			assertTrue(result instanceof StaxResult);
@@ -192,8 +194,7 @@ public class StaxEventItemWriterTests extends TestCase {
 			StaxResult staxResult = (StaxResult) result;
 			try {
 				staxResult.getXMLEventWriter().add(XMLEventFactory.newInstance().createComment(graph.toString()));
-			}
-			catch (XMLStreamException e) {
+			} catch (XMLStreamException e) {
 				throw new RuntimeException("Exception while writing to output file", e);
 			}
 		}
@@ -228,7 +229,11 @@ public class StaxEventItemWriterTests extends TestCase {
 		source.setSaveState(true);
 
 		source.afterPropertiesSet();
-		
+
 		return source;
+	}
+
+	private boolean contains(String str, String searchStr) {
+		return str.indexOf(searchStr) != -1;
 	}
 }

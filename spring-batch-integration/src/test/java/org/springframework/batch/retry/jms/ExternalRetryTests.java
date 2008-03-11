@@ -94,8 +94,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 	private List recovered = new ArrayList();
 
 	/**
-	 * Message processing is successful on the second attempt but must receive
-	 * the message again.
+	 * Message processing is successful on the second attempt but must receive the message again.
 	 * 
 	 * @throws Exception
 	 */
@@ -108,7 +107,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(final Object text) {
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-						Integer.valueOf(list.size()), text });
+				        new Integer(list.size()), text });
 				if (list.size() == 1) {
 					throw new RuntimeException("Rollback!");
 				}
@@ -121,15 +120,13 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 				public Object doInTransaction(TransactionStatus status) {
 					try {
 						return retryTemplate.execute(callback);
-					}
-					catch (Exception e) {
+					} catch (Exception e) {
 						throw new RuntimeException(e.getMessage(), e);
 					}
 				}
 			});
 			fail("Expected Exception");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 
 			assertEquals("Rollback!", e.getMessage());
 
@@ -142,8 +139,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					return retryTemplate.execute(callback);
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					throw new RuntimeException(e.getMessage(), e);
 				}
 			}
@@ -173,7 +169,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
 			public void write(final Object text) {
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-						Integer.valueOf(list.size()), text });
+				        new Integer(list.size()), text });
 				throw new RuntimeException("Rollback!");
 			}
 		});
@@ -186,14 +182,12 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 					public Object doInTransaction(TransactionStatus status) {
 						try {
 							return retryTemplate.execute(callback);
-						}
-						catch (Exception e) {
+						} catch (Exception e) {
 							throw new RuntimeException(e.getMessage(), e);
 						}
 					}
 				});
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 
 				if (i < 3)
 					assertEquals("Rollback!", e.getMessage());
@@ -231,9 +225,9 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		}
 		return msgs;
 	}
-	
+
 	private abstract class ItemReaderRecoverer extends AbstractItemReader implements ItemRecoverer {
 
-	}	
+	}
 
 }

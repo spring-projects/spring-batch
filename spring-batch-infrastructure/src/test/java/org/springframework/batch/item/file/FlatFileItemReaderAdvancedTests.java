@@ -27,6 +27,7 @@ import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.ClassUtils;
 
 /**
  * Tests for {@link FlatFileItemReader} - skip and restart functionality.
@@ -40,7 +41,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 	// common value used for writing to a file
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
-	
+
 	private ExecutionContext executionContext;
 
 	// simple stub instead of a realistic tokenizer
@@ -57,8 +58,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 	};
 
 	/**
-	 * Create inputFile, inject mock/stub dependencies for tested object,
-	 * initialize the tested object
+	 * Create inputFile, inject mock/stub dependencies for tested object, initialize the tested object
 	 */
 	protected void setUp() throws Exception {
 
@@ -83,6 +83,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 	/**
 	 * Test skip and skipRollback functionality
+	 * 
 	 * @throws IOException
 	 */
 	public void testSkip() throws Exception {
@@ -118,6 +119,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 	/**
 	 * Test skip and skipRollback functionality
+	 * 
 	 * @throws IOException
 	 */
 	public void testSkipFirstChunk() throws Exception {
@@ -160,8 +162,8 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 		// get restart data
 		reader.update(executionContext);
-		assertEquals(4, executionContext.getLong(
-				FlatFileItemReader.class.getSimpleName() + ".lines.read.count"));
+		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
+		        + ".lines.read.count"));
 		// close input
 		reader.close(executionContext);
 
@@ -175,7 +177,8 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		assertEquals("[testLine6]", reader.read().toString());
 
 		reader.update(executionContext);
-		assertEquals(6, executionContext.getLong(FlatFileItemReader.class.getSimpleName() + ".lines.read.count"));
+		assertEquals(6, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
+		        + ".lines.read.count"));
 	}
 
 }

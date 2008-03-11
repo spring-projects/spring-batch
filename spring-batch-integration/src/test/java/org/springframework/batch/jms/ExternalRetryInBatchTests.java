@@ -121,7 +121,7 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 				// back. When it comes back for recovery this code is not
 				// executed...
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-						Integer.valueOf(list.size()), text });
+				        new Integer(list.size()), text });
 				throw new RuntimeException("Rollback!");
 			}
 		});
@@ -145,24 +145,20 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 							});
 							return null;
 
-						}
-						catch (Exception e) {
+						} catch (Exception e) {
 							throw new RuntimeException(e.getMessage(), e);
 						}
 					}
 				});
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 
 				if (i == 0 || i == 2) {
 					assertEquals("Rollback!", e.getMessage());
-				}
-				else {
+				} else {
 					throw e;
 				}
 
-			}
-			finally {
+			} finally {
 				System.err.println(i + ": " + recovered);
 			}
 		}

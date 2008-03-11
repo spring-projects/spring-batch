@@ -44,6 +44,7 @@ import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -143,7 +144,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	private boolean saveState = false;
 
 	public JdbcCursorItemReader() {
-		setName(JdbcCursorItemReader.class.getSimpleName());
+		setName(ClassUtils.getShortName(JdbcCursorItemReader.class));
 	}
 
 	/**

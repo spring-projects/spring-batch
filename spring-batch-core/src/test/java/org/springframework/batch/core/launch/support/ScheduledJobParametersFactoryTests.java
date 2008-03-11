@@ -62,7 +62,7 @@ public class ScheduledJobParametersFactoryTests extends TestCase {
 	public void testGetProperties() throws Exception {
 
 		JobParameters parameters = new JobParametersBuilder().addDate("schedule.date", dateFormat.parse("01/23/2008"))
-				.addString("job.key", "myKey").addString("vendor.id", "33243243").toJobParameters();
+		        .addString("job.key", "myKey").addString("vendor.id", "33243243").toJobParameters();
 
 		Properties props = factory.getProperties(parameters);
 		assertNotNull(props);
@@ -76,12 +76,12 @@ public class ScheduledJobParametersFactoryTests extends TestCase {
 		JobParameters props = factory.getJobParameters(new Properties());
 		assertTrue(props.getParameters().isEmpty());
 	}
-	
-	public void testNullArgs(){
+
+	public void testNullArgs() {
 		assertEquals(new JobParameters(), factory.getJobParameters(null));
 		assertEquals(new Properties(), factory.getProperties(null));
 	}
-	
+
 	public void testGetParametersWithDateFormat() throws Exception {
 
 		String[] args = new String[] { "schedule.date=2008/23/01" };
@@ -101,8 +101,11 @@ public class ScheduledJobParametersFactoryTests extends TestCase {
 			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		} catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message should contain wrong date: "+message, message.contains("20080123"));
+			assertTrue("Message should contain wrong date: " + message, contains(message, "20080123"));
 		}
 	}
-	
+
+	private boolean contains(String str, String searchStr) {
+		return str.indexOf(searchStr) != -1;
+	}
 }

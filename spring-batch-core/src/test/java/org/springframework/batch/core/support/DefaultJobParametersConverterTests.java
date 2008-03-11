@@ -73,8 +73,8 @@ public class DefaultJobParametersConverterTests extends TestCase {
 			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		} catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message should contain wrong date: "+message, message.contains("20080123"));
-			assertTrue("Message should contain format: "+message, message.contains("yyyy/MM/dd"));
+			assertTrue("Message should contain wrong date: " + message, contains(message, "20080123"));
+			assertTrue("Message should contain format: " + message, contains(message, "yyyy/MM/dd"));
 		}
 	}
 
@@ -96,8 +96,8 @@ public class DefaultJobParametersConverterTests extends TestCase {
 			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		} catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message should contain wrong number: "+message, message.contains("foo"));
-			assertTrue("Message should contain format: "+message, message.contains("#"));
+			assertTrue("Message should contain wrong number: " + message, contains(message, "foo"));
+			assertTrue("Message should contain format: " + message, contains(message, "#"));
 		}
 	}
 
@@ -110,15 +110,15 @@ public class DefaultJobParametersConverterTests extends TestCase {
 			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		} catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message should contain wrong number: "+message, message.contains("1.03"));
-			assertTrue("Message should contain 'decimal': "+message, message.contains("decimal"));
+			assertTrue("Message should contain wrong number: " + message, contains(message, "1.03"));
+			assertTrue("Message should contain 'decimal': " + message, contains(message, "decimal"));
 		}
 	}
 
 	public void testGetProperties() throws Exception {
 
 		JobParameters parameters = new JobParametersBuilder().addDate("schedule.date", dateFormat.parse("01/23/2008"))
-				.addString("job.key", "myKey").addLong("vendor.id", new Long(33243243)).toJobParameters();
+		        .addString("job.key", "myKey").addLong("vendor.id", new Long(33243243)).toJobParameters();
 
 		Properties props = factory.getProperties(parameters);
 		assertNotNull(props);
@@ -132,9 +132,13 @@ public class DefaultJobParametersConverterTests extends TestCase {
 		JobParameters props = factory.getJobParameters(new Properties());
 		assertTrue(props.getParameters().isEmpty());
 	}
-	
-	public void testNullArgs(){
+
+	public void testNullArgs() {
 		assertEquals(new JobParameters(), factory.getJobParameters(null));
 		assertEquals(new Properties(), factory.getProperties(null));
+	}
+
+	private boolean contains(String str, String searchStr) {
+		return str.indexOf(searchStr) != -1;
 	}
 }

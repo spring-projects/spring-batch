@@ -98,8 +98,7 @@ public class SimpleJobLauncherTests extends TestCase {
 		try {
 			testRun();
 			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals("foo", e.getMessage());
 		}
 	}
@@ -114,8 +113,7 @@ public class SimpleJobLauncherTests extends TestCase {
 		try {
 			testRun();
 			fail("Expected Error");
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals("foo", e.getCause().getMessage());
 		}
 	}
@@ -124,11 +122,10 @@ public class SimpleJobLauncherTests extends TestCase {
 		try {
 			new SimpleJobLauncher().afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalStateException e) {
+		} catch (IllegalStateException e) {
 			// expected
-			assertTrue("Message did not contain repository: " + e.getMessage(), e.getMessage().toLowerCase().contains(
-					"repository"));
+			assertTrue("Message did not contain repository: " + e.getMessage(), contains(e.getMessage().toLowerCase(),
+			        "repository"));
 		}
 	}
 
@@ -136,5 +133,9 @@ public class SimpleJobLauncherTests extends TestCase {
 		jobLauncher = new SimpleJobLauncher();
 		jobLauncher.setJobRepository(jobRepository);
 		jobLauncher.afterPropertiesSet(); // no error
+	}
+
+	private boolean contains(String str, String searchStr) {
+		return str.indexOf(searchStr) != -1;
 	}
 }

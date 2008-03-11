@@ -36,7 +36,7 @@ import org.springframework.core.io.Resource;
 
 /**
  * Tests for {@link FlatFileItemReader} - the fundamental item reading functionality.
- *
+ * 
  * @see FlatFileItemReaderAdvancedTests
  * @author Dave Syer
  */
@@ -48,7 +48,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	// common value used for writing to a file
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
 	private String TEST_OUTPUT = "[FlatFileInputTemplate-TestData]";
-	
+
 	private ExecutionContext executionContext;
 
 	// simple stub instead of a realistic tokenizer
@@ -58,15 +58,14 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		}
 	};
 
-	private FieldSetMapper fieldSetMapper = new FieldSetMapper(){
+	private FieldSetMapper fieldSetMapper = new FieldSetMapper() {
 		public Object mapLine(FieldSet fs) {
 			return fs;
 		}
 	};
 
 	/**
-	 * Create inputFile, inject mock/stub dependencies for tested object,
-	 * initialize the tested object
+	 * Create inputFile, inject mock/stub dependencies for tested object, initialize the tested object
 	 */
 	protected void setUp() throws Exception {
 
@@ -74,7 +73,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader.setLineTokenizer(tokenizer);
 		itemReader.setFieldSetMapper(fieldSetMapper);
 		itemReader.afterPropertiesSet();
-		
+
 		executionContext = new ExecutionContext();
 	}
 
@@ -126,7 +125,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	}
 
 	public void testReadWithMapperError() throws Exception {
-		itemReader.setFieldSetMapper(new FieldSetMapper(){
+		itemReader.setFieldSetMapper(new FieldSetMapper() {
 			public Object mapLine(FieldSet fs) {
 				throw new RuntimeException("foo");
 			}
@@ -150,7 +149,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 			itemReader.read();
 			fail("Expected ReaderNotOpenException");
 		} catch (ReaderNotOpenException e) {
-			assertTrue(e.getMessage().contains("open"));
+			assertTrue(contains(e.getMessage(), "open"));
 		}
 	}
 
@@ -169,8 +168,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		try {
 			itemReader.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
@@ -196,8 +194,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		try {
 			itemReader.open(executionContext);
 			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
@@ -209,8 +206,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		try {
 			itemReader.open(executionContext);
 			fail("Expected BatchEnvironmentException");
-		}
-		catch (ItemStreamException e) {
+		} catch (ItemStreamException e) {
 			// expected
 			assertEquals("foo", e.getCause().getMessage());
 		}
@@ -227,8 +223,8 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	}
 
 	public void testComments() throws Exception {
-		itemReader.setResource(getInputResource("% Comment\n"+TEST_STRING));
-		itemReader.setComments(new String[] {"%"});
+		itemReader.setResource(getInputResource("% Comment\n" + TEST_STRING));
+		itemReader.setComments(new String[] { "%" });
 		testRead();
 	}
 
@@ -237,7 +233,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	 */
 	public void testColumnNamesInHeader() throws Exception {
 		final String INPUT = "name1|name2\nvalue1|value2\nvalue3|value4";
-		
+
 		itemReader = new FlatFileItemReader();
 		itemReader.setResource(getInputResource(INPUT));
 		itemReader.setLineTokenizer(new DelimitedLineTokenizer('|'));
@@ -245,11 +241,11 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader.setFirstLineIsHeader(true);
 		itemReader.afterPropertiesSet();
 		itemReader.open(executionContext);
-		
+
 		FieldSet fs = (FieldSet) itemReader.read();
 		assertEquals("value1", fs.readString("name1"));
 		assertEquals("value2", fs.readString("name2"));
-		
+
 		fs = (FieldSet) itemReader.read();
 		assertEquals("value3", fs.readString("name1"));
 		assertEquals("value4", fs.readString("name2"));
@@ -260,7 +256,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	 */
 	public void testLinesToSkip() throws Exception {
 		final String INPUT = "foo bar spam\none two\nthree four";
-		
+
 		itemReader = new FlatFileItemReader();
 		itemReader.setResource(getInputResource(INPUT));
 		itemReader.setLineTokenizer(new DelimitedLineTokenizer(' '));
@@ -268,62 +264,66 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		itemReader.setLinesToSkip(1);
 		itemReader.afterPropertiesSet();
 		itemReader.open(executionContext);
-		
+
 		FieldSet fs = (FieldSet) itemReader.read();
 		assertEquals("one", fs.readString(0));
 		assertEquals("two", fs.readString(1));
-		
+
 		fs = (FieldSet) itemReader.read();
 		assertEquals("three", fs.readString(0));
 		assertEquals("four", fs.readString(1));
 	}
-	
-	public void testNonExistantResource() throws Exception{
-		
+
+	public void testNonExistantResource() throws Exception {
+
 		Resource resource = new NonExistentResource();
-		
+
 		FlatFileItemReader testReader = new FlatFileItemReader();
 		testReader.setResource(resource);
 		testReader.setLineTokenizer(tokenizer);
 		testReader.setFieldSetMapper(fieldSetMapper);
 		testReader.setResource(resource);
-		
-		//afterPropertiesSet should only throw an exception if the Resource is null
+
+		// afterPropertiesSet should only throw an exception if the Resource is null
 		testReader.afterPropertiesSet();
-		
-		try{
+
+		try {
 			testReader.open(executionContext);
 			fail();
-		}catch(IllegalStateException ex){
-			//expected
+		} catch (IllegalStateException ex) {
+			// expected
 		}
-		
+
 	}
-	
-	public void testRuntimeFileCreation() throws Exception{
-		
+
+	public void testRuntimeFileCreation() throws Exception {
+
 		Resource resource = new NonExistentResource();
-		
+
 		FlatFileItemReader testReader = new FlatFileItemReader();
 		testReader.setResource(resource);
 		testReader.setLineTokenizer(tokenizer);
 		testReader.setFieldSetMapper(fieldSetMapper);
 		testReader.setResource(resource);
-		
-		//afterPropertiesSet should only throw an exception if the Resource is null
+
+		// afterPropertiesSet should only throw an exception if the Resource is null
 		testReader.afterPropertiesSet();
-		
-		//replace the resource to simulate runtime resource creation
+
+		// replace the resource to simulate runtime resource creation
 		testReader.setResource(getInputResource(TEST_STRING));
 		testReader.open(executionContext);
 		assertEquals(TEST_OUTPUT, testReader.read().toString());
 	}
-		
-	private class NonExistentResource extends AbstractResource{
+
+	private boolean contains(String str, String searchStr) {
+		return str.indexOf(searchStr) != -1;
+	}
+
+	private class NonExistentResource extends AbstractResource {
 
 		public NonExistentResource() {
 		}
-		
+
 		public boolean exists() {
 			return false;
 		}
