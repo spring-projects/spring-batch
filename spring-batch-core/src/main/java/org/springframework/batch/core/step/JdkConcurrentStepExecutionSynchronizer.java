@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.batch.core.step;
+
+import java.util.concurrent.Semaphore;
 
 import org.springframework.batch.core.StepExecution;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
-
 /**
- * @author Dave Syer
- *
+ * An implementation of the {@link StepExecutionSynchronizer} that uses the Java 5 Concurrent Utilities.
+ * 
+ * @author Ben Hale
  */
-public class DefaultStepExecutionSynchronizer implements StepExecutionSynchronizer {
+class JdkConcurrentStepExecutionSynchronizer implements StepExecutionSynchronizer {
 
-	private Semaphore semaphore = new Semaphore(1);
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.execution.step.support.StepExecutionSynchronizer#lock(org.springframework.batch.core.domain.StepExecution)
-	 */
+	private final Semaphore semaphore = new Semaphore(1);
+
 	public void lock(StepExecution stepExecution) throws InterruptedException {
 		semaphore.acquire();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.execution.step.support.StepExecutionSynchronizer#release(org.springframework.batch.core.domain.StepExecution)
-	 */
 	public void release(StepExecution stepExecution) {
 		semaphore.release();
 	}
