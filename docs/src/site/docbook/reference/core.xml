@@ -655,9 +655,19 @@
             </row>
 
             <row>
-              <entry></entry>
+              <entry>commitCount</entry>
 
-              <entry></entry>
+              <entry>The number of times the transaction has been committed
+              for this execution</entry>
+            </row>
+
+            <row>
+              <entry>itemCount</entry>
+
+              <entry>The number of items that have been process for this
+              execution. It should be noted that this value will continue
+              increasing even if a rollback causes items to be
+              reprocessed.</entry>
             </row>
           </tbody>
         </tgroup>
@@ -669,89 +679,33 @@
 
       <para>A <classname>Tasklet</classname> represents the execution of a
       logical unit of work, as defined by its implementation of the Spring
-      Batch provided <classname>Tasklet</classname> interface. Tasklets are
-      used when defining step configurations to specify the work done by the
-      step. Subsequently, the logic in a tasklet is atomic in terms of
-      transactions. A transaction will never commit until an entire tasklet
-      execution is complete (unless an exception occurs - a transaction might
-      either commit or rollback if that behavior is specified in the step's
-      exception management strategy). There is a specific implementation of
-      the Step interface, TaskletStep, that works directly with a
-      Tasklet.</para>
+      Batch provided <classname>Tasklet</classname> interface. A
+      <classname>Tasklet</classname> is useful for encapsulating processing
+      logic that is not natural to split into read-(transform)-write phases,
+      such as invoking a system command or a stored procedure.</para>
     </section>
   </section>
 
   <section>
-    <title id="s.5">Item-Oriented Processing Stereotypes</title>
+    <title id="s.5.1.1">Item Reader</title>
 
-    <para>A powerful batch processing paradigm implemented by the Spring Batch
-    framework is the concept of item-oriented processing. That is, doing work
-    by defining each unit of work as the operation of retrieving an item from
-    input and then processing that item, including any side effects that
-    processing might entail, such as file or database operations.</para>
-
-    <section>
-      <title id="s.5.1">Reader and Writer Stereotypes</title>
-
-      <para>There are two basic stereotypes that represent the first-class
-      participants in item-oriented processing, item providers and item
-      processors. They are each represented by a simple interface provided by
-      the Spring Batch framework, which allows free reign over their
-      implementations and improves our ability to leverage the Spring
-      framework's dependency injection capabilities.</para>
-
-      <section>
-        <title id="s.5.1.1">Item Readers</title>
-
-        <para>An item reader is an object that is used to retrieve the inputs
-        for a step, one at a time. When the item reader has exhausted the
-        items it can provide, it will indicate this in a meaningful way
-        (generally by returning null). When coupled with an item processor,
-        this forms a complete item-oriented process, as each item taken from
-        the provider is then processed by the writer.</para>
-      </section>
-
-      <section>
-        <title id="s.5.1.2">Item Writers/Processors</title>
-
-        <para>An item writer is an object that is used to perform processing
-        for a step, one item at a time. Generally, an item writer has no
-        knowledge of the input it will receive next, only the item that that
-        was passed in its current invocation. As a result, item writers will
-        generally make no assumptions about the input they receive an treat
-        every item the same way and keep track of its own state between
-        invocations. When coupled with an item provider, this forms a complete
-        item-oriented process, as each item taken from the provider is then
-        processed by the processor.</para>
-      </section>
-    </section>
+    <para><classname>ItemReader</classname> is an abstraction that represents
+    the retrieval of input for a <classname>Step</classname>, one item at a
+    time. When the <classname>ItemReader</classname> has exhausted the items
+    it can provide, it will indicate this by returning null. More details
+    about the <classname>ItemReader</classname> interface and it's various
+    implementatiosn can be found in Chapter 3.</para>
   </section>
 
   <section>
-    <title id="s.5.2">Support Stereotypes</title>
+    <title id="s.5.1.2">Item Writer</title>
 
-    <para>While item readers and writers serve as the main entry points for
-    item-oriented processing, they might be supplemented by a number of
-    support classes that perform specific tasks within the reader / writer
-    lifecycle. These support stereotypes are useful for dividing the work of
-    item readers and writers into reusable pieces, as well as abstracting away
-    the details of processing, such as interaction with external systems.
-    Additionally, they give us another opportunity to leverage the powerful
-    configuration features of the Spring framework, as we can switch between
-    several beans implementing these support interfaces without changing the
-    driving item reader or writer.</para>
-
-    <section>
-      <title id="s.2.4.2">Item Transformers</title>
-
-      <para>An item transformer is a class that is capable of taking an object
-      and changing it somehow before processing occurs. For instance, an item
-      transformer my alter an object by changing its properties or by
-      replacing it with another object entirely, such as a wrapper or
-      derivative object. It can also be defined as an adaptor, allowing an
-      object of one type to be converted for use as an object of a second
-      type.</para>
-    </section>
+    <para><classname>ItemWriter</classname> is an abstraction that represents
+    the output of a <classname>Step</classname>, one item at a time.
+    Generally, an item writer has no knowledge of the input it will receive
+    next, only the item that that was passed in its current invocation. More
+    details about the <classname>ItemWriter</classname> interface and it's
+    various implementations can be found in Chatper 3.</para>
   </section>
 
   <section>
@@ -802,55 +756,58 @@
 
     <para><emphasis role="bold">4.1</emphasis> The first thing the Step is
     responsible for is the initialization of the data required to begin
-    processing. The Step will interact with other architecture components,
-    such as the Input Source, to setup the data required to be
-    processed.</para>
+    processing. The <classname>Step</classname> will interact with other
+    architecture components, such as the <classname>ItemReader</classname>, to
+    setup the data required to be processed.</para>
 
-    <para><emphasis role="bold">4.1.1</emphasis> The Input Source provides
-    services to access various data sources. It provides location transparency
-    to the Batch Tasklet and hides the physical location details of the
+    <para><emphasis role="bold">4.1.1</emphasis> The
+    <classname>ItemReader</classname> provides services to access various data
+    sources. It provides location transparency to the Batch
+    <classname>Step</classname> and hides the physical location details of the
     data.</para>
 
     <para><emphasis role="bold">4.2</emphasis> Once the data is initialized by
-    the Input Source, the Step will call into the Tasklet to begin processing.
-    The Tasklet contains the business logic to define the LUW and the Step
-    repeatedly calls the Tasklets LUW to finish the business function. The
-    Step does this by first invoking the execute method on the Tasklet in
-    order to acquire a single record/set of data for processing.</para>
+    the <classname>ItemReader</classname>, the <classname>Step</classname>
+    will begin processing.</para>
 
     <para><emphasis role="bold">4.2.1</emphasis> Before a record is returned
-    to the Tasklet, it may be validated by any number of validation Frameworks
-    that can be provided to an input source. A single record/set of data is
-    gathered by interacting with the Input Source.</para>
+    to the <classname>Step</classname>, it may be validated by any number of
+    validation Frameworks that can be provided to an
+    <classname>ItemReader</classname>. A single record/set of data is gathered
+    by interacting with the <classname>ItemReader</classname>.</para>
 
     <para><emphasis role="bold">4.3</emphasis> Once a record/set has been
-    obtained, the step calls the tasklet to begin processing.</para>
+    obtained, the <classname>step</classname> calls the
+    <classname>ItemWriter</classname> to begin processing.</para>
 
-    <para><emphasis role="bold">4.3.1</emphasis> The Tasklet executes its
-    internal business logic by calling other Business Logic components as
-    necessary. Based on the business service, it requests or persists objects
-    from the data access components.</para>
+    <para><emphasis role="bold">4.3.1</emphasis> Either an ItemReader or
+    ItemWriter can execute its internal business logic by calling other
+    Business Logic components as necessary. Based on the business service, it
+    requests or persists objects from the data access components.</para>
 
     <para><emphasis role="bold">4.3.3</emphasis> Data Access components can be
     leveraged retrieve or persist domain objects.</para>
 
     <para><emphasis role="bold">4.3.4</emphasis> Once the business logic has
     been executed, the resulting output record is written out by utilizing the
-    Output Source interface. The Step will repeatedly call steps 4.2 -&gt; 4.3
-    for every record provided by the Input Source.</para>
+    <classname>ItemWriter</classname> interface. The
+    <classname>Step</classname> will repeatedly call steps 4.2 -&gt; 4.3 for
+    every record provided by the Input Source.</para>
 
     <para><emphasis role="bold">4.4</emphasis> Once all of the records are
-    processed, the Step calls the Tasklet to perform any clean up activities
-    such as closing connections, exporting files, etc.</para>
+    processed, the <classname>Step</classname> closes all streams to perform
+    any clean up activities such as closing connections, exporting files,
+    etc.</para>
 
-    <para><emphasis role="bold">4.4.1</emphasis> The Step is responsible for
-    committing data associated with the remaining logical units of work as
-    well as performing any finalization and administrative functions (e.g.
-    closing database connections).</para>
+    <para><emphasis role="bold">4.4.1</emphasis> The
+    <classname>Step</classname> is responsible for committing data associated
+    with the remaining logical units of work as well as performing any
+    finalization and administrative functions (e.g. closing database
+    connections).</para>
 
-    <para>Once the Step has completed finalization the control is passed back
-    to the Job, where any necessary logging or clean up is executed for
-    application termination and wrap-up -- provided there are no additional
-    Steps to execute.</para>
+    <para>Once the <classname>Step</classname> has completed finalization the
+    control is passed back to the <classname>Job</classname>, where any
+    necessary logging or clean up is executed for application termination and
+    wrap-up, provided there are no additional Steps to execute.</para>
   </section>
 </chapter>
