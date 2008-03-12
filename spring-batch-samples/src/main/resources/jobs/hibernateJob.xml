@@ -15,7 +15,7 @@
 		<!-- set restartable=false so that this job can be used by more than one test -->
 		<property name="restartable" value="false" />
 		<property name="steps">
-			<bean id="step1" parent="simpleStep">
+			<bean id="step1" parent="skipLimitStep">
 				<property name="skipLimit" value="5" />
 				<property name="itemReader" ref="hibernateItemReader" />
 				<property name="itemWriter" ref="hibernateOutputSource" />

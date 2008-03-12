@@ -65,6 +65,11 @@
 		<property name="startLimit" value="100" />
 		<property name="commitInterval" value="1" />
 	</bean>
+	
+	<bean id="skipLimitStep" class="org.springframework.batch.core.step.SkipLimitStepFactoryBean"
+		parent="simpleStep" abstract="true">
+		<property name="skipLimit" value="0" />
+	</bean>
 
 	<bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 		<property name="customEditors">
