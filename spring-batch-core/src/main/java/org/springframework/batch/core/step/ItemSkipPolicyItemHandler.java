@@ -74,10 +74,8 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 				contribution.incrementSkipCount();
 				skip();
 			}
-			else {
-				// Rethrow so that outer transaction is rolled back properly
-				throw e;
-			}
+			// Rethrow so that outer transaction is rolled back properly
+			throw e;
 
 		}
 

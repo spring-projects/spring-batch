@@ -9,13 +9,12 @@
  			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 	<import resource="tradeJobIo.xml" />
-	<!--import resource="tradeJobAop.xml" /-->
 
 	<bean id="tradeJob" parent="simpleJob">
 		<property name="steps">
 			<list>
 				<bean id="step1" parent="skipLimitStep">
-					<property name="skipLimit" value="5" />
+					<property name="skipLimit" value="1" />
 					<property name="streams" ref="fileInputTemplate" />
 					<property name="itemReader">
 						<bean

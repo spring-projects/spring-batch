@@ -5,16 +5,17 @@ import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Test for job that rolls back a trade that is processed.
+ * Error is encountered during writing - transaction is rolled back and the
+ * error item is skipped on second attempt to process the chunk.
  * 
  * @author Robert Kasanicky
  */
 public class RollbackJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	int before = -1;
-	
+
 	JdbcTemplate jdbcTemplate;
-	
+
 	public void setDataSource(DataSource dataSource) {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
@@ -25,8 +26,8 @@ public class RollbackJobFunctionalTests extends AbstractValidatingBatchLauncherT
 
 	protected void validatePostConditions() throws Exception {
 		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
-		assertEquals(before+5, after);
+		// 5 input records, 1 skipped => 4 written to output
+		assertEquals(before + 4, after);
 	}
-	
-	
+
 }
