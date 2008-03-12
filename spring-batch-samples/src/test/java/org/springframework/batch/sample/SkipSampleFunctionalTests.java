@@ -10,7 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * 
  * @author Robert Kasanicky
  */
-public class RollbackJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
+public class SkipSampleFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	int before = -1;
 
