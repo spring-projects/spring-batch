@@ -835,7 +835,9 @@
         </imageobject>
 
         <imageobject role="html">
-          <imagedata align="center" fileref="images/xmlinput.PNG" format="PNG" />
+          <imagedata align="center"
+                     fileref="../../resources/reference/images/xmlinput.png"
+                     format="PNG" />
         </imageobject>
 
         <caption><para>Figure X: XML Inputs</para></caption>
