@@ -54,7 +54,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 	private RepeatTemplate stepOperations;
 
-	private SimpleLimitExceptionHandler exceptionHandler;
+	private ExceptionHandler exceptionHandler;
 
 	/**
 	 * Set the commit interval.
@@ -113,7 +113,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	 * Public setter for the SimpleLimitExceptionHandler.
 	 * @param exceptionHandler the exceptionHandler to set
 	 */
-	public void setExceptionHandler(SimpleLimitExceptionHandler exceptionHandler) {
+	public void setExceptionHandler(ExceptionHandler exceptionHandler) {
 		this.exceptionHandler = exceptionHandler;
 	}
 
