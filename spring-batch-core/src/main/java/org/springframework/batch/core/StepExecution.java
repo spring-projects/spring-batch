@@ -42,7 +42,7 @@ public class StepExecution extends Entity {
 
 	private BatchStatus status = BatchStatus.STARTING;
 
-	private int taskCount = 0;
+	private int itemCount = 0;
 
 	private int commitCount = 0;
 
@@ -104,7 +104,7 @@ public class StepExecution extends Entity {
 	 * Increments the number of tasks in this execution
 	 */
 	public void incrementTaskCount() {
-		taskCount++;
+		itemCount++;
 	}
 
 	/**
@@ -166,17 +166,17 @@ public class StepExecution extends Entity {
 	 * 
 	 * @return the current number of tasks for this execution
 	 */
-	public Integer getTaskCount() {
-		return new Integer(taskCount);
+	public Integer getItemCount() {
+		return new Integer(itemCount);
 	}
 
 	/**
 	 * Sets the current number of tasks for this execution
 	 * 
-	 * @param taskCount the current number of tasks for this execution
+	 * @param itemCount the current number of tasks for this execution
 	 */
-	public void setTaskCount(int taskCount) {
-		this.taskCount = taskCount;
+	public void setItemCount(int itemCount) {
+		this.itemCount = itemCount;
 	}
 
 	/**
@@ -283,7 +283,7 @@ public class StepExecution extends Entity {
 	}
 
 	public String toString() {
-		return super.toString() + ", name=" + step.getName() + ", taskCount=" + taskCount + ", commitCount="
+		return super.toString() + ", name=" + step.getName() + ", itemCount=" + itemCount + ", commitCount="
 				+ commitCount + ", rollbackCount=" + rollbackCount;
 	}
 
@@ -328,7 +328,7 @@ public class StepExecution extends Entity {
 	 * @param contribution
 	 */
 	public synchronized void apply(StepContribution contribution) {
-		taskCount += contribution.getTaskCount();
+		itemCount += contribution.getTaskCount();
 		// TODO: this should not be necessary - the step decides
 		// executionContext = contribution.getExecutionContext();
 		commitCount += contribution.getCommitCount();

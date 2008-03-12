@@ -117,9 +117,9 @@ public class StepExecutionTests extends TestCase {
 	 * {@link org.springframework.batch.core.StepExecution#incrementTaskCount()}.
 	 */
 	public void testIncrementLuwCount() {
-		int before = execution.getTaskCount().intValue();
+		int before = execution.getItemCount().intValue();
 		execution.incrementTaskCount();
-		int after = execution.getTaskCount().intValue();
+		int after = execution.getItemCount().intValue();
 		assertEquals(before + 1, after);
 	}
 
@@ -145,11 +145,11 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.StepExecution#getTaskCount()}.
+	 * {@link org.springframework.batch.core.StepExecution#getItemCount()}.
 	 */
 	public void testGetTaskCount() {
-		execution.setTaskCount(123);
-		assertEquals(123, execution.getTaskCount().intValue());
+		execution.setItemCount(123);
+		assertEquals(123, execution.getItemCount().intValue());
 	}
 
 	/**
@@ -184,8 +184,8 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	public void testToString() throws Exception {
-		assertTrue("Should contain task count: " + execution.toString(),
-				execution.toString().indexOf("task") >= 0);
+		assertTrue("Should contain item count: " + execution.toString(),
+				execution.toString().indexOf("item") >= 0);
 		assertTrue("Should contain commit count: " + execution.toString(),
 				execution.toString().indexOf("commit") >= 0);
 		assertTrue("Should contain rollback count: " + execution.toString(),

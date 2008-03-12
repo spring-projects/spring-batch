@@ -161,7 +161,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepExecution.setStatus(BatchStatus.COMPLETED);
 		stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 		stepExecution.setCommitCount(5);
-		stepExecution.setTaskCount(5);
+		stepExecution.setItemCount(5);
 		stepExecution.setExecutionContext(new ExecutionContext());
 		stepExecution.setExitStatus(new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION,
 				"java.lang.Exception"));

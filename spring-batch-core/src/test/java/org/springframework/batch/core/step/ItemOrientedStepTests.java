@@ -120,7 +120,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		itemOrientedStep.execute(stepExecution);
 		assertEquals(1, processed.size());
-		assertEquals(1, stepExecution.getTaskCount().intValue());
+		assertEquals(1, stepExecution.getItemCount().intValue());
 	}
 
 	public void testChunkExecutor() throws Exception {
@@ -137,7 +137,7 @@ public class ItemOrientedStepTests extends TestCase {
 		StepContribution contribution = stepExecution.createStepContribution();
 		itemOrientedStep.processChunk(contribution);
 		assertEquals(1, processed.size());
-		assertEquals(0, stepExecution.getTaskCount().intValue());
+		assertEquals(0, stepExecution.getItemCount().intValue());
 		assertEquals(1, contribution.getTaskCount());
 
 	}
