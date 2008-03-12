@@ -1,41 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-			  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <book xmlns:xi="http://www.w3.org/2001/XInclude">
-	<bookinfo>
-		<title>Spring Batch - Reference Documentation</title>
-		<releaseinfo>Spring Batch 1.0</releaseinfo>
-		<authorgroup>
-			<author>
-				<firstname>Dave</firstname>
-				<surname>Syer</surname>
-			</author>
-			<author>
-				<firstname>Wayne</firstname>
-				<surname>Lund</surname>
-			</author>
-			<author>
-				<firstname>Scott</firstname>
-				<surname>Wintermute</surname>
-			</author>
-		</authorgroup>
-		<legalnotice>
-			<para>
-				Copies of this document may be made for your own use and
-				for distribution to others, provided that you do not
-				charge any fee for such copies and further provided that
-				each copy contains this Copyright Notice, whether
-				distributed in print or electronically.
-			</para>
-		</legalnotice>
-	</bookinfo>
-	<xi:include href="spring-batch-intro.xml"/>
-	<xi:include href="core.xml"/>
-	<xi:include href="readersAndWriters.xml"/>
-	<xi:include href="execution.xml"/>
-	<xi:include href="repeat.xml"/>
-	<xi:include href="retry.xml"/>
-	<xi:include href="appendix.xml"/>
-        <xi:include href="glossary.xml"/>  
-</book>
+  <bookinfo>
+    <title>Spring Batch - Reference Documentation</title>
 
+    <releaseinfo>Spring Batch 1.0</releaseinfo>
+
+    <authorgroup>
+      <author>
+        <firstname>Dave</firstname>
+
+        <surname>Syer</surname>
+      </author>
+
+      <author>
+        <firstname>Wayne</firstname>
+
+        <surname>Lund</surname>
+      </author>
+
+      <author>
+        <firstname>Lucas Ward</firstname>
+      </author>
+    </authorgroup>
+
+    <legalnotice>
+      <para>Copies of this document may be made for your own use and for
+      distribution to others, provided that you do not charge any fee for such
+      copies and further provided that each copy contains this Copyright
+      Notice, whether distributed in print or electronically.</para>
+    </legalnotice>
+  </bookinfo>
+
+  <xi:include href="spring-batch-intro.xml" />
+
+  <xi:include href="core.xml" />
+
+  <xi:include href="readersAndWriters.xml" />
+
+  <xi:include href="execution.xml" />
+
+  <xi:include href="repeat.xml" />
+
+  <xi:include href="retry.xml" />
+
+  <xi:include href="appendix.xml" />
+
+  <xi:include href="glossary.xml" />
+</book>

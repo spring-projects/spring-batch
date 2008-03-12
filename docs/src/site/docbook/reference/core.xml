@@ -2,20 +2,17 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="core">
-  <title>Spring Batch Core - the Domain language of Batch</title>
+  <title>The Domain Language of Batch</title>
 
   <section>
     <title>Introduction</title>
 
     <para>To any experienced batch architect, the overall concepts of batch
-    processing described above should be familiar and comfortable. There are
-    “Jobs” and “Steps” and a developer supplied processing units called
-    ItemReaders and ItemWriters. The following diagram is only a slight
-    variation of the batch reference architecture that has been used for
-    decades. JCL and COBOL developers are likely to be as comfortable with the
-    concepts as C++, C# and Java developers. However, because of the Spring
-    patterns, operations, templates, callbacks, and idioms, there are
-    opportunities for <itemizedlist>
+    processing used in Spring Batch should be familiar and comfortable. There
+    are “Jobs” and “Steps” and developer supplied processing units called
+    ItemReaders and ItemWriters. However, because of the Spring patterns,
+    operations, templates, callbacks, and idioms, there are opportunities for
+    <itemizedlist>
         <listitem>
           <para>significant improvement in adherence to a clear separation of
           concerns,</para>
@@ -36,17 +33,19 @@
         </listitem>
       </itemizedlist></para>
 
-    <para>The diagram below provides an overview of the high level components,
-    technical services, and basic operations required by a batch architecture.
-    This architecture framework is a blueprint that has been proven through
-    decades of implementations on the last several generations of platforms
-    (COBOL/Mainframe, C++/Unix, and now Java/anywhere). The Simple Batch
-    Execution Environment provides a physical implementation of the layers,
-    components and technical services commonly found in robust, maintainable
-    systems used to address the creation of simple to complex batch
-    applications, with the infrastructure and extensions to address very
-    complex processing needs. The materials below will walk through the
-    details of the diagram.</para>
+    <para>The diagram below is only a slight variation of the batch reference
+    architecture that has been used for decades. It provides an overview of
+    the high level components, technical services, and basic operations
+    required by a batch architecture. This architecture framework is a
+    blueprint that has been proven through decades of implementations on the
+    last several generations of platforms (COBOL/Mainframe, C++/Unix, and now
+    Java/anywhere). JCL and COBOL developers are likely to be as comfortable
+    with the concepts as C++, C# and Java developers. Spring Batch provides a
+    physical implementation of the layers, components and technical services
+    commonly found in robust, maintainable systems used to address the
+    creation of simple to complex batch applications, with the infrastructure
+    and extensions to address very complex processing needs. The materials
+    below will walk through the details of the diagram.</para>
   </section>
 
   <section>
@@ -56,21 +55,37 @@
     <mediaobject>
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="../../resources/reference/images/simple-batch-execution-env.png"
+                   fileref="images/spring-batch-reference-model.png"
                    format="JPG" />
       </imageobject>
 
       <imageobject role="html">
         <imagedata align="center"
-                   fileref="../../resources/reference/images/simple-batch-execution-env.png"
+                   fileref="images/spring-batch-reference-model.png"
                    format="JPG" />
       </imageobject>
 
-      <caption><para>Figure 1: Batch Stereotypes</para></caption>
+      <caption><para>Figure 2.1: Batch Stereotypes</para></caption>
     </mediaobject>
 
-    <para>The application style is organized into four logical tiers, which
-    include Run, Job, Application, and Data tiers. The primary goal for
+    <para>The colors used on the above diagram are extremely important. Grey
+    represents an external application such as an enterprise scheduler or a
+    database. It's important to note that scheduling is grey, and should thus
+    be considered separate from Spring Batch. Blue represents application
+    architecture services. In most cases these are provided by Spring Batch
+    with out of the box implementations, but an architecture time may make
+    specific implementations that better address their specific needs. Yellow
+    represents the pieces that must be configured by a developer. For example,
+    they need to configure their job schedule so that the job is kicked off at
+    the appropriate time. They also need to create a job configuration that
+    defines how their job will be run. It is also worth noting that the
+    <classname>ItemReader</classname> and <classname>ItemWriter</classname>
+    used by an application may just as easily be a custom one made by the
+    developer for the specific batch job, rather than one provided by Spring
+    Batch or even an architecture team.</para>
+
+    <para>The Batch Application Style is organized into four logical tiers,
+    which include Run, Job, Application, and Data. The primary goal for
     organizing an application according to the tiers is to embed what is known
     as "separation of concerns" within the system. These tiers can be
     conceptual but may they prove effective in mapping the deployment of the
@@ -111,91 +126,35 @@
           completely missing and in other cases one Job Script can start
           several Batch Job instances.</para>
         </listitem>
-      </itemizedlist>In addition the components describe the batch interaction
-    and services stereotypes that are the domain language and interfaces
-    implemented by developers in constructing a batch solution. As the diagram
-    illustrates, custom applicaton archifacts, generally created by the
-    developer, are the following:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Job Scripts</para>
-      </listitem>
-
-      <listitem>
-        <para>JobConfigurations</para>
-      </listitem>
-
-      <listitem>
-        <para>Tasklet</para>
-      </listitem>
-
-      <listitem>
-        <para>Business Logic</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>The application architect needs to consider the batch execution
-    environment with the following issues:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Define how batch jobs will be launched</para>
-      </listitem>
-
-      <listitem>
-        <para>Job construction and Configuration</para>
-      </listitem>
-
-      <listitem>
-        <para>Step construction and Configuration</para>
-      </listitem>
-
-      <listitem>
-        <para>ItemReaders</para>
-      </listitem>
-
-      <listitem>
-        <para>ItemWriters</para>
-      </listitem>
-
-      <listitem>
-        <para>Data Access Strategies</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>The grey icons indicate the technologies selected as part of the
-    batch solution that are not part of the final solution and entail items
-    like:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Schedulers (e.g. Quartz, Tivoli, etc.)</para>
-      </listitem>
-
-      <listitem>
-        <para>Physical Resources in the Data Tier that are the source and
-        target of ItemReaders and Writers like Message Queues, Databases,
-        Files and Print Queues.</para>
-      </listitem>
-    </itemizedlist>
+      </itemizedlist></para>
   </section>
 
   <section>
-    <title id="s.2">Job Stereotypes</title>
+    <title id="jobStereotypes">Job Stereotypes</title>
 
     <para>This section describes stereotypes relating to the concept of a
     batch job. A job is an entity that encapsulates an entire batch process.
     The file containing the job may sometimes be referred to as the "job
-    configuration.</para>
+    configuration". However, <classname>Job</classname> is just the top of an
+    overall hierarchy:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center" fileref="images/job-heirarchy.png" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center" fileref="images/job-heirarchy.png" />
+      </imageobject>
+    </mediaobject>
 
     <section>
       <title id="s.2.1.1">Job</title>
 
       <para>The job could be described as the heart of the Spring Batch
       framework. It is represented by a Spring bean that implements the
-      <emphasis role="bold">Job</emphasis> interface and contains all of the
-      information necessary to define the operations performed by a job. A job
+      <classname>Job</classname> interface and contains all of the information
+      necessary to define the operations performed by a job. A job
       configuration is typically contained within a Spring XML configuration
       file and the job's name is determined by the "id" attribute associated
       with the job configuration bean. The job configuration contains</para>
@@ -206,12 +165,7 @@
         </listitem>
 
         <listitem>
-          <para>Definition and ordering of [Step Configurations|#Step
-          Configuration]</para>
-        </listitem>
-
-        <listitem>
-          <para>The limit of how many times this job may be started</para>
+          <para>Definition and ordering of Steps</para>
         </listitem>
 
         <listitem>
@@ -219,117 +173,388 @@
         </listitem>
       </itemizedlist>
 
-      <para>A default simple implementation of the <emphasis
-      role="bold">Job</emphasis> interface is provided by Spring Batch in the
-      form of the SimpleJob class which creates some standard functionality on
-      top of <emphasis role="bold">Job</emphasis>, namely a standard execution
-      logic that all jobs should utilize. In general, all job configurations
-      should be defined using a bean of type <emphasis
-      role="bold">SimpleJob</emphasis>.</para>
+      <para>A default simple implementation of the <classname>Job</classname>
+      interface is provided by Spring Batch in the form of the
+      <classname>SimpleJob</classname> class which creates some standard
+      functionality on top of <classname>Job</classname>, namely a standard
+      execution logic that all jobs should utilize. In general, all jobs
+      should be defined using a bean of type
+      <classname>SimpleJob</classname>:</para>
+
+      <programlisting>  &lt;bean id="footballJob"
+        class="org.springframework.batch.execution.job.SimpleJob"&gt;
+    &lt;property name="steps"&gt;
+      &lt;list&gt;
+        &lt;!-- Step Bean details ommitted for clarity --&gt;
+        &lt;bean id="playerload" parent="simpleStep" /&gt;
+        &lt;bean id="gameLoad" parent="simpleStep" /&gt;
+        &lt;bean id="playerSummarization" parent="simpleStep" /&gt;
+      &lt;/list&gt;
+    &lt;/property&gt;
+    &lt;property name="restartable" value="true" /&gt;
+  &lt;/bean&gt;</programlisting>
     </section>
 
     <section>
-      <title id="s.2.1.2">Job Instance</title>
+      <title id="s.2.1.2">JobInstance</title>
 
-      <para>A job instance refers to the business concept of a single job
-      invocation. In other words, suppose you have a job called "foo" that is
-      run three times a day. There will be one "foo" configuration, and each
-      time "foo" is supposed to run would be an instance of the "foo" job.
-      Each instance would be uniquely identified as each one represents a
-      distinct batch need. Further, each instance might have attempted several
-      times to complete its work. Each attempt is represented by a <link
-      linkend="s.3.3">JobExecution</link>, described below. A job instance is
-      not considered to be complete until an associated job execution
-      completes successfully. As such, a single job instance may have many
-      executions. To keep track of this, every job instance provides a
-      reference to the last execution attempt.</para>
-
-      <para>For example, a unique instance might be identified by just a job
-      name, or by the combination of a job name and a scheduled date. Using
-      this second type of identification, we might have two distinct
-      instances, "foo-01-01-2008" and "foo-01-02-2008." Although these two
-      instances would share the same configuration, they would each have their
-      own set of executions and the successful completion of one instance
-      would not affect the status of the other.</para>
-
-      <para>Job instances are represented by objects of the <emphasis
-      role="bold">JobInstance</emphasis> class, which are created when the job
-      is executed. Each job instance contains references to related [Step
-      Instances|#Step Instance] and a set of job parameters, represented by
-      the <emphasis role="bold">JobParameters</emphasis> that uniquely
-      identifies this job instance.</para>
+      <para>A <classname>JobInstance</classname> refers to the concept of a
+      logical job run. Let's consider a batch job that should be run once at
+      the end of the day, such as the 'EndOfDay' job from the diagram above.
+      There is a one 'EndOfDay' <classname>Job</classname>, but each
+      individual run of the <classname>Job</classname> must be tracked
+      separately. In the case of this job, there will be one logical
+      <classname>JobInstance</classname> per day. For example, there will be a
+      January 1st run, and a January 2nd run. If the January 1st run fails the
+      first time and is run again the next day, it's still the January 1st
+      run. (Usually this corresponds with the data its processing as well,
+      meaning the January 1st run processes data for January 1st, etc) That is
+      to say, each <classname>JobInstance</classname> can have multiple
+      executions. (<classname>JobExecution</classname> is discussed in more
+      detail below) and only one instance can be running at a given time.
+      </para>
     </section>
 
     <section>
-      <title id="s.2.1.3">Job Parameters</title>
+      <title id="s.2.1.3">JobParameters</title>
 
-      <para>Job Parameters represent parameters to a job that are used to
-      either uniquely identify an instance, or to help drive processing. One
-      example of identifying a job would be 'Schedule Date'. This is a common
-      batch use case where an 'effective date' for the data is used. For
-      example, you may be processing on thursday for a scheduled date of
-      Monday. Once the JobInstance with a schedule date of monday has
-      completed successfully, a schedule date of Tuesday will be used for the
-      next run. You will then be given a new JobInstance by the framework,
-      since your parameters are different. This allows you to effectively
-      control how you define a 'JobInstance', since you control what
-      parameters are passed in.</para>
+      <para>Having discussed <classname>JobInstance</classname> and how it
+      differs from <classname>Job</classname>, the natural question to ask is,
+      "how is one JobInstance distinguished from another?" The answer is:
+      <classname>JobParameters</classname>.
+      <classname>JobParameters</classname> are any set of parameters used to
+      start a batch job, which can be used for identification or even as
+      reference data during the run. In the example above, where there are two
+      instances, one for January 1st, and another for January 2nd, there is
+      really only one Job, one that was started with a job parameter of
+      01-01-2008 and another that was started with a parameter of 01-02-2008.
+      Thus, the contract can be defined as: <classname>JobInstance</classname>
+      = <classname>Job</classname> + <classname>JobParameters</classname>.
+      This allows you to effectively control how you define a
+      <classname>JobInstance</classname>, since you control what parameters
+      are passed in.</para>
     </section>
 
     <section>
-      <title id="s.2.1.3">Job Execution</title>
+      <title id="jobExecution">JobExecution</title>
 
-      <para>A job execution refers to the technical concept of a single
-      attempt to run a job. It is a single attempt to execute the logic
-      represented by a job instance. A job execution may end in failure or
-      success, but the job instance corresponding to a given execution will
-      not be marked as complete unless the execution completes
-      successfully.</para>
+      <para>A <classname>JobExecution</classname> refers to the technical
+      concept of a single attempt to run a <classname>Job</classname>. An
+      execution may end in failure or success, but the
+      <classname>JobInstance</classname> corresponding to a given execution
+      will not be marked as complete unless the execution completes
+      successfully. For instance, if we have a
+      <classname>JobInstance</classname> of the EndOfDay job for 01-01-2008,
+      as described above, that fails to successfully complete its work the
+      first time it is run, when we attempt to run it again (with the same job
+      parameters of 01-01-2008), a new job execution will be created. </para>
 
-      <para>For instance, if we have a job instance "foo-01-01-2008" that
-      fails to successfully complete its work the first time it is run, when
-      we attempt to run it again, a new job execution will be created. If our
-      "foo" configuration is restartable, we may begin our second job
-      execution from a restart point. Otherwise, our job execution will start
-      from the beginning. In either case, we will see that our single job
-      instance has had two job executions.</para>
+      <para>A Job defines what a job is and defines how it is to be executed,
+      and <classname>JobInstance</classname> is a purely organization object
+      to group executions together, primarily to enable correct restart. A
+      <classname>JobExecution</classname>, however, is the primary storage
+      mechanism for what actually happened during a run, and as such contains
+      many more properties that must be controlled and persisted:</para>
 
-      <para>Job executions are represented by objects of the <emphasis
-      role="bold">JobExecution</emphasis> class. These job executions are
-      created by an implementation of the <emphasis
-      role="bold">JobRepository</emphasis> interface from a given <emphasis
-      role="bold">JobInstance</emphasis> corresponding to a unique <emphasis
-      role="bold">JobParameters</emphasis> object. Each job execution contains
-      a reference to its corresponding job instance and related Step
-      Executions.</para>
+      <table>
+        <title>JobExecution properties</title>
+
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry>status</entry>
+
+              <entry>A <classname>BatchStatus</classname> object that
+              indicates the status of the execution. While it's running, it's
+              BatchStatus.STARTED, if it fails it's BatchStatus.FAILED, and if
+              it finishes successfully it's BatchStatus.COMPLETED</entry>
+            </row>
+
+            <row>
+              <entry>startTime</entry>
+
+              <entry>A <classname>java.util.Date</classname> representing the
+              current system time when the execution was started.</entry>
+            </row>
+
+            <row>
+              <entry>endTime</entry>
+
+              <entry>A <classname>java.util.Date</classname> representing the
+              current system time when the execution finished, regardless of
+              whether or not it was successful.</entry>
+            </row>
+
+            <row>
+              <entry>exitStatus</entry>
+
+              <entry>The <classname>ExitStatus</classname> indicating the
+              result of the run. It is most important because it contains an
+              exit code that will be returned to the caller. See chapter 5 for
+              more details.</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+
+      <para>These properties are important because they will be persisted and
+      can be used to completely determine the status of an execution. For
+      example, if the EndOfDay job for 01-01 is executed at 9:00 PM, and fails
+      at 9:30, the following entries will be in the batch meta data
+      tables:</para>
+
+      <table>
+        <title>BATCH_JOB_INSTANCE</title>
+
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry>JOB_INSTANCE_ID</entry>
+
+              <entry>JOB_NAME</entry>
+            </row>
+
+            <row>
+              <entry>1</entry>
+
+              <entry>EndOfDayJob</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+
+      <table>
+        <title>BATCH_JOB_PARAMS</title>
+
+        <tgroup cols="4">
+          <tbody>
+            <row>
+              <entry>JOB_INSTANCE_ID</entry>
+
+              <entry>TYPE_CD</entry>
+
+              <entry>KEY_NAME</entry>
+
+              <entry>DATE_VAL</entry>
+            </row>
+
+            <row>
+              <entry>1</entry>
+
+              <entry>DATE</entry>
+
+              <entry>schedule.Date</entry>
+
+              <entry>2008-01-01 00:00:00</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+
+      <table>
+        <title>BATCH_JOB_EXECUTION</title>
+
+        <tgroup cols="5">
+          <tbody>
+            <row>
+              <entry>JOB_EXECUTION_ID</entry>
+
+              <entry>JOB_INSTANCE_ID</entry>
+
+              <entry>START_TIME</entry>
+
+              <entry>END_TIME</entry>
+
+              <entry>STATUS</entry>
+            </row>
+
+            <row>
+              <entry>1</entry>
+
+              <entry>1</entry>
+
+              <entry>2008-01-01 21:00:23.571</entry>
+
+              <entry>2008-01-01 21:30:17.132</entry>
+
+              <entry>FAILED</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+
+      <note>
+        <para>extra columns in the table have been removed for added
+        clarity.</para>
+      </note>
+
+      <para>Now that the job has failed, let's assume that it took the entire
+      course of the night for the problem to be determined, so that the 'batch
+      window' is now closed. Assuming the window starts at 9:00 PM, the job
+      will be kicked off again for 01-01, starting where it left off and
+      completing successfully at 9:30. Because it's now the next day, the
+      01-02 job must be run as well, which is kicked off just afterwards at
+      9:31, and completes in it's normal one hour time at 10:30. There should
+      now be an extra entry in both the job instance and job parameters table,
+      and two extra entries in the job execution table:</para>
+
+      <table>
+        <title>BATCH_JOB_INSTANCE</title>
+
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry>JOB_INSTANCE_ID</entry>
+
+              <entry>JOB_NAME</entry>
+            </row>
+
+            <row>
+              <entry>1</entry>
+
+              <entry>EndOfDayJob</entry>
+            </row>
+
+            <row>
+              <entry>2</entry>
+
+              <entry>EndOfDayJob</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+
+      <table>
+        <title>BATCH_JOB_PARAMS</title>
+
+        <tgroup cols="4">
+          <tbody>
+            <row>
+              <entry>JOB_INSTANCE_ID</entry>
+
+              <entry>TYPE_CD</entry>
+
+              <entry>KEY_NAME</entry>
+
+              <entry>DATE_VAL</entry>
+            </row>
+
+            <row>
+              <entry>1</entry>
+
+              <entry>DATE</entry>
+
+              <entry>schedule.Date</entry>
+
+              <entry>2008-01-01 00:00:00</entry>
+            </row>
+
+            <row>
+              <entry>2</entry>
+
+              <entry>DATE</entry>
+
+              <entry>schedule.Date</entry>
+
+              <entry>2008-01-02 00:00:00</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+
+      <table>
+        <title>BATCH_JOB_EXECUTION</title>
+
+        <tgroup cols="5">
+          <tbody>
+            <row>
+              <entry>JOB_EXECUTION_ID</entry>
+
+              <entry>JOB_INSTANCE_ID</entry>
+
+              <entry>START_TIME</entry>
+
+              <entry>END_TIME</entry>
+
+              <entry>STATUS</entry>
+            </row>
+
+            <row>
+              <entry>1</entry>
+
+              <entry>1</entry>
+
+              <entry>2008-01-01 21:00</entry>
+
+              <entry>2008-01-01 21:30</entry>
+
+              <entry>FAILED</entry>
+            </row>
+
+            <row>
+              <entry>2</entry>
+
+              <entry>1</entry>
+
+              <entry>2008-01-02 21:00</entry>
+
+              <entry>2008-01-02 21:30</entry>
+
+              <entry>COMPLETED</entry>
+            </row>
+
+            <row>
+              <entry>3</entry>
+
+              <entry>2</entry>
+
+              <entry>2008-01-02 21:31</entry>
+
+              <entry>2008-01-02 22:29</entry>
+
+              <entry>COMPLETED</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
     </section>
   </section>
 
   <section>
     <title id="s.2.1">Step Stereotypes</title>
 
-    <para>This section describes stereotypes relating to the concept of a
-    batch step. A step is an entity that encapsulates a single, independent
-    phase of a batch job. Therefore, every batch job is composed entirely of
-    one or more batch steps. Steps should be thought of as unique processing
-    streams that will be executed in sequence. For example, if you have one
-    step that loads a file into a database, another that reads from the
-    database, validates the data, preforms processing, and then writes to
-    another table, and another that reads from that table and writes out to a
-    file. Each of these steps will be performed completely before moving on to
-    the next step. The file will be completely read into the database before
-    step 2 can begin.</para>
+    <para>A <classname>Step</classname> is an entity that encapsulates a
+    single, independent phase of a batch job. Therefore, every batch job is
+    composed entirely of one or more batch steps. Steps should be thought of
+    as unique processing streams that will be executed in sequence. For
+    example, if you have one step that loads a file into a database, another
+    that reads from the database, validates the data, preforms processing, and
+    then writes to another table, and another that reads from that table and
+    writes out to a file. Each of these steps will be performed completely
+    before moving on to the next step. The file will be completely read into
+    the database before step 2 can begin. As with Job, a Step has individual
+    executions, that correspond with unique JobExecutions:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center" fileref="images/jobHeirarchyWithSteps.png" />
+      </imageobject>
+
+      <imageobject>
+        <imagedata align="center" fileref="images/jobHeirarchyWithSteps.png" />
+      </imageobject>
+    </mediaobject>
 
     <section>
-      <title id="s.2.1.1">Step</title>
+      <title id="step">Step</title>
 
-      <para>A batch step contains all of the information necessary to define a
-      discrete set of business logic within a job. This is a necessarily vague
-      description because the contents of any given step are at the discretion
-      of the developer writing jobs. A step can be as narrowly defined as a
-      single line of code or as broadly defined as necessary to complete the
-      entire work of your job. There are several factors that will affect the
-      breadth of your step configurations.</para>
+      <para>A <classname>Step</classname> contains all of the information
+      necessary to define a discrete set of business logic within a job. This
+      is a necessarily vague description because the contents of any given
+      step are at the discretion of the developer writing a job. A step can be
+      as narrowly defined as a single line of code or as broadly defined as
+      necessary to complete the entire work of a job. There are several
+      factors that will affect the breadth of step configurations.</para>
 
       <itemizedlist>
         <listitem>
@@ -351,53 +576,108 @@
       </itemizedlist>
 
       <para>Steps are defined by instantiating implementations of the
-      <emphasis role="bold">Step</emphasis> interface. Two step implementation
-      classes are available in the Spring Batch framework, and they are each
-      discussed in detail in other sections of this guide. For most
-      situations, the <emphasis role="bold">ItemOrientedStep</emphasis>
-      implementation is sufficient, but custom control flow behavior and
-      transaction management behavior can also be configured by using a
-      <emphasis role="bold">RepeatOperationsStep</emphasis>.</para>
+      <classname>Step</classname> interface. Two step implementation classes
+      are available in the Spring Batch framework, and they are each discussed
+      in detail in other sections of this guide. For most situations, the
+      <classname>ItemOrientedStep</classname> implementation is sufficient,
+      but for situations where only one call is needed, such as a stored
+      procedure call or a wrapper around existing script, a
+      <classname>TaskletStep</classname> may be the better option.</para>
     </section>
 
     <section>
-      <title id="s.2.1.3">Step Execution</title>
+      <title id="stepExecution">StepExecution</title>
 
-      <para>A step execution represents the technical concept of a single
-      attempt to execute a step. It is a single attempt to execute the logic
-      represented by a step instance.</para>
+      <para>A <classname>StepExecution</classname> represents the technical
+      concept of a single attempt to execute a <classname>Step</classname>.
+      For instance, using the example from
+      <classname>JobExecution</classname>, if we have a job instance
+      "EndOfJob-01-01-2008" that fails to successfully complete its work the
+      first time it is run, when we attempt to run it again, a new
+      <classname>StepExecution</classname> will be created. Each of these step
+      executions may represent a different invocation of the batch framework,
+      but they will all correspond to the same
+      <classname>JobInstance</classname>.</para>
 
-      <para>For instance, if we have a step instance "foo-01-01-2008#step1"
-      that fails to successfully complete its work the first time it is run,
-      when we attempt to run it again, a new step execution will be created.
-      Each of these step executions may represent a different invocation of
-      the batch framework, but they will all correspond to the same step
-      instance.</para>
+      <para>Step executions are represented by objects of the
+      <classname>StepExecution</classname> class. Each execution contains a
+      reference to its corresponding step and job execution, and transaction
+      related data such as commit and rollback count and start and end times.
+      Additionally, each step execution will contain an
+      <classname>ExecutionContext</classname>, which contains any data a
+      developer needs persisted across batch runs, such as statistics or state
+      information needed to restart. The following is a listing of the
+      properties for <classname>StepExecution</classname>:</para>
 
-      <para>Step executions are represented by objects of the <emphasis
-      role="bold">StepExecution</emphasis> class. These step executions are
-      created by an implementation of the <emphasis role="bold">Job</emphasis>
-      interface from a given <emphasis role="bold">JobExecution</emphasis>.
-      Each step execution contains a reference to its corresponding step and
-      job execution, and transaction related data such as commit and rollback
-      count and start and end times. Additionally, each step execution will
-      contain a set of execution attributes, which will contain statistics and
-      restart data.</para>
+      <table>
+        <title>StepExecution properties</title>
+
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry>status</entry>
+
+              <entry>A <classname>BatchStatus</classname> object that
+              indicates the status of the execution. While it's running, it's
+              BatchStatus.STARTED, if it fails it's BatchStatus.FAILED, and if
+              it finishes successfully it's BatchStatus.COMPLETED</entry>
+            </row>
+
+            <row>
+              <entry>startTime</entry>
+
+              <entry>A <classname>java.util.Date</classname> representing the
+              current system time when the execution was started.</entry>
+            </row>
+
+            <row>
+              <entry>endTime</entry>
+
+              <entry>A <classname>java.util.Date</classname> representing the
+              current system time when the execution finished, regardless of
+              whether or not it was successful.</entry>
+            </row>
+
+            <row>
+              <entry>exitStatus</entry>
+
+              <entry>The <classname>ExitStatus</classname> indicating the
+              result of the run. It is most important because it contains an
+              exit code that will be returned to the caller. See chapter 5 for
+              more details.</entry>
+            </row>
+
+            <row>
+              <entry>executionContext</entry>
+
+              <entry>The 'property bag' containing any user data that needs to
+              be persisted between batch runs.</entry>
+            </row>
+
+            <row>
+              <entry></entry>
+
+              <entry></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
     </section>
 
     <section>
       <title id="s.2.1.6">Tasklets</title>
 
-      <para>A tasklet represents the execution of a logical unit of work, as
-      defined by its implementation of the Spring Batch provided Tasklet
-      interface. Tasklets are used when defining step configurations to
-      specify the work done by the step. Subsequently, the logic in a tasklet
-      is atomic in terms of transactions. A transaction will never commit
-      until an entire tasklet execution is complete (unless an exception
-      occurs - a transaction might either commit or rollback if that behavior
-      is specified in the step's exception management strategy). There is a
-      specific implementation of the Step interface, TaskletStep, that works
-      directly with a Tasklet.</para>
+      <para>A <classname>Tasklet</classname> represents the execution of a
+      logical unit of work, as defined by its implementation of the Spring
+      Batch provided <classname>Tasklet</classname> interface. Tasklets are
+      used when defining step configurations to specify the work done by the
+      step. Subsequently, the logic in a tasklet is atomic in terms of
+      transactions. A transaction will never commit until an entire tasklet
+      execution is complete (unless an exception occurs - a transaction might
+      either commit or rollback if that behavior is specified in the step's
+      exception management strategy). There is a specific implementation of
+      the Step interface, TaskletStep, that works directly with a
+      Tasklet.</para>
     </section>
   </section>
 
