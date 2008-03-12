@@ -205,7 +205,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 		step.setStepOperations(stepOperations);
 
-		ItemSkipPolicyItemHandler itemHandler = new ItemSkipPolicyItemHandler(itemReader, itemWriter);
+		ItemHandler itemHandler = new SimpleItemHandler(itemReader, itemWriter);
 
 		setItemHandler(itemHandler);
 		step.setItemHandler(itemHandler);
