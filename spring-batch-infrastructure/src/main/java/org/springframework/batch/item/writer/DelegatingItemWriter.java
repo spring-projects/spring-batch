@@ -3,6 +3,7 @@ package org.springframework.batch.item.writer;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.Skippable;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -12,9 +13,9 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class DelegatingItemWriter implements ItemWriter, InitializingBean {
+public class DelegatingItemWriter implements ItemWriter, Skippable, InitializingBean {
 
-	private ItemWriter writer;
+	private ItemWriter delegate;
 	
 	/**
 	 * Default constructor.
@@ -28,7 +29,7 @@ public class DelegatingItemWriter implements ItemWriter, InitializingBean {
 	 */
 	public DelegatingItemWriter(ItemWriter itemWriter) {
 		this();
-		this.writer = itemWriter;
+		this.delegate = itemWriter;
 	}
 
 	/**
@@ -40,7 +41,7 @@ public class DelegatingItemWriter implements ItemWriter, InitializingBean {
 	 */
 	public void write(Object item) throws Exception {
 		Object result = doProcess(item);
-		writer.write(result);
+		delegate.write(result);
 	}
 
 	/**
@@ -56,25 +57,35 @@ public class DelegatingItemWriter implements ItemWriter, InitializingBean {
 	 * Setter for {@link ItemWriter}.
 	 */
 	public void setDelegate(ItemWriter writer) {
-		this.writer = writer;
+		this.delegate = writer;
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(writer);
+		Assert.notNull(delegate);
 	}
 
 	/**
 	 * Delegates to {@link ItemWriter#clear()}
 	 */
 	public void clear() throws ClearFailedException {
-		writer.clear();
+		delegate.clear();
 	}
 
 	/**
 	 * Delegates to {@link ItemWriter#flush()}
 	 */
 	public void flush() throws FlushFailedException {
-		writer.flush();
+		delegate.flush();
+	}
+
+	/**
+	 * Delegates to {@link Skippable#skip()} if delegate implements {@link Skippable}.
+	 */
+	public void skip() {
+		if (delegate instanceof Skippable) {
+			((Skippable) delegate).skip();
+		}
+		
 	}
 
 }
