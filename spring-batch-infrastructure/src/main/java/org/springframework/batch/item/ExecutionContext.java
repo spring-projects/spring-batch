@@ -50,7 +50,6 @@ public class ExecutionContext {
 
 	public void putString(String key, String value) {
 
-		Assert.notNull(value);
 		put(key, value);
 	}
 
