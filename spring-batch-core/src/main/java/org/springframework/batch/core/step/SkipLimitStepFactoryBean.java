@@ -1,5 +1,7 @@
 package org.springframework.batch.core.step;
 
+import java.util.Arrays;
+
 import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 
 /**
@@ -9,6 +11,8 @@ import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 public class SkipLimitStepFactoryBean extends DefaultStepFactoryBean {
 
 	private int skipLimit = 0;
+	
+	private Class[] skippableExceptionClasses = new Class[]{ Exception.class };
 	
 	/**
 	 * Public setter for a limit that determines skip policy. If this value is
@@ -21,6 +25,17 @@ public class SkipLimitStepFactoryBean extends DefaultStepFactoryBean {
 	 */
 	public void setSkipLimit(int skipLimit) {
 		this.skipLimit = skipLimit;
+	}
+	
+	/**
+	 * Public setter for exception classes that when raised won't crash the job
+	 * but will result in transaction rollback and the item which handling caused
+	 * the exception will be skipped.
+	 * 
+	 * @param skippableExceptionClasses defaults to <code>Exception</code>
+	 */
+	public void setSkippableExceptionClasses(Class[] exceptionClasses) {
+		this.skippableExceptionClasses = exceptionClasses;
 	}
 
 	/**
@@ -38,7 +53,10 @@ public class SkipLimitStepFactoryBean extends DefaultStepFactoryBean {
 			 * to absorb exceptions at the step level because the failed items
 			 * will never re-appear after a rollback.
 			 */
-			itemHandler.setItemSkipPolicy(new LimitCheckingItemSkipPolicy(skipLimit));
+			itemHandler.setItemSkipPolicy(new LimitCheckingItemSkipPolicy(skipLimit, Arrays.asList(skippableExceptionClasses)));
+			SimpleLimitExceptionHandler exceptionHandler = new SimpleLimitExceptionHandler();
+			exceptionHandler.setLimit(skipLimit);
+			exceptionHandler.setExceptionClasses(skippableExceptionClasses);
 			setExceptionHandler(new SimpleLimitExceptionHandler(skipLimit));
 			getStepOperations().setExceptionHandler(getExceptionHandler());
 		}
@@ -49,6 +67,5 @@ public class SkipLimitStepFactoryBean extends DefaultStepFactoryBean {
 		
 		step.setItemHandler(itemHandler);
 	}
-	
 	
 }

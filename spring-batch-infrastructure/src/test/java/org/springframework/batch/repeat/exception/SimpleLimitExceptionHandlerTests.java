@@ -63,7 +63,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
-		handler.setType(IllegalArgumentException.class);
+		handler.setExceptionClasses(new Class[] { IllegalArgumentException.class });
 
 		try {
 			handler.handleException(new RepeatContextSupport(null), throwable);
@@ -82,7 +82,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 	public void testLimitedExceptionTypeNotThrown() throws Exception {
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
-		handler.setType(RuntimeException.class);
+		handler.setExceptionClasses(new Class[] {RuntimeException.class} );
 
 		try {
 			handler.handleException(new RepeatContextSupport(null), new RuntimeException("foo"));
@@ -101,7 +101,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
-		handler.setType(RuntimeException.class);
+		handler.setExceptionClasses(new Class[] {RuntimeException.class});
 
 		RepeatContextSupport parent = new RepeatContextSupport(null);
 
@@ -125,7 +125,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
-		handler.setType(RuntimeException.class);
+		handler.setExceptionClasses(new Class[] { RuntimeException.class } );
 		handler.setUseParent(true);
 
 		RepeatContextSupport parent = new RepeatContextSupport(null);

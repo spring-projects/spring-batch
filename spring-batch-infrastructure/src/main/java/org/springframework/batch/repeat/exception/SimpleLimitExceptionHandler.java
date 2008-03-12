@@ -37,7 +37,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 
 	private RethrowOnThresholdExceptionHandler delegate = new RethrowOnThresholdExceptionHandler();
 
-	private Class type = Exception.class;
+	private Class[] exceptionClasses = new Class[] { Exception.class };
 
 	/**
 	 * Flag to indicate the the exception counters should be shared between
@@ -68,8 +68,10 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 		super();
 		delegate.setExceptionClassifier(new ExceptionClassifierSupport() {
 			public Object classify(Throwable throwable) {
-				if (type.isAssignableFrom(throwable.getClass())) {
-					return TX_INVALID;
+				for (int i = 0; i < exceptionClasses.length; i++) {
+					if (exceptionClasses[i].isAssignableFrom(throwable.getClass())) {
+						return TX_INVALID;
+					}
 				}
 				return super.classify(throwable);
 			}
@@ -106,13 +108,15 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	}
 
 	/**
-	 * Setter for the Throwable type that this handler counts. Defaults to
-	 * {@link Exception}.
+	 * Setter for the Throwable exceptionClasses that this handler counts. Defaults to
+	 * {@link Exception}. If more exceptionClasses are specified handler uses single
+	 * counter that is incremented when one of the recognized exception
+	 * exceptionClasses is handled.
 	 * 
 	 * @param type
 	 */
-	public void setType(Class type) {
-		this.type = type;
+	public void setExceptionClasses(Class[] classes) {
+		this.exceptionClasses = classes;
 	}
 
 }
