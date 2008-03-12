@@ -153,10 +153,10 @@ public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
 				retryTemplate.setBackOffPolicy(backOffPolicy);
 			}
 
-			StatefulRetryItemHandler itemProcessor = new StatefulRetryItemHandler(getItemReader(), getItemWriter(),
+			StatefulRetryItemHandler itemHandler = new StatefulRetryItemHandler(getItemReader(), getItemWriter(),
 					retryTemplate, retryCallback);
 
-			step.setItemHandler(itemProcessor);
+			step.setItemHandler(itemHandler);
 
 		}
 

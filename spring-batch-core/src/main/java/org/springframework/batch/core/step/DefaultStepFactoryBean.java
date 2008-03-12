@@ -23,7 +23,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
-import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
@@ -37,8 +36,6 @@ import org.springframework.core.task.TaskExecutor;
  * 
  */
 public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
-
-	private int skipLimit = 0;
 
 	private int commitInterval = 0;
 
@@ -74,19 +71,6 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	 */
 	public void setStreams(ItemStream[] streams) {
 		this.streams = streams;
-	}
-
-	/**
-	 * Public setter for a limit that determines skip policy. If this value is
-	 * positive then an exception in chunk processing will cause the item to be
-	 * skipped and no exception propagated until the limit is reached. If it is
-	 * zero then all exceptions will be propagated from the chunk and cause the
-	 * step to abort.
-	 * 
-	 * @param skipLimit the value to set. Default is 0 (never skip).
-	 */
-	public void setSkipLimit(int skipLimit) {
-		this.skipLimit = skipLimit;
 	}
 	
 	/**
@@ -221,26 +205,10 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 		step.setStepOperations(stepOperations);
 
-		ItemSkipPolicyItemHandler itemProcessor = new ItemSkipPolicyItemHandler(itemReader, itemWriter);
+		ItemSkipPolicyItemHandler itemHandler = new ItemSkipPolicyItemHandler(itemReader, itemWriter);
 
-		if (skipLimit > 0) {
-			/*
-			 * If there is a skip limit (not the default) then we are prepared
-			 * to absorb exceptions at the step level because the failed items
-			 * will never re-appear after a rollback.
-			 */
-			itemProcessor.setItemSkipPolicy(new LimitCheckingItemSkipPolicy(skipLimit));
-			setExceptionHandler(new SimpleLimitExceptionHandler(skipLimit));
-			stepOperations.setExceptionHandler(getExceptionHandler());
-			step.setStepOperations(stepOperations);
-		}
-		else {
-			// This is the default in ItemOrientedStep anyway...
-			itemProcessor.setItemSkipPolicy(new NeverSkipItemSkipPolicy());
-		}
-
-		setItemHandler(itemProcessor);
-		step.setItemHandler(itemProcessor);
+		setItemHandler(itemHandler);
+		step.setItemHandler(itemHandler);
 
 	}
 	
