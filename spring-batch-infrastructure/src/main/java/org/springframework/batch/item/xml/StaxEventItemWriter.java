@@ -316,7 +316,13 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 
 		// writer.writeEndDocument(); <- this doesn't work after restart
 		// we need to write end tag of the root element manually
+		
+		//harmless event to close the root tag if there were no items
+		XMLEventFactory factory = XMLEventFactory.newInstance();
+		writer.add(factory.createCharacters(""));
+		
 		writer.flush();
+		
 		ByteBuffer bbuf = ByteBuffer.wrap(("</" + getRootTagName() + ">").getBytes());
 		try {
 			channel.write(bbuf);

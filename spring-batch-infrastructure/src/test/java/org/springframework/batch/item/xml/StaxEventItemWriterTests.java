@@ -163,6 +163,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		assertTrue(outputFileContent().indexOf("<testroot attribute=\"value\"") != NOT_FOUND);
 
 		writer.close(null);
+		assertTrue(outputFileContent().indexOf("<testroot attribute=\"value\">") != NOT_FOUND);
 		assertTrue(outputFileContent().endsWith("</testroot>"));
 	}
 
