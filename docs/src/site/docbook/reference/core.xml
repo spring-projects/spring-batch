@@ -49,20 +49,19 @@
   </section>
 
   <section>
-    <title id="s.2">Simple Batch Execution Environment high level flow and
-    interaction of the architecture.</title>
+    <title id="s.2">Batch Application Style Interactions and Services</title>
 
     <mediaobject>
       <imageobject role="fo">
         <imagedata align="center"
                    fileref="images/spring-batch-reference-model.png"
-                   format="JPG" />
+                   format="PNG" />
       </imageobject>
 
       <imageobject role="html">
         <imagedata align="center"
                    fileref="images/spring-batch-reference-model.png"
-                   format="JPG" />
+                   format="PNG" />
       </imageobject>
 
       <caption><para>Figure 2.1: Batch Stereotypes</para></caption>
@@ -211,8 +210,8 @@
       meaning the January 1st run processes data for January 1st, etc) That is
       to say, each <classname>JobInstance</classname> can have multiple
       executions. (<classname>JobExecution</classname> is discussed in more
-      detail below) and only one instance can be running at a given time.
-      </para>
+      detail below) and only one instance can be running at a given
+      time.</para>
     </section>
 
     <section>
@@ -247,7 +246,7 @@
       <classname>JobInstance</classname> of the EndOfDay job for 01-01-2008,
       as described above, that fails to successfully complete its work the
       first time it is run, when we attempt to run it again (with the same job
-      parameters of 01-01-2008), a new job execution will be created. </para>
+      parameters of 01-01-2008), a new job execution will be created.</para>
 
       <para>A Job defines what a job is and defines how it is to be executed,
       and <classname>JobInstance</classname> is a purely organization object
@@ -673,17 +672,56 @@
         </tgroup>
       </table>
     </section>
+  </section>
 
-    <section>
-      <title id="s.2.1.6">Tasklets</title>
+  <section>
+    <title>JobRepository</title>
 
-      <para>A <classname>Tasklet</classname> represents the execution of a
-      logical unit of work, as defined by its implementation of the Spring
-      Batch provided <classname>Tasklet</classname> interface. A
-      <classname>Tasklet</classname> is useful for encapsulating processing
-      logic that is not natural to split into read-(transform)-write phases,
-      such as invoking a system command or a stored procedure.</para>
-    </section>
+    <para>The <classname>JobRepository</classname> is the persistence
+    mechanism for all of the Stereotypes mentioned above. When a job is first
+    launched, a <classname>JobExecution</classname> is obtained by calling the
+    repository's <methodname>createJobExecution</methodname> method, and
+    during the course of execution, <classname>StepExecution</classname> and
+    <classname>JobExecution</classname> are persisted by passing them to the
+    repository:</para>
+
+    <programlisting>  public interface JobRepository {
+
+    public JobExecution createJobExecution(Job job, JobParameters jobParameters)
+         throws JobExecutionAlreadyRunningException, JobRestartException;
+
+    void saveOrUpdate(JobExecution jobExecution);
+
+    void saveOrUpdate(StepExecution stepExecution);
+
+    void saveOrUpdateExecutionContext(StepExecution stepExecution);
+
+    StepExecution getLastStepExecution(JobInstance jobInstance, Step step);
+
+    int getStepExecutionCount(JobInstance jobInstance, Step step);
+
+}
+</programlisting>
+  </section>
+
+  <section>
+    <title>JobLauncher</title>
+
+    <para><classname>JobLauncher </classname>represents a simple interface for
+    launching a <classname>Job</classname> with a given set of
+    <classname>JobParameters</classname>:</para>
+
+    <programlisting>  public interface JobLauncher {
+
+    public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
+        JobRestartException;
+}
+</programlisting>
+
+    <para>It is expected that implementations will obtain a valid
+    <classname>JobExecution</classname> fromt he
+    <classname>JobRepository</classname> and execute the
+    <classname>Job</classname>.</para>
   </section>
 
   <section>
@@ -706,6 +744,17 @@
     next, only the item that that was passed in its current invocation. More
     details about the <classname>ItemWriter</classname> interface and it's
     various implementations can be found in Chatper 3.</para>
+  </section>
+
+  <section>
+    <title id="s.2.1.6">Tasklet</title>
+
+    <para>A <classname>Tasklet</classname> represents the execution of a
+    logical unit of work, as defined by its implementation of the Spring Batch
+    provided <classname>Tasklet</classname> interface. A
+    <classname>Tasklet</classname> is useful for encapsulating processing
+    logic that is not natural to split into read-(transform)-write phases,
+    such as invoking a system command or a stored procedure.</para>
   </section>
 
   <section>
