@@ -51,10 +51,10 @@ public class CompositeItemWriteListener implements ItemWriteListener {
 		}
 	}
 
-	public void afterWrite() {
+	public void afterWrite(Object item) {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemWriteListener listener = (ItemWriteListener) iterator.next();
-			listener.afterWrite();
+			listener.afterWrite(item);
 		}
 	}
 

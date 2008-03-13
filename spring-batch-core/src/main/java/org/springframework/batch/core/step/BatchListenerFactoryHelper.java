@@ -98,7 +98,7 @@ class BatchListenerFactoryHelper {
 				try {
 					multicaster.beforeWrite(item);
 					super.write(item);
-					multicaster.afterWrite();
+					multicaster.afterWrite(item);
 				}
 				catch (Exception e) {
 					multicaster.onWriteError(e, item);

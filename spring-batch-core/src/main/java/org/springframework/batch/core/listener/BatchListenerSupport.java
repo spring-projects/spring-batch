@@ -85,7 +85,7 @@ public class BatchListenerSupport implements StepListener, ChunkListener,
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.ItemWriteListener#afterWrite()
 	 */
-	public void afterWrite() {
+	public void afterWrite(Object item) {
 	}
 
 	/* (non-Javadoc)

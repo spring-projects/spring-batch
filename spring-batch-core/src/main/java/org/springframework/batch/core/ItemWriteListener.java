@@ -36,8 +36,9 @@ public interface ItemWriteListener extends BatchListener {
 	 * Called after {@link ItemWriter#write(Object)  If  the item is last in a
 	 * chunk, this will be called before any transaction is committed, and
 	 * before {@link ChunkListener#afterChunk()}
+	 * @param item TODO
 	 */
-	void afterWrite();
+	void afterWrite(Object item);
 
 	/**
 	 * Called if an error occurs while trying to write.

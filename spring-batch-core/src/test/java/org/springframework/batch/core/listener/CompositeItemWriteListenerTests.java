@@ -49,9 +49,10 @@ public class CompositeItemWriteListenerTests extends TestCase {
 	}
 	
 	public void testAfterWrite(){
-		listener.afterWrite();
+		Object item = new Object();
+		listener.afterWrite(item);
 		listenerControl.replay();
-		compositeListener.afterWrite();
+		compositeListener.afterWrite(item);
 		listenerControl.verify();
 	}
 	

@@ -146,10 +146,10 @@ public class MulticasterBatchListener implements StepListener, ChunkListener, It
 
 	/**
 	 * 
-	 * @see org.springframework.batch.core.listener.CompositeItemWriteListener#afterWrite()
+	 * @see org.springframework.batch.core.listener.CompositeItemWriteListener#afterWrite(Object)
 	 */
-	public void afterWrite() {
-		itemWriteListener.afterWrite();
+	public void afterWrite(Object item) {
+		itemWriteListener.afterWrite(item);
 	}
 
 	/**
