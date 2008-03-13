@@ -19,15 +19,15 @@ template.setCompletionPolicy(new FixedChunkSizeCompletionPolicy(2));
 
 template.iterate(new RepeatCallback() {
 
-    public boolean doInIteration(RepeatContext context) {
+    public ExitStatus doInIteration(RepeatContext context) {
         // Do stuff in batch...
-        return true; // Return false to signal exhausted data
+        return ExitStatus.CONTINUABLE; // Return ExitStatus.FINISHED to signal exhausted data
     }
 
 });
 +---
 
-  The callback is executed repeatedly, until the termination policy
+  The callback is executed repeatedly, until the completion policy
   determines that the batch should end.
 
   The framework provides <<<RetryOperations>>> for automatic retry of

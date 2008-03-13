@@ -5,7 +5,7 @@
   <title>Repeat</title>
 
   <section>
-    <title>Repeat Template</title>
+    <title>RepeatTemplate</title>
 
     <para>Batch processing is about repetitive actions - either as a simple
     optimisation, or as part of a job. To strategise and generalise the
@@ -192,7 +192,7 @@ template.iterate(new RepeatCallback() {
     <classname>RepeatCallback</classname>, the
     <classname>RepeatTemplate</classname> consults an
     <classname>ExceptionHandler</classname> which can decide whether or not to
-    re-throw the exception. </para>
+    re-throw the exception.</para>
 
     <para><programlisting>public interface ExceptionHandler {
 
@@ -247,7 +247,7 @@ template.iterate(new RepeatCallback() {
     <methodname>close</methodname> callbacks come before and after the entire
     iteration, and <methodname>before</methodname>,
     <methodname>after</methodname> and <methodname>onError</methodname> apply
-    to the individual RepeatCallback calls. </para>
+    to the individual RepeatCallback calls.</para>
 
     <para>Note that when there is more than one listener, they are in a list,
     so there is an order. In this case <methodname>open</methodname> and
@@ -269,5 +269,54 @@ template.iterate(new RepeatCallback() {
     SynchronousTaskExecutor, which has the effect of executing the whole
     iteration in the same thread (the same as a normal
     <classname>RepeatTemplate</classname>).</para>
+  </section>
+
+  <section>
+    <title>Declarative Iteration</title>
+
+    <para>Sometimes there is some business processing that you know you want
+    to repeat every time it happens. The classic example of this is the
+    optimization of a message pipeline - it is more efficient to process a
+    batch of messages, if they are arriving frequently, than to bear the cost
+    of a separate transaction for every message. Spring Batch provides an AOP
+    interceptor that wraps a method call in a
+    <classname>RepeatOperations</classname> for just this purpose. The
+    <classname>RepeatOperationsInterceptor</classname> executes the
+    intercepted method and repeats according to the
+    <classname>CompetionPolicy</classname> in the provided
+    <classname>RepeatTemplate</classname>.</para>
+
+    <para>Here is an example of declarative iteration using the Spring AOP
+    namespace to repeat a service call to a method called
+    <methodname>processMessage</methodname> (for more detail on how to
+    configure AOP interceptors see the Spring User Guide):</para>
+
+    <programlisting>&lt;aop:config&gt;
+    &lt;aop:pointcut id="transactional"
+        expression="execution(* com...*Service.processMessage(..))" /&gt;
+    &lt;aop:advisor pointcut-ref="transactional"
+        advice-ref="retryAdvice" order="-1"/&gt;
+&lt;/aop:config&gt;
+
+&lt;bean id="retryAdvice"
+    class="org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor"/&gt;
+</programlisting>
+
+    <para>The example above uses a default
+    <classname>RepeatTemplate</classname> inside the interceptor. To change
+    the policies, listeners etc. you only need to inject an instance of
+    <classname>RepeatTemplate</classname> into the interceptor.</para>
+
+    <para>If the intercepted method returns <code>void</code> then the
+    interceptor always returns ExitStatus.CONTINUABLE (so there is a danger of
+    an infinite loop if the <classname>CompletionPolicy</classname> does not
+    have a finite end point). Otherwise it returns
+    <code>ExitStatus.CONTINUABLE</code> until the return value from the
+    intercepted method is null, at which point it returns
+    <code>ExitStatus.FINISHED</code>. So the business logic inside the target
+    method can signal that there is no more work to do by returning
+    <code>null</code>, or by throwing an exception that is re-thrown by the
+    <classname>ExceptionHandler</classname> in the provided
+    <classname>RepeatTemplate</classname>.</para>
   </section>
 </chapter>
