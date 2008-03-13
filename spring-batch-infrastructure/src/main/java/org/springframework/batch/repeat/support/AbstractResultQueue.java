@@ -19,9 +19,11 @@ package org.springframework.batch.repeat.support;
 import org.springframework.batch.repeat.RepeatException;
 
 /**
- * Abstract implementation that can be extended for both Backport Concurrent and JDK 5 Concurrent
+ * Abstract implementation that can be extended for both Backport Concurrent and
+ * JDK 5 Concurrent.
  * 
  * @author Ben Hale
+ * @author Dave Syer
  */
 abstract class AbstractResultQueue extends RepeatInternalStateSupport implements ResultQueue {
 
@@ -31,14 +33,14 @@ abstract class AbstractResultQueue extends RepeatInternalStateSupport implements
 	// Arbitrary lock object.
 	Object hold = new Object();
 
-	// Counter to monitor the difference between expected and actually collected results. When this
-	// reaches zero there are really no more results.
+	// Counter to monitor the difference between expected and actually collected
+	// results. When this reaches zero there are really no more results.
 	volatile int count = 0;
 
 	public boolean isExpecting() {
 		synchronized (lock) {
-			// Base the decision about whether we expect more results on a counter of the number of
-			// expected results actually collected.
+			// Base the decision about whether we expect more results on a
+			// counter of the number of expected results actually collected.
 			return count > 0;
 		}
 	}
@@ -49,15 +51,17 @@ abstract class AbstractResultQueue extends RepeatInternalStateSupport implements
 				aquireWait();
 				count++;
 			}
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			throw new RepeatException("InterruptedException waiting for to acquire lock on input.");
 		}
 	}
 
 	public void put(ResultHolder holder) {
-		// There should be no need to block here, or to use offer(), but apparently the add()
-		// sometimes takes so long on the CI build that the queue fills up...
+		// There should be no need to block here, or to use offer(), but
+		// apparently the add() sometimes takes so long on the CI build that the
+		// queue fills up, so we synchronize here...
 		synchronized (hold) {
 			addResult(holder);
 			// Take from the waits queue now to allow another result to
@@ -74,19 +78,41 @@ abstract class AbstractResultQueue extends RepeatInternalStateSupport implements
 				// Decrement the counter only when the result is collected.
 				count--;
 			}
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			throw new RepeatException("Interrupted while waiting for result.");
+			throw new RepeatException("InterruptedException while waiting for result.");
 		}
 		return value;
 	}
 
+	/**
+	 * Acquire permission for one more task on the queue.
+	 * 
+	 * @throws InterruptedException
+	 */
 	protected abstract void aquireWait() throws InterruptedException;
 
+	/**
+	 * Release the permit that we were holding while a task was processed.
+	 */
 	protected abstract void releaseWait();
 
+	/**
+	 * Add a {@link ResultHolder} with a finished result to the queue for
+	 * collection. Should not block. May throw an exception to signal that the
+	 * queue is full, but that would be an unexpected condition.
+	 * 
+	 * @param resultHolder a {@link ResultHolder}
+	 */
 	protected abstract void addResult(ResultHolder resultHolder);
 
+	/**
+	 * Obtain a result from the queue, blocking until one becomes available.
+	 * 
+	 * @return a {@link ResultHolder} with the completed result
+	 * @throws InterruptedException if an interrupt is signalled
+	 */
 	protected abstract ResultHolder takeResult() throws InterruptedException;
 
 }
