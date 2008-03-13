@@ -71,13 +71,13 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		assertTrue(writer.skipped.contains("4"));
 
 //		TODO when reader throws exception on "2", it results in writer skipping "1"
-//		String[] expectedOutput = { "1", "3", "5" };
-//
-//		for (int i = 0; i < expectedOutput.length; i++) {
-//			assertTrue("Output should contain \"" + expectedOutput[i] + "\"", writer.written
-//					.contains(expectedOutput[i]));
-//		}
-//		assertTrue(writer.written.size() == expectedOutput.length);
+		String[] expectedOutput = { "1", "3", "5" };
+
+		for (int i = 0; i < expectedOutput.length; i++) {
+			assertTrue("Output should contain \"" + expectedOutput[i] + "\"", writer.written
+					.contains(expectedOutput[i]));
+		}
+		assertTrue(writer.written.size() == expectedOutput.length);
 	}
 
 	/**

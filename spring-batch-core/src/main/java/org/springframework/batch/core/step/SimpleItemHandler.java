@@ -29,8 +29,12 @@ import org.springframework.batch.repeat.ExitStatus;
  * recovering. Just delegates all calls to the provided {@link ItemReader} and
  * {@link ItemWriter}.
  * 
- * @author Dave Syer
+ * Provider extension points by protected {@link #read(StepContribution)} and
+ * {@link #write(Object, StepContribution)} methods that can be overriden to
+ * provide more sophisticated behavior (e.g. skipping).
  * 
+ * @author Dave Syer
+ * @author Robert Kasanicky
  */
 public class SimpleItemHandler implements ItemHandler {
 
@@ -65,18 +69,35 @@ public class SimpleItemHandler implements ItemHandler {
 	}
 
 	/**
-	 * Read from the {@link ItemReader} and process (if not null) with the
-	 * {@link ItemWriter}.
+	 * Get the next item from {@link #read(StepContribution)} and if not null
+	 * pass the item to {@link #write(Object, StepContribution)}.
 	 * 
 	 * @see org.springframework.batch.core.step.ItemHandler#handle(org.springframework.batch.core.StepContribution)
 	 */
 	public ExitStatus handle(StepContribution contribution) throws Exception {
-		Object item = itemReader.read();
+		Object item = read(contribution);
 		if (item == null) {
 			return ExitStatus.FINISHED;
 		}
-		itemWriter.write(item);
+		write(item, contribution);
 		return ExitStatus.CONTINUABLE;
+	}
+
+	/**
+	 * @param contribution current context
+	 * @return next item for writing
+	 */
+	protected Object read(StepContribution contribution) throws Exception {
+		return itemReader.read();
+	}
+
+	/**
+	 * 
+	 * @param item the item to write
+	 * @param contribution current context
+	 */
+	protected void write(Object item, StepContribution contribution) throws Exception {
+		itemWriter.write(item);
 	}
 
 	/**

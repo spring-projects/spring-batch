@@ -20,11 +20,17 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.Skippable;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * @author Dave Syer
+ * {@link ItemHandler} that implements skip behavior. It delegates to
+ * {@link #itemSkipPolicy} to decide whether skip should be called or not.
  * 
+ * If exception is thrown while reading the item, skip is called on the
+ * {@link ItemReader}. If exception is thrown while writing the item, skip is
+ * called on both {@link ItemReader} and {@link ItemWriter}.
+ * 
+ * @author Dave Syer
+ * @author Robert Kasanicky
  */
 public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 
@@ -46,54 +52,51 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	}
 
 	/**
-	 * Execute the business logic, delegating to the reader and writer.
-	 * Subclasses could extend the behaviour as long as they always return the
-	 * value of this method call in their superclass.<br/>
+	 * Tries to read the item from the reader, in case exception is thrown calls
+	 * skip on the reader (if skipPolicy decides it is appropriate) before
+	 * rethrowing the exception.
 	 * 
-	 * Read from the {@link ItemReader} and process (if not null) with the
-	 * {@link ItemWriter}.<br/>
-	 * 
-	 * If there is an exception and the reader or writer implements
-	 * {@link Skippable} then the skip method is called.
-	 * 
-	 * @param contribution the current step
-	 * @return {@link ExitStatus#CONTINUABLE} if there is more processing to do
-	 * @throws Exception if there is an error
+	 * @param contribution current StepContribution holding skipped items count
+	 * @return next item for processing
 	 */
-	public ExitStatus handle(StepContribution contribution) throws Exception {
-		ExitStatus exitStatus = ExitStatus.CONTINUABLE;
-
+	protected Object read(StepContribution contribution) throws Exception {
 		try {
-
-			exitStatus = super.handle(contribution);
-
+			return getItemReader().read();
 		}
 		catch (Exception e) {
-
 			if (itemSkipPolicy.shouldSkip(e, contribution.getSkipCount())) {
 				contribution.incrementSkipCount();
-				skip();
+				if (getItemReader() instanceof Skippable) {
+					((Skippable) getItemReader()).skip();
+				}
 			}
-			// Rethrow so that outer transaction is rolled back properly
 			throw e;
-
 		}
-
-		return exitStatus;
 	}
 
 	/**
-	 * Mark the current item as skipped if possible. If the reader and / or
-	 * writer are {@link Skippable} then delegate to them in that order.
+	 * Tries to write the item using the writer, in case exception is thrown
+	 * calls skip on both reader and writer (if skipPolicy decides it is
+	 * appropriate) before rethrowing the exception.
 	 * 
-	 * @see org.springframework.batch.item.Skippable#skip()
+	 * @param item item to write
+	 * @param contribution current StepContribution holding skipped items count
 	 */
-	private void skip() {
-		if (getItemReader() instanceof Skippable) {
-			((Skippable) getItemReader()).skip();
+	protected void write(Object item, StepContribution contribution) throws Exception {
+		try {
+			getItemWriter().write(item);
 		}
-		if (getItemWriter() instanceof Skippable) {
-			((Skippable) getItemWriter()).skip();
+		catch (Exception e) {
+			if (itemSkipPolicy.shouldSkip(e, contribution.getSkipCount())) {
+				contribution.incrementSkipCount();
+				if (getItemReader() instanceof Skippable) {
+					((Skippable) getItemReader()).skip();
+				}
+				if (getItemWriter() instanceof Skippable) {
+					((Skippable) getItemWriter()).skip();
+				}
+			}
+			throw e;
 		}
 	}
 
