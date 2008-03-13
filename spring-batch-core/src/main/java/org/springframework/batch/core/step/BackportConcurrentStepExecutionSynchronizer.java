@@ -20,7 +20,7 @@ import org.springframework.batch.core.StepExecution;
 import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 
 /**
- * An implementation of the {@link StepExecutionSynchronizer} that uses Backport Concurrent Utilties.
+ * An implementation of the {@link StepExecutionSynchronizer} that uses Backport Concurrent Utilities.
  * 
  * @author Dave Syer
  * @author Ben Hale

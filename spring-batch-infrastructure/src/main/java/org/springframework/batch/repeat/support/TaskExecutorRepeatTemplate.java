@@ -21,33 +21,25 @@ import java.util.List;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ArrayBlockingQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
-
 /**
- * Provides {@link RepeatOperations} support including interceptors that can be
- * used to modify or monitor the behaviour at run time.<br/>
+ * Provides {@link RepeatOperations} support including interceptors that can be used to modify or monitor the behaviour
+ * at run time.<br/>
  * 
- * This implementation is sufficient to be used to configure transactional
- * behaviour for each item by making the {@link RepeatCallback} transactional,
- * or for the whole batch by making the execute method transactional (but only
+ * This implementation is sufficient to be used to configure transactional behaviour for each item by making the
+ * {@link RepeatCallback} transactional, or for the whole batch by making the execute method transactional (but only
  * then if the task executor is synchronous).<br/>
  * 
- * This class is thread safe if its collaborators are thread safe (interceptors,
- * terminationPolicy, callback). Normally this will be the case, but clients
- * need to be aware that if the task executor is asynchronous, then the other
- * collaborators should be also. In particular the {@link RepeatCallback} that
- * is wrapped in the execute method must be thread safe - often it is based on
- * some form of data source, which itself should be both thread safe and
- * transactional (multiple threads could be accessing it at any given time, and
- * each thread would have its own transaction).<br/>
+ * This class is thread safe if its collaborators are thread safe (interceptors, terminationPolicy, callback). Normally
+ * this will be the case, but clients need to be aware that if the task executor is asynchronous, then the other
+ * collaborators should be also. In particular the {@link RepeatCallback} that is wrapped in the execute method must be
+ * thread safe - often it is based on some form of data source, which itself should be both thread safe and
+ * transactional (multiple threads could be accessing it at any given time, and each thread would have its own
+ * transaction).<br/>
  * 
  * @author Dave Syer
  * 
@@ -55,8 +47,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 	/**
-	 * Default limit for maximum number of concurrent unfinished results allowed
-	 * by the template.
+	 * Default limit for maximum number of concurrent unfinished results allowed by the template.
 	 * {@link #getNextResult(RepeatContext, RepeatCallback, TerminationContext, List)}.
 	 */
 	public static final int DEFAULT_THROTTLE_LIMIT = 4;
@@ -77,18 +68,16 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	}
 
 	/**
-	 * Use the {@link #taskExecutor} to generate a result. The internal state in
-	 * this case is a queue of unfinished result holders of type
-	 * {@link ResultHolder}. The holder with the return value should not be on
-	 * the queue when this method exits. The queue is scoped in the calling
-	 * method so there is no need to synchronize access.
+	 * Use the {@link #taskExecutor} to generate a result. The internal state in this case is a queue of unfinished
+	 * result holders of type {@link ResultHolder}. The holder with the return value should not be on the queue when
+	 * this method exits. The queue is scoped in the calling method so there is no need to synchronize access.
 	 * 
 	 * @see org.springframework.batch.repeat.support.AbstracBatchemplate#getNextResult(org.springframework.batch.item.RepeatContext,
-	 * org.springframework.batch.repeat.RepeatCallback,
-	 * org.springframework.batch.TerminationContext, java.util.List)
+	 *      org.springframework.batch.repeat.RepeatCallback, org.springframework.batch.TerminationContext,
+	 *      java.util.List)
 	 */
 	protected ExitStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
-			throws Throwable {
+	        throws Throwable {
 
 		ExecutingRunnable runnable = null;
 
@@ -97,8 +86,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		do {
 
 			/*
-			 * Wrap the callback in a runnable that will add its result to the
-			 * queue when it is ready.
+			 * Wrap the callback in a runnable that will add its result to the queue when it is ready.
 			 */
 			runnable = new ExecutingRunnable(callback, context, queue);
 
@@ -108,14 +96,13 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			taskExecutor.execute(runnable);
 
 			/*
-			 * Allow termination policy to update its state. This must happen
-			 * immediately before or after the call to the task executor.
+			 * Allow termination policy to update its state. This must happen immediately before or after the call to
+			 * the task executor.
 			 */
 			update(context);
 
 			/*
-			 * Keep going until we get a result that is finished, or early
-			 * termination...
+			 * Keep going until we get a result that is finished, or early termination...
 			 */
 		} while (queue.isEmpty() && !isComplete(context));
 
@@ -127,8 +114,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	}
 
 	/**
-	 * Wait for all the results to appear on the queue and execute the after
-	 * interceptors for each one.
+	 * Wait for all the results to appear on the queue and execute the after interceptors for each one.
 	 * 
 	 * @see org.springframework.batch.repeat.support.RepeatTemplate#waitForResults(org.springframework.batch.repeat.support.RepeatInternalState)
 	 */
@@ -141,15 +127,14 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		while (futures.isExpecting()) {
 
 			/*
-			 * Careful that no runnables that are not going to finish ever get
-			 * onto the queue, else this may block forever.
+			 * Careful that no runnables that are not going to finish ever get onto the queue, else this may block
+			 * forever.
 			 */
 			ResultHolder future = (ResultHolder) futures.take();
 
 			if (future.getError() != null) {
 				state.getThrowables().add(future.getError());
-			}
-			else {
+			} else {
 				ExitStatus status = future.getResult();
 				result = result && canContinue(status);
 				executeAfterInterceptors(future.getContext(), status);
@@ -164,7 +149,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 	protected RepeatInternalState createInternalState(RepeatContext context) {
 		// Queue of pending results:
-		return new ResultQueue();
+		return new ResultQueueFactory().getResultQueue(throttleLimit);
 	}
 
 	/**
@@ -200,34 +185,30 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		}
 
 		/**
-		 * Execute the batch callback, and store the result, or any exception
-		 * that is thrown for retrieval later by caller.
+		 * Execute the batch callback, and store the result, or any exception that is thrown for retrieval later by
+		 * caller.
 		 * 
 		 * @see java.lang.Runnable#run()
 		 */
 		public void run() {
 			try {
 				result = callback.doInIteration(context);
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				error = e;
-			}
-			finally {
+			} finally {
 				queue.put(this);
 			}
 		}
 
 		/**
-		 * Get the result - never blocks because the queue manages waiting for
-		 * the task to finish.
+		 * Get the result - never blocks because the queue manages waiting for the task to finish.
 		 */
 		public ExitStatus getResult() {
 			return result;
 		}
 
 		/**
-		 * Get the error - never blocks because the queue manages waiting for
-		 * the task to finish.
+		 * Get the error - never blocks because the queue manages waiting for the task to finish.
 		 */
 		public Throwable getError() {
 			return error;
@@ -243,133 +224,11 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	}
 
 	/**
-	 * Abstraction for queue of {@link ResultHolder} objects. Acts as a
-	 * BlockingQueue with the ability to count the number of items it expects to
-	 * ever hold. When clients schedule an item to be added they call
-	 * {@link #expect()}, and then when the result is collected the queue is
-	 * notified that it no longer expects another.
-	 * 
-	 * @author Dave Syer
-	 * 
-	 */
-	public class ResultQueue extends RepeatInternalStateSupport {
-
-		// Accumulation of result objects as they finish.
-		private BlockingQueue results = new ArrayBlockingQueue(throttleLimit);
-
-		// Accumulation of dummy objects flagging expected results in the
-		// future.
-		private Semaphore waits = new Semaphore(throttleLimit);
-
-		// Arbitrary lock object.
-		private Object lock = new Object();
-
-		// Arbitrary lock object.
-		private Object hold = new Object();
-
-		// Counter to monitor the difference between expected and actually
-		// collected results. When this reaches zero there are really no more
-		// results.
-		private volatile int count = 0;
-
-		public boolean isEmpty() {
-			return results.isEmpty();
-		}
-
-		public boolean isExpecting() {
-			synchronized (lock) {
-				// Base the decision about whether we expect more results on a
-				// counter of the number of expected results actually collected.
-				return count > 0;
-			}
-		}
-
-		public void expect() {
-			try {
-				waits.acquire();
-				synchronized (lock) {
-					count++;
-				}
-			}
-			catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				throw new RepeatException("InterruptedException waiting for to acquire lock on input.");
-			}
-		}
-
-		public void put(ResultHolder holder) {
-			// There should be no need to block here, or to use offer(), but
-			// apparently the add() sometimes takes so long on the CI build that
-			// the queue fills up...
-			synchronized (hold) {
-				results.add(holder);
-				// Take from the waits queue now to allow another result to
-				// accumulate. But don't decrement the counter.
-				waits.release();
-			}
-		}
-
-		public ResultHolder take() {
-			ResultHolder value;
-			try {
-				value = (ResultHolder) results.take();
-				synchronized (lock) {
-					// Decrement the counter only when the result is collected.
-					count--;
-				}
-			}
-			catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				throw new RepeatException("Interrupted while waiting for result.");
-			}
-			return value;
-		}
-
-	}
-
-	/**
-	 * Interface for result holder. Should be implemented by subclasses so that
-	 * the contract for
-	 * {@link AbstracBatchemplate#getNextResult(RepeatContext, RepeatCallback, TerminationContext, List)}
-	 * can be satisfied.
-	 * 
-	 * @author Dave Syer
-	 */
-	public interface ResultHolder {
-		/**
-		 * Get the result for client from this holder. Does not block if none is
-		 * available yet.
-		 * 
-		 * @return the result, or null if there is none.
-		 * @throws IllegalStateException
-		 */
-		ExitStatus getResult();
-
-		/**
-		 * Get the error for client from this holder if any. Does not block if
-		 * none is available yet.
-		 * 
-		 * @return the error, or null if there is none.
-		 * @throws IllegalStateException
-		 */
-		Throwable getError();
-
-		/**
-		 * Get the context in which the result evaluation is executing.
-		 * 
-		 * @return the context of the result evaluation.
-		 */
-		RepeatContext getContext();
-	}
-
-	/**
-	 * Public setter for the throttle limit. The throttle limit is the largest
-	 * number of concurrent tasks that can be executing at one time - if a new
-	 * task arrives and the throttle limit is breached we wait for one of the
-	 * executing tasks to finish before submitting the new one to the
-	 * {@link TaskExecutor}. Default value is {@value #DEFAULT_THROTTLE_LIMIT}.
-	 * N.B. when used with a thread pooled {@link TaskExecutor} it doesn't make
-	 * sense for the throttle limit to be less than the thread pool size.
+	 * Public setter for the throttle limit. The throttle limit is the largest number of concurrent tasks that can be
+	 * executing at one time - if a new task arrives and the throttle limit is breached we wait for one of the executing
+	 * tasks to finish before submitting the new one to the {@link TaskExecutor}. Default value is
+	 * {@value #DEFAULT_THROTTLE_LIMIT}. N.B. when used with a thread pooled {@link TaskExecutor} it doesn't make sense
+	 * for the throttle limit to be less than the thread pool size.
 	 * 
 	 * @param throttleLimit the throttleLimit to set.
 	 */
