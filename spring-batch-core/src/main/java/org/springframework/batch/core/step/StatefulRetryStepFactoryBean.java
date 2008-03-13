@@ -47,7 +47,7 @@ import org.springframework.batch.retry.support.RetryTemplate;
  * @author Dave Syer
  * 
  */
-public class StatefulRetryStepFactoryBean extends DefaultStepFactoryBean {
+public class StatefulRetryStepFactoryBean extends SimpleStepFactoryBean {
 
 	private ItemKeyGenerator itemKeyGenerator;
 

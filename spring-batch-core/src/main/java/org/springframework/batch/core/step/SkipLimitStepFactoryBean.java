@@ -8,7 +8,7 @@ import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
  * Factory bean for step that allows configuring skip limit.
  * 
  */
-public class SkipLimitStepFactoryBean extends DefaultStepFactoryBean {
+public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 
 	private int skipLimit = 0;
 	

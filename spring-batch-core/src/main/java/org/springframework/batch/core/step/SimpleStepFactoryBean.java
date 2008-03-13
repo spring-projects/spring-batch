@@ -32,10 +32,16 @@ import org.springframework.core.task.TaskExecutor;
  * Most common configuration options for simple steps should be found here. Use
  * this factory bean instead of creating a {@link Step} implementation manually.
  * 
+ * This factory does not support configuration of fault-tolerant behavior, use
+ * appropriate subclass of this factory bean to configure skip or retry.
+ * 
+ * @see SkipLimitStepFactoryBean
+ * @see StatefulRetryStepFactoryBean
+ * 
  * @author Dave Syer
  * 
  */
-public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
+public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 
 	private int commitInterval = 0;
 
@@ -72,7 +78,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 	public void setStreams(ItemStream[] streams) {
 		this.streams = streams;
 	}
-	
+
 	/**
 	 * The listeners to inject into the {@link Step}. Any instance of
 	 * {@link BatchListener} can be used, and will then receive callbacks at the
@@ -176,7 +182,6 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 
 		BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
 
-		
 		if (commitInterval > 0) {
 			RepeatTemplate chunkOperations = new RepeatTemplate();
 			chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
@@ -187,7 +192,6 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 		StepListener[] stepListeners = helper.getStepListeners(listeners);
 		itemReader = helper.getItemReader(itemReader, listeners);
 		itemWriter = helper.getItemWriter(itemWriter, listeners);
-		
 
 		// In case they are used by subclasses:
 		setItemReader(itemReader);
@@ -196,7 +200,7 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 		step.setStepListeners(stepListeners);
 
 		stepOperations = new RepeatTemplate();
-		
+
 		if (taskExecutor != null) {
 			TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
 			repeatTemplate.setTaskExecutor(taskExecutor);
@@ -211,5 +215,5 @@ public class DefaultStepFactoryBean extends AbstractStepFactoryBean {
 		step.setItemHandler(itemHandler);
 
 	}
-	
+
 }

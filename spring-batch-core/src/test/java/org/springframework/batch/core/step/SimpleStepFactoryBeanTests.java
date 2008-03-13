@@ -44,7 +44,10 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
-public class DefaultStepFactoryBeanTests extends TestCase {
+/**
+ * Tests for {@link SimpleStepFactoryBean}.
+ */
+public class SimpleStepFactoryBeanTests extends TestCase {
 
 	private List recovered = new ArrayList();
 
@@ -71,16 +74,16 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 		MapStepExecutionDao.clear();
 	}
 
-	private DefaultStepFactoryBean getStep(String arg) throws Exception {
-		return getStep(new String[] { arg });
+	private SimpleStepFactoryBean getStepFactory(String arg) throws Exception {
+		return getStepFactory(new String[] { arg });
 	}
 
-	private DefaultStepFactoryBean getStep(String arg0, String arg1) throws Exception {
-		return getStep(new String[] { arg0, arg1 });
+	private SimpleStepFactoryBean getStepFactory(String arg0, String arg1) throws Exception {
+		return getStepFactory(new String[] { arg0, arg1 });
 	}
 
-	private DefaultStepFactoryBean getStep(String[] args) throws Exception {
-		DefaultStepFactoryBean factory = new DefaultStepFactoryBean();
+	private SimpleStepFactoryBean getStepFactory(String[] args) throws Exception {
+		SimpleStepFactoryBean factory = new SimpleStepFactoryBean();
 
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
@@ -97,10 +100,10 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 	public void testSimpleJob() throws Exception {
 
 		job.setSteps(new ArrayList());
-		AbstractStep step = (AbstractStep) getStep("foo", "bar").getObject();
+		AbstractStep step = (AbstractStep) getStepFactory("foo", "bar").getObject();
 		step.setName("step1");
 		job.addStep(step);
-		step = (AbstractStep) getStep("spam").getObject();
+		step = (AbstractStep) getStepFactory("spam").getObject();
 		step.setName("step2");
 		job.addStep(step);
 
@@ -130,7 +133,7 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 		 * is recovered ("skipped") on the second attempt (see retry policy
 		 * definition above)...
 		 */
-		DefaultStepFactoryBean factory = getStep(new String[] { "foo", "bar", "spam" });
+		SimpleStepFactoryBean factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
 		factory.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
@@ -163,7 +166,7 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 	}
 
 	public void testExceptionTerminates() throws Exception {
-		DefaultStepFactoryBean factory = getStep(new String[] { "foo", "bar", "spam" });
+		SimpleStepFactoryBean factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
 		factory.setItemWriter(new AbstractItemWriter() {
 			public void write(Object data) throws Exception {
@@ -189,7 +192,7 @@ public class DefaultStepFactoryBeanTests extends TestCase {
 		String[] items = new String[] { "1", "2", "3", "4", "5", "6", "7" };
 		int commitInterval = 3;
 		
-		DefaultStepFactoryBean factory = getStep(items);
+		SimpleStepFactoryBean factory = getStepFactory(items);
 		class CountingChunkListener implements ChunkListener {
 			int beforeCount = 0;
 			int afterCount = 0;
