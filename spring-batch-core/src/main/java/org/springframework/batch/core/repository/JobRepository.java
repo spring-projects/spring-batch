@@ -26,22 +26,11 @@ import org.springframework.batch.item.ExecutionContext;
 
 /**
  * <p>
- * Repository for storing batch jobs and steps. Before using any methods, a Job
- * must first be obtained using the findOrCreateJob method. Once a Job and it's
- * related steps are obtained, they can be updated. It should be noted that any
- * reconstituted steps are expected to contain restart data <strong>if the step
- * says it wants to be restored after a restart, and {@link ExecutionContext}
- * exists.</strong>
+ * Repository for storing batch {@link JobExecution} and {@link StepExecution}s. 
+ * Before using any methods, a {@link JobExecution}
+ * must first be obtained using the createJobExecution method. Once a {@link JobExecution}
+ * is obtained, they can be updated.
  * </p>
- * 
- * Once a Job/Steps has been created, Job and Step executions can be created and
- * associated with a job, by setting the JobId and StepId respectively. Once
- * these Id's are set, an execution can be persisted. If the object is in a
- * transient state (i.e. it has no id of it's own) then an ID will be created
- * for that specific execution, and then stored ('saved'). (NOTE: The
- * relationship between a Job/Step and Job/StepExecutions is 1:N.) If an ID does
- * exist, then the execution will be stored ('updated').
- * 
  * 
  * @author Lucas Ward
  * 
@@ -49,15 +38,17 @@ import org.springframework.batch.item.ExecutionContext;
 public interface JobRepository {
 
 	/**
-	 * Find or create a job execution for a given {@link JobIdentifier} and
-	 * configuration. If the job that is uniquely identified by
-	 * {@link JobIdentifier} already exists, its persisted values (including ID)
-	 * will be returned in a new {@link JobInstance} object. If no previous run
-	 * is found, a new job will be created and returned.
-	 * @param jobParameters the runtime parameters for the job
-	 * @param jobConfiguration describes the configuration for this job
+	 * Find or create a {@link JobExecution} for a given {@link Job} and
+	 * {@link JobParameters}. If the {@link Job} that is uniquely identified by
+	 * {@link JobParameters} already exists, its persisted values (including ID)
+	 * will be returned in a new {@link JobInstance} object, associated with the
+	 * returned {@link JobExecution}. If no previous run
+	 * is found, the execution will be associated with a new {@link JobInstance}
 	 * 
-	 * @return a valid job execution for the identifier provided
+	 * @param jobParameters the runtime parameters for the job
+	 * @param job the job the execution should be associated with.
+	 * 
+	 * @return a valid job {@link JobExecution} for the arguments provided
 	 * @throws JobExecutionAlreadyRunningException if there is a
 	 * {@link JobExecution} alrady running for the job instance that would
 	 * otherwise be returned
@@ -65,7 +56,7 @@ public interface JobRepository {
 	 * JobInstance.getJobExecutionCount() is greater than Job.getStartLimit()
 	 * 
 	 */
-	public JobExecution createJobExecution(Job job, JobParameters jobParameters)
+     JobExecution createJobExecution(Job job, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException;
 
 	/**
@@ -80,7 +71,7 @@ public interface JobRepository {
 	 * 
 	 * @param jobInstance
 	 */
-	public void saveOrUpdate(JobExecution jobExecution);
+	void saveOrUpdate(JobExecution jobExecution);
 
 	/**
 	 * Save or update a {@link StepExecution}. If no ID is found a new instance
@@ -95,7 +86,7 @@ public interface JobRepository {
 	 * 
 	 * @param jobInstance
 	 */
-	public void saveOrUpdate(StepExecution stepExecution);
+	void saveOrUpdate(StepExecution stepExecution);
 
 	/**
 	 * Save the {@link ExecutionContext} of the given {@link StepExecution}.
@@ -111,11 +102,11 @@ public interface JobRepository {
 	/**
 	 * @return the last execution of step for the given job instance.
 	 */
-	public StepExecution getLastStepExecution(JobInstance jobInstance, Step step);
+	StepExecution getLastStepExecution(JobInstance jobInstance, Step step);
 
 	/**
 	 * @return the execution count of the step within the given job instance.
 	 */
-	public int getStepExecutionCount(JobInstance jobInstance, Step step);
+	int getStepExecutionCount(JobInstance jobInstance, Step step);
 
 }
