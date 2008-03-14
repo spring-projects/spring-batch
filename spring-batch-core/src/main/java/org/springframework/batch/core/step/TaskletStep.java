@@ -166,7 +166,7 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 			if (e instanceof JobInterruptedException) {
 				throw (JobInterruptedException) e;
 			}
-			if (e instanceof RuntimeException) {
+			else if (e instanceof RuntimeException) {
 				throw (RuntimeException) e;
 			}
 			throw new UnexpectedJobExecutionException(e);

@@ -468,7 +468,7 @@ public class ItemOrientedStepTests extends TestCase {
 		StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy() {
 
 			public void checkInterrupted(RepeatContext context) throws JobInterruptedException {
-				throw new JobInterruptedException("");
+				throw new JobInterruptedException("interrupted");
 			}
 		};
 
@@ -499,12 +499,12 @@ public class ItemOrientedStepTests extends TestCase {
 
 		try {
 			itemOrientedStep.execute(stepExecution);
-			fail("Expected StepInterruptedException");
+			fail("Expected JobInterruptedException");
 		} catch (JobInterruptedException ex) {
 			assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertTrue("Message does not contain JobInterruptedException: " + msg, contains(msg,
-			        "JobInterruptedException"));
+			assertTrue("Message does not contain 'interrupted': " + msg, contains(msg,
+			        "interrupted"));
 		}
 	}
 
@@ -528,6 +528,32 @@ public class ItemOrientedStepTests extends TestCase {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected RuntimeException");
 		} catch (RuntimeException ex) {
+			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+			// The original rollback was caused by this one:
+			assertEquals("Foo", ex.getMessage());
+		}
+	}
+
+	public void testStatusForErrorFailure() throws Exception {
+
+		ItemReader itemReader = new AbstractItemReader() {
+			public Object read() throws Exception {
+				// Trigger a rollback
+				throw new Error("Foo");
+			}
+		};
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
+
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
+
+		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		// step.setLastExecution(stepExecution);
+
+		try {
+			itemOrientedStep.execute(stepExecution);
+			fail("Expected Error");
+		} catch (Error ex) {
 			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 			// The original rollback was caused by this one:
 			assertEquals("Foo", ex.getMessage());

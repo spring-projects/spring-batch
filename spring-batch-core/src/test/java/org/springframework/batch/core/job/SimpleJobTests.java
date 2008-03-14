@@ -22,7 +22,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.ItemSkipPolicy;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
@@ -31,7 +30,7 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.SimpleJob;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.listener.JobListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
@@ -252,6 +251,21 @@ public class SimpleJobTests extends TestCase {
 		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
 
+	public void testFailedWithError() throws Exception {
+		stepConfiguration1.setStartLimit(5);
+		stepConfiguration2.setStartLimit(5);
+		final Error exception = new Error("Foo!");
+		stepConfiguration1.setProcessException(exception);
+		try {
+			job.execute(jobExecution);
+		} catch (Error e) {
+			assertEquals(exception, e);
+		}
+		System.err.println(list);
+		assertEquals(0, list.size());
+		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
+	}
+
 	public void testStepShouldNotStart() throws Exception {
 		// Start policy will return false, keeping the step from being started.
 		stepConfiguration1.setStartLimit(0);
@@ -320,7 +334,7 @@ public class SimpleJobTests extends TestCase {
 	private class StubStep extends AbstractStep {
 
 		private Runnable runnable;
-		private Exception exception;
+		private Throwable exception;
 		protected ExceptionHandler exceptionHandler;
 		protected RetryPolicy retryPolicy;
 		protected JobRepository jobRepository;
@@ -339,7 +353,7 @@ public class SimpleJobTests extends TestCase {
 		/**
 		 * @param exception
 		 */
-		public void setProcessException(Exception exception) {
+		public void setProcessException(Throwable exception) {
 			this.exception = exception;
 		}
 
@@ -354,6 +368,10 @@ public class SimpleJobTests extends TestCase {
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
 				throw (RuntimeException) exception;
+			}
+			if (exception instanceof Error) {
+				stepExecution.setExitStatus(ExitStatus.FAILED);
+				throw (Error) exception;
 			}
 			if (exception instanceof JobInterruptedException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);

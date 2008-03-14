@@ -27,7 +27,7 @@ public class TaskletStepTests extends TestCase {
 
 	protected void setUp() throws Exception {
 		stepExecution = new StepExecution(new StepSupport("stepName"), new JobExecution(new JobInstance(new Long(0L),
-		        new JobParameters(), new JobSupport("testJob")), new Long(12)));
+				new JobParameters(), new JobSupport("testJob")), new Long(12)));
 	}
 
 	public void testTaskletMandatory() throws Exception {
@@ -35,7 +35,8 @@ public class TaskletStepTests extends TestCase {
 		step.setJobRepository(new JobRepositorySupport());
 		try {
 			step.afterPropertiesSet();
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
 			assertTrue("Message should contain 'tasklet': " + message, contains(message.toLowerCase(), "tasklet"));
 		}
@@ -45,7 +46,8 @@ public class TaskletStepTests extends TestCase {
 		TaskletStep step = new TaskletStep();
 		try {
 			step.afterPropertiesSet();
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
 			assertTrue("Message should contain 'tasklet': " + message, contains(message.toLowerCase(), "tasklet"));
 		}
@@ -88,7 +90,8 @@ public class TaskletStepTests extends TestCase {
 		try {
 			step.execute(stepExecution);
 			fail("Expected BatchCriticalException");
-		} catch (UnexpectedJobExecutionException e) {
+		}
+		catch (UnexpectedJobExecutionException e) {
 			assertEquals("foo", e.getCause().getMessage());
 		}
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
@@ -123,7 +126,21 @@ public class TaskletStepTests extends TestCase {
 		try {
 			step.execute(stepExecution);
 			fail();
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
+			assertNotNull(stepExecution.getStartTime());
+			assertEquals(ExitStatus.FAILED, stepExecution.getExitStatus());
+			assertNotNull(stepExecution.getEndTime());
+		}
+	}
+
+	public void testExceptionError() throws JobInterruptedException, UnexpectedJobExecutionException {
+		TaskletStep step = new TaskletStep(new StubTasklet(new Error("Foo!")), new JobRepositorySupport());
+		try {
+			step.execute(stepExecution);
+			fail();
+		}
+		catch (Error e) {
 			assertNotNull(stepExecution.getStartTime());
 			assertEquals(ExitStatus.FAILED, stepExecution.getExitStatus());
 			assertNotNull(stepExecution.getEndTime());
@@ -131,20 +148,22 @@ public class TaskletStepTests extends TestCase {
 	}
 
 	/**
-	 * When job is interrupted the {@link JobInterruptedException} should be propagated up.
+	 * When job is interrupted the {@link JobInterruptedException} should be
+	 * propagated up.
 	 */
 	public void testJobInterrupted() throws Exception {
 		TaskletStep step = new TaskletStep(new Tasklet() {
 			public ExitStatus execute() throws Exception {
-				throw new JobInterruptedException("Interrupted while executing tasklet");
+				throw new JobInterruptedException("Job interrupted while executing tasklet");
 			}
 		}, new JobRepositorySupport());
 
 		try {
 			step.execute(stepExecution);
 			fail();
-		} catch (JobInterruptedException expected) {
-			assertEquals("Interrupted while executing tasklet", expected.getMessage());
+		}
+		catch (JobInterruptedException expected) {
+			assertEquals("Job interrupted while executing tasklet", expected.getMessage());
 		}
 	}
 
@@ -158,6 +177,8 @@ public class TaskletStepTests extends TestCase {
 
 		private StepExecution stepExecution;
 
+		private Throwable exception = null;
+
 		public StubTasklet(boolean exitFailure, boolean throwException) {
 			this(exitFailure, throwException, false);
 		}
@@ -168,9 +189,23 @@ public class TaskletStepTests extends TestCase {
 			this.assertStepContext = assertStepContext;
 		}
 
+		/**
+		 * @param b
+		 * @param error
+		 */
+		public StubTasklet(Throwable error) {
+			this(false, false, false);
+			this.exception = error;
+		}
+
 		public ExitStatus execute() throws Exception {
 			if (throwException) {
 				throw new Exception();
+			}
+			
+			if (exception!=null) {
+				if (exception instanceof Exception) throw (Exception) exception;
+				if (exception instanceof Error) throw (Error) exception;
 			}
 
 			if (exitFailure) {

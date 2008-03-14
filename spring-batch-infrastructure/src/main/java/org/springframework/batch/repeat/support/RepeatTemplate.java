@@ -27,7 +27,6 @@ import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
@@ -290,12 +289,8 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @param next
 	 * @return
 	 */
-	private static Exception rethrow(Throwable next) throws RuntimeException {
-		if (next instanceof RuntimeException) {
-			throw (RuntimeException) next;
-		}
-		;
-		throw new RepeatException("Rethrowing exception that is no RuntimeException.", next);
+	private static void rethrow(Throwable next) throws RuntimeException {
+		DefaultExceptionHandler.rethrow(next);
 	}
 
 	/**

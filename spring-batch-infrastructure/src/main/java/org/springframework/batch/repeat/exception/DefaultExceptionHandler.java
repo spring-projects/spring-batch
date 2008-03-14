@@ -35,21 +35,22 @@ public class DefaultExceptionHandler implements ExceptionHandler {
 	 *      Throwable)
 	 */
 	public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
-
 		rethrow(throwable);
-
 	}
 
 	/**
 	 * Convenience method to rethrow the Throwable instance. Wraps it in a {@link RepeatException} if it is not a
-	 * {@link Exception}.
+	 * {@link RuntimeException} or {@link Error}.
 	 * 
 	 * @param throwable a Throwable.
-	 * @throws RuntimeException if the throwable is a {@link RuntimeException} just rethrow, otherwise wrap in a
-	 *             {@link RepeatException}
+	 * @throws RuntimeException if the throwable is a {@link RuntimeException}
+	 * @throws Error if the throwable is an {@link Error}
+	 * @throws RepeatException otherwise
 	 */
 	public static void rethrow(Throwable throwable) throws RuntimeException {
-		if (throwable instanceof RuntimeException) {
+		if (throwable instanceof Error) {
+			throw (Error) throwable;
+		} else if (throwable instanceof RuntimeException) {
 			throw (RuntimeException) throwable;
 		} else {
 			throw new RepeatException("Exception in batch process", throwable);
