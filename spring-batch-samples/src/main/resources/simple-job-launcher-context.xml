@@ -36,13 +36,13 @@
 		p:databaseType="hsql" p:dataSource-ref="dataSource" />
 
 	<bean id="mapJobInstanceDao" lazy-init="true"
-		class="org.springframework.batch.core.repository.support.dao.MapJobInstanceDao" />
+		class="org.springframework.batch.core.repository.dao.MapJobInstanceDao" />
 
 	<bean id="mapJobExecutionDao" lazy-init="true"
-		class="org.springframework.batch.core.repository.support.dao.MapJobExecutionDao" />
+		class="org.springframework.batch.core.repository.dao.MapJobExecutionDao" />
 
 	<bean id="mapStepExecutionDao" lazy-init="true"
-		class="org.springframework.batch.core.repository.support.dao.MapStepExecutionDao" />
+		class="org.springframework.batch.core.repository.dao.MapStepExecutionDao" />
 
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="dataSource" />
