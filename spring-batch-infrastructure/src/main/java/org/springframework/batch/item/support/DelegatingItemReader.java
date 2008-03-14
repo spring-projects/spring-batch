@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.reader;
+package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.ItemReader;

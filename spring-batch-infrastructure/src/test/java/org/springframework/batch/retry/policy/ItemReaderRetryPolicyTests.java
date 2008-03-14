@@ -27,7 +27,7 @@ import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.FailedItemIdentifier;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.reader.ListItemReader;
+import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;

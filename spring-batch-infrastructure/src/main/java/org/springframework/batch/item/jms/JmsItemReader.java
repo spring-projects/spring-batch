@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.reader;
+package org.springframework.batch.item.jms;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;

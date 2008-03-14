@@ -1,4 +1,4 @@
-package org.springframework.batch.item.writer;
+package org.springframework.batch.item.support;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.CompositeItemWriter;
 
 /**
  * Tests for {@link CompositeItemWriter}

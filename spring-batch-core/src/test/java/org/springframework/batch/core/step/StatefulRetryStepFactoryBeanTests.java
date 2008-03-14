@@ -38,7 +38,7 @@ import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.reader.ListItemReader;
+import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.transaction.support.TransactionSynchronizationManager;

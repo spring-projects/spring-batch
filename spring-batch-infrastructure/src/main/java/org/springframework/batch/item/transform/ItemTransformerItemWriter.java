@@ -1,7 +1,7 @@
 package org.springframework.batch.item.transform;
 
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.writer.DelegatingItemWriter;
+import org.springframework.batch.item.support.DelegatingItemWriter;
 import org.springframework.util.Assert;
 
 /**

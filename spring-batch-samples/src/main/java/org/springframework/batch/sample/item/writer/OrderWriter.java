@@ -17,7 +17,7 @@
 package org.springframework.batch.sample.item.writer;
 
 import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.item.writer.DelegatingItemWriter;
+import org.springframework.batch.item.support.DelegatingItemWriter;
 import org.springframework.batch.sample.domain.Order;
 
 

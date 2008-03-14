@@ -31,7 +31,7 @@ import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.stream.CompositeItemStream;
+import org.springframework.batch.item.support.CompositeItemStream;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;

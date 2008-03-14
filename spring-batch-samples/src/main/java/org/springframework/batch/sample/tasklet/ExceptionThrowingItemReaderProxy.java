@@ -19,7 +19,7 @@ package org.springframework.batch.sample.tasklet;
 
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.reader.DelegatingItemReader;
+import org.springframework.batch.item.support.DelegatingItemReader;
 
 /**
  * Hacked {@link ItemReader} that throws exception on a given record number

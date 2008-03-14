@@ -13,7 +13,7 @@
 				<property name="streams" ref="fileItemReader"/>
 				<property name="itemReader">
 					<bean
-						class="org.springframework.batch.item.reader.AggregateItemReader">
+						class="org.springframework.batch.item.support.AggregateItemReader">
 						<property name="itemReader"
 							ref="fileItemReader" />
 					</bean>

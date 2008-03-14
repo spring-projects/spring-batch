@@ -21,7 +21,7 @@ import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.FileUtils;
+import org.springframework.batch.item.util.FileUtils;
 import org.springframework.batch.item.xml.stax.NoStartEndDocumentStreamWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;

@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.reader;
+package org.springframework.batch.item.support;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.springframework.batch.item.support.ListItemReader;
 
 import junit.framework.TestCase;
 

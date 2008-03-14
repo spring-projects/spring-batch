@@ -18,7 +18,7 @@ package org.springframework.batch.sample.mapping;
 
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.reader.AggregateItemReader;
+import org.springframework.batch.item.support.AggregateItemReader;
 import org.springframework.batch.sample.domain.Trade;
 
 

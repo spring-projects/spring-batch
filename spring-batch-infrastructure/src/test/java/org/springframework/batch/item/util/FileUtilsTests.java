@@ -1,4 +1,4 @@
-package org.springframework.batch.item.support;
+package org.springframework.batch.item.util;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.item.util.FileUtils;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 

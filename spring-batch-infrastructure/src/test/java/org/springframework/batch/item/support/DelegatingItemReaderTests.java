@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.reader;
+package org.springframework.batch.item.support;
 
 import junit.framework.TestCase;
 
@@ -23,6 +23,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.Skippable;
+import org.springframework.batch.item.support.DelegatingItemReader;
 
 /**
  * Unit test for {@link DelegatingItemReader}

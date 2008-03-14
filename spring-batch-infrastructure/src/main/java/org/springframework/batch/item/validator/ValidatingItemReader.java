@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.validator;
 
-import org.springframework.batch.item.reader.DelegatingItemReader;
+import org.springframework.batch.item.support.DelegatingItemReader;
 import org.springframework.util.Assert;
 
 /**

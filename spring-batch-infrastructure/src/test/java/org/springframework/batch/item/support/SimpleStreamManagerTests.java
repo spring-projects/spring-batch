@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.stream;
+package org.springframework.batch.item.support;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +24,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
+import org.springframework.batch.item.support.CompositeItemStream;
 
 /**
  * @author Dave Syer
@@ -37,7 +38,7 @@ public class SimpleStreamManagerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.stream.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
+	 * {@link org.springframework.batch.item.support.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
 	 */
 	public void testRegisterAndOpen() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
@@ -52,7 +53,7 @@ public class SimpleStreamManagerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.stream.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
+	 * {@link org.springframework.batch.item.support.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
 	 */
 	public void testRegisterTwice() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
@@ -68,7 +69,7 @@ public class SimpleStreamManagerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.stream.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
+	 * {@link org.springframework.batch.item.support.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
 	 */
 	public void testMark() {
 		manager.register(new ItemStreamSupport() {
@@ -82,7 +83,7 @@ public class SimpleStreamManagerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.stream.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
+	 * {@link org.springframework.batch.item.support.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
 	 */
 	public void testClose() {
 		manager.register(new ItemStreamSupport() {
@@ -96,7 +97,7 @@ public class SimpleStreamManagerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.stream.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
+	 * {@link org.springframework.batch.item.support.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
 	 */
 	public void testCloseDoesNotUnregister() {
 		manager.setStreams(new ItemStream[] { new ItemStreamSupport() {

@@ -37,7 +37,7 @@ import org.springframework.batch.core.repository.support.dao.MapStepExecutionDao
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.reader.ListItemReader;
+import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatTemplate;

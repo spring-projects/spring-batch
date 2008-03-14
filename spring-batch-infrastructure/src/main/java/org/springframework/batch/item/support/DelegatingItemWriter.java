@@ -1,4 +1,4 @@
-package org.springframework.batch.item.writer;
+package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;

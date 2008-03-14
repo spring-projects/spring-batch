@@ -23,7 +23,7 @@
 				</property>
 				<property name="itemWriter">
 					<bean
-						class="org.springframework.batch.item.writer.CompositeItemWriter">
+						class="org.springframework.batch.item.support.CompositeItemWriter">
 						<property name="delegates">
 							<list>
 								<bean

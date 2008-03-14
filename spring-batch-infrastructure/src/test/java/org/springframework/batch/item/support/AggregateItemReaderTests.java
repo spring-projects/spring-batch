@@ -1,4 +1,4 @@
-package org.springframework.batch.item.reader;
+package org.springframework.batch.item.support;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.support.AggregateItemReader;
 
 public class AggregateItemReaderTests extends TestCase {
 

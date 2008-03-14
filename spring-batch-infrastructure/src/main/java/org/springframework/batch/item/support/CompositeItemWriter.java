@@ -1,4 +1,4 @@
-package org.springframework.batch.item.writer;
+package org.springframework.batch.item.support;
 
 import java.util.Iterator;
 import java.util.List;

@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.writer;
+package org.springframework.batch.item.support;
 
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.DelegatingItemWriter;
 
 /**
  * @author Lucas Ward

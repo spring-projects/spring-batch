@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.reader.DelegatingItemReader;
+import org.springframework.batch.item.support.DelegatingItemReader;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;
 import org.springframework.batch.sample.domain.Customer;

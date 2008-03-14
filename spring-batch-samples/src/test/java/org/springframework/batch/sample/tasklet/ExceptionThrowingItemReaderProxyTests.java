@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.item.reader.ListItemReader;
+import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 

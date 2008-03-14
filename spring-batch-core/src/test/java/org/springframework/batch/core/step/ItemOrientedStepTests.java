@@ -49,7 +49,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.reader.ListItemReader;
+import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;

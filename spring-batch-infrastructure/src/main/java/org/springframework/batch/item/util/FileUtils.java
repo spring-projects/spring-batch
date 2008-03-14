@@ -1,4 +1,4 @@
-package org.springframework.batch.item.support;
+package org.springframework.batch.item.util;
 
 import java.io.File;
 import java.io.IOException;

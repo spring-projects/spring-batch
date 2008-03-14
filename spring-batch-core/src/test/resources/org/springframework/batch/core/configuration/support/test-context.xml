@@ -30,7 +30,7 @@
 	</bean>
 
 	<bean id="itemReader"
-		class="org.springframework.batch.item.reader.ListItemReader">
+		class="org.springframework.batch.item.support.ListItemReader">
 		<constructor-arg value="foo,bar,spam" />
 	</bean>
 
