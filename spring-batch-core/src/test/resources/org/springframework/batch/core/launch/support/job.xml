@@ -12,7 +12,7 @@
 	<import resource="test-environment.xml" />
 
 	<bean id="test-job"
-		class="org.springframework.batch.core.job.JobSupport">
+		class="org.springframework.batch.core.job.SimpleJob">
 		<property name="steps">
 			<bean id="step1"
 				class="org.springframework.batch.core.step.SimpleStepFactoryBean">
