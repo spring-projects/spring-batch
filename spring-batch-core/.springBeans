@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.4.v200802202100]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.3.v200802061800]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
-	<enableImports><![CDATA[false]]></enableImports>
+	<enableImports><![CDATA[true]]></enableImports>
 	<configs>
 		<config>src/test/resources/org/springframework/batch/core/configuration/support/test-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/launch/support/job.xml</config>
@@ -21,13 +21,6 @@
 			<configs>
 				<config>src/test/resources/org/springframework/batch/core/launch/support/job.xml</config>
 				<config>src/test/resources/org/springframework/batch/core/launch/support/test-environment.xml</config>
-			</configs>
-		</configSet>
-		<configSet>
-			<name><![CDATA[sqlDaoTest]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
 			</configs>
 		</configSet>
 	</configSets>
