@@ -10,7 +10,7 @@
 
 	<import resource="tradeJobIo.xml" />
 
-	<bean id="tradeJob" parent="simpleJob">
+	<bean id="skipJob" parent="simpleJob">
 		<property name="steps">
 			<list>
 				<bean id="step1" parent="skipLimitStep">
