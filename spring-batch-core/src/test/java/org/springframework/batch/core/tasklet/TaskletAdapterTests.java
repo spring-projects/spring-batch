@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.tasklet.support;
+package org.springframework.batch.core.tasklet;
 
-import org.springframework.batch.core.tasklet.support.TaskletAdapter;
+import org.springframework.batch.core.tasklet.TaskletAdapter;
 import org.springframework.batch.repeat.ExitStatus;
 
 import junit.framework.TestCase;
@@ -46,7 +46,7 @@ public class TaskletAdapterTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.tasklet.support.TaskletAdapter#execute()}.
+	 * Test method for {@link org.springframework.batch.core.tasklet.TaskletAdapter#execute()}.
 	 * @throws Exception 
 	 */
 	public void testExecuteWithExitStatus() throws Exception {
@@ -54,7 +54,7 @@ public class TaskletAdapterTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.tasklet.support.TaskletAdapter#mapResult(java.lang.Object)}.
+	 * Test method for {@link org.springframework.batch.core.tasklet.TaskletAdapter#mapResult(java.lang.Object)}.
 	 */
 	public void testMapResultWithNull() throws Exception {
 		tasklet.setTargetMethod("process");
@@ -62,7 +62,7 @@ public class TaskletAdapterTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.tasklet.support.TaskletAdapter#mapResult(java.lang.Object)}.
+	 * Test method for {@link org.springframework.batch.core.tasklet.TaskletAdapter#mapResult(java.lang.Object)}.
 	 */
 	public void testMapResultWithNonNull() throws Exception {
 		tasklet.setTargetMethod("process");

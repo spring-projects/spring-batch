@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.tasklet.support;
+package org.springframework.batch.core.tasklet;
 
-import org.springframework.batch.core.tasklet.Tasklet;
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator;
 import org.springframework.batch.repeat.ExitStatus;
 
