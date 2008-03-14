@@ -19,14 +19,13 @@ package org.springframework.batch.retry.policy;
 import junit.framework.TestCase;
 
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.support.RetrySynchronizationManager;
 
 public class TimeoutRetryPolicyTests extends TestCase {
 
 	public void testTimeoutPreventsRetry() throws Exception {
 		TimeoutRetryPolicy policy = new TimeoutRetryPolicy();
 		policy.setTimeout(100);
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		policy.registerThrowable(context, new Exception());
 		assertTrue(policy.canRetry(context));
 		Thread.sleep(200);
@@ -36,7 +35,7 @@ public class TimeoutRetryPolicyTests extends TestCase {
 
 	public void testRetryCount() throws Exception {
 		TimeoutRetryPolicy policy = new TimeoutRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		assertNotNull(context);
 		policy.registerThrowable(context, null);
 		assertEquals(0, context.getRetryCount());
@@ -47,9 +46,8 @@ public class TimeoutRetryPolicyTests extends TestCase {
 
 	public void testParent() throws Exception {
 		TimeoutRetryPolicy policy = new TimeoutRetryPolicy();
-		RetryContext context = policy.open(null);
-		RetrySynchronizationManager.register(context);
-		RetryContext child = policy.open(null);
+		RetryContext context = policy.open(null, null);
+		RetryContext child = policy.open(null, context);
 		assertNotSame(child, context);
 		assertSame(context, child.getParent());
 	}

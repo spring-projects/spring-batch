@@ -25,7 +25,6 @@ import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.retry.support.RetrySynchronizationManager;
 import org.springframework.batch.support.ExceptionClassifier;
 import org.springframework.batch.support.ExceptionClassifierSupport;
 import org.springframework.util.Assert;
@@ -94,10 +93,10 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 	 * Create an active context that proxies a retry policy by chosing a target
 	 * from the policy map.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback)
+	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback, RetryContext)
 	 */
-	public RetryContext open(RetryCallback callback) {
-		return new ExceptionClassifierRetryContext(exceptionClassifier).open(callback);
+	public RetryContext open(RetryCallback callback, RetryContext parent) {
+		return new ExceptionClassifierRetryContext(parent, exceptionClassifier).open(callback, parent);
 	}
 
 	/**
@@ -127,8 +126,8 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 
 		Map contexts = new HashMap();
 
-		public ExceptionClassifierRetryContext(ExceptionClassifier exceptionClassifier) {
-			super(RetrySynchronizationManager.getContext());
+		public ExceptionClassifierRetryContext(RetryContext parent, ExceptionClassifier exceptionClassifier) {
+			super(parent);
 			this.exceptionClassifier = exceptionClassifier;
 			Object key = exceptionClassifier.getDefault();
 			policy = getPolicy(key);
@@ -151,7 +150,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 			}
 		}
 
-		public RetryContext open(RetryCallback callback) {
+		public RetryContext open(RetryCallback callback, RetryContext parent) {
 			this.callback = callback;
 			return this;
 		}
@@ -165,7 +164,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 		private RetryContext getContext(RetryPolicy policy) {
 			RetryContext context = (RetryContext) contexts.get(policy);
 			if (context == null) {
-				context = policy.open(callback);
+				context = policy.open(callback, null);
 				contexts.put(policy, context);
 			}
 			return context;

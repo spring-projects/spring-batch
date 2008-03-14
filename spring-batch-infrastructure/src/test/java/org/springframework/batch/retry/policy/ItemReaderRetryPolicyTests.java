@@ -73,7 +73,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 				count++;
 				list.add(data);
 			}
-		}));
+		}), null);
 		assertNotNull(context);
 		// we haven't called the processor yet...
 		assertEquals(0, count);
@@ -88,7 +88,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 				public Object doWithRetry(RetryContext context) throws Throwable {
 					return null;
 				}
-			});
+			}, null);
 			fail("Expected IllegalStateException");
 		}
 		catch (IllegalStateException e) {
@@ -103,7 +103,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 			public void write(Object data) {
 				count++;
 			}
-		}));
+		}), null);
 		assertNotNull(context);
 
 		// We can always retry if delegate says so...
@@ -117,7 +117,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 				count++;
 				list.add(data);
 			}
-		}));
+		}), null);
 		assertNotNull(context);
 		policy.registerThrowable(context, new Exception());
 		assertFalse(policy.canRetry(context));
@@ -130,7 +130,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 				count++;
 				list.add(data);
 			}
-		}));
+		}), null);
 		assertNotNull(context);
 		policy.registerThrowable(context, new Exception());
 		assertFalse(policy.canRetry(context));
@@ -153,14 +153,14 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 		policy.setDelegate(new SimpleRetryPolicy(2));
 
 		// First call...
-		RetryContext context = policy.open(callback);
+		RetryContext context = policy.open(callback, null);
 		assertNotNull(context);
 		policy.registerThrowable(context, new Exception());
 		assertTrue(policy.canRetry(context));
 		policy.close(context);
 
 		// Second call...
-		context = policy.open(callback);
+		context = policy.open(callback, null);
 		assertNotNull(context);
 		policy.registerThrowable(context, new Exception());
 		assertFalse(policy.canRetry(context));
@@ -179,13 +179,13 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 			public void write(Object data) {
 			}
 		});
-		RetryContext context = policy.open(callback);
+		RetryContext context = policy.open(callback, null);
 		assertNotNull(context);
 		assertTrue(policy.canRetry(context));
 		policy.registerThrowable(context, new Exception());
 		assertFalse(policy.canRetry(context));
 		assertEquals(0, count);
-		context = policy.open(callback);
+		context = policy.open(callback, null);
 		// On the second retry, the recovery path is taken...
 		Object result = policy.handleRetryExhausted(context);
 		assertNotNull(result); // default result is null
@@ -207,7 +207,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 		policy.setDelegate(new SimpleRetryPolicy(1));
 		MockFailedItemProvider provider = new MockFailedItemProvider(Collections.EMPTY_LIST);
 		ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, null);
-		policy.open(callback);
+		policy.open(callback, null);
 		assertEquals(1, provider.hasFailedCount);
 	}
 
@@ -245,7 +245,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 		});
 		policy.setDelegate(new SimpleRetryPolicy(1));
 
-		RetryContext context = policy.open(callback);
+		RetryContext context = policy.open(callback, null);
 		assertNotNull(context);
 
 		assertEquals(0, count);
@@ -257,7 +257,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 		Object result = policy.handleRetryExhausted(context);
 		assertEquals("foo", result); // default result is last item
 
-		context = policy.open(callback);
+		context = policy.open(callback, null);
 		// True after exhausted - the history is reset...
 		assertTrue(policy.canRetry(context));
 	}
@@ -270,7 +270,7 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 				count++;
 				list.add(data);
 			}
-		}));
+		}), null);
 		assertNotNull(context);
 		policy.registerThrowable(context, null);
 		assertEquals(0, context.getRetryCount());
@@ -289,11 +289,11 @@ public class ItemReaderRetryPolicyTests extends TestCase {
 
 		policy = new ItemReaderRetryPolicy();
 		policy.setDelegate(new SimpleRetryPolicy(1));
-		RetryContext context = policy.open(callback);
+		RetryContext context = policy.open(callback, null);
 		assertNotNull(context);
 		policy.registerThrowable(context, new RuntimeException("foo"));
 		assertEquals(1, context.getRetryCount());
-		context = policy.open(callback);
+		context = policy.open(callback, null);
 		assertEquals(1, context.getRetryCount());
 		policy.registerThrowable(context, new RuntimeException("foo"));
 		assertEquals(2, context.getRetryCount());

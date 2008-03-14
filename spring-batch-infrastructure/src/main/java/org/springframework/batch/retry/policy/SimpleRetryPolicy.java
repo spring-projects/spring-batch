@@ -20,7 +20,6 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.retry.support.RetrySynchronizationManager;
 import org.springframework.batch.support.BinaryExceptionClassifier;
 
 /**
@@ -127,23 +126,16 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * Get a status object that can be used to track the current operation
 	 * according to this policy. Has to be aware of the latest exception and the
 	 * number of attempts.
-	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback)
+	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback, RetryContext)
 	 */
-	public RetryContext open(RetryCallback callback) {
-		return new SimpleRetryContext();
+	public RetryContext open(RetryCallback callback, RetryContext parent) {
+		return new SimpleRetryContext(parent);
 	}
 
 	private static class SimpleRetryContext extends RetryContextSupport {
-
-		public SimpleRetryContext() {
-			this(RetrySynchronizationManager.getContext());
-
-		}
-
 		public SimpleRetryContext(RetryContext parent) {
 			super(parent);
 		}
-
 	}
 
 	/**

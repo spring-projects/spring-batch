@@ -29,7 +29,6 @@ import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
 import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.retry.support.RetrySynchronizationManager;
 import org.springframework.util.Assert;
 
 /**
@@ -100,15 +99,15 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * Create a new context for the execution of the callback, which must be an
 	 * instance of {@link ItemReaderRetryCallback}.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback)
+	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback, RetryContext)
 	 * 
 	 * @throws IllegalStateException if the callback is not of the required
 	 * type.
 	 */
-	public RetryContext open(RetryCallback callback) {
+	public RetryContext open(RetryCallback callback, RetryContext parent) {
 		Assert.state(callback instanceof ItemReaderRetryCallback, "Callback must be ItemProviderRetryCallback");
-		ItemReaderRetryContext context = new ItemReaderRetryContext((ItemReaderRetryCallback) callback);
-		context.open(callback);
+		ItemReaderRetryContext context = new ItemReaderRetryContext((ItemReaderRetryCallback) callback, parent);
+		context.open(callback, null);
 		return context;
 	}
 
@@ -146,8 +145,8 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 
 		private ItemKeyGenerator keyGenerator;
 
-		public ItemReaderRetryContext(ItemReaderRetryCallback callback) {
-			super(RetrySynchronizationManager.getContext());
+		public ItemReaderRetryContext(ItemReaderRetryCallback callback, RetryContext parent) {
+			super(parent);
 			item = callback.next(this);
 			this.reader = callback.getReader();
 			this.recoverer = callback.getRecoverer();
@@ -162,14 +161,14 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 			delegate.close(this.delegateContext);
 		}
 
-		public RetryContext open(RetryCallback callback) {
+		public RetryContext open(RetryCallback callback, RetryContext parent) {
 			if (hasFailed(reader, keyGenerator, item)) {
 				this.delegateContext = retryContextCache.get(keyGenerator.getKey(item));
 			}
 			if (this.delegateContext == null) {
 				// Only create a new context if we don't know the history of
 				// this item:
-				this.delegateContext = delegate.open(callback);
+				this.delegateContext = delegate.open(callback, null);
 			}
 			// The return value shouldn't be used...
 			return null;

@@ -196,7 +196,7 @@ public class ExternalRetryPolicyTests extends TestCase {
 			// do nothing
 		}
 
-		public RetryContext open(RetryCallback callback) {
+		public RetryContext open(RetryCallback callback, RetryContext parent) {
 			RetryContextSupport context = new RetryContextSupport(null);
 			context.setAttribute(MockRetryCallback.EXHAUSTED, Boolean.valueOf(!canRetry(context)));
 			return context;

@@ -19,13 +19,12 @@ package org.springframework.batch.retry.policy;
 import junit.framework.TestCase;
 
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.support.RetrySynchronizationManager;
 
 public class NeverRetryPolicyTests extends TestCase {
 
 	public void testSimpleOperations() throws Exception {
 		NeverRetryPolicy policy = new NeverRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		assertNotNull(context);
 		// We can retry until the first exception is registered...
 		assertTrue(policy.canRetry(context));
@@ -38,7 +37,7 @@ public class NeverRetryPolicyTests extends TestCase {
 
 	public void testRetryCount() throws Exception {
 		NeverRetryPolicy policy = new NeverRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		assertNotNull(context);
 		policy.registerThrowable(context, null);
 		assertEquals(0, context.getRetryCount());
@@ -49,9 +48,8 @@ public class NeverRetryPolicyTests extends TestCase {
 
 	public void testParent() throws Exception {
 		NeverRetryPolicy policy = new NeverRetryPolicy();
-		RetryContext context = policy.open(null);
-		RetrySynchronizationManager.register(context);
-		RetryContext child = policy.open(null);
+		RetryContext context = policy.open(null, null);
+		RetryContext child = policy.open(null, context);
 		assertNotSame(child, context);
 		assertSame(context, child.getParent());
 	}

@@ -132,7 +132,7 @@ public class RetryTemplate implements RetryOperations {
 
 		// Allow the retry policy to initialise itself...
 		// TODO: catch and rethrow abnormal retry exception?
-		RetryContext context = retryPolicy.open(callback);
+		RetryContext context = retryPolicy.open(callback, RetrySynchronizationManager.getContext());
 
 		// Make sure the context is available globally for clients who need
 		// it...

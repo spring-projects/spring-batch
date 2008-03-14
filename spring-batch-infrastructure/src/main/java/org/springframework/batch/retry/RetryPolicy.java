@@ -50,13 +50,14 @@ public interface RetryPolicy {
 	 * 
 	 * @param callback the {@link RetryCallback} that will execute the unit of
 	 * work for this retry.
+	 * @param parent the parent context if we are in a nested retry.
 	 * @return a {@link RetryContext} object specific to this manager.
 	 * 
 	 */
-	RetryContext open(RetryCallback callback);
+	RetryContext open(RetryCallback callback, RetryContext parent);
 
 	/**
-	 * @param status a retry status created by the {@link #open(RetryCallback)}
+	 * @param status a retry status created by the {@link #open(RetryCallback, RetryContext)}
 	 * method of this manager.
 	 */
 	void close(RetryContext context);

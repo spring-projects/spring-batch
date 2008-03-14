@@ -21,7 +21,6 @@ import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.retry.support.RetrySynchronizationManager;
 
 /**
  * A {@link RetryPolicy} that allows the first attempt but never permits a
@@ -56,10 +55,10 @@ public class NeverRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * Return a context that can respond to early termination requests, but does
 	 * nothing else.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback)
+	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback, RetryContext)
 	 */
-	public RetryContext open(RetryCallback callback) {
-		return new NeverRetryContext(RetrySynchronizationManager.getContext());
+	public RetryContext open(RetryCallback callback, RetryContext parent) {
+		return new NeverRetryContext(parent);
 	}
 
 	/**

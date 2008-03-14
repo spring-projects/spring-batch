@@ -23,7 +23,6 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.support.RetrySynchronizationManager;
 import org.springframework.batch.support.ExceptionClassifierSupport;
 
 public class ExceptionClassifierRetryPolicyTests extends TestCase {
@@ -31,13 +30,13 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 	ExceptionClassifierRetryPolicy policy = new ExceptionClassifierRetryPolicy();
 
 	public void testDefaultPolicies() throws Exception {
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		assertNotNull(context);
 	}
 
 	public void testTrivialPolicies() throws Exception {
 		policy.setPolicyMap(Collections.singletonMap(ExceptionClassifierSupport.DEFAULT, new MockRetryPolicySupport()));
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		assertNotNull(context);
 		assertTrue(policy.canRetry(context));
 	}
@@ -45,7 +44,7 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 	public void testNullPolicies() throws Exception {
 		policy.setPolicyMap(new HashMap());
 		try {
-			policy.open(null);
+			policy.open(null, null);
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
@@ -60,7 +59,7 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 		map.put("foo", new NeverRetryPolicy());
 		policy.setPolicyMap(map);
 
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		assertNotNull(context);
 
 		assertTrue(policy.canRetry(context));
@@ -82,7 +81,7 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 		assertTrue(policy.canRetry(context));
 
 		// But now the classifier will be active in the new context...
-		context = policy.open(null);
+		context = policy.open(null, null);
 		assertTrue(policy.canRetry(context));
 		policy.registerThrowable(context, new IllegalArgumentException());
 		assertFalse(policy.canRetry(context));
@@ -97,7 +96,7 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 				count++;
 			}
 		}));
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 
 		// The mapped (child) policy hasn't been used yet, so if we close now
 		// we don't incur the possible expense of ceating the child context.
@@ -112,7 +111,7 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 
 	public void testRetryCount() throws Exception {
 		ExceptionClassifierRetryPolicy policy = new ExceptionClassifierRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		assertNotNull(context);
 		policy.registerThrowable(context, null);
 		assertEquals(0, context.getRetryCount());
@@ -123,9 +122,8 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 
 	public void testParent() throws Exception {
 		ExceptionClassifierRetryPolicy policy = new ExceptionClassifierRetryPolicy();
-		RetryContext context = policy.open(null);
-		RetrySynchronizationManager.register(context);
-		RetryContext child = policy.open(null);
+		RetryContext context = policy.open(null, null);
+		RetryContext child = policy.open(null, context);
 		assertNotSame(child, context);
 		assertSame(context, child.getParent());
 	}

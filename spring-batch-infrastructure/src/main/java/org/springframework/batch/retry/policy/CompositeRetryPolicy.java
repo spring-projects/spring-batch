@@ -24,7 +24,6 @@ import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.retry.support.RetrySynchronizationManager;
 
 /**
  * A {@link RetryPolicy} that composes a list of other policies and delegates
@@ -84,14 +83,14 @@ public class CompositeRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * Creates a new context that copies the existing policies and keeps a list
 	 * of the contexts from each one.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback)
+	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback, RetryContext)
 	 */
-	public RetryContext open(RetryCallback callback) {
+	public RetryContext open(RetryCallback callback, RetryContext parent) {
 		List list = new ArrayList();
 		for (int i = 0; i < policies.length; i++) {
-			list.add(policies[i].open(callback));
+			list.add(policies[i].open(callback, parent));
 		}
-		return new CompositeRetryContext(list);
+		return new CompositeRetryContext(parent, list);
 	}
 
 	/**
@@ -114,8 +113,8 @@ public class CompositeRetryPolicy extends AbstractStatelessRetryPolicy {
 
 		RetryPolicy[] policies;
 
-		public CompositeRetryContext(List contexts) {
-			super(RetrySynchronizationManager.getContext());
+		public CompositeRetryContext(RetryContext parent, List contexts) {
+			super(parent);
 			this.contexts = (RetryContext[]) contexts.toArray(new RetryContext[0]);
 			this.policies = CompositeRetryPolicy.this.policies;
 		}

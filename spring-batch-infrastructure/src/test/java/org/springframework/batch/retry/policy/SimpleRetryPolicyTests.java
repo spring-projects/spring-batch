@@ -19,7 +19,6 @@ package org.springframework.batch.retry.policy;
 import junit.framework.TestCase;
 
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.support.RetrySynchronizationManager;
 
 public class SimpleRetryPolicyTests extends TestCase {
 
@@ -35,14 +34,14 @@ public class SimpleRetryPolicyTests extends TestCase {
 
 	public void testCanRetryIfNoException() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		assertTrue(policy.canRetry(context));
 	}
 
 	public void testEmptyExceptionsNeverRetry() throws Exception {
 
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 
 		// We can't retry any exceptions...
 		policy.setRetryableExceptionClasses(new Class[0]);
@@ -54,16 +53,16 @@ public class SimpleRetryPolicyTests extends TestCase {
 
 	public void testRetryLimitInitialState() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		assertTrue(policy.canRetry(context));
 		policy.setMaxAttempts(0);
-		context = policy.open(null);
+		context = policy.open(null, null);
 		assertFalse(policy.canRetry(context));
 	}
 
 	public void testRetryLimitSubsequentState() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		policy.setMaxAttempts(2);
 		assertTrue(policy.canRetry(context));
 		policy.registerThrowable(context, new Exception());
@@ -74,7 +73,7 @@ public class SimpleRetryPolicyTests extends TestCase {
 
 	public void testRetryCount() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		assertNotNull(context);
 		policy.registerThrowable(context, null);
 		assertEquals(0, context.getRetryCount());
@@ -85,9 +84,8 @@ public class SimpleRetryPolicyTests extends TestCase {
 
 	public void testParent() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null);
-		RetrySynchronizationManager.register(context);
-		RetryContext child = policy.open(null);
+		RetryContext context = policy.open(null, null);
+		RetryContext child = policy.open(null, context);
 		assertNotSame(child, context);
 		assertSame(context, child.getParent());
 	}
