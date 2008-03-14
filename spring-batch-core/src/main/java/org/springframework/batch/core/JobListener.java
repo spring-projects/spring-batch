@@ -29,17 +29,26 @@ public interface JobListener {
 	/**
 	 * Initialise the state of the listener with the {@link JobExecution} from
 	 * the current scope.
-	 * @param jobExecution
+	 * @param jobExecution the current {@link JobExecution}
 	 */
 	void beforeJob(JobExecution jobExecution);
 
 	/**
 	 * Callback after successful completion of a job.
+	 * @param jobExecution the current {@link JobExecution}
 	 */
 	void afterJob(JobExecution jobExecution);
 	
 	/**
-	 * Callback on job failure.
+	 * Callback on job failure owing to the throwable provided.
+	 * @param jobExecution the current {@link JobExecution}
+	 * @param e the exception that caused the job to terminate
 	 */
 	void onError(JobExecution jobExecution, Throwable e);
+
+	/**
+	 * Callback when a job is interrupted or stopped manually.
+	 * @param jobExecution the current {@link JobExecution}
+	 */
+	void onInterrupt(JobExecution jobExecution);
 }

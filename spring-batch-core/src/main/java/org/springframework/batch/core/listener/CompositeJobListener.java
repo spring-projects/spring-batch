@@ -73,4 +73,11 @@ public class CompositeJobListener implements JobListener {
 		
 	}
 
+	public void onInterrupt(JobExecution jobExecution) {
+		for (Iterator iterator = listeners.listIterator(); iterator.hasNext();) {
+			JobListener listener = (JobListener) iterator.next();
+			listener.onInterrupt(jobExecution);
+		}
+		
+	}
 }

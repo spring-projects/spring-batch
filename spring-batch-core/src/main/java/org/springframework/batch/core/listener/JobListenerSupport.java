@@ -36,9 +36,16 @@ public class JobListenerSupport implements JobListener {
 	public void beforeJob(JobExecution jobExecution) {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.JobListener#onError(org.springframework.batch.core.JobExecution, java.lang.Throwable)
+	 */
 	public void onError(JobExecution jobExecution, Throwable e) {
-		// TODO Auto-generated method stub
-		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.JobListener#onInterrupt(org.springframework.batch.core.JobExecution)
+	 */
+	public void onInterrupt(JobExecution jobExecution) {
 	}
 
 }
