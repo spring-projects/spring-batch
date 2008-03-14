@@ -22,14 +22,13 @@ import java.util.Properties;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
@@ -160,13 +159,9 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 		try {
 			execution = launcher.run(job, jobParameters);
 		}
-		catch (JobExecutionAlreadyRunningException e) {
+		catch (JobExecutionException e) {
 			return e.getClass().getName() + ": " + e.getMessage();
 		}
-		catch (JobRestartException e) {
-			return e.getClass().getName() + ": " + e.getMessage();
-		}
-
 		registry.put(name + params, execution);
 
 		return execution.toString();

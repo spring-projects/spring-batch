@@ -23,13 +23,11 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.JobExecutionContext;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
@@ -73,13 +71,7 @@ public class JobLauncherDetails extends QuartzJobBean {
 		try {
 			jobLauncher.run(jobLocator.getJob(jobName), jobParameters);
 		}
-		catch (JobExecutionAlreadyRunningException e) {
-			log.error("Could not execute job.", e);
-		}
-		catch (JobRestartException e) {
-			log.error("Could not execute job.", e);
-		}
-		catch (NoSuchJobException e) {
+		catch (JobExecutionException e) {
 			log.error("Could not execute job.", e);
 		}
 	}

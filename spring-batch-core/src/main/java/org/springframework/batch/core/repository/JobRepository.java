@@ -26,10 +26,10 @@ import org.springframework.batch.item.ExecutionContext;
 
 /**
  * <p>
- * Repository for storing batch {@link JobExecution} and {@link StepExecution}s. 
- * Before using any methods, a {@link JobExecution}
- * must first be obtained using the createJobExecution method. Once a {@link JobExecution}
- * is obtained, they can be updated.
+ * Repository for storing batch {@link JobExecution} and {@link StepExecution}s.
+ * Before using any methods, a {@link JobExecution} must first be obtained using
+ * the createJobExecution method. Once a {@link JobExecution} is obtained, they
+ * can be updated.
  * </p>
  * 
  * @author Lucas Ward
@@ -39,25 +39,28 @@ public interface JobRepository {
 
 	/**
 	 * Find or create a {@link JobExecution} for a given {@link Job} and
-	 * {@link JobParameters}. If the {@link Job} that is uniquely identified by
-	 * {@link JobParameters} already exists, its persisted values (including ID)
-	 * will be returned in a new {@link JobInstance} object, associated with the
-	 * returned {@link JobExecution}. If no previous run
-	 * is found, the execution will be associated with a new {@link JobInstance}
+	 * {@link JobParameters}. If the {@link Job} was already executed with
+	 * these {@link JobParameters}, its persisted values (including ID) will be
+	 * returned in a new {@link JobInstance}, associated with the
+	 * {@link JobExecution}. If no previous instance is found, the execution
+	 * will be associated with a new {@link JobInstance}
 	 * 
 	 * @param jobParameters the runtime parameters for the job
 	 * @param job the job the execution should be associated with.
 	 * 
 	 * @return a valid job {@link JobExecution} for the arguments provided
 	 * @throws JobExecutionAlreadyRunningException if there is a
-	 * {@link JobExecution} alrady running for the job instance that would
-	 * otherwise be returned
-	 * @throws JobRestartException if more than one JobInstance if found or if
-	 * JobInstance.getJobExecutionCount() is greater than Job.getStartLimit()
+	 * {@link JobExecution} already running for the job instance with the
+	 * provided job and parameters.
+	 * @throws JobRestartException if one or more existing {@link JobInstance}s
+	 * is found with the same parameters and {@link Job#isRestartable()} is
+	 * false.
+	 * @throws JobInstanceAlreadyCompleteException if a {@link JobInstance} is
+	 * found and was already completed successfully.
 	 * 
 	 */
-     JobExecution createJobExecution(Job job, JobParameters jobParameters)
-			throws JobExecutionAlreadyRunningException, JobRestartException;
+	JobExecution createJobExecution(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
+			JobRestartException, JobInstanceAlreadyCompleteException;
 
 	/**
 	 * Save or Update a {@link JobExecution}. If no ID is found a new instance

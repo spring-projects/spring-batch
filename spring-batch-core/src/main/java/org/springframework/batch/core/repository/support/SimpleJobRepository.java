@@ -20,15 +20,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
@@ -134,7 +136,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * 
 	 */
 	public JobExecution createJobExecution(Job job, JobParameters jobParameters)
-			throws JobExecutionAlreadyRunningException, JobRestartException {
+			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 
 		Assert.notNull(job, "Job must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
@@ -157,7 +159,7 @@ public class SimpleJobRepository implements JobRepository {
 			}
 
 			List executions = jobExecutionDao.findJobExecutions(jobInstance);
-			
+
 			// check for running executions and find the last started
 			for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
 				JobExecution execution = (JobExecution) iterator.next();
@@ -165,19 +167,24 @@ public class SimpleJobRepository implements JobRepository {
 					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "
 							+ jobInstance);
 				}
+				if (execution.getStatus() == BatchStatus.COMPLETED) {
+					throw new JobInstanceAlreadyCompleteException(
+							"A job instance already exists is complete for parameters=" + jobParameters
+									+ ".  If you want to run this job again, change the parameters.");
+				}
 			}
 		}
 		else {
 			// no job found, create one
 			jobInstance = jobInstanceDao.createJobInstance(job, jobParameters);
 		}
-		
+
 		JobExecution jobExecution = new JobExecution(jobInstance);
-		
+
 		// Save the JobExecution so that it picks up an ID (useful for clients
 		// monitoring asynchronous executions):
 		saveOrUpdate(jobExecution);
-		
+
 		return jobExecution;
 
 	}
@@ -222,7 +229,7 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(stepExecution, "StepExecution cannot be null.");
 		Assert.notNull(stepExecution.getStepName(), "StepExecution's step name cannot be null.");
 		Assert.notNull(stepExecution.getJobExecutionId(), "StepExecution must belong to persisted JobExecution");
-		
+
 		if (stepExecution.getId() == null) {
 			stepExecutionDao.saveStepExecution(stepExecution);
 		}

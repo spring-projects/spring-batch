@@ -17,7 +17,8 @@
 package org.springframework.batch.sample;
 
 import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.converter.DefaultJobParametersConverter;
+import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.jdbc.core.JdbcOperations;
 
 /**
@@ -28,35 +29,36 @@ import org.springframework.jdbc.core.JdbcOperations;
  */
 public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 
-	//auto-injected attributes
+	// auto-injected attributes
 	private JdbcOperations jdbcTemplate;
 
 	/**
 	 * Public setter for the jdbcTemplate.
-	 *
+	 * 
 	 * @param jdbcTemplate the jdbcTemplate to set
 	 */
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.test.AbstractSingleSpringContextTests#onTearDown()
 	 */
 	protected void onTearDown() throws Exception {
 		jdbcTemplate.update("DELETE FROM TRADE");
 	}
-	
+
 	/**
 	 * Job fails on first run, because the module throws exception after
 	 * processing more than half of the input. On the second run, the job should
 	 * finish successfully, because it continues execution where the previous
 	 * run stopped (module throws exception after fixed number of processed
 	 * records).
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testRestart() throws Exception {
-		
+
 		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
 		try {
@@ -64,24 +66,26 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 			fail("First run of the job is expected to fail.");
 		}
 		catch (UnexpectedJobExecutionException expected) {
-			//expected
-			assertTrue("Not planned exception: "+expected.getMessage(), expected.getMessage().toLowerCase().indexOf("planned")>=0);
+			// expected
+			assertTrue("Not planned exception: " + expected.getMessage(), expected.getMessage().toLowerCase().indexOf(
+					"planned") >= 0);
 		}
 
 		int medium = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 		// assert based on commit interval = 2
-		assertEquals(before+2, medium);
+		assertEquals(before + 2, medium);
 
 		runJob();
 
 		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
-		assertEquals(before+5, after);
+		assertEquals(before + 5, after);
 	}
 
 	// load the application context and launch the job
 	private void runJob() throws Exception {
-		launcher.run(getJob(), new JobParameters());
+		launcher.run(getJob(), new DefaultJobParametersConverter().getJobParameters(PropertiesConverter
+				.stringToProperties("restart=true")));
 	}
 
 }

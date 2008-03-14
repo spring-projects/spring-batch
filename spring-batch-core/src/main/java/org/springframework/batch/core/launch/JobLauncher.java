@@ -18,6 +18,7 @@ package org.springframework.batch.core.launch;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 
@@ -47,8 +48,10 @@ public interface JobLauncher {
 	 * null.
 	 * @throws JobRestartException if the job has been run before and
 	 * circumstances that preclude a re-start.
+	 * @throws JobInstanceAlreadyCompleteException if the job has been run
+	 * before with the same parameters and completed successfully
 	 */
 	public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
-			JobRestartException;
+			JobRestartException, JobInstanceAlreadyCompleteException;
 
 }
