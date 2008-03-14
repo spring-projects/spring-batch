@@ -19,8 +19,6 @@ package org.springframework.batch.repeat.exception;
 import junit.framework.TestCase;
 
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatException;
-import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
 
 public class DefaultExceptionHandlerTests extends TestCase {
 
@@ -39,9 +37,9 @@ public class DefaultExceptionHandlerTests extends TestCase {
 	public void testError() throws Exception {
 		try {
 			handler.handleException(context, new Error("Foo"));
-			fail("Expected BatchException");
-		} catch (RepeatException e) {
-			assertEquals("Foo", e.getCause().getMessage());
+			fail("Expected Error");
+		} catch (Error e) {
+			assertEquals("Foo", e.getMessage());
 		}
 	}
 }

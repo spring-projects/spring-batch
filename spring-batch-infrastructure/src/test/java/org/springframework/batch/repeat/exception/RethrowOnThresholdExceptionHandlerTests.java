@@ -21,10 +21,8 @@ import java.util.Collections;
 import junit.framework.TestCase;
 
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.context.RepeatContextCounter;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.batch.repeat.exception.RethrowOnThresholdExceptionHandler;
 import org.springframework.batch.support.ExceptionClassifierSupport;
 
 public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
@@ -45,9 +43,9 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 	public void testError() throws Exception {
 		try {
 			handler.handleException(context, new Error("Foo"));
-			fail("Expected BatchException");
-		} catch (RepeatException e) {
-			assertEquals("Foo", e.getCause().getMessage());
+			fail("Expected Error");
+		} catch (Error e) {
+			assertEquals("Foo", e.getMessage());
 		}
 	}
 	

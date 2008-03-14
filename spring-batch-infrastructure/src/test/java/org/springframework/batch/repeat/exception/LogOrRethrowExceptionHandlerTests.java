@@ -25,8 +25,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.apache.log4j.WriterAppender;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatException;
-import org.springframework.batch.repeat.exception.LogOrRethrowExceptionHandler;
 import org.springframework.batch.support.ExceptionClassifierSupport;
 
 public class LogOrRethrowExceptionHandlerTests extends TestCase {
@@ -57,9 +55,9 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 	public void testError() throws Exception {
 		try {
 			handler.handleException(context, new Error("Foo"));
-			fail("Expected BatchException");
-		} catch (RepeatException e) {
-			assertEquals("Foo", e.getCause().getMessage());
+			fail("Expected Error");
+		} catch (Error e) {
+			assertEquals("Foo", e.getMessage());
 		}
 	}
 	
