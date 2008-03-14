@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample.tasklet;
 
-import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;

@@ -16,7 +16,7 @@ import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.core.step.TaskletStep;
-import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.ExitStatus;
 
 public class TaskletStepTests extends TestCase {

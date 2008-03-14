@@ -42,7 +42,7 @@ import org.springframework.batch.core.repository.support.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.support.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.dao.StepExecutionDao;
 import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.core.step.NeverSkipItemSkipPolicy;
+import org.springframework.batch.core.step.item.NeverSkipItemSkipPolicy;
 import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;

@@ -27,7 +27,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.CompositeStepListener;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.tasklet.Tasklet;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
