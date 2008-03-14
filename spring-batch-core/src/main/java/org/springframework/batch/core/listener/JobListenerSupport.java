@@ -36,4 +36,9 @@ public class JobListenerSupport implements JobListener {
 	public void beforeJob(JobExecution jobExecution) {
 	}
 
+	public void onError(JobExecution jobExecution, Throwable e) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

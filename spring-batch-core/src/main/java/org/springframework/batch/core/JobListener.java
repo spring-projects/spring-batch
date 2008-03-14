@@ -37,4 +37,9 @@ public interface JobListener {
 	 * Callback after successful completion of a job.
 	 */
 	void afterJob(JobExecution jobExecution);
+	
+	/**
+	 * Callback on job failure.
+	 */
+	void onError(JobExecution jobExecution, Throwable e);
 }

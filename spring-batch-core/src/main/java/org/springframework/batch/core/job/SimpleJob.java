@@ -133,6 +133,7 @@ public class SimpleJob extends AbstractJob {
 		}
 		catch (Throwable t) {
 			execution.setStatus(BatchStatus.FAILED);
+			listener.onError(execution, t);
 			rethrow(t);
 		}
 		finally {

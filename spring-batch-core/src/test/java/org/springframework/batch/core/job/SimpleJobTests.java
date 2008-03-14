@@ -250,6 +250,25 @@ public class SimpleJobTests extends TestCase {
 		assertEquals(0, list.size());
 		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
+	
+	public void testFailedWithListener() throws Exception {
+		job.setJobListeners(new JobListenerSupport[] { new JobListenerSupport() {
+			public void onError(JobExecution jobExecution, Throwable t) {
+				list.add(t);
+			}
+		} });
+		final RuntimeException exception = new RuntimeException("Foo!");
+		stepConfiguration1.setProcessException(exception);
+		
+		try {
+			job.execute(jobExecution);
+		} catch (RuntimeException e) {
+			assertEquals(exception, e);
+		}
+		assertEquals(1, list.size());
+		assertSame(exception, list.get(0));
+		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
+	}
 
 	public void testFailedWithError() throws Exception {
 		stepConfiguration1.setStartLimit(5);
