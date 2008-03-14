@@ -114,11 +114,11 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.StepExecution#incrementTaskCount()}.
+	 * {@link org.springframework.batch.core.StepExecution#incrementItemCount()}.
 	 */
 	public void testIncrementLuwCount() {
 		int before = execution.getItemCount().intValue();
-		execution.incrementTaskCount();
+		execution.incrementItemCount();
 		int after = execution.getItemCount().intValue();
 		assertEquals(before + 1, after);
 	}

@@ -101,9 +101,9 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Increments the number of tasks in this execution
+	 * Increments the number of items in this execution
 	 */
-	public void incrementTaskCount() {
+	public void incrementItemCount() {
 		itemCount++;
 	}
 
