@@ -103,39 +103,6 @@ public class StepExecutionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.StepExecution#incrementCommitCount()}.
-	 */
-	public void testIncrementCommitCount() {
-		int before = execution.getCommitCount().intValue();
-		execution.incrementCommitCount();
-		int after = execution.getCommitCount().intValue();
-		assertEquals(before + 1, after);
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.StepExecution#incrementItemCount()}.
-	 */
-	public void testIncrementLuwCount() {
-		int before = execution.getItemCount().intValue();
-		execution.incrementItemCount();
-		int after = execution.getItemCount().intValue();
-		assertEquals(before + 1, after);
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.StepExecution#rollback()}.
-	 */
-	public void testIncrementRollbackCount() {
-		int before = execution.getRollbackCount().intValue();
-		execution.rollback();
-		int after = execution.getRollbackCount().intValue();
-		assertEquals(before + 1, after);
-	}
-
-	/**
-	 * Test method for
 	 * {@link org.springframework.batch.core.StepExecution#getCommitCount()}.
 	 */
 	public void testGetCommitCount() {
@@ -150,15 +117,6 @@ public class StepExecutionTests extends TestCase {
 	public void testGetTaskCount() {
 		execution.setItemCount(123);
 		assertEquals(123, execution.getItemCount().intValue());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.StepExecution#getRollbackCount()}.
-	 */
-	public void testGetRollbackCount() {
-		execution.setRollbackCount(123);
-		assertEquals(123, execution.getRollbackCount().intValue());
 	}
 	
 	public void testGetJobExecution() throws Exception {

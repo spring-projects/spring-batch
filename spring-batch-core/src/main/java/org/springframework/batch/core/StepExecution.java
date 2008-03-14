@@ -50,8 +50,6 @@ public class StepExecution extends Entity {
 
 	private int skipCount = 0;
 
-	private int retryCount = 0;
-
 	private Date startTime = new Date(System.currentTimeMillis());
 
 	private Date endTime = null;
@@ -91,20 +89,6 @@ public class StepExecution extends Entity {
 	 */
 	public StepExecution(Step step, JobExecution jobExecution) {
 		this(step, jobExecution, null);
-	}
-
-	/**
-	 * Increments the number of commits in this execution
-	 */
-	public void incrementCommitCount() {
-		commitCount++;
-	}
-
-	/**
-	 * Increments the number of items in this execution
-	 */
-	public void incrementItemCount() {
-		itemCount++;
 	}
 
 	/**
@@ -177,15 +161,6 @@ public class StepExecution extends Entity {
 	 */
 	public void setItemCount(int itemCount) {
 		this.itemCount = itemCount;
-	}
-
-	/**
-	 * Sets the current number of rollbacks for this execution
-	 * 
-	 * @param rollbackCount the current number of rollbacks for this execution
-	 */
-	public void setRollbackCount(int rollbackCount) {
-		this.rollbackCount = rollbackCount;
 	}
 
 	/**
@@ -358,24 +333,8 @@ public class StepExecution extends Entity {
 		this.terminateOnly = true;
 	}
 
-	public void setSkipCount(int skipCount) {
-		this.skipCount = skipCount;
-	}
-
 	public int getSkipCount() {
 		return skipCount;
-	}
-
-	public void incrementSkipCount() {
-		skipCount++;
-	}
-
-	public void setRetryCount(int retryCount) {
-		this.retryCount = retryCount;
-	}
-
-	public int getRetryCount() {
-		return retryCount;
 	}
 
 	/**
