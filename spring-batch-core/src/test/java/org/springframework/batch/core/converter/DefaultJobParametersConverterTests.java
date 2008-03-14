@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.support;
+package org.springframework.batch.core.converter;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.support.DefaultJobParametersConverter;
+import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.util.StringUtils;
 
 /**

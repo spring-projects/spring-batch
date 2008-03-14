@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.support;
+package org.springframework.batch.core.converter;
 
 import java.util.Properties;
 

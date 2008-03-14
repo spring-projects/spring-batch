@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.support;
+package org.springframework.batch.core.converter;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -64,7 +64,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	 * @throws IllegalArgumentException if a number or date is passed in that cannot be parsed, or cast to the correct
 	 *             type.
 	 * 
-	 * @see org.springframework.batch.core.support.JobParametersConverter#getJobParameters(java.util.Properties)
+	 * @see org.springframework.batch.core.converter.JobParametersConverter#getJobParameters(java.util.Properties)
 	 */
 	public JobParameters getJobParameters(Properties props) {
 
@@ -114,7 +114,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	/**
 	 * Use the same suffixes to create properties (omitting the string suffix because it is the default).
 	 * 
-	 * @see org.springframework.batch.core.support.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
+	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
 	public Properties getProperties(JobParameters params) {
 

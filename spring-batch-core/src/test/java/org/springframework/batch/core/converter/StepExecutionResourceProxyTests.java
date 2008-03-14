@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.support;
+package org.springframework.batch.core.converter;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,9 +27,9 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.converter.StepExecutionResourceProxy;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.step.StepSupport;
-import org.springframework.batch.core.support.StepExecutionResourceProxy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;

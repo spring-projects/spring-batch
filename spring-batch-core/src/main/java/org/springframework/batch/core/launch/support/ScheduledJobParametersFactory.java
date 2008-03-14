@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.support.JobParametersConverter;
+import org.springframework.batch.core.converter.JobParametersConverter;
 
 /**
  * @author Lucas Ward
@@ -72,7 +72,7 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 	/**
 	 * Convert schedule date to Date, and assume all other parameters can be represented by their default string value.
 	 * 
-	 * @see org.springframework.batch.core.support.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
+	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
 	public Properties getProperties(JobParameters params) {
 
