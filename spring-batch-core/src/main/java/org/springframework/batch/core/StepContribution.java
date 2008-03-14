@@ -33,7 +33,7 @@ public class StepContribution {
 	private ExecutionContext executionContext;
 
 	private int commitCount;
-	
+
 	private int skipCount;
 
 	/**
@@ -98,12 +98,25 @@ public class StepContribution {
 	public boolean isTerminateOnly() {
 		return execution.isTerminateOnly();
 	}
-	
-	public int getSkipCount() {
+
+	/**
+	 * @return the sum of skips accumulated in the parent {@link StepExecution}
+	 * and this <code>StepContribution</code>.
+	 */
+	public int getStepSkipCount() {
 		return skipCount + execution.getSkipCount();
 	}
-	
-	public void incrementSkipCount(){
+
+	/**
+	 * @return the number of skips collected in this
+	 * <code>StepContribution</code> (not including skips accumulated in the
+	 * parent {@link StepExecution}.
+	 */
+	public int getContributionSkipCount() {
+		return skipCount;
+	}
+
+	public void incrementSkipCount() {
 		skipCount++;
 	}
 

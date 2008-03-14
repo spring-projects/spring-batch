@@ -64,7 +64,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 			return getItemReader().read();
 		}
 		catch (Exception e) {
-			if (itemSkipPolicy.shouldSkip(e, contribution.getSkipCount())) {
+			if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 				contribution.incrementSkipCount();
 				if (getItemReader() instanceof Skippable) {
 					((Skippable) getItemReader()).skip();
@@ -87,7 +87,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 			getItemWriter().write(item);
 		}
 		catch (Exception e) {
-			if (itemSkipPolicy.shouldSkip(e, contribution.getSkipCount())) {
+			if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 				contribution.incrementSkipCount();
 				if (getItemReader() instanceof Skippable) {
 					((Skippable) getItemReader()).skip();
