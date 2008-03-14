@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.repeat.synch;
+package org.springframework.batch.repeat.support;
 
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;

@@ -29,7 +29,7 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
+import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.JdbcTemplate;

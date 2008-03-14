@@ -27,7 +27,6 @@ import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.backoff.StatelessBackOffPolicy;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
-import org.springframework.batch.retry.synch.RetrySynchronizationManager;
 
 /**
  * @author Rob Harrop

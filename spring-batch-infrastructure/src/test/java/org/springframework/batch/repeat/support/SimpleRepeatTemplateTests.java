@@ -28,7 +28,6 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.policy.CompletionPolicySupport;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 
 /**
  * @author Dave Syer

@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.retry.synch;
+package org.springframework.batch.retry.support;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.context.RetryContextSupport;
+import org.springframework.batch.retry.support.RetrySynchronizationManager;
 import org.springframework.batch.retry.support.RetryTemplate;
 
 /**

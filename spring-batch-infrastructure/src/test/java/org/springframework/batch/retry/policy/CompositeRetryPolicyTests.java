@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.TerminatedRetryException;
-import org.springframework.batch.retry.synch.RetrySynchronizationManager;
+import org.springframework.batch.retry.support.RetrySynchronizationManager;
 
 public class CompositeRetryPolicyTests extends TestCase {
 

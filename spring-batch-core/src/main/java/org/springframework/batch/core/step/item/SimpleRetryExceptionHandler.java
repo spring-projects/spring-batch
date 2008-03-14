@@ -17,7 +17,7 @@ package org.springframework.batch.core.step.item;
 
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
-import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
+import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;

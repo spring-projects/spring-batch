@@ -30,7 +30,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
+import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.retry.ListItemReaderRecoverer;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;

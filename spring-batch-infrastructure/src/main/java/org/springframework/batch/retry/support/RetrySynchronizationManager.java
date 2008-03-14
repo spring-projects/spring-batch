@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.retry.synch;
+package org.springframework.batch.retry.support;
 
 import org.springframework.batch.retry.RetryContext;
 

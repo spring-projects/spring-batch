@@ -33,7 +33,6 @@ import org.springframework.batch.retry.backoff.BackOffInterruptedException;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.backoff.NoBackOffPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
-import org.springframework.batch.retry.synch.RetrySynchronizationManager;
 
 /**
  * Template class that simplifies the execution of operations with retry

@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
+import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 
 public class ExceptionThrowingItemReaderProxyTests extends TestCase {
 

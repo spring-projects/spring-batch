@@ -32,7 +32,6 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
-import org.springframework.batch.repeat.synch.RepeatSynchronizationManager;
 import org.springframework.util.Assert;
 
 /**

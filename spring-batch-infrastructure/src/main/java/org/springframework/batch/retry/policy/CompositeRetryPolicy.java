@@ -24,7 +24,7 @@ import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.retry.synch.RetrySynchronizationManager;
+import org.springframework.batch.retry.support.RetrySynchronizationManager;
 
 /**
  * A {@link RetryPolicy} that composes a list of other policies and delegates
