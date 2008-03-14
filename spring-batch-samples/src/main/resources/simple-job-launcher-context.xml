@@ -53,7 +53,7 @@
 		<property name="restartable" value="true" />
 	</bean>
 
-	<bean id="taskletStep" class="org.springframework.batch.core.step.TaskletStep" abstract="true">
+	<bean id="taskletStep" class="org.springframework.batch.core.step.tasklet.TaskletStep" abstract="true">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="allowStartIfComplete" value="true" />
 	</bean>

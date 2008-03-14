@@ -1,4 +1,4 @@
-package org.springframework.batch.core.step;
+package org.springframework.batch.core.step.tasklet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +15,10 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.listener.StepListenerSupport;
-import org.springframework.batch.core.step.TaskletStep;
+import org.springframework.batch.core.step.JobRepositorySupport;
+import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.ExitStatus;
 
 public class TaskletStepTests extends TestCase {
