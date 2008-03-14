@@ -108,7 +108,8 @@ public class SimpleJob extends AbstractJob {
 
 					StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step);
 
-					boolean isRestart = jobRepository.getStepExecutionCount(jobInstance, step) > 0 ? true : false;
+					boolean isRestart = (jobRepository.getStepExecutionCount(jobInstance, step) > 0
+							&& !lastStepExecution.getExitStatus().equals(ExitStatus.FINISHED)) ? true : false;
 
 					if (isRestart && lastStepExecution != null) {
 						currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
