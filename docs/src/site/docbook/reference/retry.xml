@@ -131,8 +131,7 @@ Object result = template.execute(new RetryCallback() {
       <code>RetryOperations.execute()</code> method and potentially losing the
       context that was on the stack. To avoid losing it we have to introduce a
       storage strategy to lift it off the stack and put it (at a minimum) in
-      heap storage. For this purpose Spring Batch provides the
-      <classname>ItemReaderRetryPolicy</classname> and a storage strategy
+      heap storage. For this purpose Spring Batch provides a storage strategy
       <classname>RetryContextCache</classname>. The default implementation of
       the <classname>RetryContextCache</classname> is in memory, using a
       simple <classname>Map</classname>. Advanced usage with multiple
@@ -147,10 +146,9 @@ Object result = template.execute(new RetryCallback() {
         <para>Part of the reponsibility of a stateful retry policy is to
         recognise the failed operations when they come back in a new
         transaction. To facilitate this in the commonest case where an object
-        of some type (like a message or message payload) is being processed,
-        Spring Batch provides the
-        <classname>ItemReaderRetryPolicy</classname>. This works in
-        conjunction with a special <classname>RetryCallback</classname>
+        (like a message or message payload) is being processed, Spring Batch
+        provides the <classname>ItemReaderRetryPolicy</classname>. This works
+        in conjunction with a special <classname>RetryCallback</classname>
         implementation <classname>ItemReaderRetryCallback</classname>, which
         in turn relies on the user providing an
         <classname>ItemReader</classname> and an
@@ -159,13 +157,17 @@ Object result = template.execute(new RetryCallback() {
         writer.</para>
 
         <para>The way the failed operations are recognised in this
-        implementation is by recognising the object that is returned from the
-        <classname>ItemReader</classname>. To recognise the item the user can
-        provide an <classname>ItemKeyGenerator</classname> strategy, either by
+        implementation is by identifying the object that is returned from the
+        <classname>ItemReader</classname>. To identify the item the user can
+        provide an <classname>ItemKeyGenerator</classname> strategy, and this
+        is responsible for returning a unique key identifying the item. The
+        identifier is used as a key in the
+        <classname>RetryContextCache</classname>. An
+        <classname>ItemKeyGenerator</classname> can be provided either by
         injecting it directly into the
         <classname>ItemReaderRetryCallback</classname>, or by implementing the
         interface in the <classname>ItemReader</classname>, or by accepting
-        the default which is to simply use the item to identify itself.</para>
+        the default which is to simply use the item itself as a key.</para>
 
         <para>When the retry is exhausted, because a stateful retry is always
         in a fresh transaction, there is also the option to handle the failed
@@ -258,7 +260,7 @@ Object result = template.execute(new RetryCallback() {
     The <classname>RetryOperationsInterceptor</classname> executes the
     intercepted method and retries on failure according to the
     <classname>RetryPolicy</classname> in the provided
-    <classname>RepeatTemplate</classname>. </para>
+    <classname>RepeatTemplate</classname>.</para>
 
     <para>Here is an example of declarative iteration using the Spring AOP
     namespace to repeat a service call to a method called
