@@ -26,7 +26,6 @@
 		<config>src/main/resources/jobs/ibatisJob.xml</config>
 		<config>src/main/resources/jobs/compositeProcessorSampleJob.xml</config>
 		<config>src/main/resources/jobs/footballJob.xml</config>
-		<config>src/main/resources/beanRefContext.xml</config>
 		<config>src/main/resources/jobs/delegatingJob.xml</config>
 		<config>src/main/resources/jobs/parallelJob.xml</config>
 		<config>src/main/resources/jobs/retrySample.xml</config>
