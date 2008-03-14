@@ -672,6 +672,72 @@
         </tgroup>
       </table>
     </section>
+
+    <section>
+      <title>ExecutionContext</title>
+
+      <para>An <classname>ExecutionContext</classname> represents a collection
+      of key/value pairs that are persisted and controlled by the framework in
+      order to allow developers a place to store persistent state that is
+      scoped to a <classname>JobInstance</classname>. For those familiar with
+      Quartz, it is very similar to <classname>JobDataMap</classname>. The
+      best usage example is restart. Using flat file input as an example,
+      while processing individual lines, the framework periodically persists
+      the <classname>ExecutionContext</classname> at commit points. This
+      allows the <classname>ItemReader</classname> to store its state in case
+      a fatal error occurs during the run, or even if the power goes out. All
+      that is needed is to put the current number of lines read into the
+      context, and the framework will do the rest:</para>
+
+      <programlisting>executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());</programlisting>
+
+      <para>When the <classname>ItemReader</classname> is opened, it can check
+      to see if it has any stored state in the context, and initialize itself
+      from there:</para>
+
+      <programlisting>  if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
+    log.debug("Initializing for restart. Restart data is: " + executionContext);
+
+    long lineCount = executionContext.getLong(getKey(LINES_READ_COUNT));
+
+    LineReader reader = getReader();
+
+    Object record = "";
+    while (reader.getPosition() &lt; lineCount &amp;&amp; record != null) {
+       record = readLine();
+    }
+  }</programlisting>
+
+      <para>The <classname>ExecutionContext</classname> can also be used for
+      startistics that need to be persisted about the run itself. For example,
+      if a flat file contains orders for processing that exist across multiple
+      lines, it may be necessary to store how many orders have been processed
+      (which is much different from than the number of lines read) so that an
+      email can be sent at the end of the <classname>Step</classname> with the
+      total orders processed in the body. The framework handles storing this
+      for the developer, in order to correctly scope it with an individual
+      <classname>JobInstance</classname>. It can be very difficult to know
+      whether an existing <classname>ExecutionContext</classname> should be
+      used or not. For example, using the 'EndOfDay' example from above, when
+      the 01-01 run starts again for the second time, the framework recognizes
+      that it is the same <classname>JobInstance</classname> and on an
+      individual <classname>Step</classname> basis, pulls the
+      <classname>ExecutionContext</classname> out of the database and hands it
+      as part of the <classname>StepExecution</classname> to the
+      <classname>Step</classname> itself. Conversely, for the 01-02 run the
+      framework recognizes that it is a different instance, so an empty
+      context must be handed to the <classname>Step</classname>. There are
+      many of these types of determinations that the framework makes for the
+      developer to ensure the state is given to them at the correct time. It
+      is also important to note that exactly one
+      <classname>ExecutionContext</classname> exists per
+      <classname>StepExecution</classname> at any given time. Clients of the
+      <classname>ExecutionContext</classname> should be careful because this
+      creates a shared keyspace, so care should be taken when putting values
+      in to ensure no data is overwritten, however, the
+      <classname>Step</classname> stores absolutely no data in the context, so
+      there is no way to adversely affect the framework.</para>
+    </section>
   </section>
 
   <section>
@@ -719,9 +785,28 @@
 </programlisting>
 
     <para>It is expected that implementations will obtain a valid
-    <classname>JobExecution</classname> fromt he
+    <classname>JobExecution</classname> from the
     <classname>JobRepository</classname> and execute the
     <classname>Job</classname>.</para>
+  </section>
+
+  <section>
+    <title>JobLocator</title>
+
+    <para><classname>JobLocator</classname> represents an interface for
+    locating a <classname>Job</classname>:</para>
+
+    <programlisting>  public interface JobLocator {
+
+    Job getJob(String name) throws NoSuchJobException;
+  }</programlisting>
+
+    <para>This interface is very necessary due to the nature of Spring itself.
+    Because we can't guarantee one <classname>ApplicationContext</classname>
+    equals one <classname>Job</classname>, an abstraction is needed to obtain
+    a <classname>Job</classname> for a given name. It becomes especially
+    useful when launching jobs from within a Java EE application
+    server.</para>
   </section>
 
   <section>
@@ -732,7 +817,7 @@
     time. When the <classname>ItemReader</classname> has exhausted the items
     it can provide, it will indicate this by returning null. More details
     about the <classname>ItemReader</classname> interface and it's various
-    implementatiosn can be found in Chapter 3.</para>
+    implementations can be found in Chapter 3.</para>
   </section>
 
   <section>
@@ -741,9 +826,9 @@
     <para><classname>ItemWriter</classname> is an abstraction that represents
     the output of a <classname>Step</classname>, one item at a time.
     Generally, an item writer has no knowledge of the input it will receive
-    next, only the item that that was passed in its current invocation. More
+    next, only the item that was passed in its current invocation. More
     details about the <classname>ItemWriter</classname> interface and it's
-    various implementations can be found in Chatper 3.</para>
+    various implementations can be found in Chapter 3.</para>
   </section>
 
   <section>

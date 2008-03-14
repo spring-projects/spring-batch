@@ -7,113 +7,433 @@
   <section>
     <title>Introduction</title>
 
-    <para>The "execution" layer is fertile ground for collaboration and
-    contributions from the community and from projects in the field. There is
-    lifecycle support for starting and stopping jobs. The vision for this is
-    that there can be multiple implementations of this interface providing
-    different architectural patterns, and delivering different levels of
-    scalability and robustness, without changing either the business logic or
-    the job configuration. The 1.0 release of Spring Batch has an
-    implementation of the core API that is targeted at a single VM.</para>
+    <para>In Chapter 2, the overall description of the architecture was
+    discussed, using the following diagram as a guide:</para>
 
-    <para>The execution environment is responsible for providing
-    implementations of the core domain concepts. This includes:</para>
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center"
+                   fileref="images/spring-batch-reference-model.png" />
+      </imageobject>
 
-    <itemizedlist>
-      <listitem>
-        <para>Run Tier - Implement the bootstrapping and launching of the
-        Execution Environment.</para>
-      </listitem>
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="images/spring-batch-reference-model.png" />
+      </imageobject>
+    </mediaobject>
 
-      <listitem>
-        <para>Job Tier - Implement the Job and Step strategies.</para>
-      </listitem>
-
-      <listitem>
-        <para>Application Tier - Implement the ItemReader and ItemWriter (or
-        Tasklet) strategies.</para>
-      </listitem>
-
-      <listitem>
-        <para>Data Tier - Implement a Repository solution for storing the
-        persistence state of the batch domain.</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>We will describe the flow of the simple batch execution envrionment
-    that is provided with spring-batch to clarify the sequence of processing
-    in the batch environment. The simple batch execution environment is a
-    concrete implementation of the core interfaces. The flow of a job through
-    the execution environment is as follows.</para>
+    <para>When viewed from left to right, the diagram describes a basic flow
+    for the execution of a batch job:</para>
 
     <orderedlist>
       <listitem>
-        <para>In the Run Tier, a single Java Project may have one or more
-        Jobs. Jobs are configured with the Job bean.</para>
+        <para>A Scheduler kicks off a job script (usually some form of shell
+        script)</para>
       </listitem>
 
       <listitem>
-        <para>A single Job must contain at least one Step. Steps are
-        configured with various flavours of Step FactoryBean. If more than one
-        step is configured for a Job, then they are executed serially and
-        after the previous step (all of its items / records) is complete. A
-        Job is also responsible for providing registered JobListener instances
-        with callbacks before and after the job execution.</para>
+        <para>The script sets up the classpath appropriately, and starts the
+        Java process. In most cases, using
+        <classname>CommandLineJobRunner</classname> as the entry point</para>
       </listitem>
 
       <listitem>
-        <para>Steps are responsible for executing business logic and recording
-        progress in a StepExecution.</para>
+        <para>The JobRunner finds the <classname>Job</classname> using the
+        <classname>JobLocator</classname>, pulls together the
+        <classname>JobParameters</classname> and launches the
+        <classname>Job</classname></para>
       </listitem>
 
       <listitem>
-        <para>Steps are also responsible for managing the lifecycle of
-        ItemStreams that contribute input or output to the business logic.
-        ItemStreams can be registered with a Step using the factory beans. Any
-        ItemReader or ItemWRiter injected directly into the factory bean will
-        also be registered automatically.</para>
+        <para>The <classname>JobLauncher</classname> retrieves a
+        <classname>JobExecution</classname> from the
+        <classname>JobRepository</classname>, and executes the
+        <classname>Job</classname></para>
       </listitem>
 
       <listitem>
-        <para>Steps are also responsible for providing callbacks to the
-        BatchListener family of listeners. These provide a way for application
-        developers to add additional behaviour to a step, e.g. if a checksum
-        or footer has to be added to an output file.</para>
+        <para>The <classname>Job</classname> executes each
+        <classname>Step</classname> in sequence.</para>
+      </listitem>
+
+      <listitem>
+        <para>The <classname>Step</classname> calls read on the
+        <classname>ItemReader</classname>, handing the resulting item to the
+        <classname>ItemWriter</classname> until null is returned, periodically
+        committing and storing status in the
+        <classname>JobRepository</classname>.</para>
+      </listitem>
+
+      <listitem>
+        <para>When execution is complete, the <classname>Step</classname>
+        returns control back to the <classname>Job</classname>, and if no more
+        steps exist, control is returned back to the original caller, in this
+        case, the scheduler.</para>
       </listitem>
     </orderedlist>
+
+    <para>This flow is perhaps a bit overly simplified, but describes the
+    complete flow in the most basic terms. From here, each tier will be
+    described in detail, using actual implementations and examples.</para>
   </section>
 
   <section>
-    <title>Simple Job Execution Flow</title>
+    <title>Run Tier</title>
+
+    <para>As it's name suggests, this tier is entirely concerned with actually
+    running the job. Regardless of whether the originator is a Scheduler or an
+    HTTP request, a Job must be obtained, parameters must be parsed, and
+    eventually a <classname>JobLauncher</classname> called:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center" fileref="images/run-tier.png" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center" fileref="images/run-tier.png" />
+      </imageobject>
+    </mediaobject>
 
     <para></para>
+
+    <section>
+      <title>Running Jobs from the Command Line</title>
+
+      <para>For users that want to run their jobs from an enterprise
+      scheduler, the command line is the primary interface. This is because
+      most schedulers (with the exception of Quartz unless using the
+      NativeJob) work directly with operating system processes, primarily
+      kicked off with shell scripts. There are many ways to launch a Java
+      process besides a shell script, such as Perl, Ruby, or even 'build
+      tools' such as ant or maven. However, because most people are familiar
+      with shell scripts, this example will focus on them.</para>
+
+      <section>
+        <title>The CommandLineJobRunner</title>
+
+        <para>Because the script launching the job must kick off a Java
+        Virtual Machine, there needs to be a class with a main method to act
+        as the primary entry point. Spring Batch provides an implementation
+        that serves just this purpose:
+        <classname>CommandLineJobRunner</classname>. It's important to note
+        that this is just one way to bootstrap your application, but there are
+        many ways to launch a Java process, and this class should in no way be
+        viewed as definitive. It performs four tasks:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Loads the appropriate Application Context</para>
+          </listitem>
+
+          <listitem>
+            <para>Parses command line arguments into JobParameters</para>
+          </listitem>
+
+          <listitem>
+            <para>Locates the appropriate job based on arguments</para>
+          </listitem>
+
+          <listitem>
+            <para>Uses the JobLauncher provided in the application context to
+            launch the job.</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>All of these tasks are accomplished based completely upon the
+        arguments passed in. The following are required arguments:</para>
+
+        <table>
+          <title>CommandLineJobRunner arguments</title>
+
+          <tgroup cols="2">
+            <tbody>
+              <row>
+                <entry>jobPath</entry>
+
+                <entry>The location of the XML file that will be used to
+                create an <classname>ApplicationContext</classname>. This file
+                should contain everything needed to run the complete
+                <classname>Job</classname></entry>
+              </row>
+
+              <row>
+                <entry>jobName</entry>
+
+                <entry>The name of the job to be run.</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+
+        <para>These arguments must be passed in with the path first and the
+        name second. All arguments after these are considered to be
+        JobParameters and must be in the format of 'name=value':</para>
+
+        <screen><prompt>bash$</prompt> java CommandLineJobRunner endOfDayJob.xml endOfDay schedule.date(date)=2008/01/01</screen>
+
+        <para>In most cases you would want to use a manifest to declare your
+        main class in a jar, but for simplicity, the class was used directly.
+        This example is using the same 'EndOfDay' example from Chapter 2. The
+        first argument is 'endOfDayJob.xml', which is the Spring
+        <classname>ApplicationContext</classname> containing the Job. The
+        second argument, 'endOfDay' represents the job name. The final
+        argument, 'schedule.date=01-01-2008' will be converted into
+        <classname>JobParameters</classname>. An example of the XML
+        configuration is below: </para>
+
+        <programlisting>  &lt;bean id="endOfDay"
+        class="org.springframework.batch.core.job.SimpleJob"&gt;
+    &lt;property name="steps"&gt;
+      &lt;bean id="step1" parent="simpleStep" /&gt;
+      &lt;!-- Step details removed for clarity --&gt;
+    &lt;/property&gt; 
+  &lt;/bean&gt;
+
+  &lt;!-- Launcher details removed for clarity --&gt;
+  &lt;bean id="jobLauncher"
+        class="org.springframework.batch.core.launch.support.SimpleJobLauncher" /&gt;</programlisting>
+
+        <para>This example is overly simplistic, since there are many more
+        requirements to a run a batch job in Spring Batch in general, but it
+        serves to show the two main requirements of the
+        <classname>CommandLineJobRunner</classname>:
+        <classname>Job</classname> and
+        <classname>JobLauncher.</classname></para>
+      </section>
+    </section>
   </section>
 
   <section>
-    <title>Configuration</title>
+    <title>Job Tier</title>
 
-    <para><programlisting>
-        &lt;property name="itemProvider"&gt;
-                &lt;bean class="org.springframework.batch.sample.item.provider.PlayerItemProvider"&gt;
-                        &lt;property name="inputSource" ref="playerFileInputSource" /&gt;
-                        &lt;property name="fieldSetMapper"&gt;
-                                &lt;bean class="org.springframework.batch.sample.mapping.PlayerMapper" /&gt;
-                        &lt;/property&gt;
-                &lt;/bean&gt;
-        &lt;/property&gt;
-        </programlisting></para>
+    <para>The Job Tier is responsible for the overall execution of a batch
+    job. It sequentially executes batch steps, ensuring that all steps are in
+    the correct state and all appropriate policies are enforced:</para>
 
-    <para>The LineTokenizer is just one additional property to the InputSource
-    as seen here:</para>
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center" fileref="images/jobTier.png" />
+      </imageobject>
 
-    <para><programlisting>
-                &lt;property name="tokenizer"&gt;
-                        &lt;bean
-                                class="org.springframework.batch.io.file.support.transform.DelimitedLineTokenizer"&gt;
-                                &lt;property name="names"
-                                        value="ID,lastName,firstName,position,birthYear,debutYear" /&gt;
-                        &lt;/bean&gt;
-                &lt;/property&gt;
-        </programlisting></para>
+      <imageobject role="fo">
+        <imagedata align="center" fileref="images/jobTier.png" />
+      </imageobject>
+    </mediaobject>
+
+    <para>The job tier is entirely concerned with maintaining the three job
+    stereotypes: <classname>Job</classname>,
+    <classname>JobInstance</classname>, and
+    <classname>JobExecution</classname>. The
+    <classname>JobLauncher</classname> interacts with the
+    <classname>JobRepository</classname> in order to create a
+    <classname>JobExecution</classname>, and the <classname>Job</classname>
+    stores the <classname>JobExecution</classname> using the
+    repository.</para>
+
+    <section>
+      <title>SimpleJobLauncher</title>
+
+      <para>The most basic implementation of the
+      <classname>JobLauncher</classname> interface is the SimpleJobLauncher.
+      It's only required dependency is a <classname>JobRepository</classname>,
+      in order to obtain an execution: </para>
+
+      <programlisting>  &lt;bean id="jobLauncher"
+        class="org.springframework.batch.execution.launch.SimpleJobLauncher"&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+  &lt;/bean&gt;</programlisting>
+
+      <para>Once a <classname>JobExecution</classname> is obtained, it is
+      passed to the execute method of <classname>Job</classname>, ultimately
+      returning the <classname>JobExecution</classname> to the caller:</para>
+
+      <mediaobject>
+        <imageobject role="html">
+          <imagedata align="center"
+                     fileref="images/job-launcher-sequence-sync.png" />
+        </imageobject>
+
+        <imageobject role="fo">
+          <imagedata align="center"
+                     fileref="images/job-launcher-sequence-sync.png" />
+        </imageobject>
+      </mediaobject>
+
+      <para>The sequence is fairly straightforward, and works extremely well
+      when launched from a scheduler, but causes issues when trying to launch
+      from an HTTP request. In this scenario, the launching needs to be done
+      asynchronously, so that the <classname>SimpleJobLauncher</classname>
+      returns immediately to it's caller. This is because it is not good
+      practice to keep an HTTP request open for the amount of time needed by
+      long running processes such as batch. An example sequence is below:
+      </para>
+
+      <mediaobject>
+        <imageobject role="html">
+          <imagedata align="center"
+                     fileref="images/job-launcher-sequence-async.png" />
+        </imageobject>
+
+        <imageobject role="fo">
+          <imagedata align="center"
+                     fileref="images/job-launcher-sequence-async.png" />
+        </imageobject>
+      </mediaobject>
+
+      <para>The <classname>SimpleJobLauncher</classname> can easily be
+      configured to allow for this scenario by configuring a
+      <classname>TaskExecutor</classname>:</para>
+
+      <programlisting> &lt;bean id="jobLauncher"
+        class="org.springframework.batch.execution.launch.SimpleJobLauncher"&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+    &lt;property name="taskExecutor"&gt;
+      &lt;bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" /&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+
+      <para>Any implementation of the spring
+      <classname>TaskExecutor</classname> interface can be used to control how
+      jobs are asynchronously executed.</para>
+
+      <section>
+        <title>Stopping a Job</title>
+
+        <para>One of the most common reasons for wanting to launching a
+        <classname>job</classname> asynchronously is to be able to gracefully
+        stop it. This can be done through the
+        <classname>JobExecution</classname> returned by the
+        <classname>JobLauncher</classname>:</para>
+
+        <programlisting>  JobExecution jobExecution = launcher.run(getJob(), jobParameters);
+
+  //give job adequate time to start
+  Thread.sleep(1000);
+
+  assertEquals(BatchStatus.STARTED, jobExecution.getStatus());
+  assertTrue(jobExecution.isRunning());
+
+  jobExecution.stop();
+
+  //give job time to stop
+  Thread.sleep(1000);
+
+  assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+  assertFalse(jobExecution.isRunning());</programlisting>
+
+        <para>The shutdown is not immediate, since there is no way to force
+        immediate shutdown, especially if the execution is currently in
+        developer code that the framework has no control over, such as a
+        business service. What it does mean, is that as soon as control is
+        returned back to the framework, it will set the status of the current
+        <classname>StepExecution</classname> to
+        <classname>BatchStatus.STOPPED</classname>, save it, then do the same
+        for the <classname>JobExecution</classname> before finishing.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>SimpleJobRepository</title>
+
+      <para>The SimpleJobRepository is the only provided implementation of the
+      <classname>JobRepository</classname> interface. It completely manages
+      the various batch domain objects and ensures they are created and
+      persisted correctly. The <classname>SimpleJobRepository</classname> uses
+      three different DAO interfaces for the three major domain types it
+      stores: <classname>JobInstanceDao</classname>,
+      <classname>JobExecutionDao</classname>, and
+      <classname>StepExecutionDao</classname>. The repository delegates to
+      these DAOs to both persist the various domain objects and query for them
+      during initialization. The following configuration shows a
+      SimpleJobRepository configured with JDBC DAOs:</para>
+
+      <programlisting>  &lt;bean id="jobRepository" class="org.springframework.batch.core.repository.support.SimpleJobRepository"&gt;
+    &lt;constructor-arg ref="jobInstanceDao" /&gt;
+    &lt;constructor-arg ref="jobExecutionDao" /&gt;
+    &lt;constructor-arg ref="stepExecutionDao" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="jobInstanceDao" class="org.springframework.batch.core.repository.support.dao.JdbcJobInstanceDao" &gt;
+    &lt;property name="jdbcTemplate" ref="jdbcTemplate" /&gt;
+    &lt;property name="jobIncrementer" ref="jobIncrementer" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="jobExecutionDao" class="org.springframework.batch.core.repository.support.dao.JdbcJobExecutionDao" &gt;
+    &lt;property name="jdbcTemplate" ref="jdbcTemplate" /&gt;
+    &lt;property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="stepExecutionDao" class="org.springframework.batch.core.repository.support.dao.JdbcStepExecutionDao" &gt;
+    &lt;property name="jdbcTemplate" ref="jdbcTemplate" /&gt;
+    &lt;property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" &gt;
+    &lt;property name="dataSource" ref="dataSource" /&gt;
+  &lt;/bean&gt;</programlisting>
+
+      <para>The configuration above isn't quite complete, each DAO
+      implementation is makes a reference to a Spring
+      <classname>DataFieldMaxValueIncrementer</classname>.
+      <classname>JobInstance</classname>, <classname>JobExecution</classname>,
+      and <classname>StepExecution</classname> each have unique IDs, and the
+      incrementers are used to create them.</para>
+
+      <section>
+        <title>JobRepositoryFactoryBean</title>
+
+        <para>Including the incrementers, which must be database specific, the
+        configuration above is verbose. In order to make this more manageable,
+        the framework provides a <classname>FactoryBean</classname> for
+        convenience: <classname>JobRepositoryFactoryBean</classname>.</para>
+
+        <programlisting>  &lt;bean id="jobRepository"
+        class="org.springframework.batch.execution.repository.JobRepositoryFactoryBean"
+    &lt;property name="databaseType" value="hsql" /&gt; 
+    &lt;property name="dataSource" value="dataSource" /&gt;
+  &lt;/bean&gt;</programlisting>
+
+        <para>The databaseType property indicates the type of incrementer that
+        must be used. Options include: "db2", "derby", "hsql", "mysql",
+        "oracle", and "postgres".</para>
+      </section>
+
+      <section>
+        <title>In-Memory Repository</title>
+
+        <para>There are scenarios in which you may not want to persist your
+        domain objects to the database. One reason may be speed, storing
+        domain objects at each commit point takes extra time. Another reason
+        may be that you just don't need to persist status for a particular
+        job. Spring batch provides a solution:</para>
+
+        <programlisting>  &lt;bean id="jobRepository" class="org.springframework.batch.core.repository.support.SimpleJobRepository"&gt;
+    &lt;constructor-arg ref="mapJobInstanceDao" /&gt;
+    &lt;constructor-arg ref="mapJobExecutionDao" /&gt;
+    &lt;constructor-arg ref="mapJtepExecutionDao" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="mapJobInstanceDao"
+        class="org.springframework.batch.execution.repository.dao.MapJobInstanceDao" /&gt;
+
+  &lt;bean id="mapJobExecutionDao"
+        class="org.springframework.batch.execution.repository.dao.MapJobExecutionDao" /&gt;
+
+  &lt;bean id="mapStepExecutionDao"
+        class="org.springframework.batch.execution.repository.dao.MapStepExecutionDao" /&gt;</programlisting>
+
+        <para>The Map* DAO implementations store the batch artifacts in a
+        transactional map. So, the repository and DAOs may still be used
+        normally, and are transactionally sound, but their contents will be
+        lost when the class is destroyed.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>SimpleJob</title>
+
+      <para></para>
+    </section>
   </section>
 </chapter>
