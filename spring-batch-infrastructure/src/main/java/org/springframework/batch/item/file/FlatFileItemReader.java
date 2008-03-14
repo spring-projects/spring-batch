@@ -68,7 +68,7 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 
 	private static Log log = LogFactory.getLog(FlatFileItemReader.class);
 
-	private static final String READ_STATISTICS_NAME = "lines.read.count";
+	private static final String LINES_READ_COUNT = "lines.read.count";
 
 	private static final String SKIPPED_STATISTICS_NAME = "skipped.lines.count";
 
@@ -141,10 +141,10 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 			}
 		}
 
-		if (executionContext.containsKey(getKey(READ_STATISTICS_NAME))) {
+		if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
 			log.debug("Initializing for restart. Restart data is: " + executionContext);
 
-			long lineCount = executionContext.getLong(getKey(READ_STATISTICS_NAME));
+			long lineCount = executionContext.getLong(getKey(LINES_READ_COUNT));
 
 			LineReader reader = getReader();
 
@@ -204,7 +204,7 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 			throw new ItemStreamException("ItemStream not open or already closed.");
 		}
 		Assert.notNull(executionContext, "ExecutionContext must not be null");
-		executionContext.putLong(getKey(READ_STATISTICS_NAME), reader.getPosition());
+		executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());
 		executionContext.putLong(getKey(SKIPPED_STATISTICS_NAME), skippedLines.size());
 	}
 
