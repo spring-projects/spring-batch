@@ -1,10 +1,10 @@
-package org.springframework.batch.core.repository.support.dao;
+package org.springframework.batch.core.repository.dao;
 
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.core.repository.support.dao.AbstractJdbcBatchMetadataDao;
-import org.springframework.batch.core.repository.support.dao.JdbcStepExecutionDao;
+import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
+import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
 import org.springframework.batch.repeat.ExitStatus;
 
 public class JdbcStepDaoTests extends AbstractStepDaoTests {

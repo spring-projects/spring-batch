@@ -1,4 +1,4 @@
-package org.springframework.batch.core.repository.support.dao;
+package org.springframework.batch.core.repository.dao;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcOperations;

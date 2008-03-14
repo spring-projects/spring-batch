@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.repository.support.dao;
+package org.springframework.batch.core.repository.dao;
 
 import java.util.Date;
 import java.util.List;
@@ -27,9 +27,9 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.repository.support.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.support.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.support.dao.NoSuchObjectException;
+import org.springframework.batch.core.repository.dao.JobExecutionDao;
+import org.springframework.batch.core.repository.dao.JobInstanceDao;
+import org.springframework.batch.core.repository.dao.NoSuchObjectException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;

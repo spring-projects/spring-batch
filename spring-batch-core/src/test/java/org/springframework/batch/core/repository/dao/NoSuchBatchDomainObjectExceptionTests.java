@@ -13,22 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.batch.core.repository.dao;
 
-package org.springframework.batch.core.repository.support.dao;
+import org.springframework.batch.core.repository.dao.NoSuchObjectException;
+
+import junit.framework.TestCase;
 
 /**
- * This exception identifies that a batch domain object is invalid, which
- * is generally caused by an invalid ID. (An ID which doesn't exist in the database).
- * 
- * @author Lucas Ward
  * @author Dave Syer
  *
  */
-public class NoSuchObjectException extends RuntimeException {
+public class NoSuchBatchDomainObjectExceptionTests extends TestCase {
 
-	private static final long serialVersionUID = 4399621765157283111L;
-
-	public NoSuchObjectException(String message){
-		super(message);
+	public void testCreateException() throws Exception {
+		NoSuchObjectException e = new NoSuchObjectException("Foo");
+		assertEquals("Foo", e.getMessage());
 	}
 }

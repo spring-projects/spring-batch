@@ -12,11 +12,9 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
-import org.springframework.util.ClassUtils;
 
 /**
  * Repository tests using JDBC DAOs (rather than mocks).
@@ -26,7 +24,7 @@ import org.springframework.util.ClassUtils;
 public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
 
 	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "dao/sql-dao-test.xml") };
+		return new String[] { "classpath:org/springframework/batch/core/repository/dao/sql-dao-test.xml" };
 	}
 
 	private SimpleJobRepository jobRepository;

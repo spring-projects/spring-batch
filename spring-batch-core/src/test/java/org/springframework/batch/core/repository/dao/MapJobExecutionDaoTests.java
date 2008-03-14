@@ -1,4 +1,4 @@
-package org.springframework.batch.core.repository.support.dao;
+package org.springframework.batch.core.repository.dao;
 
 import java.util.Date;
 import java.util.List;
@@ -10,8 +10,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.repository.support.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.support.dao.MapJobExecutionDao;
+import org.springframework.batch.core.repository.dao.JobExecutionDao;
+import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 
 public class MapJobExecutionDaoTests extends TestCase {
 

@@ -1,4 +1,4 @@
-package org.springframework.batch.core.repository.support.dao;
+package org.springframework.batch.core.repository.dao;
 
 import junit.framework.TestCase;
 
@@ -7,8 +7,8 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.repository.support.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.support.dao.MapJobInstanceDao;
+import org.springframework.batch.core.repository.dao.JobInstanceDao;
+import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 
 public class MapJobInstanceDaoTests extends TestCase {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.repository.support.dao;
+package org.springframework.batch.core.repository.dao;
 
 import java.util.HashMap;
 
@@ -27,8 +27,8 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.repository.support.dao.MapStepExecutionDao;
-import org.springframework.batch.core.repository.support.dao.StepExecutionDao;
+import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
+import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.dao.OptimisticLockingFailureException;

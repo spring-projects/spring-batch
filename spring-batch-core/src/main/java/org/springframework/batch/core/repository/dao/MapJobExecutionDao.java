@@ -1,4 +1,4 @@
-package org.springframework.batch.core.repository.support.dao;
+package org.springframework.batch.core.repository.dao;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -18,12 +18,12 @@ package org.springframework.batch.core.repository.support;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.core.repository.support.dao.JdbcJobExecutionDao;
-import org.springframework.batch.core.repository.support.dao.JdbcJobInstanceDao;
-import org.springframework.batch.core.repository.support.dao.JdbcStepExecutionDao;
-import org.springframework.batch.core.repository.support.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.support.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.support.dao.StepExecutionDao;
+import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
+import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
+import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
+import org.springframework.batch.core.repository.dao.JobExecutionDao;
+import org.springframework.batch.core.repository.dao.JobInstanceDao;
+import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.beans.factory.FactoryBean;

@@ -11,17 +11,17 @@
 		<constructor-arg ref="stepExecutionDao" />
 	</bean>
 
-	<bean id="jobInstanceDao" class="org.springframework.batch.core.repository.support.dao.JdbcJobInstanceDao" >
+	<bean id="jobInstanceDao" class="org.springframework.batch.core.repository.dao.JdbcJobInstanceDao" >
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="jobIncrementer" ref="jobIncrementer" />
 	</bean>
 	
-	<bean id="jobExecutionDao" class="org.springframework.batch.core.repository.support.dao.JdbcJobExecutionDao" >
+	<bean id="jobExecutionDao" class="org.springframework.batch.core.repository.dao.JdbcJobExecutionDao" >
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" />
 	</bean>
 	
-	<bean id="stepExecutionDao" class="org.springframework.batch.core.repository.support.dao.JdbcStepExecutionDao" >
+	<bean id="stepExecutionDao" class="org.springframework.batch.core.repository.dao.JdbcStepExecutionDao" >
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" />
 	</bean>

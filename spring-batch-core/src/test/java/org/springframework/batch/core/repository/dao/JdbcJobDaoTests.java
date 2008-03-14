@@ -1,11 +1,11 @@
-package org.springframework.batch.core.repository.support.dao;
+package org.springframework.batch.core.repository.dao;
 
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.core.repository.support.dao.AbstractJdbcBatchMetadataDao;
-import org.springframework.batch.core.repository.support.dao.JdbcJobExecutionDao;
-import org.springframework.batch.core.repository.support.dao.JdbcJobInstanceDao;
+import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
+import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
+import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
 import org.springframework.batch.repeat.ExitStatus;
 
 public class JdbcJobDaoTests extends AbstractJobDaoTests {

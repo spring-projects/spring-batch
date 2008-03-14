@@ -9,8 +9,8 @@
 				<property name="url" value="jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true"/>
 			</bean>
 		</property>
-		<property name="initScript" value="org/springframework/batch/core/repository/support/dao/init.sql" />
-		<property name="destroyScript" value="org/springframework/batch/core/repository/support/dao/destroy.sql" />
+		<property name="initScript" value="org/springframework/batch/core/repository/dao/init.sql" />
+		<property name="destroyScript" value="org/springframework/batch/core/repository/dao/destroy.sql" />
 	</bean>
 
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

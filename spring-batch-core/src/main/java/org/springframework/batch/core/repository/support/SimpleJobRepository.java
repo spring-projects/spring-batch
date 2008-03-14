@@ -29,9 +29,9 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.support.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.support.dao.StepExecutionDao;
+import org.springframework.batch.core.repository.dao.JobExecutionDao;
+import org.springframework.batch.core.repository.dao.JobInstanceDao;
+import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.Assert;
 
