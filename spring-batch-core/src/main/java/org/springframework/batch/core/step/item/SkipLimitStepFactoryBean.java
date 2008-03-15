@@ -2,6 +2,8 @@ package org.springframework.batch.core.step.item;
 
 import java.util.Arrays;
 
+import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
+import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 
 /**

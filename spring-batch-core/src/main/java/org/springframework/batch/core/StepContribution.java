@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core;
 
-import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Represents a contribution to a {@link StepExecution}, buffering changes
@@ -28,9 +27,7 @@ public class StepContribution {
 
 	private int taskCount = 0;
 
-	private StepExecution execution;
-
-	private ExecutionContext executionContext;
+	private int parentSkipCount;
 
 	private int commitCount;
 
@@ -40,7 +37,7 @@ public class StepContribution {
 	 * @param execution
 	 */
 	public StepContribution(StepExecution execution) {
-		this.execution = execution;
+		this.parentSkipCount = execution.getSkipCount();
 	}
 
 	/**
@@ -67,23 +64,6 @@ public class StepContribution {
 	}
 
 	/**
-	 * Set the statistics properties.
-	 * 
-	 * @param executionContext
-	 */
-	public void setExecutionContext(ExecutionContext executionContext) {
-		this.executionContext = executionContext;
-	}
-
-	/**
-	 * Public getter for the {@link ExecutionContext}.
-	 * @return the stream context
-	 */
-	public ExecutionContext getExecutionContext() {
-		return executionContext;
-	}
-
-	/**
 	 * Public getter for the commit counter.
 	 * @return the commitCount
 	 */
@@ -92,19 +72,11 @@ public class StepContribution {
 	}
 
 	/**
-	 * Delegate call to the {@link StepExecution}.
-	 * @return the flag from the underlying execution
-	 */
-	public boolean isTerminateOnly() {
-		return execution.isTerminateOnly();
-	}
-
-	/**
 	 * @return the sum of skips accumulated in the parent {@link StepExecution}
 	 * and this <code>StepContribution</code>.
 	 */
 	public int getStepSkipCount() {
-		return skipCount + execution.getSkipCount();
+		return skipCount + parentSkipCount;
 	}
 
 	/**

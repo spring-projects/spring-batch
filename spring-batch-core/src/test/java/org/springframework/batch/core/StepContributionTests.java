@@ -17,8 +17,6 @@ package org.springframework.batch.core;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.ExecutionContext;
-
 /**
  * @author Dave Syer
  * 
@@ -41,34 +39,12 @@ public class StepContributionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.StepContribution#setExecutionContext(ExecutionContext)}.
-	 */
-	public void testSetExecutionContext() {
-		assertEquals(null, contribution.getExecutionContext());
-		ExecutionContext context = new ExecutionContext();
-		context.putString("foo", "bar");
-		contribution.setExecutionContext(context);
-		assertEquals(1, contribution.getExecutionContext().getProperties().size());
-	}
-
-	/**
-	 * Test method for
 	 * {@link org.springframework.batch.core.StepContribution#incrementCommitCount()}.
 	 */
 	public void testIncrementCommitCount() {
 		assertEquals(0, contribution.getCommitCount());
 		contribution.incrementCommitCount();
 		assertEquals(1, contribution.getCommitCount());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.StepContribution#isTerminateOnly()}.
-	 */
-	public void testIsTerminateOnly() {
-		assertFalse(contribution.isTerminateOnly());
-		execution.setTerminateOnly();
-		assertTrue(contribution.isTerminateOnly());
 	}
 
 }

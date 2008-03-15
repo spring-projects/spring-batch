@@ -21,8 +21,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.step.item.LimitCheckingItemSkipPolicy;
-import org.springframework.batch.core.step.item.SkipLimitExceededException;
+import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
+import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.file.FlatFileParseException;
 
 /**

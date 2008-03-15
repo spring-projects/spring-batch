@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.step.item;
+package org.springframework.batch.core.step;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.core.StepExecution;
 
 /**
  * Policy that checks the current thread to see if it has been interrupted.
@@ -38,20 +38,20 @@ public class ThreadStepInterruptionPolicy implements StepInterruptionPolicy {
 	 * Returns if the current job lifecycle has been interrupted by checking if
 	 * the current thread is interrupted.
 	 */
-	public void checkInterrupted(RepeatContext context) throws JobInterruptedException {
+	public void checkInterrupted(StepExecution stepExecution) throws JobInterruptedException {
 
-		if (isInterrupted(context)) {
+		if (isInterrupted(stepExecution)) {
 			throw new JobInterruptedException("Job interrupted status detected.");
 		}
 		
 	}
 
 	/**
-	 * @param context the current context
+	 * @param stepExecution the current context
 	 * @return true if the job has been interrupted
 	 */
-	private boolean isInterrupted(RepeatContext context) {
-		boolean interrupted = (Thread.currentThread().isInterrupted() || context.isTerminateOnly());
+	private boolean isInterrupted(StepExecution stepExecution) {
+		boolean interrupted = (Thread.currentThread().isInterrupted() || stepExecution.isTerminateOnly());
 		if(interrupted){
 			logger.error("Step interrupted");
 		}

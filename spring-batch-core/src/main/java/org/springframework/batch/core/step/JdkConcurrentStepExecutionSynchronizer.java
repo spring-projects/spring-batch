@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.step.item;
+package org.springframework.batch.core.step;
 
 import java.util.concurrent.Semaphore;
 

@@ -28,7 +28,12 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.listener.CompositeStepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.core.step.ExitStatusExceptionClassifier;
+import org.springframework.batch.core.step.SimpleExitStatusExceptionClassifier;
+import org.springframework.batch.core.step.StepExecutionSynchronizer;
+import org.springframework.batch.core.step.StepExecutionSyncronizerFactory;
+import org.springframework.batch.core.step.StepInterruptionPolicy;
+import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -268,10 +273,12 @@ public class ItemOrientedStep extends AbstractStep {
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
 
 					final StepContribution contribution = stepExecution.createStepContribution();
-					contribution.setExecutionContext(stepExecution.getExecutionContext());
 					// Before starting a new transaction, check for
 					// interruption.
-					interruptionPolicy.checkInterrupted(context);
+					if (stepExecution.isTerminateOnly()) {
+						context.setTerminateOnly();
+					}
+					interruptionPolicy.checkInterrupted(stepExecution);
 
 					ExitStatus result = ExitStatus.CONTINUABLE;
 
@@ -281,7 +288,7 @@ public class ItemOrientedStep extends AbstractStep {
 					try {
 
 						itemHandler.mark();
-						result = processChunk(contribution);
+						result = processChunk(stepExecution, contribution);
 						contribution.incrementCommitCount();
 
 						// If the step operations are asynchronous then we need
@@ -340,7 +347,7 @@ public class ItemOrientedStep extends AbstractStep {
 					// Check for interruption after transaction as well, so that
 					// the interrupted exception is correctly propagated up to
 					// caller
-					interruptionPolicy.checkInterrupted(context);
+					interruptionPolicy.checkInterrupted(stepExecution);
 
 					return result;
 
@@ -444,23 +451,25 @@ public class ItemOrientedStep extends AbstractStep {
 	 * transaction. The transaction is programmatically started and stopped
 	 * outside this method, so subclasses that override do not need to create a
 	 * transaction.
+	 * @param execution the current {@link StepExecution} which should be
+	 * treated as read-only for the purposes of this method.
+	 * @param contribution the current {@link StepContribution} which can accept
+	 * changes to be aggregated later into the step execution.
 	 * 
-	 * @param step the current step containing the {@link Tasklet} with the
-	 * business logic.
 	 * @return true if there is more data to process.
 	 */
-	protected ExitStatus processChunk(final StepContribution contribution) {
+	protected ExitStatus processChunk(final StepExecution execution, final StepContribution contribution) {
 		ExitStatus result = chunkOperations.iterate(new RepeatCallback() {
 			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
-				if (contribution.isTerminateOnly()) {
+				if (execution.isTerminateOnly()) {
 					context.setTerminateOnly();
 				}
 				// check for interruption before each item as well
-				interruptionPolicy.checkInterrupted(context);
+				interruptionPolicy.checkInterrupted(execution);
 				ExitStatus exitStatus = itemHandler.handle(contribution);
 				contribution.incrementTaskCount();
 				// check for interruption after each item as well
-				interruptionPolicy.checkInterrupted(context);
+				interruptionPolicy.checkInterrupted(execution);
 				return exitStatus;
 			}
 		});
@@ -494,8 +503,8 @@ public class ItemOrientedStep extends AbstractStep {
 	private void processRollback(final StepExecution stepExecution, final ExceptionHolder fatalException,
 			TransactionStatus transaction) {
 		/*
-		 * Any exception thrown within the transaction should
-		 * automatically cause the transaction to rollback.
+		 * Any exception thrown within the transaction should automatically
+		 * cause the transaction to rollback.
 		 */
 		stepExecution.rollback();
 
@@ -506,9 +515,8 @@ public class ItemOrientedStep extends AbstractStep {
 		}
 		catch (Exception e) {
 			/*
-			 * If we already failed to commit, it doesn't help
-			 * to do this again - it's better to allow the
-			 * CommitFailedException to propagate
+			 * If we already failed to commit, it doesn't help to do this again -
+			 * it's better to allow the CommitFailedException to propagate
 			 */
 			if (!fatalException.hasException()) {
 				fatalException.setException(e);

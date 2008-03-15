@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.item;
+package org.springframework.batch.core.step;
 
 
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.repository.NoSuchJobException;
-import org.springframework.batch.core.step.item.ExitStatusExceptionClassifier;
-import org.springframework.batch.core.step.item.SimpleExitStatusExceptionClassifier;
+import org.springframework.batch.core.step.ExitStatusExceptionClassifier;
+import org.springframework.batch.core.step.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.repeat.ExitStatus;
 
 import junit.framework.TestCase;

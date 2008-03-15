@@ -51,38 +51,38 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 
 	public void testGetExitCodeWithpPredefinedCodes() {
 		assertEquals(
-				ecm.getExitCode(ExitStatus.FINISHED.getExitCode()),
+				ecm.intValue(ExitStatus.FINISHED.getExitCode()),
 				ExitCodeMapper.JVM_EXITCODE_COMPLETED);
 		assertEquals(
-				ecm.getExitCode(ExitStatus.FAILED.getExitCode()),
+				ecm.intValue(ExitStatus.FAILED.getExitCode()),
 				ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR);
 		assertEquals(
-				ecm.getExitCode(ExitCodeMapper.JOB_NOT_PROVIDED),
+				ecm.intValue(ExitCodeMapper.JOB_NOT_PROVIDED),
 				ExitCodeMapper.JVM_EXITCODE_JOB_ERROR);		
 		assertEquals(
-				ecm.getExitCode(ExitCodeMapper.NO_SUCH_JOB),
+				ecm.intValue(ExitCodeMapper.NO_SUCH_JOB),
 				ExitCodeMapper.JVM_EXITCODE_JOB_ERROR);		
 	}
 	
 	public void testGetExitCodeWithPredefinedCodesOverridden() {
-		System.out.println(ecm2.getExitCode(ExitStatus.FINISHED.getExitCode()));
+		System.out.println(ecm2.intValue(ExitStatus.FINISHED.getExitCode()));
 		assertEquals(
-				ecm2.getExitCode(ExitStatus.FINISHED.getExitCode()), -1);
+				ecm2.intValue(ExitStatus.FINISHED.getExitCode()), -1);
 		assertEquals(
-				ecm2.getExitCode(ExitStatus.FAILED.getExitCode()), -2);
+				ecm2.intValue(ExitStatus.FAILED.getExitCode()), -2);
 		assertEquals(
-				ecm2.getExitCode(ExitCodeMapper.JOB_NOT_PROVIDED), -3);		
+				ecm2.intValue(ExitCodeMapper.JOB_NOT_PROVIDED), -3);		
 		assertEquals(
-				ecm2.getExitCode(ExitCodeMapper.NO_SUCH_JOB), -3);		
+				ecm2.intValue(ExitCodeMapper.NO_SUCH_JOB), -3);		
 	}
 
 	public void testGetExitCodeWithCustomCode() {
-		assertEquals(ecm.getExitCode("MY_CUSTOM_CODE"),3);		
+		assertEquals(ecm.intValue("MY_CUSTOM_CODE"),3);		
 	}
 
 	public void testGetExitCodeWithDefaultCode() {
 		assertEquals(
-				ecm.getExitCode("UNDEFINED_CUSTOM_CODE"),
+				ecm.intValue("UNDEFINED_CUSTOM_CODE"),
 				ExitCodeMapper.JVM_EXITCODE_GENERIC_ERROR);		
 	}
 	

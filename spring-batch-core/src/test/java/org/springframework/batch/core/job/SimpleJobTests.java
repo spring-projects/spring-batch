@@ -23,7 +23,6 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ItemSkipPolicy;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInstance;
@@ -42,7 +41,8 @@ import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.core.step.item.NeverSkipItemSkipPolicy;
+import org.springframework.batch.core.step.skip.ItemSkipPolicy;
+import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;

@@ -23,10 +23,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.ExitStatus;
 
-
 /**
- * An implementation of {@link ExitCodeMapper} that can be configured 
- * through a map from batch exit codes (String) to integer results.
+ * An implementation of {@link ExitCodeMapper} that can be configured through a
+ * map from batch exit codes (String) to integer results. Some default entries
+ * are set up to recognise common cases.  Any that are injected are added to these.
  * 
  * @author Stijn Maller
  * @author Lucas Ward
@@ -36,19 +36,15 @@ import org.springframework.batch.repeat.ExitStatus;
 public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 
 	protected Log logger = LogFactory.getLog(getClass());
-	
+
 	private Map mapping;
-	
-	public SimpleJvmExitCodeMapper(){
+
+	public SimpleJvmExitCodeMapper() {
 		mapping = new HashMap();
-		mapping.put(ExitStatus.FINISHED.getExitCode(), 
-				new Integer(JVM_EXITCODE_COMPLETED));
-		mapping.put(ExitStatus.FAILED.getExitCode(), 
-				new Integer(JVM_EXITCODE_GENERIC_ERROR));
-		mapping.put(ExitCodeMapper.JOB_NOT_PROVIDED, 
-				new Integer(JVM_EXITCODE_JOB_ERROR));
-		mapping.put(ExitCodeMapper.NO_SUCH_JOB, 
-				new Integer(JVM_EXITCODE_JOB_ERROR));
+		mapping.put(ExitStatus.FINISHED.getExitCode(), new Integer(JVM_EXITCODE_COMPLETED));
+		mapping.put(ExitStatus.FAILED.getExitCode(), new Integer(JVM_EXITCODE_GENERIC_ERROR));
+		mapping.put(ExitCodeMapper.JOB_NOT_PROVIDED, new Integer(JVM_EXITCODE_JOB_ERROR));
+		mapping.put(ExitCodeMapper.NO_SUCH_JOB, new Integer(JVM_EXITCODE_JOB_ERROR));
 	}
 
 	public Map getMapping() {
@@ -56,33 +52,36 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 	}
 
 	/**
-	 * Supply the ExitCodeMappings 
-	 * @param exitCodeMap A set of mappings between environment specific exit codes
-	 * 					  and batch framework internal exit codes
+	 * Supply the ExitCodeMappings
+	 * @param exitCodeMap A set of mappings between environment specific exit
+	 * codes and batch framework internal exit codes
 	 */
 	public void setMapping(Map exitCodeMap) {
 		mapping.putAll(exitCodeMap);
 	}
 
 	/**
-	 * Get the JVM exitcode that matches a certain Batch Framework Exitcode
-	 * @param exitCode The exitcode of the Batch Job as known by the Batch Framework
-	 * @return The exitCode of the Batch Job as known by the JVM 
+	 * Get the operating system exit status that matches a certain Batch
+	 * Framework Exitcode
+	 * @param exitCode The exitcode of the Batch Job as known by the Batch
+	 * Framework
+	 * @return The exitCode of the Batch Job as known by the JVM
 	 */
-	public int getExitCode(String exitCode) {
-		
+	public int intValue(String exitCode) {
+
 		Integer statusCode = null;
-		
-		try{
-			statusCode = (Integer)mapping.get(exitCode);
+
+		try {
+			statusCode = (Integer) mapping.get(exitCode);
 		}
-		catch(RuntimeException ex){ 
-			//We still need to return an exit code, even if there is an issue with
-			//the mapper.
-			logger.fatal("Error mapping exit code, generic exit code returned.", ex);
+		catch (RuntimeException ex) {
+			// We still need to return an exit code, even if there is an issue
+			// with
+			// the mapper.
+			logger.fatal("Error mapping exit code, generic exit status returned.", ex);
 		}
-		
+
 		return (statusCode != null) ? statusCode.intValue() : JVM_EXITCODE_GENERIC_ERROR;
 	}
-	
+
 }

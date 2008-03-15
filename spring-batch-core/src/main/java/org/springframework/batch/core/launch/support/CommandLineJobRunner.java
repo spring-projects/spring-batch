@@ -195,11 +195,11 @@ public class CommandLineJobRunner {
 							.splitArrayElementsIntoProperties(parameters, "="));
 
 			JobExecution jobExecution = launcher.run(job, jobParameters);
-			return exitCodeMapper.getExitCode(jobExecution.getExitStatus()
+			return exitCodeMapper.intValue(jobExecution.getExitStatus()
 					.getExitCode());
 		} catch (Throwable e) {
 			logger.error("Job Terminated in error:", e);
-			return exitCodeMapper.getExitCode(ExitStatus.FAILED.getExitCode());
+			return exitCodeMapper.intValue(ExitStatus.FAILED.getExitCode());
 		}
 	}
 

@@ -15,8 +15,9 @@
  */
 package org.springframework.batch.core.step.item;
 
-import org.springframework.batch.core.ItemSkipPolicy;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.step.skip.ItemSkipPolicy;
+import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.Skippable;

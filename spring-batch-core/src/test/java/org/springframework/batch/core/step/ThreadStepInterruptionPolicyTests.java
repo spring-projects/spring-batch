@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.item;
+package org.springframework.batch.core.step;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.step.item.ThreadStepInterruptionPolicy;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.context.RepeatContextSupport;
+import org.springframework.batch.core.StepExecution;
 
 /**
  * @author Dave Syer
@@ -29,10 +27,10 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
 public class ThreadStepInterruptionPolicyTests extends TestCase {
 
 	ThreadStepInterruptionPolicy policy = new ThreadStepInterruptionPolicy();
-	private RepeatContext context = new RepeatContextSupport(null);;
+	private StepExecution context = new StepExecution(new StepSupport(), null);
 	
 	/**
-	 * Test method for {@link org.springframework.batch.core.executor.interrupt.ThreadStepInterruptionPolicy#checkInterrupted(org.springframework.batch.repeat.RepeatContext)}.
+	 * Test method for {@link org.springframework.batch.core.executor.interrupt.ThreadStepInterruptionPolicy#checkInterrupted(StepExecution)}.
 	 * @throws Exception 
 	 */
 	public void testCheckInterruptedNotComplete() throws Exception {
@@ -41,7 +39,7 @@ public class ThreadStepInterruptionPolicyTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.executor.interrupt.ThreadStepInterruptionPolicy#checkInterrupted(org.springframework.batch.repeat.RepeatContext)}.
+	 * Test method for {@link org.springframework.batch.core.executor.interrupt.ThreadStepInterruptionPolicy#checkInterrupted(StepExecution)}.
 	 * @throws Exception 
 	 */
 	public void testCheckInterruptedComplete() throws Exception {

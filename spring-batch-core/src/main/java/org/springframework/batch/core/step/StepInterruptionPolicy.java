@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.step.item;
+package org.springframework.batch.core.step;
 
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.core.StepExecution;
 
 /**
  * Strategy interface for an interruption policy. This policy allows
@@ -32,9 +32,9 @@ public interface StepInterruptionPolicy {
 	/**
 	 * Has the job been interrupted? If so then throw a
 	 * {@link JobInterruptedException}.
-	 * @param context the current context of the running step.
+	 * @param stepExecution the current context of the running step.
 	 * 
 	 * @throws JobInterruptedException when the job has been interrupted.
 	 */
-	void checkInterrupted(RepeatContext context) throws JobInterruptedException;
+	void checkInterrupted(StepExecution stepExecution) throws JobInterruptedException;
 }

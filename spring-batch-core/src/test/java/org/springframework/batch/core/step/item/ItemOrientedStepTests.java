@@ -39,9 +39,9 @@ import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.JobRepositorySupport;
+import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.item.ItemOrientedStep;
 import org.springframework.batch.core.step.item.SimpleItemHandler;
-import org.springframework.batch.core.step.item.StepInterruptionPolicy;
 import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ExecutionContext;
@@ -54,7 +54,6 @@ import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.PropertiesConverter;
@@ -138,7 +137,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
 		StepContribution contribution = stepExecution.createStepContribution();
-		itemOrientedStep.processChunk(contribution);
+		itemOrientedStep.processChunk(stepExecution, contribution);
 		assertEquals(1, processed.size());
 		assertEquals(0, stepExecution.getItemCount().intValue());
 		assertEquals(1, contribution.getTaskCount());
@@ -470,7 +469,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy() {
 
-			public void checkInterrupted(RepeatContext context) throws JobInterruptedException {
+			public void checkInterrupted(StepExecution stepExecution) throws JobInterruptedException {
 				throw new JobInterruptedException("interrupted");
 			}
 		};
