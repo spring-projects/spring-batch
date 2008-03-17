@@ -7,7 +7,7 @@
 
 Milestone Builds
 
-  These builds are provided for evaluation and community feedback.  They will have a release identifier ending in "mX" where X is the milestone number.  The current release is <<1.0.0.m5>>.
+  These builds are provided for evaluation and community feedback.  They will have a release identifier ending in "mX" where X is the milestone number, or "rcX" for a release candidate.  The current release is <<1.0.0.rc1>>.
 
 * Zip Downloads
 
@@ -33,7 +33,7 @@ Milestone Builds
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-core</artifactId>
-    <version>1.0.0.m5</version>
+    <version>1.0.0.rc1</version>
 </dependency>
 +---------------
 

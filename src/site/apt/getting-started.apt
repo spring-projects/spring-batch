@@ -47,7 +47,11 @@ $ mvn test
 
   * Download the distribution as above.
 
-  * Get the M2 Eclipse Plugin from codehaus (update site {http://m2eclipse.codehaus.org/update/}, homepage {http://m2eclipse.codehaus.org/}).  If you can't or don't want to install this plugin, you can use the {{{http://maven.apache.org/plugins/maven-eclipse-plugin/}Maven Eclipse Plugin}} to create the classpath entries you need.
+  * Get the Q4E Eclipse-plugin
+  (http://q4e.googlecode.com/svn/trunk/updatesite).  If you can't or
+  don't want to install this plugin, you can use the
+  {{{http://maven.apache.org/plugins/maven-eclipse-plugin/}Maven
+  Eclipse Plugin}} to create the classpath entries you need.
 
   * Open Eclipse and create a workspace as for the non-Mavenized version.
 

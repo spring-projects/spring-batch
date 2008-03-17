@@ -27,7 +27,7 @@ Snapshot Builds
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-core</artifactId>
-    <version>1.0.0.rc1-SNAPSHOT</version>
+    <version>1.0.0.-SNAPSHOT</version>
 </dependency>
 +---------------
 
