@@ -44,15 +44,17 @@ extended to include the datababase entities and identifier strategy.
     repository (usually a database).  A new <<<JobExecution>>> is also
     created to track the progress of this particular execution.
 
-    * If the job was previously launched the <<<Job>>> has a flag
-    indicating whether or not to continue and launch a new execution
-    (was this expected?).  The decision depends on whether or not the
-    job failed last time it was executed.
+    * If the job was previously launched and failed the <<<Job>>> is
+    responsible for indicating whether it believes it is restartable
+    (is a restart legal and expected).  There is a flag for this
+    purpose on the <<<Job>>>.  If the there was a previous failure -
+    maybe the operator has fixed some bad input and wants to run it
+    again - then we might want to restart the previous job.  
 
-    If the there was a previous failure - maybe the operator has fixed
-    some bad input and wants to run it again - then we might want to
-    restart the previous job.  Or it might be an ad-hoc request that
-    doesn't need to be distinguished from previous runs.  In either
+    If the job was previously launched with teh same
+    <<<JobParameters>>> and completed successfully, then it is an
+    error to restart it.  An ad-hoc request needs to be distinguished
+    from previous runs by adding a unique job parameter.  In either
     case a new <<<JobExecution>>> is created and stored to monitor
     this execution of the <<<JobInstance>>>.
 
@@ -60,7 +62,7 @@ Overview of the Spring Batch Launch Environment
  
   The diagram below provides an overview of the high level components, technical services, and basic operations required by a batch architecture.   This architecture framework is a blueprint that has been proven through decades of implementations on the last several generations of platforms (COBOL/Mainframe, C++/Unix, and now Java/anywhere).  Simple Batch provides a physical implementation of the layers, components and technical services commonly found in robust, maintainable systems used to address the creation of simple to complex batch applications, with the infrastructure and extensions to address very complex processing needs.  The materials below will walk through the details of the diagram.
   
-[images/simple-batch-execution-container.jpg] Simple Batch Launch Environment high level flow and interaction of the architecture.
+[images/spring-batch-reference-model.png] Simple Batch Launch Environment high level flow and interaction of the architecture.
 
 * Tiers
 
