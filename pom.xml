@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
@@ -27,36 +28,28 @@
 	</organization>
 	<scm>
 		<url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk</url>
-		<connection>scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk</connection>
-		<developerConnection>scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk</developerConnection>
+		<connection>
+			scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+		</connection>
+		<developerConnection>
+			scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+		</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
-		<url>
-			http://opensource.atlassian.com/projects/spring/browse/BATCH
-		</url>
+		<url>http://opensource.atlassian.com/projects/spring/browse/BATCH</url>
 	</issueManagement>
 	<mailingLists>
 		<mailingList>
 			<name>Spring Batch Forum</name>
-			<post>
-				http://forum.springframework.org/forumdisplay.php?f=41
-			</post>
-			<archive>
-				http://forum.springframework.org/forumdisplay.php?f=41
-			</archive>
+			<post>http://forum.springframework.org/forumdisplay.php?f=41</post>
+			<archive>http://forum.springframework.org/forumdisplay.php?f=41</archive>
 		</mailingList>
 		<mailingList>
-			<subscribe>
-				http://lists.interface21.com/listmanager/listinfo/spring-batch-announce
-			</subscribe>
-			<unsubscribe>
-				http://lists.interface21.com/listmanager/listinfo/spring-batch-announce
-			</unsubscribe>
+			<subscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</subscribe>
+			<unsubscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</unsubscribe>
 			<name>Spring Batch Announce</name>
-			<archive>
-				http://lists.interface21.com/archives/spring-batch-announce
-			</archive>
+			<archive>http://lists.interface21.com/archives/spring-batch-announce</archive>
 		</mailingList>
 	</mailingLists>
 	<ciManagement>
@@ -96,9 +89,7 @@
 		<profile>
 			<id>strict</id>
 			<properties>
-				<maven.test.failure.ignore>
-					false
-				</maven.test.failure.ignore>
+				<maven.test.failure.ignore>false</maven.test.failure.ignore>
 			</properties>
 		</profile>
 		<profile>
@@ -112,9 +103,7 @@
 			<pluginRepositories>
 				<pluginRepository>
 					<id>apache-snapshots</id>
-					<url>
-						http://people.apache.org/maven-snapshot-repository
-					</url>
+					<url>http://people.apache.org/maven-snapshot-repository</url>
 				</pluginRepository>
 				<!-- Clover 2 is still a snapshot plugin -->
 				<pluginRepository>
@@ -143,9 +132,7 @@
 								<phase>site</phase>
 								<configuration>
 									<tasks>
-										<echo>
-											Aggregating XSL reports
-										</echo>
+										<echo>Aggregating XSL reports</echo>
 										<mkdir dir="target/emma-reports" />
 										<concat destfile="target/site/emma-reports/emma-report.xml">
 											<fileset dir="." includes="**/coverage.fragment" />
@@ -161,7 +148,8 @@
 												<![CDATA[</summary>]]>
 											</footer>
 										</concat>
-										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html" style="src/main/xsl/emma2html.xsl">
+										<xslt in="target/site/emma-reports/emma-report.xml"
+											out="target/site/emma-reports/index.html" style="src/main/xsl/emma2html.xsl">
 											<param name="project" expression="${project.name}" />
 											<param name="version" expression="${project.version}" />
 										</xslt>
@@ -179,9 +167,7 @@
 	</profiles>
 
 	<distributionManagement>
-		<downloadUrl>
-			http://www.springframework.org/download
-		</downloadUrl>
+		<downloadUrl>http://www.springframework.org/download</downloadUrl>
 		<site>
 			<id>staging</id>
 			<url>file:///${user.dir}/target/staging</url>
@@ -213,9 +199,7 @@
 					<artifactId>maven-clover-plugin</artifactId>
 					<version>2</version>
 					<configuration>
-						<licenseLocation>
-							${clover.license.path}
-						</licenseLocation>
+						<licenseLocation>${clover.license.path}</licenseLocation>
 					</configuration>
 					<executions>
 						<execution>
@@ -245,7 +229,8 @@
 									</junitreport>
 									<echo>Creating Emma reports</echo>
 									<mkdir dir="target/site/emma-reports" />
-									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports" style="${project.parent.basedir}/src/main/xsl/emma.xsl">
+									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports"
+										style="${project.parent.basedir}/src/main/xsl/emma.xsl">
 										<mapper type="glob" from="*.xml" to="*.fragment" />
 										<param name="project" expression="${project.name}" />
 									</xslt>
@@ -509,6 +494,12 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-jms</artifactId>
 				<version>${spring.framework.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-context-support</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
@@ -552,9 +543,7 @@
 				<version>1.0</version>
 				<configuration>
 					<name>JUnit Report</name>
-					<description>
-						JUnit test results for this project
-					</description>
+					<description>JUnit test results for this project</description>
 					<base>junit-reports</base>
 				</configuration>
 			</plugin>
@@ -566,54 +555,24 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
 					<links>
-						<link>
-							http://java.sun.com/j2ee/1.4/docs/api
-						</link>
-						<link>
-							http://java.sun.com/j2se/1.5.0/docs/api
-						</link>
-						<link>
-							http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
-						</link>
-						<link>
-							http://jakarta.apache.org/commons/dbcp/apidocs/
-						</link>
-						<link>
-							http://jakarta.apache.org/commons/fileupload/apidocs/
-						</link>
-						<link>
-							http://jakarta.apache.org/commons/httpclient/apidocs/
-						</link>
-						<link>
-							http://jakarta.apache.org/commons/logging/api/
-						</link>
-						<link>
-							http://jakarta.apache.org/commons/pool/apidocs/
-						</link>
+						<link>http://java.sun.com/j2ee/1.4/docs/api</link>
+						<link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+						<link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
+						<link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
+						<link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
+						<link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
+						<link>http://jakarta.apache.org/commons/logging/api/</link>
+						<link>http://jakarta.apache.org/commons/pool/apidocs/</link>
 						<link>http://www.junit.org/junit/javadoc/</link>
-						<link>
-							http://logging.apache.org/log4j/docs/api/
-						</link>
-						<link>
-							http://jakarta.apache.org/regexp/apidocs/
-						</link>
-						<link>
-							http://jakarta.apache.org/velocity/api/
-						</link>
-						<link>
-							http://static.springframework.org/spring/docs/2.1.x/api/
-						</link>
-						<link>
-							http://static.springframework.org/spring-batch/spring-batch-infrastructure/apidocs/
-						</link>
-						<link>
-							http://static.springframework.org/spring-batch/spring-batch-core/apidocs/
-						</link>
+						<link>http://logging.apache.org/log4j/docs/api/</link>
+						<link>http://jakarta.apache.org/regexp/apidocs/</link>
+						<link>http://jakarta.apache.org/velocity/api/</link>
+						<link>http://static.springframework.org/spring/docs/2.1.x/api/</link>
+						<link>http://static.springframework.org/spring-batch/spring-batch-infrastructure/apidocs/</link>
+						<link>http://static.springframework.org/spring-batch/spring-batch-core/apidocs/</link>
 					</links>
 					<aggregate>true</aggregate>
-					<excludePackageNames>
-						org.springframework.batch.sample
-					</excludePackageNames>
+					<excludePackageNames>org.springframework.batch.sample</excludePackageNames>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -647,30 +606,22 @@
 		<repository>
 			<id>spring-release</id>
 			<name>Spring Portfolio Release Repository</name>
-			<url>
-				http://s3.amazonaws.com/maven.springframework.org/release
-			</url>
+			<url>http://s3.amazonaws.com/maven.springframework.org/release</url>
 		</repository>
 		<repository>
 			<id>spring-milestone</id>
 			<name>Spring Portfolio Milestone Repository</name>
-			<url>
-				http://s3.amazonaws.com/maven.springframework.org/milestone
-			</url>
+			<url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
 		</repository>
 		<repository>
 			<id>spring-external</id>
 			<name>Spring Portfolio External Repository</name>
-			<url>
-				http://s3.amazonaws.com/maven.springframework.org/external
-			</url>
+			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
 		</repository>
 		<repository>
 			<id>apache-snapshot</id>
 			<name>Apache Foundation Snapshot Repository</name>
-			<url>
-				http://people.apache.org/maven-snapshot-repository
-			</url>
+			<url>http://people.apache.org/maven-snapshot-repository</url>
 		</repository>
 		<repository>
 			<id>objectstyle</id>
@@ -683,9 +634,7 @@
 		<pluginRepository>
 			<id>spring-external</id>
 			<name>Spring External Repository</name>
-			<url>
-				http://s3.amazonaws.com/maven.springframework.org/external
-			</url>
+			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
 		</pluginRepository>
 		<pluginRepository>
 			<id>Codehaus Snapshots</id>
@@ -694,9 +643,7 @@
 		<pluginRepository>
 			<id>spring-external-svn</id>
 			<name>Spring External SVN Repository</name>
-			<url>
-				https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext
-			</url>
+			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext</url>
 		</pluginRepository>
 	</pluginRepositories>
 
