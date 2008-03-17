@@ -25,9 +25,11 @@ Introduction
   
   The Infrastructure provides the ability to batch operations together, and to retry an piece of work if there is an exception.  Both requirements have a transactional flavour, and similar concepts are relevant (propagation, synchronisation).  They also both lend themselves to the template programming model common in Spring, c.f. <<<TransactionTemplate>>>, <<<JdbcTemplate>>>, <<<JmsTemplate>>>.
   
-  The execution module is the reference implementation, expressed through the execution module of the Spring Batch product.  It provides a robust set of integrated features including logging/tracing, transaction management, job processing statistics, job restart, skip, and resource management to enable the management of the full lifecycle of traditional batch processing.  A number of sample jobs are packaged with this environment and are described in detail to more clearly articulate its usage and capabilities.
+  The Core module is the batch-focused domain and implementation.  It provides a robust set of integrated features including job processing statistics, job launch and restart to enable the management of the full lifecycle of traditional batch processing.  
 
-  The runtime dependencies of infrastructure, core and execution are shown in the figure below.
+  A number of sample jobs are packaged in a separate Samples module to more clearly articulate the usage and capabilities of the Core module.
+
+  The runtime dependencies of infrastructure and core are shown in the figure below.
 
 [images/RuntimeDependencies.png] Spring Batch runtime dependencies, showing how a client application (as per the samples) can be built in terms of other modules.
 
