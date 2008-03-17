@@ -54,7 +54,7 @@
     <mediaobject>
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="images/spring-batch-reference-model.png"
+                   fileref="src/site/resources/reference/images/spring-batch-reference-model.png"
                    format="PNG" />
       </imageobject>
 
@@ -143,7 +143,7 @@
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center" fileref="images/job-heirarchy.png" />
+        <imagedata align="center" fileref="src/site/resources/reference/images/job-heirarchy.png" />
       </imageobject>
     </mediaobject>
 

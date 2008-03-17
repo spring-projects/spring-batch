@@ -831,7 +831,7 @@
 
     <para><mediaobject>
         <imageobject role="fo">
-          <imagedata align="center" fileref="images/xmlinput.png" format="PNG" />
+          <imagedata align="center" fileref="src/site/resources/reference/images/xmlinput.png" format="PNG" />
         </imageobject>
 
         <imageobject role="html">
@@ -853,7 +853,7 @@
 
     <para><mediaobject>
         <imageobject role="fo">
-          <imagedata align="center" fileref="images/oxm-fragments.png"
+          <imagedata align="center" fileref="src/site/resources/reference/images/oxm-fragments.png"
                      format="PNG" />
         </imageobject>
 
@@ -1370,7 +1370,7 @@ itemReader.close(executionContext);</programlisting>
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center" fileref="images/drivingQueryExample.png" />
+          <imagedata align="center" fileref="src/site/resources/reference/images/drivingQueryExample.png" />
         </imageobject>
       </mediaobject>
 
@@ -1387,7 +1387,7 @@ itemReader.close(executionContext);</programlisting>
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center" fileref="images/drivingQueryJob.png" />
+          <imagedata align="center" fileref="src/site/resources/reference/images/drivingQueryJob.png" />
         </imageobject>
       </mediaobject>
 
