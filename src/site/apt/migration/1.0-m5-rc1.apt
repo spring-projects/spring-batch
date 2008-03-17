@@ -1,0 +1,31 @@
+			 ------
+                         Spring Batch Upgrade
+                         ------
+                         Robert Kasanicky
+                         ------
+                         March 2008
+
+Updating Spring Batch jobs from 1.0.0.m5 to 1.0.0.rc1 framework
+
+  The following is a description of what is needed to migrate the samples from m5 to the rc1 release.
+
+
+* CONTAINER CONFIGURATION
+
+  * DefaultStepFactoryBean has been removed, SimpleStepFactoryBean offers basic configuration options, SkipLimitStepFactoryBean adds skip configuration
+
+
+* VARIOUS
+
+  * Core and Execution modules merged to Core
+
+  * Heavy package renaming and moving (resolved cyclic dependencies)
+
+  * all StepListener methods pass the StepExecution as argument
+
+  * all JobListener methods pass the JobExecution as argument
+
+  * JobListener was enhanced with onError(..) and onInterrupt(..) methods
+
+  * InfrastructureException replaced with UnexpectedJobExecutionException
+
