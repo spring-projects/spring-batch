@@ -831,7 +831,9 @@
 
     <para><mediaobject>
         <imageobject role="fo">
-          <imagedata align="center" fileref="src/site/resources/reference/images/xmlinput.png" format="PNG" />
+          <imagedata align="center"
+                     fileref="src/site/resources/reference/images/xmlinput.png"
+                     format="PNG" />
         </imageobject>
 
         <imageobject role="html">
@@ -853,7 +855,8 @@
 
     <para><mediaobject>
         <imageobject role="fo">
-          <imagedata align="center" fileref="src/site/resources/reference/images/oxm-fragments.png"
+          <imagedata align="center"
+                     fileref="src/site/resources/reference/images/oxm-fragments.png"
                      format="PNG" />
         </imageobject>
 
@@ -1370,7 +1373,8 @@ itemReader.close(executionContext);</programlisting>
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center" fileref="src/site/resources/reference/images/drivingQueryExample.png" />
+          <imagedata align="center"
+                     fileref="src/site/resources/reference/images/drivingQueryExample.png" />
         </imageobject>
       </mediaobject>
 
@@ -1387,7 +1391,8 @@ itemReader.close(executionContext);</programlisting>
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center" fileref="src/site/resources/reference/images/drivingQueryJob.png" />
+          <imagedata align="center"
+                     fileref="src/site/resources/reference/images/drivingQueryJob.png" />
         </imageobject>
       </mediaobject>
 
@@ -1805,7 +1810,7 @@ itemReader.close(executionContext);</programlisting>
     make a reader or writer restartable.</para>
 
     <section>
-      <title>Custom Restartable ItemReader Example</title>
+      <title>Custom ItemReader Example</title>
 
       <para>For the purpose of this example, a simple
       <classname>ItemReader</classname> implementation that reads from a
@@ -1851,17 +1856,21 @@ itemReader.close(executionContext);</programlisting>
   assertEquals("3", itemReader.read());
   assertNull(itemReader.read());</programlisting>
 
-      <para>This most basic <classname>ItemReader</classname> will work, but
-      what happens if the transaction needs to be rolled back? This will
-      usually caused by an error in the ItemWriter, since the ItmReader
-      generally won't do anything that invalidates the transaction, but
-      without supporting it, there would be erroneous results. ItemReaders are
-      notified about rollbacks via the <methodname>mark</methodname> and
-      <methodname>reset</methodname> methods. In the example above they're
-      empty, but we'll need to add code to them in order to support the
-      rollback scenario:</para>
+      <section>
+        <title>Making the <classname>ItemReader</classname>
+        transactional</title>
 
-      <programlisting>  public class CustomItemReader implements ItemReader{
+        <para>This most basic <classname>ItemReader</classname> will work, but
+        what happens if the transaction needs to be rolled back? This will
+        usually caused by an error in the ItemWriter, since the ItmReader
+        generally won't do anything that invalidates the transaction, but
+        without supporting it, there would be erroneous results. ItemReaders
+        are notified about rollbacks via the <methodname>mark</methodname> and
+        <methodname>reset</methodname> methods. In the example above they're
+        empty, but we'll need to add code to them in order to support the
+        rollback scenario:</para>
+
+        <programlisting>  public class CustomItemReader implements ItemReader{
 
     List items;
     int currentIndex = 0;
@@ -1889,46 +1898,62 @@ itemReader.close(executionContext);</programlisting>
     };
   }</programlisting>
 
-      <para>The <classname>CustomItemReader</classname> has now been modified
-      to keep track of where it is currently, and where it was when mark() was
-      last called. This allows the new <classname>ItemReader</classname> to
-      fulfill the basic contract that calling <methodname>reset</methodname>
-      returns the <classname>ItemReader</classname> to the state it was in
-      when <methodname>mark</methodname> was last called:</para>
+        <para>The <classname>CustomItemReader</classname> has now been
+        modified to keep track of where it is currently, and where it was when
+        mark() was last called. This allows the new
+        <classname>ItemReader</classname> to fulfill the basic contract that
+        calling <methodname>reset</methodname> returns the
+        <classname>ItemReader</classname> to the state it was in when
+        <methodname>mark</methodname> was last called:</para>
 
-      <programlisting>  //Assume same setup as last example, a list with "1", "2", and "3"
+        <programlisting>  //Assume same setup as last example, a list with "1", "2", and "3"
   itemReader.mark();
   assertEquals("1", itemReader.read());
   assertEquals("2", itemReader.read());
   itemReader.reset();
   assertEquals("1", itemReader.read());</programlisting>
 
-      <para>In most real world scenarios, there will likely be some kind of
-      underlying resource that will require tracking. In the case of a file,
-      <methodname>mark</methodname> will hold the current location within the
-      file, and <methodname>reset</methodname> will move it back. The
-      <classname>JdbcCursorItemReader</classname>, for example, holds on to
-      the current row number, and on reset moves the cursor back by calling
-      the <classname> ResultSet</classname> <methodname>absolute</methodname>
-      method, which moves the current cursor to the row number supplied. The
-      <classname>CustomItemReader</classname> now completely adheres to the
-      entire <classname>ItemReader</classname> contract.
-      <methodname>read</methodname> will return the appropriates items,
-      returning null when empty, and <methodname>reset</methodname> returns
-      the <classname>ItemReader</classname> back to it's state as of the last
-      call to <methodname>mark</methodname>, allowing for correct support of a
-      rollback. (It's assumed a <classname>Step</classname> implementation
-      will call <methodname>mark</methodname> and
-      <methodname>reset</methodname>) The final challenge now is to make the
-      <classname>ItemReader</classname> restartable. Currently, if the power
-      goes out, and processing begins again, the
-      <classname>ItemReader</classname> must start at the beginning. This is
-      actually valid in many scenarios, but due to the large datasets often
-      used in batch, it's generally preferable that a batch job starts off at
-      where it left off. In Spring Batch, this is implemented with the
-      <classname>ItemStream</classname> interface:</para>
+        <para>In most real world scenarios, there will likely be some kind of
+        underlying resource that will require tracking. In the case of a file,
+        <methodname>mark</methodname> will hold the current location within
+        the file, and <methodname>reset</methodname> will move it back. The
+        <classname>JdbcCursorItemReader</classname>, for example, holds on to
+        the current row number, and on reset moves the cursor back by calling
+        the <classname> ResultSet</classname>
+        <methodname>absolute</methodname> method, which moves the current
+        cursor to the row number supplied. The
+        <classname>CustomItemReader</classname> now completely adheres to the
+        entire <classname>ItemReader</classname> contract.
+        <methodname>read</methodname> will return the appropriates items,
+        returning null when empty, and <methodname>reset</methodname> returns
+        the <classname>ItemReader</classname> back to it's state as of the
+        last call to <methodname>mark</methodname>, allowing for correct
+        support of a rollback. (It's assumed a <classname>Step</classname>
+        implementation will call <methodname>mark</methodname> and
+        <methodname>reset</methodname>).</para>
+      </section>
 
-      <programlisting>  public class CustomItemReader implements ItemReader, ItemStream{
+      <section>
+        <title>Making the <classname>ItemReader</classname>
+        restartable</title>
+
+        <para>The final challenge now is to make the
+        <classname>ItemReader</classname> restartable. Currently, if the power
+        goes out, and processing begins again, the
+        <classname>ItemReader</classname> must start at the beginning. This is
+        actually valid in many scenarios, but it is sometimes preferable that
+        a batch job starts off at where it left off. The key discriminant is
+        often whether the reader is stateful or stateless. A stateless reader
+        does not need to worry about restartablility, but a stateful one has
+        to try and reconstitute its last known state on restart. For this
+        reason, we recommend that you keep custom readers stateless as far as
+        possible, so you don't have to worry about restartability.</para>
+
+        <para>If you do need to store state, then in Spring Batch, this is
+        implemented with the <classname>ItemStream</classname>
+        interface:</para>
+
+        <programlisting>  public class CustomItemReader implements ItemReader, ItemStream{
 
     List items;
     int currentIndex = 0;
@@ -1973,17 +1998,17 @@ itemReader.close(executionContext);</programlisting>
     public void close(ExecutionContext executionContext) throws ItemStreamException {}
   }</programlisting>
 
-      <para>On each call to <classname>ItemStream</classname>
-      <methodname>update</methodname> method, the current index of the
-      <classname>ItemReader</classname> will be stored in the provided
-      <classname>ExecutionContext</classname> with a key of 'current.index'.
-      When the <classname>ItemStream</classname> <classname>open</classname>
-      method is called, the <classname>ExecutionContext</classname> is checked
-      to see if it contains an entry with that key, and if so the current
-      index is moved to that location. This is a fairly trivial example, but
-      it still meets the general contract:</para>
+        <para>On each call to <classname>ItemStream</classname>
+        <methodname>update</methodname> method, the current index of the
+        <classname>ItemReader</classname> will be stored in the provided
+        <classname>ExecutionContext</classname> with a key of 'current.index'.
+        When the <classname>ItemStream</classname> <classname>open</classname>
+        method is called, the <classname>ExecutionContext</classname> is
+        checked to see if it contains an entry with that key, and if so the
+        current index is moved to that location. This is a fairly trivial
+        example, but it still meets the general contract:</para>
 
-      <programlisting>  ExecutionContext executionContext = new ExecutionContext();
+        <programlisting>  ExecutionContext executionContext = new ExecutionContext();
   ((ItemStream)itemReader).open(executionContext);
   assertEquals("1", itemReader.read());
   ((ItemStream)itemReader).update(executionContext);
@@ -1997,21 +2022,23 @@ itemReader.close(executionContext);</programlisting>
   ((ItemStream)itemReader).open(executionContext);
   assertEquals("2", itemReader.read());</programlisting>
 
-      <para>Most ItemReaders have much more sophisticated restart logic. The
-      <classname>DrivingQueryItemReader</classname>, for example, only loads
-      up the remaining keys to be processed, rather than loading all of them
-      and then moving to the correct index. It's also worth noting that the
-      key used within the <classname>ExecutionContext</classname> should not
-      be trivial. That is because the same
-      <classname>ExecutionContext</classname> is used for all ItemStreams
-      within a <classname>Step</classname>. In most cases, simply prepending
-      the key with the class name should be enough to guarantee uniqueness.
-      However, in the rare cases where two of the same type of
-      <classname>ItemStream</classname> are used in the same step (which can
-      happen if two files are need for output) then a more unique name will be
-      needed. For this reason, many of the Spring Batch ItemReader and
-      ItemWriters have a setName() property that allows this key name to be
-      overridden.</para>
+        <para>Most ItemReaders have much more sophisticated restart logic. The
+        <classname>DrivingQueryItemReader</classname>, for example, only loads
+        up the remaining keys to be processed, rather than loading all of them
+        and then moving to the correct index.</para>
+
+        <para>It is also worth noting that the key used within the
+        <classname>ExecutionContext</classname> should not be trivial. That is
+        because the same <classname>ExecutionContext</classname> is used for
+        all ItemStreams within a <classname>Step</classname>. In most cases,
+        simply prepending the key with the class name should be enough to
+        guarantee uniqueness. However, in the rare cases where two of the same
+        type of <classname>ItemStream</classname> are used in the same step
+        (which can happen if two files are need for output) then a more unique
+        name will be needed. For this reason, many of the Spring Batch
+        ItemReader and ItemWriters have a setName() property that allows this
+        key name to be overridden.</para>
+      </section>
     </section>
 
     <section>
@@ -2037,21 +2064,25 @@ itemReader.close(executionContext);</programlisting>
     public void flush() throws FlushFailedException { }
   }</programlisting>
 
-      <para>The example is extremely simple, but it's worth showing to
-      illustrate an <classname>ItemWriter</classname> that doesn't respond to
-      rollbacks and commits (i.e. <methodname>clear</methodname> and
-      <methodname>flush</methodname>). If your potential writer is such that
-      it doesn't need to care about rollback or commit, likely because it's
-      writing to a database, then there is little value to the
-      <classname>ItemWriter</classname> interface in that scenario other than
-      using it to meet another class's requirement for an implementation of
-      the <classname>ItemWriter</classname> interface. In that case, the
-      <classname>ItemWriterAdapter</classname> would be a better solution.
-      However, if it does need to be transactional, then
-      <methodname>flush</methodname> and <methodname>clear</methodname> should
-      be implemented to allow for a buffering solution:</para>
+      <section>
+        <title>Making the <classname>ItemReader</classname>
+        transactional</title>
 
-      <programlisting>  public class CustomItemWriter implements ItemWriter{
+        <para>The example is extremely simple, but it's worth showing to
+        illustrate an <classname>ItemWriter</classname> that doesn't respond
+        to rollbacks and commits (i.e. <methodname>clear</methodname> and
+        <methodname>flush</methodname>). If your potential writer is such that
+        it doesn't need to care about rollback or commit, likely because it's
+        writing to a database, then there is little value to the
+        <classname>ItemWriter</classname> interface in that scenario other
+        than using it to meet another class's requirement for an
+        implementation of the <classname>ItemWriter</classname> interface. In
+        that case, the <classname>ItemWriterAdapter</classname> would be a
+        better solution. However, if it does need to be transactional, then
+        <methodname>flush</methodname> and <methodname>clear</methodname>
+        should be implemented to allow for a buffering solution:</para>
+
+        <programlisting>  public class CustomItemWriter implements ItemWriter{
 
     List output = new ArrayList();
     List buffer = new ArrayList();
@@ -2067,16 +2098,46 @@ itemReader.close(executionContext);</programlisting>
     public void flush() throws FlushFailedException {
       for(Iterator it = buffer.iterator(); it.hasNext();){
         output.add(it.next());
+        it.remove();
       }
     }
   }</programlisting>
 
-      <para>The <classname>ItemWriter</classname> buffers all output, only
-      writing to the actual output (in this case by added to a list) when the
-      <classname>ItemWriter</classname> <methodname>flush method</methodname>
-      is called. The contents of the buffer are thrown away when
-      <classname>ItemStream</classname> <methodname>clear</methodname> is
-      called.</para>
+        <para>The <classname>ItemWriter</classname> buffers all output, only
+        writing to the actual output (in this case by added to a list) when
+        the <classname>ItemWriter</classname> <methodname>flush()</methodname>
+        method is called. The contents of the buffer are thrown away when
+        <classname>ItemWriter</classname> <methodname>clear</methodname>() is
+        called.</para>
+      </section>
+
+      <section>
+        <title>Making the <classname>ItemWriter</classname>
+        restartable</title>
+
+        <para>To make the ItemWriter restartable we would follow the same
+        process as for the <classname>ItemReader</classname>, adding and
+        implementing the <classname>ItemStream</classname> interface to
+        synchronize the execution context. In the example we might have to
+        count the number of items processed and add that as a footer record.
+        If we needed to do that, we could implement
+        <classname>ItemStream</classname> in our
+        <classname>ItemWriter</classname> so that the counter was
+        reconstituted from the execution context if the stream was
+        re-opened.</para>
+
+        <para>In many realistic cases, custom ItemWriters also delegate to
+        another writer that itself is restartable (e.g. when writing to a
+        file), or else it writes to a transactional resource so doesn't need
+        to be restartable because it is stateless. When you have a stateful
+        writer you should probably also be sure to implement
+        <classname>ItemStream</classname> as well as
+        <classname>ItemWriter</classname>. Remember also that the client of
+        the writer needs to be aware of the <classname>ItemStream</classname>,
+        so you may need to register it with a factory bean (e.g. one of the
+        <classname>StepFactoryBean</classname> implementations in Spring Batch
+        Core).</para>
+      </section>
     </section>
   </section>
 </chapter>
