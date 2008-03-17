@@ -140,7 +140,7 @@ public class ItemOrientedStepTests extends TestCase {
 		itemOrientedStep.processChunk(stepExecution, contribution);
 		assertEquals(1, processed.size());
 		assertEquals(0, stepExecution.getItemCount().intValue());
-		assertEquals(1, contribution.getTaskCount());
+		assertEquals(1, contribution.getItemCount());
 
 	}
 

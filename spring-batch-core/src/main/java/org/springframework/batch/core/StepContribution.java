@@ -25,7 +25,7 @@ package org.springframework.batch.core;
  */
 public class StepContribution {
 
-	private int taskCount = 0;
+	private int itemCount = 0;
 
 	private int parentSkipCount;
 
@@ -43,8 +43,8 @@ public class StepContribution {
 	/**
 	 * Increment the counter for the number of tasks executed.
 	 */
-	public void incrementTaskCount() {
-		taskCount++;
+	public void incrementItemCount() {
+		itemCount++;
 	}
 
 	/**
@@ -52,8 +52,8 @@ public class StepContribution {
 	 * 
 	 * @return the task execution counter.
 	 */
-	public int getTaskCount() {
-		return taskCount;
+	public int getItemCount() {
+		return itemCount;
 	}
 
 	/**

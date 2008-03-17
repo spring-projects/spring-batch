@@ -303,7 +303,7 @@ public class StepExecution extends Entity {
 	 * @param contribution
 	 */
 	public synchronized void apply(StepContribution contribution) {
-		itemCount += contribution.getTaskCount();
+		itemCount += contribution.getItemCount();
 		// TODO: this should not be necessary - the step decides
 		// executionContext = contribution.getExecutionContext();
 		commitCount += contribution.getCommitCount();
@@ -335,6 +335,10 @@ public class StepExecution extends Entity {
 
 	public int getSkipCount() {
 		return skipCount;
+	}
+	
+	public void incrementSkipCountBy(int count) {
+		skipCount += count;
 	}
 
 	/**

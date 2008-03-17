@@ -29,12 +29,12 @@ public class StepContributionTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.StepContribution#incrementTaskCount()}.
+	 * {@link org.springframework.batch.core.StepContribution#incrementItemCount()}.
 	 */
 	public void testIncrementTaskCount() {
-		assertEquals(0, contribution.getTaskCount());
-		contribution.incrementTaskCount();
-		assertEquals(1, contribution.getTaskCount());
+		assertEquals(0, contribution.getItemCount());
+		contribution.incrementItemCount();
+		assertEquals(1, contribution.getItemCount());
 	}
 
 	/**

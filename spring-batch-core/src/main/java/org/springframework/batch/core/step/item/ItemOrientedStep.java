@@ -333,10 +333,12 @@ public class ItemOrientedStep extends AbstractStep {
 
 					}
 					catch (Error e) {
+						stepExecution.incrementSkipCountBy(contribution.getContributionSkipCount());
 						processRollback(stepExecution, fatalException, transaction);
 						throw e;
 					}
 					catch (Exception e) {
+						stepExecution.incrementSkipCountBy(contribution.getContributionSkipCount());
 						processRollback(stepExecution, fatalException, transaction);
 						throw e;
 					}
@@ -467,7 +469,7 @@ public class ItemOrientedStep extends AbstractStep {
 				// check for interruption before each item as well
 				interruptionPolicy.checkInterrupted(execution);
 				ExitStatus exitStatus = itemHandler.handle(contribution);
-				contribution.incrementTaskCount();
+				contribution.incrementItemCount();
 				// check for interruption after each item as well
 				interruptionPolicy.checkInterrupted(execution);
 				return exitStatus;

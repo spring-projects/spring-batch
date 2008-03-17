@@ -68,12 +68,13 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 		step.execute(stepExecution);
 
+		assertEquals(2, stepExecution.getSkipCount());
+		
 		assertTrue(reader.skipped.contains("2"));
 		assertTrue(reader.skipped.contains("4"));
 		// writer did not skip "2" as it never made it to writer, only "4" did
 		assertTrue(writer.skipped.contains("4"));
 
-//		TODO when reader throws exception on "2", it results in writer skipping "1"
 		String[] expectedOutput = { "1", "3", "5" };
 
 		for (int i = 0; i < expectedOutput.length; i++) {
@@ -81,6 +82,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 					.contains(expectedOutput[i]));
 		}
 		assertTrue(writer.written.size() == expectedOutput.length);
+		
 	}
 
 	/**
