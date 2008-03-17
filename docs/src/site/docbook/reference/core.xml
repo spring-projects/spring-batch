@@ -181,7 +181,7 @@
       <classname>SimpleJob</classname>:</para>
 
       <programlisting>  &lt;bean id="footballJob"
-        class="org.springframework.batch.execution.job.SimpleJob"&gt;
+        class="org.springframework.batch.core.job.SimpleJob"&gt;
     &lt;property name="steps"&gt;
       &lt;list&gt;
         &lt;!-- Step Bean details ommitted for clarity --&gt;
@@ -840,108 +840,5 @@
     <classname>Tasklet</classname> is useful for encapsulating processing
     logic that is not natural to split into read-(transform)-write phases,
     such as invoking a system command or a stored procedure.</para>
-  </section>
-
-  <section>
-    <title id="s.3">High Level Processing Flow</title>
-
-    <para>The diagram above illustrates the flow and architecture components
-    in a typical batch run execution.</para>
-
-    <para>Standard interaction is described as follows:</para>
-
-    <para><emphasis role="bold">1.</emphasis> In the Run tier, a Scheduler
-    starts a batch application by invoking a Job Script. The Scheduler
-    identifies what batch process it wants to run by passing the name of the
-    batch process and any required additional parameters to the Job
-    Script.</para>
-
-    <para><emphasis role="bold">2.</emphasis> The Job Script initializes the
-    program and executes any job specific scripts prior to calling the Batch
-    Launcher.</para>
-
-    <para><emphasis role="bold">3.</emphasis> The Batch Launcher starts the
-    Batch Execution Environment based upon any environment settings
-    established in the script.</para>
-
-    <para><emphasis role="bold">3.1</emphasis> The Batch Environment starts
-    and controls the batch execution. It initializes the Job execution
-    environment with static configuration items such as database settings,
-    logging levels and creates a Job based on the Job Configuration created by
-    a Batch Developer.</para>
-
-    <para><emphasis role="bold">4</emphasis> Based on configuration provided
-    by a Batch Developer, the Job sequentially executes steps after checking
-    policies to ensure that each step should be started. The status of the Job
-    and Step (start time, end time, status such as "started" or "completed" is
-    stored at various points during the process. In order to maintain data
-    integrity at the application tier, the Step acts as a controller to ensure
-    that either an entire group of actions completes successfully or that none
-    of the actions completes. In online applications the Unit Of Work and the
-    scope of a transaction tend to be the same thing (e.g. update customer).
-    This group of actions controlled by a user interaction is referred to as a
-    logical unit of work (LUW). However, in batch processing the Step
-    frequently separates the transactional scope from the LUW so that many
-    LUWs complete within one commit. This greatly improves batch throughput
-    (see pseudo code above where REPEAT(size=500). The Step controls the
-    overall execution of the Tasklet, ensuring that transactions are committed
-    at the appropriate time and that restart and statistics information is
-    stored appropriately.</para>
-
-    <para><emphasis role="bold">4.1</emphasis> The first thing the Step is
-    responsible for is the initialization of the data required to begin
-    processing. The <classname>Step</classname> will interact with other
-    architecture components, such as the <classname>ItemReader</classname>, to
-    setup the data required to be processed.</para>
-
-    <para><emphasis role="bold">4.1.1</emphasis> The
-    <classname>ItemReader</classname> provides services to access various data
-    sources. It provides location transparency to the Batch
-    <classname>Step</classname> and hides the physical location details of the
-    data.</para>
-
-    <para><emphasis role="bold">4.2</emphasis> Once the data is initialized by
-    the <classname>ItemReader</classname>, the <classname>Step</classname>
-    will begin processing.</para>
-
-    <para><emphasis role="bold">4.2.1</emphasis> Before a record is returned
-    to the <classname>Step</classname>, it may be validated by any number of
-    validation Frameworks that can be provided to an
-    <classname>ItemReader</classname>. A single record/set of data is gathered
-    by interacting with the <classname>ItemReader</classname>.</para>
-
-    <para><emphasis role="bold">4.3</emphasis> Once a record/set has been
-    obtained, the <classname>step</classname> calls the
-    <classname>ItemWriter</classname> to begin processing.</para>
-
-    <para><emphasis role="bold">4.3.1</emphasis> Either an ItemReader or
-    ItemWriter can execute its internal business logic by calling other
-    Business Logic components as necessary. Based on the business service, it
-    requests or persists objects from the data access components.</para>
-
-    <para><emphasis role="bold">4.3.3</emphasis> Data Access components can be
-    leveraged retrieve or persist domain objects.</para>
-
-    <para><emphasis role="bold">4.3.4</emphasis> Once the business logic has
-    been executed, the resulting output record is written out by utilizing the
-    <classname>ItemWriter</classname> interface. The
-    <classname>Step</classname> will repeatedly call steps 4.2 -&gt; 4.3 for
-    every record provided by the Input Source.</para>
-
-    <para><emphasis role="bold">4.4</emphasis> Once all of the records are
-    processed, the <classname>Step</classname> closes all streams to perform
-    any clean up activities such as closing connections, exporting files,
-    etc.</para>
-
-    <para><emphasis role="bold">4.4.1</emphasis> The
-    <classname>Step</classname> is responsible for committing data associated
-    with the remaining logical units of work as well as performing any
-    finalization and administrative functions (e.g. closing database
-    connections).</para>
-
-    <para>Once the <classname>Step</classname> has completed finalization the
-    control is passed back to the <classname>Job</classname>, where any
-    necessary logging or clean up is executed for application termination and
-    wrap-up, provided there are no additional Steps to execute.</para>
   </section>
 </chapter>
