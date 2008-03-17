@@ -169,7 +169,7 @@ public class SimpleJobRepository implements JobRepository {
 				}
 				if (execution.getStatus() == BatchStatus.COMPLETED) {
 					throw new JobInstanceAlreadyCompleteException(
-							"A job instance already exists is complete for parameters=" + jobParameters
+							"A job instance already exists and is complete for parameters=" + jobParameters
 									+ ".  If you want to run this job again, change the parameters.");
 				}
 			}
