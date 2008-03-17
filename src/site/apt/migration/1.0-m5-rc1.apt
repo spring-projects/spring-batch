@@ -1,4 +1,4 @@
-			 ------
+			             ------
                          Spring Batch Upgrade
                          ------
                          Robert Kasanicky
@@ -7,12 +7,16 @@
 
 Updating Spring Batch jobs from 1.0.0.m5 to 1.0.0.rc1 framework
 
-  The following is a description of what is needed to migrate the samples from m5 to the rc1 release.
+  The following is a description of what is needed to migrate the samples from m5 to the rc1 release.  The changes to existing job configurations in samples are minimal.  Simply replacing the old version of the base launcher configuration should suffice.
 
 
 * CONTAINER CONFIGURATION
 
-  * DefaultStepFactoryBean has been removed, SimpleStepFactoryBean offers basic configuration options, SkipLimitStepFactoryBean adds skip configuration
+  * The basic execution environment for the samples was renamed from "simple-container-definition.xml" to "simple-job-launcher-context.xml".
+
+  * DefaultStepFactoryBean has been removed, SimpleStepFactoryBean offers basic configuration options.
+
+  * SkipLimitStepFactoryBean adds additional skip configuration for specific exception types.
 
 
 * VARIOUS
