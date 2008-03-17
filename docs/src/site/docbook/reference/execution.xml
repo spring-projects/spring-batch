@@ -91,7 +91,8 @@
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center" fileref="src/site/resources/reference/images/run-tier.png" />
+        <imagedata align="center"
+                   fileref="src/site/resources/reference/images/run-tier.png" />
       </imageobject>
     </mediaobject>
 
@@ -178,7 +179,7 @@
         second argument, 'endOfDay' represents the job name. The final
         argument, 'schedule.date=01-01-2008' will be converted into
         <classname>JobParameters</classname>. An example of the XML
-        configuration is below: </para>
+        configuration is below:</para>
 
         <programlisting>  &lt;bean id="endOfDay"
         class="org.springframework.batch.core.job.SimpleJob"&gt;
@@ -215,7 +216,8 @@
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center" fileref="src/site/resources/reference/images/jobTier.png" />
+        <imagedata align="center"
+                   fileref="src/site/resources/reference/images/jobTier.png" />
       </imageobject>
     </mediaobject>
 
@@ -235,7 +237,7 @@
       <para>The most basic implementation of the
       <classname>JobLauncher</classname> interface is the SimpleJobLauncher.
       It's only required dependency is a <classname>JobRepository</classname>,
-      in order to obtain an execution: </para>
+      in order to obtain an execution:</para>
 
       <programlisting>  &lt;bean id="jobLauncher"
         class="org.springframework.batch.execution.launch.SimpleJobLauncher"&gt;
@@ -258,14 +260,14 @@
         </imageobject>
       </mediaobject>
 
-      <para>The sequence is fairly straightforward, and works extremely well
-      when launched from a scheduler, but causes issues when trying to launch
-      from an HTTP request. In this scenario, the launching needs to be done
+      <para>The sequence is straightforward, and works well when launched from
+      a scheduler, but causes issues when trying to launch from an HTTP
+      request. In this scenario, the launching needs to be done
       asynchronously, so that the <classname>SimpleJobLauncher</classname>
       returns immediately to it's caller. This is because it is not good
       practice to keep an HTTP request open for the amount of time needed by
-      long running processes such as batch. An example sequence is below:
-      </para>
+      long running processes such as batch. An example sequence is
+      below:</para>
 
       <mediaobject>
         <imageobject role="html">
@@ -372,7 +374,7 @@
   &lt;/bean&gt;</programlisting>
 
       <para>The configuration above isn't quite complete, each DAO
-      implementation is makes a reference to a Spring
+      implementation makes a reference to a Spring
       <classname>DataFieldMaxValueIncrementer</classname>.
       <classname>JobInstance</classname>, <classname>JobExecution</classname>,
       and <classname>StepExecution</classname> each have unique IDs, and the
@@ -484,8 +486,8 @@
   &lt;/bean&gt;</programlisting>
 
         <para>To phrase it another way, setting restartable to false means
-        "this Job doesn't not support being started again". Restarting a Job
-        that is not restartable will cause a
+        "this Job does not support being started again". Restarting a Job that
+        is not restartable will cause a
         <classname>JobRestartException</classname> to be thrown:</para>
 
         <programlisting>  Job job = new SimpleJob();
@@ -565,7 +567,8 @@
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center" fileref="src/site/resources/reference/images/application-tier.png" />
+        <imagedata align="center"
+                   fileref="src/site/resources/reference/images/application-tier.png" />
       </imageobject>
     </mediaobject>
 
@@ -750,13 +753,13 @@
           <para>The above example configuration is for a job that loads in
           information about football games and summarizes them. It contains
           three steps: playerLoad, gameLoad, and playerSummarization. The
-          playerLoad <classname>Step</classname> loads in player information
-          from a flatfile, while the <classname>gameLoad</classname> Step does
-          the same for games. The final step, playerSummarization, then
-          summarizes the statistics for each player based upon the provided
-          games. It is assumed that the file loaded by 'playerLoad' must be
-          loaded only once, but that 'gameLoad' will load any games found
-          within a particular directory, deleting them after they have been
+          playerLoad <classname>Step</classname> loads player information from
+          a flatfile, while the <classname>gameLoad</classname> Step does the
+          same for games. The final step, playerSummarization, then summarizes
+          the statistics for each player based upon the provided games. It is
+          assumed that the file loaded by 'playerLoad' must be loaded only
+          once, but that 'gameLoad' will load any games found within a
+          particular directory, deleting them after they have been
           successfully loaded into the database. As a result, the playerLoad
           <classname>Step</classname> contains no additionaly configuration.
           It can be started almost limitlessly, and if complete will be
@@ -884,7 +887,7 @@
         <classname>Step</classname> failure. However, not all exceptions are
         deterministic. If a FlatFileParseException is encountered while
         reading, it will always be thrown for that record. Resseting the
-        <classname>ItmeReader</classname> will not help. However, for other
+        <classname>ItemReader</classname> will not help. However, for other
         exceptions, such as a
         <classname>DeadlockLoserDataAccessException</classname>, which
         indicates that the current process has attempted to update a record
