@@ -24,7 +24,7 @@
 
 	<bean
 		class="org.springframework.batch.sample.dao.FlatFileCustomerCreditDao"
-		id="customerReportOutputSource">
+		id="customerReportItemWriter">
 		<property name="itemWriter">
 			<bean
 				class="org.springframework.batch.item.file.FlatFileItemWriter"
@@ -39,7 +39,7 @@
 	</bean>
 
 	<bean class="org.springframework.batch.item.file.FlatFileItemReader"
-		id="fileInputTemplate">
+		id="fileItemReader">
 		<property name="resource" ref="fileLocator" />
 		<property name="lineTokenizer" ref="tradeFileDescriptor" />
 		<property name="fieldSetMapper">

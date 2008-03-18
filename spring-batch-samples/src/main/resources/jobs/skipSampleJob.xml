@@ -15,12 +15,12 @@
 			<list>
 				<bean id="step1" parent="skipLimitStep">
 					<property name="skipLimit" value="1" />
-					<property name="streams" ref="fileInputTemplate" />
+					<property name="streams" ref="fileItemReader" />
 					<property name="itemReader">
 						<bean
 							class="org.springframework.batch.item.validator.ValidatingItemReader">
 							<property name="itemReader"
-								ref="fileInputTemplate" />
+								ref="fileItemReader" />
 							<property name="validator"
 								ref="tradeValidator" />
 						</bean>
