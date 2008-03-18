@@ -25,7 +25,7 @@ public class FlatFileCustomerCreditDaoTests extends TestCase {
 		
 		//create new writer
 		writer = new FlatFileCustomerCreditDao();
-		writer.setOutputSource(output);
+		writer.setItemWriter(output);
 	}
 
 	public void testOpen() throws Exception {

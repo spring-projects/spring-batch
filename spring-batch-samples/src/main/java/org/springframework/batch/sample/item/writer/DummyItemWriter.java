@@ -15,27 +15,16 @@
  */
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.AbstractItemWriter;
 
 /**
  * @author Dave Syer
  *
  */
-public class DummyItemWriter implements ItemWriter {
+public class DummyItemWriter extends AbstractItemWriter {
 
 	public void write(Object item) throws Exception {
 		// NO-OP
-	}
-
-	public void close() throws Exception {
-	}
-
-	public void clear() throws ClearFailedException {
-	}
-
-	public void flush() throws FlushFailedException {
 	}
 
 }

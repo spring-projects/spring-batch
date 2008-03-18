@@ -22,7 +22,7 @@ public class CustomerCreditUpdateProcessorTests extends TestCase {
 		dao = (CustomerCreditDao) daoControl.getMock();
 		//create processor, set writer and credit filter
 		writer = new CustomerCreditUpdateWriter();
-		writer.setWriter(dao);
+		writer.setDao(dao);
 		writer.setCreditFilter(CREDIT_FILTER);
 	}
 	

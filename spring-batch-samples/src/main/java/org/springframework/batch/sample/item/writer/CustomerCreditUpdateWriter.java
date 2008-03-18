@@ -38,11 +38,8 @@ public class CustomerCreditUpdateWriter extends AbstractItemWriter {
         this.creditFilter = creditFilter;
     }
 
-    public void setWriter(CustomerCreditDao writer) {
-        this.dao = writer;
+    public void setDao(CustomerCreditDao dao) {
+        this.dao = dao;
     }
-
-	public void close() throws Exception {
-	}
 
 }

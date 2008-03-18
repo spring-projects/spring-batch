@@ -84,9 +84,6 @@ public class StagingItemWriter extends JdbcDaoSupport implements StepListener, I
 				});
 	}
 
-	public void close() throws Exception {
-	}
-
 	public void clear() throws ClearFailedException {
 	}
 

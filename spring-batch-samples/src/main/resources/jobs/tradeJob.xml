@@ -45,7 +45,7 @@
 					<property name="itemWriter">
 						<bean
 							class="org.springframework.batch.sample.item.writer.CustomerCreditUpdateWriter"
-							p:writer-ref="customerReportOutputSource" />
+							p:dao-ref="customerReportOutputSource" />
 					</property>
 				</bean>
 			</list>

@@ -53,8 +53,8 @@ public class FlatFileCustomerCreditDao implements CustomerCreditDao,
 		this.separator = separator;
 	}
 
-	public void setOutputSource(ItemWriter outputSource) {
-		this.itemWriter = outputSource;
+	public void setItemWriter(ItemWriter itemWriter) {
+		this.itemWriter = itemWriter;
 	}
 
 	public void open(ExecutionContext executionContext) throws Exception {

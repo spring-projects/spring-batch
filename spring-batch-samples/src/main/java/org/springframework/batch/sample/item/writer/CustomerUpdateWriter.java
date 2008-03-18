@@ -41,10 +41,4 @@ public class CustomerUpdateWriter extends AbstractItemWriter {
     public void setDao(JdbcCustomerDebitDao outputSource) {
         this.dao = outputSource;
     }
-
-	public void close() {
-	}
-
-	public void init() {
-	}
 }

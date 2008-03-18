@@ -36,9 +36,4 @@ public class PersonWriter extends AbstractItemWriter {
         log.debug("Processing: " + data);
     }
 
-	public void close() {
-	}
-
-	public void init() {
-	}
 }

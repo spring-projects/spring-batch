@@ -6,7 +6,7 @@ import org.springframework.batch.sample.domain.Player;
 
 public class PlayerItemWriter extends AbstractItemWriter {
 
-	PlayerDao playerDao;
+	private PlayerDao playerDao;
 	
 	public void write(Object data) throws Exception {		
 		playerDao.savePlayer((Player)data);
@@ -15,7 +15,5 @@ public class PlayerItemWriter extends AbstractItemWriter {
 	public void setPlayerDao(PlayerDao playerDao) {
 		this.playerDao = playerDao;
 	}
-
-	public void close() throws Exception {
-	}
+	
 }

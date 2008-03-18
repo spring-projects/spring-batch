@@ -25,7 +25,7 @@
 	<bean
 		class="org.springframework.batch.sample.dao.FlatFileCustomerCreditDao"
 		id="customerReportOutputSource">
-		<property name="outputSource">
+		<property name="itemWriter">
 			<bean
 				class="org.springframework.batch.item.file.FlatFileItemWriter"
 				id="customerFlatFileOutputSource">
