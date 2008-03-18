@@ -33,6 +33,8 @@
 		<config>src/main/resources/alt-data-source-context.xml</config>
 		<config>src/main/resources/quartz-job-launcher-context.xml</config>
 		<config>src/main/resources/jobs/skipSampleJob.xml</config>
+		<config>src/main/resources/jobs/multilineOrderInputTokenizers.xml</config>
+		<config>src/main/resources/jobs/multilineOrderOutputAggregators.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -150,18 +152,6 @@
 			</configs>
 		</configSet>
 		<configSet>
-			<name><![CDATA[multilineOrder]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/jobs/multilineOrderIo.xml</config>
-				<config>src/main/resources/jobs/multilineOrderJob.xml</config>
-				<config>src/main/resources/simple-job-launcher-context.xml</config>
-			</configs>
-		</configSet>
-		<configSet>
 			<name><![CDATA[parallel]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
@@ -275,6 +265,20 @@
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
 				<config>src/main/resources/jobs/tradeJobIo.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[multilineOrder]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/multilineOrderIo.xml</config>
+				<config>src/main/resources/jobs/multilineOrderJob.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/jobs/multilineOrderInputTokenizers.xml</config>
+				<config>src/main/resources/jobs/multilineOrderOutputAggregators.xml</config>
 			</configs>
 		</configSet>
 	</configSets>
