@@ -295,7 +295,7 @@ public class SimpleJobTests extends TestCase {
 			job.execute(jobExecution);
 			fail("Expected BatchCriticalException");
 		}
-		catch (UnexpectedJobExecutionException ex) {
+		catch (StartLimitExceededException ex) {
 			// expected
 			assertTrue("Wrong message in exception: " + ex.getMessage(), ex.getMessage()
 					.indexOf("start limit exceeded") >= 0);

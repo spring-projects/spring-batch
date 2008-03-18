@@ -198,8 +198,7 @@ public class SimpleJob extends AbstractJob {
 		}
 		else {
 			// start max has been exceeded, throw an exception.
-			throw new UnexpectedJobExecutionException("Maximum start limit exceeded for step: " + step.getName()
-					+ "StartMax: " + step.getStartLimit());
+			throw new StartLimitExceededException(step);
 		}
 	}
 
