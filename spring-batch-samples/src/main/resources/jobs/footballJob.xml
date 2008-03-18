@@ -88,7 +88,7 @@
 		</property>
 		<property name="fieldSetMapper">
 			<bean
-				class="org.springframework.batch.sample.mapping.GameMapper" />
+				class="org.springframework.batch.sample.mapping.GameFieldSetMapper" />
 		</property>
 	</bean>
 

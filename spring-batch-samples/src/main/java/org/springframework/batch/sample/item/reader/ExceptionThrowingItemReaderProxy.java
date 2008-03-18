@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.tasklet;
+package org.springframework.batch.sample.item.reader;
 
 
 import org.springframework.batch.core.UnexpectedJobExecutionException;
