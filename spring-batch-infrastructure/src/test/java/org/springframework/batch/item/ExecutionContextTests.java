@@ -95,4 +95,9 @@ public class ExecutionContextTests extends TestCase{
 		}
 	}
 	
+	public void testPutNull(){
+		//putting null should work
+		context.put("1", null);
+	}
+	
 }

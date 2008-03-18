@@ -64,7 +64,9 @@ public class ExecutionContext {
 	}
 
 	public void put(String key, Object value) {
-		Assert.isInstanceOf(Serializable.class, value, "Value: [ " + value + "must be serializable.");
+		if(value != null){
+			Assert.isInstanceOf(Serializable.class, value, "Value: [ " + value + "must be serializable.");
+		}
 		dirty = true;
 		map.put(key, value);
 	}
