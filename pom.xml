@@ -112,6 +112,17 @@
 					<url>http://repository.atlassian.com/maven2</url>
 				</pluginRepository>
 			</pluginRepositories>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<!-- This seems to work better than the default (2008/03/19) because links on sub-module sites are not broken -->
+						<plugin>
+							<artifactId>maven-site-plugin</artifactId>
+							<version>2.0-beta-7-SNAPSHOT</version>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
 		</profile>
 		<profile>
 			<id>xsl-aggregation</id>
@@ -209,6 +220,11 @@
 							</goals>
 						</execution>
 					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>emma-maven-plugin</artifactId>
+					<version>1.0-20070912.011112-4</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -567,9 +583,8 @@
 						<link>http://logging.apache.org/log4j/docs/api/</link>
 						<link>http://jakarta.apache.org/regexp/apidocs/</link>
 						<link>http://jakarta.apache.org/velocity/api/</link>
-						<link>http://static.springframework.org/spring/docs/2.1.x/api/</link>
-						<link>http://static.springframework.org/spring-batch/spring-batch-infrastructure/apidocs/</link>
-						<link>http://static.springframework.org/spring-batch/spring-batch-core/apidocs/</link>
+						<link>http://static.springframework.org/spring/docs/2.5.x/api/</link>
+						<link>http://static.springframework.org/spring-batch/apidocs/</link>
 					</links>
 					<aggregate>true</aggregate>
 					<excludePackageNames>org.springframework.batch.sample</excludePackageNames>

@@ -2,7 +2,7 @@
 <project name="${project.name}">
   <bannerLeft>
     <name>${project.name}</name>
-    <href>http://www.springframework.org/</href>
+    <href>http://www.springframework.org/spring-batch</href>
   </bannerLeft>
   <bannerRight>
     <src>images/shim.gif</src>
@@ -17,21 +17,25 @@
   </skin>
 	<body>
 		<links>
-			<item name="Home" href="index.html"/>
+			<item name="Home" href="http://www.springframework.org/spring-batch/index.html"/>
 		</links>
 		
-		<menu name="Spring Batch">
+		<menu name="Documentation" inherit="none">
 			<item name="Home" href="index.html"/>
+			<item name="User Guide" href="spring-batch-docs/reference/index.html"/>
 			<item name="Features" href="features.html"/>
 			<item name="Use Cases" href="cases/index.html"/>
 			<item name="Transactions" href="transactions.html"/>
+			<item name="FAQ" href="faq.html"/>
 			<item name="Batch Processing Strategies" href="batch-processing-strategies.html"/>
 			<item name="General Batch Principles and Guidelines" href="batch-principles-guidelines.html"/>
+		</menu>
+		<menu name="Support" inherit="none">
 			<item name="Building" href="building.html"/>
 			<item name="Getting Started" href="getting-started.html"/>
-			<item name="FAQ" href="faq.html"/>
-			<item name="Changelog" href="changelog.html"/>
-			<item name="Migrating" href="migration/index.html"/>
+			<item name="API" href="apidocs/index.html"/>
+			<item name="Forums" href="http://forum.springframework.org/forumdisplay.php?f=41"/>
+			<item name="JIRA" href="http://jira.springframework.org/browse/BATCH"/>
 			<item name="Downloads" href="downloads.html"/>
 		</menu>
 		<menu ref="modules"/>

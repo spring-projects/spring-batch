@@ -3,21 +3,10 @@
   <bannerLeft>
     <name>Spring Batch: ${project.name}</name>
   </bannerLeft>
-  <bannerRight>
-    <src>images/shim.gif</src>
-  </bannerRight>
-  <poweredBy>
-	  <logo name="" href="" img="images/shim.gif"/>
-  </poweredBy>
-  <skin>
-    <groupId>org.springframework.maven.skins</groupId>
-    <artifactId>maven-spring-skin</artifactId>
-    <version>1.0.4</version>
-  </skin>
+
 	<body>
 
 		<links>
-			<item name="Home" href="../index.html"/>
 			<item name="${project.name}" href="index.html"/>			
 		</links>
 		

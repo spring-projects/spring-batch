@@ -8,8 +8,15 @@
 Introduction
 
   This module provides framework code for the Spring Batch project.
-  The core interfaces are <<<RepeatOperations>>> and
-  <<<RetryOperations>>>.  The main implementations are
+  The core interfaces are <<<ItemReader>>>, <<<ItemWriter>>>,
+  <<<RepeatOperations>>> and <<<RetryOperations>>>.
+
+  The reader and writer interfaces are implemented in some generic
+  ways to help users with I/O in a transactional envionment.  Spring
+  Batch provides some file-based (flat file and xml) implementations
+  and some database implementations.
+
+  The main implementations of the repeat and retry interfaces are
   <<<RepeatTemplate>>> and <<<RetryTemplate>>>.  Example usage:
 
 +---
