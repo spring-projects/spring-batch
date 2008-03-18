@@ -18,6 +18,7 @@ package org.springframework.batch.core.repository.support;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
 import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
@@ -32,8 +33,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 
 /**
- * A {@link FactoryBean} that automates the creation of a {@link SimpleJobRepository}.  Requires the user
- * to describe what kind of database they are using.  
+ * A {@link FactoryBean} that automates the creation of a
+ * {@link SimpleJobRepository}. Requires the user to describe what kind of
+ * database they are using.
  * 
  * @author Ben Hale
  * @author Lucas Ward
@@ -43,7 +45,9 @@ public class JobRepositoryFactoryBean implements FactoryBean, InitializingBean {
 	private DataSource dataSource;
 
 	private String databaseType;
-	
+
+	private String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
+
 	private DataFieldMaxValueIncrementerFactory incrementerFactory;
 
 	public void setDataSource(DataSource dataSource) {
@@ -53,19 +57,22 @@ public class JobRepositoryFactoryBean implements FactoryBean, InitializingBean {
 	public void setDatabaseType(String dbType) {
 		this.databaseType = dbType;
 	}
-	
-	public void setIncrementerFactory(
-			DataFieldMaxValueIncrementerFactory incrementerFactory) {
+
+	public void setTablePrefix(String tablePrefix) {
+		this.tablePrefix = tablePrefix;
+	}
+
+	public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
 		this.incrementerFactory = incrementerFactory;
 	}
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource, "Datasource must not be null.");
-		
-		if(incrementerFactory == null){
+
+		if (incrementerFactory == null) {
 			incrementerFactory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
 		}
-		
+
 		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), "Unsupported database type");
 	}
 
@@ -89,6 +96,7 @@ public class JobRepositoryFactoryBean implements FactoryBean, InitializingBean {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
 		dao.setJdbcTemplate(jdbcTemplate);
 		dao.setJobIncrementer(incrementerFactory.getIncrementer(databaseType, "BATCH_JOB_SEQ"));
+		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;
 	}
@@ -97,6 +105,7 @@ public class JobRepositoryFactoryBean implements FactoryBean, InitializingBean {
 		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
 		dao.setJdbcTemplate(jdbcTemplate);
 		dao.setJobExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, "BATCH_JOB_EXECUTION_SEQ"));
+		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;
 	}
@@ -105,6 +114,7 @@ public class JobRepositoryFactoryBean implements FactoryBean, InitializingBean {
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
 		dao.setJdbcTemplate(jdbcTemplate);
 		dao.setStepExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, "BATCH_STEP_EXECUTION_SEQ"));
+		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;
 	}
