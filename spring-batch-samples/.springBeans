@@ -8,10 +8,8 @@
 	<configs>
 		<config>src/main/resources/jobs/fixedLengthImportJob.xml</config>
 		<config>src/main/resources/jobs/multilineJob.xml</config>
-		<config>src/main/resources/jobs/multilineOrderInputDescriptors.xml</config>
 		<config>src/main/resources/jobs/multilineOrderIo.xml</config>
 		<config>src/main/resources/jobs/multilineOrderJob.xml</config>
-		<config>src/main/resources/jobs/multilineOrderOutputDescriptors.xml</config>
 		<config>src/main/resources/jobs/tradeJob.xml</config>
 		<config>src/main/resources/jobs/tradeJobIo.xml</config>
 		<config>src/main/resources/jobs/restartSample.xml</config>
@@ -158,10 +156,8 @@
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/jobs/multilineOrderInputDescriptors.xml</config>
 				<config>src/main/resources/jobs/multilineOrderIo.xml</config>
 				<config>src/main/resources/jobs/multilineOrderJob.xml</config>
-				<config>src/main/resources/jobs/multilineOrderOutputDescriptors.xml</config>
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>

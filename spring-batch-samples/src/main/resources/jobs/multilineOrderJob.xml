@@ -7,8 +7,8 @@
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-	<import resource="multilineOrderInputDescriptors.xml" />
-	<import resource="multilineOrderOutputDescriptors.xml" />
+	<import resource="multilineOrderInputTokenizers.xml" />
+	<import resource="multilineOrderOutputAggregators.xml" />
 	<import resource="multilineOrderIo.xml" />
 
 	<bean id="multilineOrderJob" parent="simpleJob">
@@ -16,8 +16,8 @@
 			<bean id="step1" parent="simpleStep">
 				<property name="streams">
 					<list>
-						<ref bean="flatFileOutput" />
-						<ref bean="fileInputTemplate" />
+						<ref bean="flatFileWriter" />
+						<ref bean="fileItemReader" />
 					</list>
 				</property>
 				<property name="itemReader">
@@ -27,7 +27,7 @@
 							<bean
 								class="org.springframework.batch.sample.item.reader.OrderItemReader">
 								<property name="itemReader"
-									ref="fileInputTemplate" />
+									ref="fileItemReader" />
 								<property name="headerMapper"
 									ref="headerFieldSetMapper" />
 								<property name="customerMapper"
@@ -57,11 +57,11 @@
 
 	<bean id="orderWriter"
 		class="org.springframework.batch.sample.dao.FlatFileOrderWriter">
-		<property name="delegate" ref="flatFileTransformerOutput" />
+		<property name="delegate" ref="flatFileTransformerWriter" />
 		<property name="transformer">
 			<bean
 				class="org.springframework.batch.sample.dao.OrderTransformer">
-				<property name="aggregators" ref="outputDescriptors" />
+				<property name="aggregators" ref="outputAggregators" />
 			</bean>
 		</property>
 	</bean>

@@ -5,7 +5,7 @@
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-	<util:map id="outputDescriptors">
+	<util:map id="outputAggregators">
 		<entry key="header" value-ref="outputHeader" />
 		<entry key="footer" value-ref="outputFooter" />
 		<entry key="customer" value-ref="outputCustomer" />

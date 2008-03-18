@@ -3,67 +3,67 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-	<bean id="orderFileDescriptor"
+	<bean id="orderFileTokenizer"
 		class="org.springframework.batch.item.file.transform.PrefixMatchingCompositeLineTokenizer">
 		<property name="tokenizers">
 			<map>
-				<entry key="HEA" value-ref="headerRecordDescriptor" />
-				<entry key="FOT" value-ref="footerRecordDescriptor" />
-				<entry key="BCU" value-ref="businessCustomerLineDescriptor" />
-				<entry key="NCU" value-ref="customerLineDescriptor" />
-				<entry key="BAD" value-ref="billingAddressLineDescriptor" />
-				<entry key="SAD" value-ref="shippingAddressLineDescriptor" />
-				<entry key="BIN" value-ref="billingLineDescriptor" />
-				<entry key="SIN" value-ref="shippingLineDescriptor" />
-				<entry key="LIT" value-ref="itemLineDescriptor" />
-				<entry key="" value-ref="defaultLineDescriptor" />
+				<entry key="HEA" value-ref="headerRecordTokenizer" />
+				<entry key="FOT" value-ref="footerRecordTokenizer" />
+				<entry key="BCU" value-ref="businessCustomerLineTokenizer" />
+				<entry key="NCU" value-ref="customerLineTokenizer" />
+				<entry key="BAD" value-ref="billingAddressLineTokenizer" />
+				<entry key="SAD" value-ref="shippingAddressLineTokenizer" />
+				<entry key="BIN" value-ref="billingLineTokenizer" />
+				<entry key="SIN" value-ref="shippingLineTokenizer" />
+				<entry key="LIT" value-ref="itemLineTokenizer" />
+				<entry key="" value-ref="defaultLineTokenizer" />
 			</map>
 		</property>
 	</bean>
 
-	<bean id="defaultLineDescriptor"
+	<bean id="defaultLineTokenizer"
 		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
 		<property name="columns" value="1-120" />
 	</bean>
 
-	<bean id="parentLineDescriptor" abstract="true"
+	<bean id="parentLineTokenizer" abstract="true"
 		class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
 		<property name="delimiter" value=";"/>
 	</bean>
 
-	<bean id="headerRecordDescriptor" parent="parentLineDescriptor">
+	<bean id="headerRecordTokenizer" parent="parentLineTokenizer">
 		<property name="names" value="LINE_ID,ORDER_ID,ORDER_DATE" />
 	</bean>
 
-	<bean id="footerRecordDescriptor" parent="parentLineDescriptor">
+	<bean id="footerRecordTokenizer" parent="parentLineTokenizer">
 		<property name="names" value="LINE_ID,TOTAL_LINE_ITEMS,TOTAL_ITEMS,TOTAL_PRICE" />
 	</bean>
 
-	<bean id="businessCustomerLineDescriptor" parent="parentLineDescriptor">
+	<bean id="businessCustomerLineTokenizer" parent="parentLineTokenizer">
 		<property name="names" value="LINE_ID,COMPANY_NAME,REG_ID,VIP" />
 	</bean>
 
-	<bean id="customerLineDescriptor" parent="parentLineDescriptor">
+	<bean id="customerLineTokenizer" parent="parentLineTokenizer">
 		<property name="names" value="LINE_ID,LAST_NAME,FIRST_NAME,MIDDLE_NAME,REGISTERED,REG_ID,VIP" />
 	</bean>
 
-	<bean id="billingAddressLineDescriptor" parent="parentLineDescriptor">
+	<bean id="billingAddressLineTokenizer" parent="parentLineTokenizer">
 		<property name="names" value="LINE_ID,ADDRESSEE,ADDR_LINE1,ADDR_LINE2,CITY,ZIP_CODE,STATE,COUNTRY" />
 	</bean>
 
-	<bean id="shippingAddressLineDescriptor" parent="parentLineDescriptor">
+	<bean id="shippingAddressLineTokenizer" parent="parentLineTokenizer">
 		<property name="names" value="LINE_ID,ADDRESSEE,ADDR_LINE1,ADDR_LINE2,CITY,ZIP_CODE,STATE,COUNTRY" />
 	</bean>
 
-	<bean id="billingLineDescriptor" parent="parentLineDescriptor">
+	<bean id="billingLineTokenizer" parent="parentLineTokenizer">
 		<property name="names" value="LINE_ID,PAYMENT_TYPE_ID,PAYMENT_DESC" />
 	</bean>
 
-	<bean id="shippingLineDescriptor" parent="parentLineDescriptor">
+	<bean id="shippingLineTokenizer" parent="parentLineTokenizer">
 		<property name="names" value="LINE_ID,SHIPPER_ID,SHIPPING_TYPE_ID,ADDITIONAL_SHIPPING_INFO" />
 	</bean>
 
-	<bean id="itemLineDescriptor" parent="parentLineDescriptor">
+	<bean id="itemLineTokenizer" parent="parentLineTokenizer">
 		<property name="names"
 			value="LINE_ID,ITEM_ID,PRICE,DISCOUNT_PERC,DISCOUNT_AMOUNT,SHIPPING_PRICE,HANDLING_PRICE,QUANTITY,TOTAL_PRICE" />
 	</bean>

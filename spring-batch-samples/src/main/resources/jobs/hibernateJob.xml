@@ -18,7 +18,7 @@
 			<bean id="step1" parent="skipLimitStep">
 				<property name="skipLimit" value="5" />
 				<property name="itemReader" ref="hibernateItemReader" />
-				<property name="itemWriter" ref="hibernateOutputSource" />
+				<property name="itemWriter" ref="hibernateItemWriter" />
 				<property name="commitInterval" value="3" />
 			</bean>
 		</property>
@@ -26,7 +26,7 @@
 
 
 	<!-- This is a framework class that needs a delegate and also needs to be registered as a RepeatInterceptor in the chunk -->
-	<bean id="hibernateOutputSource"
+	<bean id="hibernateItemWriter"
 		class="org.springframework.batch.item.database.HibernateAwareItemWriter">
 		<property name="sessionFactory" ref="sessionFactory" />
 		<property name="delegate" ref="hibernateCreditWriter" />

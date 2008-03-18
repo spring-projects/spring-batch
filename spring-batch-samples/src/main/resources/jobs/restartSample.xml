@@ -12,12 +12,11 @@
 	<bean id="restartSampleJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
-				<property name="streams" ref="fileItemReader"/>
+				<property name="streams" ref="fileItemReader" />
 				<property name="itemReader">
 					<bean
 						class="org.springframework.batch.item.validator.ValidatingItemReader">
-						<property name="itemReader"
-							ref="itemReader" />
+						<property name="itemReader" ref="itemReader" />
 						<property name="validator" ref="fixedValidator" />
 					</bean>
 				</property>
@@ -33,15 +32,16 @@
 	</bean>
 
 	<!-- INFRASTRUCTURE SETUP -->
-	
-	<bean id="itemReader" 
+
+	<bean id="itemReader"
 		class="org.springframework.batch.sample.item.reader.ExceptionThrowingItemReaderProxy">
 		<property name="itemReader" ref="fileItemReader" />
 	</bean>
 
 	<bean id="fileItemReader"
 		class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource" ref="fileLocator" />
+		<property name="resource"
+			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 		<property name="lineTokenizer" ref="fixedFileDescriptor" />
 		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
@@ -77,12 +77,6 @@
 			</bean>
 
 		</property>
-	</bean>
-
-	<bean id="fileLocator"
-		class="org.springframework.core.io.ClassPathResource">
-		<constructor-arg type="java.lang.String"
-			value="data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 	</bean>
 
 	<bean id="fieldSetMapper"

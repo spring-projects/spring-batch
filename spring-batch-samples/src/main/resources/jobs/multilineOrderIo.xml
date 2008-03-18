@@ -8,26 +8,26 @@
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-	<bean id="fileInputTemplate"
+	<bean id="fileItemReader"
 		class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" ref="fileInputLocator" />
-		<property name="lineTokenizer" ref="orderFileDescriptor" />
+		<property name="lineTokenizer" ref="orderFileTokenizer" />
 		<property name="fieldSetMapper">
 			<bean
 				class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
 		</property>
 	</bean>
 
-	<bean id="flatFileTransformerOutput"
+	<bean id="flatFileTransformerWriter"
 		class="org.springframework.batch.item.transform.ItemTransformerItemWriter">
-		<property name="delegate" ref="flatFileOutput"/>
+		<property name="delegate" ref="flatFileWriter"/>
 		<property name="itemTransformer">
 			<bean
 				class="org.springframework.batch.item.file.transform.RecursiveCollectionItemTransformer" />
 		</property>
 	</bean>
 
-	<bean id="flatFileOutput"
+	<bean id="flatFileWriter"
 		class="org.springframework.batch.item.file.FlatFileItemWriter">
 		<property name="resource" ref="fileOutputLocator" />
 		<property name="fieldSetCreator">
