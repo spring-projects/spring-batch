@@ -34,19 +34,6 @@
 		</property>
 	</bean>
 	
-	<bean id="jobInterruptAdvice" class="org.springframework.batch.sample.advice.DefaultJobInterruptionAdvice" />
 	
-	<aop:config>
-		<aop:aspect id="interruptChecker" ref="jobInterruptAdvice" >
-			
-			<aop:after-returning method="setJobExecution"
-				pointcut="execution(* org.springframework.batch.core.repository.JobRepository.createJobExecution(..))" 
-				returning="jobExecution" />
-			
-			<aop:before method="checkInterrupt" 
-				pointcut="execution(* org.springframework.batch.repeat.RepeatOperations.iterate(..))"/>
-				
-		</aop:aspect>
-	 </aop:config>
 
 </beans>
