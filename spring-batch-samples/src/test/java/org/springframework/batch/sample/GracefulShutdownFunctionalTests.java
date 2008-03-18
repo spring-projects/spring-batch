@@ -50,6 +50,7 @@ public class GracefulShutdownFunctionalTests extends AbstractBatchLauncherTests 
 		}
 		
 		assertFalse("Timed out waiting for job to end.", jobExecution.isRunning());
+		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 
 	}
 	

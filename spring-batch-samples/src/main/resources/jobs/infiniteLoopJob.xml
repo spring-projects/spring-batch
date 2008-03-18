@@ -25,7 +25,9 @@
 			</bean-->
 			<bean id="infiniteStep" parent="simpleStep">
 				<property name="itemReader">
-					<bean id="reader" class="org.springframework.batch.sample.item.reader.InfiniteItemReader" />
+					<bean id="reader" class="org.springframework.batch.sample.item.reader.GeneratingItemReader">
+						<property name="limit" value="1000000" />
+					</bean>
 				</property>
 				<property name="itemWriter">
 					<bean id="writer" class="org.springframework.batch.sample.item.writer.DummyItemWriter" />
