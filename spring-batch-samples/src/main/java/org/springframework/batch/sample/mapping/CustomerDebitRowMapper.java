@@ -23,7 +23,7 @@ import org.springframework.batch.sample.domain.CustomerDebit;
 import org.springframework.jdbc.core.RowMapper;
 
 
-public class CustomerUpdateMapper implements RowMapper {
+public class CustomerDebitRowMapper implements RowMapper {
 	
 	public static final String CUSTOMER_COLUMN = "customer";
 	public static final String PRICE_COLUMN = "price";

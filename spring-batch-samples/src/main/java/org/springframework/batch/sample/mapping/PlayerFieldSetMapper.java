@@ -4,7 +4,7 @@ import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.Player;
 
-public class PlayerMapper implements FieldSetMapper {
+public class PlayerFieldSetMapper implements FieldSetMapper {
 
 	public Object mapLine(FieldSet fs) {
 		

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.3.v200802061800]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.2.v200712142013]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
-	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
 		<config>src/main/resources/jobs/fixedLengthImportJob.xml</config>
 		<config>src/main/resources/jobs/multilineJob.xml</config>
@@ -29,7 +28,6 @@
 		<config>src/main/resources/jobs/delegatingJob.xml</config>
 		<config>src/main/resources/jobs/parallelJob.xml</config>
 		<config>src/main/resources/jobs/retrySample.xml</config>
-		<config>src/main/resources/jobs/simpleJob.xml</config>
 		<config>src/main/resources/simple-job-launcher-context.xml</config>
 		<config>src/main/resources/jobs/batchUpdateJob.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/item/writer/staging-test-context.xml</config>
@@ -205,7 +203,6 @@
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/jobs/simpleJob.xml</config>
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>

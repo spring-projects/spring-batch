@@ -71,7 +71,7 @@
 		</property>
 		<property name="fieldSetMapper">
 			<bean
-				class="org.springframework.batch.sample.mapping.PlayerMapper" />
+				class="org.springframework.batch.sample.mapping.PlayerFieldSetMapper" />
 		</property>
 	</bean>
 
