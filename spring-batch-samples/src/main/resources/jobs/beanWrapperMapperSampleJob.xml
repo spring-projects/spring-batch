@@ -13,12 +13,12 @@
 		<property name="steps">
 			<list>
 				<bean id="step1" parent="simpleStep">
-					<property name="streams" ref="fileInputTemplate" />
+					<property name="streams" ref="tradeFileItemReader" />
 					<property name="itemReader">
 						<bean
 							class="org.springframework.batch.item.validator.ValidatingItemReader">
 							<property name="itemReader"
-								ref="fileInputTemplate" />
+								ref="tradeFileItemReader" />
 							<property name="validator"
 								ref="fixedValidator" />
 						</bean>
@@ -32,7 +32,7 @@
 				</bean>
 				<bean id="step2" parent="simpleStep">
 					<property name="itemReader"
-						ref="fileInputTemplate2" />
+						ref="personFileItemReader" />
 					<property name="itemWriter">
 						<bean
 							class="org.springframework.batch.sample.item.writer.PersonWriter" />
@@ -45,28 +45,28 @@
 
 	<!-- INFRASTRUCTURE SETUP -->
 
-	<bean id="fileInputTemplate"
+	<bean id="tradeFileItemReader"
 		class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" value="classpath:data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportTradeDataStep.txt" />
-		<property name="lineTokenizer" ref="fixedFileDescriptor" />
-		<property name="fieldSetMapper" ref="fieldSetMapper" />
+		<property name="lineTokenizer" ref="tradeTokenizer" />
+		<property name="fieldSetMapper" ref="tradeFieldSetMapper" />
 	</bean>
 
-	<bean id="fileInputTemplate2"
+	<bean id="personFileItemReader"
 		class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" value="classpath:data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportPersonDataStep.txt" />
-		<property name="lineTokenizer" ref="fixedFileDescriptor2" />
-		<property name="fieldSetMapper" ref="fieldSetMapper2" />
+		<property name="lineTokenizer" ref="personTokenizer" />
+		<property name="fieldSetMapper" ref="personFieldSetMapper" />
 		<!--		<property name="validator" ref="fixedValidator" />-->
 	</bean>
 
-	<bean id="fixedFileDescriptor"
+	<bean id="tradeTokenizer"
 		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
 		<property name="names" value="ISIN,Quantity,price, CUSTOMER" />
 		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
 	</bean>
 
-	<bean id="fixedFileDescriptor2"
+	<bean id="personTokenizer"
 		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
 		<property name="names"
 			value="Title, FirstName, LastName, Age, Address.AddrLine1, children[0].name, children[1].name" />
@@ -100,12 +100,12 @@
 		</property>
 	</bean>
 
-	<bean id="fieldSetMapper"
+	<bean id="tradeFieldSetMapper"
 		class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
 		<property name="prototypeBeanName" value="trade" />
 	</bean>
 
-	<bean id="fieldSetMapper2"
+	<bean id="personFieldSetMapper"
 		class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
 		<property name="prototypeBeanName" value="person" />
 	</bean>

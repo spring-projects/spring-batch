@@ -22,7 +22,7 @@
 					<bean
 						class="org.springframework.batch.item.adapter.ItemReaderAdapter">
 						<property name="targetObject"
-							ref="delegatingObject" />
+							ref="delegateObject" />
 						<property name="targetMethod" value="getData" />
 					</bean>
 				</property>
@@ -30,7 +30,7 @@
 					<bean
 						class="org.springframework.batch.item.adapter.PropertyExtractingDelegatingItemWriter">
 						<property name="targetObject"
-							ref="delegatingObject" />
+							ref="delegateObject" />
 						<property name="targetMethod"
 							value="processPerson" />
 						<property
@@ -46,7 +46,7 @@
 		</property>
 	</bean>
 
-	<bean id="delegatingObject"
+	<bean id="delegateObject"
 		class="org.springframework.batch.sample.domain.PersonService" />
 
 </beans>

@@ -9,16 +9,16 @@
 
 	<import resource="data-source-context.xml" />
 
-	<bean id="jobConfigurationRegistryBeanPostProcessor"
+	<bean id="jobRegistryBeanPostProcessor"
 		class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
-		<property name="jobRegistry" ref="jobConfigurationRegistry" />
+		<property name="jobRegistry" ref="jobRegistry" />
 	</bean>
 
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
-	<bean id="jobConfigurationRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 
 	<aop:config>
 		<aop:advisor pointcut="execution(* org.springframework.batch.execution..*Repository+.*(..))"

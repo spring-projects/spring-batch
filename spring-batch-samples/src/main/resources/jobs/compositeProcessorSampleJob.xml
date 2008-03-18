@@ -12,12 +12,12 @@
 	<bean id="compositeProcessorJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
-				<property name="streams" ref="fileInputTemplate" />
+				<property name="streams" ref="fileItemReader" />
 				<property name="itemReader">
 					<bean
 						class="org.springframework.batch.item.validator.ValidatingItemReader">
 						<property name="itemReader"
-							ref="fileInputTemplate" />
+							ref="fileItemReader" />
 						<property name="validator" ref="fixedValidator" />
 					</bean>
 				</property>
@@ -30,7 +30,7 @@
 									class="org.springframework.batch.sample.item.writer.TradeWriter">
 									<property name="dao" ref="tradeDao" />
 								</bean>
-								<ref bean="flatFileOutputSource" />
+								<ref bean="fileItemWriter" />
 							</list>
 						</property>
 					</bean>
@@ -41,14 +41,15 @@
 
 	<!-- INFRASTRUCTURE SETUP -->
 
-	<bean id="fileInputTemplate"
+	<bean id="fileItemReader"
 		class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource" ref="fileLocator" />
-		<property name="lineTokenizer" ref="fixedFileDescriptor" />
+		<property name="resource"
+			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
+		<property name="lineTokenizer" ref="fixedFileTokenizer" />
 		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 
-	<bean id="fixedFileDescriptor"
+	<bean id="fixedFileTokenizer"
 		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
 		<property name="names" value="ISIN, Quantity, Price, Customer" />
 		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
@@ -82,24 +83,12 @@
 	</bean>
 
 	<bean class="org.springframework.batch.item.file.FlatFileItemWriter"
-		id="flatFileOutputSource">
-		<property name="resource" ref="customerFileLocator" />
+		id="fileItemWriter">
+		<property name="resource" value="file:target/test-outputs/20070122.testStream.ParallelCustomerReportStep.TEMP.txt" />
 		<property name="fieldSetCreator">
 			<bean
 				class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
 		</property>
-	</bean>
-
-	<bean id="customerFileLocator"
-		class="org.springframework.core.io.FileSystemResource">
-		<constructor-arg type="java.lang.String"
-			value="target/test-outputs/20070122.testStream.ParallelCustomerReportStep.TEMP.txt" />
-	</bean>
-
-	<bean id="fileLocator"
-		class="org.springframework.core.io.ClassPathResource">
-		<constructor-arg type="java.lang.String"
-			value="data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 	</bean>
 
 	<bean id="fieldSetMapper"
