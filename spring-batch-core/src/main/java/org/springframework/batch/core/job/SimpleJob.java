@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
@@ -198,7 +199,8 @@ public class SimpleJob extends AbstractJob {
 		}
 		else {
 			// start max has been exceeded, throw an exception.
-			throw new StartLimitExceededException(step);
+			throw new StartLimitExceededException("Maximum start limit exceeded for step: " + step.getName()
+					+ "StartMax: " + step.getStartLimit());
 		}
 	}
 
