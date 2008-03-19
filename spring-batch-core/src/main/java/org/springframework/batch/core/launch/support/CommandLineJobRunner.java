@@ -29,7 +29,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.StringUtils;
 
@@ -178,8 +178,10 @@ public class CommandLineJobRunner {
 	 */
 	int start(String jobPath, String jobName, String[] parameters) {
 
+		ConfigurableApplicationContext context = null;
+
 		try {
-			ApplicationContext context = new ClassPathXmlApplicationContext(jobPath);
+			context = new ClassPathXmlApplicationContext(jobPath);
 			context.getAutowireCapableBeanFactory().autowireBeanProperties(
 					this, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 
@@ -200,6 +202,10 @@ public class CommandLineJobRunner {
 		} catch (Throwable e) {
 			logger.error("Job Terminated in error:", e);
 			return exitCodeMapper.intValue(ExitStatus.FAILED.getExitCode());
+		} finally {
+			if (context!=null) {
+				context.close();
+			}
 		}
 	}
 

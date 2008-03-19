@@ -85,6 +85,12 @@ public class CommandLineJobRunnerTests extends TestCase {
 		assertEquals(new JobParameters(), StubJobLauncher.jobParameters);
 	}
 
+	public void testDestroyCallback() throws Throwable {
+		String[] args = new String[] { jobPath, jobName };
+		CommandLineJobRunner.main(args);
+		assertTrue(StubJobLauncher.destroyed);
+	}
+
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
@@ -112,6 +118,8 @@ public class CommandLineJobRunnerTests extends TestCase {
 
 		public static JobParameters jobParameters;
 
+		private static boolean destroyed = false;
+
 		public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException {
 
 			StubJobLauncher.jobParameters = jobParameters;
@@ -122,11 +130,16 @@ public class CommandLineJobRunnerTests extends TestCase {
 
 			return jobExecution;
 		}
+		
+		public void destroy() {
+			destroyed  = true;
+		}
 
 		public static void tearDown() {
 			jobExecution = null;
 			throwExecutionRunningException = false;
 			jobParameters = null;
+			destroyed = false;
 		}
 	}
 
