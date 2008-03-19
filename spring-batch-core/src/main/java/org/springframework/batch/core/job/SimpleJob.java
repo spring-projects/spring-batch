@@ -75,6 +75,7 @@ public class SimpleJob extends AbstractJob {
 	 * {@link Step}.
 	 * 
 	 * @see org.springframework.batch.core.Job#execute(org.springframework.batch.core.JobExecution)
+	 * @throws StartLimitExceededException if start limit of one of the steps was exceeded
 	 */
 	public void execute(JobExecution execution) throws JobExecutionException {
 
