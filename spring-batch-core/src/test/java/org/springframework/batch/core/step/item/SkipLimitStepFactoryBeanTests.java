@@ -24,6 +24,7 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.Skippable;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 /**
@@ -33,7 +34,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 	SkipLimitStepFactoryBean tested = new SkipLimitStepFactoryBean();
 
-	Class[] skippableExceptions = new Class[] { SkippableException.class, SkippableRuntimeException.class };
+	// TODO checked exceptions are wrapped as RepeatExceptions by the chunkOperations#exceptionHandler
+	Class[] skippableExceptions = new Class[] { RepeatException.class, SkippableException.class, SkippableRuntimeException.class };
 
 	final int SKIP_LIMIT = 2;
 

@@ -59,7 +59,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 			SimpleLimitExceptionHandler exceptionHandler = new SimpleLimitExceptionHandler();
 			exceptionHandler.setLimit(skipLimit);
 			exceptionHandler.setExceptionClasses(skippableExceptionClasses);
-			setExceptionHandler(new SimpleLimitExceptionHandler(skipLimit));
+			setExceptionHandler(exceptionHandler);
 			getStepOperations().setExceptionHandler(getExceptionHandler());
 		}
 		else {
