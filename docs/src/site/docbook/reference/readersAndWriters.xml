@@ -1730,6 +1730,193 @@ itemReader.close(executionContext);</programlisting>
   </section>
 
   <section>
+    <title>Item Transforming</title>
+
+    <para>The <classname>ItemReader</classname> and
+    <classname>ItemWriter</classname> interfaces have been discussed in detail
+    in this chapter, but what if you want to insert business logic before
+    writing? One option for both reading and writing is to use the composite
+    pattern. That is, create an <classname>ItemWriter</classname> that
+    contains another <classname>ItemWriter</classname>, or an
+    <classname>ItemReader</classname> that contains another
+    <classname>ItemReader</classname>. For example:</para>
+
+    <programlisting>  public class CompositeItemWriter implements ItemWriter {
+
+    ItemWriter itemWriter;
+
+    public CompositeItemWriter(ItemWriter itemWriter) {
+      this.itemWriter = itemWriter;
+    }
+
+    public void write(Object item) throws Exception {
+
+      //Add business logic here
+
+      itemWriter.write(item);
+    }
+
+    public void clear() throws ClearFailedException {
+      itemWriter.clear();
+    }
+
+    public void flush() throws FlushFailedException {
+      itemWriter.flush();
+    }
+}</programlisting>
+
+    <para>The class above contains another <classname>ItemWriter</classname>
+    that it delgates to after having provided some business logic. It should
+    be noted that the <methodname>clear</methodname> and
+    <methodname>flush</methodname> methods must be propogated as well so that
+    the delegate <classname>ItemWriter</classname> is notified. This pattern
+    could easily be used for an <classname>ItemReader</classname> as well,
+    perhaps to obtain more reference data based upon the input that was
+    provided by the main <classname>ItemReader</classname>. This pattern is
+    very useful if you need to control the call to
+    <classname>write</classname> yourself. However, if you only want to
+    'transform' the item passed in for writing before it is actual written,
+    there isn't much need to call <methodname>write</methodname> yourself, you
+    just want to modify the item. For this scenario, Spring Batch provides the
+    <classname>ItemTransformer</classname> interface:</para>
+
+    <programlisting>  public interface ItemTransformer {
+
+    Object transform(Object item) throws Exception;
+  }</programlisting>
+
+    <para>An ItemTransformer interface is very simple, given one object,
+    transorm it and return another. The object provided may or may not be of
+    the same type. The point is that business logic may be applied within
+    transform, and is completely up to the developer to create. An
+    <classname>ItemTransformer</classname> is used as part of the
+    <classname>ItemTransformerItemWriter</classname>, which accepts an
+    <classname>ItemWriter</classname> and an
+    <classname>ItemTransformer</classname>, passing the item first to the
+    transformer, before writing it. For example, assuming an
+    <classname>ItemReader</classname> provides a class of type Foo, and it
+    needs to be converted to type Bar before being written out. An
+    <classname>ItemTransformer</classname> can be written that perform the
+    conversion:</para>
+
+    <programlisting>  public class Foo {}
+
+  public class Bar {
+    public Bar(Foo foo) {}
+  }
+
+  public class FooTransformer implements ItemTransformer{
+
+    //Preform simple transformation, convert a Foo to a Barr
+    public Object transform(Object item) throws Exception {
+      assertTrue(item instanceof Foo);
+      Foo foo = (Foo)item;
+      return new Bar(foo);
+    }
+  }
+
+  public class BarWriter implements ItemWriter{
+
+    public void write(Object item) throws Exception {
+      assertTrue(item instanceof Bar);
+    }
+
+    //rest of class ommitted for clarity
+  }</programlisting>
+
+    <para>In the very simple example above, there is a class
+    <classname>Foo</classname>, a class <classname>Bar</classname>, and a
+    class <classname>FooTransformer</classname> that adheres to the
+    <classname>ItemTransformer</classname> interface. The transformation is
+    simple, but any type of transformation could be done here. The
+    <classname>BarWriter</classname> will be used to write out 'Bars',
+    throwing an exception if any other type is provided. Similarly, the
+    FooTransformer will throw an exception if anything but a
+    <classname>Foo</classname> is provided. An
+    <classname>ItemTransformerItemWriter</classname> can then be used like a
+    normal ItemWriter. It will be passed a <classname>Foo</classname> for
+    writing, which will be passed to the transformer, and a
+    <classname>Bar</classname> returned. The resulting
+    <classname>Bar</classname> will then be written:</para>
+
+    <programlisting>  ItemTransformerItemWriter itemTransformerItemWriter = new ItemTransformerItemWriter();
+  itemTransformerItemWriter.setItemTransformer(new FooTransformer());
+  itemTransformerItemWriter.setDelegate(new BarWriter());
+  itemTransformerItemWriter.write(new Foo());</programlisting>
+
+    <section>
+      <title>Chaining ItemTransformers</title>
+
+      <para>Performing a single transformation is useful in many scenarios,
+      but what if you want to 'chain' together multiple ItemTransformers? This
+      can be accomplished using a
+      <classname>CompositeItemTransformer</classname>. To update the previous,
+      single transformation, example, <classname>Foo</classname> will be
+      Transformed to <classname>Bar</classname>, which will be transformed to
+      <classname>Foobar</classname> and written out:</para>
+
+      <programlisting>  public class Foo {}
+
+  public class Bar {
+    public Bar(Foo foo) {}
+  }
+
+  public class Foobar{
+    public Foobar(Bar bar){}
+  }
+
+  public class FooTransformer implements ItemTransformer{
+
+    //Preform simple transformation, convert a Foo to a Barr
+    public Object transform(Object item) throws Exception {
+      assertTrue(item instanceof Foo);
+      Foo foo = (Foo)item;
+      return new Bar(foo);
+    }
+  }
+
+  public class BarTransformer implements ItemTransformer{
+
+    public Object transform(Object item) throws Exception {
+      assertTrue(item instanceof Bar);
+      return new Foobar((Bar)item);
+    }
+  }
+
+  public class FoobarWriter implements ItemWriter{
+
+    public void write(Object item) throws Exception {
+      assertTrue(item instanceof Foobar);
+    }
+ 
+    //rest of class ommitted for clarity
+  }</programlisting>
+
+      <para>A <classname>FooTransformer</classname> and
+      <classname>BarTransformer</classname> can be 'chained' together to give
+      the resultant <classname>Foobar</classname>:</para>
+
+      <programlisting>  CompositeItemTransformer compositeTransformer = new CompositeItemTransformer();
+  List itemTransformers = new ArrayList();
+  itemTransformers.add(new FooTransformer());
+  itemTransformers.add(new BarTransformer());
+  compositeTransformer.setItemTransformers(itemTransformers);</programlisting>
+
+      <para>The compositeTransformer could be said to accept a
+      <classname>Foo</classname> and return a <classname>Foobar</classname>.
+      Clients of the composite transformer don't need to know that there are
+      actually two separate transformations taking place. By updating the
+      example from above to use the composite transformer, the correct class
+      can be passed to <classname>FoobarWriter</classname>:</para>
+
+      <programlisting>  ItemTransformerItemWriter itemTransformerItemWriter = new ItemTransformerItemWriter();
+  <emphasis role="bold">itemTransformerItemWriter.setItemTransformer(compositeTransformer);</emphasis>
+  itemTransformerItemWriter.setDelegate(new FoobarWriter());
+  itemTransformerItemWriter.write(new Foo());</programlisting>
+    </section>
+  </section>
+
+  <section>
     <title id="infrastructure.5">Validating Input</title>
 
     <para>During the course of this chapter, multiple approaches to parsing
