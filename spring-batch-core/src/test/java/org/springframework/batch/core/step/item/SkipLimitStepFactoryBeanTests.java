@@ -34,8 +34,10 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 	SkipLimitStepFactoryBean tested = new SkipLimitStepFactoryBean();
 
-	// TODO checked exceptions are wrapped as RepeatExceptions by the chunkOperations#exceptionHandler
-	Class[] skippableExceptions = new Class[] { RepeatException.class, SkippableException.class, SkippableRuntimeException.class };
+	// TODO checked exceptions are wrapped as RepeatExceptions by the
+	// chunkOperations#exceptionHandler
+	Class[] skippableExceptions = new Class[] { RepeatException.class, SkippableException.class,
+			SkippableRuntimeException.class };
 
 	final int SKIP_LIMIT = 2;
 
@@ -61,8 +63,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	}
 
 	/**
-	 * 
-	 * @throws Exception
+	 * Check items causing errors are skipped as expected.
 	 */
 	public void testSkip() throws Exception {
 		ItemOrientedStep step = (ItemOrientedStep) tested.getObject();
@@ -71,7 +72,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		step.execute(stepExecution);
 
 		assertEquals(2, stepExecution.getSkipCount());
-		
+
 		assertTrue(reader.skipped.contains("2"));
 		assertTrue(reader.skipped.contains("4"));
 		// writer did not skip "2" as it never made it to writer, only "4" did
@@ -84,7 +85,31 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 					.contains(expectedOutput[i]));
 		}
 		assertTrue(writer.written.size() == expectedOutput.length);
-		
+
+	}
+
+	/**
+	 * Fatal exception should cause immediate termination regardless of other
+	 * skip settings (note the fatal exception is also classified as skippable).
+	 */
+	public void testFatalException() throws Exception {
+		tested.setFatalExceptionClasses(new Class[] { FatalRuntimeException.class });
+		tested.setItemWriter(new SkipWriterStub() {
+			public void write(Object item) {
+				throw new FatalRuntimeException("Ouch!");
+			}
+		});
+
+		ItemOrientedStep step = (ItemOrientedStep) tested.getObject();
+		StepExecution stepExecution = new StepExecution(step, jobExecution);
+
+		try {
+			step.execute(stepExecution);
+			fail();
+		}
+		catch (FatalRuntimeException expected) {
+			assertTrue(expected.getMessage().equals("Ouch!"));
+		}
 	}
 
 	/**
@@ -171,6 +196,12 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 	private static class SkippableRuntimeException extends RuntimeException {
 		public SkippableRuntimeException(String message) {
+			super(message);
+		}
+	}
+
+	private static class FatalRuntimeException extends SkippableRuntimeException {
+		public FatalRuntimeException(String message) {
 			super(message);
 		}
 	}
