@@ -198,7 +198,62 @@
         serves to show the two main requirements of the
         <classname>CommandLineJobRunner</classname>:
         <classname>Job</classname> and
-        <classname>JobLauncher.</classname></para>
+        <classname>JobLauncher</classname></para>
+      </section>
+
+      <section>
+        <title>ExitCodes</title>
+
+        <para>When launching a batch job from the command-line, it is often
+        from an enterprise scheduler. Most schedulers are fairly dumb, and
+        work only at the process level. Meaning, they only know about some
+        operating system process such as a shell script that they're invoking.
+        In this scenario, the only way to communicate back to the scheduler
+        about the success or failure of a job is through return codes. A
+        number is returned to a scheduler that is told how to interpret the
+        result. In the simple case: 0 is success and 1 is failure. However,
+        there may be scenarios such as: If job A returns 4 kick off job B, if
+        it returns 5 kick off job C. This type of behavior is configured at
+        the scheduler level, but it is important that a processing framework
+        such as Spring Batch provide a way to return a numeric representation
+        of of the 'Exit Code' for a particular batch job. In Spring Batch this
+        is encapsulated within an <classname>ExitStatus</classname>, which is
+        covered in more detail in Chapter 5. For the purposes of discussing
+        exit codes, the only important thing to know is that an
+        <classname>ExitStatus</classname> has an exit code property that is
+        set by the framework (or the developer) and is returned as part of the
+        <classname>JobExecution</classname> returned from the
+        <classname>JobLauncher</classname>. The
+        <classname>CommandLineJobRunner</classname> converts this string value
+        to a number using the <classname>ExitCodeMapper</classname>
+        interface:</para>
+
+        <programlisting>  public interface ExitCodeMapper {
+
+    public int intValue(String exitCode);
+}</programlisting>
+
+        <para>The essential contract of an
+        <classname>ExitCodeMapper</classname> is that, given a string exit
+        code, a number representation will be returned. The default
+        implementation used by the job runner is the SimpleJvmExitCodeMapper
+        that returns 0 for completion, 1 for generic errors, and 2 for any job
+        runner errors such as not being able to find a
+        <classname>Job</classname> in the provided context. If anything more
+        complex than the 3 values above is needed, then a custom
+        implementation of the <classname>ExitCodeMapper</classname> interface
+        must be supplied. Because the
+        <classname>CommandLineJobRunner</classname> is the class that creates
+        an <classname>ApplicationContext</classname>, and thus cannot be
+        'wired together', any values that need to be overwritten must be
+        autowired. This means that if an implementation of
+        <classname>ExitCodeMapper</classname> is found within the BeanFactory,
+        it will be injected into the runner after the context is created. All
+        that needs to be done to provide your own
+        <classname>ExitCodeMapper</classname> is to declare the implementation
+        as a root level bean, and ensure it's part of the
+        <classname>ApplicationContext</classname> that is loaded by the
+        runner.</para>
       </section>
     </section>
   </section>
