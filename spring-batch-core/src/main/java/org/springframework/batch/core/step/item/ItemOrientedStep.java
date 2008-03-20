@@ -267,6 +267,7 @@ public class ItemOrientedStep extends AbstractStep {
 			// reference to the ExecutionContext as the step execution.
 			listener.beforeStep(stepExecution);
 			stream.open(stepExecution.getExecutionContext());
+			itemHandler.mark();
 
 			status = stepOperations.iterate(new RepeatCallback() {
 
@@ -287,7 +288,6 @@ public class ItemOrientedStep extends AbstractStep {
 
 					try {
 
-						itemHandler.mark();
 						result = processChunk(stepExecution, contribution);
 						contribution.incrementCommitCount();
 
