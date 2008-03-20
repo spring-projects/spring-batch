@@ -143,7 +143,8 @@
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center" fileref="src/site/resources/reference/images/job-heirarchy.png" />
+        <imagedata align="center"
+                   fileref="src/site/resources/reference/images/job-heirarchy.png" />
       </imageobject>
     </mediaobject>
 
@@ -210,8 +211,21 @@
       meaning the January 1st run processes data for January 1st, etc) That is
       to say, each <classname>JobInstance</classname> can have multiple
       executions. (<classname>JobExecution</classname> is discussed in more
-      detail below) and only one instance can be running at a given
-      time.</para>
+      detail below) and only one instance can be running at a given time. The
+      definition of a <classname>JobInstance</classname> has absolutely no
+      bearing on the data the will be loaded. It is entirely up to the
+      <classname>ItemReader</classname> implementation used to determine how
+      data will be loaded. For example, in the EndOfDay scenario, there may be
+      a column on the data that indicates the 'effective date' or 'schedule
+      date' to which the data belongs. So, the January 1st run would only load
+      data from the 1st, and the January 2nd run would only use data from the
+      2nd. Because this determination will likely be a business decision, it
+      is left up to the <classname>ItemReader</classname> to decide. What
+      using the same JobInstance will decide, however, is whether or not the
+      'state' (i.e. the ExecutionContext, which is discussed below) will be
+      used. Using a new instace will mean 'start from the beginning' and using
+      an existing instance will generally mean 'start from where you left
+      off'.</para>
     </section>
 
     <section>
@@ -393,9 +407,15 @@
       will be kicked off again for 01-01, starting where it left off and
       completing successfully at 9:30. Because it's now the next day, the
       01-02 job must be run as well, which is kicked off just afterwards at
-      9:31, and completes in it's normal one hour time at 10:30. There should
-      now be an extra entry in both the job instance and job parameters table,
-      and two extra entries in the job execution table:</para>
+      9:31, and completes in it's normal one hour time at 10:30. There is no
+      requirement that one be kicked off after another, unless there is
+      potential for the two jobs to attempt to access the same data, causing
+      issues with locking at the database level. It is entirely up to the
+      scheduler to determine when to run. Since they're separate JobInstances,
+      Spring Batch will make no attempt to stop them from being run
+      concurrently. There should now be an extra entry in both the job
+      instance and job parameters table, and two extra entries in the job
+      execution table:</para>
 
       <table>
         <title>BATCH_JOB_INSTANCE</title>
