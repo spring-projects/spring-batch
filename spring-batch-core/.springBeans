@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.3.v200802061800]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.2.v200712142013]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
-	<enableImports><![CDATA[true]]></enableImports>
 	<configs>
 		<config>src/test/resources/org/springframework/batch/core/configuration/support/test-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/launch/support/job.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/launch/support/test-environment.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/repository/dao/data-source-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/repository/dao/sql-dao-test.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

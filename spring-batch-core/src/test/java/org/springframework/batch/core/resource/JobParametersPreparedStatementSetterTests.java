@@ -42,7 +42,7 @@ public class JobParametersPreparedStatementSetterTests extends AbstractTransacti
 	JobParametersPreparedStatementSetter pss;
 	
 	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "data-source-context.xml") };
+		return new String[] { "data-source-context.xml" };
 	}
 	
 	protected void onSetUpInTransaction() throws Exception {

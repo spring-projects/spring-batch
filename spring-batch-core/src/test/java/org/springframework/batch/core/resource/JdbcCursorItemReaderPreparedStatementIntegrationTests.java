@@ -57,6 +57,6 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests extends
 	}
 	
 	protected String[] getConfigLocations() {
-		return new String[] { "org/springframework/batch/core/resource/data-source-context.xml" };
+		return new String[] { "data-source-context.xml" };
 	}
 }

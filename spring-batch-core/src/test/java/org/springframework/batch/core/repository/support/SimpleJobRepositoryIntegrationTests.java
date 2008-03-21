@@ -24,7 +24,7 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
 public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
 
 	protected String[] getConfigLocations() {
-		return new String[] { "classpath:org/springframework/batch/core/repository/dao/sql-dao-test.xml" };
+		return new String[] { "classpath:sql-dao-test.xml" };
 	}
 
 	private SimpleJobRepository jobRepository;
