@@ -17,6 +17,7 @@
 package org.springframework.batch.item.database;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -38,6 +39,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.SQLWarningException;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
@@ -108,7 +110,9 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 
 	private Connection con;
 
-	private Statement stmt;
+    private PreparedStatement preparedStatement;
+    
+    private PreparedStatementSetter preparedStatementSetter;
 
 	protected ResultSet rs;
 
@@ -252,7 +256,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	public void close(ExecutionContext executionContext) {
 		initialized = false;
 		JdbcUtils.closeResultSet(this.rs);
-		JdbcUtils.closeStatement(this.stmt);
+		JdbcUtils.closeStatement(this.preparedStatement);
 		JdbcUtils.closeConnection(this.con);
 		this.currentProcessedRow = 0;
 		skippedRows.clear();
@@ -282,11 +286,14 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 
 		try {
 			this.con = dataSource.getConnection();
-			this.stmt = this.con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY,
+			preparedStatement = this.con.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY,
 			        ResultSet.HOLD_CURSORS_OVER_COMMIT);
-			applyStatementSettings(this.stmt);
-			this.rs = this.stmt.executeQuery(sql);
-			handleWarnings(this.stmt.getWarnings());
+			applyStatementSettings(preparedStatement);
+			if(this.preparedStatementSetter != null){
+				preparedStatementSetter.setValues(preparedStatement);
+			}
+			this.rs = preparedStatement.executeQuery();
+			handleWarnings(preparedStatement.getWarnings());
 		} catch (SQLException se) {
 			close(null);
 			throw getExceptionTranslator().translate("Executing query", sql, se);
@@ -302,7 +309,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	 * @see #setMaxRows
 	 * @see #setQueryTimeout
 	 */
-	private void applyStatementSettings(Statement stmt) throws SQLException {
+	private void applyStatementSettings(PreparedStatement stmt) throws SQLException {
 		if (fetchSize != VALUE_NOT_SET) {
 			stmt.setFetchSize(fetchSize);
 			stmt.setFetchDirection(ResultSet.FETCH_FORWARD);
@@ -481,7 +488,24 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	public void setSql(String sql) {
 		this.sql = sql;
 	}
+	
+	/**
+	 * Set the PreparedStatementSetter to use if any parameter values that need to be set in the supplied
+	 * query.
+	 * 
+	 * @param preparedStatementSetter
+	 */
+	public void setPreparedStatementSetter(
+			PreparedStatementSetter preparedStatementSetter) {
+		this.preparedStatementSetter = preparedStatementSetter;
+	}
 
+	/**
+	 * Set whether this {@link ItemReader} should save it's state in the
+	 * {@link ExecutionContext} or not
+	 * 
+	 * @param saveState
+	 */
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}

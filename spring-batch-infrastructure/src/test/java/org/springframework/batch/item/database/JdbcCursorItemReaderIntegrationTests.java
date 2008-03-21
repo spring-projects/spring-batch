@@ -25,4 +25,5 @@ public class JdbcCursorItemReaderIntegrationTests extends AbstractDataSourceItem
 		return result;
 	}
 
+
 }
