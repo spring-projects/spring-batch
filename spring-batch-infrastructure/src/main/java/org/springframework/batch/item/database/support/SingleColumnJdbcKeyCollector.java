@@ -146,5 +146,13 @@ public class SingleColumnJdbcKeyCollector extends ExecutionContextUserSupport im
 	public void setSql(String sql) {
 		this.sql = sql;
 	}
-
+	
+	/**
+	 * Set the {@link JdbcTemplate} to be used.
+	 * 
+	 * @param jdbcTemplate
+	 */
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
 }
