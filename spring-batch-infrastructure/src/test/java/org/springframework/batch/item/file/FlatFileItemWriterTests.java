@@ -71,6 +71,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.setResource(new FileSystemResource(outputFile));
 		inputSource.setFieldSetCreator(new PassThroughFieldSetMapper());
 		inputSource.afterPropertiesSet();
+		inputSource.setSaveState(true);
 		executionContext = new ExecutionContext();
 	}
 
@@ -267,6 +268,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		inputSource.setResource(new FileSystemResource(outputFile));
 		inputSource.setFieldSetCreator(new PassThroughFieldSetMapper());
 		inputSource.afterPropertiesSet();
+		inputSource.setSaveState(true);
 		inputSource.open(executionContext);
 		inputSource.update(executionContext);
 		assertNotNull(executionContext);

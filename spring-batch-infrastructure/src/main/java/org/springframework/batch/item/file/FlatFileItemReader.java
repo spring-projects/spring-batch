@@ -94,6 +94,8 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	private LineTokenizer tokenizer = new DelimitedLineTokenizer();
 
 	private FieldSetMapper fieldSetMapper;
+	
+	private boolean saveState = false;
 
 	/**
 	 * Encapsulates the state of the input source. If it is null then we are uninitialized.
@@ -203,9 +205,12 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 		if (reader == null) {
 			throw new ItemStreamException("ItemStream not open or already closed.");
 		}
-		Assert.notNull(executionContext, "ExecutionContext must not be null");
-		executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());
-		executionContext.putLong(getKey(SKIPPED_STATISTICS_NAME), skippedLines.size());
+		
+		if(saveState){
+			Assert.notNull(executionContext, "ExecutionContext must not be null");
+			executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());
+			executionContext.putLong(getKey(SKIPPED_STATISTICS_NAME), skippedLines.size());
+		}
 	}
 
 	/**
@@ -356,6 +361,18 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource, "Input resource must not be null");
 		Assert.notNull(fieldSetMapper, "FieldSetMapper must not be null.");
+	}
+	
+	/**
+	 * Set the boolean indicating whether or not state should be saved
+	 * in the provided {@link ExecutionContext} during the {@link ItemStream}
+	 * call to update.  Setting this to false means that it will always start
+	 * at the beginning.
+	 * 
+	 * @param saveState
+	 */
+	public void setSaveState(boolean saveState) {
+		this.saveState = saveState;
 	}
 
 }

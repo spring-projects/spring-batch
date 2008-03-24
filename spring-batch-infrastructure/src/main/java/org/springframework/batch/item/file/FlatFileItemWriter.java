@@ -80,6 +80,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	private LineAggregator lineAggregator = new DelimitedLineAggregator();
 
 	private FieldSetCreator fieldSetCreator;
+	
+	private boolean saveState = false;
 
 	public FlatFileItemWriter() {
 		setName(ClassUtils.getShortName(FlatFileItemWriter.class));
@@ -191,16 +193,21 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		if (state == null) {
 			throw new ItemStreamException("ItemStream not open or already closed.");
 		}
+		
+
 		Assert.notNull(executionContext, "ExecutionContext must not be null");
-
-		try {
-			executionContext.putLong(getKey(RESTART_DATA_NAME), state.position());
-		} catch (IOException e) {
-			throw new ItemStreamException("ItemStream does not return current position properly", e);
+		
+		if(saveState){
+		
+			try {
+				executionContext.putLong(getKey(RESTART_DATA_NAME), state.position());
+			} catch (IOException e) {
+				throw new ItemStreamException("ItemStream does not return current position properly", e);
+			}
+	
+			executionContext.putLong(getKey(WRITTEN_STATISTICS_NAME), state.linesWritten);
+			executionContext.putLong(getKey(RESTART_COUNT_STATISTICS_NAME), state.restartCount);
 		}
-
-		executionContext.putLong(getKey(WRITTEN_STATISTICS_NAME), state.linesWritten);
-		executionContext.putLong(getKey(RESTART_COUNT_STATISTICS_NAME), state.restartCount);
 	}
 
 	// Returns object representing state.
@@ -466,6 +473,18 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 
 	public void flush() throws FlushFailedException {
 		getOutputState().mark();
+	}
+	
+	/**
+	 * Set the boolean indicating whether or not state should be saved
+	 * in the provided {@link ExecutionContext} during the {@link ItemStream}
+	 * call to update.  Setting this to false means that it will always start
+	 * at the beginning.
+	 * 
+	 * @param saveState
+	 */
+	public void setSaveState(boolean saveState) {
+		this.saveState = saveState;
 	}
 
 }

@@ -65,6 +65,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		reader.setResource(getInputResource(TEST_STRING));
 		reader.setLineTokenizer(tokenizer);
 		reader.setFieldSetMapper(fieldSetMapper);
+		reader.setSaveState(true);
 		// context argument is necessary only for the FileLocator, which
 		// is mocked
 		executionContext = new ExecutionContext();
