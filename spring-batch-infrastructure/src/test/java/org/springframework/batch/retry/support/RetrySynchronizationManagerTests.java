@@ -35,7 +35,7 @@ public class RetrySynchronizationManagerTests extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		RetrySynchronizationManager.clearAll();
+		RetrySynchronizationManagerTests.clearAll();
 		RetryContext status = RetrySynchronizationManager.getContext();
 		assertNull(status);
 	}
@@ -79,5 +79,21 @@ public class RetrySynchronizationManagerTests extends TestCase {
 		RetryContext parent = new RetryContextSupport(null);
 		RetryContext child = new RetryContextSupport(parent);
 		assertSame(parent, child.getParent());
+	}
+
+	/**
+	 * Clear all contexts starting with the current one and continuing until
+	 * {@link RetrySynchronizationManager#clear()} returns null.
+	 * 
+	 * @return
+	 */
+	public static RetryContext clearAll() {
+		RetryContext result = null;
+		RetryContext context = RetrySynchronizationManager.clear();
+		while (context != null) {
+			result = context;
+			context = RetrySynchronizationManager.clear();
+		}
+		return result;
 	}
 }

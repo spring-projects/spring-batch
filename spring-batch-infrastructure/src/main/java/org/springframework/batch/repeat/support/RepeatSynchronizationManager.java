@@ -21,12 +21,14 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 
 /**
- * Global variable support for batch clients. Normally it is not necessary for
- * batch clients to be aware of the surrounding batch environment because a
+ * Global variable support for repeat clients. Normally it is not necessary for
+ * clients to be aware of the surrounding environment because a
  * {@link RepeatCallback} can always use the context it is passed by the
  * enclosing {@link RepeatOperations}. But occasionally it might be helpful to
  * have lower level access to the ongoing {@link RepeatContext} so we provide a
- * global accessor here.
+ * global accessor here. The mutator methods ({@link #clear()} and
+ * {@link #register(RepeatContext)} should not be used except internally by
+ * {@link RepeatOperations} implementations.
  * 
  * @author Dave Syer
  * 
@@ -34,6 +36,9 @@ import org.springframework.batch.repeat.RepeatOperations;
 public class RepeatSynchronizationManager {
 
 	private static final ThreadLocal contextHolder = new ThreadLocal();
+
+	private RepeatSynchronizationManager() {
+	}
 
 	/**
 	 * Getter for the current context. A context is shared by all items in the
@@ -49,7 +54,8 @@ public class RepeatSynchronizationManager {
 	}
 
 	/**
-	 * Convenience method to set the current batch session to complete.
+	 * Convenience method to set the current repeat operation to complete if it
+	 * exists.
 	 */
 	public static void setCompleteOnly() {
 		RepeatContext context = getContext();
@@ -73,8 +79,8 @@ public class RepeatSynchronizationManager {
 	}
 
 	/**
-	 * Used internally by {@link RepeatOperations} implementations to clear the
-	 * current context at the end of a batch.
+	 * Clear the current context at the end of a batch - should only be used by
+	 * {@link RepeatOperations} implementations.
 	 * 
 	 * @return the old value if there was one.
 	 */

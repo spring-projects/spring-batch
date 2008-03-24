@@ -42,7 +42,7 @@ public interface RetryContext extends AttributeAccessor {
 	boolean isExhaustedOnly();
 
 	/**
-	 * Accesssor for the parent context if retry blocks are nested.
+	 * Accessor for the parent context if retry blocks are nested.
 	 * 
 	 * @return the parent or null if there is none.
 	 */

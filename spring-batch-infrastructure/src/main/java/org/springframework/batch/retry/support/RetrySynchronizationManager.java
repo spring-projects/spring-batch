@@ -16,41 +16,66 @@
 
 package org.springframework.batch.retry.support;
 
+import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryOperations;
 
+/**
+ * Global variable support for retry clients. Normally it is not necessary for
+ * clients to be aware of the surrounding environment because a
+ * {@link RetryCallback} can always use the context it is passed by the
+ * enclosing {@link RetryOperations}. But occasionally it might be helpful to
+ * have lower level access to the ongoing {@link RetryContext} so we provide a
+ * global accessor here. The mutator methods ({@link #clear()} and
+ * {@link #register(RepeatContext)} should not be used except internally by
+ * {@link RetryOperations} implementations.
+ * 
+ * @author Dave Syer
+ * 
+ */
 public class RetrySynchronizationManager {
 
-	private RetrySynchronizationManager() {
-	}
+	private RetrySynchronizationManager() {}
 
 	private static final ThreadLocal context = new ThreadLocal();
 
+	/**
+	 * Public accessor for the locally enclosing {@link RetryContext}.
+	 * 
+	 * @return the current retry context, or null if there isn't one
+	 */
 	public static RetryContext getContext() {
 		RetryContext result = (RetryContext) context.get();
 		return result;
 	}
 
+	/**
+	 * Method for registering a context - should only be used by
+	 * {@link RetryOperations} implementations to ensure that
+	 * {@link #getContext()} always returns the correct value.
+	 * 
+	 * @param context the new context to register
+	 * @return the old context if there was one
+	 */
 	public static RetryContext register(RetryContext context) {
 		RetryContext oldContext = getContext();
 		RetrySynchronizationManager.context.set(context);
 		return oldContext;
 	}
 
+	/**
+	 * Clear the current context at the end of a batch - should only be used by
+	 * {@link RepeatOperations} implementations.
+	 * 
+	 * @return the old value if there was one.
+	 */
 	public static RetryContext clear() {
 		RetryContext value = getContext();
 		RetryContext parent = value == null ? null : value.getParent();
 		RetrySynchronizationManager.context.set(parent);
 		return value;
-	}
-
-	public static RetryContext clearAll() {
-		RetryContext result = null;
-		RetryContext context = clear();
-		while (context != null) {
-			result = context;
-			context = clear();
-		}
-		return result;
 	}
 
 }

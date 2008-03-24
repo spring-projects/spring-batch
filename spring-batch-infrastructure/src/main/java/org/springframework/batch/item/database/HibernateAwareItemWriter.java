@@ -152,11 +152,10 @@ public class HibernateAwareItemWriter implements ItemWriter, InitializingBean {
 			flush = failed.contains(output);
 		}
 		if (flush) {
-			RepeatContext context = RepeatSynchronizationManager.getContext();
 			// Force early completion to commit aggressively if we encounter a
 			// failed item (from a failed chunk but we don't know which one was
 			// the problem).
-			context.setCompleteOnly();
+			RepeatSynchronizationManager.setCompleteOnly();
 			// Flush now, so that if there is a failure this record can be
 			// skipped.
 			doHibernateFlush();
