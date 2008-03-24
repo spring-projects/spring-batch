@@ -1081,6 +1081,77 @@
   </section>
 
   <section>
+    <title>Creating File Names at Runtime</title>
+
+    <para>Both the XML and Flat File examples above use the Spring
+    <classname>Resource</classname> abstraction to obtain the file to read or
+    write from. This works because <classname>Resource</classname> has a
+    <markup>getFile</markup> method, that returns a
+    <classname>java.io.File</classname>. Both XML and Flat File resources can
+    be configured using standard Spring constructs:</para>
+
+    <programlisting>  &lt;bean id="customerFileLocator"
+        class="org.springframework.core.io.FileSystemResource"&gt;
+    &lt;constructor-arg type="java.lang.String"
+                     value="/outputs/20070122.testStream.CustomerReportStep.TEMP.txt" /&gt;
+  &lt;/bean&gt;</programlisting>
+
+    <para>The above <classname>Resource</classname> will load the file from
+    the file system, at the location specificied in the constructor. In most
+    spring applications, this solution is good enough. Resources are primarily
+    used to load spring application context files, and perhaps a properties
+    file. The names of these are known at compile time. However, in many batch
+    scenarios, a the file name may need to be determined at runtime as a
+    parameter to the job. This could be solved using a
+    <classname>PropertyPlaceholderConfigurer</classname> and '-D' parameters.
+    (System arguments):</para>
+
+    <programlisting>&lt;bean id="customerFileLocator"
+        class="org.springframework.core.io.FileSystemResource"&gt;
+    &lt;constructor-arg type="java.lang.String"
+                     value="${file.name}" /&gt;
+  &lt;/bean&gt;</programlisting>
+
+    <para>All that would be required for this solution to work would be a
+    placeholder configurer in the <classname>ApplicationContext</classname>
+    and the system arguments provided. (-Dfile.name="/file.txt") This solution
+    will work, but it would be much preffered to place the file name in the
+    <classname>JobParameters</classname> of the job and access them that way.
+    To allow for this, Spring Batch provides the
+    <classname>StepExecutionResourceProxy</classname>. The proxy can use
+    either job name, step name, or any values from the
+    <classname>JobParameters</classname>, by surround them with %:</para>
+
+    <programlisting>  &lt;bean id="inputFile"
+        class="org.springframework.batch.core.resource.StepExecutionResourceProxy" /&gt;
+    &lt;property name="filePattern" value="/%JOB_NAME%/%STEP_NAME%/%file.name%" /&gt;
+  &lt;/bean&gt;</programlisting>
+
+    <para>Assuming a job name of 'fooJob', and a step name of 'fooStep', and
+    the key-value pair of 'file.name="fileName.txt' is in the
+    <classname>JobParameters</classname> the job is start with, the folling
+    filename will be passed as the <classname>Resource</classname>:
+    "<filename>/fooJob/fooStep/fileName.txt</filename>". It should be noted
+    that in order for the proxy to have access to the
+    <classname>StepExecution</classname>, it must be registered as a
+    <classname>StepListener</classname>: </para>
+
+    <programlisting>  &lt;bean id="fooStep" parent="abstractStep"
+    p:itemReader-ref="itemReader"
+    p:itemWriter-ref="itemWriter"&gt;
+    &lt;property name="listeners"&gt;
+      &lt;list&gt;
+        &lt;ref bean="inputFile" /&gt;
+      &lt;/list&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+
+    <para>The <classname>StepListener</classname> interface will be discussed
+    in more detail in Chapter 4. For now, it is sufficient to know that the
+    proxy must be registered.</para>
+  </section>
+
+  <section>
     <title id="infrastructure.2.2">Database</title>
 
     <para>Like most enterprise application styles, a database is the central
