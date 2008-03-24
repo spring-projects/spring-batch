@@ -44,6 +44,7 @@
 			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 		<property name="lineTokenizer" ref="fixedFileDescriptor" />
 		<property name="fieldSetMapper" ref="fieldSetMapper" />
+		<property name="saveState" value="true" />
 	</bean>
 
 	<bean id="fixedFileDescriptor"
