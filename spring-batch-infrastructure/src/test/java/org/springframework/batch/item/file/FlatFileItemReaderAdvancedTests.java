@@ -83,11 +83,11 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 	}
 
 	/**
-	 * Test skip and skipRollback functionality
+	 * Test rollback functionality
 	 * 
 	 * @throws IOException
 	 */
-	public void testSkip() throws Exception {
+	public void testReset() throws Exception {
 
 		reader.close(null);
 		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
@@ -100,21 +100,13 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		reader.mark();
 		// read next record
 		reader.read(); // # 3
-		// mark record as skipped
-		reader.skip();
 		// read next records
 		reader.reset();
 
-		// we should now process all records after first commit point, that are
-		// not marked as skipped
-		assertEquals("[testLine4]", reader.read().toString());
+		// we should now process all records after first commit point
+		assertEquals("[testLine3]", reader.read().toString());
 
-		// TODO update
-		// Map statistics = template.getStatistics();
-		// assertEquals("6",
-		// statistics.get(FlatFileInputTemplate.READ_STATISTICS_NAME));
-		// assertEquals("2",
-		// statistics.get(FlatFileInputTemplate.SKIPPED_STATISTICS_NAME));
+		// TODO update and assert ExecutionContext
 
 	}
 
@@ -123,7 +115,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 	 * 
 	 * @throws IOException
 	 */
-	public void testSkipFirstChunk() throws Exception {
+	public void testFailOnFirstChunk() throws Exception {
 
 		reader.close(null);
 		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
@@ -133,8 +125,6 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		reader.read(); // #1
 		reader.read(); // #2
 		reader.read(); // #3
-		// mark record as skipped
-		reader.skip();
 		// rollback
 		reader.reset();
 		// read next record

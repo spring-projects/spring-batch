@@ -3,7 +3,6 @@ package org.springframework.batch.item.support;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.Skippable;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -13,7 +12,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class DelegatingItemWriter implements ItemWriter, Skippable, InitializingBean {
+public class DelegatingItemWriter implements ItemWriter, InitializingBean {
 
 	private ItemWriter delegate;
 	
@@ -76,16 +75,6 @@ public class DelegatingItemWriter implements ItemWriter, Skippable, Initializing
 	 */
 	public void flush() throws FlushFailedException {
 		delegate.flush();
-	}
-
-	/**
-	 * Delegates to {@link Skippable#skip()} if delegate implements {@link Skippable}.
-	 */
-	public void skip() {
-		if (delegate instanceof Skippable) {
-			((Skippable) delegate).skip();
-		}
-		
 	}
 
 }

@@ -2,8 +2,6 @@ package org.springframework.batch.item.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -17,7 +15,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ReaderNotOpenException;
-import org.springframework.batch.item.Skippable;
 import org.springframework.batch.item.xml.stax.DefaultFragmentEventReader;
 import org.springframework.batch.item.xml.stax.DefaultTransactionalEventReader;
 import org.springframework.batch.item.xml.stax.FragmentEventReader;
@@ -31,14 +28,15 @@ import org.springframework.util.ClassUtils;
 /**
  * Input source for reading XML input based on StAX.
  * 
- * It extracts fragments from the input XML document which correspond to records for processing. The fragments are
- * wrapped with StartDocument and EndDocument events so that the fragments can be further processed like standalone XML
+ * It extracts fragments from the input XML document which correspond to records
+ * for processing. The fragments are wrapped with StartDocument and EndDocument
+ * events so that the fragments can be further processed like standalone XML
  * documents.
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReader extends ExecutionContextUserSupport implements ItemReader, Skippable, ItemStream,
-        InitializingBean {
+public class StaxEventItemReader extends ExecutionContextUserSupport implements ItemReader, ItemStream,
+		InitializingBean {
 
 	private static final String READ_COUNT_STATISTICS_NAME = "read.count";
 
@@ -60,8 +58,6 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 
 	private long currentRecordCount = 0;
 
-	private List skipRecords = new ArrayList();
-
 	private boolean saveState = false;
 
 	public StaxEventItemReader() {
@@ -80,14 +76,12 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 		}
 		Object item = null;
 
-		do {
-			currentRecordCount++;
-			if (moveCursorToNextFragment(fragmentReader)) {
-				fragmentReader.markStartFragment();
-				item = eventReaderDeserializer.deserializeFragment(fragmentReader);
-				fragmentReader.markFragmentProcessed();
-			}
-		} while (skipRecords.contains(new Long(currentRecordCount)));
+		currentRecordCount++;
+		if (moveCursorToNextFragment(fragmentReader)) {
+			fragmentReader.markStartFragment();
+			item = eventReaderDeserializer.deserializeFragment(fragmentReader);
+			fragmentReader.markFragmentProcessed();
+		}
 
 		if (item == null) {
 			currentRecordCount--;
@@ -103,11 +97,14 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 		try {
 			fragmentReader.close();
 			inputStream.close();
-		} catch (XMLStreamException e) {
+		}
+		catch (XMLStreamException e) {
 			throw new DataAccessResourceFailureException("Error while closing event reader", e);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new DataAccessResourceFailureException("Error while closing input stream", e);
-		} finally {
+		}
+		finally {
 			fragmentReader = null;
 			inputStream = null;
 		}
@@ -119,11 +116,13 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 		try {
 			inputStream = resource.getInputStream();
 			txReader = new DefaultTransactionalEventReader(XMLInputFactory.newInstance().createXMLEventReader(
-			        inputStream));
+					inputStream));
 			fragmentReader = new DefaultFragmentEventReader(txReader);
-		} catch (XMLStreamException xse) {
+		}
+		catch (XMLStreamException xse) {
 			throw new DataAccessResourceFailureException("Unable to create XML reader", xse);
-		} catch (IOException ioe) {
+		}
+		catch (IOException ioe) {
 			throw new DataAccessResourceFailureException("Unable to get input stream", ioe);
 		}
 		initialized = true;
@@ -151,35 +150,28 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 	}
 
 	/**
-	 * @param eventReaderDeserializer maps xml fragments corresponding to records to objects
+	 * @param eventReaderDeserializer maps xml fragments corresponding to
+	 * records to objects
 	 */
 	public void setFragmentDeserializer(EventReaderDeserializer eventReaderDeserializer) {
 		this.eventReaderDeserializer = eventReaderDeserializer;
 	}
 
 	/**
-	 * @param fragmentRootElementName name of the root element of the fragment TODO String can be ambiguous due to
-	 *            namespaces, use QName?
+	 * @param fragmentRootElementName name of the root element of the fragment
+	 * TODO String can be ambiguous due to namespaces, use QName?
 	 */
 	public void setFragmentRootElementName(String fragmentRootElementName) {
 		this.fragmentRootElementName = fragmentRootElementName;
 	}
 
 	/**
-	 * Mark the last read record as 'skipped', so that I will not be returned from read() in the case of a rollback.
-	 * 
-	 * @see Skippable#skip()
-	 */
-	public void skip() {
-		skipRecords.add(new Long(currentRecordCount));
-	}
-
-	/**
-	 * Ensure that all required dependencies for the ItemReader to run are provided after all properties have been set.
+	 * Ensure that all required dependencies for the ItemReader to run are
+	 * provided after all properties have been set.
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 * @throws IllegalArgumentException if the Resource, FragmentDeserializer or FragmentRootElementName is null, or if
-	 *             the root element is empty.
+	 * @throws IllegalArgumentException if the Resource, FragmentDeserializer or
+	 * FragmentRootElementName is null, or if the root element is empty.
 	 * @throws IllegalStateException if the Resource does not exist.
 	 */
 	public void afterPropertiesSet() throws Exception {
@@ -199,12 +191,15 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 	}
 
 	/**
-	 * Responsible for moving the cursor before the StartElement of the fragment root.
+	 * Responsible for moving the cursor before the StartElement of the fragment
+	 * root.
 	 * 
-	 * This implementation simply looks for the next corresponding element, it does not care about element nesting. You
-	 * will need to override this method to correctly handle composite fragments.
+	 * This implementation simply looks for the next corresponding element, it
+	 * does not care about element nesting. You will need to override this
+	 * method to correctly handle composite fragments.
 	 * 
-	 * @return <code>true</code> if next fragment was found, <code>false</code> otherwise.
+	 * @return <code>true</code> if next fragment was found,
+	 * <code>false</code> otherwise.
 	 */
 	protected boolean moveCursorToNextFragment(XMLEventReader reader) {
 		try {
@@ -218,25 +213,28 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 				QName startElementName = ((StartElement) reader.peek()).getName();
 				if (startElementName.getLocalPart().equals(fragmentRootElementName)) {
 					return true;
-				} else {
+				}
+				else {
 					reader.nextEvent();
 				}
 			}
-		} catch (XMLStreamException e) {
+		}
+		catch (XMLStreamException e) {
 			throw new DataAccessResourceFailureException("Error while reading from event reader", e);
 		}
 	}
 
 	/**
-	 * Mark is supported as long as this {@link ItemStream} is used in a single-threaded environment. The state backing
-	 * the mark is a single counter, keeping track of the current position, so multiple threads cannot be accommodated.
+	 * Mark is supported as long as this {@link ItemStream} is used in a
+	 * single-threaded environment. The state backing the mark is a single
+	 * counter, keeping track of the current position, so multiple threads
+	 * cannot be accommodated.
 	 * 
 	 * @see org.springframework.batch.item.AbstractItemReader#mark()
 	 */
 	public void mark() {
 		lastCommitPointRecordCount = currentRecordCount;
 		txReader.onCommit();
-		skipRecords = new ArrayList();
 	}
 
 	/*
@@ -250,6 +248,13 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 		fragmentReader.reset();
 	}
 
+	/**
+	 * Set the flag that determines whether to save internal data for
+	 * {@link ExecutionContext}. Only switch this to false if you don't want to
+	 * save any state from this stream, and you don't need it to be restartable.
+	 * 
+	 * @param saveState flag value (default true)
+	 */
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}

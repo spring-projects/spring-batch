@@ -18,7 +18,6 @@ package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.Skippable;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -29,7 +28,7 @@ import org.springframework.util.Assert;
  * 
  * @author Dave Syer
  */
-public class DelegatingItemReader extends AbstractItemReader implements Skippable, InitializingBean {
+public class DelegatingItemReader extends AbstractItemReader implements InitializingBean {
 
 	private ItemReader itemReader;
 	
@@ -69,12 +68,6 @@ public class DelegatingItemReader extends AbstractItemReader implements Skippabl
 		this.itemReader = source;
 	}
 	
-	public void skip() {
-		if (itemReader instanceof Skippable) {
-			((Skippable) itemReader).skip();
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)

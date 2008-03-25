@@ -22,8 +22,6 @@ import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.Skippable;
-import org.springframework.batch.item.support.DelegatingItemReader;
 
 /**
  * Unit test for {@link DelegatingItemReader}
@@ -71,12 +69,7 @@ public class DelegatingItemReaderTests extends TestCase {
 		assertSame("domain object is provided by the input template", this, result);
 	}
 
-	public void testSkip() throws Exception {
-		itemProvider.skip();
-		assertEquals("after skip", itemProvider.read());
-	}
-
-	private static class MockItemReader extends AbstractItemReader implements ItemReader, ItemStream, Skippable {
+	private static class MockItemReader extends AbstractItemReader implements ItemReader, ItemStream {
 
 		private Object value;
 
@@ -96,10 +89,6 @@ public class DelegatingItemReaderTests extends TestCase {
 		}
 
 		public void open(ExecutionContext executionContext) {
-		}
-
-		public void skip() {
-			value = "after skip";
 		}
 
 		public void mark() {

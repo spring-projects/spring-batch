@@ -3,7 +3,6 @@ package org.springframework.batch.item.database;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.Skippable;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -162,45 +161,11 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 	}
 
 	/**
-	 * Rollback scenario with skip - input source rollbacks to last commit
-	 * point.
-	 * @throws Exception
-	 */
-	public void testRollbackAndSkip() throws Exception {
-
-		if (!(reader instanceof Skippable)) {
-			return;
-		}
-
-		Foo foo1 = (Foo) reader.read();
-
-		commit();
-
-		Foo foo2 = (Foo) reader.read();
-		Assert.state(!foo2.equals(foo1));
-
-		Foo foo3 = (Foo) reader.read();
-		Assert.state(!foo2.equals(foo3));
-
-		getAsSkippable(reader).skip();
-
-		rollback();
-
-		assertEquals(foo2, reader.read());
-		Foo foo4 = (Foo) reader.read();
-		assertEquals(4, foo4.getValue());
-	}
-
-	/**
-	 * Rollback scenario with skip and restart - input source rollbacks to last
+	 * Rollback scenario with restart - input source rollbacks to last
 	 * commit point.
 	 * @throws Exception
 	 */
-	public void testRollbackSkipAndRestart() throws Exception {
-
-		if (!(reader instanceof Skippable)) {
-			return;
-		}
+	public void testRollbackAndRestart() throws Exception {
 
 		getAsItemStream(reader).open(executionContext);
 		
@@ -214,8 +179,6 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 		Foo foo3 = (Foo) reader.read();
 		Assert.state(!foo2.equals(foo3));
 
-		getAsSkippable(reader).skip();
-
 		rollback();
 
 		getAsItemStream(reader).update(executionContext);
@@ -226,8 +189,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 		getAsItemStream(reader).open(executionContext);
 
 		assertEquals(foo2, reader.read());
-		Foo foo4 = (Foo) reader.read();
-		assertEquals(4, foo4.getValue());
+		assertEquals(foo3, reader.read());
 	}
 
 	private void commit() {
@@ -236,10 +198,6 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 
 	private void rollback() {
 		reader.reset();
-	}
-
-	private Skippable getAsSkippable(ItemReader source) {
-		return (Skippable) source;
 	}
 
 	private ItemStream getAsItemStream(ItemReader source) {

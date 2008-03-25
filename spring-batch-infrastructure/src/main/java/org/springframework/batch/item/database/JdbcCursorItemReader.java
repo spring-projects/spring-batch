@@ -22,8 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -34,7 +32,6 @@ import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ResetFailedException;
-import org.springframework.batch.item.Skippable;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -47,7 +44,6 @@ import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * <p>
@@ -96,17 +92,13 @@ import org.springframework.util.StringUtils;
  * @author Peter Zozom
  */
 public class JdbcCursorItemReader extends ExecutionContextUserSupport implements ItemReader, InitializingBean,
-        ItemStream, Skippable {
+        ItemStream {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);
 
 	public static final int VALUE_NOT_SET = -1;
 
 	private static final String CURRENT_PROCESSED_ROW = "last.processed.row.number";
-
-	private static final String SKIPPED_ROWS = "skipped.rows";
-
-	private static final String SKIP_COUNT = "skipped.record.count";
 
 	private Connection con;
 
@@ -119,10 +111,6 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	private DataSource dataSource;
 
 	private String sql;
-
-	private final List skippedRows = new ArrayList();
-
-	private int skipCount = 0;
 
 	private int fetchSize = VALUE_NOT_SET;
 
@@ -193,15 +181,6 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 				return null;
 			} else {
 				currentProcessedRow++;
-				if (!skippedRows.isEmpty()) {
-					// while is necessary to handle successive skips.
-					while (skippedRows.contains(new Long(currentProcessedRow))) {
-						if (!rs.next()) {
-							return null;
-						}
-						currentProcessedRow++;
-					}
-				}
 
 				Object mappedResult = mapper.mapRow(rs, (int) currentProcessedRow);
 
@@ -224,7 +203,6 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	 */
 	public void mark() {
 		lastCommittedRow = currentProcessedRow;
-		skippedRows.clear();
 	}
 
 	/**
@@ -259,8 +237,6 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		JdbcUtils.closeStatement(this.preparedStatement);
 		JdbcUtils.closeConnection(this.con);
 		this.currentProcessedRow = 0;
-		skippedRows.clear();
-		skipCount = 0;
 	}
 
 	// Check the result set is in synch with the currentRow attribute. This is
@@ -366,10 +342,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	public void update(ExecutionContext executionContext) {
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			String skipped = skippedRows.toString();
-			executionContext.putString(getKey(SKIPPED_ROWS), skipped.substring(1, skipped.length() - 1));
 			executionContext.putLong(getKey(CURRENT_PROCESSED_ROW), currentProcessedRow);
-			executionContext.putLong(getKey(SKIP_COUNT), skipCount);
 		}
 	}
 
@@ -397,24 +370,6 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 			throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);
 		}
 
-		if (!context.containsKey(getKey(SKIPPED_ROWS))) {
-			return;
-		}
-
-		String[] skipped = StringUtils.commaDelimitedListToStringArray(context.getString(getKey(SKIPPED_ROWS)));
-		for (int i = 0; i < skipped.length; i++) {
-			this.skippedRows.add(new Long(skipped[i]));
-		}
-	}
-
-	/**
-	 * Skip the current row. If the transaction is rolled back, this row will not be represented to the RowMapper when
-	 * read() is called. For example, if you read in row 2, find the data to be bad, and call skip(), then continue
-	 * processing and find
-	 */
-	public void skip() {
-		skippedRows.add(new Long(currentProcessedRow));
-		skipCount++;
 	}
 
 	/**

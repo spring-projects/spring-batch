@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.item.database;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -26,34 +23,32 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.Skippable;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * {@link ItemReader} for reading database records built on top of Hibernate.
  * 
- * It executes the HQL {@link #queryString} when initialized and iterates over the result set as {@link #read()} method
- * is called, returning an object corresponding to current row.
+ * It executes the HQL {@link #queryString} when initialized and iterates over
+ * the result set as {@link #read()} method is called, returning an object
+ * corresponding to current row.
  * 
- * Input source can be configured to use either {@link StatelessSession} sufficient for simple mappings without the need
- * to cascade to associated objects or standard hibernate {@link Session} for more advanced mappings or when caching is
- * desired.
+ * Input source can be configured to use either {@link StatelessSession}
+ * sufficient for simple mappings without the need to cascade to associated
+ * objects or standard hibernate {@link Session} for more advanced mappings or
+ * when caching is desired.
  * 
- * When stateful session is used it will be cleared after successful commit without being flushed (no inserts or updates
- * are expected).
+ * When stateful session is used it will be cleared after successful commit
+ * without being flushed (no inserts or updates are expected).
  * 
  * @author Robert Kasanicky
  * @author Dave Syer
  */
 public class HibernateCursorItemReader extends ExecutionContextUserSupport implements ItemReader, ItemStream,
-        Skippable, InitializingBean {
+		InitializingBean {
 
 	private static final String RESTART_DATA_ROW_NUMBER_KEY = "row.number";
-
-	private static final String SKIPPED_ROWS = "skipped.rows";
 
 	private SessionFactory sessionFactory;
 
@@ -68,10 +63,6 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	private boolean useStatelessSession = true;
 
 	private int lastCommitRowNumber = 0;
-
-	private final List skippedRows = new ArrayList();
-
-	private int skipCount = 0;
 
 	/* Current count of processed records. */
 	private int currentProcessedRow = 0;
@@ -90,15 +81,6 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 		}
 		if (cursor.next()) {
 			currentProcessedRow++;
-			if (!skippedRows.isEmpty()) {
-				// while is necessary to handle successive skips.
-				while (skippedRows.contains(new Integer(currentProcessedRow))) {
-					if (!cursor.next()) {
-						return null;
-					}
-					currentProcessedRow++;
-				}
-			}
 			Object data = cursor.get(0);
 			return data;
 		}
@@ -110,14 +92,19 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	 */
 	public void close(ExecutionContext executionContext) {
 		initialized = false;
-		cursor.close();
+		if (cursor != null) {
+			cursor.close();
+		}
 		currentProcessedRow = 0;
-		skippedRows.clear();
-		skipCount = 0;
 		if (useStatelessSession) {
-			statelessSession.close();
-		} else {
-			statefulSession.close();
+			if (statelessSession != null) {
+				statelessSession.close();
+			}
+		}
+		else {
+			if (statelessSession != null) {
+				statelessSession.close();
+			}
 		}
 	}
 
@@ -130,7 +117,8 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 		if (useStatelessSession) {
 			statelessSession = sessionFactory.openStatelessSession();
 			cursor = statelessSession.createQuery(queryString).scroll();
-		} else {
+		}
+		else {
 			statefulSession = sessionFactory.openSession();
 			cursor = statefulSession.createQuery(queryString).scroll();
 		}
@@ -141,13 +129,6 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 			cursor.setRowNumber(currentProcessedRow - 1);
 		}
 
-		if (executionContext.containsKey(getKey(SKIPPED_ROWS))) {
-			String[] skipped = StringUtils.commaDelimitedListToStringArray(executionContext
-			        .getString(getKey(SKIPPED_ROWS)));
-			for (int i = 0; i < skipped.length; i++) {
-				this.skippedRows.add(new Integer(skipped[i]));
-			}
-		}
 	}
 
 	/**
@@ -172,8 +153,9 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	/**
 	 * Can be set only in uninitialized state.
 	 * 
-	 * @param useStatelessSession <code>true</code> to use {@link StatelessSession} <code>false</code> to use
-	 *            standard hibernate {@link Session}
+	 * @param useStatelessSession <code>true</code> to use
+	 * {@link StatelessSession} <code>false</code> to use standard hibernate
+	 * {@link Session}
 	 */
 	public void setUseStatelessSession(boolean useStatelessSession) {
 		Assert.state(!initialized);
@@ -186,23 +168,14 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.putString(getKey(RESTART_DATA_ROW_NUMBER_KEY), "" + currentProcessedRow);
-			String skipped = skippedRows.toString();
-			executionContext.putString(getKey(SKIPPED_ROWS), skipped.substring(1, skipped.length() - 1));
 		}
 	}
 
 	/**
-	 * Skip the current row. If the transaction is rolled back, this row will not be represented when read() is called.
-	 * For example, if you read in row 2, find the data to be bad, and call skip(), then continue processing and find
-	 */
-	public void skip() {
-		skippedRows.add(new Integer(currentProcessedRow));
-		skipCount++;
-	}
-
-	/**
-	 * Mark is supported as long as this {@link ItemStream} is used in a single-threaded environment. The state backing
-	 * the mark is a single counter, keeping track of the current position, so multiple threads cannot be accommodated.
+	 * Mark is supported as long as this {@link ItemStream} is used in a
+	 * single-threaded environment. The state backing the mark is a single
+	 * counter, keeping track of the current position, so multiple threads
+	 * cannot be accommodated.
 	 * 
 	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
@@ -222,7 +195,8 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 		currentProcessedRow = lastCommitRowNumber;
 		if (lastCommitRowNumber == 0) {
 			cursor.beforeFirst();
-		} else {
+		}
+		else {
 			// Set the cursor so that next time it is advanced it will
 			// come back to the committed row.
 			cursor.setRowNumber(lastCommitRowNumber - 1);

@@ -149,20 +149,6 @@ public class StaxEventItemReaderTests extends TestCase {
 	}
 
 	/**
-	 * Skipping marked records after rollback.
-	 */
-	public void testSkip() {
-		source.open(executionContext);
-		List first = (List) source.read();
-		source.skip();
-		List second = (List) source.read();
-		assertFalse(first.equals(second));
-		source.reset();
-
-		assertEquals(second, source.read());
-	}
-
-	/**
 	 * Rollback to last commited record.
 	 */
 	public void testRollback() {

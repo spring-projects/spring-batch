@@ -17,8 +17,6 @@
 package org.springframework.batch.item.file;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,7 +27,6 @@ import org.springframework.batch.item.ItemReaderException;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ReaderNotOpenException;
-import org.springframework.batch.item.Skippable;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.separator.LineReader;
@@ -63,21 +60,17 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemReader extends ExecutionContextUserSupport implements ItemReader, Skippable, ItemStream,
+public class FlatFileItemReader extends ExecutionContextUserSupport implements ItemReader, ItemStream,
         InitializingBean {
 
 	private static Log log = LogFactory.getLog(FlatFileItemReader.class);
 
 	private static final String LINES_READ_COUNT = "lines.read.count";
 
-	private static final String SKIPPED_STATISTICS_NAME = "skipped.lines.count";
-
 	// default encoding for input files
 	public static final String DEFAULT_CHARSET = "ISO-8859-1";
 
 	private String encoding = DEFAULT_CHARSET;
-
-	private Set skippedLines = new HashSet();
 
 	private Resource resource;
 
@@ -209,7 +202,6 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 		if(saveState){
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());
-			executionContext.putLong(getKey(SKIPPED_STATISTICS_NAME), skippedLines.size());
 		}
 	}
 
@@ -221,7 +213,6 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	 */
 	public void mark() {
 		getReader().mark();
-		skippedLines.clear();
 	}
 
 	/*
@@ -234,31 +225,9 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Skip the current line which is being processed.
+	 * @return next line to be tokenized and mapped.
 	 */
-	public void skip() {
-		Integer count = new Integer(getReader().getPosition());
-		// we are not really thread safe so we don't need to synchronize
-		skippedLines.add(count);
-		log.debug("Skipping line in template=[" + this + "], line=" + count);
-	}
-
-	/**
-	 * @return next line to be tokenized and mapped (possibly skips multiple lines).
-	 */
-	protected String readLine() {
-		String line = nextLine();
-
-		while (line != null && skippedLines.contains(new Integer(getReader().getPosition()))) {
-			line = nextLine();
-		}
-		return line;
-	}
-
-	/**
-	 * @return next line from the input
-	 */
-	private String nextLine() {
+	private String readLine() {
 		try {
 			return (String) getReader().read();
 		} catch (ItemStreamException e) {

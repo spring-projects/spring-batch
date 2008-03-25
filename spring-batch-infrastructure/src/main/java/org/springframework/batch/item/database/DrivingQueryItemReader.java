@@ -203,6 +203,7 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean,
 	 */
 	public void reset() {
 		keysIterator = keys.listIterator(lastCommitIndex);
+		currentIndex = lastCommitIndex;
 	}
 
 	public void setSaveState(boolean saveState) {
