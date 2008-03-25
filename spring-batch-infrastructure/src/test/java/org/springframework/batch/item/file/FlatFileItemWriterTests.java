@@ -46,7 +46,7 @@ import org.springframework.util.ClassUtils;
 public class FlatFileItemWriterTests extends TestCase {
 
 	// object under test
-	private FlatFileItemWriter inputSource = new FlatFileItemWriter();
+	private FlatFileItemWriter writer = new FlatFileItemWriter();
 
 	// String to be written into file by the FlatFileInputTemplate
 	private static final String TEST_STRING = "FlatFileOutputTemplateTest-OutputData";
@@ -72,10 +72,10 @@ public class FlatFileItemWriterTests extends TestCase {
 
 		outputFile = File.createTempFile("flatfile-output-", ".tmp");
 
-		inputSource.setResource(new FileSystemResource(outputFile));
-		inputSource.setFieldSetCreator(new PassThroughFieldSetMapper());
-		inputSource.afterPropertiesSet();
-		inputSource.setSaveState(true);
+		writer.setResource(new FileSystemResource(outputFile));
+		writer.setFieldSetCreator(new PassThroughFieldSetMapper());
+		writer.afterPropertiesSet();
+		writer.setSaveState(true);
 		executionContext = new ExecutionContext();
 	}
 
@@ -86,7 +86,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		if (reader != null) {
 			reader.close();
 		}
-		inputSource.close(null);
+		writer.close(null);
 		outputFile.delete();
 	}
 
@@ -110,9 +110,10 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteString() throws Exception {
-		inputSource.open(executionContext);
-		inputSource.write(TEST_STRING);
-		inputSource.close(null);
+		writer.open(executionContext);
+		writer.write(TEST_STRING);
+		writer.flush();
+		writer.close(null);
 		String lineFromFile = readLine();
 
 		assertEquals(TEST_STRING, lineFromFile);
@@ -124,14 +125,14 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteWithConverter() throws Exception {
-		inputSource.setFieldSetCreator(new FieldSetCreator() {
+		writer.setFieldSetCreator(new FieldSetCreator() {
 			public FieldSet mapItem(Object data) {
 				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
 		Object data = new Object();
-		inputSource.write(data);
-		inputSource.close(null);
+		writer.write(data);
+		writer.flush();
 		String lineFromFile = readLine();
 		// converter not used if input is String
 		assertEquals("FOO:" + data.toString(), lineFromFile);
@@ -143,14 +144,14 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteWithConverterAndInfiniteLoop() throws Exception {
-		inputSource.setFieldSetCreator(new FieldSetCreator() {
+		writer.setFieldSetCreator(new FieldSetCreator() {
 			public FieldSet mapItem(Object data) {
 				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
 		Object data = new Object();
-		inputSource.write(data);
-		inputSource.close(null);
+		writer.write(data);
+		writer.flush();
 		String lineFromFile = readLine();
 		// converter not used if input is String
 		assertEquals("FOO:" + data.toString(), lineFromFile);
@@ -162,13 +163,13 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteWithConverterAndString() throws Exception {
-		inputSource.setFieldSetCreator(new FieldSetCreator() {
+		writer.setFieldSetCreator(new FieldSetCreator() {
 			public FieldSet mapItem(Object data) {
 				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
-		inputSource.write(TEST_STRING);
-		inputSource.close(null);
+		writer.write(TEST_STRING);
+		writer.flush();
 		String lineFromFile = readLine();
 		assertEquals("FOO:" + TEST_STRING, lineFromFile);
 	}
@@ -182,71 +183,74 @@ public class FlatFileItemWriterTests extends TestCase {
 		String args = "1";
 
 		// AggregatorStub ignores the LineDescriptor, so we pass null
-		inputSource.write(args);
-		inputSource.close(null);
+		writer.write(args);
+		writer.flush();
 		String lineFromFile = readLine();
 		assertEquals(args, lineFromFile);
 	}
 
 	public void testRollback() throws Exception {
-		inputSource.write("testLine1");
+		writer.write("testLine1");
 		// rollback
 		rollback();
-		inputSource.close(null);
+		writer.flush();
+		writer.close(null);
 		String lineFromFile = readLine();
 		assertEquals(null, lineFromFile);
 	}
 
 	public void testCommit() throws Exception {
-		inputSource.write("testLine1");
+		writer.write("testLine1");
 		// rollback
 		commit();
-		inputSource.close(null);
+		writer.close(null);
 		String lineFromFile = readLine();
 		assertEquals("testLine1", lineFromFile);
 	}
 
 	public void testRestart() throws Exception {
-
-		inputSource.open(executionContext);
+		
+		writer.open(executionContext);
 		// write some lines
-		inputSource.write("testLine1");
-		inputSource.write("testLine2");
-		inputSource.write("testLine3");
+		writer.write("testLine1");
+		writer.write("testLine2");
+		writer.write("testLine3");
 
 		// commit
 		commit();
 
 		// this will be rolled back...
-		inputSource.write("this will be rolled back");
+		writer.write("this will be rolled back");
 
 		// rollback
 		rollback();
 
 		// write more lines
-		inputSource.write("testLine4");
-		inputSource.write("testLine5");
+		writer.write("testLine4");
+		writer.write("testLine5");
 
 		// commit
 		commit();
 
 		// get restart data
-		inputSource.update(executionContext);
+		writer.update(executionContext);
 		// close template
-		inputSource.close(executionContext);
+		writer.close(executionContext);
 
 		// init with correct data
-		inputSource.open(executionContext);
+		writer.open(executionContext);
 
 		// write more lines
-		inputSource.write("testLine6");
-		inputSource.write("testLine7");
-		inputSource.write("testLine8");
+		writer.write("testLine6");
+		writer.write("testLine7");
+		writer.write("testLine8");
+
+		commit();
 
 		// get statistics
-		inputSource.update(executionContext);
+		writer.update(executionContext);
 		// close template
-		inputSource.close(executionContext);
+		writer.close(executionContext);
 
 		// verify what was written to the file
 		for (int i = 1; i < 9; i++) {
@@ -259,9 +263,9 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	public void testAfterPropertiesSetChecksMandatory() throws Exception {
-		inputSource = new FlatFileItemWriter();
+		writer = new FlatFileItemWriter();
 		try {
-			inputSource.afterPropertiesSet();
+			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
@@ -270,13 +274,13 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	public void testDefaultStreamContext() throws Exception {
-		inputSource = new FlatFileItemWriter();
-		inputSource.setResource(new FileSystemResource(outputFile));
-		inputSource.setFieldSetCreator(new PassThroughFieldSetMapper());
-		inputSource.afterPropertiesSet();
-		inputSource.setSaveState(true);
-		inputSource.open(executionContext);
-		inputSource.update(executionContext);
+		writer = new FlatFileItemWriter();
+		writer.setResource(new FileSystemResource(outputFile));
+		writer.setFieldSetCreator(new PassThroughFieldSetMapper());
+		writer.afterPropertiesSet();
+		writer.setSaveState(true);
+		writer.open(executionContext);
+		writer.update(executionContext);
 		assertNotNull(executionContext);
 		assertEquals(3, executionContext.entrySet().size());
 		assertEquals(0, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".current.count"));
@@ -288,16 +292,15 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteStringWithBogusEncoding() throws Exception {
-		inputSource.setEncoding("BOGUS");
-		inputSource.open(executionContext);
+		writer.setEncoding("BOGUS");
 		try {
-			inputSource.write(TEST_STRING);
+			writer.open(executionContext);
 			fail("Expecyted ItemStreamException");
 		}
 		catch (ItemStreamException e) {
 			assertTrue(e.getCause() instanceof UnsupportedCharsetException);
 		}
-		inputSource.close(null);
+		writer.close(null);
 	}
 
 	/**
@@ -307,21 +310,21 @@ public class FlatFileItemWriterTests extends TestCase {
 	 */
 	public void testWriteStringWithEncodingAfterClose() throws Exception {
 		testWriteStringWithBogusEncoding();
-		inputSource.setEncoding("UTF-8");
-		inputSource.open(executionContext);
-		inputSource.write(TEST_STRING);
-		inputSource.close(null);
+		writer.setEncoding("UTF-8");
+		writer.open(executionContext);
+		writer.write(TEST_STRING);
+		writer.flush();
 		String lineFromFile = readLine();
 
 		assertEquals(TEST_STRING, lineFromFile);
 	}
 
 	private void commit() throws Exception {
-		inputSource.flush();
+		writer.flush();
 	}
 
 	private void rollback() throws Exception {
-		inputSource.clear();
+		writer.clear();
 	}
 
 }

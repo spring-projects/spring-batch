@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ExecutionContext;
@@ -45,17 +48,20 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * This class is an output target that writes data to a file or stream. The writer also provides restart, statistics and
- * transaction features by implementing corresponding interfaces where possible (with a file). The location of the file
- * is defined by a {@link Resource} and must represent a writable file.<br/>
+ * This class is an output target that writes data to a file or stream. The
+ * writer also provides restart, statistics and transaction features by
+ * implementing corresponding interfaces where possible (with a file). The
+ * location of the file is defined by a {@link Resource} and must represent a
+ * writable file.<br/>
  * 
  * Uses buffered writer to improve performance.<br/>
  * 
  * Use {@link #write(String)} method to output a line to an item writer.
  * 
  * <p>
- * This class will be updated in the future to use a buffering approach to handling transactions, rather than outputting
- * directly to the file and truncating on rollback
+ * This class will be updated in the future to use a buffering approach to
+ * handling transactions, rather than outputting directly to the file and
+ * truncating on rollback
  * </p>
  * 
  * @author Waseem Malik
@@ -80,7 +86,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	private LineAggregator lineAggregator = new DelimitedLineAggregator();
 
 	private FieldSetCreator fieldSetCreator;
-	
+
 	private boolean saveState = false;
 
 	private boolean shouldDeleteIfExists = true;
@@ -88,6 +94,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	private String encoding = OutputState.DEFAULT_CHARSET;
 
 	private int bufferSize = OutputState.DEFAULT_BUFFER_SIZE;
+
+	private List lineBuffer = new ArrayList();
 
 	public FlatFileItemWriter() {
 		setName(ClassUtils.getShortName(FlatFileItemWriter.class));
@@ -106,8 +114,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Public setter for the {@link LineAggregator}. This will be used to translate a {@link FieldSet} into a line for
-	 * output.
+	 * Public setter for the {@link LineAggregator}. This will be used to
+	 * translate a {@link FieldSet} into a line for output.
 	 * 
 	 * @param lineAggregator the {@link LineAggregator} to set
 	 */
@@ -116,8 +124,9 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Public setter for the {@link FieldSetCreator}. This will be used to transform the item into a {@link FieldSet}
-	 * before it is aggregated by the {@link LineAggregator}.
+	 * Public setter for the {@link FieldSetCreator}. This will be used to
+	 * transform the item into a {@link FieldSet} before it is aggregated by the
+	 * {@link LineAggregator}.
 	 * 
 	 * @param fieldSetCreator the {@link FieldSetCreator} to set
 	 */
@@ -135,18 +144,21 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Writes out a string followed by a "new line", where the format of the new line separator is determined by the
-	 * underlying operating system. If the input is not a String and a converter is available the converter will be
-	 * applied and then this method recursively called with the result. If the input is an array or collection each
-	 * value will be written to a separate line (recursively calling this method for each value). If no converter is
+	 * Writes out a string followed by a "new line", where the format of the new
+	 * line separator is determined by the underlying operating system. If the
+	 * input is not a String and a converter is available the converter will be
+	 * applied and then this method recursively called with the result. If the
+	 * input is an array or collection each value will be written to a separate
+	 * line (recursively calling this method for each value). If no converter is
 	 * supplied the input object's toString method will be used.<br/>
 	 * 
-	 * @param data Object (a String or Object that can be converted) to be written to output stream
+	 * @param data Object (a String or Object that can be converted) to be
+	 * written to output stream
 	 * @throws Exception if the transformer or file output fail
 	 */
 	public void write(Object data) throws Exception {
 		FieldSet fieldSet = fieldSetCreator.mapItem(data);
-		getOutputState().write(lineAggregator.aggregate(fieldSet) + LINE_SEPARATOR);
+		lineBuffer.add(lineAggregator.aggregate(fieldSet) + LINE_SEPARATOR);
 	}
 
 	/**
@@ -190,6 +202,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		if (executionContext.containsKey(getKey(RESTART_DATA_NAME))) {
 			outputState.restoreFrom(executionContext);
 		}
+		outputState.initializeBufferedWriter();
 	}
 
 	/**
@@ -199,18 +212,18 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		if (state == null) {
 			throw new ItemStreamException("ItemStream not open or already closed.");
 		}
-		
 
 		Assert.notNull(executionContext, "ExecutionContext must not be null");
-		
-		if(saveState){
-		
+
+		if (saveState) {
+
 			try {
 				executionContext.putLong(getKey(RESTART_DATA_NAME), state.position());
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new ItemStreamException("ItemStream does not return current position properly", e);
 			}
-	
+
 			executionContext.putLong(getKey(WRITTEN_STATISTICS_NAME), state.linesWritten);
 			executionContext.putLong(getKey(RESTART_COUNT_STATISTICS_NAME), state.restartCount);
 		}
@@ -228,7 +241,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Encapsulates the runtime state of the writer. All state changing operations on the writer go through this class.
+	 * Encapsulates the runtime state of the writer. All state changing
+	 * operations on the writer go through this class.
 	 */
 	private class OutputState {
 		// default encoding for writing to output files - set to UTF-8.
@@ -261,7 +275,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		boolean shouldDeleteIfExists = true;
 
 		/**
-		 * Return the byte offset position of the cursor in the output file as a long integer.
+		 * Return the byte offset position of the cursor in the output file as a
+		 * long integer.
 		 */
 		public long position() throws IOException {
 			long pos = 0;
@@ -318,7 +333,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 				}
 				outputBufferedWriter.close();
 				fileChannel.close();
-			} catch (IOException ioe) {
+			}
+			catch (IOException ioe) {
 				throw new ItemStreamException("Unable to close the the ItemWriter", ioe);
 			}
 		}
@@ -355,13 +371,15 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		public void mark() {
 			try {
 				lastMarkedByteOffsetPosition = this.position();
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new MarkFailedException("Unable to get position for mark", e);
 			}
 		}
 
 		/**
-		 * Creates the buffered writer for the output file channel based on configuration information.
+		 * Creates the buffered writer for the output file channel based on
+		 * configuration information.
 		 */
 		private void initializeBufferedWriter() {
 			File file;
@@ -380,7 +398,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 					if (file.exists()) {
 						if (shouldDeleteIfExists) {
 							file.delete();
-						} else {
+						}
+						else {
 							throw new ItemStreamException("Resource already exists: " + resource);
 						}
 					}
@@ -391,14 +410,16 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 					file.createNewFile();
 				}
 
-			} catch (IOException ioe) {
+			}
+			catch (IOException ioe) {
 				throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]",
-				        ioe);
+						ioe);
 			}
 
 			try {
 				fileChannel = (new FileOutputStream(file.getAbsolutePath(), true)).getChannel();
-			} catch (FileNotFoundException fnfe) {
+			}
+			catch (FileNotFoundException fnfe) {
 				throw new ItemStreamException("Bad filename property parameter " + file, fnfe);
 			}
 
@@ -414,8 +435,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		}
 
 		/**
-		 * Returns the buffered writer opened to the beginning of the file specified by the absolute path name contained
-		 * in absoluteFileName.
+		 * Returns the buffered writer opened to the beginning of the file
+		 * specified by the absolute path name contained in absoluteFileName.
 		 */
 		private BufferedWriter getBufferedWriter(FileChannel fileChannel, String encoding, int bufferSize) {
 			try {
@@ -425,35 +446,41 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 				// If a buffer was requested, allocate.
 				if (bufferSize > 0) {
 					outputBufferedWriter = new BufferedWriter(Channels.newWriter(fileChannel, encoding), bufferSize);
-				} else {
+				}
+				else {
 					outputBufferedWriter = new BufferedWriter(Channels.newWriter(fileChannel, encoding));
 				}
 
 				return outputBufferedWriter;
-			} catch (UnsupportedCharsetException ucse) {
+			}
+			catch (UnsupportedCharsetException ucse) {
 				throw new ItemStreamException("Bad encoding configuration for output file " + fileChannel, ucse);
 			}
 		}
 
 		/**
-		 * Resets the file writer's current position to the point stored in the last marked byte offset position
-		 * variable. It first checks to make sure the current size of the file is not less than the byte position to be
-		 * moved to (if it is, throws an environment exception), then it truncates the file to that reset position, and
-		 * set the cursor to start writing at that point.
+		 * Resets the file writer's current position to the point stored in the
+		 * last marked byte offset position variable. It first checks to make
+		 * sure the current size of the file is not less than the byte position
+		 * to be moved to (if it is, throws an environment exception), then it
+		 * truncates the file to that reset position, and set the cursor to
+		 * start writing at that point.
 		 */
 		public void reset() throws ResetFailedException {
 			checkFileSize();
 			try {
 				getOutputState().truncate();
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new ResetFailedException("Unable to truncate file", e);
 			}
 		}
 
 		/**
-		 * Checks (on setState) to make sure that the current output file's size is not smaller than the last saved
-		 * commit point. If it is, then the file has been damaged in some way and whole task must be started over again
-		 * from the beginning.
+		 * Checks (on setState) to make sure that the current output file's size
+		 * is not smaller than the last saved commit point. If it is, then the
+		 * file has been damaged in some way and whole task must be started over
+		 * again from the beginning.
 		 */
 		private void checkFileSize() {
 			long size = -1;
@@ -461,7 +488,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 			try {
 				outputBufferedWriter.flush();
 				size = fileChannel.size();
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new ResetFailedException("An Error occured while checking file size", e);
 			}
 
@@ -473,22 +501,29 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	}
 
 	public void clear() throws ClearFailedException {
-		try {
-			getOutputState().reset();
-		} catch (Exception e) {
-			throw new ClearFailedException("Could not reset the state of the writer", e);
-		}
+		lineBuffer.clear();
 	}
 
 	public void flush() throws FlushFailedException {
-		getOutputState().mark();
+		OutputState state = getOutputState();
+		for (Iterator iterator = lineBuffer.listIterator(); iterator.hasNext();) {
+			String line = (String) iterator.next();
+			try {
+				state.write(line);
+			}
+			catch (IOException e) {
+				throw new FlushFailedException("Failed to write line to output file: " + line, e);
+			}
+		}
+		lineBuffer.clear();
+		state.mark();
 	}
-	
+
 	/**
-	 * Set the boolean indicating whether or not state should be saved
-	 * in the provided {@link ExecutionContext} during the {@link ItemStream}
-	 * call to update.  Setting this to false means that it will always start
-	 * at the beginning.
+	 * Set the boolean indicating whether or not state should be saved in the
+	 * provided {@link ExecutionContext} during the {@link ItemStream} call to
+	 * update. Setting this to false means that it will always start at the
+	 * beginning.
 	 * 
 	 * @param saveState
 	 */
