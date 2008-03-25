@@ -10,11 +10,10 @@
 		</property>
 		<property name="initScripts">
 			<list>
-				<value>init.sql</value>
+				<value>schema-hsqldb.sql</value>
 				<value>foo.sql</value>
 			</list>
 		</property>
-		<property name="destroyScript" value="destroy.sql" />
 	</bean>
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
