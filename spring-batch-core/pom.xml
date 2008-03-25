@@ -130,20 +130,6 @@
 							<tasks>
 								<typedef resource="foundrylogic/vpp/typedef.properties" />
 								<taskdef resource="foundrylogic/vpp/taskdef.properties" />
-								<!-- Scripts for DAO tests - N.B. under source control. -->
-								<vppcopy todir="${basedir}/src/test/resources" overwrite="true">
-									<config>
-										<context>
-											<property key="includes" value="src/main/sql" />
-											<property file="${basedir}/src/main/sql/hsqldb.properties" />
-										</context>
-										<engine>
-											<property key="velocimacro.library" value="src/main/sql/hsqldb.vpp" />
-										</engine>
-									</config>
-									<fileset dir="${basedir}/src/main/sql" includes="*.sql.vpp" excludes="schema*" />
-									<mapper type="glob" from="*.sql.vpp" to="*.sql" />
-								</vppcopy>
 								<!-- Reference script for HSQLDB - N.B. not under source control, but packagaed in jar. -->
 								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
 									<config>
