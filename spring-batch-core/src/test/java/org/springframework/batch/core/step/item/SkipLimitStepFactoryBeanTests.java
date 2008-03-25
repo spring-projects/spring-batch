@@ -20,7 +20,6 @@ import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResetFailedException;
-import org.springframework.batch.item.Skippable;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
@@ -67,10 +66,9 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		assertEquals(2, stepExecution.getSkipCount());
 
-		assertTrue(reader.skipped.contains("2"));
-		assertTrue(reader.skipped.contains("4"));
 		// writer did not skip "2" as it never made it to writer, only "4" did
-		assertTrue(writer.skipped.contains("4"));
+		assertTrue(reader.processed.contains("4"));
+		assertFalse(writer.written.contains("4"));
 
 		String[] expectedOutput = { "1", "3", "5" };
 
@@ -109,11 +107,11 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	/**
 	 * Simple item reader that supports skip functionality.
 	 */
-	private static class SkipReaderStub implements ItemReader, Skippable {
+	private static class SkipReaderStub implements ItemReader {
 
 		final String[] items = { "1", "2", "3", "4", "5", null };
 
-		Collection skipped = new ArrayList();
+		Collection processed = new ArrayList();
 
 		int counter = -1;
 
@@ -121,12 +119,10 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		public Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 			counter++;
-			while (skipped.contains(items[counter])) {
-				counter++;
-			}
 			if ("2".equals(items[counter])) {
 				throw new SkippableException("exception in reader");
 			}
+			processed.add(items[counter]);
 			return items[counter];
 		}
 
@@ -138,20 +134,14 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 			counter = marked;
 		}
 
-		public void skip() {
-			skipped.add(items[counter]);
-		}
-
 	}
 
 	/**
 	 * Simple item writer that supports skip functionality.
 	 */
-	private static class SkipWriterStub implements ItemWriter, Skippable {
+	private static class SkipWriterStub implements ItemWriter {
 
 		List written = new ArrayList();
-
-		Collection skipped = new ArrayList();
 
 		int flushIndex = -1;
 
@@ -166,18 +156,10 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		}
 
 		public void write(Object item) throws Exception {
-			if (skipped.contains(item)) {
-				return;
-			}
 			written.add(item);
 			if (item.equals("4")) {
 				throw new SkippableRuntimeException("exception in writer");
 			}
-		}
-
-		public void skip() {
-			int lastIndex = written.size() - 1;
-			skipped.add(written.get(lastIndex));
 		}
 
 	}
