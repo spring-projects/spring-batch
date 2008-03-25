@@ -1090,60 +1090,58 @@
     <classname>java.io.File</classname>. Both XML and Flat File resources can
     be configured using standard Spring constructs:</para>
 
-    <programlisting>  &lt;bean id="customerFileLocator"
-        class="org.springframework.core.io.FileSystemResource"&gt;
-    &lt;constructor-arg type="java.lang.String"
-                     value="/outputs/20070122.testStream.CustomerReportStep.TEMP.txt" /&gt;
+    <programlisting>  &lt;bean id="flatFileItemReader"
+        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+    &lt;property name="resource"
+                     value="file://outputs/20070122.testStream.CustomerReportStep.TEMP.txt" /&gt;
   &lt;/bean&gt;</programlisting>
 
     <para>The above <classname>Resource</classname> will load the file from
-    the file system, at the location specificied in the constructor. In most
-    spring applications, this solution is good enough. Resources are primarily
-    used to load spring application context files, and perhaps a properties
-    file. The names of these are known at compile time. However, in many batch
-    scenarios, the file name may need to be determined at runtime as a
-    parameter to the job. This could be solved using a
-    <classname>PropertyPlaceholderConfigurer</classname> and '-D' parameters.
-    (System arguments):</para>
+    the file system, at the location specificied. Note that absolute locations
+    have to start with a double slash ("//"). In most spring applications,
+    this solution is good enough because the names of these are known at
+    compile time. However, in batch scenarios, the file name may need to be
+    determined at runtime as a parameter to the job. This could be solved
+    using '-D' parameters, i.e. a system property:</para>
 
-    <programlisting>&lt;bean id="customerFileLocator"
-        class="org.springframework.core.io.FileSystemResource"&gt;
-    &lt;constructor-arg type="java.lang.String"
-                     value="${file.name}" /&gt;
-  &lt;/bean&gt;</programlisting>
+    <programlisting>&lt;bean id="flatFileItemReader"
+        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+    &lt;property name="resource" value="${input.file.name}" /&gt;
+&lt;/bean&gt;</programlisting>
 
     <para>All that would be required for this solution to work would be a
-    placeholder configurer in the <classname>ApplicationContext</classname>
-    and the system arguments provided. (-Dfile.name="/file.txt") This solution
-    will work, but it would be much preferred to place the file name in the
-    <classname>JobParameters</classname> of the job and access them that way.
-    To allow for this, Spring Batch provides the
+    system argument (-Dinput.file.name="file://file.txt"). (Note that although
+    a <classname>PropertyPlaceholderConfigurer</classname> can be used here,
+    it is not necessary if the system property is always set because the
+    <classname>ResourceEditor</classname> in Spring already filters and does
+    placeholder replacement on system properties.) </para>
+
+    <para>Often in a batch setting it is preferable to parameterise the file
+    name in the <classname>JobParameters</classname> of the job, instead of
+    through system properties, and access them that way. To allow for this,
+    Spring Batch provides the
     <classname>StepExecutionResourceProxy</classname>. The proxy can use
     either job name, step name, or any values from the
     <classname>JobParameters</classname>, by surround them with %:</para>
 
     <programlisting>  &lt;bean id="inputFile"
         class="org.springframework.batch.core.resource.StepExecutionResourceProxy" /&gt;
-    &lt;property name="filePattern" value="/%JOB_NAME%/%STEP_NAME%/%file.name%" /&gt;
+    &lt;property name="filePattern" value="//%JOB_NAME%/%STEP_NAME%/%file.name%" /&gt;
   &lt;/bean&gt;</programlisting>
 
     <para>Assuming a job name of 'fooJob', and a step name of 'fooStep', and
     the key-value pair of 'file.name="fileName.txt' is in the
     <classname>JobParameters</classname> the job is start with, the following
     filename will be passed as the <classname>Resource</classname>:
-    "<filename>/fooJob/fooStep/fileName.txt</filename>". It should be noted
+    "<filename>//fooJob/fooStep/fileName.txt</filename>". It should be noted
     that in order for the proxy to have access to the
     <classname>StepExecution</classname>, it must be registered as a
-    <classname>StepListener</classname>: </para>
+    <classname>StepListener</classname>:</para>
 
     <programlisting>  &lt;bean id="fooStep" parent="abstractStep"
     p:itemReader-ref="itemReader"
     p:itemWriter-ref="itemWriter"&gt;
-    &lt;property name="listeners"&gt;
-      &lt;list&gt;
-        &lt;ref bean="inputFile" /&gt;
-      &lt;/list&gt;
-    &lt;/property&gt;
+    &lt;property name="listeners" ref="inputFile" /&gt;
   &lt;/bean&gt;</programlisting>
 
     <para>The <classname>StepListener</classname> interface will be discussed
