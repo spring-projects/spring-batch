@@ -83,6 +83,12 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	
 	private boolean saveState = false;
 
+	private boolean shouldDeleteIfExists = true;
+
+	private String encoding = OutputState.DEFAULT_CHARSET;
+
+	private int bufferSize = OutputState.DEFAULT_BUFFER_SIZE;
+
 	public FlatFileItemWriter() {
 		setName(ClassUtils.getShortName(FlatFileItemWriter.class));
 	}
@@ -157,21 +163,21 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	 * Sets encoding for output template.
 	 */
 	public void setEncoding(String newEncoding) {
-		getOutputState().setEncoding(newEncoding);
+		this.encoding = newEncoding;
 	}
 
 	/**
 	 * Sets buffer size for output template
 	 */
 	public void setBufferSize(int newSize) {
-		getOutputState().setBufferSize(newSize);
+		this.bufferSize = newSize;
 	}
 
 	/**
 	 * @param shouldDeleteIfExists the shouldDeleteIfExists to set
 	 */
 	public void setShouldDeleteIfExists(boolean shouldDeleteIfExists) {
-		getOutputState().setShouldDeleteIfExists(shouldDeleteIfExists);
+		this.shouldDeleteIfExists = shouldDeleteIfExists;
 	}
 
 	/**
@@ -214,6 +220,9 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	private OutputState getOutputState() {
 		if (state == null) {
 			state = new OutputState();
+			state.setDeleteIfExists(shouldDeleteIfExists);
+			state.setBufferSize(bufferSize);
+			state.setEncoding(encoding);
 		}
 		return (OutputState) state;
 	}
@@ -277,24 +286,24 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		}
 
 		/**
-		 * @param shouldDeleteIfExists2
+		 * @param shouldDeleteIfExists
 		 */
-		public void setShouldDeleteIfExists(boolean shouldDeleteIfExists) {
+		public void setDeleteIfExists(boolean shouldDeleteIfExists) {
 			this.shouldDeleteIfExists = shouldDeleteIfExists;
 		}
 
 		/**
-		 * @param newSize
+		 * @param bufferSize
 		 */
-		public void setBufferSize(int newSize) {
-			bufferSize = newSize;
+		public void setBufferSize(int bufferSize) {
+			this.bufferSize = bufferSize;
 		}
 
 		/**
-		 * @param newEncoding
+		 * @param encoding
 		 */
-		public void setEncoding(String newEncoding) {
-			encoding = newEncoding;
+		public void setEncoding(String encoding) {
+			this.encoding = encoding;
 		}
 
 		/**

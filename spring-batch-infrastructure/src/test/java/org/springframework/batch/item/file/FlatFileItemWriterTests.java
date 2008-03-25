@@ -20,10 +20,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.UnsupportedCharsetException;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetCreator;
@@ -33,8 +35,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.util.ClassUtils;
 
 /**
- * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be in separate TestCase classes with
- * different <code>setUp</code> and <code>tearDown</code> methods
+ * Tests of regular usage for {@link FlatFileItemWriter} Exception cases will be
+ * in separate TestCase classes with different <code>setUp</code> and
+ * <code>tearDown</code> methods
  * 
  * @author robert.kasanicky
  * @author Dave Syer
@@ -57,7 +60,8 @@ public class FlatFileItemWriterTests extends TestCase {
 	private ExecutionContext executionContext;
 
 	/**
-	 * Create temporary output file, define mock behaviour, set dependencies and initialize the object under test
+	 * Create temporary output file, define mock behaviour, set dependencies and
+	 * initialize the object under test
 	 */
 	protected void setUp() throws Exception {
 
@@ -87,8 +91,9 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	/*
-	 * Read a line from the output file, if the reader has not been created, recreate. This method is only necessary
-	 * because running the tests in a UNIX environment locks the file if it's open for writing.
+	 * Read a line from the output file, if the reader has not been created,
+	 * recreate. This method is only necessary because running the tests in a
+	 * UNIX environment locks the file if it's open for writing.
 	 */
 	private String readLine() throws IOException {
 
@@ -258,7 +263,8 @@ public class FlatFileItemWriterTests extends TestCase {
 		try {
 			inputSource.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
@@ -274,6 +280,40 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertNotNull(executionContext);
 		assertEquals(3, executionContext.entrySet().size());
 		assertEquals(0, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".current.count"));
+	}
+
+	/**
+	 * Regular usage of <code>write(String)</code> method
+	 * 
+	 * @throws Exception
+	 */
+	public void testWriteStringWithBogusEncoding() throws Exception {
+		inputSource.setEncoding("BOGUS");
+		inputSource.open(executionContext);
+		try {
+			inputSource.write(TEST_STRING);
+			fail("Expecyted ItemStreamException");
+		}
+		catch (ItemStreamException e) {
+			assertTrue(e.getCause() instanceof UnsupportedCharsetException);
+		}
+		inputSource.close(null);
+	}
+
+	/**
+	 * Regular usage of <code>write(String)</code> method
+	 * 
+	 * @throws Exception
+	 */
+	public void testWriteStringWithEncodingAfterClose() throws Exception {
+		testWriteStringWithBogusEncoding();
+		inputSource.setEncoding("UTF-8");
+		inputSource.open(executionContext);
+		inputSource.write(TEST_STRING);
+		inputSource.close(null);
+		String lineFromFile = readLine();
+
+		assertEquals(TEST_STRING, lineFromFile);
 	}
 
 	private void commit() throws Exception {
