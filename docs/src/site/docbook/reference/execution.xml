@@ -1011,7 +1011,7 @@
           before a Step is started, after it has completed, and if any errors
           are encountered during processing:</para>
 
-          <programlisting>  public interface StepListener extends BatchListener {
+          <programlisting>  public interface StepExecutionListener extends StepListener {
 
     void beforeStep(StepExecution stepExecution);
 
@@ -1038,7 +1038,7 @@
   &lt;/bean&gt;</programlisting>
 
           <para>Because all listeners extend the
-          <classname>BatchListener</classname> interface, they all may be
+          <classname>StepListener</classname> interface, they all may be
           applied to factory beans in the same way.</para>
         </section>
 
@@ -1051,7 +1051,7 @@
           case the <classname>ChunkListener</classname> interface may be
           used:</para>
 
-          <programlisting>  public interface ChunkListener extends BatchListener {
+          <programlisting>  public interface ChunkListener extends StepListener {
 
     void beforeChunk();
 
@@ -1074,7 +1074,7 @@
           <para>When discussing skip logic earlier, it was mentioned that it
           may be beneficial to log out skipped records, so that they can be
           deal with later. In the case of read errors, this can be done with
-          an <classname>ItemReaderListener:</classname><programlisting>  public interface ItemReadListener extends BatchListener {
+          an <classname>ItemReaderListener:</classname><programlisting>  public interface ItemReadListener extends StepListener {
   
     void beforeRead();
 
@@ -1100,7 +1100,7 @@
           <para>Just as with the ItemReaderListener, the writing of an item
           can be 'listened' to:</para>
 
-          <programlisting>  public interface ItemWriteListener extends BatchListener {
+          <programlisting>  public interface ItemWriteListener extends StepListener {
 
     void beforeWrite(Object item);
 
