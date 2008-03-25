@@ -70,6 +70,7 @@ public class SimpleJobLauncherTests extends TestCase {
 
 		repositoryControl.replay();
 
+		jobLauncher.afterPropertiesSet();
 		jobLauncher.run(job, jobParameters);
 		assertEquals(ExitStatus.FINISHED, jobExecution.getExitStatus());
 

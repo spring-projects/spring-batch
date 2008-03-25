@@ -50,6 +50,11 @@ public class JobRepositoryFactoryBeanTests extends TestCase{
 	public void testNoDatabaseType() throws Exception{
 		
 		try{
+			incrementerFactory.isSupportedIncrementerType(null);
+			incrementerControl.setReturnValue(false);
+			incrementerFactory.getSupportedIncrementerTypes();
+			incrementerControl.setReturnValue(new String[0]);
+			incrementerControl.replay();
 			factory.afterPropertiesSet();
 			fail();
 		}
@@ -62,6 +67,11 @@ public class JobRepositoryFactoryBeanTests extends TestCase{
 		
 		factory.setDatabaseType("invalid type");
 		try{
+			incrementerFactory.isSupportedIncrementerType("invalid type");
+			incrementerControl.setReturnValue(false);
+			incrementerFactory.getSupportedIncrementerTypes();
+			incrementerControl.setReturnValue(new String[0]);
+			incrementerControl.replay();
 			factory.afterPropertiesSet();
 			fail();
 		}
