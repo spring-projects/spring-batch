@@ -326,6 +326,7 @@
 								<include>amqstore</include>
 								<include>.clover</include>
 								<include>surefire*</include>
+								<include>derby.log</include>
 							</includes>
 							<followSymlinks>false</followSymlinks>
 						</fileset>
