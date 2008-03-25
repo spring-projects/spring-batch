@@ -18,11 +18,12 @@ package org.springframework.batch.core.step.item;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.CompositeChunkListener;
 import org.springframework.batch.core.listener.CompositeItemReadListener;
 import org.springframework.batch.core.listener.CompositeItemWriteListener;
@@ -167,6 +168,21 @@ class BatchListenerFactoryHelper {
 			}
 		}
 		return (StepExecutionListener[]) list.toArray(new StepExecutionListener[list.size()]);
+	}
+
+	/**
+	 * @param listeners
+	 * @return
+	 */
+	public SkipListener[] getSkipListeners(StepListener[] listeners) {
+		List list = new ArrayList();
+		for (int i = 0; i < listeners.length; i++) {
+			StepListener listener = listeners[i];
+			if (listener instanceof SkipListener) {
+				list.add(listener);
+			}
+		}
+		return (SkipListener[]) list.toArray(new SkipListener[list.size()]);
 	}
 
 }

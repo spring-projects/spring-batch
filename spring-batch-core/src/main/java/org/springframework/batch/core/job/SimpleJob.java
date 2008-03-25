@@ -50,23 +50,24 @@ public class SimpleJob extends AbstractJob {
 	private CompositeExecutionJobListener listener = new CompositeExecutionJobListener();
 
 	/**
-	 * Public setter for injecting {@link JobExecutionListener}s. They will all be given
-	 * the {@link JobExecutionListener} callbacks at the appropriate point in the job.
+	 * Public setter for injecting {@link JobExecutionListener}s. They will all
+	 * be given the listener callbacks at the appropriate point in the job.
 	 * 
 	 * @param listeners the listeners to set.
 	 */
-	public void setJobListeners(JobExecutionListener[] listeners) {
+	public void setJobExecutionListeners(JobExecutionListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
 			this.listener.register(listeners[i]);
 		}
 	}
 
 	/**
-	 * Register a single listener for the {@link JobExecutionListener} callbacks.
+	 * Register a single listener for the {@link JobExecutionListener}
+	 * callbacks.
 	 * 
 	 * @param listener a {@link JobExecutionListener}
 	 */
-	public void registerListener(JobExecutionListener listener) {
+	public void registerJobExecutionListener(JobExecutionListener listener) {
 		this.listener.register(listener);
 	}
 
@@ -75,7 +76,8 @@ public class SimpleJob extends AbstractJob {
 	 * {@link Step}.
 	 * 
 	 * @see org.springframework.batch.core.Job#execute(org.springframework.batch.core.JobExecution)
-	 * @throws StartLimitExceededException if start limit of one of the steps was exceeded
+	 * @throws StartLimitExceededException if start limit of one of the steps
+	 * was exceeded
 	 */
 	public void execute(JobExecution execution) throws JobExecutionException {
 
@@ -110,8 +112,8 @@ public class SimpleJob extends AbstractJob {
 
 					StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step);
 
-					boolean isRestart = (jobRepository.getStepExecutionCount(jobInstance, step) > 0
-							&& !lastStepExecution.getExitStatus().equals(ExitStatus.FINISHED)) ? true : false;
+					boolean isRestart = (jobRepository.getStepExecutionCount(jobInstance, step) > 0 && !lastStepExecution
+							.getExitStatus().equals(ExitStatus.FINISHED)) ? true : false;
 
 					if (isRestart && lastStepExecution != null) {
 						currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());

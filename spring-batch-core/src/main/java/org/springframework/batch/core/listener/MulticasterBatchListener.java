@@ -15,12 +15,13 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -29,7 +30,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * 
  */
 public class MulticasterBatchListener implements StepExecutionListener, ChunkListener, ItemReadListener,
-		ItemWriteListener {
+		ItemWriteListener, SkipListener {
 
 	private CompositeStepExecutionListener stepListener = new CompositeStepExecutionListener();
 
@@ -38,6 +39,8 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	private CompositeItemReadListener itemReadListener = new CompositeItemReadListener();
 
 	private CompositeItemWriteListener itemWriteListener = new CompositeItemWriteListener();
+
+	private CompositeSkipListener skipListener = new CompositeSkipListener();
 
 	/**
 	 * Initialise the listener instance.
@@ -76,6 +79,9 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 		}
 		if (listener instanceof ItemWriteListener) {
 			this.itemWriteListener.register((ItemWriteListener) listener);
+		}
+		if (listener instanceof SkipListener) {
+			this.skipListener.register((SkipListener) listener);
 		}
 	}
 
@@ -168,6 +174,23 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 */
 	public void onWriteError(Exception ex, Object item) {
 		itemWriteListener.onWriteError(ex, item);
+	}
+
+	/**
+	 * @param t
+	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInRead(java.lang.Throwable)
+	 */
+	public void onSkipInRead(Throwable t) {
+		skipListener.onSkipInRead(t);
+	}
+
+	/**
+	 * @param item
+	 * @param t
+	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)
+	 */
+	public void onSkipInWrite(Object item, Throwable t) {
+		skipListener.onSkipInWrite(item, t);
 	}
 
 }

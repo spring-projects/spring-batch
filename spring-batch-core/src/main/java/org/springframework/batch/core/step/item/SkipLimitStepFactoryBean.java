@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
+import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 
 /**
@@ -28,6 +29,8 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	private Class[] skippableExceptionClasses = new Class[] { Exception.class };
 
 	private Class[] fatalExceptionClasses = new Class[] { Error.class };
+
+	private ItemKeyGenerator itemKeyGenerator;
 
 	/**
 	 * Public setter for a limit that determines skip policy. If this value is
@@ -63,6 +66,17 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	}
 
 	/**
+	 * Public setter for the {@link ItemKeyGenerator}. This is used to identify
+	 * failed items so they can be skipped if encountered again, generally in
+	 * another transaction.
+	 * 
+	 * @param itemKeyGenerator the {@link ItemKeyGenerator} to set.
+	 */
+	public void setItemKeyGenerator(ItemKeyGenerator itemKeyGenerator) {
+		this.itemKeyGenerator = itemKeyGenerator;
+	}
+
+	/**
 	 * Uses the {@link #skipLimit} value to configure item handler and and
 	 * exception handler.
 	 */
@@ -72,6 +86,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 		ItemSkipPolicyItemHandler itemHandler = new ItemSkipPolicyItemHandler(getItemReader(), getItemWriter());
 
 		if (skipLimit > 0) {
+
 			/*
 			 * If there is a skip limit (not the default) then we are prepared
 			 * to absorb exceptions at the step level because the failed items
@@ -85,6 +100,11 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 			exceptionHandler.setFatalExceptionClasses(fatalExceptionClasses);
 			setExceptionHandler(exceptionHandler);
 			getStepOperations().setExceptionHandler(getExceptionHandler());
+			itemHandler.setItemKeyGenerator(itemKeyGenerator);
+
+			BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
+			itemHandler.setSkipListeners(helper.getSkipListeners(getListeners()));
+
 		}
 		else {
 			// This is the default in ItemOrientedStep anyway...

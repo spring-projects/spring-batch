@@ -173,7 +173,7 @@ public class SimpleJobTests extends TestCase {
 	}
 
 	public void testRunNormallyWithListener() throws Exception {
-		job.setJobListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
+		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
 			public void beforeJob(JobExecution jobExecution) {
 				list.add("before");
 			}
@@ -251,7 +251,7 @@ public class SimpleJobTests extends TestCase {
 	}
 
 	public void testFailedWithListener() throws Exception {
-		job.setJobListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
+		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
 			public void onError(JobExecution jobExecution, Throwable t) {
 				list.add(t);
 			}

@@ -168,9 +168,9 @@ public class ItemOrientedStep extends AbstractStep {
 	 * 
 	 * @param listeners an array of listener objects of known types.
 	 */
-	public void setStepListeners(StepExecutionListener[] listeners) {
+	public void setStepExecutionListeners(StepExecutionListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
-			registerStepListener(listeners[i]);
+			registerStepExecutionListener(listeners[i]);
 		}
 	}
 
@@ -180,7 +180,7 @@ public class ItemOrientedStep extends AbstractStep {
 	 * 
 	 * @param listener a {@link StepExecutionListener}
 	 */
-	public void registerStepListener(StepExecutionListener listener) {
+	public void registerStepExecutionListener(StepExecutionListener listener) {
 		this.listener.register(listener);
 	}
 

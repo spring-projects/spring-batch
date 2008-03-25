@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.FailedItemIdentifier;
 import org.springframework.batch.item.ItemKeyGenerator;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.retry.RetryCallback;
@@ -99,7 +98,8 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * Create a new context for the execution of the callback, which must be an
 	 * instance of {@link ItemReaderRetryCallback}.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback, RetryContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback,
+	 * RetryContext)
 	 * 
 	 * @throws IllegalStateException if the callback is not of the required
 	 * type.
@@ -139,18 +139,18 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 		// The delegate context...
 		private RetryContext delegateContext;
 
-		private ItemReader reader;
-
 		private ItemRecoverer recoverer;
 
 		private ItemKeyGenerator keyGenerator;
 
+		private FailedItemIdentifier failedItemIdentifier;
+
 		public ItemReaderRetryContext(ItemReaderRetryCallback callback, RetryContext parent) {
 			super(parent);
 			item = callback.next(this);
-			this.reader = callback.getReader();
 			this.recoverer = callback.getRecoverer();
 			this.keyGenerator = callback.getKeyGenerator();
+			this.failedItemIdentifier = callback.getFailedItemIdentifier();
 		}
 
 		public boolean canRetry(RetryContext context) {
@@ -162,7 +162,7 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 		}
 
 		public RetryContext open(RetryCallback callback, RetryContext parent) {
-			if (hasFailed(reader, keyGenerator, item)) {
+			if (hasFailed(failedItemIdentifier, keyGenerator, item)) {
 				this.delegateContext = retryContextCache.get(keyGenerator.getKey(item));
 			}
 			if (this.delegateContext == null) {
@@ -220,19 +220,18 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * a messaging environment where the item is a message, it can be inspected
 	 * to see if it has been delivered before.<br/>
 	 * 
-	 * The default implementation of this method checks the provider for a mixin
-	 * interface {@link FailedItemIdentifier}. If the interface is present the
-	 * decision is delegated to the provider. Otherwise we just check the cache
-	 * for the item key.
+	 * The default implementation of this method checks for a non-null
+	 * {@link FailedItemIdentifier}. Otherwise we just check the cache for the
+	 * item key.
 	 * 
-	 * @param reader
+	 * @param failedItemIdentifier
 	 * @param keyGenerator
 	 * @param item
 	 * @return
 	 */
-	protected boolean hasFailed(ItemReader reader, ItemKeyGenerator keyGenerator, Object item) {
-		if (reader instanceof FailedItemIdentifier) {
-			return ((FailedItemIdentifier) reader).hasFailed(item);
+	protected boolean hasFailed(FailedItemIdentifier failedItemIdentifier, ItemKeyGenerator keyGenerator, Object item) {
+		if (failedItemIdentifier != null) {
+			return failedItemIdentifier.hasFailed(item);
 		}
 		return retryContextCache.containsKey(keyGenerator.getKey(item));
 	}

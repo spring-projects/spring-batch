@@ -18,6 +18,7 @@ package org.springframework.batch.retry.callback;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.item.FailedItemIdentifier;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
@@ -53,6 +54,8 @@ public class ItemReaderRetryCallback implements RetryCallback {
 	private ItemRecoverer recoverer;
 
 	private ItemKeyGenerator keyGenerator;
+
+	private FailedItemIdentifier failedItemIdentifier;
 
 	private ItemKeyGenerator defaultKeyGenerator = new ItemKeyGenerator() {
 		public Object getKey(Object item) {
@@ -92,6 +95,17 @@ public class ItemReaderRetryCallback implements RetryCallback {
 	 */
 	public void setKeyGenerator(ItemKeyGenerator keyGenerator) {
 		this.keyGenerator = keyGenerator;
+	}
+
+	/**
+	 * Public setter for the {@link FailedItemIdentifier}. If it is not
+	 * injected but the reader or writer implement {@link FailedItemIdentifier},
+	 * one of those will be used instead (preferring the reader to the writer if
+	 * both would be appropriate).
+	 * @param failedItemIdentifier the {@link FailedItemIdentifier} to set
+	 */
+	public void setFailedItemIdentifier(FailedItemIdentifier failedItemIdentifier) {
+		this.failedItemIdentifier = failedItemIdentifier;
 	}
 
 	public Object doWithRetry(RetryContext context) throws Throwable {
@@ -150,6 +164,27 @@ public class ItemReaderRetryCallback implements RetryCallback {
 			return (ItemKeyGenerator) writer;
 		}
 		return defaultKeyGenerator;
+	}
+
+	/**
+	 * Accessor for the {@link FailedItemIdentifier}. If the handler is null
+	 * but the {@link ItemReader} or {@link ItemWriter} is an instance of
+	 * {@link FailedItemIdentifier}, then it will be returned instead. If none
+	 * of those strategies works returns null.
+	 * 
+	 * @return the {@link FailedItemIdentifier}.
+	 */
+	public FailedItemIdentifier getFailedItemIdentifier() {
+		if (failedItemIdentifier != null) {
+			return failedItemIdentifier;
+		}
+		if (reader instanceof FailedItemIdentifier) {
+			return (FailedItemIdentifier) reader;
+		}
+		if (writer instanceof FailedItemIdentifier) {
+			return (FailedItemIdentifier) writer;
+		}
+		return null;
 	}
 
 	/**

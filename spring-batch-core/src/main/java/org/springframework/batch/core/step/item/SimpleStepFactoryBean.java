@@ -15,10 +15,9 @@
  */
 package org.springframework.batch.core.step.item;
 
-import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.listener.MulticasterBatchListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -48,8 +47,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	private ItemStream[] streams = new ItemStream[0];
 
 	private StepListener[] listeners = new StepListener[0];
-
-	private MulticasterBatchListener listener = new MulticasterBatchListener();
 
 	private TaskExecutor taskExecutor;
 
@@ -88,6 +85,14 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	 */
 	public void setListeners(StepListener[] listeners) {
 		this.listeners = listeners;
+	}
+	
+	/**
+	 * Protected getter for the {@link StepListener}s.
+	 * @return the listeners
+	 */
+	protected StepListener[] getListeners() {
+		return listeners;
 	}
 
 	/**
@@ -151,16 +156,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 
 		step.setStreams(streams);
 
-		for (int i = 0; i < listeners.length; i++) {
-			StepListener listener = listeners[i];
-			if (listener instanceof StepExecutionListener) {
-				step.registerStepListener((StepExecutionListener) listener);
-			}
-			else {
-				this.listener.register(listener);
-			}
-		}
-
 		ItemReader itemReader = getItemReader();
 		ItemWriter itemWriter = getItemWriter();
 
@@ -171,13 +166,13 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 			step.registerStream((ItemStream) itemReader);
 		}
 		if (itemReader instanceof StepExecutionListener) {
-			step.registerStepListener((StepExecutionListener) itemReader);
+			step.registerStepExecutionListener((StepExecutionListener) itemReader);
 		}
 		if (itemWriter instanceof ItemStream) {
 			step.registerStream((ItemStream) itemWriter);
 		}
 		if (itemWriter instanceof StepExecutionListener) {
-			step.registerStepListener((StepExecutionListener) itemWriter);
+			step.registerStepExecutionListener((StepExecutionListener) itemWriter);
 		}
 
 		BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
@@ -197,7 +192,7 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 		setItemReader(itemReader);
 		setItemWriter(itemWriter);
 
-		step.setStepListeners(stepListeners);
+		step.setStepExecutionListeners(stepListeners);
 
 		stepOperations = new RepeatTemplate();
 

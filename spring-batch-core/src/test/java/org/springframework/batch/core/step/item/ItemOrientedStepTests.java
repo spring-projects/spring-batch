@@ -231,7 +231,7 @@ public class ItemOrientedStepTests extends TestCase {
 		};
 
 		itemOrientedStep.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
-		itemOrientedStep.registerStepListener(new StepExecutionListenerSupport() {
+		itemOrientedStep.registerStepExecutionListener(new StepExecutionListenerSupport() {
 			public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 				return ExitStatus.FAILED.addExitDescription("FOO");
 			}
@@ -394,7 +394,7 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testDirectlyInjectedListener() throws Exception {
-		itemOrientedStep.registerStepListener(new StepExecutionListenerSupport() {
+		itemOrientedStep.registerStepExecutionListener(new StepExecutionListenerSupport() {
 			public void beforeStep(StepExecution stepExecution) {
 				list.add("foo");
 			}
@@ -421,7 +421,7 @@ public class ItemOrientedStepTests extends TestCase {
 			}
 		};
 		itemOrientedStep.setStreams(new ItemStream[] { reader });
-		itemOrientedStep.registerStepListener(reader);
+		itemOrientedStep.registerStepExecutionListener(reader);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, new JobExecution(jobInstance));
 		itemOrientedStep.execute(stepExecution);
 		assertEquals(1, list.size());
@@ -431,7 +431,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		final ExitStatus customStatus = new ExitStatus(false, "custom code");
 
-		itemOrientedStep.setStepListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
+		itemOrientedStep.setStepExecutionListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("afterStepCalled");
 				return customStatus;
@@ -452,7 +452,7 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testDirectlyInjectedListenerOnError() throws Exception {
-		itemOrientedStep.registerStepListener(new StepExecutionListenerSupport() {
+		itemOrientedStep.registerStepExecutionListener(new StepExecutionListenerSupport() {
 			public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 				list.add(e);
 				return null;

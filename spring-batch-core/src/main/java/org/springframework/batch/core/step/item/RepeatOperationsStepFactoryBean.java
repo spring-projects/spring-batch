@@ -108,13 +108,13 @@ public class RepeatOperationsStepFactoryBean extends AbstractStepFactoryBean {
 			step.registerStream((ItemStream) itemReader);
 		}
 		if (itemReader instanceof StepExecutionListener) {
-			step.registerStepListener((StepExecutionListener) itemReader);
+			step.registerStepExecutionListener((StepExecutionListener) itemReader);
 		}
 		if (itemWriter instanceof ItemStream) {
 			step.registerStream((ItemStream) itemWriter);
 		}
 		if (itemWriter instanceof StepExecutionListener) {
-			step.registerStepListener((StepExecutionListener) itemWriter);
+			step.registerStepExecutionListener((StepExecutionListener) itemWriter);
 		}
 
 		BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
@@ -128,7 +128,7 @@ public class RepeatOperationsStepFactoryBean extends AbstractStepFactoryBean {
 		setItemReader(itemReader);
 		setItemWriter(itemWriter);
 
-		step.setStepListeners(stepListeners);
+		step.setStepExecutionListeners(stepListeners);
 		step.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
 
 		step.setChunkOperations(chunkOperations);
