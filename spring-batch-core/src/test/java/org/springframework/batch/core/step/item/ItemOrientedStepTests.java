@@ -23,7 +23,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
@@ -31,6 +30,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
@@ -40,18 +40,16 @@ import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
-import org.springframework.batch.core.step.item.ItemOrientedStep;
-import org.springframework.batch.core.step.item.SimpleItemHandler;
 import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
-import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -212,6 +210,42 @@ public class ItemOrientedStepTests extends TestCase {
 		} catch (Exception ex) {
 			ExitStatus status = stepExecution.getExitStatus();
 			assertFalse(status.isContinuable());
+		}
+	}
+
+	public void testExitCodeCustomClassification() throws Exception {
+
+		ItemReader itemReader = new AbstractItemReader() {
+
+			public Object read() throws Exception {
+				int counter = 0;
+				counter++;
+
+				if (counter == 1) {
+					throw new RuntimeException();
+				}
+
+				return ExitStatus.CONTINUABLE;
+			}
+
+		};
+
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
+		itemOrientedStep.registerStepListener(new StepListenerSupport() {
+			public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
+				return ExitStatus.FAILED.addExitDescription("FOO");
+			}
+		});
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
+
+		try {
+			itemOrientedStep.execute(stepExecution);
+		} catch (Exception ex) {
+			ExitStatus status = stepExecution.getExitStatus();
+			assertFalse(status.isContinuable());
+			String description = status.getExitDescription();
+			assertTrue("Description does not include 'FOO': "+description, description.indexOf("FOO")>=0);
 		}
 	}
 
@@ -586,7 +620,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		try {
 			itemOrientedStep.execute(stepExecution);
-			fail("Expected BatchCriticalException");
+			fail("Expected UnexpectedJobExecutionException");
 		} catch (UnexpectedJobExecutionException ex) {
 			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();

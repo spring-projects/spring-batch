@@ -26,7 +26,6 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.step.ExitStatusExceptionClassifier;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
@@ -126,8 +125,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		StepExecution execution = new StepExecution(step2, jobExecution, null);
 		execution.setStatus(BatchStatus.STARTED);
 		execution.setStartTime(new Date(System.currentTimeMillis()));
-		execution.setExitStatus(new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION,
-				"java.lang.Exception"));
+		execution.setExitStatus(ExitStatus.FAILED.addExitDescription("java.lang.Exception"));
 		stepExecutionDao.saveStepExecution(execution);
 		StepExecution retrievedExecution = stepExecutionDao.getStepExecution(jobExecution, step2);
 		assertNotNull(retrievedExecution);
@@ -140,8 +138,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		execution.setStatus(BatchStatus.STARTED);
 		execution.setStartTime(new Date(System.currentTimeMillis()));
 		execution.setExecutionContext(executionContext);
-		execution.setExitStatus(new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION,
-				"java.lang.Exception"));
+		execution.setExitStatus(ExitStatus.FAILED.addExitDescription("java.lang.Exception"));
 		stepExecutionDao.saveStepExecution(execution);
 		stepExecutionDao.saveOrUpdateExecutionContext(execution);
 		StepExecution retrievedExecution = stepExecutionDao.getStepExecution(jobExecution, step2);
@@ -159,8 +156,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		stepExecution.setCommitCount(5);
 		stepExecution.setItemCount(5);
 		stepExecution.setExecutionContext(new ExecutionContext());
-		stepExecution.setExitStatus(new ExitStatus(false, ExitStatusExceptionClassifier.FATAL_EXCEPTION,
-				"java.lang.Exception"));
+		stepExecution.setExitStatus(ExitStatus.FAILED.addExitDescription("java.lang.Exception"));
 		stepExecutionDao.updateStepExecution(stepExecution);
 		StepExecution retrievedExecution = stepExecutionDao.getStepExecution(jobExecution, step1);
 		assertNotNull(retrievedExecution);

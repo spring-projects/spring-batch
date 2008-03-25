@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -25,11 +27,11 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeStepListener;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.core.step.ExitStatusExceptionClassifier;
-import org.springframework.batch.core.step.SimpleExitStatusExceptionClassifier;
 import org.springframework.batch.core.step.StepExecutionSynchronizer;
 import org.springframework.batch.core.step.StepExecutionSyncronizerFactory;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
@@ -71,11 +73,14 @@ public class ItemOrientedStep extends AbstractStep {
 
 	private static final Log logger = LogFactory.getLog(ItemOrientedStep.class);
 
+	/**
+	 * Exit code for interrupted status.
+	 */
+	public static final String JOB_INTERRUPTED = "JOB_INTERRUPTED";
+
 	private RepeatOperations chunkOperations = new RepeatTemplate();
 
 	private RepeatOperations stepOperations = new RepeatTemplate();
-
-	private ExitStatusExceptionClassifier exceptionClassifier = new SimpleExitStatusExceptionClassifier();
 
 	// default to checking current thread for interruption.
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
@@ -210,16 +215,6 @@ public class ItemOrientedStep extends AbstractStep {
 	 */
 	public void setInterruptionPolicy(StepInterruptionPolicy interruptionPolicy) {
 		this.interruptionPolicy = interruptionPolicy;
-	}
-
-	/**
-	 * Setter for the {@link ExitStatusExceptionClassifier} that will be used to
-	 * classify any exception that causes a job to fail.
-	 * 
-	 * @param exceptionClassifier
-	 */
-	public void setExceptionClassifier(ExitStatusExceptionClassifier exceptionClassifier) {
-		this.exceptionClassifier = exceptionClassifier;
 	}
 
 	/**
@@ -421,20 +416,21 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * @param stepExecution
-	 * @param fatalException
-	 * @param e
-	 * @return
-	 * @throws JobInterruptedException
+	 * @param stepExecution the current {@link StepExecution}
+	 * @param fatalException the {@link ExceptionHolder} containing information about failures in meta-data
+	 * @param e the cause of teh failure
+	 * @return an {@link ExitStatus}
 	 */
 	private ExitStatus processFailure(final StepExecution stepExecution, final ExceptionHolder fatalException,
-			Throwable e) throws JobInterruptedException {
-		ExitStatus status;
-		// classify exception so an exit code can be stored.
-		status = exceptionClassifier.classifyForExitCode(e);
+			Throwable e) {
+
+		// Default classification marks this as a failure and adds the exception
+		// type and message
+		ExitStatus status = getDefaultExitStatusForFailure(e);
 
 		if (!fatalException.hasException()) {
 			try {
+				// classify exception so an exit code can be stored.
 				status = status.and(listener.onErrorInStep(stepExecution, e));
 			}
 			catch (RuntimeException ex) {
@@ -446,6 +442,34 @@ public class ItemOrientedStep extends AbstractStep {
 			logger.error("Fatal error detected during rollback caused by underlying exception: ", e);
 		}
 		return status;
+	}
+
+	/**
+	 * Default mapping from throwable to {@link ExitStatus}. Clients can modify
+	 * the exit code using a {@link StepListener}.
+	 * 
+	 * @param throwable the cause of teh failure
+	 * @return an {@link ExitStatus}
+	 */
+	private ExitStatus getDefaultExitStatusForFailure(Throwable throwable) {
+		ExitStatus exitStatus;
+		if (throwable instanceof JobInterruptedException) {
+			exitStatus = new ExitStatus(false, JOB_INTERRUPTED, JobInterruptedException.class.getName());
+		}
+		else if (throwable instanceof NoSuchJobException) {
+			exitStatus = new ExitStatus(false, ExitCodeMapper.NO_SUCH_JOB);
+		}
+		else {
+			String message = "";
+			if (throwable != null) {
+				StringWriter writer = new StringWriter();
+				throwable.printStackTrace(new PrintWriter(writer));
+				message = writer.toString();
+			}
+			exitStatus = ExitStatus.FAILED.addExitDescription(message);
+		}
+
+		return exitStatus;
 	}
 
 	/**
