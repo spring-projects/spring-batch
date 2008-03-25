@@ -52,7 +52,7 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	 * @see org.springframework.batch.repeat.exception.handler.ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
 	 * java.lang.Throwable)
 	 */
-	public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
+	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 		// Only bother to check the delegate exception handler if we know that
 		// retry is exhausted
 		if (context.hasAttribute(EXHAUSTED)) {

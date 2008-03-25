@@ -11,10 +11,10 @@ public class FootballExceptionHandler implements ExceptionHandler {
 			.getLog(FootballExceptionHandler.class);
 
 	public void handleException(RepeatContext context, Throwable throwable)
-			throws RuntimeException {
+			throws Throwable {
 
 		if (!(throwable instanceof NumberFormatException)) {
-			throw new RuntimeException(throwable);
+			throw throwable;
 		} else {
 			logger.error("Number Format Exception!", throwable);
 		}

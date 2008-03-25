@@ -107,15 +107,15 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	}
 
 	/**
-	 * Classify the throwables and decide whether to rethrow based on the
+	 * Classify the throwables and decide whether to re-throw based on the
 	 * result. The context is used to accumulate the number of exceptions of the
 	 * same type according to the classifier.
 	 * 
-	 * @throws Exception
+	 * @throws Throwable
 	 * @see {@link ExceptionHandler#handleException(RepeatContext, Throwable)}
 	 */
 	public void handleException(RepeatContext context, Throwable throwable)
-			throws RuntimeException {
+			throws Throwable {
 
 		Object key = exceptionClassifier.classify(throwable);
 		RepeatContextCounter counter = getCounter(context, key);

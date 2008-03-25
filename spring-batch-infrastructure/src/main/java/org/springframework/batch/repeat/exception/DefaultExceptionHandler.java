@@ -34,7 +34,7 @@ public class DefaultExceptionHandler implements ExceptionHandler {
 	 * @see org.springframework.batch.repeat.exception.ExceptionHandler#handleException(RepeatContext,
 	 *      Throwable)
 	 */
-	public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
+	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 		rethrow(throwable);
 	}
 

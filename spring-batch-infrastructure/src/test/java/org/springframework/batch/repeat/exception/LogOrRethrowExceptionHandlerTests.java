@@ -43,7 +43,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 		logger.addAppender(new WriterAppender(new SimpleLayout(), writer));
 	}
 	
-	public void testRuntimeException() throws Exception {
+	public void testRuntimeException() throws Throwable {
 		try {
 			handler.handleException(context, new RuntimeException("Foo"));
 			fail("Expected RuntimeException");
@@ -52,7 +52,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 		}
 	}
 
-	public void testError() throws Exception {
+	public void testError() throws Throwable {
 		try {
 			handler.handleException(context, new Error("Foo"));
 			fail("Expected Error");
@@ -61,7 +61,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 		}
 	}
 	
-	public void testNotRethrownErrorLevel() throws Exception {
+	public void testNotRethrownErrorLevel() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
 			public Object classify(Throwable throwable) {
 				return LogOrRethrowExceptionHandler.ERROR;
@@ -72,7 +72,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 		assertNotNull(writer.toString());
 	}
 
-	public void testNotRethrownWarnLevel() throws Exception {
+	public void testNotRethrownWarnLevel() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
 			public Object classify(Throwable throwable) {
 				return LogOrRethrowExceptionHandler.WARN;
@@ -83,7 +83,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 		assertNotNull(writer.toString());
 	}
 	
-	public void testNotRethrownDebugLevel() throws Exception {
+	public void testNotRethrownDebugLevel() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
 			public Object classify(Throwable throwable) {
 				return LogOrRethrowExceptionHandler.DEBUG;
@@ -94,7 +94,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 		assertNotNull(writer.toString());
 	}
 
-	public void testUnclassifiedException() throws Exception {
+	public void testUnclassifiedException() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
 			public Object classify(Throwable throwable) {
 				return "DEFAULT";

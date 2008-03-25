@@ -36,7 +36,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 	// object under test
 	private SimpleLimitExceptionHandler handler = new SimpleLimitExceptionHandler();
 
-	public void testInitializeWithNullContext() throws Exception {
+	public void testInitializeWithNullContext() throws Throwable {
 		try {
 			handler.handleException(null, new RuntimeException("foo"));
 			fail("Expected IllegalArgumentException");
@@ -45,7 +45,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 		}
 	}
 
-	public void testInitializeWithNullContextAndNullException() throws Exception {
+	public void testInitializeWithNullContextAndNullException() throws Throwable {
 		try {
 			handler.handleException(null, null);
 		} catch (NullPointerException e) {
@@ -58,7 +58,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 	 * 
 	 * @throws Exception
 	 */
-	public void testNormalExceptionThrown() throws Exception {
+	public void testNormalExceptionThrown() throws Throwable {
 		Throwable throwable = new RuntimeException("foo");
 
 		final int MORE_THAN_ZERO = 1;
@@ -79,7 +79,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 	 * 
 	 * @throws Exception
 	 */
-	public void testLimitedExceptionTypeNotThrown() throws Exception {
+	public void testLimitedExceptionTypeNotThrown() throws Throwable {
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
 		handler.setExceptionClasses(new Class[] {RuntimeException.class} );
@@ -96,7 +96,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 	 * 
 	 * @throws Exception
 	 */
-	public void testLimitedExceptionNotThrownFromSiblings() throws Exception {
+	public void testLimitedExceptionNotThrownFromSiblings() throws Throwable {
 		Throwable throwable = new RuntimeException("foo");
 
 		final int MORE_THAN_ZERO = 1;
@@ -120,7 +120,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 	 * 
 	 * @throws Exception
 	 */
-	public void testLimitedExceptionThrownFromSiblingsWhenUsingParent() throws Exception {
+	public void testLimitedExceptionThrownFromSiblingsWhenUsingParent() throws Throwable {
 		Throwable throwable = new RuntimeException("foo");
 
 		final int MORE_THAN_ZERO = 1;
@@ -145,7 +145,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 	 * TransactionInvalidExceptions are swallowed until the exception limit is exceeded. After the limit is exceeded
 	 * exceptions are rethrown as BatchCriticalExceptions
 	 */
-	public void testExceptionNotThrownBelowLimit() throws Exception {
+	public void testExceptionNotThrownBelowLimit() throws Throwable {
 
 		final int EXCEPTION_LIMIT = 3;
 		handler.setLimit(EXCEPTION_LIMIT);
@@ -178,7 +178,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 	 * TransactionInvalidExceptions are swallowed until the exception limit is exceeded. After the limit is exceeded
 	 * exceptions are rethrown as BatchCriticalExceptions
 	 */
-	public void testExceptionThrownAboveLimit() throws Exception {
+	public void testExceptionThrownAboveLimit() throws Throwable {
 
 		final int EXCEPTION_LIMIT = 3;
 		handler.setLimit(EXCEPTION_LIMIT);

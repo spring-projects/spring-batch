@@ -105,7 +105,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * @see org.springframework.batch.repeat.exception.ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
 	 * Throwable)
 	 */
-	public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
+	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 		delegate.handleException(context, throwable);
 	}
 

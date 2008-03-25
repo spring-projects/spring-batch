@@ -25,7 +25,7 @@ public class DefaultExceptionHandlerTests extends TestCase {
 	private DefaultExceptionHandler handler = new DefaultExceptionHandler();
 	private RepeatContext context = null;
 	
-	public void testRuntimeException() throws Exception {
+	public void testRuntimeException() throws Throwable {
 		try {
 			handler.handleException(context, new RuntimeException("Foo"));
 			fail("Expected RuntimeException");
@@ -34,7 +34,7 @@ public class DefaultExceptionHandlerTests extends TestCase {
 		}
 	}
 
-	public void testError() throws Exception {
+	public void testError() throws Throwable {
 		try {
 			handler.handleException(context, new Error("Foo"));
 			fail("Expected Error");

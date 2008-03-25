@@ -54,7 +54,7 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}.
 	 */
-	public void testRethrowWhenRetryExhausted() {
+	public void testRethrowWhenRetryExhausted() throws Throwable {
 
 		RetryPolicy retryPolicy = new NeverRetryPolicy();
 		RuntimeException ex = new RuntimeException("foo");
@@ -79,7 +79,7 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}.
 	 */
-	public void testNoRethrowWhenRetryNotExhausted() {
+	public void testNoRethrowWhenRetryNotExhausted() throws Throwable {
 
 		RetryPolicy retryPolicy = new AlwaysRetryPolicy();
 		RuntimeException ex = new RuntimeException("foo");

@@ -20,34 +20,29 @@ import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**
- * Handler to allow strategies for rethrowing exceptions. Normally a
+ * Handler to allow strategies for re-throwing exceptions. Normally a
  * {@link CompletionPolicy} will be used to decide whether to end a batch when
  * there is no exception, and the {@link ExceptionHandler} is used to signal an
  * abnormal ending - an abnormal ending would result in an
  * {@link ExceptionHandler} throwing an exception. The caller will catch and
- * rethrow it if necessary.
+ * re-throw it if necessary.
  * 
  * @author Dave Syer
+ * @author Robert Kasanicky
  * 
  */
 public interface ExceptionHandler {
 
 	/**
-	 * Deal with a Throwable during a batch. The input might be
-	 * RuntimeException or other unchecked exceptions.
+	 * Deal with a Throwable during a batch - decide whether it should be
+	 * re-thrown in the first place.
 	 * 
-	 * @param context
-	 *            the current {@link RepeatContext}. Can be used to store state
-	 *            (via attributes), for example to count the number of
-	 *            occurrences of a particular exception type and implement a
-	 *            threshold policy.
-	 * @param throwable
-	 *            an exception.
-	 * @throws RuntimeException
-	 *             implementations must wrap and rethrow other Throwables
-	 *             appropriately.
+	 * @param context the current {@link RepeatContext}. Can be used to store
+	 * state (via attributes), for example to count the number of occurrences of
+	 * a particular exception type and implement a threshold policy.
+	 * @param throwable an exception.
+	 * @throws Throwable implementations are free to re-throw the exception
 	 */
-	void handleException(RepeatContext context, Throwable throwable)
-			throws RuntimeException;
+	void handleException(RepeatContext context, Throwable throwable) throws Throwable;
 
 }

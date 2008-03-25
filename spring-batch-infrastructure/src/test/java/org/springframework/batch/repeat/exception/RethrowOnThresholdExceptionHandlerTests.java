@@ -31,7 +31,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 	private RepeatContext parent = new RepeatContextSupport(null);
 	private RepeatContext context = new RepeatContextSupport(parent);
 	
-	public void testRuntimeException() throws Exception {
+	public void testRuntimeException() throws Throwable {
 		try {
 			handler.handleException(context, new RuntimeException("Foo"));
 			fail("Expected RuntimeException");
@@ -40,7 +40,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 		}
 	}
 
-	public void testError() throws Exception {
+	public void testError() throws Throwable {
 		try {
 			handler.handleException(context, new Error("Foo"));
 			fail("Expected Error");
@@ -49,7 +49,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 		}
 	}
 	
-	public void testNotRethrownWithThreshold() throws Exception {
+	public void testNotRethrownWithThreshold() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
 			public Object classify(Throwable throwable) {
 				return "RuntimeException";
@@ -63,7 +63,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 		assertEquals(1, counter.getCount());
 	}
 	
-	public void testRethrowOnThreshold() throws Exception {
+	public void testRethrowOnThreshold() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
 			public Object classify(Throwable throwable) {
 				return "RuntimeException";
@@ -92,7 +92,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 		}
 	}
 	
-	public void testNotUseParent() throws Exception {
+	public void testNotUseParent() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
 			public Object classify(Throwable throwable) {
 				return "RuntimeException";
@@ -111,7 +111,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 		}
 	}
 
-	public void testUseParent() throws Exception {
+	public void testUseParent() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
 			public Object classify(Throwable throwable) {
 				return "RuntimeException";

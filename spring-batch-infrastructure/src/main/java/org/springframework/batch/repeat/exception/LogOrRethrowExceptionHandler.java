@@ -79,7 +79,7 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	 * 
 	 * @see {@link ExceptionHandler#handleException(RepeatContext, Throwable)}
 	 */
-	public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
+	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 
 		Object key = exceptionClassifier.classify(throwable);
 		if (ERROR.equals(key)) {

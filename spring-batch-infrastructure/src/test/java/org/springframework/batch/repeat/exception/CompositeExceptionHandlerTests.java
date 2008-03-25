@@ -29,7 +29,7 @@ public class CompositeExceptionHandlerTests extends TestCase {
 
 	private CompositeExceptionHandler handler = new CompositeExceptionHandler();
 	
-	public void testNewHandler() throws Exception {
+	public void testNewHandler() throws Throwable {
 		try {
 			handler.handleException(null, new RuntimeException());
 		}
@@ -38,7 +38,7 @@ public class CompositeExceptionHandlerTests extends TestCase {
 		}
 	}
 	
-	public void testDelegation() throws Exception {
+	public void testDelegation() throws Throwable {
 		final List list = new ArrayList();
 		handler.setHandlers(new ExceptionHandler[] {
 			new ExceptionHandler() {
