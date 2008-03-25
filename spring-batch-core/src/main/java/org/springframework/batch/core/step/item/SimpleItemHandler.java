@@ -53,22 +53,6 @@ public class SimpleItemHandler implements ItemHandler {
 	}
 
 	/**
-	 * Public getter for the ItemReader.
-	 * @return the itemReader
-	 */
-	public ItemReader getItemReader() {
-		return itemReader;
-	}
-
-	/**
-	 * Public getter for the ItemWriter.
-	 * @return the itemWriter
-	 */
-	public ItemWriter getItemWriter() {
-		return itemWriter;
-	}
-
-	/**
 	 * Get the next item from {@link #read(StepContribution)} and if not null
 	 * pass the item to {@link #write(Object, StepContribution)}.
 	 * 
@@ -88,6 +72,14 @@ public class SimpleItemHandler implements ItemHandler {
 	 * @return next item for writing
 	 */
 	protected Object read(StepContribution contribution) throws Exception {
+		return doRead();
+	}
+
+	/**
+	 * @return
+	 * @throws Exception
+	 */
+	protected final Object doRead() throws Exception {
 		return itemReader.read();
 	}
 
@@ -97,6 +89,14 @@ public class SimpleItemHandler implements ItemHandler {
 	 * @param contribution current context
 	 */
 	protected void write(Object item, StepContribution contribution) throws Exception {
+		doWrite(item);
+	}
+
+	/**
+	 * @param item
+	 * @throws Exception
+	 */
+	protected final void doWrite(Object item) throws Exception {
 		itemWriter.write(item);
 	}
 

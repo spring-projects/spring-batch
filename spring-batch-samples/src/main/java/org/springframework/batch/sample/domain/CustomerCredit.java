@@ -18,9 +18,6 @@ package org.springframework.batch.sample.domain;
 
 import java.math.BigDecimal;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 
 public class CustomerCredit {
 	private int id;
@@ -60,11 +57,11 @@ public class CustomerCredit {
     }
     
     public boolean equals(Object o) {
-		return EqualsBuilder.reflectionEquals(this, o);
+		return (o instanceof CustomerCredit) && ((CustomerCredit)o).id==id;
 	}
 
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		return id;
 	}
 	
 }

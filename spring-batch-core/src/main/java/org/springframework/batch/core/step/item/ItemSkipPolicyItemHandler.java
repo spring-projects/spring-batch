@@ -15,12 +15,17 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
+import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.Skippable;
 
 /**
  * {@link ItemHandler} that implements skip behavior. It delegates to
@@ -35,7 +40,31 @@ import org.springframework.batch.item.Skippable;
  */
 public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 
+	protected final Log logger = LogFactory.getLog(getClass());
+
 	private ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
+
+	private ItemKeyGenerator itemKeyGenerator = new ItemKeyGenerator() {
+		public Object getKey(Object item) {
+			return item;
+		}
+	};
+
+	private Set skippedItems = new HashSet();
+
+	/**
+	 * Public setter for the {@link ItemKeyGenerator}. Defaults to just return
+	 * the item, and since it will be used before a write operation.
+	 * Implementations must ensure that items always have the same key when they
+	 * are read from the {@link ItemReader} (so if the item is mutable and the
+	 * reader does any buffering the key generator might need to take care to
+	 * only use data that do not change on write).
+	 * 
+	 * @param itemKeyGenerator the itemKeyGenerator to set
+	 */
+	public void setItemKeyGenerator(ItemKeyGenerator itemKeyGenerator) {
+		this.itemKeyGenerator = itemKeyGenerator;
+	}
 
 	/**
 	 * @param itemReader
@@ -53,50 +82,62 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	}
 
 	/**
-	 * Tries to read the item from the reader, in case exception is thrown calls
-	 * skip on the reader (if skipPolicy decides it is appropriate) before
-	 * rethrowing the exception.
+	 * Tries to read the item from the reader, in case of exception skip the
+	 * item if the skip policy allows, otherwise re-throw.
 	 * 
 	 * @param contribution current StepContribution holding skipped items count
 	 * @return next item for processing
 	 */
 	protected Object read(StepContribution contribution) throws Exception {
-		try {
-			return getItemReader().read();
-		}
-		catch (Exception e) {
-			if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
-				contribution.incrementSkipCount();
-				if (getItemReader() instanceof Skippable) {
-					((Skippable) getItemReader()).skip();
+
+		while (true) {
+
+			try {
+
+				Object item = doRead();
+				while (item != null && skippedItems.contains(itemKeyGenerator.getKey(item))) {
+					logger.debug("Skipping item on input: " + item);
+					item = doRead();
+				}
+				return item;
+
+			}
+			catch (Exception e) {
+				if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+					// increment skip count and try again
+					contribution.incrementSkipCount();
+				}
+				else {
+					// re-throw only when the skip policy runs out of patience
+					throw e;
 				}
 			}
-			throw e;
+
 		}
+
 	}
 
 	/**
-	 * Tries to write the item using the writer, in case exception is thrown
-	 * calls skip on both reader and writer (if skipPolicy decides it is
-	 * appropriate) before rethrowing the exception.
+	 * Tries to write the item using the writer. In case of exception consults
+	 * skip policy before re-throwing the exception. The exception is always
+	 * re-thrown, but if the item is seen again on read it will be skipped.
 	 * 
 	 * @param item item to write
 	 * @param contribution current StepContribution holding skipped items count
 	 */
 	protected void write(Object item, StepContribution contribution) throws Exception {
+		// Get the key as early as possible, otherwise it might change in
+		// doWrite()
+		Object key = itemKeyGenerator.getKey(item);
 		try {
-			getItemWriter().write(item);
+			doWrite(item);
 		}
 		catch (Exception e) {
 			if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 				contribution.incrementSkipCount();
-				if (getItemReader() instanceof Skippable) {
-					((Skippable) getItemReader()).skip();
-				}
-				if (getItemWriter() instanceof Skippable) {
-					((Skippable) getItemWriter()).skip();
-				}
+				skippedItems.add(key);
 			}
+			// always re-throw exception on write
 			throw e;
 		}
 	}
