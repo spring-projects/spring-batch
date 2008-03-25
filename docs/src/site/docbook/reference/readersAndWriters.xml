@@ -1101,7 +1101,7 @@
     spring applications, this solution is good enough. Resources are primarily
     used to load spring application context files, and perhaps a properties
     file. The names of these are known at compile time. However, in many batch
-    scenarios, a the file name may need to be determined at runtime as a
+    scenarios, the file name may need to be determined at runtime as a
     parameter to the job. This could be solved using a
     <classname>PropertyPlaceholderConfigurer</classname> and '-D' parameters.
     (System arguments):</para>
@@ -1115,7 +1115,7 @@
     <para>All that would be required for this solution to work would be a
     placeholder configurer in the <classname>ApplicationContext</classname>
     and the system arguments provided. (-Dfile.name="/file.txt") This solution
-    will work, but it would be much preffered to place the file name in the
+    will work, but it would be much preferred to place the file name in the
     <classname>JobParameters</classname> of the job and access them that way.
     To allow for this, Spring Batch provides the
     <classname>StepExecutionResourceProxy</classname>. The proxy can use
@@ -1129,7 +1129,7 @@
 
     <para>Assuming a job name of 'fooJob', and a step name of 'fooStep', and
     the key-value pair of 'file.name="fileName.txt' is in the
-    <classname>JobParameters</classname> the job is start with, the folling
+    <classname>JobParameters</classname> the job is start with, the following
     filename will be passed as the <classname>Resource</classname>:
     "<filename>/fooJob/fooStep/fileName.txt</filename>". It should be noted
     that in order for the proxy to have access to the
@@ -1867,7 +1867,7 @@ itemReader.close(executionContext);</programlisting>
     transformer, before writing it. For example, assuming an
     <classname>ItemReader</classname> provides a class of type Foo, and it
     needs to be converted to type Bar before being written out. An
-    <classname>ItemTransformer</classname> can be written that perform the
+    <classname>ItemTransformer</classname> can be written that performs the
     conversion:</para>
 
     <programlisting>  public class Foo {}
