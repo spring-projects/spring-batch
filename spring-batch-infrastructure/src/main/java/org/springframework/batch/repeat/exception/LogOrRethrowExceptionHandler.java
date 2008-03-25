@@ -75,7 +75,7 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	/**
 	 * Classify the throwables and decide whether to rethrow based on the result. The context is not used.
 	 * 
-	 * @throws RuntimeException
+	 * @throws Throwable
 	 * 
 	 * @see {@link ExceptionHandler#handleException(RepeatContext, Throwable)}
 	 */
@@ -89,7 +89,7 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 		} else if (DEBUG.equals(key) && logger.isDebugEnabled()) {
 			logger.debug("Exception encountered in batch repeat.", throwable);
 		} else if (RETHROW.equals(key)) {
-			DefaultExceptionHandler.rethrow(throwable);
+			throw throwable;
 		} else {
 			throw new IllegalStateException(
 			        "Unclassified exception encountered.  Did you mean to classifiy this as 'rethrow'?");

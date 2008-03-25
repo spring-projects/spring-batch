@@ -29,9 +29,7 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
-import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
@@ -100,8 +98,8 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		try {
 			service.error();
 			fail("Expected BatchException");
-		} catch (RepeatException e) {
-			assertEquals("Unexpected", e.getMessage().substring(0, 10));
+		} catch (Error e) {
+			assertEquals("Duh", e.getMessage().substring(0, 3));
 		}
 	}
 

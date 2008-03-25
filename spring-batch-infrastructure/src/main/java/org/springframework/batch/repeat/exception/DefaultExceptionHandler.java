@@ -17,10 +17,9 @@
 package org.springframework.batch.repeat.exception;
 
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatException;
 
 /**
- * Default implementation of {@link ExceptionHandler} - just re-throws the first exception it encounters.
+ * Default implementation of {@link ExceptionHandler} - just re-throws the exception it encounters.
  * 
  * @author Dave Syer
  * 
@@ -28,33 +27,13 @@ import org.springframework.batch.repeat.RepeatException;
 public class DefaultExceptionHandler implements ExceptionHandler {
 
 	/**
-	 * Rethrow the throwable in the collection's iterator. Wrap in a {@link RepeatException} if the first instance is
-	 * not a {@link RuntimeException}.
+	 * Re-throw the throwable.
 	 * 
 	 * @see org.springframework.batch.repeat.exception.ExceptionHandler#handleException(RepeatContext,
 	 *      Throwable)
 	 */
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
-		rethrow(throwable);
-	}
-
-	/**
-	 * Convenience method to rethrow the Throwable instance. Wraps it in a {@link RepeatException} if it is not a
-	 * {@link RuntimeException} or {@link Error}.
-	 * 
-	 * @param throwable a Throwable.
-	 * @throws RuntimeException if the throwable is a {@link RuntimeException}
-	 * @throws Error if the throwable is an {@link Error}
-	 * @throws RepeatException otherwise
-	 */
-	public static void rethrow(Throwable throwable) throws RuntimeException {
-		if (throwable instanceof Error) {
-			throw (Error) throwable;
-		} else if (throwable instanceof RuntimeException) {
-			throw (RuntimeException) throwable;
-		} else {
-			throw new RepeatException("Exception in batch process", throwable);
-		}
+		throw throwable;
 	}
 
 }

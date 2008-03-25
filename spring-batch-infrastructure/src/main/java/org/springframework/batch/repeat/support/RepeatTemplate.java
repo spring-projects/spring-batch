@@ -27,6 +27,7 @@ import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
@@ -227,7 +228,8 @@ public class RepeatTemplate implements RepeatOperations {
 								logger.debug("Exception intercepted (" + (i + 1) + " of " + listeners.length + ")",
 										throwable);
 							}
-							exceptionHandler.handleException(context, throwable);
+							
+							exceptionHandler.handleException(context, unwrapIfRethrown(throwable));
 
 						}
 						catch (Throwable handled) {
@@ -285,11 +287,31 @@ public class RepeatTemplate implements RepeatOperations {
 	}
 
 	/**
-	 * @param next
-	 * @return
+	 * Re-throws the original throwable if it is unchecked, wraps checked
+	 * exceptions into {@link RepeatException}.
 	 */
-	private static void rethrow(Throwable next) throws RuntimeException {
-		DefaultExceptionHandler.rethrow(next);
+	private static void rethrow(Throwable throwable) throws RuntimeException {
+		if (throwable instanceof Error) {
+			throw (Error) throwable;
+		}
+		else if (throwable instanceof RuntimeException) {
+			throw (RuntimeException) throwable;
+		}
+		else {
+			throw new RepeatException("Exception in batch process", throwable);
+		}
+	}
+	
+	/**
+	 * Unwraps the throwable if it has been wrapped by {@link #rethrow(Throwable)}.
+	 */
+	private static Throwable unwrapIfRethrown(Throwable throwable) {
+		if (throwable instanceof RepeatException) {
+			return throwable.getCause();
+		}
+		else {
+			return throwable;
+		}
 	}
 
 	/**

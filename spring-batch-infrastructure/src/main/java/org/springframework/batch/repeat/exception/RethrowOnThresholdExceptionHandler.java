@@ -123,7 +123,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 		int count = counter.getCount();
 		Integer threshold = (Integer) thresholds.get(key);
 		if (threshold == null || count > threshold.intValue()) {
-			DefaultExceptionHandler.rethrow(throwable);
+			throw throwable;
 		}
 
 	}

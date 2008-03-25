@@ -12,8 +12,6 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.step.JobRepositorySupport;
-import org.springframework.batch.core.step.item.ItemOrientedStep;
-import org.springframework.batch.core.step.item.SkipLimitStepFactoryBean;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemReader;
@@ -24,7 +22,6 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.Skippable;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 /**
@@ -34,10 +31,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 	SkipLimitStepFactoryBean tested = new SkipLimitStepFactoryBean();
 
-	// TODO checked exceptions are wrapped as RepeatExceptions by the
-	// chunkOperations#exceptionHandler
-	Class[] skippableExceptions = new Class[] { RepeatException.class, SkippableException.class,
-			SkippableRuntimeException.class };
+	Class[] skippableExceptions = new Class[] { SkippableException.class, SkippableRuntimeException.class };
 
 	final int SKIP_LIMIT = 2;
 
