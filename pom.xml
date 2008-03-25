@@ -533,7 +533,6 @@
 				<groupId>org.springframework.ws</groupId>
 				<artifactId>spring-oxm</artifactId>
 				<version>1.0.3</version>
-				<scope>test</scope>
 				<optional>true</optional>
 				<exclusions>
 					<exclusion>
