@@ -76,6 +76,9 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 		jobConfiguration.setName("foo");
 		int before = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		JobExecution execution = repository.createJobExecution(jobConfiguration, new JobParameters());
+		setComplete();
+		endTransaction();
+		startNewTransaction();
 		int after = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertEquals(before + 1, after);
 		assertNotNull(execution.getId());
