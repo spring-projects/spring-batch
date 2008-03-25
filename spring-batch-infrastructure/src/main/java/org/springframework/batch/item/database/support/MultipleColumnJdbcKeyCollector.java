@@ -15,38 +15,50 @@
  */
 package org.springframework.batch.item.database.support;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.database.DrivingQueryItemReader;
 import org.springframework.batch.item.database.KeyCollector;
+import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
  * <p>
  * Jdbc implementation of the {@link KeyCollector} interface that works for
  * composite keys. (i.e. keys represented by multiple columns) A sql query to be
- * used to return the keys and a {@link ExecutionContextRowMapper} to map each
+ * used to return the keys and a {@link KeyMappingPreparedStatementSetter} to map each
  * row in the resultset to an Object must be set in order to work correctly.
  * </p>
  * 
  * @author Lucas Ward
  * @see DrivingQueryItemReader
- * @see ExecutionContextRowMapper
+ * @see KeyMappingPreparedStatementSetter
  */
-public class MultipleColumnJdbcKeyCollector implements KeyCollector {
+public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport implements KeyCollector {
 
+	private static final String CURRENT_KEY = "current.key";
+	
 	private JdbcTemplate jdbcTemplate;
 
-	private ExecutionContextRowMapper keyMapper = new ColumnMapExecutionContextRowMapper();
+	private RowMapper keyMapper = new ColumnMapRowMapper();
+	
+	private KeyMappingPreparedStatementSetter keyMappingSetter = new ColumnMapKeyMappingPreparedStatementSetter();
 
 	private String sql;
 
 	private String restartSql;
 
 	public MultipleColumnJdbcKeyCollector() {
+		setName(ClassUtils.getShortName(MultipleColumnJdbcKeyCollector.class));
 	}
 
 	/**
@@ -74,9 +86,10 @@ public class MultipleColumnJdbcKeyCollector implements KeyCollector {
 		Assert.state(keyMapper != null, "KeyMapper must not be null.");
 		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty"
 				+ " in order to restart.");
-
+		
 		if (executionContext.size() > 0) {
-			return jdbcTemplate.query(restartSql, keyMapper.createSetter(executionContext), keyMapper);
+			Object key = executionContext.get(getKey(CURRENT_KEY));
+			return jdbcTemplate.query(restartSql, new PreparedStatementSetterKeyWrapper(key, keyMappingSetter), keyMapper);
 		}
 		else {
 			return jdbcTemplate.query(sql, keyMapper);
@@ -88,9 +101,9 @@ public class MultipleColumnJdbcKeyCollector implements KeyCollector {
 	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionContext(java.lang.Object)
 	 */
 	public void updateContext(Object key, ExecutionContext executionContext) {
-		Assert.state(keyMapper != null, "Key mapper must not be null.");
 		Assert.notNull(key, "The key must not be null");
-		keyMapper.mapKeys(key, executionContext);
+		Assert.notNull(executionContext, "The ExecutionContext must not be null");
+		executionContext.put(getKey(CURRENT_KEY), key);
 	}
 
 	/**
@@ -114,12 +127,12 @@ public class MultipleColumnJdbcKeyCollector implements KeyCollector {
 	}
 
 	/**
-	 * Set the {@link ExecutionContextRowMapper} to be used to map a resultset
+	 * Set the {@link KeyMappingPreparedStatementSetter} to be used to map a resultset
 	 * to keys.
 	 * 
 	 * @param keyMapper
 	 */
-	public void setKeyMapper(ExecutionContextRowMapper keyMapper) {
+	public void setKeyMapper(RowMapper keyMapper) {
 		this.keyMapper = keyMapper;
 	}
 
@@ -134,5 +147,25 @@ public class MultipleColumnJdbcKeyCollector implements KeyCollector {
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
+	}
+	
+	public void setKeyMappingSetter(
+			KeyMappingPreparedStatementSetter keyMappingSetter) {
+		this.keyMappingSetter = keyMappingSetter;
+	}
+	
+	private class PreparedStatementSetterKeyWrapper implements PreparedStatementSetter{
+		
+		private Object key;
+		private KeyMappingPreparedStatementSetter pss;
+		
+		public PreparedStatementSetterKeyWrapper(Object key, KeyMappingPreparedStatementSetter pss) {
+			this.key = key;
+			this.pss = pss;
+		}
+
+		public void setValues(PreparedStatement ps) throws SQLException {
+			pss.setValues(ps, key);
+		}
 	}
 }

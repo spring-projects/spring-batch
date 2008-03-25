@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.item.database.support;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.DrivingQueryItemReader;
 import org.springframework.batch.item.database.KeyCollector;
@@ -45,7 +48,7 @@ import org.springframework.jdbc.core.RowMapper;
  * {@link MultipleColumnJdbcKeyCollector}. In general, it's much simpler to use
  * one key as a column, and if the data itself allows this, then it should be
  * used.  However, in certain cases there is no choice and multiple columns must
- * be used. Using a {@link ExecutionContextRowMapper}, developers can create
+ * be used. Using a {@link KeyMappingPreparedStatementSetter}, developers can create
  * each unique key to suite their specific needs, and also describe how such a
  * key would be converted to {@link ExecutionContext}, so that it can be
  * serialized and stored.
@@ -56,18 +59,7 @@ import org.springframework.jdbc.core.RowMapper;
  * @see KeyCollector
  * @since 1.0
  */
-public interface ExecutionContextRowMapper extends RowMapper {
-
-	/**
-	 * Given the provided composite key, return a {@link ExecutionContext}
-	 * representation.
-	 * 
-	 * @param key
-	 * @return ExecutionContext representing the composite key.
-	 * @throws IllegalArgumentException
-	 *             if key is null or of an unsupported type.
-	 */
-	public void mapKeys(Object key, ExecutionContext executionContext);
+public interface KeyMappingPreparedStatementSetter {
 
 	/**
 	 * Given the provided restart data, return a PreparedStatementSeter that can
@@ -77,6 +69,5 @@ public interface ExecutionContextRowMapper extends RowMapper {
 	 * @return an array of objects that can be used as arguments to a
 	 *         JdbcTemplate.
 	 */
-	public PreparedStatementSetter createSetter(
-			ExecutionContext executionContext);
+	void setValues(PreparedStatement ps, Object key) throws SQLException;
 }

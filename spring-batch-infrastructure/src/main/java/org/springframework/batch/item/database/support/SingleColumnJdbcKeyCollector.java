@@ -89,10 +89,10 @@ public class SingleColumnJdbcKeyCollector extends ExecutionContextUserSupport im
 
 		Assert.notNull(executionContext, "The ExecutionContext must not be null");
 
-		if (executionContext.containsKey(RESTART_KEY)) {
+		if (executionContext.containsKey(getKey(RESTART_KEY))) {
 			Assert.state(StringUtils.hasText(restartSql), "The restart sql query must not be null or empty"
 			        + " in order to restart.");
-			return jdbcTemplate.query(restartSql, new Object[] { executionContext.get(RESTART_KEY) }, keyMapper);
+			return jdbcTemplate.query(restartSql, new Object[] { executionContext.get(getKey(RESTART_KEY)) }, keyMapper);
 		} else {
 			return jdbcTemplate.query(sql, keyMapper);
 		}
@@ -107,7 +107,7 @@ public class SingleColumnJdbcKeyCollector extends ExecutionContextUserSupport im
 	public void updateContext(Object key, ExecutionContext executionContext) {
 		Assert.notNull(key, "The key must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null");
-		executionContext.put(RESTART_KEY, key);
+		executionContext.put(getKey(RESTART_KEY), key);
 	}
 
 	/*

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.util.ClassUtils;
 
 /**
  * 
@@ -66,7 +67,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 		keyStrategy.updateContext(new Long(3), executionContext);
 		
 		assertEquals(1, executionContext.size());
-		assertEquals(new Long(3), executionContext.get("key"));
+		assertEquals(new Long(3), executionContext.get(ClassUtils.getShortName(SingleColumnJdbcKeyCollector.class) + ".key"));
 	}
 	
 	public void testGetNullKeyAsStreamContext(){
