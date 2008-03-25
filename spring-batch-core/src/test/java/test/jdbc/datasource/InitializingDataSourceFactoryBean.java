@@ -137,10 +137,6 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 		return DataSource.class;
 	}
 
-	public void setInitScript(Resource initScript) {
-		this.initScripts = new Resource[] { initScript };
-	}
-
 	public void setInitScripts(Resource[] initScripts) {
 		this.initScripts = initScripts;
 	}
