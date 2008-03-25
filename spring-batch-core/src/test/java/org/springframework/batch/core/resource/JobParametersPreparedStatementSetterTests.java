@@ -30,7 +30,6 @@ import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
-import org.springframework.util.ClassUtils;
 
 /**
  * @author Lucas Ward
