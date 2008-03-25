@@ -131,7 +131,7 @@
 								<typedef resource="foundrylogic/vpp/typedef.properties" />
 								<taskdef resource="foundrylogic/vpp/taskdef.properties" />
 								<!-- Scripts for DAO tests - N.B. under source control. -->
-								<vppcopy todir="${basedir}/src/test/resources/org/springframework/batch/core/repository/dao" overwrite="true">
+								<vppcopy todir="${basedir}/src/test/resources" overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
