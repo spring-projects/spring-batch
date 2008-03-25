@@ -12,7 +12,12 @@
 	<bean id="compositeProcessorJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
-				<property name="streams" ref="fileItemReader" />
+				<property name="streams">
+					<list>
+						<ref bean="fileItemReader" />
+						<ref bean="fileItemWriter" />
+					</list>
+				</property>
 				<property name="itemReader">
 					<bean
 						class="org.springframework.batch.item.validator.ValidatingItemReader">
@@ -21,25 +26,25 @@
 						<property name="validator" ref="fixedValidator" />
 					</bean>
 				</property>
-				<property name="itemWriter">
-					<bean
-						class="org.springframework.batch.item.support.CompositeItemWriter">
-						<property name="delegates">
-							<list>
-								<bean
-									class="org.springframework.batch.sample.item.writer.TradeWriter">
-									<property name="dao" ref="tradeDao" />
-								</bean>
-								<ref bean="fileItemWriter" />
-							</list>
-						</property>
-					</bean>
-				</property>
+				<property name="itemWriter" ref="compositeWriter" />
 			</bean>
 		</property>
 	</bean>
 
 	<!-- INFRASTRUCTURE SETUP -->
+
+	<bean id="compositeWriter"
+		class="org.springframework.batch.item.support.CompositeItemWriter">
+		<property name="delegates">
+			<list>
+				<bean
+					class="org.springframework.batch.sample.item.writer.TradeWriter">
+					<property name="dao" ref="tradeDao" />
+				</bean>
+				<ref bean="fileItemWriter" />
+			</list>
+		</property>
+	</bean>
 
 	<bean id="fileItemReader"
 		class="org.springframework.batch.item.file.FlatFileItemReader">
@@ -84,7 +89,8 @@
 
 	<bean class="org.springframework.batch.item.file.FlatFileItemWriter"
 		id="fileItemWriter">
-		<property name="resource" value="file:target/test-outputs/20070122.testStream.ParallelCustomerReportStep.TEMP.txt" />
+		<property name="resource"
+			value="file:target/test-outputs/20070122.testStream.ParallelCustomerReportStep.TEMP.txt" />
 		<property name="fieldSetCreator">
 			<bean
 				class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
