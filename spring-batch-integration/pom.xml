@@ -1,13 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-integration</artifactId>
 	<packaging>jar</packaging>
 	<name>Integration Tests</name>
-	<description>
-		Integration tests for the Spring Batch Infrastructure
-	</description>
-
+	<description> Integration tests for the Spring Batch Infrastructure </description>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<version>1.0.0.-SNAPSHOT</version>
@@ -15,16 +12,24 @@
 		<relativePath>..</relativePath>
 	</parent>
 
-	<!-- Temporary measure while we get to the bottom of the test failures on Bamboo -->
-	<properties>
-		<maven.test.skip>true</maven.test.skip>
-	</properties>
+	<profiles>
+		<profile>
+			<id>notest</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<maven.test.skip>true</maven.test.skip>
+			</properties>
+		</profile>
+	</profiles>
 
+	<!-- Temporary measure while we get to the bottom of the test failures on Bamboo -->
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
 			<artifactId>spring-batch-infrastructure</artifactId>
-			<version>${project.version}</version>
+			<version>${pom.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>hsqldb</groupId>
@@ -34,11 +39,13 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
 			<version>10.2.1.6</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
@@ -50,14 +57,24 @@
 					<artifactId>commons-logging</artifactId>
 				</exclusion>
 				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging-api</artifactId>
+				</exclusion>
+				<exclusion>
 					<groupId>mx4j</groupId>
 					<artifactId>mx4j</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.apache.geronimo.specs</groupId>
-					<artifactId>
-						geronimo-j2ee-management_1.0_spec
-					</artifactId>
+					<artifactId> geronimo-j2ee-management_1.0_spec </artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.activemq</groupId>
+					<artifactId>activeio-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.camel</groupId>
+					<artifactId>camel-core</artifactId>
 				</exclusion>
 			</exclusions>
 			<scope>test</scope>
@@ -89,7 +106,8 @@
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
-			<version>1.0-M1</version>
+			<version>1.0.1</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>xmlunit</groupId>
@@ -101,19 +119,7 @@
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-oxm</artifactId>
-			<version>1.0.0</version>
 			<scope>test</scope>
-			<optional>true</optional>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-beans</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-core</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
@@ -132,18 +138,18 @@
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
 			<version>2.4.0</version>
-			<optional>true</optional>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>stax</groupId>
 			<artifactId>stax</artifactId>
-			<optional>true</optional>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
 			<version>1.2.1</version>
-			<optional>true</optional>
+			<scope>test</scope>
 		</dependency>
 <!-- Spring Dependencies -->
 		<dependency>
@@ -164,6 +170,11 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

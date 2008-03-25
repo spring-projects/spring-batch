@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-infrastructure</artifactId>
 	<packaging>jar</packaging>
@@ -8,14 +8,12 @@
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[The Spring Batch Infrastructure is a set of low-level components, interfaces and tools for batch processing applications and optimisations.]]>
 	</description>
-
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch</artifactId>
 		<version>1.0.0.-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
-
 	<profiles>
 		<profile>
 			<id>clover</id>
@@ -38,7 +36,6 @@
 			</reporting>
 		</profile>
 	</profiles>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -56,7 +53,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -134,7 +130,7 @@
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-oxm</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.3</version>
 			<optional>true</optional>
 			<exclusions>
 				<exclusion>
@@ -207,7 +203,6 @@
 			<optional>true</optional>
 		</dependency>
 	</dependencies>
-
 	<reporting>
 		<plugins>
 			<plugin>
@@ -216,5 +211,4 @@
 			</plugin>
 		</plugins>
 	</reporting>
-
 </project>

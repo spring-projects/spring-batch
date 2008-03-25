@@ -1,6 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch</artifactId>
@@ -9,10 +8,8 @@
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track	their execution, or simply as an optimization for repetitive processing in a transactional environment. Spring Batch is part of the Spring Portfolio.]]>
 	</description>
-
 	<version>1.0.0.-SNAPSHOT</version>
 	<packaging>pom</packaging>
-
 	<modules>
 		<module>spring-batch-infrastructure</module>
 		<module>spring-batch-core</module>
@@ -20,7 +17,6 @@
 		<module>spring-batch-integration</module>
 		<module>docs</module>
 	</modules>
-
 	<url>http://www.springframework.org/spring-batch</url>
 	<organization>
 		<name>SpringSource</name>
@@ -28,11 +24,9 @@
 	</organization>
 	<scm>
 		<url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk</url>
-		<connection>
-			scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+		<connection> scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk 
 		</connection>
-		<developerConnection>
-			scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+		<developerConnection> scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk 
 		</developerConnection>
 	</scm>
 	<issueManagement>
@@ -62,12 +56,10 @@
 			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
-
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.2</spring.framework.version>
 	</properties>
-
 	<profiles>
 		<profile>
 			<id>default</id>
@@ -80,9 +72,7 @@
 			<distributionManagement>
 				<site>
 					<id>static.springframework.org</id>
-					<url>
-						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch
-					</url>
+					<url> scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch </url>
 				</site>
 			</distributionManagement>
 		</profile>
@@ -112,6 +102,13 @@
 					<url>http://repository.atlassian.com/maven2</url>
 				</pluginRepository>
 			</pluginRepositories>
+			<repositories>
+				<repository>
+					<id>apache-snapshot</id>
+					<name>Apache Foundation Snapshot Repository</name>
+					<url>http://people.apache.org/maven-snapshot-repository</url>
+				</repository>
+			</repositories>
 			<build>
 				<pluginManagement>
 					<plugins>
@@ -159,8 +156,7 @@
 												<![CDATA[</summary>]]>
 											</footer>
 										</concat>
-										<xslt in="target/site/emma-reports/emma-report.xml"
-											out="target/site/emma-reports/index.html" style="src/main/xsl/emma2html.xsl">
+										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html" style="src/main/xsl/emma2html.xsl">
 											<param name="project" expression="${project.name}" />
 											<param name="version" expression="${project.version}" />
 										</xslt>
@@ -176,7 +172,6 @@
 			</build>
 		</profile>
 	</profiles>
-
 	<distributionManagement>
 		<downloadUrl>http://www.springframework.org/download</downloadUrl>
 		<site>
@@ -194,7 +189,6 @@
 			<url>s3://maven.springframework.org/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
-
 	<build>
 		<extensions>
 			<extension>
@@ -245,8 +239,7 @@
 									</junitreport>
 									<echo>Creating Emma reports</echo>
 									<mkdir dir="target/site/emma-reports" />
-									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports"
-										style="${project.parent.basedir}/src/main/xsl/emma.xsl">
+									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports" style="${project.parent.basedir}/src/main/xsl/emma.xsl">
 										<mapper type="glob" from="*.xml" to="*.fragment" />
 										<param name="project" expression="${project.name}" />
 									</xslt>
@@ -341,7 +334,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -538,6 +530,23 @@
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.springframework.ws</groupId>
+				<artifactId>spring-oxm</artifactId>
+				<version>1.0.3</version>
+				<scope>test</scope>
+				<optional>true</optional>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-beans</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-core</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
 				<groupId>xerces</groupId>
 				<artifactId>xercesImpl</artifactId>
 				<version>2.8.1</version>
@@ -545,7 +554,6 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 	<reporting>
 		<excludeDefaults>true</excludeDefaults>
 		<plugins>
@@ -592,7 +600,6 @@
 			</plugin>
 		</plugins>
 	</reporting>
-
 	<developers>
 		<developer>
 			<id>dsyer</id>
@@ -616,7 +623,6 @@
 			<email>robert.kasanicky@accenture.com</email>
 		</developer>
 	</developers>
-
 	<repositories>
 		<repository>
 			<id>spring-release</id>
@@ -634,17 +640,11 @@
 			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
 		</repository>
 		<repository>
-			<id>apache-snapshot</id>
-			<name>Apache Foundation Snapshot Repository</name>
-			<url>http://people.apache.org/maven-snapshot-repository</url>
-		</repository>
-		<repository>
 			<id>objectstyle</id>
 			<name>ObjectStyle.org Repository</name>
 			<url>http://objectstyle.org/maven2/</url>
 		</repository>
 	</repositories>
-
 	<pluginRepositories>
 		<pluginRepository>
 			<id>spring-external</id>
@@ -661,5 +661,4 @@
 			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext</url>
 		</pluginRepository>
 	</pluginRepositories>
-
 </project>
