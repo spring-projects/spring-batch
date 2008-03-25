@@ -221,6 +221,7 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	 */
 	public void mark() {
 		getReader().mark();
+		skippedLines.clear();
 	}
 
 	/*

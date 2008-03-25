@@ -19,13 +19,15 @@ package org.springframework.batch.item;
 /**
  * Strategy interface for providing the data. <br/>
  * 
- * Implementations are expected to be stateful and will be called multiple times for each batch, with each call to
- * {@link #next} returning a different value and finally returning <code>null</code> when all input data is exhausted.<br/>
+ * Implementations are expected to be stateful and will be called multiple times
+ * for each batch, with each call to {@link #next} returning a different value
+ * and finally returning <code>null</code> when all input data is exhausted.<br/>
  * 
- * Implementations need to be thread safe and clients of a {@link ItemReader} need to be aware that this is the case.<br/>
+ * Implementations need to be thread safe and clients of a {@link ItemReader}
+ * need to be aware that this is the case.<br/>
  * 
- * A richer interface (e.g. with a look ahead or peek) is not feasible because we need to support transactions in an
- * asynchronous batch.
+ * A richer interface (e.g. with a look ahead or peek) is not feasible because
+ * we need to support transactions in an asynchronous batch.
  * 
  * @author Rob Harrop
  * @author Dave Syer
@@ -35,9 +37,11 @@ package org.springframework.batch.item;
 public interface ItemReader {
 
 	/**
-	 * Reads a piece of input data and advance to the next one. Implementations <strong>must</strong> return
-	 * <code>null</code> at the end of the input data set. In a transactional setting, caller might get the same item
-	 * twice from successive calls (or otherwise), if the first call was in a transaction that rolled back.
+	 * Reads a piece of input data and advance to the next one. Implementations
+	 * <strong>must</strong> return <code>null</code> at the end of the input
+	 * data set. In a transactional setting, caller might get the same item
+	 * twice from successive calls (or otherwise), if the first call was in a
+	 * transaction that rolled back.
 	 * 
 	 * @throws Exception if an underlying resource is unavailable.
 	 */
@@ -46,22 +50,30 @@ public interface ItemReader {
 	/**
 	 * Mark the stream so that it can be reset later and the items backed out.<br/>
 	 * 
-	 * In a multi-threaded setting implementations have to ensure that only the state from the current thread is saved.
+	 * Mark is called before reading a new chunk of items - in case of rollback
+	 * mark will not be called again before re-processing the chunk.<br/>
 	 * 
-	 * @throws MarkFailedException if there is a problem with the mark. If a mark fails inside a transaction, it would
-	 *             be worrying, but not normally fatal.
+	 * In a multi-threaded setting implementations have to ensure that only the
+	 * state from the current thread is saved.
+	 * 
+	 * @throws MarkFailedException if there is a problem with the mark. If a
+	 * mark fails inside a transaction, it would be worrying, but not normally
+	 * fatal.
 	 */
 	void mark() throws MarkFailedException;
 
 	/**
-	 * Reset the stream to the last mark. After a reset the stream state will be such that changes (items read or
-	 * written) since the last call to mark will not be visible after a call to close.<br/>
+	 * Reset the stream to the last mark. After a reset the stream state will be
+	 * such that changes (items read or written) since the last call to mark
+	 * will not be visible after a call to close.<br/>
 	 * 
-	 * In a multi-threaded setting implementations have to ensure that only the state from the current thread is reset.
+	 * In a multi-threaded setting implementations have to ensure that only the
+	 * state from the current thread is reset.
 	 * 
-	 * @throws ResetFailedException if there is a problem with the reset. If a reset fails inside a transaction, it
-	 *             would normally be fatal, and would leave the stream in an inconsistent state. So while this is an
-	 *             unchecked exception, it may be important for a client to catch it explicitly.
+	 * @throws ResetFailedException if there is a problem with the reset. If a
+	 * reset fails inside a transaction, it would normally be fatal, and would
+	 * leave the stream in an inconsistent state. So while this is an unchecked
+	 * exception, it may be important for a client to catch it explicitly.
 	 */
 	void reset() throws ResetFailedException;
 
