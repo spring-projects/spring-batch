@@ -24,8 +24,8 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.listener.CompositeStepListener;
+import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.repeat.ExitStatus;
@@ -48,7 +48,7 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 
 	private JobRepository jobRepository;
 
-	private CompositeStepListener listener = new CompositeStepListener();
+	private CompositeStepExecutionListener listener = new CompositeStepExecutionListener();
 
 	/**
 	 * Set the name property if it is not already set. Because of the order of
@@ -73,7 +73,7 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 	 * 
 	 * @param listeners an array of listener objects of known types.
 	 */
-	public void setStepListeners(StepListener[] listeners) {
+	public void setStepListeners(StepExecutionListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
 			this.listener.register(listeners[i]);
 		}
@@ -86,8 +86,8 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jobRepository, "JobRepository is mandatory for TaskletStep");
 		Assert.notNull(tasklet, "Tasklet is mandatory for TaskletStep");
-		if (tasklet instanceof StepListener) {
-			listener.register((StepListener) tasklet);
+		if (tasklet instanceof StepExecutionListener) {
+			listener.register((StepExecutionListener) tasklet);
 		}
 	}
 

@@ -29,10 +29,10 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.listener.StepListenerSupport;
+import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
@@ -231,7 +231,7 @@ public class ItemOrientedStepTests extends TestCase {
 		};
 
 		itemOrientedStep.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
-		itemOrientedStep.registerStepListener(new StepListenerSupport() {
+		itemOrientedStep.registerStepListener(new StepExecutionListenerSupport() {
 			public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 				return ExitStatus.FAILED.addExitDescription("FOO");
 			}
@@ -394,7 +394,7 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testDirectlyInjectedListener() throws Exception {
-		itemOrientedStep.registerStepListener(new StepListenerSupport() {
+		itemOrientedStep.registerStepListener(new StepExecutionListenerSupport() {
 			public void beforeStep(StepExecution stepExecution) {
 				list.add("foo");
 			}
@@ -431,7 +431,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 		final ExitStatus customStatus = new ExitStatus(false, "custom code");
 
-		itemOrientedStep.setStepListeners(new StepListener[] { new StepListenerSupport() {
+		itemOrientedStep.setStepListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("afterStepCalled");
 				return customStatus;
@@ -452,7 +452,7 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	public void testDirectlyInjectedListenerOnError() throws Exception {
-		itemOrientedStep.registerStepListener(new StepListenerSupport() {
+		itemOrientedStep.registerStepListener(new StepExecutionListenerSupport() {
 			public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 				list.add(e);
 				return null;
@@ -725,7 +725,7 @@ public class ItemOrientedStepTests extends TestCase {
 		return str.indexOf(searchStr) != -1;
 	}
 
-	private class MockRestartableItemReader extends ItemStreamSupport implements ItemReader, StepListener {
+	private class MockRestartableItemReader extends ItemStreamSupport implements ItemReader, StepExecutionListener {
 
 		private boolean getExecutionAttributesCalled = false;
 

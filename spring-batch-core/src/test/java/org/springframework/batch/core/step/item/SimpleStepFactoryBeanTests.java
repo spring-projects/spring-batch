@@ -23,7 +23,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.BatchListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobExecution;
@@ -141,7 +141,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 				throw new RuntimeException("Error!");
 			}
 		});
-		factory.setListeners(new BatchListener[] { new ItemListenerSupport() {
+		factory.setListeners(new StepListener[] { new ItemListenerSupport() {
 			public void onReadError(Exception ex) {
 				recovered.add(ex);
 			}
@@ -207,7 +207,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 			}
 		}
 		CountingChunkListener chunkListener = new CountingChunkListener();
-		factory.setListeners(new BatchListener[]{ chunkListener });
+		factory.setListeners(new StepListener[]{ chunkListener });
 		factory.setCommitInterval(commitInterval);
 		
 		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();

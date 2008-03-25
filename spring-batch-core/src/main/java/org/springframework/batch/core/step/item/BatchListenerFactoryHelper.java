@@ -18,11 +18,11 @@ package org.springframework.batch.core.step.item;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.BatchListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.listener.CompositeChunkListener;
 import org.springframework.batch.core.listener.CompositeItemReadListener;
 import org.springframework.batch.core.listener.CompositeItemWriteListener;
@@ -49,12 +49,12 @@ class BatchListenerFactoryHelper {
 	 * @param listeners
 	 * @return
 	 */
-	public ItemReader getItemReader(ItemReader itemReader, BatchListener[] listeners) {
+	public ItemReader getItemReader(ItemReader itemReader, StepListener[] listeners) {
 
 		final CompositeItemReadListener multicaster = new CompositeItemReadListener();
 
 		for (int i = 0; i < listeners.length; i++) {
-			BatchListener listener = listeners[i];
+			StepListener listener = listeners[i];
 			if (listener instanceof ItemReadListener) {
 				multicaster.register((ItemReadListener) listener);
 			}
@@ -83,11 +83,11 @@ class BatchListenerFactoryHelper {
 	 * @param listeners
 	 * @return
 	 */
-	public ItemWriter getItemWriter(ItemWriter itemWriter, BatchListener[] listeners) {
+	public ItemWriter getItemWriter(ItemWriter itemWriter, StepListener[] listeners) {
 		final CompositeItemWriteListener multicaster = new CompositeItemWriteListener();
 
 		for (int i = 0; i < listeners.length; i++) {
-			BatchListener listener = listeners[i];
+			StepListener listener = listeners[i];
 			if (listener instanceof ItemWriteListener) {
 				multicaster.register((ItemWriteListener) listener);
 			}
@@ -116,14 +116,14 @@ class BatchListenerFactoryHelper {
 	 * @param listeners
 	 * @return
 	 */
-	public RepeatOperations addChunkListeners(RepeatOperations chunkOperations, BatchListener[] listeners) {
+	public RepeatOperations addChunkListeners(RepeatOperations chunkOperations, StepListener[] listeners) {
 
 		final CompositeChunkListener multicaster = new CompositeChunkListener();
 
 		boolean hasChunkListener = false;
 
 		for (int i = 0; i < listeners.length; i++) {
-			BatchListener listener = listeners[i];
+			StepListener listener = listeners[i];
 			if (listener instanceof ChunkListener) {
 				hasChunkListener = true;
 			}
@@ -158,15 +158,15 @@ class BatchListenerFactoryHelper {
 	 * @param listeners
 	 * @return
 	 */
-	public StepListener[] getStepListeners(BatchListener[] listeners) {
+	public StepExecutionListener[] getStepListeners(StepListener[] listeners) {
 		List list = new ArrayList();
 		for (int i = 0; i < listeners.length; i++) {
-			BatchListener listener = listeners[i];
-			if (listener instanceof StepListener) {
+			StepListener listener = listeners[i];
+			if (listener instanceof StepExecutionListener) {
 				list.add(listener);
 			}
 		}
-		return (StepListener[]) list.toArray(new StepListener[list.size()]);
+		return (StepExecutionListener[]) list.toArray(new StepExecutionListener[list.size()]);
 	}
 
 }

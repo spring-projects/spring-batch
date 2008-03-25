@@ -16,13 +16,13 @@
 package org.springframework.batch.core.listener;
 
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobListener;
+import org.springframework.batch.core.JobExecutionListener;
 
 /**
  * @author Dave Syer
  *
  */
-public class JobListenerSupport implements JobListener {
+public class JobExecutionListenerSupport implements JobExecutionListener {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.JobListener#afterJob()

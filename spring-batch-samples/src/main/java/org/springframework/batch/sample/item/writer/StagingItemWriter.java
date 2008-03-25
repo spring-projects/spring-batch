@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
@@ -19,7 +19,7 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
-public class StagingItemWriter extends JdbcDaoSupport implements StepListener, ItemWriter {
+public class StagingItemWriter extends JdbcDaoSupport implements StepExecutionListener, ItemWriter {
 
 	public static final String NEW = "N";
 

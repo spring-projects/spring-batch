@@ -32,7 +32,7 @@ import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.core.listener.JobListenerSupport;
+import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
@@ -173,7 +173,7 @@ public class SimpleJobTests extends TestCase {
 	}
 
 	public void testRunNormallyWithListener() throws Exception {
-		job.setJobListeners(new JobListenerSupport[] { new JobListenerSupport() {
+		job.setJobListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
 			public void beforeJob(JobExecution jobExecution) {
 				list.add("before");
 			}
@@ -251,7 +251,7 @@ public class SimpleJobTests extends TestCase {
 	}
 
 	public void testFailedWithListener() throws Exception {
-		job.setJobListeners(new JobListenerSupport[] { new JobListenerSupport() {
+		job.setJobListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
 			public void onError(JobExecution jobExecution, Throwable t) {
 				list.add(t);
 			}

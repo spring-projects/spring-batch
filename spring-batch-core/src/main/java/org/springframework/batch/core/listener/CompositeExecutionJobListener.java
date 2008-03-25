@@ -21,13 +21,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobListener;
+import org.springframework.batch.core.JobExecutionListener;
 
 /**
  * @author Dave Syer
  * 
  */
-public class CompositeJobListener implements JobListener {
+public class CompositeExecutionJobListener implements JobExecutionListener {
 
 	private List listeners = new ArrayList();
 
@@ -36,38 +36,38 @@ public class CompositeJobListener implements JobListener {
 	 * 
 	 * @param listeners
 	 */
-	public void setListeners(JobListener[] listeners) {
+	public void setListeners(JobExecutionListener[] listeners) {
 		this.listeners = Arrays.asList(listeners);
 	}
 
 	/**
 	 * Register additional listener.
 	 * 
-	 * @param jobListener
+	 * @param jobExecutionListener
 	 */
-	public void register(JobListener jobListener) {
-		if (!listeners.contains(jobListener)) {
-			listeners.add(jobListener);
+	public void register(JobExecutionListener jobExecutionListener) {
+		if (!listeners.contains(jobExecutionListener)) {
+			listeners.add(jobExecutionListener);
 		}
 	}
 
 	public void afterJob(JobExecution jobExecution) {
 		for (Iterator iterator = listeners.listIterator(); iterator.hasNext();) {
-			JobListener listener = (JobListener) iterator.next();
+			JobExecutionListener listener = (JobExecutionListener) iterator.next();
 			listener.afterJob(jobExecution);
 		}
 	}
 
 	public void beforeJob(JobExecution jobExecution) {
 		for (Iterator iterator = listeners.listIterator(); iterator.hasNext();) {
-			JobListener listener = (JobListener) iterator.next();
+			JobExecutionListener listener = (JobExecutionListener) iterator.next();
 			listener.beforeJob(jobExecution);
 		}
 	}
 
 	public void onError(JobExecution jobExecution, Throwable e) {
 		for (Iterator iterator = listeners.listIterator(); iterator.hasNext();) {
-			JobListener listener = (JobListener) iterator.next();
+			JobExecutionListener listener = (JobExecutionListener) iterator.next();
 			listener.onError(jobExecution, e);
 		}
 		
@@ -75,7 +75,7 @@ public class CompositeJobListener implements JobListener {
 
 	public void onInterrupt(JobExecution jobExecution) {
 		for (Iterator iterator = listeners.listIterator(); iterator.hasNext();) {
-			JobListener listener = (JobListener) iterator.next();
+			JobExecutionListener listener = (JobExecutionListener) iterator.next();
 			listener.onInterrupt(jobExecution);
 		}
 		

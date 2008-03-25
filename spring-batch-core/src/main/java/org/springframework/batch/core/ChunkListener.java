@@ -23,7 +23,7 @@ package org.springframework.batch.core;
  * @author Lucas Ward
  *
  */
-public interface ChunkListener extends BatchListener {
+public interface ChunkListener extends StepListener {
 
 	/**
 	 * Callback before the chunk is executed, but inside the transaction.

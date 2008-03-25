@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.springframework.batch.core.BatchListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -28,10 +28,10 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * 
  */
-public class MulticasterBatchListener implements StepListener, ChunkListener, ItemReadListener,
+public class MulticasterBatchListener implements StepExecutionListener, ChunkListener, ItemReadListener,
 		ItemWriteListener {
 
-	private CompositeStepListener stepListener = new CompositeStepListener();
+	private CompositeStepExecutionListener stepListener = new CompositeStepExecutionListener();
 
 	private CompositeChunkListener chunkListener = new CompositeChunkListener();
 
@@ -53,7 +53,7 @@ public class MulticasterBatchListener implements StepListener, ChunkListener, It
 	 * @param listeners an array of listener objects of types known to the
 	 * multicaster.
 	 */
-	public void setListeners(BatchListener[] listeners) {
+	public void setListeners(StepListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
 			register(listeners[i]);
 		}
@@ -61,12 +61,12 @@ public class MulticasterBatchListener implements StepListener, ChunkListener, It
 
 	/**
 	 * Register the listener for callbacks on the appropriate interfaces
-	 * implemented. Any {@link BatchListener} can be provided, or an
+	 * implemented. Any {@link StepListener} can be provided, or an
 	 * {@link ItemStream}. Other types will be ignored.
 	 */
-	public void register(BatchListener listener) {
-		if (listener instanceof StepListener) {
-			this.stepListener.register((StepListener) listener);
+	public void register(StepListener listener) {
+		if (listener instanceof StepExecutionListener) {
+			this.stepListener.register((StepExecutionListener) listener);
 		}
 		if (listener instanceof ChunkListener) {
 			this.chunkListener.register((ChunkListener) listener);
@@ -81,7 +81,7 @@ public class MulticasterBatchListener implements StepListener, ChunkListener, It
 
 	/**
 	 * @return
-	 * @see org.springframework.batch.core.listener.CompositeStepListener#afterStep()
+	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#afterStep()
 	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return stepListener.afterStep(stepExecution);
@@ -89,7 +89,7 @@ public class MulticasterBatchListener implements StepListener, ChunkListener, It
 
 	/**
 	 * @param stepExecution
-	 * @see org.springframework.batch.core.listener.CompositeStepListener#beforeStep(org.springframework.batch.core.StepExecution)
+	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
 	 */
 	public void beforeStep(StepExecution stepExecution) {
 		stepListener.beforeStep(stepExecution);
@@ -98,7 +98,7 @@ public class MulticasterBatchListener implements StepListener, ChunkListener, It
 	/**
 	 * @param e
 	 * @return
-	 * @see org.springframework.batch.core.listener.CompositeStepListener#onErrorInStep(java.lang.Throwable)
+	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#onErrorInStep(java.lang.Throwable)
 	 */
 	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 		return stepListener.onErrorInStep(stepExecution, e);

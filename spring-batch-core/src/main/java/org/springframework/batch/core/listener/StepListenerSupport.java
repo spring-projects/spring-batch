@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2008 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,22 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * @author Dave Syer
+ * Basic no-op implementations of all {@link StepListener} implementations.
+ * 
+ * @author Lucas Ward
  *
  */
-public class StepListenerSupport implements StepListener {
+public class StepListenerSupport implements StepExecutionListener, ChunkListener,
+		ItemReadListener, ItemWriteListener {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution stepExecution)
@@ -33,15 +40,64 @@ public class StepListenerSupport implements StepListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#open(org.springframework.batch.item.ExecutionContext)
+	 * @see org.springframework.batch.core.domain.StepListener#beforeStep(org.springframework.batch.core.domain.StepExecution)
 	 */
 	public void beforeStep(StepExecution stepExecution) {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#onError(java.lang.Throwable)
+	 * @see org.springframework.batch.core.domain.StepListener#onErrorInStep(java.lang.Throwable)
 	 */
 	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 		return null;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.ChunkListener#afterChunk()
+	 */
+	public void afterChunk() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.ChunkListener#beforeChunk()
+	 */
+	public void beforeChunk() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.ItemReadListener#afterRead(java.lang.Object)
+	 */
+	public void afterRead(Object item) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.ItemReadListener#beforeRead()
+	 */
+	public void beforeRead() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.ItemReadListener#onReadError(java.lang.Exception)
+	 */
+	public void onReadError(Exception ex) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.ItemWriteListener#afterWrite()
+	 */
+	public void afterWrite(Object item) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.ItemWriteListener#beforeWrite(java.lang.Object)
+	 */
+	public void beforeWrite(Object item) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.ItemWriteListener#onWriteError(java.lang.Exception, java.lang.Object)
+	 */
+	public void onWriteError(Exception ex, Object item) {
+	}
+
 }

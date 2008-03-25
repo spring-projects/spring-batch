@@ -27,10 +27,10 @@ import java.util.Map.Entry;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
-import org.springframework.batch.core.listener.StepListenerSupport;
+import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.Resource;
@@ -67,7 +67,7 @@ import org.springframework.util.StringUtils;
  * To use this resource it must be initialised with a {@link StepExecution}.
  * The best way to do that is to register it as a listener in the step that is
  * going to need it. For this reason the resource implements
- * {@link StepListener}.
+ * {@link StepExecutionListener}.
  * 
  * @author Tomas Slanina
  * @author Lucas Ward
@@ -75,8 +75,8 @@ import org.springframework.util.StringUtils;
  * 
  * @see Resource
  */
-public class StepExecutionResourceProxy extends StepListenerSupport implements Resource, ResourceLoaderAware,
-		StepListener {
+public class StepExecutionResourceProxy extends StepExecutionListenerSupport implements Resource, ResourceLoaderAware,
+		StepExecutionListener {
 
 	private static final String JOB_NAME_PATTERN = "%JOB_NAME%";
 
@@ -277,7 +277,7 @@ public class StepExecutionResourceProxy extends StepListenerSupport implements R
 	 * Collect the properties of the enclosing {@link StepExecution} that will
 	 * be needed to create a file name.
 	 * 
-	 * @see org.springframework.batch.core.StepListener#beforeStep(org.springframework.batch.core.StepExecution)
+	 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
 	 */
 	public void beforeStep(StepExecution execution) {
 		String stepName = execution.getStepName();

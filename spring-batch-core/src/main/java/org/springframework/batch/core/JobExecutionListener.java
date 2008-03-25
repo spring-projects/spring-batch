@@ -24,7 +24,7 @@ package org.springframework.batch.core;
  * @author Dave Syer
  * 
  */
-public interface JobListener {
+public interface JobExecutionListener {
 
 	/**
 	 * Initialise the state of the listener with the {@link JobExecution} from

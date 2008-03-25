@@ -22,8 +22,8 @@ import java.util.Map;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.listener.StepListenerSupport;
+import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.SqlTypeValue;
@@ -32,13 +32,13 @@ import org.springframework.util.Assert;
 
 /**
  * Implementation of the {@link PreparedStatementSetter} interface that also implements
- * {@link StepListener} and uses {@link JobParameters} to set the parameters on a 
+ * {@link StepExecutionListener} and uses {@link JobParameters} to set the parameters on a 
  * PreparedStatement.
  * 
  * @author Lucas Ward
  *
  */
-public class JobParametersPreparedStatementSetter extends StepListenerSupport implements
+public class JobParametersPreparedStatementSetter extends StepExecutionListenerSupport implements
 		PreparedStatementSetter, InitializingBean {
 
 	private List parameterKeys;

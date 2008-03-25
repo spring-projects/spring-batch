@@ -25,10 +25,10 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
-import org.springframework.batch.core.listener.CompositeStepListener;
+import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.core.step.AbstractStep;
@@ -87,7 +87,7 @@ public class ItemOrientedStep extends AbstractStep {
 
 	private CompositeItemStream stream = new CompositeItemStream();
 
-	private CompositeStepListener listener = new CompositeStepListener();
+	private CompositeStepExecutionListener listener = new CompositeStepExecutionListener();
 
 	private JobRepository jobRepository;
 
@@ -168,7 +168,7 @@ public class ItemOrientedStep extends AbstractStep {
 	 * 
 	 * @param listeners an array of listener objects of known types.
 	 */
-	public void setStepListeners(StepListener[] listeners) {
+	public void setStepListeners(StepExecutionListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
 			registerStepListener(listeners[i]);
 		}
@@ -178,9 +178,9 @@ public class ItemOrientedStep extends AbstractStep {
 	 * Register a step listener for callbacks at the appropriate stages in a
 	 * step execution.
 	 * 
-	 * @param listener a {@link StepListener}
+	 * @param listener a {@link StepExecutionListener}
 	 */
-	public void registerStepListener(StepListener listener) {
+	public void registerStepListener(StepExecutionListener listener) {
 		this.listener.register(listener);
 	}
 
@@ -446,7 +446,7 @@ public class ItemOrientedStep extends AbstractStep {
 
 	/**
 	 * Default mapping from throwable to {@link ExitStatus}. Clients can modify
-	 * the exit code using a {@link StepListener}.
+	 * the exit code using a {@link StepExecutionListener}.
 	 * 
 	 * @param throwable the cause of teh failure
 	 * @return an {@link ExitStatus}

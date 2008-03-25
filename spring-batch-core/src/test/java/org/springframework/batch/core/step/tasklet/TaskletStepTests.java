@@ -12,9 +12,9 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.listener.StepListenerSupport;
+import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -109,7 +109,7 @@ public class TaskletStepTests extends TestCase {
 
 	public void testSuccessfulExecutionWithListener() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, false), new JobRepositorySupport());
-		step.setStepListeners(new StepListener[] { new StepListenerSupport() {
+		step.setStepListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
 			public void beforeStep(StepExecution context) {
 				list.add("open");
 			}
@@ -169,7 +169,7 @@ public class TaskletStepTests extends TestCase {
 		}
 	}
 
-	private class StubTasklet extends StepListenerSupport implements Tasklet {
+	private class StubTasklet extends StepExecutionListenerSupport implements Tasklet {
 
 		private final boolean exitFailure;
 

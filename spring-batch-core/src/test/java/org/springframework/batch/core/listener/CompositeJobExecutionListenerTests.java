@@ -22,31 +22,31 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobListener;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.listener.CompositeJobListener;
-import org.springframework.batch.core.listener.JobListenerSupport;
+import org.springframework.batch.core.listener.CompositeExecutionJobListener;
+import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 
 /**
  * @author Dave Syer
  * 
  */
-public class CompositeJobListenerTests extends TestCase {
+public class CompositeJobExecutionListenerTests extends TestCase {
 
-	private CompositeJobListener listener = new CompositeJobListener();
+	private CompositeExecutionJobListener listener = new CompositeExecutionJobListener();
 
 	private List list = new ArrayList();
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeJobListener#setListeners(org.springframework.batch.core.JobListener[])}.
+	 * {@link org.springframework.batch.core.listener.CompositeExecutionJobListener#setListeners(org.springframework.batch.core.JobExecutionListener[])}.
 	 */
 	public void testSetListeners() {
-		listener.setListeners(new JobListener[] { new JobListenerSupport() {
+		listener.setListeners(new JobExecutionListener[] { new JobExecutionListenerSupport() {
 			public void afterJob(JobExecution jobExecution) {
 				list.add("fail");
 			}
-		}, new JobListenerSupport() {
+		}, new JobExecutionListenerSupport() {
 			public void afterJob(JobExecution jobExecution) {
 				list.add("continue");
 			}
@@ -57,10 +57,10 @@ public class CompositeJobListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeJobListener#registerListener(org.springframework.batch.core.JobListener)}.
+	 * {@link org.springframework.batch.core.listener.CompositeExecutionJobListener#registerListener(org.springframework.batch.core.JobExecutionListener)}.
 	 */
 	public void testSetListener() {
-		listener.register(new JobListenerSupport() {
+		listener.register(new JobExecutionListenerSupport() {
 			public void afterJob(JobExecution jobExecution) {
 				list.add("fail");
 			}
@@ -71,10 +71,10 @@ public class CompositeJobListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeJobListener#beforeJob(JobExecution)}.
+	 * {@link org.springframework.batch.core.listener.CompositeExecutionJobListener#beforeJob(JobExecution)}.
 	 */
 	public void testOpen() {
-		listener.register(new JobListenerSupport() {
+		listener.register(new JobExecutionListenerSupport() {
 			public void beforeJob(JobExecution stepExecution) {
 				list.add("foo");
 			}

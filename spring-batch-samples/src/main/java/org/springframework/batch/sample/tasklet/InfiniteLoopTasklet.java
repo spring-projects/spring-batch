@@ -19,7 +19,7 @@ package org.springframework.batch.sample.tasklet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.listener.StepListenerSupport;
+import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -31,7 +31,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Lucas Ward
  * 
  */
-public class InfiniteLoopTasklet extends StepListenerSupport implements Tasklet {
+public class InfiniteLoopTasklet extends StepExecutionListenerSupport implements Tasklet {
 
 	private StepExecution stepExecution;
 	private int count = 0;

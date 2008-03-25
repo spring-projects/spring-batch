@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.step.item;
 
-import org.springframework.batch.core.BatchListener;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -36,7 +36,7 @@ public class RepeatOperationsStepFactoryBean extends AbstractStepFactoryBean {
 
 	private ItemStream[] streams = new ItemStream[0];
 
-	private BatchListener[] listeners = new BatchListener[0];
+	private StepListener[] listeners = new StepListener[0];
 
 	private RepeatOperations chunkOperations = new RepeatTemplate();
 
@@ -55,12 +55,12 @@ public class RepeatOperationsStepFactoryBean extends AbstractStepFactoryBean {
 
 	/**
 	 * The listeners to inject into the {@link Step}. Any instance of
-	 * {@link BatchListener} can be used, and will then receive callbacks at the
+	 * {@link StepListener} can be used, and will then receive callbacks at the
 	 * appropriate stage in the step.
 	 * 
 	 * @param listeners an array of listeners
 	 */
-	public void setListeners(BatchListener[] listeners) {
+	public void setListeners(StepListener[] listeners) {
 		this.listeners = listeners;
 	}
 
@@ -107,19 +107,19 @@ public class RepeatOperationsStepFactoryBean extends AbstractStepFactoryBean {
 		if (itemReader instanceof ItemStream) {
 			step.registerStream((ItemStream) itemReader);
 		}
-		if (itemReader instanceof StepListener) {
-			step.registerStepListener((StepListener) itemReader);
+		if (itemReader instanceof StepExecutionListener) {
+			step.registerStepListener((StepExecutionListener) itemReader);
 		}
 		if (itemWriter instanceof ItemStream) {
 			step.registerStream((ItemStream) itemWriter);
 		}
-		if (itemWriter instanceof StepListener) {
-			step.registerStepListener((StepListener) itemWriter);
+		if (itemWriter instanceof StepExecutionListener) {
+			step.registerStepListener((StepExecutionListener) itemWriter);
 		}
 
 		BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
 
-		StepListener[] stepListeners = helper.getStepListeners(listeners);
+		StepExecutionListener[] stepListeners = helper.getStepListeners(listeners);
 		itemReader = helper.getItemReader(itemReader, listeners);
 		itemWriter = helper.getItemWriter(itemWriter, listeners);
 		RepeatOperations stepOperations = helper.addChunkListeners(this.stepOperations, listeners);

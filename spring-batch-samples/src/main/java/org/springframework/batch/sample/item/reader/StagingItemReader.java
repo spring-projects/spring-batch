@@ -10,7 +10,7 @@ import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -25,7 +25,7 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
-public class StagingItemReader extends JdbcDaoSupport implements ItemStream, ItemReader, StepListener {
+public class StagingItemReader extends JdbcDaoSupport implements ItemStream, ItemReader, StepExecutionListener {
 
 	// Key for buffer in transaction synchronization manager
 	private static final String BUFFER_KEY = StagingItemReader.class.getName() + ".BUFFER";

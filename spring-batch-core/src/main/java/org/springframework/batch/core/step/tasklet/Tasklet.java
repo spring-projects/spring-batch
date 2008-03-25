@@ -18,7 +18,7 @@ package org.springframework.batch.core.step.tasklet;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
@@ -29,7 +29,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * stored procedure.<br/>
  * 
  * Since the batch framework has no visibility inside the {@link #execute()}
- * method, developers should consider implementing {@link StepListener} and
+ * method, developers should consider implementing {@link StepExecutionListener} and
  * check the {@link StepExecution#isTerminateOnly()} value for long lasting
  * processes to enable prompt termination of processing on user request.<br/>
  * 

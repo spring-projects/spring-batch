@@ -21,9 +21,9 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.listener.CompositeStepListener;
-import org.springframework.batch.core.listener.StepListenerSupport;
+import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.CompositeStepExecutionListener;
+import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -31,23 +31,23 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * 
  */
-public class CompositeStepListenerTests extends TestCase {
+public class CompositeStepExecutionListenerTests extends TestCase {
 
-	private CompositeStepListener listener = new CompositeStepListener();
+	private CompositeStepExecutionListener listener = new CompositeStepExecutionListener();
 
 	private List list = new ArrayList();
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeStepListener#setListeners(org.springframework.batch.core.StepListener[])}.
+	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#setListeners(org.springframework.batch.core.StepExecutionListener[])}.
 	 */
 	public void testSetListeners() {
-		listener.setListeners(new StepListener[] { new StepListenerSupport() {
+		listener.setListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("fail");
 				return ExitStatus.FAILED;
 			}
-		}, new StepListenerSupport() {
+		}, new StepExecutionListenerSupport() {
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("continue");
 				return ExitStatus.CONTINUABLE;
@@ -59,10 +59,10 @@ public class CompositeStepListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeStepListener#registerListener(org.springframework.batch.core.StepListener)}.
+	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#registerListener(org.springframework.batch.core.StepExecutionListener)}.
 	 */
 	public void testSetListener() {
-		listener.register(new StepListenerSupport() {
+		listener.register(new StepExecutionListenerSupport() {
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("fail");
 				return ExitStatus.FAILED;
@@ -74,10 +74,10 @@ public class CompositeStepListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeStepListener#beforeStep(StepExecution)}.
+	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(StepExecution)}.
 	 */
 	public void testOpen() {
-		listener.register(new StepListenerSupport() {
+		listener.register(new StepExecutionListenerSupport() {
 			public void beforeStep(StepExecution stepExecution) {
 				list.add("foo");
 			}
@@ -88,10 +88,10 @@ public class CompositeStepListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeStepListener#beforeStep(StepExecution)}.
+	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(StepExecution)}.
 	 */
 	public void testOnError() {
-		listener.register(new StepListenerSupport() {
+		listener.register(new StepExecutionListenerSupport() {
 			public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 				list.add("foo");
 				return null;

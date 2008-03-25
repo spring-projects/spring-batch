@@ -27,10 +27,10 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.JobListener;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.listener.CompositeJobListener;
+import org.springframework.batch.core.listener.CompositeExecutionJobListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
@@ -47,26 +47,26 @@ public class SimpleJob extends AbstractJob {
 
 	private JobRepository jobRepository;
 
-	private CompositeJobListener listener = new CompositeJobListener();
+	private CompositeExecutionJobListener listener = new CompositeExecutionJobListener();
 
 	/**
-	 * Public setter for injecting {@link JobListener}s. They will all be given
-	 * the {@link JobListener} callbacks at the appropriate point in the job.
+	 * Public setter for injecting {@link JobExecutionListener}s. They will all be given
+	 * the {@link JobExecutionListener} callbacks at the appropriate point in the job.
 	 * 
 	 * @param listeners the listeners to set.
 	 */
-	public void setJobListeners(JobListener[] listeners) {
+	public void setJobListeners(JobExecutionListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
 			this.listener.register(listeners[i]);
 		}
 	}
 
 	/**
-	 * Register a single listener for the {@link JobListener} callbacks.
+	 * Register a single listener for the {@link JobExecutionListener} callbacks.
 	 * 
-	 * @param listener a {@link JobListener}
+	 * @param listener a {@link JobExecutionListener}
 	 */
-	public void registerListener(JobListener listener) {
+	public void registerListener(JobExecutionListener listener) {
 		this.listener.register(listener);
 	}
 

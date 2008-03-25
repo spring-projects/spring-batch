@@ -21,14 +21,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Lucas Ward
+ * @author Dave Syer
  * 
  */
-public class CompositeStepListener implements StepListener {
+public class CompositeStepExecutionListener implements StepExecutionListener {
 
 	private List listeners = new ArrayList();
 
@@ -37,18 +38,18 @@ public class CompositeStepListener implements StepListener {
 	 * 
 	 * @param listeners
 	 */
-	public void setListeners(StepListener[] listeners) {
+	public void setListeners(StepExecutionListener[] listeners) {
 		this.listeners = Arrays.asList(listeners);
 	}
 
 	/**
 	 * Register additional listener.
 	 * 
-	 * @param stepListener
+	 * @param stepExecutionListener
 	 */
-	public void register(StepListener stepListener) {
-		if (!listeners.contains(stepListener)) {
-			listeners.add(stepListener);
+	public void register(StepExecutionListener stepExecutionListener) {
+		if (!listeners.contains(stepExecutionListener)) {
+			listeners.add(stepExecutionListener);
 		}
 	}
 
@@ -58,7 +59,7 @@ public class CompositeStepListener implements StepListener {
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		ExitStatus status = null;
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-			StepListener listener = (StepListener) iterator.next();
+			StepExecutionListener listener = (StepExecutionListener) iterator.next();
 			ExitStatus close = listener.afterStep(stepExecution);
 			status = status!=null ? status.and(close): close;
 		}
@@ -70,7 +71,7 @@ public class CompositeStepListener implements StepListener {
 	 */
 	public void beforeStep(StepExecution stepExecution) {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-			StepListener listener = (StepListener) iterator.next();
+			StepExecutionListener listener = (StepExecutionListener) iterator.next();
 			listener.beforeStep(stepExecution);
 		}
 	}
@@ -81,7 +82,7 @@ public class CompositeStepListener implements StepListener {
 	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 		ExitStatus status = null;
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-			StepListener listener = (StepListener) iterator.next();
+			StepExecutionListener listener = (StepExecutionListener) iterator.next();
 			ExitStatus close = listener.onErrorInStep(stepExecution, e);
 			status = status!=null ? status.and(close): close;
 		}
