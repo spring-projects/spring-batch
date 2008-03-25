@@ -26,8 +26,8 @@ import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrem
 import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIncrementer;
 
 /**
- * Default implementation of the {@link DataFieldMaxValueIncrementerFactory} 
- * interface.  Valid types are:
+ * Default implementation of the {@link DataFieldMaxValueIncrementerFactory} interface. Valid types
+ * are:
  * 
  * Valid values are:
  * 
@@ -41,29 +41,28 @@ import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIn
  * </ul>
  * 
  * @author Lucas Ward
- *
+ * 
  */
-public class DefaultDataFieldMaxValueIncrementerFactory implements
-		DataFieldMaxValueIncrementerFactory {
-	
-	private static final String DB_TYPE_DB2 = "db2";
+public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxValueIncrementerFactory {
 
-	private static final String DB_TYPE_DERBY = "derby";
+	static final String DB_TYPE_DB2 = "db2";
 
-	private static final String DB_TYPE_HSQL = "hsql";
+	static final String DB_TYPE_DERBY = "derby";
 
-	private static final String DB_TYPE_MYSQL = "mysql";
+	static final String DB_TYPE_HSQL = "hsql";
 
-	private static final String DB_TYPE_ORACLE = "oracle";
+	static final String DB_TYPE_MYSQL = "mysql";
 
-	private static final String DB_TYPE_POSTGRES = "postgres";
-	
+	static final String DB_TYPE_ORACLE = "oracle";
+
+	static final String DB_TYPE_POSTGRES = "postgres";
+
 	private DataSource dataSource;
-	
+
 	public DefaultDataFieldMaxValueIncrementerFactory(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
-	
+
 	public DataFieldMaxValueIncrementer getIncrementer(String incrementerType, String incrementerName) {
 		if (DB_TYPE_DB2.equals(incrementerType)) {
 			return new DB2SequenceMaxValueIncrementer(dataSource, incrementerName);
@@ -79,18 +78,21 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements
 			return new PostgreSQLSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		throw new IllegalArgumentException("databaseType argument was not on the approved list");
-	
+
 	}
 
 	public boolean isSupportedIncrementerType(String incrementerType) {
 		if (!DB_TYPE_DB2.equals(incrementerType) && !DB_TYPE_DERBY.equals(incrementerType)
 		        && !DB_TYPE_HSQL.equals(incrementerType) && !DB_TYPE_MYSQL.equals(incrementerType)
 		        && !DB_TYPE_ORACLE.equals(incrementerType) && !DB_TYPE_POSTGRES.equals(incrementerType)) {
-			
+
 			return false;
-		}
-		else{
+		} else {
 			return true;
 		}
+	}
+
+	public String[] getSupportedIncrementerTypes() {
+		return new String[] { DB_TYPE_DB2, DB_TYPE_DERBY, DB_TYPE_HSQL, DB_TYPE_MYSQL, DB_TYPE_ORACLE, DB_TYPE_POSTGRES };
 	}
 }

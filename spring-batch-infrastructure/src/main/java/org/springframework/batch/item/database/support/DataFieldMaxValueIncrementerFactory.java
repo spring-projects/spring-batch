@@ -41,7 +41,12 @@ public interface DataFieldMaxValueIncrementerFactory {
 	/**
 	 * Returns boolean indicated whether or not the provided string is supported by this
 	 * factory.
-	 * 
 	 */
 	public boolean isSupportedIncrementerType(String databaseType);
+
+	/**
+	 * Returns the list of supported database incrementer types
+	 * @return
+	 */
+	public String[] getSupportedIncrementerTypes();
 }

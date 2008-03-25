@@ -31,11 +31,11 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
- * A {@link FactoryBean} that automates the creation of a
- * {@link SimpleJobRepository}. Requires the user to describe what kind of
- * database they are using.
+ * A {@link FactoryBean} that automates the creation of a {@link SimpleJobRepository}. Requires the
+ * user to describe what kind of database they are using.
  * 
  * @author Ben Hale
  * @author Lucas Ward
@@ -73,7 +73,9 @@ public class JobRepositoryFactoryBean implements FactoryBean, InitializingBean {
 			incrementerFactory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
 		}
 
-		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), "Unsupported database type");
+		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), "'" + databaseType
+		        + "' is an unsupported database type.  The supported database types are "
+		        + StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
 	}
 
 	public Object getObject() throws Exception {

@@ -34,7 +34,7 @@ import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIn
  */
 public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 
-	DefaultDataFieldMaxValueIncrementerFactory factory;
+	DataFieldMaxValueIncrementerFactory factory;
 	
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
