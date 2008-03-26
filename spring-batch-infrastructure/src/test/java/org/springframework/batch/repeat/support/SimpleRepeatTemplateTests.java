@@ -22,10 +22,13 @@ import java.util.List;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatException;
+import org.springframework.batch.repeat.RepeatListener;
 import org.springframework.batch.repeat.callback.ItemReaderRepeatCallback;
 import org.springframework.batch.repeat.callback.NestedRepeatCallback;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
+import org.springframework.batch.repeat.listener.RepeatListenerSupport;
 import org.springframework.batch.repeat.policy.CompletionPolicySupport;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 
@@ -386,20 +389,74 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		assertFalse(result.isContinuable());
 
 	}
-	
-	public void testCustomExitCode(){
-		
-		ExitStatus status = template.iterate(new RepeatCallback(){
 
-			public ExitStatus doInIteration(RepeatContext context)
-					throws Exception {
+	public void testCustomExitCode() {
+
+		ExitStatus status = template.iterate(new RepeatCallback() {
+
+			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				ExitStatus exitStatus = new ExitStatus(false, "CUSTOM_CODE");
 				return exitStatus;
 			}
-			
+
 		});
-		
+
 		assertEquals("CUSTOM_CODE", status.getExitCode());
 	}
 
+	/**
+	 * Checked exceptions are wrapped into runtime RepeatException.
+	 * RepeatException should be unwrapped before before it is passed to
+	 * listeners and exception handler.
+	 */
+	public void testExceptionUnwrapping() {
+
+		class TestException extends Exception {
+			TestException(String msg) {
+				super(msg);
+			}
+		}
+		final TestException exception = new TestException("CRASH!");
+
+		class ExceptionHandlerStub implements ExceptionHandler {
+			boolean called = false;
+
+			public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
+				called = true;
+				assertSame(exception, throwable);
+				throw throwable; // re-throw so that repeat template
+									// terminates iteration
+			}
+		}
+		ExceptionHandlerStub exHandler = new ExceptionHandlerStub();
+
+		class RepeatListenerStub extends RepeatListenerSupport {
+			boolean called = false;
+
+			public void onError(RepeatContext context, Throwable throwable) {
+				called = true;
+				assertSame(exception, throwable);
+			}
+		}
+		RepeatListenerStub listener = new RepeatListenerStub();
+
+		template.setExceptionHandler(exHandler);
+		template.setListeners(new RepeatListener[] { listener });
+
+		try {
+			template.iterate(new RepeatCallback() {
+				public ExitStatus doInIteration(RepeatContext context) throws Exception {
+					throw new RepeatException("typically thrown by nested repeat template", exception);
+				}
+			});
+			fail();
+		}
+		catch (RepeatException expected) {
+			assertSame(exception, expected.getCause());
+		}
+
+		assertTrue(listener.called);
+		assertTrue(exHandler.called);
+
+	}
 }

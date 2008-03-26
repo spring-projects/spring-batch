@@ -217,19 +217,19 @@ public class RepeatTemplate implements RepeatOperations {
 
 						// An exception alone is not sufficient grounds for not
 						// continuing
-
+						Throwable unwrappedThrowable = unwrapIfRethrown(throwable);
 						try {
 
 							for (int i = listeners.length; i-- > 0;) {
 								RepeatListener interceptor = listeners[i];
-								interceptor.onError(context, throwable);
+								interceptor.onError(context, unwrappedThrowable);
 								// This is not an error - only log at debug
 								// level.
 								logger.debug("Exception intercepted (" + (i + 1) + " of " + listeners.length + ")",
-										throwable);
+										unwrappedThrowable);
 							}
 							
-							exceptionHandler.handleException(context, unwrapIfRethrown(throwable));
+							exceptionHandler.handleException(context, unwrappedThrowable);
 
 						}
 						catch (Throwable handled) {
