@@ -262,6 +262,8 @@ public class ItemOrientedStep extends AbstractStep {
 			// reference to the ExecutionContext as the step execution.
 			listener.beforeStep(stepExecution);
 			stream.open(stepExecution.getExecutionContext());
+			stream.update(stepExecution.getExecutionContext());
+			jobRepository.saveOrUpdateExecutionContext(stepExecution);
 			itemHandler.mark();
 
 			status = stepOperations.iterate(new RepeatCallback() {

@@ -61,7 +61,7 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
 
 public class ItemOrientedStepTests extends TestCase {
 
-	ArrayList processed = new ArrayList();
+	List processed = new ArrayList();
 
 	private List list = new ArrayList();
 
@@ -145,7 +145,7 @@ public class ItemOrientedStepTests extends TestCase {
 	public void testRepository() throws Exception {
 
 		SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
-		        new MapStepExecutionDao());
+				new MapStepExecutionDao());
 		itemOrientedStep.setJobRepository(repository);
 
 		JobExecution jobExecution = repository.createJobExecution(jobInstance.getJob(), jobInstance.getJobParameters());
@@ -178,7 +178,8 @@ public class ItemOrientedStepTests extends TestCase {
 
 		try {
 			itemOrientedStep.execute(stepExecution);
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			assertEquals(stepExecution.getRollbackCount(), new Integer(1));
 		}
 
@@ -207,7 +208,8 @@ public class ItemOrientedStepTests extends TestCase {
 
 		try {
 			itemOrientedStep.execute(stepExecution);
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			ExitStatus status = stepExecution.getExitStatus();
 			assertFalse(status.isContinuable());
 		}
@@ -241,17 +243,18 @@ public class ItemOrientedStepTests extends TestCase {
 
 		try {
 			itemOrientedStep.execute(stepExecution);
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			ExitStatus status = stepExecution.getExitStatus();
 			assertFalse(status.isContinuable());
 			String description = status.getExitDescription();
-			assertTrue("Description does not include 'FOO': "+description, description.indexOf("FOO")>=0);
+			assertTrue("Description does not include 'FOO': " + description, description.indexOf("FOO") >= 0);
 		}
 	}
 
 	/*
-	 * make sure a job that has never been executed before, but does have saveExecutionAttributes = true, doesn't have
-	 * restoreFrom called on it.
+	 * make sure a job that has never been executed before, but does have
+	 * saveExecutionAttributes = true, doesn't have restoreFrom called on it.
 	 */
 	public void testNonRestartedJob() throws Exception {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
@@ -275,28 +278,35 @@ public class ItemOrientedStepTests extends TestCase {
 			}
 		});
 		itemOrientedStep.execute(stepExecution);
-		assertEquals(1, list.size());
+		
+		// context saved before processing starts and updated at the end
+		assertEquals(2, list.size());
 	}
 
 	public void testSuccessfulExecutionWithFailureOnSaveOfExecutionContext() throws Exception {
 		final JobExecution jobExecution = new JobExecution(jobInstance);
 		final StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
 		itemOrientedStep.setJobRepository(new JobRepositorySupport() {
+			private int counter = 0;
+			// initial save before item processing succeeds, later calls fail
 			public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
-				throw new RuntimeException("foo");
+				if (counter > 0) throw new RuntimeException("foo");
+				counter++;
 			}
 		});
 		try {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected BatchCriticalException");
-		} catch (UnexpectedJobExecutionException e) {
+		}
+		catch (UnexpectedJobExecutionException e) {
 			assertEquals("foo", e.getCause().getMessage());
 		}
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 	}
 
 	/*
-	 * make sure a job that has been executed before, and is therefore being restarted, is restored.
+	 * make sure a job that has been executed before, and is therefore being
+	 * restarted, is restored.
 	 */
 	// public void testRestartedJob() throws Exception {
 	// String step = "stepName";
@@ -318,8 +328,9 @@ public class ItemOrientedStepTests extends TestCase {
 	// assertTrue(tasklet.isGetExecutionAttributesCalled());
 	// }
 	/*
-	 * Test that a job that is being restarted, but has saveExecutionAttributes set to false, doesn't have restore or
-	 * getExecutionAttributes called on it.
+	 * Test that a job that is being restarted, but has saveExecutionAttributes
+	 * set to false, doesn't have restore or getExecutionAttributes called on
+	 * it.
 	 */
 	public void testNoSaveExecutionAttributesRestartableJob() {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
@@ -329,7 +340,8 @@ public class ItemOrientedStepTests extends TestCase {
 
 		try {
 			itemOrientedStep.execute(stepExecution);
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			fail();
 		}
 
@@ -337,8 +349,9 @@ public class ItemOrientedStepTests extends TestCase {
 	}
 
 	/*
-	 * Even though the job is restarted, and saveExecutionAttributes is true, nothing will be restored because the
-	 * Tasklet does not implement Restartable.
+	 * Even though the job is restarted, and saveExecutionAttributes is true,
+	 * nothing will be restored because the Tasklet does not implement
+	 * Restartable.
 	 */
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
 		itemOrientedStep.setItemHandler(new SimpleItemHandler(new AbstractItemReader() {
@@ -468,7 +481,8 @@ public class ItemOrientedStepTests extends TestCase {
 		try {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("FOO", e.getMessage());
 		}
 		assertEquals(1, list.size());
@@ -536,11 +550,11 @@ public class ItemOrientedStepTests extends TestCase {
 		try {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected JobInterruptedException");
-		} catch (JobInterruptedException ex) {
+		}
+		catch (JobInterruptedException ex) {
 			assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertTrue("Message does not contain 'interrupted': " + msg, contains(msg,
-			        "interrupted"));
+			assertTrue("Message does not contain 'interrupted': " + msg, contains(msg, "interrupted"));
 		}
 	}
 
@@ -563,7 +577,8 @@ public class ItemOrientedStepTests extends TestCase {
 		try {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected RuntimeException");
-		} catch (RuntimeException ex) {
+		}
+		catch (RuntimeException ex) {
 			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 			// The original rollback was caused by this one:
 			assertEquals("Foo", ex.getMessage());
@@ -589,7 +604,8 @@ public class ItemOrientedStepTests extends TestCase {
 		try {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected Error");
-		} catch (Error ex) {
+		}
+		catch (Error ex) {
 			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 			// The original rollback was caused by this one:
 			assertEquals("Foo", ex.getMessage());
@@ -621,7 +637,8 @@ public class ItemOrientedStepTests extends TestCase {
 		try {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected UnexpectedJobExecutionException");
-		} catch (UnexpectedJobExecutionException ex) {
+		}
+		catch (UnexpectedJobExecutionException ex) {
 			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertTrue("Message does not contain ResetFailedException: " + msg, contains(msg, "ResetFailedException"));
@@ -648,7 +665,8 @@ public class ItemOrientedStepTests extends TestCase {
 		try {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected BatchCriticalException");
-		} catch (UnexpectedJobExecutionException ex) {
+		}
+		catch (UnexpectedJobExecutionException ex) {
 			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertEquals("", msg);
@@ -676,7 +694,8 @@ public class ItemOrientedStepTests extends TestCase {
 		try {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected RuntimeException");
-		} catch (RuntimeException ex) {
+		}
+		catch (RuntimeException ex) {
 			// The job actually completeed, but teh streams couldn't be closed.
 			assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
@@ -709,7 +728,8 @@ public class ItemOrientedStepTests extends TestCase {
 		try {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected InfrastructureException");
-		} catch (UnexpectedJobExecutionException ex) {
+		}
+		catch (UnexpectedJobExecutionException ex) {
 			// The job actually completed, but the streams couldn't be closed.
 			assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
@@ -718,6 +738,36 @@ public class ItemOrientedStepTests extends TestCase {
 			assertTrue("Message does not contain 'close': " + msg, contains(msg, "close"));
 			// The original rollback was caused by this one:
 			assertEquals("Bar", ex.getCause().getMessage());
+		}
+	}
+
+	/**
+	 * Execution context must not be left empty even if job failed before
+	 * commiting first chunk - otherwise ItemStreams won't recognize it is
+	 * restart scenario on next run. 
+	 */
+	public void testRestartAfterFailureInFirstChunk() throws Exception {
+		MockRestartableItemReader reader = new MockRestartableItemReader() {
+			public Object read() throws Exception {
+				// fail on the very first item
+				throw new RuntimeException("CRASH!");
+			}
+		};
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(reader, itemWriter));
+		itemOrientedStep.registerStream(reader);
+		
+		StepExecution stepExecution = new StepExecution(itemOrientedStep, new JobExecution(jobInstance));
+		
+		try {
+			itemOrientedStep.execute(stepExecution);
+			fail("Expected InfrastructureException");
+		}
+		catch (RuntimeException expected) {
+			// The job actually completed, but the streams couldn't be closed.
+			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+			assertEquals("CRASH!", expected.getMessage());
+			assertFalse(stepExecution.getExecutionContext().isEmpty());
+			assertTrue(stepExecution.getExecutionContext().getString("spam").equals("bucket"));
 		}
 	}
 
