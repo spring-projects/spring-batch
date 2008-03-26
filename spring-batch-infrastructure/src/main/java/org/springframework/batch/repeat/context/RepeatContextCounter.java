@@ -19,8 +19,6 @@ package org.springframework.batch.repeat.context;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.util.Assert;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * Helper class for policies that need to count the number of occurrences of
  * some event (e.g. an exception type in the context) in the scope of a batch.
@@ -49,7 +47,7 @@ public class RepeatContextCounter {
 	 * @param delta the amount by which to increment the counter.
 	 */
 	final public void increment(int delta) {
-		AtomicInteger count = getCounter();
+		AtomicCounter count = getCounter();
 		count.addAndGet(delta);
 	}
 	
@@ -96,7 +94,8 @@ public class RepeatContextCounter {
 			this.context = context;
 		}
 		if (!this.context.hasAttribute(countKey)) {
-			this.context.setAttribute(countKey, new AtomicInteger(0));
+			AtomicCounterFactory factory = new AtomicCounterFactory();
+			this.context.setAttribute(countKey, factory.getAtomicCounter());
 		}
 
 	}
@@ -108,8 +107,8 @@ public class RepeatContextCounter {
 		return getCounter().intValue();
 	}
 
-	private AtomicInteger getCounter() {
-		return ((AtomicInteger) context.getAttribute(countKey));
+	private AtomicCounter getCounter() {
+		return ((AtomicCounter) context.getAttribute(countKey));
 	}
 
 }
