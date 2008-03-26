@@ -25,22 +25,22 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Ben Hale
  */
-public class StepExecutionSyncronizerFactory {
+public class StepExecutionSynchronizerFactory {
 
 	/** Whether the backport-concurrent library is present on the classpath */
 	private static final boolean backportConcurrentAvailable = ClassUtils.isPresent(
-	        "edu.emory.mathcs.backport.java.util.concurrent.Semaphore", StepExecutionSyncronizerFactory.class
+	        "edu.emory.mathcs.backport.java.util.concurrent.Semaphore", StepExecutionSynchronizerFactory.class
 	                .getClassLoader());
 
 	private final StepExecutionSynchronizer synchronizer;
 
-	public StepExecutionSyncronizerFactory() {
+	public StepExecutionSynchronizerFactory() {
 		if (JdkVersion.isAtLeastJava15()) {
 			synchronizer = new JdkConcurrentStepExecutionSynchronizer();
 		} else if (backportConcurrentAvailable) {
 			synchronizer = new BackportConcurrentStepExecutionSynchronizer();
 		} else {
-			throw new IllegalStateException("Cannot create StepExecutionSycnronizer - "
+			throw new IllegalStateException("Cannot create StepExecutionSynchronizer - "
 			        + "neither JDK 1.5 nor backport-concurrent available on the classpath");
 		}
 	}

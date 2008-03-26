@@ -33,7 +33,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.StepExecutionSynchronizer;
-import org.springframework.batch.core.step.StepExecutionSyncronizerFactory;
+import org.springframework.batch.core.step.StepExecutionSynchronizerFactory;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
 import org.springframework.batch.item.ItemReader;
@@ -102,7 +102,7 @@ public class ItemOrientedStep extends AbstractStep {
 	 */
 	public ItemOrientedStep(String name) {
 		super(name);
-		synchronizer = new StepExecutionSyncronizerFactory().getStepExecutionSynchronizer();
+		synchronizer = new StepExecutionSynchronizerFactory().getStepExecutionSynchronizer();
 	}
 
 	/**
