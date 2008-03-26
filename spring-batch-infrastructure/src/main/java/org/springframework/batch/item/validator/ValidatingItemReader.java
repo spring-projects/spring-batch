@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.item.validator;
 
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.DelegatingItemReader;
 import org.springframework.util.Assert;
 

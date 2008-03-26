@@ -22,6 +22,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -31,7 +33,11 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.batch.item.NoWorkFoundException;
+import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResetFailedException;
+import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -124,16 +130,14 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 
 	private SQLExceptionTranslator exceptionTranslator;
 
-	/* Current count of processed records. */
-	private long currentProcessedRow = 0;
-
-	private long lastCommittedRow = 0;
 
 	private RowMapper mapper;
 
 	private boolean initialized = false;
 
 	private boolean saveState = false;
+	
+	private BufferredResultSetReader bufferredReader;
 
 	public JdbcCursorItemReader() {
 		setName(ClassUtils.getShortName(JdbcCursorItemReader.class));
@@ -168,7 +172,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	 * @throws DataAccessException
 	 * @throws IllegalStateExceptino if mapper is null.
 	 */
-	public Object read() {
+	public Object read() throws Exception{
 
 		if (!initialized) {
 			open(new ExecutionContext());
@@ -176,33 +180,18 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 
 		Assert.state(mapper != null, "Mapper must not be null.");
 
-		try {
-			if (!rs.next()) {
-				return null;
-			} else {
-				currentProcessedRow++;
-
-				Object mappedResult = mapper.mapRow(rs, (int) currentProcessedRow);
-
-				verifyCursorPosition(currentProcessedRow);
-
-				return mappedResult;
-			}
-		} catch (SQLException se) {
-			throw getExceptionTranslator().translate("Trying to process next row", sql, se);
-		}
-
+		return bufferredReader.read();
 	}
 
 	public long getCurrentProcessedRow() {
-		return currentProcessedRow;
+		return bufferredReader.getProcessedRowCount();
 	}
 
 	/**
 	 * Mark the current row. Calling reset will cause the result set to be set to the current row when mark was called.
 	 */
 	public void mark() {
-		lastCommittedRow = currentProcessedRow;
+		bufferredReader.mark();
 	}
 
 	/**
@@ -211,18 +200,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	 * @throws DataAccessException
 	 */
 	public void reset() throws ResetFailedException {
-		try {
-			currentProcessedRow = lastCommittedRow;
-			if (currentProcessedRow > 0) {
-				rs.absolute((int) currentProcessedRow);
-			} else {
-				rs.beforeFirst();
-			}
-
-		} catch (SQLException se) {
-			throw new ResetFailedException("Illegal modification of the result set cursor", getExceptionTranslator()
-			        .translate("Attempted to move ResultSet to last committed row", sql, se));
-		}
+		bufferredReader.reset();
 	}
 
 	/**
@@ -236,19 +214,9 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		JdbcUtils.closeResultSet(this.rs);
 		JdbcUtils.closeStatement(this.preparedStatement);
 		JdbcUtils.closeConnection(this.con);
-		this.currentProcessedRow = 0;
+		bufferredReader = null;
 	}
 
-	// Check the result set is in synch with the currentRow attribute. This is
-	// important
-	// to ensure that the user hasn't modified the current row.
-	private void verifyCursorPosition(long expectedCurrentRow) throws SQLException {
-		if (verifyCursorPosition) {
-			if (expectedCurrentRow != this.rs.getRow()) {
-				throw new InvalidDataAccessResourceUsageException("Unexpected cursor position change.");
-			}
-		}
-	}
 
 	/*
 	 * Executes the provided SQL query. The statement is created with 'READ_ONLY' and 'HOLD_CUSORS_OVER_COMMIT' set to
@@ -262,7 +230,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 
 		try {
 			this.con = dataSource.getConnection();
-			preparedStatement = this.con.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY,
+			preparedStatement = this.con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
 			        ResultSet.HOLD_CURSORS_OVER_COMMIT);
 			applyStatementSettings(preparedStatement);
 			if(this.preparedStatementSetter != null){
@@ -340,9 +308,9 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getExecutionContext()
 	 */
 	public void update(ExecutionContext executionContext) {
-		if (saveState) {
+		if (saveState && initialized) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			executionContext.putLong(getKey(CURRENT_PROCESSED_ROW), currentProcessedRow);
+			executionContext.putLong(getKey(CURRENT_PROCESSED_ROW), bufferredReader.getProcessedRowCount());
 		}
 	}
 
@@ -358,18 +326,20 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		executeQuery();
 		initialized = true;
 
-		// Properties restartProperties = data.getProperties();
-		if (!context.containsKey(getKey(CURRENT_PROCESSED_ROW))) {
-			return;
+		if (context.containsKey(getKey(CURRENT_PROCESSED_ROW))) {
+			try {
+				long currentProcessedRow = context.getLong(getKey(CURRENT_PROCESSED_ROW));
+				while(rs.next()){
+					if(rs.getRow() == currentProcessedRow){
+						break;
+					}
+				}
+			} catch (SQLException se) {
+				throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);
+			}
 		}
-
-		try {
-			this.currentProcessedRow = context.getLong(getKey(CURRENT_PROCESSED_ROW));
-			rs.absolute((int) currentProcessedRow);
-		} catch (SQLException se) {
-			throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);
-		}
-
+		
+		bufferredReader = new BufferredResultSetReader(rs, mapper);
 	}
 
 	/**
@@ -463,5 +433,74 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	 */
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
+	}
+	
+	private class BufferredResultSetReader implements ItemReader{
+		
+		private ResultSet rs;
+		private RowMapper rowMapper;
+		private List buffer;
+		private int currentIndex;
+		private long processedRowCount;
+		private int INITIAL_POSITION = -1;
+		
+		public BufferredResultSetReader(ResultSet rs, RowMapper rowMapper) {
+			Assert.notNull(rs, "The ResultSet must not be null");
+			Assert.notNull(rowMapper, "The RowMapper must not be null");
+			this.rs = rs;
+			this.rowMapper = rowMapper;
+			buffer = new ArrayList();
+			currentIndex = INITIAL_POSITION;
+			processedRowCount = 0;
+		}
+
+		public Object read() throws Exception, UnexpectedInputException,
+			NoWorkFoundException, ParseException {
+			
+			
+			if(buffer.size() > currentIndex){
+				currentIndex++;
+				try{
+					if(!rs.next()){
+						return null;
+					}
+					int currentRow = rs.getRow();
+					buffer.add(rowMapper.mapRow(rs, currentRow));
+					verifyCursorPosition(currentRow);
+				}
+				catch(SQLException se){
+					throw getExceptionTranslator().translate("Attempt to process next row failed", sql, se);
+				}
+			}
+			
+			processedRowCount++;
+			return buffer.get(currentIndex);
+		}
+		
+		public void mark() throws MarkFailedException {
+			buffer.clear();
+			currentIndex = INITIAL_POSITION;
+		}
+
+		public void reset() throws ResetFailedException {
+			processedRowCount -= buffer.size();
+			currentIndex = INITIAL_POSITION;
+		}
+		
+		// Check the result set is in synch with the currentRow attribute. This is
+		// important
+		// to ensure that the user hasn't modified the current row.
+		private void verifyCursorPosition(long expectedCurrentRow) throws SQLException {
+			if (verifyCursorPosition) {
+				if (expectedCurrentRow != this.rs.getRow()) {
+					throw new InvalidDataAccessResourceUsageException("Unexpected cursor position change.");
+				}
+			}
+		}
+		
+		public long getProcessedRowCount() {
+			return processedRowCount;
+		}
+
 	}
 }
