@@ -225,5 +225,34 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		assertEquals(expectedListenerCallCount, chunkListener.afterCount);
 		assertEquals(expectedListenerCallCount, chunkListener.beforeCount);
 	}
+	
+	/**
+	 * Commit interval specified is not allowed to be zero or negative.
+	 * @throws Exception 
+	 */
+	public void testCommitIntervalMustBeGreaterThanZero() throws Exception {
+		SimpleStepFactoryBean factory = getStepFactory("foo");
+		// nothing wrong here
+		factory.getObject();
+		
+		// but exception excpected after setting commit interval to value <= 0
+		factory.setCommitInterval(0);
+		try {
+			factory.getObject();
+			fail();
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+		}
+		
+		factory.setCommitInterval(-1);
+		try {
+			factory.getObject();
+			fail();
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
 
 }

@@ -26,6 +26,7 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.util.Assert;
 
 /**
  * Most common configuration options for simple steps should be found here. Use
@@ -42,7 +43,7 @@ import org.springframework.core.task.TaskExecutor;
  */
 public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 
-	private int commitInterval = 0;
+	private int commitInterval = 1;
 
 	private ItemStream[] streams = new ItemStream[0];
 
@@ -56,10 +57,11 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 
 	private ExceptionHandler exceptionHandler;
 
+	
 	/**
 	 * Set the commit interval.
 	 * 
-	 * @param commitInterval
+	 * @param commitInterval 1 by default
 	 */
 	public void setCommitInterval(int commitInterval) {
 		this.commitInterval = commitInterval;
@@ -86,7 +88,7 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	public void setListeners(StepListener[] listeners) {
 		this.listeners = listeners;
 	}
-	
+
 	/**
 	 * Protected getter for the {@link StepListener}s.
 	 * @return the listeners
@@ -153,6 +155,8 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	protected void applyConfiguration(ItemOrientedStep step) {
 
 		super.applyConfiguration(step);
+		
+		Assert.isTrue(commitInterval > 0);
 
 		step.setStreams(streams);
 
@@ -177,12 +181,10 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 
 		BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
 
-		if (commitInterval > 0) {
-			RepeatTemplate chunkOperations = new RepeatTemplate();
-			chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
-			helper.addChunkListeners(chunkOperations, listeners);
-			step.setChunkOperations(chunkOperations);
-		}
+		RepeatTemplate chunkOperations = new RepeatTemplate();
+		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
+		helper.addChunkListeners(chunkOperations, listeners);
+		step.setChunkOperations(chunkOperations);
 
 		StepExecutionListener[] stepListeners = helper.getStepListeners(listeners);
 		itemReader = helper.getItemReader(itemReader, listeners);
