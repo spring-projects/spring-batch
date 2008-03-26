@@ -64,4 +64,13 @@ public class CompositeItemReadListenerTests extends TestCase {
 		compositeListener.onReadError(ex);
 		listenerControl.verify();
 	}
+
+	public void testSetListners() throws Exception {
+		compositeListener.setListeners(new ItemReadListener[] {listener});
+		listener.beforeRead();
+		listenerControl.replay();
+		compositeListener.beforeRead();
+		listenerControl.verify();
+	}
+	
 }

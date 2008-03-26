@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemReadListener;
 
 /**
@@ -34,10 +33,10 @@ public class CompositeItemReadListener implements ItemReadListener {
 	/**
 	 * Public setter for the listeners.
 	 * 
-	 * @param listeners
+	 * @param itemReadListeners
 	 */
-	public void setListeners(ChunkListener[] listeners) {
-		this.listeners = Arrays.asList(listeners);
+	public void setListeners(ItemReadListener[] itemReadListeners) {
+		this.listeners = Arrays.asList(itemReadListeners);
 	}
 
 	/**

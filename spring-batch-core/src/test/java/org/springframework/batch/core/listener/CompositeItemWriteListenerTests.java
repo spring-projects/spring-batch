@@ -19,7 +19,6 @@ import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.batch.core.listener.CompositeItemWriteListener;
 
 /**
  * @author Lucas Ward
@@ -64,4 +63,14 @@ public class CompositeItemWriteListenerTests extends TestCase {
 		compositeListener.onWriteError(ex, item);
 		listenerControl.verify();
 	}
+
+	public void testSetListners() throws Exception {
+		compositeListener.setListeners(new ItemWriteListener[] {listener});
+		Object item = new Object();
+		listener.beforeWrite(item);
+		listenerControl.replay();
+		compositeListener.beforeWrite(item);
+		listenerControl.verify();
+	}
+
 }
