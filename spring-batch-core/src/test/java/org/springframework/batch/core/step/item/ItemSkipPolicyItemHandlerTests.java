@@ -18,6 +18,7 @@ package org.springframework.batch.core.step.item;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -30,6 +31,7 @@ import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
+import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.MarkFailedException;
@@ -37,6 +39,7 @@ import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * @author Dave Syer
@@ -44,11 +47,17 @@ import org.springframework.batch.item.UnexpectedInputException;
  */
 public class ItemSkipPolicyItemHandlerTests extends TestCase {
 
-	private ItemSkipPolicyItemHandler handler = new ItemSkipPolicyItemHandler(new SkipReaderStub(),
-			new SkipWriterStub());
+	private final SkipWriterStub writer = new SkipWriterStub();
+
+	private ItemSkipPolicyItemHandler handler = new ItemSkipPolicyItemHandler(new SkipReaderStub(), writer);
 
 	private StepContribution contribution = new StepContribution(new JobExecution(new JobInstance(new Long(11),
 			new JobParameters(), new JobSupport())).createStepExecution(new StepSupport("foo")));
+
+	protected void tearDown() throws Exception {
+		// remove the resource if it exists
+		handler.mark();
+	}
 
 	public void testReadWithNoSkip() throws Exception {
 		assertEquals(new Holder("1"), handler.read(contribution));
@@ -83,8 +92,57 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		assertEquals(0, contribution.getContributionSkipCount());
 	}
 
-	public void testWriteWithSkip() throws Exception {
+	public void testHandleWithSkip() throws Exception {
 		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		handler.handle(contribution);
+		handler.handle(contribution);
+		assertEquals(1, contribution.getContributionSkipCount());
+		// 2 is skipped so 3 was last one processed and now we are at 4
+		try {
+			handler.handle(contribution);
+			fail("Expected SkippableException");
+		}
+		catch (SkippableException e) {
+			// expected
+		}
+		assertEquals(2, contribution.getContributionSkipCount());
+		// No "4" because it was skipped on write
+		assertEquals(new Holder("5"), handler.read(contribution));
+	}
+
+	public void testWriteWithSkipAfterMark() throws Exception {
+		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		try {
+			handler.write(new Holder("4"), contribution);
+			fail("Expected SkippableException");
+		}
+		catch (SkippableException e) {
+			// expected
+		}
+		handler.handle(contribution);
+		handler.handle(contribution);
+		assertEquals(2, contribution.getContributionSkipCount());
+		// 2 is skipped so 3 was last one processed and now we are at 4, which was previously skipped
+		handler.handle(contribution);
+		assertEquals(null, handler.read(contribution));
+		assertEquals(2, contribution.getContributionSkipCount());
+		
+		assertEquals(1, TransactionSynchronizationManager.getResourceMap().size());
+		Set removed = (Set) TransactionSynchronizationManager.getResourceMap().values().iterator().next();
+		// one skipped item was detected on read
+		assertEquals(1, removed.size());
+		// mark() should remove the set of removed keys
+		handler.mark();
+		assertEquals(0, TransactionSynchronizationManager.getResourceMap().size());
+	}
+
+	public void testWriteWithSkipAndItemKeyGenerator() throws Exception {
+		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		handler.setItemKeyGenerator(new ItemKeyGenerator() {
+			public Object getKey(Object item) {
+				return ((Holder) item).value;
+			}
+		});
 		handler.write(new Holder("3"), contribution);
 		try {
 			handler.write(new Holder("4"), contribution);
@@ -94,17 +152,40 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 			// expected
 		}
 		assertEquals(1, contribution.getContributionSkipCount());
+		assertEquals(new Holder("1"), handler.read(contribution));
+		assertEquals(new Holder("3"), handler.read(contribution));
+		assertEquals(2, contribution.getContributionSkipCount());
+		// No "4" because it was skipped on write
+		assertEquals(new Holder("5"), handler.read(contribution));
 	}
-	
-	// TODO: test the item key generator, especially with a mutable item that changes on write
+
+	public void testWriteWithSkipWhenMutating() throws Exception {
+		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		writer.mutate = true;
+		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		handler.handle(contribution);
+		handler.handle(contribution);
+		assertEquals(1, contribution.getContributionSkipCount());
+		// 2 is skipped so 3 was last one processed and now we are at 4
+		try {
+			handler.handle(contribution);
+			fail("Expected SkippableException");
+		}
+		catch (SkippableException e) {
+			// expected
+		}
+		assertEquals(2, contribution.getContributionSkipCount());
+		// No "4" because it was skipped on write, even though it is mutating
+		// its key
+		assertEquals(new Holder("5"), handler.read(contribution));
+	}
 
 	/**
 	 * Simple item reader that supports skip functionality.
 	 */
 	private static class SkipReaderStub implements ItemReader {
 
-		final Holder[] items = { new Holder("1"), new Holder("2"), new Holder("3"), new Holder("4"), new Holder("5"),
-				null };
+		final String[] values = { "1", "2", "3", "4", "5" };
 
 		Collection processed = new ArrayList();
 
@@ -117,8 +198,12 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 			if (counter == 1) {
 				throw new SkippableException("exception in reader");
 			}
-			processed.add(items[counter]);
-			return items[counter];
+			if (counter >= values.length) {
+				return null;
+			}
+			Object item = new Holder(values[counter]);
+			processed.add(item);
+			return item;
 		}
 
 		public void mark() throws MarkFailedException {
@@ -136,6 +221,8 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 	 */
 	private static class SkipWriterStub implements ItemWriter {
 
+		boolean mutate = false;
+
 		List written = new ArrayList();
 
 		int flushIndex = -1;
@@ -151,8 +238,12 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		}
 
 		public void write(Object item) throws Exception {
+			String value = ((Holder) item).value;
 			written.add(item);
-			if (((Holder) item).value.equals("4")) {
+			if (mutate) {
+				((Holder) item).value = "done";
+			}
+			if (value.equals("4")) {
 				throw new SkippableException("exception in writer");
 			}
 		}

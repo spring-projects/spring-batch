@@ -16,7 +16,10 @@
 package org.springframework.batch.core.step.item;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,6 +31,8 @@ import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * {@link ItemHandler} that implements skip behavior. It delegates to
@@ -42,9 +47,16 @@ import org.springframework.batch.item.ItemWriter;
  */
 public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 
+	/**
+	 * Key for transaction resource that holds skipped keys until they can be removed
+	 */
+	private static final String TO_BE_REMOVED = ItemSkipPolicyItemHandler.class.getName()+".TO_BE_REMOVED";
+
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
+
+	private Map skippedExceptions = new HashMap();
 
 	private ItemKeyGenerator defaultItemKeyGenerator = new ItemKeyGenerator() {
 		public Object getKey(Object item) {
@@ -55,8 +67,6 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	private ItemKeyGenerator itemKeyGenerator = defaultItemKeyGenerator;
 
 	private CompositeSkipListener listener = new CompositeSkipListener();
-
-	private Map skippedExceptions = new HashMap();
 
 	/**
 	 * Register some {@link SkipListener}s with the handler. Each will get the
@@ -128,13 +138,16 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 
 				Object item = doRead();
 				Object key = itemKeyGenerator.getKey(item);
-				while (item != null && skippedExceptions.containsKey(key)) {
+				Throwable throwable = getSkippedException(key);
+				while (item != null && throwable != null) {
 					logger.debug("Skipping item on input, previously failed on output; key=[" + key + "]");
+					scheduleForRemoval(key);
 					if (listener != null) {
-						listener.onSkipInWrite(item, (Throwable) skippedExceptions.get(key));
+						listener.onSkipInWrite(item, throwable);
 					}
 					item = doRead();
 					key = itemKeyGenerator.getKey(item);
+					throwable = getSkippedException(key);
 				}
 				return item;
 
@@ -178,11 +191,65 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 				contribution.incrementSkipCount();
 				// don't call the listener here - the transaction is going to
 				// roll back
-				skippedExceptions.put(key, e);
+				addSkippedException(key, e);
 				logger.debug("Added item to skip list; key=" + key);
 			}
 			// always re-throw exception on write
 			throw e;
+		}
+	}
+	
+	public void mark() throws MarkFailedException {
+		super.mark();
+		clearSkippedExceptions();
+	}
+
+	/**
+	 * Synchronized setter for a skipped exception.
+	 */
+	private void addSkippedException(Object key, Throwable e) {
+		synchronized (skippedExceptions) {
+			skippedExceptions.put(key, e);
+		}
+	}
+
+	/**
+	 * Schedule this key for removal from the skipped exception cache at the end
+	 * of this transaction (only removed if business transaction is successful).
+	 * 
+	 * @param key
+	 */
+	private void scheduleForRemoval(Object key) {
+		if (!TransactionSynchronizationManager.hasResource(TO_BE_REMOVED)) {
+			TransactionSynchronizationManager.bindResource(TO_BE_REMOVED, new HashSet());
+		}
+		((Set) TransactionSynchronizationManager.getResource(TO_BE_REMOVED)).add(key);
+	}
+
+	/**
+	 * Clear the map of skipped exception corresponding to key.
+	 * @param key the key to clear
+	 */
+	private void clearSkippedExceptions() {
+		if (!TransactionSynchronizationManager.hasResource(TO_BE_REMOVED)) {
+			return;
+		}
+		synchronized (skippedExceptions) {
+			for (Iterator iterator = ((Set) TransactionSynchronizationManager.getResource(TO_BE_REMOVED)).iterator(); iterator.hasNext();) {
+				Object key = (Object) iterator.next();
+				skippedExceptions.remove(key);				
+			}
+			TransactionSynchronizationManager.unbindResource(TO_BE_REMOVED);
+		}
+	}
+
+	/**
+	 * Synchronized getter for a skipped exception.
+	 * @return the skippedExceptions
+	 */
+	private Throwable getSkippedException(Object key) {
+		synchronized (skippedExceptions) {
+			return (Throwable) skippedExceptions.get(key);
 		}
 	}
 
