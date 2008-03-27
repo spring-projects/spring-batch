@@ -17,6 +17,7 @@ package org.springframework.batch.item.database;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -119,9 +120,10 @@ public class BatchSqlUpdateItemWriter implements ItemWriter, InitializingBean {
 	 * @return the processed
 	 */
 	private Set getProcessed() {
-		Assert.state(TransactionSynchronizationManager.hasResource(ITEMS_PROCESSED),
-				"Processed items not bound to transaction.");
 		Set processed = (Set) TransactionSynchronizationManager.getResource(ITEMS_PROCESSED);
+		if (processed == null) {
+			processed = Collections.EMPTY_SET;
+		}
 		return processed;
 	}
 

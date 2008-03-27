@@ -47,7 +47,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	private JdbcTemplate jdbcTemplate;
 
 	protected List list = new ArrayList();
-	
+
 	private RepeatContext context = new RepeatContextSupport(null);
 
 	private PreparedStatement ps;
@@ -149,7 +149,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.item.database.BatchSqlUpdateItemWriter#flush()}.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testWriteAndFlush() throws Exception {
 		assertTrue(TransactionSynchronizationManager.hasResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED));
@@ -158,16 +158,6 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		assertFalse(TransactionSynchronizationManager.hasResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED));
 		assertEquals(3, list.size());
 		assertTrue(list.contains("SQL"));
-	}
-	
-	public void testFlushWithFailure() throws Exception{
-		tearDown();
-		try {
-			writer.flush();
-			fail("Expected IllegalStateException");
-		} catch (IllegalStateException e) {
-			assertTrue("Message should contain hint about transaction: "+e.getMessage(), e.getMessage().indexOf("transaction")>=0);
-		}
 	}
 
 	public void testWriteAndFlushWithFailure() throws Exception {
@@ -180,13 +170,14 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		});
 		ps.addBatch();
 		control.setVoidCallable();
-		control.expectAndReturn(ps.executeBatch(), new int[] {123});
+		control.expectAndReturn(ps.executeBatch(), new int[] { 123 });
 		control.replay();
 		writer.write("foo");
 		try {
 			writer.flush();
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("bar", e.getMessage());
 		}
 		assertFalse(TransactionSynchronizationManager.hasResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED));
@@ -203,6 +194,15 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		assertTrue(list.contains("SQL"));
 		assertTrue(list.contains("foo"));
 		assertTrue(context.isCompleteOnly());
+	}
+
+	/**
+	 * Flushing without writing items previously should be handled gracefully.
+	 */
+	public void testEmptyFlush() {
+		// items are bound on write, so we unbind them first
+		TransactionSynchronizationManager.unbindResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED);
+		writer.flush();
 	}
 
 }
