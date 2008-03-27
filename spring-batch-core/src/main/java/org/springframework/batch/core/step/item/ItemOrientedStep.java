@@ -299,7 +299,6 @@ public class ItemOrientedStep extends AbstractStep {
 							Thread.currentThread().interrupt();
 						}
 
-						contribution.commitReadSkipCount();
 						// Apply the contribution to the step
 						// only if chunk was successful
 						stepExecution.apply(contribution);

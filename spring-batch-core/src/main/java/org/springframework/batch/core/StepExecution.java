@@ -304,9 +304,8 @@ public class StepExecution extends Entity {
 	 */
 	public synchronized void apply(StepContribution contribution) {
 		itemCount += contribution.getItemCount();
-		// TODO: this should not be necessary - the step decides
-		// executionContext = contribution.getExecutionContext();
 		commitCount += contribution.getCommitCount();
+		contribution.combineSkipCounts();
 		skipCount += contribution.getSkipCount();
 	}
 

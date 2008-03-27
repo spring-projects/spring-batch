@@ -173,7 +173,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 				catch (SkipLimitExceededException ex) {
 					// we are headed for a abnormal ending so bake in the skip
 					// count
-					contribution.commitReadSkipCount();
+					contribution.combineSkipCounts();
 					throw ex;
 				}
 			}

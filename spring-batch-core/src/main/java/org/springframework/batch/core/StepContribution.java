@@ -101,13 +101,20 @@ public class StepContribution {
 	 * Increment the counter for skipped reads
 	 */
 	public void incrementReadSkipCount() {
-		this.readSkipCount++;
+		readSkipCount++;
 	}
 
 	/**
-	 * Clear the read skips and transfer them to the total skip count
+	 * @return the read skip count
 	 */
-	public void commitReadSkipCount() {
+	public int getReadSkipCount() {
+		return readSkipCount;
+	}
+
+	/**
+	 * Combine the skip counts and reset read skips to zero.
+	 */
+	public void combineSkipCounts() {
 		skipCount += readSkipCount;
 		readSkipCount = 0;
 	}
