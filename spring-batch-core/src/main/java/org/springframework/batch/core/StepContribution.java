@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core;
 
-
 /**
  * Represents a contribution to a {@link StepExecution}, buffering changes
  * until they can be applied at a chunk boundary.
@@ -84,12 +83,31 @@ public class StepContribution {
 	 * <code>StepContribution</code> (not including skips accumulated in the
 	 * parent {@link StepExecution}.
 	 */
-	public int getContributionSkipCount() {
+	public int getSkipCount() {
 		return skipCount;
 	}
 
+	/**
+	 * Increment the skip count
+	 */
 	public void incrementSkipCount() {
 		skipCount++;
+	}
+
+	/**
+	 * Increment the skip count by a non-trivial amount
+	 * @param delta
+	 */
+	public void incrementSkipCount(int delta) {
+		skipCount += delta;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		return "[StepContribution: items="+itemCount+", commits=" + commitCount + ", skips=" + skipCount + "]";
 	}
 
 }

@@ -1,7 +1,9 @@
 package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -12,6 +14,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.step.JobRepositorySupport;
+import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemReader;
@@ -22,13 +25,14 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.util.StringUtils;
 
 /**
  * Tests for {@link SkipLimitStepFactoryBean}.
  */
 public class SkipLimitStepFactoryBeanTests extends TestCase {
 
-	SkipLimitStepFactoryBean tested = new SkipLimitStepFactoryBean();
+	SkipLimitStepFactoryBean factory = new SkipLimitStepFactoryBean();
 
 	Class[] skippableExceptions = new Class[] { SkippableException.class, SkippableRuntimeException.class };
 
@@ -43,13 +47,13 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	JobExecution jobExecution;
 
 	protected void setUp() throws Exception {
-		tested.setJobRepository(new JobRepositorySupport());
-		tested.setTransactionManager(new ResourcelessTransactionManager());
-		tested.setCommitInterval(COMMIT_INTERVAL);
-		tested.setItemReader(reader);
-		tested.setItemWriter(writer);
-		tested.setSkippableExceptionClasses(skippableExceptions);
-		tested.setSkipLimit(SKIP_LIMIT);
+		factory.setJobRepository(new JobRepositorySupport());
+		factory.setTransactionManager(new ResourcelessTransactionManager());
+		factory.setCommitInterval(COMMIT_INTERVAL);
+		factory.setItemReader(reader);
+		factory.setItemWriter(writer);
+		factory.setSkippableExceptionClasses(skippableExceptions);
+		factory.setSkipLimit(SKIP_LIMIT);
 
 		JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), new JobSupport("skipJob"));
 		jobExecution = new JobExecution(jobInstance);
@@ -59,7 +63,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	 * Check items causing errors are skipped as expected.
 	 */
 	public void testSkip() throws Exception {
-		ItemOrientedStep step = (ItemOrientedStep) tested.getObject();
+		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 		step.execute(stepExecution);
@@ -70,13 +74,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		assertTrue(reader.processed.contains("4"));
 		assertFalse(writer.written.contains("4"));
 
-		String[] expectedOutput = { "1", "3", "5" };
-
-		for (int i = 0; i < expectedOutput.length; i++) {
-			assertTrue("Output should contain \"" + expectedOutput[i] + "\"", writer.written
-					.contains(expectedOutput[i]));
-		}
-		assertTrue(writer.written.size() == expectedOutput.length);
+		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3,5"));
+		assertEquals(expectedOutput, writer.written);
 
 	}
 
@@ -85,14 +84,14 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	 * skip settings (note the fatal exception is also classified as skippable).
 	 */
 	public void testFatalException() throws Exception {
-		tested.setFatalExceptionClasses(new Class[] { FatalRuntimeException.class });
-		tested.setItemWriter(new SkipWriterStub() {
+		factory.setFatalExceptionClasses(new Class[] { FatalRuntimeException.class });
+		factory.setItemWriter(new SkipWriterStub() {
 			public void write(Object item) {
 				throw new FatalRuntimeException("Ouch!");
 			}
 		});
 
-		ItemOrientedStep step = (ItemOrientedStep) tested.getObject();
+		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
 		try {
@@ -105,25 +104,104 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	}
 
 	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	public void testSkipOverLimit() throws Exception {
+
+		factory.setSkipLimit(1);
+
+		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step, jobExecution);
+
+		try {
+			step.execute(stepExecution);
+			fail("Expected SkipLimitExceededException.");
+		}
+		catch (SkipLimitExceededException e) {
+		}
+
+		assertEquals(1, stepExecution.getSkipCount());
+
+		// writer did not skip "2" as it never made it to writer, only "4" did
+		assertTrue(reader.processed.contains("4"));
+		assertFalse(writer.written.contains("4"));
+
+		// failure on "4" tripped the skip limit so we never got to "5"
+		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3"));
+		assertEquals(expectedOutput, writer.written);
+
+	}
+
+	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	public void testSkipOverLimitOnRead() throws Exception {
+
+		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), StringUtils
+				.commaDelimitedListToSet("2,3,5"));
+		
+		factory.setSkipLimit(3);
+		factory.setItemReader(reader);
+		factory.setSkippableExceptionClasses(new Class[] {Exception.class});
+
+		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step, jobExecution);
+
+		try {
+			step.execute(stepExecution);
+			fail("Expected SkipLimitExceededException.");
+		}
+		catch (SkipLimitExceededException e) {
+		}
+
+		assertEquals(3, stepExecution.getSkipCount());
+
+		// writer did not skip "2" as it never made it to writer, only "4" did
+		assertTrue(reader.processed.contains("4"));
+
+		// failure on "4" tripped the skip limit so we never got to "5"
+		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1"));
+		assertEquals(expectedOutput, writer.written);
+
+	}
+
+	/**
 	 * Simple item reader that supports skip functionality.
 	 */
 	private static class SkipReaderStub implements ItemReader {
 
-		final String[] items = { "1", "2", "3", "4", "5", null };
+		private final String[] items;
 
-		Collection processed = new ArrayList();
+		private Collection processed = new ArrayList();
 
-		int counter = -1;
+		private int counter = -1;
 
-		int marked = 0;
+		private int marked = 0;
+
+		private final Collection failures;
+
+		public SkipReaderStub() {
+			this(new String[] { "1", "2", "3", "4", "5" }, Collections.singleton("2"));
+		}
+
+		public SkipReaderStub(String[] items, Collection failures) {
+			this.items = items;
+			this.failures = failures;
+		}
 
 		public Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 			counter++;
-			if ("2".equals(items[counter])) {
+			if (counter >= items.length) {
+				return null;
+			}
+			String item = items[counter];
+			if (failures.contains(item)) {
 				throw new SkippableException("exception in reader");
 			}
-			processed.add(items[counter]);
-			return items[counter];
+			processed.add(item);
+			return item;
 		}
 
 		public void mark() throws MarkFailedException {

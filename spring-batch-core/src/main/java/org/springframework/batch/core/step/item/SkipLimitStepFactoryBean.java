@@ -1,9 +1,12 @@
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
+import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 
@@ -92,14 +95,24 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 			 * to absorb exceptions at the step level because the failed items
 			 * will never re-appear after a rollback.
 			 */
-			itemHandler.setItemSkipPolicy(new LimitCheckingItemSkipPolicy(skipLimit, Arrays
-					.asList(skippableExceptionClasses), Arrays.asList(fatalExceptionClasses)));
-			SimpleLimitExceptionHandler exceptionHandler = new SimpleLimitExceptionHandler();
-			exceptionHandler.setLimit(skipLimit);
+			List fatalExceptionList = new ArrayList(Arrays.asList(fatalExceptionClasses));
+			if (!fatalExceptionList.contains(SkipLimitExceededException.class)) {
+				fatalExceptionList.add(SkipLimitExceededException.class);
+			}
+			fatalExceptionClasses = (Class[]) fatalExceptionList.toArray(new Class[0]);
+			
+			LimitCheckingItemSkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, Arrays
+					.asList(skippableExceptionClasses), fatalExceptionList);
+			itemHandler.setItemSkipPolicy(skipPolicy);
+			SimpleLimitExceptionHandler exceptionHandler = new SimpleLimitExceptionHandler(skipLimit);
 			exceptionHandler.setExceptionClasses(skippableExceptionClasses);
 			exceptionHandler.setFatalExceptionClasses(fatalExceptionClasses);
+
+			getStepOperations().setExceptionHandler(exceptionHandler);
+
+			// for subclass to pick up limit and exception classes
 			setExceptionHandler(exceptionHandler);
-			getStepOperations().setExceptionHandler(getExceptionHandler());
+
 			itemHandler.setItemKeyGenerator(itemKeyGenerator);
 
 			BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();

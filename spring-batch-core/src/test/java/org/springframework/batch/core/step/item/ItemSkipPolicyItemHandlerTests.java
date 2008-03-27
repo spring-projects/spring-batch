@@ -68,7 +68,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		catch (SkippableException e) {
 			// expected
 		}
-		assertEquals(0, contribution.getContributionSkipCount());
+		assertEquals(0, contribution.getSkipCount());
 		assertEquals(new Holder("3"), handler.read(contribution));
 	}
 
@@ -76,7 +76,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		assertEquals(new Holder("1"), handler.read(contribution));
 		assertEquals(new Holder("3"), handler.read(contribution));
-		assertEquals(1, contribution.getContributionSkipCount());
+		assertEquals(1, contribution.getSkipCount());
 		assertEquals(new Holder("4"), handler.read(contribution));
 	}
 
@@ -89,14 +89,14 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		catch (SkippableException e) {
 			// expected
 		}
-		assertEquals(0, contribution.getContributionSkipCount());
+		assertEquals(0, contribution.getSkipCount());
 	}
 
 	public void testHandleWithSkip() throws Exception {
 		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		handler.handle(contribution);
 		handler.handle(contribution);
-		assertEquals(1, contribution.getContributionSkipCount());
+		assertEquals(1, contribution.getSkipCount());
 		// 2 is skipped so 3 was last one processed and now we are at 4
 		try {
 			handler.handle(contribution);
@@ -105,7 +105,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		catch (SkippableException e) {
 			// expected
 		}
-		assertEquals(2, contribution.getContributionSkipCount());
+		assertEquals(2, contribution.getSkipCount());
 		// No "4" because it was skipped on write
 		assertEquals(new Holder("5"), handler.read(contribution));
 	}
@@ -121,11 +121,11 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		}
 		handler.handle(contribution);
 		handler.handle(contribution);
-		assertEquals(2, contribution.getContributionSkipCount());
+		assertEquals(2, contribution.getSkipCount());
 		// 2 is skipped so 3 was last one processed and now we are at 4, which was previously skipped
 		handler.handle(contribution);
 		assertEquals(null, handler.read(contribution));
-		assertEquals(2, contribution.getContributionSkipCount());
+		assertEquals(2, contribution.getSkipCount());
 		
 		assertEquals(1, TransactionSynchronizationManager.getResourceMap().size());
 		Set removed = (Set) TransactionSynchronizationManager.getResourceMap().values().iterator().next();
@@ -151,10 +151,10 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		catch (SkippableException e) {
 			// expected
 		}
-		assertEquals(1, contribution.getContributionSkipCount());
+		assertEquals(1, contribution.getSkipCount());
 		assertEquals(new Holder("1"), handler.read(contribution));
 		assertEquals(new Holder("3"), handler.read(contribution));
-		assertEquals(2, contribution.getContributionSkipCount());
+		assertEquals(2, contribution.getSkipCount());
 		// No "4" because it was skipped on write
 		assertEquals(new Holder("5"), handler.read(contribution));
 	}
@@ -165,7 +165,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		handler.handle(contribution);
 		handler.handle(contribution);
-		assertEquals(1, contribution.getContributionSkipCount());
+		assertEquals(1, contribution.getSkipCount());
 		// 2 is skipped so 3 was last one processed and now we are at 4
 		try {
 			handler.handle(contribution);
@@ -174,7 +174,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		catch (SkippableException e) {
 			// expected
 		}
-		assertEquals(2, contribution.getContributionSkipCount());
+		assertEquals(2, contribution.getSkipCount());
 		// No "4" because it was skipped on write, even though it is mutating
 		// its key
 		assertEquals(new Holder("5"), handler.read(contribution));

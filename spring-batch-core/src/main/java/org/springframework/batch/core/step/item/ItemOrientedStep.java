@@ -330,12 +330,12 @@ public class ItemOrientedStep extends AbstractStep {
 
 					}
 					catch (Error e) {
-						stepExecution.incrementSkipCountBy(contribution.getContributionSkipCount());
+						stepExecution.incrementSkipCountBy(contribution.getSkipCount());
 						processRollback(stepExecution, fatalException, transaction);
 						throw e;
 					}
 					catch (Exception e) {
-						stepExecution.incrementSkipCountBy(contribution.getContributionSkipCount());
+						stepExecution.incrementSkipCountBy(contribution.getSkipCount());
 						processRollback(stepExecution, fatalException, transaction);
 						throw e;
 					}

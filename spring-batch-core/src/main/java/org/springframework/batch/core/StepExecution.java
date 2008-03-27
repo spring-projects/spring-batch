@@ -307,7 +307,7 @@ public class StepExecution extends Entity {
 		// TODO: this should not be necessary - the step decides
 		// executionContext = contribution.getExecutionContext();
 		commitCount += contribution.getCommitCount();
-		skipCount += contribution.getContributionSkipCount();
+		skipCount += contribution.getSkipCount();
 	}
 
 	/**
