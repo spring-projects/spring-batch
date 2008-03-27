@@ -78,6 +78,14 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	public void setItemKeyGenerator(ItemKeyGenerator itemKeyGenerator) {
 		this.itemKeyGenerator = itemKeyGenerator;
 	}
+	
+	/**
+	 * Protected getter for the {@link ItemKeyGenerator}.
+	 * @return the {@link ItemKeyGenerator}
+	 */
+	protected ItemKeyGenerator getItemKeyGenerator() {
+		return itemKeyGenerator;
+	}
 
 	/**
 	 * Uses the {@link #skipLimit} value to configure item handler and and

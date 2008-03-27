@@ -44,14 +44,12 @@ import org.springframework.batch.retry.support.RetryTemplate;
  * handling policy. Only exhausted retries count against the exception handler,
  * instead of counting all exceptions.<br/>
  * 
- * This class is not designed for extension.  Do not subclass it.
+ * This class is not designed for extension. Do not subclass it.
  * 
  * @author Dave Syer
  * 
  */
 public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
-
-	private ItemKeyGenerator itemKeyGenerator;
 
 	private ItemRecoverer itemRecoverer;
 
@@ -97,20 +95,6 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 	}
 
 	/**
-	 * Public setter for the {@link ItemKeyGenerator} which will be used to
-	 * cache failed items between transactions. If it is not injected but the
-	 * reader or writer implement {@link ItemKeyGenerator}, one of those will
-	 * be used instead (preferring the reader to the writer if both would be
-	 * appropriate). If neither can be used, then the default will be to just
-	 * use the item itself as a cache key.
-	 * 
-	 * @param itemKeyGenerator the {@link ItemKeyGenerator} to set
-	 */
-	public void setItemKeyGenerator(ItemKeyGenerator itemKeyGenerator) {
-		this.itemKeyGenerator = itemKeyGenerator;
-	}
-
-	/**
 	 * Public setter for the {@link ItemRecoverer}. If this is set the
 	 * {@link ItemRecoverer#recover(Object, Throwable)} will be called when
 	 * retry is exhausted, and within the business transaction (which will not
@@ -153,7 +137,7 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 			}
 
 			StatefulRetryItemHandler itemHandler = new StatefulRetryItemHandler(getItemReader(), getItemWriter(),
-					retryTemplate, itemKeyGenerator, itemRecoverer);
+					retryTemplate, getItemKeyGenerator(), itemRecoverer);
 
 			step.setItemHandler(itemHandler);
 
