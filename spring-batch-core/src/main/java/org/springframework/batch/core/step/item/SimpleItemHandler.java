@@ -29,7 +29,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * recovering. Just delegates all calls to the provided {@link ItemReader} and
  * {@link ItemWriter}.
  * 
- * Provider extension points by protected {@link #read(StepContribution)} and
+ * Provides extension points by protected {@link #read(StepContribution)} and
  * {@link #write(Object, StepContribution)} methods that can be overriden to
  * provide more sophisticated behavior (e.g. skipping).
  * 
