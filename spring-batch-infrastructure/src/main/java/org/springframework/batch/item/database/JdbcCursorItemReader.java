@@ -435,6 +435,9 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		this.saveState = saveState;
 	}
 	
+	
+
+	
 	private class BufferredResultSetReader implements ItemReader{
 		
 		private ResultSet rs;

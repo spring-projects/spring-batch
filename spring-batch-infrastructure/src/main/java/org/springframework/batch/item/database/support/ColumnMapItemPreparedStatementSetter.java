@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.SqlTypeValue;
 import org.springframework.jdbc.core.StatementCreatorUtils;
@@ -23,14 +24,14 @@ import org.springframework.util.Assert;
  * 
  * @author Lucas Ward
  * @author Dave Syer
- * @see KeyMappingPreparedStatementSetter
+ * @see ItemPreparedStatementSetter
  * @see ColumnMapRowMapper
  */
-public class ColumnMapKeyMappingPreparedStatementSetter implements KeyMappingPreparedStatementSetter {
+public class ColumnMapItemPreparedStatementSetter implements ItemPreparedStatementSetter {
 
-	public void setValues(PreparedStatement ps, Object key) throws SQLException {
-		Assert.isInstanceOf(Map.class, key, "Input to map PreparedStatement parameters must be of type Map.");
-		Set keySet = ((Map)key).entrySet();
+	public void setValues(Object item, PreparedStatement ps) throws SQLException {
+		Assert.isInstanceOf(Map.class, item, "Input to map PreparedStatement parameters must be of type Map.");
+		Set keySet = ((Map)item).entrySet();
 		int counter = 1;
 		for(Iterator it = keySet.iterator(); it.hasNext();){
 			Entry entry = (Entry)it.next();

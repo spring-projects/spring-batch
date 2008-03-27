@@ -22,6 +22,7 @@ import java.util.List;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.database.DrivingQueryItemReader;
+import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.batch.item.database.KeyCollector;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -51,7 +52,7 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 
 	private RowMapper keyMapper = new ColumnMapRowMapper();
 	
-	private KeyMappingPreparedStatementSetter keyMappingSetter = new ColumnMapKeyMappingPreparedStatementSetter();
+	private ItemPreparedStatementSetter preparedStatementSetter = new ColumnMapItemPreparedStatementSetter();
 
 	private String sql;
 
@@ -89,7 +90,7 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 		
 		if (executionContext.size() > 0) {
 			Object key = executionContext.get(getKey(CURRENT_KEY));
-			return jdbcTemplate.query(restartSql, new PreparedStatementSetterKeyWrapper(key, keyMappingSetter), keyMapper);
+			return jdbcTemplate.query(restartSql, new PreparedStatementSetterKeyWrapper(key, preparedStatementSetter), keyMapper);
 		}
 		else {
 			return jdbcTemplate.query(sql, keyMapper);
@@ -149,23 +150,23 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 		this.jdbcTemplate = jdbcTemplate;
 	}
 	
-	public void setKeyMappingSetter(
-			KeyMappingPreparedStatementSetter keyMappingSetter) {
-		this.keyMappingSetter = keyMappingSetter;
+	public void setPreparedStatementSetter(
+			ItemPreparedStatementSetter preparedStatementSetter) {
+		this.preparedStatementSetter = preparedStatementSetter;
 	}
 	
 	private class PreparedStatementSetterKeyWrapper implements PreparedStatementSetter{
 		
 		private Object key;
-		private KeyMappingPreparedStatementSetter pss;
+		private ItemPreparedStatementSetter pss;
 		
-		public PreparedStatementSetterKeyWrapper(Object key, KeyMappingPreparedStatementSetter pss) {
+		public PreparedStatementSetterKeyWrapper(Object key, ItemPreparedStatementSetter pss) {
 			this.key = key;
 			this.pss = pss;
 		}
 
 		public void setValues(PreparedStatement ps) throws SQLException {
-			pss.setValues(ps, key);
+			pss.setValues(key, ps);
 		}
 	}
 }

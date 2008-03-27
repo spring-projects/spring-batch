@@ -17,7 +17,7 @@ import org.springframework.core.CollectionFactory;
  */
 public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 
-	private ColumnMapKeyMappingPreparedStatementSetter mapper;
+	private ColumnMapItemPreparedStatementSetter mapper;
 	
 	private Map key;
 	
@@ -28,7 +28,7 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 		super.setUp();
 	
 		ps = (PreparedStatement)psControl.getMock();
-		mapper = new ColumnMapKeyMappingPreparedStatementSetter();
+		mapper = new ColumnMapItemPreparedStatementSetter();
 		
 		key = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(2);
 		key.put("1", new Integer(1));
@@ -38,7 +38,7 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 	public void testSetValuesWithInvalidType() throws Exception {
 		
 		try{
-			mapper.setValues(ps, new Object());
+			mapper.setValues(new Object(), ps);
 			fail();
 		}catch(IllegalArgumentException ex){
 			//expected
@@ -58,7 +58,7 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 	public void testCreateExecutionContextFromEmptyKeys() throws Exception {
 		
 		psControl.replay();
-		mapper.setValues(ps, new HashMap());
+		mapper.setValues(new HashMap(), ps);
 		psControl.verify();
 	}
 	
@@ -67,7 +67,7 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 		ps.setObject(1, new Integer(1));
 		ps.setObject(2, new Integer(2));
 		psControl.replay();
-		mapper.setValues(ps, key);	
+		mapper.setValues(key, ps);	
 		psControl.verify();
 	}
 	
