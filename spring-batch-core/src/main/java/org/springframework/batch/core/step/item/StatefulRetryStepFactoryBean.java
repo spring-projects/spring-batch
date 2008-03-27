@@ -42,12 +42,14 @@ import org.springframework.batch.retry.support.RetryTemplate;
  * 
  * The skipLimit property is still used to control the overall exception
  * handling policy. Only exhausted retries count against the exception handler,
- * instead of counting all exceptions.
+ * instead of counting all exceptions.<br/>
+ * 
+ * This class is not designed for extension.  Do not subclass it.
  * 
  * @author Dave Syer
  * 
  */
-public class StatefulRetryStepFactoryBean extends SimpleStepFactoryBean {
+public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 
 	private ItemKeyGenerator itemKeyGenerator;
 
@@ -142,7 +144,7 @@ public class StatefulRetryStepFactoryBean extends SimpleStepFactoryBean {
 			ItemWriterRetryPolicy itemProviderRetryPolicy = new ItemWriterRetryPolicy(retryPolicy);
 
 			RetryTemplate retryTemplate = new RetryTemplate();
-			if (retryListeners!=null) {
+			if (retryListeners != null) {
 				retryTemplate.setListeners(retryListeners);
 			}
 			retryTemplate.setRetryPolicy(itemProviderRetryPolicy);
@@ -159,7 +161,22 @@ public class StatefulRetryStepFactoryBean extends SimpleStepFactoryBean {
 
 	}
 
-	private static class StatefulRetryItemHandler extends SimpleItemHandler {
+	/**
+	 * Extend the skipping handler because we want to take advantage of that
+	 * behaviour as well as the retry. So if there is an exception on input it
+	 * is skipped if allowed. If there is an exception on output, it will be
+	 * re-thrown in any case, and the behaviour when the item is next
+	 * encountered depends on the retryable and skippable exception
+	 * configuration. Skip takes precedence, so if the exception was skippable
+	 * the item will be skipped on input and the reader moves to the next item.
+	 * If the exception is retryable but not skippable, then the write will be
+	 * attempted up again up to the retry limit. Beyond the retry limit recovery
+	 * takes over.
+	 * 
+	 * @author Dave Syer
+	 * 
+	 */
+	private static class StatefulRetryItemHandler extends ItemSkipPolicyItemHandler {
 
 		final private RetryOperations retryOperations;
 
@@ -167,18 +184,12 @@ public class StatefulRetryStepFactoryBean extends SimpleStepFactoryBean {
 
 		final private ItemRecoverer itemRecoverer;
 
-		private AbstractItemWriter writer = new AbstractItemWriter() {
-			public void write(Object item) throws Exception {
-				doWrite(item);
-			}
-		};
-
 		/**
 		 * @param itemReader
 		 * @param itemWriter
 		 * @param retryCallback
 		 * @param retryTemplate
-		 * @param itemRecoverer 
+		 * @param itemRecoverer
 		 */
 		public StatefulRetryItemHandler(ItemReader itemReader, ItemWriter itemWriter, RetryOperations retryTemplate,
 				ItemKeyGenerator itemKeyGenerator, ItemRecoverer itemRecoverer) {
@@ -187,31 +198,51 @@ public class StatefulRetryStepFactoryBean extends SimpleStepFactoryBean {
 			this.itemKeyGenerator = itemKeyGenerator;
 			this.itemRecoverer = itemRecoverer;
 		}
-		
+
 		/**
-		 * Execute the business logic, delegating to the reader and writer.
-		 * Subclasses could extend the behaviour as long as they always return
-		 * the value of this method call in their superclass.<br/>
+		 * Execute the business logic, delegating to the writer.<br/>
 		 * 
-		 * Read from the {@link ItemReader} and process (if not null) with the
-		 * {@link ItemWriter}. The call to {@link ItemWriter} is wrapped in a
-		 * stateful retry. In that case the {@link ItemRecoverer} is used (if
-		 * provided) in the case of an exception to apply alternate processing
-		 * to the item. If the stateful retry is in place then the recovery will
-		 * happen in the next transaction automatically, otherwise it might be
-		 * necessary for clients to make the recover method transactional with
-		 * appropriate propagation behaviour (probably REQUIRES_NEW because the
-		 * call will happen in the context of a transaction that is about to
-		 * rollback).<br/>
+		 * Process the item with the {@link ItemWriter} in a stateful retry. The
+		 * {@link ItemRecoverer} is used (if provided) in the case of an
+		 * exception to apply alternate processing to the item. If the stateful
+		 * retry is in place then the recovery will happen in the next
+		 * transaction automatically, otherwise it might be necessary for
+		 * clients to make the recover method transactional with appropriate
+		 * propagation behaviour (probably REQUIRES_NEW because the call will
+		 * happen in the context of a transaction that is about to rollback).<br/>
 		 * 
-		 * @see org.springframework.batch.core.step.item.SimpleItemHandler#write(java.lang.Object, org.springframework.batch.core.StepContribution)
+		 * @see org.springframework.batch.core.step.item.SimpleItemHandler#write(java.lang.Object,
+		 * org.springframework.batch.core.StepContribution)
 		 */
 		protected void write(Object item, final StepContribution contribution) throws Exception {
+			ItemWriter writer = new RetryableItemWriter(contribution);
 			ItemWriterRetryCallback retryCallback = new ItemWriterRetryCallback(item, writer);
 			retryCallback.setKeyGenerator(itemKeyGenerator);
 			retryCallback.setRecoverer(itemRecoverer);
 			retryOperations.execute(retryCallback);
 		}
 
+		/**
+		 * @author Dave Syer
+		 * 
+		 */
+		private class RetryableItemWriter extends AbstractItemWriter {
+
+			private StepContribution contribution;
+
+			/**
+			 * @param contribution
+			 */
+			public RetryableItemWriter(StepContribution contribution) {
+				this.contribution = contribution;
+			}
+
+			public void write(Object item) throws Exception {
+				doWriteWithSkip(item, contribution);
+			}
+
+		}
+
 	}
+
 }

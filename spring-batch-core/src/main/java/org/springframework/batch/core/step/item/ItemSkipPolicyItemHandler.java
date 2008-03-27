@@ -191,6 +191,15 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	 * @param contribution current StepContribution holding skipped items count
 	 */
 	protected void write(Object item, StepContribution contribution) throws Exception {
+		doWriteWithSkip(item, contribution);
+	}
+
+	/**
+	 * @param item
+	 * @param contribution
+	 * @throws Exception
+	 */
+	protected final void doWriteWithSkip(Object item, StepContribution contribution) throws Exception {
 		// Get the key as early as possible, otherwise it might change in
 		// doWrite()
 		Object key = itemKeyGenerator.getKey(item);
