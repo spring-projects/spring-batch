@@ -17,7 +17,6 @@
 package org.springframework.batch.retry.policy;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,9 +29,9 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
-import org.springframework.batch.retry.ListItemReaderRecoverer;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.StubItemKeyGeneratorRecoverer;
 import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
 import org.springframework.batch.retry.context.RetryContextSupport;
 import org.springframework.batch.retry.support.RetryTemplate;
@@ -41,7 +40,7 @@ public class ItemWriterRetryPolicyTests extends TestCase {
 
 	private ItemWriterRetryPolicy policy = new ItemWriterRetryPolicy();
 
-	private ListItemReaderRecoverer reader;
+	private StubItemKeyGeneratorRecoverer recoverer;
 
 	private int count = 0;
 
@@ -57,7 +56,7 @@ public class ItemWriterRetryPolicyTests extends TestCase {
 		super.setUp();
 		// The list simulates a failed delivery, redelivery of the same message,
 		// then a new message...
-		reader = new ListItemReaderRecoverer(Arrays.asList(new String[] { "foo", "foo", "bar" })) {
+		recoverer = new StubItemKeyGeneratorRecoverer() {
 			public boolean recover(Object data, Throwable cause) {
 				count++;
 				list.add(data);
@@ -168,7 +167,7 @@ public class ItemWriterRetryPolicyTests extends TestCase {
 			public void write(Object data) {
 			}
 		});
-		callback.setRecoverer(reader);
+		callback.setRecoverer(recoverer);
 		RetryContext context = policy.open(callback, null);
 		assertNotNull(context);
 		assertTrue(policy.canRetry(context));
@@ -210,7 +209,7 @@ public class ItemWriterRetryPolicyTests extends TestCase {
 				throw new RuntimeException("Barf!");
 			}
 		});
-		callback.setRecoverer(reader);
+		callback.setRecoverer(recoverer);
 		RetryTemplate template = new RetryTemplate();
 		template.setRetryPolicy(policy);
 		Object result = null;

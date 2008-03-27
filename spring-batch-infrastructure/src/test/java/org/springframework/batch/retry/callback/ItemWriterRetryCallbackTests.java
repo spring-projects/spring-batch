@@ -17,13 +17,12 @@
 package org.springframework.batch.retry.callback;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.AbstractItemWriter;
-import org.springframework.batch.retry.ListItemReaderRecoverer;
+import org.springframework.batch.retry.StubItemKeyGeneratorRecoverer;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.TerminatedRetryException;
@@ -39,7 +38,7 @@ public class ItemWriterRetryCallbackTests extends TestCase {
 
 	RetryTemplate template;
 
-	ListItemReaderRecoverer provider;
+	StubItemKeyGeneratorRecoverer recoverer;
 
 	ItemWriterRetryCallback callback;
 
@@ -48,7 +47,7 @@ public class ItemWriterRetryCallbackTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		template = new RetryTemplate();
-		provider = new ListItemReaderRecoverer(Arrays.asList(new String[] { "foo" })) {
+		recoverer = new StubItemKeyGeneratorRecoverer() {
 			public boolean recover(Object data, Throwable cause) {
 				count++;
 				calls.add(data);
@@ -144,12 +143,12 @@ public class ItemWriterRetryCallbackTests extends TestCase {
 	}
 
 	public void testGetKey() throws Exception {
-		callback.setKeyGenerator(provider);
+		callback.setKeyGenerator(recoverer);
 		assertEquals("key0", callback.getKeyGenerator().getKey("foo"));
 	}
 
 	public void testRecoverWithoutSession() throws Exception {
-		provider.recover("foo", null);
+		recoverer.recover("foo", null);
 		assertEquals(1, count);
 		assertEquals(1, calls.size());
 	}

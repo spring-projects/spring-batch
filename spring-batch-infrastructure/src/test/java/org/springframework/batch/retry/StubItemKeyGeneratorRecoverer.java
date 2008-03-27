@@ -16,21 +16,11 @@
 
 package org.springframework.batch.retry;
 
-import java.util.List;
-
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemRecoverer;
-import org.springframework.batch.item.support.ListItemReader;
 
-public class ListItemReaderRecoverer extends ListItemReader implements ItemRecoverer, ItemKeyGenerator {
+public class StubItemKeyGeneratorRecoverer implements ItemRecoverer, ItemKeyGenerator {
 
-	/**
-	 * Delegate to super class constructor.
-	 * @param list
-	 */
-	public ListItemReaderRecoverer(List list) {
-		super(list);
-	}
 	/**
 	 * Do nothing. Subclassses should override to implement recovery behaviour.
 	 * 

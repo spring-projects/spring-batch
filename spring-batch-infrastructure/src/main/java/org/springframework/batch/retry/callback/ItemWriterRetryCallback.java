@@ -18,7 +18,6 @@ package org.springframework.batch.retry.callback;
 
 import org.springframework.batch.item.FailedItemIdentifier;
 import org.springframework.batch.item.ItemKeyGenerator;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.retry.RetryCallback;
@@ -59,15 +58,16 @@ public class ItemWriterRetryCallback implements RetryCallback {
 		}
 	};
 
+	/**
+	 * Constructor with mandatory properties.
+	 * 
+	 * @param item the item to process
+	 * @param writer the writer to use to process it
+	 */
 	public ItemWriterRetryCallback(Object item, ItemWriter writer) {
-		this(item, writer, null);
-	}
-
-	public ItemWriterRetryCallback(Object item, ItemWriter writer, ItemKeyGenerator keyGenerator) {
 		super();
 		this.item = item;
 		this.writer = writer;
-		this.keyGenerator = keyGenerator;
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class ItemWriterRetryCallback implements RetryCallback {
 
 	/**
 	 * Accessor for the {@link ItemRecoverer}. If the handler is null but the
-	 * {@link ItemReader} is an instance of {@link ItemRecoverer}, then it will
+	 * {@link ItemWriter} is an instance of {@link ItemRecoverer}, then it will
 	 * be returned instead. If none of those strategies works then a default
 	 * implementation of {@link ItemKeyGenerator} will be used that just returns
 	 * the item.
@@ -151,7 +151,7 @@ public class ItemWriterRetryCallback implements RetryCallback {
 
 	/**
 	 * Accessor for the {@link FailedItemIdentifier}. If the handler is null
-	 * but the {@link ItemReader} or {@link ItemWriter} is an instance of
+	 * but the {@link ItemWriter} or {@link ItemWriter} is an instance of
 	 * {@link FailedItemIdentifier}, then it will be returned instead. If none
 	 * of those strategies works returns null.
 	 * 
@@ -169,7 +169,7 @@ public class ItemWriterRetryCallback implements RetryCallback {
 
 	/**
 	 * Accessor for the {@link ItemRecoverer}. If the handler is null but the
-	 * {@link ItemReader} is an instance of {@link ItemRecoverer}, then it will
+	 * {@link ItemWriter} is an instance of {@link ItemRecoverer}, then it will
 	 * be returned instead.
 	 * 
 	 * @return the {@link ItemRecoverer}.

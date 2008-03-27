@@ -167,6 +167,12 @@ public class StatefulRetryStepFactoryBean extends SimpleStepFactoryBean {
 
 		final private ItemRecoverer itemRecoverer;
 
+		private AbstractItemWriter writer = new AbstractItemWriter() {
+			public void write(Object item) throws Exception {
+				doWrite(item);
+			}
+		};
+
 		/**
 		 * @param itemReader
 		 * @param itemWriter
@@ -201,11 +207,7 @@ public class StatefulRetryStepFactoryBean extends SimpleStepFactoryBean {
 		 * @see org.springframework.batch.core.step.item.SimpleItemHandler#write(java.lang.Object, org.springframework.batch.core.StepContribution)
 		 */
 		protected void write(Object item, final StepContribution contribution) throws Exception {
-			ItemWriterRetryCallback retryCallback = new ItemWriterRetryCallback(item, new AbstractItemWriter() {
-				public void write(Object item) throws Exception {
-					doWrite(item);
-				}
-			});
+			ItemWriterRetryCallback retryCallback = new ItemWriterRetryCallback(item, writer);
 			retryCallback.setKeyGenerator(itemKeyGenerator);
 			retryCallback.setRecoverer(itemRecoverer);
 			retryOperations.execute(retryCallback);
