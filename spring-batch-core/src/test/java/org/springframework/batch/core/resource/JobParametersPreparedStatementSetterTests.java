@@ -27,6 +27,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -38,7 +39,8 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
 public class JobParametersPreparedStatementSetterTests extends AbstractTransactionalDataSourceSpringContextTests {
 
 	JdbcTemplate jdbcTemplate;
-	JobParametersPreparedStatementSetter pss;
+	StepExecutionPreparedStatementSetter pss;
+	StepExecution stepExecution;
 	
 	protected String[] getConfigLocations() {
 		return new String[] { "data-source-context.xml" };
@@ -47,11 +49,11 @@ public class JobParametersPreparedStatementSetterTests extends AbstractTransacti
 	protected void onSetUpInTransaction() throws Exception {
 		super.onSetUpInTransaction();
 		
-		pss = new JobParametersPreparedStatementSetter();
+		pss = new StepExecutionPreparedStatementSetter();
 		JobParameters jobParameters = new JobParametersBuilder().addLong("begin.id", new Long(1)).addLong("end.id", new Long(4)).toJobParameters();
 		JobInstance jobInstance = new JobInstance(new Long(1), jobParameters, new SimpleJob());
 		JobExecution jobExecution = new JobExecution(jobInstance, new Long(2));
-		StepExecution stepExecution = new StepExecution(new TaskletStep(), jobExecution, new Long(3) );
+		stepExecution = new StepExecution(new TaskletStep(), jobExecution, new Long(3) );
 		pss.beforeStep(stepExecution);
 		jdbcTemplate = getJdbcTemplate();
 	}
@@ -103,5 +105,28 @@ public class JobParametersPreparedStatementSetterTests extends AbstractTransacti
 			//expected
 		}
 
+	}
+	
+	public void testMixedProperties(){
+		
+		ExecutionContext executionContext = new ExecutionContext();
+		executionContext.putLong("begin.id", 2);
+		stepExecution.setExecutionContext(executionContext);
+		pss.beforeStep(stepExecution);
+		
+		List parameterNames = new ArrayList();
+		parameterNames.add("begin.id");
+		parameterNames.add("end.id");
+		pss.setParameterKeys(parameterNames);
+		
+		final List results = new ArrayList();
+		jdbcTemplate.query("SELECT NAME from T_FOOS where ID > ? and ID < ?", pss, new RowCallbackHandler(){
+
+			public void processRow(ResultSet rs) throws SQLException {
+				results.add(rs.getString(1));
+			}});
+		
+		assertEquals(1, results.size());
+		assertEquals("bar3", results.get(0));
 	}
 }

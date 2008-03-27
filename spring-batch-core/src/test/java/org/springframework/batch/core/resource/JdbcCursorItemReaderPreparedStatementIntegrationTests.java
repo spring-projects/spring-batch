@@ -32,7 +32,7 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests extends
 		itemReader.setMaxRows(100);
 		itemReader.setQueryTimeout(1000);
 		itemReader.setSaveState(true);
-		JobParametersPreparedStatementSetter pss = new JobParametersPreparedStatementSetter();
+		StepExecutionPreparedStatementSetter pss = new StepExecutionPreparedStatementSetter();
 		JobParameters jobParameters = new JobParametersBuilder().addLong("begin.id", new Long(1)).addLong("end.id", new Long(4)).toJobParameters();
 		JobInstance jobInstance = new JobInstance(new Long(1), jobParameters, new SimpleJob());
 		JobExecution jobExecution = new JobExecution(jobInstance, new Long(2));
