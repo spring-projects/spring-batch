@@ -26,25 +26,25 @@ import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.TerminatedRetryException;
-import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
+import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
 import org.springframework.batch.retry.context.RetryContextSupport;
 import org.springframework.util.Assert;
 
 /**
- * A {@link RetryPolicy} that detects an {@link ItemReaderRetryCallback} when it
+ * A {@link RetryPolicy} that detects an {@link ItemWriterRetryCallback} when it
  * opens a new context, and uses it to make sure the item is in place for later
  * decisions about how to retry or backoff. The callback should be an instance
- * of {@link ItemReaderRetryCallback} otherwise an exception will be thrown when
+ * of {@link ItemWriterRetryCallback} otherwise an exception will be thrown when
  * the context is created.
  * 
  * @author Dave Syer
  * 
  */
-public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
+public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	public static final String EXHAUSTED = ItemReaderRetryPolicy.class.getName() + ".EXHAUSTED";
+	public static final String EXHAUSTED = ItemWriterRetryPolicy.class.getName() + ".EXHAUSTED";
 
 	private RetryPolicy delegate;
 
@@ -53,7 +53,7 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * 
 	 * @param delegate
 	 */
-	public ItemReaderRetryPolicy(RetryPolicy delegate) {
+	public ItemWriterRetryPolicy(RetryPolicy delegate) {
 		super();
 		this.delegate = delegate;
 	}
@@ -62,7 +62,7 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * Default constructor. Creates a new {@link SimpleRetryPolicy} for the
 	 * delegate.
 	 */
-	public ItemReaderRetryPolicy() {
+	public ItemWriterRetryPolicy() {
 		this(new SimpleRetryPolicy());
 	}
 
@@ -96,7 +96,7 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 
 	/**
 	 * Create a new context for the execution of the callback, which must be an
-	 * instance of {@link ItemReaderRetryCallback}.
+	 * instance of {@link ItemWriterRetryCallback}.
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback,
 	 * RetryContext)
@@ -105,8 +105,8 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * type.
 	 */
 	public RetryContext open(RetryCallback callback, RetryContext parent) {
-		Assert.state(callback instanceof ItemReaderRetryCallback, "Callback must be ItemProviderRetryCallback");
-		ItemReaderRetryContext context = new ItemReaderRetryContext((ItemReaderRetryCallback) callback, parent);
+		Assert.state(callback instanceof ItemWriterRetryCallback, "Callback must be ItemProviderRetryCallback");
+		ItemWriterRetryContext context = new ItemWriterRetryContext((ItemWriterRetryCallback) callback, parent);
 		context.open(callback, null);
 		return context;
 	}
@@ -132,7 +132,7 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 		return ((RetryPolicy) context).handleRetryExhausted(context);
 	}
 
-	private class ItemReaderRetryContext extends RetryContextSupport implements RetryPolicy {
+	private class ItemWriterRetryContext extends RetryContextSupport implements RetryPolicy {
 
 		private Object item;
 
@@ -145,7 +145,7 @@ public class ItemReaderRetryPolicy extends AbstractStatefulRetryPolicy {
 
 		private FailedItemIdentifier failedItemIdentifier;
 
-		public ItemReaderRetryContext(ItemReaderRetryCallback callback, RetryContext parent) {
+		public ItemWriterRetryContext(ItemWriterRetryCallback callback, RetryContext parent) {
 			super(parent);
 			item = callback.next(this);
 			this.recoverer = callback.getRecoverer();

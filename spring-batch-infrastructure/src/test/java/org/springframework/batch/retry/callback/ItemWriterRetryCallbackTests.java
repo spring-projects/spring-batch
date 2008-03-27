@@ -31,7 +31,7 @@ import org.springframework.batch.retry.context.RetryContextSupport;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 
-public class ItemReaderRetryCallbackTests extends TestCase {
+public class ItemWriterRetryCallbackTests extends TestCase {
 
 	List calls = new ArrayList();
 
@@ -41,12 +41,14 @@ public class ItemReaderRetryCallbackTests extends TestCase {
 
 	ListItemReaderRecoverer provider;
 
-	ItemReaderRetryCallback callback;
+	ItemWriterRetryCallback callback;
+
+	private AbstractItemWriter writer;
 
 	protected void setUp() throws Exception {
 		super.setUp();
 		template = new RetryTemplate();
-		provider = new ListItemReaderRecoverer(Arrays.asList(new String[] { "foo", "bar" })) {
+		provider = new ListItemReaderRecoverer(Arrays.asList(new String[] { "foo" })) {
 			public boolean recover(Object data, Throwable cause) {
 				count++;
 				calls.add(data);
@@ -56,14 +58,15 @@ public class ItemReaderRetryCallbackTests extends TestCase {
 				return "key" + (count++);
 			}
 		};
-		callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
+		writer = new AbstractItemWriter() {
 			public void write(Object data) {
 				count++;
 				if (data.equals("bar")) {
 					throw new IllegalStateException("Bar detected");
 				}
 			}
-		});
+		};
+		callback = new ItemWriterRetryCallback("foo", writer);
 	}
 
 	public void testDoWithRetrySuccessfulFirstTime() throws Exception {
@@ -71,30 +74,15 @@ public class ItemReaderRetryCallbackTests extends TestCase {
 		assertEquals(1, count);
 	}
 
-	public void testDataExhausted() throws Exception {
-		provider.read();
-		provider.read(); // line up a null data item...
-
-		try {
-			template.execute(callback);
-		}
-		catch (RetryException e) {
-			fail("Unexpected RetryException");
-		}
-
-		// The item is null, and is not processed:
-		assertEquals(0, count);
-	}
-
 	public void testContextInitializedWithItemAndCanRetry() throws Exception {
 		// We can use the policy to intercept the context and do something with
 		// the item...
-		provider.read(); // line up an unsuccessful call...
+		callback = new ItemWriterRetryCallback("bar", writer);
 		assertEquals(0, calls.size());
 		template.setRetryPolicy(new NeverRetryPolicy() {
 			public boolean canRetry(RetryContext context) {
 				// ...register the failed item
-				calls.add("item(" + count + ")=" + context.getAttribute(ItemReaderRetryCallback.ITEM));
+				calls.add("item(" + count + ")=" + context.getAttribute(ItemWriterRetryCallback.ITEM));
 				// Do not call the base class method - the attempt counts as
 				// successful now
 				if (count < 2) // only retry once
@@ -120,12 +108,12 @@ public class ItemReaderRetryCallbackTests extends TestCase {
 	public void testContextInitializedWithItemAndRegisterThrowable() throws Exception {
 		// We can use the policy to intercept the context and do something with
 		// the item...
-		provider.read(); // line up an unsuccessful call...
+		callback = new ItemWriterRetryCallback("bar", writer);
 		assertEquals(0, calls.size());
 		template.setRetryPolicy(new NeverRetryPolicy() {
 			public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
 				// ...register the failed item
-				calls.add("item=" + context.getAttribute(ItemReaderRetryCallback.ITEM));
+				calls.add("item=" + context.getAttribute(ItemWriterRetryCallback.ITEM));
 				// Call the base class method so that the next attempt is a
 				// failure.
 				super.registerThrowable(context, throwable);
@@ -156,11 +144,12 @@ public class ItemReaderRetryCallbackTests extends TestCase {
 	}
 
 	public void testGetKey() throws Exception {
+		callback.setKeyGenerator(provider);
 		assertEquals("key0", callback.getKeyGenerator().getKey("foo"));
 	}
 
 	public void testRecoverWithoutSession() throws Exception {
-		callback.getRecoverer().recover("foo", null);
+		provider.recover("foo", null);
 		assertEquals(1, count);
 		assertEquals(1, calls.size());
 	}

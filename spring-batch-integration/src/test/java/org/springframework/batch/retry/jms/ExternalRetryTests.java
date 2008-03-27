@@ -23,10 +23,9 @@ import javax.sql.DataSource;
 
 import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.AbstractItemWriter;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
-import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
-import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
+import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
+import org.springframework.batch.retry.policy.ItemWriterRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
@@ -42,7 +41,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 	private RetryTemplate retryTemplate;
 
-	private ItemReader provider;
+	private ItemReaderRecoverer provider;
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -102,9 +101,9 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new ItemReaderRetryPolicy());
+		retryTemplate.setRetryPolicy(new ItemWriterRetryPolicy());
 
-		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
+		final AbstractItemWriter writer = new AbstractItemWriter() {
 			public void write(final Object text) {
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
 				        new Integer(list.size()), text });
@@ -113,12 +112,13 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 				}
 
 			}
-		});
+		};
 
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 				public Object doInTransaction(TransactionStatus status) {
 					try {
+						ItemWriterRetryCallback callback = new ItemWriterRetryCallback(provider.read(), writer);
 						return retryTemplate.execute(callback);
 					} catch (Exception e) {
 						throw new RuntimeException(e.getMessage(), e);
@@ -138,6 +138,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
 				try {
+					ItemWriterRetryCallback callback = new ItemWriterRetryCallback(provider.read(), writer);
 					return retryTemplate.execute(callback);
 				} catch (Exception e) {
 					throw new RuntimeException(e.getMessage(), e);
@@ -164,15 +165,16 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new ItemReaderRetryPolicy());
+		retryTemplate.setRetryPolicy(new ItemWriterRetryPolicy());
 
-		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
+		final ItemWriterRetryCallback callback = new ItemWriterRetryCallback(provider.read(), new AbstractItemWriter() {
 			public void write(final Object text) {
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
 				        new Integer(list.size()), text });
 				throw new RuntimeException("Rollback!");
 			}
 		});
+		callback.setRecoverer(provider);
 
 		Object result = "start";
 

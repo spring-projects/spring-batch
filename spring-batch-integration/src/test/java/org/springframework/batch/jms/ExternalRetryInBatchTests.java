@@ -23,15 +23,14 @@ import javax.sql.DataSource;
 
 import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.AbstractItemWriter;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
-import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
+import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
+import org.springframework.batch.retry.policy.ItemWriterRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -49,7 +48,7 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 
 	private RepeatTemplate repeatTemplate;
 
-	private ItemReader provider;
+	private ItemReaderRecoverer provider;
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -113,18 +112,7 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 	public void testExternalRetryRecoveryInBatch() throws Exception {
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new ItemReaderRetryPolicy(new SimpleRetryPolicy(1)));
-
-		final ItemReaderRetryCallback callback = new ItemReaderRetryCallback(provider, new AbstractItemWriter() {
-			public void write(final Object text) {
-				// No need for transaction here: the whole batch will roll
-				// back. When it comes back for recovery this code is not
-				// executed...
-				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-				        new Integer(list.size()), text });
-				throw new RuntimeException("Rollback!");
-			}
-		});
+		retryTemplate.setRetryPolicy(new ItemWriterRetryPolicy(new SimpleRetryPolicy(1)));
 
 		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
 
@@ -139,7 +127,30 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 							repeatTemplate.iterate(new RepeatCallback() {
 
 								public ExitStatus doInIteration(RepeatContext context) throws Exception {
-									return new ExitStatus(retryTemplate.execute(callback) != null);
+
+									Object item = provider.read();
+									
+									if (item==null) {
+										return ExitStatus.FINISHED;
+									}
+									
+									ItemWriterRetryCallback callback = new ItemWriterRetryCallback(item, new AbstractItemWriter() {
+										public void write(final Object text) {
+											// No need for transaction here: the whole batch will roll
+											// back. When it comes back for recovery this code is not
+											// executed...
+											jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
+											        new Integer(list.size()), text });
+											throw new RuntimeException("Rollback!");
+										}
+									});
+									
+									callback.setRecoverer(provider);
+
+									retryTemplate.execute(callback);
+									
+									return ExitStatus.CONTINUABLE;
+
 								}
 
 							});

@@ -16,38 +16,34 @@
 
 package org.springframework.batch.retry.callback;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.FailedItemIdentifier;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
+import org.springframework.batch.retry.policy.ItemWriterRetryPolicy;
 
 /**
- * A {@link RetryCallback} that knows about and caches the value from an
- * {@link ItemReader}. Used by the {@link ItemReaderRetryPolicy} to enable
- * external retry of the item processing.
+ * A {@link RetryCallback} that knows about and caches an item, and attempts to
+ * process it using an {@link ItemWriter}. Used by the
+ * {@link ItemWriterRetryPolicy} to enable external retry of the item
+ * processing.
  * 
  * @author Dave Syer
  * 
- * @see ItemReaderRetryPolicy
+ * @see ItemWriterRetryPolicy
  * @see RetryPolicy#handleRetryExhausted(RetryContext)
  * 
  */
-public class ItemReaderRetryCallback implements RetryCallback {
+public class ItemWriterRetryCallback implements RetryCallback {
 
-	private final static Log logger = LogFactory.getLog(ItemReaderRetryCallback.class);
+	public static final String ITEM = ItemWriterRetryCallback.class.getName() + ".ITEM";
 
-	public static final String ITEM = ItemReaderRetryCallback.class.getName() + ".ITEM";
-
-	private ItemReader reader;
+	private Object item;
 
 	private ItemWriter writer;
 
@@ -63,13 +59,13 @@ public class ItemReaderRetryCallback implements RetryCallback {
 		}
 	};
 
-	public ItemReaderRetryCallback(ItemReader reader, ItemWriter writer) {
-		this(reader, null, writer);
+	public ItemWriterRetryCallback(Object item, ItemWriter writer) {
+		this(item, writer, null);
 	}
 
-	public ItemReaderRetryCallback(ItemReader reader, ItemKeyGenerator keyGenerator, ItemWriter writer) {
+	public ItemWriterRetryCallback(Object item, ItemWriter writer, ItemKeyGenerator keyGenerator) {
 		super();
-		this.reader = reader;
+		this.item = item;
 		this.writer = writer;
 		this.keyGenerator = keyGenerator;
 	}
@@ -119,17 +115,7 @@ public class ItemReaderRetryCallback implements RetryCallback {
 	public Object next(RetryContext context) {
 		Object item = context.getAttribute(ITEM);
 		if (item == null) {
-			try {
-				item = reader.read();
-			}
-			catch (Exception e) {
-				throw new ExhaustedRetryException("Unexpected end of item provider", e);
-			}
-			if (item == null) {
-				// This is probably not fatal: in a batch we want to
-				// exit gracefully...
-				logger.info("ItemProvider exhausted during retry.");
-			}
+			item = this.item;
 			context.setAttribute(ITEM, item);
 		}
 		return item;
@@ -157,9 +143,6 @@ public class ItemReaderRetryCallback implements RetryCallback {
 		if (keyGenerator != null) {
 			return keyGenerator;
 		}
-		if (reader instanceof ItemKeyGenerator) {
-			return (ItemKeyGenerator) reader;
-		}
 		if (writer instanceof ItemKeyGenerator) {
 			return (ItemKeyGenerator) writer;
 		}
@@ -178,9 +161,6 @@ public class ItemReaderRetryCallback implements RetryCallback {
 		if (failedItemIdentifier != null) {
 			return failedItemIdentifier;
 		}
-		if (reader instanceof FailedItemIdentifier) {
-			return (FailedItemIdentifier) reader;
-		}
 		if (writer instanceof FailedItemIdentifier) {
 			return (FailedItemIdentifier) writer;
 		}
@@ -198,22 +178,10 @@ public class ItemReaderRetryCallback implements RetryCallback {
 		if (recoverer != null) {
 			return recoverer;
 		}
-		if (reader instanceof ItemRecoverer) {
-			return (ItemRecoverer) reader;
-		}
 		if (writer instanceof ItemRecoverer) {
 			return (ItemRecoverer) writer;
 		}
 		return null;
-	}
-
-	/**
-	 * Public getter for the {@link ItemReader}.
-	 * 
-	 * @return the {@link ItemReader} instance.
-	 */
-	public ItemReader getReader() {
-		return reader;
 	}
 
 }

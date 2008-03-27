@@ -17,17 +17,17 @@ package org.springframework.batch.core.step.item;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
-import org.springframework.batch.retry.callback.ItemReaderRetryCallback;
-import org.springframework.batch.retry.policy.ItemReaderRetryPolicy;
+import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
+import org.springframework.batch.retry.policy.ItemWriterRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 
@@ -139,10 +139,7 @@ public class StatefulRetryStepFactoryBean extends SimpleStepFactoryBean {
 			getStepOperations()
 					.setExceptionHandler(new SimpleRetryExceptionHandler(retryPolicy, getExceptionHandler()));
 
-			ItemReaderRetryCallback retryCallback = new ItemReaderRetryCallback(getItemReader(), itemKeyGenerator,
-					getItemWriter());
-			retryCallback.setRecoverer(itemRecoverer);
-			ItemReaderRetryPolicy itemProviderRetryPolicy = new ItemReaderRetryPolicy(retryPolicy);
+			ItemWriterRetryPolicy itemProviderRetryPolicy = new ItemWriterRetryPolicy(retryPolicy);
 
 			RetryTemplate retryTemplate = new RetryTemplate();
 			if (retryListeners!=null) {
@@ -154,7 +151,7 @@ public class StatefulRetryStepFactoryBean extends SimpleStepFactoryBean {
 			}
 
 			StatefulRetryItemHandler itemHandler = new StatefulRetryItemHandler(getItemReader(), getItemWriter(),
-					retryTemplate, retryCallback);
+					retryTemplate, itemKeyGenerator, itemRecoverer);
 
 			step.setItemHandler(itemHandler);
 
@@ -166,21 +163,25 @@ public class StatefulRetryStepFactoryBean extends SimpleStepFactoryBean {
 
 		final private RetryOperations retryOperations;
 
-		final private ItemReaderRetryCallback retryCallback;
+		final private ItemKeyGenerator itemKeyGenerator;
+
+		final private ItemRecoverer itemRecoverer;
 
 		/**
 		 * @param itemReader
 		 * @param itemWriter
 		 * @param retryCallback
 		 * @param retryTemplate
+		 * @param itemRecoverer 
 		 */
 		public StatefulRetryItemHandler(ItemReader itemReader, ItemWriter itemWriter, RetryOperations retryTemplate,
-				ItemReaderRetryCallback retryCallback) {
+				ItemKeyGenerator itemKeyGenerator, ItemRecoverer itemRecoverer) {
 			super(itemReader, itemWriter);
 			this.retryOperations = retryTemplate;
-			this.retryCallback = retryCallback;
+			this.itemKeyGenerator = itemKeyGenerator;
+			this.itemRecoverer = itemRecoverer;
 		}
-
+		
 		/**
 		 * Execute the business logic, delegating to the reader and writer.
 		 * Subclasses could extend the behaviour as long as they always return
@@ -197,13 +198,17 @@ public class StatefulRetryStepFactoryBean extends SimpleStepFactoryBean {
 		 * call will happen in the context of a transaction that is about to
 		 * rollback).<br/>
 		 * 
-		 * @param contribution the current step
-		 * @return {@link ExitStatus#CONTINUABLE} if there is more processing to
-		 * do
-		 * @throws Exception if there is an error
+		 * @see org.springframework.batch.core.step.item.SimpleItemHandler#write(java.lang.Object, org.springframework.batch.core.StepContribution)
 		 */
-		public ExitStatus handle(StepContribution contribution) throws Exception {
-			return new ExitStatus(retryOperations.execute(retryCallback) != null);
+		protected void write(Object item, final StepContribution contribution) throws Exception {
+			ItemWriterRetryCallback retryCallback = new ItemWriterRetryCallback(item, new AbstractItemWriter() {
+				public void write(Object item) throws Exception {
+					doWrite(item);
+				}
+			});
+			retryCallback.setKeyGenerator(itemKeyGenerator);
+			retryCallback.setRecoverer(itemRecoverer);
+			retryOperations.execute(retryCallback);
 		}
 
 	}
