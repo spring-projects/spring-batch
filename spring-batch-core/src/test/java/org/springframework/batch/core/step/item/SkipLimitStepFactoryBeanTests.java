@@ -140,10 +140,10 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), StringUtils
 				.commaDelimitedListToSet("2,3,5"));
-		
+
 		factory.setSkipLimit(3);
 		factory.setItemReader(reader);
-		factory.setSkippableExceptionClasses(new Class[] {Exception.class});
+		factory.setSkippableExceptionClasses(new Class[] { Exception.class });
 
 		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
 
@@ -161,8 +161,62 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		// writer did not skip "2" as it never made it to writer, only "4" did
 		assertTrue(reader.processed.contains("4"));
 
-		// failure on "4" tripped the skip limit so we never got to "5"
-		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1"));
+		// failure on "4" tripped the skip limit so we never write anything
+		// ("1" was written but rolled back)
+		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
+		assertEquals(expectedOutput, writer.written);
+
+	}
+
+	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	public void testSkipOnReadNotDoubleCounted() throws Exception {
+
+		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), StringUtils
+				.commaDelimitedListToSet("2,3,5"));
+
+		factory.setSkipLimit(4);
+		factory.setItemReader(reader);
+
+		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+
+		StepExecution stepExecution = jobExecution.createStepExecution(step);
+
+		step.execute(stepExecution);
+		assertEquals(4, stepExecution.getSkipCount());
+
+		// skipped 2,3,4,5
+		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6"));
+		assertEquals(expectedOutput, writer.written);
+
+	}
+
+	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	public void testSkipOnWriteNotDoubleCounted() throws Exception {
+
+		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6,7"), StringUtils
+				.commaDelimitedListToSet("2,3"));
+
+		writer = new SkipWriterStub(StringUtils.commaDelimitedListToSet("4,5"));
+
+		factory.setSkipLimit(4);
+		factory.setItemReader(reader);
+		factory.setItemWriter(writer);
+
+		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+
+		StepExecution stepExecution = jobExecution.createStepExecution(step);
+
+		step.execute(stepExecution);
+		System.err.println(writer.written);
+		System.err.println(reader.processed);
+		assertEquals(4, stepExecution.getSkipCount());
+
+		// skipped 2,3,4,5
+		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6,7"));
 		assertEquals(expectedOutput, writer.written);
 
 	}
@@ -223,6 +277,19 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		int flushIndex = -1;
 
+		private final Collection failures;
+
+		public SkipWriterStub() {
+			this(StringUtils.commaDelimitedListToSet("4"));
+		}
+
+		/**
+		 * @param commaDelimitedListToSet
+		 */
+		public SkipWriterStub(Collection failures) {
+			this.failures = failures;
+		}
+
 		public void clear() throws ClearFailedException {
 			for (int i = flushIndex + 1; i < written.size(); i++) {
 				written.remove(i);
@@ -234,10 +301,10 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		}
 
 		public void write(Object item) throws Exception {
-			written.add(item);
-			if (item.equals("4")) {
+			if (failures.contains(item)) {
 				throw new SkippableRuntimeException("exception in writer");
 			}
+			written.add(item);
 		}
 
 	}

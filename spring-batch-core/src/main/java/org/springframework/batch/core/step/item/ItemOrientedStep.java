@@ -299,6 +299,7 @@ public class ItemOrientedStep extends AbstractStep {
 							Thread.currentThread().interrupt();
 						}
 
+						contribution.commitReadSkipCount();
 						// Apply the contribution to the step
 						// only if chunk was successful
 						stepExecution.apply(contribution);
@@ -330,13 +331,11 @@ public class ItemOrientedStep extends AbstractStep {
 
 					}
 					catch (Error e) {
-						stepExecution.incrementSkipCountBy(contribution.getSkipCount());
-						processRollback(stepExecution, fatalException, transaction);
+						processRollback(stepExecution, contribution, fatalException, transaction);
 						throw e;
 					}
 					catch (Exception e) {
-						stepExecution.incrementSkipCountBy(contribution.getSkipCount());
-						processRollback(stepExecution, fatalException, transaction);
+						processRollback(stepExecution, contribution, fatalException, transaction);
 						throw e;
 					}
 					finally {
@@ -525,11 +524,14 @@ public class ItemOrientedStep extends AbstractStep {
 
 	/**
 	 * @param stepExecution
+	 * @param contribution 
 	 * @param fatalException
 	 * @param transaction
 	 */
-	private void processRollback(final StepExecution stepExecution, final ExceptionHolder fatalException,
+	private void processRollback(final StepExecution stepExecution, final StepContribution contribution, final ExceptionHolder fatalException,
 			TransactionStatus transaction) {
+
+		stepExecution.incrementSkipCountBy(contribution.getSkipCount());
 		/*
 		 * Any exception thrown within the transaction should automatically
 		 * cause the transaction to rollback.

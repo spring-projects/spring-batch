@@ -28,6 +28,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.listener.CompositeSkipListener;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
+import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -48,9 +49,10 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 
 	/**
-	 * Key for transaction resource that holds skipped keys until they can be removed
+	 * Key for transaction resource that holds skipped keys until they can be
+	 * removed
 	 */
-	private static final String TO_BE_REMOVED = ItemSkipPolicyItemHandler.class.getName()+".TO_BE_REMOVED";
+	private static final String TO_BE_REMOVED = ItemSkipPolicyItemHandler.class.getName() + ".TO_BE_REMOVED";
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -153,17 +155,26 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 
 			}
 			catch (Exception e) {
-				if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
-					// increment skip count and try again
-					contribution.incrementSkipCount();
-					if (listener != null) {
-						listener.onSkipInRead(e);
+				try {
+					if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+						// increment skip count and try again
+						contribution.incrementReadSkipCount();
+						if (listener != null) {
+							listener.onSkipInRead(e);
+						}
+						logger.debug("Skipping failed input", e);
 					}
-					logger.debug("Skipping failed input", e);
+					else {
+						// re-throw only when the skip policy runs out of
+						// patience
+						throw e;
+					}
 				}
-				else {
-					// re-throw only when the skip policy runs out of patience
-					throw e;
+				catch (SkipLimitExceededException ex) {
+					// we are headed for a abnormal ending so bake in the skip
+					// count
+					contribution.commitReadSkipCount();
+					throw ex;
 				}
 			}
 
@@ -198,7 +209,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 			throw e;
 		}
 	}
-	
+
 	public void mark() throws MarkFailedException {
 		super.mark();
 		clearSkippedExceptions();
@@ -235,9 +246,10 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 			return;
 		}
 		synchronized (skippedExceptions) {
-			for (Iterator iterator = ((Set) TransactionSynchronizationManager.getResource(TO_BE_REMOVED)).iterator(); iterator.hasNext();) {
+			for (Iterator iterator = ((Set) TransactionSynchronizationManager.getResource(TO_BE_REMOVED)).iterator(); iterator
+					.hasNext();) {
 				Object key = (Object) iterator.next();
-				skippedExceptions.remove(key);				
+				skippedExceptions.remove(key);
 			}
 			TransactionSynchronizationManager.unbindResource(TO_BE_REMOVED);
 		}

@@ -32,6 +32,8 @@ public class StepContribution {
 
 	private int skipCount;
 
+	private int readSkipCount;
+
 	/**
 	 * @param execution
 	 */
@@ -72,10 +74,11 @@ public class StepContribution {
 
 	/**
 	 * @return the sum of skips accumulated in the parent {@link StepExecution}
-	 * and this <code>StepContribution</code>.
+	 * and this <code>StepContribution</code>, including uncommitted read
+	 * skips.
 	 */
 	public int getStepSkipCount() {
-		return skipCount + parentSkipCount;
+		return readSkipCount + skipCount + parentSkipCount;
 	}
 
 	/**
@@ -88,18 +91,25 @@ public class StepContribution {
 	}
 
 	/**
-	 * Increment the skip count
+	 * Increment the total skip count for this contribution
 	 */
 	public void incrementSkipCount() {
 		skipCount++;
 	}
 
 	/**
-	 * Increment the skip count by a non-trivial amount
-	 * @param delta
+	 * Increment the counter for skipped reads
 	 */
-	public void incrementSkipCount(int delta) {
-		skipCount += delta;
+	public void incrementReadSkipCount() {
+		this.readSkipCount++;
+	}
+
+	/**
+	 * Clear the read skips and transfer them to the total skip count
+	 */
+	public void commitReadSkipCount() {
+		skipCount += readSkipCount;
+		readSkipCount = 0;
 	}
 
 	/*
@@ -107,7 +117,8 @@ public class StepContribution {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "[StepContribution: items="+itemCount+", commits=" + commitCount + ", skips=" + skipCount + "]";
+		return "[StepContribution: items=" + itemCount + ", commits=" + commitCount + ", readSkips=" + readSkipCount
+				+ ", skips=" + skipCount + "]";
 	}
 
 }
