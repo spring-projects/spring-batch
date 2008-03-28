@@ -24,7 +24,6 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.SqlTypeValue;
@@ -44,18 +43,13 @@ public class StepExecutionPreparedStatementSetter extends StepExecutionListenerS
 
 	private List parameterKeys;
 	private JobParameters jobParameters;
-	private ExecutionContext executionContext;
 	
 	public void setValues(PreparedStatement ps) throws SQLException {
 		Map parameters = jobParameters.getParameters();
 		for(int i = 0; i < parameterKeys.size(); i++){
-			String parameterKey = parameterKeys.get(i).toString();
-			Object arg = executionContext.get(parameterKey);
+			Object arg = parameters.get(parameterKeys.get(i));
 			if(arg == null){
-				arg = parameters.get(parameterKey);
-				if(arg == null){
-					throw new IllegalStateException("No job parameter found for with key of: [" + parameterKeys.get(i) + "]");
-				}
+				throw new IllegalStateException("No job parameter found for with key of: [" + parameterKeys.get(i) + "]");
 			}
 			StatementCreatorUtils.setParameterValue(ps, i + 1, SqlTypeValue.TYPE_UNKNOWN, arg);
 		}
@@ -63,7 +57,6 @@ public class StepExecutionPreparedStatementSetter extends StepExecutionListenerS
 	
 	public void beforeStep(StepExecution stepExecution) {
 		this.jobParameters = stepExecution.getJobParameters();
-		this.executionContext = stepExecution.getExecutionContext();
 	}
 	
 	/**

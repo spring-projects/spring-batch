@@ -27,7 +27,6 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -36,7 +35,7 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  * @author Lucas Ward
  *
  */
-public class JobParametersPreparedStatementSetterTests extends AbstractTransactionalDataSourceSpringContextTests {
+public class StepExecutionPreparedStatementSetterTests extends AbstractTransactionalDataSourceSpringContextTests {
 
 	JdbcTemplate jdbcTemplate;
 	StepExecutionPreparedStatementSetter pss;
@@ -105,28 +104,5 @@ public class JobParametersPreparedStatementSetterTests extends AbstractTransacti
 			//expected
 		}
 
-	}
-	
-	public void testMixedProperties(){
-		
-		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.putLong("begin.id", 2);
-		stepExecution.setExecutionContext(executionContext);
-		pss.beforeStep(stepExecution);
-		
-		List parameterNames = new ArrayList();
-		parameterNames.add("begin.id");
-		parameterNames.add("end.id");
-		pss.setParameterKeys(parameterNames);
-		
-		final List results = new ArrayList();
-		jdbcTemplate.query("SELECT NAME from T_FOOS where ID > ? and ID < ?", pss, new RowCallbackHandler(){
-
-			public void processRow(ResultSet rs) throws SQLException {
-				results.add(rs.getString(1));
-			}});
-		
-		assertEquals(1, results.size());
-		assertEquals("bar3", results.get(0));
 	}
 }
