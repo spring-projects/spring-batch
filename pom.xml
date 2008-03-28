@@ -596,6 +596,7 @@
 					</links>
 					<aggregate>true</aggregate>
 					<excludePackageNames>org.springframework.batch.sample</excludePackageNames>
+					<excludePackageNames>org.springframework.batch.container</excludePackageNames>
 				</configuration>
 			</plugin>
 		</plugins>
