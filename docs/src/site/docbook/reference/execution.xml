@@ -482,6 +482,49 @@
         transactional map. So, the repository and DAOs may still be used
         normally, and are transactionally sound, but their contents will be
         lost when the class is destroyed.</para>
+
+        <section>
+          <title>Transaction Configuration For the JobRepository</title>
+
+          <para>If the JDBC daos are used with the JobRepository it is also
+          essential to configure the transactional behaviour of the
+          repository. This is to ensure that the batch meta data, including
+          state that is necessary for restarts after a failure, is persisted
+          correctly. The behaviour of the framework is not well defined if the
+          repository methods are not transactional. </para>
+
+          <para>The Spring Batch samples have a
+          simple-job-launcher-context.xml configuration file that contains the
+          necessary details. Here is the relevant section:</para>
+
+          <para><programlisting>&lt;aop:config&gt;
+    &lt;aop:advisor 
+        pointcut="execution(* org.springframework.batch.core..*Repository+.*(..))"
+    &lt;advice-ref="txAdvice" /&gt;
+&lt;/aop:config&gt;
+
+&lt;tx:advice id="txAdvice" transaction-manager="transactionManager"&gt;
+    &lt;tx:attributes&gt;
+        &lt;tx:method name="create*" propagation="REQUIRES_NEW" isolation="SERIALIZABLE" /&gt;
+        &lt;tx:method name="*" /&gt;
+    &lt;/tx:attributes&gt;
+&lt;/tx:advice&gt;</programlisting></para>
+
+          <para>This fragment can be used as is, or with almost no changes.
+          The isolation level in the <code>create*</code> method attiributes
+          is specified to ensure that when jobs are launched there if two
+          processes are trying to launch the same job at the same time, only
+          one will succeed. This is quite aggressive, and READ_COMMITTED would
+          work just as well; READ_UNCOMMITTED would be fine if two processes
+          are not likely to collide in this way. However, since a call to the
+          <classname>create*</classname> method is quite short, it is unlikely
+          that the SERIALIZED will cause problems, as long as the database
+          platform supports it.</para>
+
+          <para>Remember also to include the appropiate namespace declarations
+          and to make sure spring-tx and spring-aop (or the whole of spring)
+          is on the classpath.</para>
+        </section>
       </section>
     </section>
 
@@ -1372,7 +1415,7 @@
       state is stored through the <classname>ItemStream</classname> interface
       in the <classname>ExecutionContext</classname>. In this way we can be
       sure that when the <code>open()</code> callback is received on a
-      restart, we always get the last value that was committed. </para>
+      restart, we always get the last value that was committed.</para>
 
       <para>N.B. We might not implement <classname>ItemStream</classname> if
       the ItemWriter is re-runnable, in the sense that it maintains its own
