@@ -36,6 +36,17 @@ import org.springframework.util.Assert;
  * {@link ItemWriter} (the delegate). A delegate is required, and will be used
  * to do the actual writing of the item.<br/>
  * 
+ * It is expected that {@link #write(Object)} is called inside a transaction,
+ * and that {@link #flush()} is then subsequently called before the transaction
+ * commits, or {@link #clear()} before it rolls back.<br/>
+ * 
+ * The writer is thread safe after its properties are set (normal singleton
+ * behaviour), so it can be used to write in multiple concurrent transactions.
+ * Note, however, that the set of failed items is stored in a collection
+ * internally, and this collection is never cleared, so it is not a great idea
+ * to go on using the writer indefinitely. Normally it would be used for the
+ * duration of a batch job and then discarded.
+ * 
  * @author Dave Syer
  * 
  */
