@@ -147,26 +147,24 @@ Object result = template.execute(new RetryCallback() {
         recognise the failed operations when they come back in a new
         transaction. To facilitate this in the commonest case where an object
         (like a message or message payload) is being processed, Spring Batch
-        provides the <classname>ItemReaderRetryPolicy</classname>. This works
+        provides the <classname>ItemWriterRetryPolicy</classname>. This works
         in conjunction with a special <classname>RetryCallback</classname>
-        implementation <classname>ItemReaderRetryCallback</classname>, which
+        implementation <classname>ItemWriterRetryCallback</classname>, which
         in turn relies on the user providing an
-        <classname>ItemReader</classname> and an
         <classname>ItemWriter</classname>. This callback implements the common
-        pattern where it reads from a reader and passes the result to a
-        writer.</para>
+        pattern where it passes the item to a writer.</para>
 
         <para>The way the failed operations are recognised in this
-        implementation is by identifying the object that is returned from the
-        <classname>ItemReader</classname>. To identify the item the user can
-        provide an <classname>ItemKeyGenerator</classname> strategy, and this
-        is responsible for returning a unique key identifying the item. The
+        implementation is by identifying the item across multiple invocations
+        of the retry. To identify the item the user can provide an
+        <classname>ItemKeyGenerator</classname> strategy, and this is
+        responsible for returning a unique key identifying the item. The
         identifier is used as a key in the
         <classname>RetryContextCache</classname>. An
         <classname>ItemKeyGenerator</classname> can be provided either by
         injecting it directly into the
-        <classname>ItemReaderRetryCallback</classname>, or by implementing the
-        interface in the <classname>ItemReader</classname>, or by accepting
+        <classname>ItemWriterRetryCallback</classname>, or by implementing the
+        interface in the <classname>ItemWriter</classname>, or by accepting
         the default which is to simply use the item itself as a key.</para>
 
         <para>When the retry is exhausted, because a stateful retry is always
@@ -176,13 +174,12 @@ Object result = template.execute(new RetryCallback() {
         almost certain to fail). This option is provided by the
         <classname>ItemRecoverer</classname> strategy. Like the key generator,
         it can be directly injected or provided by implementing the interface
-        in either the <classname>ItemReader</classname> or
-        <classname>ItemWriter</classname>.</para>
+        in the <classname>ItemWriter</classname>.</para>
 
         <para>The decision to retry or not is actually delegated to a regular
         stateless retry policy, so the usual concerns about limits and
         timeouts can be injected into the
-        <classname>ItemReaderRetryPolicy</classname> through the delegate
+        <classname>ItemWriterRetryPolicy</classname> through the delegate
         property.</para>
       </section>
     </section>
