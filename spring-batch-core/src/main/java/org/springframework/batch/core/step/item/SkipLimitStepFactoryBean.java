@@ -69,6 +69,14 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	}
 
 	/**
+	 * Protected getter for the fatal exceptions.
+	 * @return the fatalExceptionClasses
+	 */
+	protected Class[] getFatalExceptionClasses() {
+		return fatalExceptionClasses;
+	}
+
+	/**
 	 * Public setter for the {@link ItemKeyGenerator}. This is used to identify
 	 * failed items so they can be skipped if encountered again, generally in
 	 * another transaction.

@@ -119,6 +119,7 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 			SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy(retryLimit);
 			if (retryableExceptionClasses != null) {
 				retryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
+				retryPolicy.setFatalExceptionClasses(getFatalExceptionClasses());
 			}
 
 			// Co-ordinate the retry policy with the exception handler:

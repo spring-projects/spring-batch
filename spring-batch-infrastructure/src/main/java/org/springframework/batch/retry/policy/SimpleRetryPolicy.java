@@ -48,7 +48,9 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 
 	private volatile int maxAttempts;
 
-	private BinaryExceptionClassifier classifier = new BinaryExceptionClassifier();
+	private BinaryExceptionClassifier retryableClassifier = new BinaryExceptionClassifier();
+
+	private BinaryExceptionClassifier fatalClassifier = new BinaryExceptionClassifier();
 
 	/**
 	 * Create a {@link SimpleRetryPolicy} with the default number of retry
@@ -67,6 +69,7 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	public SimpleRetryPolicy(int maxAttempts) {
 		super();
 		setRetryableExceptionClasses(new Class[] { Exception.class });
+		setFatalExceptionClasses(new Class[] { Error.class });
 		this.maxAttempts = maxAttempts;
 	}
 
@@ -97,12 +100,23 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 
 	/**
 	 * Set the retryable exceptions. Any exception on the list, or subclasses
-	 * thereof, will be retryable. Others will be rethrown without retry.
+	 * thereof, will be retryable. Others will be re-thrown without retry.
 	 * 
 	 * @param retryableExceptionClasses defaults to {@link Exception}.
 	 */
 	public final void setRetryableExceptionClasses(Class[] retryableExceptionClasses) {
-		classifier.setExceptionClasses(retryableExceptionClasses);
+		retryableClassifier.setExceptionClasses(retryableExceptionClasses);
+	}
+
+	/**
+	 * Set the fatal exceptions. Any exception on the list, or subclasses
+	 * thereof, will be re-thrown without retry. This list takes precedence over
+	 * the retryable list.
+	 * 
+	 * @param retryableExceptionClasses defaults to {@link Exception}.
+	 */
+	public final void setFatalExceptionClasses(Class[] fatalExceptionClasses) {
+		fatalClassifier.setExceptionClasses(fatalExceptionClasses);
 	}
 
 	/**
@@ -126,7 +140,8 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * Get a status object that can be used to track the current operation
 	 * according to this policy. Has to be aware of the latest exception and the
 	 * number of attempts.
-	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback, RetryContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback,
+	 * RetryContext)
 	 */
 	public RetryContext open(RetryCallback callback, RetryContext parent) {
 		return new SimpleRetryContext(parent);
@@ -146,6 +161,6 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * retryable.
 	 */
 	private boolean retryForException(Throwable ex) {
-		return !classifier.isDefault(ex);
+		return fatalClassifier.isDefault(ex) && !retryableClassifier.isDefault(ex);
 	}
 }
