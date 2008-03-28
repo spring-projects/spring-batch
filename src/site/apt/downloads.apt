@@ -5,9 +5,9 @@
                                     ------
                                     December 2007
 
-Milestone Builds
+Spring Batch Downloads
 
-  These builds are provided for evaluation and community feedback.  They will have a release identifier ending in "mX" where X is the milestone number, or "rcX" for a release candidate.  The current release is <<1.0.0>>.
+  The current release is <<1.0.0>>.
 
 * Zip Downloads
 
@@ -15,19 +15,9 @@ Milestone Builds
 
 * Maven Artifacts
 
-  You can browse the {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}repository}} with a web browser.  You can see the internal and external project dependencies in the <<<spring-batch-*/*.pom>>> files.  You will probably need <<<spring-batch-core>>> and <<<spring-batch-infrastructure>>>.  Source code is packaged in a separate jar file in the same directory, and the samples are also bundled in the same way.
+  Final releases are published on Maven central repo, and also in our s3 repository, browseable {{{http://s3browse.com/explore/maven.springframework.org/release/org/springframework/batch}here}}.  You can see the internal and external project dependencies in the <<<spring-batch-*/*.pom>>> files.  You will probably need <<<spring-batch-core>>> and <<<spring-batch-infrastructure>>>.  Source code is packaged in a separate jar file in the same directory, and the samples are also bundled in the same way.
 
-  The builds consist of a set of jar artifacts deployed to a Maven2 repository. To use it, just add the following repository to your POM (inside a \<repositories\> element at the top level):
-
-+---------------
-<repository>
-    <id>spring-s3</id>
-    <name>Spring Portfolio Maven MILESTONE Repository</name>
-    <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
-</repository>
-+---------------
-
-  Individual dependencies can then by added like so (inside a \<dependencies\> element at the top level):
+Individual dependencies can then by added like so (inside a \<dependencies\> element at the top level):
 
 +---------------
 <dependency>
@@ -38,6 +28,20 @@ Milestone Builds
 +---------------
 
   The Core module has dependencies on Infrastructure, so you only need to include that to build and run jobs with Spring Batch.  I.e.
+
+* Milestone Builds
+
+  These builds are provided for evaluation and community feedback.  Spring Batch builds have a release identifier ending in "mX" where X is the milestone number, or "rcX" for a release candidate.  
+
+  Milestones and snapshots are only published in s3.  You can browse the {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}repository}} with a web browser.  To use them, just add the following repository to your POM (inside a \<repositories\> element at the top level):
+
++---------------
+<repository>
+    <id>spring-s3</id>
+    <name>Spring Portfolio Maven MILESTONE Repository</name>
+    <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
+</repository>
++---------------
 
 Snapshot Builds
 

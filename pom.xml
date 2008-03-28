@@ -595,8 +595,7 @@
 						<link>http://static.springframework.org/spring-batch/apidocs/</link>
 					</links>
 					<aggregate>true</aggregate>
-					<excludePackageNames>org.springframework.batch.sample</excludePackageNames>
-					<excludePackageNames>org.springframework.batch.container</excludePackageNames>
+					<excludePackageNames>*.batch.sample,*.batch.container</excludePackageNames>
 				</configuration>
 			</plugin>
 		</plugins>
