@@ -120,10 +120,7 @@
         <listitem>
           <para><emphasis role="bold">Data Tier:</emphasis> The Data Tier
           provides the integration with the physical data sources that might
-          include databases, files, or queues. <emphasis
-          role="bold">Note</emphasis> : In some cases the Job tier can be
-          completely missing and in other cases one Job Script can start
-          several Batch Job instances.</para>
+          include databases, files, or queues.</para>
         </listitem>
       </itemizedlist></para>
   </section>
@@ -684,9 +681,7 @@
               <entry>itemCount</entry>
 
               <entry>The number of items that have been process for this
-              execution. It should be noted that this value will continue
-              increasing even if a rollback causes items to be
-              reprocessed.</entry>
+              execution.</entry>
             </row>
           </tbody>
         </tgroup>
