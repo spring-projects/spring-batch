@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="Testing">
+  <title>Unit Testing</title>
+
+  <para>Just as with other application styles, it is extremely important to
+  unit test any code written as part of a batch job as well. The Spring core
+  documentation covers how to unit and integration test with Spring in great
+  detail, so it won't be repeated here. It is important, however, to think
+  about how to 'end to end' test a batch job, which is what this chapter will
+  focus on.</para>
+
+  <section>
+    <title>End To End Testing Batch Jobs</title>
+
+    <para>'End To End' testing can be defined as testing the complete run of a
+    batch job from beginning to end. If the job reads from a file, then writes
+    into the database, this type of testing ensures that any preconditions are
+    met (reference data, correct file, etc) and then runs the job, verifying
+    afterwards that all records that should be in the database are present and
+    correct. Below is an example from one of the Spring Batch sample jobs, the
+    'fixedLengthImportJob'. It reads from a flat file (in fixed length format)
+    and loads the records into the database. The following unit test code
+    assures it processes correctly:</para>
+
+    <programlisting>  //fixed-length file is expected on input
+  protected void validatePreConditions() throws Exception{
+    BufferedReader reader = null;
+    reader = new BufferedReader(new FileReader(fileLocator.getFile()));
+    String line;
+    while ((line = reader.readLine()) != null) {
+      assertEquals (LINE_LENGTH, line.length());
+    }
+  }
+
+  //Check that records have been correctly written to database
+  protected void validatePostConditions() throws Exception {
+
+  inputSource.open(new ExecutionContext());
+
+  jdbcTemplate.query("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", new RowCallbackHandler() {
+
+    public void processRow(ResultSet rs) throws SQLException {
+      Trade trade;
+      try {
+        trade = (Trade)inputSource.read();
+      }
+      catch (Exception e) {
+        throw new IllegalStateException(e.getMessage());
+      }
+      assertEquals(trade.getIsin(), rs.getString(2));
+      assertEquals(trade.getQuantity(),rs.getLong(3));
+      assertEquals(trade.getPrice(), rs.getBigDecimal(4));
+      assertEquals(trade.getCustomer(), rs.getString(5));
+    }});
+    
+    assertNull(inputSource.read());
+  }</programlisting>
+
+    <para>In the first method, <methodname>validatePreConditions</methodname>,
+    the input file is checked to ensure it is correctly formatted. Because it
+    is common to add extra lines to the file to test additional use cases,
+    this test ensures that the fixed length lines are the length they should
+    be. If they are not, it is much preferred to fail in this phase, rather
+    than the job (correctly) failing during the run and causing needless
+    debugging.</para>
+
+    <para>In the second method, validatePostconditions, the database is
+    checked to ensure all data has been written correctly. This is arguably
+    the most important part of the test. In this case, it reads one line from
+    the file, and one row from the database, and checks each column one by one
+    for accuracy. It's important to not hard-code the data that should be
+    present in the database into the test class. Instead, use the input file
+    (bypassing the job) to check the output. This allows you to quickly add
+    additional test cases to your file without having to add them to code. The
+    same would be true for database to database jobs, or database to file
+    jobs. It is preferable to be able to add additional rows to the database
+    input without having to add them to the hard coded list in the test
+    class.</para>
+  </section>
+
+  <section>
+    <title>Extending Unit Test frameworks</title>
+
+    <para>Because most unit testing of complete batch jobs will take place in
+    the development environment (i.e. eclipse) it's important to be able to
+    launch these tests in the same way you would launch any unit test. In the
+    following examples JUnit 3.8 will be used, but any testing framework could
+    be substituted. The Spring Batch samples contain many 'sample jobs' that
+    are unit tested using this technique. The most important step is being
+    able to launch the job within a unit test. This requires the use of the
+    <classname>JobLauncher</classname> interface that is discussed in chapters
+    2 and 4. A <classname>Job</classname> and
+    <classname>JobLauncher</classname> must be obtained from an
+    <classname>ApplicationContext</classname>, and then launched. The
+    following abstract class from Spring Batch Samples illustrates
+    this:</para>
+
+    <programlisting>  public abstract class AbstractBatchLauncherTests extends
+                        AbstractDependencyInjectionSpringContextTests {
+
+    JobLauncher launcher;
+    private Job job;
+    private JobParameters jobParameters = new JobParameters();
+
+    public AbstractBatchLauncherTests() {
+      setDependencyCheck(false);
+    }
+
+    /*
+    * @see org.springframework.test.AbstractSingleSpringContextTests#getConfigLocations()
+    */ 
+    protected String[] getConfigLocations() {
+      return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), 
+                            ClassUtils.getShortName(getClass()) + "-context.xml") };
+    }
+
+    public void testLaunchJob() throws Exception {
+      launcher.run(job, jobParameters);
+    }
+
+    public void setLauncher(JobLauncher bootstrap) {
+      this.launcher = bootstrap;
+    }
+
+    public void setJob(Job job) {
+      this.job = job;
+    }
+}</programlisting>
+
+    <para>The Spring Test class
+    <classname>AbstractDependencyInjectionSpringContextTests</classname> is
+    extended to allow for context loading, autowiring, etc. Only two classes
+    are needed: The Job to be run, and the JobLauncher to run it. Empty
+    <classname>JobParameters</classname> are used in the example above.
+    However, if the job requires specific parameters they could be coded in
+    subclasses with an abstract method, or using a factory bean in the
+    <classname>ApplicationContext</classname> for testing purposes. Because
+    none of the sample jobs require this, an empty
+    <classname>JobParameters</classname> is used. One simple JUnit test case
+    is present in the file, which actually launches the job. If any exceptions
+    are thrown or assertions fail, it will act the same way as any other unit
+    test and display as a failed test due to errors or assertion failure.
+    Because of the best practice for validation mentioned earlier in the
+    chapter, this class is extended further to allow for separate validation
+    before and after the job is run:</para>
+
+    <programlisting>  public abstract class AbstractValidatingBatchLauncherTests extends AbstractBatchLauncherTests {
+
+    public void testLaunchJob() throws Exception {
+      validatePreConditions();
+      super.testLaunchJob();
+      validatePostConditions();
+    }
+
+  /**
+  * Make sure input data meets expectations
+  */
+  protected void validatePreConditions() throws Exception {}
+
+  /**
+  * Make sure job did what it was expected to do.
+  */
+  protected abstract void validatePostConditions() throws Exception;
+
+}
+</programlisting>
+
+    <para>In the class above, the <methodname>testLaunchJob</methodname>
+    method is overridden to call the two abstract methods for validation.
+    Before actually running the job,
+    <methodname>validatePreConditions</methodname> is called (it should be
+    noted that it's not required), and then after the job completes
+    successfully, <methodname>validatePostConidtions</methodname> is
+    called.</para>
+  </section>
+</chapter>

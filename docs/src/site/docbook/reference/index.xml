@@ -44,6 +44,8 @@
   <xi:include href="repeat.xml" />
 
   <xi:include href="retry.xml" />
+  
+  <xi:include href="testing.xml" />
 
   <xi:include href="appendix.xml" />
 
