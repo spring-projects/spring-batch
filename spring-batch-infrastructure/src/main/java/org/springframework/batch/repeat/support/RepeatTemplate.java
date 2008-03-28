@@ -412,7 +412,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext,
 	 * ExitStatus)
 	 */
-	public boolean isComplete(RepeatContext context, ExitStatus result) {
+	protected boolean isComplete(RepeatContext context, ExitStatus result) {
 		boolean complete = completionPolicy.isComplete(context, result);
 		if (complete) {
 			logger.debug("Batch is complete according to policy and result value.");
@@ -421,11 +421,11 @@ public class RepeatTemplate implements RepeatOperations {
 	}
 
 	/**
-	 * Delegate to terminationPolicy.
+	 * Delegate to  {@link CompletionPolicy}.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext)
 	 */
-	public boolean isComplete(RepeatContext context) {
+	protected boolean isComplete(RepeatContext context) {
 		boolean complete = completionPolicy.isComplete(context);
 		if (complete) {
 			logger.debug("Batch is complete according to policy alone not including result.");
@@ -451,7 +451,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#update(RepeatContext)
 	 */
-	public void update(RepeatContext context) {
+	protected void update(RepeatContext context) {
 		completionPolicy.update(context);
 	}
 
