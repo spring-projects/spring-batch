@@ -1036,6 +1036,46 @@
       </section>
 
       <section>
+        <title>Registering ItemStreams with the Step</title>
+
+        <para>The step has to take care of the
+        <classname>ItemStream</classname> callbacks at the necessary points in
+        the flow. This is vital if a step is going to be fail, and might need
+        to be restarted, because the <classname>ItemStream</classname>
+        interface is where the step gets the information it needs about
+        persistent state between executions. The factory beans that Spring
+        Batch provides for convenient configuration of
+        <classname>Step</classname> instances have features that allow streams
+        to be registered with the step when it is configured.</para>
+
+        <para>If the ItemReader of ItemWriter themselves implement the
+        ItemStream interface, then these will be registered automatically. Any
+        other streams need to be registered separately. This is often the case
+        where there are indirect dependencies, like delegates being injected
+        into the reader and writer. To register these they can be injected
+        into teh factory beans through the streams property, e.g.:</para>
+
+        <programlisting>&lt;bean id="step1" parent="simpleStep"
+        class="org.springframework.batch.core.step.item.StatefulRetryStepFactoryBean"&gt;
+    &lt;property name="streams" ref="fileItemReader" /&gt;
+    &lt;property name="itemReader"&gt;
+        &lt;bean
+            class="org.springframework.batch.item.validator.ValidatingItemReader"&gt;
+            &lt;property name="itemReader" ref="itemReader" /&gt;
+            &lt;property name="validator" ref="fixedValidator" /&gt;
+        &lt;/bean&gt;
+    &lt;/property&gt;
+    ...
+&lt;/bean&gt;</programlisting>
+
+        <para>In the example above the main item reader is being set up to
+        delegate to a bean called "fileItemReader", which itself is being
+        registered as a stream directly. The step will now be restartable and
+        the state of the reader will be correctly persisted in case of a
+        failure.</para>
+      </section>
+
+      <section>
         <title>Intercepting Step Execution</title>
 
         <para>Just as with the <classname>Job</classname>, there are many

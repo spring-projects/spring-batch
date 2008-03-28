@@ -1114,7 +1114,7 @@
     a <classname>PropertyPlaceholderConfigurer</classname> can be used here,
     it is not necessary if the system property is always set because the
     <classname>ResourceEditor</classname> in Spring already filters and does
-    placeholder replacement on system properties.) </para>
+    placeholder replacement on system properties.)</para>
 
     <para>Often in a batch setting it is preferable to parameterise the file
     name in the <classname>JobParameters</classname> of the job, instead of
@@ -1130,7 +1130,7 @@
   &lt;/bean&gt;</programlisting>
 
     <para>Assuming a job name of 'fooJob', and a step name of 'fooStep', and
-    the key-value pair of 'file.name="fileName.txt' is in the
+    the key-value pair of 'file.name="fileName.txt"' is in the
     <classname>JobParameters</classname> the job is start with, the following
     filename will be passed as the <classname>Resource</classname>:
     "<filename>//fooJob/fooStep/fileName.txt</filename>". It should be noted
@@ -1914,6 +1914,27 @@ itemReader.close(executionContext);</programlisting>
   itemTransformerItemWriter.write(new Foo());</programlisting>
 
     <section>
+      <title>The Delegate Pattern and Registering with the Step</title>
+
+      <section>
+        <para>Note that the <classname>ItemTransformerItemWriter</classname>
+        and the <classname>CompositeItemWriter</classname> are examples of a
+        delegation pattern, which is quite common usage in Spring Batch. The
+        delegates themselves might implement callback interfaces like
+        <classname>ItemStream</classname> or
+        <classname>StepListener</classname>. If they do, and they are being
+        used in conjunction with Spring Batch Core as part of a step in a job,
+        then they almost certainly need to be registered manually with the
+        <classname>Step</classname>. Registration is automatic when using the
+        factory beans (<classname>*StepFactoryBean</classname>) , but only for
+        the <classname>ItemReader</classname> and
+        <classname>ItemWriter</classname> injected directly - the delegates
+        are not known to the step, so they need to be injected as listeners or
+        streams (or both if appropriate).</para>
+      </section>
+    </section>
+
+    <section>
       <title>Chaining ItemTransformers</title>
 
       <para>Performing a single transformation is useful in many scenarios,
@@ -2048,6 +2069,26 @@ itemReader.close(executionContext);</programlisting>
     <classname>ValangValidator</classname> that is used to validate an order
     object. The intent is not to show Valang functionality as much as to show
     how a validator could be added.</para>
+
+    <section>
+      <title>The Delegate Pattern and Registering with the Step</title>
+
+      <section>
+        <para>Note that the <classname>ValidatingItemReader</classname> is
+        another example of a delegation pattern, and the delegates themselves
+        might implement callback interfaces like
+        <classname>ItemStream</classname> or
+        <classname>StepListener</classname>. If they do, and they are being
+        used in conjunction with Spring Batch Core as part of a step in a job,
+        then they almost certainly need to be registered manually with the
+        <classname>Step</classname>. Registration is automatic when using the
+        factory beans (<classname>*StepFactoryBean</classname>) , but only for
+        the <classname>ItemReader</classname> and
+        <classname>ItemWriter</classname> injected directly - the delegates
+        are not known to the step, so they need to be injected as listeners or
+        streams (or both if appropriate).</para>
+      </section>
+    </section>
   </section>
 
   <section>
