@@ -28,22 +28,18 @@ Spring Batch Features and Roadmap
   * Xml is supported through Spring OXM mapping between objects and Xml
   elements (input and ouput).  Large files are streamed, not read as a whole.
 
-  * Database implementations ItemReader are provided that map a row of
+  * Database implementations of ItemReader are provided that map a row of
   a ResultSet identified by a simple (single or multiple column)
   primary key.
 
   * ItemWriter abstraction and implementations for flat files and xml
   (the Sql case is just a regular Jdbc Dao).
 
-  * ItemReader and ItemWriter implementations are generally Skippable.
-  Skippable means that they can be asked by clients to mark items as
-  skipped, and not provide or process them next time they arrive.
-
-  * ItemReader and ItenWriter implementations are also generally
-  ItemStreams.  An ItemStrean encapsulates stream-like behaviour that
+  * ItemReader and ItenWriter implementations are generally
+  ItemStreams.  An ItemStream encapsulates stream-like behaviour that
   is needed for transaction synchronization (mark/reset). It also
   provides the facility to be restored from a persistent
-  ExecutionAttributes so that jobs can fail and be restarted in
+  ExecutionContext so that jobs can fail and be restarted in
   another process.
 
   * For modifying an item before it is written, there is the
@@ -58,12 +54,12 @@ Spring Batch Features and Roadmap
   * A Job is composed of a list of Steps (sequential step model for
   job).
 
-  * Job is the entry point for launching a JobExecution.
+  * Job is also the entry point for launching a JobExecution.
 
   * Step is the corresponding point for a StepExecution.  Step is the
   main strategy for different scaling, distribution and processing
   approaches.  The 1.0 release contains implementations for in-process
-  execution (single VM).  See below (in the Execution module).
+  execution (single VM).  See below (under Execution).
 
   * The most commonly used implementation of Step is a wrapper for an
   ItemReader and an ItemWriter.  There is also a special
@@ -84,9 +80,12 @@ Spring Batch Features and Roadmap
   represenation of the state of the job - can be augmented by
   developers).
 
-  * SimpleStep - uses an ItemReader to obtain the next record to
+  * ItemOrientedStep - uses an ItemReader to obtain the next record to
   process, and hands it to an ItemWriter if it is not null.  It can
   run a StepExecution in the same process (VM).
+
+  * Adjustiable exception handling strategies allowing fault
+  tolerance through skipping bad records.
 
   * Concurrent execution of chunks (a chunk is a batch of items
   processed in the same transaction) through the Spring TaskExecutor
@@ -97,6 +96,9 @@ Spring Batch Features and Roadmap
 
   * Translation of job execution result into an exit code for
   schedulers running the job as an OS process.
+
+  * A set of listener callbacks that users can implement and register
+  with a Step to add custom behaviour like footer records.
 
 ** Samples
 
@@ -125,9 +127,12 @@ Spring Batch Features and Roadmap
   richer options for detailed outcome reports), but also who has
   executed the job, what changes they made to runtime parameters.
 
-  * OSGi support.  Deploy the Spring Batch framework as an OSGi
-  service.  Deploy individual jobs or groups of jobs as additional
+  * OSGi support.  Deploy the Spring Batch framework as a set of OSGi
+  services.  Deploy individual jobs or groups of jobs as additional
   bundles that depend on the core.
+
+  * Non-sequential models for Job configuration (branching and
+  descision support).
 
 * No Plans Yet to Support
 

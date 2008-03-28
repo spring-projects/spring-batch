@@ -13,11 +13,11 @@ Updating Spring Batch jobs from 1.0.0.rc1 to 1.0.0.final framework
 
   * SkipLimitStepFactoryBean accepts a list of fatal exceptions (java.lang.Error by default) that cause immediate step failure, regardless of skippable settings.
 
-  *  skip and retry are no longer exclusive, StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean.
+  * Skip and retry are no longer exclusive.
 
-  * exception on read does not cause transaction rollback if the exception is skippable.
+  * An exception on read does not cause transaction rollback if the exception is skippable.
 
-  * checked skippable exceptions are skipped correctly
+  * Checked skippable exceptions are skipped correctly
 
   * FlatFileItemWriter buffers output and writes to file only on flush() i.e. at the end of chunk.
 
