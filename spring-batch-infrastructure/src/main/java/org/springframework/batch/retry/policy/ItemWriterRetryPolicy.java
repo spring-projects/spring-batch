@@ -134,20 +134,20 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 
 	private class ItemWriterRetryContext extends RetryContextSupport implements RetryPolicy {
 
-		private Object item;
+		final private Object item;
 
 		// The delegate context...
 		private RetryContext delegateContext;
 
-		private ItemRecoverer recoverer;
+		final private ItemRecoverer recoverer;
 
-		private ItemKeyGenerator keyGenerator;
+		final private ItemKeyGenerator keyGenerator;
 
-		private FailedItemIdentifier failedItemIdentifier;
+		final private FailedItemIdentifier failedItemIdentifier;
 
 		public ItemWriterRetryContext(ItemWriterRetryCallback callback, RetryContext parent) {
 			super(parent);
-			item = callback.next(this);
+			this.item = callback.getItem();
 			this.recoverer = callback.getRecoverer();
 			this.keyGenerator = callback.getKeyGenerator();
 			this.failedItemIdentifier = callback.getFailedItemIdentifier();

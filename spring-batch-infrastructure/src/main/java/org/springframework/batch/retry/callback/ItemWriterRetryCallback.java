@@ -40,8 +40,6 @@ import org.springframework.batch.retry.policy.ItemWriterRetryPolicy;
  */
 public class ItemWriterRetryCallback implements RetryCallback {
 
-	public static final String ITEM = ItemWriterRetryCallback.class.getName() + ".ITEM";
-
 	private Object item;
 
 	private ItemWriter writer;
@@ -107,26 +105,20 @@ public class ItemWriterRetryCallback implements RetryCallback {
 	public Object doWithRetry(RetryContext context) throws Throwable {
 		// This requires a collaboration with the RetryPolicy...
 		if (!context.isExhaustedOnly()) {
-			return process(context);
+			process(context);
+			return null;
 		}
 		throw new RetryException("Recovery path requested in retry callback.");
 	}
 
-	public Object next(RetryContext context) {
-		Object item = context.getAttribute(ITEM);
-		if (item == null) {
-			item = this.item;
-			context.setAttribute(ITEM, item);
-		}
+	public Object getItem() {
 		return item;
 	}
 
 	private Object process(RetryContext context) throws Exception {
-		Object item = next(context);
 		if (item != null) {
 			writer.write(item);
 		}
-		context.removeAttribute(ITEM); // if successful
 		return item;
 	}
 

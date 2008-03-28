@@ -81,7 +81,7 @@ public class ItemWriterRetryCallbackTests extends TestCase {
 		template.setRetryPolicy(new NeverRetryPolicy() {
 			public boolean canRetry(RetryContext context) {
 				// ...register the failed item
-				calls.add("item(" + count + ")=" + context.getAttribute(ItemWriterRetryCallback.ITEM));
+				calls.add("item(" + count + ")=" + callback.getItem());
 				// Do not call the base class method - the attempt counts as
 				// successful now
 				if (count < 2) // only retry once
@@ -112,7 +112,7 @@ public class ItemWriterRetryCallbackTests extends TestCase {
 		template.setRetryPolicy(new NeverRetryPolicy() {
 			public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
 				// ...register the failed item
-				calls.add("item=" + context.getAttribute(ItemWriterRetryCallback.ITEM));
+				calls.add("item=" + callback.getItem());
 				// Call the base class method so that the next attempt is a
 				// failure.
 				super.registerThrowable(context, throwable);
@@ -125,7 +125,7 @@ public class ItemWriterRetryCallbackTests extends TestCase {
 		catch (IllegalStateException e) {
 			// expected
 		}
-		// One call from the callback itslef and one from the retry policy
+		// One call from the callback itself and one from the retry policy
 		assertEquals(1, count);
 		assertEquals(1, calls.size());
 		assertEquals("item=bar", calls.get(0));
