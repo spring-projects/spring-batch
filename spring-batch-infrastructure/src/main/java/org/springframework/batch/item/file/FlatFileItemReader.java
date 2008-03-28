@@ -148,7 +148,7 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 				record = readLine();
 			}
 		}
-		mark();
+		
 	}
 
 	/**
