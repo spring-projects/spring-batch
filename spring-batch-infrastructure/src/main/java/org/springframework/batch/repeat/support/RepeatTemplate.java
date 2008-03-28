@@ -438,7 +438,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
 	 */
-	public RepeatContext start() {
+	protected RepeatContext start() {
 		RepeatContext parent = RepeatSynchronizationManager.getContext();
 		RepeatContext context = completionPolicy.start(parent);
 		RepeatSynchronizationManager.register(context);
