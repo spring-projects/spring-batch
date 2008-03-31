@@ -32,6 +32,7 @@ import org.springframework.batch.core.resource.StepExecutionResourceProxy;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.DescriptiveResource;
 import org.springframework.core.io.Resource;
 
 /**
@@ -113,6 +114,24 @@ public class StepExecutionResourceProxyTests extends TestCase {
 		});
 		resource.beforeStep(stepExecution);
 		assertTrue(resource.exists());
+	}
+	
+	/**
+	 * toString delegates to the proxied resource.
+	 */
+	public void testToString() {
+		resource = new StepExecutionResourceProxy();
+		resource.setResourceLoader(new DefaultResourceLoader() {
+			public Resource getResource(String location) {
+				return new DescriptiveResource("toStringTestResource") {
+					public String toString() {
+						return "to-string-test-resource";
+					}
+				};
+			}
+		});
+		resource.beforeStep(stepExecution);
+		assertEquals("to-string-test-resource", resource.toString());
 	}
 
 	private void doTestPathName(String filename, String path) throws Exception, IOException {

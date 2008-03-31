@@ -287,4 +287,13 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 		delegate = resourceLoader.getResource(createFileName(jobName, stepName, properties));
 	}
 
+	/**
+	 * Delegates to the proxied Resource.
+	 */
+	public String toString() {
+		return delegate.toString();
+	}
+	
+	
+
 }
