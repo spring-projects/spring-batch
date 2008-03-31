@@ -97,7 +97,7 @@ public class JobRepositoryFactoryBean implements FactoryBean, InitializingBean {
 	private JobInstanceDao createJobInstanceDao(JdbcTemplate jdbcTemplate) throws Exception {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
 		dao.setJdbcTemplate(jdbcTemplate);
-		dao.setJobIncrementer(incrementerFactory.getIncrementer(databaseType, "BATCH_JOB_SEQ"));
+		dao.setJobIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ"));
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;
@@ -106,7 +106,7 @@ public class JobRepositoryFactoryBean implements FactoryBean, InitializingBean {
 	private JobExecutionDao createJobExecutionDao(JdbcTemplate jdbcTemplate) throws Exception {
 		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
 		dao.setJdbcTemplate(jdbcTemplate);
-		dao.setJobExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, "BATCH_JOB_EXECUTION_SEQ"));
+		dao.setJobExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;
@@ -115,7 +115,7 @@ public class JobRepositoryFactoryBean implements FactoryBean, InitializingBean {
 	private StepExecutionDao createStepExecutionDao(JdbcTemplate jdbcTemplate) throws Exception {
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
 		dao.setJdbcTemplate(jdbcTemplate);
-		dao.setStepExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, "BATCH_STEP_EXECUTION_SEQ"));
+		dao.setStepExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;

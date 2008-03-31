@@ -27,29 +27,35 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
 
 /**
  * @author Lucas Ward
- *
+ * 
  */
-public class JobRepositoryFactoryBeanTests extends TestCase{
+public class JobRepositoryFactoryBeanTests extends TestCase {
 
 	JobRepositoryFactoryBean factory;
+
 	MockControl incrementerControl = MockControl.createControl(DataFieldMaxValueIncrementerFactory.class);
+
 	DataFieldMaxValueIncrementerFactory incrementerFactory;
+
 	DataSource dataSource;
 	
+	String tablePrefix = "TEST_BATCH_PREFIX_";
+
 	protected void setUp() throws Exception {
 		super.setUp();
-		
+
 		factory = new JobRepositoryFactoryBean();
 		MockControl dataSourceControl = MockControl.createControl(DataSource.class);
-		dataSource = (DataSource)dataSourceControl.getMock();
+		dataSource = (DataSource) dataSourceControl.getMock();
 		factory.setDataSource(dataSource);
-		incrementerFactory = (DataFieldMaxValueIncrementerFactory)incrementerControl.getMock();
+		incrementerFactory = (DataFieldMaxValueIncrementerFactory) incrementerControl.getMock();
 		factory.setIncrementerFactory(incrementerFactory);
+		factory.setTablePrefix(tablePrefix);
 	}
-	
-	public void testNoDatabaseType() throws Exception{
-		
-		try{
+
+	public void testNoDatabaseType() throws Exception {
+
+		try {
 			incrementerFactory.isSupportedIncrementerType(null);
 			incrementerControl.setReturnValue(false);
 			incrementerFactory.getSupportedIncrementerTypes();
@@ -58,15 +64,15 @@ public class JobRepositoryFactoryBeanTests extends TestCase{
 			factory.afterPropertiesSet();
 			fail();
 		}
-		catch(IllegalArgumentException ex){
-			//expected
+		catch (IllegalArgumentException ex) {
+			// expected
 		}
 	}
-	
-	public void testInvalidDatabaseType() throws Exception{
-		
+
+	public void testInvalidDatabaseType() throws Exception {
+
 		factory.setDatabaseType("invalid type");
-		try{
+		try {
 			incrementerFactory.isSupportedIncrementerType("invalid type");
 			incrementerControl.setReturnValue(false);
 			incrementerFactory.getSupportedIncrementerTypes();
@@ -75,28 +81,28 @@ public class JobRepositoryFactoryBeanTests extends TestCase{
 			factory.afterPropertiesSet();
 			fail();
 		}
-		catch(IllegalArgumentException ex){
-			//expected
+		catch (IllegalArgumentException ex) {
+			// expected
 		}
 	}
-	
-	public void testCreateRepository() throws Exception{
+
+	public void testCreateRepository() throws Exception {
 		String databaseType = "databaseType";
 		factory.setDatabaseType(databaseType);
-		
-		incrementerFactory.getIncrementer(databaseType, "BATCH_JOB_SEQ");
+
+		incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ");
 		incrementerControl.setReturnValue(new StubIncrementer());
-		incrementerFactory.getIncrementer(databaseType, "BATCH_JOB_EXECUTION_SEQ");
+		incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ");
 		incrementerControl.setReturnValue(new StubIncrementer());
-		incrementerFactory.getIncrementer(databaseType, "BATCH_STEP_EXECUTION_SEQ");
+		incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ");
 		incrementerControl.setReturnValue(new StubIncrementer());
 		incrementerControl.replay();
-		
+
 		factory.getObject();
-		
+
 		incrementerControl.verify();
 	}
-	
+
 	private class StubIncrementer implements DataFieldMaxValueIncrementer {
 
 		public int nextIntValue() throws DataAccessException {
@@ -110,6 +116,6 @@ public class JobRepositoryFactoryBeanTests extends TestCase{
 		public String nextStringValue() throws DataAccessException {
 			return null;
 		}
-		
+
 	}
 }
