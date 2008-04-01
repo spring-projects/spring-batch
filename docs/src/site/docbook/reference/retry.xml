@@ -81,34 +81,75 @@ Object result = template.execute(new RetryCallback() {
     After a callback fails the <classname>RetryTemplate</classname> has to
     make a call to the <classname>RetryPolicy</classname> to ask it to update
     its state (which will be stored in the
-    <classname>RetryContext</classname>), then it asks the policy if another
-    attempt can be made. If another attempt cannot be made (e.g. a limit is
-    reached or a timeout is detected) then the policy is also responsible for
-    handling the exhausted state. Simple implementations will just throw
-    <classname>RetryExhaustedException</classname>, and any enclosing
-    transaction will be rolled back. More sophisticated implementations might
-    attempt to take some recovery action, in which case the transaction can
-    remain intact.</para>
+    <classname>RetryContext</classname>), and then it asks the policy if
+    another attempt can be made. If another attempt cannot be made (e.g. a
+    limit is reached or a timeout is detected) then the policy is also
+    responsible for handling the exhausted state. Simple implementations will
+    just throw <classname>RetryExhaustedException</classname>, and any
+    enclosing transaction will be rolled back. More sophisticated
+    implementations might attempt to take some recovery action, in which case
+    the transaction can remain intact.</para>
+
+    <tip>
+      <para>Failures are inherently either retryable or not - if the same
+      exception is always going to be thrown from the business logic, it
+      doesn't help to retry it. So don't retry on all exception types - try to
+      focus on only those exceptions that you expect to be retryable. It's not
+      usually harmful to the business logic to retry more aggressively, but
+      it's wasteful because if a failure is determinstic there could be a very
+      tight loop retrying something that you know in advance is fatal.</para>
+    </tip>
 
     <section>
       <title>Stateless Retry</title>
 
       <para>In the simplest case a retry is just a while loop - the
       <classname>RetryTemplate</classname> can just keep trying until it
-      either succeeds or fails. The <classname>RetryContext</classname> is
-      storing some state to determine whether to retry or abort, but this
+      either succeeds or fails. The <classname>RetryContext</classname>
+      contains some state to determine whether to retry or abort, but this
       state is on the stack and there is no need to store it anywhere
       globally, so we call this stateless retry. The distinction between
       stateless and stateful retry is contained in the implementation of the
       <classname>RetryPolicy</classname> (the
-      <classname>RetryTemplate</classname> can handle both).</para>
+      <classname>RetryTemplate</classname> can handle both). In a stateless
+      retry, the callback is always executed in the same thread on retry as
+      when it failed.</para>
 
       <para>Spring Batch provides some simple general purpose implementations
       of stateless <classname>RetryPolicy</classname>, for example a
       <classname>SimpleRetryPolicy</classname>, and the
-      <classname>TimeoutRetryPolicy</classname> used in the example above. The
-      <classname>SimpleRetryPolicy</classname> just allows a retry on any of a
-      named list of exception types, up to a fixed number of times.</para>
+      <classname>TimeoutRetryPolicy</classname> used in the example
+      above.</para>
+
+      <para>The <classname>SimpleRetryPolicy</classname> just allows a retry
+      on any of a named list of exception types, up to a fixed number of
+      times. It also has a list of "fatal" exceptions that should never be
+      retried, and this list overrides the retryable list, so it can be used
+      to give finer control over the retry behaviour, e.g.</para>
+
+      <programlisting>SimpleRetryPolicy policy = new SimpleRetryPolicy(5);
+// Retry on all exceptions (this is the default)
+policy.setRetryableExceptions(new Class[] {Exception.class});
+// ... but never retry IllegalStateException
+policy.setFatalExceptions(new Class[] {ILlegalStateException.class});
+
+// Use the policy...
+RetryTemplate template = new RetryTemplate();
+template.setRetryPolicy(policy);
+template.execute(new RetryCallback() {
+    public Object doWithRetry(RetryContext context) {
+        // business logic here
+    }
+});</programlisting>
+
+      <para>There is also a more flexible implementation called
+      <classname>ExceptionClassifierRetryPolicy</classname>, which allows the
+      user to configure different retry behaviour for an arbitrary set of
+      excecption types though the <classname>ExceptionClassifier</classname>
+      abstraction. The policy works by calling on the classifier to convert an
+      exception into a delegate <classname>RetryPolicy</classname>, so for
+      example, one exception type can be retried more times before failure
+      than another by mapping it to a different policy.</para>
 
       <para>Users might need to implement their own retry policies for more
       customized decisions, e.g. if there is a well-known solution-specific
@@ -167,11 +208,24 @@ Object result = template.execute(new RetryCallback() {
         interface in the <classname>ItemWriter</classname>, or by accepting
         the default which is to simply use the item itself as a key.</para>
 
+        <warning>
+          <para>If you use the default item key generation strategy be very
+          careful with the implementation of <code>Object.equals()</code> and
+          <code>Object.hashCode()</code> in your item class. In particular, if
+          the <classname>ItemWriter</classname> is going to insert the item
+          into a database and update a primary key field it is not a good idea
+          to use the primary key in the <methodname>equals</methodname> and
+          <methodname>hashCode</methodname> implementations, because their
+          values will change before and after the call to teh
+          <classname>ItemWriter</classname>. The best advice is to use a
+          business key to identify the items.</para>
+        </warning>
+
         <para>When the retry is exhausted, because a stateful retry is always
         in a fresh transaction, there is also the option to handle the failed
         item in a different way, instead of calling the
         <classname>RetryCallback</classname> (which is presumed now to be
-        almost certain to fail). This option is provided by the
+        likely to fail). This option is provided by the
         <classname>ItemRecoverer</classname> strategy. Like the key generator,
         it can be directly injected or provided by implementing the interface
         in the <classname>ItemWriter</classname>.</para>
