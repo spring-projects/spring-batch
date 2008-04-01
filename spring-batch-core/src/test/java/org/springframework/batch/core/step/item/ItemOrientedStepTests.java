@@ -73,8 +73,6 @@ public class ItemOrientedStepTests extends TestCase {
 
 	private ItemOrientedStep itemOrientedStep;
 
-	private RepeatTemplate template;
-
 	private JobInstance jobInstance;
 
 	private ResourcelessTransactionManager transactionManager;
@@ -97,6 +95,8 @@ public class ItemOrientedStepTests extends TestCase {
 		MapJobExecutionDao.clear();
 
 		transactionManager = new ResourcelessTransactionManager();
+
+		RepeatTemplate template;
 
 		itemOrientedStep = (ItemOrientedStep) getStep(new String[] { "foo", "bar", "spam" });
 		template = new RepeatTemplate();
@@ -125,7 +125,7 @@ public class ItemOrientedStepTests extends TestCase {
 
 	public void testChunkExecutor() throws Exception {
 
-		template = new RepeatTemplate();
+		RepeatTemplate template = new RepeatTemplate();
 
 		// Only process one item:
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));

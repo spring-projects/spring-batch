@@ -75,7 +75,6 @@
 		<dependency>
 			<groupId>backport-util-concurrent</groupId>
 			<artifactId>backport-util-concurrent</artifactId>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<!-- This is just for the JMS spec - could use javax.jms -->
