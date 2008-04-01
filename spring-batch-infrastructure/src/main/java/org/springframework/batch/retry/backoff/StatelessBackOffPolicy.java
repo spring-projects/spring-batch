@@ -24,7 +24,6 @@ import org.springframework.batch.retry.RetryContext;
  * 
  * @author Rob Harrop
  * @author Dave Syer
- * @since 2.1
  */
 public abstract class StatelessBackOffPolicy implements BackOffPolicy {
 

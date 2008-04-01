@@ -21,9 +21,10 @@ import junit.framework.TestCase;
 /**
  * @author Rob Harrop
  * @author Dave Syer
- * @since 2.1
  */
 public class ExponentialBackOffPolicyTests extends TestCase {
+
+	private DummySleeper sleeper = new DummySleeper();
 
 	public void testSetMaxInterval() throws Exception {
 		ExponentialBackOffPolicy strategy = new ExponentialBackOffPolicy();
@@ -52,44 +53,34 @@ public class ExponentialBackOffPolicyTests extends TestCase {
 
 	public void testSingleBackOff() throws Exception {
 		ExponentialBackOffPolicy strategy = new ExponentialBackOffPolicy();
+		strategy.setSleeper(sleeper);
 		BackOffContext context = strategy.start(null);
-		long before = System.currentTimeMillis();
 		strategy.backOff(context);
-		long after = System.currentTimeMillis();
-		assertEqualsApprox(ExponentialBackOffPolicy.DEFAULT_INITIAL_INTERVAL, after - before, 30);
+		assertEquals(ExponentialBackOffPolicy.DEFAULT_INITIAL_INTERVAL, sleeper.getLastBackOff());
 	}
 
 	public void testMaximumBackOff() throws Exception {
 		ExponentialBackOffPolicy strategy = new ExponentialBackOffPolicy();
 		strategy.setMaxInterval(50);
+		strategy.setSleeper(sleeper);
 		BackOffContext context = strategy.start(null);
-		long before = System.currentTimeMillis();
 		strategy.backOff(context);
-		long after = System.currentTimeMillis();
-		assertEqualsApprox(50L, after - before, 15);
+		assertEquals(50, sleeper.getLastBackOff());
 	}
 
 	public void testMultiBackOff() throws Exception {
 		ExponentialBackOffPolicy strategy = new ExponentialBackOffPolicy();
-		long seed = 40; // not too small or Windoze won't resolve the difference
-		double multiplier = 1.2; // not too large or the test takes ages!
+		long seed = 40;
+		double multiplier = 1.2;
 		strategy.setInitialInterval(seed);
 		strategy.setMultiplier(multiplier);
+		strategy.setSleeper(sleeper);
 		BackOffContext context = strategy.start(null);
 		for (int x = 0; x < 5; x++) {
-			long before = System.currentTimeMillis();
 			strategy.backOff(context);
-			long after = System.currentTimeMillis();
-			assertFalse(after == before);
-			assertEqualsApprox(seed, after - before, 20);
+			assertEquals(seed, sleeper.getLastBackOff());
 			seed *= multiplier;
 		}
 	}
 
-	private void assertEqualsApprox(long desired, long actual, long variance) {
-		long lower = desired - variance;
-		long upper = desired + 5 * variance / 2;
-		assertTrue("Expected value to be between '" + lower + "' and '" + upper + "' but was '" + actual + "'",
-				lower <= actual);
-	}
 }

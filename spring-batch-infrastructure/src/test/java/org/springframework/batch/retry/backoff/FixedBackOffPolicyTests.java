@@ -25,42 +25,38 @@ import junit.framework.TestCase;
  */
 public class FixedBackOffPolicyTests extends TestCase {
 
+	private DummySleeper sleeper = new DummySleeper();
+
 	public void testSetBackoffPeriodNegative() throws Exception {
 		FixedBackOffPolicy strategy = new FixedBackOffPolicy();
 		strategy.setBackOffPeriod(-1000L);
-		long before = System.currentTimeMillis();
+		strategy.setSleeper(sleeper);
 		strategy.backOff(null);
-		long after = System.currentTimeMillis();
 		// We should see a zero backoff if we try to set it negative
-		assertEqualsApprox(0, after - before, 25);
+		assertEquals(1, sleeper.getBackOffs().length);
+		assertEquals(1, sleeper.getLastBackOff());
 	}
 
 	public void testSingleBackOff() throws Exception {
 		int backOffPeriod = 50;
 		FixedBackOffPolicy strategy = new FixedBackOffPolicy();
 		strategy.setBackOffPeriod(backOffPeriod);
-		long before = System.currentTimeMillis();
+		strategy.setSleeper(sleeper);
 		strategy.backOff(null);
-		long after = System.currentTimeMillis();
-		assertEqualsApprox(backOffPeriod, after - before, 25);
+		assertEquals(1, sleeper.getBackOffs().length);
+		assertEquals(backOffPeriod, sleeper.getLastBackOff());
 	}
 
 	public void testManyBackOffCalls() throws Exception {
 		int backOffPeriod = 50;
 		FixedBackOffPolicy strategy = new FixedBackOffPolicy();
 		strategy.setBackOffPeriod(backOffPeriod);
+		strategy.setSleeper(sleeper);
 		for (int x = 0; x < 10; x++) {
-			long before = System.currentTimeMillis();
 			strategy.backOff(null);
-			long after = System.currentTimeMillis();
-			assertEqualsApprox(backOffPeriod, after - before, 25);
+			assertEquals(backOffPeriod, sleeper.getLastBackOff());
 		}
+		assertEquals(10, sleeper.getBackOffs().length);
 	}
 
-	private void assertEqualsApprox(long desired, long actual, long variance) {
-		long lower = desired - variance;
-		long upper = desired + 2 * variance;
-		assertTrue("Expected value to be between '" + lower + "' and '" + upper + "' but was '" + actual + "'",
-				lower <= actual);
-	}
 }

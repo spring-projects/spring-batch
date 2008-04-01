@@ -31,7 +31,6 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Rob Harrop
  * @author Dave Syer
- * @since 2.1
  */
 public class ExponentialBackOffPolicy implements BackOffPolicy {
 
@@ -66,6 +65,16 @@ public class ExponentialBackOffPolicy implements BackOffPolicy {
 	 * The value to increment the exp seed with for each retry attempt.
 	 */
 	private volatile double multiplier = DEFAULT_MULTIPLIER;
+
+	private Sleeper sleeper = new ObjectWaitSleeper();
+
+	/**
+	 * Public setter for the {@link Sleeper} strategy.
+	 * @param sleeper the sleeper to set defaults to {@link ObjectWaitSleeper}.
+	 */
+	public void setSleeper(Sleeper sleeper) {
+		this.sleeper = sleeper;
+	}
 
 	/**
 	 * Set the initial sleep interval value. Default is <code>1</code>
@@ -107,9 +116,7 @@ public class ExponentialBackOffPolicy implements BackOffPolicy {
 	public void backOff(BackOffContext backOffContext) throws BackOffInterruptedException {
 		ExponentialBackOffContext context = (ExponentialBackOffContext) backOffContext;
 		try {
-			synchronized (context) {
-				context.wait(context.getSleepAndIncrement());
-			}
+			sleeper.sleep(context.getSleepAndIncrement());
 		}
 		catch (InterruptedException e) {
 			throw new BackOffInterruptedException("Thread interrupted while sleeping", e);
@@ -130,7 +137,7 @@ public class ExponentialBackOffPolicy implements BackOffPolicy {
 			this.maxInterval = maxInterval;
 		}
 
-		public long getSleepAndIncrement() {
+		public synchronized long getSleepAndIncrement() {
 			long sleep = this.interval;
 			if (sleep > maxInterval) {
 				sleep = (long) maxInterval;

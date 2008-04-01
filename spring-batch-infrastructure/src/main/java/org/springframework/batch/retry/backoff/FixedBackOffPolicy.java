@@ -25,7 +25,7 @@ package org.springframework.batch.retry.backoff;
  * this may cause a single retry operation to have pauses of different
  * intervals.
  * @author Rob Harrop
- * @since 2.1
+ * @author Dave Syer
  */
 public class FixedBackOffPolicy extends StatelessBackOffPolicy {
 
@@ -39,6 +39,17 @@ public class FixedBackOffPolicy extends StatelessBackOffPolicy {
 	 */
 	private volatile long backOffPeriod = DEFAULT_BACK_OFF_PERIOD;
 
+	
+	private Sleeper sleeper = new ObjectWaitSleeper();
+	
+	/**
+	 * Public setter for the {@link Sleeper} strategy.
+	 * @param sleeper the sleeper to set defaults to {@link ObjectWaitSleeper}.
+	 */
+	public void setSleeper(Sleeper sleeper) {
+		this.sleeper = sleeper;
+	}
+
 	/**
 	 * Set the back off period in milliseconds. Cannot be &lt; 1. Default value
 	 * is 1000ms.
@@ -48,15 +59,12 @@ public class FixedBackOffPolicy extends StatelessBackOffPolicy {
 	}
 
 	/**
-	 * Pause for the {@link #backOffPeriod} using {@link Thread#sleep}.
+	 * Pause for the {@link #backOffPeriod}.
 	 * @throws BackOffInterruptedException if interrupted during sleep.
 	 */
 	protected void doBackOff() throws BackOffInterruptedException {
 		try {
-			Object mutex = new Object();
-			synchronized (mutex) {
-				mutex.wait(this.backOffPeriod);
-			}
+			sleeper.sleep(backOffPeriod);
 		}
 		catch (InterruptedException e) {
 			throw new BackOffInterruptedException("Thread interrupted while sleeping", e);
