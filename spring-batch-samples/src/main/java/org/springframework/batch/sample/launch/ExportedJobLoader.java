@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample;
+package org.springframework.batch.sample.launch;
 
 import java.util.Map;
 

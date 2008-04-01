@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.sample.launch;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.repository.DuplicateJobException;
@@ -39,6 +42,8 @@ public class TaskExecutorLauncher implements ResourceLoaderAware {
 
 	private ApplicationContext parentContext = null;
 
+	private static List errors = new ArrayList();
+
 	/**
 	 * Public setter for the {@link JobRegistry}.
 	 * @param registry the registry to set
@@ -53,6 +58,14 @@ public class TaskExecutorLauncher implements ResourceLoaderAware {
 	 */
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
+	}
+	
+	/**
+	 * Public getter for the errors.
+	 * @return the errors
+	 */
+	public static List getErrors() {
+		return errors;
 	}
 
 	private void register(String[] paths) throws DuplicateJobException {
@@ -70,10 +83,17 @@ public class TaskExecutorLauncher implements ResourceLoaderAware {
 	public static void main(String[] args) throws Exception {
 
 		final TaskExecutorLauncher launcher = new TaskExecutorLauncher();
+		errors.clear();
 
 		new Thread(new Runnable() {
 			public void run() {
-				launcher.run();
+				try {
+					launcher.run();
+				}
+				catch (RuntimeException e) {
+					errors.add(e);
+					throw e;
+				}
 			};
 		}).start();
 

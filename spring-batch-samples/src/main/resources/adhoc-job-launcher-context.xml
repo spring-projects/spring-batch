@@ -37,7 +37,7 @@
 							key="spring:service=batch,bean=jobLauncher"
 							value="org.springframework.batch.core.launch.support.ExportedJobLauncher" />
 						<entry key="spring:service=batch,bean=jobLoader"
-							value="org.springframework.batch.sample.JobLoader" />
+							value="org.springframework.batch.sample.launch.JobLoader" />
 					</map>
 				</property>
 			</bean>
@@ -57,7 +57,7 @@
 	</bean>
 
 	<bean id="loader"
-		class="org.springframework.batch.sample.DefaultJobLoader">
+		class="org.springframework.batch.sample.launch.DefaultJobLoader">
 		<property name="registry" ref="jobRegistry" />
 	</bean>
 

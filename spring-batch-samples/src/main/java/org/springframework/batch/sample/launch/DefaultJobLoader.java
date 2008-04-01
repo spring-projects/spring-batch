@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.springframework.batch.sample;
+package org.springframework.batch.sample.launch;
 
 import java.util.HashMap;
 import java.util.Iterator;
