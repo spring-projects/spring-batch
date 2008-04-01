@@ -122,6 +122,11 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			 */
 		} while (queue.isEmpty() && !isComplete(context));
 
+		/*
+		 * N.B. If the queue is empty then take() blocks until a result appears,
+		 * and there must be at least one because we just submitted one to teh
+		 * task executor.
+		 */
 		ResultHolder result = queue.take();
 		if (result.getError() != null) {
 			throw result.getError();
