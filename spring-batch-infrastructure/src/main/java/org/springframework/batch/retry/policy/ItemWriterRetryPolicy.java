@@ -24,6 +24,7 @@ import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
@@ -136,6 +137,10 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 
 		final private Object item;
 
+		final private Object key;
+
+		final private int initialHashCode;
+
 		// The delegate context...
 		private RetryContext delegateContext;
 
@@ -147,10 +152,12 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 
 		public ItemWriterRetryContext(ItemWriterRetryCallback callback, RetryContext parent) {
 			super(parent);
-			this.item = callback.getItem();
 			this.recoverer = callback.getRecoverer();
 			this.keyGenerator = callback.getKeyGenerator();
+			this.item = callback.getItem();
+			this.key = keyGenerator.getKey(item);
 			this.failedItemIdentifier = callback.getFailedItemIdentifier();
+			this.initialHashCode = key.hashCode();
 		}
 
 		public boolean canRetry(RetryContext context) {
@@ -162,10 +169,15 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 		}
 
 		public RetryContext open(RetryCallback callback, RetryContext parent) {
-			if (hasFailed(failedItemIdentifier, keyGenerator, item)) {
-				this.delegateContext = retryContextCache.get(keyGenerator.getKey(item));
+			if (hasFailed(failedItemIdentifier, key)) {
+				this.delegateContext = retryContextCache.get(key);
+				if (this.delegateContext == null) {
+					throw new RetryException("Inconsistent state for failed item: no history found. "
+							+ "Consider whether equals() or hashCode() for the item might be inconsistent, "
+							+ "or if you need to supply a better ItemKeyGenerator");
+				}
 			}
-			if (this.delegateContext == null) {
+			else {
 				// Only create a new context if we don't know the history of
 				// this item:
 				this.delegateContext = delegate.open(callback, null);
@@ -175,7 +187,14 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 		}
 
 		public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
-			retryContextCache.put(keyGenerator.getKey(item), this.delegateContext);
+			// TODO: this comparison assumes that hashCode is the limiting
+			// factor. Actually the cache should be able to decide for us.
+			if (this.initialHashCode != key.hashCode()) {
+				throw new RetryException("Inconsistent state for failed item key: hashCode has changed. "
+						+ "Consider whether equals() or hashCode() for the item might be inconsistent, "
+						+ "or if you need to supply a better ItemKeyGenerator");
+			}
+			retryContextCache.put(key, this.delegateContext);
 			delegate.registerThrowable(this.delegateContext, throwable);
 		}
 
@@ -191,7 +210,7 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 
 		public Object handleRetryExhausted(RetryContext context) throws Exception {
 			// If there is no going back, then we can remove the history
-			retryContextCache.remove(keyGenerator.getKey(item));
+			retryContextCache.remove(key);
 			RepeatSynchronizationManager.setCompleteOnly();
 			if (recoverer != null) {
 				boolean success = recoverer.recover(item, context.getLastThrowable());
@@ -225,15 +244,13 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * item key.
 	 * 
 	 * @param failedItemIdentifier
-	 * @param keyGenerator
-	 * @param item
+	 * @param key
 	 * @return
 	 */
-	protected boolean hasFailed(FailedItemIdentifier failedItemIdentifier, ItemKeyGenerator keyGenerator, Object item) {
+	protected boolean hasFailed(FailedItemIdentifier failedItemIdentifier, Object key) {
 		if (failedItemIdentifier != null) {
-			return failedItemIdentifier.hasFailed(item);
+			return failedItemIdentifier.hasFailed(key);
 		}
-		return retryContextCache.containsKey(keyGenerator.getKey(item));
+		return retryContextCache.containsKey(key);
 	}
-
 }

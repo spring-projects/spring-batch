@@ -31,6 +31,7 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.StubItemKeyGeneratorRecoverer;
 import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
 import org.springframework.batch.retry.context.RetryContextSupport;
@@ -45,12 +46,6 @@ public class ItemWriterRetryPolicyTests extends TestCase {
 	private int count = 0;
 
 	private List list = new ArrayList();
-
-	private ItemKeyGenerator keyGenerator = new ItemKeyGenerator() {
-		public Object getKey(Object item) {
-			return item;
-		}
-	};
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -294,10 +289,96 @@ public class ItemWriterRetryPolicyTests extends TestCase {
 		MapRetryContextCache cache = new MapRetryContextCache();
 		policy.setRetryContextCache(cache);
 		cache.put("foo", new RetryContextSupport(null));
-		assertTrue(policy.hasFailed(null, keyGenerator , "foo"));
+		assertTrue(policy.hasFailed(null, "foo"));
 	}
 
-	private static class MockFailedItemProvider extends ListItemReader implements ItemKeyGenerator, FailedItemIdentifier {
+	public void testKeyGeneratorNotConsistentAfterFailure() throws Throwable {
+
+		AbstractItemWriter writer = new AbstractItemWriter() {
+			public void write(Object data) {
+				// This simulates what happens if someone uses a primary key
+				// for hasCode and equals and then relies on default key
+				// generator
+				((StringHolder) data).string = ((StringHolder) data).string + (count++);
+				throw new RuntimeException("Barf!");
+			}
+		};
+
+		policy = new ItemWriterRetryPolicy();
+		policy.setDelegate(new SimpleRetryPolicy(3));
+		StringHolder item = new StringHolder("bar");
+		ItemWriterRetryCallback callback = new ItemWriterRetryCallback(item, writer);
+		RetryContext context = policy.open(callback, null);
+		assertNotNull(context);
+		try {
+			callback.doWithRetry(context);
+			fail("Expected RuntimeException");
+		}
+		catch (RuntimeException e) {
+			assertEquals("Barf!", e.getMessage());
+			try {
+				policy.registerThrowable(context, e);
+				fail("Expected RetryException");
+			}
+			catch (RetryException ex) {
+				String message = ex.getMessage();
+				assertTrue("Message doesn't contain 'inconsistent': " + message, message.indexOf("inconsistent") >= 0);
+			}
+			assertEquals(0, context.getRetryCount());
+		}
+
+	}
+
+	public void testCacheCapacity() throws Exception {
+		policy = new ItemWriterRetryPolicy();
+		policy.setDelegate(new SimpleRetryPolicy(1));
+		policy.setRetryContextCache(new MapRetryContextCache(1));
+		AbstractItemWriter writer = new AbstractItemWriter() {
+			public void write(Object data) {
+				count++;
+				list.add(data);
+			}
+		};
+		RetryContext context;
+		context = policy.open(new ItemWriterRetryCallback("foo", writer), null);
+		policy.registerThrowable(context, null);
+		assertEquals(0, context.getRetryCount());
+		context = policy.open(new ItemWriterRetryCallback("bar", writer), null);
+		try {
+			policy.registerThrowable(context, new RuntimeException("foo"));
+			fail("Expected RetryException");
+		}
+		catch (RetryException e) {
+			String message = e.getMessage();
+			assertTrue("Message does not contain 'capacity': " + message, message.indexOf("capacity") >= 0);
+		}
+	}
+
+	public void testCacheCapacityNotReachedIfRecovered() throws Exception {
+		policy = new ItemWriterRetryPolicy();
+		policy.setDelegate(new SimpleRetryPolicy(1));
+		policy.setRetryContextCache(new MapRetryContextCache(2));
+		AbstractItemWriter writer = new AbstractItemWriter() {
+			public void write(Object data) {
+				count++;
+				list.add(data);
+			}
+		};
+		RetryContext context;
+		context = policy.open(new ItemWriterRetryCallback("foo", writer), null);
+		policy.registerThrowable(context, null);
+		assertEquals(0, context.getRetryCount());
+		policy.registerThrowable(context, new RuntimeException("foo"));
+		context = policy.open(new ItemWriterRetryCallback("bar", writer), null);
+		policy.registerThrowable(context, null);
+		policy.handleRetryExhausted(context);
+		context = policy.open(new ItemWriterRetryCallback("spam", writer), null);
+		policy.registerThrowable(context, null);
+		assertEquals(0, context.getRetryCount());
+	}
+
+	private static class MockFailedItemProvider extends ListItemReader implements ItemKeyGenerator,
+			FailedItemIdentifier {
 
 		private int hasFailedCount = 0;
 
@@ -312,6 +393,43 @@ public class ItemWriterRetryPolicyTests extends TestCase {
 
 		public Object getKey(Object item) {
 			throw new UnsupportedOperationException("Should not call this method");
+		}
+
+	}
+
+	private static class StringHolder {
+
+		private String string;
+
+		/**
+		 * @param string
+		 */
+		public StringHolder(String string) {
+			this.string = string;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		public boolean equals(Object obj) {
+			return string.equals(((StringHolder) obj).string);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see java.lang.Object#hashCode()
+		 */
+		public int hashCode() {
+			return string.hashCode();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		public String toString() {
+			return "String: " + string + " (hash = " + hashCode() + ")";
 		}
 
 	}

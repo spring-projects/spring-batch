@@ -31,7 +31,7 @@ public interface RetryContextCache {
 
 	RetryContext get(Object key);
 
-	void put(Object key, RetryContext context);
+	void put(Object key, RetryContext context) throws RetryCacheCapacityExceededException;
 
 	void remove(Object key);
 

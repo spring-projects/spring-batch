@@ -111,11 +111,8 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 			 * to absorb exceptions at the step level because the failed items
 			 * will never re-appear after a rollback.
 			 */
-			List fatalExceptionList = new ArrayList(Arrays.asList(fatalExceptionClasses));
-			if (!fatalExceptionList.contains(SkipLimitExceededException.class)) {
-				fatalExceptionList.add(SkipLimitExceededException.class);
-			}
-			fatalExceptionClasses = (Class[]) fatalExceptionList.toArray(new Class[0]);
+			addFatalExceptionIfMissing(SkipLimitExceededException.class);
+			List fatalExceptionList = Arrays.asList(fatalExceptionClasses);
 			
 			LimitCheckingItemSkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, Arrays
 					.asList(skippableExceptionClasses), fatalExceptionList);
@@ -141,6 +138,17 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 		}
 
 		step.setItemHandler(itemHandler);
+	}
+
+	/**
+	 * @return
+	 */
+	public void addFatalExceptionIfMissing(Class cls) {
+		List fatalExceptionList = new ArrayList(Arrays.asList(fatalExceptionClasses));
+		if (!fatalExceptionList.contains(cls)) {
+			fatalExceptionList.add(cls);
+		}
+		fatalExceptionClasses = (Class[]) fatalExceptionList.toArray(new Class[0]);
 	}
 
 }

@@ -22,6 +22,7 @@ import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
@@ -116,6 +117,8 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 
 		if (retryLimit > 0) {
 
+			addFatalExceptionIfMissing(RetryException.class);
+
 			SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy(retryLimit);
 			if (retryableExceptionClasses != null) {
 				retryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
@@ -124,7 +127,7 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 
 			// Co-ordinate the retry policy with the exception handler:
 			getStepOperations()
-					.setExceptionHandler(new SimpleRetryExceptionHandler(retryPolicy, getExceptionHandler()));
+					.setExceptionHandler(new SimpleRetryExceptionHandler(retryPolicy, getExceptionHandler(), getFatalExceptionClasses()));
 
 			ItemWriterRetryPolicy itemProviderRetryPolicy = new ItemWriterRetryPolicy(retryPolicy);
 

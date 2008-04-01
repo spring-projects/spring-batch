@@ -22,6 +22,7 @@ import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.listener.RetryListenerSupport;
+import org.springframework.batch.support.BinaryExceptionClassifier;
 
 /**
  * @author Dave Syer
@@ -34,17 +35,22 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	 */
 	private static final String EXHAUSTED = SimpleRetryExceptionHandler.class.getName() + ".RETRY_EXHAUSTED";
 
-	private RetryPolicy retryPolicy;
+	final private RetryPolicy retryPolicy;
 
-	private ExceptionHandler exceptionHandler;
+	final private ExceptionHandler exceptionHandler;
+
+	final private BinaryExceptionClassifier fatalExceptionClassifier;
 
 	/**
 	 * @param retryPolicy
 	 * @param exceptionHandler
+	 * @param classes 
 	 */
-	public SimpleRetryExceptionHandler(RetryPolicy retryPolicy, ExceptionHandler exceptionHandler) {
+	public SimpleRetryExceptionHandler(RetryPolicy retryPolicy, ExceptionHandler exceptionHandler, Class[] classes) {
 		this.retryPolicy = retryPolicy;
 		this.exceptionHandler = exceptionHandler;
+		this.fatalExceptionClassifier =  new BinaryExceptionClassifier();
+		fatalExceptionClassifier.setExceptionClasses(classes);
 	}
 
 	/*
@@ -55,7 +61,7 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 		// Only bother to check the delegate exception handler if we know that
 		// retry is exhausted
-		if (context.hasAttribute(EXHAUSTED)) {
+		if (!fatalExceptionClassifier.isDefault(throwable) || context.hasAttribute(EXHAUSTED)) {
 			exceptionHandler.handleException(context, throwable);
 		}
 	}
