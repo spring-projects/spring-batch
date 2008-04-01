@@ -102,8 +102,8 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 			}
 		}
 		else {
-			if (statelessSession != null) {
-				statelessSession.close();
+			if (statefulSession != null) {
+				statefulSession.close();
 			}
 		}
 	}
