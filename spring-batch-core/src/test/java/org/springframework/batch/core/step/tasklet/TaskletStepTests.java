@@ -168,6 +168,36 @@ public class TaskletStepTests extends TestCase {
 			assertEquals("Job interrupted while executing tasklet", expected.getMessage());
 		}
 	}
+	
+	/**
+	 * Exception in {@link StepExecutionListener#afterStep(StepExecution)}
+	 * causes step to fail.
+	 * @throws JobInterruptedException
+	 */
+	public void testStepFailureInAfterStepCallback() throws JobInterruptedException {
+		TaskletStep step = new TaskletStep(new Tasklet() {
+			public ExitStatus execute() throws Exception {
+				return ExitStatus.FINISHED;
+			}
+		}, new JobRepositorySupport());
+		
+		StepExecutionListener listener = new StepExecutionListenerSupport() {
+			public ExitStatus afterStep(StepExecution stepExecution) {
+				throw new RuntimeException("exception thrown in afterStep to signal failure");
+			}
+		};
+		step.setStepListeners(new StepExecutionListener[] { listener });
+		try {
+			step.execute(stepExecution);
+			fail();
+		}
+		catch (RuntimeException expected) {
+			assertEquals("exception thrown in afterStep to signal failure", expected.getMessage());
+		}
+		
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		
+	}
 
 	private class StubTasklet extends StepExecutionListenerSupport implements Tasklet {
 

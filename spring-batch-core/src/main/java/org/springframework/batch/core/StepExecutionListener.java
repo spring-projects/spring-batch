@@ -48,6 +48,9 @@ public interface StepExecutionListener extends StepListener {
 	 * returned will be combined with the normal exit status using
 	 * {@link ExitStatus#and(ExitStatus)}.
 	 * 
+	 * Called after successful execution of step's processing logic. Throwing
+	 * exception in this method will cause step to fail.
+	 * 
 	 * @return an {@link ExitStatus} to combine with the normal value. Return
 	 * null to leave the old value unchanged.
 	 */
