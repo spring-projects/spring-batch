@@ -278,7 +278,7 @@ public class ItemOrientedStepTests extends TestCase {
 			}
 		});
 		itemOrientedStep.execute(stepExecution);
-		
+
 		// context saved before processing starts and updated at the end
 		assertEquals(2, list.size());
 	}
@@ -288,9 +288,11 @@ public class ItemOrientedStepTests extends TestCase {
 		final StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecution);
 		itemOrientedStep.setJobRepository(new JobRepositorySupport() {
 			private int counter = 0;
+
 			// initial save before item processing succeeds, later calls fail
 			public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
-				if (counter > 0) throw new RuntimeException("foo");
+				if (counter > 0)
+					throw new RuntimeException("foo");
 				counter++;
 			}
 		});
@@ -744,7 +746,7 @@ public class ItemOrientedStepTests extends TestCase {
 	/**
 	 * Execution context must not be left empty even if job failed before
 	 * commiting first chunk - otherwise ItemStreams won't recognize it is
-	 * restart scenario on next run. 
+	 * restart scenario on next run.
 	 */
 	public void testRestartAfterFailureInFirstChunk() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
@@ -755,20 +757,44 @@ public class ItemOrientedStepTests extends TestCase {
 		};
 		itemOrientedStep.setItemHandler(new SimpleItemHandler(reader, itemWriter));
 		itemOrientedStep.registerStream(reader);
-		
+
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, new JobExecution(jobInstance));
-		
+
 		try {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected InfrastructureException");
 		}
 		catch (RuntimeException expected) {
-			// The job actually completed, but the streams couldn't be closed.
 			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 			assertEquals("CRASH!", expected.getMessage());
 			assertFalse(stepExecution.getExecutionContext().isEmpty());
 			assertTrue(stepExecution.getExecutionContext().getString("spam").equals("bucket"));
 		}
+	}
+
+	/**
+	 * Exception in {@link StepExecutionListener#afterStep(StepExecution)}
+	 * causes step to fail.
+	 * @throws JobInterruptedException
+	 */
+	public void testStepFailureInAfterStepCallback() throws JobInterruptedException {
+		StepExecutionListener listener = new StepExecutionListenerSupport() {
+			public ExitStatus afterStep(StepExecution stepExecution) {
+				throw new RuntimeException("exception thrown in afterStep to signal failure");
+			}
+		};
+		itemOrientedStep.setStepExecutionListeners(new StepExecutionListener[] { listener });
+		StepExecution stepExecution = new StepExecution(itemOrientedStep, new JobExecution(jobInstance));
+		try {
+			itemOrientedStep.execute(stepExecution);
+			fail();
+		}
+		catch (RuntimeException expected) {
+			assertEquals("exception thrown in afterStep to signal failure", expected.getMessage());
+		}
+		
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		
 	}
 
 	private boolean contains(String str, String searchStr) {

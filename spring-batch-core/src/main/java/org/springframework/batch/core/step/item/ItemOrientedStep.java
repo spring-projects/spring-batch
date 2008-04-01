@@ -350,6 +350,8 @@ public class ItemOrientedStep extends AbstractStep {
 
 				}
 			});
+			
+			status = status.and(listener.afterStep(stepExecution));
 
 			fatalException.setException(updateStatus(stepExecution, BatchStatus.COMPLETED));
 		}
@@ -370,13 +372,6 @@ public class ItemOrientedStep extends AbstractStep {
 			throw e;
 		}
 		finally {
-
-			try {
-				status = status.and(listener.afterStep(stepExecution));
-			}
-			catch (RuntimeException e) {
-				logger.error("Unexpected error in listener after step.", e);
-			}
 
 			stepExecution.setExitStatus(status);
 			stepExecution.setEndTime(new Date(System.currentTimeMillis()));
