@@ -7,11 +7,15 @@
 
 Spring Batch Downloads
 
-  The current release is <<1.0.0>>.
+  The current GA release is <<1.0.0.FINAL>>, the latest snapshots are <<1.0.1.dev-SNAPSHOT>>.
 
 * Zip Downloads
 
-  There are ZIP based artifacts that contain the release JARs.  You can find those releases {{{http://static.springframework.org/downloads/nightly/release-download.php?project=BATCH}here}}.  There are two ZIP files in the release.  The first zip file is called <<<spring-batch-*-no-dependencies.zip>>>.  This file contains only the JAR files for the release.  The second zip file is called <<<spring-batch-*-with-dependencies.zip>>>.  This file contains the JAR files for the release as well as all of the third-party dependencies for the release.  In addition, this release contains the Spring Batch source code including the samples and their third-party dependencies as well.
+  There are ZIP based artifacts that contain the release JARs.  There are two ZIP files in the release.  The first zip file is called <<<spring-batch-*-no-dependencies.zip>>>.  This file contains only the JAR files for the release.  The second zip file is called <<<spring-batch-*-with-dependencies.zip>>>.  This file contains the JAR files for the release as well as all of the third-party dependencies for the release.  In addition, this release contains the Spring Batch source code including the samples and their third-party dependencies as well.
+
+  * Full releases: {{{http://static.springframework.org/downloads/nightly/release-download.php?project=BATCH}here}}.  
+
+  * Milestones: {{{http://static.springframework.org/downloads/nightly/release-download.php?project=BATCH}here}}.
 
 * Maven Artifacts
 
