@@ -105,20 +105,15 @@ public class ItemWriterRetryCallback implements RetryCallback {
 	public Object doWithRetry(RetryContext context) throws Throwable {
 		// This requires a collaboration with the RetryPolicy...
 		if (!context.isExhaustedOnly()) {
-			process(context);
+			if (item != null) {
+				writer.write(item);
+			}
 			return null;
 		}
 		throw new RetryException("Recovery path requested in retry callback.");
 	}
 
 	public Object getItem() {
-		return item;
-	}
-
-	private Object process(RetryContext context) throws Exception {
-		if (item != null) {
-			writer.write(item);
-		}
 		return item;
 	}
 
