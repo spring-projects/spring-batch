@@ -325,12 +325,13 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		Assert.notNull(context, "ExecutionContext must not be null");
 		executeQuery();
 		initialized = true;
+		long processedRowCount = 0;
 
 		if (context.containsKey(getKey(CURRENT_PROCESSED_ROW))) {
 			try {
-				long currentProcessedRow = context.getLong(getKey(CURRENT_PROCESSED_ROW));
+				processedRowCount = context.getLong(getKey(CURRENT_PROCESSED_ROW));
 				while(rs.next()){
-					if(rs.getRow() == currentProcessedRow){
+					if(rs.getRow() == processedRowCount){
 						break;
 					}
 				}
@@ -339,7 +340,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 			}
 		}
 		
-		bufferredReader = new BufferredResultSetReader(rs, mapper);
+		bufferredReader = new BufferredResultSetReader(rs, mapper, processedRowCount);
 	}
 
 	/**
@@ -447,14 +448,18 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		private long processedRowCount;
 		private int INITIAL_POSITION = -1;
 		
-		public BufferredResultSetReader(ResultSet rs, RowMapper rowMapper) {
+		public BufferredResultSetReader(ResultSet rs, RowMapper rowMapper, long processedRowCount) {
 			Assert.notNull(rs, "The ResultSet must not be null");
 			Assert.notNull(rowMapper, "The RowMapper must not be null");
 			this.rs = rs;
 			this.rowMapper = rowMapper;
 			buffer = new ArrayList();
 			currentIndex = INITIAL_POSITION;
-			processedRowCount = 0;
+			this.processedRowCount = processedRowCount;
+		}
+		
+		public BufferredResultSetReader(ResultSet rs, RowMapper rowMapper){
+			this(rs, rowMapper, 0);
 		}
 
 		public Object read() throws Exception, UnexpectedInputException,

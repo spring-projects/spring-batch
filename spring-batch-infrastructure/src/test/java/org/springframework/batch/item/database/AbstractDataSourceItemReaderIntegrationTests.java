@@ -191,6 +191,47 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 		assertEquals(foo2, reader.read());
 		assertEquals(foo3, reader.read());
 	}
+	
+	public void testMultipleRestarts() throws Exception {
+		
+		getAsItemStream(reader).open(executionContext);
+		
+		Foo foo1 = (Foo) reader.read();
+
+		commit();
+
+		Foo foo2 = (Foo) reader.read();
+		Assert.state(!foo2.equals(foo1));
+
+		Foo foo3 = (Foo) reader.read();
+		Assert.state(!foo2.equals(foo3));
+
+		rollback();
+
+		getAsItemStream(reader).update(executionContext);
+
+		// create new input source
+		reader = createItemReader();
+
+		getAsItemStream(reader).open(executionContext);
+
+		assertEquals(foo2, reader.read());
+		assertEquals(foo3, reader.read());
+		
+		getAsItemStream(reader).update(executionContext);
+		
+		commit();
+		
+		// create new input source
+		reader = createItemReader();
+
+		getAsItemStream(reader).open(executionContext);
+		
+		Foo foo4 = (Foo)reader.read();
+		Foo foo5 = (Foo)reader.read();
+		assertEquals(4, foo4.getValue());
+		assertEquals(5, foo5.getValue());
+	}
 
 	private void commit() {
 		reader.mark();
