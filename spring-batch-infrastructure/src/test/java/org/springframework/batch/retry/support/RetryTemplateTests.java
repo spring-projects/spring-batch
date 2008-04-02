@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.backoff.BackOffContext;
 import org.springframework.batch.retry.backoff.BackOffInterruptedException;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
@@ -228,6 +229,29 @@ public class RetryTemplateTests extends TestCase {
 		catch (ExhaustedRetryException e) {
 			assertTrue(e.getMessage().indexOf("exhausted") >= 0);
 		}
+	}
+
+	/**
+	 * Throwables that aren't Exception nor Error are wrapped into
+	 * RetryException.
+	 */
+	public void testThrowableWrapping() throws Exception {
+		RetryCallback callback = new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
+				throw new Throwable("throwable in callback");
+			}
+		};
+		RetryTemplate template = new RetryTemplate();
+		
+		try {
+			template.execute(callback);
+			fail();
+		}
+		catch (RetryException expected) {
+			expected.getMessage().equals("Unclassified Throwable encountered");
+			expected.getCause().getMessage().equals("throwable in callback");
+		}
+		
 	}
 
 	private static class MockRetryCallback implements RetryCallback {

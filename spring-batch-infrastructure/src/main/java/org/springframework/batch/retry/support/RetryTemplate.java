@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
@@ -177,7 +178,7 @@ public class RetryTemplate implements RetryOperations {
 
 					if (retryPolicy.shouldRethrow(context)) {
 						logger.debug("Abort retry for policy: count=" + context.getRetryCount());
-						unwrapAndThrow(e);
+						rethrow(e);
 					}
 
 				}
@@ -190,7 +191,7 @@ public class RetryTemplate implements RetryOperations {
 					// back off was prevented by another thread - fail the
 					// retry
 					logger.debug("Abort retry because interrupted: count=" + context.getRetryCount());
-					unwrapAndThrow(e);
+					rethrow(e);
 				}
 
 				/*
@@ -244,12 +245,15 @@ public class RetryTemplate implements RetryOperations {
 		}
 	}
 
-	private void unwrapAndThrow(Throwable ex) throws Exception {
+	private static void rethrow(Throwable ex) throws Exception {
 		if (ex instanceof Exception) {
 			throw (Exception) ex;
 		}
 		else if (ex instanceof Error) {
 			throw (Error) ex;
+		}
+		else {
+			throw new RetryException("Unclassified Throwable encountered", ex);
 		}
 	}
 
