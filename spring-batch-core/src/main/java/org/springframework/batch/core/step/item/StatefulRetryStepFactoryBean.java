@@ -129,13 +129,13 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 			getStepOperations()
 					.setExceptionHandler(new SimpleRetryExceptionHandler(retryPolicy, getExceptionHandler(), getFatalExceptionClasses()));
 
-			ItemWriterRetryPolicy itemProviderRetryPolicy = new ItemWriterRetryPolicy(retryPolicy);
+			ItemWriterRetryPolicy itemWriterRetryPolicy = new ItemWriterRetryPolicy(retryPolicy);
 
 			RetryTemplate retryTemplate = new RetryTemplate();
 			if (retryListeners != null) {
 				retryTemplate.setListeners(retryListeners);
 			}
-			retryTemplate.setRetryPolicy(itemProviderRetryPolicy);
+			retryTemplate.setRetryPolicy(itemWriterRetryPolicy);
 			if (backOffPolicy != null) {
 				retryTemplate.setBackOffPolicy(backOffPolicy);
 			}
