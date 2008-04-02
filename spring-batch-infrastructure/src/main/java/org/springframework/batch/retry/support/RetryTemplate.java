@@ -73,9 +73,9 @@ public class RetryTemplate implements RetryOperations {
 	private volatile RetryListener[] listeners = new RetryListener[0];
 
 	/**
-	 * Setter for listeners. The listeners are executed before and after a
-	 * retry block (i.e. before and after all the attempts), and on an error
-	 * (every attempt).
+	 * Setter for listeners. The listeners are executed before and after a retry
+	 * block (i.e. before and after all the attempts), and on an error (every
+	 * attempt).
 	 * @param listeners
 	 * @see RetryListener
 	 */
@@ -168,17 +168,17 @@ public class RetryTemplate implements RetryOperations {
 					lastException = null;
 					return callback.doWithRetry(context);
 				}
-				catch (Throwable e) {
+				catch (Throwable ex) {
+					Throwable throwable = unwrapIfRethrown(ex);
+					lastException = throwable;
 
-					lastException = e;
+					doOnErrorInterceptors(callback, context, throwable);
 
-					doOnErrorInterceptors(callback, context, e);
-
-					retryPolicy.registerThrowable(context, e);
+					retryPolicy.registerThrowable(context, throwable);
 
 					if (retryPolicy.shouldRethrow(context)) {
 						logger.debug("Abort retry for policy: count=" + context.getRetryCount());
-						rethrow(e);
+						rethrow(throwable);
 					}
 
 				}
@@ -245,16 +245,44 @@ public class RetryTemplate implements RetryOperations {
 		}
 	}
 
-	private static void rethrow(Throwable ex) throws Exception {
-		if (ex instanceof Exception) {
-			throw (Exception) ex;
+	/**
+	 * Re-throw the exception directly if possible, wrap custom Throwables into
+	 * {@link UnclassifiedRetryException}.
+	 */
+	private static void rethrow(Throwable throwable) throws Exception {
+		if (throwable instanceof Exception) {
+			throw (Exception) throwable;
 		}
-		else if (ex instanceof Error) {
-			throw (Error) ex;
+		else if (throwable instanceof Error) {
+			throw (Error) throwable;
 		}
 		else {
-			throw new RetryException("Unclassified Throwable encountered", ex);
+			throw new UnclassifiedRetryException("Unclassified Throwable encountered", throwable);
 		}
+	}
+
+	/**
+	 * Undo the wrapping done in {@link #rethrow(Throwable)}
+	 */
+	private static Throwable unwrapIfRethrown(Throwable throwable) {
+		if (throwable instanceof UnclassifiedRetryException) {
+			return throwable.getCause();
+		}
+		else {
+			return throwable;
+		}
+	}
+
+	/**
+	 * Runtime exception wrapper for Throwables that are neither Exception nor
+	 * Error.
+	 */
+	private static class UnclassifiedRetryException extends RetryException {
+
+		public UnclassifiedRetryException(String msg, Throwable cause) {
+			super(msg, cause);
+		}
+
 	}
 
 }

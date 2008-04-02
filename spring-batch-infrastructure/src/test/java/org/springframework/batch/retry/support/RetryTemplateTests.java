@@ -22,10 +22,12 @@ import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryException;
+import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.backoff.BackOffContext;
 import org.springframework.batch.retry.backoff.BackOffInterruptedException;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.backoff.StatelessBackOffPolicy;
+import org.springframework.batch.retry.listener.RetryListenerSupport;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 
@@ -242,16 +244,61 @@ public class RetryTemplateTests extends TestCase {
 			}
 		};
 		RetryTemplate template = new RetryTemplate();
-		
+
 		try {
 			template.execute(callback);
 			fail();
 		}
 		catch (RetryException expected) {
-			expected.getMessage().equals("Unclassified Throwable encountered");
-			expected.getCause().getMessage().equals("throwable in callback");
+			assertTrue(expected.getMessage().contains("Unclassified Throwable encountered"));
+			assertEquals("throwable in callback", expected.getCause().getMessage());
 		}
-		
+	}
+
+	/**
+	 * If nested template wraps unclassified Throwable into RetryException the
+	 * Throwable is unwrapped before passed to collaborators.
+	 */
+	public void testThrowableUnwrapping() throws Exception {
+
+		final RetryCallback throwingCallback = new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
+				throw new Throwable("Crashed terribly");
+			}
+		};
+		final RetryTemplate nested = new RetryTemplate();
+
+		RetryCallback callNested = new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
+				return nested.execute(throwingCallback);
+			}
+		};
+		ExceptionCheckingListener listener = new ExceptionCheckingListener();
+		RetryTemplate template = new RetryTemplate();
+		template.setListeners(new RetryListener[] { listener });
+
+		try {
+			template.execute(callNested);
+			fail();
+		}
+		catch (RetryException expected) {
+			assertTrue(expected.getMessage().contains("Unclassified Throwable encountered"));
+			assertEquals("Crashed terribly", expected.getCause().getMessage());
+		}
+		assertTrue(listener.called);
+	}
+
+	private static class ExceptionCheckingListener extends RetryListenerSupport {
+
+		boolean called = false;
+
+		public void onError(RetryContext context, RetryCallback callback, Throwable throwable) {
+			called = true;
+			assertFalse(throwable instanceof Exception);
+			assertFalse(throwable instanceof Error);
+			assertEquals("Crashed terribly", throwable.getMessage());
+		}
+
 	}
 
 	private static class MockRetryCallback implements RetryCallback {
