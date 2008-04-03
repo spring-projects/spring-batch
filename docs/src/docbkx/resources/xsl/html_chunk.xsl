@@ -77,7 +77,7 @@
                title="The Spring Framework - Spring Batch">
                 <img style="border:none;" src="images/xdev-spring_logo.jpg"/>
             </a>
-            <a style="border:none;" href="http://www.interface21.com/" title="Interface21 - Spring from the Source">
+            <a style="border:none;" href="http://www.springsource.com/" title="SpringSource - Spring from the Source">
                 <img style="border:none;position:absolute;padding-top:0px;right:2em;" src="images/banner.png"/>
             </a>
         </div>
@@ -187,8 +187,8 @@
                                 </td>
                                 <td width="20%" align="center">
                                     <span style="color:white;font-size:90%;">
-                                        <a href="http://www.interface21.com/"
-                                           title="Interface21 - Spring from the Source">Sponsored by Interface21
+                                        <a href="http://www.springsource.com/"
+                                           title="SpringSource - Spring from the Source">Sponsored by SpringSource
                                         </a>
                                     </span>
                                 </td>
