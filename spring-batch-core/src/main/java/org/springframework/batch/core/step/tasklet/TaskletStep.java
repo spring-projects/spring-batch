@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  * If the {@link Tasklet} itself implements {@link StepExecutionListener} it
  * will be registered automatically, but its injected dependencies will not be.
  * This is a good way to get access to job parameters and execution context if
- * the tasklet is parameterised.
+ * the tasklet is parameterized.
  * 
  * @author Ben Hale
  * @author Robert Kasanicky
@@ -50,8 +50,6 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 	private static final Log logger = LogFactory.getLog(TaskletStep.class);
 
 	private Tasklet tasklet;
-
-	private JobRepository jobRepository;
 
 	/**
 	 * Set the name property if it is not already set. Because of the order of
@@ -83,7 +81,7 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(jobRepository, "JobRepository is mandatory for TaskletStep");
+		super.afterPropertiesSet();
 		Assert.notNull(tasklet, "Tasklet is mandatory for TaskletStep");
 		if (tasklet instanceof StepExecutionListener) {
 			registerStepExecutionListener((StepExecutionListener) tasklet);
@@ -107,7 +105,7 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 	public TaskletStep(Tasklet tasklet, JobRepository jobRepository) {
 		this();
 		this.tasklet = tasklet;
-		this.jobRepository = jobRepository;
+		setJobRepository(jobRepository);
 	}
 
 	/**
@@ -118,17 +116,9 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 		this.tasklet = tasklet;
 	}
 
-	/**
-	 * Public setter for the {@link JobRepository}.
-	 * @param jobRepository the {@link JobRepository} to set
-	 */
-	public void setJobRepository(JobRepository jobRepository) {
-		this.jobRepository = jobRepository;
-	}
-
 	public void execute(StepExecution stepExecution) throws JobInterruptedException, UnexpectedJobExecutionException {
 		stepExecution.setStartTime(new Date());
-		updateStatus(stepExecution, BatchStatus.STARTED);
+		stepExecution.setStatus(BatchStatus.STARTED);
 
 		ExitStatus exitStatus = ExitStatus.FAILED;
 		Exception fatalException = null;
@@ -139,18 +129,18 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 			exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
 
 			try {
-				jobRepository.saveOrUpdateExecutionContext(stepExecution);
-				updateStatus(stepExecution, BatchStatus.COMPLETED);
+				getJobRepository().saveOrUpdateExecutionContext(stepExecution);
+				stepExecution.setStatus(BatchStatus.COMPLETED);
 			}
 			catch (Exception e) {
 				fatalException = e;
-				updateStatus(stepExecution, BatchStatus.UNKNOWN);
+				stepExecution.setStatus(BatchStatus.UNKNOWN);
 			}
 
 		}
 		catch (Exception e) {
 			logger.error("Encountered an error running the tasklet");
-			updateStatus(stepExecution, BatchStatus.FAILED);
+			stepExecution.setStatus(BatchStatus.FAILED);
 			try {
 				exitStatus = exitStatus.and(getCompositeListener().onErrorInStep(stepExecution, e));
 			}
@@ -169,7 +159,7 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 			stepExecution.setExitStatus(exitStatus);
 			stepExecution.setEndTime(new Date());
 			try {
-				jobRepository.saveOrUpdate(stepExecution);
+				getJobRepository().saveOrUpdate(stepExecution);
 			}
 			catch (Exception e) {
 				fatalException = e;
@@ -182,10 +172,6 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 			}
 		}
 
-	}
-
-	private void updateStatus(StepExecution stepExecution, BatchStatus status) {
-		stepExecution.setStatus(status);
 	}
 
 }

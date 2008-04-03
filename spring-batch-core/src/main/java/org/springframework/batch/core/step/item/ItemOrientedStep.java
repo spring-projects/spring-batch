@@ -87,8 +87,6 @@ public class ItemOrientedStep extends AbstractStep {
 
 	private CompositeItemStream stream = new CompositeItemStream();
 
-	private JobRepository jobRepository;
-
 	private PlatformTransactionManager transactionManager;
 
 	private ItemHandler itemHandler;
@@ -101,15 +99,6 @@ public class ItemOrientedStep extends AbstractStep {
 	public ItemOrientedStep(String name) {
 		super(name);
 		synchronizer = new StepExecutionSynchronizerFactory().getStepExecutionSynchronizer();
-	}
-
-	/**
-	 * Public setter for {@link JobRepository}.
-	 * 
-	 * @param jobRepository is a mandatory dependence (no default).
-	 */
-	public void setJobRepository(JobRepository jobRepository) {
-		this.jobRepository = jobRepository;
 	}
 
 	/**
@@ -251,7 +240,7 @@ public class ItemOrientedStep extends AbstractStep {
 			getCompositeListener().beforeStep(stepExecution);
 			stream.open(stepExecution.getExecutionContext());
 			stream.update(stepExecution.getExecutionContext());
-			jobRepository.saveOrUpdateExecutionContext(stepExecution);
+			getJobRepository().saveOrUpdateExecutionContext(stepExecution);
 			itemHandler.mark();
 
 			status = stepOperations.iterate(new RepeatCallback() {
@@ -297,7 +286,7 @@ public class ItemOrientedStep extends AbstractStep {
 
 						stream.update(stepExecution.getExecutionContext());
 						try {
-							jobRepository.saveOrUpdateExecutionContext(stepExecution);
+							getJobRepository().saveOrUpdateExecutionContext(stepExecution);
 						}
 						catch (Exception e) {
 							fatalException.setException(e);
@@ -365,7 +354,7 @@ public class ItemOrientedStep extends AbstractStep {
 			stepExecution.setEndTime(new Date(System.currentTimeMillis()));
 
 			try {
-				jobRepository.saveOrUpdate(stepExecution);
+				getJobRepository().saveOrUpdate(stepExecution);
 			}
 			catch (RuntimeException e) {
 				String msg = "Fatal error detected during final save of meta data";
@@ -496,7 +485,7 @@ public class ItemOrientedStep extends AbstractStep {
 	private Exception updateStatus(StepExecution stepExecution, BatchStatus status) {
 		stepExecution.setStatus(status);
 		try {
-			jobRepository.saveOrUpdate(stepExecution);
+			getJobRepository().saveOrUpdate(stepExecution);
 			return null;
 		}
 		catch (Exception e) {

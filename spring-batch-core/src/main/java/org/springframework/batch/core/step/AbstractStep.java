@@ -21,6 +21,9 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 /**
  * A {@link Step} implementation that provides common behavior to subclasses,
@@ -30,7 +33,7 @@ import org.springframework.batch.core.listener.CompositeStepExecutionListener;
  * @author Ben Hale
  * @author Robert Kasanicky
  */
-public abstract class AbstractStep implements Step {
+public abstract class AbstractStep implements Step, InitializingBean {
 
 	protected String name;
 
@@ -39,6 +42,8 @@ public abstract class AbstractStep implements Step {
 	protected boolean allowStartIfComplete;
 
 	private CompositeStepExecutionListener listener = new CompositeStepExecutionListener();
+	
+	private JobRepository jobRepository;
 
 	/**
 	 * Default constructor.
@@ -46,6 +51,12 @@ public abstract class AbstractStep implements Step {
 	public AbstractStep() {
 		super();
 	}
+	
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(jobRepository, "JobRepository is mandatory");
+	}
+
+
 
 	public String getName() {
 		return this.name;
@@ -126,5 +137,20 @@ public abstract class AbstractStep implements Step {
 	protected StepExecutionListener getCompositeListener() {
 		return listener;
 	}
+	
+	/**
+	 * Public setter for {@link JobRepository}.
+	 * 
+	 * @param jobRepository is a mandatory dependence (no default).
+	 */
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
+	}
+
+	protected JobRepository getJobRepository() {
+		return jobRepository;
+	}
+	
+	
 
 }

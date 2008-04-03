@@ -46,10 +46,11 @@ public class TaskletStepTests extends TestCase {
 		TaskletStep step = new TaskletStep();
 		try {
 			step.afterPropertiesSet();
+			fail();
 		}
 		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message should contain 'tasklet': " + message, contains(message.toLowerCase(), "tasklet"));
+			assertTrue("Message should contain 'mandatory': " + message, contains(message.toLowerCase(), "mandatory"));
 		}
 	}
 
