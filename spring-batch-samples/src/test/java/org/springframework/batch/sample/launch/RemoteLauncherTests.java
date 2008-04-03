@@ -18,53 +18,59 @@ package org.springframework.batch.sample.launch;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.management.MBeanServerConnection;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.launch.support.ExportedJobLauncher;
+import org.springframework.jmx.MBeanServerNotFoundException;
 import org.springframework.jmx.access.InvalidInvocationException;
 import org.springframework.jmx.access.MBeanProxyFactoryBean;
+import org.springframework.jmx.support.MBeanServerConnectionFactoryBean;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class RemoteLauncherTests extends TestCase {
-	
+
 	private static List errors = new ArrayList();
+
 	private static Thread thread;
+
 	private static ExportedJobLauncher launcher;
 
+	private static MBeanProxyFactoryBean factory;
+
 	public void testConnect() throws Exception {
-		doLaunch();
 		assertEquals(0, errors.size());
 		assertTrue(isConnected());
 	}
 
 	public void testLaunchBadJob() throws Exception {
-		doLaunch();
 		assertEquals(0, errors.size());
 		assertTrue(isConnected());
 		String result = launcher.run("foo");
-		assertTrue("Should contain 'NoSuchJobException': "+result, result.indexOf("NoSuchJobException")>=0);
+		assertTrue("Should contain 'NoSuchJobException': " + result, result.indexOf("NoSuchJobException") >= 0);
 	}
 
 	public void testLaunchAndStopRealJob() throws Exception {
-		doLaunch();
 		assertEquals(0, errors.size());
 		assertTrue(isConnected());
 		String result = launcher.run("loopJob");
-		assertTrue("Should contain 'JobExecution': "+result, result.indexOf("JobExecution: id=")>=0);
+		assertTrue("Should contain 'JobExecution': " + result, result.indexOf("JobExecution: id=") >= 0);
 		Thread.sleep(500);
 		assertTrue(launcher.isRunning());
 		launcher.stop();
 		assertFalse(launcher.isRunning());
 	}
 
-	/**
-	 * @throws Exception
+	/*
+	 * (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
 	 */
-	private static void doLaunch() throws Exception {
-		if (launcher!=null) {
+	protected void setUp() throws Exception {
+		if (launcher != null) {
 			return;
 		}
 		System.setProperty("com.sun.management.jmxremote", "");
@@ -79,13 +85,15 @@ public class RemoteLauncherTests extends TestCase {
 			}
 		});
 		thread.start();
-		MBeanProxyFactoryBean factory = new MBeanProxyFactoryBean();
+		MBeanServerConnectionFactoryBean connectionFactory = new MBeanServerConnectionFactoryBean();
+		connectionFactory.setServiceUrl("service:jmx:rmi://localhost/jndi/rmi://localhost:1099/batch-samples");
+		factory = new MBeanProxyFactoryBean();
 		factory.setObjectName("spring:service=batch,bean=jobLauncher");
 		factory.setProxyInterface(ExportedJobLauncher.class);
-		factory.afterPropertiesSet();
-		launcher = (ExportedJobLauncher) factory.getObject();
+		factory.setServer((MBeanServerConnection) connectionFactory.getObject());
+		// factory.setServiceUrl("service:jmx:rmi://localhost/jndi/rmi://localhost:1099/batch-samples");
 		int count = 0;
-		while (!isConnected() && count ++<10) {
+		while (!isConnected() && count++ < 10) {
 			Thread.sleep(1000);
 		}
 	}
@@ -98,10 +106,21 @@ public class RemoteLauncherTests extends TestCase {
 		if (!TaskExecutorLauncher.getErrors().isEmpty()) {
 			throw (RuntimeException) TaskExecutorLauncher.getErrors().get(0);
 		}
+		if (launcher == null) {
+			try {
+				factory.afterPropertiesSet();
+				launcher = (ExportedJobLauncher) factory.getObject();
+			}
+			catch (MBeanServerNotFoundException e) {
+				// ignore
+				return false;
+			}
+		}
 		try {
 			launcher.isRunning();
 			connected = true;
-		} catch (InvalidInvocationException e) {
+		}
+		catch (InvalidInvocationException e) {
 			// ignore
 		}
 		return connected;
