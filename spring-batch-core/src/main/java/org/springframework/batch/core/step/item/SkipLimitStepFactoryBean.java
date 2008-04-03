@@ -35,6 +35,8 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 
 	private ItemKeyGenerator itemKeyGenerator;
 
+	private int skipCacheCapacity = 1024;
+
 	/**
 	 * Public setter for a limit that determines skip policy. If this value is
 	 * positive then an exception in chunk processing will cause the item to be
@@ -86,13 +88,31 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	public void setItemKeyGenerator(ItemKeyGenerator itemKeyGenerator) {
 		this.itemKeyGenerator = itemKeyGenerator;
 	}
-	
+
 	/**
 	 * Protected getter for the {@link ItemKeyGenerator}.
 	 * @return the {@link ItemKeyGenerator}
 	 */
 	protected ItemKeyGenerator getItemKeyGenerator() {
 		return itemKeyGenerator;
+	}
+
+	/**
+	 * Public setter for the capacity of the skipped item cache. If a large
+	 * number of items are failing and not being recognized as skipped, it
+	 * usually signals a problem with the key generation (often equals and
+	 * hashCode in the item itself). So it is better to enforce a strict limit
+	 * than have weird looking errors, where a skip limit is reached without
+	 * anything being skipped.<br/>
+	 * 
+	 * The default value is 1024 which should be high enough and more for most
+	 * purposes. To breach the limit in a single-threaded step typically you
+	 * have to have this many failures in a single transaction.
+	 * 
+	 * @param skipCacheCapacity the capacity to set
+	 */
+	public void setSkipCacheCapacity(int skipCacheCapacity) {
+		this.skipCacheCapacity = skipCacheCapacity;
 	}
 
 	/**
@@ -113,7 +133,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 			 */
 			addFatalExceptionIfMissing(SkipLimitExceededException.class);
 			List fatalExceptionList = Arrays.asList(fatalExceptionClasses);
-			
+
 			LimitCheckingItemSkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, Arrays
 					.asList(skippableExceptionClasses), fatalExceptionList);
 			itemHandler.setItemSkipPolicy(skipPolicy);
@@ -127,6 +147,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 			setExceptionHandler(exceptionHandler);
 
 			itemHandler.setItemKeyGenerator(itemKeyGenerator);
+			itemHandler.setSkipCacheCapacity(skipCacheCapacity);
 
 			BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
 			itemHandler.setSkipListeners(helper.getSkipListeners(getListeners()));

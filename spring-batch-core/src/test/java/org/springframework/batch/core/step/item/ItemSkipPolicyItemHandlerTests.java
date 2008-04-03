@@ -26,6 +26,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
@@ -177,6 +178,29 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		}
 		catch (SkippableException e) {
 			// expected
+		}
+		assertEquals(2, contribution.getSkipCount());
+		// No "4" because it was skipped on write, even though it is mutating
+		// its key
+		assertEquals(new Holder("5"), handler.read(contribution));
+	}
+
+	public void testWriteWithSkipCapacitBreached() throws Exception {
+		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		handler.setSkipCacheCapacity(0);
+		handler.handle(contribution);
+		handler.handle(contribution);
+		contribution.combineSkipCounts();
+		assertEquals(1, contribution.getSkipCount());
+		// 2 is skipped so 3 was last one processed and now we are at 4
+		try {
+			handler.handle(contribution);
+			fail("Expected UnexpectedJobExecutionException");
+		}
+		catch (UnexpectedJobExecutionException e) {
+			// expected
+			String message = e.getMessage();
+			assertTrue("Message does not contain 'capacity': "+message, message.indexOf("capacity")>=0);
 		}
 		assertEquals(2, contribution.getSkipCount());
 		// No "4" because it was skipped on write, even though it is mutating

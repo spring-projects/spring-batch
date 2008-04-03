@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.listener.CompositeSkipListener;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
@@ -57,6 +58,8 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
+
+	private int skipCacheCapacity = 1024;
 
 	private Map skippedExceptions = new HashMap();
 
@@ -123,6 +126,20 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	 */
 	public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
 		this.itemSkipPolicy = itemSkipPolicy;
+	}
+
+	/**
+	 * Public setter for the capacity of the skipped item cache. If a large
+	 * number of items are failing and not being recognized as skipped, it
+	 * usually signals a problem with the key generation (often equals and
+	 * hashCode in the item itself). So it is better to enforce a strict limit
+	 * than have weird looking errors, where a skip limit is reached without
+	 * anything being skipped.
+	 * 
+	 * @param skipCacheCapacity the capacity to set
+	 */
+	public void setSkipCacheCapacity(int skipCacheCapacity) {
+		this.skipCacheCapacity = skipCacheCapacity;
 	}
 
 	/**
@@ -229,6 +246,13 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	 */
 	private void addSkippedException(Object key, Throwable e) {
 		synchronized (skippedExceptions) {
+			if (skippedExceptions.size() >= skipCacheCapacity) {
+				throw new UnexpectedJobExecutionException(
+						"The cache of failed items to skipped unexpectedly reached its capacity ("
+								+ skipCacheCapacity
+								+ "). "
+								+ "This often indicates a problem with the key generation strategy, and/or a mistake in the implementation of hashCode and equals in the items being processed.");
+			}
 			skippedExceptions.put(key, e);
 		}
 	}
