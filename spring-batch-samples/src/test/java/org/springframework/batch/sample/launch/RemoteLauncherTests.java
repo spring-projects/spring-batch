@@ -19,9 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.management.MBeanServerConnection;
+import javax.management.MalformedObjectNameException;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.launch.support.ExportedJobLauncher;
 import org.springframework.jmx.MBeanServerNotFoundException;
 import org.springframework.jmx.access.InvalidInvocationException;
@@ -33,6 +36,8 @@ import org.springframework.jmx.support.MBeanServerConnectionFactoryBean;
  * 
  */
 public class RemoteLauncherTests extends TestCase {
+	
+	private static Log logger = LogFactory.getLog(RemoteLauncherTests.class);
 
 	private static List errors = new ArrayList();
 
@@ -40,7 +45,7 @@ public class RemoteLauncherTests extends TestCase {
 
 	private static ExportedJobLauncher launcher;
 
-	private static MBeanProxyFactoryBean factory;
+	private static JobLoader loader;
 
 	public void testConnect() throws Exception {
 		assertEquals(0, errors.size());
@@ -85,13 +90,6 @@ public class RemoteLauncherTests extends TestCase {
 			}
 		});
 		thread.start();
-		MBeanServerConnectionFactoryBean connectionFactory = new MBeanServerConnectionFactoryBean();
-		connectionFactory.setServiceUrl("service:jmx:rmi://localhost/jndi/rmi://localhost:1099/batch-samples");
-		factory = new MBeanProxyFactoryBean();
-		factory.setObjectName("spring:service=batch,bean=jobLauncher");
-		factory.setProxyInterface(ExportedJobLauncher.class);
-		factory.setServer((MBeanServerConnection) connectionFactory.getObject());
-		// factory.setServiceUrl("service:jmx:rmi://localhost/jndi/rmi://localhost:1099/batch-samples");
 		int count = 0;
 		while (!isConnected() && count++ < 10) {
 			Thread.sleep(1000);
@@ -99,17 +97,20 @@ public class RemoteLauncherTests extends TestCase {
 	}
 
 	/**
+	 * @throws Exception 
 	 * 
 	 */
-	private static boolean isConnected() {
+	private static boolean isConnected() throws Exception {
 		boolean connected = false;
 		if (!TaskExecutorLauncher.getErrors().isEmpty()) {
 			throw (RuntimeException) TaskExecutorLauncher.getErrors().get(0);
 		}
 		if (launcher == null) {
+			MBeanServerConnectionFactoryBean connectionFactory = new MBeanServerConnectionFactoryBean();
+			connectionFactory.setServiceUrl("service:jmx:rmi://localhost/jndi/rmi://localhost:1099/batch-samples");
 			try {
-				factory.afterPropertiesSet();
-				launcher = (ExportedJobLauncher) factory.getObject();
+				launcher = (ExportedJobLauncher) getMBean(connectionFactory, "spring:service=batch,bean=jobLauncher", ExportedJobLauncher.class);
+				loader = (JobLoader) getMBean(connectionFactory, "spring:service=batch,bean=jobLoader", JobLoader.class);
 			}
 			catch (MBeanServerNotFoundException e) {
 				// ignore
@@ -118,12 +119,30 @@ public class RemoteLauncherTests extends TestCase {
 		}
 		try {
 			launcher.isRunning();
-			connected = true;
+			connected = loader.getConfigurations().size()>0;
+			logger.info("Configurations loaded: " + loader.getConfigurations());
 		}
 		catch (InvalidInvocationException e) {
 			// ignore
 		}
 		return connected;
+	}
+
+	/**
+	 * @param connectionFactory
+	 * @param objectName 
+	 * @param interfaceType 
+	 * @throws MalformedObjectNameException
+	 */
+	private static Object getMBean(MBeanServerConnectionFactoryBean connectionFactory, String objectName, Class interfaceType)
+			throws MalformedObjectNameException {
+		MBeanProxyFactoryBean factory = new MBeanProxyFactoryBean();
+		factory.setObjectName(objectName);
+		factory.setProxyInterface(interfaceType);
+		factory.setServer((MBeanServerConnection) connectionFactory.getObject());
+		// factory.setServiceUrl("service:jmx:rmi://localhost/jndi/rmi://localhost:1099/batch-samples");
+		factory.afterPropertiesSet();
+		return factory.getObject();
 	}
 
 }
