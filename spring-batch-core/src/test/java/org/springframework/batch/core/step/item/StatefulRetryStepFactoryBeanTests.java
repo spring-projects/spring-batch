@@ -32,6 +32,7 @@ import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
+import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
@@ -119,7 +120,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		};
 		factory.setItemReader(provider);
 		factory.setRetryLimit(10);
-		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+		AbstractStep step = (AbstractStep) factory.getObject();
 
 		step.execute(new StepExecution(step, jobExecution));
 	}

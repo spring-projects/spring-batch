@@ -15,16 +15,20 @@
  */
 package org.springframework.batch.core.step;
 
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 
 /**
- * A {@link Step} implementation that provides common behaviour to subclasses.
+ * A {@link Step} implementation that provides common behavior to subclasses,
+ * including registering and calling listeners.
  * 
  * @author Dave Syer
  * @author Ben Hale
+ * @author Robert Kasanicky
  */
 public abstract class AbstractStep implements Step {
 
@@ -33,6 +37,8 @@ public abstract class AbstractStep implements Step {
 	protected int startLimit = Integer.MAX_VALUE;
 
 	protected boolean allowStartIfComplete;
+
+	private CompositeStepExecutionListener listener = new CompositeStepExecutionListener();
 
 	/**
 	 * Default constructor.
@@ -90,5 +96,35 @@ public abstract class AbstractStep implements Step {
 		this.name = name;
 	}
 
-	public abstract void execute(StepExecution stepExecution) throws JobInterruptedException, UnexpectedJobExecutionException;
+	public abstract void execute(StepExecution stepExecution) throws JobInterruptedException,
+			UnexpectedJobExecutionException;
+
+	/**
+	 * Register a step listener for callbacks at the appropriate stages in a
+	 * step execution.
+	 * 
+	 * @param listener a {@link StepExecutionListener}
+	 */
+	public void registerStepExecutionListener(StepExecutionListener listener) {
+		this.listener.register(listener);
+	}
+
+	/**
+	 * Register each of the objects as listeners.
+	 * 
+	 * @param listeners an array of listener objects of known types.
+	 */
+	public void setStepExecutionListeners(StepExecutionListener[] listeners) {
+		for (int i = 0; i < listeners.length; i++) {
+			registerStepExecutionListener(listeners[i]);
+		}
+	}
+
+	/**
+	 * @return composite listener that delegates to all registered listeners.
+	 */
+	protected StepExecutionListener getCompositeListener() {
+		return listener;
+	}
+
 }

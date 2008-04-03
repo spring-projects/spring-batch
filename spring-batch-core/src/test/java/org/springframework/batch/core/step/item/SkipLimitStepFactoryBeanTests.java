@@ -13,6 +13,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
+import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ClearFailedException;
@@ -63,7 +64,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	 * Check items causing errors are skipped as expected.
 	 */
 	public void testSkip() throws Exception {
-		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 		step.execute(stepExecution);
@@ -91,7 +92,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 			}
 		});
 
-		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+		AbstractStep step = (AbstractStep) factory.getObject();
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
 		try {
@@ -110,7 +111,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		factory.setSkipLimit(1);
 
-		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
@@ -145,7 +146,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		factory.setItemReader(reader);
 		factory.setSkippableExceptionClasses(new Class[] { Exception.class });
 
-		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 
@@ -179,7 +180,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		factory.setSkipLimit(4);
 		factory.setItemReader(reader);
 
-		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = jobExecution.createStepExecution(step);
 
@@ -206,7 +207,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		factory.setItemReader(reader);
 		factory.setItemWriter(writer);
 
-		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = jobExecution.createStepExecution(step);
 

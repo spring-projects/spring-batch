@@ -28,7 +28,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
-import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.core.step.AbstractStep;
@@ -68,6 +67,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
  * @author Dave Syer
  * @author Lucas Ward
  * @author Ben Hale
+ * @author Robert Kasanicky
  */
 public class ItemOrientedStep extends AbstractStep {
 
@@ -86,8 +86,6 @@ public class ItemOrientedStep extends AbstractStep {
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
 
 	private CompositeItemStream stream = new CompositeItemStream();
-
-	private CompositeStepExecutionListener listener = new CompositeStepExecutionListener();
 
 	private JobRepository jobRepository;
 
@@ -133,6 +131,21 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
+	 * Register each of the objects as listeners. If the {@link ItemReader} or
+	 * {@link ItemWriter} themselves implements this interface they will be
+	 * registered automatically, but their injected dependencies will not be.
+	 * This is a good way to get access to job parameters and execution context
+	 * if the tasklet is parameterised.
+	 * 
+	 * @param listeners an array of listener objects of known types.
+	 */
+	public void setStepExecutionListeners(StepExecutionListener[] listeners) {
+		for (int i = 0; i < listeners.length; i++) {
+			registerStepExecutionListener(listeners[i]);
+		}
+	}
+
+	/**
 	 * Register each of the streams for callbacks at the appropriate time in the
 	 * step. The {@link ItemReader} and {@link ItemWriter} are automatically
 	 * registered, but it doesn't hurt to also register them here. Injected
@@ -157,31 +170,6 @@ public class ItemOrientedStep extends AbstractStep {
 	 */
 	public void registerStream(ItemStream stream) {
 		this.stream.register(stream);
-	}
-
-	/**
-	 * Register each of the objects as listeners. If the {@link ItemReader} or
-	 * {@link ItemWriter} themselves implements this interface they will be
-	 * registered automatically, but their injected dependencies will not be.
-	 * This is a good way to get access to job parameters and execution context
-	 * if the tasklet is parameterised.
-	 * 
-	 * @param listeners an array of listener objects of known types.
-	 */
-	public void setStepExecutionListeners(StepExecutionListener[] listeners) {
-		for (int i = 0; i < listeners.length; i++) {
-			registerStepExecutionListener(listeners[i]);
-		}
-	}
-
-	/**
-	 * Register a step listener for callbacks at the appropriate stages in a
-	 * step execution.
-	 * 
-	 * @param listener a {@link StepExecutionListener}
-	 */
-	public void registerStepExecutionListener(StepExecutionListener listener) {
-		this.listener.register(listener);
 	}
 
 	/**
@@ -260,7 +248,7 @@ public class ItemOrientedStep extends AbstractStep {
 			// Execute step level listeners *after* the execution context is
 			// fixed in the step. E.g. ItemStream instances need the the same
 			// reference to the ExecutionContext as the step execution.
-			listener.beforeStep(stepExecution);
+			getCompositeListener().beforeStep(stepExecution);
 			stream.open(stepExecution.getExecutionContext());
 			stream.update(stepExecution.getExecutionContext());
 			jobRepository.saveOrUpdateExecutionContext(stepExecution);
@@ -350,8 +338,8 @@ public class ItemOrientedStep extends AbstractStep {
 
 				}
 			});
-			
-			status = status.and(listener.afterStep(stepExecution));
+
+			status = status.and(getCompositeListener().afterStep(stepExecution));
 
 			fatalException.setException(updateStatus(stepExecution, BatchStatus.COMPLETED));
 		}
@@ -412,7 +400,8 @@ public class ItemOrientedStep extends AbstractStep {
 
 	/**
 	 * @param stepExecution the current {@link StepExecution}
-	 * @param fatalException the {@link ExceptionHolder} containing information about failures in meta-data
+	 * @param fatalException the {@link ExceptionHolder} containing information
+	 * about failures in meta-data
 	 * @param e the cause of teh failure
 	 * @return an {@link ExitStatus}
 	 */
@@ -426,7 +415,7 @@ public class ItemOrientedStep extends AbstractStep {
 		if (!fatalException.hasException()) {
 			try {
 				// classify exception so an exit code can be stored.
-				status = status.and(listener.onErrorInStep(stepExecution, e));
+				status = status.and(getCompositeListener().onErrorInStep(stepExecution, e));
 			}
 			catch (RuntimeException ex) {
 				logger.error("Unexpected error in listener on error in step.", ex);
@@ -518,12 +507,12 @@ public class ItemOrientedStep extends AbstractStep {
 
 	/**
 	 * @param stepExecution
-	 * @param contribution 
+	 * @param contribution
 	 * @param fatalException
 	 * @param transaction
 	 */
-	private void processRollback(final StepExecution stepExecution, final StepContribution contribution, final ExceptionHolder fatalException,
-			TransactionStatus transaction) {
+	private void processRollback(final StepExecution stepExecution, final StepContribution contribution,
+			final ExceptionHolder fatalException, TransactionStatus transaction) {
 
 		stepExecution.incrementSkipCountBy(contribution.getSkipCount());
 		/*

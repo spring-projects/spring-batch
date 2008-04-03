@@ -6,19 +6,17 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepSupport;
-import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.ExitStatus;
 
 public class TaskletStepTests extends TestCase {
@@ -109,7 +107,7 @@ public class TaskletStepTests extends TestCase {
 
 	public void testSuccessfulExecutionWithListener() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, false), new JobRepositorySupport());
-		step.setStepListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
+		step.setStepExecutionListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
 			public void beforeStep(StepExecution context) {
 				list.add("open");
 			}
@@ -186,7 +184,7 @@ public class TaskletStepTests extends TestCase {
 				throw new RuntimeException("exception thrown in afterStep to signal failure");
 			}
 		};
-		step.setStepListeners(new StepExecutionListener[] { listener });
+		step.setStepExecutionListeners(new StepExecutionListener[] { listener });
 		try {
 			step.execute(stepExecution);
 			fail();

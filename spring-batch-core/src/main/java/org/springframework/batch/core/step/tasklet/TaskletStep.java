@@ -25,7 +25,6 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.repeat.ExitStatus;
@@ -38,7 +37,13 @@ import org.springframework.util.Assert;
  * manage transactions or any looping functionality. The tasklet should do this
  * on its own.
  * 
+ * If the {@link Tasklet} itself implements {@link StepExecutionListener} it
+ * will be registered automatically, but its injected dependencies will not be.
+ * This is a good way to get access to job parameters and execution context if
+ * the tasklet is parameterised.
+ * 
  * @author Ben Hale
+ * @author Robert Kasanicky
  */
 public class TaskletStep extends AbstractStep implements Step, InitializingBean, BeanNameAware {
 
@@ -47,8 +52,6 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 	private Tasklet tasklet;
 
 	private JobRepository jobRepository;
-
-	private CompositeStepExecutionListener listener = new CompositeStepExecutionListener();
 
 	/**
 	 * Set the name property if it is not already set. Because of the order of
@@ -66,17 +69,13 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 	}
 
 	/**
-	 * Register each of the objects as listeners. If the {@link Tasklet} itself
-	 * implements this interface it will be registered automatically, but its
-	 * injected dependencies will not be. This is a good way to get access to
-	 * job parameters and execution context if the tasklet is parameterised.
+	 * Register each of the objects as listeners.
 	 * 
-	 * @param listeners an array of listener objects of known types.
+	 * @deprecated use
+	 * {@link #setStepExecutionListeners(StepExecutionListener[])} instead
 	 */
 	public void setStepListeners(StepExecutionListener[] listeners) {
-		for (int i = 0; i < listeners.length; i++) {
-			this.listener.register(listeners[i]);
-		}
+		setStepExecutionListeners(listeners);
 	}
 
 	/**
@@ -87,7 +86,7 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 		Assert.notNull(jobRepository, "JobRepository is mandatory for TaskletStep");
 		Assert.notNull(tasklet, "Tasklet is mandatory for TaskletStep");
 		if (tasklet instanceof StepExecutionListener) {
-			listener.register((StepExecutionListener) tasklet);
+			registerStepExecutionListener((StepExecutionListener) tasklet);
 		}
 	}
 
@@ -135,9 +134,9 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 		Exception fatalException = null;
 		try {
 
-			listener.beforeStep(stepExecution);
+			getCompositeListener().beforeStep(stepExecution);
 			exitStatus = tasklet.execute();
-			exitStatus = exitStatus.and(listener.afterStep(stepExecution));
+			exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
 
 			try {
 				jobRepository.saveOrUpdateExecutionContext(stepExecution);
@@ -153,7 +152,7 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 			logger.error("Encountered an error running the tasklet");
 			updateStatus(stepExecution, BatchStatus.FAILED);
 			try {
-				exitStatus = exitStatus.and(listener.onErrorInStep(stepExecution, e));
+				exitStatus = exitStatus.and(getCompositeListener().onErrorInStep(stepExecution, e));
 			}
 			catch (Exception ex) {
 				logger.error("Encountered an error on listener close.", ex);
@@ -178,7 +177,8 @@ public class TaskletStep extends AbstractStep implements Step, InitializingBean,
 			if (fatalException != null) {
 				logger.error("Encountered an error saving batch meta data."
 						+ "This job is now in an unknown state and should not be restarted.", fatalException);
-				throw new UnexpectedJobExecutionException("Encountered an error saving batch meta data.", fatalException);
+				throw new UnexpectedJobExecutionException("Encountered an error saving batch meta data.",
+						fatalException);
 			}
 		}
 

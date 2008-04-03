@@ -174,7 +174,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 				throw new RuntimeException("Foo");
 			}
 		});
-		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+		AbstractStep step = (AbstractStep) factory.getObject();
 		job.setSteps(Collections.singletonList(step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
@@ -210,7 +210,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		factory.setListeners(new StepListener[]{ chunkListener });
 		factory.setCommitInterval(commitInterval);
 		
-		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+		AbstractStep step = (AbstractStep) factory.getObject();
 
 		job.setSteps(Collections.singletonList(step));
 
