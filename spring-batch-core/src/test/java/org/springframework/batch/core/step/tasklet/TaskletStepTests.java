@@ -130,7 +130,7 @@ public class TaskletStepTests extends TestCase {
 		}
 		catch (RuntimeException e) {
 			assertNotNull(stepExecution.getStartTime());
-			assertEquals(ExitStatus.FAILED, stepExecution.getExitStatus());
+			assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 			assertNotNull(stepExecution.getEndTime());
 		}
 	}
@@ -143,7 +143,7 @@ public class TaskletStepTests extends TestCase {
 		}
 		catch (Error e) {
 			assertNotNull(stepExecution.getStartTime());
-			assertEquals(ExitStatus.FAILED, stepExecution.getExitStatus());
+			assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 			assertNotNull(stepExecution.getEndTime());
 		}
 	}

@@ -279,8 +279,10 @@ public class ItemOrientedStepTests extends TestCase {
 		});
 		itemOrientedStep.execute(stepExecution);
 
-		// context saved before processing starts and updated at the end
-		assertEquals(2, list.size());
+		// context saved before looping and updated once for every processing
+		// loop (once in this case) and finally in the abstract step (regardless
+		// of execution logic)
+		assertEquals(3, list.size());
 	}
 
 	public void testSuccessfulExecutionWithFailureOnSaveOfExecutionContext() throws Exception {
@@ -298,37 +300,16 @@ public class ItemOrientedStepTests extends TestCase {
 		});
 		try {
 			itemOrientedStep.execute(stepExecution);
-			fail("Expected BatchCriticalException");
+			fail();
 		}
-		catch (UnexpectedJobExecutionException e) {
+		catch (RuntimeException e) {
+			assertEquals("Fatal error detected during save of step execution context", e.getMessage());
 			assertEquals("foo", e.getCause().getMessage());
 		}
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 	}
 
-	/*
-	 * make sure a job that has been executed before, and is therefore being
-	 * restarted, is restored.
-	 */
-	// public void testRestartedJob() throws Exception {
-	// String step = "stepName";
-	// // step.setStepExecutionCount(1);
-	// MockRestartableItemReader tasklet = new MockRestartableItemReader();
-	// stepExecutor.setItemReader(tasklet);
-	// stepConfiguration.setSaveExecutionContext(true);
-	// JobExecution jobExecution = new JobExecution(jobInstance);
-	// StepExecution stepExecution = new StepExecution(step, jobExecution);
-	//
-	// stepExecution
-	// .setExecutionContext(new
-	// ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
-	// // step.setLastExecution(stepExecution);
-	// stepExecutor.execute(stepExecution);
-	//
-	// assertTrue(tasklet.isRestoreFromCalled());
-	// assertTrue(tasklet.isRestoreFromCalledWithSomeContext());
-	// assertTrue(tasklet.isGetExecutionAttributesCalled());
-	// }
+
 	/*
 	 * Test that a job that is being restarted, but has saveExecutionAttributes
 	 * set to false, doesn't have restore or getExecutionAttributes called on
@@ -497,7 +478,6 @@ public class ItemOrientedStepTests extends TestCase {
 			}
 
 			public void update(ExecutionContext executionContext) {
-				// TODO Auto-generated method stub
 				executionContext.putString("foo", "bar");
 			}
 		};
@@ -547,7 +527,6 @@ public class ItemOrientedStepTests extends TestCase {
 		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
 
 		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
-		// step.setLastExecution(stepExecution);
 
 		try {
 			itemOrientedStep.execute(stepExecution);
@@ -556,7 +535,7 @@ public class ItemOrientedStepTests extends TestCase {
 		catch (JobInterruptedException ex) {
 			assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertTrue("Message does not contain 'interrupted': " + msg, contains(msg, "interrupted"));
+			assertTrue("Message does not contain 'JobInterruptedException': " + msg, contains(msg, "JobInterruptedException"));
 		}
 	}
 
@@ -640,7 +619,7 @@ public class ItemOrientedStepTests extends TestCase {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected UnexpectedJobExecutionException");
 		}
-		catch (UnexpectedJobExecutionException ex) {
+		catch (RuntimeException ex) {
 			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertTrue("Message does not contain ResetFailedException: " + msg, contains(msg, "ResetFailedException"));
@@ -668,12 +647,12 @@ public class ItemOrientedStepTests extends TestCase {
 			itemOrientedStep.execute(stepExecution);
 			fail("Expected BatchCriticalException");
 		}
-		catch (UnexpectedJobExecutionException ex) {
+		catch (RuntimeException ex) {
 			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertEquals("", msg);
+			assertTrue(msg.contains("Fatal error detected during commit"));
 			msg = ex.getMessage();
-			assertTrue("Message does not contain 'saving': " + msg, contains(msg, "saving"));
+			assertTrue(msg.contains("Fatal error detected during commit"));
 			// The original rollback was caused by this one:
 			assertEquals("Bar", ex.getCause().getMessage());
 		}
@@ -703,7 +682,7 @@ public class ItemOrientedStepTests extends TestCase {
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertEquals("", msg);
 			msg = ex.getMessage();
-			assertTrue("Message does not contain 'final': " + msg, contains(msg, "final"));
+			assertTrue("Message does not contain 'saving batch meta data': " + msg, contains(msg, "saving batch meta data"));
 			// The original rollback was caused by this one:
 			assertEquals("Bar", ex.getCause().getMessage());
 		}
@@ -737,7 +716,7 @@ public class ItemOrientedStepTests extends TestCase {
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertEquals("", msg);
 			msg = ex.getMessage();
-			assertTrue("Message does not contain 'close': " + msg, contains(msg, "close"));
+			assertTrue("Message does not contain 'closing': " + msg, contains(msg, "closing"));
 			// The original rollback was caused by this one:
 			assertEquals("Bar", ex.getCause().getMessage());
 		}
@@ -792,9 +771,9 @@ public class ItemOrientedStepTests extends TestCase {
 		catch (RuntimeException expected) {
 			assertEquals("exception thrown in afterStep to signal failure", expected.getMessage());
 		}
-		
+
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		
+
 	}
 
 	private boolean contains(String str, String searchStr) {

@@ -15,26 +15,18 @@
  */
 package org.springframework.batch.core.step.item;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Date;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.core.launch.support.ExitCodeMapper;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.StepExecutionSynchronizer;
 import org.springframework.batch.core.step.StepExecutionSynchronizerFactory;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -72,11 +64,6 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 public class ItemOrientedStep extends AbstractStep {
 
 	private static final Log logger = LogFactory.getLog(ItemOrientedStep.class);
-
-	/**
-	 * Exit code for interrupted status.
-	 */
-	public static final String JOB_INTERRUPTED = "JOB_INTERRUPTED";
 
 	private RepeatOperations chunkOperations = new RepeatTemplate();
 
@@ -218,231 +205,98 @@ public class ItemOrientedStep extends AbstractStep {
 	 * @throws JobInterruptedException if the step or a chunk is interrupted
 	 * @throws RuntimeException if there is an exception during a chunk
 	 * execution
-	 * @see StepExecutor#execute(StepExecution)
+	 * 
 	 */
-	public void execute(final StepExecution stepExecution) throws UnexpectedJobExecutionException,
-			JobInterruptedException {
+	public ExitStatus doExecute(final StepExecution stepExecution) throws Exception {
+		stream.update(stepExecution.getExecutionContext());
+		getJobRepository().saveOrUpdateExecutionContext(stepExecution);
+		itemHandler.mark();
 
-		ExitStatus status = ExitStatus.FAILED;
 		final ExceptionHolder fatalException = new ExceptionHolder();
 
-		try {
+		return stepOperations.iterate(new RepeatCallback() {
 
-			stepExecution.setStartTime(new Date(System.currentTimeMillis()));
-			// We need to save the step execution right away, before we start
-			// using its ID. It would be better to make the creation atomic in
-			// the caller.
-			fatalException.setException(updateStatus(stepExecution, BatchStatus.STARTED));
+			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+				final StepContribution contribution = stepExecution.createStepContribution();
+				// Before starting a new transaction, check for
+				// interruption.
+				if (stepExecution.isTerminateOnly()) {
+					context.setTerminateOnly();
+				}
+				interruptionPolicy.checkInterrupted(stepExecution);
 
-			// Execute step level listeners *after* the execution context is
-			// fixed in the step. E.g. ItemStream instances need the the same
-			// reference to the ExecutionContext as the step execution.
-			getCompositeListener().beforeStep(stepExecution);
-			stream.open(stepExecution.getExecutionContext());
-			stream.update(stepExecution.getExecutionContext());
-			getJobRepository().saveOrUpdateExecutionContext(stepExecution);
-			itemHandler.mark();
+				ExitStatus exitStatus = ExitStatus.CONTINUABLE;
 
-			status = stepOperations.iterate(new RepeatCallback() {
+				TransactionStatus transaction = transactionManager.getTransaction(new DefaultTransactionDefinition());
 
-				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
+				try {
 
-					final StepContribution contribution = stepExecution.createStepContribution();
-					// Before starting a new transaction, check for
-					// interruption.
-					if (stepExecution.isTerminateOnly()) {
-						context.setTerminateOnly();
-					}
-					interruptionPolicy.checkInterrupted(stepExecution);
+					exitStatus = processChunk(stepExecution, contribution);
+					contribution.incrementCommitCount();
 
-					ExitStatus result = ExitStatus.CONTINUABLE;
-
-					TransactionStatus transaction = transactionManager
-							.getTransaction(new DefaultTransactionDefinition());
-
+					// If the step operations are asynchronous then we need
+					// to synchronize changes to the step execution (at a
+					// minimum).
 					try {
-
-						result = processChunk(stepExecution, contribution);
-						contribution.incrementCommitCount();
-
-						// If the step operations are asynchronous then we need
-						// to synchronize changes to the step execution (at a
-						// minimum).
-						try {
-							synchronizer.lock(stepExecution);
-						}
-						catch (InterruptedException e) {
-							stepExecution.setStatus(BatchStatus.STOPPED);
-							Thread.currentThread().interrupt();
-						}
-
-						// Apply the contribution to the step
-						// only if chunk was successful
-						stepExecution.apply(contribution);
-
-						// Attempt to flush before the step execution and stream
-						// state are updated
-						itemHandler.flush();
-
-						stream.update(stepExecution.getExecutionContext());
-						try {
-							getJobRepository().saveOrUpdateExecutionContext(stepExecution);
-						}
-						catch (Exception e) {
-							fatalException.setException(e);
-							stepExecution.setStatus(BatchStatus.UNKNOWN);
-							throw new CommitFailedException(
-									"Fatal error detected during save of step execution context", e);
-						}
-
-						try {
-							itemHandler.mark();
-							transactionManager.commit(transaction);
-						}
-						catch (Exception e) {
-							fatalException.setException(e);
-							stepExecution.setStatus(BatchStatus.UNKNOWN);
-							throw new CommitFailedException("Fatal error detected during commit", e);
-						}
-
+						synchronizer.lock(stepExecution);
 					}
-					catch (Error e) {
-						processRollback(stepExecution, contribution, fatalException, transaction);
-						throw e;
+					catch (InterruptedException e) {
+						stepExecution.setStatus(BatchStatus.STOPPED);
+						Thread.currentThread().interrupt();
+					}
+
+					// Apply the contribution to the step
+					// only if chunk was successful
+					stepExecution.apply(contribution);
+
+					// Attempt to flush before the step execution and stream
+					// state are updated
+					itemHandler.flush();
+
+					stream.update(stepExecution.getExecutionContext());
+					try {
+						getJobRepository().saveOrUpdateExecutionContext(stepExecution);
 					}
 					catch (Exception e) {
-						processRollback(stepExecution, contribution, fatalException, transaction);
-						throw e;
-					}
-					finally {
-						synchronizer.release(stepExecution);
+						fatalException.setException(e);
+						stepExecution.setStatus(BatchStatus.UNKNOWN);
+						throw new FatalException("Fatal error detected during save of step execution context", e);
 					}
 
-					// Check for interruption after transaction as well, so that
-					// the interrupted exception is correctly propagated up to
-					// caller
-					interruptionPolicy.checkInterrupted(stepExecution);
-
-					return result;
+					try {
+						itemHandler.mark();
+						transactionManager.commit(transaction);
+					}
+					catch (Exception e) {
+						fatalException.setException(e);
+						stepExecution.setStatus(BatchStatus.UNKNOWN);
+						logger.error("Fatal error detected during commit.");
+						throw new FatalException("Fatal error detected during commit", e);
+					}
 
 				}
-			});
-
-			status = status.and(getCompositeListener().afterStep(stepExecution));
-
-			fatalException.setException(updateStatus(stepExecution, BatchStatus.COMPLETED));
-		}
-		catch (CommitFailedException e) {
-			logger.error("Fatal error detected during commit.");
-			throw e;
-		}
-		catch (RuntimeException e) {
-			status = processFailure(stepExecution, fatalException, e);
-			if (e.getCause() instanceof JobInterruptedException) {
-				updateStatus(stepExecution, BatchStatus.STOPPED);
-				throw (JobInterruptedException) e.getCause();
-			}
-			throw e;
-		}
-		catch (Error e) {
-			status = processFailure(stepExecution, fatalException, e);
-			throw e;
-		}
-		finally {
-
-			stepExecution.setExitStatus(status);
-			stepExecution.setEndTime(new Date(System.currentTimeMillis()));
-
-			try {
-				getJobRepository().saveOrUpdate(stepExecution);
-			}
-			catch (RuntimeException e) {
-				String msg = "Fatal error detected during final save of meta data";
-				logger.error(msg, e);
-				if (!fatalException.hasException()) {
-					fatalException.setException(e);
+				catch (Error e) {
+					processRollback(stepExecution, contribution, fatalException, transaction);
+					throw e;
 				}
-				throw new UnexpectedJobExecutionException(msg, fatalException.getException());
-			}
-
-			try {
-				stream.close(stepExecution.getExecutionContext());
-			}
-			catch (RuntimeException e) {
-				String msg = "Fatal error detected during close of streams. "
-						+ "The job execution completed (possibly unsuccessfully but with consistent meta-data).";
-				logger.error(msg, e);
-				if (!fatalException.hasException()) {
-					fatalException.setException(e);
+				catch (Exception e) {
+					processRollback(stepExecution, contribution, fatalException, transaction);
+					throw e;
 				}
-				throw new UnexpectedJobExecutionException(msg, fatalException.getException());
+				finally {
+					synchronizer.release(stepExecution);
+				}
+
+				// Check for interruption after transaction as well, so that
+				// the interrupted exception is correctly propagated up to
+				// caller
+				interruptionPolicy.checkInterrupted(stepExecution);
+
+				return exitStatus;
 			}
 
-			if (fatalException.hasException()) {
-				throw new UnexpectedJobExecutionException("Encountered an error saving batch meta data.",
-						fatalException.getException());
-			}
+		});
 
-		}
-
-	}
-
-	/**
-	 * @param stepExecution the current {@link StepExecution}
-	 * @param fatalException the {@link ExceptionHolder} containing information
-	 * about failures in meta-data
-	 * @param e the cause of teh failure
-	 * @return an {@link ExitStatus}
-	 */
-	private ExitStatus processFailure(final StepExecution stepExecution, final ExceptionHolder fatalException,
-			Throwable e) {
-
-		// Default classification marks this as a failure and adds the exception
-		// type and message
-		ExitStatus status = getDefaultExitStatusForFailure(e);
-
-		if (!fatalException.hasException()) {
-			try {
-				// classify exception so an exit code can be stored.
-				status = status.and(getCompositeListener().onErrorInStep(stepExecution, e));
-			}
-			catch (RuntimeException ex) {
-				logger.error("Unexpected error in listener on error in step.", ex);
-			}
-			updateStatus(stepExecution, BatchStatus.FAILED);
-		}
-		else {
-			logger.error("Fatal error detected during rollback caused by underlying exception: ", e);
-		}
-		return status;
-	}
-
-	/**
-	 * Default mapping from throwable to {@link ExitStatus}. Clients can modify
-	 * the exit code using a {@link StepExecutionListener}.
-	 * 
-	 * @param throwable the cause of teh failure
-	 * @return an {@link ExitStatus}
-	 */
-	private ExitStatus getDefaultExitStatusForFailure(Throwable throwable) {
-		ExitStatus exitStatus;
-		if (throwable instanceof JobInterruptedException) {
-			exitStatus = new ExitStatus(false, JOB_INTERRUPTED, JobInterruptedException.class.getName());
-		}
-		else if (throwable instanceof NoSuchJobException) {
-			exitStatus = new ExitStatus(false, ExitCodeMapper.NO_SUCH_JOB);
-		}
-		else {
-			String message = "";
-			if (throwable != null) {
-				StringWriter writer = new StringWriter();
-				throwable.printStackTrace(new PrintWriter(writer));
-				message = writer.toString();
-			}
-			exitStatus = ExitStatus.FAILED.addExitDescription(message);
-		}
-
-		return exitStatus;
 	}
 
 	/**
@@ -476,25 +330,6 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Convenience method to update the status in all relevant places.
-	 * 
-	 * @param stepInstance the current step
-	 * @param stepExecution the current stepExecution
-	 * @param status the status to set
-	 */
-	private Exception updateStatus(StepExecution stepExecution, BatchStatus status) {
-		stepExecution.setStatus(status);
-		try {
-			getJobRepository().saveOrUpdate(stepExecution);
-			return null;
-		}
-		catch (Exception e) {
-			return e;
-		}
-
-	}
-
-	/**
 	 * @param stepExecution
 	 * @param contribution
 	 * @param fatalException
@@ -522,7 +357,7 @@ public class ItemOrientedStep extends AbstractStep {
 			 */
 			if (!fatalException.hasException()) {
 				fatalException.setException(e);
-				stepExecution.setStatus(BatchStatus.UNKNOWN);
+				throw new FatalException("Failed while processing rollback", e);
 			}
 		}
 	}
@@ -545,11 +380,11 @@ public class ItemOrientedStep extends AbstractStep {
 
 	}
 
-	private class CommitFailedException extends RuntimeException {
+	protected void close(ExecutionContext ctx) throws Exception {
+		stream.close(ctx);
+	}
 
-		public CommitFailedException(String string, Exception e) {
-			super(string, e);
-		}
-
+	protected void open(ExecutionContext ctx) throws Exception {
+		stream.open(ctx);
 	}
 }

@@ -45,6 +45,7 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.item.AbstractItemReader;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
@@ -508,6 +509,21 @@ public class SimpleJobTests extends TestCase {
 
 		public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
 			this.itemSkipPolicy = itemSkipPolicy;
+		}
+
+		protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		protected void close(ExecutionContext ctx) throws Exception {
+			// TODO Auto-generated method stub
+			
+		}
+
+		protected void open(ExecutionContext ctx) throws Exception {
+			// TODO Auto-generated method stub
+			
 		}
 
 	}
