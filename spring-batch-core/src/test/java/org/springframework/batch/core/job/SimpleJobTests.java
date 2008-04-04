@@ -41,17 +41,8 @@ import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
-import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.core.step.skip.ItemSkipPolicy;
-import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
-import org.springframework.batch.item.AbstractItemReader;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.exception.ExceptionHandler;
-import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * Tests for DefaultJobLifecycle. MapJobDao and MapStepExecutionDao are used
@@ -192,19 +183,7 @@ public class SimpleJobTests extends TestCase {
 		job.setJobRepository(jobRepository);
 		// do not set StepExecutorFactory...
 		step1.setStartLimit(5);
-		step1.setItemReader(new AbstractItemReader() {
-			public Object read() throws Exception {
-				list.add("1");
-				return null;
-			}
-		});
 		step2.setStartLimit(5);
-		step2.setItemReader(new AbstractItemReader() {
-			public Object read() throws Exception {
-				list.add("2");
-				return null;
-			}
-		});
 		job.execute(jobExecution);
 		assertEquals(2, list.size());
 		checkRepository(BatchStatus.COMPLETED, ExitStatus.FINISHED);
@@ -353,7 +332,7 @@ public class SimpleJobTests extends TestCase {
 		catch (RuntimeException e) {
 			assertSame(exception, e);
 		}
-		
+
 		try {
 			job.execute(jobExecution);
 			fail();
@@ -384,27 +363,15 @@ public class SimpleJobTests extends TestCase {
 		checkRepository(status, null);
 	}
 
-	private static class StubStep extends AbstractStep {
+	private static class StubStep extends StepSupport {
 
 		private Runnable runnable;
 
 		private Throwable exception;
 
-		protected ExceptionHandler exceptionHandler;
+		private JobRepository jobRepository;
 
-		protected RetryPolicy retryPolicy;
-
-		protected JobRepository jobRepository;
-
-		protected PlatformTransactionManager transactionManager;
-
-		protected ItemReader itemReader;
-
-		protected ItemWriter itemWriter;
-
-		protected ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
-
-		Properties passedInContext;
+		private Properties passedInContext;
 
 		/**
 		 * @param string
@@ -427,13 +394,17 @@ public class SimpleJobTests extends TestCase {
 			this.runnable = runnable;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.springframework.batch.core.step.StepSupport#execute(org.springframework.batch.core.StepExecution)
+		 */
 		public void execute(StepExecution stepExecution) throws JobInterruptedException,
 				UnexpectedJobExecutionException {
-			
+
 			passedInContext = stepExecution.getExecutionContext().getProperties();
 			stepExecution.getExecutionContext().putString("key", "value");
 			jobRepository.saveOrUpdateExecutionContext(stepExecution);
-			
+
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
 				throw (RuntimeException) exception;
@@ -450,29 +421,7 @@ public class SimpleJobTests extends TestCase {
 				runnable.run();
 			}
 			stepExecution.setExitStatus(ExitStatus.FINISHED);
-		}
 
-		/**
-		 * Set the name property. Always overrides the default value if this
-		 * object is a Spring bean.
-		 * 
-		 * @see #setBeanName(java.lang.String)
-		 */
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		/**
-		 * Public setter for the {@link RetryPolicy}.
-		 * 
-		 * @param retryPolicy the {@link RetryPolicy} to set
-		 */
-		public void setRetryPolicy(RetryPolicy retryPolicy) {
-			this.retryPolicy = retryPolicy;
-		}
-
-		public void setExceptionHandler(ExceptionHandler exceptionHandler) {
-			this.exceptionHandler = exceptionHandler;
 		}
 
 		/**
@@ -482,48 +431,6 @@ public class SimpleJobTests extends TestCase {
 		 */
 		public void setJobRepository(JobRepository jobRepository) {
 			this.jobRepository = jobRepository;
-		}
-
-		/**
-		 * Public setter for the {@link PlatformTransactionManager}.
-		 * 
-		 * @param transactionManager the transaction manager to set
-		 */
-		public void setTransactionManager(PlatformTransactionManager transactionManager) {
-			this.transactionManager = transactionManager;
-		}
-
-		/**
-		 * @param itemReader the itemReader to set
-		 */
-		public void setItemReader(ItemReader itemReader) {
-			this.itemReader = itemReader;
-		}
-
-		/**
-		 * @param itemWriter the itemWriter to set
-		 */
-		public void setItemWriter(ItemWriter itemWriter) {
-			this.itemWriter = itemWriter;
-		}
-
-		public void setItemSkipPolicy(ItemSkipPolicy itemSkipPolicy) {
-			this.itemSkipPolicy = itemSkipPolicy;
-		}
-
-		protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		protected void close(ExecutionContext ctx) throws Exception {
-			// TODO Auto-generated method stub
-			
-		}
-
-		protected void open(ExecutionContext ctx) throws Exception {
-			// TODO Auto-generated method stub
-			
 		}
 
 	}

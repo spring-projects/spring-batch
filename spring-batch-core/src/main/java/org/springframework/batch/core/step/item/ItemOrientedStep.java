@@ -207,7 +207,7 @@ public class ItemOrientedStep extends AbstractStep {
 	 * execution
 	 * 
 	 */
-	public ExitStatus doExecute(final StepExecution stepExecution) throws Exception {
+	protected ExitStatus doExecute(final StepExecution stepExecution) throws Exception {
 		stream.update(stepExecution.getExecutionContext());
 		getJobRepository().saveOrUpdateExecutionContext(stepExecution);
 		itemHandler.mark();

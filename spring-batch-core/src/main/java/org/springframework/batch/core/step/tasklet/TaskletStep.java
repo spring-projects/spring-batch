@@ -22,7 +22,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.Assert;
 
 /**
@@ -38,24 +37,9 @@ import org.springframework.util.Assert;
  * @author Ben Hale
  * @author Robert Kasanicky
  */
-public class TaskletStep extends AbstractStep implements BeanNameAware {
+public class TaskletStep extends AbstractStep {
 
 	private Tasklet tasklet;
-
-	/**
-	 * Set the name property if it is not already set. Because of the order of
-	 * the callbacks in a Spring container the name property will be set first
-	 * if it is present. Care is needed with bean definition inheritance - if a
-	 * parent bean has a name, then its children need an explicit name as well,
-	 * otherwise they will not be unique.
-	 * 
-	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
-	 */
-	public void setBeanName(String name) {
-		if (this.name == null) {
-			this.name = name;
-		}
-	}
 
 	/**
 	 * Register each of the objects as listeners.
