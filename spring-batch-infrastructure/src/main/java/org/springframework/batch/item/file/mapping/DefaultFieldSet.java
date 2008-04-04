@@ -375,6 +375,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
 	public Date readDate(int index, String pattern) {
 		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+		sdf.setLenient(false);
 		Date date;
 		String value = readAndTrim(index);
 		try {

@@ -43,17 +43,18 @@ public class FieldSetTests extends TestCase {
 		assertEquals(14, fieldSet.getFieldCount());
 
 	}
-	
+
 	public void testNames() throws Exception {
 		assertEquals(fieldSet.getFieldCount(), fieldSet.getNames().length);
 	}
 
 	public void testNamesNotKnown() throws Exception {
-		fieldSet = new DefaultFieldSet(new String[]{"foo"});
+		fieldSet = new DefaultFieldSet(new String[] { "foo" });
 		try {
 			fieldSet.getNames();
 			fail("Expected IllegalStateException");
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			// expected
 		}
 	}
@@ -190,24 +191,24 @@ public class FieldSetTests extends TestCase {
 		assertEquals(354224, fieldSet.readInt("Integer"));
 	}
 
-	public void testReadBlankInt(){
+	public void testReadBlankInt() {
 
-		//Trying to parse a blank field as an integer, but without a default
-		//value should throw a NumberFormatException
-		try{
+		// Trying to parse a blank field as an integer, but without a default
+		// value should throw a NumberFormatException
+		try {
 			fieldSet.readInt(13);
 			fail();
 		}
-		catch(NumberFormatException ex){
-			//expected
+		catch (NumberFormatException ex) {
+			// expected
 		}
 
-		try{
+		try {
 			fieldSet.readInt("BlankInput");
 			fail();
 		}
-		catch(NumberFormatException ex){
-			//expected
+		catch (NumberFormatException ex) {
+			// expected
 		}
 
 	}
@@ -218,7 +219,7 @@ public class FieldSetTests extends TestCase {
 	}
 
 	public void testReadLongWithPadding() throws Exception {
-		fieldSet = new DefaultFieldSet(new String[] {"000009"});
+		fieldSet = new DefaultFieldSet(new String[] { "000009" });
 		assertEquals(9, fieldSet.readLong(0));
 	}
 
@@ -311,6 +312,32 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
+	public void testStrictReadDateWithPattern() throws Exception {
+
+		fieldSet = new DefaultFieldSet(new String[] {"50-2-13"});
+		try {
+			fieldSet.readDate(0, "dd-MM-yyyy");
+			fail("field value is not a valid date for strict parser, exception expected");
+		}
+		catch (IllegalArgumentException e) {
+			String message = e.getMessage();
+			assertTrue("Message did not contain: " + message, message.indexOf("dd-MM-yyyy") > 0);
+		}
+	}
+
+	public void testStrictReadDateWithPatternAndStrangeDate() throws Exception {
+
+		fieldSet = new DefaultFieldSet(new String[] {"5550212"});
+		try {
+			System.err.println(fieldSet.readDate(0, "yyyyMMdd"));
+			fail("field value is not a valid date for strict parser, exception expected");
+		}
+		catch (IllegalArgumentException e) {
+			String message = e.getMessage();
+			assertTrue("Message did not contain: " + message, message.indexOf("yyyyMMdd") > 0);
+		}
+	}
+
 	public void testReadDateByNameInvalidWithPattern() throws Exception {
 
 		try {
@@ -391,8 +418,8 @@ public class FieldSetTests extends TestCase {
 	}
 
 	public void testProperties() throws Exception {
-		assertEquals("foo", new DefaultFieldSet(new String[] { "foo", "bar" }, new String[] { "Foo", "Bar" }).getProperties()
-				.getProperty("Foo"));
+		assertEquals("foo", new DefaultFieldSet(new String[] { "foo", "bar" }, new String[] { "Foo", "Bar" })
+				.getProperties().getProperty("Foo"));
 	}
 
 	public void testPropertiesWithNoNames() throws Exception {
@@ -405,14 +432,15 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
-	public void testPropertiesWithWhiteSpace() throws Exception{
+	public void testPropertiesWithWhiteSpace() throws Exception {
 
-		assertEquals("bar", new DefaultFieldSet(new String[] { "foo", "bar   " }, new String[] { "Foo", "Bar"}).getProperties().getProperty("Bar"));
+		assertEquals("bar", new DefaultFieldSet(new String[] { "foo", "bar   " }, new String[] { "Foo", "Bar" })
+				.getProperties().getProperty("Bar"));
 	}
 
-	public void testPropertiesWithNullValues() throws Exception{
+	public void testPropertiesWithNullValues() throws Exception {
 
-		fieldSet = new DefaultFieldSet(new String[] { null, "bar" }, new String[] { "Foo", "Bar"});
+		fieldSet = new DefaultFieldSet(new String[] { null, "bar" }, new String[] { "Foo", "Bar" });
 		assertEquals("bar", fieldSet.getProperties().getProperty("Bar"));
 		assertEquals(null, fieldSet.getProperties().getProperty("Foo"));
 	}
@@ -434,19 +462,19 @@ public class FieldSetTests extends TestCase {
 			assertEquals(tokens[i], values[i]);
 		}
 	}
-	
-	public void testPaddedLong(){
-		FieldSet fs = new DefaultFieldSet(new String[]{"00000009"});
-		
+
+	public void testPaddedLong() {
+		FieldSet fs = new DefaultFieldSet(new String[] { "00000009" });
+
 		long value = fs.readLong(0);
 		assertEquals(value, 9);
 	}
-	
+
 	public void testReadRawString() {
 		String name = "fieldName";
 		String value = " string with trailing whitespace   ";
-		FieldSet fs = new DefaultFieldSet(new String[] { value }, new String[]{ name });
-		
+		FieldSet fs = new DefaultFieldSet(new String[] { value }, new String[] { name });
+
 		assertEquals(value, fs.readRawString(0));
 		assertEquals(value, fs.readRawString(name));
 	}
