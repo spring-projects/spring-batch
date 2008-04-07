@@ -21,9 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.SkipListener;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Dave Syer
@@ -51,19 +48,6 @@ public class CompositeSkipListener implements SkipListener {
 		if (!listeners.contains(listener)) {
 			listeners.add(listener);
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#onError(java.lang.Throwable)
-	 */
-	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
-		ExitStatus status = null;
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-			StepExecutionListener listener = (StepExecutionListener) iterator.next();
-			ExitStatus close = listener.onErrorInStep(stepExecution, e);
-			status = status!=null ? status.and(close): close;
-		}
-		return status;
 	}
 
 	/* (non-Javadoc)
