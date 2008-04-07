@@ -261,6 +261,22 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals(3, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
 
 	}
+	
+	public void testOpenWithNonexistentFile() throws Exception {
+		writer = new FlatFileItemWriter();
+		writer.setFieldSetCreator(new PassThroughFieldSetMapper());
+		FileSystemResource file = new FileSystemResource("no-such-file.foo");
+		file.getFile().setReadOnly();
+		writer.setResource(file);
+		writer.afterPropertiesSet();
+		try {
+			writer.open(executionContext);
+			fail("Expected IllegalStateException");
+		} catch (IllegalStateException e) {
+			String message = e.getMessage();
+			assertTrue("Message does not contain 'writable': "+message, message.indexOf("writable")>=0);
+		}
+	}
 
 	public void testAfterPropertiesSetChecksMandatory() throws Exception {
 		writer = new FlatFileItemWriter();

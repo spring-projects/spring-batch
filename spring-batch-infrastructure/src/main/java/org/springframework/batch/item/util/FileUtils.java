@@ -3,6 +3,7 @@ package org.springframework.batch.item.util;
 import java.io.File;
 import java.io.IOException;
 
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 
@@ -41,7 +42,7 @@ public class FileUtils {
 			if (!restarted) {
 				if (file.exists()) {
 					if(!overwriteOutputFile){
-						throw new  DataAccessResourceFailureException("File already exists: ["
+						throw new  ItemStreamException("File already exists: ["
 						+ file.getAbsolutePath() + "]");
 					}
 					file.delete();
@@ -53,13 +54,13 @@ public class FileUtils {
 				file.createNewFile();
 			}
 		} catch (IOException ioe) {
-			throw new DataAccessResourceFailureException(
+			throw new ItemStreamException(
 					"Unable to create file: [" + file.getAbsolutePath() + "]",
 					ioe);
 		}
 
 		if (!file.canWrite()) {
-			throw new DataAccessResourceFailureException(
+			throw new ItemStreamException(
 					"File is not writable: [" + file.getAbsolutePath() + "]");
 		}
 	}

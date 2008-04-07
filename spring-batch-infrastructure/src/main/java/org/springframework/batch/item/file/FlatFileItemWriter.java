@@ -108,9 +108,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource, "The resource must be set");
-		Assert.notNull(fieldSetCreator, "A FieldSetUnmapper must be provided.");
-		File file = resource.getFile();
-		Assert.state(!file.exists() || file.canWrite(), "Resource is not writable: [" + resource + "]");
+		Assert.notNull(fieldSetCreator, "A FieldSetCreator must be provided.");
 	}
 
 	/**
@@ -232,6 +230,13 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	// Returns object representing state.
 	private OutputState getOutputState() {
 		if (state == null) {
+			try {
+				File file = resource.getFile();
+				Assert.state(!file.exists() || file.canWrite(), "Resource is not writable: [" + resource + "]");
+			}
+			catch (IOException e) {
+				throw new ItemStreamException("Could not test resource for writable status.", e);
+			}
 			state = new OutputState();
 			state.setDeleteIfExists(shouldDeleteIfExists);
 			state.setBufferSize(bufferSize);
