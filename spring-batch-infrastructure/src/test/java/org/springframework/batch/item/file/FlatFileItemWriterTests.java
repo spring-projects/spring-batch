@@ -262,10 +262,10 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	}
 	
-	public void testOpenWithNonexistentFile() throws Exception {
+	public void testOpenWithNonWritableFile() throws Exception {
 		writer = new FlatFileItemWriter();
 		writer.setFieldSetCreator(new PassThroughFieldSetMapper());
-		FileSystemResource file = new FileSystemResource("no-such-file.foo");
+		FileSystemResource file = new FileSystemResource("target/no-such-file.foo");
 		writer.setResource(file);
 		file.getFile().createNewFile();
 		file.getFile().setReadOnly();
