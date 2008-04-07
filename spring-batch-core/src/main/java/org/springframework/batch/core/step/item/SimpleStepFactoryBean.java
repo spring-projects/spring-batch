@@ -133,16 +133,16 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	}
 
 	/**
-	 * Public getter for the ItemProcessor.
-	 * @return the itemProcessor
+	 * Public getter for the ItemHandler.
+	 * @return the ItemHandler
 	 */
 	protected ItemHandler getItemHandler() {
 		return itemHandler;
 	}
 
 	/**
-	 * Public setter for the ItemProcessor.
-	 * @param itemHandler the itemProcessor to set
+	 * Public setter for the ItemHandler.
+	 * @param itemHandler the ItemHandler to set
 	 */
 	protected void setItemHandler(ItemHandler itemHandler) {
 		this.itemHandler = itemHandler;

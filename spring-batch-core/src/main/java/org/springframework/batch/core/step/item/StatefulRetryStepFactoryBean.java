@@ -142,6 +142,7 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 
 			StatefulRetryItemHandler itemHandler = new StatefulRetryItemHandler(getItemReader(), getItemWriter(),
 					retryTemplate, getItemKeyGenerator(), itemRecoverer);
+			itemHandler.setItemSkipPolicy(getItemSkipPolicy());
 
 			step.setItemHandler(itemHandler);
 

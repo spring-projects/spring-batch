@@ -53,6 +53,8 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 	private List recovered = new ArrayList();
 
 	private List processed = new ArrayList();
+	
+	int count = 0;	
 
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
 			new MapStepExecutionDao());
@@ -109,20 +111,51 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(new String[] { "a", "b", "c" }));
 		ItemReader provider = new ListItemReader(items) {
-			int count = 0;
 			public Object read() {
+				Object item = super.read();
 				count++;
 				if (count == 2) {
 					throw new RuntimeException("Temporary error - retry for success.");
 				}
-				return super.read();
+				return item;
 			}
 		};
 		factory.setItemReader(provider);
 		factory.setRetryLimit(10);
 		AbstractStep step = (AbstractStep) factory.getObject();
 
-		step.execute(new StepExecution(step, jobExecution));
+		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		step.execute(stepExecution);
+		
+		assertEquals(0, stepExecution.getSkipCount());
+		// b is processed twice, plus 1, plus c, plus the null at end
+		assertEquals(5, count);
 	}
 	
+	public void testSkipAndRetry() throws Exception {
+		factory.setSkippableExceptionClasses(new Class[] {Exception.class});
+		factory.setSkipLimit(1);
+		List items = TransactionAwareProxyFactory.createTransactionalList();
+		items.addAll(Arrays.asList(new String[] { "a", "b", "c" }));
+		ItemReader provider = new ListItemReader(items) {
+			public Object read() {
+				Object item = super.read();
+				count++;
+				if ("b".equals(item)) {
+					throw new RuntimeException("Read error - planned but skippable.");
+				}
+				return item;
+			}
+		};
+		factory.setItemReader(provider);
+		factory.setRetryLimit(10);
+		AbstractStep step = (AbstractStep) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		step.execute(stepExecution);
+		
+		assertEquals(1, stepExecution.getSkipCount());
+		// b is processed once and skipped, plus 1, plus c, plus the null at end
+		assertEquals(4, count);
+	}
 }

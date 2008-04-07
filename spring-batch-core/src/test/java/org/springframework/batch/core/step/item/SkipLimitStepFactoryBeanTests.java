@@ -25,7 +25,9 @@ import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.StringUtils;
 
 /**
@@ -46,6 +48,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	SkipWriterStub writer = new SkipWriterStub();
 
 	JobExecution jobExecution;
+
+	protected int count;
 
 	protected void setUp() throws Exception {
 		factory.setJobRepository(new JobRepositorySupport());
@@ -220,6 +224,32 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6,7"));
 		assertEquals(expectedOutput, writer.written);
 
+	}
+
+	public void testDefaultSkipPolicy() throws Exception {
+		factory.setSkippableExceptionClasses(new Class[] {Exception.class});
+		factory.setSkipLimit(1);
+		List items = TransactionAwareProxyFactory.createTransactionalList();
+		items.addAll(Arrays.asList(new String[] { "a", "b", "c" }));
+		ItemReader provider = new ListItemReader(items) {
+			public Object read() {
+				Object item = super.read();
+				count++;
+				if ("b".equals(item)) {
+					throw new RuntimeException("Read error - planned failure.");
+				}
+				return item;
+			}
+		};
+		factory.setItemReader(provider);
+		AbstractStep step = (AbstractStep) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		step.execute(stepExecution);
+		
+		assertEquals(1, stepExecution.getSkipCount());
+		// b is processed once and skipped, plus 1, plus c, plus the null at end
+		assertEquals(4, count);
 	}
 
 	/**

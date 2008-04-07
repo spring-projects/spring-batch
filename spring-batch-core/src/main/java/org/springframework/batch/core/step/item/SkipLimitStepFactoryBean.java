@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
@@ -36,6 +37,8 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	private ItemKeyGenerator itemKeyGenerator;
 
 	private int skipCacheCapacity = 1024;
+
+	private ItemSkipPolicy itemSkipPolicy;
 
 	/**
 	 * Public setter for a limit that determines skip policy. If this value is
@@ -96,6 +99,14 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	protected ItemKeyGenerator getItemKeyGenerator() {
 		return itemKeyGenerator;
 	}
+	
+	/**
+	 * Protected getter for the {@link ItemSkipPolicy}.
+	 * @return the itemSkipPolicy
+	 */
+	protected ItemSkipPolicy getItemSkipPolicy() {
+		return itemSkipPolicy;
+	}
 
 	/**
 	 * Public setter for the capacity of the skipped item cache. If a large
@@ -134,9 +145,10 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 			addFatalExceptionIfMissing(SkipLimitExceededException.class);
 			List fatalExceptionList = Arrays.asList(fatalExceptionClasses);
 
-			LimitCheckingItemSkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, Arrays
+			LimitCheckingItemSkipPolicy limitCheckingSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, Arrays
 					.asList(skippableExceptionClasses), fatalExceptionList);
-			itemHandler.setItemSkipPolicy(skipPolicy);
+			itemHandler.setItemSkipPolicy(limitCheckingSkipPolicy);
+			this.itemSkipPolicy = limitCheckingSkipPolicy;
 			SimpleLimitExceptionHandler exceptionHandler = new SimpleLimitExceptionHandler(skipLimit);
 			exceptionHandler.setExceptionClasses(skippableExceptionClasses);
 			exceptionHandler.setFatalExceptionClasses(fatalExceptionClasses);
