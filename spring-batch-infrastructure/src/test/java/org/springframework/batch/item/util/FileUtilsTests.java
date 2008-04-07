@@ -8,8 +8,6 @@ import java.io.IOException;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.util.FileUtils;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 
 /**
