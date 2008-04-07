@@ -46,8 +46,8 @@ public class TaskletAdapter extends AbstractMethodInvokingDelegator implements T
 
 	/**
 	 * If the result is an {@link ExitStatus} already just return that,
-	 * otherwise return {@link ExitStatus#FINISHED} if the result is null and
-	 * {@link ExitStatus#CONTINUABLE} if not.
+	 * otherwise return {@link ExitStatus#FINISHED}.
+	 * 
 	 * @param result the value returned by the delegate method
 	 * @return an {@link ExitStatus} consistent with the result
 	 */
@@ -55,10 +55,7 @@ public class TaskletAdapter extends AbstractMethodInvokingDelegator implements T
 		if (result instanceof ExitStatus) {
 			return (ExitStatus) result;
 		}
-		if (result == null) {
-			return ExitStatus.FINISHED;
-		}
-		return ExitStatus.CONTINUABLE;
+		return ExitStatus.FINISHED;
 	}
 
 }

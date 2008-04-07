@@ -67,7 +67,7 @@ public class TaskletAdapterTests extends TestCase {
 	public void testMapResultWithNonNull() throws Exception {
 		tasklet.setTargetMethod("process");
 		this.result = "foo";
-		assertEquals(ExitStatus.CONTINUABLE, tasklet.execute());
+		assertEquals(ExitStatus.FINISHED, tasklet.execute());
 	}
 
 }
