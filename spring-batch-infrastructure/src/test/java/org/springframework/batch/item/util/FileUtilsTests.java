@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.util.FileUtils;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
@@ -64,7 +65,7 @@ public class FileUtilsTests extends TestCase {
 			FileUtils.setUpOutputFile(file, true, false);
 			fail();
 		}
-		catch (DataAccessResourceFailureException e) {
+		catch (ItemStreamException e) {
 			// expected
 		}
 
@@ -72,7 +73,7 @@ public class FileUtilsTests extends TestCase {
 			FileUtils.setUpOutputFile(file, true, true);
 			fail();
 		}
-		catch (DataAccessResourceFailureException e) {
+		catch (ItemStreamException e) {
 			// expected
 		}
 
@@ -115,7 +116,7 @@ public class FileUtilsTests extends TestCase {
 		try{
 			FileUtils.setUpOutputFile(file, false, false);
 			fail();
-		}catch(DataAccessResourceFailureException ex){
+		}catch(ItemStreamException ex){
 			assertTrue(ex.getCause() instanceof IOException);
 		}finally{
 			file.delete();
