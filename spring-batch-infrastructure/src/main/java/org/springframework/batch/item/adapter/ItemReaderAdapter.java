@@ -16,9 +16,7 @@
 
 package org.springframework.batch.item.adapter;
 
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
 
@@ -38,17 +36,14 @@ public class ItemReaderAdapter extends AbstractMethodInvokingDelegator implement
 	}
 
 	/**
-	 * Do nothing.
-	 * 
-	 * @see org.springframework.batch.item.ItemReader#close(ExecutionContext)
+	 * No-op.
 	 */
-	public void close() throws ItemStreamException {
-
-	}
-
 	public void mark() throws MarkFailedException {
 	}
 
+	/**
+	 * No-op.
+	 */
 	public void reset() throws ResetFailedException {
 	}
 }
