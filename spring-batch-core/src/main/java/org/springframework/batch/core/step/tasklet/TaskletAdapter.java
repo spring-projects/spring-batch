@@ -19,11 +19,11 @@ import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * A {@link Tasklet} that wraps a method in a POJO. By default the
- * {@link ExitStatus} is determined by comparing the return value from the POJO
- * with null. The POJO method is usually going to have no arguments, but a
- * static argument or array of arguments can be used by setting the arguments
- * property.
+ * A {@link Tasklet} that wraps a method in a POJO. By default the return value
+ * is {@link ExitStatus#FINISHED} unless the delegate POJO itself returns an
+ * {@link ExitStatus}. The POJO method is usually going to have no arguments,
+ * but a static argument or array of arguments can be used by setting the
+ * arguments property.
  * 
  * @see AbstractMethodInvokingDelegator
  * 
@@ -34,9 +34,7 @@ public class TaskletAdapter extends AbstractMethodInvokingDelegator implements T
 
 	/**
 	 * Delegate execution to the target object and translate the return value to
-	 * an {@link ExitStatus} by invoking a method in the delegate POJO. N.B. the
-	 * delegate method should not be void, otherwise there is no way to
-	 * determine when the result indicates a finished job.
+	 * an {@link ExitStatus} by invoking a method in the delegate POJO.
 	 * 
 	 * @see org.springframework.batch.core.step.tasklet.Tasklet#execute()
 	 */
