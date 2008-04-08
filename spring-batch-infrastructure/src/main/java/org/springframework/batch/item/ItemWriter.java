@@ -45,19 +45,19 @@ public interface ItemWriter {
 	 * retry or a batch the framework will catch the exception and convert or
 	 * rethrow it as appropriate.
 	 */
-	public void write(Object item) throws Exception;
+	void write(Object item) throws Exception;
 	
 	/**
 	 * Flush any buffers that are being held.  This will usually be performed
 	 * prior to committing any transactions.
 	 * @throws FlushFailedException TODO
 	 */
-	public void flush() throws FlushFailedException;
+	void flush() throws FlushFailedException;
 	
 	/**
 	 * Clear any buffers that are being held.  This will usually be performed
 	 * prior to rolling back any transactions.
 	 * @throws ClearFailedException TODO
 	 */
-	public void clear() throws ClearFailedException;
+	void clear() throws ClearFailedException;
 }
