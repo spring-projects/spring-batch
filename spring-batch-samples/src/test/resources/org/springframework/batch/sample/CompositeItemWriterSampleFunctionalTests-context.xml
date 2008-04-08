@@ -5,6 +5,6 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
 	<import resource="classpath:/simple-job-launcher-context.xml" />
-	<import resource="classpath:/jobs/compositeProcessorSampleJob.xml" />
+	<import resource="classpath:/jobs/compositeItemWriterSampleJob.xml" />
 
 </beans>
