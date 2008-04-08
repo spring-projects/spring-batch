@@ -16,9 +16,7 @@
 package org.springframework.batch.item.database;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -83,10 +81,9 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	protected void tearDown() throws Exception {
-		Map map = TransactionSynchronizationManager.getResourceMap();
-		for (Iterator iterator = map.keySet().iterator(); iterator.hasNext();) {
-			String key = (String) iterator.next();
-			TransactionSynchronizationManager.unbindResource(key);			
+		String key = HibernateAwareItemWriter.class.getName() + ".ITEMS_PROCESSED";
+		if (TransactionSynchronizationManager.hasResource(key)) {
+			TransactionSynchronizationManager.unbindResource(key);	
 		}
 		RepeatSynchronizationManager.clear();
 	}
