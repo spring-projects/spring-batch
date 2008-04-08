@@ -20,9 +20,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -88,10 +86,8 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	protected void tearDown() throws Exception {
-		Map map = TransactionSynchronizationManager.getResourceMap();
-		for (Iterator iterator = map.keySet().iterator(); iterator.hasNext();) {
-			String key = (String) iterator.next();
-			TransactionSynchronizationManager.unbindResource(key);
+		if (TransactionSynchronizationManager.hasResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED)) {
+			TransactionSynchronizationManager.unbindResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED);
 		}
 		RepeatSynchronizationManager.clear();
 	}
