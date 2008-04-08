@@ -16,19 +16,20 @@
 
 package org.springframework.batch.item;
 
-
 /**
- * <p>Basic interface for generic output operations. Class implementing this
+ * <p>
+ * Basic interface for generic output operations. Class implementing this
  * interface will be responsible for serializing objects as necessary.
  * Generally, it is responsibility of implementing class to decide which
- * technology to use for mapping and how it should be configured.</p>
+ * technology to use for mapping and how it should be configured.
+ * </p>
  * 
  * <p>
- * Due to the nature of batch processing, it is expected that most writers
- * will buffer output.  A flush method is provided to the interface in order
- * to ensure that any buffers can be flushed before a transaction is
- * committed.  Along the same lines, if a transaction has been rolled back,
- * then the contents of any buffers should be thrown away.
+ * Due to the nature of batch processing, it is expected that most writers will
+ * buffer output. A flush method is provided to the interface in order to ensure
+ * that any buffers can be flushed before a transaction is committed. Along the
+ * same lines, if a transaction has been rolled back, then the contents of any
+ * buffers should be thrown away.
  * </p>
  * 
  * @author Dave Syer
@@ -46,18 +47,22 @@ public interface ItemWriter {
 	 * rethrow it as appropriate.
 	 */
 	void write(Object item) throws Exception;
-	
+
 	/**
-	 * Flush any buffers that are being held.  This will usually be performed
+	 * Flush any buffers that are being held. This will usually be performed
 	 * prior to committing any transactions.
-	 * @throws FlushFailedException TODO
+	 * @throws FlushFailedException in case of an error.  If this exception is
+	 * thrown the writer may be in an inconsistent state and manual intervention
+	 * might be required to reconcile the data with persistent output.
 	 */
 	void flush() throws FlushFailedException;
-	
+
 	/**
-	 * Clear any buffers that are being held.  This will usually be performed
+	 * Clear any buffers that are being held. This will usually be performed
 	 * prior to rolling back any transactions.
-	 * @throws ClearFailedException TODO
+	 * @throws ClearFailedException in case of an error. If this exception is
+	 * thrown the writer may be in an inconsistent state and manual intervention
+	 * might be required to reconcile the data with persistent output.
 	 */
 	void clear() throws ClearFailedException;
 }
