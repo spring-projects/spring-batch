@@ -54,6 +54,8 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	private ItemHandler itemHandler;
 
 	private RepeatTemplate stepOperations;
+	
+	private RepeatTemplate chunkOperations;
 
 	private ExceptionHandler exceptionHandler;
 
@@ -66,7 +68,7 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	public void setCommitInterval(int commitInterval) {
 		this.commitInterval = commitInterval;
 	}
-
+	
 	/**
 	 * The streams to inject into the {@link Step}. Any instance of
 	 * {@link ItemStream} can be used, and will then receive callbacks at the
@@ -105,6 +107,16 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	protected RepeatTemplate getStepOperations() {
 		return stepOperations;
 	}
+	
+	/**
+	 * Protected getter for the chunk operations to make them available in
+	 * subclasses.
+	 * @return the step operations
+	 */
+	protected RepeatTemplate getChunkOperations() {
+		return chunkOperations;
+	}
+
 
 	/**
 	 * Public setter for the SimpleLimitExceptionHandler.
@@ -181,7 +193,7 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 
 		BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
 
-		RepeatTemplate chunkOperations = new RepeatTemplate();
+		chunkOperations = new RepeatTemplate();
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
 		helper.addChunkListeners(chunkOperations, listeners);
 		step.setChunkOperations(chunkOperations);
