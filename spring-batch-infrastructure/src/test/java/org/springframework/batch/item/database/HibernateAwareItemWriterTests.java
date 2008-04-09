@@ -81,7 +81,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	protected void tearDown() throws Exception {
-		String key = HibernateAwareItemWriter.class.getName() + ".ITEMS_PROCESSED";
+		String key = writer.getResourceKey();
 		if (TransactionSynchronizationManager.hasResource(key)) {
 			TransactionSynchronizationManager.unbindResource(key);	
 		}
@@ -165,16 +165,19 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		} catch (RuntimeException e) {
 			assertEquals("bar", e.getMessage());
 		}
-		assertEquals(1, list.size());
+		assertEquals(2, list.size());
+		assertTrue(list.contains("foo"));
+		assertTrue(list.contains("delegateFlush"));
 		writer.setHibernateTemplate(new HibernateTemplateWrapper() {
 			public void flush() throws DataAccessException {
 				list.add("flush");
 			}
 		});
 		writer.write("foo");
-		assertEquals(4, list.size());
+		assertEquals(6, list.size());
 		assertTrue(list.contains("flush"));
 		assertTrue(list.contains("clear"));
+		assertTrue(list.contains("delegateFlush"));
 		assertTrue(context.isCompleteOnly());
 	}
 

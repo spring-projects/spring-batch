@@ -15,19 +15,13 @@
  */
 package org.springframework.batch.item.database;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.hibernate.SessionFactory;
 import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.orm.hibernate3.HibernateOperations;
 import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
 /**
@@ -50,14 +44,12 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class HibernateAwareItemWriter implements ItemWriter, InitializingBean {
+public class HibernateAwareItemWriter extends AbstractTransactionalResourceItemWriter implements InitializingBean {
 
 	/**
 	 * Key for items processed in the current transaction {@link RepeatContext}.
 	 */
 	private static final String ITEMS_PROCESSED = HibernateAwareItemWriter.class.getName() + ".ITEMS_PROCESSED";
-
-	private Set failed = new HashSet();
 
 	private ItemWriter delegate;
 
@@ -92,7 +84,7 @@ public class HibernateAwareItemWriter implements ItemWriter, InitializingBean {
 	}
 
 	/**
-	 * Check mandatory properties - there must be a delegate.
+	 * Check mandatory properties - there must be a delegate and hibernateTemplate.
 	 * 
 	 * @see org.springframework.dao.support.DaoSupport#initDao()
 	 */
@@ -102,119 +94,30 @@ public class HibernateAwareItemWriter implements ItemWriter, InitializingBean {
 	}
 
 	/**
-	 * Use the delegate to actually do the writing, but flush aggressively if
-	 * the item was previously part of a failed chunk.
-	 * 
-	 * @throws Exception
-	 * 
-	 * @see org.springframework.batch.io.OutputSource#write(java.lang.Object)
+	 * Delegate to subclass and flush the hibernate session.
 	 */
-	public void write(Object output) throws Exception {
-		bindTransactionResources();
-		getProcessed().add(output);
-		delegate.write(output);
-		flushIfNecessary(output);
-	}
-
-	/**
-	 * Accessor for the list of processed items in this transaction.
-	 * 
-	 * @return the processed
-	 */
-	private Set getProcessed() {
-		Assert.state(TransactionSynchronizationManager.hasResource(ITEMS_PROCESSED),
-				"Processed items not bound to transaction.");
-		Set processed = (Set) TransactionSynchronizationManager.getResource(ITEMS_PROCESSED);
-		return processed;
-	}
-
-	/**
-	 * Set up the {@link RepeatContext} as a transaction resource.
-	 * 
-	 * @param context the context to set
-	 */
-	private void bindTransactionResources() {
-		if (TransactionSynchronizationManager.hasResource(ITEMS_PROCESSED)) {
-			return;
-		}
-		TransactionSynchronizationManager.bindResource(ITEMS_PROCESSED, new HashSet());
-	}
-
-	/**
-	 * Remove the transaction resource associated with this context.
-	 */
-	private void unbindTransactionResources() {
-		if (!TransactionSynchronizationManager.hasResource(ITEMS_PROCESSED)) {
-			return;
-		}
-		TransactionSynchronizationManager.unbindResource(ITEMS_PROCESSED);
-	}
-
-	/**
-	 * Accessor for the context property.
-	 * 
-	 * @param output
-	 * 
-	 * @return the context
-	 */
-	private void flushIfNecessary(Object output) throws Exception {
-		boolean flush;
-		synchronized (failed) {
-			flush = failed.contains(output);
-		}
-		if (flush) {
-			// Force early completion to commit aggressively if we encounter a
-			// failed item (from a failed chunk but we don't know which one was
-			// the problem).
-			RepeatSynchronizationManager.setCompleteOnly();
-			// Flush now, so that if there is a failure this record can be
-			// skipped.
-			doHibernateFlush();
-		}
-	}
-
-	/**
-	 * Flush the hibernate session from within a repeat context.
-	 */
-	private void doHibernateFlush() {
-		try {
-			hibernateTemplate.flush();
-			// This should happen when the transaction commits anyway, but to be
-			// sure...
-			hibernateTemplate.clear();
-		}
-		catch (RuntimeException e) {
-			synchronized (failed) {
-				failed.addAll(getProcessed());
-			}
-			// This used to contain a call to onError, however, I think this
-			// should be handled within the step.
-			throw e;
-		}
+	protected void doFlush() {
+		delegate.flush();
+		hibernateTemplate.flush();
+		// This should happen when the transaction commits anyway, but to be
+		// sure...
+		hibernateTemplate.clear();
 	}
 
 	/**
 	 * Call the delegate clear() method, and then clear the hibernate session.
-	 * 
-	 * @see org.springframework.batch.item.ItemWriter#clear()
 	 */
-	public void clear() throws ClearFailedException {
-		unbindTransactionResources();
-		hibernateTemplate.clear();
+	protected void doClear() throws ClearFailedException {
 		delegate.clear();
+		hibernateTemplate.clear();
 	}
 
-	/**
-	 * Flush the Hibernate session and record failures if there are any. The
-	 * delegate flush will also be called.
-	 * 
-	 * @see org.springframework.batch.item.ItemWriter#flush()
-	 */
-	public void flush() throws FlushFailedException {
-		bindTransactionResources();
-		doHibernateFlush();
-		unbindTransactionResources();
-		delegate.flush();
+	protected String getResourceKey() {
+		return ITEMS_PROCESSED;
+	}
+
+	protected void doWrite(Object output) throws Exception {
+		delegate.write(output);
 	}
 
 }

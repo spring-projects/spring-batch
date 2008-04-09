@@ -76,7 +76,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 				list.add(item);
 			}
 		});
-		TransactionSynchronizationManager.bindResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED, new HashSet(
+		TransactionSynchronizationManager.bindResource(writer.getResourceKey(), new HashSet(
 				Collections.singleton("spam")));
 		RepeatSynchronizationManager.register(context);
 	}
@@ -86,8 +86,8 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	protected void tearDown() throws Exception {
-		if (TransactionSynchronizationManager.hasResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED)) {
-			TransactionSynchronizationManager.unbindResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED);
+		if (TransactionSynchronizationManager.hasResource(writer.getResourceKey())) {
+			TransactionSynchronizationManager.unbindResource(writer.getResourceKey());
 		}
 		RepeatSynchronizationManager.clear();
 	}
@@ -125,9 +125,9 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	 * {@link org.springframework.batch.item.database.BatchSqlUpdateItemWriter#clear()}.
 	 */
 	public void testClear() {
-		assertTrue(TransactionSynchronizationManager.hasResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED));
+		assertTrue(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		writer.clear();
-		assertFalse(TransactionSynchronizationManager.hasResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED));
+		assertFalse(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 	}
 
 	/**
@@ -135,9 +135,9 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	 * {@link org.springframework.batch.item.database.BatchSqlUpdateItemWriter#flush()}.
 	 */
 	public void testFlush() {
-		assertTrue(TransactionSynchronizationManager.hasResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED));
+		assertTrue(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		writer.flush();
-		assertFalse(TransactionSynchronizationManager.hasResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED));
+		assertFalse(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		assertEquals(2, list.size());
 		assertTrue(list.contains("SQL"));
 	}
@@ -148,10 +148,10 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteAndFlush() throws Exception {
-		assertTrue(TransactionSynchronizationManager.hasResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED));
+		assertTrue(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		writer.write("bar");
 		writer.flush();
-		assertFalse(TransactionSynchronizationManager.hasResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED));
+		assertFalse(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		assertEquals(3, list.size());
 		assertTrue(list.contains("SQL"));
 	}
@@ -176,7 +176,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		catch (RuntimeException e) {
 			assertEquals("bar", e.getMessage());
 		}
-		assertFalse(TransactionSynchronizationManager.hasResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED));
+		assertFalse(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		assertEquals(2, list.size());
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter() {
 			public void setValues(Object item, PreparedStatement ps) throws SQLException {
@@ -197,7 +197,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	 */
 	public void testEmptyFlush() {
 		// items are bound on write, so we unbind them first
-		TransactionSynchronizationManager.unbindResource(BatchSqlUpdateItemWriter.ITEMS_PROCESSED);
+		TransactionSynchronizationManager.unbindResource(writer.getResourceKey());
 		writer.flush();
 	}
 

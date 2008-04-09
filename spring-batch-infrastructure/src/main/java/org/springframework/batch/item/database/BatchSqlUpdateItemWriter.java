@@ -17,21 +17,16 @@ package org.springframework.batch.item.database;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.PreparedStatementCallback;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
 /**
@@ -59,14 +54,12 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class BatchSqlUpdateItemWriter implements ItemWriter, InitializingBean {
+public class BatchSqlUpdateItemWriter extends AbstractTransactionalResourceItemWriter implements InitializingBean {
 
 	/**
 	 * Key for items processed in the current transaction {@link RepeatContext}.
 	 */
-	protected static final String ITEMS_PROCESSED = BatchSqlUpdateItemWriter.class.getName() + ".ITEMS_PROCESSED";
-
-	private Set failed = new HashSet();
+	private static final String ITEMS_PROCESSED = BatchSqlUpdateItemWriter.class.getName() + ".ITEMS_PROCESSED";
 
 	private JdbcOperations jdbcTemplate;
 
@@ -112,129 +105,38 @@ public class BatchSqlUpdateItemWriter implements ItemWriter, InitializingBean {
 	}
 
 	/**
-	 * Buffer the item in a transaction resource, but flush aggressively if the
-	 * item was previously part of a failed chunk.
-	 * 
-	 * @throws Exception
-	 * 
-	 * @see org.springframework.batch.io.OutputSource#write(java.lang.Object)
+	 * Create and execute batch prepared statement.
 	 */
-	public void write(Object output) throws Exception {
-		bindTransactionResources();
-		getProcessed().add(output);
-		flushIfNecessary(output);
-	}
-
-	/**
-	 * Accessor for the list of processed items in this transaction.
-	 * 
-	 * @return the processed
-	 */
-	private Set getProcessed() {
-		Set processed = (Set) TransactionSynchronizationManager.getResource(ITEMS_PROCESSED);
-		if (processed == null) {
-			processed = Collections.EMPTY_SET;
-		}
-		return processed;
-	}
-
-	/**
-	 * Set up the {@link RepeatContext} as a transaction resource.
-	 * 
-	 * @param context the context to set
-	 */
-	private void bindTransactionResources() {
-		if (TransactionSynchronizationManager.hasResource(ITEMS_PROCESSED)) {
-			return;
-		}
-		TransactionSynchronizationManager.bindResource(ITEMS_PROCESSED, new HashSet());
-	}
-
-	/**
-	 * Remove the transaction resource associated with this context.
-	 */
-	private void unbindTransactionResources() {
-		if (!TransactionSynchronizationManager.hasResource(ITEMS_PROCESSED)) {
-			return;
-		}
-		TransactionSynchronizationManager.unbindResource(ITEMS_PROCESSED);
-	}
-
-	/**
-	 * Accessor for the context property.
-	 * 
-	 * @param output
-	 * 
-	 * @return the context
-	 */
-	private void flushIfNecessary(Object output) throws Exception {
-		boolean flush;
-		synchronized (failed) {
-			flush = failed.contains(output);
-		}
-		if (flush) {
-			RepeatContext context = RepeatSynchronizationManager.getContext();
-			// Force early completion to commit aggressively if we encounter a
-			// failed item (from a failed chunk but we don't know which one was
-			// the problem).
-			context.setCompleteOnly();
-			// Flush now, so that if there is a failure this record can be
-			// skipped.
-			doFlush();
-		}
-	}
-
-	/**
-	 * Flush the hibernate session from within a repeat context.
-	 */
-	private void doFlush() {
+	protected void doFlush() {
 		final Set processed = getProcessed();
-		try {
-			if (!processed.isEmpty()) {
-				jdbcTemplate.execute(sql, new PreparedStatementCallback() {
-					public Object doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
-						for (Iterator iterator = processed.iterator(); iterator.hasNext();) {
-							Object item = (Object) iterator.next();
-							preparedStatementSetter.setValues(item, ps);
-							ps.addBatch();
-						}
-						return ps.executeBatch();
+		if (!processed.isEmpty()) {
+			jdbcTemplate.execute(sql, new PreparedStatementCallback() {
+				public Object doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
+					for (Iterator iterator = processed.iterator(); iterator.hasNext();) {
+						Object item = (Object) iterator.next();
+						preparedStatementSetter.setValues(item, ps);
+						ps.addBatch();
 					}
-				});
-			}
-		}
-		catch (RuntimeException e) {
-			synchronized (failed) {
-				failed.addAll(processed);
-			}
-			throw e;
-		}
-		finally {
-			getProcessed().clear();
+					return ps.executeBatch();
+				}
+			});
 		}
 	}
 
-	/**
-	 * Unbind transaction resources, effectively clearing the item buffer.
-	 * 
-	 * @see org.springframework.batch.item.ItemWriter#clear()
-	 */
-	public void clear() throws ClearFailedException {
-		unbindTransactionResources();
+	protected String getResourceKey() {
+		return ITEMS_PROCESSED;
 	}
 
 	/**
-	 * Flush the internal item buffer and record failures if there are any.
-	 * 
-	 * @see org.springframework.batch.item.ItemWriter#flush()
+	 * No-op.
 	 */
-	public void flush() throws FlushFailedException {
-		try {
-			doFlush();
-		}
-		finally {
-			unbindTransactionResources();
-		}
+	protected void doWrite(Object output) {
+	}
+	
+	/**
+	 * No-op.
+	 */
+	protected void doClear() throws ClearFailedException {
 	}
 
 }
