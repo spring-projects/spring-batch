@@ -52,6 +52,7 @@ import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.PropertiesConverter;
@@ -750,6 +751,22 @@ public class ItemOrientedStepTests extends TestCase {
 			assertTrue(stepExecution.getExecutionContext().getString("spam").equals("bucket"));
 		}
 	}
+	
+	public void testStepToCompletion() throws Exception {
+
+		RepeatTemplate template = new RepeatTemplate();
+
+		// process all items:
+		template.setCompletionPolicy(new DefaultResultCompletionPolicy());
+		itemOrientedStep.setStepOperations(template);
+
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep, jobExecutionContext);
+
+		itemOrientedStep.execute(stepExecution);
+		assertEquals(3, processed.size());
+		assertEquals(3, stepExecution.getItemCount().intValue());
+		}
 
 	/**
 	 * Exception in {@link StepExecutionListener#afterStep(StepExecution)}

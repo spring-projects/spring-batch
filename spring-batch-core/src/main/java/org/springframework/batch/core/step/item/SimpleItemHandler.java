@@ -89,6 +89,7 @@ public class SimpleItemHandler implements ItemHandler {
 	 * @param contribution current context
 	 */
 	protected void write(Object item, StepContribution contribution) throws Exception {
+		contribution.incrementItemCount();
 		doWrite(item);
 	}
 

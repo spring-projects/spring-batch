@@ -320,7 +320,6 @@ public class ItemOrientedStep extends AbstractStep {
 				// check for interruption before each item as well
 				interruptionPolicy.checkInterrupted(execution);
 				ExitStatus exitStatus = itemHandler.handle(contribution);
-				contribution.incrementItemCount();
 				// check for interruption after each item as well
 				interruptionPolicy.checkInterrupted(execution);
 				return exitStatus;
