@@ -27,7 +27,7 @@ public class UnexpectedJobExecutionException extends RuntimeException {
 	private static final long serialVersionUID = 8838982304219248527L;
 
 	/**
-	 * Constructs a new instance with a default error code of 1.
+	 * Constructs a new instance with a message.
 	 * 
 	 * @param msg the exception message.
 	 * 
@@ -37,7 +37,7 @@ public class UnexpectedJobExecutionException extends RuntimeException {
 	}
 
 	/**
-	 * Constructs a new instance with a default error code of 1.
+	 * Constructs a new instance with a message.
 	 * 
 	 * @param msg the exception message.
 	 * 
@@ -47,16 +47,16 @@ public class UnexpectedJobExecutionException extends RuntimeException {
 	}
 
 	/**
-	 * Constructs a new instance with a nested exception. The error code is
-	 * defaulted to 1 and the message is empty.
+	 * Constructs a new instance with a nested exception. The message is empty.
+	 * @deprecated use one of the other constructors
 	 */
 	public UnexpectedJobExecutionException(Throwable nested) {
 		super(nested);
 	}
 
 	/**
-	 * Constructs a new instance, the error code is defaulted to one and the
-	 * message is empty.
+	 * Constructs a new instance, the message is empty.
+	 * @deprecated use one of the other constructors
 	 */
 	public UnexpectedJobExecutionException() {
 		super();
