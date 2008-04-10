@@ -29,7 +29,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 
 	private SimpleJobRepository jobRepository;
 
-	private JobSupport job = new JobSupport("testJob");
+	private JobSupport job = new JobSupport("SimpleJobRepositoryIntegrationTestsJob");
 
 	private JobParameters jobParameters = new JobParameters();
 
