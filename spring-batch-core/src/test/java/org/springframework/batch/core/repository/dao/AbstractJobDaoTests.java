@@ -286,7 +286,7 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 	
 	public void testCreationAddsVersion() {
 		
-		jobInstance = jobInstanceDao.createJobInstance(new JobSupport("testVersion"), new JobParameters());
+		jobInstance = jobInstanceDao.createJobInstance(new JobSupport("testCreationAddsVersion"), new JobParameters());
 		
 		assertNotNull(jobInstance.getVersion());
 	}

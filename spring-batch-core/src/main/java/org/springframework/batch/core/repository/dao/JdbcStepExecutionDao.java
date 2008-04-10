@@ -110,8 +110,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					executionContext.put(key, rs.getObject("OBJECT_VAL"));
 				}
 				else {
-					throw new UnexpectedJobExecutionException("Invalid type found: [" + typeCd + "] for execution id: ["
-							+ executionId + "]");
+					throw new UnexpectedJobExecutionException("Invalid type found: [" + typeCd
+							+ "] for execution id: [" + executionId + "]");
 				}
 			}
 		};
@@ -171,6 +171,11 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 * @see StepDao#saveStepExecution(StepExecution)
 	 */
 	public void saveStepExecution(StepExecution stepExecution) {
+
+		Assert.isNull(stepExecution.getId(),
+				"to-be-saved (not updated) StepExecution can't already have an id assigned");
+		Assert.isNull(stepExecution.getVersion(),
+				"to-be-saved (not updated) StepExecution can't already have a version assigned");
 
 		validateStepExecution(stepExecution);
 
@@ -324,11 +329,11 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
-				int curentVersion = getJdbcTemplate().queryForInt(
-						getQuery(CURRENT_VERSION_STEP_EXECUTION),
+				int curentVersion = getJdbcTemplate().queryForInt(getQuery(CURRENT_VERSION_STEP_EXECUTION),
 						new Object[] { stepExecution.getId() });
 				throw new OptimisticLockingFailureException("Attempt to update step execution id="
-						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion() + "), where current version is "+curentVersion);
+						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion()
+						+ "), where current version is " + curentVersion);
 			}
 
 			stepExecution.incrementVersion();
