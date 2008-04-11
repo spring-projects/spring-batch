@@ -234,7 +234,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		else if (e instanceof RuntimeException) {
 			throw (RuntimeException) e;
 		}
-		throw new UnexpectedJobExecutionException(e);
+		throw new UnexpectedJobExecutionException("Unexpected checked exception in step execution", e);
 	}
 
 	/**

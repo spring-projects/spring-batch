@@ -218,7 +218,7 @@ public class SimpleJob extends AbstractJob {
 			throw (Error) t;
 		}
 		else {
-			throw new UnexpectedJobExecutionException(t);
+			throw new UnexpectedJobExecutionException("Unexpected checked exception in job execution", t);
 		}
 	}
 
