@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item.file;
 
-import java.io.IOException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
@@ -254,9 +252,8 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	 * Setter for resource property. The location of an input stream that can be read.
 	 * 
 	 * @param resource
-	 * @throws IOException
 	 */
-	public void setResource(Resource resource) throws IOException {
+	public void setResource(Resource resource) {
 		this.resource = resource;
 		path = resource.toString();
 		if (path.length() > 50) {
