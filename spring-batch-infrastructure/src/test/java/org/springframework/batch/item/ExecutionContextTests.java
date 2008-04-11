@@ -40,8 +40,11 @@ public class ExecutionContextTests extends TestCase{
 		
 		assertEquals("testString1", context.getString("1"));
 		assertEquals("testString2", context.getString("2"));
+		assertEquals("defaultString", context.getString("5", "defaultString"));
 		assertEquals(4.4, context.getDouble("4"), 0);
+		assertEquals(5.5, context.getDouble("5", 5.5), 0);
 		assertEquals(3, context.getLong("3"));
+		assertEquals(5, context.getLong("5", 5));
 	}
 	
 	public void testInvalidCast(){

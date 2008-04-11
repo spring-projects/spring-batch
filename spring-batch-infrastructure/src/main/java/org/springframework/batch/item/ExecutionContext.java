@@ -127,6 +127,23 @@ public class ExecutionContext {
 
 		return (String) readAndValidate(key, String.class);
 	}
+	
+	/**
+	 * Typesafe Getter for the String represented by the provided key
+	 * with default value to return if key is not represented.
+	 * 
+	 * @param key The key to get a value for
+	 * @param defaultString Default to return if key is not represented
+	 * @return The <code>String</code> value if key is repreesnted,
+	 * specified default otherwise
+	 */
+	public String getString(String key, String defaultString) {
+		if(!map.containsKey(key)) {
+			return defaultString;
+		}
+		
+		return (String) readAndValidate(key, String.class);
+	}
 
 	/**
 	 * Typesafe Getter for the Long represented by the provided key.
@@ -138,6 +155,23 @@ public class ExecutionContext {
 
 		return ((Long) readAndValidate(key, Long.class)).longValue();
 	}
+	
+	/**
+	 * Typesafe Getter for the Long represented by the provided key
+	 * with default value to return if key is not represented.
+	 * 
+	 * @param key The key to get a value for
+	 * @param defaultLong Default to return if key is not represented
+	 * @return The <code>long</code> value if key is represented,
+	 * specified default otherwise
+	 */
+	public long getLong(String key, long defaultLong) {
+		if(!map.containsKey(key)) {
+			return defaultLong;
+		}
+		
+		return ((Long) readAndValidate(key, Long.class)).longValue();
+	}
 
 	/**
 	 * Typesafe Getter for the Double represented by the provided key.
@@ -146,6 +180,23 @@ public class ExecutionContext {
 	 * @return The <code>Double</code> value
 	 */
 	public double getDouble(String key) {
+		return ((Double) readAndValidate(key, Double.class)).doubleValue();
+	}
+	
+	/**
+	 * Typesafe Getter for the Double represented by the provided key
+	 * with default value to return if key is not represented.
+	 * 
+	 * @param key The key to get a value for
+	 * @param defaultDouble Default to return if key is not represented
+	 * @return The <code>double</code> value if key is represented, 
+	 * specified default otherwise
+	 */
+	public double getDouble(String key, double defaultDouble) {
+		if(!map.containsKey(key)) {
+			return defaultDouble;
+		}
+		
 		return ((Double) readAndValidate(key, Double.class)).doubleValue();
 	}
 
