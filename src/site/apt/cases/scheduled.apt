@@ -1,7 +1,7 @@
                                     ------
                                     Scheduler Managed Use Case
                                     ------
-                                    Wayne Lund
+                                    Wayne Lund, Dave Syer
                                     ------
                                     May 2007
 
@@ -14,10 +14,17 @@ Use Case: Scheduler Managed Processing
 
 * Scope
 
-  * Batch jobs tends to run within carefully planned job stream schedules.  At a minimum this requires
-  an integration between the Batch Launcher (in the abstract) and the scheduler's control mechanism to 
-  start and stop batch jobs and then to understand the results of the batch job execution 
-  (e.g. COMPLETED, ABENDED, etc.) so that subsequent actions may be taken.  
+  * Batch jobs tends to run within carefully planned job stream
+  schedules.  At a minimum this requires an integration between the
+  Batch Launcher (in the abstract) and the scheduler's control
+  mechanism to start and stop batch jobs and then to understand the
+  results of the batch job execution (e.g. COMPLETED, ABENDED, etc.)
+  so that subsequent actions may be taken.
+
+  * Spring Batch does not aim to implement the scheduling concerns as
+  such (other tools are available for that).  The framework, does need
+  to provide the information that such tools need to decide when to
+  act and what to do (e.g. exit code mapping).
 
 * Preconditions
 
@@ -32,3 +39,4 @@ Use Case: Scheduler Managed Processing
   * Batch Jobs are launched and managed by scheduler
 
 * Description
+

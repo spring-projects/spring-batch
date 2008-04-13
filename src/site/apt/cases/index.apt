@@ -26,7 +26,10 @@ Use Cases for Spring Batch
     
     * {{{file-to-file.html}Copy File to File in a Batch}}
 
-    * {{{parallel.html}Massively Parallel Batch Processing}}
+    * {{{parallel.html}Massively Parallel Batch Processing}}.  Spring
+    Batch 1.0 does not contain any implementations of this use case,
+    but it is quite feasible to implement them using the framework as
+    a starting point.
 
     * {{{restart.html}Manual Restart After Failure}}
 
@@ -42,7 +45,11 @@ Use Cases for Spring Batch
     chunk it (e.g. if it is now in a form for which chunk failure is
     easier to deal with).
     
-    * {{{scheduled.html}Scheduled Processing}}: Batch Jobs controlled by scheduler (e.g. start, stop, suspend, kill)
+    * {{{scheduled.html}Scheduled Processing}}: Batch Jobs controlled
+    by scheduler (e.g. start, stop, suspend, kill).  Spring Batch does
+    not intend to implement the scheduler concerns, but needs
+    toprovide enough information that a scheduler can act
+    appropriately.
     
 
 * Actors

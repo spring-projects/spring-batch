@@ -24,8 +24,8 @@ Use Case: Massively Parallel Batch Processing
 
   * The initial implementation might concentrate on multiple threads
   in a single process.  Ultimately we need to be able to support
-  multiple processes each one running in an application server (so
-  that jobs that require EJBs can be used).
+  multiple processes each one running in an application server
+  (e.g. so that jobs that require EJBs can be used).
 
 * Preconditions
 
@@ -95,17 +95,42 @@ Use Case: Massively Parallel Batch Processing
 
 * Implementation
 
-  * The hard thing about this use case is the partitioning of input
-  (and output) sources.  This has to be done in such a way that the
-  individual operations are unaware that they are participating in a
-  batch farm.  Partitioning has to be at least partially deterministic
-  because restarts have to be able to ignore data that have already
-  been processed successfully.
+  * There are actually two approaches to this problem, which are
+  largely complementary.  
+
+    [[1]] The <Chunking> model dynamically assigned chunks of items to
+    be processed and sends them to durable middleware.  Worker
+    processes pick them up and process them, sending back a message
+    about the status.  This approach works best if the dispatching is
+    efficient compared to the processing.
+
+    [[1]] The <Partitioning> approach is more like running multiple
+    jobs in parallel, with input data partitioned into larger pieces,
+    and not split any further by the dispatcher.  The item reading
+    happens in the worker processes.  This approach is necessary if
+    the dispatcher in the <Chunking> model becomes a bottle neck.
+
+  Generally, chunking is easier to implement than partitioning, but
+  there are tools available for implementing both patterns
+  efficiently.
+
+** Chunking
+
+  
+
+** Partitioning
+
+  The hard thing about this use case is the partitioning of input (and
+  output) sources.  Ideally, this has to be done in such a way that
+  the individual operations are unaware that they are participating in
+  a batch farm.  Partitioning has to be at least partially
+  deterministic because restarts have to be able to ignore data that
+  have already been processed successfully.
 
   Consider two examples: a file input source and a JDBC (SQL query)
   based input source.  Each provides its own challenges.
 
-** File Data Source Partitioning
+*** File Data Source Partitioning
 
   * If each node reads the whole file there could be a performance
   issue.  They would all need to have instructions about which lines
@@ -169,7 +194,7 @@ batchTemplate.iterate(new ItemProviderRepeatCallback(provider, processor));
 
 +---  
 
-** SQL Data Source Partitioning
+*** SQL Data Source Partitioning
 
   * If each node is allowed to do its own query or queries to
   determine the input data:
@@ -232,8 +257,8 @@ batchTemplate.iterate(new ItemProviderRepeatCallback(provider, processor));
   It would be an error to run a batch in parallel if the partition
   query had not been provided.
 
-  * What happens if the data source changes between a batch and
-  restart?  We can't legislate for that because it is outside the
+  * What happens if the data source changes between failed execution
+  and restart?  We can't legislate for that because it is outside the
   realm of what can be controlled through a transaction.  A restart
   might produce different results than the original failed batch would
   have done were it successful.
