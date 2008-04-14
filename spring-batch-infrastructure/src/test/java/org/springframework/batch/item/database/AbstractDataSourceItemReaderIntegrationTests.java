@@ -54,7 +54,8 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 	 */
 	public void testNormalProcessing() throws Exception {
 		getAsInitializingBean(reader).afterPropertiesSet();
-
+		getAsItemStream(reader).open(executionContext);
+		
 		Foo foo1 = (Foo) reader.read();
 		assertEquals(1, foo1.getValue());
 
@@ -116,6 +117,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 
 		// create new input source
 		reader = createItemReader();
+		getAsItemStream(reader).open(new ExecutionContext());
 
 		Foo foo = (Foo) reader.read();
 		assertEquals(1, foo.getValue());
@@ -134,7 +136,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 	 * @throws Exception
 	 */
 	public void testRestoreFromEmptyData() throws Exception {
-		getAsItemStream(reader).update(executionContext);
+		getAsItemStream(reader).open(executionContext);
 
 		Foo foo = (Foo) reader.read();
 		assertEquals(1, foo.getValue());
@@ -145,6 +147,8 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 	 * @throws Exception
 	 */
 	public void testRollback() throws Exception {
+		getAsItemStream(reader).open(executionContext);
+		
 		Foo foo1 = (Foo) reader.read();
 
 		commit();

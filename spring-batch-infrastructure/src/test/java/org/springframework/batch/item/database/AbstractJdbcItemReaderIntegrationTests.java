@@ -105,6 +105,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 
 		// create new input source
 		itemReader = createItemReader();
+		getAsItemStream(itemReader).open(new ExecutionContext());
 
 		Foo foo = (Foo) itemReader.read();
 		assertEquals(1, foo.getValue());
@@ -134,6 +135,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 	 * @throws Exception 
 	 */
 	public void testRollback() throws Exception {
+		getAsItemStream(itemReader).open(executionContext);
 		Foo foo1 = (Foo) itemReader.read();
 
 		commit();

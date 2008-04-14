@@ -44,6 +44,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	 */
 	public void testNormalProcessing() throws Exception {
 		getAsInitializingBean(itemReader).afterPropertiesSet();
+		getAsItemStream(itemReader).open(new ExecutionContext());
 
 		Foo foo1 = (Foo) itemReader.read();
 		assertEquals(1, foo1.getValue());
@@ -109,6 +110,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 
 		// create new input source
 		itemReader = createItemReader();
+		getAsItemStream(itemReader).open(new ExecutionContext());
 
 		Foo foo = (Foo) itemReader.read();
 		assertEquals(1, foo.getValue());
@@ -140,6 +142,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	 * @throws Exception 
 	 */
 	public void testRollback() throws Exception {
+		getAsItemStream(itemReader).open(new ExecutionContext());
 		Foo foo1 = (Foo) itemReader.read();
 
 		commit();

@@ -102,9 +102,6 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean,
 	 * null otherwise.
 	 */
 	public Object read() {
-		if (!initialized) {
-			open(new ExecutionContext());
-		}
 
 		if (keysIterator.hasNext()) {
 			currentIndex++;

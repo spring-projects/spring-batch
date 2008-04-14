@@ -4,6 +4,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -56,6 +57,7 @@ public class HibernateCursorProjectionItemReaderIntegrationTests extends Abstrac
 
 	public void testNormalProcessing() throws Exception {	
 		((InitializingBean) reader).afterPropertiesSet();
+		((ItemStream) reader).open(new ExecutionContext());
 		Object[] foo1 = (Object[]) reader.read();
 		assertEquals(new Integer(1), foo1[0]);
 	}

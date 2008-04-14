@@ -10,6 +10,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
@@ -48,7 +49,7 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests extends
 	}
 	
 	public void testRead() throws Exception{
-		
+		itemReader.open(new ExecutionContext());
 		Foo foo = (Foo)itemReader.read();
 		assertEquals(2, foo.getId());
 		foo = (Foo)itemReader.read();

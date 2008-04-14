@@ -151,6 +151,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource, "DataSOurce must be provided");
 		Assert.notNull(sql, "The SQL query must be provided");
+		Assert.notNull(mapper, "RowMapper must be provided");
 	}
 
 	/**
@@ -173,12 +174,6 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	 * @throws IllegalStateExceptino if mapper is null.
 	 */
 	public Object read() throws Exception{
-
-		if (!initialized) {
-			open(new ExecutionContext());
-		}
-
-		Assert.state(mapper != null, "Mapper must not be null.");
 
 		return bufferredReader.read();
 	}

@@ -76,9 +76,7 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	}
 
 	public Object read() {
-		if (!initialized) {
-			open(new ExecutionContext());
-		}
+		
 		if (cursor.next()) {
 			currentProcessedRow++;
 			Object[] data = cursor.get();
