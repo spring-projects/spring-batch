@@ -16,43 +16,64 @@
 
 package org.springframework.batch.item.validator;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.FieldError;
+import org.springframework.validation.Errors;
 
 /**
- * Adapter for the spring validator interface.
+ * Adapts the {@link org.springframework.validation.Validator} interface to
+ * {@link org.springframework.batch.item.validator.Validator}.
  * 
- * @see Validator
+ * @author Tomas Slanina
+ * @author Robert Kasanicky
  */
-public class SpringValidator implements Validator {
-	private static final Log log = LogFactory.getLog(SpringValidator.class);
+public class SpringValidator implements Validator, InitializingBean {
 
 	private org.springframework.validation.Validator validator;
 
 	/**
 	 * @see Validator#validate(Object)
 	 */
-	public void validate(Object value) throws ValidationException {
-		if (validator == null) {
-			throw new ValidationException("Validator not specified.");
+	public void validate(Object item) throws ValidationException {
+
+		if (!validator.supports(item.getClass())) {
+			throw new ValidationException("Validation failed for " + item + ": " + item.getClass().getName()
+					+ " class is not supported by validator.");
 		}
 
-		BeanPropertyBindingResult errors = new BeanPropertyBindingResult(value, "object");
+		BeanPropertyBindingResult errors = new BeanPropertyBindingResult(item, "item");
 
-		if (validator.supports(value.getClass())) {
-			validator.validate(value, errors);
-		}
-		else {
-			throw new ValidationException(value.getClass() + " is not supported by validator.");
-		}
+		validator.validate(item, errors);
 
 		if (errors.hasErrors()) {
-			log.debug(errors);
-			throw new ValidationException("SpringValidator >> validation failed on: " + getInvalidColumnNames(errors));
+			throw new ValidationException("Validation failed for " + item + ": " + errorsToString(errors));
+		}
+	}
+
+	/**
+	 * @return string of field errors followed by global errors.
+	 */
+	private String errorsToString(Errors errors) {
+		StringBuilder builder = new StringBuilder();
+
+		appendCollection(errors.getFieldErrors(), builder);
+		appendCollection(errors.getGlobalErrors(), builder);
+
+		return builder.toString();
+	}
+
+	/**
+	 * Append the string representation of elements of the collection (separated
+	 * by new lines) to the given StringBuilder.
+	 */
+	private void appendCollection(Collection collection, StringBuilder builder) {
+		for (Iterator iterator = collection.iterator(); iterator.hasNext();) {
+			builder.append("\n");
+			builder.append(iterator.next().toString());
 		}
 	}
 
@@ -60,18 +81,8 @@ public class SpringValidator implements Validator {
 		this.validator = validator;
 	}
 
-	private String getInvalidColumnNames(BeanPropertyBindingResult errors) {
-		StringBuffer stringBuffer = new StringBuffer();
-		List list = errors.getFieldErrors();
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(validator, "validator must be set");
 
-		for (int i = 0; i < list.size(); i++) {
-			if (i > 0) {
-				stringBuffer.append(", ");
-			}
-
-			stringBuffer.append(((FieldError) list.get(i)).getField());
-		}
-
-		return stringBuffer.toString();
 	}
 }

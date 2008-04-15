@@ -21,10 +21,14 @@ import junit.framework.TestCase;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+/**
+ * Tests for {@link SpringValidator}.
+ */
 public class SpringValidatorTests extends TestCase {
-	private SpringValidator validator = new SpringValidator();
 
-	private Validator mockValidator;
+	SpringValidator validator = new SpringValidator();
+
+	Validator mockValidator;
 
 	protected void setUp() throws Exception {
 		mockValidator = new MockSpringValidator();
@@ -34,15 +38,16 @@ public class SpringValidatorTests extends TestCase {
 	/**
 	 * Validator property is not set
 	 */
-	public void testValidateNullValidator() {
+	public void testNullValidator() throws Exception {
+
 		validator.setValidator(null);
 
 		try {
-			validator.validate(MockSpringValidator.ACCEPT_VALUE);
-			fail("must not validate with null validator");
+			validator.afterPropertiesSet();
+			fail("null validator must cause exception");
 		}
-		catch (ValidationException expected) {
-			assertTrue(true);
+		catch (IllegalArgumentException e) {
+			// expected
 		}
 	}
 
@@ -60,33 +65,29 @@ public class SpringValidatorTests extends TestCase {
 	}
 
 	/**
-	 * Typical successful validation
+	 * Typical successful validation - no exception is thrown.
 	 */
 	public void testValidateSuccessfully() {
-		try {
-			validator.validate(MockSpringValidator.ACCEPT_VALUE);
-			assertTrue(true);
-		}
-		catch (ValidationException unexpected) {
-			throw unexpected;
-		}
+		validator.validate(MockSpringValidator.ACCEPT_VALUE);
+		assertTrue(true);
 	}
 
 	/**
-	 * Typical failed validation
+	 * Typical failed validation - {@link ValidationException} is thrown
 	 */
 	public void testValidateFailure() {
 		try {
 			validator.validate(MockSpringValidator.REJECT_VALUE);
 			fail("exception should have been thrown on invalid value");
 		}
-		catch (ValidationException expected) {
-			assertTrue(true);
+		catch (ValidationException e) {
+			// expected
 		}
 	}
-	
+
 	/**
-	 * Typical failed validation
+	 * Typical failed validation - message contains the item and names of
+	 * invalid fields.
 	 */
 	public void testValidateFailureWithFields() {
 		try {
@@ -94,10 +95,14 @@ public class SpringValidatorTests extends TestCase {
 			fail("exception should have been thrown on invalid value");
 		}
 		catch (ValidationException expected) {
-			assertTrue("Wonrg message: "+expected.getMessage(), expected.getMessage().indexOf("foo, bar")>=0);
+//			System.out.println(expected.getMessage());
+			assertTrue("message should contain the item#toString() value", expected.getMessage().contains(
+					"TestBeanToString"));
+			assertTrue("message should contain names of the invalid fields", expected.getMessage().contains("foo"));
+			assertTrue("message should contain names of the invalid fields", expected.getMessage().contains("bar"));
 		}
 	}
-	
+
 	static class MockSpringValidator implements Validator {
 		public static final TestBean ACCEPT_VALUE = new TestBean();
 
@@ -125,24 +130,33 @@ public class SpringValidatorTests extends TestCase {
 			}
 		}
 	}
-	
+
 	static class TestBean {
 		private String foo;
+
 		private String bar;
+
 		public String getFoo() {
 			return foo;
 		}
+
 		public String getBar() {
 			return bar;
 		}
+
 		public TestBean() {
 			super();
 		}
+
 		public TestBean(String foo, String bar) {
 			this();
 			this.foo = foo;
 			this.bar = bar;
 		}
-		
+
+		public String toString() {
+			return "TestBeanToString";
+		}
+
 	}
 }
