@@ -291,9 +291,9 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 	 * Delegates to the proxied Resource.
 	 */
 	public String toString() {
+		Assert.state(delegate != null, "The delegate resource has not been initialised. "
+				+ "Remember to register this object as a StepListener.");
 		return delegate.toString();
 	}
-	
-	
 
 }

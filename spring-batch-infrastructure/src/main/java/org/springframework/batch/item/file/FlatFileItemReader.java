@@ -72,8 +72,6 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 
 	private Resource resource;
 
-	private String path;
-
 	private RecordSeparatorPolicy recordSeparatorPolicy;
 
 	private String[] comments;
@@ -181,7 +179,7 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 			} catch (RuntimeException ex) {
 				// add current line count to message and re-throw
 				int lineCount = getReader().getPosition();
-				throw new FlatFileParseException("Parsing error at line: " + lineCount + " in resource=" + path
+				throw new FlatFileParseException("Parsing error at line: " + lineCount + " in resource=" + resource.getDescription()
 				        + ", input=[" + line + "]", ex, line, lineCount);
 			}
 		}
@@ -255,10 +253,6 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	 */
 	public void setResource(Resource resource) {
 		this.resource = resource;
-		path = resource.toString();
-		if (path.length() > 50) {
-			path = path.substring(0, 20) + "..." + path.substring(path.length());
-		}
 	}
 
 	/**
