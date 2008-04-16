@@ -133,6 +133,16 @@ public class StepExecutionResourceProxyTests extends TestCase {
 		resource.beforeStep(stepExecution);
 		assertEquals("to-string-test-resource", resource.toString());
 	}
+	
+	/**
+	 * If delegate is not set toString returns the filePattern.
+	 */
+	public void testToStringWithNullDelegate() {
+		resource = new StepExecutionResourceProxy();
+		String filePattern = "arbitrary pattern";
+		resource.setFilePattern("arbitrary pattern");
+		assertEquals(filePattern, resource.toString());
+	}
 
 	private void doTestPathName(String filename, String path) throws Exception, IOException {
 		String returnedPath = resource.getFile().getAbsolutePath();
