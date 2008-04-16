@@ -1,9 +1,8 @@
 package org.springframework.batch.item;
 
-import org.springframework.batch.item.sample.Foo;
-import org.springframework.util.Assert;
-
 import junit.framework.TestCase;
+
+import org.springframework.batch.item.sample.Foo;
 
 /**
  * Common tests for {@link ItemReader} implementations. Expected input is five
@@ -50,18 +49,33 @@ public abstract class CommonItemReaderTests extends TestCase {
 	 */
 	public void testReset() throws Exception {
 		Foo foo1 = (Foo) tested.read();
-
+		assertEquals(1, foo1.getValue());
+		
 		tested.mark();
 
 		Foo foo2 = (Foo) tested.read();
-		Assert.state(!foo2.equals(foo1));
+		assertEquals(2, foo2.getValue());
 
 		Foo foo3 = (Foo) tested.read();
-		Assert.state(!foo2.equals(foo3));
+		assertEquals(3, foo3.getValue());
 
 		tested.reset();
 
 		assertEquals(foo2, tested.read());
+		
+		assertEquals(foo3, tested.read());
+		
+
+		Foo foo4 = (Foo) tested.read();
+		assertEquals(4, foo4.getValue());
+		
+		tested.mark();
+		
+		Foo foo5 = (Foo) tested.read();
+		assertEquals(5, foo5.getValue());
+		
+		assertNull(tested.read());
+		
 	}
 
 }

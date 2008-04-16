@@ -460,9 +460,9 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		public Object read() throws Exception, UnexpectedInputException,
 			NoWorkFoundException, ParseException {
 			
-			
-			if(buffer.size() > currentIndex){
-				currentIndex++;
+			currentIndex++;
+			// if the incremented index reaches out of the buffer, add next item from result set to buffer
+			if(buffer.size() == currentIndex){
 				try{
 					if(!rs.next()){
 						return null;
