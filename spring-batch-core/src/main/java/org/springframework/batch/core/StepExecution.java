@@ -24,11 +24,10 @@ import org.springframework.util.Assert;
 
 /**
  * Batch domain object representation the execution of a step. Unlike
- * JobExecution, there are four additional properties: luwCount, commitCount,
- * rollbackCount and statistics. These values represent how many times a step
- * has iterated through logical units of work, how many times it has been
- * committed, and any other statistics the developer wishes to store,
- * respectively.
+ * JobExecution, there are four additional properties: itemCount, commitCount,
+ * rollbackCount and execution context. These values represent how many items
+ * the step has processed, how many times it has been committed and rolled back,
+ * and any other information the developer wishes to store, respectively.
  * 
  * @author Lucas Ward
  * @author Dave Syer
@@ -146,18 +145,18 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Returns the current number of tasks for this execution
+	 * Returns the current number of items processed for this execution
 	 * 
-	 * @return the current number of tasks for this execution
+	 * @return the current number of items processed for this execution
 	 */
 	public Integer getItemCount() {
 		return new Integer(itemCount);
 	}
 
 	/**
-	 * Sets the current number of tasks for this execution
+	 * Sets the current number of processed items for this execution
 	 * 
-	 * @param itemCount the current number of tasks for this execution
+	 * @param itemCount the current number of processed items for this execution
 	 */
 	public void setItemCount(int itemCount) {
 		this.itemCount = itemCount;
@@ -310,8 +309,7 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * On unsuccessful execution after a chunk has rolled back. Synchronizes
-	 * access to the {@link StepExecution} so that changes are atomic.
+	 * On unsuccessful execution after a chunk has rolled back.
 	 */
 	public synchronized void rollback() {
 		rollbackCount++;
@@ -335,7 +333,7 @@ public class StepExecution extends Entity {
 	public int getSkipCount() {
 		return skipCount;
 	}
-	
+
 	public void incrementSkipCountBy(int count) {
 		skipCount += count;
 	}
