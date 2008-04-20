@@ -531,7 +531,7 @@
 			<dependency>
 				<groupId>org.springframework.ws</groupId>
 				<artifactId>spring-oxm</artifactId>
-				<version>1.0.3</version>
+				<version>1.0.4</version>
 				<optional>true</optional>
 				<exclusions>
 					<exclusion>
