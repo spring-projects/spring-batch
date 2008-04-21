@@ -28,11 +28,11 @@ import org.springframework.util.Assert;
 /**
  * <p>
  * Convenience class for driving query input sources. Input Sources of this type
- * use a 'driving query' to return back a list of keys.  A key can be defined
- * as anything that can uniquely identify a record so that a more detailed
- * record can be retrieved for each object.  This allows a much smaller footprint
- * to be stored in memory for processing.  The following 'Customer' example table
- * will help illustrate this:
+ * use a 'driving query' to return back a list of keys. A key can be defined as
+ * anything that can uniquely identify a record so that a more detailed record
+ * can be retrieved for each object. This allows a much smaller footprint to be
+ * stored in memory for processing. The following 'Customer' example table will
+ * help illustrate this:
  * 
  * <pre>
  * CREATE TABLE CUSTOMER (
@@ -42,12 +42,14 @@ import org.springframework.util.Assert;
  * );
  * </pre>
  * 
- * <p>A cursor based solution would simply open up a cursor over ID, NAME, and CREDIT,
- * and move it from one to the next.  This can cause issues on databases with 
- * pessimistic locking strategies.  A 'driving query' approach would be to
+ * <p>
+ * A cursor based solution would simply open up a cursor over ID, NAME, and
+ * CREDIT, and move it from one to the next. This can cause issues on databases
+ * with pessimistic locking strategies. A 'driving query' approach would be to
  * return only the ID of the customer, then use a separate DAO to retrieve the
- * name and credit for each ID.  This means that there will be a call to a 
- * separate DAO for each call to {@link ItemReader#read()}.</p>
+ * name and credit for each ID. This means that there will be a call to a
+ * separate DAO for each call to {@link ItemReader#read()}.
+ * </p>
  * 
  * <p>
  * Mutability: Because this base class cannot guarantee that the keys returned
@@ -62,8 +64,7 @@ import org.springframework.util.Assert;
  * 
  * @author Lucas Ward
  */
-public class DrivingQueryItemReader implements ItemReader, InitializingBean,
-		ItemStream {
+public class DrivingQueryItemReader implements ItemReader, InitializingBean, ItemStream {
 
 	private boolean initialized = false;
 
@@ -76,7 +77,7 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean,
 	private int lastCommitIndex = 0;
 
 	private KeyCollector keyGenerator;
-	
+
 	private boolean saveState = false;
 
 	public DrivingQueryItemReader() {
@@ -113,13 +114,13 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean,
 
 	/**
 	 * Get the current key. This method will return the same object returned by
-	 * the last read() method. If the ItemReader hasn't been initialized yet,
-	 * then null will be returned.
+	 * the last read() method. If no items have been read yet the ItemReader
+	 * yet, then null will be returned.
 	 * 
 	 * @return the current key.
 	 */
 	protected Object getCurrentKey() {
-		if (initialized) {
+		if (initialized && currentIndex > 0) {
 			return keys.get(currentIndex - 1);
 		}
 
@@ -152,7 +153,7 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean,
 		Assert.state(keys == null && !initialized, "Cannot open an already opened input source"
 				+ ", call close() first.");
 		keys = keyGenerator.retrieveKeys(executionContext);
-		if(keys == null || keys.size() == 0){
+		if (keys == null || keys.size() == 0) {
 			throw new NoWorkFoundException("KeyGenerator must return at least 1 key");
 		}
 		keysIterator = keys.listIterator();
@@ -160,9 +161,9 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean,
 	}
 
 	public void update(ExecutionContext executionContext) {
-		if(saveState){
+		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			if(getCurrentKey() != null){
+			if (getCurrentKey() != null) {
 				keyGenerator.updateContext(getCurrentKey(), executionContext);
 			}
 		}
