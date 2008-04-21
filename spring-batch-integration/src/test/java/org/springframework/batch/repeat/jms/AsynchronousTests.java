@@ -25,15 +25,18 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.springframework.batch.container.jms.BatchMessageListenerContainer;
+import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+import org.springframework.util.ClassUtils;
 
 public class AsynchronousTests extends AbstractDependencyInjectionSpringContextTests {
 
 	protected String[] getConfigLocations() {
-		return new String[] { "/org/springframework/batch/jms/jms-context.xml" };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class,
+				"jms-context.xml") };
 	}
 
 	private BatchMessageListenerContainer container;

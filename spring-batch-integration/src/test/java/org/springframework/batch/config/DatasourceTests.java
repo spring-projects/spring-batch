@@ -16,12 +16,14 @@
 
 package org.springframework.batch.config;
 
+import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.util.ClassUtils;
 
 public class DatasourceTests extends AbstractTransactionalDataSourceSpringContextTests {
 
 	protected String[] getConfigLocations() {
-		return new String[] { "/org/springframework/batch/jms/jms-context.xml" };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class, "jms-context.xml") };
 	}
 
 	public void testTemplate() throws Exception {

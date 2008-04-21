@@ -19,8 +19,10 @@ package org.springframework.batch.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+import org.springframework.util.ClassUtils;
 
 public class MessagingTests extends AbstractDependencyInjectionSpringContextTests {
 
@@ -31,7 +33,8 @@ public class MessagingTests extends AbstractDependencyInjectionSpringContextTest
 	}
 
 	protected String[] getConfigLocations() {
-		return new String[] { "/org/springframework/batch/jms/jms-context.xml" };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class,
+				"jms-context.xml") };
 	}
 
 	protected void onSetUp() throws Exception {

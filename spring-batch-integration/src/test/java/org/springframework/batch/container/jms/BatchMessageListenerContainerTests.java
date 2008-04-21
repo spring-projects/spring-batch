@@ -125,8 +125,13 @@ public class BatchMessageListenerContainerTests extends TestCase {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
 		container.setSessionTransacted(true);
-		boolean received = doTestWithException(new IllegalStateException("No way!"), true, 2);
-		assertFalse("Message received", received);
+		try {
+			boolean received = doTestWithException(new IllegalStateException("No way!"), true, 2);
+			assertFalse("Message received", received);
+			fail("Expected IllegalStateException");
+		} catch (IllegalStateException e) {
+			assertEquals("No way!", e.getMessage());
+		}
 	}
 
 	public void testNonTransactionalReceiveAndExecuteWithCallbackThrowingException() throws Exception {

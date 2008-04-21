@@ -23,6 +23,7 @@ import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Session;
 
+import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -33,6 +34,7 @@ import org.springframework.jms.core.SessionCallback;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.ClassUtils;
 
 public class SynchronousTests extends AbstractTransactionalDataSourceSpringContextTests {
 
@@ -49,7 +51,8 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 	}
 
 	protected String[] getConfigLocations() {
-		return new String[] { "/org/springframework/batch/jms/jms-context.xml" };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class,
+				"jms-context.xml") };
 	}
 
 	protected void onSetUpBeforeTransaction() throws Exception {
@@ -85,7 +88,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-				        new Integer(list.size()), text });
+						new Integer(list.size()), text });
 				return new ExitStatus(text != null);
 			}
 		});
@@ -116,7 +119,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-				        new Integer(list.size()), text });
+						new Integer(list.size()), text });
 				return new ExitStatus(text != null);
 			}
 		});
@@ -146,7 +149,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		// The JmsTemplate is used elsewhere outside a transaction, so
 		// we need to use one here that is transaction aware.
 		final JmsTemplate jmsTemplate = new JmsTemplate((ConnectionFactory) applicationContext
-		        .getBean("txAwareConnectionFactory"));
+				.getBean("txAwareConnectionFactory"));
 		jmsTemplate.setReceiveTimeout(100L);
 		jmsTemplate.setSessionTransacted(true);
 
@@ -156,7 +159,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-				        new Integer(list.size()), text });
+						new Integer(list.size()), text });
 				return new ExitStatus(text != null);
 			}
 		});
@@ -170,9 +173,11 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 						try {
 							assertTrue("Not a SessionProxy - wrong spring version?", session instanceof SessionProxy);
 							((SessionProxy) session).getTargetSession().rollback();
-						} catch (JMSException e) {
+						}
+						catch (JMSException e) {
 							throw e;
-						} catch (Exception e) {
+						}
+						catch (Exception e) {
 							// swallow it
 							e.printStackTrace();
 						}

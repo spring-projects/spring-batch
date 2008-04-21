@@ -111,7 +111,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 	 * Extension point for subclasses. Do anything necessary to recover from the
 	 * exception, which was raised when the message was being processed.
 	 * @param session the current JMS session.
-	 * @param message the message just receieved and failed to process.
+	 * @param message the message just received and failed to process.
 	 * @param ex the exception thrown during message processing.
 	 */
 	protected void recover(Session session, Message message, Throwable ex) throws JMSException {
@@ -140,10 +140,34 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 		}
 		else if (ex instanceof Error) {
 			// Just re-throw Error instances because otherwise unit tests just
-			// swallow expections from EasyMock and JUnit.
+			// swallow exceptions from EasyMock and JUnit.
 			throw (Error) ex;
 		}
 	}
+	
+	/**
+	 * Override base class to prevent exceptions from being swallowed.
+	 * 
+	 * @see org.springframework.jms.listener.AbstractMessageListenerContainer#handleListenerException(java.lang.Throwable)
+	 */
+	protected void handleListenerException(Throwable ex) {
+		if (!isSessionTransacted()) {
+			// Log the exceptions in base class if not transactional anyway
+			super.handleListenerException(ex);
+			return;
+		}
+		logger.debug("Re-throwing exception in container.");
+		if (ex instanceof RuntimeException) {
+			// We need to re-throw so that an enclosing non-JMS transaction can
+			// rollback...
+			throw (RuntimeException) ex;
+		}
+		else if (ex instanceof Error) {
+			// Just re-throw Error instances because otherwise unit tests just
+			// swallow exceptions from EasyMock and JUnit.
+			throw (Error) ex;
+		}
+	}	
 
 	/**
 	 * Override base class method to wrap call in a batch.

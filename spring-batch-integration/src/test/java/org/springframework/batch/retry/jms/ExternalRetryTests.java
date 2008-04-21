@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
 import org.springframework.batch.retry.policy.ItemWriterRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
@@ -34,6 +35,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.ClassUtils;
 
 public class ExternalRetryTests extends AbstractDependencyInjectionSpringContextTests {
 
@@ -60,7 +62,8 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 	}
 
 	protected String[] getConfigLocations() {
-		return new String[] { "/org/springframework/batch/jms/jms-context.xml" };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class,
+				"jms-context.xml") };
 	}
 
 	protected void onSetUp() throws Exception {
@@ -93,7 +96,8 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 	private List recovered = new ArrayList();
 
 	/**
-	 * Message processing is successful on the second attempt but must receive the message again.
+	 * Message processing is successful on the second attempt but must receive
+	 * the message again.
 	 * 
 	 * @throws Exception
 	 */
@@ -106,7 +110,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		final AbstractItemWriter writer = new AbstractItemWriter() {
 			public void write(final Object text) {
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-				        new Integer(list.size()), text });
+						new Integer(list.size()), text });
 				if (list.size() == 1) {
 					throw new RuntimeException("Rollback!");
 				}
@@ -120,13 +124,15 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 					try {
 						ItemWriterRetryCallback callback = new ItemWriterRetryCallback(provider.read(), writer);
 						return retryTemplate.execute(callback);
-					} catch (Exception e) {
+					}
+					catch (Exception e) {
 						throw new RuntimeException(e.getMessage(), e);
 					}
 				}
 			});
 			fail("Expected Exception");
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 
 			assertEquals("Rollback!", e.getMessage());
 
@@ -140,7 +146,8 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 				try {
 					ItemWriterRetryCallback callback = new ItemWriterRetryCallback(provider.read(), writer);
 					return retryTemplate.execute(callback);
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					throw new RuntimeException(e.getMessage(), e);
 				}
 			}
@@ -170,7 +177,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		final ItemWriterRetryCallback callback = new ItemWriterRetryCallback(provider.read(), new AbstractItemWriter() {
 			public void write(final Object text) {
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-				        new Integer(list.size()), text });
+						new Integer(list.size()), text });
 				throw new RuntimeException("Rollback!");
 			}
 		});
@@ -184,12 +191,14 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 					public Object doInTransaction(TransactionStatus status) {
 						try {
 							return retryTemplate.execute(callback);
-						} catch (Exception e) {
+						}
+						catch (Exception e) {
 							throw new RuntimeException(e.getMessage(), e);
 						}
 					}
 				});
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 
 				if (i < 3)
 					assertEquals("Rollback!", e.getMessage());

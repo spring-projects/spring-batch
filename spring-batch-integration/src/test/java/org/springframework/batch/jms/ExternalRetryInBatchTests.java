@@ -40,6 +40,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.ClassUtils;
 
 public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpringContextTests {
 	private JmsTemplate jmsTemplate;
@@ -71,7 +72,7 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 	}
 
 	protected String[] getConfigLocations() {
-		return new String[] { "/org/springframework/batch/jms/jms-context.xml" };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "jms-context.xml" )};
 	}
 
 	protected void onSetUp() throws Exception {

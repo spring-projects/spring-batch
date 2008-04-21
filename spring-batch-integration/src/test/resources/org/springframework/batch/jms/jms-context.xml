@@ -52,6 +52,7 @@
 	<bean id="container"
 		class="org.springframework.batch.container.jms.BatchMessageListenerContainer">
 		<property name="transactionManager" ref="transactionManager" />
+		<property name="recoveryInterval" value="0" />
 		<property name="connectionFactory"
 			ref="txAwareConnectionFactory" />
 		<property name="destinationName" value="queue" />
