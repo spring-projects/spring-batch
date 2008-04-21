@@ -80,6 +80,12 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 		container.stop();
 		// Need to give the container time to shutdown
 		Thread.sleep(1000L);
+		String foo = "";
+		int count = 0;
+		while (foo != null && count < 100) {
+			foo = (String) jmsTemplate.receiveAndConvert("queue");
+			count++;
+		}
 	}
 
 	List list = new ArrayList();
@@ -122,11 +128,15 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 	public void testRollback() throws Exception {
 
 		assertInitialState();
+		
+		// Prevent us from being overwhelmed after rollback
+		container.setRecoveryInterval(500);
 
 		container.setMessageListener(new SessionAwareMessageListener() {
 			public void onMessage(Message message, Session session) throws JMSException {
 				list.add(message.toString());
 				final String text = ((TextMessage) message).getText();
+				logger.debug("Processing message: " + message);
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
 						new Integer(list.size()), text });
 				// This causes the DB to rollback but not the message
@@ -138,8 +148,10 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 
 		container.start();
 
-		// Need to sleep for at least a second here...
-		Thread.sleep(3000L);
+		// Need to sleep here, but not too long or the
+		// container goes into its own recovery cycle and spits out the bad
+		// message...
+		Thread.sleep(500L);
 
 		// We rolled back so the messages might come in many times...
 		assertTrue(list.size() >= 1);

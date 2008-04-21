@@ -17,14 +17,13 @@
 package org.springframework.batch.container.jms;
 
 import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.jms.connection.TransactionAwareConnectionFactoryProxy;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.listener.adapter.MessageListenerAdapter;
@@ -44,8 +43,6 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 
 	private RepeatOperations template;
 
-	private ThreadLocal messageHolder = new ThreadLocal();
-
 	/**
 	 * Create a new {@link BatchMessageListenerContainer}. The container is set
 	 * with auto startup = false (not the default of the parent container).
@@ -63,88 +60,6 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 		setMessageListener(new MessageListenerAdapter());
 	}
 
-	/**
-	 * Override base class method to store message in a thread local for later
-	 * use.
-	 * 
-	 * @see org.springframework.jms.listener.AbstractPollingMessageListenerContainer#receiveMessage(javax.jms.MessageConsumer)
-	 */
-	protected Message receiveMessage(MessageConsumer consumer) throws JMSException {
-		Message message = super.receiveMessage(consumer);
-		if (message!=null) {
-			messageHolder.set(message);
-		}
-		return message;
-	}
-
-	/**
-	 * Override base class method to enable the message holder to be reset,
-	 * signalling that a rollback has occurred.
-	 * 
-	 * @see org.springframework.jms.listener.AbstractMessageListenerContainer#rollbackOnExceptionIfNecessary(javax.jms.Session,
-	 * java.lang.Throwable)
-	 */
-	protected void rollbackOnExceptionIfNecessary(Session session, Throwable ex) throws JMSException {
-		super.rollbackOnExceptionIfNecessary(session, ex);
-		if (session.getTransacted() && isSessionTransacted()) {
-			messageHolder.set(null);
-		}
-	}
-
-	/**
-	 * Override base class to allow extra processing in the case of exception,
-	 * with knowledge of the message.
-	 * 
-	 * @see org.springframework.jms.listener.AbstractMessageListenerContainer#doExecuteListener(javax.jms.Session,
-	 * javax.jms.Message)
-	 */
-	protected void doExecuteListener(Session session, Message message) throws JMSException {
-		try {
-			super.doExecuteListener(session, message);
-		}
-		catch (Throwable ex) {
-			handleListenerException(session, message, ex);
-		}
-	}
-
-	/**
-	 * Extension point for subclasses. Do anything necessary to recover from the
-	 * exception, which was raised when the message was being processed.
-	 * @param session the current JMS session.
-	 * @param message the message just received and failed to process.
-	 * @param ex the exception thrown during message processing.
-	 */
-	protected void recover(Session session, Message message, Throwable ex) throws JMSException {
-		// do nothing...
-	}
-
-	/**
-	 * Used to provide a recovery path - delegates to
-	 * {@link #recover(Session, Message, Throwable)}. 
-	 * 
-	 * TODO: Could be merged into base class?
-	 * 
-	 * @param session the JMS session
-	 * @param message the last message
-	 * @param ex the exception thrown by listener
-	 * @see #doExecuteListener(Session, Message)
-	 * @see #recover(Session, Message, Throwable)
-	 */
-	protected final void handleListenerException(Session session, Message message, Throwable ex) throws JMSException {
-		// Call out to recovery path...
-		recover(session, message, ex);
-		if (ex instanceof RuntimeException) {
-			// We need to rethrow so that an enclosing non-JMS transaction can
-			// rollback...
-			throw (RuntimeException) ex;
-		}
-		else if (ex instanceof Error) {
-			// Just re-throw Error instances because otherwise unit tests just
-			// swallow exceptions from EasyMock and JUnit.
-			throw (Error) ex;
-		}
-	}
-	
 	/**
 	 * Override base class to prevent exceptions from being swallowed.
 	 * 
@@ -176,18 +91,13 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 	 */
 	protected boolean receiveAndExecute(final Session session, final MessageConsumer consumer) throws JMSException {
 
-		template.iterate(new RepeatCallback() {
+		ExitStatus status = template.iterate(new RepeatCallback() {
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				return doBatchCallBack(session, consumer);
 			}
 		});
 		
-		if (messageHolder.get()==null) {
-			return false;
-		}
-
-		messageHolder.set(null);
-		return true;
+		return status.isContinuable();
 	}
 
 	/**
@@ -219,8 +129,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 		 * be rolled back when a batch fails.
 		 */
 		if (super.receiveAndExecute(session, consumer)) {
-			Object message = messageHolder.get();
-			return new ExitStatus(message!=null);
+			return ExitStatus.CONTINUABLE;
 		}
 		return ExitStatus.FINISHED;
 	}

@@ -52,7 +52,7 @@ public class BatchMessageListenerContainerTests extends TestCase {
 		container = getContainer(template);
 		boolean received = doExecute(null, null);
 		assertEquals(1, count);
-		assertFalse("Message received", received);
+		assertTrue("Message received", received);
 	}
 
 	private BatchMessageListenerContainer getContainer(RepeatTemplate template) {
@@ -139,8 +139,8 @@ public class BatchMessageListenerContainerTests extends TestCase {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
 		container.setSessionTransacted(false);
-		boolean received = doTestWithException(new IllegalStateException("No way!"), false, 2);
-		assertTrue("Message not received", received);
+		boolean received = doTestWithException(new IllegalStateException("No way!"), false, 1);
+		assertFalse("Message received successfully", received);
 	}
 
 	public void testNonTransactionalReceiveAndExecuteWithCallbackThrowingError() throws Exception {
@@ -149,8 +149,8 @@ public class BatchMessageListenerContainerTests extends TestCase {
 		container = getContainer(template);
 		container.setSessionTransacted(false);
 		try {
-			boolean received = doTestWithException(new RuntimeException("No way!"), false, 2);
-			assertTrue("Message not received", received);
+			boolean received = doTestWithException(new RuntimeException("No way!"), false, 1);
+			assertFalse("Message received successfully", received);
 		}
 		catch (RuntimeException e) {
 			assertEquals("No way!", e.getMessage());

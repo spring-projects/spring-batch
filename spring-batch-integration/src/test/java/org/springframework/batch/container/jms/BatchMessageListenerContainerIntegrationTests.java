@@ -20,8 +20,6 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemRecoverer;
@@ -40,8 +38,6 @@ import org.springframework.util.ClassUtils;
  */
 public class BatchMessageListenerContainerIntegrationTests extends AbstractDependencyInjectionSpringContextTests {
 	
-	private final Log logger = LogFactory.getLog(getClass());
-
 	private JmsTemplate jmsTemplate;
 
 	private BatchMessageListenerContainer container;
