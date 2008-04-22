@@ -106,10 +106,10 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 	 * 
 	 * @param session
 	 * @param consumer
-	 * @return
+	 * 
 	 * @throws JMSException
 	 * 
-	 * @see {@link #receiveMessage(MessageConsumer)}
+	 * @see #receiveMessage(MessageConsumer)
 	 */
 	protected ExitStatus doBatchCallBack(Session session, MessageConsumer consumer) throws JMSException {
 		/*
