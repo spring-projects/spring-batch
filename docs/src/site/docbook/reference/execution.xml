@@ -1304,6 +1304,94 @@
   &lt;property name="tasklet" ref="tasklet" /&gt;
   &lt;property name="jobRepository" ref="repository" /&gt;
 &lt;/bean&gt;</programlisting>
+
+      <section>
+        <title>TaskletAdapter</title>
+
+        <para>As with other adapters for the <classname>ItemWriter</classname>
+        and <classname>ItemReader</classname> interfaces, the
+        <classname>Tasklet</classname> interface contains an implementation
+        that allows for adapting itself to any pre-existing class:
+        <classname>TaskletAdapter</classname>. An example where this may be
+        useful is an existing DAO that is used to upate a flag on a set of
+        records. The <classname>TaskletAdapter</classname> can be used to call
+        this class without having to write an adapter for the
+        <classname>Tasklet</classname> interface:</para>
+
+        <programlisting>  &lt;bean id="deleteFilesInDir" parent="taskletStep"&gt;
+    &lt;property name="tasklet"&gt;
+      &lt;bean class="org.springframework.batch.core.step.tasklet.TaskletAdapter"&gt;
+        &lt;property name="targetObject"&gt;
+          &lt;bean class="org.mycompany.FooDao"&gt;
+        &lt;/property&gt;
+        &lt;property name="targetMethod" value-"updateFoo" /&gt;
+      &lt;/bean&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+      </section>
+
+      <section>
+        <title>Example Tasklet implementation</title>
+
+        <para>Many batch jobs contains steps that must be done before the main
+        processing begins in order to set up various resources, or after
+        processing has completed to cleanup those resources. In the case of a
+        job that works heavily with files, it is often necessary to delete
+        certain files locally after they have been uploaded successfully to
+        another location. The example below taken from the Spring Batch
+        samples project, is a <classname>Tasklet</classname> implementation
+        with just such a responsibility:</para>
+
+        <programlisting>  public class FileDeletingTasklet implements Tasklet, InitializingBean {
+
+    private Resource directory;
+
+    public ExitStatus execute() throws Exception {
+      File dir = directory.getFile();
+      Assert.state(dir.isDirectory());
+    
+      File[] files = dir.listFiles();
+      for (int i = 0; i &lt; files.length; i++) {
+        boolean deleted = files[i].delete();
+        if (!deleted) {
+          throw new UnexpectedJobExecutionException("Could not delete file " + files[i].getPath());
+        }
+      }
+      return ExitStatus.FINISHED;
+    }
+
+    public void setDirectoryResource(Resource directory) {
+      this.directory = directory;
+    }
+
+    public void afterPropertiesSet() throws Exception {
+      Assert.notNull(directory, "directory must be set");
+    }
+  }</programlisting>
+
+        <para>The above <classname>Tasklet</classname> implementation will
+        delete all files within a given directory. It should be noted that the
+        <methodname>execute</methodname> method will only be called once. All
+        that is left is to inject the <classname>Tasklet</classname> into a
+        <classname>TaskletStep</classname>:</para>
+
+        <programlisting>  &lt;bean id="taskletJob" parent="simpleJob"&gt;
+    &lt;property name="steps"&gt;
+      &lt;bean id="deleteFilesInDir" parent="taskletStep"&gt;
+        &lt;property name="tasklet"&gt;
+          &lt;bean class="org.springframework.batch.sample.tasklet.FileDeletingTasklet"&gt;
+            &lt;property name="directoryResource" ref="directory" /&gt;
+          &lt;/bean&gt;
+        &lt;/property&gt;
+      &lt;/bean&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="directory"
+        class="org.springframework.core.io.FileSystemResource"&gt;
+    &lt;constructor-arg value="target/test-outputs/test-dir" /&gt;
+  &lt;/bean&gt;</programlisting>
+      </section>
     </section>
   </section>
 
