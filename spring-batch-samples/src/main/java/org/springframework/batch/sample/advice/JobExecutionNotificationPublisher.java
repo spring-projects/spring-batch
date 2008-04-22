@@ -49,11 +49,11 @@ public class JobExecutionNotificationPublisher implements ApplicationListener, N
 	}
 
 	/**
-	 * If the event is a {@link RepeatOperationsApplicationEvent} for open and
+	 * If the event is a {@link SimpleMessageApplicationEvent} for open and
 	 * close we log the event at INFO level and send a JMX notification if we
 	 * are also an MBean.
 	 * 
-	 * @see org.springframework.batch.core.launch.support.SimpleJobLauncher#onApplicationEvent(org.springframework.context.ApplicationEvent)
+	 * @see ApplicationListener#onApplicationEvent(ApplicationEvent) 
 	 */
 	public void onApplicationEvent(ApplicationEvent applicationEvent) {
 		if (applicationEvent instanceof SimpleMessageApplicationEvent) {

@@ -31,7 +31,7 @@ public class TradeWriter extends AbstractItemWriter {
     private int index = 0;
     
     /**
-	 * Public setter for the {@link int} property.
+	 * Public setter for the the index on which failure should occur.
 	 *
 	 * @param failure the failure to set
 	 */

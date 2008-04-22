@@ -65,7 +65,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 
 	/**
 	 * 
-	 * @see org.springframework.batch.item.database.DrivingQueryItemReader#open()
+	 * @see org.springframework.batch.item.database.DrivingQueryItemReader#open(ExecutionContext)
 	 */
 	public void open(ExecutionContext executionContext) {
 		// Can be called from multiple threads because of lazy initialisation...

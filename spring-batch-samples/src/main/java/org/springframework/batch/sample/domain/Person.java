@@ -106,7 +106,7 @@ public class Person {
 		return title;
 	}
 	/**
-	 * @param person_title the person_title to set
+	 * @param title the person title to set
 	 */
 	public void setTitle(String title) {
 		this.title = title;

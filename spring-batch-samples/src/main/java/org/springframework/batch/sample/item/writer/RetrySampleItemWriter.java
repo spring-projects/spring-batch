@@ -20,7 +20,7 @@ public class RetrySampleItemWriter extends AbstractItemWriter {
 	}
 
 	/**
-	 * @return number of times {@link #handle(Object)} method was called.
+	 * @return number of times {@link #write(Object)} method was called.
 	 */
 	public int getCounter() {
 		return counter;

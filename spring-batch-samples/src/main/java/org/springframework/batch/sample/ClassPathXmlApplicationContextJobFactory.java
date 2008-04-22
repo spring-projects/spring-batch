@@ -103,21 +103,18 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory {
 			}
 		}
 		/**
-		 * @return
 		 * @see org.springframework.batch.core.Job#getName()
 		 */
 		public String getName() {
 			return delegate.getName();
 		}
 		/**
-		 * @return
 		 * @see org.springframework.batch.core.Job#getSteps()
 		 */
 		public List getSteps() {
 			return delegate.getSteps();
 		}
 		/**
-		 * @return
 		 * @see org.springframework.batch.core.Job#isRestartable()
 		 */
 		public boolean isRestartable() {
