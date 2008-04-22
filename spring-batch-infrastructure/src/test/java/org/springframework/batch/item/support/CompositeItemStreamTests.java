@@ -30,16 +30,12 @@ import org.springframework.batch.item.support.CompositeItemStream;
  * @author Dave Syer
  * 
  */
-public class SimpleStreamManagerTests extends TestCase {
+public class CompositeItemStreamTests extends TestCase {
 
 	private CompositeItemStream manager = new CompositeItemStream();
 
 	private List list = new ArrayList();
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.support.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
-	 */
 	public void testRegisterAndOpen() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
@@ -51,10 +47,6 @@ public class SimpleStreamManagerTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.support.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
-	 */
 	public void testRegisterTwice() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
@@ -67,10 +59,6 @@ public class SimpleStreamManagerTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.support.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
-	 */
 	public void testMark() {
 		manager.register(new ItemStreamSupport() {
 			public void update(ExecutionContext executionContext) {
@@ -81,10 +69,6 @@ public class SimpleStreamManagerTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.support.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
-	 */
 	public void testClose() {
 		manager.register(new ItemStreamSupport() {
 			public void close(ExecutionContext executionContext) throws ItemStreamException {
@@ -95,10 +79,6 @@ public class SimpleStreamManagerTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.support.CompositeItemStream#commit(org.springframework.transaction.TransactionStatus)}.
-	 */
 	public void testCloseDoesNotUnregister() {
 		manager.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			public void open(ExecutionContext executionContext) throws ItemStreamException {

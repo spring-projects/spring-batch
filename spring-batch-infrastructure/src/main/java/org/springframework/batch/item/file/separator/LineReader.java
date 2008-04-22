@@ -25,7 +25,7 @@ import org.springframework.batch.item.ItemStream;
 public interface LineReader extends ItemReader, ItemStream {
 
 	/**
-	 * @return
+	 * @return position
 	 */
 	int getPosition();
 

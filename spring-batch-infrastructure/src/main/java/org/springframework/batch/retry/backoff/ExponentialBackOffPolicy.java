@@ -21,13 +21,13 @@ import org.springframework.util.ClassUtils;
 
 /**
  * Implementation of {@link BackOffPolicy} that increases the back off period
- * for each retry attempt in a given set using the {@link Math#exp exponential}
- * function. <p/> This implementation is thread-safe and suitable for concurrent
- * access. Modifications to the configuration do not affect any retry sets that
- * are already in progress. <p/> The {@link #setExpSeed expSeed} property
- * controls the initial value passed to {@link Math#exp} and the
- * {@link #setIncrement increment} property controls by how much this value is
- * increased for each subsequent attempt.
+ * for each retry attempt in a given set using the
+ * {@link Math#exp(double) exponential} function. <p/> This implementation is
+ * thread-safe and suitable for concurrent access. Modifications to the
+ * configuration do not affect any retry sets that are already in progress. <p/>
+ * The {@link #setInitialInterval(long)} property controls the initial value passed to
+ * {@link Math#exp(double)} and the {@link #setMultiplier(double)} property controls by
+ * how much this value is increased for each subsequent attempt.
  * 
  * @author Rob Harrop
  * @author Dave Syer
@@ -103,7 +103,7 @@ public class ExponentialBackOffPolicy implements BackOffPolicy {
 	}
 
 	/**
-	 * Returns a new instance of {@link ExponentialBackOffContext} configured
+	 * Returns a new instance of {@link BackOffContext} configured
 	 * with the 'expSeed' and 'increment' values.
 	 */
 	public BackOffContext start(RetryContext context) {

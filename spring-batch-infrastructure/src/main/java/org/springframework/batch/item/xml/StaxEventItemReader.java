@@ -68,7 +68,7 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 	 * Read in the next root element from the file, and return it.
 	 * 
 	 * @return the next available record, if none exist, return null
-	 * @see org.springframework.batch.io.ItemReader#read()
+	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
 	public Object read() {
 		if (!initialized) {

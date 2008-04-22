@@ -16,7 +16,6 @@
 
 package org.springframework.batch.retry.policy;
 
-import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.context.RetryContextSupport;
@@ -113,14 +112,14 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * thereof, will be re-thrown without retry. This list takes precedence over
 	 * the retryable list.
 	 * 
-	 * @param retryableExceptionClasses defaults to {@link Exception}.
+	 * @param fatalExceptionClasses defaults to {@link Exception}.
 	 */
 	public final void setFatalExceptionClasses(Class[] fatalExceptionClasses) {
 		fatalClassifier.setExceptionClasses(fatalExceptionClasses);
 	}
 
 	/**
-	 * @see org.springframework.batch.retry.RetryManager#close(RepeatContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#close(RetryContext)
 	 */
 	public void close(RetryContext status) {
 	}

@@ -24,7 +24,7 @@ public class DefaultTransactionalEventReader extends AbstractEventReaderWrapper 
 	/**
 	 * Creates instance of this class and wraps XMLEventReader.
 	 *
-	 * @param parent event reader to be wrapped.
+	 * @param wrappedReader event reader to be wrapped.
 	 */
 	public DefaultTransactionalEventReader(XMLEventReader wrappedReader) {
 		super(wrappedReader);

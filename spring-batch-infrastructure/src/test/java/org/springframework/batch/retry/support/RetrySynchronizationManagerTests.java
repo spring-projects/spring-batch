@@ -84,8 +84,6 @@ public class RetrySynchronizationManagerTests extends TestCase {
 	/**
 	 * Clear all contexts starting with the current one and continuing until
 	 * {@link RetrySynchronizationManager#clear()} returns null.
-	 * 
-	 * @return
 	 */
 	public static RetryContext clearAll() {
 		RetryContext result = null;

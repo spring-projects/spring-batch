@@ -207,7 +207,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	/**
 	 * Set "overwrite" flag for the output file. Flag is ignored when output file processing is restarted.
 	 * 
-	 * @param shouldDeleteIfExists
+	 * @param overwriteOutput
 	 */
 	public void setOverwriteOutput(boolean overwriteOutput) {
 		this.overwriteOutput = overwriteOutput;
@@ -225,7 +225,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	/**
 	 * Open the output source
 	 * 
-	 * @see org.springframework.batch.item.ResourceLifecycle#open()
+	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
 	public void open(ExecutionContext executionContext) {
 		long startAtPosition = 0;
@@ -334,7 +334,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	/**
 	 * Flush and close the output source.
 	 * 
-	 * @see org.springframework.batch.item.ResourceLifecycle#close(ExecutionContext)
+	 * @see org.springframework.batch.item.ItemStream#close(ExecutionContext)
 	 */
 	public void close(ExecutionContext executionContext) {
 		flush();

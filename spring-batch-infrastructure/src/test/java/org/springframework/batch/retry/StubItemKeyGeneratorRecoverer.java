@@ -24,7 +24,7 @@ public class StubItemKeyGeneratorRecoverer implements ItemRecoverer, ItemKeyGene
 	/**
 	 * Do nothing. Subclassses should override to implement recovery behaviour.
 	 * 
-	 * @see org.springframework.batch.item.ItemReader#recover(java.lang.Object,
+	 * @see org.springframework.batch.item.ItemRecoverer#recover(java.lang.Object,
 	 * Throwable)
 	 * 
 	 * @return false if nothing can be done (the default), or true if the item

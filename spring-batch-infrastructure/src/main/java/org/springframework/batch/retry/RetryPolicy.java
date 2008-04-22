@@ -57,7 +57,7 @@ public interface RetryPolicy {
 	RetryContext open(RetryCallback callback, RetryContext parent);
 
 	/**
-	 * @param status a retry status created by the {@link #open(RetryCallback, RetryContext)}
+	 * @param context a retry status created by the {@link #open(RetryCallback, RetryContext)}
 	 * method of this manager.
 	 */
 	void close(RetryContext context);

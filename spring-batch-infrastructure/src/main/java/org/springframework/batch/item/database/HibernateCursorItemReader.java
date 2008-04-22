@@ -30,9 +30,9 @@ import org.springframework.util.ClassUtils;
 /**
  * {@link ItemReader} for reading database records built on top of Hibernate.
  * 
- * It executes the HQL {@link #queryString} when initialized and iterates over
- * the result set as {@link #read()} method is called, returning an object
- * corresponding to current row.
+ * It executes the HQL {@link #setQueryString(String)} when initialized and
+ * iterates over the result set as {@link #read()} method is called, returning
+ * an object corresponding to current row.
  * 
  * Input source can be configured to use either {@link StatelessSession}
  * sufficient for simple mappings without the need to cascade to associated
@@ -76,11 +76,11 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	}
 
 	public Object read() {
-		
+
 		if (cursor.next()) {
 			currentProcessedRow++;
 			Object[] data = cursor.get();
-			if (data.length>1) {
+			if (data.length > 1) {
 				return data;
 			}
 			return data[0];

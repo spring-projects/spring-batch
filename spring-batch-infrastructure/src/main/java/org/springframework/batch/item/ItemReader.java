@@ -20,7 +20,7 @@ package org.springframework.batch.item;
  * Strategy interface for providing the data. <br/>
  * 
  * Implementations are expected to be stateful and will be called multiple times
- * for each batch, with each call to {@link #next} returning a different value
+ * for each batch, with each call to {@link #read()} returning a different value
  * and finally returning <code>null</code> when all input data is exhausted.<br/>
  * 
  * Implementations need to be thread safe and clients of a {@link ItemReader}

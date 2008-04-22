@@ -38,8 +38,6 @@ class EventSequence {
 	/**
 	 * Gets next XMLEvent from cache and moves cursor to next event.
 	 * If cache contains no more events, null is returned.
-	 * 
-	 * @return
 	 */
 	public XMLEvent nextEvent() {
 		return (hasNext()) ? (XMLEvent)events.get(++currentIndex) :null;
@@ -48,8 +46,6 @@ class EventSequence {
 	/**
 	 * Gets next XMLEvent from cache but cursor remains on the same position.
 	 * If cache contains no more events, null is returned.
-	 * 
-	 * @return
 	 */
 	public XMLEvent peek() {
 		return (hasNext()) ? (XMLEvent)events.get(currentIndex+1) :null;

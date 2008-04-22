@@ -319,9 +319,7 @@ public interface FieldSet {
 	 * designated column <code>index</code>.
 	 * 
 	 * @param index the field index.
-	 * @param pattern the pattern describing the date and time format
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
-	 * @see #DEFAULT_DATE_PATTERN
 	 */
 	Date readDate(int index);
 
@@ -330,10 +328,8 @@ public interface FieldSet {
 	 * with given <code>name</code>.
 	 * 
 	 * @param name the field name.
-	 * @param pattern the pattern describing the date and time format
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
-	 * @see #DEFAULT_DATE_PATTERN
 	 */
 	Date readDate(String name);
 

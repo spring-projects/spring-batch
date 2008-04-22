@@ -64,7 +64,7 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 
 	/**
 	 * Setter for the {@link ExceptionClassifier} used by this handler. The default is to map all throwable instances to
-	 * {@value #RETHROW}.
+	 * {@link #RETHROW}.
 	 * 
 	 * @param exceptionClassifier
 	 */
@@ -77,7 +77,7 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	 * 
 	 * @throws Throwable
 	 * 
-	 * @see {@link ExceptionHandler#handleException(RepeatContext, Throwable)}
+	 * @see ExceptionHandler#handleException(RepeatContext, Throwable)
 	 */
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 

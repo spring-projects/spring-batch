@@ -99,8 +99,6 @@ public class ExitStatus implements Serializable {
 
 	/**
 	 * Getter for the exit description (defaults to blank)
-	 * 
-	 * @return
 	 */
 	public String getExitDescription() {
 		return exitDescription;

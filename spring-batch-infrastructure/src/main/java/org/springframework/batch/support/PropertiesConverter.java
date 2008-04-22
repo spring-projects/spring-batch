@@ -53,7 +53,6 @@ public final class PropertiesConverter {
 	 * @param stringToParse String to parse.
 	 * @return Properties parsed from each string.
 	 * @see PropertiesPersister
-	 * @throws StringIOException
 	 */
 	public static Properties stringToProperties(String stringToParse) {
 
@@ -89,7 +88,6 @@ public final class PropertiesConverter {
 	 * 
 	 * @param propertiesToParse
 	 * @return String representation of properties object
-	 * @throws StringIOException if IOException is thrown from StringWriter
 	 */
 	public static String propertiesToString(Properties propertiesToParse) {
 

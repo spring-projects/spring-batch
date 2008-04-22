@@ -21,7 +21,7 @@ import org.springframework.batch.retry.RetryException;
 /**
  * Exception class signifiying that an attempt to back off using a
  * {@link BackOffPolicy} was interrupted, most likely by an
- * {@link InterruptedException} during a call to {@link Thread#sleep}.
+ * {@link InterruptedException} during a call to {@link Thread#sleep(long)}.
  * 
  * @author Rob Harrop
  * @since 2.1

@@ -54,7 +54,7 @@ public class ItemReaderRepeatCallback implements RepeatCallback {
 	/**
 	 * Use the writer to process the next item if there is one. Return the
 	 * item processed, or null if nothing was available.
-	 * @see org.springframework.batch.repeat.RepeatCallback#doInIteration(org.springframework.batch.item.BatchContextAdapter)
+	 * @see org.springframework.batch.repeat.RepeatCallback#doInIteration(RepeatContext)
 	 * @param context the current context.
 	 * @return null if the data provider is exhausted.
 	 */

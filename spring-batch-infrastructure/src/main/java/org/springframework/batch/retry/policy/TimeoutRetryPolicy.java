@@ -39,7 +39,7 @@ public class TimeoutRetryPolicy extends AbstractStatelessRetryPolicy {
 	private long timeout = DEFAULT_TIMEOUT;
 
 	/**
-	 * Setter for timeout. Default is {@value #DEFAULT_TIMEOUT}.
+	 * Setter for timeout. Default is {@link #DEFAULT_TIMEOUT}.
 	 * @param timeout
 	 */
 	public void setTimeout(long timeout) {

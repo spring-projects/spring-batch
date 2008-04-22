@@ -99,7 +99,7 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 
 	/**
 	 * The bean name (id) for an object that can be populated from the field set
-	 * that will be passed into {@link #mapLine(DefaultFieldSet)}. Typically a
+	 * that will be passed into {@link #mapLine(FieldSet)}. Typically a
 	 * prototype scoped bean so that a new instance is returned for each field
 	 * set mapped.
 	 * 
@@ -115,7 +115,7 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 	/**
 	 * Public setter for the type of bean to create instead of using a prototype
 	 * bean. An object of this type will be created from its default constructor
-	 * for every call to {@link #mapLine(DefaultFieldSet)}.<br/>
+	 * for every call to {@link #mapLine(FieldSet)}.<br/>
 	 * 
 	 * Either this property or the prototype bean name must be specified, but
 	 * not both.
@@ -150,7 +150,7 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 	 * the {@link DataBinder} from {@link #createBinder(Object)} has errors
 	 * after binding).
 	 * 
-	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#mapLine(org.springframework.batch.item.file.mapping.DefaultFieldSet)
+	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#mapLine(org.springframework.batch.item.file.mapping.FieldSet)
 	 */
 	public Object mapLine(FieldSet fs) {
 		Object copy = getBean();
@@ -173,7 +173,7 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 	 * bind the properties form a field set into the target object. This
 	 * implementation creates a new {@link DataBinder} and calls out to
 	 * {@link #initBinder(DataBinder)} and
-	 * {@link #registerPropertyEditors(DataBinder)}.
+	 * {@link #registerCustomEditors(PropertyEditorRegistry)}.
 	 * 
 	 * @param target
 	 * @return a {@link DataBinder} that can be used to bind properties to the
@@ -194,10 +194,10 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 	 * by {@link #createBinder(Object)}.
 	 * <p>
 	 * Note that registration of custom property editors should be done in
-	 * {@link #registerPropertyEditors(PropertyEditorRegistry)}, not here! This
+	 * {@link #registerCustomEditors(PropertyEditorRegistry)}, not here! This
 	 * method will only be called when a <b>new</b> data binder is created.
 	 * @param binder new binder instance
-	 * @see #createBinder(RequestContext, Object)
+	 * @see #createBinder(Object)
 	 */
 	protected void initBinder(DataBinder binder) {
 	}

@@ -26,7 +26,7 @@ import org.springframework.util.StringUtils;
  * '36, 14, 1-10, 15, 49-57' is equal to '36-48, 14-14, 1-10, 15-35, 49-57'
  * <p>
  * Property editor also allows to validate whether ranges are disjoint. Validation
- * can be turned on/off by using {@link #forceDisjointRanges}. By default 
+ * can be turned on/off by using {@link #setForceDisjointRanges(boolean)}. By default 
  * validation is turned off.
  * 
  * @author peter.zozom

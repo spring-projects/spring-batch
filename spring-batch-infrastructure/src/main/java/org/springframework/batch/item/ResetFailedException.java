@@ -35,8 +35,8 @@ public class ResetFailedException extends ItemReaderException {
 	/**
 	 * Create a new {@link ResetFailedException} based on a message and another exception.
 	 * 
-	 * @param message the message for this exception
-	 * @param cause the other exception
+	 * @param msg the message for this exception
+	 * @param nested the other exception
 	 */
 	public ResetFailedException(String msg, Throwable nested) {
 		super(msg, nested);

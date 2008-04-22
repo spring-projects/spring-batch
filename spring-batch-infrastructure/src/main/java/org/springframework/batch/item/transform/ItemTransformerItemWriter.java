@@ -15,7 +15,7 @@ public class ItemTransformerItemWriter extends DelegatingItemWriter {
 	private ItemTransformer itemTransformer;
 
 	/**
-	 * Transform the item using the {@link #itemTransformer}.
+	 * Transform the item using the {@link #setItemTransformer(ItemTransformer)}.
 	 */
 	protected Object doProcess(Object item) throws Exception {
 		return itemTransformer.transform(item);

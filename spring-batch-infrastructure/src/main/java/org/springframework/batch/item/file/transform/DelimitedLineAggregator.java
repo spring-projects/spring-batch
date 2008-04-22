@@ -33,8 +33,6 @@ public class DelimitedLineAggregator implements LineAggregator {
 	 * Method used to create string representing object.
 	 * 
 	 * @param fieldSet arrays of strings representing data to be stored
-	 * @param lineDescriptor for this implementation this parameter is not
-	 * used
 	 */
 	public String aggregate(FieldSet fieldSet) {
 		StringBuffer buffer = new StringBuffer();

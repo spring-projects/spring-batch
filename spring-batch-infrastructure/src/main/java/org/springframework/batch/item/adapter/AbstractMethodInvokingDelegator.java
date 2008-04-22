@@ -156,14 +156,14 @@ public class AbstractMethodInvokingDelegator implements InitializingBean {
 	}
 
 	/**
-	 * @param targetMethod name of the method to be invoked on {@link #targetObject}.
+	 * @param targetMethod name of the method to be invoked on {@link #setTargetObject(Object)}.
 	 */
 	public void setTargetMethod(String targetMethod) {
 		this.targetMethod = targetMethod;
 	}
 	
 	/**
-	 * @param arguments arguments values for the {{@link #targetMethod}.
+	 * @param arguments arguments values for the {{@link #setTargetMethod(String)}.
 	 * These are not expected to change during the lifetime of the delegator 
 	 * and will be used only when the subclass tries to invoke the target method
 	 * without providing explicit argument values.

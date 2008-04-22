@@ -111,7 +111,7 @@ public class JmsItemReader extends AbstractItemReader implements ItemRecoverer, 
 	 * Send the message back to the proovider using the specified error
 	 * destination property of this provider.
 	 * 
-	 * @see org.springframework.batch.item.AbstractItemReader#recover(java.lang.Object,
+	 * @see org.springframework.batch.item.ItemRecoverer#recover(Object,
 	 * Throwable)
 	 */
 	public boolean recover(Object item, Throwable cause) {
@@ -140,7 +140,7 @@ public class JmsItemReader extends AbstractItemReader implements ItemRecoverer, 
 	 * If the message is a {@link Message} then returns the JMS message ID.
 	 * Otherwise just delegate to parent class.
 	 * 
-	 * @see org.springframework.batch.item.AbstractItemReader#getKey(java.lang.Object)
+	 * @see org.springframework.batch.item.ItemKeyGenerator#getKey(java.lang.Object)
 	 * 
 	 * @throws UnexpectedInputException if the JMS id cannot be determined from
 	 * a JMS Message

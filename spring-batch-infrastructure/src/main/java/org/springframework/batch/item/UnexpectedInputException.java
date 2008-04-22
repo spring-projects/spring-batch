@@ -37,8 +37,8 @@ public class UnexpectedInputException extends ItemReaderException {
 	/**
 	 * Create a new {@link UnexpectedInputException} based on a message and another exception.
 	 * 
-	 * @param message the message for this exception
-	 * @param cause the other exception
+	 * @param msg the message for this exception
+	 * @param nested the other exception
 	 */
 	public UnexpectedInputException(String msg, Throwable nested) {
 		super(msg, nested);

@@ -101,7 +101,6 @@ public class SingleColumnJdbcKeyCollector extends ExecutionContextUserSupport im
 	/**
 	 * Get the restart data representing the last processed key.
 	 * 
-	 * @see KeyCollector#saveState(Object)
 	 * @throws IllegalArgumentException if key is null.
 	 */
 	public void updateContext(Object key, ExecutionContext executionContext) {

@@ -39,7 +39,6 @@ public interface KeyCollector {
 	 * for all KeyCollector implementations.
 	 * 
 	 * @param key to be converted to restart data.
-	 * @return {@link ExecutionContext} representation of the key.
 	 * @throws IllegalArgumentException if key is null.
 	 * @throws IllegalArgumentException if key is an incompatible type.
 	 */

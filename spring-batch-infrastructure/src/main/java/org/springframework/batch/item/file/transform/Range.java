@@ -12,7 +12,7 @@ import org.springframework.util.Assert;
  */
 public class Range {
 
-	private final static int UPPER_BORDER_NOT_DEFINED = Integer.MAX_VALUE;
+	public final static int UPPER_BORDER_NOT_DEFINED = Integer.MAX_VALUE;
 	
 	private int min;	
 	private int max;

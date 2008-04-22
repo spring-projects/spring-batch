@@ -27,7 +27,7 @@ public class ExitStatusTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, int)}.
+	 * {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, String)}.
 	 */
 	public void testExitStatusBooleanInt() {
 		ExitStatus status = new ExitStatus(true, "10");
@@ -37,7 +37,7 @@ public class ExitStatusTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, int)}.
+	 * {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, String)}.
 	 */
 	public void testExitStatusConstantsContinuable() {
 		ExitStatus status = ExitStatus.CONTINUABLE;
@@ -47,7 +47,7 @@ public class ExitStatusTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, int)}.
+	 * {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, String)}.
 	 */
 	public void testExitStatusConstantsFinished() {
 		ExitStatus status = ExitStatus.FINISHED;

@@ -27,7 +27,7 @@ import org.springframework.util.Assert;
 
 /**
  * <p>
- * Convenience class for driving query input sources. Input Sources of this type
+ * Convenience class for driving query item readers. Item readers of this type
  * use a 'driving query' to return back a list of keys. A key can be defined as
  * anything that can uniquely identify a record so that a more detailed record
  * can be retrieved for each object. This allows a much smaller footprint to be
@@ -95,9 +95,7 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean, Ite
 	}
 
 	/**
-	 * Return the next key in the List. If the ItemReader has not been
-	 * initialized yet, then {@link AbstractDrivingQueryItemReader.open()} will
-	 * be called.
+	 * Return the next key in the List.
 	 * 
 	 * @return next key in the list if not index is not at the last element,
 	 * null otherwise.
@@ -140,10 +138,8 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean, Ite
 	}
 
 	/**
-	 * Initialize the input source by delegating to the subclass in order to
-	 * retrieve the keys. The input source will also be registered with the
-	 * {@link BatchTransactionSynchronizationManager} in order to ensure it is
-	 * notified about commits and rollbacks.
+	 * Initialize the item reader by delegating to the subclass in order to
+	 * retrieve the keys.
 	 * 
 	 * @throws IllegalStateException if the keys list is null or initialized is
 	 * true.

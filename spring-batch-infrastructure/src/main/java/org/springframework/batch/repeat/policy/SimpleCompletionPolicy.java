@@ -64,7 +64,7 @@ public class SimpleCompletionPolicy extends DefaultResultCompletionPolicy {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext,
 	 * ExitStatus)
-	 * @throws Exception (normally terminating the batch) if the result is
+	 * @throws RuntimeException (normally terminating the batch) if the result is
 	 * itself an exception.
 	 */
 	public boolean isComplete(RepeatContext context, ExitStatus result) {

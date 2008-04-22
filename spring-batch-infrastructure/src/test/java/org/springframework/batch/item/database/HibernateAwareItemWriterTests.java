@@ -90,7 +90,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.database.HibernateAwareItemWriter#initDao()}.
+	 * {@link org.springframework.batch.item.database.HibernateAwareItemWriter#afterPropertiesSet()}.
 	 * 
 	 * @throws Exception
 	 */
@@ -108,7 +108,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.database.HibernateAwareItemWriter#initDao()}.
+	 * {@link org.springframework.batch.item.database.HibernateAwareItemWriter#afterPropertiesSet()}.
 	 * 
 	 * @throws Exception
 	 */
@@ -183,7 +183,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.database.HibernateAwareItemWriter#close(org.springframework.batch.repeat.RepeatContext)}.
+	 * {@link org.springframework.batch.item.database.HibernateAwareItemWriter#flush()}.
 	 */
 	public void testFlush() throws Exception{
 		writer.flush();
@@ -195,7 +195,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.database.HibernateAwareItemWriter#close(org.springframework.batch.repeat.RepeatContext)}.
+	 * {@link org.springframework.batch.item.database.HibernateAwareItemWriter#clear()}.
 	 */
 	public void testClear() throws Exception{
 		writer.clear();

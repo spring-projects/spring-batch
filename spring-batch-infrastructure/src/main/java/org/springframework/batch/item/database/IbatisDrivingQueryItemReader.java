@@ -58,7 +58,7 @@ public class IbatisDrivingQueryItemReader extends DrivingQueryItemReader {
 	/**
 	 * Set the {@link SqlMapClientTemplate} to use for this input source.
 	 * 
-	 * @param sqlMapClientTemplate
+	 * @param sqlMapClient
 	 */
 	public void setSqlMapClient(
 			SqlMapClient sqlMapClient) {

@@ -99,7 +99,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * Rethrows only if the limit is breached for this context on the exception
 	 * type specified.
 	 * 
-	 * @see #setType(Class)
+	 * @see #setExceptionClasses(Class[])
 	 * @see #setLimit(int)
 	 * 
 	 * @see org.springframework.batch.repeat.exception.ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
@@ -138,7 +138,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	/**
 	 * Setter for the Throwable exceptionClasses that shouldn't be counted, but
 	 * rethrown immediately. This list has higher priority than
-	 * {@link #exceptionClasses}.
+	 * {@link #setExceptionClasses(Class[])}.
 	 * 
 	 * @param fatalExceptionClasses defaults to {@link Error}
 	 */

@@ -19,8 +19,8 @@ package org.springframework.batch.retry.backoff;
 
 /**
  * Implementation of {@link BackOffPolicy} that pauses for a fixed period of
- * time before continuing. A pause is implemented using {@link Thread#sleep}.
- * <p/> {@link #backOff} is thread-safe and it is safe to call
+ * time before continuing. A pause is implemented using {@link Thread#sleep(long)}.
+ * <p/> {@link #setBackOffPeriod(long)} is thread-safe and it is safe to call
  * {@link #setBackOffPeriod} during execution from multiple threads, however
  * this may cause a single retry operation to have pauses of different
  * intervals.
@@ -59,7 +59,7 @@ public class FixedBackOffPolicy extends StatelessBackOffPolicy {
 	}
 
 	/**
-	 * Pause for the {@link #backOffPeriod}.
+	 * Pause for the {@link #setBackOffPeriod(long)}.
 	 * @throws BackOffInterruptedException if interrupted during sleep.
 	 */
 	protected void doBackOff() throws BackOffInterruptedException {

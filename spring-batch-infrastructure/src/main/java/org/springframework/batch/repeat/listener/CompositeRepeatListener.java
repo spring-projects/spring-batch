@@ -44,7 +44,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	/**
 	 * Register additional listener.
 	 * 
-	 * @param itemReaderListener
+	 * @param listener
 	 */
 	public void register(RepeatListener listener) {
 		if (!listeners.contains(listener)) {

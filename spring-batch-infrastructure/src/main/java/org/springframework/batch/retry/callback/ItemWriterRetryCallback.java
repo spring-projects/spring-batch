@@ -74,7 +74,7 @@ public class ItemWriterRetryCallback implements RetryCallback {
 	 * be used instead (preferring the reader to the writer if both would be
 	 * appropriate).
 	 * 
-	 * @param recoveryHandler
+	 * @param recoverer
 	 */
 	public void setRecoverer(ItemRecoverer recoverer) {
 		this.recoverer = recoverer;

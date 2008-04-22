@@ -68,7 +68,7 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 
 	private Collection comments = DEFAULT_COMMENTS;
 
-	// Encapsulates the state of the input source.
+	// Encapsulates the state of the reader.
 	private State state = null;
 
 	private RecordSeparatorPolicy recordSeparatorPolicy = new DefaultRecordSeparatorPolicy();
@@ -113,7 +113,7 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 	 * 
 	 * @return a String.
 	 * 
-	 * @see org.springframework.batch.item.adapter.support.ItemReader#read()
+	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
 	public synchronized Object read() {
 		// Make a copy of the recordSeparatorPolicy reference, in case it is
@@ -147,9 +147,7 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 	}
 
 	/**
-	 * A no-op because the oobject is initialized with all it needs to open in the constructor.
-	 * 
-	 * @see org.springframework.batch.item.ResourceLifecycle#open()
+	 * Creates internal state object.
 	 */
 	public synchronized void open() {
 		state = new State();

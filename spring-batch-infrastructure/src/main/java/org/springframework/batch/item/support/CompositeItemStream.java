@@ -55,7 +55,7 @@ public class CompositeItemStream implements ItemStream {
 	 * Simple aggregate {@link ExecutionContext} provider for the contributions
 	 * registered under the given key.
 	 * 
-	 * @see org.springframework.batch.item.stream.StreamManager#getExecutionContext(java.lang.Object)
+	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
 	public void update(ExecutionContext executionContext) {
 		synchronized (streams) {
@@ -70,8 +70,6 @@ public class CompositeItemStream implements ItemStream {
 	 * Register a {@link ItemStream} as one of the interesting providers under
 	 * the provided key.
 	 * 
-	 * @see org.springframework.batch.item.stream.StreamManager#register(java.lang.Object,
-	 * org.springframework.batch.item.ItemStream, ExecutionContext)
 	 */
 	public void register(ItemStream stream) {
 		synchronized (streams) {
@@ -82,7 +80,7 @@ public class CompositeItemStream implements ItemStream {
 	}
 
 	/**
-	 * Broadcast the call to close from this {@link StreamManager}.
+	 * Broadcast the call to close.
 	 * @throws ItemStreamException
 	 */
 	public void close(ExecutionContext executionContext) throws ItemStreamException {
@@ -95,7 +93,7 @@ public class CompositeItemStream implements ItemStream {
 	}
 
 	/**
-	 * Broadcast the call to open from this {@link StreamManager}.
+	 * Broadcast the call to open.
 	 * @throws ItemStreamException
 	 */
 	public void open(ExecutionContext executionContext) throws ItemStreamException {

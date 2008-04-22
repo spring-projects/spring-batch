@@ -53,7 +53,7 @@ import org.springframework.util.ClassUtils;
 
 /**
  * <p>
- * Simple input source that opens a JDBC cursor and continually retrieves the
+ * Simple item reader that opens a JDBC cursor and continually retrieves the
  * next row in the ResultSet. It is extremely important to note that the
  * JdbcDriver used must be version 3.0 or higher. This is because earlier
  * versions do not support holding a ResultSet open over commits.
@@ -190,7 +190,6 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	 * 
 	 * @returns Object returned by RowMapper
 	 * @throws DataAccessException
-	 * @throws IllegalStateExceptino if mapper is null.
 	 */
 	public Object read() throws Exception {
 
@@ -223,7 +222,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	 * will be closed. This must be called or the connection and cursor will be
 	 * held open indefinitely!
 	 * 
-	 * @see org.springframework.batch.item.ResourceLifecycle#close(ExecutionContext)
+	 * @see org.springframework.batch.item.ItemStream#close(ExecutionContext)
 	 */
 	public void close(ExecutionContext executionContext) {
 		initialized = false;

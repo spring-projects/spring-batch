@@ -245,7 +245,6 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * 
 	 * @param failedItemIdentifier
 	 * @param key
-	 * @return
 	 */
 	protected boolean hasFailed(FailedItemIdentifier failedItemIdentifier, Object key) {
 		if (failedItemIdentifier != null) {

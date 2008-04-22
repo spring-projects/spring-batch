@@ -21,15 +21,15 @@ import org.springframework.batch.item.file.mapping.FieldSet;
 
 /**
  * Interface used to create string used to create string representing object.
- * @author tomas.slanina
  * 
+ * @author tomas.slanina
  */
 public interface LineAggregator {
 	/**
 	 * Method used to create a string to be stored from the array of values.
 	 * 
 	 * @param fieldSet values to be converted
-	 * @return
+	 * @return string
 	 */
 	public String aggregate(FieldSet fieldSet);
 }

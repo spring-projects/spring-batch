@@ -96,8 +96,6 @@ public class BatchSqlUpdateItemWriter extends AbstractTransactionalResourceItemW
 
 	/**
 	 * Check mandatory properties - there must be a delegate.
-	 * 
-	 * @see org.springframework.dao.support.DaoSupport#initDao()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jdbcTemplate, "BatchSqlUpdateItemWriter requires an data source.");

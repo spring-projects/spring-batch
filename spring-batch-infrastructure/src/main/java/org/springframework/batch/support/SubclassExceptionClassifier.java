@@ -92,12 +92,11 @@ public class SubclassExceptionClassifier extends ExceptionClassifierSupport {
 	 * Comparator for classes to order by inheritance.
 	 * 
 	 * @author Dave Syer
-	 *
+	 * 
 	 */
 	private class ClassComparator implements Comparator {
 		/**
-		 * @return 1 if arg0 is assignable from arg1
-		 * @return -1 otherwise
+		 * @return 1 if arg0 is assignable from arg1, -1 otherwise
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
 		public int compare(Object arg0, Object arg1) {

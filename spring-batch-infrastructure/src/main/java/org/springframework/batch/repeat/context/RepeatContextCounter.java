@@ -59,7 +59,7 @@ public class RepeatContextCounter {
 	}
 
 	/**
-	 * Convenience constructor with {@link #useParent}=false.
+	 * Convenience constructor with useParent=false.
 	 * @param context the current context.
 	 * @param countKey the key to use to store the counter in the context.
 	 */

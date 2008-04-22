@@ -97,7 +97,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	/**
 	 * Setter for the {@link ExceptionClassifier} used by this handler. The
 	 * default is to map all throwable instances to
-	 * {@value ExceptionClassifierSupport#DEFAULT}, which are then mapped to a
+	 * {@link ExceptionClassifierSupport#DEFAULT}, which are then mapped to a
 	 * threshold of 0 by the {@link #setThresholds(Map)} map.
 	 * 
 	 * @param exceptionClassifier
@@ -112,7 +112,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 * same type according to the classifier.
 	 * 
 	 * @throws Throwable
-	 * @see {@link ExceptionHandler#handleException(RepeatContext, Throwable)}
+	 * @see ExceptionHandler#handleException(RepeatContext, Throwable)
 	 */
 	public void handleException(RepeatContext context, Throwable throwable)
 			throws Throwable {

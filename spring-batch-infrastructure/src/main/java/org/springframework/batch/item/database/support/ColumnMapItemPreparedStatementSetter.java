@@ -17,7 +17,7 @@ import org.springframework.jdbc.core.StatementCreatorUtils;
 import org.springframework.util.Assert;
 
 /**
- * </p>Implementation of the {@link KeyMappingPreparedStatementSetter} interface that assumes all
+ * </p>Implementation of the {@link ItemPreparedStatementSetter} interface that assumes all
  * keys are contained within a {@link Map} with the column name as the key.  It assumes nothing 
  * about ordering, and assumes that the order the entry set can be iterated over is the same as
  * the PreparedStatement should be set.</p>

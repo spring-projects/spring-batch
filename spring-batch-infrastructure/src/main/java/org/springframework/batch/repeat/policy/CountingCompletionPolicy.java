@@ -78,7 +78,7 @@ public abstract class CountingCompletionPolicy extends DefaultResultCompletionPo
 	/**
 	 * Extension point for subclasses. Inspect the context and update the state
 	 * of a counter in whatever way is appropriate. This will be added to the
-	 * session-level counter if {@link #useParent} is true.
+	 * session-level counter if {@link #setUseParent(boolean)} is true.
 	 * 
 	 * @param context the current context.
 	 * 

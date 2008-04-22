@@ -16,8 +16,6 @@
 
 package org.springframework.batch.repeat.support;
 
-import java.util.List;
-
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -52,7 +50,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	/**
 	 * Default limit for maximum number of concurrent unfinished results allowed
 	 * by the template.
-	 * {@link #getNextResult(RepeatContext, RepeatCallback, TerminationContext, List)}.
+	 * {@link #getNextResult(RepeatContext, RepeatCallback, RepeatInternalState)}.
 	 */
 	public static final int DEFAULT_THROTTLE_LIMIT = 4;
 
@@ -72,15 +70,12 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	}
 
 	/**
-	 * Use the {@link #taskExecutor} to generate a result. The internal state in
+	 * Use the {@link #setTaskExecutor(TaskExecutor)} to generate a result. The internal state in
 	 * this case is a queue of unfinished result holders of type
 	 * {@link ResultHolder}. The holder with the return value should not be on
 	 * the queue when this method exits. The queue is scoped in the calling
 	 * method so there is no need to synchronize access.
 	 * 
-	 * @see org.springframework.batch.repeat.support.AbstracBatchemplate#getNextResult(org.springframework.batch.item.RepeatContext,
-	 * org.springframework.batch.repeat.RepeatCallback,
-	 * org.springframework.batch.TerminationContext, java.util.List)
 	 */
 	protected ExitStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
 			throws Throwable {
@@ -257,7 +252,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * number of concurrent tasks that can be executing at one time - if a new
 	 * task arrives and the throttle limit is breached we wait for one of the
 	 * executing tasks to finish before submitting the new one to the
-	 * {@link TaskExecutor}. Default value is {@value #DEFAULT_THROTTLE_LIMIT}.
+	 * {@link TaskExecutor}. Default value is {@link #DEFAULT_THROTTLE_LIMIT}.
 	 * N.B. when used with a thread pooled {@link TaskExecutor} it doesn't make
 	 * sense for the throttle limit to be less than the thread pool size.
 	 * 

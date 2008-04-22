@@ -36,7 +36,7 @@ public class DelegatingItemWriter implements ItemWriter, InitializingBean {
 	 * delegate {@link ItemWriter}.
 	 * @throws Exception 
 	 * 
-	 * @see ItemWriter#process(java.lang.Object)
+	 * @see ItemWriter#write(Object)
 	 */
 	public void write(Object item) throws Exception {
 		Object result = doProcess(item);

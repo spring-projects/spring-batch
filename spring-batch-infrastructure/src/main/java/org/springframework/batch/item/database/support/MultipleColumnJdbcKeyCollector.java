@@ -34,15 +34,15 @@ import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * Jdbc implementation of the {@link KeyCollector} interface that works for
- * composite keys. (i.e. keys represented by multiple columns) A sql query to be
- * used to return the keys and a {@link KeyMappingPreparedStatementSetter} to map each
- * row in the resultset to an Object must be set in order to work correctly.
+ * JDBC implementation of the {@link KeyCollector} interface that works for
+ * composite keys. (i.e. keys represented by multiple columns) A SQL query to be
+ * used to return the keys and a {@link ItemPreparedStatementSetter} to map each
+ * row in the result set to an Object must be set in order to work correctly.
  * </p>
  * 
  * @author Lucas Ward
  * @see DrivingQueryItemReader
- * @see KeyMappingPreparedStatementSetter
+ * @see ItemPreparedStatementSetter
  */
 public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport implements KeyCollector {
 
@@ -66,8 +66,7 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 	 * Construct a new ItemReader.
 	 * 
 	 * @param jdbcTemplate
-	 * @param sql - Sql statement that returns all keys to process.
-	 * @param keyMapper - RowMapper that maps each row of the ResultSet to an
+	 * @param sql - SQL statement that returns all keys to process.
 	 * object.
 	 */
 	public MultipleColumnJdbcKeyCollector(JdbcTemplate jdbcTemplate, String sql) {
@@ -128,7 +127,7 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 	}
 
 	/**
-	 * Set the {@link KeyMappingPreparedStatementSetter} to be used to map a resultset
+	 * Set the {@link RowMapper} to be used to map a result set
 	 * to keys.
 	 * 
 	 * @param keyMapper

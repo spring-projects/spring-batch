@@ -85,8 +85,6 @@ public class HibernateAwareItemWriter extends AbstractTransactionalResourceItemW
 
 	/**
 	 * Check mandatory properties - there must be a delegate and hibernateTemplate.
-	 * 
-	 * @see org.springframework.dao.support.DaoSupport#initDao()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(delegate, "HibernateAwareItemWriter requires an ItemWriter as a delegate.");

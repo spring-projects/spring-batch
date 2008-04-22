@@ -35,8 +35,8 @@ public class NoWorkFoundException extends ItemReaderException {
 	/**
 	 * Create a new {@link NoWorkFoundException} based on a message and another exception.
 	 * 
-	 * @param message the message for this exception
-	 * @param cause the other exception
+	 * @param msg the message for this exception
+	 * @param nested the other exception
 	 */
 	public NoWorkFoundException(String msg, Throwable nested) {
 		super(msg, nested);

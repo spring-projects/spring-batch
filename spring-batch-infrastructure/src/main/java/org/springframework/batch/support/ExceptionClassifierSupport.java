@@ -31,7 +31,7 @@ public class ExceptionClassifierSupport implements ExceptionClassifier {
 	public static final String DEFAULT = "default";
 
 	/**
-	 * Always returns the value of {@value #DEFAULT}.
+	 * Always returns the value of {@link #DEFAULT}.
 	 * 
 	 * @see org.springframework.batch.support.ExceptionClassifier#classify(java.lang.Throwable)
 	 */

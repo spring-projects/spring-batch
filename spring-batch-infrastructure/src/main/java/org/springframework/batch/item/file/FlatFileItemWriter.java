@@ -56,8 +56,6 @@ import org.springframework.util.ClassUtils;
  * 
  * Uses buffered writer to improve performance.<br/>
  * 
- * Use {@link #write(String)} method to output a line to an item writer.
- * 
  * <p>
  * This class will be updated in the future to use a buffering approach to
  * handling transactions, rather than outputting directly to the file and
@@ -160,7 +158,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * @see ResourceLifecycle#close(ExecutionContext)
+	 * @see ItemStream#close(ExecutionContext)
 	 */
 	public void close(ExecutionContext executionContext) {
 		if (state != null) {
@@ -193,7 +191,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	/**
 	 * Initialize the Output Template.
 	 * 
-	 * @see ResourceLifecycle#open()
+	 * @see ItemStream#open(ExecutionContext)
 	 */
 	public void open(ExecutionContext executionContext) {
 		OutputState outputState = getOutputState();
@@ -298,7 +296,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		}
 
 		/**
-		 * @param properties
+		 * @param executionContext
 		 */
 		public void restoreFrom(ExecutionContext executionContext) {
 			lastMarkedByteOffsetPosition = executionContext.getLong(getKey(RESTART_DATA_NAME));
@@ -345,9 +343,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		}
 
 		/**
-		 * @param data
-		 * @param offset
-		 * @param length
+		 * @param line
 		 * @throws IOException
 		 */
 		public void write(String line) throws IOException {

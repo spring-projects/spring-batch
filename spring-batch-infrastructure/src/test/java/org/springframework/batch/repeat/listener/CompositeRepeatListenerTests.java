@@ -36,8 +36,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 	private List list = new ArrayList();
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.execution.listener.CompositeStepListener#setListeners(org.springframework.batch.core.domain.StepListener[])}.
+	 * Test method for {@link CompositeRepeatListener#setListeners(RepeatListener[])}.
 	 */
 	public void testSetListeners() {
 		listener.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
@@ -55,7 +54,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.execution.listener.CompositeStepListener#registerListener(org.springframework.batch.core.domain.StepListener)}.
+	 * {@link CompositeRepeatListener#register(RepeatListener)}.
 	 */
 	public void testSetListener() {
 		listener.register(new RepeatListenerSupport() {
@@ -67,10 +66,6 @@ public class CompositeRepeatListenerTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.execution.listener.CompositeStepListener#beforeStep(StepExecution)}.
-	 */
 	public void testClose() {
 		listener.register(new RepeatListenerSupport() {
 			public void close(RepeatContext context) {
@@ -81,10 +76,6 @@ public class CompositeRepeatListenerTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.execution.listener.CompositeStepListener#beforeStep(StepExecution)}.
-	 */
 	public void testOnError() {
 		listener.register(new RepeatListenerSupport() {
 			public void onError(RepeatContext context, Throwable e) {

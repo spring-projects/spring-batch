@@ -71,7 +71,7 @@ public abstract class AbstractTransactionalResourceItemWriter implements ItemWri
 	 * 
 	 * @throws Exception
 	 * 
-	 * @see org.springframework.batch.io.OutputSource#write(java.lang.Object)
+	 * @see org.springframework.batch.item.ItemWriter#write(Object)
 	 */
 	public void write(Object output) throws Exception {
 		bindTransactionResources();

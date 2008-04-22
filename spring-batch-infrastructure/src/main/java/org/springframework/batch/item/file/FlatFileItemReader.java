@@ -39,18 +39,21 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * This class represents a {@link ItemReader}, that reads lines from text file, tokenizes them to structured tuples ({@link FieldSet}s)
- * instances and maps the {@link FieldSet}s to domain objects. The location of the file is defined by the resource
- * property. To separate the structure of the file, {@link LineTokenizer} is used to parse data obtained from the file.
- * <br/>
+ * This class represents a {@link ItemReader}, that reads lines from text file,
+ * tokenizes them to structured tuples ({@link FieldSet}s) instances and maps
+ * the {@link FieldSet}s to domain objects. The location of the file is defined
+ * by the resource property. To separate the structure of the file,
+ * {@link LineTokenizer} is used to parse data obtained from the file. <br/>
  * 
- * A {@link FlatFileItemReader} is not thread safe because it maintains state in the form of a
- * {@link ResourceLineReader}. Be careful to configure a {@link FlatFileItemReader} using an appropriate factory or
- * scope so that it is not shared between threads.<br/>
+ * A {@link FlatFileItemReader} is not thread safe because it maintains state in
+ * the form of a {@link ResourceLineReader}. Be careful to configure a
+ * {@link FlatFileItemReader} using an appropriate factory or scope so that it
+ * is not shared between threads.<br/>
  * 
  * <p>
- * This class supports restart, skipping invalid lines and storing statistics. It can be configured to setup
- * {@link FieldSet} column names from the file header, skip given number of lines at the beginning of the file.
+ * This class supports restart, skipping invalid lines and storing statistics.
+ * It can be configured to setup {@link FieldSet} column names from the file
+ * header, skip given number of lines at the beginning of the file.
  * </p>
  * 
  * @author Waseem Malik
@@ -58,8 +61,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemReader extends ExecutionContextUserSupport implements ItemReader, ItemStream,
-        InitializingBean {
+public class FlatFileItemReader extends ExecutionContextUserSupport implements ItemReader, ItemStream, InitializingBean {
 
 	private static Log log = LogFactory.getLog(FlatFileItemReader.class);
 
@@ -83,11 +85,12 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	private LineTokenizer tokenizer = new DelimitedLineTokenizer();
 
 	private FieldSetMapper fieldSetMapper;
-	
+
 	private boolean saveState = false;
 
 	/**
-	 * Encapsulates the state of the input source. If it is null then we are uninitialized.
+	 * Encapsulates the state of the input source. If it is null then we are
+	 * uninitialized.
 	 */
 	private LineReader reader;
 
@@ -144,13 +147,13 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 				record = readLine();
 			}
 		}
-		
+
 	}
 
 	/**
 	 * Close and null out the reader.
 	 * 
-	 * @throws Exception
+	 * @throws ItemStreamException
 	 */
 	public void close(ExecutionContext executionContext) throws ItemStreamException {
 		try {
@@ -158,16 +161,18 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 				log.debug("Closing flat file for reading: " + resource);
 				reader.close(null);
 			}
-		} finally {
+		}
+		finally {
 			reader = null;
 		}
 	}
 
 	/**
-	 * Reads a line from input, tokenizes is it using the {@link #tokenizer} and maps to domain object using
-	 * {@link #fieldSetMapper}.
+	 * Reads a line from input, tokenizes is it using the
+	 * {@link #setLineTokenizer(LineTokenizer)} and maps to domain object using
+	 * {@link #setFieldSetMapper(FieldSetMapper)}.
 	 * 
-	 * @see org.springframework.batch.io.ItemReader#read()
+	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
 	public Object read() throws Exception {
 		String line = readLine();
@@ -176,34 +181,38 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 			try {
 				FieldSet tokenizedLine = tokenizer.tokenize(line);
 				return fieldSetMapper.mapLine(tokenizedLine);
-			} catch (RuntimeException ex) {
+			}
+			catch (RuntimeException ex) {
 				// add current line count to message and re-throw
 				int lineCount = getReader().getPosition();
-				throw new FlatFileParseException("Parsing error at line: " + lineCount + " in resource=" + resource.getDescription()
-				        + ", input=[" + line + "]", ex, line, lineCount);
+				throw new FlatFileParseException("Parsing error at line: " + lineCount + " in resource="
+						+ resource.getDescription() + ", input=[" + line + "]", ex, line, lineCount);
 			}
 		}
 		return null;
 	}
 
 	/**
-	 * This method returns the execution attributes for the reader. It returns the current Line Count which can be used
-	 * to reinitialise the batch job in case of restart.
+	 * This method returns the execution attributes for the reader. It returns
+	 * the current Line Count which can be used to reinitialise the batch job in
+	 * case of restart.
 	 */
 	public void update(ExecutionContext executionContext) {
 		if (reader == null) {
 			throw new ItemStreamException("ItemStream not open or already closed.");
 		}
-		
-		if(saveState){
+
+		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());
 		}
 	}
 
 	/**
-	 * Mark is supported as long as this {@link ItemStream} is used in a single-threaded environment. The state backing
-	 * the mark is a single counter, keeping track of the current position, so multiple threads cannot be accommodated.
+	 * Mark is supported as long as this {@link ItemStream} is used in a
+	 * single-threaded environment. The state backing the mark is a single
+	 * counter, keeping track of the current position, so multiple threads
+	 * cannot be accommodated.
 	 * 
 	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
@@ -226,11 +235,14 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	private String readLine() {
 		try {
 			return (String) getReader().read();
-		} catch (ItemStreamException e) {
+		}
+		catch (ItemStreamException e) {
 			throw e;
-		} catch (ItemReaderException e) {
+		}
+		catch (ItemReaderException e) {
 			throw e;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException();
 		}
 	}
@@ -247,7 +259,8 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Setter for resource property. The location of an input stream that can be read.
+	 * Setter for resource property. The location of an input stream that can be
+	 * read.
 	 * 
 	 * @param resource
 	 */
@@ -256,8 +269,9 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Public setter for the recordSeparatorPolicy. Used to determine where the line endings are and do things like
-	 * continue over a line ending if inside a quoted string.
+	 * Public setter for the recordSeparatorPolicy. Used to determine where the
+	 * line endings are and do things like continue over a line ending if inside
+	 * a quoted string.
 	 * 
 	 * @param recordSeparatorPolicy the recordSeparatorPolicy to set
 	 */
@@ -266,8 +280,8 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Setter for comment prefixes. Can be used to ignore header lines as well by using e.g. the first couple of column
-	 * names as a prefix.
+	 * Setter for comment prefixes. Can be used to ignore header lines as well
+	 * by using e.g. the first couple of column names as a prefix.
 	 * 
 	 * @param comments an array of comment line prefixes.
 	 */
@@ -277,8 +291,10 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Indicates whether first line is a header. If the tokenizer is an {@link AbstractLineTokenizer} and the column
-	 * names haven't been set already then the header will be used to setup column names. Default is <code>false</code>.
+	 * Indicates whether first line is a header. If the tokenizer is an
+	 * {@link AbstractLineTokenizer} and the column names haven't been set
+	 * already then the header will be used to setup column names. Default is
+	 * <code>false</code>.
 	 */
 	public void setFirstLineIsHeader(boolean firstLineIsHeader) {
 		this.firstLineIsHeader = firstLineIsHeader;
@@ -301,8 +317,10 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Public setter for the number of lines to skip at the start of a file. Can be used if the file contains a header
-	 * without useful (column name) information, and without a comment delimiter at the beginning of the lines.
+	 * Public setter for the number of lines to skip at the start of a file. Can
+	 * be used if the file contains a header without useful (column name)
+	 * information, and without a comment delimiter at the beginning of the
+	 * lines.
 	 * 
 	 * @param linesToSkip the number of lines to skip
 	 */
@@ -311,9 +329,11 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Setter for the encoding for this input source. Default value is {@value #DEFAULT_CHARSET}.
+	 * Setter for the encoding for this input source. Default value is
+	 * {@link #DEFAULT_CHARSET}.
 	 * 
-	 * @param encoding a properties object which possibly contains the encoding for this input file;
+	 * @param encoding a properties object which possibly contains the encoding
+	 * for this input file;
 	 */
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
@@ -323,12 +343,12 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements I
 		Assert.notNull(resource, "Input resource must not be null");
 		Assert.notNull(fieldSetMapper, "FieldSetMapper must not be null.");
 	}
-	
+
 	/**
-	 * Set the boolean indicating whether or not state should be saved
-	 * in the provided {@link ExecutionContext} during the {@link ItemStream}
-	 * call to update.  Setting this to false means that it will always start
-	 * at the beginning.
+	 * Set the boolean indicating whether or not state should be saved in the
+	 * provided {@link ExecutionContext} during the {@link ItemStream} call to
+	 * update. Setting this to false means that it will always start at the
+	 * beginning.
 	 * 
 	 * @param saveState
 	 */

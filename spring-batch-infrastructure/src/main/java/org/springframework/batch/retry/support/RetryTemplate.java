@@ -43,13 +43,12 @@ import org.springframework.batch.retry.policy.SimpleRetryPolicy;
  * 
  * By default, an operation is retried if is throws any {@link Exception} or
  * subclass of {@link Exception}. This behaviour can be changed by using the
- * {@link #setRetryableExceptionClasses} method to specify exactly which
- * {@link Exception} classes to retry for. <br/>
+ * {@link #setRetryPolicy(RetryPolicy)} method. <br/>
  * 
  * Also by default, each operation is retried for a maximum of three attempts
  * with no back off in between. This behaviour can be configured using the
- * {@link #setRetryAttempts retryAttempts} and
- * {@link #setBackOffStrategy backOffStrategy} properties. The
+ * {@link #setRetryPolicy(RetryPolicy)} and
+ * {@link #setBackOffPolicy(BackOffPolicy)} properties. The
  * {@link org.springframework.batch.retry.backoff.BackOffPolicy} controls how
  * long the pause is between each individual retry attempt. <br/>
  * 

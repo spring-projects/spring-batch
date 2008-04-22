@@ -53,7 +53,7 @@ public class NestedRepeatCallback implements RepeatCallback {
 	 * batch process, or to break a process up into smaller chunks (e.g. to
 	 * change the transaction boundaries).
 	 * 
-	 * @see org.springframework.batch.repeat.RepeatCallback#doInIteration(org.springframework.batch.support.BatchContextAdapter)
+	 * @see org.springframework.batch.repeat.RepeatCallback#doInIteration(RepeatContext)
 	 */
 	public ExitStatus doInIteration(RepeatContext context) throws Exception {
 		return template.iterate(callback);

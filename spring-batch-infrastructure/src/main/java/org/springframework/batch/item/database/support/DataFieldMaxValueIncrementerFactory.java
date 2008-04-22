@@ -46,7 +46,6 @@ public interface DataFieldMaxValueIncrementerFactory {
 
 	/**
 	 * Returns the list of supported database incrementer types
-	 * @return
 	 */
 	public String[] getSupportedIncrementerTypes();
 }

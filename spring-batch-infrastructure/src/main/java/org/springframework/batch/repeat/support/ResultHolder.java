@@ -4,10 +4,7 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**
- * Interface for result holder. Should be implemented by subclasses so that
- * the contract for
- * {@link AbstracBatchemplate#getNextResult(RepeatContext, RepeatCallback, TerminationContext, List)}
- * can be satisfied.
+ * Interface for result holder. 
  * 
  * @author Dave Syer
  */

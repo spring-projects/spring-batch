@@ -16,7 +16,6 @@
 
 package org.springframework.batch.retry.support;
 
-import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
@@ -29,7 +28,7 @@ import org.springframework.batch.retry.RetryOperations;
  * enclosing {@link RetryOperations}. But occasionally it might be helpful to
  * have lower level access to the ongoing {@link RetryContext} so we provide a
  * global accessor here. The mutator methods ({@link #clear()} and
- * {@link #register(RepeatContext)} should not be used except internally by
+ * {@link #register(RetryContext)} should not be used except internally by
  * {@link RetryOperations} implementations.
  * 
  * @author Dave Syer

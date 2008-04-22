@@ -337,7 +337,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @param state maintained by the implementation.
 	 * @return a finished result.
 	 * 
-	 * @see {@link #isComplete(RepeatContext)}
+	 * @see #isComplete(RepeatContext)
 	 */
 	protected ExitStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
 			throws Throwable {
@@ -355,7 +355,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * processes. By default does nothing and returns true.
 	 * 
 	 * @param state the internal state.
-	 * @return true if {@link #canContinue(Object)} is true for all results
+	 * @return true if {@link #canContinue(ExitStatus)} is true for all results
 	 * retrieved.
 	 */
 	protected boolean waitForResults(RepeatInternalState state) {
