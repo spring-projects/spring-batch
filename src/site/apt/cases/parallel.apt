@@ -116,7 +116,26 @@ Use Case: Massively Parallel Batch Processing
 
 ** Chunking
 
-  
+  The messages from a dispatcher to worker processes consist of a
+  chunk of items - a set of items to be processed together in a single
+  transaction (or as the worker sees fit).  The dispatcher is usually
+  single threaded, but this is only a restriction based on the input
+  data type (if it is a file it is difficult to read in parallel and
+  maintain restartability).  Using a process indicator the dispatcher
+  could be reading from a database table in a multi-threaded model.
+
+  The main restriction is that for restartability the messages between
+  the dispatcher and workers has to be durable (i.e. JMS or
+  equivalent).  If there is a durable middleware there are no in
+  principle difficulties with this approach.
+
+  The practicalities deserve some discussion.  In particular the
+  dispatcher has to co-ordinate asynchronous replies from its workers,
+  and also has to avoid overwhelming the workers (so there should be
+  some throttling).  As long as the middleware is durable the
+  dispatcher can simply wait for replies whenever it thinks there are
+  workers working.  It needs to record this expectation in a durable
+  form as well, as part of an <<<ExecutionContext>>> for the step.
 
 ** Partitioning
 

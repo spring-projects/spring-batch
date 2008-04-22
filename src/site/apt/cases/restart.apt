@@ -69,12 +69,12 @@ Use Case: Manual Restart After Failure
   (persist / rehydrate).
 
   * The initial condition is naturally under control of the
-  <<<DataProvider>>>.  The client need not know about the persistence
+  <<<ItemReader>>>.  The client need not know about the persistence
   and rehydration.  In fact explicit persistence and rehydration might
   be overkill - just relying on the transaction semantics might be
-  adequate in a lot of cases.  The <<<DataProvider>>> would have to be
+  adequate in a lot of cases.  The <<<ItemReader>>> would have to be
   aware of the transactions, which we assume are normally demarcated
-  in the <<<ExecutionHandler>>>.  Since the point at which persistence
+  in the <<<Step>>>.  Since the point at which persistence
   is needed is tied to transaction commits, there may have to be some
   transaction synchronization.
 

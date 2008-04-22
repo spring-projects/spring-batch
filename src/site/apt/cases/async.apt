@@ -10,8 +10,8 @@ Use Case: Asynchronous Chunk Processing
 * Goal
 
   Increased the efficiency of chunk processing by having it execute
-  asynchronously: each record in a separate thread.  Maintain
-  transactional intergrity of the chunk.
+  asynchronously: in multiple threads.  Maintain transactional
+  intergrity of the chunk.
 
 * Scope
 
@@ -119,11 +119,11 @@ Use Case: Asynchronous Chunk Processing
   have its own threads - how would each one be able to guide its child
   processes to participate in the same transaction?
 
-  * Beware a framework that extracts data from an <<<ItemProvider>>>
+  * Beware a framework that extracts data from an <<<ItemReader>>>
   before executing the business logic (e.g. in a
-  <<<ItemProcessor>>>).  It is not enough to allow concurrent
+  <<<ItemWriter>>>).  It is not enough to allow concurrent
   processing but simply insist that the individual records are
-  processed transactionally because the <<<ItemProvider>>> will then
+  processed transactionally because the <<<ItemReader>>> will then
   not be able to participate in the transaction - its next record has
   already been passed to the consumer when the transaction starts, so
   if there is a rollback then the record is lost.
@@ -131,14 +131,14 @@ Use Case: Asynchronous Chunk Processing
   This is the origin of the signature:
 
 +---
-public interface ItemProvider {
+public interface ItemReader {
     Object next();
 }
 +---
 
-  There is no peeking and no iteratror-style <<<hasNext>>>.  If there
+  There is no peeking and no iterator-style <<<hasNext>>>.  If there
   is a processing problem, transactional clients of the
-  <<<ItemProvider>>> throw an exception <after> the provider's
+  <<<ItemReader>>> throw an exception <after> the provider's
   <<<next()>>> has been called, but in the same thread (so that
   transactional semantics are preserved and the data provider reverts
   to its previous state).
@@ -155,5 +155,5 @@ public interface RepeatCallback {
   so we can return an object, which is null when the processing has
   finished.
 
-  In  the end we decided against the <<<Object>>> retrun type and went
-  with a boolean flag to signal (false) for no more processing.
+  In  the end we decided against the <<<Object>>> return type and went
+  with an exit status to signal for no more processing.

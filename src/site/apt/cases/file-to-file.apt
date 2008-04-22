@@ -76,7 +76,7 @@ Use Case: Copy File to File
   * With some external limitations the write-only file source can be
   implemented so that within a single JVM it will behave like a
   transactional database datasource.  We can provide a
-  <<<FileOutputTemplate>>> that hides the resource acquisition and
+  <<<FlatFileItemWriter>>> that hides the resource acquisition and
   release, and interacts with an existing transaction to provide the
   transactional behaviour that is required.
 

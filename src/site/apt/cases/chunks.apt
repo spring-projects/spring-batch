@@ -120,14 +120,14 @@ Use Case: Commit Batch Process Periodically
   {{{simple.html}simple}} use case).  The iterator could be more than
   just a loop that might terminate early: here it could also manage
   the file cursor on the input source.  In this design there is a
-  <<<ItemProvider>>> interface that can take care of termination and
+  <<<ItemReader>>> interface that can take care of termination and
   iteration (e.g. iterator-like method signatures).
 
   * Another design idea (more encapsulated and more in keeping with
   existing Spring practice) is to make the data source transaction
   aware, and for the client use it like a database resource, through a
   template.  In this case there is a <<<FileInputTemplate>>>.  The
-  <<<ItemProvider>>> needs to be aware of the data source template, so
+  <<<ItemReader>>> needs to be aware of the data source template, so
   that it can terminate when the data is exhausted.
 
   In this version of events there are two kinds of resource in play.
@@ -193,7 +193,7 @@ batchTemplate.iterate(chunkCallback);
 +---
 
   The transaction boundary is demarcated at the chunk level
-  (<<<chunkCallback.doWithRepeat()>>>).  Thw termination policy depends
+  (<<<chunkCallback.doWithRepeat()>>>).  The termination policy depends
   only on a data source eventually returning null.
 
   * N.B. the chunkSize can be dynamic. E.g., if the chunk is long
@@ -201,7 +201,7 @@ batchTemplate.iterate(chunkCallback);
   in case the batch has to be terminated.
 
   * Chunking can also be implemented simply in an
-  <<<ExecutionHandler>>>.  The handler just buffers records up to a
+  <<<ItemHandler>>>.  The handler just buffers records up to a
   chunk size, and then executes them all in one step (which might be
   transactional).  This is easier to implement, and easier to
   configure for the clients, but cannot easily be made both concurrent
