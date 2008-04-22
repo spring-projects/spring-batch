@@ -136,8 +136,8 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	private void insertParameter(Long jobId, ParameterType type, String key, Object value) {
 
 		Object[] args = new Object[0];
-		int[] argTypes = new int[] { Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.TIMESTAMP,
-				Types.INTEGER, Types.DOUBLE };
+		int[] argTypes = new int[] { Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.TIMESTAMP,
+				Types.BIGINT, Types.DOUBLE };
 
 		if (type == ParameterType.STRING) {
 			args = new Object[] { jobId, key, type, value, new Timestamp(0L), new Long(0), new Double(0) };

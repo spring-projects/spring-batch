@@ -1,5 +1,7 @@
 package org.springframework.batch.core.repository.dao;
 
+import java.util.Date;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -9,14 +11,18 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
 
 public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
 
+	private static final long DATE = 777;
+
 	private JobInstanceDao dao = new MapJobInstanceDao();
 
 	private Job fooJob = new JobSupport("foo");
 
-	private JobParameters fooParams = new JobParametersBuilder().addString("fooKey", "fooValue").toJobParameters();
+	private JobParameters fooParams = new JobParametersBuilder().addString("stringKey", "stringValue").addLong(
+			"longKey", new Long(Long.MAX_VALUE)).addDouble("doubleKey", new Double(Double.MAX_VALUE)).addDate(
+			"dateKey", new Date(DATE)).toJobParameters();
 
 	protected abstract JobInstanceDao getJobInstanceDao();
-	
+
 	protected void onSetUp() throws Exception {
 		dao = getJobInstanceDao();
 	}
@@ -32,7 +38,15 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalD
 		assertEquals(fooParams, fooInstance.getJobParameters());
 
 		JobInstance retrievedInstance = dao.getJobInstance(fooJob, fooParams);
+		JobParameters retrievedParams = retrievedInstance.getJobParameters();
 		assertEquals(fooInstance, retrievedInstance);
+		assertEquals(fooJob, retrievedInstance.getJob());
+		assertEquals(fooParams, retrievedParams);
+		
+		assertEquals(Long.MAX_VALUE, retrievedParams.getLong("longKey").longValue());
+		assertEquals(Double.MAX_VALUE, retrievedParams.getDouble("doubleKey").doubleValue(), 0.001);
+		assertEquals("stringValue", retrievedParams.getString("stringKey"));
+		assertEquals(new Date(DATE), retrievedParams.getDate("dateKey"));
 	}
 
 	/**
@@ -52,13 +66,14 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalD
 	}
 
 	public void testCreationAddsVersion() {
-		
+
 		JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), new JobSupport("testVersionAndId"));
-		
+
 		assertNull(jobInstance.getVersion());
 
 		jobInstance = dao.createJobInstance(new JobSupport("testVersion"), new JobParameters());
 
 		assertNotNull(jobInstance.getVersion());
 	}
+
 }
