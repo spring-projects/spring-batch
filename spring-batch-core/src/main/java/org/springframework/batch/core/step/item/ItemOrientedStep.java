@@ -18,9 +18,11 @@ package org.springframework.batch.core.step.item;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.StepExecutionSynchronizer;
 import org.springframework.batch.core.step.StepExecutionSynchronizerFactory;
@@ -200,7 +202,7 @@ public class ItemOrientedStep extends AbstractStep {
 	 * is used to store the result. Various reporting information are also added
 	 * to the current context (the {@link RepeatContext} governing the step
 	 * execution, which would normally be available to the caller somehow
-	 * through the step's {@link JobExecutionContext}.<br/>
+	 * through the step's {@link ExecutionContext}.<br/>
 	 * 
 	 * @throws JobInterruptedException if the step or a chunk is interrupted
 	 * @throws RuntimeException if there is an exception during a chunk

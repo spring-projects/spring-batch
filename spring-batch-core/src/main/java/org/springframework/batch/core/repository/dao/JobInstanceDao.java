@@ -18,10 +18,10 @@ public interface JobInstanceDao {
 	 * 
 	 * PreConditions: JobInstance for given name and parameters must not already exist
 	 * 
-	 * PostConditions: A valid job instancewill be returned which has been persisted and
+	 * PostConditions: A valid job instance will be returned which has been persisted and
 	 * contains an unique Id.
 	 * 
-	 * @param jobName
+	 * @param job
 	 * @param jobParameters
 	 * @return JobInstance
 	 */
@@ -32,10 +32,10 @@ public interface JobInstanceDao {
 	 * matching job instances are found, then a list of size 0 will be
 	 * returned.
 	 * 
-	 * @param jobName
+	 * @param job
 	 * @param jobParameters
-	 * @return List of {@link JobInstance} objects matching
-	 * {@link JobIdentifier}
+	 * @return {@link JobInstance} object matching
+	 * {@link Job} and {@link JobParameters}
 	 */
 	JobInstance getJobInstance(Job job, JobParameters jobParameters);
 

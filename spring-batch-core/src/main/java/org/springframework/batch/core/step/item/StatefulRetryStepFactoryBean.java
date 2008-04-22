@@ -176,8 +176,8 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 		/**
 		 * @param itemReader
 		 * @param itemWriter
-		 * @param retryCallback
 		 * @param retryTemplate
+		 * @param itemKeyGenerator
 		 * @param itemRecoverer
 		 */
 		public StatefulRetryItemHandler(ItemReader itemReader, ItemWriter itemWriter, RetryOperations retryTemplate,

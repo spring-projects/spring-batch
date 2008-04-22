@@ -30,9 +30,9 @@ public class AbstractJobTests extends TestCase {
 	JobSupport job = new JobSupport("job");
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#JobConfiguration()}.
+	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#getName()}.
 	 */
-	public void testJobConfiguration() {
+	public void testGetName() {
 		job = new JobSupport();
 		assertNull(job.getName());
 	}
@@ -56,7 +56,7 @@ public class AbstractJobTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#setStepNames(java.util.List)}.
+	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#setSteps(java.util.List)}.
 	 */
 	public void testSetSteps() {
 		job.setSteps(Collections.singletonList(new StepSupport("step")));
@@ -65,7 +65,7 @@ public class AbstractJobTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.job.AbstractJob#addStepName(org.springframework.batch.core.configuration.StepConfiguration)}.
+	 * {@link org.springframework.batch.core.job.AbstractJob#addStep(org.springframework.batch.core.Step)}.
 	 */
 	public void testAddStep() {
 		job.addStep(new StepSupport("step"));
@@ -73,7 +73,7 @@ public class AbstractJobTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#setStartLimit(int)}.
+	 * Test method for {@link org.springframework.batch.core.job.JobSupport#setStartLimit(int)}.
 	 */
 	public void testSetStartLimit() {
 		assertEquals(Integer.MAX_VALUE, job.getStartLimit());

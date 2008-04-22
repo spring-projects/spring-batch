@@ -221,7 +221,6 @@ public class TaskletStepTests extends TestCase {
 		}
 
 		/**
-		 * @param b
 		 * @param error
 		 */
 		public StubTasklet(Throwable error) {

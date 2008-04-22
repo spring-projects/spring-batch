@@ -42,7 +42,7 @@ public class CompositeChunkListener implements ChunkListener {
 	/**
 	 * Register additional listener.
 	 * 
-	 * @param stepListener
+	 * @param chunkListener
 	 */
 	public void register(ChunkListener chunkListener) {
 		if (!listeners.contains(chunkListener)) {

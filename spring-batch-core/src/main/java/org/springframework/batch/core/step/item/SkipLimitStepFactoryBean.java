@@ -13,10 +13,10 @@ import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 
 /**
  * Factory bean for step that provides options for configuring skip behavior.
- * User can set {@link #skipLimit} to set how many exceptions of
- * {@link #skippableExceptionClasses} types are tolerated.
- * {@link #fatalExceptionClasses} will cause immediate termination of job - they
- * are treated as higher priority than {@link #skippableExceptionClasses}, so
+ * User can set {@link #setSkipLimit(int)} to set how many exceptions of
+ * {@link #setSkippableExceptionClasses(Class[])} types are tolerated.
+ * {@link #setFatalExceptionClasses(Class[])} will cause immediate termination of job - they
+ * are treated as higher priority than {@link #setSkippableExceptionClasses(Class[])}, so
  * the two lists don't need to be exclusive.
  * 
  * @see SimpleStepFactoryBean
@@ -58,7 +58,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	 * but will result in transaction rollback and the item which handling
 	 * caused the exception will be skipped.
 	 * 
-	 * @param skippableExceptionClasses defaults to <code>Exception</code>
+	 * @param exceptionClasses defaults to <code>Exception</code>
 	 */
 	public void setSkippableExceptionClasses(Class[] exceptionClasses) {
 		this.skippableExceptionClasses = exceptionClasses;
@@ -127,7 +127,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	}
 
 	/**
-	 * Uses the {@link #skipLimit} value to configure item handler and and
+	 * Uses the {@link #setSkipLimit(int)} value to configure item handler and and
 	 * exception handler.
 	 */
 	protected void applyConfiguration(ItemOrientedStep step) {
@@ -173,9 +173,6 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 		step.setItemHandler(itemHandler);
 	}
 
-	/**
-	 * @return
-	 */
 	public void addFatalExceptionIfMissing(Class cls) {
 		List fatalExceptionList = new ArrayList(Arrays.asList(fatalExceptionClasses));
 		if (!fatalExceptionList.contains(cls)) {

@@ -64,7 +64,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	/**
-	 * @see JobDao#getJobExecutionCount(JobInstance)
+	 * @see JobExecutionDao#getJobExecutionCount(JobInstance)
 	 * @throws IllegalArgumentException if jobId is null.
 	 */
 	public int getJobExecutionCount(JobInstance jobInstance) {
@@ -82,7 +82,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * abstraction. Once a new id has been obtained, the JobExecution is saved
 	 * via a SQL INSERT statement.
 	 * 
-	 * @see JobDao#saveJobExecution(JobExecution)
+	 * @see JobExecutionDao#saveJobExecution(JobExecution)
 	 * @throws IllegalArgumentException if jobExecution is null, as well as any
 	 * of it's fields to be persisted.
 	 */
@@ -124,7 +124,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * ID. The database is then queried to ensure that the ID exists, which
 	 * ensures that it is valid.
 	 * 
-	 * @see JobDao#updateJobExecution(JobExecution)
+	 * @see JobExecutionDao#updateJobExecution(JobExecution)
 	 */
 	public void updateJobExecution(JobExecution jobExecution) {
 

@@ -46,9 +46,8 @@ import org.springframework.util.Assert;
 class BatchListenerFactoryHelper {
 
 	/**
-	 * @param itemReader2
+	 * @param itemReader
 	 * @param listeners
-	 * @return
 	 */
 	public ItemReader getItemReader(ItemReader itemReader, StepListener[] listeners) {
 
@@ -80,9 +79,8 @@ class BatchListenerFactoryHelper {
 	}
 
 	/**
-	 * @param itemWriter2
+	 * @param itemWriter
 	 * @param listeners
-	 * @return
 	 */
 	public ItemWriter getItemWriter(ItemWriter itemWriter, StepListener[] listeners) {
 		final CompositeItemWriteListener multicaster = new CompositeItemWriteListener();
@@ -115,7 +113,6 @@ class BatchListenerFactoryHelper {
 	/**
 	 * @param chunkOperations
 	 * @param listeners
-	 * @return
 	 */
 	public RepeatOperations addChunkListeners(RepeatOperations chunkOperations, StepListener[] listeners) {
 
@@ -157,7 +154,6 @@ class BatchListenerFactoryHelper {
 
 	/**
 	 * @param listeners
-	 * @return
 	 */
 	public StepExecutionListener[] getStepListeners(StepListener[] listeners) {
 		List list = new ArrayList();
@@ -172,7 +168,6 @@ class BatchListenerFactoryHelper {
 
 	/**
 	 * @param listeners
-	 * @return
 	 */
 	public SkipListener[] getSkipListeners(StepListener[] listeners) {
 		List list = new ArrayList();

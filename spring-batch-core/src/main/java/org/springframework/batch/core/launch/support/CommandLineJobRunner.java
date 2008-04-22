@@ -140,7 +140,7 @@ public class CommandLineJobRunner {
 	}
 
 	/**
-	 * Injection setter for the {@link JvmExitCodeMapper}.
+	 * Injection setter for the {@link ExitCodeMapper}.
 	 * 
 	 * @param exitCodeMapper
 	 *            the exitCodeMapper to set

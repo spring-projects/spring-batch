@@ -76,7 +76,7 @@ public class SimpleItemHandler implements ItemHandler {
 	}
 
 	/**
-	 * @return
+	 * @return item
 	 * @throws Exception
 	 */
 	protected final Object doRead() throws Exception {

@@ -72,7 +72,7 @@ public interface JobRepository {
 	 * Preconditions: {@link JobExecution} must contain a valid
 	 * {@link JobInstance}.
 	 * 
-	 * @param jobInstance
+	 * @param jobExecution
 	 */
 	void saveOrUpdate(JobExecution jobExecution);
 
@@ -83,11 +83,11 @@ public interface JobRepository {
 	 * Instead, it should be left blank, to be assigned by a
 	 * {@link JobRepository}. The {@link ExecutionContext} of the
 	 * {@link StepExecution} is <em>not</em> saved: see
-	 * {@link #saveExecutionContext(StepExecution)}.
+	 * {@link #saveOrUpdateExecutionContext(StepExecution)}.
 	 * 
 	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
 	 * 
-	 * @param jobInstance
+	 * @param stepExecution
 	 */
 	void saveOrUpdate(StepExecution stepExecution);
 

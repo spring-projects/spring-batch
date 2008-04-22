@@ -6,7 +6,6 @@ package org.springframework.batch.core.launch.support;
  * framework has specific requirements regarding the operating system process
  * return status.
  * 
- * @param The type of return status expected by the environment
  * @author Stijn Maller
  * @author Lucas Ward
  * @author Dave Syer

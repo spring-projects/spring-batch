@@ -47,8 +47,8 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * jobIncrementer (which is likely a sequence) for the nextLong, and then
 	 * passing the Id and parameter values into an INSERT statement.
 	 * 
-	 * @see JobDao#createJob(JobIdentifier)
-	 * @throws IllegalArgumentException if any {@link JobIdentifier} fields are
+	 * @see JobInstanceDao#createJobInstance(Job, JobParameters)
+	 * @throws IllegalArgumentException if any {@link JobParameters} fields are
 	 * null.
 	 */
 	public JobInstance createJobInstance(Job job, JobParameters jobParameters) {
@@ -159,8 +159,8 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * The job table is queried for <strong>any</strong> jobs that match the
 	 * given identifier, adding them to a list via the RowMapper callback.
 	 * 
-	 * @see JobDao#findJobInstances(JobIdentifier)
-	 * @throws IllegalArgumentException if any {@link JobIdentifier} fields are
+	 * @see JobInstanceDao#getJobInstance(Job, JobParameters)
+	 * @throws IllegalArgumentException if any {@link JobParameters} fields are
 	 * null.
 	 */
 	public JobInstance getJobInstance(final Job job, final JobParameters jobParameters) {

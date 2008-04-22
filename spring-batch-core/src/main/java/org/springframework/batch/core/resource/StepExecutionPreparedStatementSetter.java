@@ -63,8 +63,6 @@ public class StepExecutionPreparedStatementSetter extends StepExecutionListenerS
 	 * The parameter names that will be pulled from the {@link JobParameters}.  It is
 	 * assumed that their order in the List is the order of the parameters in the 
 	 * PreparedStatement.
-	 * 
-	 * @return
 	 */
 	public void setParameterKeys(List parameterKeys) {
 		this.parameterKeys = parameterKeys;

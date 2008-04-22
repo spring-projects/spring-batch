@@ -94,7 +94,6 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 
 	/**
 	 * @param relativePath
-	 * @return
 	 * @throws IOException
 	 * @see org.springframework.core.io.Resource#createRelative(java.lang.String)
 	 */
@@ -105,7 +104,6 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 	}
 
 	/**
-	 * @return
 	 * @see org.springframework.core.io.Resource#exists()
 	 */
 	public boolean exists() {
@@ -115,7 +113,6 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 	}
 
 	/**
-	 * @return
 	 * @see org.springframework.core.io.Resource#getDescription()
 	 */
 	public String getDescription() {
@@ -125,7 +122,6 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 	}
 
 	/**
-	 * @return
 	 * @throws IOException
 	 * @see org.springframework.core.io.Resource#getFile()
 	 */
@@ -136,7 +132,6 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 	}
 
 	/**
-	 * @return
 	 * @see org.springframework.core.io.Resource#getFilename()
 	 */
 	public String getFilename() {
@@ -146,7 +141,6 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 	}
 
 	/**
-	 * @return
 	 * @throws IOException
 	 * @see org.springframework.core.io.InputStreamSource#getInputStream()
 	 */
@@ -157,7 +151,6 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 	}
 
 	/**
-	 * @return
 	 * @throws IOException
 	 * @see org.springframework.core.io.Resource#getURI()
 	 */
@@ -168,7 +161,6 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 	}
 
 	/**
-	 * @return
 	 * @throws IOException
 	 * @see org.springframework.core.io.Resource#getURL()
 	 */
@@ -179,7 +171,6 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 	}
 
 	/**
-	 * @return
 	 * @see org.springframework.core.io.Resource#isOpen()
 	 */
 	public boolean isOpen() {
@@ -288,7 +279,7 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 	}
 
 	/**
-	 * Delegates to the proxied Resource if set, otherwise returns the {@link #filePattern}.
+	 * Delegates to the proxied Resource if set, otherwise returns the value of {@link #setFilePattern(String)}.
 	 */
 	public String toString() {
 		return (delegate == null) ? filePattern : delegate.toString(); 

@@ -57,7 +57,7 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeExecutionJobListener#registerJobExecutionListener(org.springframework.batch.core.JobExecutionListener)}.
+	 * {@link org.springframework.batch.core.listener.CompositeExecutionJobListener#register(org.springframework.batch.core.JobExecutionListener)}.
 	 */
 	public void testSetListener() {
 		listener.register(new JobExecutionListenerSupport() {

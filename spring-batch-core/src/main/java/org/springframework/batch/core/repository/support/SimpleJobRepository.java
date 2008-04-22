@@ -127,9 +127,10 @@ public class SimpleJobRepository implements JobRepository {
 	 * the same {@link JobParameters} and job name). The first transaction to
 	 * complete in this scenario obtains a valid {@link JobExecution}, and
 	 * others throw {@link JobExecutionAlreadyRunningException} (or timeout).
-	 * There are no such guarantees if the {@link JobDao} does not respect the
-	 * transaction isolation levels (e.g. if using a non-relational data-store,
-	 * or if the platform does not support the higher isolation levels).
+	 * There are no such guarantees if the {@link JobInstanceDao} and
+	 * {@link JobExecutionDao} do not respect the transaction isolation levels
+	 * (e.g. if using a non-relational data-store, or if the platform does not
+	 * support the higher isolation levels).
 	 * </p>
 	 * 
 	 * @see JobRepository#createJobExecution(Job, JobParameters)
@@ -193,11 +194,11 @@ public class SimpleJobRepository implements JobRepository {
 	 * Save or Update a JobExecution. A JobExecution is considered one
 	 * 'execution' of a particular job. Therefore, it must have it's jobId field
 	 * set before it is passed into this method. It also has it's own unique
-	 * identifer, because it must be updatable separately. If an id isn't found,
+	 * identifier, because it must be updatable separately. If an id isn't found,
 	 * a new JobExecution is created, if one is found, the current row is
 	 * updated.
 	 * 
-	 * @param JobExecution to be stored.
+	 * @param jobExecution to be stored.
 	 * @throws IllegalArgumentException if jobExecution is null.
 	 */
 	public void saveOrUpdate(JobExecution jobExecution) {
@@ -221,7 +222,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * noted that assigning an ID randomly will likely cause an exception
 	 * depending on the StepDao implementation.
 	 * 
-	 * @param StepExecution to be saved.
+	 * @param stepExecution to be saved.
 	 * @throws IllegalArgumentException if stepExecution is null.
 	 */
 	public void saveOrUpdate(StepExecution stepExecution) {

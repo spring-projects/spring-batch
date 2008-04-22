@@ -19,12 +19,13 @@ package org.springframework.batch.core.launch.support;
 import java.util.Properties;
 
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 
 /**
  * Interface to expose for remote management of jobs. Similar to
  * {@link JobLauncher}, but replaces {@link JobExecution} and
- * {@link JobIdentifier} with Strings in return types and method parameters, so
+ * {@link JobParameters} with Strings in return types and method parameters, so
  * it can be inspected by remote clients like the jconsole from the JRE without
  * any links to Spring Batch.
  * 

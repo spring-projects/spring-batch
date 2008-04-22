@@ -28,7 +28,7 @@ public class JobInstanceTests extends TestCase {
 	private JobInstance instance = new JobInstance(new Long(11), new JobParameters(), new JobSupport("job"));
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobInstance#getIdentifier()}.
+	 * Test method for {@link org.springframework.batch.core.JobInstance#getJobName()}.
 	 */
 	public void testGetName() {
 		instance = new JobInstance(new Long(1), new JobParameters(), new JobSupport("foo"));

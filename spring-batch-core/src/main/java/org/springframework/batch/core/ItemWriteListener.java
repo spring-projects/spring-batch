@@ -33,10 +33,10 @@ public interface ItemWriteListener extends StepListener {
 	void beforeWrite(Object item);
 
 	/**
-	 * Called after {@link ItemWriter#write(Object)  If  the item is last in a
+	 * Called after {@link ItemWriter#write(Object)}  If  the item is last in a
 	 * chunk, this will be called before any transaction is committed, and
 	 * before {@link ChunkListener#afterChunk()}
-	 * @param item TODO
+	 * @param item written item
 	 */
 	void afterWrite(Object item);
 

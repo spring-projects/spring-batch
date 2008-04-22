@@ -30,7 +30,7 @@ public class ThreadStepInterruptionPolicyTests extends TestCase {
 	private StepExecution context = new StepExecution(new StepSupport(), null);
 	
 	/**
-	 * Test method for {@link org.springframework.batch.core.executor.interrupt.ThreadStepInterruptionPolicy#checkInterrupted(StepExecution)}.
+	 * Test method for {@link org.springframework.batch.core.step.ThreadStepInterruptionPolicy#checkInterrupted(StepExecution)}.
 	 * @throws Exception 
 	 */
 	public void testCheckInterruptedNotComplete() throws Exception {
@@ -39,7 +39,7 @@ public class ThreadStepInterruptionPolicyTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.executor.interrupt.ThreadStepInterruptionPolicy#checkInterrupted(StepExecution)}.
+	 * Test method for {@link org.springframework.batch.core.step.ThreadStepInterruptionPolicy#checkInterrupted(StepExecution)}.
 	 * @throws Exception 
 	 */
 	public void testCheckInterruptedComplete() throws Exception {

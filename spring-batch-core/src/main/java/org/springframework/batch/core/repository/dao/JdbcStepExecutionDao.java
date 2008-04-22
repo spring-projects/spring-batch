@@ -168,7 +168,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 * stepExecutionIncrementor, and then set in the StepExecution. All values
 	 * will then be stored via an INSERT statement.
 	 * 
-	 * @see StepDao#saveStepExecution(StepExecution)
+	 * @see StepExecutionDao#saveStepExecution(StepExecution)
 	 */
 	public void saveStepExecution(StepExecution stepExecution) {
 
@@ -213,7 +213,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 * any attributes that don't match a provided type must be serialized into a
 	 * blob.
 	 * 
-	 * @see {@link LobCreator}
+	 * @see LobCreator
 	 */
 	public void saveOrUpdateExecutionContext(final StepExecution stepExecution) {
 

@@ -42,7 +42,7 @@ public class CompositeSkipListener implements SkipListener {
 	/**
 	 * Register additional listener.
 	 * 
-	 * @param stepExecutionListener
+	 * @param listener
 	 */
 	public void register(SkipListener listener) {
 		if (!listeners.contains(listener)) {

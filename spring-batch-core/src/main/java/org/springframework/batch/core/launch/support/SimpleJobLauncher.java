@@ -62,8 +62,8 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	 * used to determine if this is an execution of an existing job instance, or if a new one should
 	 * be created.
 	 * 
-	 * @param job, the job to be run.
-	 * @param jobParameters, the {@link JobParameters} for this particular execution.
+	 * @param job the job to be run.
+	 * @param jobParameters the {@link JobParameters} for this particular execution.
 	 * @return JobExecutionAlreadyRunningException if the JobInstance already exists and has an
 	 *         execution already running.
 	 * @throws JobRestartException if the execution would be a re-start, but a re-start is either

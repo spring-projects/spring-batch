@@ -86,8 +86,7 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	}
 
 	/**
-	 * @return
-	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#afterStep()
+	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#afterStep(StepExecution)
 	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return stepListener.afterStep(stepExecution);
@@ -103,8 +102,7 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 
 	/**
 	 * @param e
-	 * @return
-	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#onErrorInStep(java.lang.Throwable)
+	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#onErrorInStep(StepExecution, Throwable)
 	 */
 	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 		return stepListener.onErrorInStep(stepExecution, e);

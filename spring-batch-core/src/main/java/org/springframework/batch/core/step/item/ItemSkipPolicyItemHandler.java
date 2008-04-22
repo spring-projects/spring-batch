@@ -38,7 +38,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * {@link ItemHandler} that implements skip behavior. It delegates to
- * {@link #itemSkipPolicy} to decide whether skip should be called or not.
+ * {@link #setItemSkipPolicy(ItemSkipPolicy)} to decide whether skip should be called or not.
  * 
  * If exception is thrown while reading the item, skip is called on the
  * {@link ItemReader}. If exception is thrown while writing the item, skip is

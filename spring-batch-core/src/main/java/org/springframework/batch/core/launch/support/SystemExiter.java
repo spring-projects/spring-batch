@@ -33,7 +33,7 @@ public interface SystemExiter {
 	 * @throws SecurityException
 	 * 		if a security manager exists and its <code>checkExit</code>
      *        	method doesn't allow exit with the specified status.
-     * @see System.exit
+     * @see System#exit(int)
 	 */
 	void exit(int status);
 }

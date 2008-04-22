@@ -29,7 +29,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	/**
 	 * Public setter for the table prefix property. This will be prefixed to all
 	 * the table names before queries are executed. Defaults to
-	 * {@value #DEFAULT_TABLE_PREFIX}.
+	 * {@link #DEFAULT_TABLE_PREFIX}.
 	 * 
 	 * @param tablePrefix the tablePrefix to set
 	 */

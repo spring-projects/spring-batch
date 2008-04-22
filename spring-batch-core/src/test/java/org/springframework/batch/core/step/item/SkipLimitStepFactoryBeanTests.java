@@ -315,7 +315,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		}
 
 		/**
-		 * @param commaDelimitedListToSet
+		 * @param failures commaDelimitedListToSet
 		 */
 		public SkipWriterStub(Collection failures) {
 			this.failures = failures;
