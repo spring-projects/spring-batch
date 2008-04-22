@@ -10,17 +10,17 @@
     <para>All batch processing can be described in its most simple form as
     reading in large amounts of data, performing some type of calculation or
     transformation, and writing the result out. Spring Batch provides two key
-    interfaces to help perform bulk reading and writing: ItemReader and
-    ItemWriter</para>
+    interfaces to help perform bulk reading and writing:
+    <classname>ItemReader</classname> and
+    <classname>ItemWriter</classname>.</para>
   </section>
 
   <section>
     <title id="infrastructure.1">ItemReader</title>
 
-    <para>Although a simple concept, <emphasis
-    role="bold">ItemReader</emphasis>s are the means for providing data from
-    many different types of input. The most general examples include:
-    <itemizedlist>
+    <para>Although a simple concept, an <classname>ItemReader</classname> is
+    the means for providing data from many different types of input. The most
+    general examples include: <itemizedlist>
         <listitem>
           <para>Flat File- Flat File Item Readers read lines of data from a
           flat file that typically describe records with fields of data
@@ -31,23 +31,24 @@
         <listitem>
           <para>XML - XML ItemReaders process XML independently of
           technologies used for parsing, mapping and validating objects. Input
-          data allows for the validation of and XML file against and XSD
+          data allows for the validation of and XML file against an XSD
           schema.</para>
         </listitem>
 
         <listitem>
-          <para>Database - A database resource accessed that returns
-          resultsets that can be mapped to objects for processing. The default
-          SQL Input Sources invoke a RowMapper to return objects, keep track
-          of the current row if restart is required, basic statistics, and
-          some transaction enhancements that will be explained later.</para>
+          <para>Database - A database resource is accessed that returns
+          resultsets which can be mapped to objects for processing. The
+          default SQL Input Sources invoke a <classname>RowMapper</classname>
+          to return objects, keep track of the current row if restart is
+          required, basic statistics, and some transaction enhancements that
+          will be explained later.</para>
         </listitem>
       </itemizedlist>There are many more possibilities, but we'll focus on the
     basic ones for this chapter. A complete list of all available ItemReaders
     can be found in Appendix A.</para>
 
-    <para>The Item Reader is a basic interface for generic input
-    operations:</para>
+    <para><classname>ItemReader</classname> is a basic interface for generic
+    input operations:</para>
 
     <programlisting>public interface ItemReader {
 
@@ -64,7 +65,7 @@
     Item, returning null if no more items are left. An item might represent a
     line in a file, a row in a database, or an element in an XML file. It is
     generally expected that these will be mapped to a usable domain object
-    (i.e. Trade or Foo, etc) but there is no requirement in the contract to do
+    (i.e. Trade, Foo, etc) but there is no requirement in the contract to do
     so.</para>
 
     <para>The <methodname>mark</methodname> and <methodname>reset</methodname>
@@ -81,11 +82,11 @@
 
     <para><classname>ItemWriter</classname> is similar in functionality to an
     <classname>ItemReader</classname> with the exception that the operations
-    are reversed. They still need to be located, opened and closed but they
-    differ in the case that we write out, rather than reading in. In the case
-    of databases or queues these may be inserts, updates or sends. The format
-    of the serialization of the output source is specific for every batch
-    job.</para>
+    are reversed. Resources still need to be located, opened and closed but
+    they differ in the case that an <classname>ItemWriter</classname> writes
+    out, rather than reading in. In the case of databases or queues these may
+    be inserts, updates or sends. The format of the serialization of the
+    output is specific for every batch job.</para>
 
     <para>As with <classname>ItemReader</classname>,
     <classname>ItemWriter</classname> is a fairly generic interface:</para>
@@ -101,19 +102,22 @@
 </programlisting>
 
     <para>As with <methodname>read</methodname> on
-    <classname>ItemReader</classname>, write provides the basic contract of
-    <classname>ItemWriter</classname>, it will attempt to write out the item
-    passed in as long as it is open. As with <methodname>mark</methodname> and
-    <methodname>reset</methodname>, <methodname>flush</methodname> and
-    <methodname>clear</methodname> are necessary due to the nature of batch
-    processing. Because it is generally expected that items will be 'batched'
-    together into a chunk, and then output, it is expected that an
-    <classname>ItemWriter</classname> will perform some type of buffering.
-    <methodname>flush</methodname> will empty the buffer by actually writing
-    the items out, whereas <methodname>clear</methodname> will simply throw
-    the contents of the buffer away. In most cases, a Step implementation will
-    call <methodname>flush</methodname> before a commit and
-    <methodname>clear</methodname> in case of rollback.</para>
+    <classname>ItemReader</classname>, <methodname>write</methodname> provides
+    the basic contract of <classname>ItemWriter</classname>, it will attempt
+    to write out the item passed in as long as it is open. As with
+    <methodname>mark</methodname> and <methodname>reset</methodname>,
+    <methodname>flush</methodname> and <methodname>clear</methodname> are
+    necessary due to the transactional nature of batch processing. Because it
+    is generally expected that items will be 'batched' together into a chunk,
+    and then output, it is expected that an <classname>ItemWriter</classname>
+    will perform some type of buffering. <methodname>flush</methodname> will
+    empty the buffer by actually writing the items out, whereas
+    <methodname>clear</methodname> will simply throw the contents of the
+    buffer away. In most cases, a Step implementation will call
+    <methodname>flush</methodname> before a commit and
+    <methodname>clear</methodname> in case of rollback. It is expected that
+    implementations of the <classname>Step</classname> interface will call
+    these methods.</para>
   </section>
 
   <section>
@@ -137,20 +141,20 @@
 
     <para>Before describing each method, it's worth briefly mentioning the
     <classname>ExecutionContext</classname>. Clients of an
-    <classname>ItemReader</classname> that is also an
+    <classname>ItemReader</classname> that also implements
     <classname>ItemStream</classname> should call
     <methodname>open</methodname> before any calls to
     <methodname>read</methodname>, to open any resources such as files or
     obtain connections. A similar restriction applies to an
-    <classname>ItemWriter</classname> that is also an
+    <classname>ItemWriter</classname> is also implements
     <classname>ItemStream</classname>. As mentioned before, if expected data
     is found in the <classname>ExecutionContext</classname>, it may be used to
     start the <classname>ItemReader</classname> or
     <classname>ItemWriter</classname> at a location other than its initial
-    state. Conversely, close will be called to ensure any resources allocated
-    during <methodname>open</methodname> will be released safely.
-    <methodname>update</methodname> is called primarily to ensure that any
-    state currently being held is loaded into the provided
+    state. Conversely, <methodname>close</methodname> will be called to ensure
+    any resources allocated during <methodname>open</methodname> will be
+    released safely. <methodname>update</methodname> is called primarily to
+    ensure that any state currently being held is loaded into the provided
     <classname>ExecutionContext</classname>. This method will be called before
     committing, to ensure that the current state is persisted in the database
     before commit.</para>
@@ -213,38 +217,25 @@
     <section>
       <title id="infrastructure.1.2.1">FlatFileItemReader</title>
 
-      <para>One of the most common tasks performed in batch jobs involve
-      reading from some type of file. A flat file is basically any type of
-      file that contains at most two-dimensional (tabular) data. Reading flat
-      files in the Spring Batch framework is facilitated by the class
+      <para>A flat file is any type of file that contains at most
+      two-dimensional (tabular) data. Reading flat files in the Spring Batch
+      framework is facilitated by the class
       <classname>FlatFileItemReader</classname>, which provides basic
-      functionality for reading and parsing flat files. In addition, there are
-      default implementations of the <classname>ItemReader</classname> and
-      <classname>ItemStream</classname> interfaces that solve the majority of
-      file processing needs.</para>
-
-      <para>The <classname>FlatFileItemReader</classname> class has several
-      properties. The three most important of these properties are
+      functionality for reading and parsing flat files.
+      <classname>FlatFileItemReader</classname> class has several properties.
+      The three most important of these properties are
       <classname>Resource</classname>, <classname>FieldSetMapper</classname>
-      and <classname>LineTokenizer</classname>, which define the resource from
-      which data will be read and the method by which the read data will be
-      converted int distinct fields. The <classname>FieldSetMapper</classname>
-      and <classname>LineTokenizer</classname> interfaces will be explored
-      more in the next sections. In addition, we'll explore integration with
-      the file system via the resource property. The resource property
-      represents a Spring Core <classname>Resource</classname>. Documentation
-      explaining how to create beans of this type can be found in <ulink
+      and <classname>LineTokenizer. </classname>The
+      <classname>FieldSetMapper</classname> and
+      <classname>LineTokenizer</classname> interfaces will be explored more in
+      the next sections. The resource property represents a Spring Core
+      <classname>Resource</classname>. Documentation explaining how to create
+      beans of this type can be found in <ulink
       url="http://static.springframework.org/spring/docs/2.5.x/reference/resources.html"><citetitle>Spring
       Framework, Chapter 4.Resources</citetitle></ulink>. Therefore, this
       guide will not go into the details of creating
-      <classname>Resource</classname> objects except to make a couple of
-      points on the locating files to process within a batch environment.
-      Tokenizers and field set mappers will be discussed a bit later.</para>
-
-      <para>As mentioned, the location of the file is defined by the resource
-      property. There are only a few methods exposed through a resource
-      service. A resource is used to help locate, open, and close resources.
-      It can be as simple as: <programlisting>
+      <classname>Resource</classname> objects. A resource is used to locate,
+      open, and close resources. It can be as simple as: <programlisting>
         Resource resource = new FileSystemResource("resources/trades.csv");
         </programlisting></para>
 
@@ -259,17 +250,8 @@
       process of feeding the data into the pipe from this starting
       point.</para>
 
-      <para>The flat file reader uses a
-      <classname>ResourceLineReader</classname> object to read from the file.
-      Optionally, you can specify a
-      <classname>RecordSeparatorPolicy</classname> through the
-      recordSeparatorPolicy property. This can be used to configure more
-      low-level features, such as what constitutes the end of a line and
-      whether to continue quoted strings over newlines, among other
-      things.</para>
-
-      <para>The other properties in the flat file readers allow you to further
-      specify how your data will be interpreted: <table>
+      <para>The other properties in <classname>FlatFileItemReader</classname>
+      allow you to further specify how your data will be interpreted: <table>
           <title>Flat File Item Reader Properties</title>
 
           <tgroup cols="3">
@@ -324,6 +306,16 @@
                 AbstractLineTokenizer, field names will be set automatically
                 from this line</entry>
               </row>
+
+              <row>
+                <entry align="left">recordSeparatorPolicy</entry>
+
+                <entry align="left">RecordSeparatorPolicy</entry>
+
+                <entry align="left">Used to determine where the line endings
+                are and do things like continue over a line ending if inside a
+                quoted string.</entry>
+              </row>
             </tbody>
           </tgroup>
         </table></para>
@@ -331,16 +323,14 @@
       <section>
         <title>FieldSetMapper</title>
 
-        <para>Field set mappers used by the
-        <classname>FlatFileItemReader</classname> implement the
-        <classname>FieldSetMapper</classname> interface. This interface
-        defines a single method, mapLine, which takes a FieldSet object and
-        maps its contents to some Object. This object may be a custom DTO or
-        domain object, or it could be as simple as an array, depending on your
-        needs. The <classname>FieldSetMapper</classname> is used in
-        conjunction with the <classname>LineTokenizer</classname> to translate
-        a line of data from a resource into an object of the desired
-        type:</para>
+        <para>The <classname>FieldSetMapper</classname> interface defines a
+        single method, <methodname>mapLine</methodname>, which takes a
+        <classname>FieldSet</classname> object and maps its contents to an
+        object. This object may be a custom DTO or domain object, or it could
+        be as simple as an array, depending on your needs. The
+        <classname>FieldSetMapper</classname> is used in conjunction with the
+        <classname>LineTokenizer</classname> to translate a line of data from
+        a resource into an object of the desired type:</para>
 
         <programlisting>  public interface FieldSetMapper {
   
@@ -348,7 +338,7 @@
 
   }</programlisting>
 
-        <para>As you can see, the pattern used is exatly the same as
+        <para>As you can see, the pattern used is exactly the same as
         <classname>RowMapper</classname> used by
         <classname>JdbcTemplate</classname>.</para>
       </section>
@@ -367,14 +357,13 @@
   
     FieldSet tokenize(String line);
 
-  }
-</programlisting>
+  }</programlisting>
 
         <para>The contract of a <classname>LineTokenizer</classname> is such
         that, given a line of input (in theory the
         <classname>String</classname> could encompass more than one line) a
         <classname>FieldSet</classname> representing the line will be
-        returned. This will then be based to a
+        returned. This will then be passed to a
         <classname>FieldSetMapper</classname>. Spring Batch contains the
         following LineTokenizers:</para>
 
@@ -405,8 +394,8 @@
 
         <para>Now that the basic interfaces for reading in flat files have
         been defined, a simple example explaining how they work together is
-        helpful. In it's most simple form, the flow when reading a line form a
-        file is this:</para>
+        helpful. In it's most simple form, the flow when reading a line from a
+        file is the following:</para>
 
         <orderedlist>
           <listitem>
@@ -479,7 +468,7 @@
     }
   }    </programlisting></para>
 
-        <para>We can then read in from the filed by correctly constructing our
+        <para>We can then read in from the file by correctly constructing our
         FlatFileItemReader and calling read():</para>
 
         <programlisting>  FlatFileItemReader itemReader = new FlatFileItemReader();
@@ -498,11 +487,11 @@
       <section>
         <title>Mapping fields by name</title>
 
-        <para>There is one additional functionality that is similar in
-        function to a JDBC <classname>ResultSet</classname>. The names of the
-        fields can be injected into the <classname>LineTokenizer</classname>
-        to increase the readability of the mapping function. We can expose
-        this behavior by adding the following. First, we tell the
+        <para>There is one additional functionality line tokenizers that is
+        similar in function to a JDBC <classname>ResultSet</classname>. The
+        names of the fields can be injected into the
+        <classname>LineTokenizer</classname> to increase the readability of
+        the mapping function. First, we tell the
         <classname>LineTokenizer</classname> what the names of the fields in
         the fieldset are:</para>
 
@@ -562,8 +551,8 @@
         is required) in the same way the Spring container will look for
         setters matching a property name. Each available field in the
         <classname>FieldSet</classname> will be mapped, and the resultant
-        <classname>Player</classname> object will be returned, only there was
-        no code required.</para>
+        <classname>Player</classname> object will be returned, with no code
+        required.</para>
       </section>
 
       <section>
@@ -678,23 +667,22 @@
       <para>Writing out to flat files has the same problems and issues that
       reading in from a file must overcome. It must be able to write out in
       either delimited or fixed length formats in a transactional
-      manger.</para>
+      manner.</para>
 
       <section>
         <title>LineAggregator</title>
 
-        <para>Just like file reading's <classname>LineTokenizer</classname>
-        interface is necessary to take a string and split it into tokens, file
-        writing must have a way to aggregate multiple fields into a single
-        string for writing to a file. In Spring Batch this is the
+        <para>Just as the <classname>LineTokenizer</classname> interface is
+        necessary to take a string and split it into tokens, file writing must
+        have a way to aggregate multiple fields into a single string for
+        writing to a file. In Spring Batch this is the
         <classname>LineAggregator</classname>:</para>
 
         <programlisting>  public interface LineAggregator {
 
     public String aggregate(FieldSet fieldSet);
 
-  }
-</programlisting>
+  }</programlisting>
 
         <para>The <classname>LineAggregator</classname> is exactly the
         opposite of a <classname>LineTokenizer</classname>.
@@ -761,22 +749,22 @@
         <classname>FlatFileItemWriter</classname> expresses this in
         code:</para>
 
-        <programlisting>public void write(Object data) throws Exception {
-  FieldSet fieldSet = fieldSetCreator.mapItem(data);
-  getOutputState().write(lineAggregator.aggregate(fieldSet) + LINE_SEPARATOR);
-}</programlisting>
+        <programlisting>  public void write(Object data) throws Exception {
+    FieldSet fieldSet = fieldSetCreator.mapItem(data);
+    getOutputState().write(lineAggregator.aggregate(fieldSet) + LINE_SEPARATOR);
+  }</programlisting>
 
         <para>A simple configuration with the smallest ammount of setters
         would look like the following:</para>
 
-        <programlisting>&lt;bean id="itemWriter"
-      class="org.springframework.batch.io.file.FlatFileItemWriter"&gt;
-  &lt;property name="resource"
-            value="file:target/test-outputs/20070122.testStream.multilineStep.txt" /&gt;
-  &lt;property name="fieldSetCreator"&gt;
-    &lt;bean class="org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper"/&gt;
-  &lt;/property&gt;
-&lt;/bean&gt;</programlisting>
+        <programlisting>  &lt;bean id="itemWriter"
+        class="org.springframework.batch.io.file.FlatFileItemWriter"&gt;
+    &lt;property name="resource"
+              value="file:target/test-outputs/20070122.testStream.multilineStep.txt" /&gt;
+    &lt;property name="fieldSetCreator"&gt;
+      &lt;bean class="org.springframework.batch.io.file.mapping.PassThroughFieldSetMapper"/&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
       </section>
 
       <section>
@@ -788,17 +776,17 @@
         File writing isn't quite so simple. At first glance it seems like a
         similar straight forward contract should exist for
         <classname>FlatFileItemWriter</classname>, if the file already exists,
-        throw an exception, if it does not, create it and start writing. Job
-        restart throws a bit of a kink into this. In the normal restart
-        scenario, the contract is reversed, if the file exists start writing
-        to it from the last known good position, if it does not, throw an
-        exception. However, what happens if the file name for this job is
-        always the same? In this case, you would want to delete the file if it
-        exists, unless it's a restart. Because of this possibility, the
-        <classname>FlatFileItemWriter</classname> contains the property,
-        <methodname>shouldDeleteIfExists</methodname>. Setting this property
-        to true will cause an existing file with the same name to be deleted
-        when the writer is opened.</para>
+        throw an exception, if it does not, create it and start writing.
+        However, potentially restarting a <classname>Job</classname> can cause
+        issues. In the normal restart scenario, the contract is reversed, if
+        the file exists start writing to it from the last known good position,
+        if it does not, throw an exception. However, what happens if the file
+        name for this job is always the same? In this case, you would want to
+        delete the file if it exists, unless it's a restart. Because of this
+        possibility, the <classname>FlatFileItemWriter</classname> contains
+        the property, <methodname>shouldDeleteIfExists</methodname>. Setting
+        this property to true will cause an existing file with the same name
+        to be deleted when the writer is opened.</para>
       </section>
     </section>
   </section>
@@ -819,15 +807,15 @@
       only to provide callbacks).</para>
     </note>
 
-    <para>Lets take a closer look how XML input and output works in batch.
-    First, there are a few concepts that vary from file reading and writing
-    but are common across Spring Batch XML processing. With XML processing
-    instead of lines of records (FieldSets) that need to be tokenized, it is
-    assumed an XML resource is a collection of 'fragments' corresponding to
-    individual records. Note that OXM tools are designed to work with
-    standalone XML documents rather than XML fragments cut out of an XML
-    document, therefore the Spring Batch infrastructure needs to work around
-    this fact (as described below).</para>
+    <para>Lets take a closer look how XML input and output works in Spring
+    Batch. First, there are a few concepts that vary from file reading and
+    writing but are common across Spring Batch XML processing. With XML
+    processing instead of lines of records (FieldSets) that need to be
+    tokenized, it is assumed an XML resource is a collection of 'fragments'
+    corresponding to individual records. Note that OXM tools are designed to
+    work with standalone XML documents rather than XML fragments cut out of an
+    XML document, therefore the Spring Batch infrastructure needs to work
+    around this fact, as described below:</para>
 
     <para><mediaobject>
         <imageobject role="fo">
@@ -843,9 +831,11 @@
         <caption><para>Figure 3.1: XML Input</para></caption>
       </mediaobject></para>
 
-    <para>Spring Batch uses Object/XML Mapping (OXM) to bind fragments to
-    objects. However, Spring Batch is not tied to any particular xml binding
-    technology. Typical use is to delegate to <ulink
+    <para>The 'trade' tag is defined as the 'root element' in the scenario
+    above. Everything between '&lt;trade&gt;' and '&lt;/trade&gt;' is
+    considered one 'fragment'. Spring Batch uses Object/XML Mapping (OXM) to
+    bind fragments to objects. However, Spring Batch is not tied to any
+    particular xml binding technology. Typical use is to delegate to <ulink
     url="http://static.springframework.org/spring-ws/site/reference/html/oxm.html"><citetitle>Spring
     OXM</citetitle></ulink>, which provides uniform abstraction for the most
     popular OXM technologies. The dependency on Spring OXM is optional and you
@@ -868,8 +858,8 @@
         <caption><para>Figure 3.2: OXM Binding</para></caption>
       </mediaobject></para>
 
-    <para>Now with and introduction into OXM and how one can use XML fragments
-    to represent records, let's take a closer look at Item Readers and Item
+    <para>Now with an introduction to OXM and how one can use XML fragments to
+    represent records, let's take a closer look at Item Readers and Item
     Writers.</para>
 
     <section>
@@ -901,27 +891,25 @@
     &lt;price&gt;99.99&lt;/price&gt;
     &lt;customer&gt;Customer3&lt;/customer&gt;
   &lt;/trade&gt;
-&lt;/records&gt;
-</programlisting></para>
+&lt;/records&gt;</programlisting></para>
 
       <para>To be able to process the XML records we need the following:
       <itemizedlist>
           <listitem>
-            <para>Root Element Name - this is name of the root element of the
-            fragment that constitutes the object to be mapped. The example
+            <para>Root Element Name - Name of the root element of the fragment
+            that constitutes the object to be mapped. The example
             configuration demonstrates this with the value of trade.</para>
           </listitem>
 
           <listitem>
-            <para>Resource - This is a Spring Resource that in the case of
-            this example will abstract the details of opening a file for
-            reading content.</para>
+            <para>Resource - Spring Resource that represents the file to be
+            read.</para>
           </listitem>
 
           <listitem>
-            <para><classname>FragmentDeserializer</classname> - this is the
-            UnMarshalling facility provided by Spring OXM for mapping the XML
-            fragment to an object.</para>
+            <para><classname>FragmentDeserializer</classname> - UnMarshalling
+            facility provided by Spring OXM for mapping the XML fragment to an
+            object.</para>
           </listitem>
         </itemizedlist></para>
 
@@ -1010,12 +998,13 @@
 
       <para>Output works symmetrically to input. The
       <classname>StaxEventItemWriter</classname> needs a
-      <classname>Resource</classname>, a serializer, and a rootTagName. A java
+      <classname>Resource</classname>, a serializer, and a rootTagName. A Java
       object is passed to a serializer (typically a wrapper around Spring OXM
-      <classname>Marshaller</classname>) which writes to output using a custom
-      event writer that filters the StartDocument and EndDocument events
-      produced for each fragment by the OXM tools. We'll show this in an
-      example using the
+      <classname>Marshaller</classname>) which writes to a
+      <classname>Resource</classname> using a custom event writer that filters
+      the <classname>StartDocument</classname> and
+      <classname>EndDocument</classname> events produced for each fragment by
+      the OXM tools. We'll show this in an example using the
       <classname>MarshallingEventWriterSerializer</classname>. The Spring
       configuration for this setup looks as follows:</para>
 
@@ -1042,10 +1031,10 @@
 &lt;/bean&gt;</parameter></programlisting>
 
       <para>To summarize with a Java example, the following code illustrates
-      all of the points discussed. The code demonstrates the programmatic
-      setup of the required properties.</para>
+      all of the points discussed, demonstrating the programmatic setup of the
+      required properties.</para>
 
-      <programlisting>StaxEventItemWriter staxItemWriter = new StaxEventItemWriter()
+      <programlisting>     StaxEventItemWriter staxItemWriter = new StaxEventItemWriter()
      FileSystemResource resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", "xml"))
 
      Map aliases = new HashMap();
@@ -1116,13 +1105,13 @@
     <classname>ResourceEditor</classname> in Spring already filters and does
     placeholder replacement on system properties.)</para>
 
-    <para>Often in a batch setting it is preferable to parameterise the file
+    <para>Often in a batch setting it is preferable to parameterize the file
     name in the <classname>JobParameters</classname> of the job, instead of
     through system properties, and access them that way. To allow for this,
     Spring Batch provides the
     <classname>StepExecutionResourceProxy</classname>. The proxy can use
     either job name, step name, or any values from the
-    <classname>JobParameters</classname>, by surround them with %:</para>
+    <classname>JobParameters</classname>, by surrounding them with %:</para>
 
     <programlisting>  &lt;bean id="inputFile"
         class="org.springframework.batch.core.resource.StepExecutionResourceProxy" /&gt;
@@ -1131,8 +1120,8 @@
 
     <para>Assuming a job name of 'fooJob', and a step name of 'fooStep', and
     the key-value pair of 'file.name="fileName.txt"' is in the
-    <classname>JobParameters</classname> the job is start with, the following
-    filename will be passed as the <classname>Resource</classname>:
+    <classname>JobParameters</classname> the job is started with, the
+    following filename will be passed as the <classname>Resource</classname>:
     "<filename>//fooJob/fooStep/fileName.txt</filename>". It should be noted
     that in order for the proxy to have access to the
     <classname>StepExecution</classname>, it must be registered as a
@@ -1417,7 +1406,7 @@ itemReader.close(executionContext);</programlisting>
         <classname>CustomerCredit</classname> objects in the exact same manner
         as described by the <classname>JdbcCursorItemReader</classname>,
         assuming hibernate mapping files have been created correctly for the
-        Customer table. The 'useStatelessSession' property default to true,
+        Customer table. The 'useStatelessSession' property defaults to true,
         but has been added here to draw attention to the ability to switch it
         on or off.</para>
       </section>
@@ -1427,7 +1416,7 @@ itemReader.close(executionContext);</programlisting>
       <title>Driving Query Based ItemReaders</title>
 
       <para>In the previous section, Cursor based database input was
-      discussed. However, this isn't the only option. Many database vendors,
+      discussed. However, it isn't the only option. Many database vendors,
       such as DB2, have extremely pessimistic locking strategies that can
       cause issues if the table being read also needs to be used by other
       portions of the online application. Furthermore, opening cursors over
@@ -1451,9 +1440,9 @@ itemReader.close(executionContext);</programlisting>
       <para>As you can see, this example uses the same 'FOO' table as was used
       in the cursor based example. However, rather than selecting the entire
       row, only the ID's were selected in the SQL statement. So, rather than a
-      FOO object being returned from read(), an Integer will be returned. This
-      number can then be used to query for the 'details', which is a complete
-      Foo object:</para>
+      FOO object being returned from <classname>read</classname>, an Integer
+      will be returned. This number can then be used to query for the
+      'details', which is a complete Foo object:</para>
 
       <mediaobject>
         <imageobject role="html">
@@ -1476,8 +1465,8 @@ itemReader.close(executionContext);</programlisting>
         <title>KeyCollector</title>
 
         <para>As the previous example illustrates, the DrivingQueryItemReader
-        is fairly simple. It simply iteratoes over a list of keys. However,
-        the real complication is how those keys are obtained. The
+        is fairly simple. It simply iterates over a list of keys. However, the
+        real complication is how those keys are obtained. The
         <classname>KeyCollector</classname> interface abstracts this:</para>
 
         <programlisting>  public interface KeyCollector {
@@ -1494,9 +1483,9 @@ itemReader.close(executionContext);</programlisting>
         keys 1 through 1,000, and fails after processing key 500, upon
         restarting keys 500 through 1,000 should be returned. This
         functionality is made possible by the
-        <methodname>saveState</methodname> method, which saves the provided
-        key (which should be the current key being processed) in the provided
-        <classname>ExecutionContext</classname>. The
+        <methodname>updateContext</methodname> method, which saves the
+        provided key (which should be the current key being processed) in the
+        provided <classname>ExecutionContext</classname>. The
         <methodname>retrieveKeys</methodname> method can then use this value
         to retrieve a subset of the original keys:</para>
 
@@ -1520,10 +1509,10 @@ itemReader.close(executionContext);</programlisting>
       <section>
         <title>SingleColumnJdbcKeyCollector</title>
 
-        <para>The most common driving query scenario is that of a input that
-        has only one column that represents it's key. This is implemented as
-        the <classname>SingleColumnJdbcKeyCollector</classname> class, which
-        has the following options:</para>
+        <para>The most common driving query scenario is that of input that has
+        only one column that represents its key. This is implemented as the
+        <classname>SingleColumnJdbcKeyCollector</classname> class, which has
+        the following options:</para>
 
         <table>
           <title>SinglecolumnJdbcKeyCollector properties</title>
@@ -1717,25 +1706,24 @@ itemReader.close(executionContext);</programlisting>
       example, let's assume that 20 items will be written per chunk, and the
       15th item throws a DataIntegrityViolationException. As far as the Step
       is concerned, all 20 item will be written out successfully, since
-      there's no way to know that and error will occur until they are actually
+      there's no way to know that an error will occur until they are actually
       written out. Once
       <classname>ItemWriter#</classname><methodname>flush</methodname>() is
       called, the buffer will be emptied and the exception will be hit. At
-      this point, there's nothing the Step can do, the transaction must be
-      rolled back. Normally, this exception will cause the Item to be skipped
-      (depending upon the skip/retry policies), and then it won't be written
-      out again. However, in this scenario, there's no way for it to know
-      which item caused the issue, the whole buffer was being written out when
-      the failure happened. Because this is a common enough use case,
-      especially when using Hibernate, Spring Batch provides an implementation
-      to help: <classname>HibernateAwareItemWriter</classname>. The
-      <classname>HibernateAwareItemWriter</classname> solves the problem in a
-      straightforward way: if a chunk fails the first time, on subsequent runs
-      it will be flushed and the transaction committed after each time. This
-      effectively lowers the commit interval to one for the length of the
-      chunk. Doing so allows for items to be skipped reliably. The following
-      example illustrates how to configure the
-      <classname>HibernateAwareItemWriter</classname>:</para>
+      this point, there's nothing the <classname>Step</classname> can do, the
+      transaction must be rolled back. Normally, this exception will cause the
+      Item to be skipped (depending upon the skip/retry policies), and then it
+      won't be written out again. However, in this scenario, there's no way
+      for it to know which item caused the issue, the whole buffer was being
+      written out when the failure happened. Because this is a common enough
+      use case, especially when using Hibernate, Spring Batch provides an
+      implementation to help: <classname>HibernateAwareItemWriter</classname>.
+      The <classname>HibernateAwareItemWriter</classname> solves the problem
+      in a straightforward way: if a chunk fails the first time, on subsequent
+      runs it will be flushed after after each time. This effectively lowers
+      the commit interval to one for the length of the chunk. Doing so allows
+      for items to be skipped reliably. The following example illustrates how
+      to configure the <classname>HibernateAwareItemWriter</classname>:</para>
 
       <programlisting>  &lt;bean id="hibernateItemWriter"
         class="org.springframework.batch.item.database.HibernateAwareItemWriter"&gt;
@@ -1855,10 +1843,10 @@ itemReader.close(executionContext);</programlisting>
     Object transform(Object item) throws Exception;
   }</programlisting>
 
-    <para>An ItemTransformer interface is very simple, given one object,
-    transorm it and return another. The object provided may or may not be of
-    the same type. The point is that business logic may be applied within
-    transform, and is completely up to the developer to create. An
+    <para>An ItemTransformer is very simple, given one object, transorm it and
+    return another. The object provided may or may not be of the same type.
+    The point is that business logic may be applied within transform, and is
+    completely up to the developer to create. An
     <classname>ItemTransformer</classname> is used as part of the
     <classname>ItemTransformerItemWriter</classname>, which accepts an
     <classname>ItemWriter</classname> and an
@@ -1920,18 +1908,19 @@ itemReader.close(executionContext);</programlisting>
       <section>
         <para>Note that the <classname>ItemTransformerItemWriter</classname>
         and the <classname>CompositeItemWriter</classname> are examples of a
-        delegation pattern, which is quite common usage in Spring Batch. The
-        delegates themselves might implement callback interfaces like
+        delegation pattern, which is common in Spring Batch. The delegates
+        themselves might implement callback interfaces like
         <classname>ItemStream</classname> or
         <classname>StepListener</classname>. If they do, and they are being
-        used in conjunction with Spring Batch Core as part of a step in a job,
-        then they almost certainly need to be registered manually with the
+        used in conjunction with Spring Batch Core as part of a
+        <classname>Step</classname> in a <classname>Job</classname>, then they
+        almost certainly need to be registered manually with the
         <classname>Step</classname>. Registration is automatic when using the
         factory beans (<classname>*StepFactoryBean</classname>) , but only for
         the <classname>ItemReader</classname> and
-        <classname>ItemWriter</classname> injected directly - the delegates
-        are not known to the step, so they need to be injected as listeners or
-        streams (or both if appropriate).</para>
+        <classname>ItemWriter</classname> injected directly. The delegates are
+        not known to the <classname>Step</classname>, so they need to be
+        injected as listeners or streams (or both if appropriate).</para>
       </section>
     </section>
 

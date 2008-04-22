@@ -69,9 +69,9 @@
       have teamed to collaborate on the development of Spring Batch.</para>
 
       <para>Accenture has contributed previously proprietary batch processing
-      architecture frameworks -- based upon decades worth of experience in
+      architecture frameworks, based upon decades worth of experience in
       building batch architectures with the last several generations of
-      platforms (i.e., COBOL/Mainframe, C++/Unix, and now Java/anywhere) -- to
+      platforms, (i.e., COBOL/Mainframe, C++/Unix, and now Java/anywhere) to
       the Spring Batch project along with committer resources to drive
       support, enhancements, and the future roadmap.</para>
 
@@ -178,11 +178,11 @@
       <para>Spring Batch is designed with extensibility and a diverse group of
       end users in mind. The figure below shows a sketch of the layered
       architecture that supports the extensibility and ease of use for
-      end-user developers.
-		<mediaobject>
+      end-user developers. <mediaobject>
           <imageobject role="fo">
-            <imagedata align="center" fileref="src/site/resources/reference/images/spring-batch-layers.png"
-                       format="PNG"/>
+            <imagedata align="center"
+                       fileref="src/site/resources/reference/images/spring-batch-layers.png"
+                       format="PNG" />
           </imageobject>
 
           <imageobject role="html">
@@ -204,7 +204,8 @@
       are built on top of a common infrastructure. This infrastructure
       contains common readers and writers, and services such as the
       <classname>RetryTemplate</classname>, which are used both by application
-      developers(readers and writers) and the core framework itself.
+      developers(<classname>ItemReader</classname> and
+      <classname>ItemWriter</classname>) and the core framework itself.
       (retry)</para>
     </section>
   </section>

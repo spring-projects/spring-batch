@@ -12,24 +12,24 @@
     are “Jobs” and “Steps” and developer supplied processing units called
     ItemReaders and ItemWriters. However, because of the Spring patterns,
     operations, templates, callbacks, and idioms, there are opportunities for
-    <itemizedlist>
+    the following:<itemizedlist>
         <listitem>
           <para>significant improvement in adherence to a clear separation of
-          concerns,</para>
+          concerns</para>
         </listitem>
 
         <listitem>
           <para>clearly delineated architectural layers and services provided
-          as interfaces,</para>
+          as interfaces</para>
         </listitem>
 
         <listitem>
           <para>simple and default implementations that allowed for quick
-          adoption and ease of use out-of-the-box, and</para>
+          adoption and ease of use out-of-the-box</para>
         </listitem>
 
         <listitem>
-          <para>significantly enhanced extensibility.</para>
+          <para>significantly enhanced extensibility</para>
         </listitem>
       </itemizedlist></para>
 
@@ -44,8 +44,7 @@
     physical implementation of the layers, components and technical services
     commonly found in robust, maintainable systems used to address the
     creation of simple to complex batch applications, with the infrastructure
-    and extensions to address very complex processing needs. The materials
-    below will walk through the details of the diagram.</para>
+    and extensions to address very complex processing needs.</para>
   </section>
 
   <section>
@@ -67,12 +66,14 @@
       <caption><para>Figure 2.1: Batch Stereotypes</para></caption>
     </mediaobject>
 
-    <para>The colors used on the above diagram are extremely important. Grey
+    <para>The above diagram highlights the interactions and key services
+    provided by the Spring Batch framework. The colors used are important to
+    understanding the responsibilities of a developer in Spring Batch. Grey
     represents an external application such as an enterprise scheduler or a
     database. It's important to note that scheduling is grey, and should thus
     be considered separate from Spring Batch. Blue represents application
     architecture services. In most cases these are provided by Spring Batch
-    with out of the box implementations, but an architecture time may make
+    with out of the box implementations, but an architecture team may make
     specific implementations that better address their specific needs. Yellow
     represents the pieces that must be configured by a developer. For example,
     they need to configure their job schedule so that the job is kicked off at
@@ -87,7 +88,7 @@
     which include Run, Job, Application, and Data. The primary goal for
     organizing an application according to the tiers is to embed what is known
     as "separation of concerns" within the system. These tiers can be
-    conceptual but may they prove effective in mapping the deployment of the
+    conceptual but may prove effective in mapping the deployment of the
     artifacts onto physical components like Java runtimes and integration with
     data sources and targets. Effective separation of concerns results in
     reducing the impact of change to the system. The four conceptual tiers
@@ -130,9 +131,10 @@
 
     <para>This section describes stereotypes relating to the concept of a
     batch job. A job is an entity that encapsulates an entire batch process.
-    The file containing the job may sometimes be referred to as the "job
-    configuration". However, <classname>Job</classname> is just the top of an
-    overall hierarchy:</para>
+    As is common with other Spring projects, a <classname>Job</classname> will
+    be wired together via an XML configuration file. This file may be referred
+    to as the "job configuration". However, <classname>Job</classname> is just
+    the top of an overall hierarchy:</para>
 
     <mediaobject>
       <imageobject role="html">
@@ -148,8 +150,7 @@
     <section>
       <title id="s.2.1.1">Job</title>
 
-      <para>The job could be described as the heart of the Spring Batch
-      framework. It is represented by a Spring bean that implements the
+      <para>A job is represented by a Spring bean that implements the
       <classname>Job</classname> interface and contains all of the information
       necessary to define the operations performed by a job. A job
       configuration is typically contained within a Spring XML configuration
@@ -198,9 +199,9 @@
       <para>A <classname>JobInstance</classname> refers to the concept of a
       logical job run. Let's consider a batch job that should be run once at
       the end of the day, such as the 'EndOfDay' job from the diagram above.
-      There is a one 'EndOfDay' <classname>Job</classname>, but each
-      individual run of the <classname>Job</classname> must be tracked
-      separately. In the case of this job, there will be one logical
+      There is one 'EndOfDay' <classname>Job</classname>, but each individual
+      run of the <classname>Job</classname> must be tracked separately. In the
+      case of this job, there will be one logical
       <classname>JobInstance</classname> per day. For example, there will be a
       January 1st run, and a January 2nd run. If the January 1st run fails the
       first time and is run again the next day, it's still the January 1st
@@ -208,30 +209,33 @@
       meaning the January 1st run processes data for January 1st, etc) That is
       to say, each <classname>JobInstance</classname> can have multiple
       executions. (<classname>JobExecution</classname> is discussed in more
-      detail below) and only one instance can be running at a given time. The
-      definition of a <classname>JobInstance</classname> has absolutely no
-      bearing on the data the will be loaded. It is entirely up to the
-      <classname>ItemReader</classname> implementation used to determine how
-      data will be loaded. For example, in the EndOfDay scenario, there may be
-      a column on the data that indicates the 'effective date' or 'schedule
-      date' to which the data belongs. So, the January 1st run would only load
-      data from the 1st, and the January 2nd run would only use data from the
-      2nd. Because this determination will likely be a business decision, it
-      is left up to the <classname>ItemReader</classname> to decide. What
-      using the same JobInstance will decide, however, is whether or not the
-      'state' (i.e. the ExecutionContext, which is discussed below) will be
-      used. Using a new instace will mean 'start from the beginning' and using
-      an existing instance will generally mean 'start from where you left
-      off'.</para>
+      detail below) and only one <classname>JobInstance</classname>
+      corresponding to a particular <classname>Job</classname> can be running
+      at a given time. The definition of a <classname>JobInstance</classname>
+      has absolutely no bearing on the data the will be loaded. It is entirely
+      up to the <classname>ItemReader</classname> implementation used to
+      determine how data will be loaded. For example, in the EndOfDay
+      scenario, there may be a column on the data that indicates the
+      'effective date' or 'schedule date' to which the data belongs. So, the
+      January 1st run would only load data from the 1st, and the January 2nd
+      run would only use data from the 2nd. Because this determination will
+      likely be a business decision, it is left up to the
+      <classname>ItemReader</classname> to decide. What using the same
+      <classname>JobInstance</classname> will determine, however, is whether
+      or not the 'state' (i.e. the ExecutionContext, which is discussed below)
+      from previous executions will be used. Using a new
+      <classname>JobInstance</classname> will mean 'start from the beginning'
+      and using an existing instance will generally mean 'start from where you
+      left off'.</para>
     </section>
 
     <section>
       <title id="s.2.1.3">JobParameters</title>
 
       <para>Having discussed <classname>JobInstance</classname> and how it
-      differs from <classname>Job</classname>, the natural question to ask is,
-      "how is one JobInstance distinguished from another?" The answer is:
-      <classname>JobParameters</classname>.
+      differs from <classname>Job</classname>, the natural question to ask is:
+      "how is one <classname>JobInstance</classname> distinguished from
+      another?" The answer is: <classname>JobParameters</classname>.
       <classname>JobParameters</classname> are any set of parameters used to
       start a batch job, which can be used for identification or even as
       reference data during the run. In the example above, where there are two
@@ -310,7 +314,7 @@
       <para>These properties are important because they will be persisted and
       can be used to completely determine the status of an execution. For
       example, if the EndOfDay job for 01-01 is executed at 9:00 PM, and fails
-      at 9:30, the following entries will be in the batch meta data
+      at 9:30, the following entries will be made in the batch meta data
       tables:</para>
 
       <table>
@@ -405,14 +409,18 @@
       completing successfully at 9:30. Because it's now the next day, the
       01-02 job must be run as well, which is kicked off just afterwards at
       9:31, and completes in it's normal one hour time at 10:30. There is no
-      requirement that one be kicked off after another, unless there is
-      potential for the two jobs to attempt to access the same data, causing
-      issues with locking at the database level. It is entirely up to the
-      scheduler to determine when to run. Since they're separate JobInstances,
-      Spring Batch will make no attempt to stop them from being run
-      concurrently. There should now be an extra entry in both the job
-      instance and job parameters table, and two extra entries in the job
-      execution table:</para>
+      requirement that one <classname>JobInstance</classname> be kicked off
+      after another, unless there is potential for the two jobs to attempt to
+      access the same data, causing issues with locking at the database level.
+      It is entirely up to the scheduler to determine when to run. Since
+      they're separate JobInstances, Spring Batch will make no attempt to stop
+      them from being run concurrently. (Attempting to run the same
+      <classname>JobInstance</classname> while another is already running will
+      result in a <classname>JobExecutionAlreadyRunningException</classname>
+      being thrown) There should now be an extra entry in both the
+      <classname>JobInstance</classname> and
+      <classname>JobParameters</classname> tables, and two extra entries in
+      the <classname>JobExecution</classname> table:</para>
 
       <table>
         <title>BATCH_JOB_INSTANCE</title>
@@ -539,17 +547,19 @@
   <section>
     <title id="s.2.1">Step Stereotypes</title>
 
-    <para>A <classname>Step</classname> is an entity that encapsulates a
-    single, independent phase of a batch job. Therefore, every batch job is
-    composed entirely of one or more batch steps. Steps should be thought of
-    as unique processing streams that will be executed in sequence. For
-    example, if you have one step that loads a file into a database, another
-    that reads from the database, validates the data, preforms processing, and
-    then writes to another table, and another that reads from that table and
-    writes out to a file. Each of these steps will be performed completely
-    before moving on to the next step. The file will be completely read into
-    the database before step 2 can begin. As with Job, a Step has individual
-    executions, that correspond with unique JobExecutions:</para>
+    <para>A <classname>Step</classname> is a domain object that encapsulates
+    an independent, sequential phase of a batch job. Therefore, every Job is
+    composed entirely of one or more steps. A <classname>Step</classname>
+    should be thought of as a unique processing stream that will be executed
+    in sequence. For example, if you have one step that loads a file into a
+    database, another that reads from the database, validates the data,
+    preforms processing, and then writes to another table, and another that
+    reads from that table and writes out to a file. Each of these steps will
+    be performed completely before moving on to the next step. The file will
+    be completely read into the database before step 2 can begin. As with
+    <classname>Job</classname>, a <classname>Step</classname> has an
+    individual <classname>StepExecution</classname> that corresponds with a
+    unique <classname>JobExecution</classname>:</para>
 
     <mediaobject>
       <imageobject role="html">
@@ -566,65 +576,52 @@
       <title id="step">Step</title>
 
       <para>A <classname>Step</classname> contains all of the information
-      necessary to define a discrete set of business logic within a job. This
-      is a necessarily vague description because the contents of any given
-      step are at the discretion of the developer writing a job. A step can be
-      as narrowly defined as a single line of code or as broadly defined as
-      necessary to complete the entire work of a job. There are several
-      factors that will affect the breadth of step configurations.</para>
-
-      <itemizedlist>
-        <listitem>
-          <para>Re-usability - step definitions can be shared between
-          jobs</para>
-        </listitem>
-
-        <listitem>
-          <para>Transaction Management - depending on your desired transaction
-          strategy, you may divide the work of your job differently between
-          steps</para>
-        </listitem>
-
-        <listitem>
-          <para>Extensibility - adequately granular definition of steps allows
-          the addition or subtraction of steps at a later time in the
-          appropriate position within your job configuration</para>
-        </listitem>
-      </itemizedlist>
+      necessary to define and control the actual batch processing. This is a
+      necessarily vague description because the contents of any given
+      <classname>Step</classname> are at the discretion of the developer
+      writing a <classname>Job</classname>. A Step can be as simple or complex
+      as the developer desires. A simple <classname>Step</classname> might
+      load data from a file into the database, requiring little or no code.
+      (depending upon the implementations used) A more complex
+      <classname>Step</classname> may have complicated business rules that are
+      applied as part of the processing.</para>
 
       <para>Steps are defined by instantiating implementations of the
       <classname>Step</classname> interface. Two step implementation classes
       are available in the Spring Batch framework, and they are each discussed
-      in detail in other sections of this guide. For most situations, the
+      in detail in Chatper 4 of this guide. For most situations, the
       <classname>ItemOrientedStep</classname> implementation is sufficient,
       but for situations where only one call is needed, such as a stored
       procedure call or a wrapper around existing script, a
-      <classname>TaskletStep</classname> may be the better option.</para>
+      <classname>TaskletStep</classname> may be a better option.</para>
     </section>
 
     <section>
       <title id="stepExecution">StepExecution</title>
 
-      <para>A <classname>StepExecution</classname> represents the technical
-      concept of a single attempt to execute a <classname>Step</classname>.
-      For instance, using the example from
-      <classname>JobExecution</classname>, if we have a job instance
-      "EndOfJob-01-01-2008" that fails to successfully complete its work the
-      first time it is run, when we attempt to run it again, a new
-      <classname>StepExecution</classname> will be created. Each of these step
-      executions may represent a different invocation of the batch framework,
-      but they will all correspond to the same
+      <para>A <classname>StepExecution</classname> represents a single attempt
+      to execute a <classname>Step</classname>. Using the example from
+      <classname>JobExecution</classname>, if there is a
+      <classname>JobInstance</classname> for the "EndOfDayJob", with
+      <classname>JobParameters</classname> of "01-01-2008" that fails to
+      successfully complete its work the first time it is run, when it is
+      executed again, a new <classname>StepExecution</classname> will be
+      created. Each of these step executions may represent a different
+      invocation of the batch framework, but they will all correspond to the
+      same <classname>JobInstance</classname>, just as multiple
+      <classname>JobExecutions</classname> belong to the same
       <classname>JobInstance</classname>.</para>
 
       <para>Step executions are represented by objects of the
       <classname>StepExecution</classname> class. Each execution contains a
-      reference to its corresponding step and job execution, and transaction
-      related data such as commit and rollback count and start and end times.
-      Additionally, each step execution will contain an
-      <classname>ExecutionContext</classname>, which contains any data a
-      developer needs persisted across batch runs, such as statistics or state
-      information needed to restart. The following is a listing of the
-      properties for <classname>StepExecution</classname>:</para>
+      reference to its corresponding step and
+      <classname>JobExecution</classname>, and transaction related data such
+      as commit and rollback count and start and end times. Additionally, each
+      step execution will contain an <classname>ExecutionContext</classname>,
+      which contains any data a developer needs persisted across batch runs,
+      such as statistics or state information needed to restart. The following
+      is a listing of the properties for
+      <classname>StepExecution</classname>:</para>
 
       <table>
         <title>StepExecution properties</title>
@@ -635,9 +632,10 @@
               <entry>status</entry>
 
               <entry>A <classname>BatchStatus</classname> object that
-              indicates the status of the execution. While it's running, it's
-              BatchStatus.STARTED, if it fails it's BatchStatus.FAILED, and if
-              it finishes successfully it's BatchStatus.COMPLETED</entry>
+              indicates the status of the execution. While it's running, the
+              status is BatchStatus.STARTED, if it fails the status is
+              BatchStatus.FAILED, and if it finishes successfully the status
+              is BatchStatus.COMPLETED</entry>
             </row>
 
             <row>
@@ -659,29 +657,29 @@
               <entry>exitStatus</entry>
 
               <entry>The <classname>ExitStatus</classname> indicating the
-              result of the run. It is most important because it contains an
-              exit code that will be returned to the caller. See chapter 5 for
-              more details.</entry>
+              result of the execution. It is most important because it
+              contains an exit code that will be returned to the caller. See
+              chapter 5 for more details.</entry>
             </row>
 
             <row>
               <entry>executionContext</entry>
 
               <entry>The 'property bag' containing any user data that needs to
-              be persisted between batch runs.</entry>
+              be persisted between executions.</entry>
             </row>
 
             <row>
               <entry>commitCount</entry>
 
-              <entry>The number of times the transaction has been committed
-              for this execution</entry>
+              <entry>The number transactions that have been committed for this
+              execution</entry>
             </row>
 
             <row>
               <entry>itemCount</entry>
 
-              <entry>The number of items that have been process for this
+              <entry>The number of items that have been processed for this
               execution.</entry>
             </row>
           </tbody>
@@ -707,9 +705,13 @@
 
       <programlisting>executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());</programlisting>
 
-      <para>When the <classname>ItemReader</classname> is opened, it can check
-      to see if it has any stored state in the context, and initialize itself
-      from there:</para>
+      <para>The call above will store the current number of lines read into
+      the ExecutionContext. It should be made just before the framework
+      commits. Being notified before a commit requires one of the various
+      StepListeners, or an ItemStream, which are discussed in more detail
+      later in this guide. When the <classname>ItemReader</classname> is
+      opened, it can check to see if it has any stored state in the context,
+      and initialize itself from there:</para>
 
       <programlisting>  if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
     log.debug("Initializing for restart. Restart data is: " + executionContext);
@@ -759,9 +761,9 @@
   <section>
     <title>JobRepository</title>
 
-    <para>The <classname>JobRepository</classname> is the persistence
-    mechanism for all of the Stereotypes mentioned above. When a job is first
-    launched, a <classname>JobExecution</classname> is obtained by calling the
+    <para><classname>JobRepository</classname> is the persistence mechanism
+    for all of the Stereotypes mentioned above. When a job is first launched,
+    a <classname>JobExecution</classname> is obtained by calling the
     repository's <methodname>createJobExecution</methodname> method, and
     during the course of execution, <classname>StepExecution</classname> and
     <classname>JobExecution</classname> are persisted by passing them to the

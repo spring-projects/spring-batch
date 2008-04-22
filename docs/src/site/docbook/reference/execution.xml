@@ -7,8 +7,8 @@
   <section>
     <title>Introduction</title>
 
-    <para>In Chapter 2, the overall description of the architecture was
-    discussed, using the following diagram as a guide:</para>
+    <para>In Chapter 2, the overall architecture design was discussed, using
+    the following diagram as a guide:</para>
 
     <mediaobject>
       <imageobject role="html">
@@ -80,7 +80,7 @@
   <section>
     <title>Run Tier</title>
 
-    <para>As it's name suggests, this tier is entirely concerned with actually
+    <para>As its name suggests, this tier is entirely concerned with actually
     running the job. Regardless of whether the originator is a Scheduler or an
     HTTP request, a Job must be obtained, parameters must be parsed, and
     eventually a <classname>JobLauncher</classname> called:</para>
@@ -102,11 +102,11 @@
       <para>For users that want to run their jobs from an enterprise
       scheduler, the command line is the primary interface. This is because
       most schedulers (with the exception of Quartz unless using the
-      NativeJob) work directly with operating system processes, primarily
-      kicked off with shell scripts. There are many ways to launch a Java
-      process besides a shell script, such as Perl, Ruby, or even 'build
-      tools' such as ant or maven. However, because most people are familiar
-      with shell scripts, this example will focus on them.</para>
+      <classname>NativeJob</classname>) work directly with operating system
+      processes, primarily kicked off with shell scripts. There are many ways
+      to launch a Java process besides a shell script, such as Perl, Ruby, or
+      even 'build tools' such as ant or maven. However, because most people
+      are familiar with shell scripts, this example will focus on them.</para>
 
       <section>
         <title>The CommandLineJobRunner</title>
@@ -295,7 +295,7 @@
       in order to obtain an execution:</para>
 
       <programlisting>  &lt;bean id="jobLauncher"
-        class="org.springframework.batch.core.launch.support.SimpleJobLauncher"&gt;
+        class="org.springframework.batch.execution.launch.SimpleJobLauncher"&gt;
     &lt;property name="jobRepository" ref="jobRepository" /&gt;
   &lt;/bean&gt;</programlisting>
 
@@ -341,7 +341,7 @@
       <classname>TaskExecutor</classname>:</para>
 
       <programlisting> &lt;bean id="jobLauncher"
-        class="org.springframework.batch.core.launch.support.SimpleJobLauncher"&gt;
+        class="org.springframework.batch.execution.launch.SimpleJobLauncher"&gt;
     &lt;property name="jobRepository" ref="jobRepository" /&gt;
     &lt;property name="taskExecutor"&gt;
       &lt;bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" /&gt;
@@ -444,7 +444,7 @@
         convenience: <classname>JobRepositoryFactoryBean</classname>.</para>
 
         <programlisting>  &lt;bean id="jobRepository"
-        class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
+        class="org.springframework.batch.execution.repository.JobRepositoryFactoryBean"
     &lt;property name="databaseType" value="hsql" /&gt; 
     &lt;property name="dataSource" value="dataSource" /&gt;
   &lt;/bean&gt;</programlisting>
@@ -470,13 +470,13 @@
   &lt;/bean&gt;
 
   &lt;bean id="mapJobInstanceDao"
-        class="org.springframework.batch.core.repository.dao.MapJobInstanceDao" /&gt;
+        class="org.springframework.batch.execution.repository.dao.MapJobInstanceDao" /&gt;
 
   &lt;bean id="mapJobExecutionDao"
-        class="org.springframework.batch.core.repository.dao.MapJobExecutionDao" /&gt;
+        class="org.springframework.batch.execution.repository.dao.MapJobExecutionDao" /&gt;
 
   &lt;bean id="mapStepExecutionDao"
-        class="org.springframework.batch.core.repository.dao.MapStepExecutionDao" /&gt;</programlisting>
+        class="org.springframework.batch.execution.repository.dao.MapStepExecutionDao" /&gt;</programlisting>
 
         <para>The Map* DAO implementations store the batch artifacts in a
         transactional map. So, the repository and DAOs may still be used
@@ -510,9 +510,9 @@
     &lt;/tx:attributes&gt;
 &lt;/tx:advice&gt;</programlisting></para>
 
-          <para>This fragment can be used as is, or with almost no changes.
-          The isolation level in the <code>create*</code> method attiributes
-          is specified to ensure that when jobs are launched there if two
+          <para>This fragment can be used as is, with almost no changes. The
+          isolation level in the <code>create*</code> method attiributes is
+          specified to ensure that when jobs are launched there if two
           processes are trying to launch the same job at the same time, only
           one will succeed. This is quite aggressive, and READ_COMMITTED would
           work just as well; READ_UNCOMMITTED would be fine if two processes
@@ -530,15 +530,15 @@
           <title>Recommendations for Indexing Meta Data Tables</title>
 
           <para>Spring Batch provides DDL samples for the meta-data tables in
-          the Core jar file for several common database platforms. We do not
-          include index declarations inthat DDL because there are too many
-          variations in how people want to do that dependeing on their precise
-          platform, local conventions and also the business requirements of
-          how the jobs will be operated. So here we give some indication as to
-          which columns are going to be used in a WHERE clause by the Dao
-          ipmlementations that we provide, and how frequently they might be
-          used, so that individual projects can make up their own minds about
-          indexing.</para>
+          the Core jar file for several common database platforms. Index
+          declarations are not included in that DDL because there are too many
+          variations in how users may want to index dependeing on their
+          precise platform, local conventions and also the business
+          requirements of how the jobs will be operated. The table below
+          provides some indication as to which columns are going to be used in
+          a WHERE clause by the Dao ipmlementations provided by Spring Batch,
+          and how frequently they might be used, so that individual projects
+          can make up their own minds about indexing.</para>
 
           <table>
             <title>Where clauses in SQL statements (exluding primary keys) and
@@ -722,8 +722,6 @@
     &lt;bean class="org.springframework.batch.core.listener.JobListenerSupport" /&gt;
   &lt;/property&gt;
   &lt;/bean&gt;</programlisting>
-
-        <para></para>
       </section>
     </section>
 
@@ -731,26 +729,27 @@
       <title>JobFactory and Stateful Components in Steps</title>
 
       <para>Unlike many traditional Spring applications, many of the
-      components of a batch application are stateful - the file readers and
-      writers are the obvious examples. The recommended way to deal with this
-      is to create a fresh <classname>ApplicationContext</classname> for each
-      job execution. If the job is launched from the command line with
-      <classname>CommandLineJobRunner</classname> this is trivial. For more
-      complex launching scenarios, where jobs are executed in parallel or
-      serially from the same process, some extra steps have to be taken to
-      ensure that the <classname>ApplicationContext</classname> is refreshed.
-      This is preferable to using prototype scope for the stateful beans
-      because then they would not receive lifecycle callbacks from the
-      container at the end of use (e.g. through destroy-method in XML).</para>
+      components of a batch application are stateful, the file readers and
+      writers are obvious examples. The recommended way to deal with this is
+      to create a fresh <classname>ApplicationContext</classname> for each job
+      execution. If the <classname>Job</classname> is launched from the
+      command line with <classname>CommandLineJobRunner</classname> this is
+      trivial. For more complex launching scenarios, where jobs are executed
+      in parallel or serially from the same process, some extra steps have to
+      be taken to ensure that the <classname>ApplicationContext</classname> is
+      refreshed. This is preferable to using prototype scope for the stateful
+      beans because then they would not receive lifecycle callbacks from the
+      container at the end of use. (e.g. through destroy-method in XML)</para>
 
       <para>The strategy provided by Spring Batch to deal with this scenario
       is the <classname>JobFactory</classname>, and the samples provide an
-      example of a specialised implementation that can load an
+      example of a specialized implementation that can load an
       <classname>ApplicationContext</classname> and close it properly when the
-      job is finished. Look at the
+      job is finished. A relevant examples is
       <classname>ClassPathXmlApplicationContextJobFactory</classname> and its
       use in the <code>adhoc-job-launcher-context.xml</code> and the
-      <code>quartz-job-launcher-context.xml</code>.</para>
+      <code>quartz-job-launcher-context.xml</code>, which can be found in the
+      Samples project.</para>
     </section>
   </section>
 
@@ -862,10 +861,7 @@
         transaction. At the beginning of processing a transaction is begun,
         and each time <markup>read</markup> is called on the
         <classname>ItemReader</classname>, a counter is incremented. When it
-        reaches 10, the transaction will be committed. This also means that if
-        an item is skipped it will still count as an item against the commit
-        interval even though it hasn't been written out. (Skipping items will
-        be covered in more detail later in this chapter)</para>
+        reaches 10, the transaction will be committed.</para>
       </section>
 
       <section>
@@ -885,8 +881,9 @@
           manually before it can be run again. This is configurable on the
           step level, since different steps have different requirements. One
           Step that may only be executed once can exist as part of the same
-          Job as Step that can be run infinitely. Below is an example start
-          limit configuration:</para>
+          <classname>Job</classname> as <classname>Step</classname> that can
+          be run infinitely. Below is an example start limit
+          configuration:</para>
 
           <programlisting> &lt;bean id="simpleStep"
         class="org.springframework.batch.core.step.item.SimpleStepFactoryBean" &gt;
@@ -953,27 +950,28 @@
           information about football games and summarizes them. It contains
           three steps: playerLoad, gameLoad, and playerSummarization. The
           playerLoad <classname>Step</classname> loads player information from
-          a flatfile, while the <classname>gameLoad</classname> Step does the
-          same for games. The final step, playerSummarization, then summarizes
+          a flat file, while the <classname>gameLoad</classname>
+          <classname>Step</classname> does the same for games. The final
+          <classname>Step</classname>, playerSummarization, then summarizes
           the statistics for each player based upon the provided games. It is
           assumed that the file loaded by 'playerLoad' must be loaded only
           once, but that 'gameLoad' will load any games found within a
           particular directory, deleting them after they have been
           successfully loaded into the database. As a result, the playerLoad
-          <classname>Step</classname> contains no additionaly configuration.
-          It can be started almost limitlessly, and if complete will be
-          skipped. The 'gameLoad' <classname>Step</classname>, however, needs
-          to be run everytime, in case extra files have been dropped since it
-          last executed, so it has 'allowStartIfComplete' set to 'true' in
-          order to always be started. (It is assumed that the database tables
-          games are loaded into has a process indicator on it, to ensure new
-          games can be properly found by the summarization step) The
-          summarization <classname>step</classname>, which is the most
-          important in the <classname>Job</classname>, is configured to have a
-          start limit of 3. This is useful in case it continually fails, a new
-          exit code will be returned to the operators that control job
-          execution, and it won't be allowed to start again until manual
-          intervention has taken place.</para>
+          <classname>Step</classname> contains no additional configuration. It
+          can be started almost limitlessly, and if complete will be skipped.
+          The 'gameLoad' <classname>Step</classname>, however, needs to be run
+          everytime, in case extra files have been dropped since it last
+          executed, so it has 'allowStartIfComplete' set to 'true' in order to
+          always be started. (It is assumed that the database tables games are
+          loaded into has a process indicator on it, to ensure new games can
+          be properly found by the summarization step) The summarization
+          <classname>step</classname>, which is the most important in the
+          <classname>Job</classname>, is configured to have a start limit of
+          3. This is useful in case it continually fails, a new exit code will
+          be returned to the operators that control job execution, and it
+          won't be allowed to start again until manual intervention has taken
+          place.</para>
 
           <note>
             <para>This job is purely for example purposes and is not the same
@@ -1076,7 +1074,10 @@
 
         <para>In this example, a <classname>FlatFileItemReader</classname> is
         used, and if at any point a FlatFileParseException is thrown, it will
-        be skipped and counted against the total skip limit of 10.</para>
+        be skipped and counted against the total skip limit of 10. It should
+        be noted that any failures encountered while reading will not count
+        against the commit interval. In other words, the commit interval is
+        only incremented on writes (regardless of success or failure).</para>
       </section>
 
       <section>
@@ -1111,22 +1112,23 @@
       <section>
         <title>Registering ItemStreams with the Step</title>
 
-        <para>The step has to take care of the
-        <classname>ItemStream</classname> callbacks at the necessary points in
-        the flow. This is vital if a step is going to be fail, and might need
-        to be restarted, because the <classname>ItemStream</classname>
-        interface is where the step gets the information it needs about
-        persistent state between executions. The factory beans that Spring
-        Batch provides for convenient configuration of
-        <classname>Step</classname> instances have features that allow streams
-        to be registered with the step when it is configured.</para>
+        <para>The step has to take care of <classname>ItemStream</classname>
+        callbacks at the necessary points in its lifecycle. This is vital if a
+        step fails, and might need to be restarted, because the
+        <classname>ItemStream</classname> interface is where the step gets the
+        information it needs about persistent state between executions. The
+        factory beans that Spring Batch provides for convenient configuration
+        of <classname>Step</classname> instances have features that allow
+        streams to be registered with the step when it is configured.</para>
 
-        <para>If the ItemReader of ItemWriter themselves implement the
-        ItemStream interface, then these will be registered automatically. Any
-        other streams need to be registered separately. This is often the case
-        where there are indirect dependencies, like delegates being injected
-        into the reader and writer. To register these they can be injected
-        into teh factory beans through the streams property, e.g.:</para>
+        <para>If the <classname>ItemReader</classname> or
+        <classname>ItemWriter</classname> themselves implement the ItemStream
+        interface, then these will be registered automatically. Any other
+        streams need to be registered separately. This is often the case where
+        there are indirect dependencies, like delegates being injected into
+        the reader and writer. To register these they can be injected into the
+        factory beans through the streams property, as illustrated
+        below:</para>
 
         <programlisting>&lt;bean id="step1" parent="simpleStep"
         class="org.springframework.batch.core.step.item.StatefulRetryStepFactoryBean"&gt;
@@ -1160,12 +1162,13 @@
         with one of many <classname>Step</classname> scoped listeners.</para>
 
         <section>
-          <title>StepListener</title>
+          <title>StepExecutionListener</title>
 
-          <para>StepListener represents the most generic listener for
-          <classname>Step</classname> execution. It allows for notification
-          before a Step is started, after it has completed, and if any errors
-          are encountered during processing:</para>
+          <para><classname>StepExecutionListener</classname> represents the
+          most generic listener for <classname>Step</classname> execution. It
+          allows for notification before a <classname>Step</classname> is
+          started, after it has completed, and if any errors are encountered
+          during processing:</para>
 
           <programlisting>  public interface StepExecutionListener extends StepListener {
 
@@ -1180,7 +1183,8 @@
           <methodname>onErrorInStep</methodname> and
           <methodname>afterStep</methodname> in order to allow listeners the
           chance to modify the exit code that is returned upon completion of a
-          <classname>Step</classname>. A StepListener can be applied to any
+          <classname>Step</classname>. A
+          <classname>StepExecutionListener</classname> can be applied to any
           step factory bean via the listeners property:</para>
 
           <programlisting>  &lt;bean id="simpleStep"
@@ -1227,10 +1231,10 @@
         <section>
           <title>ItemReadListener</title>
 
-          <para>When discussing skip logic earlier, it was mentioned that it
-          may be beneficial to log out skipped records, so that they can be
-          deal with later. In the case of read errors, this can be done with
-          an <classname>ItemReaderListener:</classname><programlisting>  public interface ItemReadListener extends StepListener {
+          <para>When discussing skip logic above, it was mentioned that it may
+          be beneficial to log out skipped records, so that they can be deal
+          with later. In the case of read errors, this can be done with an
+          <classname>ItemReaderListener:</classname><programlisting>  public interface ItemReadListener extends StepListener {
   
     void beforeRead();
 
@@ -1413,9 +1417,10 @@
       <classname>ItemTransformer</classname>.</para>
 
       <para>Here we provide a few examples of common patterns in custom
-      business logic, mainly using the listener interfaces - but remember that
-      a reader or writer can implement the listener interfaces as well if that
-      is appropriate.</para>
+      business logic, mainly using the listener interfaces . It should be
+      noted that an <classname>ItemReader</classname> or
+      <classname>ItemWriter</classname> can implement the listener interfaces
+      as well if appropriate.</para>
     </section>
 
     <section>
@@ -1424,10 +1429,11 @@
       <para>A common use case is the need for special handling of errors in a
       step, item by item, perhaps logging to a special channel, or inserting a
       record into a database. The ItemOrientedStep (created from the step
-      factory beans) allows us to implement this use case with a simple
+      factory beans) allows users to implement this use case with a simple
       <classname>ItemReadListener</classname>, for errors on read, and an
-      <classname>ItemWriteListener</classname>, for errors on write.
-      E.g.</para>
+      <classname>ItemWriteListener</classname>, for errors on write. The below
+      code snippets illustrate a listener that logs both read and write
+      failures:</para>
 
       <programlisting>public class ItemFailureLoggerListener extends ItemListenerSupport {
 
@@ -1443,8 +1449,8 @@
 
 }</programlisting>
 
-      <para>Having implemented this listener it just needs to be registered
-      with the step, e.g.</para>
+      <para>Having implemented this listener it must be registered with the
+      step:</para>
 
       <programlisting>&lt;bean id="simpleStep"
         class="org.springframework.batch.core.step.item.SimpleStepFactoryBean" &gt;
@@ -1456,11 +1462,11 @@
 
       <para>Remember that if your listener does anything in an
       <code>onError()</code> method, it will be inside a transaction that is
-      going to rollback. If you need to use a transactional resource like a
-      database inside an <code>onError()</code> method, consider adding a
-      declarative transaction to that method (see Spring Core Reference Guide
-      for details), and giving its propagation attribute the value
-      REQUIRES_NEW.</para>
+      going to be rolled back. If you need to use a transactional resource
+      such as a database inside an <code>onError()</code> method, consider
+      adding a declarative transaction to that method (see Spring Core
+      Reference Guide for details), and giving its propagation attribute the
+      value REQUIRES_NEW.</para>
     </section>
 
     <section>
@@ -1472,8 +1478,8 @@
       sense to stop a job execution from within the business logic.</para>
 
       <para>The simplest thing to do is to throw a RuntimeException (one that
-      isn't retried indefinitely or skipped), e.g. we could use a custom
-      exception type as in the example below</para>
+      isn't retried indefinitely or skipped), For example, a custom exception
+      type could be used, as in the example below:</para>
 
       <programlisting>public class PoisonPillItemWriter extends AbstractItemWriter {
     
@@ -1488,8 +1494,8 @@
 }</programlisting>
 
       <para>Another simple way to stop a step from executing is to simply
-      return <code>null</code> from the <classname>ItemReader</classname>,
-      e.g.</para>
+      return <code>null</code> from the
+      <classname>ItemReader</classname>:</para>
 
       <programlisting>public class EarlyCompletionItemReader extends AbstractItemReader {
 
@@ -1516,7 +1522,7 @@
       strategy which signals a complete batch when the item to be processed is
       null. A more sophisticated completion policy could be implemented and
       injected into the <classname>Step</classname> through the
-      <classname>RepeatOperationsStepFactoryBean</classname>, e.g.</para>
+      <classname>RepeatOperationsStepFactoryBean</classname>:</para>
 
       <programlisting>&lt;bean id="simpleStep"
         class="org.springframework.batch.core.step.item.RepeatOperationsStepFactoryBean" &gt;
@@ -1533,10 +1539,10 @@
       <para>An alternative is to set a flag in the
       <classname>StepExecution</classname>, which is checked by the
       <classname>Step</classname> implementations in the framework in between
-      item processing. To implement this alternative we need access to the
+      item processing. To implement this alternative, we need access to the
       current StepExecution, and this can be achieved by implementing a
       StepListener and registering it with the Step. Here is an example of a
-      listener that sets the flag</para>
+      listener that sets the flag:</para>
 
       <programlisting>public class CustomItemWriter extends ItemListenerSupport implements StepListener {
 
@@ -1567,13 +1573,13 @@
       <title>Adding a Footer Record</title>
 
       <para>A very common requirement is to aggregate information during the
-      output process and to append a record at the end of a file summarising
+      output process and to append a record at the end of a file summarizing
       the data, or providing a checksum. This can also be achieved with a
       callbacks in the step, normally as part of a custom
-      <classname>ItemWriter</classname>. In this case, since we are
-      accumulating state that we do not want to lose if the job aborts, we
-      probably need to implement the <classname>ItemStream</classname>
-      interface.</para>
+      <classname>ItemWriter</classname>. In this case, since a job is
+      accumulating state that should not be lost if the job aborts, the
+      <classname>ItemStream</classname> interface should be
+      implemented:</para>
 
       <programlisting>public class CustomItemWriter extends AbstractItemWriter implements 
     ItemStream, StepListener
@@ -1616,11 +1622,12 @@
       state is stored through the <classname>ItemStream</classname> interface
       in the <classname>ExecutionContext</classname>. In this way we can be
       sure that when the <code>open()</code> callback is received on a
-      restart, we always get the last value that was committed.</para>
-
-      <para>N.B. We might not implement <classname>ItemStream</classname> if
-      the ItemWriter is re-runnable, in the sense that it maintains its own
-      state in a transactional resource like a database.</para>
+      restart. The framework garuntees we always get the last value that was
+      committed. It should be noted that it is not always necessary to
+      implement ItemStream. For example, if the ItemWriter is re-runnable, in
+      the sense that it maintains its own state in a transactional resource
+      like a database, there is no need to maintain state within the writer
+      itself.</para>
     </section>
   </section>
 </chapter>
