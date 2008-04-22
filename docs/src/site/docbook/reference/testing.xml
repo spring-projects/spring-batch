@@ -39,7 +39,8 @@
 
   inputSource.open(new ExecutionContext());
 
-  jdbcTemplate.query("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", new RowCallbackHandler() {
+  jdbcTemplate.query("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", 
+       new RowCallbackHandler() {
 
     public void processRow(ResultSet rs) throws SQLException {
       Trade trade;

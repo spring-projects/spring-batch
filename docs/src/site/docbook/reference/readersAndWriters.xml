@@ -1196,8 +1196,9 @@
           <imagedata align="center" fileref="images/cursorExample.png" />
         </imageobject>
 
-        <imageobject role="html">
-          <imagedata align="center" fileref="images/cursorExample.png" />
+        <imageobject role="fo">
+          <imagedata align="center"
+                     fileref="src/site/resources/reference/images/cursorExample.png" />
         </imageobject>
       </mediaobject>
 

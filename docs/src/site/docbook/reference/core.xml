@@ -556,8 +556,9 @@
         <imagedata align="center" fileref="images/jobHeirarchyWithSteps.png" />
       </imageobject>
 
-      <imageobject>
-        <imagedata align="center" fileref="images/jobHeirarchyWithSteps.png" />
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/resources/reference/images/jobHeirarchyWithSteps.png" />
       </imageobject>
     </mediaobject>
 
@@ -694,9 +695,9 @@
       <para>An <classname>ExecutionContext</classname> represents a collection
       of key/value pairs that are persisted and controlled by the framework in
       order to allow developers a place to store persistent state that is
-      scoped to a <classname>StepExecution</classname>. For those familiar with
-      Quartz, it is very similar to <classname>JobDataMap</classname>. The
-      best usage example is restart. Using flat file input as an example,
+      scoped to a <classname>StepExecution</classname>. For those familiar
+      with Quartz, it is very similar to <classname>JobDataMap</classname>.
+      The best usage example is restart. Using flat file input as an example,
       while processing individual lines, the framework periodically persists
       the <classname>ExecutionContext</classname> at commit points. This
       allows the <classname>ItemReader</classname> to store its state in case
