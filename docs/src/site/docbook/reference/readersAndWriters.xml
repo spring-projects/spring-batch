@@ -821,11 +821,13 @@
         <imageobject role="fo">
           <imagedata align="center"
                      fileref="src/site/resources/reference/images/xmlinput.png"
-                     format="PNG" />
+                     format="PNG"
+                     width="66%" />
         </imageobject>
 
         <imageobject role="html">
-          <imagedata align="center" fileref="images/xmlinput.png" format="PNG" />
+          <imagedata align="center" fileref="images/xmlinput.png" format="PNG"
+                     width="66%" />
         </imageobject>
 
         <caption><para>Figure 3.1: XML Input</para></caption>
@@ -847,12 +849,14 @@
         <imageobject role="fo">
           <imagedata align="center"
                      fileref="src/site/resources/reference/images/oxm-fragments.png"
-                     format="PNG" />
+                     format="PNG"
+                     width="66%" />
         </imageobject>
 
         <imageobject role="html">
           <imagedata align="center" fileref="images/oxm-fragments.png"
-                     format="PNG" />
+                     format="PNG"
+                     width="66%" />
         </imageobject>
 
         <caption><para>Figure 3.2: OXM Binding</para></caption>
@@ -1182,12 +1186,14 @@
 
       <mediaobject>
         <imageobject role="html">
-          <imagedata align="center" fileref="images/cursorExample.png" />
+          <imagedata align="center" fileref="images/cursorExample.png"
+                     width="66%" />
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/resources/reference/images/cursorExample.png" />
+                     fileref="src/site/resources/reference/images/cursorExample.png"
+                     width="66%" />
         </imageobject>
       </mediaobject>
 
@@ -1428,12 +1434,14 @@ itemReader.close(executionContext);</programlisting>
 
       <mediaobject>
         <imageobject role="html">
-          <imagedata align="center" fileref="images/drivingQueryExample.png" />
+          <imagedata align="center" fileref="images/drivingQueryExample.png"
+                     width="66%" />
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/resources/reference/images/drivingQueryExample.png" />
+                     fileref="src/site/resources/reference/images/drivingQueryExample.png"
+                     width="66%" />
         </imageobject>
       </mediaobject>
 
@@ -1446,12 +1454,14 @@ itemReader.close(executionContext);</programlisting>
 
       <mediaobject>
         <imageobject role="html">
-          <imagedata align="center" fileref="images/drivingQueryJob.png" />
+          <imagedata align="center" fileref="images/drivingQueryJob.png"
+                     width="66%" />
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/resources/reference/images/drivingQueryJob.png" />
+                     fileref="src/site/resources/reference/images/drivingQueryJob.png"
+                     width="66%" />
         </imageobject>
       </mediaobject>
 

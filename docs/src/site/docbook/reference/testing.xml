@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
-<chapter id="Testing">
+<chapter id="testing">
   <title>Unit Testing</title>
 
   <para>Just as with other application styles, it is extremely important to

@@ -40,12 +40,14 @@
 			<imageobject role="fo">
 				<imagedata
 					fileref="src/site/resources/reference/images/simple-batch-execution-env.jpg"
-					format="JPG" align="center" />
+					format="JPG" align="center"
+                     width="66%" />
 			</imageobject>
 			<imageobject role="html">
 				<imagedata
 					fileref="images/simple-batch-execution-env.jpg" format="JPG"
-					align="center" />
+					align="center"
+                    width="66%" />
 			</imageobject>
 			<caption>
 				<para>Figure 1: Batch Execution Environment</para>

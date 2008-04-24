@@ -13,12 +13,14 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center"
-                   fileref="images/spring-batch-reference-model.png" />
+                   fileref="images/spring-batch-reference-model.png" 
+                   width="75%" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/resources/reference/images/spring-batch-reference-model.png" />
+                   fileref="src/site/resources/reference/images/spring-batch-reference-model.png" 
+                   width="75%" />
       </imageobject>
     </mediaobject>
 
@@ -306,12 +308,14 @@
       <mediaobject>
         <imageobject role="html">
           <imagedata align="center"
-                     fileref="images/job-launcher-sequence-sync.png" />
+                     fileref="images/job-launcher-sequence-sync.png"
+                     width="66%" />
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/resources/reference/images/job-launcher-sequence-sync.png" />
+                     fileref="src/site/resources/reference/images/job-launcher-sequence-sync.png"
+                     width="66%" />
         </imageobject>
       </mediaobject>
 
@@ -327,12 +331,14 @@
       <mediaobject>
         <imageobject role="html">
           <imagedata align="center"
-                     fileref="images/job-launcher-sequence-async.png" />
+                     fileref="images/job-launcher-sequence-async.png"
+                     width="66%" />
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/resources/reference/images/job-launcher-sequence-async.png" />
+                     fileref="src/site/resources/reference/images/job-launcher-sequence-async.png"
+                     width="66%" />
         </imageobject>
       </mediaobject>
 
