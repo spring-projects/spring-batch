@@ -22,6 +22,7 @@
 		
 		<menu name="Documentation" inherit="none">
 			<item name="Home" href="index.html"/>
+			<item name="Changelog" href="changelog.html"/>
 			<item name="User Guide" href="spring-batch-docs/index.html"/>
 			<item name="Features" href="features.html"/>
 			<item name="Use Cases" href="cases/index.html"/>
