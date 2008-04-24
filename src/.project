@@ -4,11 +4,4 @@
 	<comment></comment>
 	<projects>
 	</projects>
-	<linkedResources>
-		<link>
-			<name>pom.xml</name>
-			<type>1</type>
-			<locationURI>PARENT/pom.xml</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>
