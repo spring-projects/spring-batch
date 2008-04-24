@@ -27,7 +27,6 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 

@@ -32,9 +32,7 @@ import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
-import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.StepSupport;
-import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Test SimpleJobRepository. The majority of test cases are tested using
