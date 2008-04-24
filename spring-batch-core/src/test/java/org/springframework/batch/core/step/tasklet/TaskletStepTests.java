@@ -198,7 +198,7 @@ public class TaskletStepTests extends TestCase {
 		
 	}
 
-	private class StubTasklet extends StepExecutionListenerSupport implements Tasklet {
+	private static class StubTasklet extends StepExecutionListenerSupport implements Tasklet {
 
 		private final boolean exitFailure;
 

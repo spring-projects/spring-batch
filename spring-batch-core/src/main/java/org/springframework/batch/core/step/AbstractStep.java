@@ -310,11 +310,9 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		}
 		else {
 			String message = "";
-			if (ex != null) {
-				StringWriter writer = new StringWriter();
-				ex.printStackTrace(new PrintWriter(writer));
-				message = writer.toString();
-			}
+			StringWriter writer = new StringWriter();
+			ex.printStackTrace(new PrintWriter(writer));
+			message = writer.toString();
 			exitStatus = ExitStatus.FAILED.addExitDescription(message);
 		}
 
@@ -326,7 +324,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * rollback transaction. Throwing this exception will result in storing
 	 * {@link BatchStatus#UNKNOWN} as step's status.
 	 */
-	protected class FatalException extends RuntimeException {
+	protected static class FatalException extends RuntimeException {
 		public FatalException(String string, Exception e) {
 			super(string, e);
 		}

@@ -103,7 +103,7 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 		incrementerControl.verify();
 	}
 
-	private class StubIncrementer implements DataFieldMaxValueIncrementer {
+	private static class StubIncrementer implements DataFieldMaxValueIncrementer {
 
 		public int nextIntValue() throws DataAccessException {
 			return 0;

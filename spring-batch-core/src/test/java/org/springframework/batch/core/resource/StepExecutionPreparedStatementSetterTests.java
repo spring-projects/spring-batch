@@ -37,7 +37,6 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  */
 public class StepExecutionPreparedStatementSetterTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	JdbcTemplate jdbcTemplate;
 	StepExecutionPreparedStatementSetter pss;
 	StepExecution stepExecution;
 	

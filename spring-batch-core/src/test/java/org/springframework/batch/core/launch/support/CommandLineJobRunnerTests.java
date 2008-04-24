@@ -110,7 +110,7 @@ public class CommandLineJobRunnerTests extends TestCase {
 		}
 	}
 
-	public static class StubJobLauncher implements JobLauncher {
+	private static class StubJobLauncher implements JobLauncher {
 
 		public static JobExecution jobExecution;
 

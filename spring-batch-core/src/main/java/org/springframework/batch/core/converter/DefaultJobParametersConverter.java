@@ -48,11 +48,11 @@ import org.springframework.util.StringUtils;
  */
 public class DefaultJobParametersConverter implements JobParametersConverter {
 
-	public static String DATE_TYPE = "(date)";
+	public static final String DATE_TYPE = "(date)";
 
-	public static String STRING_TYPE = "(string)";
+	public static final String STRING_TYPE = "(string)";
 
-	public static String LONG_TYPE = "(long)";
+	public static final String LONG_TYPE = "(long)";
 
 	private DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
@@ -104,7 +104,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			} else if (StringUtils.endsWithIgnoreCase(key, STRING_TYPE)) {
 				propertiesBuilder.addString(StringUtils.replace(key, STRING_TYPE, ""), value);
 			} else {
-				propertiesBuilder.addString(key.toString(), value.toString());
+				propertiesBuilder.addString(key, value.toString());
 			}
 		}
 
@@ -124,9 +124,10 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 
 		Map parameters = params.getParameters();
 		Properties result = new Properties();
-		for (Iterator iterator = parameters.keySet().iterator(); iterator.hasNext();) {
-			String key = (String) iterator.next();
-			Object value = parameters.get(key);
+		for (Iterator iterator = parameters.entrySet().iterator(); iterator.hasNext();) {
+			Entry entry = (Entry) iterator.next();
+			String key = (String) entry.getKey();
+			Object value = entry.getValue();
 			if (value instanceof Date) {
 				result.setProperty(key + DATE_TYPE, dateFormat.format(value));
 			} else if (value instanceof Long) {

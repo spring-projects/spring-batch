@@ -34,7 +34,7 @@ import org.springframework.batch.core.converter.JobParametersConverter;
  */
 public class ScheduledJobParametersFactory implements JobParametersConverter {
 
-	public static String SCHEDULE_DATE_KEY = "schedule.date";
+	public static final String SCHEDULE_DATE_KEY = "schedule.date";
 
 	private DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
@@ -82,13 +82,13 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 
 		Map parameters = params.getParameters();
 		Properties result = new Properties();
-		for (Iterator iterator = parameters.keySet().iterator(); iterator.hasNext();) {
-			String key = (String) iterator.next();
-			Object value = parameters.get(key);
+		for (Iterator iterator = parameters.entrySet().iterator(); iterator.hasNext();) {
+			Entry entry = (Entry) iterator.next();
+			String key = (String) entry.getKey();
 			if (key.equals(SCHEDULE_DATE_KEY)) {
-				result.setProperty(key, dateFormat.format(value));
+				result.setProperty(key, dateFormat.format(entry.getValue()));
 			} else {
-				result.setProperty(key, "" + value);
+				result.setProperty(key, "" + entry.getValue());
 			}
 		}
 		return result;
