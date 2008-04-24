@@ -91,12 +91,13 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 
 	public void close(ExecutionContext executionContext) {
 		initialized = false;
-		if (fragmentReader == null && inputStream == null) {
-			return;
-		}
 		try {
-			fragmentReader.close();
-			inputStream.close();
+			if (fragmentReader != null) {
+				fragmentReader.close();
+			}
+			if (inputStream != null) {
+				inputStream.close();
+			}
 		}
 		catch (XMLStreamException e) {
 			throw new DataAccessResourceFailureException("Error while closing event reader", e);

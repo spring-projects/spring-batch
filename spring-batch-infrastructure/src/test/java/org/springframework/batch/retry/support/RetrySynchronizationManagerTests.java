@@ -29,8 +29,6 @@ import org.springframework.batch.retry.support.RetryTemplate;
  */
 public class RetrySynchronizationManagerTests extends TestCase {
 
-	int count = 0;
-
 	RetryTemplate template = new RetryTemplate();
 
 	protected void setUp() throws Exception {

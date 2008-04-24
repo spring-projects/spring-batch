@@ -10,7 +10,7 @@ import org.springframework.core.io.Resource;
 
 public class FlatFileItemReaderCommonTests extends CommonItemStreamItemReaderTests {
 
-	private final String FOOS = "1 \n 2 \n 3 \n 4 \n 5 \n"; 
+	private static final String FOOS = "1 \n 2 \n 3 \n 4 \n 5 \n"; 
 	
 	protected ItemReader getItemReader() throws Exception {
 		FlatFileItemReader tested = new FlatFileItemReader();

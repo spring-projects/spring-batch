@@ -154,7 +154,7 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 		this.preparedStatementSetter = preparedStatementSetter;
 	}
 	
-	private class PreparedStatementSetterKeyWrapper implements PreparedStatementSetter{
+	private static class PreparedStatementSetterKeyWrapper implements PreparedStatementSetter{
 		
 		private Object key;
 		private ItemPreparedStatementSetter pss;

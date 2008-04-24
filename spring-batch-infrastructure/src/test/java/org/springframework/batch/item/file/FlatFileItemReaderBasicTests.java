@@ -319,7 +319,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		return str.indexOf(searchStr) != -1;
 	}
 
-	private class NonExistentResource extends AbstractResource {
+	private static class NonExistentResource extends AbstractResource {
 
 		public NonExistentResource() {
 		}

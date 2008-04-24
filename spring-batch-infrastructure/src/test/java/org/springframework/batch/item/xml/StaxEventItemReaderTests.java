@@ -222,7 +222,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		newSource.setOpenCalled(false);
 		// calling read again should require re-initialization because of close
 		try {
-			item = newSource.read();
+			newSource.read();
 			fail("Expected ReaderNotOpenException");
 		} catch (ReaderNotOpenException e) {
 			// expected
