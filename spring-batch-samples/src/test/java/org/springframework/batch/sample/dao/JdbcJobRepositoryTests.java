@@ -97,7 +97,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 		JobExecution execution = null;
 		long t0 = System.currentTimeMillis();
 		try {
-			execution = doConcurrentStart();
+			doConcurrentStart();
 			fail("Expected JobExecutionAlreadyRunningException");
 		}
 		catch (JobExecutionAlreadyRunningException e) {
@@ -141,7 +141,7 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 
 		long t0 = System.currentTimeMillis();
 		try {
-			execution = doConcurrentStart();
+			doConcurrentStart();
 			fail("Expected JobExecutionAlreadyRunningException");
 		}
 		catch (JobExecutionAlreadyRunningException e) {

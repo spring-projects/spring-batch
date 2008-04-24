@@ -158,7 +158,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 		return false;
 	}
 
-	private class StagingBuffer {
+	private static class StagingBuffer {
 
 		private List list = new ArrayList();
 

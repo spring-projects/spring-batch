@@ -1,6 +1,7 @@
 package org.springframework.batch.sample.domain;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * Domain object representing the summary of a given Player's 
@@ -105,4 +106,8 @@ public class PlayerSummary {
 	public boolean equals(Object obj) {
 		return EqualsBuilder.reflectionEquals(this, obj);
 	}
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
+	}
+	
 }
