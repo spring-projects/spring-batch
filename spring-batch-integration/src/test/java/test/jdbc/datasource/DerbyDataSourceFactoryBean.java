@@ -11,8 +11,6 @@ public class DerbyDataSourceFactoryBean extends AbstractFactoryBean {
 
 	private String dataDirectory = "derby-home";
 
-	DataSource dataSource;
-
 	public void setDataDirectory(String dataDirectory) {
 		this.dataDirectory = dataDirectory;
 	}
@@ -26,7 +24,6 @@ public class DerbyDataSourceFactoryBean extends AbstractFactoryBean {
 		final EmbeddedDataSource ds = new EmbeddedDataSource();
 		ds.setDatabaseName("derbydb");
 		ds.setCreateDatabase("create");
-		dataSource = ds;
 
 		return ds;
 	}
