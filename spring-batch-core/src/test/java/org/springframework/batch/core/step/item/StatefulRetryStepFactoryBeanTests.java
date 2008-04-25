@@ -134,14 +134,14 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 	
 	public void testSkipAndRetry() throws Exception {
 		factory.setSkippableExceptionClasses(new Class[] {Exception.class});
-		factory.setSkipLimit(1);
+		factory.setSkipLimit(2);
 		List items = TransactionAwareProxyFactory.createTransactionalList();
-		items.addAll(Arrays.asList(new String[] { "a", "b", "c" }));
+		items.addAll(Arrays.asList(new String[] { "a", "b", "c", "d", "e", "f" }));
 		ItemReader provider = new ListItemReader(items) {
 			public Object read() {
 				Object item = super.read();
 				count++;
-				if ("b".equals(item)) {
+				if ("b".equals(item) || "d".equals(item)) {
 					throw new RuntimeException("Read error - planned but skippable.");
 				}
 				return item;
@@ -154,8 +154,45 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		StepExecution stepExecution = new StepExecution(step, jobExecution);
 		step.execute(stepExecution);
 		
-		assertEquals(1, stepExecution.getSkipCount());
+		assertEquals(2, stepExecution.getSkipCount());
 		// b is processed once and skipped, plus 1, plus c, plus the null at end
-		assertEquals(4, count);
+		assertEquals(7, count);
 	}
+	
+	//The following test fails due to current expected behavior of retry
+	//that will be addressed in 1.1
+//	public void testSkipAndRetryWithWriteFailure() throws Exception {
+//		
+//		factory.setSkippableExceptionClasses(new Class[] {RetryException.class});
+//		factory.setSkipLimit(2);
+//		List items = TransactionAwareProxyFactory.createTransactionalList();
+//		items.addAll(Arrays.asList(new String[] { "a", "b", "c", "d", "e", "f" }));
+//		ItemReader provider = new ListItemReader(items) {
+//			public Object read() {
+//				Object item = super.read();
+//				System.out.print("Read Called! Item: [" + item + "]");
+//				count++;				
+//				return item;
+//			}
+//		};
+//		
+//		ItemWriter itemWriter = new AbstractItemWriter(){
+//			public void write(Object item) throws Exception {
+//				System.out.print("Write Called! Item: [" + item + "]");
+//				if ("b".equals(item) || "d".equals(item)) {
+//					throw new RuntimeException("Read error - planned but skippable.");
+//				}			
+//			}};
+//		factory.setItemReader(provider);
+//		factory.setItemWriter(itemWriter);
+//		factory.setRetryLimit(5);
+//		factory.setRetryableExceptionClasses(new Class[]{RuntimeException.class});
+//		AbstractStep step = (AbstractStep) factory.getObject();
+//		step.setName("mytest");
+//		StepExecution stepExecution = new StepExecution(step, jobExecution);
+//		step.execute(stepExecution);
+//		
+//		assertEquals(2, stepExecution.getSkipCount());
+//		assertEquals(9, count);
+//	}
 }

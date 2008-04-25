@@ -201,5 +201,15 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		}
 
 	}
+	
+	public void testStoreInteger(){	
+		dao.saveStepExecution(stepExecution);
+		ExecutionContext ec = new ExecutionContext();
+		ec.put("intValue", new Integer(343232));
+		stepExecution.setExecutionContext(ec);
+		dao.saveOrUpdateExecutionContext(stepExecution);
+		ExecutionContext restoredEc = dao.findExecutionContext(stepExecution);
+		assertEquals(ec, restoredEc);
+	}
 
 }

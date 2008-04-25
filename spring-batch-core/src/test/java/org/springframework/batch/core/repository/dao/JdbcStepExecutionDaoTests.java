@@ -17,5 +17,5 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 	protected String[] getConfigLocations() {
 		return new String[] { "sql-dao-test.xml" };
 	}
-
+	
 }
