@@ -12,7 +12,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
@@ -61,7 +60,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		factory.setSkippableExceptionClasses(skippableExceptions);
 		factory.setSkipLimit(SKIP_LIMIT);
 
-		JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), new JobSupport("skipJob"));
+		JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), "skipJob");
 		jobExecution = new JobExecution(jobInstance);
 	}
 

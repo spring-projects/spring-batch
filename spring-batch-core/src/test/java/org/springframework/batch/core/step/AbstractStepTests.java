@@ -10,7 +10,6 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -31,7 +30,7 @@ public class AbstractStepTests extends TestCase {
 	final List events = new ArrayList();
 
 	final StepExecution execution = new StepExecution(tested.getName(), new JobExecution(new JobInstance(new Long(1),
-			new JobParameters(), new JobSupport())));
+			new JobParameters(), "jobName")));
 
 	/**
 	 * Fills the events list when abstract methods are called.

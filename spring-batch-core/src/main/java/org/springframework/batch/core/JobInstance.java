@@ -26,8 +26,7 @@ import org.springframework.util.Assert;
  * 
  * Trying to execute an existing JobIntance that has already completed
  * successfully will result in error. Error will be raised also for an attempt
- * to restart a failed JobInstance if the Job ({@link JobInstance#getJob()})
- * is not restartable.
+ * to restart a failed JobInstance if the Job is not restartable.
  * 
  * @see Job
  * @see JobParameters
@@ -42,13 +41,14 @@ public class JobInstance extends Entity {
 
 	private JobParameters jobParameters;
 
-	private Job job;
+	private String jobName;
 
-	public JobInstance(Long id, JobParameters jobParameters, Job job) {
+	public JobInstance(Long id, JobParameters jobParameters, String jobName) {
 		super(id);
-		Assert.notNull(job);
+		Assert.hasLength(jobName);
+		// Assert.hasLength(job.getName());
 		this.jobParameters = jobParameters == null ? new JobParameters() : jobParameters;
-		this.job = job;
+		this.jobName = jobName;
 	}
 
 	/**
@@ -62,15 +62,11 @@ public class JobInstance extends Entity {
 	 * @return the job name. (Equivalent to getJob().getName())
 	 */
 	public String getJobName() {
-		return job == null ? null : job.getName();
+		return jobName;
 	}
 
 	public String toString() {
-		return super.toString() + ", JobParameters=[" + jobParameters + "]" + ", Job=[" + job + "]";
-	}
-
-	public Job getJob() {
-		return job;
+		return super.toString() + ", JobParameters=[" + jobParameters + "]" + ", Job=[" + jobName + "]";
 	}
 
 }

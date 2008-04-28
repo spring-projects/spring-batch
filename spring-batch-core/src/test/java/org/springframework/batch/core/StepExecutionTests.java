@@ -21,7 +21,6 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
@@ -224,7 +223,7 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	private StepExecution newStepExecution(Step step, Long long2) {
-		JobInstance job = new JobInstance(new Long(3), new JobParameters(), new JobSupport("testJob"));
+		JobInstance job = new JobInstance(new Long(3), new JobParameters(), "testJob");
 		StepExecution execution = new StepExecution(step.getName(), new JobExecution(job, long2), new Long(4));
 		return execution;
 	}

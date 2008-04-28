@@ -27,7 +27,6 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.item.ClearFailedException;
@@ -53,7 +52,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 	private ItemSkipPolicyItemHandler handler = new ItemSkipPolicyItemHandler(new SkipReaderStub(), writer);
 
 	private StepContribution contribution = new StepContribution(new JobExecution(new JobInstance(new Long(11),
-			new JobParameters(), new JobSupport())).createStepExecution(new StepSupport("foo")));
+			new JobParameters(), "jobName")).createStepExecution(new StepSupport("foo")));
 
 	protected void tearDown() throws Exception {
 		// remove the resource if it exists

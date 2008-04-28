@@ -17,26 +17,24 @@ package org.springframework.batch.core;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.job.JobSupport;
-
 /**
  * @author dsyer
  *
  */
 public class JobInstanceTests extends TestCase {
 
-	private JobInstance instance = new JobInstance(new Long(11), new JobParameters(), new JobSupport("job"));
+	private JobInstance instance = new JobInstance(new Long(11), new JobParameters(), "job");
 
 	/**
 	 * Test method for {@link org.springframework.batch.core.JobInstance#getJobName()}.
 	 */
 	public void testGetName() {
-		instance = new JobInstance(new Long(1), new JobParameters(), new JobSupport("foo"));
+		instance = new JobInstance(new Long(1), new JobParameters(), "foo");
 		assertEquals("foo", instance.getJobName());
 	}
 	
 	public void testGetJob(){
-		assertEquals("job", instance.getJob().getName());
+		assertEquals("job", instance.getJobName());
 	}
 
 	public void testCreateWithNulls(){
@@ -47,7 +45,7 @@ public class JobInstanceTests extends TestCase {
 		catch (IllegalArgumentException e) {
 			// expected 
 		}
-		instance = new JobInstance(null, null, new JobSupport("testJob"));
+		instance = new JobInstance(null, null, "testJob");
 		assertEquals("testJob", instance.getJobName());
 		assertEquals(0, instance.getJobParameters().getParameters().size());
 	}

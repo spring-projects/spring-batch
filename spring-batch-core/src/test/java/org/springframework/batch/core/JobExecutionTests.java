@@ -19,7 +19,6 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -29,7 +28,7 @@ import org.springframework.batch.repeat.ExitStatus;
  */
 public class JobExecutionTests extends TestCase {
 
-	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), new JobSupport("foo")), new Long(12));
+	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), "foo"), new Long(12));
 
 	/**
 	 * Test method for
@@ -96,7 +95,7 @@ public class JobExecutionTests extends TestCase {
 	 */
 	public void testGetJobId() {
 		assertEquals(11, execution.getJobId().longValue());
-		execution = new JobExecution(new JobInstance(new Long(23), new JobParameters(), new JobSupport("testJob")), null);
+		execution = new JobExecution(new JobInstance(new Long(23), new JobParameters(), "testJob"), null);
 		assertEquals(23, execution.getJobId().longValue());
 	}
 

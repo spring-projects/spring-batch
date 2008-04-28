@@ -23,6 +23,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
@@ -74,6 +75,8 @@ public class ItemOrientedStepTests extends TestCase {
 
 	private ItemOrientedStep itemOrientedStep;
 
+	private Job job;
+	
 	private JobInstance jobInstance;
 
 	private ResourcelessTransactionManager transactionManager;
@@ -108,7 +111,8 @@ public class ItemOrientedStepTests extends TestCase {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		itemOrientedStep.setChunkOperations(template);
 
-		jobInstance = new JobInstance(new Long(0), new JobParameters(), new JobSupport("FOO"));
+		job = new JobSupport("FOO");
+		jobInstance = new JobInstance(new Long(0), new JobParameters(), job.getName());
 
 		itemOrientedStep.setTransactionManager(transactionManager);
 
@@ -149,7 +153,7 @@ public class ItemOrientedStepTests extends TestCase {
 				new MapStepExecutionDao());
 		itemOrientedStep.setJobRepository(repository);
 
-		JobExecution jobExecution = repository.createJobExecution(jobInstance.getJob(), jobInstance.getJobParameters());
+		JobExecution jobExecution = repository.createJobExecution(job, jobInstance.getJobParameters());
 		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecution);
 
 		itemOrientedStep.execute(stepExecution);

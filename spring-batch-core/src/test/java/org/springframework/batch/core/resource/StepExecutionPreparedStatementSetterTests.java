@@ -25,7 +25,6 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
@@ -47,7 +46,7 @@ public class StepExecutionPreparedStatementSetterTests extends AbstractTransacti
 		
 		pss = new StepExecutionPreparedStatementSetter();
 		JobParameters jobParameters = new JobParametersBuilder().addLong("begin.id", new Long(1)).addLong("end.id", new Long(4)).toJobParameters();
-		JobInstance jobInstance = new JobInstance(new Long(1), jobParameters, new SimpleJob());
+		JobInstance jobInstance = new JobInstance(new Long(1), jobParameters, "simpleJob");
 		JobExecution jobExecution = new JobExecution(jobInstance, new Long(2));
 		stepExecution = new StepExecution("taskletStep", jobExecution, new Long(3) );
 		pss.beforeStep(stepExecution);

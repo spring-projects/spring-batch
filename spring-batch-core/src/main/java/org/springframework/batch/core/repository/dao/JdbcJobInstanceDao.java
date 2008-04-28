@@ -61,7 +61,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		
 		Long jobId = new Long(jobIncrementer.nextLongValue());
 		
-		JobInstance jobInstance = new JobInstance(jobId, jobParameters, job);
+		JobInstance jobInstance = new JobInstance(jobId, jobParameters, job.getName());
 		jobInstance.incrementVersion();
 		
 		Object[] parameters = new Object[] { jobId, job.getName(), createJobKey(jobParameters), jobInstance.getVersion() };
@@ -173,7 +173,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-				JobInstance jobInstance = new JobInstance(new Long(rs.getLong(1)), jobParameters, job);
+				JobInstance jobInstance = new JobInstance(new Long(rs.getLong(1)), jobParameters, job.getName());
 				return jobInstance;
 			}
 		};

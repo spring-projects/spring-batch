@@ -23,8 +23,6 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
@@ -71,9 +69,8 @@ public class JdbcJobDaoQueryTests extends TestCase {
 				return 1;
 			}
 		});
-		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), new JobSupport(
-				"testJob")));
-		
+		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), "testJob"));
+
 		jobExecutionDao.saveJobExecution(jobExecution);
 		assertEquals(1, list.size());
 		String query = (String) list.get(0);

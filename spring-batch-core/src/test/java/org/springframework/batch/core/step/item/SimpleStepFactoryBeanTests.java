@@ -65,7 +65,11 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 
 	private ItemReader reader;
 
-	private SimpleJob job = new SimpleJob();;
+	private SimpleJob job = new SimpleJob() {
+		{
+			setBeanName("simpleJob");
+		}
+	};
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -188,16 +192,17 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		}
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 	}
-	
+
 	public void testChunkListeners() throws Exception {
 		String[] items = new String[] { "1", "2", "3", "4", "5", "6", "7" };
 		int commitInterval = 3;
-		
+
 		SimpleStepFactoryBean factory = getStepFactory(items);
 		class CountingChunkListener implements ChunkListener {
 			int beforeCount = 0;
+
 			int afterCount = 0;
-			
+
 			public void afterChunk() {
 				afterCount++;
 			}
@@ -207,9 +212,9 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 			}
 		}
 		CountingChunkListener chunkListener = new CountingChunkListener();
-		factory.setListeners(new StepListener[]{ chunkListener });
+		factory.setListeners(new StepListener[] { chunkListener });
 		factory.setCommitInterval(commitInterval);
-		
+
 		AbstractStep step = (AbstractStep) factory.getObject();
 
 		job.setSteps(Collections.singletonList(step));
@@ -220,21 +225,21 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertNull(reader.read());
 		assertEquals(items.length, written.size());
-		
-		int expectedListenerCallCount = (items.length / commitInterval ) + 1;
+
+		int expectedListenerCallCount = (items.length / commitInterval) + 1;
 		assertEquals(expectedListenerCallCount, chunkListener.afterCount);
 		assertEquals(expectedListenerCallCount, chunkListener.beforeCount);
 	}
-	
+
 	/**
 	 * Commit interval specified is not allowed to be zero or negative.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void testCommitIntervalMustBeGreaterThanZero() throws Exception {
 		SimpleStepFactoryBean factory = getStepFactory("foo");
 		// nothing wrong here
 		factory.getObject();
-		
+
 		// but exception excpected after setting commit interval to value <= 0
 		factory.setCommitInterval(0);
 		try {
@@ -244,7 +249,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		catch (IllegalArgumentException e) {
 			// expected
 		}
-		
+
 		factory.setCommitInterval(-1);
 		try {
 			factory.getObject();

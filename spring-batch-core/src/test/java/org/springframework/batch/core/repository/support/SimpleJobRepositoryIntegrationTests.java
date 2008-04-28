@@ -70,7 +70,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		JobExecution firstExecution = jobRepository.createJobExecution(job, jobParams);
 		firstExecution.setStartTime(new Date());
 
-		assertEquals(job, firstExecution.getJobInstance().getJob());
+		assertEquals(job.getName(), firstExecution.getJobInstance().getJobName());
 
 		jobRepository.saveOrUpdate(firstExecution);
 		firstExecution.setEndTime(new Date());
@@ -78,7 +78,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		JobExecution secondExecution = jobRepository.createJobExecution(job, jobParams);
 
 		assertEquals(firstExecution.getJobInstance(), secondExecution.getJobInstance());
-		assertEquals(job, secondExecution.getJobInstance().getJob());
+		assertEquals(job.getName(), secondExecution.getJobInstance().getJobName());
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		JobExecution secondExecution = jobRepository.createJobExecution(job, jobParameters);
 
 		assertEquals(firstExecution.getJobInstance(), secondExecution.getJobInstance());
-		assertEquals(job, secondExecution.getJobInstance().getJob());
+		assertEquals(job.getName(), secondExecution.getJobInstance().getJobName());
 	}
 
 	/**

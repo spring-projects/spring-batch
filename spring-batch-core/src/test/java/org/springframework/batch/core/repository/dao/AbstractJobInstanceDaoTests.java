@@ -34,13 +34,13 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalD
 
 		JobInstance fooInstance = dao.createJobInstance(fooJob, fooParams);
 		assertNotNull(fooInstance.getId());
-		assertEquals(fooJob, fooInstance.getJob());
+		assertEquals(fooJob.getName(), fooInstance.getJobName());
 		assertEquals(fooParams, fooInstance.getJobParameters());
 
 		JobInstance retrievedInstance = dao.getJobInstance(fooJob, fooParams);
 		JobParameters retrievedParams = retrievedInstance.getJobParameters();
 		assertEquals(fooInstance, retrievedInstance);
-		assertEquals(fooJob, retrievedInstance.getJob());
+		assertEquals(fooJob.getName(), retrievedInstance.getJobName());
 		assertEquals(fooParams, retrievedParams);
 		
 		assertEquals(Long.MAX_VALUE, retrievedParams.getLong("longKey").longValue());
@@ -67,7 +67,7 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalD
 
 	public void testCreationAddsVersion() {
 
-		JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), new JobSupport("testVersionAndId"));
+		JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), "testVersionAndId");
 
 		assertNull(jobInstance.getVersion());
 

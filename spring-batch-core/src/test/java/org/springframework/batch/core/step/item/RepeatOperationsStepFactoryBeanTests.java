@@ -25,10 +25,8 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.EmptyItemWriter;
 import org.springframework.batch.core.step.JobRepositorySupport;
-import org.springframework.batch.core.step.item.RepeatOperationsStepFactoryBean;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
@@ -45,9 +43,8 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 
 	private List list;
 
-	private JobExecution jobExecution = new JobExecution(new JobInstance(new Long(0L), new JobParameters(),
-			new JobSupport("job")));
-	
+	private JobExecution jobExecution = new JobExecution(new JobInstance(new Long(0L), new JobParameters(), "job"));
+
 	protected void setUp() throws Exception {
 		factory.setBeanName("RepeatOperationsStep");
 		factory.setItemReader(new ListItemReader(new ArrayList()));

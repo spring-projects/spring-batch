@@ -7,14 +7,13 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.job.JobSupport;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 public abstract class AbstractJobExecutionDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
 
 	JobExecutionDao dao;
 
-	JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), new JobSupport("execTestJob"));
+	JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), "execTestJob");
 	
 	JobExecution execution = new JobExecution(jobInstance);
 	

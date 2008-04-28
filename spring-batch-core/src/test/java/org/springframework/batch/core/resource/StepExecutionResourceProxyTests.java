@@ -27,8 +27,6 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.resource.StepExecutionResourceProxy;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -63,7 +61,7 @@ public class StepExecutionResourceProxyTests extends TestCase {
 
 	protected void setUp() throws Exception {
 
-		jobInstance = new JobInstance(new Long(0), new JobParameters(), new JobSupport("testJob"));
+		jobInstance = new JobInstance(new Long(0), new JobParameters(), "testJob");
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		Step step = new StepSupport("bar");
 		stepExecution = jobExecution.createStepExecution(step);
@@ -98,7 +96,7 @@ public class StepExecutionResourceProxyTests extends TestCase {
 	public void testNonStandardFilePatternWithJobParameters() throws Exception {
 		resource.setFilePattern("foo/data/%JOB_NAME%/%job.key%-foo");
 		jobInstance = new JobInstance(new Long(0), new JobParametersBuilder().addString("job.key", "spam")
-				.toJobParameters(), new JobSupport("testJob"));
+				.toJobParameters(), "testJob");
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		Step step = new StepSupport("bar");
 		resource.beforeStep(jobExecution.createStepExecution(step));

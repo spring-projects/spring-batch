@@ -46,7 +46,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	SimpleJobRepository jobRepository;
 
-	JobSupport jobConfiguration;
+	JobSupport job;
 
 	JobParameters jobParameters;
 
@@ -85,9 +85,9 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 		jobParameters = new JobParametersBuilder().toJobParameters();
 
-		jobConfiguration = new JobSupport();
-		jobConfiguration.setBeanName("RepositoryTest");
-		jobConfiguration.setRestartable(true);
+		job = new JobSupport();
+		job.setBeanName("RepositoryTest");
+		job.setRestartable(true);
 
 		stepConfiguration1 = new StepSupport("TestStep1");
 
@@ -97,9 +97,9 @@ public class SimpleJobRepositoryTests extends TestCase {
 		stepConfigurations.add(stepConfiguration1);
 		stepConfigurations.add(stepConfiguration2);
 
-		jobConfiguration.setSteps(stepConfigurations);
+		job.setSteps(stepConfigurations);
 
-		databaseJob = new JobInstance(new Long(1), jobParameters, jobConfiguration);
+		databaseJob = new JobInstance(new Long(1), jobParameters, job.getName());
 
 		databaseStep1 = "dbStep1";
 		databaseStep2 = "dbStep2";
@@ -126,7 +126,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	public void testSaveOrUpdateValidJobExecution() throws Exception {
 
-		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(1), jobParameters, jobConfiguration));
+		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(1), jobParameters, job.getName()));
 
 		// new execution - call save on job dao
 		jobExecutionDao.saveJobExecution(jobExecution);

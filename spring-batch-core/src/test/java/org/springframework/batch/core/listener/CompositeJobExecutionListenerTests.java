@@ -21,11 +21,8 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.listener.CompositeExecutionJobListener;
-import org.springframework.batch.core.listener.JobExecutionListenerSupport;
+import org.springframework.batch.core.JobInstance;
 
 /**
  * @author Dave Syer
@@ -79,7 +76,7 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 				list.add("foo");
 			}
 		});
-		listener.beforeJob(new JobExecution(new JobInstance(new Long(11L), null, new JobSupport())));
+		listener.beforeJob(new JobExecution(new JobInstance(new Long(11L), null, "testOpenJob")));
 		assertEquals(1, list.size());
 	}
 
