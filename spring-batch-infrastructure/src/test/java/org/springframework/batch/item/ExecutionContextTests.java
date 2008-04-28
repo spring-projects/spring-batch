@@ -15,7 +15,13 @@
  */
 package org.springframework.batch.item;
 
+import java.io.Serializable;
+
 import junit.framework.TestCase;
+
+import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * @author Lucas Ward
@@ -101,6 +107,44 @@ public class ExecutionContextTests extends TestCase{
 	public void testPutNull(){
 		//putting null should work
 		context.put("1", null);
+	}
+	
+	public void testSerialization() {
+		
+		TestSerializable s = new TestSerializable();
+		s.value = 7;
+		
+		context.putString("1", "testString1");
+		context.putString("2", "testString2");
+		context.putLong("3", 3);
+		context.putDouble("4", 4.4);
+		context.put("5", s);
+		
+		byte[] serialized = SerializationUtils.serialize(context);
+		
+		ExecutionContext deserialized = (ExecutionContext) SerializationUtils.deserialize(serialized);
+		
+		assertEquals(context, deserialized);
+		assertEquals(7, ((TestSerializable)deserialized.get("5")).value);
+	}
+	
+	/**
+	 * Value object for testing serialization
+	 */
+	private static class TestSerializable implements Serializable {
+
+		int value;
+
+		public boolean equals(Object obj) {
+			return EqualsBuilder.reflectionEquals(this, obj);
+		}
+
+		public int hashCode() {
+			return HashCodeBuilder.reflectionHashCode(this);
+		}
+		
+		
+		
 	}
 	
 }

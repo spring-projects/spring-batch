@@ -3,6 +3,7 @@
  */
 package org.springframework.batch.core;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -24,7 +25,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @author Lucas Ward
  * @since 1.0
  */
-public class JobParameters {
+public class JobParameters implements Serializable {
 
 	private final Map stringMap;
 

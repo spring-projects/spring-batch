@@ -19,6 +19,7 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -152,5 +153,11 @@ public class JobExecutionTests extends TestCase {
 		execution = new JobExecution();
 		assertTrue("JobExecution string does not contain id", execution.toString().indexOf("id=") >= 0);
 		assertTrue("JobExecution string does not contain job: " + execution, execution.toString().indexOf("job=") >= 0);
+	}
+	
+	public void testSerialization() {
+		byte[] serialized = SerializationUtils.serialize(execution);
+		
+		assertEquals(execution, SerializationUtils.deserialize(serialized));
 	}
 }

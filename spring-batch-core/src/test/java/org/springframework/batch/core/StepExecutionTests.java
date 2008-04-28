@@ -21,6 +21,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
@@ -220,6 +221,19 @@ public class StepExecutionTests extends TestCase {
 		assertTrue(set.contains(execution));
 		execution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
 		assertTrue(set.contains(execution));
+	}
+	
+	public void testSerialization() throws Exception {
+		
+		ExitStatus status = ExitStatus.NOOP;
+		execution.setExitStatus(status);
+		execution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		
+		byte[] serialized = SerializationUtils.serialize(execution);
+		StepExecution deserialized = (StepExecution) SerializationUtils.deserialize(serialized);
+		
+		assertEquals(execution, deserialized);
+		assertEquals(status, deserialized.getExitStatus());
 	}
 
 	private StepExecution newStepExecution(Step step, Long long2) {

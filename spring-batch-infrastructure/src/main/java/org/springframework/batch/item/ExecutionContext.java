@@ -35,7 +35,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Douglas Kaminsky
  */
-public class ExecutionContext {
+public class ExecutionContext implements Serializable {
 
 	private boolean dirty = false;
 

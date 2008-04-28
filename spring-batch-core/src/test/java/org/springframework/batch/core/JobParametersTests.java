@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.SerializationUtils;
+
 import junit.framework.TestCase;
 
 /**
@@ -244,5 +246,13 @@ public class JobParametersTests extends TestCase {
 	public void testHashCodeEqualWhenNotEmpty() throws Exception {
 		int code = getNewParameters().hashCode();
 		assertEquals(code, parameters.hashCode());
+	}
+	
+	public void testSerialization() {
+		JobParameters params = getNewParameters();
+		
+		byte[] serialized = SerializationUtils.serialize(params);
+		
+		assertEquals(params, SerializationUtils.deserialize(serialized));
 	}
 }
