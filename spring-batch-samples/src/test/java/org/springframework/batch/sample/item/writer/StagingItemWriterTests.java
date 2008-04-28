@@ -20,7 +20,6 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.sample.tasklet.JobSupport;
-import org.springframework.batch.sample.tasklet.StepSupport;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
 
@@ -37,12 +36,13 @@ public class StagingItemWriterTests extends AbstractTransactionalDataSourceSprin
 				"staging-test-context.xml") };
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.test.AbstractTransactionalSpringContextTests#onSetUpBeforeTransaction()
 	 */
 	protected void onSetUpBeforeTransaction() throws Exception {
-		StepExecution stepExecution = new StepExecution(new StepSupport("stepName"),
-				new JobExecution(new JobInstance(new Long(12L), new JobParameters(), new JobSupport("testJob"))));
+		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(new Long(12L),
+				new JobParameters(), new JobSupport("testJob"))));
 		writer.beforeStep(stepExecution);
 	}
 

@@ -27,7 +27,7 @@ import org.springframework.batch.core.StepExecution;
 public class ThreadStepInterruptionPolicyTests extends TestCase {
 
 	ThreadStepInterruptionPolicy policy = new ThreadStepInterruptionPolicy();
-	private StepExecution context = new StepExecution(new StepSupport(), null);
+	private StepExecution context = new StepExecution("stepSupport", null);
 	
 	/**
 	 * Test method for {@link org.springframework.batch.core.step.ThreadStepInterruptionPolicy#checkInterrupted(StepExecution)}.

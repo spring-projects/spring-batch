@@ -94,7 +94,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		jobExecution = new JobExecution(jobInstance);
 		jobExecutionDao.saveJobExecution(jobExecution);
 
-		stepExecution = new StepExecution(step1, jobExecution, new Long(1));
+		stepExecution = new StepExecution(step1.getName(), jobExecution, new Long(1));
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setStartTime(new Date(System.currentTimeMillis()));
 		stepExecutionDao.saveStepExecution(stepExecution);
@@ -122,7 +122,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	}
 	
 	public void testSaveStepExecution() {
-		StepExecution execution = new StepExecution(step2, jobExecution, null);
+		StepExecution execution = new StepExecution(step2.getName(), jobExecution, null);
 		execution.setStatus(BatchStatus.STARTED);
 		execution.setStartTime(new Date(System.currentTimeMillis()));
 		execution.setExitStatus(ExitStatus.FAILED.addExitDescription("java.lang.Exception"));
@@ -134,7 +134,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	}
 
 	public void testSaveStepExecutionAndExecutionContext() {
-		StepExecution execution = new StepExecution(step2, jobExecution, null);
+		StepExecution execution = new StepExecution(step2.getName(), jobExecution, null);
 		execution.setStatus(BatchStatus.STARTED);
 		execution.setStartTime(new Date(System.currentTimeMillis()));
 		execution.setExecutionContext(executionContext);
@@ -165,7 +165,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	}
 
 	public void testUpdateStepExecutionWithNullId() {
-		StepExecution stepExecution = new StepExecution(new StepSupport("testStep"), null, null);
+		StepExecution stepExecution = new StepExecution("testStep", null, null);
 		try {
 			stepExecutionDao.updateStepExecution(stepExecution);
 			fail("Expected IllegalArgumentException");

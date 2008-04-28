@@ -16,7 +16,6 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.JobRepositorySupport;
-import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.repeat.ExitStatus;
 
 public class TaskletStepTests extends TestCase {
@@ -26,7 +25,7 @@ public class TaskletStepTests extends TestCase {
 	private List list = new ArrayList();
 
 	protected void setUp() throws Exception {
-		stepExecution = new StepExecution(new StepSupport("stepName"), new JobExecution(new JobInstance(new Long(0L),
+		stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(new Long(0L),
 				new JobParameters(), new JobSupport("testJob")), new Long(12)));
 	}
 

@@ -143,7 +143,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	public void testSaveOrUpdateStepExecutionException() {
 
-		StepExecution stepExecution = new StepExecution(new StepSupport("stepName"), null, null);
+		StepExecution stepExecution = new StepExecution("stepName", null, null);
 
 		// failure scenario -- no step id set.
 		try {

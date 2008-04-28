@@ -72,7 +72,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 				return null;
 			}
 		}, itemWriter));
-		stepExecution = new StepExecution(step, jobExecution);
+		stepExecution = new StepExecution(step.getName(), jobExecution);
 	}
 
 	public void testInterruptChunk() throws Exception {

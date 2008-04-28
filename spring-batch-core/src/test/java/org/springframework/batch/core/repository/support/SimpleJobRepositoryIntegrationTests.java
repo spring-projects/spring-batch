@@ -126,7 +126,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 
 		// first execution
 		JobExecution firstJobExec = jobRepository.createJobExecution(job, jobParameters);
-		StepExecution firstStepExec = new StepExecution(step, firstJobExec);
+		StepExecution firstStepExec = new StepExecution(step.getName(), firstJobExec);
 		jobRepository.saveOrUpdate(firstJobExec);
 		jobRepository.saveOrUpdate(firstStepExec);
 
@@ -145,7 +145,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 
 		// second execution
 		JobExecution secondJobExec = jobRepository.createJobExecution(job, jobParameters);
-		StepExecution secondStepExec = new StepExecution(step, secondJobExec);
+		StepExecution secondStepExec = new StepExecution(step.getName(), secondJobExec);
 		jobRepository.saveOrUpdate(secondJobExec);
 		jobRepository.saveOrUpdate(secondStepExec);
 
@@ -164,7 +164,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		};
 		JobExecution jobExec = jobRepository.createJobExecution(job, jobParameters);
 		Step step = new StepSupport("step1");
-		StepExecution stepExec = new StepExecution(step, jobExec);
+		StepExecution stepExec = new StepExecution(step.getName(), jobExec);
 		stepExec.setExecutionContext(ctx);
 
 		jobRepository.saveOrUpdate(stepExec);

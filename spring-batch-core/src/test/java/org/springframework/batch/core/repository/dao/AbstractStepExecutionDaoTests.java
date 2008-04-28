@@ -67,7 +67,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		jobExecution = repository.createJobExecution(new JobSupport("testJob"), new JobParameters());
 		jobInstance = jobExecution.getJobInstance();
 		step = new StepSupport("foo");
-		stepExecution = new StepExecution(step, jobExecution);
+		stepExecution = new StepExecution(step.getName(), jobExecution);
 		dao = getStepExecutionDao();
 	}
 
@@ -179,10 +179,10 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	public void testConcurrentModificationException() {
 		step = new StepSupport("foo");
 
-		StepExecution exec1 = new StepExecution(step, jobExecution);
+		StepExecution exec1 = new StepExecution(step.getName(), jobExecution);
 		dao.saveStepExecution(exec1);
 
-		StepExecution exec2 = new StepExecution(step, jobExecution);
+		StepExecution exec2 = new StepExecution(step.getName(), jobExecution);
 		exec2.setId(exec1.getId());
 
 		exec2.incrementVersion();

@@ -354,7 +354,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-			StepExecution stepExecution = new StepExecution(step, jobExecution, new Long(rs.getLong(1)));
+			StepExecution stepExecution = new StepExecution(step.getName(), jobExecution, new Long(rs.getLong(1)));
 			stepExecution.setStartTime(rs.getTimestamp(3));
 			stepExecution.setEndTime(rs.getTimestamp(4));
 			stepExecution.setStatus(BatchStatus.getStatus(rs.getString(5)));

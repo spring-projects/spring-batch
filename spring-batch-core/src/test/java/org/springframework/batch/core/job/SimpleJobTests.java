@@ -115,8 +115,8 @@ public class SimpleJobTests extends TestCase {
 		jobExecution = jobRepository.createJobExecution(job, jobParameters);
 		jobInstance = jobExecution.getJobInstance();
 
-		stepExecution1 = new StepExecution(step1, jobExecution, null);
-		stepExecution2 = new StepExecution(step2, jobExecution, null);
+		stepExecution1 = new StepExecution(step1.getName(), jobExecution, null);
+		stepExecution2 = new StepExecution(step2.getName(), jobExecution, null);
 
 	}
 

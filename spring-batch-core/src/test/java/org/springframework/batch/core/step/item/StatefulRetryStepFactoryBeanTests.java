@@ -124,7 +124,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		factory.setRetryLimit(10);
 		AbstractStep step = (AbstractStep) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 		
 		assertEquals(0, stepExecution.getSkipCount());
@@ -151,7 +151,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		factory.setRetryLimit(10);
 		AbstractStep step = (AbstractStep) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 		
 		assertEquals(2, stepExecution.getSkipCount());

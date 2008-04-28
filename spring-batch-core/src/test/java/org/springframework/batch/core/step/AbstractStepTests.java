@@ -30,13 +30,17 @@ public class AbstractStepTests extends TestCase {
 	 */
 	final List events = new ArrayList();
 
-	final StepExecution execution = new StepExecution(tested, new JobExecution(new JobInstance(new Long(1),
+	final StepExecution execution = new StepExecution(tested.getName(), new JobExecution(new JobInstance(new Long(1),
 			new JobParameters(), new JobSupport())));
 
 	/**
 	 * Fills the events list when abstract methods are called.
 	 */
 	private class EventTrackingStep extends AbstractStep {
+		
+		public EventTrackingStep() {
+			setBeanName("eventTrackingStep");
+		}
 
 		protected void open(ExecutionContext ctx) throws Exception {
 			events.add("open");

@@ -33,10 +33,10 @@ import org.springframework.batch.support.PropertiesConverter;
  */
 public class StepExecutionTests extends TestCase {
 
-	private StepExecution execution = newStepExecution(new StepSupport("stepName"),
-			new Long(23));
+	private StepExecution execution = newStepExecution(new StepSupport("stepName"), new Long(23));
 
-	private StepExecution blankExecution = new StepExecution(new StepSupport("blank"), new JobExecution());
+	private StepExecution blankExecution = new StepExecution("blank", new JobExecution());
+
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#JobExecution()}.
@@ -50,7 +50,7 @@ public class StepExecutionTests extends TestCase {
 	 * {@link org.springframework.batch.core.JobExecution#JobExecution()}.
 	 */
 	public void testStepExecutionWithNullId() {
-		assertNull(new StepExecution(new StepSupport("stepName"), new JobExecution()).getId());
+		assertNull(new StepExecution("stepName", new JobExecution()).getId());
 	}
 
 	/**
@@ -118,34 +118,37 @@ public class StepExecutionTests extends TestCase {
 		execution.setItemCount(123);
 		assertEquals(123, execution.getItemCount().intValue());
 	}
-	
+
 	public void testGetJobExecution() throws Exception {
 		assertNotNull(execution.getJobExecution());
 	}
-	
+
 	public void testApplyContribution() throws Exception {
 		StepContribution contribution = execution.createStepContribution();
 		contribution.incrementCommitCount();
 		execution.apply(contribution);
 		assertEquals(new Integer(1), execution.getCommitCount());
 	}
-	
+
 	public void testTerminateOnly() throws Exception {
 		assertFalse(execution.isTerminateOnly());
 		execution.setTerminateOnly();
 		assertTrue(execution.isTerminateOnly());
 	}
 
-	public void testToStringWithNullName() throws Exception {
-		String value = new StepExecution(new StepSupport(null), new JobExecution()).toString();
-		assertTrue("Should contain name=null: "+value, value.indexOf("name=null")>=0);
+	public void testNullNameIsIllegal() throws Exception {
+		try {
+			new StepExecution(null, new JobExecution());
+			fail();
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+		}
 	}
 
 	public void testToString() throws Exception {
-		assertTrue("Should contain item count: " + execution.toString(),
-				execution.toString().indexOf("item") >= 0);
-		assertTrue("Should contain commit count: " + execution.toString(),
-				execution.toString().indexOf("commit") >= 0);
+		assertTrue("Should contain item count: " + execution.toString(), execution.toString().indexOf("item") >= 0);
+		assertTrue("Should contain commit count: " + execution.toString(), execution.toString().indexOf("commit") >= 0);
 		assertTrue("Should contain rollback count: " + execution.toString(),
 				execution.toString().indexOf("rollback") >= 0);
 	}
@@ -154,7 +157,7 @@ public class StepExecutionTests extends TestCase {
 		assertNotNull(execution.getExecutionContext());
 		ExecutionContext context = new ExecutionContext();
 		context.putString("foo", "bar");
-		execution.setExecutionContext(context );
+		execution.setExecutionContext(context);
 		assertEquals("bar", execution.getExecutionContext().getString("foo"));
 	}
 
@@ -204,14 +207,12 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	public void testHashCode() throws Exception {
-		assertTrue("Hash code same as parent", new Entity(execution.getId())
-				.hashCode() != execution.hashCode());
+		assertTrue("Hash code same as parent", new Entity(execution.getId()).hashCode() != execution.hashCode());
 	}
 
 	public void testHashCodeWithNullIds() throws Exception {
-		assertTrue("Hash code not same as parent",
-				new Entity(execution.getId()).hashCode() != blankExecution
-						.hashCode());
+		assertTrue("Hash code not same as parent", new Entity(execution.getId()).hashCode() != blankExecution
+				.hashCode());
 	}
 
 	public void testHashCodeViaHashSet() throws Exception {
@@ -224,7 +225,7 @@ public class StepExecutionTests extends TestCase {
 
 	private StepExecution newStepExecution(Step step, Long long2) {
 		JobInstance job = new JobInstance(new Long(3), new JobParameters(), new JobSupport("testJob"));
-		StepExecution execution = new StepExecution(step, new JobExecution(job, long2), new Long(4));
+		StepExecution execution = new StepExecution(step.getName(), new JobExecution(job, long2), new Long(4));
 		return execution;
 	}
 

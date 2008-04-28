@@ -52,6 +52,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	protected int count;
 
 	protected void setUp() throws Exception {
+		factory.setBeanName("stepName");
 		factory.setJobRepository(new JobRepositorySupport());
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setCommitInterval(COMMIT_INTERVAL);
@@ -70,7 +71,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	public void testSkip() throws Exception {
 		AbstractStep step = (AbstractStep) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 
 		assertEquals(2, stepExecution.getSkipCount());
@@ -97,7 +98,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		});
 
 		AbstractStep step = (AbstractStep) factory.getObject();
-		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		try {
 			step.execute(stepExecution);
@@ -117,7 +118,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		AbstractStep step = (AbstractStep) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		try {
 			step.execute(stepExecution);
@@ -152,7 +153,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		AbstractStep step = (AbstractStep) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		try {
 			step.execute(stepExecution);
@@ -244,7 +245,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		factory.setItemReader(provider);
 		AbstractStep step = (AbstractStep) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step, jobExecution);
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 		
 		assertEquals(1, stepExecution.getSkipCount());

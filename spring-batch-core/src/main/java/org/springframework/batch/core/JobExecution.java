@@ -142,7 +142,7 @@ public class JobExecution extends Entity {
 	 * Register a step execution with the current job execution.
 	 */
 	public StepExecution createStepExecution(Step step) {
-		StepExecution stepExecution = new StepExecution(step, this, null);
+		StepExecution stepExecution = new StepExecution(step.getName(), this, null);
 		this.stepExecutions.add(stepExecution);
 		return stepExecution;
 	}

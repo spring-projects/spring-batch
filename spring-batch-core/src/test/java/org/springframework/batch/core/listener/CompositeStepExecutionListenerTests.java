@@ -22,9 +22,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.listener.CompositeStepExecutionListener;
-import org.springframework.batch.core.listener.StepExecutionListenerSupport;
-import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -82,7 +79,7 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 				list.add("foo");
 			}
 		});
-		listener.beforeStep(new StepExecution(new StepSupport("foo"), null));
+		listener.beforeStep(new StepExecution("foo", null));
 		assertEquals(1, list.size());
 	}
 
