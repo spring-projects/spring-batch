@@ -146,7 +146,7 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean, Ite
 	 */
 	public void open(ExecutionContext executionContext) {
 
-		Assert.state(keys == null && !initialized, "Cannot open an already opened input source"
+		Assert.state(keys == null && !initialized, "Cannot open an already opened item reader"
 				+ ", call close() first.");
 		keys = keyGenerator.retrieveKeys(executionContext);
 		if (keys == null || keys.size() == 0) {
