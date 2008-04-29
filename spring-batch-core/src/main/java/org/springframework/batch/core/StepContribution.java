@@ -42,16 +42,16 @@ public class StepContribution {
 	}
 
 	/**
-	 * Increment the counter for the number of tasks executed.
+	 * Increment the counter for the number of items processed.
 	 */
 	public void incrementItemCount() {
 		itemCount++;
 	}
 
 	/**
-	 * Public access to the task execution counter.
+	 * Public access to the item counter.
 	 * 
-	 * @return the task execution counter.
+	 * @return the item counter.
 	 */
 	public int getItemCount() {
 		return itemCount;
