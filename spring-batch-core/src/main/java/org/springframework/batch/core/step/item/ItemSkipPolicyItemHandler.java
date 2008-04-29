@@ -38,7 +38,13 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * {@link ItemHandler} that implements skip behavior. It delegates to
- * {@link #setItemSkipPolicy(ItemSkipPolicy)} to decide whether skip should be called or not.
+ * {@link #setItemSkipPolicy(ItemSkipPolicy)} to decide whether skip should be
+ * called or not.
+ * 
+ * When exception is skipped on read it is *not* re-thrown (does not cause tx
+ * rollback). Skipped exception on write is re-thrown by default (causes tx
+ * rollback) unless the exception class is included in
+ * {@link #setDoNotRethrowExceptionClasses(Class[])}.
  * 
  * If exception is thrown while reading the item, skip is called on the
  * {@link ItemReader}. If exception is thrown while writing the item, skip is
@@ -62,6 +68,8 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	private int skipCacheCapacity = 1024;
 
 	private Map skippedExceptions = new HashMap();
+
+	private Class[] doNotRethrowExceptionClasses = new Class[] {};
 
 	private ItemKeyGenerator defaultItemKeyGenerator = new ItemKeyGenerator() {
 		public Object getKey(Object item) {
@@ -230,10 +238,25 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 				// roll back
 				addSkippedException(key, e);
 				logger.debug("Added item to skip list; key=" + key);
+
+				// return without re-throwing if exception shouldn't cause
+				// rollback
+				if (!shouldRethrow(e)) {
+					return;
+				}
 			}
-			// always re-throw exception on write
+			// re-throw exception on write by default
 			throw e;
 		}
+	}
+
+	private boolean shouldRethrow(Exception e) {
+		for (int i = 0; i < doNotRethrowExceptionClasses.length; i++) {
+			if (doNotRethrowExceptionClasses[i].isAssignableFrom(e.getClass())) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public void mark() throws MarkFailedException {
@@ -296,6 +319,14 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 		synchronized (skippedExceptions) {
 			return (Throwable) skippedExceptions.get(key);
 		}
+	}
+
+	/**
+	 * doNotRethrowExceptionClasses will not be re-thrown when skipped.
+	 * @param doNotRethrowExceptionClasses empty by default
+	 */
+	public void setDoNotRethrowExceptionClasses(Class[] doNotRethrowExceptionClasses) {
+		this.doNotRethrowExceptionClasses = doNotRethrowExceptionClasses;
 	}
 
 }

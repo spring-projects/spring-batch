@@ -33,6 +33,8 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	private Class[] skippableExceptionClasses = new Class[] { Exception.class };
 
 	private Class[] fatalExceptionClasses = new Class[] { Error.class };
+	
+	private Class[] txValidExceptionClasses = new Class[] {};
 
 	private ItemKeyGenerator itemKeyGenerator;
 
@@ -125,6 +127,17 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	public void setSkipCacheCapacity(int skipCacheCapacity) {
 		this.skipCacheCapacity = skipCacheCapacity;
 	}
+	
+	/**
+	 * Skippable txValidExceptionClasses will *not* cause transaction rollback.
+	 * 
+	 * @param txValidExceptionClasses empty by default
+	 * 
+	 * @see #setSkippableExceptionClasses(Class[])
+	 */
+	public void setTxValidExceptionClasses(Class[] txValidExceptionClasses) {
+		this.txValidExceptionClasses = txValidExceptionClasses;
+	}
 
 	/**
 	 * Uses the {@link #setSkipLimit(int)} value to configure item handler and and
@@ -148,6 +161,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 			LimitCheckingItemSkipPolicy limitCheckingSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, Arrays
 					.asList(skippableExceptionClasses), fatalExceptionList);
 			itemHandler.setItemSkipPolicy(limitCheckingSkipPolicy);
+			itemHandler.setDoNotRethrowExceptionClasses(txValidExceptionClasses);
 			this.itemSkipPolicy = limitCheckingSkipPolicy;
 			SimpleLimitExceptionHandler exceptionHandler = new SimpleLimitExceptionHandler(skipLimit);
 			exceptionHandler.setExceptionClasses(skippableExceptionClasses);

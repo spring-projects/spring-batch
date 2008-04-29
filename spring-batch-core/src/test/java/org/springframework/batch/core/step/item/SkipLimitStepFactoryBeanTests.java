@@ -34,19 +34,19 @@ import org.springframework.util.StringUtils;
  */
 public class SkipLimitStepFactoryBeanTests extends TestCase {
 
-	SkipLimitStepFactoryBean factory = new SkipLimitStepFactoryBean();
+	private SkipLimitStepFactoryBean factory = new SkipLimitStepFactoryBean();
 
-	Class[] skippableExceptions = new Class[] { SkippableException.class, SkippableRuntimeException.class };
+	private Class[] skippableExceptions = new Class[] { SkippableException.class, SkippableRuntimeException.class };
 
-	final int SKIP_LIMIT = 2;
+	private final int SKIP_LIMIT = 2;
 
-	final int COMMIT_INTERVAL = 2;
+	private final int COMMIT_INTERVAL = 2;
 
-	SkipReaderStub reader = new SkipReaderStub();
+	private SkipReaderStub reader = new SkipReaderStub();
 
-	SkipWriterStub writer = new SkipWriterStub();
+	private SkipWriterStub writer = new SkipWriterStub();
 
-	JobExecution jobExecution;
+	private JobExecution jobExecution;
 
 	protected int count;
 
@@ -75,12 +75,33 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		assertEquals(2, stepExecution.getSkipCount());
 
+		// only write exception caused rollback
+		assertEquals(1, stepExecution.getRollbackCount().intValue());
+
 		// writer did not skip "2" as it never made it to writer, only "4" did
 		assertTrue(reader.processed.contains("4"));
 		assertFalse(writer.written.contains("4"));
 
 		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3,5"));
 		assertEquals(expectedOutput, writer.written);
+
+	}
+
+	/**
+	 * Check skippable write exception does not cause rollback when included on
+	 * {@link SkipLimitStepFactoryBean#setTxValidExceptionClasses(Class[])}.
+	 */
+	public void testSkipWithoutRethrow() throws Exception {
+		factory.setTxValidExceptionClasses(new Class[] { SkippableRuntimeException.class });
+		AbstractStep step = (AbstractStep) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		step.execute(stepExecution);
+
+		assertEquals(2, stepExecution.getSkipCount());
+
+		// no rollbacks
+		assertEquals(0, stepExecution.getRollbackCount().intValue());
 
 	}
 
@@ -227,7 +248,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	}
 
 	public void testDefaultSkipPolicy() throws Exception {
-		factory.setSkippableExceptionClasses(new Class[] {Exception.class});
+		factory.setSkippableExceptionClasses(new Class[] { Exception.class });
 		factory.setSkipLimit(1);
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(new String[] { "a", "b", "c" }));
@@ -246,7 +267,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
-		
+
 		assertEquals(1, stepExecution.getSkipCount());
 		// b is processed once and skipped, plus 1, plus c, plus the null at end
 		assertEquals(4, count);

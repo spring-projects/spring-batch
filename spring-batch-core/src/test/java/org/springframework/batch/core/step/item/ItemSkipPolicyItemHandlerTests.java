@@ -124,11 +124,12 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		handler.handle(contribution);
 		contribution.combineSkipCounts();
 		assertEquals(2, contribution.getSkipCount());
-		// 2 is skipped so 3 was last one processed and now we are at 4, which was previously skipped
+		// 2 is skipped so 3 was last one processed and now we are at 4, which
+		// was previously skipped
 		handler.handle(contribution);
 		assertEquals(null, handler.read(contribution));
 		assertEquals(2, contribution.getSkipCount());
-		
+
 		assertEquals(1, TransactionSynchronizationManager.getResourceMap().size());
 		Set removed = (Set) TransactionSynchronizationManager.getResourceMap().values().iterator().next();
 		// one skipped item was detected on read
@@ -199,8 +200,32 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		catch (UnexpectedJobExecutionException e) {
 			// expected
 			String message = e.getMessage();
-			assertTrue("Message does not contain 'capacity': "+message, message.indexOf("capacity")>=0);
+			assertTrue("Message does not contain 'capacity': " + message, message.indexOf("capacity") >= 0);
 		}
+		assertEquals(2, contribution.getSkipCount());
+		// No "4" because it was skipped on write, even though it is mutating
+		// its key
+		assertEquals(new Holder("5"), handler.read(contribution));
+	}
+
+	/**
+	 * Skippable write exceptions are not re-thrown when included in the
+	 * {@link ItemSkipPolicyItemHandler#setDoNotRethrowExceptionClasses(Class[])}
+	 */
+	public void testWriteWithSkipAndDoNotRethrow() throws Exception {
+
+		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		handler.setDoNotRethrowExceptionClasses(new Class[] { SkippableException.class });
+
+		handler.handle(contribution);
+		handler.handle(contribution);
+		contribution.combineSkipCounts();
+		assertEquals(1, contribution.getSkipCount());
+
+		// skippable exception thrown in writer at this point, but it won't be
+		// re-thrown
+		handler.handle(contribution);
+
 		assertEquals(2, contribution.getSkipCount());
 		// No "4" because it was skipped on write, even though it is mutating
 		// its key
