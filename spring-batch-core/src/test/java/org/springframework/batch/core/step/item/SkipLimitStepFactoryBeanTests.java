@@ -92,10 +92,10 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 	/**
 	 * Check skippable write exception does not cause rollback when included on
-	 * {@link SkipLimitStepFactoryBean#setTxValidExceptionClasses(Class[])}.
+	 * {@link SkipLimitStepFactoryBean#setNoRollbackForExceptionClasses(Class[])}.
 	 */
 	public void testSkipWithoutRethrow() throws Exception {
-		factory.setTxValidExceptionClasses(new Class[] { SkippableRuntimeException.class });
+		factory.setNoRollbackForExceptionClasses(new Class[] { SkippableRuntimeException.class });
 		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);

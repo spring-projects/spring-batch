@@ -15,9 +15,14 @@ import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
  * Factory bean for step that provides options for configuring skip behavior.
  * User can set {@link #setSkipLimit(int)} to set how many exceptions of
  * {@link #setSkippableExceptionClasses(Class[])} types are tolerated.
- * {@link #setFatalExceptionClasses(Class[])} will cause immediate termination of job - they
- * are treated as higher priority than {@link #setSkippableExceptionClasses(Class[])}, so
- * the two lists don't need to be exclusive.
+ * {@link #setFatalExceptionClasses(Class[])} will cause immediate termination
+ * of job - they are treated as higher priority than
+ * {@link #setSkippableExceptionClasses(Class[])}, so the two lists don't need
+ * to be exclusive.
+ * 
+ * Skippable exceptions on write will by default cause transaction rollback - to
+ * avoid rollback for specific exception class include it in the
+ * {@link #setNoRollbackForExceptionClasses(Class[])} list.
  * 
  * @see SimpleStepFactoryBean
  * @see StatefulRetryStepFactoryBean
@@ -33,8 +38,8 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	private Class[] skippableExceptionClasses = new Class[] { Exception.class };
 
 	private Class[] fatalExceptionClasses = new Class[] { Error.class };
-	
-	private Class[] txValidExceptionClasses = new Class[] {};
+
+	private Class[] noRollbackForExceptionClasses = new Class[] {};
 
 	private ItemKeyGenerator itemKeyGenerator;
 
@@ -101,7 +106,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	protected ItemKeyGenerator getItemKeyGenerator() {
 		return itemKeyGenerator;
 	}
-	
+
 	/**
 	 * Protected getter for the {@link ItemSkipPolicy}.
 	 * @return the itemSkipPolicy
@@ -127,21 +132,22 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	public void setSkipCacheCapacity(int skipCacheCapacity) {
 		this.skipCacheCapacity = skipCacheCapacity;
 	}
-	
+
 	/**
-	 * Skippable txValidExceptionClasses will *not* cause transaction rollback.
+	 * Skippable noRollbackForExceptionClasses will *not* cause transaction
+	 * rollback.
 	 * 
-	 * @param txValidExceptionClasses empty by default
+	 * @param noRollbackForExceptionClasses empty by default
 	 * 
 	 * @see #setSkippableExceptionClasses(Class[])
 	 */
-	public void setTxValidExceptionClasses(Class[] txValidExceptionClasses) {
-		this.txValidExceptionClasses = txValidExceptionClasses;
+	public void setNoRollbackForExceptionClasses(Class[] noRollbackForExceptionClasses) {
+		this.noRollbackForExceptionClasses = noRollbackForExceptionClasses;
 	}
 
 	/**
-	 * Uses the {@link #setSkipLimit(int)} value to configure item handler and and
-	 * exception handler.
+	 * Uses the {@link #setSkipLimit(int)} value to configure item handler and
+	 * and exception handler.
 	 */
 	protected void applyConfiguration(ItemOrientedStep step) {
 		super.applyConfiguration(step);
@@ -161,7 +167,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 			LimitCheckingItemSkipPolicy limitCheckingSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, Arrays
 					.asList(skippableExceptionClasses), fatalExceptionList);
 			itemHandler.setItemSkipPolicy(limitCheckingSkipPolicy);
-			itemHandler.setDoNotRethrowExceptionClasses(txValidExceptionClasses);
+			itemHandler.setDoNotRethrowExceptionClasses(noRollbackForExceptionClasses);
 			this.itemSkipPolicy = limitCheckingSkipPolicy;
 			SimpleLimitExceptionHandler exceptionHandler = new SimpleLimitExceptionHandler(skipLimit);
 			exceptionHandler.setExceptionClasses(skippableExceptionClasses);
