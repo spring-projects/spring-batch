@@ -339,7 +339,8 @@ public class ItemOrientedStep extends AbstractStep {
 	private void processRollback(final StepExecution stepExecution, final StepContribution contribution,
 			final ExceptionHolder fatalException, TransactionStatus transaction) {
 
-		stepExecution.incrementSkipCountBy(contribution.getSkipCount());
+		stepExecution.incrementReadSkipCountBy(contribution.getReadSkipCount());
+		stepExecution.incrementWriteSkipCountBy(contribution.getWriteSkipCount());
 		/*
 		 * Any exception thrown within the transaction should automatically
 		 * cause the transaction to rollback.

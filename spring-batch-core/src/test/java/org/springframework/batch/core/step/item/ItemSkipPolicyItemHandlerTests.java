@@ -76,6 +76,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		assertEquals(new Holder("1"), handler.read(contribution));
 		assertEquals(new Holder("3"), handler.read(contribution));
+		contribution.combineSkipCounts();
 		assertEquals(1, contribution.getReadSkipCount());
 		assertEquals(new Holder("4"), handler.read(contribution));
 	}

@@ -47,7 +47,9 @@ public class StepExecution extends Entity {
 
 	private int rollbackCount = 0;
 
-	private int skipCount = 0;
+	private int readSkipCount = 0;
+	
+	private int writeSkipCount = 0;
 
 	private Date startTime = new Date(System.currentTimeMillis());
 
@@ -301,8 +303,10 @@ public class StepExecution extends Entity {
 	public synchronized void apply(StepContribution contribution) {
 		itemCount += contribution.getItemCount();
 		commitCount += contribution.getCommitCount();
+		
 		contribution.combineSkipCounts();
-		skipCount += contribution.getSkipCount();
+		readSkipCount += contribution.getReadSkipCount();
+		writeSkipCount += contribution.getWriteSkipCount();
 	}
 
 	/**
@@ -328,11 +332,15 @@ public class StepExecution extends Entity {
 	}
 
 	public int getSkipCount() {
-		return skipCount;
+		return readSkipCount + writeSkipCount;
 	}
 
-	public void incrementSkipCountBy(int count) {
-		skipCount += count;
+	public void incrementReadSkipCountBy(int count) {
+		readSkipCount += count;
+	}
+	
+	public void incrementWriteSkipCountBy(int count) {
+		writeSkipCount += count;
 	}
 
 	/**
@@ -346,6 +354,22 @@ public class StepExecution extends Entity {
 			return new JobParameters();
 		}
 		return jobExecution.getJobInstance().getJobParameters();
+	}
+
+	public int getReadSkipCount() {
+		return readSkipCount;
+	}
+
+	public int getWriteSkipCount() {
+		return writeSkipCount;
+	}
+
+	public void setReadSkipCount(int readSkipCount) {
+		this.readSkipCount = readSkipCount;
+	}
+
+	public void setWriteSkipCount(int writeSkipCount) {
+		this.writeSkipCount = writeSkipCount;
 	}
 
 }

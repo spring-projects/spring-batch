@@ -183,7 +183,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 				try {
 					if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 						// increment skip count and try again
-						contribution.incrementReadSkipCount();
+						contribution.incrementTemporaryReadSkipCount();
 						if (listener != null) {
 							listener.onSkipInRead(e);
 						}
@@ -233,7 +233,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 		}
 		catch (Exception e) {
 			if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
-				contribution.incrementSkipCount();
+				contribution.incrementWriteSkipCount();
 				// don't call the listener here - the transaction is going to
 				// roll back
 				addSkippedException(key, e);

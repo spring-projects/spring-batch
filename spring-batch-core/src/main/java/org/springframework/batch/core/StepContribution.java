@@ -30,9 +30,11 @@ public class StepContribution {
 
 	private int commitCount;
 
-	private int skipCount;
-
 	private int readSkipCount;
+
+	private int writeSkipCount;
+
+	private int uncommitedReadSkipCount;
 
 	/**
 	 * @param execution
@@ -78,7 +80,7 @@ public class StepContribution {
 	 * skips.
 	 */
 	public int getStepSkipCount() {
-		return readSkipCount + skipCount + parentSkipCount;
+		return uncommitedReadSkipCount + readSkipCount + writeSkipCount + parentSkipCount;
 	}
 
 	/**
@@ -87,21 +89,28 @@ public class StepContribution {
 	 * parent {@link StepExecution}.
 	 */
 	public int getSkipCount() {
-		return skipCount;
+		return readSkipCount + writeSkipCount;
 	}
 
 	/**
-	 * Increment the total skip count for this contribution
+	 * Increment the read skip count for this contribution
 	 */
-	public void incrementSkipCount() {
-		skipCount++;
-	}
-
-	/**
-	 * Increment the counter for skipped reads
-	 */
-	public void incrementReadSkipCount() {
+	public void incrementReadsSkipCount() {
 		readSkipCount++;
+	}
+
+	/**
+	 * Increment the write skip count for this contribution
+	 */
+	public void incrementWriteSkipCount() {
+		writeSkipCount++;
+	}
+
+	/**
+	 * Increment the counter for temporary skipped reads
+	 */
+	public void incrementTemporaryReadSkipCount() {
+		uncommitedReadSkipCount++;
 	}
 
 	/**
@@ -112,11 +121,19 @@ public class StepContribution {
 	}
 
 	/**
-	 * Combine the skip counts and reset read skips to zero.
+	 * @return the write skip count
+	 */
+	public int getWriteSkipCount() {
+		return writeSkipCount;
+	}
+
+	/**
+	 * Add the temporary read skip count to read skip count and reset the
+	 * temporary counter.
 	 */
 	public void combineSkipCounts() {
-		skipCount += readSkipCount;
-		readSkipCount = 0;
+		readSkipCount += uncommitedReadSkipCount;
+		uncommitedReadSkipCount = 0;
 	}
 
 	/*
@@ -124,8 +141,8 @@ public class StepContribution {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "[StepContribution: items=" + itemCount + ", commits=" + commitCount + ", readSkips=" + readSkipCount
-				+ ", skips=" + skipCount + "]";
+		return "[StepContribution: items=" + itemCount + ", commits=" + commitCount + ", uncommitedReadSkips="
+				+ uncommitedReadSkipCount + ", readSkips=" + readSkipCount + "writeSkips=" + writeSkipCount + "]";
 	}
 
 }

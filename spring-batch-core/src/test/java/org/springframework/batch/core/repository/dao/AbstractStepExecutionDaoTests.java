@@ -72,6 +72,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	}
 
 	public void testSaveExecutionAssignsIdAndVersion() throws Exception {
+		
 		assertNull(stepExecution.getId());
 		assertNull(stepExecution.getVersion());
 		dao.saveStepExecution(stepExecution);
@@ -80,12 +81,17 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	}
 
 	public void testSaveAndFindExecution() {
+		
 		stepExecution.setStatus(BatchStatus.STARTED);
+		stepExecution.setReadSkipCount(7);
+		stepExecution.setWriteSkipCount(5);
 		dao.saveStepExecution(stepExecution);
 
 		StepExecution retrieved = dao.getStepExecution(jobExecution, step);
 		assertEquals(stepExecution, retrieved);
 		assertEquals(BatchStatus.STARTED, retrieved.getStatus());
+		assertEquals(stepExecution.getReadSkipCount(), retrieved.getReadSkipCount());
+		assertEquals(stepExecution.getWriteSkipCount(), retrieved.getWriteSkipCount());
 
 		assertNull(dao.getStepExecution(jobExecution, new StepSupport("not-existing step")));
 	}
