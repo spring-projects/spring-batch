@@ -174,6 +174,13 @@ public class StepExecution extends Entity {
 	}
 
 	/**
+	 * Setter for number of rollbacks for this execution
+	 */
+	public void setRollbackCount(int rollbackCount) {
+		this.rollbackCount = rollbackCount;
+	}
+
+	/**
 	 * Gets the time this execution started
 	 * 
 	 * @return the time this execution started

@@ -85,6 +85,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setReadSkipCount(7);
 		stepExecution.setWriteSkipCount(5);
+		stepExecution.setRollbackCount(3);
 		dao.saveStepExecution(stepExecution);
 
 		StepExecution retrieved = dao.getStepExecution(jobExecution, step);
@@ -92,7 +93,8 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		assertEquals(BatchStatus.STARTED, retrieved.getStatus());
 		assertEquals(stepExecution.getReadSkipCount(), retrieved.getReadSkipCount());
 		assertEquals(stepExecution.getWriteSkipCount(), retrieved.getWriteSkipCount());
-
+		assertEquals(stepExecution.getRollbackCount(), retrieved.getRollbackCount());
+		
 		assertNull(dao.getStepExecution(jobExecution, new StepSupport("not-existing step")));
 	}
 

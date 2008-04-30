@@ -62,18 +62,18 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			+ " KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL) values(?,?,?,?,?,?,?)";
 
 	private static final String SAVE_STEP_EXECUTION = "INSERT into %PREFIX%STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, "
-			+ "END_TIME, STATUS, COMMIT_COUNT, ITEM_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT) "
-			+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "END_TIME, STATUS, COMMIT_COUNT, ITEM_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, ROLLBACK_COUNT) "
+			+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%STEP_EXECUTION_CONTEXT set "
 			+ "TYPE_CD = ?, STRING_VAL = ?, DOUBLE_VAL = ?, LONG_VAL = ?, OBJECT_VAL = ? where STEP_EXECUTION_ID = ? and KEY_NAME = ?";
 
 	private static final String UPDATE_STEP_EXECUTION = "UPDATE %PREFIX%STEP_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ "STATUS = ?, COMMIT_COUNT = ?, ITEM_COUNT = ?, CONTINUABLE = ? , EXIT_CODE = ?, "
-			+ "EXIT_MESSAGE = ?, VERSION = ?, READ_SKIP_COUNT = ?, WRITE_SKIP_COUNT = ? where STEP_EXECUTION_ID = ? and VERSION = ?";
+			+ "EXIT_MESSAGE = ?, VERSION = ?, READ_SKIP_COUNT = ?, WRITE_SKIP_COUNT = ?, ROLLBACK_COUNT = ? where STEP_EXECUTION_ID = ? and VERSION = ?";
 
 	private static final String GET_STEP_EXECUTION = "SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
-			+ " ITEM_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT from %PREFIX%STEP_EXECUTION where STEP_NAME = ? and JOB_EXECUTION_ID = ?";
+			+ " ITEM_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, ROLLBACK_COUNT from %PREFIX%STEP_EXECUTION where STEP_NAME = ? and JOB_EXECUTION_ID = ?";
 
 	private static final String CURRENT_VERSION_STEP_EXECUTION = "SELECT VERSION FROM %PREFIX%STEP_EXECUTION WHERE STEP_EXECUTION_ID=?";
 
@@ -186,13 +186,14 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 				stepExecution.getEndTime(), stepExecution.getStatus().toString(), stepExecution.getCommitCount(),
 				stepExecution.getItemCount(), stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
 				stepExecution.getExitStatus().getExitCode(), stepExecution.getExitStatus().getExitDescription(),
-				Integer.valueOf(stepExecution.getReadSkipCount()), Integer.valueOf(stepExecution.getWriteSkipCount()) };
+				Integer.valueOf(stepExecution.getReadSkipCount()), Integer.valueOf(stepExecution.getWriteSkipCount()),
+				stepExecution.getRollbackCount() };
 		getJdbcTemplate().update(
 				getQuery(SAVE_STEP_EXECUTION),
 				parameters,
 				new int[] { Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP,
 						Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.CHAR, Types.VARCHAR,
-						Types.VARCHAR, Types.INTEGER, Types.INTEGER });
+						Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER });
 	}
 
 	/**
@@ -322,14 +323,14 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
 					stepExecution.getExitStatus().getExitCode(), exitDescription, version,
 					Integer.valueOf(stepExecution.getReadSkipCount()),
-					Integer.valueOf(stepExecution.getWriteSkipCount()), stepExecution.getId(),
-					stepExecution.getVersion() };
+					Integer.valueOf(stepExecution.getWriteSkipCount()), stepExecution.getRollbackCount(),
+					stepExecution.getId(), stepExecution.getVersion() };
 			int count = getJdbcTemplate().update(
 					getQuery(UPDATE_STEP_EXECUTION),
 					parameters,
 					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
 							Types.CHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER,
-							Types.INTEGER, Types.INTEGER });
+							Types.INTEGER, Types.INTEGER, Types.INTEGER });
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
@@ -368,6 +369,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			stepExecution.setExecutionContext(findExecutionContext(stepExecution));
 			stepExecution.setReadSkipCount(rs.getInt(11));
 			stepExecution.setWriteSkipCount(rs.getInt(12));
+			stepExecution.setRollbackCount(rs.getInt(13));
 			return stepExecution;
 		}
 
