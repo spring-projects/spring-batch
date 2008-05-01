@@ -48,6 +48,8 @@
   <xi:include href="testing.xml" />
 
   <xi:include href="appendix.xml" />
+  
+  <xi:include href="schema-appendix.xml" />
 
   <xi:include href="glossary.xml" />
 </book>
