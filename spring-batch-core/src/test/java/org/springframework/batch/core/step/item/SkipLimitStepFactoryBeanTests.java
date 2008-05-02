@@ -75,8 +75,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		
 		assertEquals(2, stepExecution.getSkipCount());
-		assertEquals(1, stepExecution.getReadSkipCount());
-		assertEquals(1, stepExecution.getWriteSkipCount());
+		assertEquals(1, stepExecution.getReadSkipCount().intValue());
+		assertEquals(1, stepExecution.getWriteSkipCount().intValue());
 		
 		// only write exception caused rollback
 		assertEquals(1, stepExecution.getRollbackCount().intValue());
@@ -102,8 +102,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		step.execute(stepExecution);
 
 		assertEquals(2, stepExecution.getSkipCount());
-		assertEquals(1, stepExecution.getReadSkipCount());
-		assertEquals(1, stepExecution.getWriteSkipCount());
+		assertEquals(1, stepExecution.getReadSkipCount().intValue());
+		assertEquals(1, stepExecution.getWriteSkipCount().intValue());
 
 		// no rollbacks
 		assertEquals(0, stepExecution.getRollbackCount().intValue());
@@ -188,8 +188,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		}
 
 		assertEquals(3, stepExecution.getSkipCount());
-		assertEquals(2, stepExecution.getReadSkipCount());
-		assertEquals(1, stepExecution.getWriteSkipCount());
+		assertEquals(2, stepExecution.getReadSkipCount().intValue());
+		assertEquals(1, stepExecution.getWriteSkipCount().intValue());
 
 		// writer did not skip "2" as it never made it to writer, only "4" did
 		assertTrue(reader.processed.contains("4"));
@@ -218,8 +218,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		step.execute(stepExecution);
 		assertEquals(4, stepExecution.getSkipCount());
-		assertEquals(3, stepExecution.getReadSkipCount());
-		assertEquals(1, stepExecution.getWriteSkipCount());
+		assertEquals(3, stepExecution.getReadSkipCount().intValue());
+		assertEquals(1, stepExecution.getWriteSkipCount().intValue());
 
 		// skipped 2,3,4,5
 		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6"));
@@ -249,8 +249,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		System.err.println(writer.written);
 		System.err.println(reader.processed);
 		assertEquals(4, stepExecution.getSkipCount());
-		assertEquals(2, stepExecution.getReadSkipCount());
-		assertEquals(2, stepExecution.getWriteSkipCount());
+		assertEquals(2, stepExecution.getReadSkipCount().intValue());
+		assertEquals(2, stepExecution.getWriteSkipCount().intValue());
 
 		// skipped 2,3,4,5
 		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6,7"));

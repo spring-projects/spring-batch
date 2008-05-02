@@ -186,8 +186,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 				stepExecution.getEndTime(), stepExecution.getStatus().toString(), stepExecution.getCommitCount(),
 				stepExecution.getItemCount(), stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
 				stepExecution.getExitStatus().getExitCode(), stepExecution.getExitStatus().getExitDescription(),
-				Integer.valueOf(stepExecution.getReadSkipCount()), Integer.valueOf(stepExecution.getWriteSkipCount()),
-				stepExecution.getRollbackCount() };
+				stepExecution.getReadSkipCount(), stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount() };
 		getJdbcTemplate().update(
 				getQuery(SAVE_STEP_EXECUTION),
 				parameters,
@@ -322,8 +321,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					stepExecution.getStatus().toString(), stepExecution.getCommitCount(), stepExecution.getItemCount(),
 					stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
 					stepExecution.getExitStatus().getExitCode(), exitDescription, version,
-					Integer.valueOf(stepExecution.getReadSkipCount()),
-					Integer.valueOf(stepExecution.getWriteSkipCount()), stepExecution.getRollbackCount(),
+					stepExecution.getReadSkipCount(),
+					stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount(),
 					stepExecution.getId(), stepExecution.getVersion() };
 			int count = getJdbcTemplate().update(
 					getQuery(UPDATE_STEP_EXECUTION),

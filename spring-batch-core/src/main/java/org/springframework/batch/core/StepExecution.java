@@ -363,12 +363,12 @@ public class StepExecution extends Entity {
 		return jobExecution.getJobInstance().getJobParameters();
 	}
 
-	public int getReadSkipCount() {
-		return readSkipCount;
+	public Integer getReadSkipCount() {
+		return new Integer(readSkipCount);
 	}
 
-	public int getWriteSkipCount() {
-		return writeSkipCount;
+	public Integer getWriteSkipCount() {
+		return new Integer(writeSkipCount);
 	}
 
 	public void setReadSkipCount(int readSkipCount) {
