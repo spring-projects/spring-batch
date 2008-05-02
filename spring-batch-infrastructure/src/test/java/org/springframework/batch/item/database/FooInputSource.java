@@ -48,6 +48,7 @@ class FooItemReader implements ItemStream, ItemReader, DisposableBean, Initializ
 	};
 
 	public void close(ExecutionContext executionContext) {
+		inputSource.close(executionContext);
 	}
 
 	/*
