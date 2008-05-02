@@ -91,6 +91,7 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 
 	public void close(ExecutionContext executionContext) {
 		initialized = false;
+		currentRecordCount = 0;
 		try {
 			if (fragmentReader != null) {
 				fragmentReader.close();
