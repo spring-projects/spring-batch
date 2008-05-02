@@ -55,5 +55,25 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 		Foo fooAfterRestart = (Foo) tested.read();
 		assertEquals(3, fooAfterRestart.getValue());
 	}
+	
+	public void testReopen() throws Exception {
+		testedAsStream().update(executionContext);
+		
+		Foo foo1 = (Foo) tested.read();
+		assertEquals(1, foo1.getValue());
+
+		Foo foo2 = (Foo) tested.read();
+		assertEquals(2, foo2.getValue());
+
+		testedAsStream().update(executionContext);
+
+		// create new input source
+		testedAsStream().close(executionContext);
+
+		testedAsStream().open(executionContext);
+
+		Foo fooAfterRestart = (Foo) tested.read();
+		assertEquals(3, fooAfterRestart.getValue());
+	}
 
 }

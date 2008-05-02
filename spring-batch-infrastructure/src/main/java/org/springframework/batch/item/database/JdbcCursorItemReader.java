@@ -230,6 +230,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		JdbcUtils.closeStatement(this.preparedStatement);
 		JdbcUtils.closeConnection(this.con);
 		bufferredReader = null;
+		rs = null;
 	}
 
 	/*
@@ -343,7 +344,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	 */
 	public void open(ExecutionContext context) {
 		Assert.state(!initialized, "Stream is already initialized.  Close before re-opening.");
-		Assert.isNull(rs);
+		Assert.isNull(rs, "ResultSet still open!  Close before re-opening.");
 		Assert.notNull(context, "ExecutionContext must not be null");
 		executeQuery();
 		initialized = true;
