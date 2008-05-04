@@ -51,7 +51,8 @@ Import-Package: edu.emory.mathcs.backport.java.util.concurrent;version
  action;version="[2.0.0, 3.0.0)";resolution:=optional,org.springframew
  ork.transaction.support;version="[2.0.0, 3.0.0)";resolution:=optional
  ,org.springframework.util;version="[2.0.0, 3.0.0)";resolution:=option
- al
+ al,org.springframework.beans.factory;version="[2.0.0, 3.0.0)";resolut
+ ion:=optional
 Export-Package: org.springframework.batch.core;version=1.0.0;uses:="or
  g.springframework.batch.item,org.springframework.batch.repeat",org.sp
  ringframework.batch.core.configuration;version=1.0.0;uses:="org.sprin
