@@ -134,6 +134,7 @@ public class SimpleJob extends AbstractJob {
 		}
 		catch (JobInterruptedException e) {
 			execution.setStatus(BatchStatus.STOPPED);
+			listener.onInterrupt(execution);
 			rethrow(e);
 		}
 		catch (Throwable t) {

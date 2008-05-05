@@ -22,9 +22,11 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
+import org.easymock.MockControl;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
@@ -343,6 +345,30 @@ public class SimpleJobTests extends TestCase {
 		assertTrue(step1.passedInContext.isEmpty());
 		assertFalse(step2.passedInContext.isEmpty());
 
+	}
+
+	public void testInterruptWithListener() throws Exception {
+		step1.setProcessException(new JobInterruptedException("job interrupted!"));
+		
+		MockControl control = MockControl.createStrictControl(JobExecutionListener.class);
+		JobExecutionListener listener = (JobExecutionListener) control.getMock();
+		listener.beforeJob(jobExecution);
+		control.setVoidCallable();
+		listener.onInterrupt(jobExecution);
+		control.setVoidCallable();
+		control.replay();
+		
+		job.setJobExecutionListeners(new JobExecutionListener[] { listener });
+		
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (UnexpectedJobExecutionException e){
+			// expected
+		}
+		
+		control.verify();
 	}
 
 	/*
