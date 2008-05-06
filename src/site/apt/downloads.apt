@@ -7,7 +7,7 @@
 
 Spring Batch Downloads
 
-  The current GA release is <<1.0.0.FINAL>>, the latest snapshots are <<1.0.1.dev-SNAPSHOT>>.
+  The current GA release is <<1.0.1.RELEASE>>, the latest snapshots are <<1.1.0.DEV-SNAPSHOT>>.
 
 * Zip Downloads
 
@@ -27,7 +27,7 @@ Individual dependencies can then by added like so (inside a \<dependencies\> ele
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-core</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1.RELEASE</version>
 </dependency>
 +---------------
 
