@@ -74,6 +74,10 @@ public abstract class CommonItemReaderTests extends TestCase {
 		Foo foo5 = (Foo) tested.read();
 		assertEquals(5, foo5.getValue());
 		
+		tested.reset();
+		
+		assertEquals(foo5, tested.read());
+		
 		assertNull(tested.read());
 		
 	}

@@ -162,17 +162,6 @@ public class StaxEventItemReaderTests extends TestCase {
 
 		assertEquals(second, source.read());
 
-		// rollback while deserializing record
-		source.reset();
-		source.setFragmentDeserializer(new ExceptionFragmentDeserializer());
-		try {
-			source.read();
-		} catch (Exception expected) {
-			source.reset();
-		}
-		source.setFragmentDeserializer(deserializer);
-
-		assertEquals(second, source.read());
 	}
 
 	/**
@@ -353,18 +342,6 @@ public class StaxEventItemReaderTests extends TestCase {
 
 	private boolean contains(String str, String searchStr) {
 		return str.indexOf(searchStr) != -1;
-	}
-
-	/**
-	 * Moves cursor inside the fragment body and causes rollback.
-	 */
-	private static class ExceptionFragmentDeserializer implements EventReaderDeserializer {
-
-		public Object deserializeFragment(XMLEventReader eventReader) {
-			eventReader.next();
-			throw new RuntimeException();
-		}
-
 	}
 
 	private static class MockStaxEventItemReader extends StaxEventItemReader {
