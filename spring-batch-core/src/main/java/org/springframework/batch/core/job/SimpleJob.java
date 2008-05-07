@@ -27,11 +27,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.listener.CompositeExecutionJobListener;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -44,32 +41,6 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  */
 public class SimpleJob extends AbstractJob {
-
-	private JobRepository jobRepository;
-
-	private CompositeExecutionJobListener listener = new CompositeExecutionJobListener();
-
-	/**
-	 * Public setter for injecting {@link JobExecutionListener}s. They will all
-	 * be given the listener callbacks at the appropriate point in the job.
-	 * 
-	 * @param listeners the listeners to set.
-	 */
-	public void setJobExecutionListeners(JobExecutionListener[] listeners) {
-		for (int i = 0; i < listeners.length; i++) {
-			this.listener.register(listeners[i]);
-		}
-	}
-
-	/**
-	 * Register a single listener for the {@link JobExecutionListener}
-	 * callbacks.
-	 * 
-	 * @param listener a {@link JobExecutionListener}
-	 */
-	public void registerJobExecutionListener(JobExecutionListener listener) {
-		this.listener.register(listener);
-	}
 
 	/**
 	 * Run the specified job by looping through the steps and delegating to the
@@ -98,7 +69,7 @@ public class SimpleJob extends AbstractJob {
 			execution.setStartTime(new Date());
 			updateStatus(execution, BatchStatus.STARTING);
 
-			listener.beforeJob(execution);
+			getCompositeListener().beforeJob(execution);
 
 			for (Iterator i = steps.iterator(); i.hasNext();) {
 
@@ -110,9 +81,9 @@ public class SimpleJob extends AbstractJob {
 					updateStatus(execution, BatchStatus.STARTED);
 					currentStepExecution = execution.createStepExecution(step);
 
-					StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step);
+					StepExecution lastStepExecution = getJobRepository().getLastStepExecution(jobInstance, step);
 
-					boolean isRestart = (jobRepository.getStepExecutionCount(jobInstance, step) > 0 && !lastStepExecution
+					boolean isRestart = (getJobRepository().getStepExecutionCount(jobInstance, step) > 0 && !lastStepExecution
 							.getExitStatus().equals(ExitStatus.FINISHED)) ? true : false;
 
 					if (isRestart && lastStepExecution != null) {
@@ -129,17 +100,17 @@ public class SimpleJob extends AbstractJob {
 
 			updateStatus(execution, BatchStatus.COMPLETED);
 
-			listener.afterJob(execution);
+			getCompositeListener().afterJob(execution);
 
 		}
 		catch (JobInterruptedException e) {
 			execution.setStatus(BatchStatus.STOPPED);
-			listener.onInterrupt(execution);
+			getCompositeListener().onInterrupt(execution);
 			rethrow(e);
 		}
 		catch (Throwable t) {
 			execution.setStatus(BatchStatus.FAILED);
-			listener.onError(execution, t);
+			getCompositeListener().onError(execution, t);
 			rethrow(t);
 		}
 		finally {
@@ -159,14 +130,14 @@ public class SimpleJob extends AbstractJob {
 
 			execution.setEndTime(new Date());
 			execution.setExitStatus(status);
-			jobRepository.saveOrUpdate(execution);
+			getJobRepository().saveOrUpdate(execution);
 		}
 
 	}
 
 	private void updateStatus(JobExecution jobExecution, BatchStatus status) {
 		jobExecution.setStatus(status);
-		jobRepository.saveOrUpdate(jobExecution);
+		getJobRepository().saveOrUpdate(jobExecution);
 	}
 
 	/*
@@ -177,7 +148,7 @@ public class SimpleJob extends AbstractJob {
 
 		BatchStatus stepStatus;
 		// if the last execution is null, the step has never been executed.
-		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step);
+		StepExecution lastStepExecution = getJobRepository().getLastStepExecution(jobInstance, step);
 		if (lastStepExecution == null) {
 			stepStatus = BatchStatus.STARTING;
 		}
@@ -197,7 +168,7 @@ public class SimpleJob extends AbstractJob {
 			return false;
 		}
 
-		if (jobRepository.getStepExecutionCount(jobInstance, step) < step.getStartLimit()) {
+		if (getJobRepository().getStepExecutionCount(jobInstance, step) < step.getStartLimit()) {
 			// step start count is less than start max, return true
 			return true;
 		}
@@ -221,16 +192,5 @@ public class SimpleJob extends AbstractJob {
 		else {
 			throw new UnexpectedJobExecutionException("Unexpected checked exception in job execution", t);
 		}
-	}
-
-	/**
-	 * Public setter for the {@link JobRepository} that is needed to manage the
-	 * state of the batch meta domain (jobs, steps, executions) during the life
-	 * of a job.
-	 * 
-	 * @param jobRepository
-	 */
-	public void setJobRepository(JobRepository jobRepository) {
-		this.jobRepository = jobRepository;
 	}
 }

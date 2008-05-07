@@ -20,7 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.listener.CompositeExecutionJobListener;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.ClassUtils;
 
@@ -40,6 +43,10 @@ public abstract class AbstractJob implements BeanNameAware, Job {
 	private String name;
 
 	private boolean restartable = false;
+
+	private JobRepository jobRepository;
+
+	private CompositeExecutionJobListener listener = new CompositeExecutionJobListener();
 
 	/**
 	 * Default constructor.
@@ -120,5 +127,46 @@ public abstract class AbstractJob implements BeanNameAware, Job {
 
 	public String toString() {
 		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
+	}
+
+	/**
+	 * Public setter for injecting {@link JobExecutionListener}s. They will all
+	 * be given the listener callbacks at the appropriate point in the job.
+	 * 
+	 * @param listeners the listeners to set.
+	 */
+	public void setJobExecutionListeners(JobExecutionListener[] listeners) {
+		for (int i = 0; i < listeners.length; i++) {
+			this.listener.register(listeners[i]);
+		}
+	}
+
+	/**
+	 * Register a single listener for the {@link JobExecutionListener}
+	 * callbacks.
+	 * 
+	 * @param listener a {@link JobExecutionListener}
+	 */
+	public void registerJobExecutionListener(JobExecutionListener listener) {
+		this.listener.register(listener);
+	}
+
+	/**
+	 * Public setter for the {@link JobRepository} that is needed to manage the
+	 * state of the batch meta domain (jobs, steps, executions) during the life
+	 * of a job.
+	 * 
+	 * @param jobRepository
+	 */
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
+	}
+
+	protected JobRepository getJobRepository() {
+		return jobRepository;
+	}
+
+	protected CompositeExecutionJobListener getCompositeListener() {
+		return listener;
 	}
 }

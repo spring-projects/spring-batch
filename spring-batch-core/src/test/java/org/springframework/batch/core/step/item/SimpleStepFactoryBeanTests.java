@@ -28,6 +28,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
@@ -65,7 +66,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 
 	private ItemReader reader;
 
-	private SimpleJob job = new SimpleJob() {
+	private AbstractJob job = new SimpleJob() {
 		{
 			setBeanName("simpleJob");
 		}
