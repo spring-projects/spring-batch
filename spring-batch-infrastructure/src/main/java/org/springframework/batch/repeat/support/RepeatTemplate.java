@@ -205,7 +205,7 @@ public class RepeatTemplate implements RepeatOperations {
 				// Check that we are still running...
 				if (running) {
 
-					logger.debug("Batch operation about to start at count=" + context.getStartedCount());
+					logger.debug("Repeat operation about to start at count=" + context.getStartedCount());
 
 					try {
 
@@ -379,7 +379,7 @@ public class RepeatTemplate implements RepeatOperations {
 			complete = complete || isMarkedComplete(context.getParent());
 		}
 		if (complete) {
-			logger.debug("Batch is complete according to context alone.");
+			logger.debug("Repeat is complete according to context alone.");
 		}
 		return complete;
 
@@ -415,7 +415,7 @@ public class RepeatTemplate implements RepeatOperations {
 	protected boolean isComplete(RepeatContext context, ExitStatus result) {
 		boolean complete = completionPolicy.isComplete(context, result);
 		if (complete) {
-			logger.debug("Batch is complete according to policy and result value.");
+			logger.debug("Repeat is complete according to policy and result value.");
 		}
 		return complete;
 	}
@@ -428,7 +428,7 @@ public class RepeatTemplate implements RepeatOperations {
 	protected boolean isComplete(RepeatContext context) {
 		boolean complete = completionPolicy.isComplete(context);
 		if (complete) {
-			logger.debug("Batch is complete according to policy alone not including result.");
+			logger.debug("Repeat is complete according to policy alone not including result.");
 		}
 		return complete;
 	}
@@ -442,7 +442,7 @@ public class RepeatTemplate implements RepeatOperations {
 		RepeatContext parent = RepeatSynchronizationManager.getContext();
 		RepeatContext context = completionPolicy.start(parent);
 		RepeatSynchronizationManager.register(context);
-		logger.debug("Starting batch step.");
+		logger.debug("Starting repeat context.");
 		return context;
 	}
 
