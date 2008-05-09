@@ -35,22 +35,14 @@ public class StepExecutionTests extends TestCase {
 
 	private StepExecution execution = newStepExecution(new StepSupport("stepName"), new Long(23));
 
-	private StepExecution blankExecution = new StepExecution("blank", new JobExecution());
+	private StepExecution blankExecution = newStepExecution(new StepSupport("blank"), null);
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#JobExecution()}.
-	 */
 	public void testStepExecution() {
-		assertNull(new StepExecution().getId());
+		assertNull(new StepExecution("step", null).getId());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#JobExecution()}.
-	 */
 	public void testStepExecutionWithNullId() {
-		assertNull(new StepExecution("stepName", new JobExecution()).getId());
+		assertNull(new StepExecution("stepName", new JobExecution(new JobInstance(null,null,"foo"))).getId());
 	}
 
 	/**
@@ -138,7 +130,7 @@ public class StepExecutionTests extends TestCase {
 
 	public void testNullNameIsIllegal() throws Exception {
 		try {
-			new StepExecution(null, new JobExecution());
+			new StepExecution(null, new JobExecution(new JobInstance(null, null, "job")));
 			fail();
 		}
 		catch (IllegalArgumentException e) {
@@ -180,11 +172,6 @@ public class StepExecutionTests extends TestCase {
 
 	public void testEqualsWithNullJob() throws Exception {
 		Entity stepExecution = newStepExecution(new StepSupport("stepName"), new Long(11));
-		assertFalse(stepExecution.equals(blankExecution));
-	}
-
-	public void testEqualsWithNullStep() throws Exception {
-		Entity stepExecution = newStepExecution(new StepSupport("stepName"), null);
 		assertFalse(stepExecution.equals(blankExecution));
 	}
 

@@ -31,21 +31,17 @@ import org.springframework.batch.repeat.ExitStatus;
  */
 public class JobExecution extends Entity {
 
-	private JobInstance jobInstance;
+	private final JobInstance jobInstance;
 
 	private transient Collection stepExecutions = new HashSet();
 
-	private BatchStatus status = BatchStatus.STARTING;
+	private volatile BatchStatus status = BatchStatus.STARTING;
 
-	private Date startTime = null;
+	private volatile Date startTime = null;
 
-	private Date endTime = null;
+	private volatile Date endTime = null;
 
-	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
-
-	// Package private constructor for testing
-	JobExecution() {
-	}
+	private volatile ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
 	/**
 	 * Because a JobExecution isn't valid unless the job is set, this
@@ -123,10 +119,6 @@ public class JobExecution extends Entity {
 	 */
 	public JobInstance getJobInstance() {
 		return jobInstance;
-	}
-
-	public void setJobInstance(JobInstance jobInstance) {
-		this.jobInstance = jobInstance;
 	}
 
 	/**

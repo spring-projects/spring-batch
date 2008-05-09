@@ -31,12 +31,8 @@ public class JobExecutionTests extends TestCase {
 
 	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), "foo"), new Long(12));
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#JobExecution()}.
-	 */
 	public void testJobExecution() {
-		assertNull(new JobExecution().getId());
+		assertNull(new JobExecution(new JobInstance(null,null,"foo")).getId());
 	}
 
 	/**
@@ -150,7 +146,7 @@ public class JobExecutionTests extends TestCase {
 	}
 
 	public void testToStringWithNullJob() throws Exception {
-		execution = new JobExecution();
+		execution = new JobExecution(new JobInstance(null,null,"foo"));
 		assertTrue("JobExecution string does not contain id", execution.toString().indexOf("id=") >= 0);
 		assertTrue("JobExecution string does not contain job: " + execution, execution.toString().indexOf("job=") >= 0);
 	}

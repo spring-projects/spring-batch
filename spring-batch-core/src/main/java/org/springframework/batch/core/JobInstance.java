@@ -39,9 +39,9 @@ import org.springframework.util.Assert;
  */
 public class JobInstance extends Entity {
 
-	private JobParameters jobParameters;
+	private final JobParameters jobParameters;
 
-	private String jobName;
+	private final String jobName;
 
 	public JobInstance(Long id, JobParameters jobParameters, String jobName) {
 		super(id);

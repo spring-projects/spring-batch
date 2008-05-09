@@ -35,38 +35,31 @@ import org.springframework.util.Assert;
  */
 public class StepExecution extends Entity {
 
-	private JobExecution jobExecution;
+	private final JobExecution jobExecution;
 
-	private String stepName;
+	private final String stepName;
 
-	private BatchStatus status = BatchStatus.STARTING;
+	private volatile BatchStatus status = BatchStatus.STARTING;
 
-	private int itemCount = 0;
+	private volatile int itemCount = 0;
 
-	private int commitCount = 0;
+	private volatile int commitCount = 0;
 
-	private int rollbackCount = 0;
+	private volatile int rollbackCount = 0;
 
-	private int readSkipCount = 0;
+	private volatile int readSkipCount = 0;
 	
-	private int writeSkipCount = 0;
+	private volatile int writeSkipCount = 0;
 
-	private Date startTime = new Date(System.currentTimeMillis());
+	private volatile Date startTime = new Date(System.currentTimeMillis());
 
-	private Date endTime = null;
+	private volatile Date endTime = null;
 
-	private ExecutionContext executionContext = new ExecutionContext();
+	private volatile ExecutionContext executionContext = new ExecutionContext();
 
-	private ExitStatus exitStatus = ExitStatus.UNKNOWN;
+	private volatile ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
-	private boolean terminateOnly;
-
-	/**
-	 * Package private constructor for Hibernate
-	 */
-	StepExecution() {
-		super();
-	}
+	private volatile boolean terminateOnly;
 
 	/**
 	 * Constructor with mandatory properties.

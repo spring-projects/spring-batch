@@ -23,7 +23,7 @@ import junit.framework.TestCase;
  */
 public class StepContributionTests extends TestCase {
 
-	private StepExecution execution = new StepExecution();
+	private StepExecution execution = new StepExecution("step", null);
 
 	private StepContribution contribution = new StepContribution(execution);
 

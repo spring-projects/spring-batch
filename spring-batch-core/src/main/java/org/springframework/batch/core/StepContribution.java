@@ -24,17 +24,17 @@ package org.springframework.batch.core;
  */
 public class StepContribution {
 
-	private int itemCount = 0;
+	private volatile int itemCount = 0;
 
-	private int parentSkipCount;
+	private final int parentSkipCount;
 
-	private int commitCount;
+	private volatile int commitCount;
 
-	private int readSkipCount;
+	private volatile int readSkipCount;
 
-	private int writeSkipCount;
+	private volatile int writeSkipCount;
 
-	private int uncommitedReadSkipCount;
+	private volatile int uncommitedReadSkipCount;
 
 	/**
 	 * @param execution
