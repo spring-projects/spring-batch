@@ -22,19 +22,19 @@ import org.springframework.batch.item.ItemRecoverer;
 public class StubItemKeyGeneratorRecoverer implements ItemRecoverer, ItemKeyGenerator {
 
 	/**
-	 * Do nothing. Subclassses should override to implement recovery behaviour.
+	 * Do nothing and return null. Subclassses should override to implement
+	 * recovery behaviour.
 	 * 
 	 * @see org.springframework.batch.item.ItemRecoverer#recover(java.lang.Object,
 	 * Throwable)
 	 * 
-	 * @return false if nothing can be done (the default), or true if the item
-	 * can now safely be ignored or committed.
+	 * @return null.
 	 */
-	public boolean recover(Object item, Throwable cause) {
-		return false;
+	public Object recover(Object item, Throwable cause) {
+		return null;
 	}
-	
-	/** 
+
+	/**
 	 * Return the item (assume it is its own key).
 	 * 
 	 * @see org.springframework.batch.item.ItemKeyGenerator#getKey(java.lang.Object)

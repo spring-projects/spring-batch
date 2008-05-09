@@ -52,8 +52,8 @@ public class GeneratingItemReader implements ItemReader, ItemRecoverer {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemRecoverer#recover(java.lang.Object, java.lang.Throwable)
 	 */
-	public boolean recover(Object data, Throwable cause) {
-		return false;
+	public Object recover(Object data, Throwable cause) {
+		return data;
 	}
 
 	/* (non-Javadoc)

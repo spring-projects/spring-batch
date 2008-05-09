@@ -15,18 +15,16 @@
  */
 package org.springframework.batch.container.jms;
 
-import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.jms.TextMessage;
 
-import org.springframework.batch.item.AbstractItemWriter;
-import org.springframework.batch.item.ItemKeyGenerator;
-import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.jms.ExternalRetryInBatchTests;
-import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
-import org.springframework.batch.retry.policy.ItemWriterRetryPolicy;
+import org.springframework.batch.retry.RecoveryCallback;
+import org.springframework.batch.retry.RetryCallback;
+import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.callback.RecoveryRetryCallback;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
+import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
@@ -44,7 +42,7 @@ public class BatchMessageListenerContainerIntegrationTests extends AbstractDepen
 
 	private int recovered;
 
-	private int count;
+	private volatile int count;
 
 	/**
 	 * Public setter for the {@link BatchMessageListenerContainer}.
@@ -101,6 +99,7 @@ public class BatchMessageListenerContainerIntegrationTests extends AbstractDepen
 				count++;
 			}
 		});
+		container.initializeProxy();
 		container.start();
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
@@ -118,51 +117,40 @@ public class BatchMessageListenerContainerIntegrationTests extends AbstractDepen
 			public void onMessage(Message msg) {
 				logger.debug("Message: "+msg);
 				count++;
-				throw new RuntimeException("planned failure: " + msg);
+				throw new RuntimeException("planned failure for represent: " + msg);
 			}
 		});
+		container.initializeProxy();
 		container.start();
 		jmsTemplate.convertAndSend("queue", "foo");
 		int waiting = 0;
-		while (count < 2 && waiting++ < 10) {
+		while (count < 2 && waiting++ < 20) {
 			Thread.sleep(100L);
 		}
 		if (count < 2) {
+			logger.debug("Count: "+count);
 			fail("Expected message to be processed twice.");
 		}
 	}
 
 	public void testFailureAndRecovery() throws Exception {
 		final RetryTemplate retryTemplate = new RetryTemplate();
-		retryTemplate.setRetryPolicy(new ItemWriterRetryPolicy(new NeverRetryPolicy()));
+		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy(new NeverRetryPolicy()));
 		container.setMessageListener(new MessageListener() {
 			public void onMessage(final Message msg) {
 				try {
-					ItemWriterRetryCallback callback = new ItemWriterRetryCallback(msg, new AbstractItemWriter() {
-						public void write(Object item) throws Exception {
-							logger.debug("Message: "+item);
+					RecoveryRetryCallback callback = new RecoveryRetryCallback(msg, new RetryCallback() {
+						public Object doWithRetry(RetryContext context) throws Throwable {
+							logger.debug("Message: "+msg);
 							count++;
 							throw new RuntimeException("planned failure: " + msg);
 						}
-					});
-					callback.setKeyGenerator(new ItemKeyGenerator() {
-						public Object getKey(Object item) {
-							String text;
-							try {
-								text = ((TextMessage)item).getJMSMessageID();
-							}
-							catch (JMSException e) {
-								text = ""+item;
-							}
-							logger.debug("Key for message: "+text);
-							return text;
-						}
-					});
-					callback.setRecoverer(new ItemRecoverer() {
-						public boolean recover(Object data, Throwable cause) {
+					}, msg.getJMSMessageID());
+					callback.setRecoveryCallback(new RecoveryCallback() {
+						public Object recover(Throwable throwable) {
 							recovered++;
-							logger.debug("Recovered: " + data);
-							return true;
+							logger.debug("Recovered: " + msg);
+							return msg;
 						}
 					});
 					retryTemplate.execute(callback);
@@ -172,6 +160,7 @@ public class BatchMessageListenerContainerIntegrationTests extends AbstractDepen
 				}
 			}
 		});
+		container.initializeProxy();
 		container.start();
 		jmsTemplate.convertAndSend("queue", "foo");
 		int waiting = 0;

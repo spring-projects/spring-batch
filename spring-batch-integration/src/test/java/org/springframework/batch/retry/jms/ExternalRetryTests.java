@@ -25,8 +25,11 @@ import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.jms.ExternalRetryInBatchTests;
-import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
-import org.springframework.batch.retry.policy.ItemWriterRetryPolicy;
+import org.springframework.batch.retry.RecoveryCallback;
+import org.springframework.batch.retry.RetryCallback;
+import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.callback.RecoveryRetryCallback;
+import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
@@ -78,9 +81,9 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 				return text;
 			}
 
-			public boolean recover(Object data, Throwable cause) {
+			public Object recover(Object data, Throwable cause) {
 				recovered.add(data);
-				return true;
+				return data;
 			}
 		};
 		retryTemplate = new RetryTemplate();
@@ -105,7 +108,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new ItemWriterRetryPolicy());
+		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy());
 
 		final AbstractItemWriter writer = new AbstractItemWriter() {
 			public void write(final Object text) {
@@ -122,7 +125,13 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 				public Object doInTransaction(TransactionStatus status) {
 					try {
-						ItemWriterRetryCallback callback = new ItemWriterRetryCallback(provider.read(), writer);
+						final Object item = provider.read();
+						RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
+							public Object doWithRetry(RetryContext context) throws Throwable {
+								writer.write(item);
+								return null;
+							}
+						});
 						return retryTemplate.execute(callback);
 					}
 					catch (Exception e) {
@@ -144,7 +153,13 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
 				try {
-					ItemWriterRetryCallback callback = new ItemWriterRetryCallback(provider.read(), writer);
+					final Object item = provider.read();
+					RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
+						public Object doWithRetry(RetryContext context) throws Throwable {
+							writer.write(item);
+							return null;
+						}
+					});
 					return retryTemplate.execute(callback);
 				}
 				catch (Exception e) {
@@ -172,16 +187,22 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new ItemWriterRetryPolicy());
+		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy());
 
-		final ItemWriterRetryCallback callback = new ItemWriterRetryCallback(provider.read(), new AbstractItemWriter() {
-			public void write(final Object text) {
+		final Object item = provider.read();
+		final RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-						new Integer(list.size()), text });
+						new Integer(list.size()), item });
 				throw new RuntimeException("Rollback!");
 			}
 		});
-		callback.setRecoverer(provider);
+		
+		callback.setRecoveryCallback(new RecoveryCallback() {
+			public Object recover(Throwable throwable) {
+				return provider.recover(item, throwable);
+			}
+		});
 
 		Object result = "start";
 

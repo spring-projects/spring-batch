@@ -100,7 +100,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 
 		System.err.println(jdbcTemplate.queryForList("select * from T_FOOS"));
 
-		// Database committed so this resord should be there...
+		// Database committed so this record should be there...
 		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(2, count);
 

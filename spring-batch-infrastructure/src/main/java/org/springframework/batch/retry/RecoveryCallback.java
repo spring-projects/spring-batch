@@ -13,24 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.batch.retry;
 
-package org.springframework.batch.item;
+/**
+ * @author Dave Syer
+ * 
+ */
+public interface RecoveryCallback {
 
-import junit.framework.TestCase;
+	/**
+	 * @param throwable
+	 * @return an Object that can be used to replace the callback result that
+	 * failed
+	 */
+	Object recover(Throwable throwable);
 
-public class ItemRecoveryHandlerTests extends TestCase {
-
-	ItemRecoverer recoverer = new ItemRecoverer() {
-		public Object recover(Object data, Throwable cause) {
-			return null;
-		}
-	};
-
-	public void testRecover() throws Exception {
-		try {
-			recoverer.recover("foo", null);
-		} catch (Exception e) {
-			fail("Unexpected Exception");
-		}
-	}
 }

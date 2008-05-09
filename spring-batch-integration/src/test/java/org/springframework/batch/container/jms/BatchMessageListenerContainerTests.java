@@ -28,10 +28,9 @@ import javax.jms.Session;
 
 import junit.framework.TestCase;
 
+import org.aopalliance.aop.Advice;
 import org.easymock.MockControl;
-import org.springframework.batch.container.jms.BatchMessageListenerContainer;
-import org.springframework.batch.repeat.RepeatCallback;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.util.ReflectionUtils;
@@ -41,27 +40,6 @@ public class BatchMessageListenerContainerTests extends TestCase {
 	BatchMessageListenerContainer container;
 
 	int count = 0;
-
-	public void testReceiveAndExecuteWithNoCallback() throws Exception {
-		RepeatTemplate template = new RepeatTemplate() {
-			public ExitStatus iterate(RepeatCallback callback) {
-				count++;
-				return ExitStatus.CONTINUABLE; // means we can continue to operate, but no message is received
-			}
-		};
-		container = getContainer(template);
-		boolean received = doExecute(null, null);
-		assertEquals(1, count);
-		assertTrue("Message received", received);
-	}
-
-	private BatchMessageListenerContainer getContainer(RepeatTemplate template) {
-		MockControl connectionFactoryControl = MockControl.createControl(ConnectionFactory.class);
-		ConnectionFactory connectionFactory = (ConnectionFactory) connectionFactoryControl.getMock();
-		BatchMessageListenerContainer container = new BatchMessageListenerContainer(template);
-		container.setConnectionFactory(connectionFactory);
-		return container;
-	}
 
 	public void testReceiveAndExecuteWithCallback() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
@@ -140,7 +118,7 @@ public class BatchMessageListenerContainerTests extends TestCase {
 		container = getContainer(template);
 		container.setSessionTransacted(false);
 		boolean received = doTestWithException(new IllegalStateException("No way!"), false, 1);
-		assertFalse("Message received successfully", received);
+		assertTrue("Message not received but listener not transactional so this should be true", received);
 	}
 
 	public void testNonTransactionalReceiveAndExecuteWithCallbackThrowingError() throws Exception {
@@ -150,12 +128,25 @@ public class BatchMessageListenerContainerTests extends TestCase {
 		container.setSessionTransacted(false);
 		try {
 			boolean received = doTestWithException(new RuntimeException("No way!"), false, 1);
-			assertFalse("Message received successfully", received);
+			assertTrue("Message not received but listener not transactional so this should be true", received);
 		}
 		catch (RuntimeException e) {
 			assertEquals("No way!", e.getMessage());
 			fail("Unexpected Error - should be swallowed");
 		}
+	}
+
+	private BatchMessageListenerContainer getContainer(RepeatTemplate template) {
+		MockControl connectionFactoryControl = MockControl.createControl(ConnectionFactory.class);
+		ConnectionFactory connectionFactory = (ConnectionFactory) connectionFactoryControl.getMock();
+		BatchMessageListenerContainer container = new BatchMessageListenerContainer();
+		RepeatOperationsInterceptor interceptor = new RepeatOperationsInterceptor();
+		interceptor.setRepeatOperations(template);
+		container.setAdvices(new Advice[] {interceptor});
+		container.setConnectionFactory(connectionFactory);
+		container.setDestinationName("queue");
+		container.afterPropertiesSet();
+		return container;
 	}
 
 	private boolean doTestWithException(final Throwable t, boolean expectRollback, int expectGetTransactionCount)

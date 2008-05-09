@@ -22,15 +22,17 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.batch.item.AbstractItemReader;
-import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
-import org.springframework.batch.retry.policy.ItemWriterRetryPolicy;
+import org.springframework.batch.retry.RecoveryCallback;
+import org.springframework.batch.retry.RetryCallback;
+import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.callback.RecoveryRetryCallback;
+import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -88,9 +90,9 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 				return text;
 			}
 
-			public boolean recover(Object data, Throwable cause) {
+			public Object recover(Object data, Throwable cause) {
 				recovered.add(data);
-				return true;
+				return data;
 			}
 		};
 		retryTemplate = new RetryTemplate();
@@ -113,7 +115,7 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 	public void testExternalRetryRecoveryInBatch() throws Exception {
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new ItemWriterRetryPolicy(new SimpleRetryPolicy(1)));
+		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy(new SimpleRetryPolicy(1)));
 
 		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
 
@@ -129,24 +131,28 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 
 								public ExitStatus doInIteration(RepeatContext context) throws Exception {
 
-									Object item = provider.read();
+									final Object item = provider.read();
 									
 									if (item==null) {
 										return ExitStatus.FINISHED;
 									}
 									
-									ItemWriterRetryCallback callback = new ItemWriterRetryCallback(item, new AbstractItemWriter() {
-										public void write(final Object text) {
+									RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
+										public Object doWithRetry(RetryContext context) throws Throwable {
 											// No need for transaction here: the whole batch will roll
 											// back. When it comes back for recovery this code is not
 											// executed...
 											jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-											        new Integer(list.size()), text });
+											        new Integer(list.size()), item });
 											throw new RuntimeException("Rollback!");
 										}
 									});
 									
-									callback.setRecoverer(provider);
+									callback.setRecoveryCallback(new RecoveryCallback() {
+										public Object recover(Throwable throwable) {
+											return provider.recover(item, throwable);
+										}
+									});
 
 									retryTemplate.execute(callback);
 									

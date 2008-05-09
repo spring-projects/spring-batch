@@ -102,10 +102,10 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 
 	public void testRecovery() throws Exception {
 		factory.setItemRecoverer(new ItemRecoverer() {
-			public boolean recover(Object item, Throwable cause) {
+			public Object recover(Object item, Throwable cause) {
 				recovered.add(item);
 				assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
-				return true;
+				return item;
 			}
 		});
 		List items = TransactionAwareProxyFactory.createTransactionalList();

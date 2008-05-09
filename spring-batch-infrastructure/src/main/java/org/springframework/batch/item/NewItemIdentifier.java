@@ -18,21 +18,20 @@ package org.springframework.batch.item;
 
 /**
  * Strategy interface to distinguish a new item from one that has been processed
- * before and failed, e.g. by examining a message flag.
+ * before and one that has not, e.g. by examining a message flag.
  * 
  * @author Dave Syer
  * 
  */
-public interface FailedItemIdentifier {
+public interface NewItemIdentifier {
 
 	/**
-	 * Inspect the item and determine if it has previously failed processing.
-	 * The safest choice when the answer is indeterminate is 'true'.
+	 * Inspect the item and determine if it has never been processed before.
+	 * The safest choice when the answer is indeterminate is 'false'.
 	 * 
 	 * @param item the current item.
-	 * @return true if the item has been seen before and is known to have failed
-	 * processing.
+	 * @return true if the item is known to have never been processed before.
 	 */
-	boolean hasFailed(Object item);
+	boolean isNew(Object item);
 
 }

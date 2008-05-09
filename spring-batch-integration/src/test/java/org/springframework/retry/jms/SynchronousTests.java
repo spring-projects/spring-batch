@@ -19,12 +19,11 @@ package org.springframework.retry.jms;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.jms.JmsItemReader;
 import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
+import org.springframework.batch.retry.callback.RecoveryRetryCallback;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -53,16 +52,13 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		String foo = "";
 		int count = 0;
 		while (foo != null && count < 100) {
+			logger.debug("Drained message: "+count+": "+foo);
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
 		jdbcTemplate.execute("delete from T_FOOS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		retryTemplate = new RetryTemplate();
-	}
-
-	protected void onSetUpInTransaction() throws Exception {
-		super.onSetUpInTransaction();
 	}
 
 	private void assertInitialState() {
@@ -101,7 +97,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 					public Object doInTransaction(TransactionStatus status) {
 
 						list.add(text);
-						System.err.println("Inserting: [" + list.size() + "," + text + "]");
+						logger.debug("Inserting: [" + list.size() + "," + text + "]");
 						jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
 								new Integer(list.size()), text });
 						if (list.size() == 1) {
@@ -146,16 +142,17 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		provider.setJmsTemplate(jmsTemplate);
 		jmsTemplate.setDefaultDestinationName("queue");
 
-		retryTemplate.execute(new ItemWriterRetryCallback(provider.read(), new AbstractItemWriter() {
-			public void write(final Object text) {
+		final Object text = provider.read();
+		retryTemplate.execute(new RecoveryRetryCallback(text, new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
 
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
-				transactionTemplate.execute(new TransactionCallback() {
+				return transactionTemplate.execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus status) {
 
 						list.add(text);
-						System.err.println("Inserting: [" + list.size() + "," + text + "]");
+						logger.debug("Inserting: [" + list.size() + "," + text + "]");
 						jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
 								new Integer(list.size()), text });
 						if (list.size() == 1) {
@@ -215,7 +212,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 					public Object doInTransaction(TransactionStatus status) {
 
 						list.add(text);
-						System.err.println("Inserting: [" + list.size() + "," + text + "]");
+						logger.debug("Inserting: [" + list.size() + "," + text + "]");
 						jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
 								new Integer(list.size()), text });
 						return text;
@@ -271,6 +268,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 						// transaction...
 						final String text = (String) jmsTemplate.receiveAndConvert("queue");
 						list.add(text);
+						logger.debug("Processing Foo: "+text);
 						jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
 								new Integer(list.size()), text });
 						if (list.size() == 1) {
@@ -319,10 +317,11 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 					return transactionTemplate.execute(new TransactionCallback() {
 						public Object doInTransaction(TransactionStatus status) {
 
-							// The receieve is inside the retry and the
+							// The receive is inside the retry and the
 							// transaction...
 							final String text = (String) jmsTemplate.receiveAndConvert("queue");
 							list.add(text);
+							logger.debug("Processing Foo: "+text);
 							jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)",
 									new Object[] { new Integer(list.size()), text });
 							throw new RuntimeException("Rollback!");

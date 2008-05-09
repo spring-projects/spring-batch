@@ -35,5 +35,5 @@ public interface ItemRecoverer {
 	 *            the cause of the failure that led to this recovery.
 	 * @return true if recovery was successful.
 	 */
-	boolean recover(Object data, Throwable cause);
+	Object recover(Object data, Throwable cause);
 }

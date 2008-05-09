@@ -22,13 +22,16 @@ import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.retry.RecoveryCallback;
+import org.springframework.batch.retry.RetryCallback;
+import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
-import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
-import org.springframework.batch.retry.policy.ItemWriterRetryPolicy;
+import org.springframework.batch.retry.callback.RecoveryRetryCallback;
+import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 
@@ -126,16 +129,16 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 			}
 
 			// Co-ordinate the retry policy with the exception handler:
-			getStepOperations()
-					.setExceptionHandler(new SimpleRetryExceptionHandler(retryPolicy, getExceptionHandler(), getFatalExceptionClasses()));
+			getStepOperations().setExceptionHandler(
+					new SimpleRetryExceptionHandler(retryPolicy, getExceptionHandler(), getFatalExceptionClasses()));
 
-			ItemWriterRetryPolicy itemWriterRetryPolicy = new ItemWriterRetryPolicy(retryPolicy);
+			RecoveryCallbackRetryPolicy recoveryCallbackRetryPolicy = new RecoveryCallbackRetryPolicy(retryPolicy);
 
 			RetryTemplate retryTemplate = new RetryTemplate();
 			if (retryListeners != null) {
 				retryTemplate.setListeners(retryListeners);
 			}
-			retryTemplate.setRetryPolicy(itemWriterRetryPolicy);
+			retryTemplate.setRetryPolicy(recoveryCallbackRetryPolicy);
 			if (backOffPolicy != null) {
 				retryTemplate.setBackOffPolicy(backOffPolicy);
 			}
@@ -203,11 +206,22 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 		 * @see org.springframework.batch.core.step.item.SimpleItemHandler#write(java.lang.Object,
 		 * org.springframework.batch.core.StepContribution)
 		 */
-		protected void write(Object item, final StepContribution contribution) throws Exception {
-			ItemWriter writer = new RetryableItemWriter(contribution);
-			ItemWriterRetryCallback retryCallback = new ItemWriterRetryCallback(item, writer);
-			retryCallback.setKeyGenerator(itemKeyGenerator);
-			retryCallback.setRecoverer(itemRecoverer);
+		protected void write(final Object item, final StepContribution contribution) throws Exception {
+			final ItemWriter writer = new RetryableItemWriter(contribution);
+			RecoveryRetryCallback retryCallback = new RecoveryRetryCallback(item, new RetryCallback() {
+				public Object doWithRetry(RetryContext context) throws Throwable {
+					writer.write(item);
+					return null;
+				}
+			}, itemKeyGenerator != null ? itemKeyGenerator.getKey(item) : item);
+			retryCallback.setRecoveryCallback(new RecoveryCallback() {
+				public Object recover(Throwable throwable) {
+					if (itemRecoverer != null) {
+						return itemRecoverer.recover(item, throwable);
+					}
+					return null;
+				}
+			});
 			retryOperations.execute(retryCallback);
 		}
 

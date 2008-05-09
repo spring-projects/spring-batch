@@ -18,34 +18,32 @@ package org.springframework.batch.retry.policy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.FailedItemIdentifier;
-import org.springframework.batch.item.ItemKeyGenerator;
-import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
+import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.TerminatedRetryException;
-import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
+import org.springframework.batch.retry.callback.RecoveryRetryCallback;
 import org.springframework.batch.retry.context.RetryContextSupport;
 import org.springframework.util.Assert;
 
 /**
- * A {@link RetryPolicy} that detects an {@link ItemWriterRetryCallback} when it
+ * A {@link RetryPolicy} that detects an {@link RecoveryRetryCallback} when it
  * opens a new context, and uses it to make sure the item is in place for later
  * decisions about how to retry or backoff. The callback should be an instance
- * of {@link ItemWriterRetryCallback} otherwise an exception will be thrown when
+ * of {@link RecoveryRetryCallback} otherwise an exception will be thrown when
  * the context is created.
  * 
  * @author Dave Syer
  * 
  */
-public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
+public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	public static final String EXHAUSTED = ItemWriterRetryPolicy.class.getName() + ".EXHAUSTED";
+	public static final String EXHAUSTED = RecoveryCallbackRetryPolicy.class.getName() + ".EXHAUSTED";
 
 	private RetryPolicy delegate;
 
@@ -54,7 +52,7 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * 
 	 * @param delegate
 	 */
-	public ItemWriterRetryPolicy(RetryPolicy delegate) {
+	public RecoveryCallbackRetryPolicy(RetryPolicy delegate) {
 		super();
 		this.delegate = delegate;
 	}
@@ -63,7 +61,7 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * Default constructor. Creates a new {@link SimpleRetryPolicy} for the
 	 * delegate.
 	 */
-	public ItemWriterRetryPolicy() {
+	public RecoveryCallbackRetryPolicy() {
 		this(new SimpleRetryPolicy());
 	}
 
@@ -97,7 +95,7 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 
 	/**
 	 * Create a new context for the execution of the callback, which must be an
-	 * instance of {@link ItemWriterRetryCallback}.
+	 * instance of {@link RecoveryRetryCallback}.
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback,
 	 * RetryContext)
@@ -106,8 +104,8 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * type.
 	 */
 	public RetryContext open(RetryCallback callback, RetryContext parent) {
-		Assert.state(callback instanceof ItemWriterRetryCallback, "Callback must be ItemProviderRetryCallback");
-		ItemWriterRetryContext context = new ItemWriterRetryContext((ItemWriterRetryCallback) callback, parent);
+		Assert.state(callback instanceof RecoveryRetryCallback, "Callback must be ItemProviderRetryCallback");
+		ItemWriterRetryContext context = new ItemWriterRetryContext((RecoveryRetryCallback) callback, parent);
 		context.open(callback, null);
 		return context;
 	}
@@ -135,8 +133,6 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 
 	private class ItemWriterRetryContext extends RetryContextSupport implements RetryPolicy {
 
-		final private Object item;
-
 		final private Object key;
 
 		final private int initialHashCode;
@@ -144,19 +140,15 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 		// The delegate context...
 		private RetryContext delegateContext;
 
-		final private ItemRecoverer recoverer;
+		final private RecoveryCallback recoverer;
 
-		final private ItemKeyGenerator keyGenerator;
+		final private boolean forceRefresh;
 
-		final private FailedItemIdentifier failedItemIdentifier;
-
-		public ItemWriterRetryContext(ItemWriterRetryCallback callback, RetryContext parent) {
+		public ItemWriterRetryContext(RecoveryRetryCallback callback, RetryContext parent) {
 			super(parent);
-			this.recoverer = callback.getRecoverer();
-			this.keyGenerator = callback.getKeyGenerator();
-			this.item = callback.getItem();
-			this.key = keyGenerator.getKey(item);
-			this.failedItemIdentifier = callback.getFailedItemIdentifier();
+			this.recoverer = callback.getRecoveryCallback();
+			this.key = callback.getKey();
+			this.forceRefresh = callback.isForceRefresh();
 			this.initialHashCode = key.hashCode();
 		}
 
@@ -169,7 +161,11 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 		}
 
 		public RetryContext open(RetryCallback callback, RetryContext parent) {
-			if (hasFailed(failedItemIdentifier, key)) {
+			if (forceRefresh) {
+				// Avoid a cache hit if the caller tells us this is a fresh item
+				this.delegateContext = delegate.open(callback, null);
+			}
+			else if (retryContextCache.containsKey(key)) {
 				this.delegateContext = retryContextCache.get(key);
 				if (this.delegateContext == null) {
 					throw new RetryException("Inconsistent state for failed item: no history found. "
@@ -213,14 +209,9 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 			retryContextCache.remove(key);
 			RepeatSynchronizationManager.setCompleteOnly();
 			if (recoverer != null) {
-				boolean success = recoverer.recover(item, context.getLastThrowable());
-				if (!success) {
-					int count = context.getRetryCount();
-					logger.error("Could not recover from error after retry exhausted after [" + count + "] attempts.",
-							context.getLastThrowable());
-				}
+				return recoverer.recover(context.getLastThrowable());
 			}
-			return item;
+			return null;
 		}
 
 		public Throwable getLastThrowable() {
@@ -233,23 +224,4 @@ public class ItemWriterRetryPolicy extends AbstractStatefulRetryPolicy {
 
 	}
 
-	/**
-	 * Extension point for cases where it is possible to avoid a cache hit by
-	 * inspecting the item to determine if could ever have been seen before. In
-	 * a messaging environment where the item is a message, it can be inspected
-	 * to see if it has been delivered before.<br/>
-	 * 
-	 * The default implementation of this method checks for a non-null
-	 * {@link FailedItemIdentifier}. Otherwise we just check the cache for the
-	 * item key.
-	 * 
-	 * @param failedItemIdentifier
-	 * @param key
-	 */
-	protected boolean hasFailed(FailedItemIdentifier failedItemIdentifier, Object key) {
-		if (failedItemIdentifier != null) {
-			return failedItemIdentifier.hasFailed(key);
-		}
-		return retryContextCache.containsKey(key);
-	}
 }

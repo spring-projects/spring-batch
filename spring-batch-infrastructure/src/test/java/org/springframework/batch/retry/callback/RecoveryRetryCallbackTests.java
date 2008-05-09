@@ -21,16 +21,16 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.AbstractItemWriter;
-import org.springframework.batch.retry.StubItemKeyGeneratorRecoverer;
+import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryException;
+import org.springframework.batch.retry.StubItemKeyGeneratorRecoverer;
 import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 
-public class ItemWriterRetryCallbackTests extends TestCase {
+public class RecoveryRetryCallbackTests extends TestCase {
 
 	List calls = new ArrayList();
 
@@ -40,32 +40,28 @@ public class ItemWriterRetryCallbackTests extends TestCase {
 
 	StubItemKeyGeneratorRecoverer recoverer;
 
-	ItemWriterRetryCallback callback;
-
-	private AbstractItemWriter writer;
+	RecoveryRetryCallback callback;
 
 	protected void setUp() throws Exception {
 		super.setUp();
 		template = new RetryTemplate();
 		recoverer = new StubItemKeyGeneratorRecoverer() {
-			public boolean recover(Object data, Throwable cause) {
+			public Object recover(Object data, Throwable cause) {
 				count++;
 				calls.add(data);
-				return true;
+				return data;
 			}
+
 			public Object getKey(Object item) {
 				return "key" + (count++);
 			}
 		};
-		writer = new AbstractItemWriter() {
-			public void write(Object data) {
+		callback = new RecoveryRetryCallback("foo", new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
 				count++;
-				if (data.equals("bar")) {
-					throw new IllegalStateException("Bar detected");
-				}
+				return null;
 			}
-		};
-		callback = new ItemWriterRetryCallback("foo", writer);
+		});
 	}
 
 	public void testDoWithRetrySuccessfulFirstTime() throws Exception {
@@ -76,12 +72,17 @@ public class ItemWriterRetryCallbackTests extends TestCase {
 	public void testContextInitializedWithItemAndCanRetry() throws Exception {
 		// We can use the policy to intercept the context and do something with
 		// the item...
-		callback = new ItemWriterRetryCallback("bar", writer);
+		callback = new RecoveryRetryCallback("bar", new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
+				count++;
+				throw new IllegalStateException("Detected bar");
+			}
+		});
 		assertEquals(0, calls.size());
 		template.setRetryPolicy(new NeverRetryPolicy() {
 			public boolean canRetry(RetryContext context) {
 				// ...register the failed item
-				calls.add("item(" + count + ")=" + callback.getItem());
+				calls.add("item(" + count + ")=" + callback.getKey());
 				// Do not call the base class method - the attempt counts as
 				// successful now
 				if (count < 2) // only retry once
@@ -107,12 +108,17 @@ public class ItemWriterRetryCallbackTests extends TestCase {
 	public void testContextInitializedWithItemAndRegisterThrowable() throws Exception {
 		// We can use the policy to intercept the context and do something with
 		// the item...
-		callback = new ItemWriterRetryCallback("bar", writer);
+		callback = new RecoveryRetryCallback("bar", new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
+				count++;
+				throw new IllegalStateException("Detected bar");
+			}
+		});
 		assertEquals(0, calls.size());
 		template.setRetryPolicy(new NeverRetryPolicy() {
 			public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
 				// ...register the failed item
-				calls.add("item=" + callback.getItem());
+				calls.add("item=" + callback.getKey());
 				// Call the base class method so that the next attempt is a
 				// failure.
 				super.registerThrowable(context, throwable);
@@ -143,8 +149,8 @@ public class ItemWriterRetryCallbackTests extends TestCase {
 	}
 
 	public void testGetKey() throws Exception {
-		callback.setKeyGenerator(recoverer);
-		assertEquals("key0", callback.getKeyGenerator().getKey("foo"));
+		callback = new RecoveryRetryCallback("foo", null, "key0");
+		assertEquals("key0", callback.getKey());
 	}
 
 	public void testRecoverWithoutSession() throws Exception {

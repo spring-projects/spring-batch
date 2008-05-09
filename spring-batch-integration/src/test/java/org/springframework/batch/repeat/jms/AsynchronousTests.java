@@ -73,6 +73,7 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 		// Add a couple of messages...
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
+		
 	}
 
 	protected void onTearDown() throws Exception {
@@ -108,6 +109,8 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 			}
 		});
 
+		container.initializeProxy();
+		
 		container.start();
 
 		// Need to sleep for at least a second here...
@@ -145,18 +148,20 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 				}
 			}
 		});
+		
+		container.initializeProxy();
 
 		container.start();
 
 		// Need to sleep here, but not too long or the
 		// container goes into its own recovery cycle and spits out the bad
 		// message...
-		Thread.sleep(500L);
+		Thread.sleep(1000L);
 
 		// We rolled back so the messages might come in many times...
 		assertTrue(list.size() >= 1);
 
-		System.err.println(jdbcTemplate.queryForList("select * from T_FOOS"));
+		logger.debug("T_FOOS: "+jdbcTemplate.queryForList("select * from T_FOOS"));
 
 		String text = "";
 		List msgs = new ArrayList();
@@ -164,7 +169,7 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 			text = (String) jmsTemplate.receiveAndConvert("queue");
 			msgs.add(text);
 		}
-		System.err.println(msgs);
+		logger.debug("Messages: "+msgs);
 
 		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);

@@ -171,12 +171,12 @@ public class JmsItemReaderTests extends TestCase {
 		messageControl.replay();
 
 		itemProvider.setItemType(Message.class);
-		assertEquals(true, itemProvider.hasFailed(message));
+		assertEquals(false, itemProvider.isNew(message));
 		messageControl.verify();
 	}
 
 	public void testIsNewForNonMessage() throws Exception {
 		itemProvider.setItemType(String.class);
-		assertEquals(true, itemProvider.hasFailed("foo"));
+		assertEquals(false, itemProvider.isNew("foo"));
 	}
 }

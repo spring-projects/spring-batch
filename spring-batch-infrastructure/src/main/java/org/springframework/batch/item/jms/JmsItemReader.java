@@ -23,7 +23,7 @@ import javax.jms.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.AbstractItemReader;
-import org.springframework.batch.item.FailedItemIdentifier;
+import org.springframework.batch.item.NewItemIdentifier;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
@@ -37,12 +37,12 @@ import org.springframework.util.Assert;
  * An {@link ItemReader} for JMS using a {@link JmsTemplate}. The template
  * should have a default destination, which will be used to provide items in
  * {@link #read()}. If a recovery step is needed, set the error destination and
- * the item will be sent there if processing fails in an external retry.
+ * the item will be sent there if processing fails in a stateful retry.
  * 
  * @author Dave Syer
  * 
  */
-public class JmsItemReader extends AbstractItemReader implements ItemRecoverer, ItemKeyGenerator, FailedItemIdentifier {
+public class JmsItemReader extends AbstractItemReader implements ItemRecoverer, ItemKeyGenerator, NewItemIdentifier {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
@@ -108,13 +108,14 @@ public class JmsItemReader extends AbstractItemReader implements ItemRecoverer, 
 	}
 
 	/**
-	 * Send the message back to the proovider using the specified error
-	 * destination property of this provider.
+	 * Send the message back to the provider using the specified error
+	 * destination property of this reader. If the recovery is successful the
+	 * item itself is returned, otherwise null.
 	 * 
 	 * @see org.springframework.batch.item.ItemRecoverer#recover(Object,
 	 * Throwable)
 	 */
-	public boolean recover(Object item, Throwable cause) {
+	public Object recover(Object item, Throwable cause) {
 		try {
 			if (errorDestination != null) {
 				jmsTemplate.convertAndSend(errorDestination, item);
@@ -124,15 +125,14 @@ public class JmsItemReader extends AbstractItemReader implements ItemRecoverer, 
 			}
 			else {
 				// do nothing - it doesn't make sense to send the message back
-				// to
-				// the destination it came from
-				return false;
+				// to the destination it came from
+				return null;
 			}
-			return true;
+			return item;
 		}
 		catch (JmsException e) {
 			logger.error("Could not recover because of JmsException.", e);
-			return false;
+			throw e;
 		}
 	}
 
@@ -158,21 +158,21 @@ public class JmsItemReader extends AbstractItemReader implements ItemRecoverer, 
 	}
 
 	/**
-	 * If the item is a message, check the JMS redelivered flag, otherwise
-	 * return true to be on the safe side.
+	 * If the item is a message, check the JMS re-delivered flag, otherwise
+	 * return false to be on the safe side.
 	 * 
-	 * @see org.springframework.batch.item.FailedItemIdentifier#hasFailed(java.lang.Object)
+	 * @see org.springframework.batch.item.NewItemIdentifier#isNew(java.lang.Object)
 	 */
-	public boolean hasFailed(Object item) {
+	public boolean isNew(Object item) {
 		if (itemType != null && itemType.isAssignableFrom(Message.class)) {
 			try {
-				return ((Message) item).getJMSRedelivered();
+				return !((Message) item).getJMSRedelivered();
 			}
 			catch (JMSException e) {
 				throw new UnexpectedInputException("Could not extract message ID", e);
 			}
 		}
-		return true;
+		return false;
 	}
 
 }

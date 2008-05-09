@@ -19,12 +19,11 @@ package org.springframework.batch.retry.jms;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.jms.JmsItemReader;
 import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.callback.ItemWriterRetryCallback;
+import org.springframework.batch.retry.callback.RecoveryRetryCallback;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
@@ -150,23 +149,24 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		provider.setJmsTemplate(jmsTemplate);
 		jmsTemplate.setDefaultDestinationName("queue");
 
-		retryTemplate.execute(new ItemWriterRetryCallback(provider.read(), new AbstractItemWriter() {
-			public void write(final Object text) {
+		final Object item = provider.read();
+		retryTemplate.execute(new RecoveryRetryCallback(item, new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
 
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
-				transactionTemplate.execute(new TransactionCallback() {
+				return transactionTemplate.execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus status) {
 
-						list.add(text);
-						System.err.println("Inserting: [" + list.size() + "," + text + "]");
+						list.add(item);
+						System.err.println("Inserting: [" + list.size() + "," + item + "]");
 						jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-								new Integer(list.size()), text });
+								new Integer(list.size()), item });
 						if (list.size() == 1) {
 							throw new RuntimeException("Rollback!");
 						}
 
-						return text;
+						return item;
 
 					}
 				});

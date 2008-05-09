@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:tx="http://www.springframework.org/schema/tx"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<import resource="classpath:/data-source.xml"/>
+	<import resource="classpath:/data-source.xml" />
 
 	<!-- Transaction manager for a datasource -->
-	<bean id="transactionManager"
-		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
@@ -23,21 +20,18 @@
 		<property name="connectionFactory" ref="connectionFactory" />
 	</bean>
 
-	<bean id="jmsTemplate"
-		class="org.springframework.jms.core.JmsTemplate">
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
 		<property name="connectionFactory" ref="connectionFactory" />
 		<property name="receiveTimeout" value="100" />
 		<!-- This is important... -->
 		<property name="sessionTransacted" value="true" />
 	</bean>
 
-	<bean id="jdbcTemplate"
-		class="org.springframework.jdbc.core.JdbcTemplate">
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="connectionFactory"
-		class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="brokerService">
+	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="brokerService">
 		<property name="brokerURL">
 			<value>vm://localhost</value>
 		</property>
@@ -45,28 +39,43 @@
 
 	<bean id="txAwareConnectionFactory"
 		class="org.springframework.jms.connection.TransactionAwareConnectionFactoryProxy">
-		<property name="targetConnectionFactory" ref="connectionFactory"/>
+		<property name="targetConnectionFactory" ref="connectionFactory" />
 		<property name="synchedLocalTransactionAllowed" value="true" />
 	</bean>
 
-	<bean id="container"
-		class="org.springframework.batch.container.jms.BatchMessageListenerContainer">
+	<bean id="container" class="org.springframework.batch.container.jms.BatchMessageListenerContainer"
+		lazy-init="true">
+		<property name="recoveryInterval" value="500" />
+		<!-- We aren't adding a listener here (want to do it in unit test)
+		so need to set autoStartup=false -->
+		<property name="autoStartup" value="false" />
+		<!-- We need the transaction manager, but only because we can't 
+		intercept the MessageListenerContainer in the right place 
+		(it tries to open a JMS session before receiveAndExecute() 
+		so the JMS session commits after every item, not after every chunk) -->
 		<property name="transactionManager" ref="transactionManager" />
-		<property name="recoveryInterval" value="0" />
-		<property name="connectionFactory"
-			ref="txAwareConnectionFactory" />
+		<property name="connectionFactory" ref="txAwareConnectionFactory" />
 		<property name="destinationName" value="queue" />
 		<!-- This is important... it forces the container to acknowledge message receipt, 
 			and avoid duplicate messages in the sunny day case -->
 		<property name="sessionTransacted" value="true" />
-		<constructor-arg ref="transactionalBatchTemplate" />
+		<property name="advices">
+			<list>
+				<!-- Need another transaction manager here so that rollbacks are processed correctly -->
+				<bean class="org.springframework.transaction.interceptor.TransactionInterceptor">
+					<property name="transactionManager" ref="transactionManager" />
+					<property name="transactionAttributes" value="*=PROPAGATION_REQUIRED" />
+				</bean>
+				<bean class="org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor">
+					<property name="repeatOperations" ref="batchTemplate" />
+				</bean>
+			</list>
+		</property>
 	</bean>
 
-	<bean id="batchTemplate"
-		class="org.springframework.batch.repeat.support.RepeatTemplate">
+	<bean id="batchTemplate" class="org.springframework.batch.repeat.support.RepeatTemplate">
 		<property name="completionPolicy">
-			<bean 
-				class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
+			<bean class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
 				<constructor-arg value="2" />
 			</bean>
 		</property>
@@ -76,20 +85,14 @@
 		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="proxyInterfaces">
-			<value>
-				org.springframework.batch.repeat.RepeatOperations
-			</value>
+			<value>org.springframework.batch.repeat.RepeatOperations</value>
 		</property>
 		<property name="proxyTargetClass" value="false" />
-		<property name="transactionAttributes"
-			value="*=PROPAGATION_REQUIRED">
-		</property>
+		<property name="transactionAttributes" value="*=PROPAGATION_REQUIRED"></property>
 		<property name="target">
-			<bean
-				class="org.springframework.batch.repeat.support.RepeatTemplate">
+			<bean class="org.springframework.batch.repeat.support.RepeatTemplate">
 				<property name="completionPolicy">
-					<bean
-						class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
+					<bean class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
 						<constructor-arg value="2" />
 					</bean>
 				</property>
