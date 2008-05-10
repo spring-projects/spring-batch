@@ -19,6 +19,7 @@ package org.springframework.batch.retry.policy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
+import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
@@ -127,7 +128,7 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * 
 	 * @see org.springframework.batch.retry.policy.AbstractStatefulRetryPolicy#handleRetryExhausted(org.springframework.batch.retry.RetryContext)
 	 */
-	public Object handleRetryExhausted(RetryContext context) throws Exception {
+	public Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException {
 		return ((RetryPolicy) context).handleRetryExhausted(context);
 	}
 
@@ -204,13 +205,15 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 			throw new UnsupportedOperationException("Not supported - this code should be unreachable.");
 		}
 
-		public Object handleRetryExhausted(RetryContext context) throws Exception {
+		public Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException {
 			// If there is no going back, then we can remove the history
 			retryContextCache.remove(key);
 			RepeatSynchronizationManager.setCompleteOnly();
 			if (recoverer != null) {
 				return recoverer.recover(context.getLastThrowable());
 			}
+			logger.info("No recover callback provided.  Returning null from recovery step.");
+			// Don't want to call the delegate here - it would throw an exception
 			return null;
 		}
 

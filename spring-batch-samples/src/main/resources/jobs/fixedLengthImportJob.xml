@@ -11,7 +11,7 @@
 
 	<bean id="fixedLengthImportJob" parent="simpleJob">
 		<property name="steps">
-			<bean id="step1" parent="simpleStep">
+			<bean id="step1" parent="simpleStep" p:commitInterval="3">
 				<property name="streams" ref="fileItemReader" />
 				<property name="itemReader">
 					<bean

@@ -79,7 +79,7 @@ public interface RetryPolicy {
 	 * @param context the current retry context.
 	 * @return an appropriate value possibly from the callback.
 	 * 
-	 * @throws Exception if there is no recovery path.
+	 * @throws ExhaustedRetryException if there is no recovery path.
 	 */
-	Object handleRetryExhausted(RetryContext context) throws Exception, ExhaustedRetryException;
+	Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException;
 }

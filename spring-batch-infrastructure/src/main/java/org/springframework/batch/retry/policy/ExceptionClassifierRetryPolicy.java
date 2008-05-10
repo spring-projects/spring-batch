@@ -176,7 +176,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 			return result;
 		}
 
-		public Object handleRetryExhausted(RetryContext context) throws Exception {
+		public Object handleRetryExhausted(RetryContext context) throws UnsupportedOperationException {
 			// Not called...
 			throw new UnsupportedOperationException("Not supported - this code should be unreachable.");
 		}

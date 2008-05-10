@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 
@@ -60,7 +61,7 @@ public abstract class AbstractStatefulRetryPolicy implements RetryPolicy {
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#handleRetryExhausted(org.springframework.batch.retry.RetryContext)
 	 */
-	public Object handleRetryExhausted(RetryContext context) throws Exception {
+	public Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException {
 		return null;
 	}
 

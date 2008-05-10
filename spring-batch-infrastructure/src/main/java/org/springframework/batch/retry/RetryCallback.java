@@ -20,7 +20,6 @@ package org.springframework.batch.retry;
  * Callback interface for an operation that can be retried using a
  * {@link RetryOperations}.
  * 
- * @since 2.1
  * @author Rob Harrop
  */
 public interface RetryCallback {

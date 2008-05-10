@@ -16,13 +16,16 @@
 package org.springframework.batch.retry;
 
 /**
+ * Callback for stateful retry after all tries are exhausted.
+ * 
  * @author Dave Syer
  * 
+ * @since 1.1
  */
 public interface RecoveryCallback {
 
 	/**
-	 * @param throwable
+	 * @param throwable the cause of the failure that we are to recover from
 	 * @return an Object that can be used to replace the callback result that
 	 * failed
 	 */
