@@ -113,19 +113,9 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 		}
 		final Object item = arg;
 
-		RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
-				return invocation.proceed();
-			}
-		}, keyGenerator != null ? keyGenerator.getKey(item) : item);
-		callback.setRecoveryCallback(new RecoveryCallback() {
-			public Object recover(RetryContext context) {
-				if (recoverer != null) {
-					return recoverer.recover(item, context.getLastThrowable());
-				}
-				return item;
-			}
-		});
+		RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new MethodInvocationRetryCallback(invocation),
+				keyGenerator != null ? keyGenerator.getKey(item) : item);
+		callback.setRecoveryCallback(new ItemRecovererCallback(item, recoverer));
 		if (newItemIdentifier != null) {
 			callback.setForceRefresh(newItemIdentifier.isNew(item));
 		}
@@ -135,6 +125,55 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 		logger.debug("Exiting proxied method in stateful retry with result: (" + result + ")");
 
 		return result;
+
+	}
+
+	/**
+	 * @author Dave Syer
+	 * 
+	 */
+	private static final class MethodInvocationRetryCallback implements RetryCallback {
+		/**
+		 * 
+		 */
+		private final MethodInvocation invocation;
+
+		/**
+		 * @param invocation
+		 */
+		private MethodInvocationRetryCallback(MethodInvocation invocation) {
+			this.invocation = invocation;
+		}
+
+		public Object doWithRetry(RetryContext context) throws Throwable {
+			return invocation.proceed();
+		}
+	}
+
+	/**
+	 * @author Dave Syer
+	 * 
+	 */
+	private static final class ItemRecovererCallback implements RecoveryCallback {
+
+		private final Object item;
+
+		private final ItemRecoverer recoverer;
+
+		/**
+		 * @param item the item that failed.
+		 */
+		private ItemRecovererCallback(Object item, ItemRecoverer recoverer) {
+			this.item = item;
+			this.recoverer = recoverer;
+		}
+
+		public Object recover(RetryContext context) {
+			if (recoverer != null) {
+				return recoverer.recover(item, context.getLastThrowable());
+			}
+			return item;
+		}
 
 	}
 
