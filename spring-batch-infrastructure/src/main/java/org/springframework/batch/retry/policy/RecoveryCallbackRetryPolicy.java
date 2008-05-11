@@ -195,11 +195,6 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 			delegate.registerThrowable(this.delegateContext, throwable);
 		}
 
-		public boolean isExternal() {
-			// Not called...
-			throw new UnsupportedOperationException("Not supported - this code should be unreachable.");
-		}
-
 		public boolean shouldRethrow(RetryContext context) {
 			// Not called...
 			throw new UnsupportedOperationException("Not supported - this code should be unreachable.");
@@ -210,9 +205,9 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 			retryContextCache.remove(key);
 			RepeatSynchronizationManager.setCompleteOnly();
 			if (recoverer != null) {
-				return recoverer.recover(context.getLastThrowable());
+				return recoverer.recover(context);
 			}
-			logger.info("No recover callback provided.  Returning null from recovery step.");
+			logger.info("No recovery callback provided.  Returning null from recovery step.");
 			// Don't want to call the delegate here - it would throw an exception
 			return null;
 		}

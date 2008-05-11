@@ -150,7 +150,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 			}
 		});
 		callback.setRecoveryCallback(new RecoveryCallback() {
-			public Object recover(Throwable cause) {
+			public Object recover(RetryContext context) {
 				count++;
 				list.add(input);
 				return input;
@@ -189,7 +189,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 			}
 		});
 		callback.setRecoveryCallback(new RecoveryCallback() {
-			public Object recover(Throwable cause) {
+			public Object recover(RetryContext context) {
 				count++;
 				list.add(input);
 				return input;

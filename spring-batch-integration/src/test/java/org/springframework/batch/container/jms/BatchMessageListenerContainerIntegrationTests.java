@@ -147,7 +147,7 @@ public class BatchMessageListenerContainerIntegrationTests extends AbstractDepen
 						}
 					}, msg.getJMSMessageID());
 					callback.setRecoveryCallback(new RecoveryCallback() {
-						public Object recover(Throwable throwable) {
+						public Object recover(RetryContext context) {
 							recovered++;
 							logger.debug("Recovered: " + msg);
 							return msg;

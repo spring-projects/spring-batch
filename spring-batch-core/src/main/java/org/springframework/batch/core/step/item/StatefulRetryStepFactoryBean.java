@@ -215,9 +215,9 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 				}
 			}, itemKeyGenerator != null ? itemKeyGenerator.getKey(item) : item);
 			retryCallback.setRecoveryCallback(new RecoveryCallback() {
-				public Object recover(Throwable throwable) {
+				public Object recover(RetryContext context) {
 					if (itemRecoverer != null) {
-						return itemRecoverer.recover(item, throwable);
+						return itemRecoverer.recover(item, context.getLastThrowable());
 					}
 					return null;
 				}

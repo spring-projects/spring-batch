@@ -25,10 +25,10 @@ package org.springframework.batch.retry;
 public interface RecoveryCallback {
 
 	/**
-	 * @param throwable the cause of the failure that we are to recover from
+	 * @param context the current retry context
 	 * @return an Object that can be used to replace the callback result that
 	 * failed
 	 */
-	Object recover(Throwable throwable);
+	Object recover(RetryContext context);
 
 }

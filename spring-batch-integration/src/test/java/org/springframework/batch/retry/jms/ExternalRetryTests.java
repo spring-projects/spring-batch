@@ -199,8 +199,8 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		});
 		
 		callback.setRecoveryCallback(new RecoveryCallback() {
-			public Object recover(Throwable throwable) {
-				return provider.recover(item, throwable);
+			public Object recover(RetryContext context) {
+				return provider.recover(item, context.getLastThrowable());
 			}
 		});
 

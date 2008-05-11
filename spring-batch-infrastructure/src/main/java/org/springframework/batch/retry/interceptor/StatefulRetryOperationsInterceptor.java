@@ -119,9 +119,9 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 			}
 		}, keyGenerator != null ? keyGenerator.getKey(item) : item);
 		callback.setRecoveryCallback(new RecoveryCallback() {
-			public Object recover(Throwable cause) {
+			public Object recover(RetryContext context) {
 				if (recoverer != null) {
-					return recoverer.recover(item, cause);
+					return recoverer.recover(item, context.getLastThrowable());
 				}
 				return item;
 			}
