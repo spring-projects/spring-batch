@@ -172,6 +172,10 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 			if (recoverer != null) {
 				return recoverer.recover(item, context.getLastThrowable());
 			}
+			// TODO: This sucks big time because the method invocation almost
+			// certainly does not return an object of this type. It would be
+			// better to return null (but then method invocations that return
+			// primitive values would barf).
 			return item;
 		}
 

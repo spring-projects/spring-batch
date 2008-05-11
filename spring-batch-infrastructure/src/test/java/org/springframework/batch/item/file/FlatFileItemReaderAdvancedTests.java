@@ -106,8 +106,6 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		// we should now process all records after first commit point
 		assertEquals("[testLine3]", reader.read().toString());
 
-		// TODO update and assert ExecutionContext
-
 	}
 
 	/**

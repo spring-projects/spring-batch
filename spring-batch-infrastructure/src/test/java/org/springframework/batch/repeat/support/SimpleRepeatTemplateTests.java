@@ -262,9 +262,6 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		}) {
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
-				// TODO parameter is rewritten and then compared to value it has
-				// just been assigned
-				context = RepeatSynchronizationManager.getContext();
 				assertSame(context, RepeatSynchronizationManager.getContext());
 				return super.doInIteration(context);
 			}
@@ -307,9 +304,6 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		}) {
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
-				// TODO parameter is rewritten and then compared to value it has
-				// just been assigned
-				context = RepeatSynchronizationManager.getContext();
 				assertSame(context, RepeatSynchronizationManager.getContext());
 				super.doInIteration(context);
 				return ExitStatus.CONTINUABLE;

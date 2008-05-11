@@ -29,7 +29,6 @@ import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * A {@link MethodInterceptor} that can be used to automatically repeat calls to
@@ -83,12 +82,12 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 									"MethodInvocation of the wrong type detected - this should not happen with Spring AOP, so please raise an issue if you see this exception");
 						}
 
-						// N.B. discards return value if there is one
+						Object result = clone.proceed();
 						if (clone.getMethod().getReturnType().equals(Void.TYPE)) {
-							clone.proceed();
+							results.clear();
+							results.add(result);
 							return ExitStatus.CONTINUABLE;
 						}
-						Object result = clone.proceed();
 						if (!isComplete(result)) {
 							// We only save the last non-null result
 							results.clear();
@@ -123,12 +122,9 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 			return results.get(0);
 		}
 
-		Class returnType = invocation.getMethod().getReturnType();
-		Object defaultValue = null;
-		if (ClassUtils.isPrimitiveOrWrapper(returnType)) {
-			defaultValue = getDefaultForPrimitiveType(returnType);
-		}
-		return defaultValue;
+		// No result means something weird happened
+		throw new IllegalStateException("No result available for attempted repeat call to " + invocation
+				+ ".  The invocation was never called, so maybe there is a problem with the completion policy?");
 	}
 
 	/**
@@ -154,44 +150,6 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 		public RepeatOperationsInterceptorException(String message, Throwable e) {
 			super(message, e);
 		}
-	}
-
-	/**
-	 * Set up a default return value for primitive types (all basically "0").
-	 * @param returnType the desired primitive type
-	 * @return a value to use as the default return value if recovery path is
-	 * taken
-	 */
-	// TODO: cache these values.
-	private Object getDefaultForPrimitiveType(Class returnType) {
-		if (returnType.equals(Boolean.TYPE)) {
-			return Boolean.FALSE;
-		}
-		else if (returnType.equals(Byte.TYPE)) {
-			return Byte.valueOf("0");
-		}
-		else if (returnType.equals(Character.TYPE)) {
-			return Character.valueOf('0');
-		}
-		else if (returnType.equals(Short.TYPE)) {
-			return Short.valueOf("0");
-		}
-		else if (returnType.equals(Integer.TYPE)) {
-			return Integer.valueOf('0');
-		}
-		else if (returnType.equals(Long.TYPE)) {
-			return Long.valueOf('0');
-		}
-		else if (returnType.equals(Float.TYPE)) {
-			return Float.valueOf('0');
-		}
-		else if (returnType.equals(Double.TYPE)) {
-			return Double.valueOf('0');
-		}
-		else if (returnType.equals(Void.TYPE)) {
-			return null;
-		}
-		throw new IllegalStateException("Primitive type with no default: " + returnType);
 	}
 
 }

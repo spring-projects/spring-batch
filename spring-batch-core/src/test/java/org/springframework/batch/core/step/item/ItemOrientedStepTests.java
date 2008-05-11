@@ -360,7 +360,6 @@ public class ItemOrientedStepTests extends TestCase {
 			}
 
 			public void update(ExecutionContext executionContext) {
-				// TODO Auto-generated method stub
 				executionContext.putString("foo", "bar");
 			}
 		};

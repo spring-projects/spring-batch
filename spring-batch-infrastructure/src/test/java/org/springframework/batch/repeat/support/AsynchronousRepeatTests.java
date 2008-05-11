@@ -67,6 +67,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		TaskExecutorRepeatTemplate jobTemplate = new TaskExecutorRepeatTemplate();
 		final RepeatTemplate stepTemplate = new RepeatTemplate();
 		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+		taskExecutor.setConcurrencyLimit(2);
 		jobTemplate.setTaskExecutor(taskExecutor);
 
 		final String threadName = Thread.currentThread().getName();
@@ -92,9 +93,9 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		// Thread.sleep(500);
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		// Because of the throttling and queueing internally to a TaskExecutor,
-		// more than one thread will be used - the number used is (as of writing)
-		// one less than the throttle limit of the template.
-		// TODO: see if we can get it to use only one thread?
+		// more than one thread will be used - the number used is the
+		// concurrency limit in the task executor, plus 1.
+		// System.err.println(threadNames);
 		assertTrue(threadNames.size() >= 1);
 	}
 

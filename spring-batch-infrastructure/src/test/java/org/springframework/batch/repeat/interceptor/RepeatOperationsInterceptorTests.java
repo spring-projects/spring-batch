@@ -29,6 +29,7 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
+import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -62,8 +63,12 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		final List calls = new ArrayList();
 		interceptor.setRepeatOperations(new RepeatOperations() {
 			public ExitStatus iterate(RepeatCallback callback) {
-				Object result = "1";
+				try {
+					Object result = callback.doInIteration(null);
 				calls.add(result);
+				} catch (Exception e) {
+					throw new RepeatException("Encountered exception in repeat.", e);
+				}
 				return ExitStatus.CONTINUABLE;
 			}
 		});

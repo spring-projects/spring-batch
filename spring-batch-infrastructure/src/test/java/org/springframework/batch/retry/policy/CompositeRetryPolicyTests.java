@@ -80,9 +80,6 @@ public class CompositeRetryPolicyTests extends TestCase {
 		policy.setPolicies(new RetryPolicy[] { new MockRetryPolicySupport() {
 			public void close(RetryContext context) {
 				list.add("1");
-				// TODO: test that all close methods are called if this
-				// happens...
-				// throw new RuntimeException("Pah!");
 			}
 		}, new MockRetryPolicySupport() {
 			public void close(RetryContext context) {
@@ -92,6 +89,30 @@ public class CompositeRetryPolicyTests extends TestCase {
 		RetryContext context = policy.open(null, null);
 		assertNotNull(context);
 		policy.close(context);
+		assertEquals(2, list.size());
+	}
+
+	public void testExceptionOnPoliciesClose() throws Exception {
+		final List list = new ArrayList();
+		CompositeRetryPolicy policy = new CompositeRetryPolicy();
+		policy.setPolicies(new RetryPolicy[] { new MockRetryPolicySupport() {
+			public void close(RetryContext context) {
+				list.add("1");
+				throw new RuntimeException("Pah!");
+			}
+		}, new MockRetryPolicySupport() {
+			public void close(RetryContext context) {
+				list.add("2");
+			}
+		} });
+		RetryContext context = policy.open(null, null);
+		assertNotNull(context);
+		try {
+			policy.close(context);
+			fail("Expected RuntimeException");
+		} catch (RuntimeException e) {
+			assertEquals("Pah!", e.getMessage());
+		}
 		assertEquals(2, list.size());
 	}
 

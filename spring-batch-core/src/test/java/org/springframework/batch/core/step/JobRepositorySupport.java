@@ -61,12 +61,10 @@ public class JobRepositorySupport implements JobRepository {
 	}
 
 	public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public int getStepExecutionCount(JobInstance jobInstance, Step step) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

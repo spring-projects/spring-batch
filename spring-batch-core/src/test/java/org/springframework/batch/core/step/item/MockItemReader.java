@@ -55,7 +55,6 @@ public class MockItemReader implements ItemReader {
 	}
 
 	public Object getKey(Object item) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

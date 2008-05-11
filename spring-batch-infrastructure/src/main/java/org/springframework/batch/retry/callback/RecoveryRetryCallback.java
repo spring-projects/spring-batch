@@ -21,7 +21,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 
@@ -112,11 +111,10 @@ public class RecoveryRetryCallback implements RetryCallback {
 	}
 
 	public Object doWithRetry(RetryContext context) throws Throwable {
-		if (!context.isExhaustedOnly()) {
-			return callback.doWithRetry(context);
-		}
-		// TODO: is this necessary?
-		throw new RetryException("Recovery path requested in retry callback.");
+		return callback.doWithRetry(context);
+		// N.B. code used to check here for isExhaustedOnly and throw exception.
+		// This is unnecessary because the callback could just throw the
+		// exception itself if it wants to go to the recovery path.
 	}
 
 	public Object getItem() {
