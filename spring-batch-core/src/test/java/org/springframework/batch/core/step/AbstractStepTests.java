@@ -2,6 +2,7 @@ package org.springframework.batch.core.step;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -24,6 +25,8 @@ public class AbstractStepTests extends TestCase {
 
 	StepExecutionListener listener2 = new EventTrackingListener("listener2");
 
+	JobRepositoryStub repository = new JobRepositoryStub();
+
 	/**
 	 * Sequence of events encountered during step execution.
 	 */
@@ -36,7 +39,7 @@ public class AbstractStepTests extends TestCase {
 	 * Fills the events list when abstract methods are called.
 	 */
 	private class EventTrackingStep extends AbstractStep {
-		
+
 		public EventTrackingStep() {
 			setBeanName("eventTrackingStep");
 		}
@@ -75,24 +78,40 @@ public class AbstractStepTests extends TestCase {
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			assertSame(execution, stepExecution);
 			events.add(getEvent("afterStep"));
+			stepExecution.getExecutionContext().putString("afterStep", "afterStep");
 			return stepExecution.getExitStatus();
 		}
 
 		public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 			assertSame(execution, stepExecution);
 			events.add(getEvent("onErrorInStep"));
+			stepExecution.getExecutionContext().putString("onErrorInStep", "onErrorInStep");
 			return stepExecution.getExitStatus();
 		}
 
 		public void beforeStep(StepExecution stepExecution) {
 			assertSame(execution, stepExecution);
 			events.add(getEvent("beforeStep"));
+			stepExecution.getExecutionContext().putString("beforeStep", "beforeStep");
+		}
+
+	}
+
+	/**
+	 * Remembers the last saved values of execution context.
+	 */
+	private static class JobRepositoryStub extends JobRepositorySupport {
+
+		Properties saved = new Properties();
+
+		public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+			saved = stepExecution.getExecutionContext().getProperties();
 		}
 
 	}
 
 	protected void setUp() throws Exception {
-		tested.setJobRepository(new JobRepositorySupport());
+		tested.setJobRepository(repository);
 	}
 
 	/**
@@ -111,8 +130,13 @@ public class AbstractStepTests extends TestCase {
 		assertEquals("listener2#afterStep", events.get(i++));
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
-		
+
 		assertEquals(ExitStatus.FINISHED, execution.getExitStatus());
+
+		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
+				.containsKey("beforeStep"));
+		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
+				.containsKey("afterStep"));
 	}
 
 	/**
@@ -125,7 +149,7 @@ public class AbstractStepTests extends TestCase {
 				throw new RuntimeException("crash!");
 			}
 		};
-		tested.setJobRepository(new JobRepositorySupport());
+		tested.setJobRepository(repository);
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 
 		try {
@@ -145,8 +169,11 @@ public class AbstractStepTests extends TestCase {
 		assertEquals("listener2#onErrorInStep", events.get(i++));
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
-		
+
 		assertEquals(ExitStatus.FAILED.getExitCode(), execution.getExitStatus().getExitCode());
+		
+		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
+				.containsKey("onErrorInStep"));
 	}
 
 	/**

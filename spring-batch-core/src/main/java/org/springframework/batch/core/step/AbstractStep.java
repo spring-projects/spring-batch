@@ -186,6 +186,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 			try {
 				exitStatus = exitStatus.and(getCompositeListener().onErrorInStep(stepExecution, e));
+				getJobRepository().saveOrUpdateExecutionContext(stepExecution);
 			}
 			catch (Exception ex) {
 				logger.error("Encountered an error on listener close.", ex);
