@@ -178,6 +178,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 				"to-be-saved (not updated) StepExecution can't already have a version assigned");
 
 		validateStepExecution(stepExecution);
+		
+		String exitDescription = truncateExitDescription(stepExecution.getExitStatus().getExitDescription());
 
 		stepExecution.setId(new Long(stepExecutionIncrementer.nextLongValue()));
 		stepExecution.incrementVersion(); // should be 0 now
@@ -185,7 +187,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 				stepExecution.getStepName(), stepExecution.getJobExecutionId(), stepExecution.getStartTime(),
 				stepExecution.getEndTime(), stepExecution.getStatus().toString(), stepExecution.getCommitCount(),
 				stepExecution.getItemCount(), stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
-				stepExecution.getExitStatus().getExitCode(), stepExecution.getExitStatus().getExitDescription(),
+				stepExecution.getExitStatus().getExitCode(), exitDescription,
 				stepExecution.getReadSkipCount(), stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount() };
 		getJdbcTemplate().update(
 				getQuery(SAVE_STEP_EXECUTION),
@@ -306,11 +308,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		// Do not check for existence of step execution considering
 		// it is saved at every commit point.
 
-		String exitDescription = stepExecution.getExitStatus().getExitDescription();
-		if (exitDescription != null && exitDescription.length() > EXIT_MESSAGE_LENGTH) {
-			exitDescription = exitDescription.substring(0, EXIT_MESSAGE_LENGTH);
-			logger.debug("Truncating long message before update of StepExecution: " + stepExecution);
-		}
+		String exitDescription = truncateExitDescription(stepExecution.getExitStatus().getExitDescription());
 
 		// Attempt to prevent concurrent modification errors by blocking here if
 		// someone is already trying to do it.
@@ -321,9 +319,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					stepExecution.getStatus().toString(), stepExecution.getCommitCount(), stepExecution.getItemCount(),
 					stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
 					stepExecution.getExitStatus().getExitCode(), exitDescription, version,
-					stepExecution.getReadSkipCount(),
-					stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount(),
-					stepExecution.getId(), stepExecution.getVersion() };
+					stepExecution.getReadSkipCount(), stepExecution.getWriteSkipCount(),
+					stepExecution.getRollbackCount(), stepExecution.getId(), stepExecution.getVersion() };
 			int count = getJdbcTemplate().update(
 					getQuery(UPDATE_STEP_EXECUTION),
 					parameters,
@@ -342,6 +339,22 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 			stepExecution.incrementVersion();
 
+		}
+	}
+
+	/**
+	 * Truncate the exit description if the length exceeds
+	 * {@link #EXIT_MESSAGE_LENGTH}.
+	 * @param description the string to truncate
+	 * @return truncated description
+	 */
+	private String truncateExitDescription(String description) {
+		if (description != null && description.length() > EXIT_MESSAGE_LENGTH) {
+			logger.debug("Truncating long message before update of StepExecution, original message is: " + description);
+			return description.substring(0, EXIT_MESSAGE_LENGTH);
+		}
+		else {
+			return description;
 		}
 	}
 

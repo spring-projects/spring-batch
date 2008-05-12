@@ -38,17 +38,17 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  */
 public abstract class AbstractStepExecutionDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	private StepExecutionDao dao;
+	protected StepExecutionDao dao;
 
-	private JobInstance jobInstance;
+	protected JobInstance jobInstance;
 
-	private JobExecution jobExecution;
+	protected JobExecution jobExecution;
 
-	private Step step;
+	protected Step step;
 
-	private StepExecution stepExecution;
+	protected StepExecution stepExecution;
 
-	private JobRepository repository;
+	protected JobRepository repository;
 
 	/**
 	 * @return {@link StepExecutionDao} implementation ready for use.
