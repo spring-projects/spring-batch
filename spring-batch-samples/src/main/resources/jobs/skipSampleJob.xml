@@ -31,17 +31,23 @@
 							p:dao-ref="tradeDao" p:failure="3" />
 					</property>
 				</bean>
-				<bean id="step2" parent="simpleStep">
+				<bean id="step2" parent="skipLimitStep">
+					<property name="commitInterval" value="2" />
+					<property name="skipLimit" value="1" />
+					<property name="noRollbackForExceptionClasses"
+						value="org.springframework.batch.item.validator.ValidationException" />
 					<property name="itemReader"
 						ref="tradeSqlItemReader" />
-					<property name="itemWriter">
-						<bean
-							class="org.springframework.batch.sample.item.writer.DummyItemWriter" />
-					</property>
+					<property name="itemWriter"
+						ref="itemTrackingWriter" />
 				</bean>
 			</list>
 		</property>
 	</bean>
+
+	<bean id="itemTrackingWriter"
+		class="org.springframework.batch.sample.item.writer.ItemTrackingItemWriter"
+		p:validationFailure="2" />
 
 	<bean id="tradeSqlItemReader"
 		class="org.springframework.batch.item.database.JdbcCursorItemReader">

@@ -1,7 +1,6 @@
 package org.springframework.batch.sample;
 
-import javax.sql.DataSource;
-
+import org.springframework.batch.sample.item.writer.ItemTrackingItemWriter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -16,8 +15,16 @@ public class SkipSampleFunctionalTests extends AbstractValidatingBatchLauncherTe
 
 	JdbcTemplate jdbcTemplate;
 
-	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
+	ItemTrackingItemWriter writer;
+
+	// auto-injection
+	public void setWriter(ItemTrackingItemWriter writer) {
+		this.writer = writer;
+	}
+
+	// auto-injection
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
 	}
 
 	protected void onSetUp() throws Exception {
@@ -28,6 +35,9 @@ public class SkipSampleFunctionalTests extends AbstractValidatingBatchLauncherTe
 		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 		// 5 input records, 1 skipped => 4 written to output
 		assertEquals(before + 4, after);
+		
+		// no item was processed twice (no rollback occurred despite error on write)
+		assertEquals(after, writer.getItems().size());
 	}
 
 }
