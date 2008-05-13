@@ -16,9 +16,6 @@
 
 package org.springframework.batch.repeat.interceptor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.ProxyMethodInvocation;
@@ -33,8 +30,9 @@ import org.springframework.util.Assert;
 /**
  * A {@link MethodInterceptor} that can be used to automatically repeat calls to
  * a method on a service. The injected {@link RepeatOperations} is used to
- * control the completion of the loop. By default it will repeat until the
- * target method returns null. Be careful when injecting a bespoke
+ * control the completion of the loop. Independent of the completion policy in
+ * the {@link RepeatOperations} the loop will repeat until the target method
+ * returns null or false. Be careful when injecting a bespoke
  * {@link RepeatOperations} that the loop will actually terminate, because the
  * default policy for a vanilla {@link RepeatTemplate} will never complete if
  * the return type of the target method is void (the value returned is always
@@ -65,7 +63,14 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	 */
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 
-		final List results = new ArrayList();
+		final ResultHolder result = new ResultHolder();
+		// Cache void return value if intercepted method returns void
+		final boolean voidReturnType = Void.TYPE.equals(invocation.getMethod().getReturnType());
+		if (voidReturnType) {
+			// This will be ignored anyway, but we want it to be non-null for
+			// convenience of checking that there is a result.
+			result.setValue(new Object());
+		}
 
 		try {
 			repeatOperations.iterate(new RepeatCallback() {
@@ -82,19 +87,17 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 									"MethodInvocation of the wrong type detected - this should not happen with Spring AOP, so please raise an issue if you see this exception");
 						}
 
-						Object result = clone.proceed();
-						if (clone.getMethod().getReturnType().equals(Void.TYPE)) {
-							results.clear();
-							results.add(result);
+						Object value = clone.proceed();
+						if (voidReturnType) {
 							return ExitStatus.CONTINUABLE;
 						}
-						if (!isComplete(result)) {
-							// We only save the last non-null result
-							results.clear();
-							results.add(result);
+						if (!isComplete(value)) {
+							// Save the last result
+							result.setValue(value);
 							return ExitStatus.CONTINUABLE;
 						}
 						else {
+							result.setFinalValue(value);
 							return ExitStatus.FINISHED;
 						}
 					}
@@ -110,16 +113,13 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 
 			});
 		}
-		catch (RepeatOperationsInterceptorException e) {
-			// Unwrap and re-throw any nasty errors
-			throw e.getCause();
-		}
 		catch (Throwable t) {
+			// The repeat exception should be unwrapped by the template
 			throw t;
 		}
 
-		if (!results.isEmpty()) {
-			return results.get(0);
+		if (result.isReady()) {
+			return result.getValue();
 		}
 
 		// No result means something weird happened
@@ -149,6 +149,54 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 		 */
 		public RepeatOperationsInterceptorException(String message, Throwable e) {
 			super(message, e);
+		}
+	}
+
+	/**
+	 * Simple wrapper object for the result from a method invocation.
+	 * 
+	 * @author Dave Syer
+	 * 
+	 */
+	private static class ResultHolder {
+		private Object value = null;
+
+		private boolean ready = false;
+
+		/**
+		 * Public setter for the Object.
+		 * @param value the value to set
+		 */
+		public void setValue(Object value) {
+			this.ready = true;
+			this.value = value;
+		}
+
+		/**
+		 * @param value
+		 */
+		public void setFinalValue(Object value) {
+			if (ready) {
+				// Only set the value the last time if the last time was also
+				// the first time
+				return;
+			}
+			setValue(value);
+		}
+
+		/**
+		 * Public getter for the Object.
+		 * @return the value
+		 */
+		public Object getValue() {
+			return value;
+		}
+
+		/**
+		 * @return true if a value has been set
+		 */
+		public boolean isReady() {
+			return ready;
 		}
 	}
 

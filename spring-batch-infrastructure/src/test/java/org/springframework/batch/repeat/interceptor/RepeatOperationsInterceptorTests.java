@@ -46,8 +46,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		super.setUp();
 		interceptor = new RepeatOperationsInterceptor();
 		target = new ServiceImpl();
-		ProxyFactory factory = new ProxyFactory(RepeatOperations.class
-				.getClassLoader());
+		ProxyFactory factory = new ProxyFactory(RepeatOperations.class.getClassLoader());
 		factory.setInterfaces(new Class[] { Service.class });
 		factory.setTarget(target);
 		service = (Service) factory.getProxy();
@@ -59,14 +58,22 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		assertEquals(3, target.count);
 	}
 
+	public void testCompleteOnFirstInvocation() throws Exception {
+		((Advised) service).addAdvice(interceptor);
+		target.setMaxService(0);
+		service.service();
+		assertEquals(1, target.count);
+	}
+
 	public void testSetTemplate() throws Exception {
 		final List calls = new ArrayList();
 		interceptor.setRepeatOperations(new RepeatOperations() {
 			public ExitStatus iterate(RepeatCallback callback) {
 				try {
 					Object result = callback.doInIteration(null);
-				calls.add(result);
-				} catch (Exception e) {
+					calls.add(result);
+				}
+				catch (Exception e) {
 					throw new RepeatException("Encountered exception in repeat.", e);
 				}
 				return ExitStatus.CONTINUABLE;
@@ -74,6 +81,25 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		});
 		((Advised) service).addAdvice(interceptor);
 		service.service();
+		assertEquals(1, calls.size());
+	}
+
+	public void testCallbackNotExecuted() throws Exception {
+		final List calls = new ArrayList();
+		interceptor.setRepeatOperations(new RepeatOperations() {
+			public ExitStatus iterate(RepeatCallback callback) {
+				calls.add(null);
+				return ExitStatus.FINISHED;
+			}
+		});
+		((Advised) service).addAdvice(interceptor);
+		try {
+			service.service();
+			fail("Expected IllegalStateException");
+		} catch (IllegalStateException e) {
+			String message = e.getMessage();
+			assertTrue("Wrong exception message: "+message, message.toLowerCase().indexOf("no result available")>=0);
+		}
 		assertEquals(1, calls.size());
 	}
 
@@ -93,7 +119,8 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		try {
 			service.exception();
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("Duh", e.getMessage().substring(0, 3));
 		}
 	}
@@ -102,10 +129,30 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		((Advised) service).addAdvice(interceptor);
 		try {
 			service.error();
-			fail("Expected BatchException");
-		} catch (Error e) {
+			fail("Expected Error");
+		}
+		catch (Error e) {
 			assertEquals("Duh", e.getMessage().substring(0, 3));
 		}
+	}
+
+	public void testCallbackWithBoolean() throws Exception {
+		RepeatTemplate template = new RepeatTemplate();
+		// N.B. the default completion policy results in an infinite loop, so we
+		// need to set the chunk size.
+		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
+		interceptor.setRepeatOperations(template);
+		((Advised) service).addAdvice(interceptor);
+		assertTrue(service.isContinuable());
+		assertEquals(2, target.count);
+	}
+
+	public void testCallbackWithBooleanReturningFalseFirstTime() throws Exception {
+		target.setComplete(true);
+		((Advised) service).addAdvice(interceptor);
+		// Complete without repeat when boolean return value is false
+		assertFalse(service.isContinuable());
+		assertEquals(1, target.count);
 	}
 
 	public void testInterceptorChainWithRetry() throws Exception {
@@ -129,7 +176,12 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		try {
 			interceptor.invoke(new MethodInvocation() {
 				public Method getMethod() {
-					return null;
+					try {
+						return Object.class.getMethod("toString", new Class[0]);
+					}
+					catch (Exception e) {
+						throw new RuntimeException(e);
+					}
 				}
 
 				public Object[] getArguments() {
@@ -149,10 +201,10 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 				}
 			});
 			fail("IllegalStateException expected");
-		} catch (IllegalStateException e) {
-			assertTrue("Exception message should contain MethodInvocation: "
-					+ e.getMessage(), e.getMessage()
-					.indexOf("MethodInvocation") >= 0);
+		}
+		catch (IllegalStateException e) {
+			assertTrue("Exception message should contain MethodInvocation: " + e.getMessage(), e.getMessage().indexOf(
+					"MethodInvocation") >= 0);
 		}
 	}
 
@@ -164,18 +216,37 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		Object exception() throws Exception;
 
 		Object error() throws Exception;
+
+		boolean isContinuable() throws Exception;
 	}
 
 	private static class ServiceImpl implements Service {
 		private int count = 0;
 
+		private boolean complete;
+
+		private int maxService = 2;
+		
+		/**
+		 * Public setter for the maximum number of times to call service().
+		 * @param maxService the maxService to set
+		 */
+		public void setMaxService(int maxService) {
+			this.maxService = maxService;
+		}
+
 		public Object service() throws Exception {
 			count++;
-			if (count <= 2) {
+			if (count <= maxService) {
 				return new Integer(count);
-			} else {
+			}
+			else {
 				return null;
 			}
+		}
+
+		public void setComplete(boolean complete) {
+			this.complete = complete;
 		}
 
 		public void alternate() throws Exception {
@@ -187,7 +258,12 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		}
 
 		public Object error() throws Exception {
-			throw new Error("Duh! Stupid.");
+			throw new Error("Duh! Stupid error.");
+		}
+
+		public boolean isContinuable() throws Exception {
+			count++;
+			return !complete;
 		}
 	}
 
