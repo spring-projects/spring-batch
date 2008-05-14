@@ -101,7 +101,7 @@ public class DefaultJobParametersConverterTests extends TestCase {
 		}
 	}
 
-	public void testGetParametersWithDouble() throws Exception {
+	public void testGetParametersWithDoubleValueDeclaredAsLong() throws Exception {
 
 		String[] args = new String[] { "value(long)=1.03" };
 		factory.setNumberFormat(new DecimalFormat("#.#"));
@@ -113,6 +113,28 @@ public class DefaultJobParametersConverterTests extends TestCase {
 			assertTrue("Message should contain wrong number: " + message, contains(message, "1.03"));
 			assertTrue("Message should contain 'decimal': " + message, contains(message, "decimal"));
 		}
+	}
+	
+	public void testGetParametersWithBogusDouble() throws Exception {
+
+		String[] args = new String[] { "value(double)=foo" };
+
+		try {
+			factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		} catch (IllegalArgumentException e) {
+			String message = e.getMessage();
+			assertTrue("Message should contain wrong number: " + message, contains(message, "foo"));
+			assertTrue("Message should contain format: " + message, contains(message, "#"));
+		}
+	}
+
+	public void testGetParametersWithDouble() throws Exception {
+
+		String[] args = new String[] { "value(double)=1.38" };
+
+		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(props);
+		assertEquals(1.38, props.getDouble("value").doubleValue(), Double.MIN_VALUE);
 	}
 
 	public void testGetProperties() throws Exception {
