@@ -71,7 +71,7 @@ public class SystemCommandTaskletIntegrationTests extends TestCase {
 			fail();
 		}
 		catch (SystemCommandException e) {
-			assertTrue(e.getMessage().contains("did not finish successfully within the timeout"));
+			assertTrue(e.getMessage().indexOf("did not finish successfully within the timeout") > 0);
 		}
 	}
 
@@ -129,7 +129,7 @@ public class SystemCommandTaskletIntegrationTests extends TestCase {
 			// expected
 		}
 
-		File notDirectory = File.createTempFile(this.getClass().getSimpleName(), null);
+		File notDirectory = File.createTempFile(this.getClass().getName(), null);
 		Assert.state(notDirectory.exists());
 		Assert.state(!notDirectory.isDirectory());
 
