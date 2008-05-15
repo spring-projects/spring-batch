@@ -25,8 +25,10 @@ import junit.framework.TestCase;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.listener.SkipListenerSupport;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.item.ClearFailedException;
@@ -231,6 +233,33 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		// No "4" because it was skipped on write, even though it is mutating
 		// its key
 		assertEquals(new Holder("5"), handler.read(contribution));
+	}
+
+	/**
+	 * {@link SkipListener#onSkipInWrite(Object, Throwable)} should be called
+	 * also if the exception is not re-thrown (does not cause rollback).
+	 */
+	public void testHandleWithSkipAndListeners() throws Exception {
+
+		class SkipOnWriteListener extends SkipListenerSupport {
+
+			boolean called = false;
+
+			public void onSkipInWrite(Object item, Throwable t) {
+				called = true;
+			}
+
+		}
+		;
+		SkipOnWriteListener skipOnWriteListener = new SkipOnWriteListener();
+		handler.setSkipListeners(new SkipListener[] { skipOnWriteListener });
+		handler.setDoNotRethrowExceptionClasses(new Class[] { SkippableException.class });
+		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		for (int i = 0; i < 5; i++) {
+			handler.handle(contribution);
+		}
+		assertTrue("onSkipInWrite should be called although the exception is not re-thrown", skipOnWriteListener.called);
+
 	}
 
 	/**

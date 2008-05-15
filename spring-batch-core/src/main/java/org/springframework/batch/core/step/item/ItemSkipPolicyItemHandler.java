@@ -169,9 +169,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 				while (item != null && throwable != null) {
 					logger.debug("Skipping item on input, previously failed on output; key=[" + key + "]");
 					scheduleForRemoval(key);
-					if (listener != null) {
-						listener.onSkipInWrite(item, throwable);
-					}
+					
 					item = doRead();
 					key = itemKeyGenerator.getKey(item);
 					throwable = getSkippedException(key);
@@ -239,6 +237,10 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 				addSkippedException(key, e);
 				logger.debug("Added item to skip list; key=" + key);
 
+				if (listener != null) {
+					listener.onSkipInWrite(item, e);
+				}
+				
 				// return without re-throwing if exception shouldn't cause
 				// rollback
 				if (!shouldRethrow(e)) {

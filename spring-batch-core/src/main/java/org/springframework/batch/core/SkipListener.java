@@ -18,28 +18,28 @@ package org.springframework.batch.core;
 /**
  * Interface for listener to skipped items. Callbacks will be called by
  * {@link Step} implementations at the appropriate time in the step lifecycle.
- * Callbacks must always be made (where relevant) in a transaction that is still
- * valid: i.e. possibly on a read error, but not on a write error.
  * 
  * @author Dave Syer
+ * @author Robert Kasanicky
  * 
  */
 public interface SkipListener extends StepListener {
 
 	/**
 	 * Callback for a failure on read that is legal, so is not going to be
-	 * re-thrown.
+	 * re-thrown. In case transaction is rolled back and items are re-read, this
+	 * callback will occur repeatedly for the same cause.
 	 * 
-	 * @param t
+	 * @param t cause of the failure
 	 */
 	void onSkipInRead(Throwable t);
 
 	/**
 	 * This item failed on write with the given exception, and a skip was called
-	 * for. The callback is deferred until a new transaction is available. This
-	 * callback might occur more than once for the same item, but only once in
-	 * successful transaction.
-	 * 
+	 * for. The callback occurs immediately after the item is marked for future
+	 * skipping and is called only once for the same item, regardless of
+	 * rollbacks (chunk may be re-processed several times or the exception on
+	 * write may not cause rollback at all).
 	 * 
 	 * @param item the failed item
 	 * @param t the cause of the failure
