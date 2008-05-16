@@ -13,6 +13,9 @@
 
 	<bean id="test-job"
 		class="org.springframework.batch.core.job.SimpleJob">
+		<property name="jobRepository">
+			<bean class="org.springframework.batch.core.step.JobRepositorySupport" />
+		</property>
 		<property name="steps">
 			<bean id="step1"
 				class="org.springframework.batch.core.step.item.SimpleStepFactoryBean">

@@ -25,6 +25,8 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.listener.CompositeExecutionJobListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -36,7 +38,7 @@ import org.springframework.util.ClassUtils;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public abstract class AbstractJob implements BeanNameAware, Job {
+public abstract class AbstractJob implements Job, BeanNameAware, InitializingBean {
 
 	private List steps = new ArrayList();
 
@@ -160,6 +162,10 @@ public abstract class AbstractJob implements BeanNameAware, Job {
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
+	}
+	
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(getJobRepository(), "JobRepository must be set");
 	}
 
 	protected JobRepository getJobRepository() {
