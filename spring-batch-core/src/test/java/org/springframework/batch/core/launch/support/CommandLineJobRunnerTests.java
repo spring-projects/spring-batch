@@ -15,11 +15,15 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import java.util.Properties;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.converter.DefaultJobParametersConverter;
+import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.repeat.ExitStatus;
@@ -62,6 +66,7 @@ public class CommandLineJobRunnerTests extends TestCase {
 
 	public void testMain() {
 		CommandLineJobRunner.main(args);
+		assertTrue("injected JobParametersConverter used instead of default", StubJobParametersConverter.called);
 		assertEquals(0, StubSystemExiter.getStatus());
 	}
 
@@ -130,9 +135,9 @@ public class CommandLineJobRunnerTests extends TestCase {
 
 			return jobExecution;
 		}
-		
+
 		public void destroy() {
-			destroyed  = true;
+			destroyed = true;
 		}
 
 		public static void tearDown() {
@@ -141,6 +146,23 @@ public class CommandLineJobRunnerTests extends TestCase {
 			jobParameters = null;
 			destroyed = false;
 		}
+	}
+
+	private static class StubJobParametersConverter implements JobParametersConverter {
+
+		JobParametersConverter delegate = new DefaultJobParametersConverter();
+
+		static boolean called = false;
+
+		public JobParameters getJobParameters(Properties properties) {
+			called = true;
+			return delegate.getJobParameters(properties);
+		}
+
+		public Properties getProperties(JobParameters params) {
+			throw new UnsupportedOperationException();
+		}
+
 	}
 
 }

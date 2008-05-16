@@ -157,6 +157,15 @@ public class CommandLineJobRunner {
 	public void setSystemExiter(SystemExiter systemExitor) {
 		this.systemExiter = systemExitor;
 	}
+	
+	/**
+	 * Injection setter for {@link JobParametersConverter}.
+	 * 
+	 * @param jobParametersConverter
+	 */
+	public void setJobParametersConverter(JobParametersConverter jobParametersConverter) {
+		this.jobParametersConverter = jobParametersConverter;
+	}
 
 	/**
 	 * Delegate to the exiter to (possibly) exit the VM gracefully.
@@ -170,6 +179,7 @@ public class CommandLineJobRunner {
 	public void setJobLocator(JobLocator jobLocator) {
 		this.jobLocator = jobLocator;
 	}
+	
 
 	/*
 	 * Start a job by obtaining a combined classpath using the job launcher and
