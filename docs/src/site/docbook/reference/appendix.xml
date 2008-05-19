@@ -198,7 +198,7 @@
             <entry align="left">java.lang.Object</entry>
 
             <entry align="left">Extends <emphasis
-            role="bold">ItemWriterItemWriter</emphasis> by defining its
+            role="bold">DelegatingItemWriter</emphasis> by defining its
             <emphasis role="bold">doProcess</emphasis> method to call an
             injected <emphasis role="bold">ItemTransformer</emphasis></entry>
           </row>

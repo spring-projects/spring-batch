@@ -472,10 +472,11 @@
         FlatFileItemReader and calling read():</para>
 
         <programlisting>  FlatFileItemReader itemReader = new FlatFileItemReader();
-  itemReader.setResource = new FileSystemResource("resources/players.csv");
+  itemReader.setResource(new FileSystemResource("resources/players.csv"));
   //DelimitedLineTokenizer defaults to comma as it's delimiter
   itemReader.setLineTokenizer(new DelimitedLineTokenizer());
   itemReader.setFieldSetMapper(new PlayerFieldSetMapper());
+  itemReader.open(new ExecutionContext());
   itemReader.read();
 </programlisting>
 
