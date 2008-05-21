@@ -23,17 +23,37 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.NewItemIdentifier;
+import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.callback.RecoveryRetryCallback;
-import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
+import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
+/**
+ * A {@link MethodInterceptor} that can be used to automatically retry calls to
+ * a method on a service if it fails. The argument to the service method is
+ * treated as an item to be remembered in case the call fails. So the retry
+ * operation is stateful, and the item that failed is tracked by its unique key
+ * (via {@link ItemKeyGenerator}) until the retry is exhausted, at which point
+ * the {@link ItemRecoverer} is called.<br/>
+ * 
+ * The main use case for this is where the service is transactional, via a
+ * transaction interceptor on the interceptor chain. In this case the retry (and
+ * recovery on exhausted) always happens in a new transaction.<br/>
+ * 
+ * The injected {@link RetryOperations} is used to control the number of
+ * retries. By default it will retry a fixed number of times, according to the
+ * defaults in {@link RetryTemplate}.<br/>
+ * 
+ * @author Dave Syer
+ */
 public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 
 	private transient Log logger = LogFactory.getLog(getClass());
@@ -58,7 +78,10 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 	 * Public setter for the {@link ItemRecoverer} to use if the retry is
 	 * exhausted. The recoverer should be able to return an object of the same
 	 * type as the target object because its return value will be used to return
-	 * to the caller in the case of a recovery.
+	 * to the caller in the case of a recovery.<br/>
+	 * 
+	 * If no recoverer is set then an exhausted retry will result in an
+	 * {@link ExhaustedRetryException}.
 	 * 
 	 * @param recoverer the {@link ItemRecoverer} to set
 	 */
@@ -71,7 +94,9 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 	}
 
 	/**
-	 * Public setter for the retryPolicy.
+	 * Public setter for the retryPolicy. The value provided should be a normal
+	 * stateless policy, which is wrapped into a stateful policy inside this
+	 * method.
 	 * @param retryPolicy the retryPolicy to set
 	 */
 	public void setRetryPolicy(RetryPolicy retryPolicy) {
@@ -94,10 +119,14 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 	 * re-thrown. The only time it is not re-thrown is when retry is exhausted
 	 * and the recovery path is taken (though the {@link ItemRecoverer} provided
 	 * if there is one). In that case the value returned from the method
-	 * invocation will be null, or if primitive then "0" (e.g. Boolean.FALSE, 0L
-	 * etc.).
+	 * invocation will be the value returned by the recoverer (so the return
+	 * type for that should be the same as the intercepted method).
 	 * 
 	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
+	 * @see ItemRecoverer#recover(Object, Throwable)
+	 * 
+	 * @throws ExhaustedRetryException if the retry is exhausted and no
+	 * {@link ItemRecoverer} is provided.
 	 */
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 
@@ -172,11 +201,7 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 			if (recoverer != null) {
 				return recoverer.recover(item, context.getLastThrowable());
 			}
-			// TODO: This sucks big time because the method invocation almost
-			// certainly does not return an object of this type. It would be
-			// better to return null (but then method invocations that return
-			// primitive values would barf).
-			return item;
+			throw new ExhaustedRetryException("Retry was exhausted but there was no recovery path.");
 		}
 
 	}

@@ -16,8 +16,6 @@
 
 package org.springframework.batch.retry.callback;
 
-import org.springframework.batch.item.ItemRecoverer;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
@@ -26,8 +24,8 @@ import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 
 /**
  * A {@link RetryCallback} that knows about and caches an item, and attempts to
- * process it using an {@link ItemWriter}. Used by the
- * {@link RecoveryCallbackRetryPolicy} to enable external retry of the item
+ * process it using a delegate {@link RetryCallback}. Used by the
+ * {@link RecoveryCallbackRetryPolicy} to enable stateful retry of the
  * processing.
  * 
  * @author Dave Syer
@@ -52,12 +50,12 @@ public class RecoveryRetryCallback implements RetryCallback {
 	 * Constructor with mandatory properties. The key will be set to the item.
 	 * 
 	 * @param item the item to process
-	 * @param writer the writer to use to process it
+	 * @param callback the delegate to use to process it
 	 */
-	public RecoveryRetryCallback(Object item, RetryCallback writer) {
+	public RecoveryRetryCallback(Object item, RetryCallback callback) {
 		super();
 		this.item = item;
-		this.callback = writer;
+		this.callback = callback;
 		this.key = item;
 	}
 
@@ -65,12 +63,12 @@ public class RecoveryRetryCallback implements RetryCallback {
 	 * Constructor with mandatory properties.
 	 * 
 	 * @param item the item to process
-	 * @param writer the writer to use to process it
+	 * @param callback the delegate to use to process it
 	 */
-	public RecoveryRetryCallback(Object item, RetryCallback writer, Object key) {
+	public RecoveryRetryCallback(Object item, RetryCallback callback, Object key) {
 		super();
 		this.item = item;
-		this.callback = writer;
+		this.callback = callback;
 		this.key = key;
 	}
 
@@ -84,10 +82,7 @@ public class RecoveryRetryCallback implements RetryCallback {
 	}
 
 	/**
-	 * Setter for injecting optional recovery handler. If it is not injected but
-	 * the reader or writer implement {@link ItemRecoverer}, one of those will
-	 * be used instead (preferring the reader to the writer if both would be
-	 * appropriate).
+	 * Setter for injecting optional recovery handler.
 	 * 
 	 * @param recoverer
 	 */
@@ -126,9 +121,9 @@ public class RecoveryRetryCallback implements RetryCallback {
 	}
 
 	/**
-	 * Accessor for the {@link ItemRecoverer}.
+	 * Accessor for the {@link RecoveryCallback}.
 	 * 
-	 * @return the {@link ItemRecoverer}.
+	 * @return the {@link RecoveryCallback}.
 	 */
 	public RecoveryCallback getRecoveryCallback() {
 		return recoverer;

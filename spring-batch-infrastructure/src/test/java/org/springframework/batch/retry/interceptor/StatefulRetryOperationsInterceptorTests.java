@@ -28,6 +28,7 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.target.SingletonTargetSource;
 import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.policy.AlwaysRetryPolicy;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
@@ -134,7 +135,30 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 		assertEquals(1, result.size());
 	}
 
-	public void testRetryExceptionAfterTooManyAttempts() throws Exception {
+	public void testRetryExceptionAfterTooManyAttemptsWithNoRecovery() throws Exception {
+		((Advised) service).addAdvice(interceptor);
+		interceptor.setRetryPolicy(new NeverRetryPolicy());
+		try {
+			service.service("foo");
+			fail("Expected Exception.");
+		}
+		catch (Exception e) {
+			String message = e.getMessage();
+			assertTrue("Wrong message: " + message, message.startsWith("Not enough calls"));
+		}
+		assertEquals(1, count);
+		try {
+			service.service("foo");
+			fail("Expected ExhaustedRetryException");
+		} catch (ExhaustedRetryException e) {
+			// expected
+			String message = e.getMessage();
+			assertTrue("Wrong message: " + message, message.startsWith("Retry was exhausted but there was no recover"));
+		}
+		assertEquals(1, count);
+	}
+
+	public void testRecoveryAfterTooManyAttempts() throws Exception {
 		((Advised) service).addAdvice(interceptor);
 		interceptor.setRetryPolicy(new NeverRetryPolicy());
 		try {
