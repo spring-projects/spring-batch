@@ -25,6 +25,7 @@ import org.springframework.batch.item.ItemReaderException;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ReaderNotOpenException;
+import org.springframework.batch.item.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.separator.LineReader;
@@ -61,7 +62,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemReader extends ExecutionContextUserSupport implements ItemReader, ItemStream, InitializingBean {
+public class FlatFileItemReader extends ExecutionContextUserSupport implements ResourceAwareItemReaderItemStream, InitializingBean {
 
 	private static Log log = LogFactory.getLog(FlatFileItemReader.class);
 

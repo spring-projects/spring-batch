@@ -14,10 +14,10 @@ import javax.xml.stream.events.StartElement;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ExecutionContextUserSupport;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ReaderNotOpenException;
+import org.springframework.batch.item.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.xml.stax.DefaultFragmentEventReader;
 import org.springframework.batch.item.xml.stax.FragmentEventReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -36,7 +36,7 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReader extends ExecutionContextUserSupport implements ItemReader, ItemStream,
+public class StaxEventItemReader extends ExecutionContextUserSupport implements ResourceAwareItemReaderItemStream,
 		InitializingBean {
 
 	private static final String READ_COUNT_STATISTICS_NAME = "read.count";
@@ -60,13 +60,14 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 	private long currentRecordCount = 0;
 
 	private boolean saveState = false;
-	
+
 	private List buffer = new ArrayList();
-	
+
 	private Iterator bufferIterator = null;
-	
+
 	/**
-	 * indicates the reader has been shouldReadBuffer and should read items from buffer
+	 * indicates the reader has been shouldReadBuffer and should read items from
+	 * buffer
 	 */
 	private boolean shouldReadBuffer = false;
 
@@ -86,18 +87,19 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 		}
 
 		currentRecordCount++;
-		
+
 		// read from buffer after rollback
 		if (shouldReadBuffer) {
 			if (bufferIterator.hasNext()) {
 				return bufferIterator.next();
-			} else {
+			}
+			else {
 				// buffer is exhausted, continue reading from file
 				shouldReadBuffer = false;
 				bufferIterator = null;
 			}
 		}
-		
+
 		Object item = null;
 
 		if (moveCursorToNextFragment(fragmentReader)) {
@@ -142,8 +144,7 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 
 		try {
 			inputStream = resource.getInputStream();
-			eventReader = XMLInputFactory.newInstance().createXMLEventReader(
-					inputStream);
+			eventReader = XMLInputFactory.newInstance().createXMLEventReader(inputStream);
 			fragmentReader = new DefaultFragmentEventReader(eventReader);
 		}
 		catch (XMLStreamException xse) {
@@ -159,7 +160,7 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 			int REASONABLE_ADHOC_COMMIT_FREQUENCY = 100;
 			while (currentRecordCount <= restoredRecordCount) {
 				currentRecordCount++;
-				
+
 				if (currentRecordCount % REASONABLE_ADHOC_COMMIT_FREQUENCY == 0) {
 					mark(); // clear the history buffer
 				}
@@ -288,7 +289,7 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}
-	
+
 	/**
 	 * Clear the buffer and release the iterator.
 	 */
