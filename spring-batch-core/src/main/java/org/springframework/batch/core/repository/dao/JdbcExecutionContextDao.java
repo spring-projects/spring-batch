@@ -23,127 +23,58 @@ import org.springframework.util.Assert;
 
 /**
  * JDBC DAO for {@link ExecutionContext}.
- * 
- * TODO 'DRY' the implementation.
- * 
+ *
  */
 class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
-	
+
 	private static final String STEP_DISCRIMINATOR = "S";
-	
+
 	private static final String JOB_DISCRIMINATOR = "J";
-	
+
 	private static final String FIND_EXECUTION_CONTEXT = "SELECT TYPE_CD, KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL "
-		+ "from %PREFIX%EXECUTION_CONTEXT where EXECUTION_ID = ? and DISCRIMINATOR = ?";
-	
+			+ "from %PREFIX%EXECUTION_CONTEXT where EXECUTION_ID = ? and DISCRIMINATOR = ?";
+
 	private static final String INSERT_STEP_EXECUTION_CONTEXT = "INSERT into %PREFIX%EXECUTION_CONTEXT(EXECUTION_ID, DISCRIMINATOR, TYPE_CD,"
-		+ " KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL) values(?,?,?,?,?,?,?,?)";
+			+ " KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL) values(?,?,?,?,?,?,?,?)";
 
 	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%EXECUTION_CONTEXT set "
-		+ "TYPE_CD = ?, STRING_VAL = ?, DOUBLE_VAL = ?, LONG_VAL = ?, OBJECT_VAL = ? where EXECUTION_ID = ? and KEY_NAME = ?";
+			+ "TYPE_CD = ?, STRING_VAL = ?, DOUBLE_VAL = ?, LONG_VAL = ?, OBJECT_VAL = ? where EXECUTION_ID = ? and KEY_NAME = ?";
 
 	private LobHandler lobHandler = new DefaultLobHandler();
-	
+
 	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
 		final Long executionId = jobExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
 		final ExecutionContext executionContext = new ExecutionContext();
 
-		RowCallbackHandler callback = new RowCallbackHandler() {
-
-			public void processRow(ResultSet rs) throws SQLException {
-
-				String typeCd = rs.getString("TYPE_CD");
-				AttributeType type = AttributeType.getType(typeCd);
-				String key = rs.getString("KEY_NAME");
-				if (type == AttributeType.STRING) {
-					executionContext.putString(key, rs.getString("STRING_VAL"));
-				}
-				else if (type == AttributeType.LONG) {
-					executionContext.putLong(key, rs.getLong("LONG_VAL"));
-				}
-				else if (type == AttributeType.DOUBLE) {
-					executionContext.putDouble(key, rs.getDouble("DOUBLE_VAL"));
-				}
-				else if (type == AttributeType.OBJECT) {
-					executionContext.put(key, SerializationUtils.deserialize(rs.getBinaryStream("OBJECT_VAL")));
-				}
-				else {
-					throw new UnexpectedJobExecutionException("Invalid type found: [" + typeCd
-							+ "] for execution id: [" + executionId + "]");
-				}
-			}
-		};
-
-		getJdbcTemplate().query(getQuery(FIND_EXECUTION_CONTEXT), new Object[] { executionId, JOB_DISCRIMINATOR }, callback);
+		getJdbcTemplate().query(getQuery(FIND_EXECUTION_CONTEXT), new Object[] { executionId, JOB_DISCRIMINATOR },
+				new ExecutionContextRowCallbackHandler(executionContext));
 
 		return executionContext;
 	}
-	
+
 	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
 		final Long executionId = stepExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
 		final ExecutionContext executionContext = new ExecutionContext();
 
-		RowCallbackHandler callback = new RowCallbackHandler() {
-
-			public void processRow(ResultSet rs) throws SQLException {
-
-				String typeCd = rs.getString("TYPE_CD");
-				AttributeType type = AttributeType.getType(typeCd);
-				String key = rs.getString("KEY_NAME");
-				if (type == AttributeType.STRING) {
-					executionContext.putString(key, rs.getString("STRING_VAL"));
-				}
-				else if (type == AttributeType.LONG) {
-					executionContext.putLong(key, rs.getLong("LONG_VAL"));
-				}
-				else if (type == AttributeType.DOUBLE) {
-					executionContext.putDouble(key, rs.getDouble("DOUBLE_VAL"));
-				}
-				else if (type == AttributeType.OBJECT) {
-					executionContext.put(key, SerializationUtils.deserialize(rs.getBinaryStream("OBJECT_VAL")));
-				}
-				else {
-					throw new UnexpectedJobExecutionException("Invalid type found: [" + typeCd
-							+ "] for execution id: [" + executionId + "]");
-				}
-			}
-		};
-
-		getJdbcTemplate().query(getQuery(FIND_EXECUTION_CONTEXT), new Object[] { executionId, STEP_DISCRIMINATOR }, callback);
+		getJdbcTemplate().query(getQuery(FIND_EXECUTION_CONTEXT), new Object[] { executionId, STEP_DISCRIMINATOR },
+				new ExecutionContextRowCallbackHandler(executionContext));
 
 		return executionContext;
 	}
-	
+
 	public void saveOrUpdateExecutionContext(final JobExecution jobExecution) {
 		Long executionId = jobExecution.getId();
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
-		
-		for (Iterator it = executionContext.entrySet().iterator(); it.hasNext();) {
-			Entry entry = (Entry) it.next();
-			final String key = entry.getKey().toString();
-			final Object value = entry.getValue();
 
-			if (value instanceof String) {
-				updateExecutionAttribute(executionId, JOB_DISCRIMINATOR, key, value, AttributeType.STRING);
-			}
-			else if (value instanceof Double) {
-				updateExecutionAttribute(executionId, JOB_DISCRIMINATOR, key, value, AttributeType.DOUBLE);
-			}
-			else if (value instanceof Long) {
-				updateExecutionAttribute(executionId, JOB_DISCRIMINATOR, key, value, AttributeType.LONG);
-			}
-			else {
-				updateExecutionAttribute(executionId, JOB_DISCRIMINATOR, key, value, AttributeType.OBJECT);
-			}
-		}
+		saveOrUpdateExecutionContext(executionContext, executionId, JOB_DISCRIMINATOR);
 	}
-	
+
 	/**
 	 * Save or update execution attributes. A lob creator must be used, since
 	 * any attributes that don't match a provided type must be serialized into a
@@ -158,28 +89,33 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
-		for (Iterator it = executionContext.entrySet().iterator(); it.hasNext();) {
+		saveOrUpdateExecutionContext(executionContext, executionId, STEP_DISCRIMINATOR);
+	}
+
+	private void saveOrUpdateExecutionContext(ExecutionContext ctx, Long executionId, String discriminator) {
+
+		for (Iterator it = ctx.entrySet().iterator(); it.hasNext();) {
 			Entry entry = (Entry) it.next();
 			final String key = entry.getKey().toString();
 			final Object value = entry.getValue();
 
 			if (value instanceof String) {
-				updateExecutionAttribute(executionId, STEP_DISCRIMINATOR, key, value, AttributeType.STRING);
+				updateExecutionAttribute(executionId, discriminator, key, value, AttributeType.STRING);
 			}
 			else if (value instanceof Double) {
-				updateExecutionAttribute(executionId, STEP_DISCRIMINATOR, key, value, AttributeType.DOUBLE);
+				updateExecutionAttribute(executionId, discriminator, key, value, AttributeType.DOUBLE);
 			}
 			else if (value instanceof Long) {
-				updateExecutionAttribute(executionId, STEP_DISCRIMINATOR, key, value, AttributeType.LONG);
+				updateExecutionAttribute(executionId, discriminator, key, value, AttributeType.LONG);
 			}
 			else {
-				updateExecutionAttribute(executionId, STEP_DISCRIMINATOR, key, value, AttributeType.OBJECT);
+				updateExecutionAttribute(executionId, discriminator, key, value, AttributeType.OBJECT);
 			}
 		}
 	}
-	
-	private void updateExecutionAttribute(final Long executionId, final String discriminator, final String key, final Object value,
-			final AttributeType type) {
+
+	private void updateExecutionAttribute(final Long executionId, final String discriminator, final String key,
+			final Object value, final AttributeType type) {
 
 		PreparedStatementCallback callback = new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
 
@@ -227,9 +163,9 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 			insertExecutionAttribute(executionId, discriminator, key, value, type);
 		}
 	}
-	
-	private void insertExecutionAttribute(final Long executionId, final String discriminator, final String key, final Object value,
-			final AttributeType type) {
+
+	private void insertExecutionAttribute(final Long executionId, final String discriminator, final String key,
+			final Object value, final AttributeType type) {
 		PreparedStatementCallback callback = new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
 
 			protected void setValues(PreparedStatement ps, LobCreator lobCreator) throws SQLException,
@@ -274,7 +210,7 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 	public void setLobHandler(LobHandler lobHandler) {
 		this.lobHandler = lobHandler;
 	}
-	
+
 	public static class AttributeType {
 
 		private final String type;
@@ -308,5 +244,35 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 			return null;
 		}
 	}
-	
+
+	private static class ExecutionContextRowCallbackHandler implements RowCallbackHandler {
+
+		private ExecutionContext executionContext;
+
+		public ExecutionContextRowCallbackHandler(ExecutionContext ctx) {
+			executionContext = ctx;
+		}
+
+		public void processRow(ResultSet rs) throws SQLException {
+
+			String typeCd = rs.getString("TYPE_CD");
+			AttributeType type = AttributeType.getType(typeCd);
+			String key = rs.getString("KEY_NAME");
+			if (type == AttributeType.STRING) {
+				executionContext.putString(key, rs.getString("STRING_VAL"));
+			}
+			else if (type == AttributeType.LONG) {
+				executionContext.putLong(key, rs.getLong("LONG_VAL"));
+			}
+			else if (type == AttributeType.DOUBLE) {
+				executionContext.putDouble(key, rs.getDouble("DOUBLE_VAL"));
+			}
+			else if (type == AttributeType.OBJECT) {
+				executionContext.put(key, SerializationUtils.deserialize(rs.getBinaryStream("OBJECT_VAL")));
+			}
+			else {
+				throw new UnexpectedJobExecutionException("Invalid type found: [" + typeCd + "]");
+			}
+		}
+	};
 }
