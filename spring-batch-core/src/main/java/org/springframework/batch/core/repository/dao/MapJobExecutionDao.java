@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.Assert;
 
@@ -17,11 +18,14 @@ import org.springframework.util.Assert;
 public class MapJobExecutionDao implements JobExecutionDao {
 	
 	private static Map executionsById = TransactionAwareProxyFactory.createTransactionalMap();
+	
+	private static Map contextsByJobExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
 
-	private static long currentId;
+	private static long currentId = 0;
 
 	public static void clear() {
 		executionsById.clear();
+		contextsByJobExecutionId.clear();
 	}
 
 	public int getJobExecutionCount(JobInstance jobInstance) {
@@ -77,5 +81,14 @@ public class MapJobExecutionDao implements JobExecutionDao {
 			}
 		}
 		return lastExec;
+	}
+
+	public ExecutionContext findExecutionContext(JobExecution jobExecution) {
+		return (ExecutionContext) contextsByJobExecutionId.get(jobExecution.getId());
+	}
+
+	public void saveOrUpdateExecutionContext(JobExecution jobExecution) {
+		contextsByJobExecutionId.put(jobExecution.getId(), jobExecution.getExecutionContext());
+		
 	}
 }

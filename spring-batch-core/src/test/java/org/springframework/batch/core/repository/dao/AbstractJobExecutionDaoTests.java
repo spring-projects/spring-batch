@@ -1,12 +1,14 @@
 package org.springframework.batch.core.repository.dao;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 public abstract class AbstractJobExecutionDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
@@ -95,5 +97,37 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		dao.saveJobExecution(exec2);
 		
 		assertEquals(exec2, dao.getLastJobExecution(jobInstance));
+	}
+	
+	public void testSaveAndFindContext() {
+		dao.saveJobExecution(execution);
+		ExecutionContext ctx = new ExecutionContext(new HashMap() {
+			{
+				put("key", "value");
+			}
+		});
+		execution.setExecutionContext(ctx);
+		dao.saveOrUpdateExecutionContext(execution);
+
+		ExecutionContext retrieved = dao.findExecutionContext(execution);
+		assertEquals(ctx, retrieved);
+	}
+
+	public void testUpdateContext() {
+		dao.saveJobExecution(execution);
+		ExecutionContext ctx = new ExecutionContext(new HashMap() {
+			{
+				put("key", "value");
+			}
+		});
+		execution.setExecutionContext(ctx);
+		dao.saveOrUpdateExecutionContext(execution);
+
+		ctx.putLong("longKey", 7);
+		dao.saveOrUpdateExecutionContext(execution);
+
+		ExecutionContext retrieved = dao.findExecutionContext(execution);
+		assertEquals(ctx, retrieved);
+		assertEquals(7, retrieved.getLong("longKey"));
 	}
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Data Access Object for job executions.
@@ -51,5 +52,21 @@ public interface JobExecutionDao {
 	 * @return last JobExecution for given JobInstance.
 	 */
 	JobExecution getLastJobExecution(JobInstance jobInstance);
+	
+	/**
+	 * Find the {@link ExecutionContext} for the given {@link JobExecution}.
+	 * 
+	 * @throws IllegalArgumentException if the id is null.
+	 */
+	ExecutionContext findExecutionContext(JobExecution jobExecution);
+
+	/**
+	 * Save the {@link ExecutionContext} of the given {@link JobExecution}.
+	 * 
+	 * @param jobExecution the {@link JobExecution} containing the
+	 * {@link ExecutionContext} to be saved.
+	 * @throws IllegalArgumentException if the attributes are null.
+	 */
+	void saveOrUpdateExecutionContext(JobExecution jobExecution);
 
 }

@@ -10,10 +10,13 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.jdbc.support.lob.DefaultLobHandler;
+import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
 
 /**
@@ -53,6 +56,10 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			+ " where JOB_INSTANCE_ID = ? and START_TIME = (SELECT max(START_TIME) from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ?)";
 
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
+	
+	private LobHandler lobHandler = new DefaultLobHandler();
+	
+	private JdbcExecutionContextDao ecDao = new JdbcExecutionContextDao();
 
 	public List findJobExecutions(final JobInstance job) {
 
@@ -174,6 +181,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(jobExecutionIncrementer);
+		ecDao.setJdbcTemplate(getJdbcTemplate());
+		ecDao.setLobHandler(lobHandler);
+		ecDao.afterPropertiesSet();
 	}
 
 	/**
@@ -218,6 +228,18 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		else {
 			return (JobExecution) executions.get(0);
 		}
+	}
+
+	public ExecutionContext findExecutionContext(JobExecution jobExecution) {
+		return ecDao.getExecutionContext(jobExecution);
+	}
+
+	public void saveOrUpdateExecutionContext(JobExecution jobExecution) {
+		ecDao.saveOrUpdateExecutionContext(jobExecution);		
+	}
+
+	public void setLobHandler(LobHandler lobHandler) {
+		this.lobHandler = lobHandler;
 	}
 
 }

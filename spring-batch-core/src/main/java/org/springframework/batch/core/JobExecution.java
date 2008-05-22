@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -42,6 +43,8 @@ public class JobExecution extends Entity {
 	private volatile Date endTime = null;
 
 	private volatile ExitStatus exitStatus = ExitStatus.UNKNOWN;
+	
+	private ExecutionContext executionContext;
 
 	/**
 	 * Because a JobExecution isn't valid unless the job is set, this
@@ -177,5 +180,23 @@ public class JobExecution extends Entity {
 			stepExecution.setTerminateOnly();
 		}
 		status = BatchStatus.STOPPING;
+	}
+
+	/**
+	 * Sets the {@link ExecutionContext} for this execution
+	 * 
+	 * @param executionContext the context
+	 */
+	public void setExecutionContext(ExecutionContext executionContext) {
+		this.executionContext = executionContext;
+	}
+
+	/**
+	 * Returns the {@link ExecutionContext} for this execution
+	 * 
+	 * @return the context
+	 */
+	public ExecutionContext getExecutionContext() {
+		return executionContext;
 	}
 }
