@@ -24,6 +24,8 @@ import org.springframework.util.Assert;
 /**
  * JDBC DAO for {@link ExecutionContext}.
  * 
+ * TODO 'DRY' the implementation.
+ * 
  */
 class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 	
