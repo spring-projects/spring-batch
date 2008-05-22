@@ -11,7 +11,7 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 	}
 
 	protected JobRepository getJobRepository() {
-		deleteFromTables(new String[] { "BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION",
+		deleteFromTables(new String[] { "BATCH_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION",
 				"BATCH_JOB_PARAMS", "BATCH_JOB_INSTANCE" });
 		return (JobRepository) getApplicationContext().getBean("jobRepository");
 	}

@@ -3,7 +3,7 @@ package org.springframework.batch.core.repository.dao;
 public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 	protected JobExecutionDao getJobExecutionDao() {
-		deleteFromTables(new String[] { "BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION",
+		deleteFromTables(new String[] { "BATCH_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION",
 				"BATCH_JOB_PARAMS", "BATCH_JOB_INSTANCE" });
 
 		// job instance needs to exist before job execution can be created

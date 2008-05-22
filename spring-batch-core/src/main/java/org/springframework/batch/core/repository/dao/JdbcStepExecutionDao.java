@@ -56,17 +56,17 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	private static final Log logger = LogFactory.getLog(JdbcStepExecutionDao.class);
 
 	private static final String FIND_STEP_EXECUTION_CONTEXT = "SELECT TYPE_CD, KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL "
-			+ "from %PREFIX%STEP_EXECUTION_CONTEXT where STEP_EXECUTION_ID = ?";
+			+ "from %PREFIX%EXECUTION_CONTEXT where EXECUTION_ID = ? and DISCRIMINATOR = 'S'";
 
-	private static final String INSERT_STEP_EXECUTION_CONTEXT = "INSERT into %PREFIX%STEP_EXECUTION_CONTEXT(STEP_EXECUTION_ID, TYPE_CD,"
-			+ " KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL) values(?,?,?,?,?,?,?)";
+	private static final String INSERT_STEP_EXECUTION_CONTEXT = "INSERT into %PREFIX%EXECUTION_CONTEXT(EXECUTION_ID, DISCRIMINATOR, TYPE_CD,"
+			+ " KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL) values(?,'S',?,?,?,?,?,?)";
 
 	private static final String SAVE_STEP_EXECUTION = "INSERT into %PREFIX%STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, "
 			+ "END_TIME, STATUS, COMMIT_COUNT, ITEM_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, ROLLBACK_COUNT) "
 			+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%STEP_EXECUTION_CONTEXT set "
-			+ "TYPE_CD = ?, STRING_VAL = ?, DOUBLE_VAL = ?, LONG_VAL = ?, OBJECT_VAL = ? where STEP_EXECUTION_ID = ? and KEY_NAME = ?";
+	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%EXECUTION_CONTEXT set "
+			+ "TYPE_CD = ?, STRING_VAL = ?, DOUBLE_VAL = ?, LONG_VAL = ?, OBJECT_VAL = ? where EXECUTION_ID = ? and KEY_NAME = ?";
 
 	private static final String UPDATE_STEP_EXECUTION = "UPDATE %PREFIX%STEP_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ "STATUS = ?, COMMIT_COUNT = ?, ITEM_COUNT = ?, CONTINUABLE = ? , EXIT_CODE = ?, "
