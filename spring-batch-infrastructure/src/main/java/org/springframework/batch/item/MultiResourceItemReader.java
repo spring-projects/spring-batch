@@ -6,14 +6,11 @@ import java.util.List;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.Assert;
 
 /**
  * Reads items from multiple resources sequentially - resource list is given by
- * {@link #setResourcePatternResolver(ResourcePatternResolver)}, the actual
- * reading is delegated to
+ * {@link #setResources(Resource[])}, the actual reading is delegated to
  * {@link #setDelegate(ResourceAwareItemReaderItemStream)}.
  * 
  * Reset (rollback) capability is implemented by item buffering.
@@ -26,10 +23,6 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	private static final String RESOURCE_INDEX = "resourceIndex";
 
 	private ResourceAwareItemReaderItemStream delegate;
-
-	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-
-	private String resourceLocationPattern;
 
 	private Resource[] resources;
 
@@ -117,12 +110,6 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 * delegate.
 	 */
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		try {
-			resources = resourcePatternResolver.getResources(resourceLocationPattern);
-		}
-		catch (Exception e) {
-			throw new ItemStreamException("Couldn't get resource", e);
-		}
 
 		if (executionContext.containsKey(getKey(RESOURCE_INDEX))) {
 			int index = Long.valueOf(executionContext.getLong(getKey(RESOURCE_INDEX))).intValue();
@@ -149,26 +136,15 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 		this.delegate = delegate;
 	}
 
-	/**
-	 * @param resourcePatternResolver provides the list of input
-	 * {@link Resource}s given {@link #setResourceLocationPattern(String)}.
-	 * {@link PathMatchingResourcePatternResolver} is used by default.
-	 */
-	public void setResourcePatternResolver(ResourcePatternResolver resourcePatternResolver) {
-		this.resourcePatternResolver = resourcePatternResolver;
-	}
-
-	/**
-	 * @param resourceLocationPattern identifies the input {@link Resource}s,
-	 * parsed by {@link #setResourcePatternResolver(ResourcePatternResolver)}
-	 */
-	public void setResourceLocationPattern(String resourceLocationPattern) {
-		this.resourceLocationPattern = resourceLocationPattern;
-	}
-
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(resourcePatternResolver, "resourcePatternResolver property must be set");
-		Assert.hasLength(resourceLocationPattern, "resourceLocationPattern property must be set");
+		Assert.notEmpty(resources, "There must be at least one input resource");
+	}
+
+	/**
+	 * @param resources input resources
+	 */
+	public void setResources(Resource[] resources) {
+		this.resources = resources;
 	}
 
 }

@@ -2,20 +2,16 @@ package org.springframework.batch.item;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
  * Tests for {@link MultiResourceItemReader}.
  */
 public class MultiResourceItemReaderIntegrationTests extends TestCase {
-
-	private static final String PATTERN = "resource location pattern";
 
 	private MultiResourceItemReader tested = new MultiResourceItemReader();
 
@@ -39,17 +35,10 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 
-		MockControl control = MockControl.createStrictControl(ResourcePatternResolver.class);
-		ResourcePatternResolver resolver = (ResourcePatternResolver) control.getMock();
-		resolver.getResources(PATTERN);
-		control.setReturnValue(new Resource[] { r1, r2, r3, r4, r5 }, 2);
-		control.replay();
-
 		itemReader.setFieldSetMapper(new PassThroughFieldSetMapper());
 
-		tested.setResourcePatternResolver(resolver);
 		tested.setDelegate(itemReader);
-		tested.setResourceLocationPattern(PATTERN);
+		tested.setResources(new Resource[] { r1, r2, r3, r4, r5 });
 		tested.afterPropertiesSet();
 	}
 
