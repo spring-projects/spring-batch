@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step.item;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
@@ -37,6 +39,8 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Robert Kasanicky
  */
 public class SimpleItemHandler implements ItemHandler {
+
+	protected final Log logger = LogFactory.getLog(getClass());
 
 	private ItemReader itemReader;
 

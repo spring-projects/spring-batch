@@ -21,8 +21,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
@@ -60,9 +58,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	 * removed
 	 */
 	private static final String TO_BE_REMOVED = ItemSkipPolicyItemHandler.class.getName() + ".TO_BE_REMOVED";
-
-	protected final Log logger = LogFactory.getLog(getClass());
-
+	
 	private ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
 
 	private int skipCacheCapacity = 1024;

@@ -15,12 +15,19 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.item.AbstractItemWriter;
+import org.springframework.batch.core.listener.CompositeSkipListener;
+import org.springframework.batch.core.step.skip.ItemSkipPolicy;
+import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
+import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
@@ -37,12 +44,13 @@ import org.springframework.batch.retry.support.RetryTemplate;
 
 /**
  * Factory bean for step that executes its item processing with a stateful
- * retry. Failed items are never skipped, but always cause a rollback. Before a
- * rollback, the {@link Step} makes a record of the failed item, caching it
- * under a key given by the {@link ItemKeyGenerator}. Then when it is
- * re-presented by the {@link ItemReader} it is recognised and retried up to a
- * limit given by the {@link RetryPolicy}. When the retry is exhausted instead
- * of the item being skipped it is handled by an {@link ItemRecoverer}.<br/>
+ * retry. Failed items where the exception is classified as retryable always
+ * cause a rollback. Before a rollback, the {@link Step} makes a record of the
+ * failed item, caching it under a key given by the {@link ItemKeyGenerator}.
+ * Then when it is re-presented by the {@link ItemReader} it is recognised and
+ * retried up to a limit given by the {@link RetryPolicy}. When the retry is
+ * exhausted the item is skipped and handled by a {@link SkipListener} if one is
+ * present.<br/>
  * 
  * The skipLimit property is still used to control the overall exception
  * handling policy. Only exhausted retries count against the exception handler,
@@ -54,8 +62,6 @@ import org.springframework.batch.retry.support.RetryTemplate;
  * 
  */
 public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
-
-	private ItemRecoverer itemRecoverer;
 
 	private int retryLimit;
 
@@ -99,18 +105,6 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 	}
 
 	/**
-	 * Public setter for the {@link ItemRecoverer}. If this is set the
-	 * {@link ItemRecoverer#recover(Object, Throwable)} will be called when
-	 * retry is exhausted, and within the business transaction (which will not
-	 * roll back because of any other item-related errors).
-	 * 
-	 * @param itemRecoverer the {@link ItemRecoverer} to set
-	 */
-	public void setItemRecoverer(ItemRecoverer itemRecoverer) {
-		this.itemRecoverer = itemRecoverer;
-	}
-
-	/**
 	 * @param step
 	 * 
 	 */
@@ -123,7 +117,8 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 			addFatalExceptionIfMissing(RetryException.class);
 
 			SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy(retryLimit);
-			if (retryableExceptionClasses != null) {
+			if (retryableExceptionClasses != null) { // otherwise we retry
+				// all exceptions
 				retryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
 				retryPolicy.setFatalExceptionClasses(getFatalExceptionClasses());
 			}
@@ -143,9 +138,15 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 				retryTemplate.setBackOffPolicy(backOffPolicy);
 			}
 
+			List exceptions = new ArrayList(Arrays.asList(getSkippableExceptionClasses()));
+			if (retryableExceptionClasses != null) {
+				exceptions.addAll(Arrays.asList(retryableExceptionClasses));
+			}
+			LimitCheckingItemSkipPolicy itemSkipPolicy = new LimitCheckingItemSkipPolicy(getSkipLimit(), exceptions,
+					Arrays.asList(getFatalExceptionClasses()));
 			StatefulRetryItemHandler itemHandler = new StatefulRetryItemHandler(getItemReader(), getItemWriter(),
-					retryTemplate, getItemKeyGenerator(), itemRecoverer);
-			itemHandler.setItemSkipPolicy(getItemSkipPolicy());
+					retryTemplate, getItemKeyGenerator(), itemSkipPolicy);
+			itemHandler.setSkipListeners(new BatchListenerFactoryHelper().getSkipListeners(getListeners()));
 
 			step.setItemHandler(itemHandler);
 
@@ -154,96 +155,137 @@ public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 	}
 
 	/**
-	 * Extend the skipping handler because we want to take advantage of that
-	 * behaviour as well as the retry. So if there is an exception on input it
-	 * is skipped if allowed. If there is an exception on output, it will be
-	 * re-thrown in any case, and the behaviour when the item is next
-	 * encountered depends on the retryable and skippable exception
-	 * configuration. Skip takes precedence, so if the exception was skippable
-	 * the item will be skipped on input and the reader moves to the next item.
-	 * If the exception is retryable but not skippable, then the write will be
-	 * attempted up again up to the retry limit. Beyond the retry limit recovery
-	 * takes over.
+	 * If there is an exception on input it is skipped if allowed. If there is
+	 * an exception on output, it will be re-thrown in any case, and the
+	 * behaviour when the item is next encountered depends on the retryable and
+	 * skippable exception configuration. If the exception is retryable the
+	 * write will be attempted again up to the retry limit. When retry attempts
+	 * are exhausted the skip listener is invoked and the skip count
+	 * incremented. A retryable exception is thus also effectively also
+	 * implicitly skippable.
 	 * 
 	 * @author Dave Syer
 	 * 
 	 */
-	private static class StatefulRetryItemHandler extends ItemSkipPolicyItemHandler {
+	private static class StatefulRetryItemHandler extends SimpleItemHandler {
 
 		final private RetryOperations retryOperations;
 
 		final private ItemKeyGenerator itemKeyGenerator;
 
-		final private ItemRecoverer itemRecoverer;
+		private CompositeSkipListener listener = new CompositeSkipListener();
+
+		final private ItemSkipPolicy itemSkipPolicy;
 
 		/**
 		 * @param itemReader
 		 * @param itemWriter
 		 * @param retryTemplate
 		 * @param itemKeyGenerator
-		 * @param itemRecoverer
 		 */
 		public StatefulRetryItemHandler(ItemReader itemReader, ItemWriter itemWriter, RetryOperations retryTemplate,
-				ItemKeyGenerator itemKeyGenerator, ItemRecoverer itemRecoverer) {
+				ItemKeyGenerator itemKeyGenerator, ItemSkipPolicy itemSkipPolicy) {
 			super(itemReader, itemWriter);
 			this.retryOperations = retryTemplate;
 			this.itemKeyGenerator = itemKeyGenerator;
-			this.itemRecoverer = itemRecoverer;
+			this.itemSkipPolicy = itemSkipPolicy;
+		}
+
+		/**
+		 * Register some {@link SkipListener}s with the handler. Each will get
+		 * the callbacks in the order specified at the correct stage if a skip
+		 * occurs.
+		 * 
+		 * @param listeners
+		 */
+		public void setSkipListeners(SkipListener[] listeners) {
+			for (int i = 0; i < listeners.length; i++) {
+				registerSkipListener(listeners[i]);
+			}
+		}
+
+		/**
+		 * Register a listener for callbacks at the appropriate stages in a skip
+		 * process.
+		 * 
+		 * @param listener a {@link SkipListener}
+		 */
+		public void registerSkipListener(SkipListener listener) {
+			this.listener.register(listener);
+		}
+
+		/**
+		 * Tries to read the item from the reader, in case of exception skip the
+		 * item if the skip policy allows, otherwise re-throw.
+		 * 
+		 * @param contribution current StepContribution holding skipped items
+		 * count
+		 * @return next item for processing
+		 */
+		protected Object read(StepContribution contribution) throws Exception {
+
+			while (true) {
+				try {
+					return doRead();
+				}
+				catch (Exception e) {
+					try {
+						if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+							// increment skip count and try again
+							contribution.incrementTemporaryReadSkipCount();
+							if (listener != null) {
+								listener.onSkipInRead(e);
+							}
+							logger.debug("Skipping failed input", e);
+						}
+						else {
+							// re-throw only when the skip policy runs out of
+							// patience
+							throw e;
+						}
+					}
+					catch (SkipLimitExceededException ex) {
+						// we are headed for a abnormal ending so bake in the
+						// skip count
+						contribution.combineSkipCounts();
+						throw ex;
+					}
+				}
+			}
+
 		}
 
 		/**
 		 * Execute the business logic, delegating to the writer.<br/>
 		 * 
-		 * Process the item with the {@link ItemWriter} in a stateful retry. The
-		 * {@link ItemRecoverer} is used (if provided) in the case of an
-		 * exception to apply alternate processing to the item. If the stateful
-		 * retry is in place then the recovery will happen in the next
-		 * transaction automatically, otherwise it might be necessary for
-		 * clients to make the recover method transactional with appropriate
-		 * propagation behaviour (probably REQUIRES_NEW because the call will
-		 * happen in the context of a transaction that is about to rollback).<br/>
+		 * Process the item with the {@link ItemWriter} in a stateful retry. Any
+		 * {@link SkipListener} provided is called when retry attempts are
+		 * exhausted. The listener callback (on write failure) will happen in
+		 * the next transaction automatically.<br/>
 		 * 
 		 * @see org.springframework.batch.core.step.item.SimpleItemHandler#write(java.lang.Object,
 		 * org.springframework.batch.core.StepContribution)
 		 */
 		protected void write(final Object item, final StepContribution contribution) throws Exception {
-			final ItemWriter writer = new RetryableItemWriter(contribution);
 			RecoveryRetryCallback retryCallback = new RecoveryRetryCallback(item, new RetryCallback() {
 				public Object doWithRetry(RetryContext context) throws Throwable {
-					writer.write(item);
+					doWrite(item);
 					return null;
 				}
 			}, itemKeyGenerator != null ? itemKeyGenerator.getKey(item) : item);
 			retryCallback.setRecoveryCallback(new RecoveryCallback() {
 				public Object recover(RetryContext context) {
-					if (itemRecoverer != null) {
-						return itemRecoverer.recover(item, context.getLastThrowable());
+					Throwable t = context.getLastThrowable();
+					// TODO: add retryable exceptions as well? (Or ensure that
+					// all retryable exceptions are skippable?)
+					if (itemSkipPolicy.shouldSkip(t, contribution.getStepSkipCount())) {
+						listener.onSkipInWrite(item, t);
 					}
+					contribution.incrementWriteSkipCount();
 					return null;
 				}
 			});
 			retryOperations.execute(retryCallback);
-		}
-
-		/**
-		 * @author Dave Syer
-		 * 
-		 */
-		private class RetryableItemWriter extends AbstractItemWriter {
-
-			private StepContribution contribution;
-
-			/**
-			 * @param contribution
-			 */
-			public RetryableItemWriter(StepContribution contribution) {
-				this.contribution = contribution;
-			}
-
-			public void write(Object item) throws Exception {
-				doWriteWithSkip(item, contribution);
-			}
-
 		}
 
 	}
