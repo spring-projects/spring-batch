@@ -105,7 +105,7 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * type.
 	 */
 	public RetryContext open(RetryCallback callback, RetryContext parent) {
-		Assert.state(callback instanceof RecoveryRetryCallback, "Callback must be ItemProviderRetryCallback");
+		Assert.state(callback instanceof RecoveryRetryCallback, "Callback must be RecoveryRetryCallback");
 		ItemWriterRetryContext context = new ItemWriterRetryContext((RecoveryRetryCallback) callback, parent);
 		context.open(callback, null);
 		return context;

@@ -66,7 +66,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 			fail("Expected IllegalStateException");
 		}
 		catch (IllegalStateException e) {
-			assertTrue(e.getMessage().indexOf("must be ItemProvider") >= 0);
+			assertTrue(e.getMessage().indexOf("must be RecoveryRetryCallback") >= 0);
 		}
 	}
 
