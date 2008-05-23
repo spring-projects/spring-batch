@@ -188,7 +188,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		assertEquals(new Holder("5"), handler.read(contribution));
 	}
 
-	public void testWriteWithSkipCapacitBreached() throws Exception {
+	public void testWriteWithSkipCapacityBreached() throws Exception {
 		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		handler.setSkipCacheCapacity(0);
 		handler.handle(contribution);
