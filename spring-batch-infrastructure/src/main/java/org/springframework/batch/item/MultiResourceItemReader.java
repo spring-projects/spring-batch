@@ -13,7 +13,11 @@ import org.springframework.util.Assert;
  * {@link #setResources(Resource[])}, the actual reading is delegated to
  * {@link #setDelegate(ResourceAwareItemReaderItemStream)}.
  * 
- * Reset (rollback) capability is implemented by item buffering.
+ * Reset (rollback) capability is implemented by item buffering. To restart
+ * correctly resource ordering needs to be preserved between runs.
+ * 
+ * TODO more robust restart e.g. sort resources alphabetically and store
+ * filename instead of resource array index.
  * 
  * @author Robert Kasanicky
  */
