@@ -89,7 +89,8 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		job.setRestartable(true);
 
 		JobExecution firstExecution = jobRepository.createJobExecution(job, jobParameters);
-		firstExecution.setEndTime(new Date());
+		firstExecution.setStartTime(new Date(0));
+		firstExecution.setEndTime(new Date(1));
 		jobRepository.saveOrUpdate(firstExecution);
 		JobExecution secondExecution = jobRepository.createJobExecution(job, jobParameters);
 
@@ -163,6 +164,8 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 			}
 		};
 		JobExecution jobExec = jobRepository.createJobExecution(job, jobParameters);
+		jobExec.setStartTime(new Date(0));
+		jobExec.setExecutionContext(ctx);
 		Step step = new StepSupport("step1");
 		StepExecution stepExec = new StepExecution(step.getName(), jobExec);
 		stepExec.setExecutionContext(ctx);
@@ -170,9 +173,13 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		jobRepository.saveOrUpdate(stepExec);
 		jobRepository.saveOrUpdateExecutionContext(stepExec);
 
-		StepExecution retrievedExec = jobRepository.getLastStepExecution(jobExec.getJobInstance(), step);
-		assertEquals(stepExec, retrievedExec);
-		assertEquals(ctx, retrievedExec.getExecutionContext());
+		StepExecution retrievedStepExec = jobRepository.getLastStepExecution(jobExec.getJobInstance(), step);
+		assertEquals(stepExec, retrievedStepExec);
+		assertEquals(ctx, retrievedStepExec.getExecutionContext());
+		
+//		JobExecution retrievedJobExec = jobRepository.getLastJobExecution(jobExec.getJobInstance());
+//		assertEquals(jobExec, retrievedJobExec);
+//		assertEquals(ctx, retrievedJobExec.getExecutionContext());
 	}
 
 	/**

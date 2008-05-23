@@ -111,5 +111,16 @@ public interface JobRepository {
 	 * @return the execution count of the step within the given job instance.
 	 */
 	int getStepExecutionCount(JobInstance jobInstance, Step step);
+	
+	/**
+	 * @return the execution count of the given job instance.
+	 */
+	int getJobExecutionCount(JobInstance jobInstance);
+	
+	/**
+	 * @return the last execution of the given job instance.
+	 */
+	JobExecution getLastJobExecution(JobInstance jobInstance);
+
 
 }

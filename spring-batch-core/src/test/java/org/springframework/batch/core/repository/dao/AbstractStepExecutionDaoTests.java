@@ -161,6 +161,16 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		ExecutionContext retrieved = dao.findExecutionContext(stepExecution);
 		assertEquals(ctx, retrieved);
 	}
+	
+	public void testSaveAndFindEmptyContext() {
+		dao.saveStepExecution(stepExecution);
+		ExecutionContext ctx = new ExecutionContext();
+		stepExecution.setExecutionContext(ctx);
+		dao.saveOrUpdateExecutionContext(stepExecution);
+
+		ExecutionContext retrieved = dao.findExecutionContext(stepExecution);
+		assertEquals(ctx, retrieved);
+	}
 
 	public void testUpdateContext() {
 		dao.saveStepExecution(stepExecution);

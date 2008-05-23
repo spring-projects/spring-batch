@@ -164,6 +164,9 @@ public class SimpleJobTests extends TestCase {
 		checkRepository(BatchStatus.COMPLETED);
 		assertNotNull(jobExecution.getEndTime());
 		assertNotNull(jobExecution.getStartTime());
+		
+		assertTrue(step1.passedInJobContext.isEmpty());
+		assertFalse(step2.passedInJobContext.isEmpty());
 	}
 
 	public void testRunNormallyWithListener() throws Exception {
@@ -342,8 +345,8 @@ public class SimpleJobTests extends TestCase {
 		catch (RuntimeException e) {
 			assertSame(exception, e);
 		}
-		assertTrue(step1.passedInContext.isEmpty());
-		assertFalse(step2.passedInContext.isEmpty());
+		assertTrue(step1.passedInStepContext.isEmpty());
+		assertFalse(step2.passedInStepContext.isEmpty());
 
 	}
 
@@ -397,7 +400,9 @@ public class SimpleJobTests extends TestCase {
 
 		private JobRepository jobRepository;
 
-		private Properties passedInContext;
+		private Properties passedInStepContext;
+		
+		private Properties passedInJobContext;
 
 		/**
 		 * @param string
@@ -427,8 +432,10 @@ public class SimpleJobTests extends TestCase {
 		public void execute(StepExecution stepExecution) throws JobInterruptedException,
 				UnexpectedJobExecutionException {
 
-			passedInContext = stepExecution.getExecutionContext().getProperties();
-			stepExecution.getExecutionContext().putString("key", "value");
+			passedInJobContext = stepExecution.getJobExecution().getExecutionContext().getProperties();
+			passedInStepContext = stepExecution.getExecutionContext().getProperties();
+			stepExecution.getExecutionContext().putString("stepKey", "stepValue");
+			stepExecution.getJobExecution().getExecutionContext().putString("jobKey", "jobValue");
 			jobRepository.saveOrUpdateExecutionContext(stepExecution);
 
 			if (exception instanceof RuntimeException) {

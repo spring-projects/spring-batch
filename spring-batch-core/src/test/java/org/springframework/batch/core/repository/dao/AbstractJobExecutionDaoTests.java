@@ -112,6 +112,16 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		ExecutionContext retrieved = dao.findExecutionContext(execution);
 		assertEquals(ctx, retrieved);
 	}
+	
+	public void testSaveAndFindEmptyContext() {
+		dao.saveJobExecution(execution);
+		ExecutionContext ctx = new ExecutionContext();
+		execution.setExecutionContext(ctx);
+		dao.saveOrUpdateExecutionContext(execution);
+
+		ExecutionContext retrieved = dao.findExecutionContext(execution);
+		assertEquals(ctx, retrieved);
+	}
 
 	public void testUpdateContext() {
 		dao.saveJobExecution(execution);

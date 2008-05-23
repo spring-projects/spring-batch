@@ -38,13 +38,13 @@ public class JobExecution extends Entity {
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 
-	private volatile Date startTime = null;
+	private volatile Date startTime = new Date(System.currentTimeMillis());
 
 	private volatile Date endTime = null;
 
 	private volatile ExitStatus exitStatus = ExitStatus.UNKNOWN;
 	
-	private ExecutionContext executionContext;
+	private ExecutionContext executionContext = new ExecutionContext();
 
 	/**
 	 * Because a JobExecution isn't valid unless the job is set, this

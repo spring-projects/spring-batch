@@ -247,6 +247,7 @@ public class SimpleJobRepository implements JobRepository {
 	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
 		saveOrUpdate(stepExecution);
 		stepExecutionDao.saveOrUpdateExecutionContext(stepExecution);
+		jobExecutionDao.saveOrUpdateExecutionContext(stepExecution.getJobExecution());
 	}
 
 	/**
@@ -288,6 +289,29 @@ public class SimpleJobRepository implements JobRepository {
 			}
 		}
 		return count;
+	}
+	
+	/**
+	 * @return number of executions of the given job instance
+	 */
+	public int getJobExecutionCount(JobInstance jobInstance) {
+		
+		return jobExecutionDao.findJobExecutions(jobInstance).size();
+	}
+
+	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+		List jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
+		if (jobExecutions.isEmpty()) {
+			return null;
+		}
+		JobExecution lastExecution = (JobExecution) jobExecutions.get(0);
+		for (Iterator iterator = jobExecutions.iterator(); iterator.hasNext();) {
+			JobExecution exec = (JobExecution) iterator.next();
+			if (lastExecution.getStartTime().getTime() < exec.getStartTime().getTime()) {
+				lastExecution = exec;
+			}
+		}
+		return lastExecution;
 	}
 
 }

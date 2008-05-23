@@ -68,4 +68,12 @@ public class JobRepositorySupport implements JobRepository {
 		return 0;
 	}
 
+	public int getJobExecutionCount(JobInstance jobInstance) {
+		return 0;
+	}
+
+	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+		return null;
+	}
+
 }
