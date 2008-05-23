@@ -89,6 +89,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		factory.setItemWriter(processor);
 		factory.setJobRepository(repository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
+		factory.setRetryableExceptionClasses(new Class[] { Exception.class });
 
 		JobSupport job = new JobSupport("jobName");
 		job.setRestartable(true);
@@ -107,7 +108,15 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		assertTrue(factory.getObject() instanceof Step);
 	}
 
-	public void testSuccessfulRetry() throws Exception {
+	/**
+	 * N.B. this doesn't really test retry, since the retry is only on write
+	 * failures, but it does test that read errors are re-presented for another
+	 * try when the retryLimit is high enough (it is used to build an exception
+	 * handler).
+	 * 
+	 * @throws Exception
+	 */
+	public void testSuccessfulRetryWithReadFailure() throws Exception {
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(new String[] { "a", "b", "c" }));
 		ItemReader provider = new ListItemReader(items) {
@@ -122,6 +131,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		};
 		factory.setItemReader(provider);
 		factory.setRetryLimit(10);
+		factory.setSkippableExceptionClasses(new Class[0]);
 		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -129,7 +139,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 
 		assertEquals(0, stepExecution.getSkipCount());
 
-		// b is processed twice, plus 1, plus c, plus the null at end
+		// b is processed twice, plus a, plus c, plus the null at end
 		assertEquals(5, count);
 	}
 
@@ -201,7 +211,8 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		assertEquals(2, recovered.size());
 		assertEquals(2, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getWriteSkipCount().intValue());
-		// each item once, plus 5 failed retries each for b and d, plus the null terminator
+		// each item once, plus 5 failed retries each for b and d, plus the null
+		// terminator
 		assertEquals(17, count);
 	}
 }

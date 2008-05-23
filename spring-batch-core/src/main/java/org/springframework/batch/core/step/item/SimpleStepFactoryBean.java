@@ -21,6 +21,7 @@ import org.springframework.batch.core.StepListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -57,7 +58,7 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	
 	private RepeatTemplate chunkOperations;
 
-	private ExceptionHandler exceptionHandler;
+	private ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
 
 	
 	/**

@@ -8,6 +8,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -33,6 +35,8 @@ import org.springframework.util.StringUtils;
  * Tests for {@link SkipLimitStepFactoryBean}.
  */
 public class SkipLimitStepFactoryBeanTests extends TestCase {
+
+	protected final Log logger = LogFactory.getLog(getClass());
 
 	private SkipLimitStepFactoryBean factory = new SkipLimitStepFactoryBean();
 
@@ -73,11 +77,10 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 
-		
 		assertEquals(2, stepExecution.getSkipCount());
 		assertEquals(1, stepExecution.getReadSkipCount().intValue());
 		assertEquals(1, stepExecution.getWriteSkipCount().intValue());
-		
+
 		// only write exception caused rollback
 		assertEquals(1, stepExecution.getRollbackCount().intValue());
 
@@ -192,11 +195,13 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		assertEquals(1, stepExecution.getWriteSkipCount().intValue());
 
 		// writer did not skip "2" as it never made it to writer, only "4" did
+		assertFalse(reader.processed.contains("2"));
 		assertTrue(reader.processed.contains("4"));
 
-		// failure on "4" tripped the skip limit so we never write anything
-		// ("1" was written but rolled back)
-		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
+		// failure on "5" tripped the skip limit but "4" failed on write and was skipped and 
+		// RepeatSynchronizationManager.setCompleteOnly() was called in the retry policy to
+		// aggressively commit after a recovery ("1" was written at that point)
+		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1"));
 		assertEquals(expectedOutput, writer.written);
 
 	}
@@ -289,6 +294,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	 */
 	private static class SkipReaderStub implements ItemReader {
 
+		protected final Log logger = LogFactory.getLog(getClass());
+
 		private final String[] items;
 
 		private Collection processed = new ArrayList();
@@ -311,22 +318,27 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		public Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 			counter++;
 			if (counter >= items.length) {
+				logger.debug("Returning null at count=" + counter);
 				return null;
 			}
 			String item = items[counter];
 			if (failures.contains(item)) {
+				logger.debug("Throwing exception for [" + item + "] at count=" + counter);
 				throw new SkippableException("exception in reader");
 			}
 			processed.add(item);
+			logger.debug("Returning [" + item + "] at count=" + counter);
 			return item;
 		}
 
 		public void mark() throws MarkFailedException {
+			logger.debug("Marked at count=" + counter);
 			marked = counter;
 		}
 
 		public void reset() throws ResetFailedException {
 			counter = marked;
+			logger.debug("Reset at count=" + counter);
 		}
 
 	}
@@ -336,9 +348,11 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	 */
 	private static class SkipWriterStub implements ItemWriter {
 
-		List written = new ArrayList();
+		protected final Log logger = LogFactory.getLog(getClass());
 
-		int flushIndex = -1;
+		private List written = new ArrayList();
+
+		private int flushIndex = -1;
 
 		private final Collection failures;
 
@@ -355,7 +369,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		public void clear() throws ClearFailedException {
 			for (int i = flushIndex + 1; i < written.size(); i++) {
-				written.remove(i);
+				written.remove(written.size()-1);
 			}
 		}
 
@@ -365,6 +379,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		public void write(Object item) throws Exception {
 			if (failures.contains(item)) {
+				logger.debug("Throwing write exception on [" + item + "]");
 				throw new SkippableRuntimeException("exception in writer");
 			}
 			written.add(item);

@@ -52,6 +52,17 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 		}
 	}
 
+	public void testNullContext() throws Exception {
+		Map map = new HashMap();
+		map.put(ExceptionClassifierSupport.DEFAULT, new NeverRetryPolicy());
+		policy.setPolicyMap(map);
+
+		RetryContext context = policy.open(null, null);
+		assertNotNull(context);
+
+		assertTrue(policy.canRetry(context));
+	}
+
 	public void testClassifierOperates() throws Exception {
 
 		Map map = new HashMap();

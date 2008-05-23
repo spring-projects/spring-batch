@@ -135,6 +135,10 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 		}
 
 		public boolean canRetry(RetryContext context) {
+			if (this.context==null) {
+				// there was no error yet
+				return true;
+			}
 			return policy.canRetry(this.context);
 		}
 
