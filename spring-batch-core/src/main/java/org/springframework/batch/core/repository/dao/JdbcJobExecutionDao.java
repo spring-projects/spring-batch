@@ -192,7 +192,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @author Dave Syer
 	 * 
 	 */
-	private static class JobExecutionRowMapper implements RowMapper {
+	private class JobExecutionRowMapper implements RowMapper {
 
 		private JobInstance job;
 
@@ -208,6 +208,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			jobExecution.setEndTime(rs.getTimestamp(3));
 			jobExecution.setStatus(BatchStatus.getStatus(rs.getString(4)));
 			jobExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(5)), rs.getString(6), rs.getString(7)));
+			jobExecution.setExecutionContext(findExecutionContext(jobExecution));
 			return jobExecution;
 		}
 

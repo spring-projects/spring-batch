@@ -16,9 +16,9 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	JobExecutionDao dao;
 
 	JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), "execTestJob");
-	
+
 	JobExecution execution = new JobExecution(jobInstance);
-	
+
 	/**
 	 * @return tested object ready for use
 	 */
@@ -32,7 +32,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	 * Save and find a job execution.
 	 */
 	public void testSaveAndFind() {
-		
+
 		dao.saveJobExecution(execution);
 
 		List executions = dao.findJobExecutions(jobInstance);
@@ -44,7 +44,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	 * Saving sets id to the entity.
 	 */
 	public void testSaveAddsIdAndVersion() {
-		
+
 		assertNull(execution.getId());
 		assertNull(execution.getVersion());
 		dao.saveJobExecution(execution);
@@ -57,7 +57,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	 * instance.
 	 */
 	public void testGetExecutionCount() {
-		
+
 		JobExecution exec1 = new JobExecution(jobInstance);
 		JobExecution exec2 = new JobExecution(jobInstance);
 
@@ -75,30 +75,40 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	public void testUpdateExecution() {
 		execution.setStatus(BatchStatus.STARTED);
 		dao.saveJobExecution(execution);
-		
+
 		execution.setStatus(BatchStatus.COMPLETED);
 		dao.updateJobExecution(execution);
-		
+
 		JobExecution updated = (JobExecution) dao.findJobExecutions(jobInstance).get(0);
 		assertEquals(execution, updated);
 		assertEquals(BatchStatus.COMPLETED, updated.getStatus());
 	}
-	
+
 	/**
 	 * Check the execution with most recent start time is returned
 	 */
 	public void testGetLastExecution() {
 		JobExecution exec1 = new JobExecution(jobInstance);
 		exec1.setStartTime(new Date(0));
+
+		ExecutionContext ctx = new ExecutionContext() {
+			{
+				put("key", "value");
+			}
+		};
 		JobExecution exec2 = new JobExecution(jobInstance);
+		exec2.setExecutionContext(ctx);
 		exec2.setStartTime(new Date(1));
-		
+
 		dao.saveJobExecution(exec1);
 		dao.saveJobExecution(exec2);
-		
-		assertEquals(exec2, dao.getLastJobExecution(jobInstance));
+		dao.saveOrUpdateExecutionContext(exec2);
+
+		JobExecution last = dao.getLastJobExecution(jobInstance);
+		assertEquals(exec2, last);
+		assertEquals("value", last.getExecutionContext().getString("key"));
 	}
-	
+
 	public void testSaveAndFindContext() {
 		dao.saveJobExecution(execution);
 		ExecutionContext ctx = new ExecutionContext(new HashMap() {
@@ -112,7 +122,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		ExecutionContext retrieved = dao.findExecutionContext(execution);
 		assertEquals(ctx, retrieved);
 	}
-	
+
 	public void testSaveAndFindEmptyContext() {
 		dao.saveJobExecution(execution);
 		ExecutionContext ctx = new ExecutionContext();

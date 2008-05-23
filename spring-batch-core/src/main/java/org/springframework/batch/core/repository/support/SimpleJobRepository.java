@@ -34,6 +34,7 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.Assert;
 
@@ -152,6 +153,7 @@ public class SimpleJobRepository implements JobRepository {
 		 */
 
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(job, jobParameters);
+		ExecutionContext executionContext;
 
 		// existing job instance found
 		if (jobInstance != null) {
@@ -174,13 +176,16 @@ public class SimpleJobRepository implements JobRepository {
 									+ ".  If you want to run this job again, change the parameters.");
 				}
 			}
+			executionContext = jobExecutionDao.getLastJobExecution(jobInstance).getExecutionContext();
 		}
 		else {
 			// no job found, create one
 			jobInstance = jobInstanceDao.createJobInstance(job, jobParameters);
+			executionContext = new ExecutionContext();
 		}
 
 		JobExecution jobExecution = new JobExecution(jobInstance);
+		jobExecution.setExecutionContext(executionContext);
 
 		// Save the JobExecution so that it picks up an ID (useful for clients
 		// monitoring asynchronous executions):
@@ -289,29 +294,6 @@ public class SimpleJobRepository implements JobRepository {
 			}
 		}
 		return count;
-	}
-	
-	/**
-	 * @return number of executions of the given job instance
-	 */
-	public int getJobExecutionCount(JobInstance jobInstance) {
-		
-		return jobExecutionDao.findJobExecutions(jobInstance).size();
-	}
-
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
-		List jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
-		if (jobExecutions.isEmpty()) {
-			return null;
-		}
-		JobExecution lastExecution = (JobExecution) jobExecutions.get(0);
-		for (Iterator iterator = jobExecutions.iterator(); iterator.hasNext();) {
-			JobExecution exec = (JobExecution) iterator.next();
-			if (lastExecution.getStartTime().getTime() < exec.getStartTime().getTime()) {
-				lastExecution = exec;
-			}
-		}
-		return lastExecution;
 	}
 
 }

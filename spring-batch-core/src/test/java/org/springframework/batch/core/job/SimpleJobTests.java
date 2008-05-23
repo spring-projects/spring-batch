@@ -373,6 +373,43 @@ public class SimpleJobTests extends TestCase {
 		
 		control.verify();
 	}
+	
+	/**
+	 * Execution context should be restored on restart.
+	 */
+	public void testRestartScenario() throws Exception {
+		
+		job.setRestartable(true);
+		
+		step1.setAllowStartIfComplete(true);
+		final RuntimeException exception = new RuntimeException("Foo!");
+		step2.setProcessException(exception);
+
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (RuntimeException e) {
+			assertSame(exception, e);
+		}
+		
+		assertTrue(step1.passedInJobContext.isEmpty());
+		assertFalse(step2.passedInJobContext.isEmpty());
+		
+		assertFalse(jobExecution.getExecutionContext().isEmpty());
+
+		jobExecution = jobRepository.createJobExecution(job, jobParameters);
+		
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (RuntimeException e) {
+			assertSame(exception, e);
+		}
+		assertFalse(step1.passedInJobContext.isEmpty());
+		assertFalse(step2.passedInJobContext.isEmpty());
+	}
 
 	/*
 	 * Check JobRepository to ensure status is being saved.
