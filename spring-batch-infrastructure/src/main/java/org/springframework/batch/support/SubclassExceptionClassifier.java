@@ -36,7 +36,7 @@ public class SubclassExceptionClassifier extends ExceptionClassifierSupport {
 	/**
 	 * Map of Throwable class types to keys for the classifier. Any subclass of
 	 * the type provided will be classified as of the type given by the
-	 * correspinding map entry value.
+	 * corresponding map entry value.
 	 * 
 	 * @param typeMap the typeMap to set
 	 */
