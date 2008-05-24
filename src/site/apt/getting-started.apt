@@ -29,7 +29,7 @@ Spring Batch Getting Started
 
   You can get a pretty good idea about how to set up a job by examining the unit tests in the <<<org.springframework.batch.sample>>> package (in <<<src/main/java>>>) and the configuration in <<<src/main/resources/jobs>>>.
 
-  To launch a job from the command line instead of a unit test use the <<<BatchCommandLineLauncher.main()>>> method (see Javadocs included in that class).
+  To launch a job from the command line instead of a unit test use the <<<CommandLineJobRunner.main()>>> method (see Javadocs included in that class).
 
 ** With Maven on the Command Line
 
