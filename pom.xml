@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch</artifactId>
@@ -23,8 +24,12 @@
 	</organization>
 	<scm>
 		<url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk</url>
-		<connection>scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk</connection>
-		<developerConnection>scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk</developerConnection>
+		<connection>
+			scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+		</connection>
+		<developerConnection>
+			scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
+		</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
@@ -69,7 +74,9 @@
 			<distributionManagement>
 				<site>
 					<id>static.springframework.org</id>
-					<url> scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch </url>
+					<url>
+						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch
+					</url>
 				</site>
 			</distributionManagement>
 		</profile>
@@ -153,7 +160,8 @@
 												<![CDATA[</summary>]]>
 											</footer>
 										</concat>
-										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html" style="src/main/xsl/emma2html.xsl">
+										<xslt in="target/site/emma-reports/emma-report.xml"
+											out="target/site/emma-reports/index.html" style="src/main/xsl/emma2html.xsl">
 											<param name="project" expression="${project.name}" />
 											<param name="version" expression="${project.version}" />
 										</xslt>
@@ -236,7 +244,8 @@
 									</junitreport>
 									<echo>Creating Emma reports</echo>
 									<mkdir dir="target/site/emma-reports" />
-									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports" style="${project.parent.basedir}/src/main/xsl/emma.xsl">
+									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports"
+										style="${project.parent.basedir}/src/main/xsl/emma.xsl">
 										<mapper type="glob" from="*.xml" to="*.fragment" />
 										<param name="project" expression="${project.name}" />
 									</xslt>
@@ -591,9 +600,20 @@
 						<link>http://jakarta.apache.org/velocity/api/</link>
 						<link>http://static.springframework.org/spring/docs/2.5.x/api/</link>
 						<link>http://static.springframework.org/spring-batch/apidocs/</link>
+						<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
 					</links>
-					<aggregate>true</aggregate>
-					<excludePackageNames>*.batch.sample,*.batch.container</excludePackageNames>
+					<reportSets>
+						<reportSet>
+							<id>html</id>
+							<configuration>
+								<aggregate>true</aggregate>
+								<excludePackageNames>*.batch.sample,*.batch.container</excludePackageNames>
+							</configuration>
+							<reports>
+								<report>javadoc</report>
+							</reports>
+						</reportSet>
+					</reportSets>
 				</configuration>
 			</plugin>
 		</plugins>
