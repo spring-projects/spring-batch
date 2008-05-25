@@ -75,7 +75,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 	 * Public setter for the {@link Advice}.
 	 * @param advices the advice to set
 	 */
-	public void setAdvices(Advice[] advices) {
+	public void setAdviceChain(Advice[] advices) {
 		this.advices = advices;
 	}
 
