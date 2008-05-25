@@ -59,7 +59,7 @@
 		<!-- This is important... it forces the container to acknowledge message receipt, 
 			and avoid duplicate messages in the sunny day case -->
 		<property name="sessionTransacted" value="true" />
-		<property name="advices">
+		<property name="adviceChain">
 			<list>
 				<!-- Need another transaction manager here so that rollbacks are processed correctly -->
 				<bean class="org.springframework.transaction.interceptor.TransactionInterceptor">

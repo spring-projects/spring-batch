@@ -142,7 +142,7 @@ public class BatchMessageListenerContainerTests extends TestCase {
 		BatchMessageListenerContainer container = new BatchMessageListenerContainer();
 		RepeatOperationsInterceptor interceptor = new RepeatOperationsInterceptor();
 		interceptor.setRepeatOperations(template);
-		container.setAdvices(new Advice[] {interceptor});
+		container.setAdviceChain(new Advice[] {interceptor});
 		container.setConnectionFactory(connectionFactory);
 		container.setDestinationName("queue");
 		container.afterPropertiesSet();
