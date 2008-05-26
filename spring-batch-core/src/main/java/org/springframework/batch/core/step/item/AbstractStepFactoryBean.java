@@ -19,6 +19,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.validator.Validator;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -33,7 +34,7 @@ import org.springframework.util.Assert;
  * 
  */
 public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAware {
-
+	
 	private String name;
 
 	private int startLimit = Integer.MAX_VALUE;
@@ -49,6 +50,8 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 	private JobRepository jobRepository;
 
 	private boolean singleton = true;
+
+	private Validator jobRepositoryValidator = new TransactionInterceptorValidator(1);
 
 	/**
 	 * 
@@ -160,8 +163,8 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 
 		Assert.notNull(getItemReader(), "ItemReader must be provided");
 		Assert.notNull(getItemWriter(), "ItemWriter must be provided");
-		Assert.notNull(jobRepository, "JobRepository must be provided");
 		Assert.notNull(transactionManager, "TransactionManager must be provided");
+		jobRepositoryValidator .validate(jobRepository);
 
 		step.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
 		step.setTransactionManager(transactionManager);

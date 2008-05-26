@@ -20,20 +20,8 @@
 
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 
-	<aop:config>
-		<aop:advisor pointcut="execution(* org.springframework.batch.core..*Repository+.*(..))"
-			advice-ref="txAdvice" />
-	</aop:config>
-
-	<tx:advice id="txAdvice" transaction-manager="transactionManager">
-		<tx:attributes>
-			<tx:method name="create*" propagation="REQUIRES_NEW" isolation="SERIALIZABLE" />
-			<tx:method name="*" />
-		</tx:attributes>
-	</tx:advice>
-
 	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
-		p:databaseType="${environment}" p:dataSource-ref="dataSource" />
+		p:databaseType="${environment}" p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>
 
 	<bean id="mapJobInstanceDao" lazy-init="true"
 		class="org.springframework.batch.core.repository.dao.MapJobInstanceDao" />
