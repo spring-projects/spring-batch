@@ -39,7 +39,7 @@ public interface ItemReadListener extends StepListener {
 	void afterRead(Object item);
 	
 	/**
-	 * Called if an error occurs while trying to write.
+	 * Called if an error occurs while trying to read.
 	 * 
 	 * @param ex thrown from {@link ItemWriter}
 	 */
