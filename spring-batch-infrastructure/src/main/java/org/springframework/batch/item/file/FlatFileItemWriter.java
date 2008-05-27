@@ -25,6 +25,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -95,6 +96,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 
 	private List lineBuffer = new ArrayList();
 
+	private List headerLines = new ArrayList();
+
 	public FlatFileItemWriter() {
 		setName(ClassUtils.getShortName(FlatFileItemWriter.class));
 	}
@@ -140,6 +143,50 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	}
 
 	/**
+	 * Sets encoding for output template.
+	 */
+	public void setEncoding(String newEncoding) {
+		this.encoding = newEncoding;
+	}
+
+	/**
+	 * Sets buffer size for output template
+	 */
+	public void setBufferSize(int newSize) {
+		this.bufferSize = newSize;
+	}
+
+	/**
+	 * @param shouldDeleteIfExists the shouldDeleteIfExists to set
+	 */
+	public void setShouldDeleteIfExists(boolean shouldDeleteIfExists) {
+		this.shouldDeleteIfExists = shouldDeleteIfExists;
+	}
+
+	/**
+	 * Set the flag indicating whether or not state should be saved in the
+	 * provided {@link ExecutionContext} during the {@link ItemStream} call to
+	 * update. Setting this to false means that it will always start at the
+	 * beginning on a restart.
+	 * 
+	 * @param saveState
+	 */
+	public void setSaveState(boolean saveState) {
+		this.saveState = saveState;
+	}
+
+	/**
+	 * Public setter for the header lines. These will be output at the head of
+	 * the file before any calls to {@link #write(Object)} (and not on restart
+	 * unless the restart is after a failure before the first flush).
+	 * 
+	 * @param headerLines the header lines to set
+	 */
+	public void setHeaderLines(String[] headerLines) {
+		this.headerLines = Arrays.asList(headerLines);
+	}
+
+	/**
 	 * Writes out a string followed by a "new line", where the format of the new
 	 * line separator is determined by the underlying operating system. If the
 	 * input is not a String and a converter is available the converter will be
@@ -168,27 +215,6 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Sets encoding for output template.
-	 */
-	public void setEncoding(String newEncoding) {
-		this.encoding = newEncoding;
-	}
-
-	/**
-	 * Sets buffer size for output template
-	 */
-	public void setBufferSize(int newSize) {
-		this.bufferSize = newSize;
-	}
-
-	/**
-	 * @param shouldDeleteIfExists the shouldDeleteIfExists to set
-	 */
-	public void setShouldDeleteIfExists(boolean shouldDeleteIfExists) {
-		this.shouldDeleteIfExists = shouldDeleteIfExists;
-	}
-
-	/**
 	 * Initialize the Output Template.
 	 * 
 	 * @see ItemStream#open(ExecutionContext)
@@ -199,6 +225,12 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 			outputState.restoreFrom(executionContext);
 		}
 		outputState.initializeBufferedWriter();
+		if (outputState.lastMarkedByteOffsetPosition == 0) {
+			for (Iterator iterator = headerLines.iterator(); iterator.hasNext();) {
+				String line = (String) iterator.next();
+				lineBuffer.add(line + LINE_SEPARATOR);
+			}
+		}
 	}
 
 	/**
@@ -223,6 +255,21 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 			executionContext.putLong(getKey(WRITTEN_STATISTICS_NAME), state.linesWritten);
 			executionContext.putLong(getKey(RESTART_COUNT_STATISTICS_NAME), state.restartCount);
 		}
+	}
+
+	public void flush() throws FlushFailedException {
+		OutputState state = getOutputState();
+		for (Iterator iterator = lineBuffer.listIterator(); iterator.hasNext();) {
+			String line = (String) iterator.next();
+			try {
+				state.write(line);
+			}
+			catch (IOException e) {
+				throw new FlushFailedException("Failed to write line to output file: " + line, e);
+			}
+		}
+		lineBuffer.clear();
+		state.mark();
 	}
 
 	// Returns object representing state.
@@ -503,33 +550,6 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 
 	public void clear() throws ClearFailedException {
 		lineBuffer.clear();
-	}
-
-	public void flush() throws FlushFailedException {
-		OutputState state = getOutputState();
-		for (Iterator iterator = lineBuffer.listIterator(); iterator.hasNext();) {
-			String line = (String) iterator.next();
-			try {
-				state.write(line);
-			}
-			catch (IOException e) {
-				throw new FlushFailedException("Failed to write line to output file: " + line, e);
-			}
-		}
-		lineBuffer.clear();
-		state.mark();
-	}
-
-	/**
-	 * Set the boolean indicating whether or not state should be saved in the
-	 * provided {@link ExecutionContext} during the {@link ItemStream} call to
-	 * update. Setting this to false means that it will always start at the
-	 * beginning.
-	 * 
-	 * @param saveState
-	 */
-	public void setSaveState(boolean saveState) {
-		this.saveState = saveState;
 	}
 
 }

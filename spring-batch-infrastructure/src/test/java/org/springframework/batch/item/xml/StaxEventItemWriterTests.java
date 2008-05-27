@@ -37,11 +37,12 @@ public class StaxEventItemWriterTests extends TestCase {
 	// test item for writing to output
 	private Object item = new Object() {
 		public String toString() {
-			return TEST_STRING;
+			return ClassUtils.getShortName(StaxEventItemWriter.class)+"-testString";
 		}
 	};
 
-	private static final String TEST_STRING = ClassUtils.getShortName(StaxEventItemWriter.class) + "-testString";
+	private static final String TEST_STRING = "<!--" + ClassUtils.getShortName(StaxEventItemWriter.class)
+			+ "-testString-->";
 
 	private static final int NOT_FOUND = -1;
 
@@ -96,9 +97,11 @@ public class StaxEventItemWriterTests extends TestCase {
 	public void testWriteAndFlush() throws Exception {
 		writer.open(executionContext);
 		writer.write(item);
-		assertEquals("", outputFileContent());
+		String content = outputFileContent();
+		assertEquals("", content);
 		writer.flush();
-		assertTrue(contains(outputFileContent(), TEST_STRING));
+		content = outputFileContent();
+		assertTrue("Wrong content: "+content, contains(content, TEST_STRING));
 	}
 
 	/**
@@ -132,6 +135,66 @@ public class StaxEventItemWriterTests extends TestCase {
 	}
 
 	/**
+	 * Item is written to the output file only after flush.
+	 */
+	public void testWriteWithHeader() throws Exception {
+		Object header1 = new Object();
+		Object header2 = new Object();
+		writer.setHeaderItems(new Object[] {header1, header2});
+		writer.open(executionContext);
+		writer.write(item);
+		String content = outputFileContent();
+		assertEquals("", content);
+		writer.flush();
+		content = outputFileContent();
+		assertTrue("Wrong content: "+content, contains(content, "<!--" + header1 + "-->"));
+		assertTrue("Wrong content: "+content, contains(content, "<!--" + header2 + "-->"));
+		assertTrue("Wrong content: "+content, contains(content, TEST_STRING));
+	}
+
+	/**
+	 * Item is written to the output file only after flush.
+	 */
+	public void testWriteWithHeaderAfterRollback() throws Exception {
+		Object header = new Object();
+		writer.setHeaderItems(new Object[] {header});
+		writer.open(executionContext);
+		writer.write(item);
+		String content = outputFileContent();
+		assertEquals("", content);
+		writer.clear();
+		writer.flush();
+		writer.open(executionContext);
+		writer.write(item);
+		writer.flush();
+		content = outputFileContent();
+		assertEquals("Wrong content: "+content, 1, countContains(content, "<!--" + header + "-->"));
+		assertEquals("Wrong content: "+content, 1, countContains(content, TEST_STRING));
+	}
+
+	/**
+	 * Item is written to the output file only after flush.
+	 */
+	public void testWriteWithHeaderAfterFlushAndRollback() throws Exception {
+		Object header = new Object();
+		writer.setHeaderItems(new Object[] {header});
+		writer.open(executionContext);
+		writer.write(item);
+		String content = outputFileContent();
+		assertEquals("", content);
+		writer.flush();
+		writer.update(executionContext);
+		writer.close(executionContext);
+		writer.open(executionContext);
+		writer.write(item);
+		writer.clear();
+		writer.flush();
+		content = outputFileContent();
+		assertEquals("Wrong content: "+content, 1, countContains(content, "<!--" + header + "-->"));
+		assertEquals("Wrong content: "+content, 1, countContains(content, TEST_STRING));
+	}
+
+	/**
 	 * Count of 'records written so far' is returned as statistics.
 	 */
 	public void testStreamContext() throws Exception {
@@ -141,7 +204,7 @@ public class StaxEventItemWriterTests extends TestCase {
 			writer.write(item);
 			writer.update(executionContext);
 			long writeStatistics = executionContext.getLong(ClassUtils.getShortName(StaxEventItemWriter.class)
-			        + ".record.count");
+					+ ".record.count");
 
 			assertEquals(i, writeStatistics);
 		}
@@ -195,7 +258,8 @@ public class StaxEventItemWriterTests extends TestCase {
 			StaxResult staxResult = (StaxResult) result;
 			try {
 				staxResult.getXMLEventWriter().add(XMLEventFactory.newInstance().createComment(graph.toString()));
-			} catch (XMLStreamException e) {
+			}
+			catch (XMLStreamException e) {
 				throw new RuntimeException("Exception while writing to output file", e);
 			}
 		}
@@ -236,5 +300,15 @@ public class StaxEventItemWriterTests extends TestCase {
 
 	private boolean contains(String str, String searchStr) {
 		return str.indexOf(searchStr) != -1;
+	}
+
+	private int countContains(String str, String searchStr) {
+		int begin = -1;
+		int count = 0;
+		while (str.indexOf(searchStr, begin+1) > begin) {
+			count++;
+			begin = str.indexOf(searchStr, begin);
+		}
+		return count;
 	}
 }

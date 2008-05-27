@@ -336,6 +336,70 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals(TEST_STRING, lineFromFile);
 	}
 
+	public void testWriteHeader() throws Exception {
+		writer.setHeaderLines(new String[] {"a", "b"});
+		writer.open(executionContext);
+		writer.write(TEST_STRING);
+		writer.flush();
+		writer.close(null);
+		String lineFromFile = readLine();
+		assertEquals("a", lineFromFile);
+		lineFromFile = readLine();
+		assertEquals("b", lineFromFile);
+		lineFromFile = readLine();
+		assertEquals(TEST_STRING, lineFromFile);
+	}
+
+	public void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
+		writer.setHeaderLines(new String[] {"a", "b"});
+		writer.open(executionContext);
+		writer.write(TEST_STRING);
+		writer.clear();
+		writer.close(executionContext);
+		writer.open(executionContext);
+		writer.write(TEST_STRING);
+		writer.flush();
+		writer.close(executionContext);
+		String lineFromFile = readLine();
+		assertEquals("a", lineFromFile);
+		lineFromFile = readLine();
+		assertEquals("b", lineFromFile);
+		lineFromFile = readLine();
+		assertEquals(TEST_STRING, lineFromFile);
+		lineFromFile = readLine();
+		assertEquals(null, lineFromFile);
+	}
+
+	public void testWriteHeaderAfterRestartOnSecondChunk() throws Exception {
+		writer.setHeaderLines(new String[] {"a", "b"});
+		writer.open(executionContext);
+		writer.write(TEST_STRING);
+		writer.flush();
+		writer.update(executionContext);
+		writer.write(TEST_STRING);
+		writer.clear();
+		writer.close(executionContext);
+		String lineFromFile = readLine();
+		assertEquals("a", lineFromFile);
+		lineFromFile = readLine();
+		assertEquals("b", lineFromFile);
+		lineFromFile = readLine();
+		assertEquals(TEST_STRING, lineFromFile);
+		writer.open(executionContext);
+		writer.write(TEST_STRING);
+		writer.flush();
+		writer.close(executionContext);
+		reader = null;
+		lineFromFile = readLine();
+		assertEquals("a", lineFromFile);
+		lineFromFile = readLine();
+		assertEquals("b", lineFromFile);
+		lineFromFile = readLine();
+		assertEquals(TEST_STRING, lineFromFile);
+		lineFromFile = readLine();
+		assertEquals(TEST_STRING, lineFromFile);
+	}
+
 	private void commit() throws Exception {
 		writer.flush();
 	}
