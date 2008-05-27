@@ -163,7 +163,6 @@ public class StaxEventItemWriterTests extends TestCase {
 		String content = outputFileContent();
 		assertEquals("", content);
 		writer.clear();
-		writer.flush();
 		writer.open(executionContext);
 		writer.write(item);
 		writer.flush();
