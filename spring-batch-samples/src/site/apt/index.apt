@@ -1,5 +1,58 @@
 Spring Batch Samples
 
+* Overview
+
+  There is considerable variability in the types of input and output
+  formats in batch jobs. There is also a number of options to consider
+  in terms of how the types of strategies that will be used to handle
+  skips, recovery, and statistics. However, when approaching a new
+  batch job there are a few standard questions to answer to help
+  determine how the job will be written and how to utilize the
+  services offered by the spring batch framework. Consider the
+  following:
+
+  There is considerable variability in the types of input and output
+  formats in batch jobs. There is also a number of options to consider
+  in terms of how the types of strategies that will be used to handle
+  skips, recovery, and statistics. However, when approaching a new
+  batch job there are a few standard questions to answer to help
+  determine how the job will be written and how to utilize the
+  services offered by the spring batch framework. Consider the
+  following:
+
+    * How do I configure this batch job? In the samples the pattern is
+    to follow the convention of <<<[nameOf]Job.xml>>>. Each sample
+    will identify the XML definition used to configure the job. Job
+    configurations that leverage a common execution environment have
+    many common items in their respective configurations.
+
+    * What is the input source? Each sample batch job identifies
+    its input source.
+
+    * What is my output source? Each sample batch job identifies
+    its output source.
+
+    * How are records read and validated from the input source? This
+    refers to the input type and its format (e.g. flat file with fixed
+    position, comma separated or XML, etc.)
+      
+    * What is the policy of the job if a input record fails the
+    validation step? The most important aspect is whether the record
+    can be skipped so that processing can be continued.
+
+    * How do I process the data and write to the output source? How
+    and what business logic is being applied to the processing of a
+    record?
+
+    * How do I recover from an exception while operating on the output
+    source? There are numerous recovery strategies that can be applied
+    to handling errors on transactional targets. The samples provide a
+    feeling for some of the choices.
+
+    * Can I restart the job and if so which strategy can I use to
+    restart the job? The samples show some of the options available to
+    jobs and what the decision criteria is for the respective choices.
+
   Here is a list of samples with checks to indicate which features each one demonstrates:
 
 *----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
@@ -35,3 +88,515 @@ tradeJob                 | x |  |  |  | x |  | x |  |  |  | x |  |  |  |  | x |
 *----
 xmlStaxJob               |  |  | x |  |  |  |  |  | x |  |  |  |  |  |  |  | 
 *----
+
+* Common Sample Test Structures
+
+** Tasklet Job
+
+  The goal is to show the simplest use of the batch framework with a
+  single job with a single step, which processes one input source to
+  one output source.
+
+  <Description:> This job is defined by simpleTaskletJob.xml file. Job
+  itself is defined by element simpleTaskletJob. Each job consists of
+  several steps, these steps are defined in steps property. In this
+  example we have only one step. The step defines a tasklet that is
+  responsible for processing trades. In this case processing will be
+  handled by SimpleTradeTasklet class. Each tasklet must implement
+  execute() method. All processing of business data should be handled
+  by this method. In this example the tradeFieldSetMapper obtains the
+  data from the input source and maps the line to the Trade object.
+    
++---
+    trade = (Trade) tradeFieldSetMapper.mapLine(inputSource.readFieldSet());
++---
+
+  If data exists and an object is returned it is simply passed to the
+  output source. If there is no data to read an ExitStatus with the
+  status of FINISHED is returned from the Tasklet.
+
+  <Method read()> gets the data from the input template defined and
+  maps it to an object using mapper defined in XML definition. This
+  sample uses FlatFileInputTemplate class as input template. This
+  template reads the whole line from the file and pass it to tokenizer
+  which knows the structure of the line. Location of the file is
+  defined by fileLocatorStrategy property, structurte of the line is
+  defined by fixedFileDescriptor. Result of parsing the line is stored
+  in FieldSet, which is used by mapper to create value object. In our
+  example we use DefaultLineMapper which creates an instance of Trade
+  class.
+
+  <Method process()> is quite simple - just writes trade object using
+  DbTradeWriter class. This class writes values obtained from an
+  object to the database.
+
+  <Specific information:> This job has whole logic implemented in
+  Tasklet. It is not using Data provider as well as Tasklet processor,
+  which is typical way how to handle data.
+
+  <XML definition:> simpleTaskletJob.xml
+
+    [Note:] we need to document Spring IDE in setup and installation
+    so we can use to describe the project. Also, if we could also
+    publish we can provide links to the graphics from docs. This is a
+    sample only.
+
+  Visualization of the spring configuration through Spring-IDE exposes
+  the structure of a job configuration. The following is the
+  visualization of the Simple Tasklet Job configuration. See
+  {{{http://springide.org/blog/}Spring IDE}}.
+
+  For simplicity we are only displaying the job configuration itself
+  and leaving out the details of the supporting batch execution
+  environment configuration. The source view of the configuration is
+  as follows:
+
++---
+<bean id="taskletJob" parent="simpleJob">
+	<property name="steps">
+		<list>
+			<bean id="deleteFilesInDir" parent="taskletStep">
+				<property name="tasklet">
+					<bean
+			class="org.springframework.batch.sample.tasklet.FileDeletingTasklet">
+						<property name="directoryResource"
+							ref="directory" />
+					</bean>
+				</property>
+			</bean>
+			<bean id="executeSystemCommand" parent="taskletStep">
+				<property name="tasklet">
+					<bean
+			class="org.springframework.batch.sample.tasklet.SystemCommandTasklet">
+						<property name="command" value="echo hello" />
+						<!-- 5 second timeout for the command to complete -->
+						<property name="timeout" value="5000" />
+					</bean>
+				</property>
+			</bean>
+		</list>
+	</property>
+
+</bean>
+
+<bean id="directory"
+	class="org.springframework.core.io.FileSystemResource">
+	<constructor-arg value="target/test-outputs/test-dir" />
+</bean>
++---
+
+  You should take the time to make sure you understand the
+  relationship of the xml configuration with the visualization as
+  provided by Spring IDE.
+
+** Fixed Length Import Job
+
+  The goal is to demonstrate a typical scenarion of importing data
+  from a fixed-length file to database
+
+  <Description:> This job shows a more typical scenario, when reading
+  input data and processing the data is cleanly separated. The data
+  provider is responsible for reading input and mapping each record to
+  a domain object, which is then passed to the module processor. The
+  module processor handles the processing of the domain objects, in
+  this case it only writes them to database.
+
+  <XML definition:> fixedLengthImportJob.xml
+
+  <Input source:> file with fixed row structure
+
+  In this example we are using a simple fixed length record structure
+  that can be found in the project at
+  <<<data/fixedLengthImportJob/input>>>.  There's generally a
+  considerable amount of thought that goes into architecting the
+  folder structures for batch file management. See [provide a link to
+  DefaultFileStrategy]. The only point to note here is the
+  ImportTradeDataStep matches the name of the step in the
+  configuration and the fixed length records look like:
+
++---
+  UK21341EAH4597898.34customer1
+  UK21341EAH4611218.12customer2
+  UK21341EAH4724512.78customer2
+  UK21341EAH48108109.25customer3
+  UK21341EAH49854123.39customer4
++---
+
+  Looking back to the configuration file you will see where this is
+  documented in the property of the <<<FixedLengthTokenizer>>>. You can
+  see the following:
+
+*---+---+
+|<<FieldName>>|<<Length>>|
+|ISIN|12|
+|Quantity|3|
+|Price|5|
+|Customer|9|
+*---+---+
+
+  <Output target:> database - writes the data to database using a DAO
+  object
+
+
+* Multiline Order Job
+
+  The goal is to demostrate how to handle a more complex file input
+  format, where a record meant for processing inludes nested records
+  and spans multiple lines <XML definition:> multilineOrderJob.xml
+
+  <Input source:> file with multiline records
+
+  <Output target:> file with multiline records
+
+  <Data Provider:> OrderDataProvider is an example of a non-default
+  programmatic data provider. It reads input until it detects that the
+  multiline record has finished and encapsulates the record in a
+  single domain object.
+
+  <Tasklet processor:> module processor passes the object to a an
+  injected 'report service' which in this case writes the output to a
+  file do demonstrate how to use the FlatFileOutputTemplate for
+  writing multiline output according to a file descriptor.
+
+* Quartz Batch
+
+    The goal is to demonstrate how to schedule job execution using
+    Quartz scheduler
+
+    <XML definition:>
+    quartzBatch.xml
+
+    <Description:> First, declares
+    launcher beans. Each launcher bean is able to launch a job using injected
+    arguments. Second, triggers are declared saying when the launchers should
+    be run. Last, there is the scheduler bean, where the triggers are
+    registered.
+
+* Simple Skip Sample
+
+* Restart Sample
+
+* SQL Cursor Trade Job
+
+* Trade Job
+
+  The goal is to show a reasonably complex scenario, that would
+  resemble the real-life usage of the framework.
+
+  <Description:> This job has 3 steps.  First, data about trades is
+  imported from a file to database. Second, the data about trades is
+  read from the database and credit on customer accounts is decreased
+  appropriately. Last, a report about customers is exported to a file.
+
+  <XML definition:> tradeJob.xml - the job definition, tradeJobIo.xml
+  - input and output configuration, tradeJobAop.xml - optional AOP
+  logging
+
+  <Description:> This job has 3 steps.  First, data about trades is
+  imported from a file to database. Second, the data about trades is
+  read from the database and credit on customer accounts is decreased
+  appropriately. Last, a report about customers is exported to a file.
+
+* XML Job
+
+* Football Job
+
+  This is a Football statistics loading job. We’ll give it the id of
+  <<<footballjob>>> in our configuration file. Before diving into the
+  batch job, we’ll examine the two input files that need to be
+  loaded. First is <<<player.csv>>>, which can be found in the samples
+  project under src/main/resources/data/footballjob/input/. Each line
+  within this file represents a player, with a unique id, the player’s
+  name, position, etc:
+
++---
+AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996
+AbduRa00,Abdullah,Rabih,rb,1975,1999
+AberWa00,Abercrombie,Walter,rb,1959,1982
+AbraDa00,Abramowicz,Danny,wr,1945,1967
+AdamBo00,Adams,Bob,te,1946,1969
+AdamCh00,Adams,Charlie,wr,1979,2003
+...
++---
+
+  One of the first noticeable characteristics of the file is that each
+  data element is separated by a comma, a format most are familiar
+  with known as 'CSV'. Other separators such as pipes or semicolons
+  could just as easily be used to delineate between unique
+  elements. In general, it falls into one of two types of flat file
+  formats: delimited or fixed length.  Because both input files in
+  this example are comma delimited, we'll skip over fixed length for
+  now, other than to say that the only difference between the two
+  types is that fixed length formatting determines the separation
+  between elements by assigning each element a 'fixed length' in which
+  to reside, rather than using a character that hopefully doesn't
+  exist in the data itself to separate individual elements.
+
+  The second file, 'games.csv' is formatted the same as the previous
+  example, and resides in the same directory:
+
++---
+AbduKa00,1996,mia,10,nwe,0,0,0,0,0,29,104,,16,2
+AbduKa00,1996,mia,11,clt,0,0,0,0,0,18,70,,11,2
+AbduKa00,1996,mia,12,oti,0,0,0,0,0,18,59,,0,0
+AbduKa00,1996,mia,13,pit,0,0,0,0,0,16,57,,0,0
+AbduKa00,1996,mia,14,rai,0,0,0,0,0,18,39,,7,0
+AbduKa00,1996,mia,15,nyg,0,0,0,0,0,17,96,,14,0
++---
+
+  Each line in the file represents an individual player's performance
+  in a particular game, containing such statistics as passing yards,
+  receptions, rushes, and total touchdowns.
+
+  Our example batch job is going to load both files into a database,
+  and then combine each to summarize how each player performed for a
+  particular year. Although this example is fairly trivial, it shows
+  multiple types of input, and the general style is a common batch
+  scenario.  That is, summarizing a very large dataset so that it can
+  be more easily manipulated or viewed by an online web-based
+  application. In an enterprise solution the third step, the reporting
+  step, could be implemented through the use of Eclipse BIRT or one of
+  the many Java Reporting Engines. Given this description, we can then
+  easily divide our batch job up into 3 'steps': one to load the
+  player data, one to load the game data, and one to produce a summary
+  report:
+
+  NOTE:One of the nice features of Spring is a project called Spring
+  IDE. When you download the project you can install Spring IDE and
+  add the Spring configurations to the IDE project. This is not a
+  tutorial on Spring IDE but the visual view into Spring beans is
+  helpful in understanding the structure of a Job
+  Configuration. Spring IDE produces the following diagram:
+
+[images/spring-batch-football-graph.jpg]
+
+  This corresponds exactly with the footballJob.xml job configuration
+  file which can be found in the jobs folder under
+  src/main/resources. When you drill down into the footballjob you
+  will see that the configuration has a list of steps:
+
++---
+<property name="steps">
+  <list>
+    <bean id="playerload" parent="simpleStep" .../>
+    <bean id="gameLoad" parent="simpleStep" .../>
+    <bean id="playerSummarization" parent="simpleStep" .../>
+  </list>
+</property>
++---
+
+  The step is run until there is no more input to process, which in
+  this case would mean that each file has been completely
+  processed. To describe it in a more narrative form: The first step,
+  playerLoad, begins executing by grabbing one line of input from the
+  file, and parsing it into a domain object. That domain object is
+  then passed to a dao, which writes it out to the PLAYERS table. This
+  action is repeated until there are no more lines in the file,
+  causing the playerLoad step to finish. Next, the gameLoad step does
+  the same for the games input file, inserting into the GAMES
+  table. Once finished, the playerSummarization step can begin. Unlike
+  the first two steps, playerSummarization's input comes from the
+  database, using a Sql statement to combine the GAMES and PLAYERS
+  table. Each returned row is packaged into a domain object and
+  written out to the PLAYER_SUMMARY table.
+
+  Now that we've discussed the entire flow of the batch job, we can
+  dive deeper into the first step: playerLoad: 
+
++---
+<bean id="playerload" parent="simpleStep">
+	<property name="commitInterval" value="${job.commit.interval}" />
+	<property name="startLimit" value="100" />
+	<property name="itemReader"
+		ref="playerFileItemReader" />
+	<property name="itemWriter">
+		<bean
+			class="org.springframework.batch.sample.item.writer.PlayerItemWriter">
+			<property name="playerDao">
+				<bean
+					class="org.springframework.batch.sample.dao.JdbcPlayerDao">
+					<property name="dataSource"
+						ref="dataSource" />
+				</bean>
+			</property>
+		</bean>
+	</property>
+</bean>
++---
+
+  The root bean in this case is a StepConfiguration, which can be
+  considered a 'blueprint' of sorts that tells the execution
+  environment basic details about how the batch job should be
+  executed. It contains two properties: (others have been removed for
+  greater clarity) commitInterval and tasklet. The Tasklet is the main
+  abstraction representing the developer's business logic within the
+  batch job. After performing all necessary startup, the framework
+  will periodically delegate to the Tasklet. In this way, the
+  developer can remain solely concerned with their business logic. In
+  this case, the Tasklet has been split into two classes:
+
+    * <Item Provider> – the item provider is the source of the
+    information pipe. At the most basic level input is read in from an
+    input source, parsed into a domain object and returned. In this
+    way, the good batch architecture practice of ensuring all data has
+    been read before beginning processing can be enforced, along with
+    providing a possible avenue for reuse.
+
+    * <Item Processorr> – this is the business logic. At a high level,
+    the ItemProcessor takes the item returned from the ItemProvider
+    and 'processes' it. In our case it's a data access object that is
+    simply responsible for inserting a record into the PLAYERS
+    table. As you can see the developer does very little.
+
+  Clearly, the developer does very little. Simply provide a job
+  configuration with a configured number of steps, an Item Provider
+  associated to some type of input source, and Item Processor
+  associated to some type of output source and a little mapping of
+  data from flat records to objects and the pipe is ready wired for
+  processing.
+
+  The other property to the StepConfiguration, commitInterval, gives
+  the framework vital information about how to control transactions
+  during the batch run. Due to the large amount of data involved in
+  batch processing, it is often advantageous to 'batch' together
+  multiple Logical Units of Work into one transaction, since starting
+  and committing a transaction is extremely expensive. For example, in
+  the playerLoad step, the framework calls the execute() method on the
+  Tasklet, which then calls next() on the ItemProvider. The
+  ItemProvider reads one record from the file, then returns a domain
+  object representation which is passed to the processor. The
+  processor then writes the one record to the database. It can then be
+  said that one iteration = one call to Tasklet.execute() = one line
+  of the file. Therefore, setting your commitInterval to 5 would
+  result in the framework committing a transaction after 5 lines have
+  been read from the file, with 5 resultant entries in the PLAYERS
+  table.
+
+  Following the general flow of the batch job, the next step is to
+  describe how each line of the file will be parsed from its string
+  representation into a domain object. The first thing the provider
+  will need is an InputSource, which is provided as part of the Spring
+  Batch infrastructure. Because the input is flat-file based, a
+  FlatFileInputSource is used:
+
++---
+<bean id="playerFileItemReader"
+	class="org.springframework.batch.item.file.FlatFileItemReader">
+	<property name="resource"
+		value="classpath:data/footballjob/input/${player.file.name}" />
+	<property name="lineTokenizer">
+		<bean
+			class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+			<property name="names"
+				value="ID,lastName,firstName,position,birthYear,debutYear" />
+		</bean>
+	</property>
+	<property name="fieldSetMapper">
+		<bean
+			class="org.springframework.batch.sample.mapping.PlayerFieldSetMapper" />
+	</property>
+</bean>
++---
+
+  There are two required dependencies of the input source; the first
+  is a resource to read in, which is the file to process. The second
+  dependency is a LineTokenizer. The interface for a LineTokenizer is
+  very simple, given a string; it will return a FieldSet that wraps
+  the results from splitting the provided string. A FieldSet is Spring
+  Batch's abstraction for flat file data. It allows developers to work
+  with file input in much the same way as they would work with
+  database input. All the developers need to provide is a
+  FieldSetMapper (similar to a Spring RowMapper) that will map the
+  provided FieldSet into an Object. Simply by providing the names of
+  each token to the LineTokenizer, the ItemProvider can pass the
+  FieldSet into our PlayerMapper, which implements the FieldSetMapper
+  interface. There is a single method, mapLine(), which maps FieldSets
+  the same way that developers are comfortable mapping ResultSets into
+  Java Objects, either by index or fieldname. This behavior is by
+  intention and design similar to the RowMapper passed into a
+  JdbcTemplate.  You can see this below: 
+
++---
+public class
+  PlayerMapper implements FieldSetMapper {
+
+        public Object mapLine(FieldSet fs) {
+                
+                if(fs == null){
+                        return null;
+                }
+                
+                Player player = new Player();
+                player.setID(fs.readString("ID"));
+                player.setLastName(fs.readString("lastName"));
+                player.setFirstName(fs.readString("firstName"));
+                player.setPosition(fs.readString("position"));
+                player.setDebutYear(fs.readInt("debutYear"));
+                player.setBirthYear(fs.readInt("birthYear"));
+                
+                return player;
+        }
+}
++---
+
+  The flow of the ItemProvider, in this case, starts with a call to
+  readFieldSet on the InputSource. The next line in the file is read
+  in as a String and passed into the provided LineTokenizer. The
+  LineTokenizer splits the line at every comma, and creates a FieldSet
+  using the created String array and the array of names passed
+  in. (Note: it is only necessary to provide the names if you wish to
+  access the field by name, rather than by index).
+
+  Once the domain representation of the data has been returned by the
+  provider, (i.e. an Player object) it is passed to the ItemProcessor,
+  which is essentially a Dao that uses a Spring JdbcTemplate to insert
+  a new row in the PLAYERS table.
+
+  The next step, gameLoad, works almost exactly the same as the
+  playerLoad step, except the games file is used.
+
+  The final step, playerSummarization, is much like the previous two
+  steps, it is split into a provider that reads from an InputSource
+  and returns a domain object to the processor. However, in this case,
+  the input source is the database, not a file:
+
++----
+<bean id="playerSummarizationSource"
+  class="org.springframework.batch.item.database.JdbcCursorItemReader">
+  <property name="dataSource" ref="dataSource" />
+  <property name="mapper">
+	<bean
+      class="org.springframework.batch.sample.mapping.PlayerSummaryMapper" />
+  </property>
+  <property name="sql">
+    <value>
+SELECT games.player_id, games.year_no, SUM(COMPLETES),
+SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
+SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),
+SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)
+from games, players where players.player_id =
+games.player_id group by games.player_id, games.year_no
+    </value>
+  </property>
+</bean>
++----
+
+  The SqlCursorInputSource has three dependences:
+
+    * A DataSource
+
+    * The SqlRowMapper to use for each row.
+
+    * The Sql statement used to create the Cursor.
+
+  When the step is first started, a query will be run against the
+  database to open a cursor, and each call to inputSource.read() will
+  move the cursor to the next row, using the provided RowMapper to
+  return the correct object. As with the previous two steps, each
+  record returned by the provider will be written out to the database
+  in the PLAYER_SUMMARY table. Finally to run this sample application
+  you can execute the JUnit test <<<FootballJobFunctionalTests>>>, and
+  you'll see an output showing each of the records as they are
+  processed. Please keep in mind that AoP is used to wrap the
+  ItemProcessors and output each record as it is processed to the
+  logger, which will greatly impact performance.
