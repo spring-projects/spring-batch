@@ -16,8 +16,8 @@
 
 package org.springframework.batch.repeat.support;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ArrayBlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 
 /**
@@ -34,7 +34,7 @@ class BackportConcurrentResultQueue extends AbstractResultQueue implements Repea
 	private final Semaphore waits;
 
 	BackportConcurrentResultQueue(int throttleLimit) {
-		results = new ArrayBlockingQueue(throttleLimit);
+		results = new LinkedBlockingQueue();
 		waits = new Semaphore(throttleLimit);
 	}
 

@@ -16,8 +16,8 @@
 
 package org.springframework.batch.repeat.support;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -34,7 +34,7 @@ class JdkConcurrentResultQueue extends AbstractResultQueue implements RepeatInte
 	private final Semaphore waits;
 
 	JdkConcurrentResultQueue(int throttleLimit) {
-		results = new ArrayBlockingQueue(throttleLimit);
+		results = new LinkedBlockingQueue();
 		waits = new Semaphore(throttleLimit);
 	}
 

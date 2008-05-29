@@ -28,14 +28,11 @@ import org.springframework.batch.repeat.RepeatException;
 abstract class AbstractResultQueue extends RepeatInternalStateSupport implements ResultQueue {
 
 	// Arbitrary lock object.
-	Object lock = new Object();
-
-	// Arbitrary lock object.
-	Object hold = new Object();
+	private final Object lock = new Object();
 
 	// Counter to monitor the difference between expected and actually collected
 	// results. When this reaches zero there are really no more results.
-	volatile int count = 0;
+	private volatile int count = 0;
 
 	public boolean isExpecting() {
 		synchronized (lock) {
@@ -59,15 +56,11 @@ abstract class AbstractResultQueue extends RepeatInternalStateSupport implements
 	}
 
 	public void put(ResultHolder holder) {
-		// There should be no need to block here, or to use offer(), but
-		// apparently the add() sometimes takes so long on the CI build that the
-		// queue fills up, so we synchronize here...
-		synchronized (hold) {
-			addResult(holder);
-			// Take from the waits queue now to allow another result to
-			// accumulate. But don't decrement the counter.
-			releaseWait();
-		}
+		// There should be no need to block here, or to use offer()
+		addResult(holder);
+		// Take from the waits queue now to allow another result to
+		// accumulate. But don't decrement the counter.
+		releaseWait();
 	}
 
 	public ResultHolder take() {
