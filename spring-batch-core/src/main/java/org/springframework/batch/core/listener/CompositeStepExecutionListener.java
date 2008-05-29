@@ -15,14 +15,12 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.core.Ordered;
 
 /**
  * @author Lucas Ward
@@ -31,7 +29,7 @@ import org.springframework.batch.repeat.ExitStatus;
  */
 public class CompositeStepExecutionListener implements StepExecutionListener {
 
-	private List listeners = new ArrayList();
+	private OrderedComposite list = new OrderedComposite();
 
 	/**
 	 * Public setter for the listeners.
@@ -39,7 +37,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	 * @param listeners
 	 */
 	public void setListeners(StepExecutionListener[] listeners) {
-		this.listeners = Arrays.asList(listeners);
+		list.setItems(listeners);
 	}
 
 	/**
@@ -48,43 +46,48 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	 * @param stepExecutionListener
 	 */
 	public void register(StepExecutionListener stepExecutionListener) {
-		if (!listeners.contains(stepExecutionListener)) {
-			listeners.add(stepExecutionListener);
-		}
+		list.add(stepExecutionListener);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#close()
+	/**
+	 * Call the registered listeners in reverse order, respecting and
+	 * prioritising those that implement {@link Ordered}.
+	 * @see org.springframework.batch.core.StepExecutionListener#afterStep(StepExecution)
 	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		ExitStatus status = null;
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator iterator = list.reverse(); iterator.hasNext();) {
 			StepExecutionListener listener = (StepExecutionListener) iterator.next();
 			ExitStatus close = listener.afterStep(stepExecution);
-			status = status!=null ? status.and(close): close;
+			status = status != null ? status.and(close) : close;
 		}
 		return status;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#open(org.springframework.batch.core.domain.JobParameters)
+	/**
+	 * Call the registered listeners in order, respecting and prioritising those
+	 * that implement {@link Ordered}.
+	 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(StepExecution)
 	 */
 	public void beforeStep(StepExecution stepExecution) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
 			StepExecutionListener listener = (StepExecutionListener) iterator.next();
 			listener.beforeStep(stepExecution);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#onError(java.lang.Throwable)
+	/**
+	 * Call the registered listeners in reverse order, respecting and
+	 * prioritising those that implement {@link Ordered}.
+	 * @see org.springframework.batch.core.StepExecutionListener#onErrorInStep(StepExecution,
+	 * java.lang.Throwable)
 	 */
 	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 		ExitStatus status = null;
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator iterator = list.reverse(); iterator.hasNext();) {
 			StepExecutionListener listener = (StepExecutionListener) iterator.next();
 			ExitStatus close = listener.onErrorInStep(stepExecution, e);
-			status = status!=null ? status.and(close): close;
+			status = status != null ? status.and(close) : close;
 		}
 		return status;
 	}

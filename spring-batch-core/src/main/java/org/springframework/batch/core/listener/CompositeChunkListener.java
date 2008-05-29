@@ -15,12 +15,10 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.core.Ordered;
 
 /**
  * @author Lucas Ward
@@ -28,7 +26,7 @@ import org.springframework.batch.core.ChunkListener;
  */
 public class CompositeChunkListener implements ChunkListener {
 
-	private List listeners = new ArrayList();
+	private OrderedComposite listeners = new OrderedComposite();
 
 	/**
 	 * Public setter for the listeners.
@@ -36,7 +34,7 @@ public class CompositeChunkListener implements ChunkListener {
 	 * @param listeners
 	 */
 	public void setListeners(ChunkListener[] listeners) {
-		this.listeners = Arrays.asList(listeners);
+		this.listeners.setItems(listeners);
 	}
 
 	/**
@@ -45,13 +43,14 @@ public class CompositeChunkListener implements ChunkListener {
 	 * @param chunkListener
 	 */
 	public void register(ChunkListener chunkListener) {
-		if (!listeners.contains(chunkListener)) {
-			listeners.add(chunkListener);
-		}
+		listeners.add(chunkListener);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ChunkListener#afterChunk()
+	/**
+	 * Call the registered listeners in order, respecting and prioritising those
+	 * that implement {@link Ordered}.
+	 * 
+	 * @see org.springframework.batch.core.ChunkListener#afterChunk()
 	 */
 	public void afterChunk() {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
@@ -60,11 +59,13 @@ public class CompositeChunkListener implements ChunkListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ChunkListener#beforeChunk()
+	/**
+	 * Call the registered listeners in reverse order.
+	 * 
+	 * @see org.springframework.batch.core.ChunkListener#beforeChunk()
 	 */
 	public void beforeChunk() {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator iterator = listeners.reverse(); iterator.hasNext();) {
 			ChunkListener listener = (ChunkListener) iterator.next();
 			listener.beforeChunk();
 		}

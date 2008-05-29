@@ -15,20 +15,19 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.core.Ordered;
 
 /**
  * @author Lucas Ward
+ * @author Dave Syer
  * 
  */
 public class CompositeItemWriteListener implements ItemWriteListener {
 
-	private List listeners = new ArrayList();
+	private OrderedComposite listeners = new OrderedComposite();
 
 	/**
 	 * Public setter for the listeners.
@@ -36,7 +35,7 @@ public class CompositeItemWriteListener implements ItemWriteListener {
 	 * @param itemWriteListeners
 	 */
 	public void setListeners(ItemWriteListener[] itemWriteListeners) {
-		this.listeners = Arrays.asList(itemWriteListeners);
+		this.listeners.setItems(itemWriteListeners);
 	}
 
 	/**
@@ -45,18 +44,26 @@ public class CompositeItemWriteListener implements ItemWriteListener {
 	 * @param itemReaderListener
 	 */
 	public void register(ItemWriteListener itemReaderListener) {
-		if (!listeners.contains(itemReaderListener)) {
-			listeners.add(itemReaderListener);
-		}
+		listeners.add(itemReaderListener);
 	}
 
+	/**
+	 * Call the registered listeners in reverse order, respecting and
+	 * prioritising those that implement {@link Ordered}.
+	 * @see org.springframework.batch.core.ItemWriteListener#afterWrite(java.lang.Object)
+	 */
 	public void afterWrite(Object item) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemWriteListener listener = (ItemWriteListener) iterator.next();
 			listener.afterWrite(item);
 		}
 	}
 
+	/**
+	 * Call the registered listeners in order, respecting and prioritising those
+	 * that implement {@link Ordered}.
+	 * @see org.springframework.batch.core.ItemWriteListener#beforeWrite(java.lang.Object)
+	 */
 	public void beforeWrite(Object item) {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemWriteListener listener = (ItemWriteListener) iterator.next();
@@ -64,8 +71,14 @@ public class CompositeItemWriteListener implements ItemWriteListener {
 		}
 	}
 
+	/**
+	 * Call the registered listeners in reverse order, respecting and
+	 * prioritising those that implement {@link Ordered}.
+	 * @see org.springframework.batch.core.ItemWriteListener#onWriteError(java.lang.Exception,
+	 * java.lang.Object)
+	 */
 	public void onWriteError(Exception ex, Object item) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemWriteListener listener = (ItemWriteListener) iterator.next();
 			listener.onWriteError(ex, item);
 		}

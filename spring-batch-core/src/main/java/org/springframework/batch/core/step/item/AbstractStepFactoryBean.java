@@ -164,7 +164,7 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 		Assert.notNull(getItemReader(), "ItemReader must be provided");
 		Assert.notNull(getItemWriter(), "ItemWriter must be provided");
 		Assert.notNull(transactionManager, "TransactionManager must be provided");
-		jobRepositoryValidator .validate(jobRepository);
+		jobRepositoryValidator.validate(jobRepository);
 
 		step.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
 		step.setTransactionManager(transactionManager);

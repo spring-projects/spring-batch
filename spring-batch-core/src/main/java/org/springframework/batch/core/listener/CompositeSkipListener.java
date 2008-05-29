@@ -15,12 +15,10 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import org.springframework.batch.core.SkipListener;
+import org.springframework.core.Ordered;
 
 /**
  * @author Dave Syer
@@ -28,7 +26,7 @@ import org.springframework.batch.core.SkipListener;
  */
 public class CompositeSkipListener implements SkipListener {
 
-	private List listeners = new ArrayList();
+	private OrderedComposite listeners = new OrderedComposite();
 
 	/**
 	 * Public setter for the listeners.
@@ -36,7 +34,7 @@ public class CompositeSkipListener implements SkipListener {
 	 * @param listeners
 	 */
 	public void setListeners(SkipListener[] listeners) {
-		this.listeners = Arrays.asList(listeners);
+		this.listeners.setItems(listeners);
 	}
 
 	/**
@@ -45,12 +43,12 @@ public class CompositeSkipListener implements SkipListener {
 	 * @param listener
 	 */
 	public void register(SkipListener listener) {
-		if (!listeners.contains(listener)) {
-			listeners.add(listener);
-		}
+		listeners.add(listener);
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Call the registered listeners in order, respecting and prioritising those
+	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.SkipListener#onSkipInRead(java.lang.Throwable)
 	 */
 	public void onSkipInRead(Throwable t) {
@@ -60,8 +58,11 @@ public class CompositeSkipListener implements SkipListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)
+	/**
+	 * Call the registered listeners in order, respecting and prioritising those
+	 * that implement {@link Ordered}.
+	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object,
+	 * java.lang.Throwable)
 	 */
 	public void onSkipInWrite(Object item, Throwable t) {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {

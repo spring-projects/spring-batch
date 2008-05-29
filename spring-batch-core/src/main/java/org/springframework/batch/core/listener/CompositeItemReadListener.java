@@ -15,20 +15,19 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import org.springframework.batch.core.ItemReadListener;
+import org.springframework.core.Ordered;
 
 /**
  * @author Lucas Ward
+ * @author Dave Syer
  * 
  */
 public class CompositeItemReadListener implements ItemReadListener {
 
-	private List listeners = new ArrayList();
+	private OrderedComposite listeners = new OrderedComposite();
 
 	/**
 	 * Public setter for the listeners.
@@ -36,7 +35,7 @@ public class CompositeItemReadListener implements ItemReadListener {
 	 * @param itemReadListeners
 	 */
 	public void setListeners(ItemReadListener[] itemReadListeners) {
-		this.listeners = Arrays.asList(itemReadListeners);
+		this.listeners.setItems(itemReadListeners);
 	}
 
 	/**
@@ -45,18 +44,26 @@ public class CompositeItemReadListener implements ItemReadListener {
 	 * @param itemReaderListener
 	 */
 	public void register(ItemReadListener itemReaderListener) {
-		if (!listeners.contains(itemReaderListener)) {
-			listeners.add(itemReaderListener);
-		}
+		listeners.add(itemReaderListener);
 	}
 
+	/**
+	 * Call the registered listeners in reverse order, respecting and
+	 * prioritising those that implement {@link Ordered}.
+	 * @see org.springframework.batch.core.ItemReadListener#afterRead(java.lang.Object)
+	 */
 	public void afterRead(Object item) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemReadListener listener = (ItemReadListener) iterator.next();
 			listener.afterRead(item);
 		}
 	}
 
+	/**
+	 * Call the registered listeners in order, respecting and prioritising those
+	 * that implement {@link Ordered}.
+	 * @see org.springframework.batch.core.ItemReadListener#beforeRead()
+	 */
 	public void beforeRead() {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemReadListener listener = (ItemReadListener) iterator.next();
@@ -64,6 +71,11 @@ public class CompositeItemReadListener implements ItemReadListener {
 		}
 	}
 
+	/**
+	 * Call the registered listeners in reverse order, respecting and
+	 * prioritising those that implement {@link Ordered}.
+	 * @see org.springframework.batch.core.ItemReadListener#onReadError(java.lang.Exception)
+	 */
 	public void onReadError(Exception ex) {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemReadListener listener = (ItemReadListener) iterator.next();
