@@ -36,7 +36,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final Log logger = LogFactory.getLog(JdbcJobExecutionDao.class);
 
-	private static final int EXIT_MESSAGE_LENGTH = 250;
+	private static final int DEFAULT_EXIT_MESSAGE_LENGTH = 2500;
 
 	private static final String GET_JOB_EXECUTION_COUNT = "SELECT count(JOB_EXECUTION_ID) from %PREFIX%JOB_EXECUTION "
 			+ "where JOB_INSTANCE_ID = ?";
@@ -55,11 +55,22 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final String GET_LAST_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE from %PREFIX%JOB_EXECUTION"
 			+ " where JOB_INSTANCE_ID = ? and START_TIME = (SELECT max(START_TIME) from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ?)";
 
+	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
+
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
 	
 	private LobHandler lobHandler = new DefaultLobHandler();
 	
 	private JdbcExecutionContextDao ecDao = new JdbcExecutionContextDao();
+
+	/**
+	 * Public setter for the exit message length in database. Do not set this if
+	 * you haven't modified the schema.
+	 * @param exitMessageLength the exitMessageLength to set
+	 */
+	public void setExitMessageLength(int exitMessageLength) {
+		this.exitMessageLength = exitMessageLength;
+	}
 
 	public List findJobExecutions(final JobInstance job) {
 
@@ -140,8 +151,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		jobExecution.incrementVersion();
 
 		String exitDescription = jobExecution.getExitStatus().getExitDescription();
-		if (exitDescription != null && exitDescription.length() > EXIT_MESSAGE_LENGTH) {
-			exitDescription = exitDescription.substring(0, EXIT_MESSAGE_LENGTH);
+		if (exitDescription != null && exitDescription.length() > exitMessageLength) {
+			exitDescription = exitDescription.substring(0, exitMessageLength);
 			logger.debug("Truncating long message before update of JobExecution: " + jobExecution);
 		}
 		Object[] parameters = new Object[] { jobExecution.getStartTime(), jobExecution.getEndTime(),

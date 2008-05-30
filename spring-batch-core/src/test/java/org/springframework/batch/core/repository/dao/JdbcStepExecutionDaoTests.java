@@ -35,6 +35,7 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 		
 		stepExecution.setExitStatus(exitStatus);
 
+		((JdbcStepExecutionDao) dao).setExitMessageLength(250);
 		dao.saveStepExecution(stepExecution);
 
 		StepExecution retrievedAfterSave = dao.getStepExecution(jobExecution, step);

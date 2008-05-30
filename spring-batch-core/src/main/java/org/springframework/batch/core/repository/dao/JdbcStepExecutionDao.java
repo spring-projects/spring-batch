@@ -58,13 +58,24 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private static final String CURRENT_VERSION_STEP_EXECUTION = "SELECT VERSION FROM %PREFIX%STEP_EXECUTION WHERE STEP_EXECUTION_ID=?";
 
-	private static final int EXIT_MESSAGE_LENGTH = 250;
+	private static final int DEFAULT_EXIT_MESSAGE_LENGTH = 2500;
+
+	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
 	private LobHandler lobHandler = new DefaultLobHandler();
 
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
-	
+
 	private JdbcExecutionContextDao ecDao = new JdbcExecutionContextDao();
+
+	/**
+	 * Public setter for the exit message length in database. Do not set this if
+	 * you haven't modified the schema.
+	 * @param exitMessageLength the exitMessageLength to set
+	 */
+	public void setExitMessageLength(int exitMessageLength) {
+		this.exitMessageLength = exitMessageLength;
+	}
 
 	public ExecutionContext findExecutionContext(final StepExecution stepExecution) {
 
@@ -86,7 +97,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 				"to-be-saved (not updated) StepExecution can't already have a version assigned");
 
 		validateStepExecution(stepExecution);
-		
+
 		String exitDescription = truncateExitDescription(stepExecution.getExitStatus().getExitDescription());
 
 		stepExecution.setId(new Long(stepExecutionIncrementer.nextLongValue()));
@@ -95,8 +106,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 				stepExecution.getStepName(), stepExecution.getJobExecutionId(), stepExecution.getStartTime(),
 				stepExecution.getEndTime(), stepExecution.getStatus().toString(), stepExecution.getCommitCount(),
 				stepExecution.getItemCount(), stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
-				stepExecution.getExitStatus().getExitCode(), exitDescription,
-				stepExecution.getReadSkipCount(), stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount() };
+				stepExecution.getExitStatus().getExitCode(), exitDescription, stepExecution.getReadSkipCount(),
+				stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount() };
 		getJdbcTemplate().update(
 				getQuery(SAVE_STEP_EXECUTION),
 				parameters,
@@ -130,8 +141,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 		ecDao.saveOrUpdateExecutionContext(stepExecution);
 	}
-
-	
 
 	/*
 	 * (non-Javadoc)
@@ -187,9 +196,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 * @return truncated description
 	 */
 	private String truncateExitDescription(String description) {
-		if (description != null && description.length() > EXIT_MESSAGE_LENGTH) {
+		if (description != null && description.length() > exitMessageLength) {
 			logger.debug("Truncating long message before update of StepExecution, original message is: " + description);
-			return description.substring(0, EXIT_MESSAGE_LENGTH);
+			return description.substring(0, exitMessageLength);
 		}
 		else {
 			return description;

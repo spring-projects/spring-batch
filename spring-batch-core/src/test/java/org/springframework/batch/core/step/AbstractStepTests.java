@@ -126,8 +126,8 @@ public class AbstractStepTests extends TestCase {
 		assertEquals("listener2#beforeStep", events.get(i++));
 		assertEquals("open", events.get(i++));
 		assertEquals("doExecute", events.get(i++));
-		assertEquals("listener1#afterStep", events.get(i++));
 		assertEquals("listener2#afterStep", events.get(i++));
+		assertEquals("listener1#afterStep", events.get(i++));
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
 
@@ -165,8 +165,8 @@ public class AbstractStepTests extends TestCase {
 		assertEquals("listener2#beforeStep", events.get(i++));
 		assertEquals("open", events.get(i++));
 		assertEquals("doExecute", events.get(i++));
-		assertEquals("listener1#onErrorInStep", events.get(i++));
 		assertEquals("listener2#onErrorInStep", events.get(i++));
+		assertEquals("listener1#onErrorInStep", events.get(i++));
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
 
