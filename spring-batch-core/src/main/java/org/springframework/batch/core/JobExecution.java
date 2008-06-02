@@ -34,7 +34,7 @@ public class JobExecution extends Entity {
 
 	private final JobInstance jobInstance;
 
-	private transient Collection stepExecutions = new HashSet();
+	private volatile transient Collection stepExecutions = new HashSet();
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 
@@ -46,7 +46,7 @@ public class JobExecution extends Entity {
 
 	private volatile ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
-	private ExecutionContext executionContext = new ExecutionContext();
+	private volatile ExecutionContext executionContext = new ExecutionContext();
 
 	/**
 	 * Because a JobExecution isn't valid unless the job is set, this
