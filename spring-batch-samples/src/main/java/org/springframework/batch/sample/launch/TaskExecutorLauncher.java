@@ -20,8 +20,8 @@ import java.util.List;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.configuration.support.ClassPathXmlApplicationContextJobFactory;
 import org.springframework.batch.core.repository.DuplicateJobException;
-import org.springframework.batch.sample.ClassPathXmlApplicationContextJobFactory;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
