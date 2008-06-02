@@ -67,36 +67,26 @@ import org.springframework.util.ClassUtils;
  * position and throw a DataAccessException if it is not. This means that, in
  * theory, a RowMapper could read ahead, as long as it returns the row back to
  * the correct position before returning. The reason for such strictness on the
- * ResultSet is due to the need to maintain control for transactions,
- * restartability and skippability. This ensures that each call to
- * {@link #read()} returns the ResultSet at the correct line, regardless of
- * rollbacks, restarts, or skips.
+ * ResultSet is due to the need to maintain control for transactions and
+ * restartability. This ensures that each call to {@link #read()} returns the
+ * ResultSet at the correct line, regardless of rollbacks or restarts.
  * </p>
  * 
  * <p>
  * {@link ExecutionContext}: The current row is returned as restart data, and
  * when restored from that same data, the cursor is opened and the current row
- * set to the value within the restart data. Two values are stored: the current
- * line being processed and the number of lines that have been skipped.
+ * set to the value within the restart data. See
+ * {@link #setDriverSupportsAbsolute(boolean)} for improving restart
+ * performance.
  * </p>
  * 
  * <p>
  * Transactions: The same ResultSet is held open regardless of commits or roll
  * backs in a surrounding transaction. This means that when such a transaction
- * is committed, the input source is notified through the {@link #mark()} and
+ * is committed, the reader is notified through the {@link #mark()} and
  * {@link #reset()} so that it can save it's current row number. Later, if the
  * transaction is rolled back, the current row can be moved back to the same row
  * number as it was on when commit was called.
- * </p>
- * 
- * <p>
- * Calling skip will indicate that a record is bad and should not be
- * re-presented to the user if the transaction is rolled back. For example, if
- * row 2 is read in, and found to be bad, calling skip will inform the
- * {@link ItemReader}. If reading is then continued, and a rollback is
- * necessary because of an error on output, the input source will be returned to
- * row 1. Calling read while on row 1 will move the current row to 3, not 2,
- * because 2 has been marked as skipped.
  * </p>
  * 
  * <p>
@@ -154,6 +144,8 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 
 	private boolean saveState = false;
 
+	private boolean driverSupportsAbsolute = false;
+
 	private BufferredResultSetReader bufferredReader;
 
 	public JdbcCursorItemReader() {
@@ -183,10 +175,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 
 	/**
 	 * Increment the cursor to the next row, validating the cursor position and
-	 * passing the resultset to the RowMapper. If read has not been called on
-	 * this instance before, the cursor will be opened. If there are skipped
-	 * records for this commit scope, an internal list of skipped records will
-	 * be checked to ensure that only a valid row is given to the mapper.
+	 * passing the ResultSet to the RowMapper.
 	 * 
 	 * @returns Object returned by RowMapper
 	 * @throws DataAccessException
@@ -218,7 +207,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/**
-	 * Close this input source. The ResultSet, Statement and Connection created
+	 * Close this item reader. The ResultSet, Statement and Connection created
 	 * will be closed. This must be called or the connection and cursor will be
 	 * held open indefinitely!
 	 * 
@@ -285,10 +274,11 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		}
 	}
 
-	/*
-	 * Return the exception translator for this instance. <p>Creates a default
-	 * SQLErrorCodeSQLExceptionTranslator for the specified DataSource if none
-	 * is set.
+	/**
+	 * Return the exception translator for this instance.
+	 * 
+	 * Creates a default SQLErrorCodeSQLExceptionTranslator for the specified
+	 * DataSource if none is set.
 	 */
 	protected SQLExceptionTranslator getExceptionTranslator() {
 		if (exceptionTranslator == null) {
@@ -302,7 +292,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		return exceptionTranslator;
 	}
 
-	/*
+	/**
 	 * Throw a SQLWarningException if we're not ignoring warnings, else log the
 	 * warnings (at debug level).
 	 * 
@@ -337,10 +327,11 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#restoreFrom(org.springframework.batch.item.ExecutionContext)
+	/**
+	 * Execute the {@link #setSql(String)} query and move to the saved position
+	 * in case of restart. If {@link #setDriverSupportsAbsolute(boolean)} is set
+	 * to true the reader will attempt to use {@link ResultSet#absolute(int)} to
+	 * move the cursor and fall back on ResultSet traversal in case of failure.
 	 */
 	public void open(ExecutionContext context) {
 		Assert.state(!initialized, "Stream is already initialized.  Close before re-opening.");
@@ -351,22 +342,47 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		int processedRowCount = 0;
 
 		if (context.containsKey(getKey(CURRENT_PROCESSED_ROW))) {
-			try {
-				processedRowCount = Long.valueOf(context.getLong(getKey(CURRENT_PROCESSED_ROW))).intValue();
-				int count = 0;
-				while (rs.next()) {
-					count++;
-					if (count == processedRowCount) {
-						break;
-					}
+			processedRowCount = Long.valueOf(context.getLong(getKey(CURRENT_PROCESSED_ROW))).intValue();
+
+			if (driverSupportsAbsolute) {
+				try {
+					rs.absolute(processedRowCount);
+				}
+				catch (SQLException e) {
+					// Driver does not support rs.absolute(int) revert to
+					// traversing ResultSet
+					log.warn("The JDBC driver does not appear to support ResultSet.absolute(). Consider"
+							+ " reverting to the default behavior setting the driverSupportsAbsolute to false", e);
+
+					moveCursorToRow(processedRowCount);
 				}
 			}
-			catch (SQLException se) {
-				throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);
+			else {
+				moveCursorToRow(processedRowCount);
 			}
 		}
 
 		bufferredReader = new BufferredResultSetReader(rs, mapper, processedRowCount);
+	}
+
+	/**
+	 * Moves the cursor in the ResultSet to the position specified by the row
+	 * parameter by traversing the ResultSet.
+	 * @param row
+	 */
+	private void moveCursorToRow(int row) {
+		try {
+			int count = 0;
+			while (rs.next()) {
+				count++;
+				if (count == row) {
+					break;
+				}
+			}
+		}
+		catch (SQLException se) {
+			throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", sql, se);
+		}
 	}
 
 	/**
@@ -437,8 +453,8 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/**
-	 * Set the sql statement to be used when creating the cursor. This statement
-	 * should be a complete and valid Sql statement, as it will be run directly
+	 * Set the SQL statement to be used when creating the cursor. This statement
+	 * should be a complete and valid SQL statement, as it will be run directly
 	 * without any modification.
 	 * 
 	 * @param sql
@@ -465,6 +481,21 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	 */
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
+	}
+
+	/**
+	 * Indicate whether the JDBC driver supports setting the absolute row on a
+	 * {@link ResultSet}. It is recommended that this is set to
+	 * <code>true</code> for JDBC drivers that supports ResultSet.absolute()
+	 * as it may improve performance, especially if a step fails while working
+	 * with a large data set.
+	 * 
+	 * @see ResultSet#absolute(int)
+	 * 
+	 * @param driverSupportsAbsolute <code>false</code> by default
+	 */
+	public void setDriverSupportsAbsolute(boolean driverSupportsAbsolute) {
+		this.driverSupportsAbsolute = driverSupportsAbsolute;
 	}
 
 	private class BufferredResultSetReader implements ItemReader {
@@ -528,10 +559,10 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 			currentIndex = INITIAL_POSITION;
 		}
 
-		// Check the result set is in synch with the currentRow attribute. This
-		// is
-		// important
-		// to ensure that the user hasn't modified the current row.
+		/**
+		 * Check the result set is in synch with the currentRow attribute. This
+		 * is important to ensure that the user hasn't modified the current row.
+		 */
 		private void verifyCursorPosition(long expectedCurrentRow) throws SQLException {
 			if (verifyCursorPosition) {
 				if (expectedCurrentRow != this.rs.getRow()) {
