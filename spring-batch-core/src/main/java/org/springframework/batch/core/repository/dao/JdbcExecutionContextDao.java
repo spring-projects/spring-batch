@@ -23,7 +23,12 @@ import org.springframework.util.Assert;
 
 /**
  * JDBC DAO for {@link ExecutionContext}.
- *
+ * 
+ * Stores execution context data related to both Step and Job using
+ * discriminator column to distinguish between the two.
+ * 
+ * @author Lucas Ward
+ * @author Robert Kasanicky
  */
 class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 
@@ -42,6 +47,10 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 
 	private LobHandler lobHandler = new DefaultLobHandler();
 
+	/**
+	 * @param jobExecution
+	 * @return execution context associated with the given jobExecution.
+	 */
 	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
 		final Long executionId = jobExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
@@ -54,6 +63,10 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 		return executionContext;
 	}
 
+	/**
+	 * @param stepExecution
+	 * @return execution context associated with the given stepExecution.
+	 */
 	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
 		final Long executionId = stepExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
@@ -66,6 +79,11 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 		return executionContext;
 	}
 
+	/**
+	 * Persist or update the execution context associated with the given
+	 * jobExecution
+	 * @param jobExecution
+	 */
 	public void saveOrUpdateExecutionContext(final JobExecution jobExecution) {
 		Long executionId = jobExecution.getId();
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
@@ -76,11 +94,9 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 	}
 
 	/**
-	 * Save or update execution attributes. A lob creator must be used, since
-	 * any attributes that don't match a provided type must be serialized into a
-	 * blob.
-	 * 
-	 * @see LobCreator
+	 * Persist or update the execution context associated with the given
+	 * stepExecution
+	 * @param stepExecution
 	 */
 	public void saveOrUpdateExecutionContext(final StepExecution stepExecution) {
 
@@ -92,6 +108,10 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 		saveOrUpdateExecutionContext(executionContext, executionId, STEP_DISCRIMINATOR);
 	}
 
+	/**
+	 * Resolves attribute's class to corresponding {@link AttributeType} and
+	 * persists or updates the attribute.
+	 */
 	private void saveOrUpdateExecutionContext(ExecutionContext ctx, Long executionId, String discriminator) {
 
 		for (Iterator it = ctx.entrySet().iterator(); it.hasNext();) {
@@ -114,6 +134,11 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 		}
 	}
 
+	/**
+	 * Creates {@link PreparedStatement} from the provided arguments and tries
+	 * to update the attribute - if the attribute does not exist in the database
+	 * yet it is inserted.
+	 */
 	private void updateExecutionAttribute(final Long executionId, final String discriminator, final String key,
 			final Object value, final AttributeType type) {
 
@@ -164,6 +189,10 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 		}
 	}
 
+	/**
+	 * Creates {@link PreparedStatement} from provided arguments and inserts new
+	 * row for the attribute.
+	 */
 	private void insertExecutionAttribute(final Long executionId, final String discriminator, final String key,
 			final Object value, final AttributeType type) {
 		PreparedStatementCallback callback = new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
@@ -211,7 +240,10 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 		this.lobHandler = lobHandler;
 	}
 
-	public static class AttributeType {
+	/**
+	 * Attribute types supported by the {@link ExecutionContext}.
+	 */
+	private static class AttributeType {
 
 		private final String type;
 
@@ -245,6 +277,11 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 		}
 	}
 
+	/**
+	 * Reads attributes from {@link ResultSet} and puts them into
+	 * {@link ExecutionContext}, resolving the attributes' types using the
+	 * 'TYPE_CD' column.
+	 */
 	private static class ExecutionContextRowCallbackHandler implements RowCallbackHandler {
 
 		private ExecutionContext executionContext;
