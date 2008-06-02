@@ -89,7 +89,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	 */
 	public void testGetLastExecution() {
 		JobExecution exec1 = new JobExecution(jobInstance);
-		exec1.setStartTime(new Date(0));
+		exec1.setCreateTime(new Date(0));
 
 		ExecutionContext ctx = new ExecutionContext() {
 			{
@@ -98,7 +98,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		};
 		JobExecution exec2 = new JobExecution(jobInstance);
 		exec2.setExecutionContext(ctx);
-		exec2.setStartTime(new Date(1));
+		exec2.setCreateTime(new Date(1));
 
 		dao.saveJobExecution(exec1);
 		dao.saveJobExecution(exec2);

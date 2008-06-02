@@ -260,7 +260,7 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 		lastExecution.setStatus(BatchStatus.STARTED);
 
 		int JUMP_INTO_FUTURE = 1000; // makes sure start time is 'greatest'
-		lastExecution.setStartTime(new Date(System.currentTimeMillis() + JUMP_INTO_FUTURE));
+		lastExecution.setCreateTime(new Date(System.currentTimeMillis() + JUMP_INTO_FUTURE));
 		jobExecutionDao.saveJobExecution(lastExecution);
 
 		assertEquals(lastExecution, jobExecutionDao.getLastJobExecution(jobInstance));

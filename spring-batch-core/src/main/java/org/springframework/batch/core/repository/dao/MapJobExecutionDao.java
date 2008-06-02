@@ -16,9 +16,9 @@ import org.springframework.util.Assert;
  * 
  */
 public class MapJobExecutionDao implements JobExecutionDao {
-	
+
 	private static Map executionsById = TransactionAwareProxyFactory.createTransactionalMap();
-	
+
 	private static Map contextsByJobExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
 
 	private static long currentId = 0;
@@ -76,7 +76,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 			if (lastExec == null) {
 				lastExec = exec;
 			}
-			if (lastExec.getStartTime().getTime() < exec.getStartTime().getTime()) {
+			if (lastExec.getCreateTime().before(exec.getCreateTime())) {
 				lastExec = exec;
 			}
 		}
@@ -89,6 +89,6 @@ public class MapJobExecutionDao implements JobExecutionDao {
 
 	public void saveOrUpdateExecutionContext(JobExecution jobExecution) {
 		contextsByJobExecutionId.put(jobExecution.getId(), jobExecution.getExecutionContext());
-		
+
 	}
 }

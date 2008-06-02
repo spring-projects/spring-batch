@@ -38,12 +38,14 @@ public class JobExecution extends Entity {
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 
-	private volatile Date startTime = new Date(System.currentTimeMillis());
+	private volatile Date startTime = null;
+
+	private volatile Date createTime = new Date(System.currentTimeMillis());
 
 	private volatile Date endTime = null;
 
 	private volatile ExitStatus exitStatus = ExitStatus.UNKNOWN;
-	
+
 	private ExecutionContext executionContext = new ExecutionContext();
 
 	/**
@@ -198,5 +200,19 @@ public class JobExecution extends Entity {
 	 */
 	public ExecutionContext getExecutionContext() {
 		return executionContext;
+	}
+
+	/**
+	 * @return the time when this execution was created.
+	 */
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	/**
+	 * @param createTime creation time of this execution.
+	 */
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
 }
