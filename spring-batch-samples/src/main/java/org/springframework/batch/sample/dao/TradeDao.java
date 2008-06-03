@@ -18,18 +18,16 @@ package org.springframework.batch.sample.dao;
 
 import org.springframework.batch.sample.domain.Trade;
 
-
 /**
- * Simple interface for writing a Trade object
- * to an arbitraty output
- *
+ * Interface for writing a Trade object to an arbitrary output.
+ * 
  * @author Robert Kasanicky
  */
 public interface TradeDao {
-    /**
-     * Write a trade object to some kind of output,
-     * different implementations can write to file, database etc.
-     */
-    void writeTrade(Trade trade);
+	/**
+	 * Write a trade object to some kind of output, different implementations
+	 * can write to file, database etc.
+	 */
+	void writeTrade(Trade trade);
 
 }

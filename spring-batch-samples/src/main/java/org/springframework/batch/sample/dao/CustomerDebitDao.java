@@ -18,7 +18,12 @@ package org.springframework.batch.sample.dao;
 
 import org.springframework.batch.sample.domain.CustomerDebit;
 
+/**
+ * Interface for writing {@link CustomerDebitDao} object to arbitrary output.
+ * 
+ * @author Robert.Kasanicky
+ */
 public interface CustomerDebitDao {
-	
+
 	void write(CustomerDebit customerDebit);
 }

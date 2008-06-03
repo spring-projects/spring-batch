@@ -22,44 +22,48 @@ import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
 
+/**
+ * Delegates the actual writing to custom DAO delegate. Allows configurable
+ * exception raising for testing skip and restart.
+ */
 public class TradeWriter extends AbstractItemWriter {
-    private static Log log = LogFactory.getLog(TradeWriter.class);
-    private TradeDao dao;
-    
-    private int failure = -1;
-    
-    private int index = 0;
-    
-    /**
+	private static Log log = LogFactory.getLog(TradeWriter.class);
+
+	private TradeDao dao;
+
+	private int failure = -1;
+
+	private int index = 0;
+
+	/**
 	 * Public setter for the the index on which failure should occur.
-	 *
+	 * 
 	 * @param failure the failure to set
 	 */
 	public void setFailure(int failure) {
 		this.failure = failure;
 	}
 
-    public void write(Object data) {
-        if (!(data instanceof Trade)) {
-            log.warn("TradeProcessor can process only Trade objects, skipping record");
+	public void write(Object data) {
+		if (!(data instanceof Trade)) {
+			log.warn("TradeProcessor can process only Trade objects, skipping record");
 
-            return;
-        }
+			return;
+		}
 
-        Trade trade = (Trade) data;
-        log.debug(data);
+		Trade trade = (Trade) data;
+		log.debug(data);
 
-        //TODO put some processing of the trade object here
-        dao.writeTrade(trade);
-        
-        if(index++ == failure) {
-        	throw new RuntimeException("Something unexpected happened!");
-        }
-        
-        
-    }
+		// TODO put some processing of the trade object here
+		dao.writeTrade(trade);
 
-    public void setDao(TradeDao dao) {
-        this.dao = dao;
-    }
+		if (index++ == failure) {
+			throw new RuntimeException("Something unexpected happened!");
+		}
+
+	}
+
+	public void setDao(TradeDao dao) {
+		this.dao = dao;
+	}
 }

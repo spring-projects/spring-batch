@@ -17,18 +17,19 @@
 package org.springframework.batch.sample.item.writer;
 
 import org.springframework.batch.item.AbstractItemWriter;
+import org.springframework.batch.sample.dao.CustomerDebitDao;
 import org.springframework.batch.sample.dao.JdbcCustomerDebitDao;
 import org.springframework.batch.sample.domain.CustomerDebit;
 import org.springframework.batch.sample.domain.Trade;
 
 
 /**
- * Transforms Trade to a CustomerDebit and asks dao object to write the result.
+ * Transforms Trade to a CustomerDebit and asks DAO delegate to write the result.
  * 
  * @author Robert Kasanicky
  */
 public class CustomerUpdateWriter extends AbstractItemWriter {
-    private JdbcCustomerDebitDao dao;
+    private CustomerDebitDao dao;
 
     public void write(Object data) {
         Trade trade = (Trade) data;
