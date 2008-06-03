@@ -16,8 +16,7 @@ import org.springframework.util.Assert;
  * Reset (rollback) capability is implemented by item buffering. To restart
  * correctly resource ordering needs to be preserved between runs.
  * 
- * TODO more robust restart e.g. sort resources alphabetically and store
- * filename instead of resource array index.
+ * @see SortedMultiResourceItemReader
  * 
  * @author Robert Kasanicky
  */
