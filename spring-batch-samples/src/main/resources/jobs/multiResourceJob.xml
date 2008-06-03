@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+
+	<bean id="multiResourceJob" parent="simpleJob">
+		<property name="steps">
+			<bean id="step1" parent="simpleStep" p:commitInterval="3">
+				<property name="streams" ref="fileItemReader" />
+				<property name="itemReader">
+					<bean
+						class="org.springframework.batch.item.validator.ValidatingItemReader">
+						<property name="itemReader"
+							ref="fileItemReader" />
+						<property name="validator" ref="fixedValidator" />
+					</bean>
+				</property>
+				<property name="itemWriter">
+					<bean
+						class="org.springframework.batch.sample.item.writer.TradeWriter">
+						<property name="dao" ref="tradeDao" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- INFRASTRUCTURE SETUP -->
+
+	<!-- This input source is injected into the test case to verify the output - not used by the job at all -->
+	<bean id="testItemReader"
+		class="org.springframework.batch.item.SortedMultiResourceItemReader">
+		<property name="resources"
+			value="classpath:data/multiResourceJob/input/file-*.txt" />
+		<property name="delegate" ref="flatFileItemReader" />
+	</bean>
+	
+	<bean id="fileItemReader" parent="testItemReader"
+		autowire-candidate="false" />
+	
+	<bean id="flatFileItemReader"
+		class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource"
+			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
+		<property name="lineTokenizer" ref="fixedFileTokenizer" />
+		<property name="fieldSetMapper" ref="fieldSetMapper" />
+	</bean>
+
+	<bean id="fixedFileTokenizer"
+		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		<property name="names" value="ISIN, Quantity, Price, Customer" />
+		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
+	</bean>
+
+	<bean id="fixedValidator"
+		class="org.springframework.batch.item.validator.SpringValidator">
+		<property name="validator">
+			<bean id="tradeValidator"
+				class="org.springmodules.validation.valang.ValangValidator">
+				<property name="valang">
+					<value>
+						<![CDATA[
+						{ isin : length(?) < 13 : 'ISIN too long' : 'isin_length' : 12}
+					]]>
+					</value>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="tradeDao"
+		class="org.springframework.batch.sample.dao.JdbcTradeDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="incrementer">
+			<bean parent="incrementerParent">
+				<property name="incrementerName" value="TRADE_SEQ" />
+			</bean>
+
+		</property>
+	</bean>
+
+	<bean id="fieldSetMapper"
+		class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
+
+</beans>
