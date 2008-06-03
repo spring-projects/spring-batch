@@ -112,6 +112,7 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 	public void testRestart() throws Exception {
 
 		itemReader.setSaveState(true);
+		tested.setSaveState(true);
 
 		tested.open(ctx);
 

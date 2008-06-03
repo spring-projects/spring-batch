@@ -38,6 +38,8 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 
 	private boolean shouldReadBuffer = false;
 
+	private boolean saveState = false;
+
 	public MultiResourceItemReader() {
 		setName(MultiResourceItemReader.class.getSimpleName());
 	}
@@ -129,8 +131,10 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 * Store the current resource index and delegate's data.
 	 */
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		executionContext.putLong(getKey(RESOURCE_INDEX), currentResourceIndex);
-		delegate.update(executionContext);
+		if (saveState) {
+			executionContext.putLong(getKey(RESOURCE_INDEX), currentResourceIndex);
+			delegate.update(executionContext);
+		}
 	}
 
 	/**
@@ -149,6 +153,17 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 */
 	public void setResources(Resource[] resources) {
 		this.resources = resources;
+	}
+	
+	/**
+	 * Set the boolean indicating whether or not state should be saved in the
+	 * provided {@link ExecutionContext} during the {@link ItemStream} call to
+	 * update.
+	 * 
+	 * @param saveState
+	 */
+	public void setSaveState(boolean saveState) {
+		this.saveState = saveState;
 	}
 
 }
