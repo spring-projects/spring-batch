@@ -6,7 +6,7 @@
 	<description> Integration tests for the Spring Batch Infrastructure </description>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
-		<version>1.0.3.BUILD-SNAPSHOT</version>
+		<version>1.0.1.a</version>
 		<artifactId>spring-batch</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
