@@ -9,16 +9,9 @@
 
 	<import resource="data-source-context.xml" />
 
-	<bean id="jobRegistryBeanPostProcessor"
-		class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
-		<property name="jobRegistry" ref="jobRegistry" />
-	</bean>
-
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
-
-	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 
 	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
 		p:databaseType="${environment}" p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>

@@ -42,6 +42,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
+import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
@@ -241,24 +242,34 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		// nothing wrong here
 		factory.getObject();
 
-		// but exception excpected after setting commit interval to value <= 0
-		factory.setCommitInterval(0);
-		try {
-			factory.getObject();
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
-
+		// but exception expected after setting commit interval to value < 0
 		factory.setCommitInterval(-1);
 		try {
 			factory.getObject();
 			fail();
 		}
-		catch (IllegalArgumentException e) {
+		catch (IllegalStateException e) {
 			// expected
 		}
 	}
 
+	/**
+	 * Commit interval specified is not allowed to be zero or negative.
+	 * @throws Exception
+	 */
+	public void testCommitIntervalAndCompletionPolicyBothSet() throws Exception {
+		SimpleStepFactoryBean factory = getStepFactory("foo");
+
+		// but exception expected after setting commit interval and completion policy
+		factory.setCommitInterval(1);
+		factory.setChunkCompletionPolicy(new SimpleCompletionPolicy(2));
+		try {
+			factory.getObject();
+			fail();
+		}
+		catch (IllegalStateException e) {
+			// expected
+		}
+
+	}
 }

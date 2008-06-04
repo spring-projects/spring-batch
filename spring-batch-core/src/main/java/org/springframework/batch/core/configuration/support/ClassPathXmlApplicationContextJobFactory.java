@@ -34,15 +34,17 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class ClassPathXmlApplicationContextJobFactory implements JobFactory {
 
-	private String beanName;
+	final private String beanName;
 
-	private String path;
+	final private String path;
 
-	private ApplicationContext parent;
+	final private ApplicationContext parent;
 
 	/**
-	 * @param beanName
-	 * @param path
+	 * @param beanName the id of the {@link Job} in the application context to
+	 * be created
+	 * @param path the path to the XML configuration containing the {@link Job}
+	 * @param parent the application context to use as a parent (or null)
 	 */
 	public ClassPathXmlApplicationContextJobFactory(String beanName, String path, ApplicationContext parent) {
 		super();
@@ -73,14 +75,16 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory {
 	public String getJobName() {
 		return beanName;
 	}
-	
+
 	/**
 	 * @author Dave Syer
-	 *
+	 * 
 	 */
 	private static class ContextClosingJob implements Job {
 		private Job delegate;
+
 		private ConfigurableApplicationContext context;
+
 		/**
 		 * @param delegate
 		 * @param context
@@ -90,6 +94,7 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory {
 			this.delegate = delegate;
 			this.context = context;
 		}
+
 		/**
 		 * @param execution
 		 * @throws JobExecutionException
@@ -98,22 +103,26 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory {
 		public void execute(JobExecution execution) throws JobExecutionException {
 			try {
 				delegate.execute(execution);
-			} finally {
+			}
+			finally {
 				context.close();
 			}
 		}
+
 		/**
 		 * @see org.springframework.batch.core.Job#getName()
 		 */
 		public String getName() {
 			return delegate.getName();
 		}
+
 		/**
 		 * @see org.springframework.batch.core.Job#getSteps()
 		 */
 		public List getSteps() {
 			return delegate.getSteps();
 		}
+
 		/**
 		 * @see org.springframework.batch.core.Job#isRestartable()
 		 */
@@ -121,6 +130,6 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory {
 			return delegate.isRestartable();
 		}
 
-	}	
+	}
 
 }

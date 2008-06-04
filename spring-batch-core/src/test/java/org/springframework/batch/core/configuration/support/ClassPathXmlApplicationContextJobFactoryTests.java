@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import org.springframework.util.ClassUtils;
-
 import junit.framework.TestCase;
+
+import org.springframework.util.ClassUtils;
 
 /**
  * @author Dave Syer
@@ -25,7 +25,7 @@ import junit.framework.TestCase;
  */
 public class ClassPathXmlApplicationContextJobFactoryTests extends TestCase {
 	
-	private ClassPathXmlApplicationContextJobFactory factory = new ClassPathXmlApplicationContextJobFactory("test-job", ClassUtils.addResourcePathToPackagePath(getClass(), "test-context.xml"), null);
+	private ClassPathXmlApplicationContextJobFactory factory = new ClassPathXmlApplicationContextJobFactory("test-job", ClassUtils.addResourcePathToPackagePath(getClass(), "trivial-context.xml"), null);
 
 	/**
 	 * Test method for {@link org.springframework.batch.core.configuration.support.ClassPathXmlApplicationContextJobFactory#createJob()}.

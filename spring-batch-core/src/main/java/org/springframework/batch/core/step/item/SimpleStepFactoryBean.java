@@ -15,12 +15,15 @@
  */
 package org.springframework.batch.core.step.item;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -44,7 +47,11 @@ import org.springframework.util.Assert;
  */
 public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 
-	private int commitInterval = 1;
+	protected final Log logger = LogFactory.getLog(getClass());
+
+	private static final int DEFAULT_COMMIT_INTERVAL = 1;
+
+	private int commitInterval = 0;
 
 	private ItemStream[] streams = new ItemStream[0];
 
@@ -55,21 +62,35 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	private ItemHandler itemHandler;
 
 	private RepeatTemplate stepOperations;
-	
+
 	private RepeatTemplate chunkOperations;
 
 	private ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
 
-	
+	private CompletionPolicy chunkCompletionPolicy;
+
 	/**
-	 * Set the commit interval.
+	 * Set the commit interval. Either set this or the chunkCompletionPolicy but
+	 * not both.
 	 * 
 	 * @param commitInterval 1 by default
 	 */
 	public void setCommitInterval(int commitInterval) {
 		this.commitInterval = commitInterval;
 	}
-	
+
+	/**
+	 * Public setter for the {@link CompletionPolicy} applying to the chunk
+	 * level. A transaction will be committed when this policy decides to
+	 * complete. Defaults to a {@link SimpleCompletionPolicy} with chunk size
+	 * equal to the commitInterval property.
+	 * 
+	 * @param chunkCompletionPolicy the chunkCompletionPolicy to set
+	 */
+	public void setChunkCompletionPolicy(CompletionPolicy chunkCompletionPolicy) {
+		this.chunkCompletionPolicy = chunkCompletionPolicy;
+	}
+
 	/**
 	 * The streams to inject into the {@link Step}. Any instance of
 	 * {@link ItemStream} can be used, and will then receive callbacks at the
@@ -108,7 +129,7 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	protected RepeatTemplate getStepOperations() {
 		return stepOperations;
 	}
-	
+
 	/**
 	 * Protected getter for the chunk operations to make them available in
 	 * subclasses.
@@ -117,7 +138,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	protected RepeatTemplate getChunkOperations() {
 		return chunkOperations;
 	}
-
 
 	/**
 	 * Public setter for the SimpleLimitExceptionHandler.
@@ -168,8 +188,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	protected void applyConfiguration(ItemOrientedStep step) {
 
 		super.applyConfiguration(step);
-		
-		Assert.isTrue(commitInterval > 0);
 
 		step.setStreams(streams);
 
@@ -195,7 +213,7 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 		BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
 
 		chunkOperations = new RepeatTemplate();
-		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
+		chunkOperations.setCompletionPolicy(getChunkCompletionPolicy());
 		helper.addChunkListeners(chunkOperations, listeners);
 		step.setChunkOperations(chunkOperations);
 
@@ -224,6 +242,26 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 		setItemHandler(itemHandler);
 		step.setItemHandler(itemHandler);
 
+	}
+
+	/**
+	 * @return a {@link CompletionPolicy} consistent with the commit interval
+	 * and injected policy (if present).
+	 */
+	private CompletionPolicy getChunkCompletionPolicy() {
+		Assert.state(!(chunkCompletionPolicy != null && commitInterval != 0),
+				"You must specify either a chunkCompletionPolicy or a commitInterval but not both.");
+		Assert.state(commitInterval >= 0,
+				"The commitInterval must be positive or zero (for default value).");
+
+		if (chunkCompletionPolicy != null) {
+			return chunkCompletionPolicy;
+		}
+		if (commitInterval == 0) {
+			logger.info("Setting commit interval to default value (" + DEFAULT_COMMIT_INTERVAL + ")");
+			commitInterval = DEFAULT_COMMIT_INTERVAL;
+		}
+		return new SimpleCompletionPolicy(commitInterval);
 	}
 
 }

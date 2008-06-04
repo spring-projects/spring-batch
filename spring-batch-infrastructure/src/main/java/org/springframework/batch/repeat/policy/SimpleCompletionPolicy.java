@@ -20,6 +20,7 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.util.ClassUtils;
 
 /**
  * Policy for terminating a batch after a fixed number of operations. Internal
@@ -102,6 +103,13 @@ public class SimpleCompletionPolicy extends DefaultResultCompletionPolicy {
 		public boolean isComplete() {
 			return getStartedCount() >= chunkSize;
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		return ClassUtils.getShortName(SimpleCompletionPolicy.class)+": chunkSize="+chunkSize;
 	}
 
 }
