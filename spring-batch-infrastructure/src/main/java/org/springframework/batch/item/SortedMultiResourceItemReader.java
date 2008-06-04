@@ -28,6 +28,10 @@ public class SortedMultiResourceItemReader extends MultiResourceItemReader {
 		}
 
 	};
+	
+	public SortedMultiResourceItemReader() {
+		setName(SortedMultiResourceItemReader.class.getSimpleName());
+	}
 
 	/**
 	 * @param comparator used to order the injected resources, by default
