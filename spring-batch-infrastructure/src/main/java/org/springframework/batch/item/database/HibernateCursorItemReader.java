@@ -15,6 +15,11 @@
  */
 package org.springframework.batch.item.database;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
+import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -25,7 +30,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * {@link ItemReader} for reading database records built on top of Hibernate.
@@ -71,19 +75,46 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 
 	private boolean saveState = false;
 
+	private boolean shouldReadBuffer = false;
+
+	private ListIterator itemBufferIterator = null;
+
+	private List itemBuffer = new ArrayList();
+	
+	private int lastMarkedBufferIndex = 0;
+
 	public HibernateCursorItemReader() {
-		setName(ClassUtils.getShortName(HibernateCursorItemReader.class));
+		setName(HibernateCursorItemReader.class.getSimpleName());
 	}
 
 	public Object read() {
 
-		if (cursor.next()) {
-			currentProcessedRow++;
-			Object[] data = cursor.get();
-			if (data.length > 1) {
-				return data;
+		currentProcessedRow++;
+
+		if (shouldReadBuffer) {
+			if (itemBufferIterator.hasNext()) {
+				return itemBufferIterator.next();
 			}
-			return data[0];
+			else {
+				// buffer is exhausted, continue reading from file
+				shouldReadBuffer = false;
+				itemBufferIterator = null;
+			}
+		}
+
+		if (cursor.next()) {
+			Object[] data = cursor.get();
+			Object item;
+
+			if (data.length > 1) {
+				item = data;
+			}
+			else {
+				item = data[0];
+			}
+
+			itemBuffer.add(item);
+			return item;
 		}
 		return null;
 	}
@@ -117,17 +148,19 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 
 		if (useStatelessSession) {
 			statelessSession = sessionFactory.openStatelessSession();
-			cursor = statelessSession.createQuery(queryString).scroll();
+			cursor = statelessSession.createQuery(queryString).scroll(ScrollMode.FORWARD_ONLY);
 		}
 		else {
 			statefulSession = sessionFactory.openSession();
-			cursor = statefulSession.createQuery(queryString).scroll();
+			cursor = statefulSession.createQuery(queryString).scroll(ScrollMode.FORWARD_ONLY);
 		}
 		initialized = true;
 
 		if (executionContext.containsKey(getKey(RESTART_DATA_ROW_NUMBER_KEY))) {
 			currentProcessedRow = Integer.parseInt(executionContext.getString(getKey(RESTART_DATA_ROW_NUMBER_KEY)));
-			cursor.setRowNumber(currentProcessedRow - 1);
+			for (int i = 0; i < currentProcessedRow; i++) {
+				cursor.next();
+			}
 		}
 
 	}
@@ -181,10 +214,20 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
 	public void mark() {
-		lastCommitRowNumber = currentProcessedRow;
+
+		if (!shouldReadBuffer) {
+			itemBuffer.clear();
+			itemBufferIterator = null;
+			lastMarkedBufferIndex = 0;
+		}
+		else {
+			lastMarkedBufferIndex = itemBufferIterator.nextIndex();
+		}
+		
 		if (!useStatelessSession) {
 			statefulSession.clear();
 		}
+		lastCommitRowNumber = currentProcessedRow;
 	}
 
 	/*
@@ -194,14 +237,8 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	 */
 	public void reset() {
 		currentProcessedRow = lastCommitRowNumber;
-		if (lastCommitRowNumber == 0) {
-			cursor.beforeFirst();
-		}
-		else {
-			// Set the cursor so that next time it is advanced it will
-			// come back to the committed row.
-			cursor.setRowNumber(lastCommitRowNumber - 1);
-		}
+		shouldReadBuffer = true;
+		itemBufferIterator = itemBuffer.listIterator(lastMarkedBufferIndex);
 	}
 
 	public void setSaveState(boolean saveState) {

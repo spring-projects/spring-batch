@@ -63,8 +63,15 @@ public abstract class CommonItemReaderTests extends TestCase {
 
 		assertEquals(foo2, tested.read());
 		
-		assertEquals(foo3, tested.read());
+//		TODO handle shortening the commit interval on the fly
+//		
+//		tested.mark();
+//		
+//		assertEquals(foo3, tested.read());
+//		
+//		tested.reset();
 		
+		assertEquals(foo3, tested.read());
 
 		Foo foo4 = (Foo) tested.read();
 		assertEquals(4, foo4.getValue());

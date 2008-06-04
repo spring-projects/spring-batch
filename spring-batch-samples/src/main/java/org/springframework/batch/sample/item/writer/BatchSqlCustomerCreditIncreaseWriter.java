@@ -45,8 +45,7 @@ public class BatchSqlCustomerCreditIncreaseWriter implements ItemWriter, Initial
 	 * @see org.springframework.batch.item.processor.DelegatingItemWriter#doProcess(java.lang.Object)
 	 */
 	public void write(Object data) throws Exception {
-		CustomerCredit customerCredit = (CustomerCredit) data;
-		customerCredit.increaseCreditBy(FIXED_AMOUNT);
+		CustomerCredit customerCredit = ((CustomerCredit) data).increaseCreditBy(FIXED_AMOUNT);
 		delegate.write(customerCredit);
 	}
 

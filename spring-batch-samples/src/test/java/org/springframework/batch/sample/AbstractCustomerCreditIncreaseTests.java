@@ -108,10 +108,13 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 
 					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 						final BigDecimal creditBeforeUpdate = (BigDecimal) creditsBeforeUpdate.get(rowNum);
+						System.out.print("BEFORE:" + creditBeforeUpdate);
 						final BigDecimal expectedCredit = creditBeforeUpdate.add(CREDIT_INCREASE);
+						System.out.print(" EXPECTED:" + expectedCredit);
 						if (expectedCredit.equals(rs.getBigDecimal(CREDIT_COLUMN))) {
 							matches.add(rs.getBigDecimal(ID_COLUMN));
 						}
+						System.out.println(" ACTUAL: " + rs.getBigDecimal(CREDIT_COLUMN));
 						return null;
 					}
 

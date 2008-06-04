@@ -52,8 +52,12 @@ public class CustomerCredit {
         this.name = name;
     }
     
-    public void increaseCreditBy(BigDecimal sum) {
-    	this.credit = this.credit.add(sum);
+    public CustomerCredit increaseCreditBy(BigDecimal sum) {
+    	CustomerCredit newCredit = new CustomerCredit();
+    	newCredit.credit = this.credit.add(sum);
+    	newCredit.name = this.name;
+    	newCredit.id = this.id;
+    	return newCredit;
     }
     
     public boolean equals(Object o) {
