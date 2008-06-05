@@ -3,8 +3,8 @@ package org.springframework.batch.item.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -61,9 +61,11 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 
 	private boolean saveState = false;
 
-	private List buffer = new ArrayList();
+	private List itemBuffer = new ArrayList();
 
-	private Iterator bufferIterator = null;
+	private ListIterator itemBufferIterator = null;
+	
+	private int lastMarkedBufferIndex = 0;
 
 	/**
 	 * indicates the reader has been shouldReadBuffer and should read items from
@@ -90,13 +92,13 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 
 		// read from buffer after rollback
 		if (shouldReadBuffer) {
-			if (bufferIterator.hasNext()) {
-				return bufferIterator.next();
+			if (itemBufferIterator.hasNext()) {
+				return itemBufferIterator.next();
 			}
 			else {
 				// buffer is exhausted, continue reading from file
 				shouldReadBuffer = false;
-				bufferIterator = null;
+				itemBufferIterator = null;
 			}
 		}
 
@@ -108,7 +110,7 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 			fragmentReader.markFragmentProcessed();
 		}
 
-		buffer.add(item);
+		itemBuffer.add(item);
 		if (item == null) {
 			currentRecordCount--;
 		}
@@ -118,7 +120,8 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 	public void close(ExecutionContext executionContext) {
 		initialized = false;
 		currentRecordCount = 0;
-		clearBuffer();
+		itemBuffer.clear();
+		itemBufferIterator = null;
 		try {
 			if (fragmentReader != null) {
 				fragmentReader.close();
@@ -262,9 +265,17 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 	 * @see org.springframework.batch.item.AbstractItemReader#mark()
 	 */
 	public void mark() {
+		
+		if (!shouldReadBuffer) {
+			itemBuffer.clear();
+			itemBufferIterator = null;
+			lastMarkedBufferIndex = 0;
+		}
+		else {
+			lastMarkedBufferIndex = itemBufferIterator.nextIndex();
+		}
+		
 		lastCommitPointRecordCount = currentRecordCount;
-		clearBuffer();
-		shouldReadBuffer = false;
 	}
 
 	/*
@@ -275,7 +286,7 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 	public void reset() {
 		currentRecordCount = lastCommitPointRecordCount;
 		shouldReadBuffer = true;
-		bufferIterator = buffer.listIterator();
+		itemBufferIterator = itemBuffer.listIterator(lastMarkedBufferIndex);
 		fragmentReader.reset();
 	}
 
@@ -290,11 +301,5 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 		this.saveState = saveState;
 	}
 
-	/**
-	 * Clear the buffer and release the iterator.
-	 */
-	private void clearBuffer() {
-		buffer.clear();
-		bufferIterator = null;
-	}
+	
 }

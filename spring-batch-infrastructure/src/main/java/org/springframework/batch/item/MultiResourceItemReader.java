@@ -1,8 +1,8 @@
 package org.springframework.batch.item;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -33,11 +33,13 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 
 	private List itemBuffer = new ArrayList();
 
-	private Iterator itemBufferIterator = null;
+	private ListIterator itemBufferIterator = null;
 
 	private boolean shouldReadBuffer = false;
 
 	private boolean saveState = false;
+	
+	private int lastMarkedBufferIndex = 0;
 
 	public MultiResourceItemReader() {
 		setName(MultiResourceItemReader.class.getSimpleName());
@@ -84,9 +86,15 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 * @see ItemReader#mark()
 	 */
 	public void mark() throws MarkFailedException {
+		if (!shouldReadBuffer) {
+			itemBuffer.clear();
+			itemBufferIterator = null;
+			lastMarkedBufferIndex = 0;
+		}
+		else {
+			lastMarkedBufferIndex = itemBufferIterator.nextIndex();
+		}
 		delegate.mark();
-		itemBuffer.clear();
-		shouldReadBuffer = false;
 	}
 
 	/**
@@ -96,7 +104,7 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 */
 	public void reset() throws ResetFailedException {
 		shouldReadBuffer = true;
-		itemBufferIterator = itemBuffer.listIterator();
+		itemBufferIterator = itemBuffer.listIterator(lastMarkedBufferIndex);
 	}
 
 	/**

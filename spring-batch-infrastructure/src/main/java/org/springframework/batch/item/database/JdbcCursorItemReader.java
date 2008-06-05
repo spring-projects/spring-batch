@@ -512,6 +512,8 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 
 		private int INITIAL_POSITION = -1;
 
+		private int lastMarkedIndex;
+
 		public BufferredResultSetReader(ResultSet rs, RowMapper rowMapper, int processedRowCount) {
 			Assert.notNull(rs, "The ResultSet must not be null");
 			Assert.notNull(rowMapper, "The RowMapper must not be null");
@@ -519,6 +521,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 			this.rowMapper = rowMapper;
 			buffer = new ArrayList();
 			currentIndex = INITIAL_POSITION;
+			lastMarkedIndex = INITIAL_POSITION;
 			this.processedRowCount = processedRowCount;
 		}
 
@@ -536,7 +539,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 					if (!rs.next()) {
 						return null;
 					}
-					int currentRow = processedRowCount + 1;// rs.getRow();
+					int currentRow = processedRowCount + 1;
 					buffer.add(rowMapper.mapRow(rs, currentRow));
 					verifyCursorPosition(currentRow);
 				}
@@ -550,13 +553,19 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		}
 
 		public void mark() throws MarkFailedException {
-			buffer.clear();
-			currentIndex = INITIAL_POSITION;
+			if (currentIndex == buffer.size()) {
+				buffer.clear();
+				currentIndex = INITIAL_POSITION;
+				lastMarkedIndex = INITIAL_POSITION;
+			}
+			else {
+				lastMarkedIndex = currentIndex;
+			}
 		}
 
 		public void reset() throws ResetFailedException {
-			processedRowCount -= buffer.size();
-			currentIndex = INITIAL_POSITION;
+			processedRowCount -= currentIndex - lastMarkedIndex;
+			currentIndex = lastMarkedIndex;
 		}
 
 		/**
