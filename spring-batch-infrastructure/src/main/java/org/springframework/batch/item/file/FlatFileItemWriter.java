@@ -18,7 +18,6 @@ package org.springframework.batch.item.file;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.Channels;
@@ -42,25 +41,22 @@ import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetCreator;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
+import org.springframework.batch.item.util.FileUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * This class is an output target that writes data to a file or stream. The
- * writer also provides restart, statistics and transaction features by
- * implementing corresponding interfaces where possible (with a file). The
- * location of the file is defined by a {@link Resource} and must represent a
- * writable file.<br/>
+ * This class is an item writer that writes data to a file or stream. The writer
+ * also provides restart. The location of the output file is defined by a
+ * {@link Resource} and must represent a writable file.<br/>
  * 
  * Uses buffered writer to improve performance.<br/>
  * 
  * <p>
- * This class will be updated in the future to use a buffering approach to
- * handling transactions, rather than outputting directly to the file and
- * truncating on rollback
+ * Output lines are buffered until {@link #flush()} is called and only then the
+ * actual writing to file occurs.
  * </p>
  * 
  * @author Waseem Malik
@@ -215,16 +211,21 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Initialize the Output Template.
+	 * Initialize the reader.
 	 * 
 	 * @see ItemStream#open(ExecutionContext)
 	 */
-	public void open(ExecutionContext executionContext) {
+	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		OutputState outputState = getOutputState();
 		if (executionContext.containsKey(getKey(RESTART_DATA_NAME))) {
 			outputState.restoreFrom(executionContext);
 		}
-		outputState.initializeBufferedWriter();
+		try {
+			outputState.initializeBufferedWriter();
+		}
+		catch (IOException ioe) {
+			throw new ItemStreamException("Failed to initialize writer", ioe);
+		}
 		if (outputState.lastMarkedByteOffsetPosition == 0) {
 			for (Iterator iterator = headerLines.iterator(); iterator.hasNext();) {
 				String line = (String) iterator.next();
@@ -428,48 +429,14 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		/**
 		 * Creates the buffered writer for the output file channel based on
 		 * configuration information.
+		 * @throws IOException
 		 */
-		private void initializeBufferedWriter() {
-			File file;
+		private void initializeBufferedWriter() throws IOException {
+			File file = resource.getFile();
 
-			try {
-				file = resource.getFile();
+			FileUtils.setUpOutputFile(file, restarted, shouldDeleteIfExists);
 
-				// If the output source was restarted, keep existing file.
-				// If the output source was not restarted, check following:
-				// - if the file should be deleted, delete it if it was exiting
-				// and create blank file,
-				// - if the file should not be deleted, if it already exists,
-				// throw an exception,
-				// - if the file was not existing, create new.
-				if (!restarted) {
-					if (file.exists()) {
-						if (shouldDeleteIfExists) {
-							file.delete();
-						}
-						else {
-							throw new ItemStreamException("Resource already exists: " + resource);
-						}
-					}
-					String parent = file.getParent();
-					if (parent != null) {
-						new File(parent).mkdirs();
-					}
-					file.createNewFile();
-				}
-
-			}
-			catch (IOException ioe) {
-				throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]",
-						ioe);
-			}
-
-			try {
-				fileChannel = (new FileOutputStream(file.getAbsolutePath(), true)).getChannel();
-			}
-			catch (FileNotFoundException fnfe) {
-				throw new ItemStreamException("Bad filename property parameter " + file, fnfe);
-			}
+			fileChannel = (new FileOutputStream(file.getAbsolutePath(), true)).getChannel();
 
 			outputBufferedWriter = getBufferedWriter(fileChannel, encoding, bufferSize);
 
