@@ -24,7 +24,7 @@ public class HibernateCursorItemReaderStatefulIntegrationTests extends Hibernate
 		SessionFactory sessionFactory = (SessionFactory) sessionFactoryControl.getMock();
 		MockControl sessionControl = MockControl.createControl(Session.class);
 		Session session = (Session) sessionControl.getMock();
-		MockControl resultsControl = MockControl.createControl(Query.class);
+		MockControl resultsControl = MockControl.createNiceControl(Query.class);
 		Query scrollableResults = (Query) resultsControl.getMock();
 		HibernateCursorItemReader itemReader = new HibernateCursorItemReader();
 		itemReader.setSessionFactory(sessionFactory);
@@ -35,10 +35,13 @@ public class HibernateCursorItemReaderStatefulIntegrationTests extends Hibernate
 		sessionFactoryControl.setReturnValue(session);
 		session.createQuery("testQuery");
 		sessionControl.setReturnValue(scrollableResults);
+		scrollableResults.setFetchSize(0);
+		resultsControl.setReturnValue(scrollableResults);
 		session.close();
 		sessionControl.setReturnValue(null);
 		sessionFactoryControl.replay();
 		sessionControl.replay();
+		resultsControl.replay();
 		itemReader.open(new ExecutionContext());
 		itemReader.close(new ExecutionContext());
 		sessionFactoryControl.verify();

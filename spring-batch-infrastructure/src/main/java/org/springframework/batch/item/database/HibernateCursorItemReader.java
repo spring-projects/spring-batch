@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
@@ -39,13 +40,16 @@ import org.springframework.util.ClassUtils;
  * iterates over the result set as {@link #read()} method is called, returning
  * an object corresponding to current row.
  * 
- * Input source can be configured to use either {@link StatelessSession}
+ * The reader can be configured to use either {@link StatelessSession}
  * sufficient for simple mappings without the need to cascade to associated
  * objects or standard hibernate {@link Session} for more advanced mappings or
  * when caching is desired.
  * 
  * When stateful session is used it will be cleared after successful commit
  * without being flushed (no inserts or updates are expected).
+ * 
+ * Reset(rollback) functionality is implemented by item buffering allowing the
+ * cursor used to be forward-only.
  * 
  * @author Robert Kasanicky
  * @author Dave Syer
@@ -81,8 +85,10 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	private ListIterator itemBufferIterator = null;
 
 	private List itemBuffer = new ArrayList();
-	
+
 	private int lastMarkedBufferIndex = 0;
+
+	private int fetchSize = 0;
 
 	public HibernateCursorItemReader() {
 		setName(ClassUtils.getShortName(HibernateCursorItemReader.class));
@@ -142,19 +148,13 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	}
 
 	/**
-	 * Creates cursor for the query.
+	 * Creates a forward-only cursor for the query.
 	 */
 	public void open(ExecutionContext executionContext) {
 		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
 
-		if (useStatelessSession) {
-			statelessSession = sessionFactory.openStatelessSession();
-			cursor = statelessSession.createQuery(queryString).scroll(ScrollMode.FORWARD_ONLY);
-		}
-		else {
-			statefulSession = sessionFactory.openSession();
-			cursor = statefulSession.createQuery(queryString).scroll(ScrollMode.FORWARD_ONLY);
-		}
+		cursor = createQuery().setFetchSize(fetchSize).scroll(ScrollMode.FORWARD_ONLY);
+
 		initialized = true;
 
 		if (executionContext.containsKey(getKey(RESTART_DATA_ROW_NUMBER_KEY))) {
@@ -167,6 +167,20 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	}
 
 	/**
+	 * Open appropriate type of hibernate session and create the query.
+	 */
+	private Query createQuery() {
+		if (useStatelessSession) {
+			statelessSession = sessionFactory.openStatelessSession();
+			return statelessSession.createQuery(queryString);
+		}
+		else {
+			statefulSession = sessionFactory.openSession();
+			return statefulSession.createQuery(queryString);
+		}
+	}
+
+	/**
 	 * @param sessionFactory hibernate session factory
 	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
@@ -176,6 +190,7 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(sessionFactory);
 		Assert.hasLength(queryString);
+		Assert.isTrue(fetchSize >= 0, "fetchSize must not be negative");
 	}
 
 	/**
@@ -224,7 +239,7 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 		else {
 			lastMarkedBufferIndex = itemBufferIterator.nextIndex();
 		}
-		
+
 		if (!useStatelessSession) {
 			statefulSession.clear();
 		}
@@ -244,5 +259,18 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
+	}
+
+	/**
+	 * Gives the JDBC driver a hint as to the number of rows that should be
+	 * fetched from the database when more rows are needed for this
+	 * <code>ResultSet</code> object. If the fetch size specified is zero, the
+	 * JDBC driver ignores the value.
+	 * 
+	 * @param fetchSize the number of rows to fetch, 0 by default
+	 * @see Query#setFetchSize(int)
+	 */
+	public void setFetchSize(int fetchSize) {
+		this.fetchSize = fetchSize;
 	}
 }
