@@ -3,7 +3,9 @@ package org.springframework.batch.item;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.springframework.batch.item.database.HibernateCursorItemReader;
 import org.springframework.core.io.Resource;
+import org.springframework.util.ClassUtils;
 
 /**
  * {@link MultiResourceItemReader} which orders the injected resources using
@@ -30,7 +32,7 @@ public class SortedMultiResourceItemReader extends MultiResourceItemReader {
 	};
 	
 	public SortedMultiResourceItemReader() {
-		setName(SortedMultiResourceItemReader.class.getSimpleName());
+		setName(ClassUtils.getShortName(SortedMultiResourceItemReader.class));
 	}
 
 	/**
