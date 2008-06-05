@@ -40,11 +40,11 @@ public class TradeFieldSetMapperTests extends AbstractFieldSetMapperTests{
 	}
 	
 	public void testBeginRecord() throws Exception {
-		assertEquals(AggregateItemReader.BEGIN_RECORD, fieldSetMapper().mapLine(new DefaultFieldSet(new String[] {"BEGIN"})));
+		assertEquals(AggregateItemReader.BEGIN_RECORD, fieldSetMapper().mapLine(new DefaultFieldSet(new String[] {"BEGIN"}), FieldSetMapper.ROW_NUMBER_UNKNOWN));
 	}
 
 	public void testEndRecord() throws Exception {
-		assertEquals(AggregateItemReader.END_RECORD, fieldSetMapper().mapLine(new DefaultFieldSet(new String[] {"END"})));
+		assertEquals(AggregateItemReader.END_RECORD, fieldSetMapper().mapLine(new DefaultFieldSet(new String[] {"END"}), FieldSetMapper.ROW_NUMBER_UNKNOWN));
 	}
 
 }

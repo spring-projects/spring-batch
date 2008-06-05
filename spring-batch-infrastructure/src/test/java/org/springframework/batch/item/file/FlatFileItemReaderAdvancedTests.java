@@ -52,7 +52,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 	};
 
 	private FieldSetMapper fieldSetMapper = new FieldSetMapper() {
-		public Object mapLine(FieldSet fs) {
+		public Object mapLine(FieldSet fs, int rownum) {
 			return fs;
 		}
 	};

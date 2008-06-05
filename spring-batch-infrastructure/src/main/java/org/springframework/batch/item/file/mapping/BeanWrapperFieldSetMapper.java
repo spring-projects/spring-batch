@@ -99,7 +99,7 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 
 	/**
 	 * The bean name (id) for an object that can be populated from the field set
-	 * that will be passed into {@link #mapLine(FieldSet)}. Typically a
+	 * that will be passed into {@link #mapLine(FieldSet, int)}. Typically a
 	 * prototype scoped bean so that a new instance is returned for each field
 	 * set mapped.
 	 * 
@@ -115,7 +115,7 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 	/**
 	 * Public setter for the type of bean to create instead of using a prototype
 	 * bean. An object of this type will be created from its default constructor
-	 * for every call to {@link #mapLine(FieldSet)}.<br/>
+	 * for every call to {@link #mapLine(FieldSet, int)}.<br/>
 	 * 
 	 * Either this property or the prototype bean name must be specified, but
 	 * not both.
@@ -150,9 +150,9 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 	 * the {@link DataBinder} from {@link #createBinder(Object)} has errors
 	 * after binding).
 	 * 
-	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#mapLine(org.springframework.batch.item.file.mapping.FieldSet)
+	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#mapLine(org.springframework.batch.item.file.mapping.FieldSet, int)
 	 */
-	public Object mapLine(FieldSet fs) {
+	public Object mapLine(FieldSet fs, int rownum) {
 		Object copy = getBean();
 		DataBinder binder = createBinder(copy);
 		binder.bind(new MutablePropertyValues(getBeanProperties(copy, fs.getProperties())));

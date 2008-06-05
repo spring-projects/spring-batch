@@ -179,13 +179,13 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements R
 		String line = readLine();
 
 		if (line != null) {
+			int lineCount = getReader().getPosition();
 			try {
 				FieldSet tokenizedLine = tokenizer.tokenize(line);
-				return fieldSetMapper.mapLine(tokenizedLine);
+				return fieldSetMapper.mapLine(tokenizedLine, lineCount);
 			}
 			catch (RuntimeException ex) {
 				// add current line count to message and re-throw
-				int lineCount = getReader().getPosition();
 				throw new FlatFileParseException("Parsing error at line: " + lineCount + " in resource="
 						+ resource.getDescription() + ", input=[" + line + "]", ex, line, lineCount);
 			}

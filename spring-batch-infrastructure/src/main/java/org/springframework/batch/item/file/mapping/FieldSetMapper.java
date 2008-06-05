@@ -16,18 +16,31 @@
 
 package org.springframework.batch.item.file.mapping;
 
-
 /**
- * Interface that is used to map data obtained from a file into an object.
+ * Interface that is used to map data obtained from a {@link FieldSet} into an
+ * object.
  * 
  * @author tomas.slanina
  * @author Dave Syer
  * 
  */
 public interface FieldSetMapper {
-	
+
 	/**
-	 * Method used to map data obtained from a file into an object.
+	 * Constant (negative) value indicating an unknown row number.
 	 */
-	public Object mapLine(FieldSet fs);
+	public final static int ROW_NUMBER_UNKNOWN = -1;
+
+	/**
+	 * Method used to map data obtained from a {@link FieldSet} into an object.
+	 * Implementations can do whatever they need to to convert the input into an
+	 * object of the desired type. Often the row number is not used, and
+	 * sometimes it is not available anyway, in which case its value will be
+	 * {@link #ROW_NUMBER_UNKNOWN}.
+	 * 
+	 * @param fs the {@link FieldSet} to map
+	 * @param rownum the row number for the field set in the input source (if
+	 * known)
+	 */
+	public Object mapLine(FieldSet fs, int rownum);
 }

@@ -1,9 +1,9 @@
 package org.springframework.batch.sample.mapping;
 
+import junit.framework.TestCase;
+
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-
-import junit.framework.TestCase;
 
 /**
  * Encapsulates basic logic for testing custom {@link FieldSetMapper} implementations.
@@ -35,7 +35,7 @@ public abstract class AbstractFieldSetMapperTests extends TestCase {
 	 * Assumes the domain object implements sensible <code>equals(Object other)</code>
 	 */
 	public void testRegularUse() {
-		assertEquals(expectedDomainObject(), fieldSetMapper().mapLine(fieldSet()));
+		assertEquals(expectedDomainObject(), fieldSetMapper().mapLine(fieldSet(), FieldSetMapper.ROW_NUMBER_UNKNOWN));
 	}
 	
 }

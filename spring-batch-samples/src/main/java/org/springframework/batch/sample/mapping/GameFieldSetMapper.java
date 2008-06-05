@@ -6,7 +6,7 @@ import org.springframework.batch.sample.domain.Game;
 
 public class GameFieldSetMapper implements FieldSetMapper {
 
-	public Object mapLine(FieldSet fs) {
+	public Object mapLine(FieldSet fs, int rownum) {
 		
 		if(fs == null){
 			return null;
