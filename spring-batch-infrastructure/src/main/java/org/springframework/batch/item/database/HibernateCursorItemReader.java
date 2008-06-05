@@ -30,6 +30,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * {@link ItemReader} for reading database records built on top of Hibernate.
@@ -84,7 +85,7 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	private int lastMarkedBufferIndex = 0;
 
 	public HibernateCursorItemReader() {
-		setName(HibernateCursorItemReader.class.getSimpleName());
+		setName(ClassUtils.getShortName(HibernateCursorItemReader.class));
 	}
 
 	public Object read() {
