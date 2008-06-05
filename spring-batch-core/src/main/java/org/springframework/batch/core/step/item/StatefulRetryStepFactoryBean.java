@@ -39,6 +39,9 @@ import org.springframework.batch.retry.RetryPolicy;
  * 
  * @author Dave Syer
  * 
+ * @deprecated All the features of this factory bean were moved to
+ * {@link SkipLimitStepFactoryBean} in version 1.1.0.
+ * 
  */
 public class StatefulRetryStepFactoryBean extends SkipLimitStepFactoryBean {
 

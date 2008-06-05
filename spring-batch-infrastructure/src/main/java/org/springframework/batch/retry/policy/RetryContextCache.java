@@ -19,7 +19,7 @@ package org.springframework.batch.retry.policy;
 import org.springframework.batch.retry.RetryContext;
 
 /**
- * Simple map-like bstraction for stateful retry policies to use when storing
+ * Simple map-like abstraction for stateful retry policies to use when storing
  * and retrieving {@link RetryContext} instances.
  * 
  * @author Dave Syer

@@ -180,7 +180,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		}
 		catch (Throwable e) {
 
-			logger.error("Encountered an error executing the step");
+			logger.error("Encountered an error executing the step: "+e.getClass()+": "+e.getMessage());
 			stepExecution.setStatus(determineBatchStatus(e));
 			exitStatus = getDefaultExitStatusForFailure(e);
 

@@ -37,11 +37,14 @@ import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
+import org.springframework.batch.core.step.skip.SkipLimitExceededException;
+import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.retry.RetryException;
+import org.springframework.batch.retry.policy.RetryCacheCapacityExceededException;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -54,7 +57,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private StatefulRetryStepFactoryBean factory = new StatefulRetryStepFactoryBean();
+	private SkipLimitStepFactoryBean factory = new SkipLimitStepFactoryBean();
 
 	private List recovered = new ArrayList();
 
@@ -214,5 +217,79 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		// each item once, plus 5 failed retries each for b and d, plus the null
 		// terminator
 		assertEquals(17, count);
+	}
+
+	public void testRetryWithNoSkip() throws Exception {
+		factory.setRetryableExceptionClasses(new Class[] { Exception.class });
+		factory.setRetryLimit(4);
+		factory.setSkipLimit(0);
+		List items = TransactionAwareProxyFactory.createTransactionalList();
+		items.addAll(Arrays.asList(new String[] { "b" }));
+		ItemReader provider = new ListItemReader(items) {
+			public Object read() {
+				Object item = super.read();
+				count++;
+				return item;
+			}
+		};
+		ItemWriter itemWriter = new AbstractItemWriter() {
+			public void write(Object item) throws Exception {
+				logger.debug("Write Called! Item: [" + item + "]");
+				throw new RuntimeException("Write error - planned but retryable.");
+			}
+		};
+		factory.setItemReader(provider);
+		factory.setItemWriter(itemWriter);
+		AbstractStep step = (AbstractStep) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		try {
+			step.execute(stepExecution);
+			fail("Expected SkipLimitExceededException");
+		}
+		catch (SkipLimitExceededException e) {
+			// expected
+		}
+
+		assertEquals(0, stepExecution.getSkipCount());
+		// b is processed 4 times plus the null at end
+		assertEquals(5, count);
+	}
+
+	public void testCacheLimitWithRetry() throws Exception {
+		factory.setRetryableExceptionClasses(new Class[] { Exception.class });
+		factory.setRetryLimit(2);
+		// set the cache limit lower than the number of unique un-recovered
+		// errors expected
+		factory.setCacheCapacity(2);
+		ItemReader provider = new AbstractItemReader() {
+			public Object read() {
+				Object item = new Object();
+				count++;
+				return item;
+			}
+		};
+		ItemWriter itemWriter = new AbstractItemWriter() {
+			public void write(Object item) throws Exception {
+				logger.debug("Write Called! Item: [" + item + "]");
+				throw new RuntimeException("Write error - planned but retryable.");
+			}
+		};
+		factory.setItemReader(provider);
+		factory.setItemWriter(itemWriter);
+		AbstractStep step = (AbstractStep) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		try {
+			step.execute(stepExecution);
+			fail("Expected RetryCacheCapacityExceededException");
+		}
+		catch (RetryCacheCapacityExceededException e) {
+			// expected
+		}
+
+		assertEquals(0, stepExecution.getSkipCount());
+		// 2 processed and cached, 3rd barfed because cache was full
+		assertEquals(3, count);
 	}
 }

@@ -40,7 +40,6 @@ import org.springframework.util.Assert;
  * appropriate subclass of this factory bean to configure skip or retry.
  * 
  * @see SkipLimitStepFactoryBean
- * @see StatefulRetryStepFactoryBean
  * 
  * @author Dave Syer
  * 

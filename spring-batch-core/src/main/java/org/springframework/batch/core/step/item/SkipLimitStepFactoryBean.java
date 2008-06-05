@@ -23,6 +23,7 @@ import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.callback.RecoveryRetryCallback;
 import org.springframework.batch.retry.policy.ExceptionClassifierRetryPolicy;
+import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
@@ -43,7 +44,6 @@ import org.springframework.batch.support.SubclassExceptionClassifier;
  * {@link #setNoRollbackForExceptionClasses(Class[])} list.
  * 
  * @see SimpleStepFactoryBean
- * @see StatefulRetryStepFactoryBean
  * 
  * @author Dave Syer
  * @author Robert Kasanicky
@@ -61,8 +61,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 
 	private ItemKeyGenerator itemKeyGenerator;
 
-	// TODO: build this into the retry policy
-	private int skipCacheCapacity = 1024;
+	private int cacheCapacity = 0;
 
 	private int retryLimit;
 
@@ -79,6 +78,27 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	 */
 	public void setRetryLimit(int retryLimit) {
 		this.retryLimit = retryLimit;
+	}
+
+	/**
+	 * Public setter for the capacity of the cache in the retry policy. If more
+	 * items than this fail without being skipped or recovered an exception will
+	 * be thrown. This is to guard against inadvertent infinite loops generated
+	 * by item identity problems. If a large number of items are failing and not
+	 * being recognized as skipped, it usually signals a problem with the key
+	 * generation (often equals and hashCode in the item itself). So it is
+	 * better to enforce a strict limit than have weird looking errors, where a
+	 * skip limit is reached without anything being skipped.<br/>
+	 * 
+	 * The default value should be high enough and more for most purposes. To
+	 * breach the limit in a single-threaded step typically you have to have
+	 * this many failures in a single transaction. Defaults to the value in the
+	 * {@link MapRetryContextCache}.
+	 * 
+	 * @param cacheCapacity the cacheCapacity to set
+	 */
+	public void setCacheCapacity(int cacheCapacity) {
+		this.cacheCapacity = cacheCapacity;
 	}
 
 	/**
@@ -150,24 +170,6 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	}
 
 	/**
-	 * Public setter for the capacity of the skipped item cache. If a large
-	 * number of items are failing and not being recognized as skipped, it
-	 * usually signals a problem with the key generation (often equals and
-	 * hashCode in the item itself). So it is better to enforce a strict limit
-	 * than have weird looking errors, where a skip limit is reached without
-	 * anything being skipped.<br/>
-	 * 
-	 * The default value is 1024 which should be high enough and more for most
-	 * purposes. To breach the limit in a single-threaded step typically you
-	 * have to have this many failures in a single transaction.
-	 * 
-	 * @param skipCacheCapacity the capacity to set
-	 */
-	public void setSkipCacheCapacity(int skipCacheCapacity) {
-		this.skipCacheCapacity = skipCacheCapacity;
-	}
-
-	/**
 	 * Skippable noRollbackForExceptionClasses will *not* cause transaction
 	 * rollback.
 	 * 
@@ -192,7 +194,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 			addFatalExceptionIfMissing(RetryException.class);
 
 			SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryLimit);
-			if (retryableExceptionClasses.length>0) { // otherwise we retry
+			if (retryableExceptionClasses.length > 0) { // otherwise we retry
 				// all exceptions
 				simpleRetryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
 			}
@@ -218,6 +220,9 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 
 			RecoveryCallbackRetryPolicy recoveryCallbackRetryPolicy = new RecoveryCallbackRetryPolicy(retryPolicy);
 			recoveryCallbackRetryPolicy.setRecoverableExceptionClasses(noRollbackForExceptionClasses);
+			if (cacheCapacity > 0) {
+				recoveryCallbackRetryPolicy.setRetryContextCache(new MapRetryContextCache(cacheCapacity));
+			}
 
 			RetryTemplate retryTemplate = new RetryTemplate();
 			if (retryListeners != null) {
