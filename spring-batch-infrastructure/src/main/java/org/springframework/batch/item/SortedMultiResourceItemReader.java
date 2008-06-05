@@ -3,7 +3,6 @@ package org.springframework.batch.item;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.springframework.batch.item.database.HibernateCursorItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
 
