@@ -33,7 +33,7 @@ public class AddressFieldSetMapper implements FieldSetMapper {
 	public static final String COUNTRY_COLUMN = "COUNTRY";
 	
 	
-    public Object mapLine(FieldSet fieldSet, int rownum) {
+    public Object mapLine(FieldSet fieldSet) {
         Address address = new Address();
 
         address.setAddressee(fieldSet.readString(ADDRESSEE_COLUMN));

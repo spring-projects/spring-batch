@@ -28,7 +28,7 @@ public class ShippingFieldSetMapper implements FieldSetMapper {
 	public static final String SHIPPING_TYPE_ID_COLUMN = "SHIPPING_TYPE_ID";
 	public static final String SHIPPER_ID_COLUMN = "SHIPPER_ID";
 
-	public Object mapLine(FieldSet fieldSet, int rownum) {
+	public Object mapLine(FieldSet fieldSet) {
         ShippingInfo info = new ShippingInfo();
 
         info.setShipperId(fieldSet.readString(SHIPPER_ID_COLUMN));

@@ -59,7 +59,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	};
 
 	private FieldSetMapper fieldSetMapper = new FieldSetMapper() {
-		public Object mapLine(FieldSet fs, int rownum) {
+		public Object mapLine(FieldSet fs) {
 			return fs;
 		}
 	};
@@ -126,7 +126,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 
 	public void testReadWithMapperError() throws Exception {
 		itemReader.setFieldSetMapper(new FieldSetMapper() {
-			public Object mapLine(FieldSet fs, int rownum) {
+			public Object mapLine(FieldSet fs) {
 				throw new RuntimeException("foo");
 			}
 		});

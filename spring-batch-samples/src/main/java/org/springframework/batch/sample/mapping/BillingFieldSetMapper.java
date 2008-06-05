@@ -27,7 +27,7 @@ public class BillingFieldSetMapper implements FieldSetMapper {
 	public static final String PAYMENT_TYPE_ID_COLUMN = "PAYMENT_TYPE_ID";
 	public static final String PAYMENT_DESC_COLUMN = "PAYMENT_DESC";
 	
-    public Object mapLine(FieldSet fieldSet, int rownum) {
+    public Object mapLine(FieldSet fieldSet) {
         BillingInfo info = new BillingInfo();
 
         info.setPaymentId(fieldSet.readString(PAYMENT_TYPE_ID_COLUMN));

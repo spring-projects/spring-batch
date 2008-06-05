@@ -91,7 +91,7 @@ public class OrderItemReader extends DelegatingItemReader {
 		// start a new Order
 		if (Order.LINE_ID_HEADER.equals(lineId)) {
 			log.debug("STARTING NEW RECORD");
-			order = (Order) headerMapper.mapLine(fieldSet, FieldSetMapper.ROW_NUMBER_UNKNOWN);
+			order = (Order) headerMapper.mapLine(fieldSet);
 
 			return;
 		}
@@ -116,7 +116,7 @@ public class OrderItemReader extends DelegatingItemReader {
 			log.debug("MAPPING CUSTOMER");
 
 			if (order.getCustomer() == null) {
-				order.setCustomer((Customer) customerMapper.mapLine(fieldSet, FieldSetMapper.ROW_NUMBER_UNKNOWN));
+				order.setCustomer((Customer) customerMapper.mapLine(fieldSet));
 				order.getCustomer().setBusinessCustomer(true);
 			}
 
@@ -127,7 +127,7 @@ public class OrderItemReader extends DelegatingItemReader {
 			log.debug("MAPPING CUSTOMER");
 
 			if (order.getCustomer() == null) {
-				order.setCustomer((Customer) customerMapper.mapLine(fieldSet, FieldSetMapper.ROW_NUMBER_UNKNOWN));
+				order.setCustomer((Customer) customerMapper.mapLine(fieldSet));
 				order.getCustomer().setBusinessCustomer(false);
 			}
 
@@ -136,25 +136,25 @@ public class OrderItemReader extends DelegatingItemReader {
 
 		if (Address.LINE_ID_BILLING_ADDR.equals(lineId)) {
 			log.debug("MAPPING BILLING ADDRESS");
-			order.setBillingAddress((Address) addressMapper.mapLine(fieldSet, FieldSetMapper.ROW_NUMBER_UNKNOWN));
+			order.setBillingAddress((Address) addressMapper.mapLine(fieldSet));
 			return;
 		}
 
 		if (Address.LINE_ID_SHIPPING_ADDR.equals(lineId)) {
 			log.debug("MAPPING SHIPPING ADDRESS");
-			order.setShippingAddress((Address) addressMapper.mapLine(fieldSet, FieldSetMapper.ROW_NUMBER_UNKNOWN));
+			order.setShippingAddress((Address) addressMapper.mapLine(fieldSet));
 			return;
 		}
 
 		if (BillingInfo.LINE_ID_BILLING_INFO.equals(lineId)) {
 			log.debug("MAPPING BILLING INFO");
-			order.setBilling((BillingInfo) billingMapper.mapLine(fieldSet, FieldSetMapper.ROW_NUMBER_UNKNOWN));
+			order.setBilling((BillingInfo) billingMapper.mapLine(fieldSet));
 			return;
 		}
 
 		if (ShippingInfo.LINE_ID_SHIPPING_INFO.equals(lineId)) {
 			log.debug("MAPPING SHIPPING INFO");
-			order.setShipping((ShippingInfo) shippingMapper.mapLine(fieldSet, FieldSetMapper.ROW_NUMBER_UNKNOWN));
+			order.setShipping((ShippingInfo) shippingMapper.mapLine(fieldSet));
 			return;
 		}
 
@@ -165,7 +165,7 @@ public class OrderItemReader extends DelegatingItemReader {
 				order.setLineItems(new ArrayList());
 			}
 
-			order.getLineItems().add(itemMapper.mapLine(fieldSet, FieldSetMapper.ROW_NUMBER_UNKNOWN));
+			order.getLineItems().add(itemMapper.mapLine(fieldSet));
 
 			return;
 		}

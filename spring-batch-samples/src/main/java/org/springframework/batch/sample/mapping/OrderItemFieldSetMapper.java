@@ -33,7 +33,7 @@ public class OrderItemFieldSetMapper implements FieldSetMapper {
 	public static final String ITEM_ID_COLUMN = "ITEM_ID";
 	
 	
-    public Object mapLine(FieldSet fieldSet, int rownum) {
+    public Object mapLine(FieldSet fieldSet) {
         LineItem item = new LineItem();
 
         item.setItemId(fieldSet.readLong(ITEM_ID_COLUMN));

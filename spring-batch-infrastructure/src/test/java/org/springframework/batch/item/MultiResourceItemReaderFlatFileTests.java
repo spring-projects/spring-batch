@@ -15,7 +15,7 @@ public class MultiResourceItemReaderFlatFileTests extends CommonItemStreamItemRe
 		FlatFileItemReader fileReader = new FlatFileItemReader();
 
 		fileReader.setFieldSetMapper(new FieldSetMapper() {
-			public Object mapLine(FieldSet fs, int rownum) {
+			public Object mapLine(FieldSet fs) {
 				Foo foo = new Foo();
 				foo.setValue(fs.readInt(0));
 				return foo;

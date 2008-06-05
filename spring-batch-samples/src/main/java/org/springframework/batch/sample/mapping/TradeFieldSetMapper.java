@@ -30,7 +30,7 @@ public class TradeFieldSetMapper implements FieldSetMapper {
 	public static final int PRICE_COLUMN = 2;
 	public static final int CUSTOMER_COLUMN = 3;
 	
-    public Object mapLine(FieldSet fieldSet, int rownum) {
+    public Object mapLine(FieldSet fieldSet) {
     	
     	if ("BEGIN".equals(fieldSet.readString(0))) {
     		return AggregateItemReader.BEGIN_RECORD;

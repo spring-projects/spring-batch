@@ -182,7 +182,7 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements R
 			int lineCount = getReader().getPosition();
 			try {
 				FieldSet tokenizedLine = tokenizer.tokenize(line);
-				return fieldSetMapper.mapLine(tokenizedLine, lineCount);
+				return fieldSetMapper.mapLine(tokenizedLine);
 			}
 			catch (RuntimeException ex) {
 				// add current line count to message and re-throw
