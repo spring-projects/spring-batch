@@ -44,6 +44,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 	public static void clear() {
 		executionsByJobExecutionId.clear();
+		contextsByStepExecutionId.clear();
 	}
 
 	public ExecutionContext findExecutionContext(StepExecution stepExecution) {
