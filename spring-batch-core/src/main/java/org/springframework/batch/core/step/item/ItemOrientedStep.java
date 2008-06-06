@@ -265,17 +265,22 @@ public class ItemOrientedStep extends AbstractStep {
 						throw new FatalException("Fatal error detected during save of step execution context", e);
 					}
 
+					itemHandler.mark();
+
 					try {
-						itemHandler.mark();
 						transactionManager.commit(transaction);
 					}
 					catch (Exception e) {
-						fatalException.setException(e);
-						stepExecution.setStatus(BatchStatus.UNKNOWN);
 						logger.error("Fatal error detected during commit.");
-						throw new FatalException("Fatal error detected during commit", e);
+						throw new CommitException("Fatal error detected during commit - "
+								+ "the execution is in undefined state and restart will not be possible", e);
 					}
 
+				}
+				catch (CommitException e) {
+					// trying to rollback after failed commit would just be
+					// asking for more trouble - die ASAP
+					throw e;
 				}
 				catch (Error e) {
 					processRollback(stepExecution, contribution, fatalException, transaction);
@@ -380,6 +385,15 @@ public class ItemOrientedStep extends AbstractStep {
 			return this.exception;
 		}
 
+	}
+
+	/**
+	 * Encapsulates exception thrown while committing transaction.
+	 */
+	private static class CommitException extends FatalException {
+		public CommitException(String msg, Throwable cause) {
+			super(msg, cause);
+		}
 	}
 
 	protected void close(ExecutionContext ctx) throws Exception {

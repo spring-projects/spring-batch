@@ -326,7 +326,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * {@link BatchStatus#UNKNOWN} as step's status.
 	 */
 	protected static class FatalException extends RuntimeException {
-		public FatalException(String string, Exception e) {
+		public FatalException(String string, Throwable e) {
 			super(string, e);
 		}
 	}

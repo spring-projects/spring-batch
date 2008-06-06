@@ -654,9 +654,9 @@ public class ItemOrientedStepTests extends TestCase {
 		catch (RuntimeException ex) {
 			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertTrue(msg.contains("Fatal error detected during commit"));
+			assertTrue(msg.contains("Fatal error detected during commit - the execution is in undefined state and restart will not be possible"));
 			msg = ex.getMessage();
-			assertTrue(msg.contains("Fatal error detected during commit"));
+			assertTrue(msg.contains("Fatal error detected during commit - the execution is in undefined state and restart will not be possible"));
 			// The original rollback was caused by this one:
 			assertEquals("Bar", ex.getCause().getMessage());
 		}
