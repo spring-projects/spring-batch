@@ -41,7 +41,7 @@ public class ExecutionContextUserSupport {
 	 * key that can be safely used to identify data stored in
 	 * {@link ExecutionContext}.
 	 */
-	protected String getKey(String s) {
+	public String getKey(String s) {
 		Assert.hasLength(name, "ItemStream must have a name assigned.");
 		return name + "." + s;
 	}

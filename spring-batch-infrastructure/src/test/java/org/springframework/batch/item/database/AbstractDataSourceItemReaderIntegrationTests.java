@@ -126,7 +126,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 			getAsItemStream(reader).open(executionContext);
 			fail();
 		}
-		catch (IllegalStateException ex) {
+		catch (Exception ex) {
 			// expected
 		}
 	}

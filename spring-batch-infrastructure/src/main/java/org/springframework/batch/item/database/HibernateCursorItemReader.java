@@ -15,18 +15,13 @@
  */
 package org.springframework.batch.item.database;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-
 import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ExecutionContextUserSupport;
+import org.springframework.batch.item.AbstractBufferedItemReaderItemStream;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.beans.factory.InitializingBean;
@@ -54,10 +49,8 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader extends ExecutionContextUserSupport implements ItemReader, ItemStream,
+public class HibernateCursorItemReader extends AbstractBufferedItemReaderItemStream implements ItemStream,
 		InitializingBean {
-
-	private static final String RESTART_DATA_ROW_NUMBER_KEY = "row.number";
 
 	private SessionFactory sessionFactory;
 
@@ -71,99 +64,12 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 
 	private boolean useStatelessSession = true;
 
-	private int lastCommitRowNumber = 0;
-
-	/* Current count of processed records. */
-	private int currentProcessedRow = 0;
-
 	private boolean initialized = false;
-
-	private boolean saveState = false;
-
-	private boolean shouldReadBuffer = false;
-
-	private ListIterator itemBufferIterator = null;
-
-	private List itemBuffer = new ArrayList();
-
-	private int lastMarkedBufferIndex = 0;
 
 	private int fetchSize = 0;
 
 	public HibernateCursorItemReader() {
 		setName(ClassUtils.getShortName(HibernateCursorItemReader.class));
-	}
-
-	public Object read() {
-
-		currentProcessedRow++;
-
-		if (shouldReadBuffer) {
-			if (itemBufferIterator.hasNext()) {
-				return itemBufferIterator.next();
-			}
-			else {
-				// buffer is exhausted, continue reading from file
-				shouldReadBuffer = false;
-				itemBufferIterator = null;
-			}
-		}
-
-		if (cursor.next()) {
-			Object[] data = cursor.get();
-			Object item;
-
-			if (data.length > 1) {
-				item = data;
-			}
-			else {
-				item = data[0];
-			}
-
-			itemBuffer.add(item);
-			return item;
-		}
-		return null;
-	}
-
-	/**
-	 * Closes the result set cursor and hibernate session.
-	 */
-	public void close(ExecutionContext executionContext) {
-		initialized = false;
-		if (cursor != null) {
-			cursor.close();
-		}
-		currentProcessedRow = 0;
-		if (useStatelessSession) {
-			if (statelessSession != null) {
-				statelessSession.close();
-			}
-		}
-		else {
-			if (statefulSession != null) {
-				statefulSession.close();
-			}
-		}
-	}
-
-	/**
-	 * Creates a forward-only cursor for the query.
-	 */
-	public void open(ExecutionContext executionContext) {
-		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
-
-		cursor = createQuery().setFetchSize(fetchSize).scroll(ScrollMode.FORWARD_ONLY);
-
-		initialized = true;
-
-		if (executionContext.containsKey(getKey(RESTART_DATA_ROW_NUMBER_KEY))) {
-			currentProcessedRow = Integer.parseInt(executionContext.getString(getKey(RESTART_DATA_ROW_NUMBER_KEY)));
-			for (int i = 0; i < currentProcessedRow; i++) {
-				cursor.next();
-			}
-		}
-
 	}
 
 	/**
@@ -213,15 +119,6 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	}
 
 	/**
-	 */
-	public void update(ExecutionContext executionContext) {
-		if (saveState) {
-			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			executionContext.putString(getKey(RESTART_DATA_ROW_NUMBER_KEY), "" + currentProcessedRow);
-		}
-	}
-
-	/**
 	 * Mark is supported as long as this {@link ItemStream} is used in a
 	 * single-threaded environment. The state backing the mark is a single
 	 * counter, keeping track of the current position, so multiple threads
@@ -231,34 +128,11 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	 */
 	public void mark() {
 
-		if (!shouldReadBuffer) {
-			itemBuffer.clear();
-			itemBufferIterator = null;
-			lastMarkedBufferIndex = 0;
-		}
-		else {
-			lastMarkedBufferIndex = itemBufferIterator.nextIndex();
-		}
+		super.mark();
 
 		if (!useStatelessSession) {
 			statefulSession.clear();
 		}
-		lastCommitRowNumber = currentProcessedRow;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#reset(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void reset() {
-		currentProcessedRow = lastCommitRowNumber;
-		shouldReadBuffer = true;
-		itemBufferIterator = itemBuffer.listIterator(lastMarkedBufferIndex);
-	}
-
-	public void setSaveState(boolean saveState) {
-		this.saveState = saveState;
 	}
 
 	/**
@@ -272,5 +146,57 @@ public class HibernateCursorItemReader extends ExecutionContextUserSupport imple
 	 */
 	public void setFetchSize(int fetchSize) {
 		this.fetchSize = fetchSize;
+	}
+
+	protected Object doRead() throws Exception {
+		if (cursor.next()) {
+			Object[] data = cursor.get();
+			Object item;
+
+			if (data.length > 1) {
+				item = data;
+			}
+			else {
+				item = data[0];
+			}
+
+			return item;
+		}
+		return null;
+	}
+
+	/**
+	 * Open hibernate session and create a forward-only cursor for the
+	 * {@link #setQueryString(String)}.
+	 */
+	protected void doOpen() throws Exception {
+		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
+
+		cursor = createQuery().setFetchSize(fetchSize).scroll(ScrollMode.FORWARD_ONLY);
+
+		initialized = true;
+
+	}
+
+	/**
+	 * Close the cursor and hibernate session.
+	 */
+	protected void doClose() throws Exception {
+		initialized = false;
+
+		if (cursor != null) {
+			cursor.close();
+		}
+		if (useStatelessSession) {
+			if (statelessSession != null) {
+				statelessSession.close();
+			}
+		}
+		else {
+			if (statefulSession != null) {
+				statefulSession.close();
+			}
+		}
+
 	}
 }
