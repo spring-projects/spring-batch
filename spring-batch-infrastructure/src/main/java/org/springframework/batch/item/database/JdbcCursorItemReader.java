@@ -22,24 +22,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.item.AbstractBufferedItemReaderItemStream;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ExecutionContextUserSupport;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.MarkFailedException;
-import org.springframework.batch.item.NoWorkFoundException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.ResetFailedException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.SQLWarningException;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -104,15 +95,13 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Lucas Ward
  * @author Peter Zozom
+ * @author Robert Kasanicky
  */
-public class JdbcCursorItemReader extends ExecutionContextUserSupport implements ItemReader, InitializingBean,
-		ItemStream {
+public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream implements InitializingBean {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);
 
 	public static final int VALUE_NOT_SET = -1;
-
-	private static final String CURRENT_PROCESSED_ROW = "last.processed.row.number";
 
 	private Connection con;
 
@@ -142,11 +131,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 
 	private boolean initialized = false;
 
-	private boolean saveState = false;
-
 	private boolean driverSupportsAbsolute = false;
-
-	private BufferredResultSetReader bufferredReader;
 
 	public JdbcCursorItemReader() {
 		setName(ClassUtils.getShortName(JdbcCursorItemReader.class));
@@ -174,55 +159,6 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/**
-	 * Increment the cursor to the next row, validating the cursor position and
-	 * passing the ResultSet to the RowMapper.
-	 * 
-	 * @returns Object returned by RowMapper
-	 * @throws DataAccessException
-	 */
-	public Object read() throws Exception {
-
-		return bufferredReader.read();
-	}
-
-	public long getCurrentProcessedRow() {
-		return bufferredReader.getProcessedRowCount();
-	}
-
-	/**
-	 * Mark the current row. Calling reset will cause the result set to be set
-	 * to the current row when mark was called.
-	 */
-	public void mark() {
-		bufferredReader.mark();
-	}
-
-	/**
-	 * Set the ResultSet's current row to the last marked position.
-	 * 
-	 * @throws DataAccessException
-	 */
-	public void reset() throws ResetFailedException {
-		bufferredReader.reset();
-	}
-
-	/**
-	 * Close this item reader. The ResultSet, Statement and Connection created
-	 * will be closed. This must be called or the connection and cursor will be
-	 * held open indefinitely!
-	 * 
-	 * @see org.springframework.batch.item.ItemStream#close(ExecutionContext)
-	 */
-	public void close(ExecutionContext executionContext) {
-		initialized = false;
-		JdbcUtils.closeResultSet(this.rs);
-		JdbcUtils.closeStatement(this.preparedStatement);
-		JdbcUtils.closeConnection(this.con);
-		bufferredReader = null;
-		rs = null;
-	}
-
-	/*
 	 * Executes the provided SQL query. The statement is created with
 	 * 'READ_ONLY' and 'HOLD_CUSORS_OVER_COMMIT' set to true. This is extremely
 	 * important, since a non read-only cursor may lock tables that shouldn't be
@@ -251,7 +187,7 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 
 	}
 
-	/*
+	/**
 	 * Prepare the given JDBC Statement (or PreparedStatement or
 	 * CallableStatement), applying statement settings such as fetch size, max
 	 * rows, and query timeout. @param stmt the JDBC Statement to prepare
@@ -313,56 +249,6 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		else if (warnings != null) {
 			throw new SQLWarningException("Warning not ignored", warnings);
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.item.stream.ItemStreamAdapter#getExecutionContext()
-	 */
-	public void update(ExecutionContext executionContext) {
-		if (saveState && initialized) {
-			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			executionContext.putLong(getKey(CURRENT_PROCESSED_ROW), bufferredReader.getProcessedRowCount());
-		}
-	}
-
-	/**
-	 * Execute the {@link #setSql(String)} query and move to the saved position
-	 * in case of restart. If {@link #setDriverSupportsAbsolute(boolean)} is set
-	 * to true the reader will attempt to use {@link ResultSet#absolute(int)} to
-	 * move the cursor and fall back on ResultSet traversal in case of failure.
-	 */
-	public void open(ExecutionContext context) {
-		Assert.state(!initialized, "Stream is already initialized.  Close before re-opening.");
-		Assert.isNull(rs, "ResultSet still open!  Close before re-opening.");
-		Assert.notNull(context, "ExecutionContext must not be null");
-		executeQuery();
-		initialized = true;
-		int processedRowCount = 0;
-
-		if (context.containsKey(getKey(CURRENT_PROCESSED_ROW))) {
-			processedRowCount = Long.valueOf(context.getLong(getKey(CURRENT_PROCESSED_ROW))).intValue();
-
-			if (driverSupportsAbsolute) {
-				try {
-					rs.absolute(processedRowCount);
-				}
-				catch (SQLException e) {
-					// Driver does not support rs.absolute(int) revert to
-					// traversing ResultSet
-					log.warn("The JDBC driver does not appear to support ResultSet.absolute(). Consider"
-							+ " reverting to the default behavior setting the driverSupportsAbsolute to false", e);
-
-					moveCursorToRow(processedRowCount);
-				}
-			}
-			else {
-				moveCursorToRow(processedRowCount);
-			}
-		}
-
-		bufferredReader = new BufferredResultSetReader(rs, mapper, processedRowCount);
 	}
 
 	/**
@@ -474,16 +360,6 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 	}
 
 	/**
-	 * Set whether this {@link ItemReader} should save it's state in the
-	 * {@link ExecutionContext} or not
-	 * 
-	 * @param saveState
-	 */
-	public void setSaveState(boolean saveState) {
-		this.saveState = saveState;
-	}
-
-	/**
 	 * Indicate whether the JDBC driver supports setting the absolute row on a
 	 * {@link ResultSet}. It is recommended that this is set to
 	 * <code>true</code> for JDBC drivers that supports ResultSet.absolute()
@@ -498,91 +374,81 @@ public class JdbcCursorItemReader extends ExecutionContextUserSupport implements
 		this.driverSupportsAbsolute = driverSupportsAbsolute;
 	}
 
-	private class BufferredResultSetReader implements ItemReader {
-
-		private ResultSet rs;
-
-		private RowMapper rowMapper;
-
-		private List buffer;
-
-		private int currentIndex;
-
-		private int processedRowCount;
-
-		private int INITIAL_POSITION = -1;
-
-		private int lastMarkedIndex;
-
-		public BufferredResultSetReader(ResultSet rs, RowMapper rowMapper, int processedRowCount) {
-			Assert.notNull(rs, "The ResultSet must not be null");
-			Assert.notNull(rowMapper, "The RowMapper must not be null");
-			this.rs = rs;
-			this.rowMapper = rowMapper;
-			buffer = new ArrayList();
-			currentIndex = INITIAL_POSITION;
-			lastMarkedIndex = INITIAL_POSITION;
-			this.processedRowCount = processedRowCount;
-		}
-
-		public BufferredResultSetReader(ResultSet rs, RowMapper rowMapper) {
-			this(rs, rowMapper, 0);
-		}
-
-		public Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
-
-			currentIndex++;
-			// if the incremented index reaches out of the buffer, add next item
-			// from result set to buffer
-			if (buffer.size() == currentIndex) {
-				try {
-					if (!rs.next()) {
-						return null;
-					}
-					int currentRow = processedRowCount + 1;
-					buffer.add(rowMapper.mapRow(rs, currentRow));
-					verifyCursorPosition(currentRow);
-				}
-				catch (SQLException se) {
-					throw getExceptionTranslator().translate("Attempt to process next row failed", sql, se);
-				}
-			}
-
-			processedRowCount++;
-			return buffer.get(currentIndex);
-		}
-
-		public void mark() throws MarkFailedException {
-			if (currentIndex == buffer.size()) {
-				buffer.clear();
-				currentIndex = INITIAL_POSITION;
-				lastMarkedIndex = INITIAL_POSITION;
-			}
-			else {
-				lastMarkedIndex = currentIndex;
+	/**
+	 * Check the result set is in synch with the currentRow attribute. This is
+	 * important to ensure that the user hasn't modified the current row.
+	 */
+	private void verifyCursorPosition(long expectedCurrentRow) throws SQLException {
+		if (verifyCursorPosition) {
+			if (expectedCurrentRow != this.rs.getRow()) {
+				throw new InvalidDataAccessResourceUsageException("Unexpected cursor position change.");
 			}
 		}
+	}
 
-		public void reset() throws ResetFailedException {
-			processedRowCount -= currentIndex - lastMarkedIndex;
-			currentIndex = lastMarkedIndex;
-		}
-
-		/**
-		 * Check the result set is in synch with the currentRow attribute. This
-		 * is important to ensure that the user hasn't modified the current row.
-		 */
-		private void verifyCursorPosition(long expectedCurrentRow) throws SQLException {
-			if (verifyCursorPosition) {
-				if (expectedCurrentRow != this.rs.getRow()) {
-					throw new InvalidDataAccessResourceUsageException("Unexpected cursor position change.");
-				}
-			}
-		}
-
-		public long getProcessedRowCount() {
-			return processedRowCount;
-		}
+	/**
+	 * Close the cursor and database connection.
+	 */
+	protected void doClose() throws Exception {
+		initialized = false;
+		JdbcUtils.closeResultSet(this.rs);
+		JdbcUtils.closeStatement(this.preparedStatement);
+		JdbcUtils.closeConnection(this.con);
+		rs = null;
 
 	}
+
+	/**
+	 * Execute the {@link #setSql(String)} query.
+	 */
+	protected void doOpen() throws Exception {
+		Assert.state(!initialized, "Stream is already initialized.  Close before re-opening.");
+		Assert.isNull(rs, "ResultSet still open!  Close before re-opening.");
+		executeQuery();
+		initialized = true;
+
+	}
+
+	/**
+	 * Read next row and map it to item, verify cursor position if
+	 * {@link #setVerifyCursorPosition(boolean)} is true.
+	 */
+	protected Object doRead() throws Exception {
+		try {
+			if (!rs.next()) {
+				return null;
+			}
+			int currentRow = getCurrentItemCount();
+			Object item = mapper.mapRow(rs, currentRow);
+			verifyCursorPosition(currentRow);
+			return item;
+		}
+		catch (SQLException se) {
+			throw getExceptionTranslator().translate("Attempt to process next row failed", sql, se);
+		}
+	}
+
+	/**
+	 * Use {@link ResultSet#absolute(int)} if possible, otherwise scroll by
+	 * calling {@link ResultSet#next()}.
+	 */
+	protected void jumpToItem(int itemIndex) throws Exception {
+		if (driverSupportsAbsolute) {
+			try {
+				rs.absolute(itemIndex);
+			}
+			catch (SQLException e) {
+				// Driver does not support rs.absolute(int) revert to
+				// traversing ResultSet
+				log.warn("The JDBC driver does not appear to support ResultSet.absolute(). Consider"
+						+ " reverting to the default behavior setting the driverSupportsAbsolute to false", e);
+
+				moveCursorToRow(itemIndex);
+			}
+		}
+		else {
+			moveCursorToRow(itemIndex);
+		}
+	}
+
 }
