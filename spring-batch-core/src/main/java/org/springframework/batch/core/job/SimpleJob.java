@@ -53,14 +53,6 @@ public class SimpleJob extends AbstractJob {
 	public void execute(JobExecution execution) throws JobExecutionException {
 
 		JobInstance jobInstance = execution.getJobInstance();
-
-//		boolean isJobRestart = getJobRepository().getJobExecutionCount(jobInstance) > 1;
-//		if (isJobRestart) {
-//			ExecutionContext restartContext = getJobRepository().getLastJobExecution(jobInstance).getExecutionContext();
-//			execution.setExecutionContext(restartContext);
-//		} else {
-//			execution.setExecutionContext(new ExecutionContext());
-//		}
 		
 		StepExecution currentStepExecution = null;
 		int startedCount = 0;
