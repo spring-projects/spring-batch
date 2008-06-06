@@ -34,7 +34,7 @@ public abstract class AbstractStaxEventReaderItemReaderTests extends TestCase {
 
 	}
 
-	public void testRead() {
+	public void testRead() throws Exception {
 		Object result;
 		List results = new ArrayList();
 		while ((result = source.read()) != null) {

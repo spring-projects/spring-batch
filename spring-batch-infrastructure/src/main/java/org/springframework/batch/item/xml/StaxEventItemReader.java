@@ -1,10 +1,6 @@
 package org.springframework.batch.item.xml;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -12,11 +8,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ExecutionContextUserSupport;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ReaderNotOpenException;
+import org.springframework.batch.item.AbstractBufferedItemReaderItemStream;
 import org.springframework.batch.item.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.xml.stax.DefaultFragmentEventReader;
 import org.springframework.batch.item.xml.stax.FragmentEventReader;
@@ -36,10 +28,8 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReader extends ExecutionContextUserSupport implements ResourceAwareItemReaderItemStream,
-		InitializingBean {
-
-	private static final String READ_COUNT_STATISTICS_NAME = "read.count";
+public class StaxEventItemReader extends AbstractBufferedItemReaderItemStream implements
+		ResourceAwareItemReaderItemStream, InitializingBean {
 
 	private FragmentEventReader fragmentReader;
 
@@ -53,128 +43,8 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 
 	private String fragmentRootElementName;
 
-	private boolean initialized = false;
-
-	private long lastCommitPointRecordCount = 0;
-
-	private long currentRecordCount = 0;
-
-	private boolean saveState = false;
-
-	private List itemBuffer = new ArrayList();
-
-	private ListIterator itemBufferIterator = null;
-	
-	private int lastMarkedBufferIndex = 0;
-
-	/**
-	 * indicates the reader has been shouldReadBuffer and should read items from
-	 * buffer
-	 */
-	private boolean shouldReadBuffer = false;
-
 	public StaxEventItemReader() {
 		setName(ClassUtils.getShortName(StaxEventItemReader.class));
-	}
-
-	/**
-	 * Read in the next root element from the file, and return it.
-	 * 
-	 * @return the next available record, if none exist, return null
-	 * @see org.springframework.batch.item.ItemReader#read()
-	 */
-	public Object read() {
-		if (!initialized) {
-			throw new ReaderNotOpenException("Reader must be open before it can be read.");
-		}
-
-		currentRecordCount++;
-
-		// read from buffer after rollback
-		if (shouldReadBuffer) {
-			if (itemBufferIterator.hasNext()) {
-				return itemBufferIterator.next();
-			}
-			else {
-				// buffer is exhausted, continue reading from file
-				shouldReadBuffer = false;
-				itemBufferIterator = null;
-			}
-		}
-
-		Object item = null;
-
-		if (moveCursorToNextFragment(fragmentReader)) {
-			fragmentReader.markStartFragment();
-			item = eventReaderDeserializer.deserializeFragment(fragmentReader);
-			fragmentReader.markFragmentProcessed();
-		}
-
-		itemBuffer.add(item);
-		if (item == null) {
-			currentRecordCount--;
-		}
-		return item;
-	}
-
-	public void close(ExecutionContext executionContext) {
-		initialized = false;
-		currentRecordCount = 0;
-		itemBuffer.clear();
-		itemBufferIterator = null;
-		try {
-			if (fragmentReader != null) {
-				fragmentReader.close();
-			}
-			if (inputStream != null) {
-				inputStream.close();
-			}
-		}
-		catch (XMLStreamException e) {
-			throw new DataAccessResourceFailureException("Error while closing event reader", e);
-		}
-		catch (IOException e) {
-			throw new DataAccessResourceFailureException("Error while closing input stream", e);
-		}
-		finally {
-			fragmentReader = null;
-			inputStream = null;
-		}
-	}
-
-	public void open(ExecutionContext executionContext) {
-		Assert.state(resource.exists(), "Input resource does not exist: [" + resource + "]");
-
-		try {
-			inputStream = resource.getInputStream();
-			eventReader = XMLInputFactory.newInstance().createXMLEventReader(inputStream);
-			fragmentReader = new DefaultFragmentEventReader(eventReader);
-		}
-		catch (XMLStreamException xse) {
-			throw new DataAccessResourceFailureException("Unable to create XML reader", xse);
-		}
-		catch (IOException ioe) {
-			throw new DataAccessResourceFailureException("Unable to get input stream", ioe);
-		}
-		initialized = true;
-
-		if (executionContext.containsKey(getKey(READ_COUNT_STATISTICS_NAME))) {
-			long restoredRecordCount = executionContext.getLong(getKey(READ_COUNT_STATISTICS_NAME));
-			int REASONABLE_ADHOC_COMMIT_FREQUENCY = 100;
-			while (currentRecordCount <= restoredRecordCount) {
-				currentRecordCount++;
-
-				if (currentRecordCount % REASONABLE_ADHOC_COMMIT_FREQUENCY == 0) {
-					mark(); // clear the history buffer
-				}
-				if (!fragmentReader.hasNext()) {
-					throw new ItemStreamException("Restore point must be before end of input");
-				}
-				fragmentReader.next();
-				moveCursorToNextFragment(fragmentReader);
-			}
-			mark(); // clear the history buffer
-		}
 	}
 
 	public void setResource(Resource resource) {
@@ -213,16 +83,6 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 	}
 
 	/**
-	 * @see ItemStream#update(ExecutionContext)
-	 */
-	public void update(ExecutionContext executionContext) {
-		if (saveState) {
-			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			executionContext.putLong(getKey(READ_COUNT_STATISTICS_NAME), currentRecordCount);
-		}
-	}
-
-	/**
 	 * Responsible for moving the cursor before the StartElement of the fragment
 	 * root.
 	 * 
@@ -256,50 +116,44 @@ public class StaxEventItemReader extends ExecutionContextUserSupport implements 
 		}
 	}
 
-	/**
-	 * Mark is supported as long as this {@link ItemStream} is used in a
-	 * single-threaded environment. The state backing the mark is a single
-	 * counter, keeping track of the current position, so multiple threads
-	 * cannot be accommodated.
-	 * 
-	 * @see org.springframework.batch.item.AbstractItemReader#mark()
-	 */
-	public void mark() {
-		
-		if (!shouldReadBuffer) {
-			itemBuffer.clear();
-			itemBufferIterator = null;
-			lastMarkedBufferIndex = 0;
+	protected void doClose() throws Exception {
+		try {
+			if (fragmentReader != null) {
+				fragmentReader.close();
+			}
+			if (inputStream != null) {
+				inputStream.close();
+			}
 		}
-		else {
-			lastMarkedBufferIndex = itemBufferIterator.nextIndex();
+		finally {
+			fragmentReader = null;
+			inputStream = null;
 		}
-		
-		lastCommitPointRecordCount = currentRecordCount;
+
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void reset() {
-		currentRecordCount = lastCommitPointRecordCount;
-		shouldReadBuffer = true;
-		itemBufferIterator = itemBuffer.listIterator(lastMarkedBufferIndex);
-		fragmentReader.reset();
+	protected void doOpen() throws Exception {
+		Assert.state(resource.exists(), "Input resource does not exist: [" + resource + "]");
+
+		inputStream = resource.getInputStream();
+		eventReader = XMLInputFactory.newInstance().createXMLEventReader(inputStream);
+		fragmentReader = new DefaultFragmentEventReader(eventReader);
+
 	}
 
 	/**
-	 * Set the flag that determines whether to save internal data for
-	 * {@link ExecutionContext}. Only switch this to false if you don't want to
-	 * save any state from this stream, and you don't need it to be restartable.
-	 * 
-	 * @param saveState flag value (default true)
+	 * Move to next fragment and map it to item.
 	 */
-	public void setSaveState(boolean saveState) {
-		this.saveState = saveState;
+	protected Object doRead() throws Exception {
+		Object item = null;
+
+		if (moveCursorToNextFragment(fragmentReader)) {
+			fragmentReader.markStartFragment();
+			item = eventReaderDeserializer.deserializeFragment(fragmentReader);
+			fragmentReader.markFragmentProcessed();
+		}
+
+		return item;
 	}
 
-	
 }

@@ -83,6 +83,14 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 		return item;
 	}
 
+	/**
+	 * Mark is supported as long as this {@link ItemStream} is used in a
+	 * single-threaded environment. The state backing the mark is a single
+	 * counter, keeping track of the current position, so multiple threads
+	 * cannot be accommodated.
+	 * 
+	 * @see org.springframework.batch.item.AbstractItemReader#mark()
+	 */
 	public void mark() throws MarkFailedException {
 
 		if (!shouldReadBuffer) {
@@ -138,7 +146,7 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 		}
 
 		if (executionContext.containsKey(ecSupport.getKey(ITEM_COUNT))) {
-			int itemCount = Integer.parseInt(executionContext.getString(ecSupport.getKey(ITEM_COUNT)));
+			int itemCount = new Long(executionContext.getLong(ecSupport.getKey(ITEM_COUNT))).intValue();
 
 			try {
 				jumpToItem(itemCount);
@@ -155,7 +163,7 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			executionContext.putString(ecSupport.getKey(ITEM_COUNT), "" + currentItemCount);
+			executionContext.putLong(ecSupport.getKey(ITEM_COUNT), currentItemCount);
 		}
 
 	}
@@ -164,6 +172,13 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 		ecSupport.setName(name);
 	}
 
+	/**
+	 * Set the flag that determines whether to save internal data for
+	 * {@link ExecutionContext}. Only switch this to false if you don't want to
+	 * save any state from this stream, and you don't need it to be restartable.
+	 * 
+	 * @param saveState flag value (default true)
+	 */
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}
