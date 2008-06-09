@@ -7,6 +7,7 @@ import java.util.ListIterator;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * Reads items from multiple resources sequentially - resource list is given by
@@ -42,7 +43,7 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	private int lastMarkedBufferIndex = 0;
 
 	public MultiResourceItemReader() {
-		setName(MultiResourceItemReader.class.getSimpleName());
+		setName(ClassUtils.getShortName(MultiResourceItemReader.class));
 	}
 
 	/**
