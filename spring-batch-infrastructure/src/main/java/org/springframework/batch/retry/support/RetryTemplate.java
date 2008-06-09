@@ -111,7 +111,7 @@ public class RetryTemplate implements RetryOperations {
 	}
 
 	/**
-	 * Keep executing the callback until it eiether succeeds or the policy
+	 * Keep executing the callback until it either succeeds or the policy
 	 * dictates that we stop, in which case the most recent exception thrown by
 	 * the callback will be rethrown.
 	 * 
@@ -158,7 +158,7 @@ public class RetryTemplate implements RetryOperations {
 			 * external retry to allow a recovery in handleRetryExhausted
 			 * without the callback processing (which would throw an exception).
 			 */
-			while (retryPolicy.canRetry(context) && !isMarkedExhausted(context)) {
+			while (retryPolicy.canRetry(context) && !context.isExhaustedOnly()) {
 
 				try {
 					logger.debug("Retry: count=" + context.getRetryCount());
@@ -209,15 +209,6 @@ public class RetryTemplate implements RetryOperations {
 			doCloseInterceptors(callback, context, lastException);
 			RetrySynchronizationManager.clear();
 		}
-	}
-
-	/**
-	 * Check if client has marked the context to end the retry attempts.
-	 * @param context
-	 * @return
-	 */
-	private boolean isMarkedExhausted(RetryContext context) {
-		return context.isExhaustedOnly();
 	}
 
 	private boolean doOpenInterceptors(RetryCallback callback, RetryContext context) {
