@@ -67,7 +67,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 
 	private Class[] doNotRethrowExceptionClasses = new Class[] {};
 
-	private ItemKeyGenerator defaultItemKeyGenerator = new ItemKeyGenerator() {
+	private static final ItemKeyGenerator defaultItemKeyGenerator = new ItemKeyGenerator() {
 		public Object getKey(Object item) {
 			return item;
 		}
@@ -111,10 +111,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	 * resets to default value.
 	 */
 	public void setItemKeyGenerator(ItemKeyGenerator itemKeyGenerator) {
-		if (itemKeyGenerator == null) {
-			itemKeyGenerator = defaultItemKeyGenerator;
-		}
-		this.itemKeyGenerator = itemKeyGenerator;
+		this.itemKeyGenerator = (itemKeyGenerator == null) ? defaultItemKeyGenerator : itemKeyGenerator;
 	}
 
 	/**
@@ -178,9 +175,9 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 					if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 						// increment skip count and try again
 						contribution.incrementTemporaryReadSkipCount();
-						if (listener != null) {
-							listener.onSkipInRead(e);
-						}
+						
+						listener.onSkipInRead(e);
+						
 						logger.debug("Skipping failed input", e);
 					}
 					else {
@@ -228,14 +225,11 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 		catch (Exception e) {
 			if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 				contribution.incrementWriteSkipCount();
-				// don't call the listener here - the transaction is going to
-				// roll back
+				
 				addSkippedException(key, e);
 				logger.debug("Added item to skip list; key=" + key);
 
-				if (listener != null) {
-					listener.onSkipInWrite(item, e);
-				}
+				listener.onSkipInWrite(item, e);
 				
 				// return without re-throwing if exception shouldn't cause
 				// rollback
@@ -302,7 +296,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 		synchronized (skippedExceptions) {
 			for (Iterator iterator = ((Set) TransactionSynchronizationManager.getResource(TO_BE_REMOVED)).iterator(); iterator
 					.hasNext();) {
-				Object key = (Object) iterator.next();
+				Object key = iterator.next();
 				skippedExceptions.remove(key);
 			}
 			TransactionSynchronizationManager.unbindResource(TO_BE_REMOVED);
