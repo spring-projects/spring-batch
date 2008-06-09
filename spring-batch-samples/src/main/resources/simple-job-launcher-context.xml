@@ -16,8 +16,8 @@
 	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
 		p:databaseType="${environment}" p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>
 
-	<bean id="mapJobInstanceDao" lazy-init="true"
-		class="org.springframework.batch.core.repository.dao.MapJobInstanceDao" />
+	<bean id="mapJobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" 
+		p:transactionManager-ref="transactionManager" lazy-init="true" />
 
 	<bean id="mapJobExecutionDao" lazy-init="true"
 		class="org.springframework.batch.core.repository.dao.MapJobExecutionDao" />
