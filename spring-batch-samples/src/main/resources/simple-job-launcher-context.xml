@@ -17,7 +17,7 @@
 		p:databaseType="${environment}" p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager"/>
 
 	<bean id="mapJobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" 
-		p:transactionManager-ref="transactionManager" lazy-init="true" />
+		p:transactionManager-ref="transactionManager" lazy-init="true" autowire-candidate="false" />
 
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="dataSource" />
