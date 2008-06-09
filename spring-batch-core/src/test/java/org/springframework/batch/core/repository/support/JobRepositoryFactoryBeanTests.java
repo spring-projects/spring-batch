@@ -105,6 +105,11 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 
 		factory.setTransactionManager(null);
 		try {
+			incrementerFactory.isSupportedIncrementerType(null);
+			incrementerControl.setReturnValue(true);
+			incrementerFactory.getSupportedIncrementerTypes();
+			incrementerControl.setReturnValue(new String[0]);
+			incrementerControl.replay();
 			factory.afterPropertiesSet();
 			fail();
 		}
