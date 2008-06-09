@@ -59,3 +59,12 @@ tx
 skippable
 discriminator
 zozom
+metadata
+retryable
+int
+org
+springframework
+backoff
+harrop
+rethrow
+rethrown
