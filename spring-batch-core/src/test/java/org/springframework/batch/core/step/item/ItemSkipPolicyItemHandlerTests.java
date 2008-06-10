@@ -109,6 +109,8 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		catch (SkippableException e) {
 			// expected
 		}
+		
+		assertEquals(3, contribution.getItemCount());
 		assertEquals(2, contribution.getSkipCount());
 		// No "4" because it was skipped on write
 		assertEquals(new Holder("5"), handler.read(contribution));
@@ -131,6 +133,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		// was previously skipped
 		handler.handle(contribution);
 		assertEquals(null, handler.read(contribution));
+		assertEquals(3, contribution.getItemCount());
 		assertEquals(2, contribution.getSkipCount());
 
 		assertEquals(1, TransactionSynchronizationManager.getResourceMap().size());
@@ -182,6 +185,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		catch (SkippableException e) {
 			// expected
 		}
+		assertEquals(3, contribution.getItemCount());
 		assertEquals(2, contribution.getSkipCount());
 		// No "4" because it was skipped on write, even though it is mutating
 		// its key
@@ -229,6 +233,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		// re-thrown
 		handler.handle(contribution);
 
+		assertEquals(3, contribution.getItemCount());
 		assertEquals(2, contribution.getSkipCount());
 		// No "4" because it was skipped on write, even though it is mutating
 		// its key

@@ -67,6 +67,7 @@ public class SimpleItemHandler implements ItemHandler {
 		if (item == null) {
 			return ExitStatus.FINISHED;
 		}
+		contribution.incrementItemCount();
 		write(item, contribution);
 		return ExitStatus.CONTINUABLE;
 	}
@@ -93,7 +94,6 @@ public class SimpleItemHandler implements ItemHandler {
 	 * @param contribution current context
 	 */
 	protected void write(Object item, StepContribution contribution) throws Exception {
-		contribution.incrementItemCount();
 		doWrite(item);
 	}
 

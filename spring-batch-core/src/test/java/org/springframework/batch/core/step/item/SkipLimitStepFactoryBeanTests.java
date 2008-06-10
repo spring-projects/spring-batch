@@ -90,6 +90,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3,5"));
 		assertEquals(expectedOutput, writer.written);
+		
+		assertEquals(4, stepExecution.getItemCount().intValue());
 
 	}
 
@@ -110,6 +112,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		// no rollbacks
 		assertEquals(0, stepExecution.getRollbackCount().intValue());
+		
+		assertEquals(4, stepExecution.getItemCount().intValue());
 
 	}
 
