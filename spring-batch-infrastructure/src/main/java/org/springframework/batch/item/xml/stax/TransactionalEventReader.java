@@ -5,6 +5,8 @@ import javax.xml.stream.XMLEventReader;
 /**
  * XMLEventReader with transactional capabilities (ability to rollback to last commit point).
  * 
+ * @deprecated no longer used, to be removed in 2.0
+ * 
  * @author Robert Kasanicky
  */
 public interface TransactionalEventReader extends XMLEventReader{

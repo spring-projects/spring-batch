@@ -12,6 +12,8 @@ import org.springframework.util.Assert;
 /**
  * Class used to wrap XMLEventReader. Events from wrapped reader are stored in
  * {@link EventSequence} to support transactions.
+ * 
+ * @deprecated no longer used, to be removed in 2.0
  *
  * @author Tomas Slanina
  * @author Robert Kasanicky

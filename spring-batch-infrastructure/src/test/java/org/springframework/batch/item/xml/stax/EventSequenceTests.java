@@ -6,7 +6,9 @@ import javax.xml.stream.events.XMLEvent;
 import junit.framework.TestCase;
 
 /**
- * Tests for {@link EventSequence}
+ * Tests for {@link EventSequence}.
+ * 
+ * @deprecated no longer used, to be removed in 2.0
  * 
  * @author Robert Kasanicky
  */

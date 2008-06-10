@@ -34,8 +34,8 @@ public class DefaultFragmentEventReaderTests extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		Resource input = new ByteArrayResource(xml.getBytes());
-		eventReader = new DefaultTransactionalEventReader(XMLInputFactory.newInstance().createXMLEventReader(
-				input.getInputStream()));
+		eventReader = XMLInputFactory.newInstance().createXMLEventReader(
+				input.getInputStream());
 		fragmentReader = new DefaultFragmentEventReader(eventReader);
 	}
 

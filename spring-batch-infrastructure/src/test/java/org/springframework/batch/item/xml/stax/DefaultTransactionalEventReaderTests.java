@@ -12,6 +12,8 @@ import org.springframework.core.io.Resource;
 /**
  * Tests for {@link DefaultTransactionalEventReader}.
  * 
+ * @deprecated no longer used, to be removed in 2.0
+ * 
  * @author Robert Kasanicky
  */
 public class DefaultTransactionalEventReaderTests extends TestCase {

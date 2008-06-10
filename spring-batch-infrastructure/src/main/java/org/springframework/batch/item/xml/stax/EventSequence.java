@@ -7,6 +7,8 @@ import javax.xml.stream.events.XMLEvent;
 
 /**
  * Holds a list of XML events, typically corresponding to a single record.
+ * 
+ * @deprecated no longer used, to be removed in 2.0
  *  
  * @author tomas.slanina
  */
