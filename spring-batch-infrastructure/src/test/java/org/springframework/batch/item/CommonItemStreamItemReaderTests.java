@@ -28,8 +28,6 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 		testedAsStream().close(executionContext);
 	}
 
-
-
 	/**
 	 * Restart scenario - read items, update execution context, create new
 	 * reader and restore from restart data - the new input source should
@@ -38,7 +36,7 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 	public void testRestart() throws Exception {
 
 		testedAsStream().update(executionContext);
-		
+
 		Foo foo1 = (Foo) tested.read();
 		assertEquals(1, foo1.getValue());
 
@@ -55,10 +53,43 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 		Foo fooAfterRestart = (Foo) tested.read();
 		assertEquals(3, fooAfterRestart.getValue());
 	}
-	
+
+	/**
+	 * Restart scenario - read items, rollback to last marked position, update
+	 * execution context, create new reader and restore from restart data - the
+	 * new input source should continue where the old one finished.
+	 */
+	public void testResetAndRestart() throws Exception {
+
+		testedAsStream().update(executionContext);
+
+		Foo foo1 = (Foo) tested.read();
+		assertEquals(1, foo1.getValue());
+
+		Foo foo2 = (Foo) tested.read();
+		assertEquals(2, foo2.getValue());
+		
+		tested.mark();
+		
+		Foo foo3 = (Foo) tested.read();
+		assertEquals(3, foo3.getValue());
+		
+		tested.reset();
+
+		testedAsStream().update(executionContext);
+
+		// create new input source
+		tested = getItemReader();
+
+		testedAsStream().open(executionContext);
+
+		Foo fooAfterRestart = (Foo) tested.read();
+		assertEquals(3, fooAfterRestart.getValue());
+	}
+
 	public void testReopen() throws Exception {
 		testedAsStream().update(executionContext);
-		
+
 		Foo foo1 = (Foo) tested.read();
 		assertEquals(1, foo1.getValue());
 
