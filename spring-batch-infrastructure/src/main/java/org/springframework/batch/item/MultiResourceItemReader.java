@@ -41,6 +41,7 @@ public class MultiResourceItemReader extends AbstractBufferedItemReaderItemStrea
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notEmpty(resources, "There must be at least one input resource");
+		Assert.notNull(delegate);
 	}
 
 	/**
