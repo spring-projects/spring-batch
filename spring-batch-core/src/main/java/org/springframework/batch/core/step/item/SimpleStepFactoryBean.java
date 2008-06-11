@@ -139,7 +139,7 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	}
 
 	/**
-	 * Public setter for the SimpleLimitExceptionHandler.
+	 * Public setter for the {@link ExceptionHandler}.
 	 * @param exceptionHandler the exceptionHandler to set
 	 */
 	public void setExceptionHandler(ExceptionHandler exceptionHandler) {
@@ -233,6 +233,8 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 			repeatTemplate.setTaskExecutor(taskExecutor);
 			stepOperations = repeatTemplate;
 		}
+		
+		stepOperations.setExceptionHandler(exceptionHandler);
 
 		step.setStepOperations(stepOperations);
 

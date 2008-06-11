@@ -42,6 +42,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
+import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -195,6 +196,29 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 	}
 
+	public void testExceptionHandler() throws Exception {
+		SimpleStepFactoryBean factory = getStepFactory(new String[] { "foo", "bar", "spam" });
+		factory.setBeanName("exceptionStep");
+		factory.setExceptionHandler(new SimpleLimitExceptionHandler(1));
+		factory.setItemWriter(new AbstractItemWriter() {
+			int count = 0;
+
+			public void write(Object data) throws Exception {
+				if (count++ == 0) {
+					throw new RuntimeException("Foo");
+				}
+			}
+		});
+		AbstractStep step = (AbstractStep) factory.getObject();
+		job.setSteps(Collections.singletonList(step));
+
+		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
+		
+		job.execute(jobExecution);
+		
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+	}
+
 	public void testChunkListeners() throws Exception {
 		String[] items = new String[] { "1", "2", "3", "4", "5", "6", "7" };
 		int commitInterval = 3;
@@ -260,7 +284,8 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	public void testCommitIntervalAndCompletionPolicyBothSet() throws Exception {
 		SimpleStepFactoryBean factory = getStepFactory("foo");
 
-		// but exception expected after setting commit interval and completion policy
+		// but exception expected after setting commit interval and completion
+		// policy
 		factory.setCommitInterval(1);
 		factory.setChunkCompletionPolicy(new SimpleCompletionPolicy(2));
 		try {
