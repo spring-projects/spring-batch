@@ -36,6 +36,9 @@ public class MultiResourceItemReader extends AbstractBufferedItemReaderItemStrea
 		this.delegate = delegate;
 	}
 
+	/**
+	 * Make sure resources are set.
+	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notEmpty(resources, "There must be at least one input resource");
 	}
@@ -47,16 +50,32 @@ public class MultiResourceItemReader extends AbstractBufferedItemReaderItemStrea
 		this.resources = resources;
 	}
 
+	/**
+	 * Close the delegate and reset resource index.
+	 * 
+	 * @see AbstractBufferedItemReaderItemStream#doClose()
+	 */
 	protected void doClose() throws Exception {
 		currentResourceIndex = 0;
 		delegate.close(new ExecutionContext());
 	}
 
+	/**
+	 * Open the delegate pointing it to the first resource.
+	 * 
+	 * @see AbstractBufferedItemReaderItemStream#doOpen()
+	 */
 	protected void doOpen() throws Exception {
 		delegate.setResource(resources[0]);
 		delegate.open(new ExecutionContext());
 	}
 
+	/**
+	 * Use the delegate to read next item, jump to next resource if the item is
+	 * null.
+	 * 
+	 * @see AbstractBufferedItemReaderItemStream#doRead()
+	 */
 	protected Object doRead() throws Exception {
 
 		Object item = delegate.read();
