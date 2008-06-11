@@ -228,7 +228,7 @@ public class RepeatTemplate implements RepeatOperations {
 								logger.debug("Exception intercepted (" + (i + 1) + " of " + listeners.length + ")",
 										unwrappedThrowable);
 							}
-							
+
 							exceptionHandler.handleException(context, unwrappedThrowable);
 
 						}
@@ -301,9 +301,10 @@ public class RepeatTemplate implements RepeatOperations {
 			throw new RepeatException("Exception in batch process", throwable);
 		}
 	}
-	
+
 	/**
-	 * Unwraps the throwable if it has been wrapped by {@link #rethrow(Throwable)}.
+	 * Unwraps the throwable if it has been wrapped by
+	 * {@link #rethrow(Throwable)}.
 	 */
 	private static Throwable unwrapIfRethrown(Throwable throwable) {
 		if (throwable instanceof RepeatException) {
@@ -341,13 +342,9 @@ public class RepeatTemplate implements RepeatOperations {
 	 */
 	protected ExitStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
 			throws Throwable {
-		try {
-			update(context);
-			return callback.doInIteration(context);
-		}
-		catch (Throwable t) {
-			throw t;
-		}
+		update(context);
+		return callback.doInIteration(context);
+
 	}
 
 	/**
@@ -421,7 +418,7 @@ public class RepeatTemplate implements RepeatOperations {
 	}
 
 	/**
-	 * Delegate to  {@link CompletionPolicy}.
+	 * Delegate to {@link CompletionPolicy}.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext)
 	 */
