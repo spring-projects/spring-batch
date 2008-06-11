@@ -18,11 +18,9 @@ package org.springframework.batch.item.file;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ExecutionContextUserSupport;
+import org.springframework.batch.item.AbstractBufferedItemReaderItemStream;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemReaderException;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.ResourceAwareItemReaderItemStream;
@@ -62,11 +60,9 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemReader extends ExecutionContextUserSupport implements ResourceAwareItemReaderItemStream, InitializingBean {
+public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream implements ResourceAwareItemReaderItemStream, InitializingBean {
 
 	private static Log log = LogFactory.getLog(FlatFileItemReader.class);
-
-	private static final String LINES_READ_COUNT = "lines.read.count";
 
 	// default encoding for input files
 	public static final String DEFAULT_CHARSET = "ISO-8859-1";
@@ -87,8 +83,6 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements R
 
 	private FieldSetMapper fieldSetMapper;
 
-	private boolean saveState = false;
-
 	/**
 	 * Encapsulates the state of the input source. If it is null then we are
 	 * uninitialized.
@@ -99,135 +93,11 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements R
 		setName(ClassUtils.getShortName(FlatFileItemReader.class));
 	}
 
-	/**
-	 * Initialize the reader if necessary.
-	 * 
-	 * @throws IllegalStateException if the resource cannot be opened
-	 */
-	public void open(ExecutionContext executionContext) throws ItemStreamException {
-
-		Assert.state(resource.exists(), "Resource must exist: [" + resource + "]");
-
-		log.debug("Opening flat file for reading: " + resource);
-
-		if (this.reader == null) {
-			ResourceLineReader reader = new ResourceLineReader(resource, encoding);
-			if (recordSeparatorPolicy != null) {
-				reader.setRecordSeparatorPolicy(recordSeparatorPolicy);
-			}
-			if (comments != null) {
-				reader.setComments(comments);
-			}
-			reader.open();
-			this.reader = reader;
-		}
-
-		for (int i = 0; i < linesToSkip; i++) {
+	protected void jumpToItem(int itemIndex) throws Exception {
+		Object record = "";
+		while (reader.getPosition() < itemIndex && record != null) {
 			readLine();
 		}
-
-		if (firstLineIsHeader) {
-			// skip the header
-			String firstLine = readLine();
-			// set names in tokenizer if they haven't been set already
-			if (tokenizer instanceof AbstractLineTokenizer && !((AbstractLineTokenizer) tokenizer).hasNames()) {
-				String[] names = tokenizer.tokenize(firstLine).getValues();
-				((AbstractLineTokenizer) tokenizer).setNames(names);
-			}
-		}
-
-		if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
-			log.debug("Initializing for restart. Restart data is: " + executionContext);
-
-			long lineCount = executionContext.getLong(getKey(LINES_READ_COUNT));
-
-			LineReader reader = getReader();
-
-			Object record = "";
-			while (reader.getPosition() < lineCount && record != null) {
-				record = readLine();
-			}
-		}
-
-	}
-
-	/**
-	 * Close and null out the reader.
-	 * 
-	 * @throws ItemStreamException
-	 */
-	public void close(ExecutionContext executionContext) throws ItemStreamException {
-		try {
-			if (reader != null) {
-				log.debug("Closing flat file for reading: " + resource);
-				reader.close(null);
-			}
-		}
-		finally {
-			reader = null;
-		}
-	}
-
-	/**
-	 * Reads a line from input, tokenizes is it using the
-	 * {@link #setLineTokenizer(LineTokenizer)} and maps to domain object using
-	 * {@link #setFieldSetMapper(FieldSetMapper)}.
-	 * 
-	 * @see org.springframework.batch.item.ItemReader#read()
-	 */
-	public Object read() throws Exception {
-		String line = readLine();
-
-		if (line != null) {
-			int lineCount = getReader().getPosition();
-			try {
-				FieldSet tokenizedLine = tokenizer.tokenize(line);
-				return fieldSetMapper.mapLine(tokenizedLine);
-			}
-			catch (RuntimeException ex) {
-				// add current line count to message and re-throw
-				throw new FlatFileParseException("Parsing error at line: " + lineCount + " in resource="
-						+ resource.getDescription() + ", input=[" + line + "]", ex, line, lineCount);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * This method returns the execution attributes for the reader. It returns
-	 * the current Line Count which can be used to reinitialise the batch job in
-	 * case of restart.
-	 */
-	public void update(ExecutionContext executionContext) {
-		if (reader == null) {
-			throw new ItemStreamException("ItemStream not open or already closed.");
-		}
-
-		if (saveState) {
-			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());
-		}
-	}
-
-	/**
-	 * Mark is supported as long as this {@link ItemStream} is used in a
-	 * single-threaded environment. The state backing the mark is a single
-	 * counter, keeping track of the current position, so multiple threads
-	 * cannot be accommodated.
-	 * 
-	 * @see org.springframework.batch.item.ItemReader#mark()
-	 */
-	public void mark() {
-		getReader().mark();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
-	 */
-	public void reset() {
-		getReader().reset();
 	}
 
 	/**
@@ -345,16 +215,74 @@ public class FlatFileItemReader extends ExecutionContextUserSupport implements R
 		Assert.notNull(fieldSetMapper, "FieldSetMapper must not be null.");
 	}
 
+	protected void doClose() throws Exception {
+		try {
+			if (reader != null) {
+				log.debug("Closing flat file for reading: " + resource);
+				reader.close(null);
+			}
+		}
+		finally {
+			reader = null;
+		}
+	}
+
+	protected void doOpen() throws Exception {
+		Assert.state(resource.exists(), "Resource must exist: [" + resource + "]");
+
+		log.debug("Opening flat file for reading: " + resource);
+
+		if (this.reader == null) {
+			ResourceLineReader reader = new ResourceLineReader(resource, encoding);
+			if (recordSeparatorPolicy != null) {
+				reader.setRecordSeparatorPolicy(recordSeparatorPolicy);
+			}
+			if (comments != null) {
+				reader.setComments(comments);
+			}
+			reader.open();
+			this.reader = reader;
+		}
+
+		for (int i = 0; i < linesToSkip; i++) {
+			readLine();
+		}
+
+		if (firstLineIsHeader) {
+			// skip the header
+			String firstLine = readLine();
+			// set names in tokenizer if they haven't been set already
+			if (tokenizer instanceof AbstractLineTokenizer && !((AbstractLineTokenizer) tokenizer).hasNames()) {
+				String[] names = tokenizer.tokenize(firstLine).getValues();
+				((AbstractLineTokenizer) tokenizer).setNames(names);
+			}
+		}
+		
+	}
+
 	/**
-	 * Set the boolean indicating whether or not state should be saved in the
-	 * provided {@link ExecutionContext} during the {@link ItemStream} call to
-	 * update. Setting this to false means that it will always start at the
-	 * beginning.
+	 * Reads a line from input, tokenizes is it using the
+	 * {@link #setLineTokenizer(LineTokenizer)} and maps to domain object using
+	 * {@link #setFieldSetMapper(FieldSetMapper)}.
 	 * 
-	 * @param saveState
+	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
-	public void setSaveState(boolean saveState) {
-		this.saveState = saveState;
+	protected Object doRead() throws Exception {
+		String line = readLine();
+
+		if (line != null) {
+			int lineCount = getReader().getPosition();
+			try {
+				FieldSet tokenizedLine = tokenizer.tokenize(line);
+				return fieldSetMapper.mapLine(tokenizedLine);
+			}
+			catch (RuntimeException ex) {
+				// add current line count to message and re-throw
+				throw new FlatFileParseException("Parsing error at line: " + lineCount + " in resource="
+						+ resource.getDescription() + ", input=[" + line + "]", ex, line, lineCount);
+			}
+		}
+		return null;
 	}
 
 }

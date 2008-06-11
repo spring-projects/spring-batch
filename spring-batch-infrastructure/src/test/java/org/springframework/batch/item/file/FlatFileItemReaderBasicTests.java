@@ -194,7 +194,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		try {
 			itemReader.open(executionContext);
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		} catch (ItemStreamException e) {
 			// expected
 		}
 	}
@@ -208,7 +208,8 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 			fail("Expected BatchEnvironmentException");
 		} catch (ItemStreamException e) {
 			// expected
-			assertEquals("foo", e.getCause().getMessage());
+			assertEquals("Failed to initialize the reader", e.getMessage());
+			assertEquals("foo", e.getCause().getCause().getMessage());
 		}
 	}
 
@@ -290,7 +291,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		try {
 			testReader.open(executionContext);
 			fail();
-		} catch (IllegalStateException ex) {
+		} catch (ItemStreamException ex) {
 			// expected
 		}
 
