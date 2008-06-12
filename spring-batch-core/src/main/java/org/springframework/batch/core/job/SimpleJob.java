@@ -53,7 +53,7 @@ public class SimpleJob extends AbstractJob {
 	public void execute(JobExecution execution) throws JobExecutionException {
 
 		JobInstance jobInstance = execution.getJobInstance();
-		
+
 		StepExecution currentStepExecution = null;
 		int startedCount = 0;
 		List steps = getSteps();
@@ -72,6 +72,10 @@ public class SimpleJob extends AbstractJob {
 			getCompositeListener().beforeJob(execution);
 
 			for (Iterator i = steps.iterator(); i.hasNext();) {
+
+				if (execution.getStatus() == BatchStatus.STOPPING) {
+					throw new JobInterruptedException("JobExecution interrupted.");
+				}
 
 				Step step = (Step) i.next();
 

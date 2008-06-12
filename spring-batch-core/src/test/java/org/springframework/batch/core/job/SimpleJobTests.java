@@ -17,6 +17,7 @@
 package org.springframework.batch.core.job;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -164,7 +165,7 @@ public class SimpleJobTests extends TestCase {
 		checkRepository(BatchStatus.COMPLETED);
 		assertNotNull(jobExecution.getEndTime());
 		assertNotNull(jobExecution.getStartTime());
-		
+
 		assertTrue(step1.passedInJobContext.isEmpty());
 		assertFalse(step2.passedInJobContext.isEmpty());
 	}
@@ -352,7 +353,7 @@ public class SimpleJobTests extends TestCase {
 
 	public void testInterruptWithListener() throws Exception {
 		step1.setProcessException(new JobInterruptedException("job interrupted!"));
-		
+
 		MockControl control = MockControl.createStrictControl(JobExecutionListener.class);
 		JobExecutionListener listener = (JobExecutionListener) control.getMock();
 		listener.beforeJob(jobExecution);
@@ -360,27 +361,27 @@ public class SimpleJobTests extends TestCase {
 		listener.onInterrupt(jobExecution);
 		control.setVoidCallable();
 		control.replay();
-		
+
 		job.setJobExecutionListeners(new JobExecutionListener[] { listener });
-		
+
 		try {
 			job.execute(jobExecution);
 			fail();
 		}
-		catch (UnexpectedJobExecutionException e){
+		catch (UnexpectedJobExecutionException e) {
 			// expected
 		}
-		
+
 		control.verify();
 	}
-	
+
 	/**
 	 * Execution context should be restored on restart.
 	 */
 	public void testRestartScenario() throws Exception {
-		
+
 		job.setRestartable(true);
-		
+
 		step1.setAllowStartIfComplete(true);
 		final RuntimeException exception = new RuntimeException("Foo!");
 		step2.setProcessException(exception);
@@ -392,14 +393,14 @@ public class SimpleJobTests extends TestCase {
 		catch (RuntimeException e) {
 			assertSame(exception, e);
 		}
-		
+
 		assertTrue(step1.passedInJobContext.isEmpty());
 		assertFalse(step2.passedInJobContext.isEmpty());
-		
+
 		assertFalse(jobExecution.getExecutionContext().isEmpty());
 
 		jobExecution = jobRepository.createJobExecution(job, jobParameters);
-		
+
 		try {
 			job.execute(jobExecution);
 			fail();
@@ -409,6 +410,31 @@ public class SimpleJobTests extends TestCase {
 		}
 		assertFalse(step1.passedInJobContext.isEmpty());
 		assertFalse(step2.passedInJobContext.isEmpty());
+	}
+
+	public void testInterruptJob() throws Exception {
+
+		step1 = new StubStep("interruptStep") {
+
+			public void execute(StepExecution stepExecution) throws JobInterruptedException,
+					UnexpectedJobExecutionException {
+				stepExecution.getJobExecution().stop();
+			}
+
+		};
+
+		job.setSteps(Arrays.asList(new Step[] { step1, step2 }));
+
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (UnexpectedJobExecutionException expected) {
+			assertTrue(expected.getCause() instanceof JobInterruptedException);
+			assertEquals("JobExecution interrupted.", expected.getCause().getMessage());
+		}
+
+		assertNull("Second step was not executed", step2.passedInStepContext);
 	}
 
 	/*
@@ -438,7 +464,7 @@ public class SimpleJobTests extends TestCase {
 		private JobRepository jobRepository;
 
 		private Properties passedInStepContext;
-		
+
 		private Properties passedInJobContext;
 
 		/**
