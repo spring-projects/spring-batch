@@ -37,6 +37,7 @@
 		<config>src/main/resources/jobs/taskletJob.xml</config>
 		<config>src/main/resources/jobs/compositeItemWriterSampleJob.xml</config>
 		<config>src/main/resources/jobs/multiResourceJob.xml</config>
+		<config>src/main/resources/jobs/jobExecutionContextSample.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -302,6 +303,17 @@
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
 				<config>src/main/resources/jobs/multiResourceJob.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[jobExecutionContextSample]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/jobExecutionContextSample.xml</config>
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>
