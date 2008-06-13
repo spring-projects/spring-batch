@@ -12,15 +12,15 @@ Overview of the Spring Integration Batch Module
 *---+---+---+---+---+
 |<<ID>>|<<Description>>|<<Status>>|<<Sub-package>>|<<Comments>>|
 *----
-|1|{{{trigger}Message triggers job}}|Prototype|launch|Relatively complete - maybe look at making handlers strongly typed.  Also lots of opportunities with monitoring progress.|
+|1|{{{Triggers}Message triggers job}}|Prototype|launch|Relatively complete - maybe look at making handlers strongly typed.  Also lots of opportunities with monitoring progress.|
 *----
-|2|{{{chunking}Chunking and multi-VM job execution}}|Prototype|chunk|Sunny day case works fine (but not packaged yet as a re-usable handler).  Failures might need some analysis.  Use of statefulStepExecutionListener might be improved on?|
+|2|{{{Chunking}Chunking and multi-VM job execution}}|Prototype|chunk|Sunny day case works fine (but not packaged yet as a re-usable handler).  Failures might need some analysis.  Use of statefulStepExecutionListener might be improved on?|
 *----
-|3|{{{aggregator}Asynchronous Aggregator}}|Unstarted| |
+|3|{{{Aggregator}Asynchronous Aggregator}}|Unstarted| |
 *----
-|4|{{{jobflow}Stateful and non-linear jobs}} -> job = flow|Prototype|job|Failure cases need to be analysed - in particular, what happens on restart (after lights out) to messages from the middle of a job.|
+|4|{{{jobs}Stateful and non-linear jobs}} -> job = flow|Prototype|job|Failure cases need to be analysed - in particular, what happens on restart (after lights out) to messages from the middle of a job.|
 *----
-|5|{{{stepflow}Flexible item processing model}} (as message flow) -> step = flow|Prototype|item|Complete (v. simple).|
+|5|{{{Flexible}Flexible item processing model}} (as message flow) -> step = flow|Prototype|item|Complete (v. simple).|
 *----
 |6|{{{repeat}Automatic repeat / retry}}|Prototype|retry (unit test)|Works with patched PollingSourceAdapter.|
 *----
@@ -31,9 +31,9 @@ Overview of the Spring Integration Batch Module
 
   Number 6 from the list (repeat/retry) is more of a Spring Integration pattern than a Spring Batch one.  We will try and implement it in Spring Batch first, and see about pushing it out into Spring Integration later (with probably a split of repeat/retry out of Batch at that time).
 
-* Message Triggers Job
+* Message {Triggers} Job
 
-  {trigger}Description:
+  Description:
 
     [[1]] User sends message to channel (maybe through a scheduler)
 
@@ -55,9 +55,9 @@ Overview of the Spring Integration Batch Module
 
     [[1]] User wants to block on send and only receive response when job is done
 
-* Chunking and Multi-VM
+* {Chunking} and Multi-VM
 
-  {chunking}Description:
+  Description:
 
     [[1]] Step flushes chunk as message to outgoing channel (repeat up to throttle limit)
 
@@ -71,9 +71,9 @@ Overview of the Spring Integration Batch Module
 
   TODO: failure modes
 
-* Asynchronous Aggregator
+* Asynchronous {Aggregator}
 
-  {aggregator}Job is executed over long period.  Many jobs can be executing concurrently.  
+  Job is executed over long period.  Many jobs can be executing concurrently.  
 
   Description:
 
@@ -85,9 +85,9 @@ Overview of the Spring Integration Batch Module
 
     [[1]] Aggregator sits and waits for all items in a job to be finished and then wraps up
 
-* Stateful and non-linear jobs
+* Stateful and non-linear {jobs}
 
-  {jobflow}Dependencies beyween steps and conditional flow between steps.  Each handler node in a message flow is a step execution, with all the robustness guarantees from the Spring Batch meta data.
+  Dependencies beyween steps and conditional flow between steps.  Each handler node in a message flow is a step execution, with all the robustness guarantees from the Spring Batch meta data.
 
   Description:
 
@@ -109,9 +109,9 @@ Overview of the Spring Integration Batch Module
 
   Variation: restart after failure
 
-* Flexible item processing model
+* {Flexible} item processing model
 
-  {stepflow}Description:
+  Description:
 
     [[1]] Step hands item to ItemWriter
 
@@ -129,7 +129,7 @@ Overview of the Spring Integration Batch Module
 
 * Automatic repeat / retry
 
-  {repeat}Description (repeat):
+  Description ({repeat}):
 
     [[1]] User sends message to channel
 
@@ -145,7 +145,7 @@ Overview of the Spring Integration Batch Module
 
 * Restartable file processing
 
-  {files}Large file needs to be processed, so message payload of file contents is not practical.  One line or XML event per message with failover and restartability from Spring Batch.
+  Large {files} need to be processed, so message payload of file contents is not practical.  One line or XML event per message with failover and restartability from Spring Batch.
 
   Description:
 
