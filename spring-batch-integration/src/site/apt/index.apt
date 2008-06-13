@@ -1,0 +1,10 @@
+                                    ------
+                                    Spring Integration Batch
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    March 2008
+
+Overview of the Spring Integration Batch Module
+
+  Many of the 2.0 Features we identified for Spring Batch look like they might be efficiently and concisely implemented in Spring Integration.  These are features that can extend Spring Batch, or use Spring batch features in the context of Spring Integration. 
