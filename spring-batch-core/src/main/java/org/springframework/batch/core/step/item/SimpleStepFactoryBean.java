@@ -21,7 +21,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
@@ -177,22 +176,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 
 		ItemReader itemReader = getItemReader();
 		ItemWriter itemWriter = getItemWriter();
-
-		// Since we are going to wrap these things with listener callbacks we
-		// need to register them here because the step will not know we did
-		// that.
-		if (itemReader instanceof ItemStream) {
-			step.registerStream((ItemStream) itemReader);
-		}
-		if (itemReader instanceof StepExecutionListener) {
-			step.registerStepExecutionListener((StepExecutionListener) itemReader);
-		}
-		if (itemWriter instanceof ItemStream) {
-			step.registerStream((ItemStream) itemWriter);
-		}
-		if (itemWriter instanceof StepExecutionListener) {
-			step.registerStepExecutionListener((StepExecutionListener) itemWriter);
-		}
 
 		BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
 

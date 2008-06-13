@@ -16,6 +16,7 @@
 package org.springframework.batch.core.step.item;
 
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -187,6 +188,25 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 		step.setAllowStartIfComplete(allowStartIfComplete);
 		
 		step.setStreams(streams);
+		
+		ItemReader itemReader = getItemReader();
+		ItemWriter itemWriter = getItemWriter();
+
+		// Since we are going to wrap these things with listener callbacks we
+		// need to register them here because the step will not know we did
+		// that.
+		if (itemReader instanceof ItemStream) {
+			step.registerStream((ItemStream) itemReader);
+		}
+		if (itemReader instanceof StepExecutionListener) {
+			step.registerStepExecutionListener((StepExecutionListener) itemReader);
+		}
+		if (itemWriter instanceof ItemStream) {
+			step.registerStream((ItemStream) itemWriter);
+		}
+		if (itemWriter instanceof StepExecutionListener) {
+			step.registerStepExecutionListener((StepExecutionListener) itemWriter);
+		}
 
 	}
 
