@@ -18,6 +18,7 @@ package org.springframework.batch.core.step.item;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.validator.Validator;
 import org.springframework.beans.factory.BeanNameAware;
@@ -52,6 +53,8 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 	private boolean singleton = true;
 
 	private Validator jobRepositoryValidator = new TransactionInterceptorValidator(1);
+	
+	private ItemStream[] streams = new ItemStream[0];
 
 	/**
 	 * 
@@ -108,6 +111,17 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 	 */
 	public void setItemWriter(ItemWriter itemWriter) {
 		this.itemWriter = itemWriter;
+	}
+	
+	/**
+	 * The streams to inject into the {@link Step}. Any instance of
+	 * {@link ItemStream} can be used, and will then receive callbacks at the
+	 * appropriate stage in the step.
+	 * 
+	 * @param streams an array of listeners
+	 */
+	public void setStreams(ItemStream[] streams) {
+		this.streams = streams;
 	}
 
 	/**
@@ -171,6 +185,8 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 		step.setJobRepository(jobRepository);
 		step.setStartLimit(startLimit);
 		step.setAllowStartIfComplete(allowStartIfComplete);
+		
+		step.setStreams(streams);
 
 	}
 

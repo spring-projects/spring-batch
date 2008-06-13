@@ -34,24 +34,12 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
  */
 public class RepeatOperationsStepFactoryBean extends AbstractStepFactoryBean {
 
-	private ItemStream[] streams = new ItemStream[0];
-
 	private StepListener[] listeners = new StepListener[0];
 
 	private RepeatOperations chunkOperations = new RepeatTemplate();
 
 	private RepeatOperations stepOperations = new RepeatTemplate();
 
-	/**
-	 * The streams to inject into the {@link Step}. Any instance of
-	 * {@link ItemStream} can be used, and will then receive callbacks at the
-	 * appropriate stage in the step.
-	 * 
-	 * @param streams an array of listeners
-	 */
-	public void setStreams(ItemStream[] streams) {
-		this.streams = streams;
-	}
 
 	/**
 	 * The listeners to inject into the {@link Step}. Any instance of
@@ -93,8 +81,6 @@ public class RepeatOperationsStepFactoryBean extends AbstractStepFactoryBean {
 	protected void applyConfiguration(ItemOrientedStep step) {
 
 		super.applyConfiguration(step);
-
-		step.setStreams(streams);
 
 		ItemReader itemReader = getItemReader();
 		ItemWriter itemWriter = getItemWriter();

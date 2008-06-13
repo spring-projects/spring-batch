@@ -52,8 +52,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 
 	private int commitInterval = 0;
 
-	private ItemStream[] streams = new ItemStream[0];
-
 	private StepListener[] listeners = new StepListener[0];
 
 	private TaskExecutor taskExecutor;
@@ -88,17 +86,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	 */
 	public void setChunkCompletionPolicy(CompletionPolicy chunkCompletionPolicy) {
 		this.chunkCompletionPolicy = chunkCompletionPolicy;
-	}
-
-	/**
-	 * The streams to inject into the {@link Step}. Any instance of
-	 * {@link ItemStream} can be used, and will then receive callbacks at the
-	 * appropriate stage in the step.
-	 * 
-	 * @param streams an array of listeners
-	 */
-	public void setStreams(ItemStream[] streams) {
-		this.streams = streams;
 	}
 
 	/**
@@ -187,8 +174,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	protected void applyConfiguration(ItemOrientedStep step) {
 
 		super.applyConfiguration(step);
-
-		step.setStreams(streams);
 
 		ItemReader itemReader = getItemReader();
 		ItemWriter itemWriter = getItemWriter();
