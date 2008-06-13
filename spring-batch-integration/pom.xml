@@ -3,6 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-integration</artifactId>
+	<name>Enterprise Integration</name>
 	<packaging>jar</packaging>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
