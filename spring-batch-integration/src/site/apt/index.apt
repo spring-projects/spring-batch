@@ -7,7 +7,7 @@
 
 Overview of the Spring Integration Batch Module
 
-  Many of the 2.0 Features we identified for Spring Batch look like they might be efficiently and concisely implemented in Spring Integration.  Here is a list of use cases.  These are features that can extend Spring Batch, or use Spring batch features in the context of Spring Integration.  Work in progress by Dave Syer and Jonas Parttner.  Many issues to do with transactionality and synchronous execution have been raised and fixed in Spring Integration as a result of these use cases being prototyped.
+  Many of the 2.0 Features we identified for Spring Batch look like they might be efficiently and concisely implemented in Spring Integration.  Here is a list of use cases.  These are features that can extend Spring Batch, or use Spring batch features in the context of Spring Integration.  Work in progress by Dave Syer and Jonas Partner.  Many issues to do with transactionality and synchronous execution have been raised and fixed in Spring Integration as a result of these use cases being prototyped.
 
 *---+---+---+---+---+
 |<<ID>>|<<Description>>|<<Status>>|<<Sub-package>>|<<Comments>>|
