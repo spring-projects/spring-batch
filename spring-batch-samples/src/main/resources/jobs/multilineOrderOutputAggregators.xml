@@ -19,7 +19,7 @@
 
 	<bean id="outputFooter"
 		class="org.springframework.batch.item.file.transform.FixedLengthLineAggregator"
-				p:columns="1-10,11-30" />
+				p:columns="1-10,11-30"  p:alignment="RIGHT"/>
 
 	<bean id="outputCustomer" class="org.springframework.batch.item.file.transform.FixedLengthLineAggregator"
 				p:columns="1-9,10-19,20-29,30-39,40-49" />
@@ -30,7 +30,7 @@
 
 	<bean id="outputBilling"
 		class="org.springframework.batch.item.file.transform.FixedLengthLineAggregator"
-				p:columns="1-8,9-18,19-38" />
+				p:columns="1-8,9-18,19-38"/>
 
 	<bean id="outputLineItem"
 		class="org.springframework.batch.item.file.transform.FixedLengthLineAggregator"

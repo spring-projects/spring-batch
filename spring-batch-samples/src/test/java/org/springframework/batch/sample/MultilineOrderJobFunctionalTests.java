@@ -33,7 +33,7 @@ public class MultilineOrderJobFunctionalTests extends AbstractValidatingBatchLau
 	"BILLING:VISA      VISA-12345678903    "+
 	"ITEM:104439104137.49     "+
 	"ITEM:2134776319221.99    "+
-	"END_ORDER:267.34              "+
+	"END_ORDER:              267.34"+
 	"BEGIN_ORDER:13100346  2007/02/15                    "+
 	"CUSTOMER:72155919                                "+
 	"ADDRESS:St. Andrews Road 31 London    55342     "+
@@ -43,7 +43,7 @@ public class MultilineOrderJobFunctionalTests extends AbstractValidatingBatchLau
 	"ITEM:104433930179.95     "+
 	"ITEM:213474731955.29     "+
 	"ITEM:1044359501339.99    "+
-	"END_ORDER:14043.74            ";
+	"END_ORDER:            14043.74";
 
 	
 	private Resource fileOutputLocator = new FileSystemResource("target/test-outputs/20070122.teststream.multilineOrderStep.TEMP.txt");
