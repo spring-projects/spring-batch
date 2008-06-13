@@ -241,7 +241,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 					.asList(fatalExceptionClasses));
 			StatefulRetryItemHandler itemHandler = new StatefulRetryItemHandler(getItemReader(), getItemWriter(),
 					retryTemplate, itemKeyGenerator, readSkipPolicy, writeSkipPolicy);
-			itemHandler.setSkipListeners(new BatchListenerFactoryHelper().getSkipListeners(getListeners()));
+			itemHandler.setSkipListeners(BatchListenerFactoryHelper.getSkipListeners(getListeners()));
 
 			step.setItemHandler(itemHandler);
 

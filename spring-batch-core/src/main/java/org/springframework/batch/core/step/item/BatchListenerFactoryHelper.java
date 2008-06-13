@@ -43,13 +43,13 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-class BatchListenerFactoryHelper {
+abstract class BatchListenerFactoryHelper {
 
 	/**
 	 * @param itemReader
 	 * @param listeners
 	 */
-	public ItemReader getItemReader(ItemReader itemReader, StepListener[] listeners) {
+	public static ItemReader getItemReader(ItemReader itemReader, StepListener[] listeners) {
 
 		final CompositeItemReadListener multicaster = new CompositeItemReadListener();
 
@@ -82,7 +82,7 @@ class BatchListenerFactoryHelper {
 	 * @param itemWriter
 	 * @param listeners
 	 */
-	public ItemWriter getItemWriter(ItemWriter itemWriter, StepListener[] listeners) {
+	public static ItemWriter getItemWriter(ItemWriter itemWriter, StepListener[] listeners) {
 		final CompositeItemWriteListener multicaster = new CompositeItemWriteListener();
 
 		for (int i = 0; i < listeners.length; i++) {
@@ -114,7 +114,7 @@ class BatchListenerFactoryHelper {
 	 * @param chunkOperations
 	 * @param listeners
 	 */
-	public RepeatOperations addChunkListeners(RepeatOperations chunkOperations, StepListener[] listeners) {
+	public static RepeatOperations addChunkListeners(RepeatOperations chunkOperations, StepListener[] listeners) {
 
 		final CompositeChunkListener multicaster = new CompositeChunkListener();
 
@@ -155,7 +155,7 @@ class BatchListenerFactoryHelper {
 	/**
 	 * @param listeners
 	 */
-	public StepExecutionListener[] getStepListeners(StepListener[] listeners) {
+	public static StepExecutionListener[] getStepListeners(StepListener[] listeners) {
 		List list = new ArrayList();
 		for (int i = 0; i < listeners.length; i++) {
 			StepListener listener = listeners[i];
@@ -169,7 +169,7 @@ class BatchListenerFactoryHelper {
 	/**
 	 * @param listeners
 	 */
-	public SkipListener[] getSkipListeners(StepListener[] listeners) {
+	public static SkipListener[] getSkipListeners(StepListener[] listeners) {
 		List list = new ArrayList();
 		for (int i = 0; i < listeners.length; i++) {
 			StepListener listener = listeners[i];

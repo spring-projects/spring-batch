@@ -84,12 +84,10 @@ public class RepeatOperationsStepFactoryBean extends AbstractStepFactoryBean {
 		ItemReader itemReader = getItemReader();
 		ItemWriter itemWriter = getItemWriter();
 
-		BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
-
-		StepExecutionListener[] stepListeners = helper.getStepListeners(listeners);
-		itemReader = helper.getItemReader(itemReader, listeners);
-		itemWriter = helper.getItemWriter(itemWriter, listeners);
-		RepeatOperations chunkOperations = helper.addChunkListeners(this.chunkOperations, listeners);
+		StepExecutionListener[] stepListeners = BatchListenerFactoryHelper.getStepListeners(listeners);
+		itemReader = BatchListenerFactoryHelper.getItemReader(itemReader, listeners);
+		itemWriter = BatchListenerFactoryHelper.getItemWriter(itemWriter, listeners);
+		RepeatOperations chunkOperations = BatchListenerFactoryHelper.addChunkListeners(this.chunkOperations, listeners);
 
 		// In case they are used by subclasses:
 		setItemReader(itemReader);

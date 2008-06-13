@@ -177,16 +177,14 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 		ItemReader itemReader = getItemReader();
 		ItemWriter itemWriter = getItemWriter();
 
-		BatchListenerFactoryHelper helper = new BatchListenerFactoryHelper();
-
 		chunkOperations = new RepeatTemplate();
 		chunkOperations.setCompletionPolicy(getChunkCompletionPolicy());
-		helper.addChunkListeners(chunkOperations, listeners);
+		BatchListenerFactoryHelper.addChunkListeners(chunkOperations, listeners);
 		step.setChunkOperations(chunkOperations);
 
-		StepExecutionListener[] stepListeners = helper.getStepListeners(listeners);
-		itemReader = helper.getItemReader(itemReader, listeners);
-		itemWriter = helper.getItemWriter(itemWriter, listeners);
+		StepExecutionListener[] stepListeners = BatchListenerFactoryHelper.getStepListeners(listeners);
+		itemReader = BatchListenerFactoryHelper.getItemReader(itemReader, listeners);
+		itemWriter = BatchListenerFactoryHelper.getItemWriter(itemWriter, listeners);
 
 		// In case they are used by subclasses:
 		setItemReader(itemReader);
