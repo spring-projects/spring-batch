@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:integration="http://www.springframework.org/schema/integration"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		http://www.springframework.org/schema/integration
+                                 http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+	<import resource="classpath:/simple-job-launcher-context.xml" />
+	<integration:annotation-driven/>
+	<integration:message-bus auto-create-channels="true" />
+	<integration:channel id="requests" />
+	<integration:channel id="replies" />
+	<bean id="job" parent="simpleJob">
+		<property name="steps">
+			<bean
+				class="org.springframework.batch.integration.job.MessageOrientedStep">
+				<property name="name" value="TODO: I shouldn't have to set this"/>
+				<property name="requestChannel" ref="requests" />
+				<property name="replyChannel" ref="replies" />
+				<property name="jobRepository" ref="jobRepository" />
+			</bean>
+		</property>
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+	<bean id="step"
+		class="org.springframework.batch.integration.job.StepExecutionMessageHandler">
+		<property name="step">
+			<bean parent="taskletStep">
+				<property name="tasklet">
+					<bean
+						class="org.springframework.batch.integration.job.TestTasklet" />
+				</property>
+			</bean>
+		</property>
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+	<integration:handler-endpoint handler="step" method="handle" input-channel="requests"
+		 output-channel="replies" />
+</beans>
