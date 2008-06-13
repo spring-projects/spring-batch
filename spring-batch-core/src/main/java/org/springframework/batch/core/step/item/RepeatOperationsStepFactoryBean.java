@@ -16,10 +16,6 @@
 package org.springframework.batch.core.step.item;
 
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.StepListener;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
@@ -33,23 +29,9 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
  */
 public class RepeatOperationsStepFactoryBean extends AbstractStepFactoryBean {
 
-	private StepListener[] listeners = new StepListener[0];
-
 	private RepeatOperations chunkOperations = new RepeatTemplate();
 
 	private RepeatOperations stepOperations = new RepeatTemplate();
-
-
-	/**
-	 * The listeners to inject into the {@link Step}. Any instance of
-	 * {@link StepListener} can be used, and will then receive callbacks at the
-	 * appropriate stage in the step.
-	 * 
-	 * @param listeners an array of listeners
-	 */
-	public void setListeners(StepListener[] listeners) {
-		this.listeners = listeners;
-	}
 
 	/**
 	 * The {@link RepeatOperations} to use for the outer loop of the batch
@@ -81,21 +63,8 @@ public class RepeatOperationsStepFactoryBean extends AbstractStepFactoryBean {
 
 		super.applyConfiguration(step);
 
-		ItemReader itemReader = getItemReader();
-		ItemWriter itemWriter = getItemWriter();
-
-		StepExecutionListener[] stepListeners = BatchListenerFactoryHelper.getStepListeners(listeners);
-		itemReader = BatchListenerFactoryHelper.getItemReader(itemReader, listeners);
-		itemWriter = BatchListenerFactoryHelper.getItemWriter(itemWriter, listeners);
-		RepeatOperations chunkOperations = BatchListenerFactoryHelper.addChunkListeners(this.chunkOperations, listeners);
-
-		// In case they are used by subclasses:
-		setItemReader(itemReader);
-		setItemWriter(itemWriter);
-
-		step.setStepExecutionListeners(stepListeners);
-		step.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
-
+		RepeatOperations chunkOperations = BatchListenerFactoryHelper.addChunkListeners(this.chunkOperations, getListeners());
+		
 		step.setChunkOperations(chunkOperations);
 		step.setStepOperations(stepOperations);
 

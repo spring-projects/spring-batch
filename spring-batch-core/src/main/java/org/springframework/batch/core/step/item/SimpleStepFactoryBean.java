@@ -18,10 +18,6 @@ package org.springframework.batch.core.step.item;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.StepListener;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
@@ -50,8 +46,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	private static final int DEFAULT_COMMIT_INTERVAL = 1;
 
 	private int commitInterval = 0;
-
-	private StepListener[] listeners = new StepListener[0];
 
 	private TaskExecutor taskExecutor;
 
@@ -85,25 +79,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	 */
 	public void setChunkCompletionPolicy(CompletionPolicy chunkCompletionPolicy) {
 		this.chunkCompletionPolicy = chunkCompletionPolicy;
-	}
-
-	/**
-	 * The listeners to inject into the {@link Step}. Any instance of
-	 * {@link StepListener} can be used, and will then receive callbacks at the
-	 * appropriate stage in the step.
-	 * 
-	 * @param listeners an array of listeners
-	 */
-	public void setListeners(StepListener[] listeners) {
-		this.listeners = listeners;
-	}
-
-	/**
-	 * Protected getter for the {@link StepListener}s.
-	 * @return the listeners
-	 */
-	protected StepListener[] getListeners() {
-		return listeners;
 	}
 
 	/**
@@ -174,23 +149,10 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 
 		super.applyConfiguration(step);
 
-		ItemReader itemReader = getItemReader();
-		ItemWriter itemWriter = getItemWriter();
-
 		chunkOperations = new RepeatTemplate();
 		chunkOperations.setCompletionPolicy(getChunkCompletionPolicy());
-		BatchListenerFactoryHelper.addChunkListeners(chunkOperations, listeners);
+		BatchListenerFactoryHelper.addChunkListeners(chunkOperations, getListeners());
 		step.setChunkOperations(chunkOperations);
-
-		StepExecutionListener[] stepListeners = BatchListenerFactoryHelper.getStepListeners(listeners);
-		itemReader = BatchListenerFactoryHelper.getItemReader(itemReader, listeners);
-		itemWriter = BatchListenerFactoryHelper.getItemWriter(itemWriter, listeners);
-
-		// In case they are used by subclasses:
-		setItemReader(itemReader);
-		setItemWriter(itemWriter);
-
-		step.setStepExecutionListeners(stepListeners);
 
 		stepOperations = new RepeatTemplate();
 
@@ -203,11 +165,6 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 		stepOperations.setExceptionHandler(exceptionHandler);
 
 		step.setStepOperations(stepOperations);
-
-		ItemHandler itemHandler = new SimpleItemHandler(itemReader, itemWriter);
-
-		setItemHandler(itemHandler);
-		step.setItemHandler(itemHandler);
 
 	}
 

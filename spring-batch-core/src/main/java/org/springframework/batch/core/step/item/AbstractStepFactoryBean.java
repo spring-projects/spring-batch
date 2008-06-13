@@ -17,6 +17,7 @@ package org.springframework.batch.core.step.item;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -30,13 +31,17 @@ import org.springframework.util.Assert;
 /**
  * Base class for factory beans for {@link ItemOrientedStep}. Ensures that all
  * the mandatory properties are set, and provides basic support for the
- * {@link Step} interface responsibilities like start limit.
+ * {@link Step} interface responsibilities like start limit. Supports
+ * registration of {@link ItemStream}s and {@link StepListener}s.
+ * 
+ * @see SimpleStepFactoryBean
+ * @see RepeatOperationsStepFactoryBean
  * 
  * @author Dave Syer
  * 
  */
 public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAware {
-	
+
 	private String name;
 
 	private int startLimit = Integer.MAX_VALUE;
@@ -54,8 +59,10 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 	private boolean singleton = true;
 
 	private Validator jobRepositoryValidator = new TransactionInterceptorValidator(1);
-	
+
 	private ItemStream[] streams = new ItemStream[0];
+
+	private StepListener[] listeners = new StepListener[0];
 
 	/**
 	 * 
@@ -113,7 +120,7 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 	public void setItemWriter(ItemWriter itemWriter) {
 		this.itemWriter = itemWriter;
 	}
-	
+
 	/**
 	 * The streams to inject into the {@link Step}. Any instance of
 	 * {@link ItemStream} can be used, and will then receive callbacks at the
@@ -123,6 +130,25 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 	 */
 	public void setStreams(ItemStream[] streams) {
 		this.streams = streams;
+	}
+
+	/**
+	 * The listeners to inject into the {@link Step}. Any instance of
+	 * {@link StepListener} can be used, and will then receive callbacks at the
+	 * appropriate stage in the step.
+	 * 
+	 * @param listeners an array of listeners
+	 */
+	public void setListeners(StepListener[] listeners) {
+		this.listeners = listeners;
+	}
+
+	/**
+	 * Protected getter for the {@link StepListener}s.
+	 * @return the listeners
+	 */
+	protected StepListener[] getListeners() {
+		return listeners;
 	}
 
 	/**
@@ -186,9 +212,9 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 		step.setJobRepository(jobRepository);
 		step.setStartLimit(startLimit);
 		step.setAllowStartIfComplete(allowStartIfComplete);
-		
+
 		step.setStreams(streams);
-		
+
 		ItemReader itemReader = getItemReader();
 		ItemWriter itemWriter = getItemWriter();
 
@@ -207,6 +233,17 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 		if (itemWriter instanceof StepExecutionListener) {
 			step.registerStepExecutionListener((StepExecutionListener) itemWriter);
 		}
+
+		StepExecutionListener[] stepListeners = BatchListenerFactoryHelper.getStepListeners(listeners);
+		itemReader = BatchListenerFactoryHelper.getItemReader(itemReader, listeners);
+		itemWriter = BatchListenerFactoryHelper.getItemWriter(itemWriter, listeners);
+
+		// In case they are used by subclasses:
+		setItemReader(itemReader);
+		setItemWriter(itemWriter);
+
+		step.setStepExecutionListeners(stepListeners);
+		step.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
 
 	}
 
