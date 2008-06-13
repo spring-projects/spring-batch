@@ -104,7 +104,7 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 	 */
 	public void testAggregateFormattedRight() {
 		String[] args = { "Matchsize", "Smallsize" };
-		aggregator.setAlignment("right");
+		aggregator.setAlignment(Alignment.RIGHT);
 		aggregator.setColumns(new Range[] {new Range(1,13), new Range(14,23)});
 		String result = aggregator.aggregate(new DefaultFieldSet(args));
 		assertEquals(23,result.length());
@@ -116,7 +116,7 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 	 */
 	public void testAggregateFormattedCenter() {
 		String[] args = { "Matchsize", "Smallsize" };
-		aggregator.setAlignment("center");
+		aggregator.setAlignment(Alignment.CENTER);
 		aggregator.setColumns(new Range[] {new Range(1,13), new Range(14,25)});
 		String result = aggregator.aggregate(new DefaultFieldSet(args));
 		assertEquals(result, "  Matchsize   Smallsize  ");
@@ -128,7 +128,7 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 	public void testAggregateWithCustomPadding() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setPadding('.');
-		aggregator.setAlignment("left");
+		aggregator.setAlignment(Alignment.LEFT);
 		aggregator.setColumns(new Range[] {new Range(1,13), new Range(14,24)});
 		String result = aggregator.aggregate(new DefaultFieldSet(args));
 		assertEquals(result, "Matchsize....Smallsize..");
@@ -139,23 +139,10 @@ public class FixedLengthLineAggregatorTests extends TestCase {
 	 */
 	public void testAggregateFormattedLeft() {
 		String[] args = { "Matchsize", "Smallsize" };
-		aggregator.setAlignment("left");
+		aggregator.setAlignment(Alignment.LEFT);
 		aggregator.setColumns(new Range[] {new Range(1,13), new Range(14,24)});
 		String result = aggregator.aggregate(new DefaultFieldSet(args));
 		assertEquals(result, "Matchsize    Smallsize  ");
-	}
-
-	
-	/**
-	 * Try set ivalid alignment
-	 */
-	public void testInvalidAlignment() {
-		try {
-			aggregator.setAlignment("foo");
-			fail("Exception was expected: invalid alignment value");
-		} catch (IllegalArgumentException iae) {
-			// expected
-		}
 	}
 	
 	/**
