@@ -166,11 +166,12 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				throw new UnexpectedJobExecutionException("Failed to initialize the step", e);
 			}
 			exitStatus = doExecute(stepExecution);
+
+			stepExecution.setStatus(BatchStatus.COMPLETED);
 			exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
 
 			try {
 				getJobRepository().saveOrUpdateExecutionContext(stepExecution);
-				stepExecution.setStatus(BatchStatus.COMPLETED);
 			}
 			catch (Exception e) {
 				commitException = e;
