@@ -24,10 +24,19 @@ import org.springframework.util.ClassUtils;
 public class MultiResourceItemReader extends ExecutionContextUserSupport implements ItemReader, ItemStream,
 		InitializingBean {
 
+	/**
+	 * Key for the index of the current resource
+	 */
 	private static final String RESOURCE_INDEX = "resourceIndex";
-	
-	private static final String ITEM_COUNT = "itemCount";
-	
+
+	/**
+	 * Key for item count within current resource
+	 */
+	private static final String ITEM_COUNT = "itemIndex";
+
+	/**
+	 * Unique object instance that marks resource boundaries in the item buffer
+	 */
 	private static final Object END_OF_RESOURCE_MARKER = new Object();
 
 	private ResourceAwareItemReaderItemStream delegate;
@@ -35,12 +44,12 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	private Resource[] resources;
 
 	private int currentResourceIndex = 0;
-	
+
 	private int lastMarkedResourceIndex = 0;
-	
-	private long currentResourceItemCount = 0;
-	
-	private long lastMarkedResourceItemCount = 0;
+
+	private long currentItemIndex = 0;
+
+	private long lastMarkedItemIndex = 0;
 
 	private List itemBuffer = new ArrayList();
 
@@ -59,44 +68,78 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 */
 	public Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 
+		Object item;
 		if (shouldReadBuffer) {
 			if (itemBufferIterator.hasNext()) {
-				Object buffered = itemBufferIterator.next();
-				while (buffered == END_OF_RESOURCE_MARKER) {
-					currentResourceIndex++;
-					buffered = itemBufferIterator.next();
-				}
-				currentResourceItemCount++;
-				return buffered;
+				item = readBufferedItem();
 			}
 			else {
 				// buffer is exhausted, continue reading from file
 				shouldReadBuffer = false;
 				itemBufferIterator = null;
+				item = readNextItem();
 			}
 		}
+		else {
+			item = readNextItem();
+		}
+
+		return item;
+	}
+
+	/**
+	 * Use the delegate to read the next item, jump to next resource if current
+	 * one is exhausted. Items are appended to the buffer.
+	 * @return next item from input
+	 */
+	private Object readNextItem() throws Exception {
 
 		Object item = delegate.read();
-		currentResourceItemCount++;
 
 		while (item == null) {
 
-			if (++currentResourceIndex >= resources.length) {
-				currentResourceItemCount = 0;
+			incrementResourceIndex();
+
+			if (currentResourceIndex >= resources.length) {
 				return null;
 			}
+			itemBuffer.add(END_OF_RESOURCE_MARKER);
+
 			delegate.close(new ExecutionContext());
 			delegate.setResource(resources[currentResourceIndex]);
 			delegate.open(new ExecutionContext());
-			item = delegate.read();
-			itemBuffer.add(END_OF_RESOURCE_MARKER);
-			currentResourceItemCount = 1;
 
+			item = delegate.read();
 		}
 
 		itemBuffer.add(item);
 
+		currentItemIndex++;
+
 		return item;
+	}
+
+	/**
+	 * Read next item from buffer while keeping track of the position within the
+	 * input for possible restart.
+	 * @return next item from buffer
+	 */
+	private Object readBufferedItem() {
+		Object buffered = itemBufferIterator.next();
+		while (buffered == END_OF_RESOURCE_MARKER) {
+			incrementResourceIndex();
+			buffered = itemBufferIterator.next();
+		}
+		currentItemIndex++;
+		return buffered;
+	}
+
+	/**
+	 * Adjust indexes for next resource.
+	 */
+	private void incrementResourceIndex() {
+		currentResourceIndex++;
+		currentItemIndex = 0;
 	}
 
 	/**
@@ -105,6 +148,18 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 * @see ItemReader#mark()
 	 */
 	public void mark() throws MarkFailedException {
+		emptyBuffer();
+
+		lastMarkedResourceIndex = currentResourceIndex;
+		lastMarkedItemIndex = currentItemIndex;
+
+		delegate.mark();
+	}
+
+	/**
+	 * Discard the buffered items that have already been read.
+	 */
+	private void emptyBuffer() {
 		if (!shouldReadBuffer) {
 			itemBuffer.clear();
 			itemBufferIterator = null;
@@ -113,10 +168,6 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 			itemBuffer = itemBuffer.subList(itemBufferIterator.nextIndex(), itemBuffer.size());
 			itemBufferIterator = itemBuffer.listIterator();
 		}
-		
-		lastMarkedResourceIndex = currentResourceIndex;
-		lastMarkedResourceItemCount = currentResourceItemCount;
-		delegate.mark();
 	}
 
 	/**
@@ -128,7 +179,7 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 		shouldReadBuffer = true;
 		itemBufferIterator = itemBuffer.listIterator();
 		currentResourceIndex = lastMarkedResourceIndex;
-		currentResourceItemCount = lastMarkedResourceItemCount;
+		currentItemIndex = lastMarkedItemIndex;
 	}
 
 	/**
@@ -139,49 +190,51 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 		shouldReadBuffer = false;
 		lastMarkedResourceIndex = 0;
 		currentResourceIndex = 0;
-		currentResourceItemCount = 0;
-		lastMarkedResourceItemCount = 0;
+		currentItemIndex = 0;
+		lastMarkedItemIndex = 0;
 		itemBufferIterator = null;
 		itemBuffer.clear();
 		delegate.close(executionContext);
 	}
 
 	/**
-	 * Figure out which resource to start with in case of restart and open the
-	 * delegate.
+	 * Figure out which resource to start with in case of restart, open the
+	 * delegate and restore delegate's position in the resource.
 	 */
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 
 		if (executionContext.containsKey(getKey(RESOURCE_INDEX))) {
 			currentResourceIndex = Long.valueOf(executionContext.getLong(getKey(RESOURCE_INDEX))).intValue();
+			lastMarkedResourceIndex = currentResourceIndex;
 		}
-		
+
 		if (executionContext.containsKey(getKey(ITEM_COUNT))) {
-			currentResourceItemCount = executionContext.getLong(getKey(ITEM_COUNT));
+			currentItemIndex = executionContext.getLong(getKey(ITEM_COUNT));
+			lastMarkedItemIndex = currentItemIndex;
 		}
 
 		delegate.setResource(resources[currentResourceIndex]);
 
 		delegate.open(new ExecutionContext());
-		
-		for (int i = 0; i < currentResourceItemCount; i++) {
-			try {
+
+		try {
+			for (int i = 0; i < currentItemIndex; i++) {
 				delegate.read();
 				delegate.mark();
 			}
-			catch (Exception e) {
-				throw new ItemStreamException("Could not restore position on restart", e);
-			}
+		}
+		catch (Exception e) {
+			throw new ItemStreamException("Could not restore position on restart", e);
 		}
 	}
 
 	/**
-	 * Store the current resource index and delegate's data.
+	 * Store the current resource index and position in the resource.
 	 */
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (saveState) {
 			executionContext.putLong(getKey(RESOURCE_INDEX), currentResourceIndex);
-			executionContext.putLong(getKey(ITEM_COUNT), currentResourceItemCount);
+			executionContext.putLong(getKey(ITEM_COUNT), currentItemIndex);
 		}
 	}
 
