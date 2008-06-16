@@ -1,4 +1,4 @@
-package org.springframework.batch.integration.launch;
+package org.springframework.batch.integration.file;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.integration.message.Message;

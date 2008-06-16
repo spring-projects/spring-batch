@@ -14,13 +14,9 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.integration.JobSupport;
-import org.springframework.batch.integration.launch.JobLaunchingMessageHandler;
-import org.springframework.batch.integration.launch.MessageToJobStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.bus.MessageBus;
 import org.springframework.integration.channel.AbstractMessageChannel;
-import org.springframework.integration.message.Message;
-import org.springframework.integration.message.StringMessage;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
@@ -30,8 +26,6 @@ public class JobLaunchingMessageHandlerTests extends AbstractJUnit4SpringContext
 	JobLaunchingMessageHandler messageHandler;
 
 	StubJobLauncher jobLauncher;
-	
-
 
 	//	@Autowired
 	//	@Qualifier("jobs") TODO: Qualifier seems to be broken here why ?????
@@ -43,13 +37,13 @@ public class JobLaunchingMessageHandlerTests extends AbstractJUnit4SpringContext
 	@Before
 	public void setUp() {
 		jobLauncher = new StubJobLauncher();
-		messageHandler = new JobLaunchingMessageHandler(jobLauncher, new StubMessageToJobStrategy());
+		messageHandler = new JobLaunchingMessageHandler(jobLauncher);
 		jobsChannel = (AbstractMessageChannel) applicationContext.getBean("jobs");
 	}
 	
 	@Test
 	public void testSimpleDelivery() throws Exception{
-		messageHandler.handle(new StringMessage("testjob"));
+		messageHandler.launch(new JobExecutionRequest(new JobSupport("testjob"), null));
 		
 		assertEquals("Wrong job count", 1, jobLauncher.jobs.size());
 		assertEquals("Wrong job name", jobLauncher.jobs.get(0).getName(), "testjob");
@@ -68,15 +62,6 @@ public class JobLaunchingMessageHandlerTests extends AbstractJUnit4SpringContext
 			jobs.add(job);
 			parameters.add(jobParameters);
 			return new JobExecution(new JobInstance(jobId.getAndIncrement(), jobParameters, job.getName()));
-		}
-
-	}
-	
-	private static class StubMessageToJobStrategy implements MessageToJobStrategy {
-		
-		public Job getJob(Message<?> message) {
-			String name = (String) message.getPayload();
-			return new JobSupport(name);
 		}
 
 	}
