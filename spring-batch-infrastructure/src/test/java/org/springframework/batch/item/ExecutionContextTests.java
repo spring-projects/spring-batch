@@ -128,6 +128,18 @@ public class ExecutionContextTests extends TestCase{
 		assertEquals(7, ((TestSerializable)deserialized.get("5")).value);
 	}
 	
+	public void testCopyConstructor() throws Exception {
+		ExecutionContext context = new ExecutionContext();
+		context.put("foo", "bar");
+		ExecutionContext copy = new ExecutionContext(context);
+		assertEquals(copy, context);
+	}
+	
+	public void testCopyConstructorNullnNput() throws Exception {
+		ExecutionContext context = new ExecutionContext((ExecutionContext)null);
+		assertTrue(context.isEmpty());
+	}
+	
 	/**
 	 * Value object for testing serialization
 	 */

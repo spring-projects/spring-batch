@@ -59,6 +59,20 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
+	 * @param executionContext
+	 */
+	public ExecutionContext(ExecutionContext executionContext) {
+		this();
+		if (executionContext==null) {
+			return;
+		}
+		for (Iterator iterator = executionContext.entrySet().iterator(); iterator.hasNext();) {
+			Entry entry = (Entry) iterator.next();
+			this.map.put(entry.getKey(), entry.getValue());
+		}
+	}
+
+	/**
 	 * Adds a String value to the context.
 	 * 
 	 * @param key Key to add to context
