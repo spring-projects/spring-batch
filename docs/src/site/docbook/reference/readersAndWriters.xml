@@ -538,11 +538,11 @@
         configuration looks like the following:</para>
 
         <programlisting>  &lt;bean id="fieldSetMapper"
-        class="org.springframework.batch.io.file.mapping.BeanWrapperFieldSetMapper"&gt;
+        class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"&gt;
     &lt;property name="prototypeBeanName" value="player" /&gt;
   &lt;/bean&gt;
 
-  &lt;bean id="person"
+  &lt;bean id="player"
         class="org.springframework.batch.sample.domain.Player"
         scope="prototype" /&gt;</programlisting>
 
@@ -822,8 +822,7 @@
         <imageobject role="fo">
           <imagedata align="center"
                      fileref="src/site/resources/reference/images/xmlinput.png"
-                     format="PNG"
-                     width="66%" />
+                     format="PNG" width="66%" />
         </imageobject>
 
         <imageobject role="html">
@@ -850,14 +849,12 @@
         <imageobject role="fo">
           <imagedata align="center"
                      fileref="src/site/resources/reference/images/oxm-fragments.png"
-                     format="PNG"
-                     width="66%" />
+                     format="PNG" width="66%" />
         </imageobject>
 
         <imageobject role="html">
           <imagedata align="center" fileref="images/oxm-fragments.png"
-                     format="PNG"
-                     width="66%" />
+                     format="PNG" width="66%" />
         </imageobject>
 
         <caption><para>Figure 3.2: OXM Binding</para></caption>
