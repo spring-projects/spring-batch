@@ -42,8 +42,8 @@ public class ExecutionContext implements Serializable {
 	private final Map map;
 
 	/**
-	 * Default constructor. Initializes a new execution context with an
-	 * empty internal map.
+	 * Default constructor. Initializes a new execution context with an empty
+	 * internal map.
 	 */
 	public ExecutionContext() {
 		map = new HashMap();
@@ -80,7 +80,7 @@ public class ExecutionContext implements Serializable {
 
 		put(key, new Long(value));
 	}
-	 
+
 	/**
 	 * Add a Double value to the context.
 	 * 
@@ -91,7 +91,7 @@ public class ExecutionContext implements Serializable {
 
 		put(key, new Double(value));
 	}
-	
+
 	/**
 	 * Add an Object value to the context (must be Serializable).
 	 * 
@@ -99,7 +99,7 @@ public class ExecutionContext implements Serializable {
 	 * @param value Value to associate with key
 	 */
 	public void put(String key, Object value) {
-		if(value != null){
+		if (value != null) {
 			Assert.isInstanceOf(Serializable.class, value, "Value: [ " + value + "must be serializable.");
 		}
 		dirty = true;
@@ -119,7 +119,7 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Typesafe Getter for the String represented by the provided key.
-	 *  
+	 * 
 	 * @param key The key to get a value for
 	 * @return The <code>String</code> value
 	 */
@@ -127,27 +127,27 @@ public class ExecutionContext implements Serializable {
 
 		return (String) readAndValidate(key, String.class);
 	}
-	
+
 	/**
-	 * Typesafe Getter for the String represented by the provided key
-	 * with default value to return if key is not represented.
+	 * Typesafe Getter for the String represented by the provided key with
+	 * default value to return if key is not represented.
 	 * 
 	 * @param key The key to get a value for
 	 * @param defaultString Default to return if key is not represented
-	 * @return The <code>String</code> value if key is repreesnted,
-	 * specified default otherwise
+	 * @return The <code>String</code> value if key is repreesnted, specified
+	 * default otherwise
 	 */
 	public String getString(String key, String defaultString) {
-		if(!map.containsKey(key)) {
+		if (!map.containsKey(key)) {
 			return defaultString;
 		}
-		
+
 		return (String) readAndValidate(key, String.class);
 	}
 
 	/**
 	 * Typesafe Getter for the Long represented by the provided key.
-	 *  
+	 * 
 	 * @param key The key to get a value for
 	 * @return The <code>Long</code> value
 	 */
@@ -155,48 +155,48 @@ public class ExecutionContext implements Serializable {
 
 		return ((Long) readAndValidate(key, Long.class)).longValue();
 	}
-	
+
 	/**
-	 * Typesafe Getter for the Long represented by the provided key
-	 * with default value to return if key is not represented.
+	 * Typesafe Getter for the Long represented by the provided key with default
+	 * value to return if key is not represented.
 	 * 
 	 * @param key The key to get a value for
 	 * @param defaultLong Default to return if key is not represented
-	 * @return The <code>long</code> value if key is represented,
-	 * specified default otherwise
+	 * @return The <code>long</code> value if key is represented, specified
+	 * default otherwise
 	 */
 	public long getLong(String key, long defaultLong) {
-		if(!map.containsKey(key)) {
+		if (!map.containsKey(key)) {
 			return defaultLong;
 		}
-		
+
 		return ((Long) readAndValidate(key, Long.class)).longValue();
 	}
 
 	/**
 	 * Typesafe Getter for the Double represented by the provided key.
-	 *  
+	 * 
 	 * @param key The key to get a value for
 	 * @return The <code>Double</code> value
 	 */
 	public double getDouble(String key) {
 		return ((Double) readAndValidate(key, Double.class)).doubleValue();
 	}
-	
+
 	/**
-	 * Typesafe Getter for the Double represented by the provided key
-	 * with default value to return if key is not represented.
+	 * Typesafe Getter for the Double represented by the provided key with
+	 * default value to return if key is not represented.
 	 * 
 	 * @param key The key to get a value for
 	 * @param defaultDouble Default to return if key is not represented
-	 * @return The <code>double</code> value if key is represented, 
-	 * specified default otherwise
+	 * @return The <code>double</code> value if key is represented, specified
+	 * default otherwise
 	 */
 	public double getDouble(String key, double defaultDouble) {
-		if(!map.containsKey(key)) {
+		if (!map.containsKey(key)) {
 			return defaultDouble;
 		}
-		
+
 		return ((Double) readAndValidate(key, Double.class)).doubleValue();
 	}
 
@@ -212,8 +212,8 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Utility method that attempts to take a value represented by a given
-	 * key and validate it as a member of the specified type. 
+	 * Utility method that attempts to take a value represented by a given key
+	 * and validate it as a member of the specified type.
 	 * 
 	 * @param key The key to validate a value for
 	 * @param type Class against which value should be validated
@@ -252,7 +252,7 @@ public class ExecutionContext implements Serializable {
 	 * Returns the entry set containing the contents of this context.
 	 * 
 	 * @return A set representing the contents of the context
-	* @see java.util.Map#entrySet()
+	 * @see java.util.Map#entrySet()
 	 */
 	public Set entrySet() {
 		return map.entrySet();
@@ -281,10 +281,13 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Returns a <code>Properties</code> object containing <code>String</code>  
+	 * Returns a <code>Properties</code> object containing <code>String</code>
 	 * versions of the contents of the context.
 	 * 
 	 * @return Contents of context as a {@link java.util.Properties}
+	 * 
+	 * @deprecated to be removed with no replacement in 2.0. Should not be part
+	 * of public API (test purposes only)
 	 */
 	public Properties getProperties() {
 		Properties props = new Properties();
