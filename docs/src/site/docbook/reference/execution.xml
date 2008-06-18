@@ -470,25 +470,31 @@
         may be that you just don't need to persist status for a particular
         job. Spring batch provides a solution:</para>
 
-        <programlisting>  &lt;bean id="jobRepository" class="org.springframework.batch.core.repository.support.SimpleJobRepository"&gt;
-    &lt;constructor-arg ref="mapJobInstanceDao" /&gt;
-    &lt;constructor-arg ref="mapJobExecutionDao" /&gt;
-    &lt;constructor-arg ref="mapJtepExecutionDao" /&gt;
-  &lt;/bean&gt;
+        <programlisting>  &lt;bean id="simpleJobRepository" class="org.springframework.batch.core.repository.support.SimpleJobRepository"&gt; 
+    &lt;constructor-arg ref="mapJobInstanceDao" /&gt; 
+    &lt;constructor-arg ref="mapJobExecutionDao" /&gt; 
+    &lt;constructor-arg ref="mapStepExecutionDao" /&gt; 
+  &lt;/bean&gt; 
 
-  &lt;bean id="mapJobInstanceDao"
-        class="org.springframework.batch.execution.repository.dao.MapJobInstanceDao" /&gt;
+  &lt;bean id="mapJobInstanceDao" 
+        class="org.springframework.batch.core.repository.dao.MapJobInstanceDao" /&gt; 
 
-  &lt;bean id="mapJobExecutionDao"
-        class="org.springframework.batch.execution.repository.dao.MapJobExecutionDao" /&gt;
+  &lt;bean id="mapJobExecutionDao" 
+        class="org.springframework.batch.core.repository.dao.MapJobExecutionDao" /&gt; 
 
-  &lt;bean id="mapStepExecutionDao"
-        class="org.springframework.batch.execution.repository.dao.MapStepExecutionDao" /&gt;</programlisting>
+  &lt;bean id="mapStepExecutionDao" 
+        class="org.springframework.batch.core.repository.dao.MapStepExecutionDao" /&gt; </programlisting>
 
         <para>The Map* DAO implementations store the batch artifacts in a
         transactional map. So, the repository and DAOs may still be used
         normally, and are transactionally sound, but their contents will be
         lost when the class is destroyed.</para>
+
+        <para>There is also a separate FactoryBean for the in-memory
+        <classname>JobRepository</classname>, which reduces the amount of
+        configuration required:</para>
+
+        <programlisting>  &lt;bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" /&gt;</programlisting>
 
         <section>
           <title>Transaction Configuration For the JobRepository</title>
