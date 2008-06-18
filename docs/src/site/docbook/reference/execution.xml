@@ -1077,13 +1077,13 @@
         Usually these bad records are logged as well, which will be covered
         later when discussing listeners. Configuring skip handling requires
         using a new factory bean:
-        <classname>SkipLimitStepFactoryBean</classname><programlisting>  &lt;bean id="skipSample" parent="simpleStep"
+        <classname>SkipLimitStepFactoryBean</classname><programlisting>  &lt;bean id="skipSample"
         class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean"&gt;
     &lt;property name="skipLimit" value="10" /&gt;
     &lt;property name="itemReader" ref="flatFileItemReader" /&gt;
     &lt;property name="itemWriter" ref="itemWriter" /&gt;
-    &lt;property name="skippableExceptionClasses"
-              value="org.springframework.batch.item.file.FlatFileParseException"&gt;
+    <emphasis role="bold">&lt;property name="skippableExceptionClasses"
+              value="org.springframework.batch.item.file.FlatFileParseException"&gt;</emphasis>
     &lt;/property&gt;
   &lt;/bean&gt; </programlisting></para>
 
@@ -1093,6 +1093,31 @@
         be noted that any failures encountered while reading will not count
         against the commit interval. In other words, the commit interval is
         only incremented on writes (regardless of success or failure).</para>
+      </section>
+
+      <section>
+        <para>One problem with the example above is that any other exception
+        besides a <classname>FlatFileParseException</classname> will cause the
+        <classname>Job</classname> to fail. In certain scenarios this may be
+        the correct behaviour, however, in certain scenarios it may be easier
+        to identify which exceptions should cause failure and skip everything
+        else:<programlisting>  &lt;bean id="skipSample"
+        class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean"&gt;
+    &lt;property name="skipLimit" value="10" /&gt;
+    &lt;property name="itemReader" ref="flatFileItemReader" /&gt;
+    &lt;property name="itemWriter" ref="itemWriter" /&gt;
+    <emphasis role="bold">&lt;property name="skippableExceptionClasses"
+              value="java.lang.Exception"&gt;</emphasis>
+    <emphasis role="bold">&lt;property name="fatalExceptionClasses"
+              value="java.io.FileNotFoundException"&gt;</emphasis>
+    &lt;/property&gt;
+  &lt;/befan&gt;</programlisting></para>
+
+        <para>By setting the skippable exceptions to
+        <classname>java.lang.Exception</classname>, any exception that is
+        thrown will be skipped. However, the second list,
+        'fatalExceptionClasses', contains specific exceptions that should be
+        fatal if encountered.</para>
       </section>
 
       <section>
@@ -1107,21 +1132,46 @@
         <classname>DeadlockLoserDataAccessException</classname>, which
         indicates that the current process has attempted to update a record
         that another process holds a lock on, waiting and trying again might
-        result in success. In this case, a
-        <classname>StatefulRetryStepFactoryBean</classname> should be
-        used:</para>
+        result in success. In this case, retry should be configured:</para>
 
-        <programlisting>  &lt;bean id="step1" parent="simpleStep"
-        class="org.springframework.batch.core.step.item.StatefulRetryStepFactoryBean"&gt;
+        <programlisting>  &lt;bean id="step1"
+        class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean"&gt;
     &lt;property name="itemReader" ref="itemGenerator" /&gt;
     &lt;property name="itemWriter" ref="itemWriter" /&gt;
-    &lt;property name="retryLimit" value="3" /&gt;
-    &lt;property name="retryableExceptionClasses" value="org.springframework.dao.DeadlockLoserDataAccessException" /&gt;
+    <emphasis role="bold">&lt;property name="retryLimit" value="3" /&gt;
+    &lt;property name="retryableExceptionClasses" value="org.springframework.dao.DeadlockLoserDataAccessException" /&gt;</emphasis>
   &lt;/bean&gt;</programlisting>
 
         <para>The StatefulRetryStepFactoryBean requires a limit for the number
         of times an individual item can be retried, and a list of Exceptions
         that are 'retryable'.</para>
+      </section>
+
+      <section>
+        <title>Controlling rollback</title>
+
+        <para>By default, regardless of retry or skip, any exceptions thrown
+        from the <classname>ItemWriter</classname> will cause the transaction
+        controlled by the <classname>Step</classname> to rollback. If skip is
+        configured as described above, exceptions thrown from the
+        <classname>ItemReader</classname> will not cause a rollback. However,
+        there are many scenarios in which exceptions thrown from the
+        <classname>ItemWriter</classname> should not cause a rollback because
+        no action has taken place to invalidate the transaction. For this
+        reason, the SkipLimitStepFactoryBean can be configured with a list of
+        exceptions that should not cause rollback:</para>
+
+        <programlisting>  &lt;bean id="step2" 
+        class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean"&gt;
+    &lt;property name="commitInterval" value="2" /&gt;
+    &lt;property name="skipLimit" value="1" /&gt;
+    <emphasis role="bold">&lt;property name="noRollbackForExceptionClasses"
+              value="org.springframework.batch.item.validator.ValidationException" /&gt;</emphasis>
+    &lt;property name="itemReader"
+              ref="tradeSqlItemReader" /&gt;
+    &lt;property name="itemWriter"
+              ref="itemTrackingWriter" /&gt;
+  &lt;/bean&gt;</programlisting>
       </section>
 
       <section>
