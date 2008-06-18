@@ -19,7 +19,6 @@ package org.springframework.batch.core.job;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -45,6 +44,7 @@ import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -269,7 +269,6 @@ public class SimpleJobTests extends TestCase {
 		catch (Error e) {
 			assertEquals(exception, e);
 		}
-		System.err.println(list);
 		assertEquals(0, list.size());
 		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
@@ -347,6 +346,7 @@ public class SimpleJobTests extends TestCase {
 			assertSame(exception, e);
 		}
 		assertTrue(step1.passedInStepContext.isEmpty());
+		System.err.println(step2.passedInStepContext);
 		assertFalse(step2.passedInStepContext.isEmpty());
 
 	}
@@ -463,9 +463,9 @@ public class SimpleJobTests extends TestCase {
 
 		private JobRepository jobRepository;
 
-		private Properties passedInStepContext;
+		private ExecutionContext passedInStepContext;
 
-		private Properties passedInJobContext;
+		private ExecutionContext passedInJobContext;
 
 		/**
 		 * @param string
@@ -495,10 +495,11 @@ public class SimpleJobTests extends TestCase {
 		public void execute(StepExecution stepExecution) throws JobInterruptedException,
 				UnexpectedJobExecutionException {
 
-			passedInJobContext = stepExecution.getJobExecution().getExecutionContext().getProperties();
-			passedInStepContext = stepExecution.getExecutionContext().getProperties();
+			passedInJobContext = new ExecutionContext(stepExecution.getJobExecution().getExecutionContext());
+			passedInStepContext = new ExecutionContext(stepExecution.getExecutionContext());
 			stepExecution.getExecutionContext().putString("stepKey", "stepValue");
 			stepExecution.getJobExecution().getExecutionContext().putString("jobKey", "jobValue");
+			jobRepository.saveOrUpdate(stepExecution);
 			jobRepository.saveOrUpdateExecutionContext(stepExecution);
 
 			if (exception instanceof RuntimeException) {

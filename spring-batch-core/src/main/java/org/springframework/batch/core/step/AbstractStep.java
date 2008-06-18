@@ -171,6 +171,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
 
 			try {
+				getJobRepository().saveOrUpdate(stepExecution);
 				getJobRepository().saveOrUpdateExecutionContext(stepExecution);
 			}
 			catch (Exception e) {

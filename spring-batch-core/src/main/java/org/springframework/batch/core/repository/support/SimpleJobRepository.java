@@ -250,7 +250,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdateExecutionContext(org.springframework.batch.core.domain.StepExecution)
 	 */
 	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
-		saveOrUpdate(stepExecution);
+		// Until there is an interface change (
 		stepExecutionDao.saveOrUpdateExecutionContext(stepExecution);
 		jobExecutionDao.saveOrUpdateExecutionContext(stepExecution.getJobExecution());
 	}
