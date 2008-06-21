@@ -40,7 +40,8 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
+import org.springframework.transaction.interceptor.TransactionAttribute;
 
 /**
  * Simple implementation of executing the step as a set of chunks, each chunk
@@ -78,6 +79,8 @@ public class ItemOrientedStep extends AbstractStep {
 
 	private PlatformTransactionManager transactionManager;
 
+	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
+
 	private ItemHandler itemHandler;
 
 	private StepExecutionSynchronizer synchronizer;
@@ -98,7 +101,15 @@ public class ItemOrientedStep extends AbstractStep {
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
-
+	
+	/**
+	 * Public setter for the {@link TransactionAttribute}.
+	 * @param transactionAttribute the {@link TransactionAttribute} to set
+	 */
+	public void setTransactionAttribute(TransactionAttribute transactionAttribute) {
+		this.transactionAttribute = transactionAttribute;
+	}
+	
 	/**
 	 * Public setter for the {@link ItemHandler}.
 	 * 
@@ -230,7 +241,7 @@ public class ItemOrientedStep extends AbstractStep {
 
 				ExitStatus exitStatus = ExitStatus.CONTINUABLE;
 
-				TransactionStatus transaction = transactionManager.getTransaction(new DefaultTransactionDefinition());
+				TransactionStatus transaction = transactionManager.getTransaction(transactionAttribute);
 
 				try {
 

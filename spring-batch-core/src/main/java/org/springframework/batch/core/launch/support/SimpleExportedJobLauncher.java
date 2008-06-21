@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -30,6 +31,7 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.NoSuchJobException;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -104,10 +106,10 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 		int i = 0;
 		for (Iterator iterator = execution.getStepExecutions().iterator(); iterator.hasNext();) {
 			StepExecution stepExecution = (StepExecution) iterator.next();
-			Properties statistics = stepExecution.getExecutionContext().getProperties();
-			for (Iterator iter = statistics.keySet().iterator(); iter.hasNext();) {
-				String key = (String) iter.next();
-				result.setProperty(prefix + "step" + i + "." + key, statistics.getProperty(key));
+			ExecutionContext statistics = stepExecution.getExecutionContext();
+			for (Iterator iter = statistics.entrySet().iterator(); iter.hasNext();) {
+				Entry entry = (Entry) iter.next();
+				result.setProperty(prefix + "step" + i + "." + entry.getKey(), ""+entry.getValue());
 			}
 		}
 	}

@@ -4,7 +4,7 @@
 
 	<bean id="dataSource" class="test.jdbc.datasource.InitializingDataSourceFactoryBean">
 		<property name="dataSource" ref="hsql" />
-		<property name="initScript" value="org/springframework/batch/jms/init.sql" />
+		<property name="initScripts" value="org/springframework/batch/jms/init.sql" />
 		<property name="destroyScript" value="org/springframework/batch/jms/destroy.sql" />
 	</bean>
 

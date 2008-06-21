@@ -26,6 +26,7 @@ import org.springframework.batch.item.validator.Validator;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.util.Assert;
 
 /**
@@ -53,6 +54,8 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 	private ItemWriter itemWriter;
 
 	private PlatformTransactionManager transactionManager;
+	
+	private TransactionAttribute transactionAttribute;
 
 	private JobRepository jobRepository;
 
@@ -186,6 +189,14 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 	}
 
 	/**
+	 * Public setter for the {@link TransactionAttribute}.
+	 * @param transactionAttribute the {@link TransactionAttribute} to set
+	 */
+	public void setTransactionAttribute(TransactionAttribute transactionAttribute) {
+		this.transactionAttribute = transactionAttribute;
+	}
+
+	/**
 	 * Create a {@link Step} from the configuration provided.
 	 * 
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
@@ -209,6 +220,9 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 
 		step.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
 		step.setTransactionManager(transactionManager);
+		if (transactionAttribute!=null) {
+			step.setTransactionAttribute(transactionAttribute);
+		}
 		step.setJobRepository(jobRepository);
 		step.setStartLimit(startLimit);
 		step.setAllowStartIfComplete(allowStartIfComplete);

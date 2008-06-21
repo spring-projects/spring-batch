@@ -2,7 +2,6 @@ package org.springframework.batch.core.step;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -102,10 +101,10 @@ public class AbstractStepTests extends TestCase {
 	 */
 	private static class JobRepositoryStub extends JobRepositorySupport {
 
-		Properties saved = new Properties();
+		ExecutionContext saved = new ExecutionContext();
 
 		public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
-			saved = stepExecution.getExecutionContext().getProperties();
+			saved = stepExecution.getExecutionContext();
 		}
 
 	}

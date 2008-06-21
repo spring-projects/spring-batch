@@ -14,6 +14,7 @@
 		<property name="steps">
 			<list>
 				<bean id="step1" parent="simpleStep">
+					<property name="transactionAttribute" value="PROPAGATION_REQUIRED,ISOLATION_READ_UNCOMMITTED"/>
 					<property name="streams" ref="fileItemReader" />
 					<property name="itemReader">
 						<bean

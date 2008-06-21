@@ -9,7 +9,7 @@
 				<property name="url" value="jdbc:hsqldb:mem:testdb" />
 			</bean>
 		</property>
-		<property name="initScript" value="org/springframework/batch/item/database/init-foo-schema-hsqldb.sql" />
+		<property name="initScripts" value="org/springframework/batch/item/database/init-foo-schema-hsqldb.sql" />
 		<property name="destroyScript" value="org/springframework/batch/item/database/destroy-foo-schema-hsqldb.sql" />
 	</bean>
 

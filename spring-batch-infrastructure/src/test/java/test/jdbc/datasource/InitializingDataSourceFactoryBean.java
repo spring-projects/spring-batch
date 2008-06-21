@@ -36,20 +36,35 @@ import org.springframework.util.StringUtils;
 
 public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 
-	private Resource initScript;
+	private Resource[] initScripts;
 
 	private Resource destroyScript;
 
 	DataSource dataSource;
 
-	public void destroy() throws Exception {
-		super.destroy();
+	private static boolean initialized = false;
 
+	/**
+	 * @throws Throwable
+	 * @see java.lang.Object#finalize()
+	 */
+	protected void finalize() throws Throwable {
+		super.finalize();
+		initialized = false;
+		logger.debug("finalize called");
+	}
+
+	protected void destroyInstance(Object instance) throws Exception {
 		try {
 			doExecuteScript(destroyScript);
 		}
 		catch (Exception e) {
-			logger.warn("Could not execute destroy script [" + destroyScript + "]", e);
+			if (logger.isDebugEnabled()) {
+				logger.warn("Could not execute destroy script [" + destroyScript + "]", e);
+			}
+			else {
+				logger.warn("Could not execute destroy script [" + destroyScript + "]");
+			}
 		}
 	}
 
@@ -60,13 +75,21 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 
 	protected Object createInstance() throws Exception {
 		Assert.notNull(dataSource);
-		try {
-			doExecuteScript(destroyScript);
+		if (!initialized) {
+			try {
+				doExecuteScript(destroyScript);
+			}
+			catch (Exception e) {
+				logger.debug("Could not execute destroy script [" + destroyScript + "]", e);
+			}
+			if (initScripts != null) {
+				for (int i = 0; i < initScripts.length; i++) {
+					Resource initScript = initScripts[i];
+					doExecuteScript(initScript);
+				}
+			}
+			initialized = true;
 		}
-		catch (Exception e) {
-			logger.debug("Could not execute destroy script [" + destroyScript + "]", e);
-		}
-		doExecuteScript(initScript);
 		return dataSource;
 	}
 
@@ -74,31 +97,29 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 		if (scriptResource == null || !scriptResource.exists())
 			return;
 		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
-		if (initScript != null) {
-			transactionTemplate.execute(new TransactionCallback() {
+		transactionTemplate.execute(new TransactionCallback() {
 
-				public Object doInTransaction(TransactionStatus status) {
-					JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-					String[] scripts;
-					try {
-						scripts = StringUtils.delimitedListToStringArray(stripComments(IOUtils.readLines(scriptResource
-								.getInputStream())), ";");
-					}
-					catch (IOException e) {
-						throw new BeanInitializationException("Cannot load script from [" + initScript + "]", e);
-					}
-					for (int i = 0; i < scripts.length; i++) {
-						String script = scripts[i].trim();
-						if (StringUtils.hasText(script)) {
-							jdbcTemplate.execute(scripts[i]);
-						}
-					}
-					return null;
+			public Object doInTransaction(TransactionStatus status) {
+				JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+				String[] scripts;
+				try {
+					scripts = StringUtils.delimitedListToStringArray(stripComments(IOUtils.readLines(scriptResource
+							.getInputStream())), ";");
 				}
+				catch (IOException e) {
+					throw new BeanInitializationException("Cannot load script from [" + scriptResource + "]", e);
+				}
+				for (int i = 0; i < scripts.length; i++) {
+					String script = scripts[i].trim();
+					if (StringUtils.hasText(script)) {
+						jdbcTemplate.execute(scripts[i]);
+					}
+				}
+				return null;
+			}
 
-			});
+		});
 
-		}
 	}
 
 	private String stripComments(List list) {
@@ -116,8 +137,8 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 		return DataSource.class;
 	}
 
-	public void setInitScript(Resource initScript) {
-		this.initScript = initScript;
+	public void setInitScripts(Resource[] initScripts) {
+		this.initScripts = initScripts;
 	}
 
 	public void setDestroyScript(Resource destroyScript) {
