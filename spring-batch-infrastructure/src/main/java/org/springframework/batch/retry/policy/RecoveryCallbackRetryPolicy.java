@@ -106,7 +106,7 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 	 */
 	public RetryContext open(RetryCallback callback, RetryContext parent) {
 		Assert.state(callback instanceof RecoveryRetryCallback, "Callback must be RecoveryRetryCallback");
-		ItemWriterRetryContext context = new ItemWriterRetryContext((RecoveryRetryCallback) callback, parent);
+		RecoveryCallbackRetryContext context = new RecoveryCallbackRetryContext((RecoveryRetryCallback) callback, parent);
 		context.open(callback, null);
 		return context;
 	}
@@ -132,7 +132,7 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 		return ((RetryPolicy) context).handleRetryExhausted(context);
 	}
 
-	private class ItemWriterRetryContext extends RetryContextSupport implements RetryPolicy {
+	private class RecoveryCallbackRetryContext extends RetryContextSupport implements RetryPolicy {
 
 		final private Object key;
 
@@ -145,7 +145,7 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 
 		final private boolean forceRefresh;
 
-		public ItemWriterRetryContext(RecoveryRetryCallback callback, RetryContext parent) {
+		public RecoveryCallbackRetryContext(RecoveryRetryCallback callback, RetryContext parent) {
 			super(parent);
 			this.recoverer = callback.getRecoveryCallback();
 			this.key = callback.getKey();
