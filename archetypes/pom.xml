@@ -4,7 +4,17 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-archetypes</artifactId>
 	<packaging>pom</packaging>
-	<name>Samples-Archetypes-Parent</name>
+	<name>Samples Archetypes Parent</name>
+	<description>
+	<![CDATA[
+	Spring Batch archetypes are simple project templates containing just enough code
+	to get you started running a job.  For more detailed examples of using particular 
+	features of the framework, look at the Spring Batch Samples	project.  Currently the 
+	archetypes are deployed as regular Maven projects (not archetypes), because of limitations
+	in the archetype plugin.  For most effective use, copy one into Eclipse and use Q4E to manage
+	the dependencies. 
+]]>
+	</description>
 
 	<parent>
 		<groupId>org.springframework.batch</groupId>

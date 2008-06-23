@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>simple-cli-archetype</artifactId>
 	<packaging>jar</packaging>
-	<name>Spring Batch Simple Commandline-Archetype</name>
+	<name>Spring Batch Simple Commandline Archetype</name>
 
 	<parent>
 		<groupId>org.springframework.batch</groupId>

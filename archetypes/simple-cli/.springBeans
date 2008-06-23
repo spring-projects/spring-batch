@@ -7,7 +7,6 @@
 	</configSuffixes>
 	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
-		<config>src/main/resources/example/simpleJob.xml</config>
 	</configs>
 	<configSets>
 	</configSets>
