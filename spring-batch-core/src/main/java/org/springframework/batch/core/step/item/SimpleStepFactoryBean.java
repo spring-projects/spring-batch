@@ -59,6 +59,8 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 
 	private CompletionPolicy chunkCompletionPolicy;
 
+	private int throttleLimit = TaskExecutorRepeatTemplate.DEFAULT_THROTTLE_LIMIT;
+
 	/**
 	 * Set the commit interval. Either set this or the chunkCompletionPolicy but
 	 * not both.
@@ -126,6 +128,17 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	}
 
 	/**
+	 * Public setter for the throttle limit. This limits the number of tasks
+	 * queued for concurrent processing to prevent thread pools from being
+	 * overwhelmed. Defaults to
+	 * {@link TaskExecutorRepeatTemplate#DEFAULT_THROTTLE_LIMIT}.
+	 * @param throttleLimit the throttle limit to set.
+	 */
+	public void setThrottleLimit(int throttleLimit) {
+		this.throttleLimit = throttleLimit;
+	}
+
+	/**
 	 * Public getter for the ItemHandler.
 	 * @return the ItemHandler
 	 */
@@ -159,9 +172,10 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 		if (taskExecutor != null) {
 			TaskExecutorRepeatTemplate repeatTemplate = new TaskExecutorRepeatTemplate();
 			repeatTemplate.setTaskExecutor(taskExecutor);
+			repeatTemplate.setThrottleLimit(throttleLimit);
 			stepOperations = repeatTemplate;
 		}
-		
+
 		stepOperations.setExceptionHandler(exceptionHandler);
 
 		step.setStepOperations(stepOperations);
@@ -175,8 +189,7 @@ public class SimpleStepFactoryBean extends AbstractStepFactoryBean {
 	private CompletionPolicy getChunkCompletionPolicy() {
 		Assert.state(!(chunkCompletionPolicy != null && commitInterval != 0),
 				"You must specify either a chunkCompletionPolicy or a commitInterval but not both.");
-		Assert.state(commitInterval >= 0,
-				"The commitInterval must be positive or zero (for default value).");
+		Assert.state(commitInterval >= 0, "The commitInterval must be positive or zero (for default value).");
 
 		if (chunkCompletionPolicy != null) {
 			return chunkCompletionPolicy;

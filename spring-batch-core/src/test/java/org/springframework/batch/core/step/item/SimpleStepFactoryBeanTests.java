@@ -47,6 +47,7 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 /**
  * Tests for {@link SimpleStepFactoryBean}.
@@ -120,6 +121,25 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(3, written.size());
+		assertTrue(written.contains("foo"));
+	}
+
+	public void testSimpleConcurrentJob() throws Exception {
+
+		job.setSteps(new ArrayList());
+		SimpleStepFactoryBean factory = getStepFactory("foo", "bar");
+		factory.setTaskExecutor(new SimpleAsyncTaskExecutor());
+		factory.setThrottleLimit(1);
+
+		AbstractStep step = (AbstractStep) factory.getObject();
+		step.setName("step1");
+		job.addStep(step);
+
+		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
+
+		job.execute(jobExecution);
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals(2, written.size());
 		assertTrue(written.contains("foo"));
 	}
 
