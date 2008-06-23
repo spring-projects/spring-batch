@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file is imported in the archetype pom.xml files for integration tests -->
+<project name="common-test" default="test">
+
+    <property name="version" value="${version}"/>
+    <property name="archetype" value="${archetype}"/>
+    <property name="test.dir" value="${basedir}/target/test-archetype"/>
+
+    <target name="test" description="Tests that 'mvn integration-test' works with archetype">
+        <echo message="Creating archetype '${archetype}', version '${version}'"/>
+        <test archetype="${archetype}" version="${version}"/>
+    </target>
+
+    <macrodef name="test">
+        <attribute name="archetype"/>
+        <attribute name="version"/>
+        
+        <sequential>
+            <delete dir="${test.dir}"/>
+            <mkdir dir="${test.dir}"/>
+            <maven dir="${basedir}" command="install -Dmaven.test.skip=true"/>
+            <maven dir="${test.dir}" archetype="@{archetype}" version="@{version}" />
+            <maven dir="${test.dir}/test" command="clean package exec:exec"/>
+        </sequential>
+    </macrodef>
+    
+    <macrodef name="maven">
+        <attribute name="dir"/>
+        <attribute name="name" default=""/>
+        <attribute name="archetype" default=""/>
+        <attribute name="version" default=""/>
+        <attribute name="command" default="-e archetype:create -DarchetypeGroupId=org.springframework.batch -DarchetypeArtifactId=@{archetype} -DarchetypeVersion=@{version} -DgroupId=com.foo -DartifactId=test"/>
+        
+        <sequential>
+            <exec dir="@{dir}" executable="mvn.bat" os="Windows XP" failonerror="true">
+                <arg line="@{command}"/>
+            </exec>
+            <exec dir="@{dir}" executable="mvn" os="Mac OS X" failonerror="true">
+                <arg line="@{command}"/>
+            </exec>
+            <exec dir="@{dir}" executable="mvn" os="Linux" failonerror="true">
+                <arg line="@{command}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+    
+</project>

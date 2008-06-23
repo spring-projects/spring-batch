@@ -1,0 +1,110 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>simple-cli-archetype</artifactId>
+	<packaging>jar</packaging>
+	<name>Spring Batch Simple Commandline-Archetype</name>
+
+	<parent>
+		<groupId>org.springframework.batch</groupId>
+		<artifactId>spring-batch-archetypes</artifactId>
+		<version>1.1.0.DEV-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+
+	<description>
+		<![CDATA[
+      This project is a minimal command line batch sample from
+      Spring Batch.  Once installed you can use "mvn exec:exec" to 
+      see the job run.
+    ]]>
+	</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.batch</groupId>
+			<artifactId>spring-batch-samples</artifactId>
+			<version>${pom.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.2.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-collections</groupId>
+					<artifactId>commons-collections</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>1.8.0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>1.5.3</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!--forkMode>pertest</forkMode-->
+					<includes>
+						<include>**/*Tests.java</include>
+					</includes>
+					<excludes>
+						<exclude>**/Abstract*.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<executable>java</executable>
+					<arguments>
+						<argument>-classpath</argument>
+						<!-- automatically creates the classpath using all project dependencies, 
+							also adding the project build directory -->
+						<classpath />
+						<argument>org.springframework.batch.core.launch.support.CommandLineJobRunner</argument>
+						<!-- job configuration file -->
+						<argument>example/simpleJob.xml</argument>
+						<!-- job name -->
+						<argument>job1</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
