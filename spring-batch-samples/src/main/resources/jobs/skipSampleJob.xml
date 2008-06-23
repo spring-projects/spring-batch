@@ -34,8 +34,9 @@
 				<bean id="step2" parent="skipLimitStep">
 					<property name="commitInterval" value="2" />
 					<property name="skipLimit" value="1" />
-					<property name="noRollbackForExceptionClasses"
-						value="org.springframework.batch.item.validator.ValidationException" />
+					<!-- No rollback for exceptions that are marked with "+" in the tx attributes -->
+					<property name="transactionAttribute"
+						value="+org.springframework.batch.item.validator.ValidationException" />
 					<property name="itemReader"
 						ref="tradeSqlItemReader" />
 					<property name="itemWriter"

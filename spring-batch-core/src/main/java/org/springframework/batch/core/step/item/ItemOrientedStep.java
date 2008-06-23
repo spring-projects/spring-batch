@@ -101,7 +101,7 @@ public class ItemOrientedStep extends AbstractStep {
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
-	
+
 	/**
 	 * Public setter for the {@link TransactionAttribute}.
 	 * @param transactionAttribute the {@link TransactionAttribute} to set
@@ -109,7 +109,7 @@ public class ItemOrientedStep extends AbstractStep {
 	public void setTransactionAttribute(TransactionAttribute transactionAttribute) {
 		this.transactionAttribute = transactionAttribute;
 	}
-	
+
 	/**
 	 * Public setter for the {@link ItemHandler}.
 	 * 
@@ -245,7 +245,18 @@ public class ItemOrientedStep extends AbstractStep {
 
 				try {
 
-					exitStatus = processChunk(stepExecution, contribution);
+					try {
+						exitStatus = processChunk(stepExecution, contribution);
+					} catch (Error e) {
+						if (transactionAttribute.rollbackOn(e)) {
+							throw e;
+						}
+					} catch (Exception e) {
+						if (transactionAttribute.rollbackOn(e)) {
+							throw e;
+						}						
+					}
+
 					contribution.incrementCommitCount();
 
 					// If the step operations are asynchronous then we need
@@ -265,9 +276,30 @@ public class ItemOrientedStep extends AbstractStep {
 
 					// Attempt to flush before the step execution and stream
 					// state are updated
-					itemHandler.flush();
+					try {
+						itemHandler.flush();
+					} catch (Error e) {
+						if (transactionAttribute.rollbackOn(e)) {
+							throw e;
+						}
+					} catch (Exception e) {
+						if (transactionAttribute.rollbackOn(e)) {
+							throw e;
+						}						
+					}
 
-					stream.update(stepExecution.getExecutionContext());
+					try {
+						stream.update(stepExecution.getExecutionContext());
+					} catch (Error e) {
+						if (transactionAttribute.rollbackOn(e)) {
+							throw e;
+						}
+					} catch (Exception e) {
+						if (transactionAttribute.rollbackOn(e)) {
+							throw e;
+						}						
+					}
+
 					try {
 						getJobRepository().saveOrUpdateExecutionContext(stepExecution);
 					}

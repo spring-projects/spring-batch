@@ -29,6 +29,7 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.StringUtils;
 
 /**
@@ -97,10 +98,14 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 	/**
 	 * Check skippable write exception does not cause rollback when included on
-	 * {@link SkipLimitStepFactoryBean#setNoRollbackForExceptionClasses(Class[])}.
+	 * transaction attributes as "no rollback for".
 	 */
 	public void testSkipWithoutRethrow() throws Exception {
-		factory.setNoRollbackForExceptionClasses(new Class[] { SkippableRuntimeException.class });
+		factory.setTransactionAttribute(new DefaultTransactionAttribute() {
+			public boolean rollbackOn(Throwable ex) {
+				return !(ex instanceof SkippableRuntimeException);
+			};
+		});
 		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);

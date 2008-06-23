@@ -41,7 +41,7 @@ import org.springframework.batch.support.SubclassExceptionClassifier;
  * 
  * Skippable exceptions on write will by default cause transaction rollback - to
  * avoid rollback for specific exception class include it in the
- * {@link #setNoRollbackForExceptionClasses(Class[])} list.
+ * transaction attribute as "no rollback for".
  * 
  * @see SimpleStepFactoryBean
  * 
@@ -56,8 +56,6 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	private Class[] skippableExceptionClasses = new Class[] { Exception.class };
 
 	private Class[] fatalExceptionClasses = new Class[] { Error.class };
-
-	private Class[] noRollbackForExceptionClasses = new Class[] {};
 
 	private ItemKeyGenerator itemKeyGenerator;
 
@@ -170,18 +168,6 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	}
 
 	/**
-	 * Skippable noRollbackForExceptionClasses will *not* cause transaction
-	 * rollback.
-	 * 
-	 * @param noRollbackForExceptionClasses empty by default
-	 * 
-	 * @see #setSkippableExceptionClasses(Class[])
-	 */
-	public void setNoRollbackForExceptionClasses(Class[] noRollbackForExceptionClasses) {
-		this.noRollbackForExceptionClasses = noRollbackForExceptionClasses;
-	}
-
-	/**
 	 * Uses the {@link #setSkipLimit(int)} value to configure item handler and
 	 * and exception handler.
 	 */
@@ -218,8 +204,11 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 			getStepOperations().setExceptionHandler(
 					new SimpleRetryExceptionHandler(retryPolicy, getExceptionHandler(), fatalExceptionClasses));
 
-			RecoveryCallbackRetryPolicy recoveryCallbackRetryPolicy = new RecoveryCallbackRetryPolicy(retryPolicy);
-			recoveryCallbackRetryPolicy.setRecoverableExceptionClasses(noRollbackForExceptionClasses);
+			RecoveryCallbackRetryPolicy recoveryCallbackRetryPolicy = new RecoveryCallbackRetryPolicy(retryPolicy) {
+				protected boolean recoverForException(Throwable ex) {
+					return !getTransactionAttribute().rollbackOn(ex);
+				}
+			};
 			if (cacheCapacity > 0) {
 				recoveryCallbackRetryPolicy.setRetryContextCache(new MapRetryContextCache(cacheCapacity));
 			}

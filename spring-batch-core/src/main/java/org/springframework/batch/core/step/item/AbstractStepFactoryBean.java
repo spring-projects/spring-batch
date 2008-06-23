@@ -26,6 +26,7 @@ import org.springframework.batch.item.validator.Validator;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.util.Assert;
 
@@ -194,6 +195,14 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 	 */
 	public void setTransactionAttribute(TransactionAttribute transactionAttribute) {
 		this.transactionAttribute = transactionAttribute;
+	}
+
+	/**
+	 * Protected getter for the {@link TransactionAttribute} for subclasses only.
+	 * @return the transactionAttribute
+	 */
+	protected TransactionAttribute getTransactionAttribute() {
+		return transactionAttribute!=null?transactionAttribute:new DefaultTransactionAttribute();
 	}
 
 	/**
