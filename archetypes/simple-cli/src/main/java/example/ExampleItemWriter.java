@@ -11,7 +11,7 @@ import org.springframework.batch.item.ItemWriter;
  */
 public class ExampleItemWriter extends AbstractItemWriter {
 
-	private static final Log log = LogFactory.getLog(ExampleItemWriterTests.class);
+	private static final Log log = LogFactory.getLog(ExampleItemWriter.class);
 	
 	/**
 	 * @see ItemWriter#write(Object)
