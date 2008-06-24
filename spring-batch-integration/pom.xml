@@ -12,7 +12,6 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<properties>
-		<spring.framework.version>2.5.4.A</spring.framework.version>
 		<spring.integration.version>1.0.0.M4</spring.integration.version>
 	</properties>
 	<profiles>
@@ -84,31 +83,31 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.context</artifactId>
+			<artifactId>spring-context</artifactId>
 			<version>${spring.framework.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.aop</artifactId>
+			<artifactId>spring-aop</artifactId>
 			<version>${spring.framework.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.jms</artifactId>
+			<artifactId>spring-jms</artifactId>
 			<version>${spring.framework.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.transaction</artifactId>
+			<artifactId>spring-tx</artifactId>
 			<version>${spring.framework.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.test</artifactId>
+			<artifactId>spring-test</artifactId>
 			<version>${spring.framework.version}</version>
 			<scope>test</scope>
 		</dependency>

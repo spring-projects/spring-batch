@@ -153,10 +153,11 @@ public class ChunkMessageChannelItemWriter extends StepExecutionListenerSupport 
 	private boolean waitForResults() {
 		// TODO: cumulative timeout, or throw an exception?
 		int count = 0;
-		while (localState.getExpecting() > 0 && count++ < 10) {
+		int maxCount = 10;
+		while (localState.getExpecting() > 0 && count++ < maxCount) {
 			getNextResult(100);
 		}
-		return count < 10;
+		return count < maxCount;
 	}
 
 	/**
