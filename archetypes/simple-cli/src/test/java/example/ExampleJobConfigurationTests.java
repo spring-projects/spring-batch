@@ -18,8 +18,6 @@ package example;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
-import junit.framework.TestCase;
-
 /**
  * @author Dave Syer
  *
