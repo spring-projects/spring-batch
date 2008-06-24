@@ -30,6 +30,10 @@ public interface Job {
 
 	String getName();
 
+	/**
+	 * @deprecated planned for removal in 2.0
+	 * @return the {@link Step}s executed as part of this job.
+	 */
 	List getSteps();
 
 	boolean isRestartable();

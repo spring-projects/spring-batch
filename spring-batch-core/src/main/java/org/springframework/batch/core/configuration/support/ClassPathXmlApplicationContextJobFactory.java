@@ -117,6 +117,7 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory {
 		}
 
 		/**
+		 * @deprecated planned for removal in 2.0
 		 * @see org.springframework.batch.core.Job#getSteps()
 		 */
 		public List getSteps() {
