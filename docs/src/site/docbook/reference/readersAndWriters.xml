@@ -1139,6 +1139,42 @@
     in more detail in Chapter 4. For now, it is sufficient to know that the
     proxy must be registered.</para>
   </section>
+  
+  <section>
+  	<title>Multi-file input</title>
+  	
+  	<para>
+  	It a is common requirement to process multiple files in a single step 
+  	(e.g. all files in given directory, or files matching given pattern).
+  	<classname>MultiResourceItemReader</classname> supports multi-file input by wrapping a delegate 
+  	<classname>ResourceAwareItemReaderItemStream</classname> (both <classname>FlatFileItemReader</classname> 
+  	and <classname>StaxEventItemReader</classname> implement this interface). 
+  	<classname>MultiResourceItemReader</classname> uses the delegate to read items from the resource and
+  	takes care of correct rollback functionality (potentially spanning file boundaries) as well as efficient 
+  	restart (skips already processed files without re-reading them). 
+  	</para>
+  	
+  	<para>
+  	To restart correctly file ordering needs to be preserved
+  	between job runs, which may not be easy to guarantee. In such circumstances we suggest to use
+  	<classname>SortedMultiResourceItemReader</classname> which first sorts resources using injected 
+  	<classname>Comparator</classname>. By default resources are ordered alphabetically by filename. 
+  	</para>
+  	
+  	<para>
+	Below is an example configuration where the <classname>SortedMultiResourceItemReader</classname>
+	is configured to read multiple flat files (note standard Spring syntax is used to specify the resources):
+  	</para>
+  	
+  	<programlisting><![CDATA[
+    <bean id="multiResourceReader" class="org.springframework.batch.item.SortedMultiResourceItemReader">
+	  <property name="resources" value="classpath:data/multiResourceJob/input/file-*.txt" />
+	  <property name="delegate" ref="flatFileItemReader" />
+    </bean>
+ 	]]>
+  	</programlisting>
+  	
+  </section>
 
   <section>
     <title id="infrastructure.2.2">Database</title>
