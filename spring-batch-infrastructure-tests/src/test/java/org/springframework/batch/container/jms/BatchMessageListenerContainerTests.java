@@ -139,7 +139,14 @@ public class BatchMessageListenerContainerTests extends TestCase {
 	private BatchMessageListenerContainer getContainer(RepeatTemplate template) {
 		MockControl connectionFactoryControl = MockControl.createControl(ConnectionFactory.class);
 		ConnectionFactory connectionFactory = (ConnectionFactory) connectionFactoryControl.getMock();
-		BatchMessageListenerContainer container = new BatchMessageListenerContainer();
+		// Yuck: we need to turn these method in base class to no-ops because the invoker is a private class
+		// we can't create for test purposes...
+		BatchMessageListenerContainer container = new BatchMessageListenerContainer() {
+			protected void messageReceived(Object invoker, Session session) {
+			}
+			protected void noMessageReceived(Object invoker, Session session) {
+			}
+		};
 		RepeatOperationsInterceptor interceptor = new RepeatOperationsInterceptor();
 		interceptor.setRepeatOperations(template);
 		container.setAdviceChain(new Advice[] {interceptor});
@@ -193,11 +200,12 @@ public class BatchMessageListenerContainerTests extends TestCase {
 
 	private boolean doExecute(Session session, MessageConsumer consumer) throws IllegalAccessException {
 		Method method = ReflectionUtils.findMethod(container.getClass(), "receiveAndExecute", new Class[] {
-				Session.class, MessageConsumer.class });
+				Object.class, Session.class, MessageConsumer.class });
 		method.setAccessible(true);
 		boolean received;
 		try {
-			received = ((Boolean) method.invoke(container, new Object[] { session, consumer })).booleanValue();
+			// A null invoker is not normal, but we don't care about the invoker for a unit test
+			received = ((Boolean) method.invoke(container, new Object[] { null, session, consumer })).booleanValue();
 		}
 		catch (InvocationTargetException e) {
 			if (e.getCause() instanceof RuntimeException) {

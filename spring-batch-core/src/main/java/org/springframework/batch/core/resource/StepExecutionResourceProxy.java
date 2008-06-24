@@ -189,6 +189,15 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 	}
 
 	/**
+	 * @see org.springframework.core.io.Resource#lastModified()
+	 */
+	public long lastModified() throws IOException {
+		Assert.state(delegate != null, "The delegate resource has not been initialised. "
+				+ "Remember to register this object as a StepListener.");
+		return delegate.lastModified();
+	}
+
+	/**
 	 * Public setter for the {@link JobParametersConverter} used to translate
 	 * {@link JobParameters} into {@link Properties}. Defaults to a
 	 * {@link DefaultJobParametersConverter}.

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -17,6 +18,7 @@
 		<module>spring-batch-samples</module>
 		<module>spring-batch-integration</module>
 		<module>docs</module>
+		<module>archetypes</module>
 	</modules>
 	<url>http://www.springframework.org/spring-batch</url>
 	<organization>
@@ -61,7 +63,7 @@
 	</licenses>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-		<spring.framework.version>2.5.2</spring.framework.version>
+		<spring.framework.version>2.5.5</spring.framework.version>
 	</properties>
 	<profiles>
 		<profile>

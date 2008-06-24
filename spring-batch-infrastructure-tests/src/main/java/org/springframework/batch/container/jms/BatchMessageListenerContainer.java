@@ -58,19 +58,19 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 	 * 
 	 */
 	public static interface ContainerDelegate {
-		boolean receiveAndExecute(Session session, MessageConsumer consumer) throws JMSException;
+		boolean receiveAndExecute(Object invoker, Session session, MessageConsumer consumer) throws JMSException;
 	}
 
 	private Advice[] advices = new Advice[0];
 
 	private ContainerDelegate delegate = new ContainerDelegate() {
-		public boolean receiveAndExecute(Session session, MessageConsumer consumer) throws JMSException {
-			return BatchMessageListenerContainer.super.receiveAndExecute(session, consumer);
+		public boolean receiveAndExecute(Object invoker, Session session, MessageConsumer consumer) throws JMSException {
+			return BatchMessageListenerContainer.super.receiveAndExecute(invoker, session, consumer);
 		}
 	};
-	
+
 	private ContainerDelegate proxy = delegate;
-	
+
 	/**
 	 * Public setter for the {@link Advice}.
 	 * @param advices the advice to set
@@ -81,7 +81,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 
 	/**
 	 * Set up interceptor with provided advice on the
-	 * {@link #receiveAndExecute(Session, MessageConsumer)} method.
+	 * {@link #receiveAndExecute(Object, Session, MessageConsumer)} method.
 	 * 
 	 * @see org.springframework.jms.listener.AbstractJmsListeningContainer#afterPropertiesSet()
 	 */
@@ -117,11 +117,12 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 
 	/**
 	 * Override base class method to wrap call in advice if provided.
-	 * @see org.springframework.jms.listener.AbstractPollingMessageListenerContainer#receiveAndExecute(javax.jms.Session,
-	 * javax.jms.MessageConsumer)
+	 * @see org.springframework.jms.listener.AbstractPollingMessageListenerContainer#receiveAndExecute(Object,
+	 * javax.jms.Session, javax.jms.MessageConsumer)
 	 */
-	protected boolean receiveAndExecute(final Session session, final MessageConsumer consumer) throws JMSException {
-		return proxy.receiveAndExecute(session, consumer);
+	protected boolean receiveAndExecute(final Object invoker, final Session session, final MessageConsumer consumer)
+			throws JMSException {
+		return proxy.receiveAndExecute(invoker, session, consumer);
 	}
 
 	/**
@@ -139,7 +140,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 		factory.setProxyTargetClass(false);
 		factory.addInterface(ContainerDelegate.class);
 		factory.setTarget(delegate);
-		proxy = (ContainerDelegate) factory.getProxy();		
+		proxy = (ContainerDelegate) factory.getProxy();
 	}
 
 }
