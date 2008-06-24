@@ -8,9 +8,11 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.repository.dao.AbstractJobDaoTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.util.ClassUtils;
 
 public class JdbcCursorItemReaderPreparedStatementIntegrationTests extends
 	AbstractTransactionalDataSourceSpringContextTests {
@@ -56,6 +58,6 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests extends
 	}
 	
 	protected String[] getConfigLocations() {
-		return new String[] { "data-source-context.xml" };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(AbstractJobDaoTests.class, "data-source-context.xml") };
 	}
 }

@@ -39,6 +39,7 @@
 		<config>src/main/resources/jobs/compositeItemWriterSampleJob.xml</config>
 		<config>src/main/resources/jobs/multiResourceJob.xml</config>
 		<config>src/main/resources/jobs/jobExecutionContextSample.xml</config>
+		<config>src/main/resources/hibernate-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

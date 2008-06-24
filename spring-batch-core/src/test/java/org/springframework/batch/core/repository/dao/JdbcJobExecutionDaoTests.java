@@ -1,5 +1,7 @@
 package org.springframework.batch.core.repository.dao;
 
+import org.springframework.util.ClassUtils;
+
 public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 	protected JobExecutionDao getJobExecutionDao() {
@@ -14,7 +16,7 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 	}
 
 	protected String[] getConfigLocations() {
-		return new String[] { "sql-dao-test.xml" };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "sql-dao-test.xml") };
 	}
 
 }

@@ -3,6 +3,7 @@ package org.springframework.batch.core.repository.dao;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.util.ClassUtils;
 
 public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 
@@ -17,7 +18,7 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 	}
 
 	protected String[] getConfigLocations() {
-		return new String[] { "sql-dao-test.xml" };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "sql-dao-test.xml") };
 	}
 
 	/**

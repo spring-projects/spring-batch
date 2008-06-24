@@ -28,6 +28,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.AbstractJobDaoTests;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
@@ -43,6 +44,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.ClassUtils;
 
 /**
  * @author Dave Syer
@@ -118,7 +120,7 @@ public class ItemOrientedStepIntegrationTests extends AbstractDependencyInjectio
 	 * @see org.springframework.test.AbstractSingleSpringContextTests#getConfigLocations()
 	 */
 	protected String[] getConfigLocations() {
-		return new String[] { "sql-dao-test.xml" };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(AbstractJobDaoTests.class, "sql-dao-test.xml") };
 	}
 
 	public void testStatusForCommitFailedException() throws Exception {

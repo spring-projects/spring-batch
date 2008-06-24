@@ -29,6 +29,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.util.ClassUtils;
 
 /**
  * @author Dave Syer
@@ -52,7 +53,7 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 	protected Date jobExecutionStartTime = new Date(System.currentTimeMillis());
 
 	protected String[] getConfigLocations() {
-		return new String[] { "sql-dao-test.xml" };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "sql-dao-test.xml") };
 	}
 
 	/**

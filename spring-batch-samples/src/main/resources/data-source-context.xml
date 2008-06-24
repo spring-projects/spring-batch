@@ -12,20 +12,8 @@
 		<property name="username" value="${batch.jdbc.user}" />
 		<property name="password" value="${batch.jdbc.password}" />
 	</bean>
-	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
 		<property name="dataSource" ref="dataSource" />
-		<property name="mappingLocations" value="classpath*:/*.hbm.xml" />
-		<property name="hibernateProperties">
-			<value>
-				<![CDATA[
-			hibernate.show_sql=true
-			hibernate.format_sql=true
-			]]>
-			</value>
-		</property>
-	</bean>
-	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" lazy-init="true">
-		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	<!-- Set up or detect a System property called "environment" used to construct a properties file on the classpath.  The default is "hsql".  -->
 	<bean id="environment" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">

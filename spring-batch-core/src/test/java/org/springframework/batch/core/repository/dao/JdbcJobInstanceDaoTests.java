@@ -1,5 +1,7 @@
 package org.springframework.batch.core.repository.dao;
 
+import org.springframework.util.ClassUtils;
+
 
 public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 	
@@ -10,7 +12,7 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 	}
 	
 	protected String[] getConfigLocations() {
-		return new String[] { "sql-dao-test.xml" };
+		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "sql-dao-test.xml") };
 	}
 
 }
