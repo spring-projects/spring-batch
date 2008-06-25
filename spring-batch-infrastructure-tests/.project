@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>spring-batch-integration</name>
+	<name>spring-batch-infrastructure-tests</name>
 	<comment>Integration tests for the Spring Batch Infrastructure</comment>
 	<projects>
 		<project>spring-batch-infrastructure</project>
