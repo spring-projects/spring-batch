@@ -26,5 +26,13 @@ public class ChunkRequest implements Serializable {
 	public Collection<Object> getItems() {
 		return items;
 	}
+	
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+": jobId="+jobId+", skipCount="+skipCount+", item count="+items.size();
+	}
 
 }

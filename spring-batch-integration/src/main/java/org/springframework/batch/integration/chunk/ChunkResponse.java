@@ -28,4 +28,12 @@ public class ChunkResponse implements Serializable {
 		return exitStatus;
 	}
 
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+": jobId="+jobId+", skipCount="+skipCount+", status="+exitStatus;
+	}
+
 }
