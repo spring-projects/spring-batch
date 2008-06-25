@@ -29,6 +29,7 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -133,9 +134,14 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.item.database.BatchSqlUpdateItemWriter#flush()}.
+	 * @throws SQLException 
 	 */
-	public void testFlush() {
+	public void testFlush() throws SQLException {
 		assertTrue(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
+		ps.addBatch(); // there is one item in the buffer to start
+		control.setVoidCallable();
+		control.expectAndReturn(ps.executeBatch(), new int[0]);
+		control.replay();
 		writer.flush();
 		assertFalse(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		assertEquals(2, list.size());
@@ -149,8 +155,37 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	 */
 	public void testWriteAndFlush() throws Exception {
 		assertTrue(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
+		ps.addBatch();
+		control.setVoidCallable(2);
+		control.expectAndReturn(ps.executeBatch(), new int[] { 123 });
+		control.replay();
 		writer.write("bar");
 		writer.flush();
+		assertFalse(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
+		assertEquals(3, list.size());
+		assertTrue(list.contains("SQL"));
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.database.BatchSqlUpdateItemWriter#flush()}.
+	 * @throws Exception
+	 */
+	public void testWriteAndFlushWithEmptyUpdate() throws Exception {
+		assertTrue(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
+		ps.addBatch();
+		control.setVoidCallable(2);
+		control.expectAndReturn(ps.executeBatch(), new int[] { 0 });
+		control.replay();
+		writer.write("bar");
+		try {
+			writer.flush();
+			fail("Expected EmptyResultDataAccessException");
+		} catch (EmptyResultDataAccessException e) {
+			// expected
+			String message = e.getMessage();
+			assertTrue("Wrong message: "+message, message.indexOf("did not update")>=0);
+		}
 		assertFalse(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		assertEquals(3, list.size());
 		assertTrue(list.contains("SQL"));

@@ -17,14 +17,16 @@ package org.springframework.batch.item.database;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.util.Assert;
@@ -67,6 +69,17 @@ public class BatchSqlUpdateItemWriter extends AbstractTransactionalResourceItemW
 
 	private String sql;
 
+	private boolean assertUpdates = true;
+
+	/**
+	 * Public setter for the flag that determines whether an assertion is made
+	 * that all items cause at least one row to be updated.
+	 * @param assertUpdates the flag to set. Defaults to true;
+	 */
+	public void setAssertUpdates(boolean assertUpdates) {
+		this.assertUpdates = assertUpdates;
+	}
+
 	/**
 	 * Public setter for the query string to execute on write. The parameters
 	 * should correspond to those known to the
@@ -104,11 +117,15 @@ public class BatchSqlUpdateItemWriter extends AbstractTransactionalResourceItemW
 
 	/**
 	 * Create and execute batch prepared statement.
+	 * @throws EmptyResultDataAccessException if any of the items does not cause an update
 	 */
-	protected void doFlush() {
-		final Set processed = getProcessed();
+	protected void doFlush() throws EmptyResultDataAccessException {
+
+		final List processed = new ArrayList(getProcessed());
+
 		if (!processed.isEmpty()) {
-			jdbcTemplate.execute(sql, new PreparedStatementCallback() {
+
+			int[] values = (int[]) jdbcTemplate.execute(sql, new PreparedStatementCallback() {
 				public Object doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
 					for (Iterator iterator = processed.iterator(); iterator.hasNext();) {
 						Object item = (Object) iterator.next();
@@ -118,7 +135,19 @@ public class BatchSqlUpdateItemWriter extends AbstractTransactionalResourceItemW
 					return ps.executeBatch();
 				}
 			});
+
+			if (assertUpdates) {
+				for (int i = 0; i < values.length; i++) {
+					int value = values[i];
+					if (value == 0) {
+						throw new EmptyResultDataAccessException("Item " + i + " of " + values.length
+								+ " did not update any rows: [" + processed.get(i) + "]", 1);
+					}
+				}
+			}
+
 		}
+
 	}
 
 	protected String getResourceKey() {
@@ -130,7 +159,7 @@ public class BatchSqlUpdateItemWriter extends AbstractTransactionalResourceItemW
 	 */
 	protected void doWrite(Object output) {
 	}
-	
+
 	/**
 	 * No-op.
 	 */
