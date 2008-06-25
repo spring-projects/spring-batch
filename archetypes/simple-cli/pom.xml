@@ -2,17 +2,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.springframework.batch</groupId>
 	<artifactId>simple-cli-archetype</artifactId>
+	<version>1.1.0.DEV-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Spring Batch Simple Commandline Archetype</name>
-
-	<parent>
-		<groupId>org.springframework.batch</groupId>
-		<artifactId>spring-batch-archetypes</artifactId>
-		<version>1.1.0.DEV-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
-
 
 	<description>
 		<![CDATA[
@@ -21,6 +15,20 @@
       see the job run.
     ]]>
 	</description>
+
+	<properties>
+		<maven.test.failure.ignore>true</maven.test.failure.ignore>
+		<spring.framework.version>2.5.5</spring.framework.version>
+	</properties>
+	
+	<profiles>
+		<profile>
+			<id>strict</id>
+			<properties>
+				<maven.test.failure.ignore>false</maven.test.failure.ignore>
+			</properties>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		<dependency>
@@ -104,5 +112,12 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>Codehaus</id>
+			<url>http://repository.codehaus.org/</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 </project>

@@ -2,11 +2,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-archetypes</artifactId>
+	<version>1.1.0.DEV-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Archetypes</name>
 	<description>
-	<![CDATA[
+		<![CDATA[
 	Spring Batch archetypes are simple project templates containing just enough code
 	to get you started running a job.  For more detailed examples of using particular 
 	features of the framework, look at the Spring Batch Samples	project.  Currently the 
@@ -16,22 +18,8 @@
 ]]>
 	</description>
 
-	<parent>
-		<groupId>org.springframework.batch</groupId>
-		<artifactId>spring-batch</artifactId>
-		<version>1.1.0.DEV-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
-
 	<modules>
 		<module>simple-cli</module>
 	</modules>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>Codehaus</id>
-			<url>http://repository.codehaus.org/</url>
-		</pluginRepository>
-	</pluginRepositories>
 
 </project>
