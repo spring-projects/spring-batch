@@ -11,7 +11,7 @@
 	<description>
 		<![CDATA[
       This project is a minimal command line batch sample from
-      Spring Batch.  Once installed you can use "mvn exec:exec" to 
+      Spring Batch.  Once installed you can use "mvn exec:java" to 
       see the job run.
     ]]>
 	</description>
@@ -96,13 +96,8 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.1</version>
 				<configuration>
-					<executable>java</executable>
+					<mainClass>org.springframework.batch.core.launch.support.CommandLineJobRunner</mainClass>
 					<arguments>
-						<argument>-classpath</argument>
-						<!-- automatically creates the classpath using all project dependencies, 
-							also adding the project build directory -->
-						<classpath />
-						<argument>org.springframework.batch.core.launch.support.CommandLineJobRunner</argument>
 						<!-- job configuration file -->
 						<argument>example/simpleJob.xml</argument>
 						<!-- job name -->
