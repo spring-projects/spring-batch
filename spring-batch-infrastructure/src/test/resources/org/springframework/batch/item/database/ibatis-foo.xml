@@ -25,6 +25,10 @@
   <select id="getAllFooIdsRestart" resultClass="int">
   	select ID from T_FOOS where ID > #id#
   </select>
+  
+  <select id="getNoFoos" resultMap="fooResult">
+  	select ID, NAME, VALUE from T_FOOS where ID = -1
+  </select>
 
   <insert id="insertFoo" parameterClass="org.springframework.batch.item.sample.Foo">
   	insert INTO T_WRITE_FOOS (ID, NAME, VALUE) VALUES (#id#, #name#, #value#)

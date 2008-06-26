@@ -26,7 +26,7 @@ public interface KeyCollector {
 	 * 
 	 * @param executionContext ExecutionContext containing any potential initial state
 	 * that could potentially be used to retrieve the correct keys.
-	 * @return list of keys returned by the driving query
+	 * @return list of keys returned by the driving query (can be empty but not null)
 	 */
 	List retrieveKeys(ExecutionContext executionContext);
 	

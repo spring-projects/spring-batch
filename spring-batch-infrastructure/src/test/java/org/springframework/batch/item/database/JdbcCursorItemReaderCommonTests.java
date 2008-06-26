@@ -1,5 +1,6 @@
 package org.springframework.batch.item.database;
 
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 
 public class JdbcCursorItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
@@ -28,6 +29,14 @@ public class JdbcCursorItemReaderCommonTests extends CommonDatabaseItemStreamIte
 		testedAsStream().open(executionContext);
 
 		testRestart();
+	}
+
+	protected void pointToEmptyInput(ItemReader tested) throws Exception {
+		JdbcCursorItemReader reader = (JdbcCursorItemReader) tested;
+		reader.close(new ExecutionContext());
+		reader.setSql("select ID from T_FOOS where ID < 0");
+		reader.afterPropertiesSet();
+		reader.open(new ExecutionContext());		
 	}
 
 }

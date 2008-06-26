@@ -7,7 +7,8 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
-public class MultiResourceItemReaderFlatFileTests extends CommonItemStreamItemReaderTests {
+public class MultiResourceItemReaderFlatFileTests extends
+		CommonItemStreamItemReaderTests {
 
 	protected ItemReader getItemReader() throws Exception {
 
@@ -35,6 +36,16 @@ public class MultiResourceItemReaderFlatFileTests extends CommonItemStreamItemRe
 		multiReader.afterPropertiesSet();
 
 		return multiReader;
+	}
+
+	protected void pointToEmptyInput(ItemReader tested) throws Exception {
+		MultiResourceItemReader multiReader = (MultiResourceItemReader) tested;
+		multiReader.close(new ExecutionContext());
+		multiReader.setResources(new Resource[] { new ByteArrayResource(""
+				.getBytes()) });
+		multiReader.afterPropertiesSet();
+		multiReader.open(new ExecutionContext());
+		
 	}
 
 }

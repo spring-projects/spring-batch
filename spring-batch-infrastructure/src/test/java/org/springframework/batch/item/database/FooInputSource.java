@@ -9,17 +9,21 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 class FooItemReader implements ItemStream, ItemReader, DisposableBean, InitializingBean {
 
-	DrivingQueryItemReader inputSource;
+	DrivingQueryItemReader itemReader;
+
+	public void setItemReader(DrivingQueryItemReader itemReader) {
+		this.itemReader = itemReader;
+	}
 
 	FooDao fooDao = new SingleKeyFooDao();
 
 	public FooItemReader(DrivingQueryItemReader inputSource, JdbcTemplate jdbcTemplate) {
-		this.inputSource = inputSource;
+		this.itemReader = inputSource;
 		fooDao.setJdbcTemplate(jdbcTemplate);
 	}
 
 	public Object read() {
-		Object key = inputSource.read();
+		Object key = itemReader.read();
 		if (key != null) {
 			return fooDao.getFoo(key);
 		}
@@ -29,11 +33,11 @@ class FooItemReader implements ItemStream, ItemReader, DisposableBean, Initializ
 	}
 
 	public void update(ExecutionContext executionContext) {
-		inputSource.update(executionContext);
+		itemReader.update(executionContext);
 	}
 
 	public void destroy() throws Exception {
-		inputSource.close(null);
+		itemReader.close(null);
 	}
 
 	public void setFooDao(FooDao fooDao) {
@@ -44,11 +48,11 @@ class FooItemReader implements ItemStream, ItemReader, DisposableBean, Initializ
 	}
 
 	public void open(ExecutionContext executionContext) {
-		inputSource.open(executionContext);
+		itemReader.open(executionContext);
 	};
 
 	public void close(ExecutionContext executionContext) {
-		inputSource.close(executionContext);
+		itemReader.close(executionContext);
 	}
 
 	/*
@@ -56,7 +60,7 @@ class FooItemReader implements ItemStream, ItemReader, DisposableBean, Initializ
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
 	 */
 	public void mark() {
-		inputSource.mark();
+		itemReader.mark();
 	}
 
 	/*
@@ -64,6 +68,6 @@ class FooItemReader implements ItemStream, ItemReader, DisposableBean, Initializ
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
 	 */
 	public void reset() {
-		inputSource.reset();
+		itemReader.reset();
 	};
 }

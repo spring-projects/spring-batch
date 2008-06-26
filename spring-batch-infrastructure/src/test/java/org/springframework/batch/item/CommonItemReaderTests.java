@@ -45,12 +45,13 @@ public abstract class CommonItemReaderTests extends TestCase {
 	}
 
 	/**
-	 * Rollback scenario - reader resets to last marked point.
+	 * Rollback scenario - reader resets to last marked point. Note the commit
+	 * interval can change dynamically.
 	 */
 	public void testReset() throws Exception {
 		Foo foo1 = (Foo) tested.read();
 		assertEquals(1, foo1.getValue());
-		
+
 		tested.mark();
 
 		Foo foo2 = (Foo) tested.read();
@@ -62,31 +63,48 @@ public abstract class CommonItemReaderTests extends TestCase {
 		tested.reset();
 
 		assertEquals(foo2, tested.read());
-		
-//		TODO handle shortening the commit interval on the fly
-		
+
 		tested.mark();
-		
+
 		assertEquals(foo3, tested.read());
-		
+
 		tested.reset();
-		
+
 		assertEquals(foo3, tested.read());
 
 		Foo foo4 = (Foo) tested.read();
 		assertEquals(4, foo4.getValue());
-		
+
 		tested.mark();
-		
+
 		Foo foo5 = (Foo) tested.read();
 		assertEquals(5, foo5.getValue());
-		
+
 		tested.reset();
-		
+
 		assertEquals(foo5, tested.read());
-		
+
 		assertNull(tested.read());
-		
+
 	}
+
+	/**
+	 * Empty input should be handled gracefully - null is returned on first
+	 * read.
+	 */
+	public void testEmptyInput() throws Exception {
+		pointToEmptyInput(tested);
+		assertNull(tested.read());
+	}
+
+	/**
+	 * Point the reader to empty input (close and open if necessary for the new
+	 * settings to apply).
+	 * 
+	 * @param tested
+	 *            the reader
+	 */
+	protected abstract void pointToEmptyInput(ItemReader tested)
+			throws Exception;
 
 }

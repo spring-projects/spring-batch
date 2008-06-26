@@ -1,6 +1,7 @@
 package org.springframework.batch.item.file;
 
 import org.springframework.batch.item.CommonItemStreamItemReaderTests;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
@@ -27,6 +28,16 @@ public class FlatFileItemReaderCommonTests extends CommonItemStreamItemReaderTes
 		tested.setSaveState(true);
 		tested.afterPropertiesSet();
 		return tested;
+	}
+
+	protected void pointToEmptyInput(ItemReader tested) throws Exception {
+		FlatFileItemReader reader = (FlatFileItemReader) tested;
+		reader.close(new ExecutionContext());
+		
+		reader.setResource(new ByteArrayResource("".getBytes()));
+		reader.afterPropertiesSet();
+		
+		reader.open(new ExecutionContext());
 	}
 
 }

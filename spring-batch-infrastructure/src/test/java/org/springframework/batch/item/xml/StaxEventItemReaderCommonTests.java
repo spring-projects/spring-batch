@@ -6,6 +6,7 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 
 import org.springframework.batch.item.CommonItemStreamItemReaderTests;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
@@ -38,6 +39,16 @@ public class StaxEventItemReaderCommonTests extends CommonItemStreamItemReaderTe
 		reader.setSaveState(true);
 		reader.afterPropertiesSet();
 		return reader;
+	}
+
+	protected void pointToEmptyInput(ItemReader tested) throws Exception {
+		StaxEventItemReader reader = (StaxEventItemReader) tested;
+		reader.close(new ExecutionContext());
+		
+		reader.setResource(new ByteArrayResource("<foos />".getBytes()));
+		reader.afterPropertiesSet();
+		
+		reader.open(new ExecutionContext());
 	}
 
 }

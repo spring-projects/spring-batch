@@ -21,7 +21,6 @@ import java.util.List;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -76,7 +75,7 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean, Ite
 
 	private int lastCommitIndex = 0;
 
-	private KeyCollector keyGenerator;
+	private KeyCollector keyCollector;
 
 	private boolean saveState = false;
 
@@ -148,10 +147,8 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean, Ite
 
 		Assert.state(keys == null && !initialized, "Cannot open an already opened item reader"
 				+ ", call close() first.");
-		keys = keyGenerator.retrieveKeys(executionContext);
-		if (keys == null || keys.size() == 0) {
-			throw new NoWorkFoundException("KeyGenerator must return at least 1 key");
-		}
+		keys = keyCollector.retrieveKeys(executionContext);
+		Assert.notNull(keys, "Keys must not be null");
 		keysIterator = keys.listIterator();
 		initialized = true;
 	}
@@ -160,22 +157,22 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean, Ite
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			if (getCurrentKey() != null) {
-				keyGenerator.updateContext(getCurrentKey(), executionContext);
+				keyCollector.updateContext(getCurrentKey(), executionContext);
 			}
 		}
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(keyGenerator, "The KeyGenerator must not be null.");
+		Assert.notNull(keyCollector, "The KeyGenerator must not be null.");
 	}
 
 	/**
 	 * Set the key generation strategy to use for this input source.
 	 * 
-	 * @param keyGenerator
+	 * @param keyCollector
 	 */
-	public void setKeyCollector(KeyCollector keyGenerator) {
-		this.keyGenerator = keyGenerator;
+	public void setKeyCollector(KeyCollector keyCollector) {
+		this.keyCollector = keyCollector;
 	}
 
 	/**

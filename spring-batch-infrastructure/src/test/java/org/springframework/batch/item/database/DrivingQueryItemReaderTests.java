@@ -9,36 +9,34 @@ import junit.framework.TestCase;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
 public class DrivingQueryItemReaderTests extends TestCase {
-	
+
 	DrivingQueryItemReader itemReader;
-	
+
 	static {
 		TransactionSynchronizationManager.initSynchronization();
 	}
-	
+
 	protected void setUp() throws Exception {
 		super.setUp();
-		
+
 		itemReader = createItemReader();
 	}
-	
-	private DrivingQueryItemReader createItemReader() throws Exception{
-		
+
+	private DrivingQueryItemReader createItemReader() throws Exception {
+
 		DrivingQueryItemReader inputSource = new DrivingQueryItemReader();
 		inputSource.setKeyCollector(new MockKeyGenerator());
 		inputSource.setSaveState(true);
-		
+
 		return inputSource;
 	}
-	
-	
+
 	/**
 	 * Regular scenario - read all rows and eventually return null.
 	 */
@@ -66,14 +64,15 @@ public class DrivingQueryItemReaderTests extends TestCase {
 
 	/**
 	 * Restart scenario.
+	 * 
 	 * @throws Exception
 	 */
 	public void testRestart() throws Exception {
 
 		ExecutionContext executionContext = new ExecutionContext();
-		
+
 		getAsItemStream(itemReader).open(executionContext);
-		
+
 		Foo foo1 = (Foo) itemReader.read();
 		assertEquals(1, foo1.getValue());
 
@@ -97,9 +96,9 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	public void testInvalidRestore() throws Exception {
 
 		ExecutionContext executionContext = new ExecutionContext();
-		
+
 		getAsItemStream(itemReader).open(executionContext);
-		
+
 		Foo foo1 = (Foo) itemReader.read();
 		assertEquals(1, foo1.getValue());
 
@@ -118,15 +117,15 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		try {
 			getAsItemStream(itemReader).open(executionContext);
 			fail();
-		}
-		catch (IllegalStateException ex) {
+		} catch (IllegalStateException ex) {
 			// expected
 		}
 	}
 
 	/**
 	 * Empty restart data should be handled gracefully.
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	public void testRestoreFromEmptyData() throws Exception {
 		ExecutionContext streamContext = new ExecutionContext(new Properties());
@@ -139,7 +138,8 @@ public class DrivingQueryItemReaderTests extends TestCase {
 
 	/**
 	 * Rollback scenario.
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	public void testRollback() throws Exception {
 		getAsItemStream(itemReader).open(new ExecutionContext());
@@ -157,27 +157,25 @@ public class DrivingQueryItemReaderTests extends TestCase {
 
 		assertEquals(foo2, itemReader.read());
 	}
-	
-	public void testRetriveZeroKeys(){
-		
-		itemReader.setKeyCollector(new KeyCollector(){
+
+	public void testRetriveZeroKeys() {
+
+		itemReader.setKeyCollector(new KeyCollector() {
 
 			public List retrieveKeys(ExecutionContext executionContext) {
 				return new ArrayList();
 			}
 
-			public void updateContext(Object key, ExecutionContext executionContext) {
-			}});
-		
-		try{
-			itemReader.open(new ExecutionContext());
-			fail();
-		}
-		catch(NoWorkFoundException ex){
-			//expected
-		}
-	}
+			public void updateContext(Object key,
+					ExecutionContext executionContext) {
+			}
+		});
 
+		itemReader.open(new ExecutionContext());
+		
+		assertNull(itemReader.read());
+
+	}
 
 	private void commit() {
 		itemReader.mark();
@@ -186,7 +184,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	private void rollback() {
 		itemReader.reset();
 	}
-	
+
 	private InitializingBean getAsInitializingBean(ItemReader source) {
 		return (InitializingBean) source;
 	}
@@ -194,46 +192,45 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	private ItemStream getAsItemStream(ItemReader source) {
 		return (ItemStream) source;
 	}
-	
-	private static class MockKeyGenerator implements KeyCollector{
+
+	private static class MockKeyGenerator implements KeyCollector {
 
 		static ExecutionContext streamContext;
 		List keys;
 		List restartKeys;
 		static final String RESTART_KEY = "restart.keys";
-		
-		static{
+
+		static {
 			Properties props = new Properties();
-			//restart data properties cannot be empty.
+			// restart data properties cannot be empty.
 			props.setProperty("", "");
-			
+
 			streamContext = new ExecutionContext(props);
 		}
-		
+
 		public MockKeyGenerator() {
-			
+
 			keys = new ArrayList();
 			keys.add(new Foo(1, "1", 1));
 			keys.add(new Foo(2, "2", 2));
 			keys.add(new Foo(3, "3", 3));
 			keys.add(new Foo(4, "4", 4));
 			keys.add(new Foo(5, "5", 5));
-			
+
 			restartKeys = new ArrayList();
 			restartKeys.add(new Foo(3, "3", 3));
 			restartKeys.add(new Foo(4, "4", 4));
 			restartKeys.add(new Foo(5, "5", 5));
 		}
-		
+
 		public ExecutionContext saveState(Object key) {
 			return streamContext;
 		}
 
 		public List retrieveKeys(ExecutionContext executionContext) {
-			if(executionContext.containsKey(RESTART_KEY)){
+			if (executionContext.containsKey(RESTART_KEY)) {
 				return restartKeys;
-			}
-			else{
+			} else {
 				return keys;
 			}
 		}
@@ -241,7 +238,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		public void updateContext(Object key, ExecutionContext executionContext) {
 			executionContext.put(RESTART_KEY, restartKeys);
 		}
-		
+
 	}
 
 }

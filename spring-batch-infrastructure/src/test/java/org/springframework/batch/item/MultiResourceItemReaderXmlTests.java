@@ -50,5 +50,15 @@ public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderT
 
 		return multiReader;
 	}
+	
+	protected void pointToEmptyInput(ItemReader tested) throws Exception {
+		MultiResourceItemReader multiReader = (MultiResourceItemReader) tested;
+		multiReader.close(new ExecutionContext());
+		multiReader.setResources(new Resource[] { new ByteArrayResource("<foos />"
+				.getBytes()) });
+		multiReader.afterPropertiesSet();
+		multiReader.open(new ExecutionContext());
+		
+	}
 
 }
