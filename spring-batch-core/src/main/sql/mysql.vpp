@@ -1,3 +1,4 @@
 #macro (sequence $name)CREATE TABLE ${name} (ID BIGINT NOT NULL) type=MYISAM;
 INSERT INTO ${name} values(0);
 #end
+#macro (notnull $name $type)MODIFY COLUMN ${name} ${type} NOT NULL#end
