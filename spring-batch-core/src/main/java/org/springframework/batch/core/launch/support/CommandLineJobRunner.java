@@ -116,8 +116,7 @@ import org.springframework.util.StringUtils;
  */
 public class CommandLineJobRunner {
 
-	protected static final Log logger = LogFactory
-			.getLog(CommandLineJobRunner.class);
+	protected static final Log logger = LogFactory.getLog(CommandLineJobRunner.class);
 
 	private ExitCodeMapper exitCodeMapper = new SimpleJvmExitCodeMapper();
 
@@ -132,8 +131,7 @@ public class CommandLineJobRunner {
 	/**
 	 * Injection setter for the {@link JobLauncher}.
 	 * 
-	 * @param launcher
-	 *            the launcher to set
+	 * @param launcher the launcher to set
 	 */
 	public void setLauncher(JobLauncher launcher) {
 		this.launcher = launcher;
@@ -142,8 +140,7 @@ public class CommandLineJobRunner {
 	/**
 	 * Injection setter for the {@link ExitCodeMapper}.
 	 * 
-	 * @param exitCodeMapper
-	 *            the exitCodeMapper to set
+	 * @param exitCodeMapper the exitCodeMapper to set
 	 */
 	public void setExitCodeMapper(ExitCodeMapper exitCodeMapper) {
 		this.exitCodeMapper = exitCodeMapper;
@@ -157,7 +154,7 @@ public class CommandLineJobRunner {
 	public void setSystemExiter(SystemExiter systemExitor) {
 		this.systemExiter = systemExitor;
 	}
-	
+
 	/**
 	 * Injection setter for {@link JobParametersConverter}.
 	 * 
@@ -179,7 +176,6 @@ public class CommandLineJobRunner {
 	public void setJobLocator(JobLocator jobLocator) {
 		this.jobLocator = jobLocator;
 	}
-	
 
 	/*
 	 * Start a job by obtaining a combined classpath using the job launcher and
@@ -192,28 +188,29 @@ public class CommandLineJobRunner {
 
 		try {
 			context = new ClassPathXmlApplicationContext(jobPath);
-			context.getAutowireCapableBeanFactory().autowireBeanProperties(
-					this, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+			context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
+					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 
 			Job job;
 			if (jobLocator != null) {
 				job = jobLocator.getJob(jobName);
-			} else {
+			}
+			else {
 				job = (Job) context.getBean(jobName);
 			}
 
-			JobParameters jobParameters = jobParametersConverter
-					.getJobParameters(StringUtils
-							.splitArrayElementsIntoProperties(parameters, "="));
+			JobParameters jobParameters = jobParametersConverter.getJobParameters(StringUtils
+					.splitArrayElementsIntoProperties(parameters, "="));
 
 			JobExecution jobExecution = launcher.run(job, jobParameters);
-			return exitCodeMapper.intValue(jobExecution.getExitStatus()
-					.getExitCode());
-		} catch (Throwable e) {
+			return exitCodeMapper.intValue(jobExecution.getExitStatus().getExitCode());
+		}
+		catch (Throwable e) {
 			logger.error("Job Terminated in error:", e);
 			return exitCodeMapper.intValue(ExitStatus.FAILED.getExitCode());
-		} finally {
-			if (context!=null) {
+		}
+		finally {
+			if (context != null) {
 				context.close();
 			}
 		}
@@ -225,28 +222,25 @@ public class CommandLineJobRunner {
 	 * such contexts. No exception are thrown from this method, rather
 	 * exceptions are logged and an integer returned through the exit status in
 	 * a {@link JvmSystemExiter} (which can be overridden by defining one in the
-	 * Spring context).
+	 * Spring context).<br/> Parameters can be provided in the form key=value,
+	 * and will be converted using the injected {@link JobParametersConverter}.
 	 * 
 	 * @param args
-	 *            <p>
-	 *            <ul>
-	 *            <li>jobPath: the xml application context containing a
-	 *            {@link Job}
-	 *            <li>jobName: the bean id of the job.
-	 *            <li>jobLauncherPath: the xml application context containing a
-	 *            {@link JobLauncher}
-	 *            <li>jobParameters: 0 to many parameters that will be used to
-	 *            launch a job.
-	 *            </ul>
-	 *            </p>
+	 * <p>
+	 * <ul>
+	 * <li>jobPath: the xml application context containing a {@link Job}
+	 * <li>jobName: the bean id of the job.
+	 * <li>jobParameters: 0 to many parameters that will be used to launch a
+	 * job.
+	 * </ul>
+	 * </p>
 	 */
 	public static void main(String[] args) {
 
 		CommandLineJobRunner command = new CommandLineJobRunner();
 
 		if (args.length < 2) {
-			logger
-					.error("At least 2 arguments are required: JobPath and JobName.");
+			logger.error("At least 2 arguments are required: JobPath and JobName.");
 			command.exit(1);
 		}
 
