@@ -16,7 +16,7 @@ import org.springframework.util.Assert;
  */
 public abstract class AbstractBufferedItemReaderItemStream implements ItemReader, ItemStream {
 
-	private static final String ITEM_COUNT = "piece.count";
+	private static final String PIECE_COUNT = "piece.count";
 
 	private int currentItemCount = 0;
 
@@ -145,8 +145,8 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 			throw new ItemStreamException("Failed to initialize the reader", e);
 		}
 
-		if (executionContext.containsKey(ecSupport.getKey(ITEM_COUNT))) {
-			int itemCount = new Long(executionContext.getLong(ecSupport.getKey(ITEM_COUNT))).intValue();
+		if (executionContext.containsKey(ecSupport.getKey(PIECE_COUNT))) {
+			int itemCount = new Long(executionContext.getLong(ecSupport.getKey(PIECE_COUNT))).intValue();
 
 			try {
 				jumpToItem(itemCount);
@@ -163,7 +163,7 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			executionContext.putLong(ecSupport.getKey(ITEM_COUNT), currentItemCount);
+			executionContext.putLong(ecSupport.getKey(PIECE_COUNT), currentItemCount);
 		}
 
 	}
