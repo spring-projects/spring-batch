@@ -745,11 +745,156 @@
 
       <programlisting>executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());</programlisting>
 
-      <para>The call above will store the current number of lines read into
-      the ExecutionContext. It should be made just before the framework
-      commits. Being notified before a commit requires one of the various
-      StepListeners, or an <classname>ItemStream</classname>, which are
-      discussed in more detail later in this guide. When the
+      <para>Using the EndOfDay example from the Job Stereotypes section as an
+      example, assume there's one step: 'loadData', that loads a file into the
+      database. After the first failed run, the meta data tables would look
+      like the following:</para>
+
+      <para><table>
+          <title>BATCH_JOB_INSTANCE</title>
+
+          <tgroup cols="2">
+            <tbody>
+              <row>
+                <entry>JOB_INSTANCE_ID</entry>
+
+                <entry>JOB_NAME</entry>
+              </row>
+
+              <row>
+                <entry>1</entry>
+
+                <entry>EndOfDayJob</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table><table>
+          <title>BATCH_JOB_PARAMS</title>
+
+          <tgroup cols="4">
+            <tbody>
+              <row>
+                <entry>JOB_INSTANCE_ID</entry>
+
+                <entry>TYPE_CD</entry>
+
+                <entry>KEY_NAME</entry>
+
+                <entry>DATE_VAL</entry>
+              </row>
+
+              <row>
+                <entry>1</entry>
+
+                <entry>DATE</entry>
+
+                <entry>schedule.Date</entry>
+
+                <entry>2008-01-01 00:00:00</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table><table>
+          <title>BATCH_JOB_EXECUTION</title>
+
+          <tgroup cols="5">
+            <tbody>
+              <row>
+                <entry>JOB_EXECUTION_ID</entry>
+
+                <entry>JOB_INSTANCE_ID</entry>
+
+                <entry>START_TIME</entry>
+
+                <entry>END_TIME</entry>
+
+                <entry>STATUS</entry>
+              </row>
+
+              <row>
+                <entry>1</entry>
+
+                <entry>1</entry>
+
+                <entry>2008-01-01 21:00:23.571</entry>
+
+                <entry>2008-01-01 21:30:17.132</entry>
+
+                <entry>FAILED</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table><table>
+          <title>BATCH_STEP_EXECUTION</title>
+
+          <tgroup cols="6">
+            <tbody>
+              <row>
+                <entry>STEP_EXECUTION_ID</entry>
+
+                <entry>JOB_EXECUTION_ID</entry>
+
+                <entry>STEP_NAME</entry>
+
+                <entry>START_TIME</entry>
+
+                <entry>END_TIME</entry>
+
+                <entry>STATUS</entry>
+              </row>
+
+              <row>
+                <entry>1</entry>
+
+                <entry>1</entry>
+
+                <entry>loadDate</entry>
+
+                <entry>2008-01-01 21:00:23.571</entry>
+
+                <entry>2008-01-01 21:30:17.132</entry>
+
+                <entry>FAILED</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table><table>
+          <title>BATCH_EXECUTION_CONTEXT</title>
+
+          <tgroup cols="4">
+            <tbody>
+              <row>
+                <entry>EXECUTION_ID</entry>
+
+                <entry>TYPE_CD</entry>
+
+                <entry>KEY_NAME</entry>
+
+                <entry>LONG_VAL</entry>
+              </row>
+
+              <row>
+                <entry>1</entry>
+
+                <entry>LONG</entry>
+
+                <entry>piece.count</entry>
+
+                <entry>40321</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>In this case, the <classname>Step</classname> ran for 30
+      minutes and processed 40,321 'pieces', which would represent lines in a
+      file in this scenario. This value will be updated just before each
+      commit by the framework, and can contain multiple rows corresponding to
+      entries within the <classname>ExecutionContext</classname>. Being
+      notified before a commit requires one of the various StepListeners, or
+      an <classname>ItemStream</classname>, which are discussed in more detail
+      later in this guide. As with the previous example, it is assumed that
+      the Job is restarted the next day. When it is restarted, the values from
+      the <classname>ExecutionContext</classname> of the last run are
+      reconstituted from the database, and when the
       <classname>ItemReader</classname> is opened, it can check to see if it
       has any stored state in the context, and initialize itself from
       there:</para>
@@ -767,14 +912,17 @@
     }
   }</programlisting>
 
-      <para>The <classname>ExecutionContext</classname> can also be used for
-      startistics that need to be persisted about the run itself. For example,
-      if a flat file contains orders for processing that exist across multiple
-      lines, it may be necessary to store how many orders have been processed
-      (which is much different from than the number of lines read) so that an
-      email can be sent at the end of the <classname>Step</classname> with the
-      total orders processed in the body. The framework handles storing this
-      for the developer, in order to correctly scope it with an individual
+      <para>In this case, after the above code is executed, the current line
+      will be 40,322, allowing the <classname>Step</classname> to start again
+      from where it left off. The <classname>ExecutionContext</classname> can
+      also be used for statistics that need to be persisted about the run
+      itself. For example, if a flat file contains orders for processing that
+      exist across multiple lines, it may be necessary to store how many
+      orders have been processed (which is much different from than the number
+      of lines read) so that an email can be sent at the end of the
+      <classname>Step</classname> with the total orders processed in the body.
+      The framework handles storing this for the developer, in order to
+      correctly scope it with an individual
       <classname>JobInstance</classname>. It can be very difficult to know
       whether an existing <classname>ExecutionContext</classname> should be
       used or not. For example, using the 'EndOfDay' example from above, when
