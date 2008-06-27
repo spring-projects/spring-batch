@@ -16,7 +16,7 @@ import org.springframework.util.Assert;
  */
 public abstract class AbstractBufferedItemReaderItemStream implements ItemReader, ItemStream {
 
-	private static final String ITEM_COUNT = "item.count";
+	private static final String ITEM_COUNT = "piece.count";
 
 	private int currentItemCount = 0;
 
