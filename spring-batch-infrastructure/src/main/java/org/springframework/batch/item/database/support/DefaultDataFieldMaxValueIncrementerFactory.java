@@ -26,8 +26,8 @@ import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrem
 import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIncrementer;
 
 /**
- * Default implementation of the {@link DataFieldMaxValueIncrementerFactory} interface. Valid types
- * are:
+ * Default implementation of the {@link DataFieldMaxValueIncrementerFactory}
+ * interface. Valid types are:
  * 
  * Valid values are:
  * 
@@ -59,6 +59,20 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 
 	private DataSource dataSource;
 
+	private String primaryKeyColumnName = "id";
+
+	/**
+	 * Public setter for the primary key column name (defaults to "id"). Only
+	 * used by some platforms (Derby, HSQL, MySQL), and should be fine for use
+	 * with Spring Batch meta data as long as the default batch schema hasn't
+	 * been changed.
+	 * 
+	 * @param primaryKeyColumnName the primary key column name to set
+	 */
+	public void setPrimaryKeyColumnName(String primaryKeyColumnName) {
+		this.primaryKeyColumnName = primaryKeyColumnName;
+	}
+
 	public DefaultDataFieldMaxValueIncrementerFactory(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
@@ -66,15 +80,20 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 	public DataFieldMaxValueIncrementer getIncrementer(String incrementerType, String incrementerName) {
 		if (DB_TYPE_DB2.equals(incrementerType)) {
 			return new DB2SequenceMaxValueIncrementer(dataSource, incrementerName);
-		} else if (DB_TYPE_DERBY.equals(incrementerType)) {
-			return new DerbyMaxValueIncrementer(dataSource, incrementerName, "id");
-		} else if (DB_TYPE_HSQL.equals(incrementerType)) {
-			return new HsqlMaxValueIncrementer(dataSource, incrementerName, "id");
-		} else if (DB_TYPE_MYSQL.equals(incrementerType)) {
-			return new MySQLMaxValueIncrementer(dataSource, incrementerName, "id");
-		} else if (DB_TYPE_ORACLE.equals(incrementerType)) {
+		}
+		else if (DB_TYPE_DERBY.equals(incrementerType)) {
+			return new DerbyMaxValueIncrementer(dataSource, incrementerName, primaryKeyColumnName);
+		}
+		else if (DB_TYPE_HSQL.equals(incrementerType)) {
+			return new HsqlMaxValueIncrementer(dataSource, incrementerName, primaryKeyColumnName);
+		}
+		else if (DB_TYPE_MYSQL.equals(incrementerType)) {
+			return new MySQLMaxValueIncrementer(dataSource, incrementerName, primaryKeyColumnName);
+		}
+		else if (DB_TYPE_ORACLE.equals(incrementerType)) {
 			return new OracleSequenceMaxValueIncrementer(dataSource, incrementerName);
-		} else if (DB_TYPE_POSTGRES.equals(incrementerType)) {
+		}
+		else if (DB_TYPE_POSTGRES.equals(incrementerType)) {
 			return new PostgreSQLSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		throw new IllegalArgumentException("databaseType argument was not on the approved list");
@@ -83,11 +102,12 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 
 	public boolean isSupportedIncrementerType(String incrementerType) {
 		if (!DB_TYPE_DB2.equals(incrementerType) && !DB_TYPE_DERBY.equals(incrementerType)
-		        && !DB_TYPE_HSQL.equals(incrementerType) && !DB_TYPE_MYSQL.equals(incrementerType)
-		        && !DB_TYPE_ORACLE.equals(incrementerType) && !DB_TYPE_POSTGRES.equals(incrementerType)) {
+				&& !DB_TYPE_HSQL.equals(incrementerType) && !DB_TYPE_MYSQL.equals(incrementerType)
+				&& !DB_TYPE_ORACLE.equals(incrementerType) && !DB_TYPE_POSTGRES.equals(incrementerType)) {
 
 			return false;
-		} else {
+		}
+		else {
 			return true;
 		}
 	}
