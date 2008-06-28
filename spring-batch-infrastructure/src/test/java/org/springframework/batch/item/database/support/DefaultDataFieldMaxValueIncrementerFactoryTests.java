@@ -20,7 +20,6 @@ import javax.sql.DataSource;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.jdbc.support.incrementer.DB2SequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DerbyMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
@@ -34,7 +33,7 @@ import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIn
  */
 public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 
-	DataFieldMaxValueIncrementerFactory factory;
+	private DefaultDataFieldMaxValueIncrementerFactory factory;
 	
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -88,6 +87,7 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 	}
 
 	public void testOracle(){
+		factory.setIncrementerColumnName("ID");
 		assertTrue(factory.getIncrementer("oracle", "NAME") instanceof OracleSequenceMaxValueIncrementer);
 	}
 

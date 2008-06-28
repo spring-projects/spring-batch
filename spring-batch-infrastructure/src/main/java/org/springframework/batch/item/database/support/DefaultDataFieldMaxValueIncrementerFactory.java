@@ -59,18 +59,18 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 
 	private DataSource dataSource;
 
-	private String primaryKeyColumnName = "id";
+	private String incrementerColumnName = "id";
 
 	/**
-	 * Public setter for the primary key column name (defaults to "id"). Only
-	 * used by some platforms (Derby, HSQL, MySQL), and should be fine for use
-	 * with Spring Batch meta data as long as the default batch schema hasn't
-	 * been changed.
+	 * Public setter for the column name (defaults to "id") in the incrementer.
+	 * Only used by some platforms (Derby, HSQL, MySQL), and should be fine for
+	 * use with Spring Batch meta data as long as the default batch schema
+	 * hasn't been changed.
 	 * 
-	 * @param primaryKeyColumnName the primary key column name to set
+	 * @param incrementerColumnName the primary key column name to set
 	 */
-	public void setPrimaryKeyColumnName(String primaryKeyColumnName) {
-		this.primaryKeyColumnName = primaryKeyColumnName;
+	public void setIncrementerColumnName(String incrementerColumnName) {
+		this.incrementerColumnName = incrementerColumnName;
 	}
 
 	public DefaultDataFieldMaxValueIncrementerFactory(DataSource dataSource) {
@@ -82,13 +82,13 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 			return new DB2SequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (DB_TYPE_DERBY.equals(incrementerType)) {
-			return new DerbyMaxValueIncrementer(dataSource, incrementerName, primaryKeyColumnName);
+			return new DerbyMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
 		}
 		else if (DB_TYPE_HSQL.equals(incrementerType)) {
-			return new HsqlMaxValueIncrementer(dataSource, incrementerName, primaryKeyColumnName);
+			return new HsqlMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
 		}
 		else if (DB_TYPE_MYSQL.equals(incrementerType)) {
-			return new MySQLMaxValueIncrementer(dataSource, incrementerName, primaryKeyColumnName);
+			return new MySQLMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
 		}
 		else if (DB_TYPE_ORACLE.equals(incrementerType)) {
 			return new OracleSequenceMaxValueIncrementer(dataSource, incrementerName);
