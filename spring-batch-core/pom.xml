@@ -213,6 +213,34 @@
 									<fileset dir="${basedir}/src/main/sql" includes="schema*.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-mysql.sql" />
 								</vppcopy>
+								<!-- Reference script for MS SQLServer - N.B. not under source control, but packaged in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/sqlserver.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/sqlserver.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-sqlserver.sql" />
+								</vppcopy>
+								<!-- Reference script for Sybase - N.B. not under source control, but packaged in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/sybase.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/sybase.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-sybase.sql" />
+								</vppcopy>
 							</tasks>
 						</configuration>
 						<goals>
