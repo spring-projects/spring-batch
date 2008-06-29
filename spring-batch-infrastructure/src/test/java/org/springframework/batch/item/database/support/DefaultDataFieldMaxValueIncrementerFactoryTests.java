@@ -26,6 +26,8 @@ import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.SqlServerMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
 
 /**
  * @author Lucas Ward
@@ -52,6 +54,8 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 		assertTrue(factory.isSupportedIncrementerType("oracle"));
 		assertTrue(factory.isSupportedIncrementerType("postgres"));
 		assertTrue(factory.isSupportedIncrementerType("hsql"));
+		assertTrue(factory.isSupportedIncrementerType("sqlserver"));
+		assertTrue(factory.isSupportedIncrementerType("sybase"));
 	}
 	
 	public void testUnsupportedDatabaseType(){
@@ -101,6 +105,14 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 	
 	public void testPostgres(){
 		assertTrue(factory.getIncrementer("postgres", "NAME") instanceof PostgreSQLSequenceMaxValueIncrementer);
+	}
+
+	public void testMsSqlServer(){
+		assertTrue(factory.getIncrementer("sqlserver", "NAME") instanceof SqlServerMaxValueIncrementer);
+	}
+
+	public void testSybase(){
+		assertTrue(factory.getIncrementer("sybase", "NAME") instanceof SybaseMaxValueIncrementer);
 	}
 
 
