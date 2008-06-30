@@ -16,7 +16,8 @@
 package org.springframework.batch.item;
 
 /**
- * Exception indicating that an {@link ItemReader} found no work to process while initializing.
+ * Exception indicating no work was found - e.g. the input is empty or
+ * more generally no items were processed.
  * 
  * @author Lucas Ward
  * @author Ben Hale

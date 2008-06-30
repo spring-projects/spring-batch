@@ -18,6 +18,7 @@ package org.springframework.batch.core.step;
 
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -25,19 +26,13 @@ import org.springframework.batch.repeat.ExitStatus;
  * 
  * @author Robert Kasanicky
  */
-public class NoItemsProcessedDetector extends StepExecutionListenerSupport {
+public class NoWorkFoundListener extends StepExecutionListenerSupport {
 
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		if (stepExecution.getItemCount().intValue() == 0) {
-			throw new NoItemsProcessedException("Step has not processed any items");
+			throw new NoWorkFoundException("Step has not processed any items");
 		}
 		return stepExecution.getExitStatus();
-	}
-
-	private static class NoItemsProcessedException extends RuntimeException {
-		public NoItemsProcessedException(String message) {
-			super(message);
-		}
 	}
 
 }

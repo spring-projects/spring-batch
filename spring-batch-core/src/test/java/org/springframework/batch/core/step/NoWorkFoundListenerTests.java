@@ -20,10 +20,11 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.NoWorkFoundException;
 
-public class NoItemsProcessedDetectorTests extends TestCase {
+public class NoWorkFoundListenerTests extends TestCase {
 
-    private NoItemsProcessedDetector tested = new NoItemsProcessedDetector();
+    private NoWorkFoundListener tested = new NoWorkFoundListener();
 
     /**
      *  If item count is zero exception is thrown
@@ -38,7 +39,7 @@ public class NoItemsProcessedDetectorTests extends TestCase {
         try {
             tested.afterStep(stepExecution);
             fail();
-        } catch (RuntimeException e) {
+        } catch (NoWorkFoundException e) {
            assertEquals("Step has not processed any items", e.getMessage());
         }
     }
