@@ -457,6 +457,12 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 			Object item = iterator.next();
 			serializer.serializeObject(eventWriter, item);
 		}
+		try {
+			eventWriter.flush();
+		}
+		catch (XMLStreamException e) {
+			throw new FlushFailedException("Failed to flush the events", e);
+		}
 		buffer.clear();
 
 		lastCommitPointPosition = getPosition();

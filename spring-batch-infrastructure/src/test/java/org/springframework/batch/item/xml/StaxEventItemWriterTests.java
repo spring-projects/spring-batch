@@ -88,7 +88,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.write(item);
 		// rollback
 		writer.clear();
-		assertEquals("", outputFileContent());
+		assertFalse(outputFileContent().contains(TEST_STRING));
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.open(executionContext);
 		writer.write(item);
 		String content = outputFileContent();
-		assertEquals("", content);
+		assertFalse(content.contains(TEST_STRING));
 		writer.flush();
 		content = outputFileContent();
 		assertTrue("Wrong content: "+content, contains(content, TEST_STRING));
@@ -143,10 +143,8 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.setHeaderItems(new Object[] {header1, header2});
 		writer.open(executionContext);
 		writer.write(item);
-		String content = outputFileContent();
-		assertEquals("", content);
 		writer.flush();
-		content = outputFileContent();
+		String content = outputFileContent();
 		assertTrue("Wrong content: "+content, contains(content, "<!--" + header1 + "-->"));
 		assertTrue("Wrong content: "+content, contains(content, "<!--" + header2 + "-->"));
 		assertTrue("Wrong content: "+content, contains(content, TEST_STRING));
@@ -160,13 +158,11 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.setHeaderItems(new Object[] {header});
 		writer.open(executionContext);
 		writer.write(item);
-		String content = outputFileContent();
-		assertEquals("", content);
 		writer.clear();
 		writer.open(executionContext);
 		writer.write(item);
 		writer.flush();
-		content = outputFileContent();
+		String content = outputFileContent();
 		assertEquals("Wrong content: "+content, 1, countContains(content, "<!--" + header + "-->"));
 		assertEquals("Wrong content: "+content, 1, countContains(content, TEST_STRING));
 	}
@@ -179,8 +175,6 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.setHeaderItems(new Object[] {header});
 		writer.open(executionContext);
 		writer.write(item);
-		String content = outputFileContent();
-		assertEquals("", content);
 		writer.flush();
 		writer.update(executionContext);
 		writer.close(executionContext);
@@ -188,7 +182,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.write(item);
 		writer.clear();
 		writer.flush();
-		content = outputFileContent();
+		String content = outputFileContent();
 		assertEquals("Wrong content: "+content, 1, countContains(content, "<!--" + header + "-->"));
 		assertEquals("Wrong content: "+content, 1, countContains(content, TEST_STRING));
 	}
