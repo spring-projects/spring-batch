@@ -64,7 +64,7 @@ public class JdbcGameDaoIntegrationTests extends AbstractTransactionalDataSource
 		gameDao.write(game);
 
 		Game tempGame = (Game) getJdbcTemplate().queryForObject("SELECT * FROM GAMES where PLAYER_ID=? AND YEAR_NO=?",
-				new Object[] { game.getId(), new Integer(game.getYear()) }, new GameRowMapper());
+				new Object[] { "XXXXX00 ", new Integer(game.getYear()) }, new GameRowMapper());
 		assertEquals(tempGame, game);
 	}
 
