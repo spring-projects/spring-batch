@@ -1,0 +1,38 @@
+Spring Batch 1.1 Release Notes
+
+
+* Notable new features:
+
+  * Job-level execution context (shared among all steps)
+
+  * MultiResourceItemReader for reading multi-file input
+
+  * SystemCommandTasklet for executing system commands
+
+  * FlatFileItemWriter and StaxEventItemWriter support headers
+
+  * Maven archetype
+
+  * Modifiable transaction attributes for ItemOrientedStep
+
+  * StepExecutionSimpleCompletionPolicy for pulling commit interval from JobParameters
+
+  * MapJobRepositoryFactoryBean for easy setup of in-memory repository
+
+  * StepExecution has persistent rollbackCount, readSkipCount and writeSkipCount
+
+  * NoWorkFoundListener can be used to fail the step if no work was done (e.g. input was empty)
+
+
+* Other
+
+  * StatefulRetryStepFactoryBean is deprecated - use SkipLimitStepFactoryBean instead
+
+
+* Upgrade instructions from 1.0.1 to 1.1
+
+  * update the database schema using the update script (or create a fresh schema) - note that 1.0.x jobs won't work with 1.1 schema
+  
+  * use the updated simple-job-launcher-context.xml
+ 
+  * jobs should run without modification
