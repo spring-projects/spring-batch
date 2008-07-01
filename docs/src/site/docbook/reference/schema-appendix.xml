@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+<!DOCTYPE appendix PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <appendix>
   <title>Meta-Data Schema</title>
@@ -156,7 +156,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
         <para>JOB_INSTANCE_ID: Foreign Key from the BATCH_JOB_INSTANCE table
         that indicates the job instance the parameter entry belongs to. It
         should be noted that multiple rows (i.e key/value pairs) may exist for
-        each instance. </para>
+        each instance.</para>
       </listitem>
 
       <listitem>
@@ -328,7 +328,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
 
       <listitem>
         <para>START_TIME: Timestamp representing the time the execution was
-        started. </para>
+        started.</para>
       </listitem>
 
       <listitem>
@@ -376,7 +376,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
   </section>
 
   <section>
-    <title>BATCH_STEP_EXECUTION_CONTEXT</title>
+    <title>BATCH_EXECUTION_CONTEXT</title>
 
     <para>The BATCH_STEP_EXECUTION_CONTEXT table holds all information
     relevant to an <classname>ExecutionContext</classname>. There is exactly
@@ -389,7 +389,8 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     a column to determine the type:</para>
 
     <programlisting>CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT  (
-  STEP_EXECUTION_ID BIGINT NOT NULL ,
+  EXECUTION_ID BIGINT NOT NULL ,
+  DISCRIMINATOR VARCHAR2(1) NOT NULL,
   TYPE_CD VARCHAR(6) NOT NULL ,
   KEY_NAME VARCHAR(1000) NOT NULL , 
   STRING_VAL VARCHAR(1000) , 
@@ -397,18 +398,22 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
   LONG_VAL VARCHAR(10) ,
   DOUBLE_VAL DOUBLE PRECISION ,
   OBJECT_VAL BLOB,
-  constraint STEP_EXECUTION_CONTEXT_FK foreign key (STEP_EXECUTION_ID)
-  references BATCH_STEP_EXECUTION(STEP_EXECUTION_ID)
 ) ;</programlisting>
 
     <para>Below are descriptions for each column:</para>
 
     <itemizedlist>
       <listitem>
-        <para>STEP_EXECUTION_ID: Foreign key representing the
-        <classname>StepExecution</classname> to which the context belongs.
-        There may be more than one row associated to a given
-        <classname>StepExecution</classname>.</para>
+        <para>EXECUTION_ID: Foreign key representing the
+        <classname>StepExecution</classname> or
+        <classname>JobExecution</classname> to which the context belongs.
+        There may be more than one row associated to a given execution.</para>
+      </listitem>
+
+      <listitem>
+        <para>DISCRIMINATOR: Character indicating whether or not the entry is
+        job or step scoped. (i.e. does it belong to the JobExecution or
+        StepExecution)</para>
       </listitem>
 
       <listitem>
