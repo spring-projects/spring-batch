@@ -38,7 +38,15 @@ public class JdbcPlayerDaoIntegrationTests extends AbstractTransactionalDataSour
 		player.setBirthYear(1975);
 		player.setDebutYear(1998);
 	}
-	
+
+
+	protected void onSetUpInTransaction() throws Exception {
+		super.onSetUpInTransaction();
+
+		jdbcTemplate.execute("delete from PLAYERS");
+
+	}
+
 	public void testSavePlayer(){
 		
 		playerDao.savePlayer(player);

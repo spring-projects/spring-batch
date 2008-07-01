@@ -56,6 +56,13 @@ public class JdbcPlayerSummaryDaoIntegrationTests extends
 		summary.setTotalTd(0);
 	}
 
+	protected void onSetUpInTransaction() throws Exception {
+		super.onSetUpInTransaction();
+
+		jdbcTemplate.execute("delete from PLAYER_SUMMARY");
+
+	}
+	
 	public void testWrite() {
 
 		playerSummaryDao.write(summary);
