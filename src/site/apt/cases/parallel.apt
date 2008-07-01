@@ -149,7 +149,7 @@ Use Case: Massively Parallel Batch Processing
   Consider two examples: a file input source and a JDBC (SQL query)
   based input source.  Each provides its own challenges.
 
-*** File Data Source Partitioning
+*** File Data Source
 
   * If each node reads the whole file there could be a performance
   issue.  They would all need to have instructions about which lines
@@ -163,16 +163,15 @@ Use Case: Massively Parallel Batch Processing
   * But if each input record can span a variable number of lines (not
   that unlikely in practice), then we can't use line numbers
 
-  * Maybe the best solution is to have a single process parsing the
-  file and sending it to a message queue, either formally using a
-  messaging infrastructure or informally using some sort of
-  roll-your-own approach.  The integration pattern could then be a
+  * Maybe the best solution is to use middleware anyway.  A single
+  process parses the file and sends it to a message queue, item by
+  item (or chunk by chunk).  The integration pattern could then be a
   simple Eager Consumer, assuming that all records are processed
   independently.  The messaging semantics would simply have to ensure
   that a consumer can roll back and return the input records to a
   queue for another consumer to retry.
 
-  For large batches a real messaging infrastructure (JMS etc.) with
+  * For large batches a real messaging infrastructure (JMS etc.) with
   guaranteed delivery would be a benefit, but might be seen as
   overkill for a system that didn't otherwise require it.  In this
   case we could imagine the partitioning process being one of simply
@@ -182,19 +181,15 @@ Use Case: Massively Parallel Batch Processing
 
   * What would parallel processing look like to the client?  We can
   make it completely transparent if we assume that the client only
-  ever implements <<<ItemProvider>>> and <<<ItemProcessor>>>.  The
-  client code is unaware of the partitioning of its data source:
-
-+---
-batchTemplate.iterate(new ItemProviderRepeatCallback(provider, processor));
-+---
+  ever implements <<<ItemReader>>> and <<<ItemWriter>>>.  The
+  client code is unaware of the partitioning of its data source.
 
   * Parallelisation could also take place at the level of the
-  <<<ItemProvider>>> - we could proxy the data provider and wrap it in
+  <<<ItemReader>>> - we could proxy the data provider and wrap it in
   a partitioning proxy:
 
 +---
-<bean id="itemProvider" 
+<bean id="itemReader" 
     class="org.springframework.aop.framework.ProxyFactoryBean">
 
     <property name="target">
@@ -260,7 +255,7 @@ batchTemplate.iterate(new ItemProviderRepeatCallback(provider, processor));
 
 +---
 <bean id="inputSource" 
-    class="test.input.SqlInputDataProvider">
+    class="test.input.SqlInputItemReader">
 
     <property name="query">
         <value>SELECT * from T_INPUT</value>

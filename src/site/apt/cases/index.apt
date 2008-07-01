@@ -29,7 +29,8 @@ Use Cases for Spring Batch
     * {{{parallel.html}Massively Parallel Batch Processing}}.  Spring
     Batch 1.0 does not contain any implementations of this use case,
     but it is quite feasible to implement them using the framework as
-    a starting point.
+    a starting point.  1.1 has some prototype code under the Integration
+    module.
 
     * {{{restart.html}Manual Restart After Failure}}
 

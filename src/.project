@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>src</name>
+	<name>spring-batch</name>
 	<comment></comment>
 	<projects>
 	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>pom.xml</name>
+			<type>1</type>
+			<locationURI>SPRING_BATCH/pom.xml</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

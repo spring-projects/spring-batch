@@ -1,0 +1,3 @@
+#macro (sequence $name)CREATE TABLE ${name} (ID BIGINT IDENTITY);
+#end
+#macro (notnull $name $type)ALTER COLUMN ${name} ${type} NOT NULL#end

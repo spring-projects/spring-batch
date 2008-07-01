@@ -189,6 +189,18 @@
 			<version>10.2.1.6</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jtds</groupId>
+			<artifactId>jtds</artifactId>
+			<version>1.2.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.oracle.jdbc</groupId>
+			<artifactId>com.springsource.oracle.jdbc</artifactId>
+			<version>10.2.0.2</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -342,6 +354,34 @@
 									</config>
 									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-mysql.sql" />
+								</vppcopy>
+								<!-- Reference script for MS SQLServer - N.B. not under source control, but packaged in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/sqlserver.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/sqlserver.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-sqlserver.sql" />
+								</vppcopy>
+								<!-- Reference script for Sybase - N.B. not under source control, but packaged in jar. -->
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/sybase.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/sybase.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-sybase.sql" />
 								</vppcopy>
 							</tasks>
 						</configuration>

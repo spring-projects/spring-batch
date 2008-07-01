@@ -70,9 +70,8 @@ $ mvn test -DforkMode=never -Dtest=FootballJobFunctionalTests -Dplayer.file.name
   and feeds changes into other projects in your workspace.  It is not
   recommended to use the Maven Eclipse plugin (<<<mvn
   eclipse:eclipse>>>) because it cannot track dependencies across the
-  Eclipse workspace.  It will also create conflicting Eclipse
-  meta-data every time you run it, which will interfere with the meta
-  data under source control.
+  Eclipse workspace.  It will also create Eclipse meta-data every time
+  you run it, conflicting with the version under source control.
 
 * Dependencies
 
