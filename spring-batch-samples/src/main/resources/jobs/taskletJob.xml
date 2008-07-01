@@ -34,7 +34,7 @@
 					<property name="tasklet">
 						<bean
 							class="org.springframework.batch.sample.tasklet.SystemCommandTasklet">
-							<property name="command" value="echo hello" />
+							<property name="command" value="java -version" />
 							<!-- 5 second timeout for the command to complete -->
 							<property name="timeout" value="5000" />
 						</bean>

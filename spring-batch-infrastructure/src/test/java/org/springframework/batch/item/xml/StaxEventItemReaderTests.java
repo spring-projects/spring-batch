@@ -116,7 +116,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		source.read();
 		source.update(executionContext);
 		System.out.println(executionContext);
-		assertEquals(1, executionContext.getLong(ClassUtils.getShortName(StaxEventItemReader.class) + ".piece.count"));
+		assertEquals(1, executionContext.getLong(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
 		List expectedAfterRestart = (List) source.read();
 
 		source = createNewInputSouce();
@@ -183,7 +183,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	}
 
 	private long extractRecordCount() {
-		return executionContext.getLong(ClassUtils.getShortName(StaxEventItemReader.class) + ".piece.count");
+		return executionContext.getLong(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count");
 	}
 
 	public void testCloseWithoutOpen() throws Exception {

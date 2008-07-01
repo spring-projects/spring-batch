@@ -152,7 +152,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		// get restart data
 		reader.update(executionContext);
 		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
-		        + ".piece.count"));
+		        + ".read.count"));
 		// close input
 		reader.close(executionContext);
 
@@ -167,7 +167,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 		reader.update(executionContext);
 		assertEquals(6, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
-		        + ".piece.count"));
+		        + ".read.count"));
 	}
 
 }
