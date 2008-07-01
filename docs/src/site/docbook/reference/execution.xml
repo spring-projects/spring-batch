@@ -499,16 +499,13 @@
         <section>
           <title>Transaction Configuration For the JobRepository</title>
 
-          <para>If the JDBC daos are used with the JobRepository it is also
-          essential to configure the transactional behaviour of the
+          <para>If either of the JobRepository factory beans are used,
+          transactional advice will be automatically created around the
           repository. This is to ensure that the batch meta data, including
           state that is necessary for restarts after a failure, is persisted
           correctly. The behaviour of the framework is not well defined if the
-          repository methods are not transactional. If you use the
-          <classname>JobRepositoryFactoryBean</classname> then the transaction
-          manager will be set up for you (this was not the case with Spring
-          Batch version 1.0.x). The isolation level in the
-          <code>create*</code> method attiributes is specified separately to
+          repository methods are not transactional. The isolation level in the
+          <code>create*</code> method attributes is specified separately to
           ensure that when jobs are launched there if two processes are trying
           to launch the same job at the same time, only one will succeed. The
           default isolation level for that method is SERIALIZABLE, which is
@@ -517,23 +514,35 @@
           collide in this way. However, since a call to the
           <classname>create*</classname> method is quite short, it is unlikely
           that the SERIALIZED will cause problems, as long as the database
-          platform supports it.</para>
+          platform supports it. However, this can be overriden in the factory
+          beans:</para>
 
-          <para>To use the map DAOs you should add transaction boundaries
-          declaratively to the repository. Here is the relevant
-          configuration:</para>
+          <para><programlisting>  &lt;bean id="jobRepository"
+        class="org.springframework.batch.execution.repository.JobRepositoryFactoryBean"
+    &lt;property name="databaseType" value="hsql" /&gt; 
+    &lt;property name="dataSource" ref="dataSource" /&gt;
+    &lt;property name="transactionManager" ref="transactionManager" /&gt;
+    <emphasis role="bold">&lt;property name="IsolationLevelForCreate" value="ISOLATION_REPEATABLE_READ" /&gt;</emphasis>
+  &lt;/bean&gt;</programlisting></para>
 
-          <para><programlisting>&lt;aop:config&gt;
-    &lt;aop:advisor 
-        pointcut="execution(* org.springframework.batch.core..*Repository+.*(..))"
-    &lt;advice-ref="txAdvice" /&gt;
-&lt;/aop:config&gt;
+          <para>If the factory beans aren't used then it is also essential to
+          configure the transactional behaviour of the repository using
+          AOP:</para>
 
-&lt;tx:advice id="txAdvice" transaction-manager="transactionManager"&gt;
-    &lt;tx:attributes&gt;
-        &lt;tx:method name="*" /&gt;
-    &lt;/tx:attributes&gt;
-&lt;/tx:advice&gt;</programlisting></para>
+          <para><programlisting>  
+  &lt;aop:config&gt;
+      &lt;aop:advisor 
+           pointcut="execution(* org.springframework.batch.core..*Repository+.*(..))"
+      &lt;advice-ref="txAdvice" /&gt;
+  &lt;/aop:config&gt;
+
+  &lt;tx:advice id="txAdvice" transaction-manager="transactionManager"&gt;
+      &lt;tx:attributes&gt;
+          &lt;tx:method name="*" /&gt;
+      &lt;/tx:attributes&gt;
+  &lt;/tx:advice&gt;
+
+</programlisting></para>
 
           <para>This fragment can be used as is, with almost no changes.
           Remember also to include the appropiate namespace declarations and
@@ -586,9 +595,9 @@
                 </row>
 
                 <row>
-                  <entry>BATCH_STEP_EXECUTION_CONTEXT</entry>
+                  <entry>BATCH_EXECUTION_CONTEXT</entry>
 
-                  <entry>STEP_EXECUTION_ID = ? and KEY_NAME = ?</entry>
+                  <entry>EXECUTION_ID = ? and KEY_NAME = ?</entry>
 
                   <entry>On commit interval, a.k.a. chunk</entry>
                 </row>
@@ -620,11 +629,11 @@
       <title>SimpleJob</title>
 
       <para>The only current implementation of the <classname>Job</classname>
-      interface is <classname>SimpleJob</classname>. Since a Job is just a
-      simple loop through a list of Steps, this implementation should be
-      sufficient for the majority of needs. It has only three required
-      dependencies: a name, <classname>JobRepository</classname>, and a list
-      of Steps.</para>
+      interface is <classname>SimpleJob</classname>. Since a
+      <classname>Job</classname> is just a simple loop through a list of
+      Steps, this implementation should be sufficient for the majority of
+      needs. It has only three required dependencies: a name,
+      <classname>JobRepository</classname>, and a list of Steps.</para>
 
       <programlisting>  &lt;bean id="footballJob"
         class="org.springframework.batch.core.job.SimpleJob"&gt;
@@ -654,8 +663,9 @@
         role="bold">It is entirely up to the developer to ensure that a new
         instance is always created in this scenario</emphasis>. However,
         Spring Batch does provide some help. If a Job should never be
-        restarted, but should always be run as part of a new JobInstance, then
-        the restartable property may be set to 'false':</para>
+        restarted, but should always be run as part of a new
+        <classname>JobInstance</classname>, then the restartable property may
+        be set to 'false':</para>
 
         <programlisting>  &lt;bean id="footballJob"
         class="org.springframework.batch.core.job.SimpleJob"&gt;
@@ -1142,9 +1152,9 @@
     &lt;property name="retryableExceptionClasses" value="org.springframework.dao.DeadlockLoserDataAccessException" /&gt;</emphasis>
   &lt;/bean&gt;</programlisting>
 
-        <para>The StatefulRetryStepFactoryBean requires a limit for the number
-        of times an individual item can be retried, and a list of Exceptions
-        that are 'retryable'.</para>
+        <para>The <classname>StatefulRetryStepFactoryBean</classname> requires
+        a limit for the number of times an individual item can be retried, and
+        a list of Exceptions that are 'retryable'.</para>
       </section>
 
       <section>
@@ -1158,20 +1168,27 @@
         there are many scenarios in which exceptions thrown from the
         <classname>ItemWriter</classname> should not cause a rollback because
         no action has taken place to invalidate the transaction. For this
-        reason, the SkipLimitStepFactoryBean can be configured with a list of
-        exceptions that should not cause rollback:</para>
+        reason, the <classname>SkipLimitStepFactoryBean</classname> can be
+        configured with a list of exceptions that should not cause
+        rollback:</para>
 
         <programlisting>  &lt;bean id="step2" 
         class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean"&gt;
     &lt;property name="commitInterval" value="2" /&gt;
     &lt;property name="skipLimit" value="1" /&gt;
-    <emphasis role="bold">&lt;property name="noRollbackForExceptionClasses"
-              value="org.springframework.batch.item.validator.ValidationException" /&gt;</emphasis>
+    &lt;!-- No rollback for exceptions that are marked with "+" in the tx attributes --&gt;
+    <emphasis role="bold">&lt;property name="transactionAttribute"
+      value="+org.springframework.batch.item.validator.ValidationException" /&gt;</emphasis>
     &lt;property name="itemReader"
               ref="tradeSqlItemReader" /&gt;
     &lt;property name="itemWriter"
               ref="itemTrackingWriter" /&gt;
   &lt;/bean&gt;</programlisting>
+
+        <para>The <classname>TransactionAttribute</classname> property above
+        can be used to control multiple other settings such as isolation and
+        propagation behaviour. More information on setting transaction
+        attributes can be found in the spring core documentation.</para>
       </section>
 
       <section>
@@ -1460,6 +1477,27 @@
         class="org.springframework.core.io.FileSystemResource"&gt;
     &lt;constructor-arg value="target/test-outputs/test-dir" /&gt;
   &lt;/bean&gt;</programlisting>
+      </section>
+
+      <section>
+        <title>Executing System Commands</title>
+
+        <para>Many batch jobs may require that an external command be called
+        from within the batch job. Such a process could be kicked off
+        separately by the scheduler, but the advantage of common meta-data
+        about the run would be lost. Furthermore, a multi-step job would also
+        need to be split up into multiple jobs as well. Because the need is so
+        common, Spring Batch provides a <classname>Tasklet</classname>
+        implementation for calling system commands:</para>
+
+        <programlisting>
+  &lt;bean class="org.springframework.batch.sample.tasklet.SystemCommandTasklet"&gt;
+    &lt;property name="command" value="echo hello" /&gt;
+    &lt;!-- 5 second timeout for the command to complete --&gt;
+    &lt;property name="timeout" value="5000" /&gt;
+  &lt;/bean&gt;
+
+</programlisting>
       </section>
     </section>
   </section>
