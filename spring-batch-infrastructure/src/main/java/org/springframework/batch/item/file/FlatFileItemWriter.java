@@ -66,7 +66,7 @@ import org.springframework.util.ClassUtils;
  */
 public class FlatFileItemWriter extends ExecutionContextUserSupport implements ItemWriter, ItemStream, InitializingBean {
 
-	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	private static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
 
 	private static final String WRITTEN_STATISTICS_NAME = "written";
 
@@ -94,6 +94,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 
 	private List headerLines = new ArrayList();
 
+	private String lineSeparator = DEFAULT_LINE_SEPARATOR;
+
 	public FlatFileItemWriter() {
 		setName(ClassUtils.getShortName(FlatFileItemWriter.class));
 	}
@@ -106,6 +108,15 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource, "The resource must be set");
 		Assert.notNull(fieldSetCreator, "A FieldSetCreator must be provided.");
+	}
+
+	/**
+	 * Public setter for the line separator. Defaults to the System property
+	 * line.separator.
+	 * @param lineSeparator the line separator to set
+	 */
+	public void setLineSeparator(String lineSeparator) {
+		this.lineSeparator = lineSeparator;
 	}
 
 	/**
@@ -197,7 +208,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	 */
 	public void write(Object data) throws Exception {
 		FieldSet fieldSet = fieldSetCreator.mapItem(data);
-		lineBuffer.add(lineAggregator.aggregate(fieldSet) + LINE_SEPARATOR);
+		lineBuffer.add(lineAggregator.aggregate(fieldSet) + lineSeparator);
 	}
 
 	/**
@@ -229,7 +240,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		if (outputState.lastMarkedByteOffsetPosition == 0) {
 			for (Iterator iterator = headerLines.iterator(); iterator.hasNext();) {
 				String line = (String) iterator.next();
-				lineBuffer.add(line + LINE_SEPARATOR);
+				lineBuffer.add(line + lineSeparator);
 			}
 		}
 	}

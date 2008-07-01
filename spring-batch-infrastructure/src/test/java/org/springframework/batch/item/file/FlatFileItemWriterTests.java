@@ -181,12 +181,19 @@ public class FlatFileItemWriterTests extends TestCase {
 	 */
 	public void testWriteRecord() throws Exception {
 		String args = "1";
-
-		// AggregatorStub ignores the LineDescriptor, so we pass null
 		writer.write(args);
 		writer.flush();
 		String lineFromFile = readLine();
 		assertEquals(args, lineFromFile);
+	}
+
+	public void testWriteRecordWithrecordSeparator() throws Exception {
+		writer.setLineSeparator("|");
+		writer.write("1");
+		writer.write("2");
+		writer.flush();
+		String lineFromFile = readLine();
+		assertEquals("1|2|", lineFromFile);
 	}
 
 	public void testRollback() throws Exception {
