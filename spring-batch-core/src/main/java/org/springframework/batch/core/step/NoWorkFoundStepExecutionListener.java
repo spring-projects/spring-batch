@@ -26,7 +26,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * 
  * @author Robert Kasanicky
  */
-public class NoWorkFoundListener extends StepExecutionListenerSupport {
+public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
 
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		if (stepExecution.getItemCount().intValue() == 0) {

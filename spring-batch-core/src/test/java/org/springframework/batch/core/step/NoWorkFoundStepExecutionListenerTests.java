@@ -22,9 +22,12 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.NoWorkFoundException;
 
-public class NoWorkFoundListenerTests extends TestCase {
+/**
+ * Tests for {@link NoWorkFoundStepExecutionListener}.
+ */
+public class NoWorkFoundStepExecutionListenerTests extends TestCase {
 
-    private NoWorkFoundListener tested = new NoWorkFoundListener();
+    private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
 
     /**
      *  If item count is zero exception is thrown
