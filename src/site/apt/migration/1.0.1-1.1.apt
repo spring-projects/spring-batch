@@ -33,6 +33,6 @@ Spring Batch 1.1 Release Notes
 
   * update the database schema using the update script (or create a fresh schema) - note that 1.0.x jobs won't work with 1.1 schema
   
-  * use the updated simple-job-launcher-context.xml
+  * use the updated simple-job-launcher-context.xml (or remove TX advice for repository - it is applied automatically, and remove beans 'jobRegistry' and 'jobRegistryBeanPostProcessor')
  
   * jobs should run without modification
